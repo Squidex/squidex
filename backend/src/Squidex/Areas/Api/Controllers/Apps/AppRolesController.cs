@@ -22,16 +22,8 @@ namespace Squidex.Areas.Api.Controllers.Apps;
 /// Update and query apps.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Apps))]
-public sealed class AppRolesController : ApiController
+public sealed class AppRolesController(ICommandBus commandBus, RolePermissionsProvider permissionsProvider) : ApiController(commandBus)
 {
-    private readonly RolePermissionsProvider permissionsProvider;
-
-    public AppRolesController(ICommandBus commandBus, RolePermissionsProvider permissionsProvider)
-        : base(commandBus)
-    {
-        this.permissionsProvider = permissionsProvider;
-    }
-
     /// <summary>
     /// Get app roles.
     /// </summary>

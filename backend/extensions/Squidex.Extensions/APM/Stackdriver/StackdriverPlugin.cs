@@ -18,15 +18,8 @@ namespace Squidex.Extensions.APM.Stackdriver;
 
 public sealed class StackdriverPlugin : IPlugin
 {
-    private sealed class Configurator : ITelemetryConfigurator
+    private sealed class Configurator(string projectId) : ITelemetryConfigurator
     {
-        private readonly string projectId;
-
-        public Configurator(string projectId)
-        {
-            this.projectId = projectId;
-        }
-
         public void Configure(TracerProviderBuilder builder)
         {
             builder.UseStackdriverExporter(projectId);

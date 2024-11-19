@@ -12,22 +12,15 @@ using Squidex.Hosting;
 
 namespace Squidex.Infrastructure.Diagnostics;
 
-public sealed class Diagnoser : IInitializable
+public sealed class Diagnoser(IOptions<DiagnoserOptions> options, IAssetStore assetStore) : IInitializable
 {
     private static readonly TimeSpan DefaultTimeout = TimeSpan.FromMinutes(30);
-    private readonly DiagnoserOptions options;
-    private readonly IAssetStore assetStore;
+    private readonly DiagnoserOptions options = options.Value;
     private Task? scheduledGcDumpTask;
     private Task? scheduledDumpTask;
     private Timer? timer;
 
     public int Order => int.MaxValue;
-
-    public Diagnoser(IOptions<DiagnoserOptions> options, IAssetStore assetStore)
-    {
-        this.options = options.Value;
-        this.assetStore = assetStore;
-    }
 
     public Task InitializeAsync(
         CancellationToken ct)

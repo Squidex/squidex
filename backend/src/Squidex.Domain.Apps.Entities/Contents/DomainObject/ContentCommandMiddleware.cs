@@ -12,22 +12,13 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject;
 
-public sealed class ContentCommandMiddleware : CachingDomainObjectMiddleware<ContentCommand, ContentDomainObject, WriteContent>
+public sealed class ContentCommandMiddleware(
+    IDomainObjectFactory domainObjectFactory,
+    IDomainObjectCache domainObjectCache,
+    IContentEnricher contentEnricher,
+    IContextProvider contextProvider)
+    : CachingDomainObjectMiddleware<ContentCommand, ContentDomainObject, WriteContent>(domainObjectFactory, domainObjectCache)
 {
-    private readonly IContentEnricher contentEnricher;
-    private readonly IContextProvider contextProvider;
-
-    public ContentCommandMiddleware(
-        IDomainObjectFactory domainObjectFactory,
-        IDomainObjectCache domainObjectCache,
-        IContentEnricher contentEnricher,
-        IContextProvider contextProvider)
-        : base(domainObjectFactory, domainObjectCache)
-    {
-        this.contentEnricher = contentEnricher;
-        this.contextProvider = contextProvider;
-    }
-
     protected override async Task<object> EnrichResultAsync(CommandContext context, CommandResult result,
         CancellationToken ct)
     {

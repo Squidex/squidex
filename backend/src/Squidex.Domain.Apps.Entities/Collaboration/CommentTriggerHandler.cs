@@ -19,18 +19,9 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Collaboration;
 
-public sealed class CommentTriggerHandler : IRuleTriggerHandler
+public sealed class CommentTriggerHandler(IScriptEngine scriptEngine, IUserResolver userResolver) : IRuleTriggerHandler
 {
-    private readonly IScriptEngine scriptEngine;
-    private readonly IUserResolver userResolver;
-
     public Type TriggerType => typeof(CommentTrigger);
-
-    public CommentTriggerHandler(IScriptEngine scriptEngine, IUserResolver userResolver)
-    {
-        this.scriptEngine = scriptEngine;
-        this.userResolver = userResolver;
-    }
 
     public bool Handles(AppEvent @event)
     {

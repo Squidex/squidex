@@ -14,7 +14,7 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Users.MongoDb;
 
-public sealed class MongoRoleStore : MongoRepositoryBase<IdentityRole>, IRoleStore<IdentityRole>
+public sealed class MongoRoleStore(IMongoDatabase database) : MongoRepositoryBase<IdentityRole>(database), IRoleStore<IdentityRole>
 {
     static MongoRoleStore()
     {
@@ -27,11 +27,6 @@ public sealed class MongoRoleStore : MongoRepositoryBase<IdentityRole>, IRoleSto
 
             cm.UnmapMember(x => x.ConcurrencyStamp);
         });
-    }
-
-    public MongoRoleStore(IMongoDatabase database)
-        : base(database)
-    {
     }
 
     protected override string CollectionName()

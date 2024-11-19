@@ -17,16 +17,8 @@ namespace Squidex.Areas.Api.Controllers.Templates;
 /// Readonly API for news items.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Templates))]
-public sealed class TemplatesController : ApiController
+public sealed class TemplatesController(ICommandBus commandBus, TemplatesClient templatesClient) : ApiController(commandBus)
 {
-    private readonly TemplatesClient templatesClient;
-
-    public TemplatesController(ICommandBus commandBus, TemplatesClient templatesClient)
-        : base(commandBus)
-    {
-        this.templatesClient = templatesClient;
-    }
-
     /// <summary>
     /// Get all templates.
     /// </summary>

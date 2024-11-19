@@ -14,22 +14,15 @@ using TestSuite.Model;
 
 namespace TestSuite.ApiTests;
 
-public class RuleRunnerTests : IClassFixture<ClientFixture>, IClassFixture<WebhookCatcherFixture>
+public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhookCatcher) : IClassFixture<ClientFixture>, IClassFixture<WebhookCatcherFixture>
 {
     private readonly string secret = Guid.NewGuid().ToString();
     private readonly string schemaName = $"schema-{Guid.NewGuid()}";
     private readonly string schemaNameRef = $"schema-{Guid.NewGuid()}-ref";
     private readonly string contentString = Guid.NewGuid().ToString();
-    private readonly WebhookCatcherClient webhookCatcher;
+    private readonly WebhookCatcherClient webhookCatcher = webhookCatcher.Client;
 
-    public ClientFixture _ { get; }
-
-    public RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhookCatcher)
-    {
-        _ = fixture;
-
-        this.webhookCatcher = webhookCatcher.Client;
-    }
+    public ClientFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_run_rules_on_content_change()

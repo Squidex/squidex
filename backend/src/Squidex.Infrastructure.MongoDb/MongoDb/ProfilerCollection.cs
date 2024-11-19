@@ -12,14 +12,9 @@ using MongoDB.Driver;
 
 namespace Squidex.Infrastructure.MongoDb;
 
-public sealed class ProfilerCollection
+public sealed class ProfilerCollection(IMongoDatabase database)
 {
-    private readonly IMongoCollection<ProfilerDocument> collection;
-
-    public ProfilerCollection(IMongoDatabase database)
-    {
-        collection = database.GetCollection<ProfilerDocument>("system.profile");
-    }
+    private readonly IMongoCollection<ProfilerDocument> collection = database.GetCollection<ProfilerDocument>("system.profile");
 
     public async Task<IReadOnlyList<ProfilerDocument>> GetQueriesAsync(string collectionName,
         CancellationToken ct = default)

@@ -13,14 +13,9 @@ using TestSuite.Model;
 
 namespace TestSuite.ApiTests;
 
-public class SearchTests : IClassFixture<ContentFixture>
+public class SearchTests(ContentFixture fixture) : IClassFixture<ContentFixture>
 {
-    public ContentFixture _ { get; }
-
-    public SearchTests(ContentFixture fixture)
-    {
-        _ = fixture;
-    }
+    public ContentFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_search_asset()

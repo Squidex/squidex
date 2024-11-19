@@ -9,11 +9,11 @@ using Squidex.Assets;
 
 namespace TestSuite.Utils;
 
-public sealed class PauseStream : DelegateStream
+public sealed class PauseStream(Stream innerStream, double pauseAfter) : DelegateStream(innerStream)
 {
-    private readonly int maxLength;
+    private readonly int maxLength = (int)Math.Floor(innerStream.Length * pauseAfter) + 1;
     private long totalRead;
-    private long totalRemaining;
+    private long totalRemaining = innerStream.Length;
     private long seekStart;
 
     public override long Length
@@ -25,14 +25,6 @@ public sealed class PauseStream : DelegateStream
     {
         get => base.Position - seekStart;
         set => throw new NotSupportedException();
-    }
-
-    public PauseStream(Stream innerStream, double pauseAfter)
-        : base(innerStream)
-    {
-        maxLength = (int)Math.Floor(innerStream.Length * pauseAfter) + 1;
-
-        totalRemaining = innerStream.Length;
     }
 
     public override long Seek(long offset, SeekOrigin origin)

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Amazon.Runtime.Internal.Endpoints.StandardLibrary;
 using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.HandleRules;
@@ -18,40 +17,23 @@ using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Runner;
 
-public sealed class RuleRunnerJob : IJobRunner
+public sealed class RuleRunnerJob(
+    IAppProvider appProvider,
+    IEventFormatter eventFormatter,
+    IEventStore eventStore,
+    IRuleEventRepository ruleEventRepository,
+    IRuleService ruleService,
+    IRuleUsageTracker ruleUsageTracker,
+    ILogger<RuleRunnerJob> log)
+    : IJobRunner
 {
     public const string TaskName = "run-rule";
     public const string ArgRuleId = "ruleId";
     public const string ArgSnapshot = "snapshots";
 
     private const int MaxErrors = 10;
-    private readonly IAppProvider appProvider;
-    private readonly IEventFormatter eventFormatter;
-    private readonly IEventStore eventStore;
-    private readonly IRuleEventRepository ruleEventRepository;
-    private readonly IRuleService ruleService;
-    private readonly IRuleUsageTracker ruleUsageTracker;
-    private readonly ILogger<RuleRunnerJob> log;
 
     public string Name => TaskName;
-
-    public RuleRunnerJob(
-        IAppProvider appProvider,
-        IEventFormatter eventFormatter,
-        IEventStore eventStore,
-        IRuleEventRepository ruleEventRepository,
-        IRuleService ruleService,
-        IRuleUsageTracker ruleUsageTracker,
-        ILogger<RuleRunnerJob> log)
-    {
-        this.appProvider = appProvider;
-        this.eventStore = eventStore;
-        this.eventFormatter = eventFormatter;
-        this.ruleEventRepository = ruleEventRepository;
-        this.ruleService = ruleService;
-        this.ruleUsageTracker = ruleUsageTracker;
-        this.log = log;
-    }
 
     public static DomainId? GetRunningRuleId(Job job)
     {

@@ -24,13 +24,21 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents;
 
-public partial class MongoContentRepository : MongoBase<MongoContentEntity>, IContentRepository, IInitializable
+public partial class MongoContentRepository(
+    IMongoDatabase database,
+    IAppProvider appProvider,
+    string shardKey,
+    IOptions<ContentOptions> options,
+    ILogger<MongoContentRepository> log)
+    : MongoBase<MongoContentEntity>, IContentRepository, IInitializable
 {
-    private readonly MongoContentCollection collectionComplete;
-    private readonly MongoContentCollection collectionPublished;
-    private readonly ContentOptions options;
-    private readonly IMongoDatabase database;
-    private readonly IAppProvider appProvider;
+    private readonly MongoContentCollection collectionComplete =
+            new MongoContentCollection($"States_Contents_All3{shardKey}", database, log,
+                ReadPreference.Primary, options.Value.OptimizeForSelfHosting);
+    private readonly MongoContentCollection collectionPublished =
+            new MongoContentCollection($"States_Contents_Published3{shardKey}", database, log,
+                ReadPreference.Secondary, options.Value.OptimizeForSelfHosting);
+    private readonly ContentOptions options = options.Value;
 
     public bool CanUseTransactions { get; private set; }
 
@@ -41,22 +49,6 @@ public partial class MongoContentRepository : MongoBase<MongoContentEntity>, ICo
         BsonEscapedDictionarySerializer<ContentFieldData, ContentData>.Register();
         BsonStringSerializer<Status>.Register();
         MongoContentEntity.RegisterClassMap();
-    }
-
-    public MongoContentRepository(IMongoDatabase database, IAppProvider appProvider, string shardKey,
-        IOptions<ContentOptions> options, ILogger<MongoContentRepository> log)
-    {
-        this.appProvider = appProvider;
-        this.database = database;
-        this.options = options.Value;
-
-        collectionComplete =
-            new MongoContentCollection($"States_Contents_All3{shardKey}", database, log,
-                ReadPreference.Primary, options.Value.OptimizeForSelfHosting);
-
-        collectionPublished =
-            new MongoContentCollection($"States_Contents_Published3{shardKey}", database, log,
-                ReadPreference.Secondary, options.Value.OptimizeForSelfHosting);
     }
 
     public async Task InitializeAsync(

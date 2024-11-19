@@ -13,18 +13,11 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Templates.Extensions;
 
-public sealed class JsonArrayFluidValue : FluidValue
+public sealed class JsonArrayFluidValue(JsonArray value, TemplateOptions options) : FluidValue
 {
-    private readonly JsonArray value;
-    private readonly TemplateOptions options;
+    private readonly JsonArray value = value;
 
     public override FluidValues Type { get; } = FluidValues.Array;
-
-    public JsonArrayFluidValue(JsonArray value, TemplateOptions options)
-    {
-        this.value = value;
-        this.options = options;
-    }
 
     public override bool Equals(FluidValue other)
     {

@@ -16,16 +16,10 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Scripting.Extensions;
 
-public sealed class HttpJintExtension : IJintExtension, IScriptDescriptor
+public sealed class HttpJintExtension(IHttpClientFactory httpClientFactory) : IJintExtension, IScriptDescriptor
 {
     private delegate void HttpJsonDelegate(string url, Action<JsValue> callback, JsValue? headers = null, bool ignoreError = false);
     private delegate void HttpJsonWithBodyDelegate(string url, JsValue body, Action<JsValue> callback, JsValue? headers = null, bool ignoreError = false);
-    private readonly IHttpClientFactory httpClientFactory;
-
-    public HttpJintExtension(IHttpClientFactory httpClientFactory)
-    {
-        this.httpClientFactory = httpClientFactory;
-    }
 
     public void ExtendAsync(ScriptExecutionContext context)
     {

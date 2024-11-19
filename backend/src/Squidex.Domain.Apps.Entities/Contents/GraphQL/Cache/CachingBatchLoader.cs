@@ -16,19 +16,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Cache;
 
 record struct CacheableId<T>(T Id, TimeSpan CacheDuration = default);
 
-internal class CachingBatchDataLoader<TKey, T> : DataLoaderBase<CacheableId<TKey>, T> where TKey : notnull where T : class
+internal class CachingBatchDataLoader<TKey, T>(
+    IQueryCache<TKey, T> queryCache,
+    Func<IEnumerable<TKey>, CancellationToken, Task<IDictionary<TKey, T>>> queryDelegate,
+    bool canCache = true,
+    int maxBatchSize = int.MaxValue)
+    : DataLoaderBase<CacheableId<TKey>, T>(canCache, maxBatchSize) where TKey : notnull where T : class
 {
-    private readonly IQueryCache<TKey, T> queryCache;
-    private readonly Func<IEnumerable<TKey>, CancellationToken, Task<IDictionary<TKey, T>>> queryDelegate;
-
-    public CachingBatchDataLoader(IQueryCache<TKey, T> queryCache,
-        Func<IEnumerable<TKey>, CancellationToken, Task<IDictionary<TKey, T>>> queryDelegate, bool canCache = true, int maxBatchSize = int.MaxValue)
-        : base(canCache, maxBatchSize)
-    {
-        this.queryCache = queryCache;
-        this.queryDelegate = queryDelegate;
-    }
-
     protected override async Task FetchAsync(IEnumerable<DataLoaderPair<CacheableId<TKey>, T>> list,
         CancellationToken cancellationToken)
     {

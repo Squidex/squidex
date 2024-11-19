@@ -16,11 +16,8 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Text;
 
-public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndexEntity<T>>, ITextIndex, IDeleter where T : class
+public abstract class MongoTextIndexBase<T>(IMongoDatabase database, string shardKey, CommandFactory<T> factory) : MongoRepositoryBase<MongoTextIndexEntity<T>>(database), ITextIndex, IDeleter where T : class
 {
-    private readonly CommandFactory<T> factory;
-    private readonly string shardKey;
-
     protected sealed class MongoTextResult
     {
         [BsonId]
@@ -34,13 +31,6 @@ public abstract class MongoTextIndexBase<T> : MongoRepositoryBase<MongoTextIndex
         [BsonIgnoreIfDefault]
         [BsonElement("score")]
         public double Score { get; set; }
-    }
-
-    protected MongoTextIndexBase(IMongoDatabase database, string shardKey, CommandFactory<T> factory)
-        : base(database)
-    {
-        this.shardKey = shardKey;
-        this.factory = factory;
     }
 
     protected override Task SetupCollectionAsync(IMongoCollection<MongoTextIndexEntity<T>> collection,

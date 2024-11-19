@@ -10,15 +10,9 @@ using Squidex.Domain.Users;
 
 namespace Squidex.Web.Pipeline;
 
-public sealed class SetupMiddleware
+public sealed class SetupMiddleware(RequestDelegate next)
 {
-    private readonly RequestDelegate next;
     private bool isUserFound;
-
-    public SetupMiddleware(RequestDelegate next)
-    {
-        this.next = next;
-    }
 
     public async Task InvokeAsync(HttpContext context, IUserService userService)
     {

@@ -12,18 +12,9 @@ using Squidex.Infrastructure.Security;
 
 namespace Squidex.Web.Pipeline;
 
-public sealed class CachingKeysMiddleware
+public sealed class CachingKeysMiddleware(CachingManager cachingManager, IOptions<CachingOptions> cachingOptions, RequestDelegate next)
 {
-    private readonly CachingOptions cachingOptions;
-    private readonly CachingManager cachingManager;
-    private readonly RequestDelegate next;
-
-    public CachingKeysMiddleware(CachingManager cachingManager, IOptions<CachingOptions> cachingOptions, RequestDelegate next)
-    {
-        this.cachingOptions = cachingOptions.Value;
-        this.cachingManager = cachingManager;
-        this.next = next;
-    }
+    private readonly CachingOptions cachingOptions = cachingOptions.Value;
 
     public async Task InvokeAsync(HttpContext context)
     {

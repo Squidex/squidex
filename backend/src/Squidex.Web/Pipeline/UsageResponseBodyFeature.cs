@@ -10,11 +10,10 @@ using Microsoft.AspNetCore.Http.Features;
 
 namespace Squidex.Web.Pipeline;
 
-internal sealed class UsageResponseBodyFeature : IHttpResponseBodyFeature
+internal sealed class UsageResponseBodyFeature(IHttpResponseBodyFeature inner) : IHttpResponseBodyFeature
 {
-    private readonly IHttpResponseBodyFeature inner;
-    private readonly UsageStream usageStream;
-    private readonly UsagePipeWriter usageWriter;
+    private readonly UsageStream usageStream = new UsageStream(inner.Stream);
+    private readonly UsagePipeWriter usageWriter = new UsagePipeWriter(inner.Writer);
     private long bytesWritten;
 
     public long BytesWritten
@@ -30,14 +29,6 @@ internal sealed class UsageResponseBodyFeature : IHttpResponseBodyFeature
     public PipeWriter Writer
     {
         get => usageWriter;
-    }
-
-    public UsageResponseBodyFeature(IHttpResponseBodyFeature inner)
-    {
-        usageStream = new UsageStream(inner.Stream);
-        usageWriter = new UsagePipeWriter(inner.Writer);
-
-        this.inner = inner;
     }
 
     public Task StartAsync(

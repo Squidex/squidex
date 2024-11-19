@@ -12,14 +12,9 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Core.Scripting;
 
-public abstract class ScriptExecutionContext : ScriptVars
+public abstract class ScriptExecutionContext(Engine engine) : ScriptVars
 {
-    public Engine Engine { get; }
-
-    protected ScriptExecutionContext(Engine engine)
-    {
-        Engine = engine;
-    }
+    public Engine Engine { get; } = engine;
 
     public abstract JsValue Evaluate(Prepared<Script> script);
 

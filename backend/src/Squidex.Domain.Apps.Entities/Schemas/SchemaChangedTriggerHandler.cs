@@ -18,16 +18,9 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Schemas;
 
-public sealed class SchemaChangedTriggerHandler : IRuleTriggerHandler
+public sealed class SchemaChangedTriggerHandler(IScriptEngine scriptEngine) : IRuleTriggerHandler
 {
-    private readonly IScriptEngine scriptEngine;
-
     public Type TriggerType => typeof(SchemaChangedTrigger);
-
-    public SchemaChangedTriggerHandler(IScriptEngine scriptEngine)
-    {
-        this.scriptEngine = scriptEngine;
-    }
 
     public bool Handles(AppEvent appEvent)
     {

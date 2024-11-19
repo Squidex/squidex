@@ -25,24 +25,14 @@ namespace Squidex.Areas.IdentityServer.Controllers.Profile;
 
 [Authorize]
 [AutoValidateAntiforgeryToken]
-public sealed class ProfileController : IdentityServerController
+public sealed class ProfileController(
+    IOptions<MyIdentityOptions> identityOptions,
+    IUserPictureStore userPictureStore,
+    IUserService userService,
+    IAssetThumbnailGenerator assetGenerator)
+    : IdentityServerController
 {
-    private readonly IUserPictureStore userPictureStore;
-    private readonly IUserService userService;
-    private readonly IAssetThumbnailGenerator assetGenerator;
-    private readonly MyIdentityOptions identityOptions;
-
-    public ProfileController(
-        IOptions<MyIdentityOptions> identityOptions,
-        IUserPictureStore userPictureStore,
-        IUserService userService,
-        IAssetThumbnailGenerator assetGenerator)
-    {
-        this.identityOptions = identityOptions.Value;
-        this.userPictureStore = userPictureStore;
-        this.userService = userService;
-        this.assetGenerator = assetGenerator;
-    }
+    private readonly MyIdentityOptions identityOptions = identityOptions.Value;
 
     [HttpGet]
     [Route("account/profile/")]

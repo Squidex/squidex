@@ -18,12 +18,8 @@ namespace Squidex.Domain.Apps.Core.Scripting.Internal;
 
 public static class JsonMapper
 {
-    private sealed class JsonObjectInstance : ObjectInstance
+    private sealed class JsonObjectInstance(Engine engine) : ObjectInstance(engine)
     {
-        public JsonObjectInstance(Engine engine)
-            : base(engine)
-        {
-        }
     }
 
     public static JsValue Map(JsonValue value, Engine engine)

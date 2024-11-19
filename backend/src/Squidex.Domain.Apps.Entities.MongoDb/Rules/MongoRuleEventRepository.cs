@@ -16,13 +16,8 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Rules;
 
-public sealed class MongoRuleEventRepository : MongoRepositoryBase<MongoRuleEventEntity>, IRuleEventRepository, IDeleter
+public sealed class MongoRuleEventRepository(IMongoDatabase database) : MongoRepositoryBase<MongoRuleEventEntity>(database), IRuleEventRepository, IDeleter
 {
-    public MongoRuleEventRepository(IMongoDatabase database)
-        : base(database)
-    {
-    }
-
     protected override string CollectionName()
     {
         return "RuleEvents";

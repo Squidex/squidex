@@ -17,10 +17,8 @@ namespace Squidex.Domain.Apps.Entities.Assets;
 
 public sealed class FileTagAssetMetadataSource : IAssetMetadataSource
 {
-    private sealed class FileAbstraction : IFileAbstraction
+    private sealed class FileAbstraction(IAssetFile file) : IFileAbstraction
     {
-        private readonly IAssetFile file;
-
         public string Name
         {
             get => file.FileName;
@@ -34,11 +32,6 @@ public sealed class FileTagAssetMetadataSource : IAssetMetadataSource
         public Stream WriteStream
         {
             get => throw new NotSupportedException();
-        }
-
-        public FileAbstraction(IAssetFile file)
-        {
-            this.file = file;
         }
 
         public void CloseStream(Stream stream)

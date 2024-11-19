@@ -15,18 +15,13 @@ using Squidex.Infrastructure.Json;
 
 namespace Squidex.Web.Pipeline;
 
-public sealed class JsonStreamResult<T> : ActionResult
+public sealed class JsonStreamResult<T>(IAsyncEnumerable<T> stream) : ActionResult
 {
 #pragma warning disable RECS0108 // Warns about static fields in generic types
     public static readonly byte[] Prefix = Encoding.UTF8.GetBytes("data: ");
     public static readonly byte[] Separator = Encoding.UTF8.GetBytes("\n\n");
-#pragma warning restore RECS0108 // Warns about static fields in generic types
-    private readonly IAsyncEnumerable<T> stream;
 
-    public JsonStreamResult(IAsyncEnumerable<T> stream)
-    {
-        this.stream = stream;
-    }
+#pragma warning restore RECS0108 // Warns about static fields in generic types
 
     public override async Task ExecuteResultAsync(ActionContext context)
     {

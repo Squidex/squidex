@@ -23,24 +23,24 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="FakeItEasy" Version="8.3.0" />
-    <PackageReference Include="FluentAssertions" Version="6.12.0" />
-    <PackageReference Include="GraphQL" Version="8.0.2" />
-    <PackageReference Include="GraphQL.SystemTextJson" Version="8.0.2" />
+    <PackageReference Include="FluentAssertions" Version="6.12.2" />
+    <PackageReference Include="GraphQL" Version="8.2.1" />
+    <PackageReference Include="GraphQL.SystemTextJson" Version="8.2.1" />
     <PackageReference Include="Lorem.Universal.Net" Version="4.0.80" />
-    <PackageReference Include="Meziantou.Analyzer" Version="2.0.163">
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.179">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.0" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Memory" Version="8.0.1" />
     <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.0" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageReference Include="NodaTime.Serialization.JsonNet" Version="3.1.0" />
     <PackageReference Include="Squidex.YDotNet.Native" Version="0.2.9" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="System.Reactive.Linq" Version="6.0.1" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
-    <PackageReference Include="Verify.Xunit" Version="26.2.0" />
-    <PackageReference Include="xunit" Version="2.9.0" />
+    <PackageReference Include="Verify.Xunit" Version="26.6.0" />
+    <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>

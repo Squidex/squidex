@@ -11,16 +11,12 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Pipeline.Squid;
 
-public sealed class SquidMiddleware
+public sealed class SquidMiddleware(RequestDelegate next)
 {
     private readonly string squidHappyLG = LoadSvg("happy");
     private readonly string squidHappySM = LoadSvg("happy-sm");
     private readonly string squidSadLG = LoadSvg("sad");
     private readonly string squidSadSM = LoadSvg("sad-sm");
-
-    public SquidMiddleware(RequestDelegate next)
-    {
-    }
 
     public async Task InvokeAsync(HttpContext context)
     {

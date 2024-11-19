@@ -15,7 +15,7 @@ using Squidex.Infrastructure.Log;
 
 namespace Squidex.Domain.Apps.Entities.Apps;
 
-public sealed class DefaultAppLogStore : IAppLogStore, IDeleter
+public sealed class DefaultAppLogStore(IRequestLogStore requestLogStore) : IAppLogStore, IDeleter
 {
     private const string FieldAuthClientId = "AuthClientId";
     private const string FieldAuthUserId = "AuthUserId";
@@ -36,13 +36,6 @@ public sealed class DefaultAppLogStore : IAppLogStore, IDeleter
         DetectDelimiter = false,
         Delimiter = "|"
     };
-
-    private readonly IRequestLogStore requestLogStore;
-
-    public DefaultAppLogStore(IRequestLogStore requestLogStore)
-    {
-        this.requestLogStore = requestLogStore;
-    }
 
     Task IDeleter.DeleteAppAsync(App app,
         CancellationToken ct)

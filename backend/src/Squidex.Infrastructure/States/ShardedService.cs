@@ -9,19 +9,11 @@ using Squidex.Hosting;
 
 namespace Squidex.Infrastructure.States;
 
-public abstract class ShardedService<TKey, TService> : IInitializable where TKey : notnull, IDeterministicHashCode
+public abstract class ShardedService<TKey, TService>(IShardingStrategy sharding, Func<string, TService> factory) : IInitializable where TKey : notnull, IDeterministicHashCode
 {
     private readonly Dictionary<string, TService> shards = [];
-    private readonly IShardingStrategy sharding;
-    private readonly Func<string, TService> factory;
 
     protected IEnumerable<TService> Shards => shards.Values;
-
-    protected ShardedService(IShardingStrategy sharding, Func<string, TService> factory)
-    {
-        this.sharding = sharding;
-        this.factory = factory;
-    }
 
     public async Task InitializeAsync(
         CancellationToken ct)

@@ -15,17 +15,8 @@ using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Schemas;
 
-public sealed class SchemasSearchSource : ISearchSource
+public sealed class SchemasSearchSource(IAppProvider appProvider, IUrlGenerator urlGenerator) : ISearchSource
 {
-    private readonly IAppProvider appProvider;
-    private readonly IUrlGenerator urlGenerator;
-
-    public SchemasSearchSource(IAppProvider appProvider, IUrlGenerator urlGenerator)
-    {
-        this.appProvider = appProvider;
-        this.urlGenerator = urlGenerator;
-    }
-
     public async Task<SearchResults> SearchAsync(string query, Context context,
         CancellationToken ct)
     {

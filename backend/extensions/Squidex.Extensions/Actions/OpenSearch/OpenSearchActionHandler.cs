@@ -18,16 +18,9 @@ using Squidex.Infrastructure.Json;
 
 namespace Squidex.Extensions.Actions.OpenSearch;
 
-public sealed class OpenSearchActionHandler : RuleActionHandler<OpenSearchAction, OpenSearchJob>
+public sealed class OpenSearchActionHandler(RuleEventFormatter formatter, IScriptEngine scriptEngine, IJsonSerializer serializer) : RuleActionHandler<OpenSearchAction, OpenSearchJob>(formatter)
 {
-    private readonly ClientPool<(Uri Host, string? Username, string? Password), OpenSearchLowLevelClient> clients;
-    private readonly IScriptEngine scriptEngine;
-    private readonly IJsonSerializer serializer;
-
-    public OpenSearchActionHandler(RuleEventFormatter formatter, IScriptEngine scriptEngine, IJsonSerializer serializer)
-        : base(formatter)
-    {
-        clients = new ClientPool<(Uri Host, string? Username, string? Password), OpenSearchLowLevelClient>(key =>
+    private readonly ClientPool<(Uri Host, string? Username, string? Password), OpenSearchLowLevelClient> clients = new ClientPool<(Uri Host, string? Username, string? Password), OpenSearchLowLevelClient>(key =>
         {
             var config = new ConnectionConfiguration(key.Host);
 
@@ -38,10 +31,6 @@ public sealed class OpenSearchActionHandler : RuleActionHandler<OpenSearchAction
 
             return new OpenSearchLowLevelClient(config);
         });
-
-        this.scriptEngine = scriptEngine;
-        this.serializer = serializer;
-    }
 
     protected override async Task<(string Description, OpenSearchJob Data)> CreateJobAsync(EnrichedEvent @event, OpenSearchAction action)
     {

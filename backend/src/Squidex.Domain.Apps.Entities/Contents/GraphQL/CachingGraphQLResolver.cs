@@ -23,12 +23,14 @@ using GraphQLSchema = GraphQL.Types.Schema;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL;
 
-public sealed class CachingGraphQLResolver : IConfigureExecution
+public sealed class CachingGraphQLResolver(
+    IBackgroundCache cache,
+    ISchemasHash schemasHash,
+    IServiceProvider serviceProvider,
+    IOptions<GraphQLOptions> options)
+    : IConfigureExecution
 {
-    private readonly IBackgroundCache cache;
-    private readonly ISchemasHash schemasHash;
-    private readonly IServiceProvider serviceProvider;
-    private readonly GraphQLOptions options;
+    private readonly GraphQLOptions options = options.Value;
 
     private sealed record CacheEntry(GraphQLSchema Model, string Hash, Instant Created);
 
@@ -37,15 +39,6 @@ public sealed class CachingGraphQLResolver : IConfigureExecution
     public IServiceProvider Services
     {
         get => serviceProvider;
-    }
-
-    public CachingGraphQLResolver(IBackgroundCache cache, ISchemasHash schemasHash, IServiceProvider serviceProvider,
-        IOptions<GraphQLOptions> options)
-    {
-        this.cache = cache;
-        this.schemasHash = schemasHash;
-        this.serviceProvider = serviceProvider;
-        this.options = options.Value;
     }
 
     public async Task<ExecutionResult> ExecuteAsync(ExecutionOptions options, ExecutionDelegate next)

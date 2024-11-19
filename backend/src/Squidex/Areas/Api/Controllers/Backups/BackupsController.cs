@@ -23,16 +23,8 @@ namespace Squidex.Areas.Api.Controllers.Backups;
 /// Update and query backups for apps.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Backups))]
-public class BackupsController : ApiController
+public class BackupsController(ICommandBus commandBus, IJobService jobService) : ApiController(commandBus)
 {
-    private readonly IJobService jobService;
-
-    public BackupsController(ICommandBus commandBus, IJobService jobService)
-        : base(commandBus)
-    {
-        this.jobService = jobService;
-    }
-
     /// <summary>
     /// Get all backup jobs.
     /// </summary>

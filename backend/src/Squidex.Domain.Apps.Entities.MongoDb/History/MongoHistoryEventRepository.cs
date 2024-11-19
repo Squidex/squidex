@@ -15,7 +15,7 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.History;
 
-public sealed class MongoHistoryEventRepository : MongoRepositoryBase<HistoryEvent>, IHistoryEventRepository, IDeleter
+public sealed class MongoHistoryEventRepository(IMongoDatabase database) : MongoRepositoryBase<HistoryEvent>(database), IHistoryEventRepository, IDeleter
 {
     static MongoHistoryEventRepository()
     {
@@ -29,11 +29,6 @@ public sealed class MongoHistoryEventRepository : MongoRepositoryBase<HistoryEve
             cm.MapProperty(x => x.EventType)
                 .SetElementName("Message");
         });
-    }
-
-    public MongoHistoryEventRepository(IMongoDatabase database)
-        : base(database)
-    {
     }
 
     protected override string CollectionName()

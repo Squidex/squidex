@@ -11,15 +11,8 @@ using Squidex.Domain.Apps.Core.Teams;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Test;
 
-public sealed class TestController : IdentityServerController
+public sealed class TestController(DynamicSchemeProvider schemes) : IdentityServerController
 {
-    private readonly DynamicSchemeProvider schemes;
-
-    public TestController(DynamicSchemeProvider schemes)
-    {
-        this.schemes = schemes;
-    }
-
     [Route("test/")]
     public async Task<IActionResult> Test(
         [FromQuery] AuthScheme scheme)

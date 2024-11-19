@@ -11,13 +11,8 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Infrastructure.UsageTracking;
 
-public sealed class MongoUsageRepository : MongoRepositoryBase<MongoUsage>, IUsageRepository
+public sealed class MongoUsageRepository(IMongoDatabase database) : MongoRepositoryBase<MongoUsage>(database), IUsageRepository
 {
-    public MongoUsageRepository(IMongoDatabase database)
-        : base(database)
-    {
-    }
-
     protected override string CollectionName()
     {
         return "UsagesV2";

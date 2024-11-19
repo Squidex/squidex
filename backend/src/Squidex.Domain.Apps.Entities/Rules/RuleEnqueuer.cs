@@ -19,17 +19,19 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Rules;
 
-public sealed class RuleEnqueuer : IEventConsumer, IRuleEnqueuer
+public sealed class RuleEnqueuer(
+    IMemoryCache cache,
+    ILocalCache localCache,
+    IAppProvider appProvider,
+    IRuleEventRepository ruleEventRepository,
+    IRuleService ruleService,
+    IRuleUsageTracker ruleUsageTracker,
+    IOptions<RuleOptions> options,
+    ILogger<RuleEnqueuer> log)
+    : IEventConsumer, IRuleEnqueuer
 {
-    private readonly IMemoryCache cache;
-    private readonly IRuleEventRepository ruleEventRepository;
-    private readonly IRuleUsageTracker ruleUsageTracker;
-    private readonly IRuleService ruleService;
-    private readonly ILogger<RuleEnqueuer> log;
-    private readonly IAppProvider appProvider;
-    private readonly ILocalCache localCache;
-    private readonly TimeSpan cacheDuration;
-    private readonly int maxExtraEvents;
+    private readonly TimeSpan cacheDuration = options.Value.RulesCacheDuration;
+    private readonly int maxExtraEvents = options.Value.MaxEnrichedEvents;
 
     public int BatchSize
     {
@@ -39,25 +41,6 @@ public sealed class RuleEnqueuer : IEventConsumer, IRuleEnqueuer
     public string Name
     {
         get => GetType().Name;
-    }
-
-    public RuleEnqueuer(IMemoryCache cache, ILocalCache localCache,
-        IAppProvider appProvider,
-        IRuleEventRepository ruleEventRepository,
-        IRuleService ruleService,
-        IRuleUsageTracker ruleUsageTracker,
-        IOptions<RuleOptions> options,
-        ILogger<RuleEnqueuer> log)
-    {
-        this.appProvider = appProvider;
-        this.cache = cache;
-        this.cacheDuration = options.Value.RulesCacheDuration;
-        this.ruleEventRepository = ruleEventRepository;
-        this.ruleUsageTracker = ruleUsageTracker;
-        this.ruleService = ruleService;
-        this.log = log;
-        this.localCache = localCache;
-        this.maxExtraEvents = options.Value.MaxEnrichedEvents;
     }
 
     public async Task EnqueueAsync(DomainId ruleId, Rule rule, Envelope<IEvent> @event)

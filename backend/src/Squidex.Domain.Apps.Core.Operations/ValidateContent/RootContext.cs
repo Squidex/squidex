@@ -15,34 +15,24 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent;
 
-public sealed class RootContext
+public sealed class RootContext(App app, Schema schema, DomainId contentId, ResolvedComponents components, IJsonSerializer serializer)
 {
     private readonly ConcurrentBag<ValidationError> errors = [];
     private readonly Scheduler scheduler = new Scheduler();
 
-    public IJsonSerializer Serializer { get; }
+    public IJsonSerializer Serializer { get; } = serializer;
 
-    public DomainId ContentId { get; }
+    public DomainId ContentId { get; } = contentId;
 
-    public App App { get; }
+    public App App { get; } = app;
 
-    public Schema Schema { get; }
+    public Schema Schema { get; } = schema;
 
-    public ResolvedComponents Components { get; }
+    public ResolvedComponents Components { get; } = components;
 
     public IEnumerable<ValidationError> Errors
     {
         get => errors;
-    }
-
-    public RootContext(App app, Schema schema, DomainId contentId, ResolvedComponents components,
-        IJsonSerializer serializer)
-    {
-        App = app;
-        Components = components;
-        ContentId = contentId;
-        Serializer = serializer;
-        Schema = schema;
     }
 
     public void AddError(IEnumerable<string> path, string message)

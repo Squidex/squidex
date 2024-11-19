@@ -10,15 +10,8 @@ using Squidex.Caching;
 
 namespace Squidex.Web.Pipeline;
 
-public sealed class LocalCacheMiddleware
+public sealed class LocalCacheMiddleware(RequestDelegate next)
 {
-    private readonly RequestDelegate next;
-
-    public LocalCacheMiddleware(RequestDelegate next)
-    {
-        this.next = next;
-    }
-
     public async Task InvokeAsync(HttpContext context, ILocalCache localCache)
     {
         using (localCache.StartContext())

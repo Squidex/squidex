@@ -53,7 +53,7 @@ internal sealed class ContentGraphType : ObjectGraphType<EnrichedContent>
 
         var contentDataType = new DataGraphType(builder, schemaInfo);
 
-        if (contentDataType.Fields.Any())
+        if (contentDataType.Fields.Count != 0)
         {
             AddField(new FieldType
             {
@@ -66,7 +66,7 @@ internal sealed class ContentGraphType : ObjectGraphType<EnrichedContent>
 
         var contentDataTypeFlat = new DataFlatGraphType(builder, schemaInfo);
 
-        if (contentDataTypeFlat.Fields.Any())
+        if (contentDataTypeFlat.Fields.Count != 0)
         {
             AddField(new FieldType
             {
@@ -94,7 +94,8 @@ internal sealed class ContentGraphType : ObjectGraphType<EnrichedContent>
 
     private void AddReferencingQueries(Builder builder, SchemaInfo referencingSchemaInfo)
     {
-        var contentType = builder.GetContentType(referencingSchemaInfo);
+        var contentType = builder.GetContentType(referencingSchemaInfo)
+            ?? throw new InvalidOperationException($"Failed to resolve content graph type for schema {referencingSchemaInfo.TypeName}.");
 
         AddField(new FieldTypeWithSchemaId
         {
@@ -126,7 +127,8 @@ internal sealed class ContentGraphType : ObjectGraphType<EnrichedContent>
 
     private void AddReferencesQueries(Builder builder, SchemaInfo referencesSchemaInfo)
     {
-        var contentType = builder.GetContentType(referencesSchemaInfo);
+        var contentType = builder.GetContentType(referencesSchemaInfo)
+            ?? throw new InvalidOperationException($"Failed to resolve content graph type for schema {referencesSchemaInfo.TypeName}.");
 
         AddField(new FieldTypeWithSchemaId
         {

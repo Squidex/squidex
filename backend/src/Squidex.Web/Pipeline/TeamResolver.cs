@@ -19,15 +19,8 @@ using Squidex.Shared.Identity;
 
 namespace Squidex.Web.Pipeline;
 
-public sealed class TeamResolver : IAsyncActionFilter
+public sealed class TeamResolver(IAppProvider appProvider) : IAsyncActionFilter
 {
-    private readonly IAppProvider appProvider;
-
-    public TeamResolver(IAppProvider appProvider)
-    {
-        this.appProvider = appProvider;
-    }
-
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var user = context.HttpContext.User;

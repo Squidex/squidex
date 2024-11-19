@@ -12,10 +12,8 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Scripting.ContentWrapper;
 
-public sealed class ContentFieldProperty : CustomProperty
+public sealed class ContentFieldProperty(ContentFieldObject contentField, JsonValue contentValue = default) : CustomProperty
 {
-    private readonly ContentFieldObject contentField;
-    private JsonValue contentValue;
     private JsValue? value;
     private bool isChanged;
 
@@ -58,11 +56,5 @@ public sealed class ContentFieldProperty : CustomProperty
     public bool IsChanged
     {
         get => isChanged;
-    }
-
-    public ContentFieldProperty(ContentFieldObject contentField, JsonValue contentValue = default)
-    {
-        this.contentField = contentField;
-        this.contentValue = contentValue;
     }
 }

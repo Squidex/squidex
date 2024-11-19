@@ -11,15 +11,9 @@ namespace Squidex.Infrastructure;
 
 public static class ResultList
 {
-    private sealed class Impl<T> : ReadonlyList<T>, IResultList<T>
+    private sealed class Impl<T>(List<T> items, long total) : ReadonlyList<T>(items), IResultList<T>
     {
-        public long Total { get; }
-
-        public Impl(List<T> items, long total)
-            : base(items)
-        {
-            Total = total;
-        }
+        public long Total { get; } = total;
     }
 
     private static class Empties<T>

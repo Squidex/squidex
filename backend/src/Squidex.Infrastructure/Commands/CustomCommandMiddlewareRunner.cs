@@ -7,14 +7,9 @@
 
 namespace Squidex.Infrastructure.Commands;
 
-public sealed class CustomCommandMiddlewareRunner : ICommandMiddleware
+public sealed class CustomCommandMiddlewareRunner(IEnumerable<ICustomCommandMiddleware> extensions) : ICommandMiddleware
 {
-    private readonly IEnumerable<ICustomCommandMiddleware> extensions;
-
-    public CustomCommandMiddlewareRunner(IEnumerable<ICustomCommandMiddleware> extensions)
-    {
-        this.extensions = extensions.Reverse().ToList();
-    }
+    private readonly IEnumerable<ICustomCommandMiddleware> extensions = extensions.Reverse().ToList();
 
     public async Task HandleAsync(CommandContext context, NextDelegate next,
         CancellationToken ct)

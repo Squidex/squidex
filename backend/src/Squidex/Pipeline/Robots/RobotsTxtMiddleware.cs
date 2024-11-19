@@ -9,15 +9,8 @@ using Microsoft.Extensions.Options;
 
 namespace Squidex.Pipeline.Robots;
 
-public sealed class RobotsTxtMiddleware
+public sealed class RobotsTxtMiddleware(RequestDelegate next)
 {
-    private readonly RequestDelegate next;
-
-    public RobotsTxtMiddleware(RequestDelegate next)
-    {
-        this.next = next;
-    }
-
     public async Task InvokeAsync(HttpContext context, IOptions<RobotsTxtOptions> robotsTxtOptions)
     {
         var text = robotsTxtOptions.Value.Text;

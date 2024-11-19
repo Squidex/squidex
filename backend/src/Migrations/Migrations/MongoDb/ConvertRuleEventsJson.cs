@@ -12,14 +12,9 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Migrations.Migrations.MongoDb;
 
-public sealed class ConvertRuleEventsJson : MongoBase<BsonDocument>, IMigration
+public sealed class ConvertRuleEventsJson(IMongoDatabase database) : MongoBase<BsonDocument>, IMigration
 {
-    private readonly IMongoCollection<BsonDocument> collection;
-
-    public ConvertRuleEventsJson(IMongoDatabase database)
-    {
-        collection = database.GetCollection<BsonDocument>("RuleEvents");
-    }
+    private readonly IMongoCollection<BsonDocument> collection = database.GetCollection<BsonDocument>("RuleEvents");
 
     public async Task UpdateAsync(
         CancellationToken ct)

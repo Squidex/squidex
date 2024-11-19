@@ -16,15 +16,8 @@ public class CustomCommandMiddlewareRunnerTests
         public long ExpectedVersion { get; set; }
     }
 
-    public sealed class CustomMiddleware : ICustomCommandMiddleware
+    public sealed class CustomMiddleware(int value) : ICustomCommandMiddleware
     {
-        private readonly int value;
-
-        public CustomMiddleware(int value)
-        {
-            this.value = value;
-        }
-
         public Task HandleAsync(CommandContext context, NextDelegate next,
             CancellationToken ct)
         {

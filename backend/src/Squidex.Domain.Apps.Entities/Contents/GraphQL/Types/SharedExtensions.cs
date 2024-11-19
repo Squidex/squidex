@@ -194,18 +194,10 @@ public static class SharedExtensions
         return new FieldNameResolver(context.Document, context.Schema).Iterate(context.FieldAst, context.FieldDefinition.ResolvedType);
     }
 
-    private sealed class FieldNameResolver
+    private sealed class FieldNameResolver(GraphQLDocument document, ISchema schema)
     {
-        private readonly GraphQLDocument document;
-        private readonly ISchema schema;
         private HashSet<string>? fieldNames = [];
         private IComplexGraphType? currentParent;
-
-        public FieldNameResolver(GraphQLDocument document, ISchema schema)
-        {
-            this.document = document;
-            this.schema = schema;
-        }
 
         public HashSet<string>? Iterate(GraphQLField field, IGraphType? type)
         {

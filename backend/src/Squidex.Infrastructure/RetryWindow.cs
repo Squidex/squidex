@@ -9,20 +9,12 @@ using NodaTime;
 
 namespace Squidex.Infrastructure;
 
-public sealed class RetryWindow
+public sealed class RetryWindow(TimeSpan windowDuration, int windowSize, IClock? clock = null)
 {
-    private readonly Duration windowDuration;
-    private readonly int windowSize;
+    private readonly Duration windowDuration = Duration.FromTimeSpan(windowDuration);
+    private readonly int windowSize = windowSize + 1;
     private readonly Queue<Instant> retries = new Queue<Instant>();
-    private readonly IClock clock;
-
-    public RetryWindow(TimeSpan windowDuration, int windowSize, IClock? clock = null)
-    {
-        this.windowDuration = Duration.FromTimeSpan(windowDuration);
-        this.windowSize = windowSize + 1;
-
-        this.clock = clock ?? SystemClock.Instance;
-    }
+    private readonly IClock clock = clock ?? SystemClock.Instance;
 
     public void Reset()
     {

@@ -24,22 +24,12 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace Squidex.Areas.Account.Controllers.Connect;
 
-public class AuthorizationController : IdentityServerController
+public class AuthorizationController(
+    IOpenIddictScopeManager scopeManager,
+    IOpenIddictApplicationManager applicationManager,
+    IUserService userService)
+    : IdentityServerController
 {
-    private readonly IOpenIddictScopeManager scopeManager;
-    private readonly IOpenIddictApplicationManager applicationManager;
-    private readonly IUserService userService;
-
-    public AuthorizationController(
-        IOpenIddictScopeManager scopeManager,
-        IOpenIddictApplicationManager applicationManager,
-        IUserService userService)
-    {
-        this.scopeManager = scopeManager;
-        this.applicationManager = applicationManager;
-        this.userService = userService;
-    }
-
     [HttpPost("connect/token")]
     [Produces("application/json")]
     public async Task<IActionResult> Exchange()

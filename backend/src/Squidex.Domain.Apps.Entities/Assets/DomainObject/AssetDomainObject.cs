@@ -21,17 +21,13 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject;
 
-public partial class AssetDomainObject : DomainObject<Asset>
+public partial class AssetDomainObject(
+    DomainId id,
+    IPersistenceFactory<Asset> persistence,
+    ILogger<AssetDomainObject> log,
+    IServiceProvider serviceProvider)
+    : DomainObject<Asset>(id, persistence, log)
 {
-    private readonly IServiceProvider serviceProvider;
-
-    public AssetDomainObject(DomainId id, IPersistenceFactory<Asset> persistence, ILogger<AssetDomainObject> log,
-        IServiceProvider serviceProvider)
-        : base(id, persistence, log)
-    {
-        this.serviceProvider = serviceProvider;
-    }
-
     protected override bool IsDeleted(Asset snapshot)
     {
         return snapshot.IsDeleted;

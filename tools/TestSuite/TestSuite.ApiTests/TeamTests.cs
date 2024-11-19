@@ -14,14 +14,9 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-public class TeamTests : IClassFixture<CreatedTeamFixture>
+public class TeamTests(CreatedTeamFixture fixture) : IClassFixture<CreatedTeamFixture>
 {
-    public CreatedTeamFixture _ { get; }
-
-    public TeamTests(CreatedTeamFixture fixture)
-    {
-        _ = fixture;
-    }
+    public CreatedTeamFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_set_name()

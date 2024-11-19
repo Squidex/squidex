@@ -11,21 +11,12 @@ using Squidex.Infrastructure.Commands;
 
 namespace Migrations;
 
-public sealed class RebuildRunner
+public sealed class RebuildRunner(
+    IOptions<RebuildOptions> rebuildOptions,
+    Rebuilder rebuilder,
+    RebuildFiles rebuildFiles)
 {
-    private readonly RebuildFiles rebuildFiles;
-    private readonly Rebuilder rebuilder;
-    private readonly RebuildOptions rebuildOptions;
-
-    public RebuildRunner(
-        IOptions<RebuildOptions> rebuildOptions,
-        Rebuilder rebuilder,
-        RebuildFiles rebuildFiles)
-    {
-        this.rebuildFiles = rebuildFiles;
-        this.rebuilder = rebuilder;
-        this.rebuildOptions = rebuildOptions.Value;
-    }
+    private readonly RebuildOptions rebuildOptions = rebuildOptions.Value;
 
     public async Task RunAsync(
         CancellationToken ct)

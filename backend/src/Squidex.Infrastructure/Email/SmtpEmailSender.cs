@@ -15,17 +15,10 @@ using MimeKit.Text;
 namespace Squidex.Infrastructure.Email;
 
 [ExcludeFromCodeCoverage]
-public sealed class SmtpEmailSender : IEmailSender
+public sealed class SmtpEmailSender(IOptions<SmtpOptions> options) : IEmailSender
 {
-    private readonly SmtpOptions options;
-    private readonly ObjectPool<SmtpClient> clientPool;
-
-    public SmtpEmailSender(IOptions<SmtpOptions> options)
-    {
-        this.options = options.Value;
-
-        clientPool = new DefaultObjectPoolProvider().Create(new DefaultPooledObjectPolicy<SmtpClient>());
-    }
+    private readonly SmtpOptions options = options.Value;
+    private readonly ObjectPool<SmtpClient> clientPool = new DefaultObjectPoolProvider().Create(new DefaultPooledObjectPolicy<SmtpClient>());
 
     public async Task SendAsync(string recipient, string subject, string body,
         CancellationToken ct = default)

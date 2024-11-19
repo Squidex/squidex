@@ -8,18 +8,11 @@
 namespace Squidex.Infrastructure.EventSourcing;
 
 [Serializable]
-public class WrongEventVersionException : Exception
+public class WrongEventVersionException(long versionCurrent, long versionExpected, Exception? inner = null) : Exception(FormatMessage(versionCurrent, versionExpected), inner)
 {
-    public long VersionCurrent { get; }
+    public long VersionCurrent { get; } = versionCurrent;
 
-    public long VersionExpected { get; }
-
-    public WrongEventVersionException(long versionCurrent, long versionExpected, Exception? inner = null)
-        : base(FormatMessage(versionCurrent, versionExpected), inner)
-    {
-        VersionCurrent = versionCurrent;
-        VersionExpected = versionExpected;
-    }
+    public long VersionExpected { get; } = versionExpected;
 
     private static string FormatMessage(long currentVersion, long expectedVersion)
     {

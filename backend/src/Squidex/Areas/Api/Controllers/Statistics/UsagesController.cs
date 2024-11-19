@@ -24,33 +24,17 @@ namespace Squidex.Areas.Api.Controllers.Statistics;
 /// Retrieves usage information for apps and teams.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Statistics))]
-public sealed class UsagesController : ApiController
+public sealed class UsagesController(
+    ICommandBus commandBus,
+    IDataProtectionProvider dataProtection,
+    IApiUsageTracker usageTracker,
+    IAppLogStore usageLog,
+    IUsageGate usageGate,
+    IAssetUsageTracker assetUsageTracker,
+    IUrlGenerator urlGenerator)
+    : ApiController(commandBus)
 {
-    private readonly IApiUsageTracker usageTracker;
-    private readonly IAppLogStore usageLog;
-    private readonly IUsageGate usageGate;
-    private readonly IAssetUsageTracker assetUsageTracker;
-    private readonly IDataProtector dataProtector;
-    private readonly IUrlGenerator urlGenerator;
-
-    public UsagesController(
-        ICommandBus commandBus,
-        IDataProtectionProvider dataProtection,
-        IApiUsageTracker usageTracker,
-        IAppLogStore usageLog,
-        IUsageGate usageGate,
-        IAssetUsageTracker assetUsageTracker,
-        IUrlGenerator urlGenerator)
-        : base(commandBus)
-    {
-        this.usageLog = usageLog;
-        this.assetUsageTracker = assetUsageTracker;
-        this.urlGenerator = urlGenerator;
-        this.usageGate = usageGate;
-        this.usageTracker = usageTracker;
-
-        dataProtector = dataProtection.CreateProtector("LogToken");
-    }
+    private readonly IDataProtector dataProtector = dataProtection.CreateProtector("LogToken");
 
     /// <summary>
     /// Get api calls as log file.

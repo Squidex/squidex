@@ -15,15 +15,8 @@ using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace Squidex.Areas.IdentityServer.Controllers.UserInfo;
 
-public class UserInfoController : IdentityServerController
+public class UserInfoController(IUserService userService) : IdentityServerController
 {
-    private readonly IUserService userService;
-
-    public UserInfoController(IUserService userService)
-    {
-        this.userService = userService;
-    }
-
     [Authorize(AuthenticationSchemes = OpenIddictServerAspNetCoreDefaults.AuthenticationScheme)]
     [HttpGet]
     [HttpPost]

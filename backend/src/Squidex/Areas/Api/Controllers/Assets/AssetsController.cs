@@ -26,27 +26,14 @@ namespace Squidex.Areas.Api.Controllers.Assets;
 /// Uploads and retrieves assets.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Assets))]
-public sealed class AssetsController : ApiController
+public sealed class AssetsController(
+    ICommandBus commandBus,
+    IAssetQueryService assetQuery,
+    IAssetUsageTracker assetUsageTracker,
+    ITagService tagService,
+    AssetTusRunner assetTusRunner)
+    : ApiController(commandBus)
 {
-    private readonly IAssetQueryService assetQuery;
-    private readonly IAssetUsageTracker assetUsageTracker;
-    private readonly ITagService tagService;
-    private readonly AssetTusRunner assetTusRunner;
-
-    public AssetsController(
-        ICommandBus commandBus,
-        IAssetQueryService assetQuery,
-        IAssetUsageTracker assetUsageTracker,
-        ITagService tagService,
-        AssetTusRunner assetTusRunner)
-        : base(commandBus)
-    {
-        this.assetQuery = assetQuery;
-        this.assetUsageTracker = assetUsageTracker;
-        this.assetTusRunner = assetTusRunner;
-        this.tagService = tagService;
-    }
-
     /// <summary>
     /// Get assets tags.
     /// </summary>

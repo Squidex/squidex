@@ -13,15 +13,8 @@ using Squidex.Log;
 
 namespace Squidex.Web.Pipeline;
 
-public sealed class RequestLogPerformanceMiddleware
+public sealed class RequestLogPerformanceMiddleware(RequestDelegate next)
 {
-    private readonly RequestDelegate next;
-
-    public RequestLogPerformanceMiddleware(RequestDelegate next)
-    {
-        this.next = next;
-    }
-
     public async Task InvokeAsync(HttpContext context, ISemanticLog log, IOptions<RequestLogOptions> requestLogOptions)
     {
         if (!requestLogOptions.Value.LogRequests)

@@ -8,12 +8,7 @@
 namespace Squidex.Domain.Apps.Core;
 
 [AttributeUsage(AttributeTargets.Property)]
-public sealed class FieldDescriptionAttribute : Attribute
+public sealed class FieldDescriptionAttribute(string name) : Attribute
 {
-    public string Name { get; }
-
-    public FieldDescriptionAttribute(string name)
-    {
-        Name = name;
-    }
+    public string Name { get; } = name;
 }

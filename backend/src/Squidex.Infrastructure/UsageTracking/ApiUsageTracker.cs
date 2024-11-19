@@ -7,17 +7,11 @@
 
 namespace Squidex.Infrastructure.UsageTracking;
 
-public sealed class ApiUsageTracker : IApiUsageTracker
+public sealed class ApiUsageTracker(IUsageTracker usageTracker) : IApiUsageTracker
 {
     public const string CounterTotalBytes = "TotalBytes";
     public const string CounterTotalCalls = "TotalCalls";
     public const string CounterTotalElapsedMs = "TotalElapsedMs";
-    private readonly IUsageTracker usageTracker;
-
-    public ApiUsageTracker(IUsageTracker usageTracker)
-    {
-        this.usageTracker = usageTracker;
-    }
 
     public Task DeleteAsync(string key,
         CancellationToken ct = default)

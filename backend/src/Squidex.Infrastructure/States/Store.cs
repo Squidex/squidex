@@ -9,26 +9,14 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States;
 
-public sealed class Store<T> : IStore<T>
+public sealed class Store<T>(
+    IEventFormatter eventFormatter,
+    IEventStore eventStore,
+    IEventStreamNames eventStreamNames,
+    ISnapshotStore<T> snapshotStore)
+    : IStore<T>
 {
-    private readonly IEventFormatter eventFormatter;
-    private readonly IEventStore eventStore;
-    private readonly IEventStreamNames eventStreamNames;
-    private readonly ISnapshotStore<T> snapshotStore;
-
     public ISnapshotStore<T> Snapshots => snapshotStore;
-
-    public Store(
-        IEventFormatter eventFormatter,
-        IEventStore eventStore,
-        IEventStreamNames eventStreamNames,
-        ISnapshotStore<T> snapshotStore)
-    {
-        this.eventFormatter = eventFormatter;
-        this.eventStore = eventStore;
-        this.eventStreamNames = eventStreamNames;
-        this.snapshotStore = snapshotStore;
-    }
 
     public Task ClearSnapshotsAsync()
     {

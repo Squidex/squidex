@@ -22,18 +22,8 @@ namespace Squidex.Areas.Api.Controllers.Apps;
 /// Update and query apps.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Apps))]
-public sealed class AppContributorsController : ApiController
+public sealed class AppContributorsController(ICommandBus commandBus, IUsageGate usageGate, IUserResolver userResolver) : ApiController(commandBus)
 {
-    private readonly IUsageGate usageGate;
-    private readonly IUserResolver userResolver;
-
-    public AppContributorsController(ICommandBus commandBus, IUsageGate usageGate, IUserResolver userResolver)
-        : base(commandBus)
-    {
-        this.usageGate = usageGate;
-        this.userResolver = userResolver;
-    }
-
     /// <summary>
     /// Get app contributors.
     /// </summary>

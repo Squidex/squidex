@@ -18,16 +18,8 @@ namespace Squidex.Areas.Api.Controllers.EventConsumers;
 /// Update and query event consumers.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(EventConsumers))]
-public sealed class EventConsumersController : ApiController
+public sealed class EventConsumersController(ICommandBus commandBus, IEventConsumerManager eventConsumerManager) : ApiController(commandBus)
 {
-    private readonly IEventConsumerManager eventConsumerManager;
-
-    public EventConsumersController(ICommandBus commandBus, IEventConsumerManager eventConsumerManager)
-        : base(commandBus)
-    {
-        this.eventConsumerManager = eventConsumerManager;
-    }
-
     /// <summary>
     /// Get event consumers.
     /// </summary>

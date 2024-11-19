@@ -14,17 +14,11 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 
 namespace Squidex.Extensions.Actions.Twitter;
 
-public sealed class TweetActionHandler : RuleActionHandler<TweetAction, TweetJob>
+public sealed class TweetActionHandler(RuleEventFormatter formatter, IOptions<TwitterOptions> twitterOptions) : RuleActionHandler<TweetAction, TweetJob>(formatter)
 {
     private const string Description = "Send a tweet";
 
-    private readonly TwitterOptions twitterOptions;
-
-    public TweetActionHandler(RuleEventFormatter formatter, IOptions<TwitterOptions> twitterOptions)
-        : base(formatter)
-    {
-        this.twitterOptions = twitterOptions.Value;
-    }
+    private readonly TwitterOptions twitterOptions = twitterOptions.Value;
 
     protected override async Task<(string Description, TweetJob Data)> CreateJobAsync(EnrichedEvent @event, TweetAction action)
     {

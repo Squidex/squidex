@@ -12,10 +12,6 @@ using Squidex.Infrastructure.Caching;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public sealed class ContentCache : QueryCache<DomainId, EnrichedContent>, IContentCache
+public sealed class ContentCache(IMemoryCache? memoryCache, IOptions<ContentOptions> options) : QueryCache<DomainId, EnrichedContent>(options.Value.CanCache ? memoryCache : null), IContentCache
 {
-    public ContentCache(IMemoryCache? memoryCache, IOptions<ContentOptions> options)
-        : base(options.Value.CanCache ? memoryCache : null)
-    {
-    }
 }

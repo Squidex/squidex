@@ -85,7 +85,8 @@ public class AppPermanentDeleterTests : GivenContext
     {
         await sut.On(Envelope.Create(new AppContributorRemoved
         {
-            AppId = AppId, ContributorId = "user1"
+            AppId = AppId,
+            ContributorId = "user1"
         }));
 
         A.CallTo(() => deleter1.DeleteContributorAsync(AppId.Id, "user1", default))

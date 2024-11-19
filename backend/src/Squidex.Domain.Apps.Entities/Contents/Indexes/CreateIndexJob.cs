@@ -15,7 +15,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Indexes;
 
-public sealed class CreateIndexJob : IJobRunner
+public sealed class CreateIndexJob(IContentRepository contentRepository) : IJobRunner
 {
     public const string TaskName = "createIndex";
     public const string ArgAppId = "appId";
@@ -23,14 +23,8 @@ public sealed class CreateIndexJob : IJobRunner
     public const string ArgSchemaId = "schemaId";
     public const string ArgSchemaName = "schemaName";
     public const string ArgFieldName = "field_";
-    private readonly IContentRepository contentRepository;
 
     public string Name => TaskName;
-
-    public CreateIndexJob(IContentRepository contentRepository)
-    {
-        this.contentRepository = contentRepository;
-    }
 
     public static JobRequest BuildRequest(RefToken actor, App app, Schema schema, IndexDefinition index)
     {

@@ -17,20 +17,9 @@ using Command = Squidex.Domain.Apps.Entities.Contents.Commands.CreateContent;
 
 namespace Squidex.Extensions.Actions.CreateContent;
 
-public sealed class CreateContentActionHandler : RuleActionHandler<CreateContentAction, Command>
+public sealed class CreateContentActionHandler(RuleEventFormatter formatter, IAppProvider appProvider, ICommandBus commandBus, IJsonSerializer jsonSerializer) : RuleActionHandler<CreateContentAction, Command>(formatter)
 {
     private const string Description = "Create a content";
-    private readonly ICommandBus commandBus;
-    private readonly IAppProvider appProvider;
-    private readonly IJsonSerializer jsonSerializer;
-
-    public CreateContentActionHandler(RuleEventFormatter formatter, IAppProvider appProvider, ICommandBus commandBus, IJsonSerializer jsonSerializer)
-        : base(formatter)
-    {
-        this.appProvider = appProvider;
-        this.commandBus = commandBus;
-        this.jsonSerializer = jsonSerializer;
-    }
 
     protected override async Task<(string Description, Command Data)> CreateJobAsync(EnrichedEvent @event, CreateContentAction action)
     {

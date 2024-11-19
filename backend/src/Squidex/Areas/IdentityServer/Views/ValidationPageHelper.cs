@@ -13,21 +13,14 @@ using Microsoft.AspNetCore.Razor.TagHelpers;
 namespace Squidex.Areas.IdentityServer.Views;
 
 [HtmlTargetElement("div", Attributes = "error-for")]
-public class ValidationPageHelper : TagHelper
+public class ValidationPageHelper(IHtmlHelper htmlHelper) : TagHelper
 {
-    private readonly IHtmlHelper htmlHelper;
-
     [HtmlAttributeName("error-for")]
     public ModelExpression For { get; set; }
 
     [ViewContext]
     [HtmlAttributeNotBound]
     public ViewContext ViewContext { get; set; }
-
-    public ValidationPageHelper(IHtmlHelper htmlHelper)
-    {
-        this.htmlHelper = htmlHelper;
-    }
 
     public override void Process(TagHelperContext context, TagHelperOutput output)
     {

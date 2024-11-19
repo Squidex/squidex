@@ -19,15 +19,8 @@ using static Parlot.Fluent.Parsers;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-public sealed class AssetsFluidExtension : IFluidExtension
+public sealed class AssetsFluidExtension(IServiceProvider serviceProvider) : IFluidExtension
 {
-    private readonly IServiceProvider serviceProvider;
-
-    public AssetsFluidExtension(IServiceProvider serviceProvider)
-    {
-        this.serviceProvider = serviceProvider;
-    }
-
     public void RegisterLanguageExtensions(CustomFluidParser parser, TemplateOptions options)
     {
         AddAssetFilter(options);

@@ -79,8 +79,9 @@ public class ExtensionsTests
     {
         var rendered =
             projection.Render(
-                BsonSerializer.SerializerRegistry.GetSerializer<MongoContentEntity>(),
-                BsonSerializer.SerializerRegistry)
+                new RenderArgs<MongoContentEntity>(
+                    BsonSerializer.SerializerRegistry.GetSerializer<MongoContentEntity>(),
+                    BsonSerializer.SerializerRegistry))
             .Document.ToString();
 
         Assert.Equal(Cleanup(expected), rendered);

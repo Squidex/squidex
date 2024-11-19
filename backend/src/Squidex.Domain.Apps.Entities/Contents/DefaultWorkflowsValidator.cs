@@ -11,15 +11,8 @@ using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public sealed class DefaultWorkflowsValidator : IWorkflowsValidator
+public sealed class DefaultWorkflowsValidator(IAppProvider appProvider) : IWorkflowsValidator
 {
-    private readonly IAppProvider appProvider;
-
-    public DefaultWorkflowsValidator(IAppProvider appProvider)
-    {
-        this.appProvider = appProvider;
-    }
-
     public async Task<IReadOnlyList<string>> ValidateAsync(DomainId appId, Workflows workflows)
     {
         Guard.NotNull(workflows);

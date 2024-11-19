@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Config.OpenApi;
@@ -18,26 +19,17 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
 using Squidex.Web;
 using Squidex.Web.Pipeline;
-using System.Diagnostics;
 
 namespace Squidex.Areas.Api.Controllers.Contents;
 
 [SchemaMustBePublished]
 [ApiExplorerSettings(GroupName = nameof(Contents))]
-public sealed class ContentsController : ApiController
+public sealed class ContentsController(
+    ICommandBus commandBus,
+    IContentQueryService contentQuery,
+    IContentWorkflow contentWorkflow)
+    : ApiController(commandBus)
 {
-    private readonly IContentQueryService contentQuery;
-    private readonly IContentWorkflow contentWorkflow;
-
-    public ContentsController(ICommandBus commandBus,
-        IContentQueryService contentQuery,
-        IContentWorkflow contentWorkflow)
-        : base(commandBus)
-    {
-        this.contentQuery = contentQuery;
-        this.contentWorkflow = contentWorkflow;
-    }
-
     /// <summary>
     /// Streams contents.
     /// </summary>
@@ -57,10 +49,6 @@ public sealed class ContentsController : ApiController
     [OpenApiIgnore]
     public IActionResult StreamContents(string app, string schema, [FromQuery] int skip = 0)
     {
-        if (schema.Equals("de-studyprogram-details"))
-        {
-            Debugger.Break();
-        }
         var contents = contentQuery.StreamAsync(Context, schema, skip, HttpContext.RequestAborted);
 
         return new JsonStreamResult<EnrichedContent>(contents);

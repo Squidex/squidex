@@ -12,7 +12,7 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Infrastructure.EventSourcing;
 
-public partial class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IEventStore
+public partial class MongoEventStore(IMongoDatabase database) : MongoRepositoryBase<MongoEventCommit>(database), IEventStore
 {
     public IMongoCollection<BsonDocument> RawCollection
     {
@@ -25,11 +25,6 @@ public partial class MongoEventStore : MongoRepositoryBase<MongoEventCommit>, IE
     }
 
     public bool CanUseChangeStreams { get; private set; }
-
-    public MongoEventStore(IMongoDatabase database)
-        : base(database)
-    {
-    }
 
     protected override string CollectionName()
     {

@@ -14,7 +14,7 @@ using Squidex.Shared;
 
 namespace Squidex.Web;
 
-public sealed class Resources
+public sealed class Resources(ApiController controller)
 {
     private readonly Dictionary<(string Id, string Schema), bool> permissions = [];
 
@@ -153,7 +153,7 @@ public sealed class Resources
     public bool CanDownloadJob => Can(PermissionIds.AppJobsDownload);
 
     // Context
-    public Context Context { get; set; }
+    public Context Context { get; set; } = controller.HttpContext.Context();
 
     public string? App => GetAppName();
 
@@ -163,13 +163,7 @@ public sealed class Resources
 
     public DomainId AppId => GetAppId();
 
-    public ApiController Controller { get; }
-
-    public Resources(ApiController controller)
-    {
-        Controller = controller;
-        Context = controller.HttpContext.Context();
-    }
+    public ApiController Controller { get; } = controller;
 
     public string Url<T>(Func<T?, string> action, object? values = null) where T : ApiController
     {

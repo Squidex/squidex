@@ -14,28 +14,13 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.Commands;
 
-public class Rebuilder
+public class Rebuilder(
+    IDomainObjectFactory domainObjectFactory,
+    ILocalCache localCache,
+    IEventStore eventStore,
+    IServiceProvider serviceProvider,
+    ILogger<Rebuilder> log)
 {
-    private readonly IDomainObjectFactory domainObjectFactory;
-    private readonly ILocalCache localCache;
-    private readonly IEventStore eventStore;
-    private readonly IServiceProvider serviceProvider;
-    private readonly ILogger<Rebuilder> log;
-
-    public Rebuilder(
-        IDomainObjectFactory domainObjectFactory,
-        ILocalCache localCache,
-        IEventStore eventStore,
-        IServiceProvider serviceProvider,
-        ILogger<Rebuilder> log)
-    {
-        this.eventStore = eventStore;
-        this.serviceProvider = serviceProvider;
-        this.domainObjectFactory = domainObjectFactory;
-        this.localCache = localCache;
-        this.log = log;
-    }
-
     public virtual async Task<T> RebuildStateAsync<T, TState>(DomainId id,
         CancellationToken ct = default)
         where T : DomainObject<TState> where TState : Entity, new()

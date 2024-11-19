@@ -10,15 +10,10 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Infrastructure.Migrations;
 
-public sealed class MongoMigrationStatus : MongoRepositoryBase<MongoMigrationEntity>, IMigrationStatus
+public sealed class MongoMigrationStatus(IMongoDatabase database) : MongoRepositoryBase<MongoMigrationEntity>(database), IMigrationStatus
 {
     private const string DefaultId = "Default";
     private static readonly FindOneAndUpdateOptions<MongoMigrationEntity> UpsertFind = new FindOneAndUpdateOptions<MongoMigrationEntity> { IsUpsert = true };
-
-    public MongoMigrationStatus(IMongoDatabase database)
-        : base(database)
-    {
-    }
 
     protected override string CollectionName()
     {

@@ -12,16 +12,9 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 
 namespace Squidex.Extensions.Actions.Kafka;
 
-public sealed class KafkaActionHandler : RuleActionHandler<KafkaAction, KafkaJob>
+public sealed class KafkaActionHandler(RuleEventFormatter formatter, KafkaProducer kafkaProducer) : RuleActionHandler<KafkaAction, KafkaJob>(formatter)
 {
     private const string Description = "Push to Kafka";
-    private readonly KafkaProducer kafkaProducer;
-
-    public KafkaActionHandler(RuleEventFormatter formatter, KafkaProducer kafkaProducer)
-        : base(formatter)
-    {
-        this.kafkaProducer = kafkaProducer;
-    }
 
     protected override async Task<(string Description, KafkaJob Data)> CreateJobAsync(EnrichedEvent @event, KafkaAction action)
     {

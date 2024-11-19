@@ -7,12 +7,7 @@
 
 namespace Squidex.Domain.Apps.Core.ValidateContent;
 
-public sealed class JsonError
+public sealed class JsonError(string error)
 {
-    public string Error { get; }
-
-    public JsonError(string error)
-    {
-        Error = error;
-    }
+    public string Error { get; } = error;
 }

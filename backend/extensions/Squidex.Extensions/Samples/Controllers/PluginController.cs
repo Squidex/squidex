@@ -11,13 +11,8 @@ using Squidex.Web;
 
 namespace Squidex.Extensions.Samples.Controllers;
 
-public sealed class PluginController : ApiController
+public sealed class PluginController(ICommandBus commandBus) : ApiController(commandBus)
 {
-    public PluginController(ICommandBus commandBus)
-        : base(commandBus)
-    {
-    }
-
     [Route("plugins/sample")]
     public IActionResult Test()
     {

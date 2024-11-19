@@ -22,34 +22,19 @@ using YDotNet.Server;
 
 namespace Squidex.Domain.Apps.Entities.Collaboration;
 
-public sealed partial class CommentCollaborationHandler : IDocumentCallback, ICollaborationService
+public sealed partial class CommentCollaborationHandler(
+    IJsonSerializer jsonSerializer,
+    IEventStore eventStore,
+    IEventFormatter eventFormatter,
+    IUserResolver userResolver,
+    IClock clock,
+    ILogger<CommentCollaborationHandler> log)
+    : IDocumentCallback, ICollaborationService
 {
     private static readonly Regex MentionRegex = BuildMentionRegex();
-    private readonly IJsonSerializer jsonSerializer;
-    private readonly IEventStore eventStore;
-    private readonly IEventFormatter eventFormatter;
-    private readonly IUserResolver userResolver;
-    private readonly IClock clock;
-    private readonly ILogger<CommentCollaborationHandler> log;
     private IDocumentManager? currentManager;
 
     public Task LastTask { get; private set; }
-
-    public CommentCollaborationHandler(
-        IJsonSerializer jsonSerializer,
-        IEventStore eventStore,
-        IEventFormatter eventFormatter,
-        IUserResolver userResolver,
-        IClock clock,
-        ILogger<CommentCollaborationHandler> log)
-    {
-        this.jsonSerializer = jsonSerializer;
-        this.eventStore = eventStore;
-        this.eventFormatter = eventFormatter;
-        this.userResolver = userResolver;
-        this.clock = clock;
-        this.log = log;
-    }
 
     public ValueTask OnInitializedAsync(IDocumentManager manager)
     {

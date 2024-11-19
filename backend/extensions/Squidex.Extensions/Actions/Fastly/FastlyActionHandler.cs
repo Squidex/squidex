@@ -13,17 +13,9 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Extensions.Actions.Fastly;
 
-public sealed class FastlyActionHandler : RuleActionHandler<FastlyAction, FastlyJob>
+public sealed class FastlyActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory) : RuleActionHandler<FastlyAction, FastlyJob>(formatter)
 {
     private const string Description = "Purge key in fastly";
-
-    private readonly IHttpClientFactory httpClientFactory;
-
-    public FastlyActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory)
-        : base(formatter)
-    {
-        this.httpClientFactory = httpClientFactory;
-    }
 
     protected override (string Description, FastlyJob Data) CreateJob(EnrichedEvent @event, FastlyAction action)
     {

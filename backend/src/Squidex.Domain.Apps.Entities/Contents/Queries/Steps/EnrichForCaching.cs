@@ -9,15 +9,8 @@ using Squidex.Infrastructure.Caching;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 
-public sealed class EnrichForCaching : IContentEnricherStep
+public sealed class EnrichForCaching(IRequestCache requestCache) : IContentEnricherStep
 {
-    private readonly IRequestCache requestCache;
-
-    public EnrichForCaching(IRequestCache requestCache)
-    {
-        this.requestCache = requestCache;
-    }
-
     public Task EnrichAsync(Context context,
         CancellationToken ct)
     {

@@ -12,15 +12,8 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ExtractReferenceIds;
 
-public sealed class ValueReferencesConverter : IContentValueConverter
+public sealed class ValueReferencesConverter(HashSet<DomainId>? validIds = null) : IContentValueConverter
 {
-    private readonly HashSet<DomainId>? validIds;
-
-    public ValueReferencesConverter(HashSet<DomainId>? validIds = null)
-    {
-        this.validIds = validIds;
-    }
-
     public (bool Remove, JsonValue) ConvertValue(IField field, JsonValue source, IField? parent)
     {
         if (validIds == null || source == default)

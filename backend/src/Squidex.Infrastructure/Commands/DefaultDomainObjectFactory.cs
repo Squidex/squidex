@@ -12,10 +12,8 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Infrastructure.Commands;
 
-public sealed class DefaultDomainObjectFactory : IDomainObjectFactory
+public sealed class DefaultDomainObjectFactory(IServiceProvider serviceProvider) : IDomainObjectFactory
 {
-    private readonly IServiceProvider serviceProvider;
-
     private static class DefaultFactory<T>
     {
         private static readonly ObjectFactory ObjectFactory =
@@ -36,11 +34,6 @@ public sealed class DefaultDomainObjectFactory : IDomainObjectFactory
         {
             return (T)ObjectFactory(serviceProvider, [id, persistenceFactory]);
         }
-    }
-
-    public DefaultDomainObjectFactory(IServiceProvider serviceProvider)
-    {
-        this.serviceProvider = serviceProvider;
     }
 
     public T Create<T>(DomainId id)

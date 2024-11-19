@@ -10,15 +10,8 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Backup;
 
-public sealed class DefaultBackupArchiveStore : IBackupArchiveStore
+public sealed class DefaultBackupArchiveStore(IAssetStore assetStore) : IBackupArchiveStore
 {
-    private readonly IAssetStore assetStore;
-
-    public DefaultBackupArchiveStore(IAssetStore assetStore)
-    {
-        this.assetStore = assetStore;
-    }
-
     public Task DownloadAsync(DomainId backupId, Stream stream,
         CancellationToken ct = default)
     {

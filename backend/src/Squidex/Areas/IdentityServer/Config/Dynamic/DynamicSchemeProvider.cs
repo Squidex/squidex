@@ -21,35 +21,20 @@ using Squidex.Infrastructure.Json;
 
 namespace Squidex.Areas.IdentityServer.Config;
 
-public sealed class DynamicSchemeProvider : AuthenticationSchemeProvider, IOptionsMonitor<DynamicOpenIdConnectOptions>
+public sealed class DynamicSchemeProvider(
+    IAppProvider appProvider,
+    IHttpContextAccessor httpContextAccessor,
+    IDistributedCache dynamicCache,
+    IJsonSerializer jsonSerializer,
+    OpenIdConnectPostConfigureOptions configure,
+    IOptions<AuthenticationOptions> options)
+    : AuthenticationSchemeProvider(options), IOptionsMonitor<DynamicOpenIdConnectOptions>
 {
     private static readonly string[] UrlPrefixes = ["signin-", "signout-callback-", "signout-"];
-
-    private readonly IAppProvider appProvider;
-    private readonly IHttpContextAccessor httpContextAccessor;
-    private readonly IDistributedCache dynamicCache;
-    private readonly IJsonSerializer jsonSerializer;
-    private readonly OpenIdConnectPostConfigureOptions configure;
 
     public DynamicOpenIdConnectOptions CurrentValue => null!;
 
     private sealed record SchemeResult(AuthenticationScheme Scheme, DynamicOpenIdConnectOptions Options);
-
-    public DynamicSchemeProvider(
-        IAppProvider appProvider,
-        IHttpContextAccessor httpContextAccessor,
-        IDistributedCache dynamicCache,
-        IJsonSerializer jsonSerializer,
-        OpenIdConnectPostConfigureOptions configure,
-        IOptions<AuthenticationOptions> options)
-        : base(options)
-    {
-        this.appProvider = appProvider;
-        this.httpContextAccessor = httpContextAccessor;
-        this.dynamicCache = dynamicCache;
-        this.jsonSerializer = jsonSerializer;
-        this.configure = configure;
-    }
 
     public async Task<string> AddTemporarySchemeAsync(AuthScheme scheme,
         CancellationToken ct = default)

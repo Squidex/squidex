@@ -18,33 +18,20 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Apps;
 
-public sealed class BackupApps : IBackupHandler
+public sealed class BackupApps(
+    Rebuilder rebuilder,
+    IAppImageStore appImageStore,
+    IAppProvider appProvider,
+    IAppsIndex appsIndex,
+    IAppUISettings appUISettings)
+    : IBackupHandler
 {
     private const string SettingsFile = "Settings.json";
     private const string AvatarFile = "Avatar.image";
-    private readonly Rebuilder rebuilder;
-    private readonly IAppImageStore appImageStore;
-    private readonly IAppProvider appProvider;
-    private readonly IAppsIndex appsIndex;
-    private readonly IAppUISettings appUISettings;
     private AppDomainObject? app;
     private string? appReservation;
 
     public string Name { get; } = "Apps";
-
-    public BackupApps(
-        Rebuilder rebuilder,
-        IAppImageStore appImageStore,
-        IAppProvider appProvider,
-        IAppsIndex appsIndex,
-        IAppUISettings appUISettings)
-    {
-        this.appsIndex = appsIndex;
-        this.appImageStore = appImageStore;
-        this.appProvider = appProvider;
-        this.appUISettings = appUISettings;
-        this.rebuilder = rebuilder;
-    }
 
     public async Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context,
         CancellationToken ct)

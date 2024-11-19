@@ -10,17 +10,9 @@ using Squidex.Translator.State;
 
 namespace Squidex.Translator.Processes;
 
-public partial class TranslateTypescript
+public partial class TranslateTypescript(DirectoryInfo folder, TranslationService service)
 {
-    private readonly TranslationService service;
-    private readonly DirectoryInfo folder;
-
-    public TranslateTypescript(DirectoryInfo folder, TranslationService service)
-    {
-        this.folder = Frontend.GetFolder(folder);
-
-        this.service = service;
-    }
+    private readonly DirectoryInfo folder = Frontend.GetFolder(folder);
 
     public void Run()
     {

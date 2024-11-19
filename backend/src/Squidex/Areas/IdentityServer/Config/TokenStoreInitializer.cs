@@ -15,17 +15,10 @@ using Squidex.Infrastructure.Timers;
 
 namespace Squidex.Areas.IdentityServer.Config;
 
-public sealed class TokenStoreInitializer : IInitializable, IBackgroundProcess
+public sealed class TokenStoreInitializer(IOptions<OpenIddictMongoDbOptions> options, IServiceProvider serviceProvider) : IInitializable, IBackgroundProcess
 {
-    private readonly OpenIddictMongoDbOptions options;
-    private readonly IServiceProvider serviceProvider;
+    private readonly OpenIddictMongoDbOptions options = options.Value;
     private CompletionTimer timer;
-
-    public TokenStoreInitializer(IOptions<OpenIddictMongoDbOptions> options, IServiceProvider serviceProvider)
-    {
-        this.options = options.Value;
-        this.serviceProvider = serviceProvider;
-    }
 
     public async Task InitializeAsync(
         CancellationToken ct)

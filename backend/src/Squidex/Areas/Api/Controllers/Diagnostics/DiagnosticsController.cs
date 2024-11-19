@@ -17,16 +17,8 @@ namespace Squidex.Areas.Api.Controllers.Diagnostics;
 /// Makes a diagnostics request.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Diagnostics))]
-public sealed class DiagnosticsController : ApiController
+public sealed class DiagnosticsController(ICommandBus commandBus, Diagnoser dumper) : ApiController(commandBus)
 {
-    private readonly Diagnoser dumper;
-
-    public DiagnosticsController(ICommandBus commandBus, Diagnoser dumper)
-        : base(commandBus)
-    {
-        this.dumper = dumper;
-    }
-
     /// <summary>
     /// Creates a dump and writes it into storage..
     /// </summary>

@@ -19,24 +19,14 @@ using Squidex.Infrastructure.Security;
 
 namespace Squidex.Domain.Apps.Entities;
 
-public sealed class AppProvider : IAppProvider
+public sealed class AppProvider(
+    IAppsIndex indexForApps,
+    IRulesIndex indexForRules,
+    ISchemasIndex indexForSchemas,
+    ITeamsIndex indexForTeams,
+    ILocalCache localCache)
+    : IAppProvider
 {
-    private readonly ILocalCache localCache;
-    private readonly IAppsIndex indexForApps;
-    private readonly IRulesIndex indexForRules;
-    private readonly ISchemasIndex indexForSchemas;
-    private readonly ITeamsIndex indexForTeams;
-
-    public AppProvider(IAppsIndex indexForApps, IRulesIndex indexForRules, ISchemasIndex indexForSchemas, ITeamsIndex indexForTeams,
-        ILocalCache localCache)
-    {
-        this.localCache = localCache;
-        this.indexForApps = indexForApps;
-        this.indexForRules = indexForRules;
-        this.indexForSchemas = indexForSchemas;
-        this.indexForTeams = indexForTeams;
-    }
-
     public async Task<(App?, Schema?)> GetAppWithSchemaAsync(DomainId appId, DomainId id, bool canCache = false,
         CancellationToken ct = default)
     {

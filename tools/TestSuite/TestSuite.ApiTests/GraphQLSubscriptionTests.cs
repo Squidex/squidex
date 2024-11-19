@@ -17,14 +17,9 @@ namespace TestSuite.ApiTests;
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
 
-public class GraphQLSubscriptionTests : IClassFixture<ContentFixture>
+public class GraphQLSubscriptionTests(ContentFixture fixture) : IClassFixture<ContentFixture>
 {
-    public ContentFixture _ { get; set; }
-
-    public GraphQLSubscriptionTests(ContentFixture fixture)
-    {
-        _ = fixture;
-    }
+    public ContentFixture _ { get; } = fixture;
 
     private sealed class ContentChangesResult
     {

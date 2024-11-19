@@ -13,13 +13,8 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets;
 
-public sealed class MongoShardedAssetRepository : ShardedSnapshotStore<MongoAssetRepository, Asset>, IAssetRepository, IDeleter
+public sealed class MongoShardedAssetRepository(IShardingStrategy sharding, Func<string, MongoAssetRepository> factory) : ShardedSnapshotStore<MongoAssetRepository, Asset>(sharding, factory, x => x.AppId.Id), IAssetRepository, IDeleter
 {
-    public MongoShardedAssetRepository(IShardingStrategy sharding, Func<string, MongoAssetRepository> factory)
-        : base(sharding, factory, x => x.AppId.Id)
-    {
-    }
-
     public IEnumerable<IMongoCollection<MongoAssetEntity>> GetInternalCollections()
     {
         return Shards.Select(x => x.GetInternalCollection());

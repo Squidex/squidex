@@ -11,18 +11,10 @@ using Squidex.Text;
 
 namespace Squidex.Infrastructure.EventSourcing;
 
-public sealed class EventStoreProjectionClient
+public sealed class EventStoreProjectionClient(EventStoreClientSettings settings, string projectionPrefix)
 {
     private readonly ConcurrentDictionary<string, bool> projections = new ConcurrentDictionary<string, bool>();
-    private readonly string projectionPrefix;
-    private readonly EventStoreProjectionManagementClient client;
-
-    public EventStoreProjectionClient(EventStoreClientSettings settings, string projectionPrefix)
-    {
-        client = new EventStoreProjectionManagementClient(settings);
-
-        this.projectionPrefix = projectionPrefix;
-    }
+    private readonly EventStoreProjectionManagementClient client = new EventStoreProjectionManagementClient(settings);
 
     private string CreateFilterProjectionName(string filter)
     {

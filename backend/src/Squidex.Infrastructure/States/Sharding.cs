@@ -35,15 +35,8 @@ public sealed class SingleSharding : IShardingStrategy
     }
 }
 
-public sealed class PartitionedSharding : IShardingStrategy
+public sealed class PartitionedSharding(int numPartitions) : IShardingStrategy
 {
-    private readonly int numPartitions;
-
-    public PartitionedSharding(int numPartitions)
-    {
-        this.numPartitions = numPartitions;
-    }
-
     public string GetShardKey<T>(T key) where T : notnull, IDeterministicHashCode
     {
         var partition = Math.Abs(key.GetDeterministicHashCode()) % numPartitions;

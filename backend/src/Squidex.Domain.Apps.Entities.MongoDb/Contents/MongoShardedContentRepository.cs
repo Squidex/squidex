@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Runtime.CompilerServices;
-using System.Xml.Linq;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
@@ -19,13 +18,8 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Contents;
 
-public sealed class MongoShardedContentRepository : ShardedSnapshotStore<MongoContentRepository, WriteContent>, IContentRepository, IDeleter
+public sealed class MongoShardedContentRepository(IShardingStrategy sharding, Func<string, MongoContentRepository> factory) : ShardedSnapshotStore<MongoContentRepository, WriteContent>(sharding, factory, x => x.AppId.Id), IContentRepository, IDeleter
 {
-    public MongoShardedContentRepository(IShardingStrategy sharding, Func<string, MongoContentRepository> factory)
-        : base(sharding, factory, x => x.AppId.Id)
-    {
-    }
-
     public Task<Content?> FindContentAsync(App app, Schema schema, DomainId id, SearchScope scope,
         CancellationToken ct = default)
     {

@@ -7,17 +7,9 @@
 
 namespace Squidex.Infrastructure.Commands;
 
-public class CachingDomainObjectMiddleware<TCommand, T, TState> : AggregateCommandMiddleware<TCommand, T>
+public class CachingDomainObjectMiddleware<TCommand, T, TState>(IDomainObjectFactory domainObjectFactory, IDomainObjectCache domainObjectCache) : AggregateCommandMiddleware<TCommand, T>(domainObjectFactory)
     where TCommand : IAggregateCommand where T : DomainObject<TState> where TState : Entity, new()
 {
-    private readonly IDomainObjectCache domainObjectCache;
-
-    public CachingDomainObjectMiddleware(IDomainObjectFactory domainObjectFactory, IDomainObjectCache domainObjectCache)
-        : base(domainObjectFactory)
-    {
-        this.domainObjectCache = domainObjectCache;
-    }
-
     protected override async Task<CommandResult> ExecuteCommandAsync(T executable, TCommand command,
         CancellationToken ct)
     {

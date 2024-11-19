@@ -9,16 +9,8 @@ using GraphQL.DataLoader;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Cache;
 
-internal class NonCachingBatchLoader<TKey, T> : DataLoaderBase<TKey, T> where TKey : notnull where T : class
+internal class NonCachingBatchLoader<TKey, T>(Func<IEnumerable<TKey>, CancellationToken, Task<IDictionary<TKey, T>>> queryDelegate, int maxBatchSize = int.MaxValue) : DataLoaderBase<TKey, T>(false, maxBatchSize) where TKey : notnull where T : class
 {
-    private readonly Func<IEnumerable<TKey>, CancellationToken, Task<IDictionary<TKey, T>>> queryDelegate;
-
-    public NonCachingBatchLoader(Func<IEnumerable<TKey>, CancellationToken, Task<IDictionary<TKey, T>>> queryDelegate, int maxBatchSize = int.MaxValue)
-        : base(false, maxBatchSize)
-    {
-        this.queryDelegate = queryDelegate;
-    }
-
     protected override async Task FetchAsync(IEnumerable<DataLoaderPair<TKey, T>> list,
         CancellationToken cancellationToken)
     {

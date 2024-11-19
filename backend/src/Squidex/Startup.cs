@@ -18,15 +18,8 @@ using Squidex.Web.Pipeline;
 
 namespace Squidex;
 
-public sealed class Startup
+public sealed class Startup(IConfiguration config)
 {
-    private readonly IConfiguration config;
-
-    public Startup(IConfiguration config)
-    {
-        this.config = config;
-    }
-
     public void ConfigureServices(IServiceCollection services)
     {
         services.AddHttpClient();

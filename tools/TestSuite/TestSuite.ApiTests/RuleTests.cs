@@ -13,16 +13,11 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-public class RuleTests : IClassFixture<ClientFixture>
+public class RuleTests(ClientFixture fixture) : IClassFixture<ClientFixture>
 {
     private readonly string ruleName = Guid.NewGuid().ToString();
 
-    public ClientFixture _ { get; }
-
-    public RuleTests(ClientFixture fixture)
-    {
-        _ = fixture;
-    }
+    public ClientFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_create_rule()

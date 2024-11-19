@@ -67,13 +67,8 @@ public class AcceptHeader
         }
     }
 
-    public abstract class BaseAttribute : OpenApiOperationProcessorAttribute
+    public abstract class BaseAttribute(string name, string description, JsonObjectType schemaType = JsonObjectType.String) : OpenApiOperationProcessorAttribute(typeof(Processor), name, description, schemaType)
     {
-        protected BaseAttribute(string name, string description, JsonObjectType schemaType = JsonObjectType.String)
-            : base(typeof(Processor), name, description, schemaType)
-        {
-        }
-
 #pragma warning disable IDE1006 // Naming Styles
         public record Processor(string name, string description, JsonObjectType schemaType) : IOperationProcessor
 #pragma warning restore IDE1006 // Naming Styles

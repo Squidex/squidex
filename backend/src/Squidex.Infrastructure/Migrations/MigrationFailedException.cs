@@ -8,15 +8,9 @@
 namespace Squidex.Infrastructure.Migrations;
 
 [Serializable]
-public class MigrationFailedException : Exception
+public class MigrationFailedException(string name, Exception? inner = null) : Exception(FormatException(name), inner)
 {
-    public string Name { get; }
-
-    public MigrationFailedException(string name, Exception? inner = null)
-        : base(FormatException(name), inner)
-    {
-        Name = name;
-    }
+    public string Name { get; } = name;
 
     private static string FormatException(string name)
     {

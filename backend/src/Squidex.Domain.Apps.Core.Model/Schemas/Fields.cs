@@ -20,7 +20,7 @@ public static class Fields
     public static RootField<AssetsFieldProperties> Assets(long id, string name, Partitioning partitioning,
         AssetsFieldProperties? properties = null)
     {
-        return new RootField<AssetsFieldProperties> { Id = id, Name = name, Partitioning = partitioning, Properties = properties ?? new () };
+        return new RootField<AssetsFieldProperties> { Id = id, Name = name, Partitioning = partitioning, Properties = properties ?? new() };
     }
 
     public static RootField<BooleanFieldProperties> Boolean(long id, string name, Partitioning partitioning,

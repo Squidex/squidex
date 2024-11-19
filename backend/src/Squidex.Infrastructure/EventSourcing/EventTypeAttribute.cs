@@ -10,14 +10,9 @@ using Squidex.Infrastructure.Reflection;
 namespace Squidex.Infrastructure.EventSourcing;
 
 [AttributeUsage(AttributeTargets.Class, Inherited = false)]
-public sealed class EventTypeAttribute : TypeNameAttribute
+public sealed class EventTypeAttribute(string typeName, int version = 1) : TypeNameAttribute(CreateTypeName(typeName, version))
 {
     private const string Suffix = "Event";
-
-    public EventTypeAttribute(string typeName, int version = 1)
-        : base(CreateTypeName(typeName, version))
-    {
-    }
 
     private static string CreateTypeName(string typeName, int version)
     {

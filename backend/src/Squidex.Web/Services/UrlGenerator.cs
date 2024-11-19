@@ -16,22 +16,15 @@ using IGenericUrlGenerator = Squidex.Hosting.IUrlGenerator;
 
 namespace Squidex.Web.Services;
 
-public sealed class UrlGenerator : IUrlGenerator, IHttpImageEndpoint
+public sealed class UrlGenerator(
+    IGenericUrlGenerator urlGenerator,
+    IAssetFileStore assetFileStore,
+    IOptions<AssetOptions> assetOptions,
+    IOptions<ContentOptions> contentOptions)
+    : IUrlGenerator, IHttpImageEndpoint
 {
-    private readonly IAssetFileStore assetFileStore;
-    private readonly IGenericUrlGenerator urlGenerator;
-    private readonly AssetOptions assetOptions;
-    private readonly ContentOptions contentOptions;
-
-    public UrlGenerator(IGenericUrlGenerator urlGenerator, IAssetFileStore assetFileStore,
-        IOptions<AssetOptions> assetOptions,
-        IOptions<ContentOptions> contentOptions)
-    {
-        this.contentOptions = contentOptions.Value;
-        this.assetFileStore = assetFileStore;
-        this.assetOptions = assetOptions.Value;
-        this.urlGenerator = urlGenerator;
-    }
+    private readonly AssetOptions assetOptions = assetOptions.Value;
+    private readonly ContentOptions contentOptions = contentOptions.Value;
 
     public string? AssetThumbnail(NamedId<DomainId> appId, string idOrSlug, AssetType assetType)
     {

@@ -12,13 +12,8 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Scripting.Internal;
 
-internal sealed class CustomClrConverter : DefaultTypeConverter
+internal sealed class CustomClrConverter(Engine engine) : DefaultTypeConverter(engine)
 {
-    public CustomClrConverter(Engine engine)
-        : base(engine)
-    {
-    }
-
     public override object? Convert(object? value, Type type, IFormatProvider formatProvider)
     {
         if (type == typeof(JsonValue))

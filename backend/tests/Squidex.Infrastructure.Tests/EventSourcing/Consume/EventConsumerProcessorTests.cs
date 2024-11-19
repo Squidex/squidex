@@ -13,19 +13,15 @@ namespace Squidex.Infrastructure.EventSourcing.Consume;
 
 public class EventConsumerProcessorTests
 {
-    public sealed class MyEventConsumerProcessor : EventConsumerProcessor
+    public sealed class MyEventConsumerProcessor(
+        IPersistenceFactory<EventConsumerState> persistenceFactory,
+        IEventConsumer eventConsumer,
+        IEventFormatter eventFormatter,
+        IEventStore eventStore,
+        ILogger<EventConsumerProcessor> log)
+    : EventConsumerProcessor(persistenceFactory, eventConsumer, eventFormatter, eventStore, log)
     {
         public IEventSubscriber<StoredEvent>? Subscriber { get; set; }
-
-        public MyEventConsumerProcessor(
-            IPersistenceFactory<EventConsumerState> persistenceFactory,
-            IEventConsumer eventConsumer,
-            IEventFormatter eventFormatter,
-            IEventStore eventStore,
-            ILogger<EventConsumerProcessor> log)
-            : base(persistenceFactory, eventConsumer, eventFormatter, eventStore, log)
-        {
-        }
 
         protected override IEventSubscription CreateRetrySubscription(IEventSubscriber<ParsedEvents> subscriber)
         {

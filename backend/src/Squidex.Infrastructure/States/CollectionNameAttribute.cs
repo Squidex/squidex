@@ -8,12 +8,7 @@
 namespace Squidex.Infrastructure.States;
 
 [AttributeUsage(AttributeTargets.Class)]
-public sealed class CollectionNameAttribute : Attribute
+public sealed class CollectionNameAttribute(string name) : Attribute
 {
-    public string Name { get; }
-
-    public CollectionNameAttribute(string name)
-    {
-        Name = name;
-    }
+    public string Name { get; } = name;
 }

@@ -26,11 +26,10 @@ public sealed class MongoParallelInsertTests : IClassFixture<MongoEventStoreFixt
     {
     }
 
-    public sealed class MyEventConsumer : IEventConsumer
+    public sealed class MyEventConsumer(int expectedCount) : IEventConsumer
     {
         private readonly HashSet<Guid> uniqueReceivedEvents = [];
         private readonly TaskCompletionSource<bool> tcs = new TaskCompletionSource<bool>();
-        private readonly int expectedCount;
 
         public Func<int, Task> EventReceived { get; set; }
 
@@ -41,11 +40,6 @@ public sealed class MongoParallelInsertTests : IClassFixture<MongoEventStoreFixt
         public StreamFilter EventsFilter => StreamFilter.Prefix(Name);
 
         public Task Completed => tcs.Task;
-
-        public MyEventConsumer(int expectedCount)
-        {
-            this.expectedCount = expectedCount;
-        }
 
         public async Task On(Envelope<IEvent> @event)
         {

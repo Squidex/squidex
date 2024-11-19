@@ -22,27 +22,16 @@ using Squidex.Web;
 namespace Squidex.Areas.IdentityServer.Controllers.Setup;
 
 [AutoValidateAntiforgeryToken]
-public class SetupController : IdentityServerController
+public class SetupController(
+    IAssetStore assetStore,
+    IOptions<MyUIOptions> uiOptions,
+    IOptions<MyIdentityOptions> identityOptions,
+    IUrlGenerator urlGenerator,
+    IUserService userService)
+    : IdentityServerController
 {
-    private readonly IAssetStore assetStore;
-    private readonly IUrlGenerator urlGenerator;
-    private readonly IUserService userService;
-    private readonly MyUIOptions uiOptions;
-    private readonly MyIdentityOptions identityOptions;
-
-    public SetupController(
-        IAssetStore assetStore,
-        IOptions<MyUIOptions> uiOptions,
-        IOptions<MyIdentityOptions> identityOptions,
-        IUrlGenerator urlGenerator,
-        IUserService userService)
-    {
-        this.assetStore = assetStore;
-        this.identityOptions = identityOptions.Value;
-        this.uiOptions = uiOptions.Value;
-        this.urlGenerator = urlGenerator;
-        this.userService = userService;
-    }
+    private readonly MyUIOptions uiOptions = uiOptions.Value;
+    private readonly MyIdentityOptions identityOptions = identityOptions.Value;
 
     [HttpGet]
     [Route("setup/")]

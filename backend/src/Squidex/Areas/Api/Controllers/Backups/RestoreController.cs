@@ -21,16 +21,8 @@ namespace Squidex.Areas.Api.Controllers.Backups;
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Backups))]
 [ApiModelValidation(true)]
-public class RestoreController : ApiController
+public class RestoreController(ICommandBus commandBus, IJobService jobService) : ApiController(commandBus)
 {
-    private readonly IJobService jobService;
-
-    public RestoreController(ICommandBus commandBus, IJobService jobService)
-        : base(commandBus)
-    {
-        this.jobService = jobService;
-    }
-
     /// <summary>
     /// Get current restore status.
     /// </summary>

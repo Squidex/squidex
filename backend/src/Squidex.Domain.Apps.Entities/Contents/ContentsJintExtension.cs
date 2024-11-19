@@ -13,21 +13,14 @@ using Jint.Runtime;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Scripting;
-using Squidex.Domain.Apps.Core.Scripting.Internal;
 using Squidex.Domain.Apps.Entities.Properties;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public sealed class ContentsJintExtension : IJintExtension, IScriptDescriptor
+public sealed class ContentsJintExtension(IServiceProvider serviceProvider) : IJintExtension, IScriptDescriptor
 {
     private delegate void GetContentsDelegate(string schema, JsValue query, Action<JsValue> callback);
-    private readonly IServiceProvider serviceProvider;
-
-    public ContentsJintExtension(IServiceProvider serviceProvider)
-    {
-        this.serviceProvider = serviceProvider;
-    }
 
     public void ExtendAsync(ScriptExecutionContext context)
     {

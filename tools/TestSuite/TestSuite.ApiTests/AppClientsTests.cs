@@ -13,18 +13,13 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-public sealed class AppClientsTests : IClassFixture<ClientFixture>
+public sealed class AppClientsTests(ClientFixture fixture) : IClassFixture<ClientFixture>
 {
     private readonly string id = Guid.NewGuid().ToString();
     private readonly string clientRole = "Editor";
     private readonly string clientName = "My Client";
 
-    public ClientFixture _ { get; }
-
-    public AppClientsTests(ClientFixture fixture)
-    {
-        _ = fixture;
-    }
+    public ClientFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_create_client()

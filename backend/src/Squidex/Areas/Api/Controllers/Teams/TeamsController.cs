@@ -21,16 +21,8 @@ namespace Squidex.Areas.Api.Controllers.Teams;
 /// Update and query teams.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Teams))]
-public sealed class TeamsController : ApiController
+public sealed class TeamsController(ICommandBus commandBus, IAppProvider appProvider) : ApiController(commandBus)
 {
-    private readonly IAppProvider appProvider;
-
-    public TeamsController(ICommandBus commandBus, IAppProvider appProvider)
-        : base(commandBus)
-    {
-        this.appProvider = appProvider;
-    }
-
     /// <summary>
     /// Get your teams.
     /// </summary>

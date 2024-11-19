@@ -10,16 +10,11 @@ using TestSuite.Model;
 
 namespace TestSuite.Fixtures;
 
-public abstract class TestSchemaWithReferencesFixtureBase : CreatedAppFixture
+public abstract class TestSchemaWithReferencesFixtureBase(string schemaName) : CreatedAppFixture
 {
     public IContentsClient<TestEntityWithReferences, TestEntityWithReferencesData> Contents { get; private set; }
 
-    public string SchemaName { get; }
-
-    protected TestSchemaWithReferencesFixtureBase(string schemaName)
-    {
-        SchemaName = schemaName;
-    }
+    public string SchemaName { get; } = schemaName;
 
     public override async Task InitializeAsync()
     {

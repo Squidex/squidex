@@ -10,15 +10,8 @@ using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators;
 
-public sealed class ComponentValidator : IValidator
+public sealed class ComponentValidator(Func<Schema, IValidator?> validatorFactory) : IValidator
 {
-    private readonly Func<Schema, IValidator?> validatorFactory;
-
-    public ComponentValidator(Func<Schema, IValidator?> validatorFactory)
-    {
-        this.validatorFactory = validatorFactory;
-    }
-
     public void Validate(object? value, ValidationContext context)
     {
         if (value is Component component)

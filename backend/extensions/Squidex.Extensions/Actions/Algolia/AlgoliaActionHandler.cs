@@ -18,25 +18,14 @@ using Squidex.Infrastructure.Json;
 
 namespace Squidex.Extensions.Actions.Algolia;
 
-public sealed class AlgoliaActionHandler : RuleActionHandler<AlgoliaAction, AlgoliaJob>
+public sealed class AlgoliaActionHandler(RuleEventFormatter formatter, IScriptEngine scriptEngine, IJsonSerializer serializer) : RuleActionHandler<AlgoliaAction, AlgoliaJob>(formatter)
 {
-    private readonly ClientPool<(string AppId, string ApiKey, string IndexName), ISearchIndex> clients;
-    private readonly IScriptEngine scriptEngine;
-    private readonly IJsonSerializer serializer;
-
-    public AlgoliaActionHandler(RuleEventFormatter formatter, IScriptEngine scriptEngine, IJsonSerializer serializer)
-        : base(formatter)
-    {
-        clients = new ClientPool<(string AppId, string ApiKey, string IndexName), ISearchIndex>(key =>
+    private readonly ClientPool<(string AppId, string ApiKey, string IndexName), ISearchIndex> clients = new ClientPool<(string AppId, string ApiKey, string IndexName), ISearchIndex>(key =>
         {
             var client = new SearchClient(key.AppId, key.ApiKey);
 
             return client.InitIndex(key.IndexName);
         });
-
-        this.scriptEngine = scriptEngine;
-        this.serializer = serializer;
-    }
 
     protected override async Task<(string Description, AlgoliaJob Data)> CreateJobAsync(EnrichedEvent @event, AlgoliaAction action)
     {

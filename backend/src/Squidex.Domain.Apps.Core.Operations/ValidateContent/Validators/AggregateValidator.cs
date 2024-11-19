@@ -9,14 +9,9 @@ using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators;
 
-public sealed class AggregateValidator : IValidator
+public sealed class AggregateValidator(IEnumerable<IValidator>? validators) : IValidator
 {
-    private readonly IValidator[]? validators;
-
-    public AggregateValidator(IEnumerable<IValidator>? validators)
-    {
-        this.validators = validators?.ToArray();
-    }
+    private readonly IValidator[]? validators = validators?.ToArray();
 
     public void Validate(object? value, ValidationContext context)
     {

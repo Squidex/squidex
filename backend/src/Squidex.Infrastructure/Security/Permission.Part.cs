@@ -9,23 +9,16 @@ namespace Squidex.Infrastructure.Security;
 
 public sealed partial class Permission
 {
-    internal readonly struct Part
+    internal readonly struct Part(ReadOnlyMemory<char>[]? alternatives, bool exclusion)
     {
         private const char SeparatorAlternative = '|';
         private const char SeparatorMain = '.';
         private const char CharAny = '*';
         private const char CharExclude = '^';
 
-        public readonly ReadOnlyMemory<char>[]? Alternatives;
+        public readonly ReadOnlyMemory<char>[]? Alternatives = alternatives;
 
-        public readonly bool Exclusion;
-
-        public Part(ReadOnlyMemory<char>[]? alternatives, bool exclusion)
-        {
-            Alternatives = alternatives;
-
-            Exclusion = exclusion;
-        }
+        public readonly bool Exclusion = exclusion;
 
         public static Part[] ParsePath(string path)
         {

@@ -17,7 +17,7 @@ public sealed class UpsertContent : ContentDataCommand, ISchemaCommand
 
     public bool CheckReferrers { get; set; }
 
-    public bool Patch { get;  set; }
+    public bool Patch { get; set; }
 
     public bool EnrichDefaults { get; set; }
 

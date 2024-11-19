@@ -15,35 +15,20 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-public sealed class RecursiveDeleter : IEventConsumer
+public sealed class RecursiveDeleter(
+    ICommandBus commandBus,
+    IAssetRepository assetRepository,
+    IAssetFolderRepository assetFolderRepository,
+    TypeRegistry typeRegistry,
+    ILogger<RecursiveDeleter> log)
+    : IEventConsumer
 {
-    private readonly ICommandBus commandBus;
-    private readonly IAssetRepository assetRepository;
-    private readonly IAssetFolderRepository assetFolderRepository;
-    private readonly ILogger<RecursiveDeleter> log;
-    private readonly HashSet<string> consumingTypes;
-
-    public StreamFilter EventsFilter { get; } = StreamFilter.Prefix("assetFolder-");
-
-    public RecursiveDeleter(
-        ICommandBus commandBus,
-        IAssetRepository assetRepository,
-        IAssetFolderRepository assetFolderRepository,
-        TypeRegistry typeRegistry,
-        ILogger<RecursiveDeleter> log)
-    {
-        this.commandBus = commandBus;
-        this.assetRepository = assetRepository;
-        this.assetFolderRepository = assetFolderRepository;
-
-        this.log = log;
-
-        // Compute the event types names once for performance reasons and use hashset for extensibility.
-        consumingTypes =
+    private readonly HashSet<string> consumingTypes =
         [
             typeRegistry.GetName<IEvent, AssetFolderDeleted>()
         ];
-    }
+
+    public StreamFilter EventsFilter { get; } = StreamFilter.Prefix("assetFolder-");
 
     public ValueTask<bool> HandlesAsync(StoredEvent @event)
     {

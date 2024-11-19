@@ -14,13 +14,8 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Rules;
 
-public sealed class MongoRuleRepository : MongoSnapshotStoreBase<Rule, MongoRuleEntity>, IRuleRepository, IDeleter
+public sealed class MongoRuleRepository(IMongoDatabase database) : MongoSnapshotStoreBase<Rule, MongoRuleEntity>(database), IRuleRepository, IDeleter
 {
-    public MongoRuleRepository(IMongoDatabase database)
-        : base(database)
-    {
-    }
-
     protected override string CollectionName()
     {
         return "States_Rules";

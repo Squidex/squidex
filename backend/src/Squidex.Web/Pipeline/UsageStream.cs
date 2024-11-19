@@ -9,9 +9,8 @@
 
 namespace Squidex.Web.Pipeline;
 
-internal sealed class UsageStream : Stream
+internal sealed class UsageStream(Stream inner) : Stream
 {
-    private readonly Stream inner;
     private long bytesWritten;
 
     public long BytesWritten
@@ -43,11 +42,6 @@ internal sealed class UsageStream : Stream
     {
         get => throw new NotSupportedException();
         set => throw new NotSupportedException();
-    }
-
-    public UsageStream(Stream inner)
-    {
-        this.inner = inner;
     }
 
     public override IAsyncResult BeginWrite(byte[] buffer, int offset, int count, AsyncCallback? callback, object? state)

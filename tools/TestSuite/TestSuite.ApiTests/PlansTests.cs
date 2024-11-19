@@ -11,14 +11,9 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-public class PlansTests : IClassFixture<CreatedAppFixture>
+public class PlansTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFixture>
 {
-    public CreatedAppFixture _ { get; }
-
-    public PlansTests(CreatedAppFixture fixture)
-    {
-        _ = fixture;
-    }
+    public CreatedAppFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_get_plans()

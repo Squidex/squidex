@@ -11,15 +11,8 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Teams.Indexes;
 
-public sealed class TeamsIndex : ITeamsIndex
+public sealed class TeamsIndex(ITeamRepository teamRepository) : ITeamsIndex
 {
-    private readonly ITeamRepository teamRepository;
-
-    public TeamsIndex(ITeamRepository teamRepository)
-    {
-        this.teamRepository = teamRepository;
-    }
-
     public async Task<Team?> GetTeamAsync(DomainId id,
         CancellationToken ct = default)
     {

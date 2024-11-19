@@ -15,12 +15,9 @@ using Squidex.Infrastructure.Json;
 
 namespace Squidex.Extensions.Actions.Medium;
 
-public sealed class MediumActionHandler : RuleActionHandler<MediumAction, MediumJob>
+public sealed class MediumActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory, IJsonSerializer serializer) : RuleActionHandler<MediumAction, MediumJob>(formatter)
 {
     private const string Description = "Post to medium";
-
-    private readonly IHttpClientFactory httpClientFactory;
-    private readonly IJsonSerializer serializer;
 
     private sealed class UserResponse
     {
@@ -30,14 +27,6 @@ public sealed class MediumActionHandler : RuleActionHandler<MediumAction, Medium
     private sealed class UserResponseData
     {
         public string Id { get; set; }
-    }
-
-    public MediumActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory, IJsonSerializer serializer)
-        : base(formatter)
-    {
-        this.httpClientFactory = httpClientFactory;
-
-        this.serializer = serializer;
     }
 
     protected override async Task<(string Description, MediumJob Data)> CreateJobAsync(EnrichedEvent @event, MediumAction action)

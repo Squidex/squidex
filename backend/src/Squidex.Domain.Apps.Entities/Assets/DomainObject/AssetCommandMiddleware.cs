@@ -15,30 +15,17 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject;
 
-public sealed class AssetCommandMiddleware : CachingDomainObjectMiddleware<AssetCommand, AssetDomainObject, Asset>
+public sealed class AssetCommandMiddleware(
+    IDomainObjectFactory domainObjectFactory,
+    IDomainObjectCache domainObjectCache,
+    IAssetEnricher assetEnricher,
+    IAssetFileStore assetFileStore,
+    IAssetQueryService assetQuery,
+    IContextProvider contextProvider,
+    IEnumerable<IAssetMetadataSource> assetMetadataSources)
+    : CachingDomainObjectMiddleware<AssetCommand, AssetDomainObject, Asset>(domainObjectFactory, domainObjectCache)
 {
-    private readonly IAssetFileStore assetFileStore;
-    private readonly IAssetEnricher assetEnricher;
-    private readonly IAssetQueryService assetQuery;
-    private readonly IContextProvider contextProvider;
-    private readonly IEnumerable<IAssetMetadataSource> assetMetadataSources;
-
-    public AssetCommandMiddleware(
-        IDomainObjectFactory domainObjectFactory,
-        IDomainObjectCache domainObjectCache,
-        IAssetEnricher assetEnricher,
-        IAssetFileStore assetFileStore,
-        IAssetQueryService assetQuery,
-        IContextProvider contextProvider,
-        IEnumerable<IAssetMetadataSource> assetMetadataSources)
-        : base(domainObjectFactory, domainObjectCache)
-    {
-        this.assetEnricher = assetEnricher;
-        this.assetFileStore = assetFileStore;
-        this.assetMetadataSources = assetMetadataSources.OrderBy(x => x.Order).ToList();
-        this.assetQuery = assetQuery;
-        this.contextProvider = contextProvider;
-    }
+    private readonly IEnumerable<IAssetMetadataSource> assetMetadataSources = assetMetadataSources.OrderBy(x => x.Order).ToList();
 
     public override async Task HandleAsync(CommandContext context, NextDelegate next,
         CancellationToken ct)

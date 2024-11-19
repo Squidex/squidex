@@ -13,18 +13,8 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public sealed class DynamicContentWorkflow : IContentWorkflow
+public sealed class DynamicContentWorkflow(IScriptEngine scriptEngine, IAppProvider appProvider) : IContentWorkflow
 {
-    private readonly IScriptEngine scriptEngine;
-    private readonly IAppProvider appProvider;
-
-    public DynamicContentWorkflow(IScriptEngine scriptEngine, IAppProvider appProvider)
-    {
-        this.scriptEngine = scriptEngine;
-
-        this.appProvider = appProvider;
-    }
-
     public async ValueTask<StatusInfo[]> GetAllAsync(Schema schema)
     {
         var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);

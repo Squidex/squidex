@@ -17,19 +17,8 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Areas.Api.Config;
 
-public class AssetFileResolver
+public class AssetFileResolver(IAssetUsageTracker assetUsage, IUsageGate usageGate, IHttpClientFactory httpClientFactory)
 {
-    private readonly IAssetUsageTracker assetUsage;
-    private readonly IUsageGate usageGate;
-    private readonly IHttpClientFactory httpClientFactory;
-
-    public AssetFileResolver(IAssetUsageTracker assetUsage, IUsageGate usageGate, IHttpClientFactory httpClientFactory)
-    {
-        this.assetUsage = assetUsage;
-        this.usageGate = usageGate;
-        this.httpClientFactory = httpClientFactory;
-    }
-
     public async Task<IAssetFile> ToFileAsync(UploadModel model, HttpContext httpContext, App? app,
         CancellationToken ct)
     {

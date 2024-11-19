@@ -14,22 +14,13 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-public sealed class DefaultAssetFileStore : IAssetFileStore, IDeleter
+public sealed class DefaultAssetFileStore(
+    IAssetStore assetStore,
+    IAssetRepository assetRepository,
+    IOptions<AssetOptions> options)
+    : IAssetFileStore, IDeleter
 {
-    private readonly IAssetStore assetStore;
-    private readonly IAssetRepository assetRepository;
-    private readonly AssetOptions options;
-
-    public DefaultAssetFileStore(
-        IAssetStore assetStore,
-        IAssetRepository assetRepository,
-        IOptions<AssetOptions> options)
-    {
-        this.assetStore = assetStore;
-        this.assetRepository = assetRepository;
-
-        this.options = options.Value;
-    }
+    private readonly AssetOptions options = options.Value;
 
     async Task IDeleter.DeleteAppAsync(App app,
         CancellationToken ct)

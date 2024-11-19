@@ -12,16 +12,11 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Infrastructure.EventSourcing;
 
-public abstract class MongoEventStoreTests : EventStoreTests<MongoEventStore>, IAsyncLifetime
+public abstract class MongoEventStoreTests(MongoEventStoreFixture fixture) : EventStoreTests<MongoEventStore>, IAsyncLifetime
 {
     private ProfilerCollection profiler;
 
-    public MongoEventStoreFixture _ { get; }
-
-    protected MongoEventStoreTests(MongoEventStoreFixture fixture)
-    {
-        _ = fixture;
-    }
+    public MongoEventStoreFixture _ { get; } = fixture;
 
     public override MongoEventStore CreateStore()
     {
@@ -48,19 +43,11 @@ public abstract class MongoEventStoreTests : EventStoreTests<MongoEventStore>, I
 }
 
 [Trait("Category", "Dependencies")]
-public sealed class MongoEventStoreTests_Direct : MongoEventStoreTests, IClassFixture<MongoEventStoreFixture_Direct>
+public sealed class MongoEventStoreTests_Direct(MongoEventStoreFixture_Direct fixture) : MongoEventStoreTests(fixture), IClassFixture<MongoEventStoreFixture_Direct>
 {
-    public MongoEventStoreTests_Direct(MongoEventStoreFixture_Direct fixture)
-        : base(fixture)
-    {
-    }
 }
 
 [Trait("Category", "Dependencies")]
-public sealed class MongoEventStoreTests_Replica : MongoEventStoreTests, IClassFixture<MongoEventStoreFixture_Replica>
+public sealed class MongoEventStoreTests_Replica(MongoEventStoreFixture_Replica fixture) : MongoEventStoreTests(fixture), IClassFixture<MongoEventStoreFixture_Replica>
 {
-    public MongoEventStoreTests_Replica(MongoEventStoreFixture_Replica fixture)
-        : base(fixture)
-    {
-    }
 }

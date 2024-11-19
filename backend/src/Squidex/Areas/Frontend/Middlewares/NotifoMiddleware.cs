@@ -11,17 +11,9 @@ using Squidex.Domain.Apps.Entities.History;
 
 namespace Squidex.Areas.Frontend.Middlewares;
 
-public sealed class NotifoMiddleware
+public sealed class NotifoMiddleware(RequestDelegate next, IOptions<NotifoOptions> options)
 {
-    private readonly RequestDelegate next;
-    private readonly string? workerUrl;
-
-    public NotifoMiddleware(RequestDelegate next, IOptions<NotifoOptions> options)
-    {
-        this.next = next;
-
-        workerUrl = GetUrl(options.Value);
-    }
+    private readonly string? workerUrl = GetUrl(options.Value);
 
     public async Task InvokeAsync(HttpContext context)
     {

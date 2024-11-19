@@ -13,14 +13,9 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-public class StatisticsTests : IClassFixture<CreatedAppFixture>
+public class StatisticsTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFixture>
 {
-    public CreatedAppFixture _ { get; }
-
-    public StatisticsTests(CreatedAppFixture fixture)
-    {
-        _ = fixture;
-    }
+    public CreatedAppFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_get_logs()

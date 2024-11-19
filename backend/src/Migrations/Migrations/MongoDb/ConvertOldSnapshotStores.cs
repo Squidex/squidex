@@ -12,15 +12,8 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Migrations.Migrations.MongoDb;
 
-public sealed class ConvertOldSnapshotStores : MongoBase<BsonDocument>, IMigration
+public sealed class ConvertOldSnapshotStores(IMongoDatabase database) : MongoBase<BsonDocument>, IMigration
 {
-    private readonly IMongoDatabase database;
-
-    public ConvertOldSnapshotStores(IMongoDatabase database)
-    {
-        this.database = database;
-    }
-
     public Task UpdateAsync(
         CancellationToken ct)
     {

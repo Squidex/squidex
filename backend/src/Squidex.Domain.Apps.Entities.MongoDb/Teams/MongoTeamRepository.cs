@@ -13,13 +13,8 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Teams;
 
-public sealed class MongoTeamRepository : MongoSnapshotStoreBase<Team, MongoTeamEntity>, ITeamRepository
+public sealed class MongoTeamRepository(IMongoDatabase database) : MongoSnapshotStoreBase<Team, MongoTeamEntity>(database), ITeamRepository
 {
-    public MongoTeamRepository(IMongoDatabase database)
-        : base(database)
-    {
-    }
-
     protected override string CollectionName()
     {
         return "States_Teams";

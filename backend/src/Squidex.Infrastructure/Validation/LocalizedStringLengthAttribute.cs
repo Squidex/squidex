@@ -11,13 +11,8 @@ using Squidex.Text;
 
 namespace Squidex.Infrastructure.Validation;
 
-public sealed class LocalizedStringLengthAttribute : StringLengthAttribute
+public sealed class LocalizedStringLengthAttribute(int maximumLength) : StringLengthAttribute(maximumLength)
 {
-    public LocalizedStringLengthAttribute(int maximumLength)
-        : base(maximumLength)
-    {
-    }
-
     public override string FormatErrorMessage(string name)
     {
         var property = T.Get($"common.{name.ToCamelCase()}", name);

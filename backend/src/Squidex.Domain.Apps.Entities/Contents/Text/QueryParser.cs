@@ -9,15 +9,8 @@ using System.Text;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
-public sealed class QueryParser
+public sealed class QueryParser(Func<string, string> fieldProvider)
 {
-    private readonly Func<string, string> fieldProvider;
-
-    public QueryParser(Func<string, string> fieldProvider)
-    {
-        this.fieldProvider = fieldProvider;
-    }
-
     public Query? Parse(string text)
     {
         if (string.IsNullOrWhiteSpace(text))

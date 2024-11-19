@@ -12,18 +12,12 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Apps;
 
-public sealed class DefaultAppImageStore : IAppImageStore
+public sealed class DefaultAppImageStore(
+    IAssetStore assetStore,
+    IOptions<AssetOptions> options)
+    : IAppImageStore
 {
-    private readonly IAssetStore assetStore;
-    private readonly AssetOptions options;
-
-    public DefaultAppImageStore(IAssetStore assetStore,
-        IOptions<AssetOptions> options)
-    {
-        this.assetStore = assetStore;
-
-        this.options = options.Value;
-    }
+    private readonly AssetOptions options = options.Value;
 
     public Task DownloadAsync(DomainId appId, Stream stream,
         CancellationToken ct = default)

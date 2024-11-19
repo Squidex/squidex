@@ -16,17 +16,8 @@ using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Extensions.Validation;
 
-internal sealed class CompositeUniqueValidator : IValidator
+internal sealed class CompositeUniqueValidator(string contentTag, IContentRepository contentRepository) : IValidator
 {
-    private readonly string contentTag;
-    private readonly IContentRepository contentRepository;
-
-    public CompositeUniqueValidator(string contentTag, IContentRepository contentRepository)
-    {
-        this.contentTag = contentTag;
-        this.contentRepository = contentRepository;
-    }
-
     public void Validate(object? value, ValidationContext context)
     {
         if (value is ContentData data)

@@ -13,15 +13,9 @@ using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.HandleRules.Extensions;
 
-public sealed class EventJintExtension : IJintExtension, IScriptDescriptor
+public sealed class EventJintExtension(IUrlGenerator urlGenerator) : IJintExtension, IScriptDescriptor
 {
     private delegate JsValue EventDelegate();
-    private readonly IUrlGenerator urlGenerator;
-
-    public EventJintExtension(IUrlGenerator urlGenerator)
-    {
-        this.urlGenerator = urlGenerator;
-    }
 
     public void Extend(ScriptExecutionContext context)
     {

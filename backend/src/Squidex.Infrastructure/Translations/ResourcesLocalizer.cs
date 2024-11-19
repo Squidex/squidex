@@ -11,17 +11,12 @@ using System.Text;
 
 namespace Squidex.Infrastructure.Translations;
 
-public sealed class ResourcesLocalizer : ILocalizer
+public sealed class ResourcesLocalizer(ResourceManager resourceManager) : ILocalizer
 {
 #if DEBUG
     private static readonly MissingKeys MissingKeys = new MissingKeys();
-#endif
-    private readonly ResourceManager resourceManager;
 
-    public ResourcesLocalizer(ResourceManager resourceManager)
-    {
-        this.resourceManager = resourceManager;
-    }
+#endif
 
     public (string Result, bool Found) Get(CultureInfo culture, string key, string fallback, object? args = null)
     {

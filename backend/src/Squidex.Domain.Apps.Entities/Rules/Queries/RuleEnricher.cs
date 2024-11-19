@@ -12,17 +12,8 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Queries;
 
-public sealed class RuleEnricher : IRuleEnricher
+public sealed class RuleEnricher(IRuleUsageTracker ruleUsageTracker, IRequestCache requestCache) : IRuleEnricher
 {
-    private readonly IRuleUsageTracker ruleUsageTracker;
-    private readonly IRequestCache requestCache;
-
-    public RuleEnricher(IRuleUsageTracker ruleUsageTracker, IRequestCache requestCache)
-    {
-        this.ruleUsageTracker = ruleUsageTracker;
-        this.requestCache = requestCache;
-    }
-
     public async Task<EnrichedRule> EnrichAsync(Rule rule, Context context,
         CancellationToken ct)
     {

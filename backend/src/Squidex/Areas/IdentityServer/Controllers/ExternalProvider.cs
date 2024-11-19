@@ -7,16 +7,9 @@
 
 namespace Squidex.Areas.IdentityServer.Controllers;
 
-public class ExternalProvider
+public class ExternalProvider(string authenticationSchema, string displayName)
 {
-    public string DisplayName { get; }
+    public string DisplayName { get; } = displayName;
 
-    public string AuthenticationScheme { get; }
-
-    public ExternalProvider(string authenticationSchema, string displayName)
-    {
-        AuthenticationScheme = authenticationSchema;
-
-        DisplayName = displayName;
-    }
+    public string AuthenticationScheme { get; } = authenticationSchema;
 }

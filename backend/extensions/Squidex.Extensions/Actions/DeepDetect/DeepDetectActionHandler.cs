@@ -23,31 +23,17 @@ namespace Squidex.Extensions.Actions.DeepDetect;
 
 #pragma warning disable MA0048 // File name must match type name
 
-internal sealed partial class DeepDetectActionHandler : RuleActionHandler<DeepDetectAction, DeepDetectJob>
+internal sealed partial class DeepDetectActionHandler(
+    RuleEventFormatter formatter,
+    IHttpClientFactory httpClientFactory,
+    IJsonSerializer jsonSerializer,
+    IAppProvider appProvider,
+    IAssetQueryService assetQuery,
+    ICommandBus commandBus,
+    IUrlGenerator urlGenerator)
+    : RuleActionHandler<DeepDetectAction, DeepDetectJob>(formatter)
 {
     private const string Description = "Analyze Image";
-    private readonly IHttpClientFactory httpClientFactory;
-    private readonly IJsonSerializer jsonSerializer;
-    private readonly IAppProvider appProvider;
-    private readonly IAssetQueryService assetQuery;
-    private readonly ICommandBus commandBus;
-    private readonly IUrlGenerator urlGenerator;
-
-    public DeepDetectActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory,
-        IJsonSerializer jsonSerializer,
-        IAppProvider appProvider,
-        IAssetQueryService assetQuery,
-        ICommandBus commandBus,
-        IUrlGenerator urlGenerator)
-        : base(formatter)
-    {
-        this.httpClientFactory = httpClientFactory;
-        this.jsonSerializer = jsonSerializer;
-        this.appProvider = appProvider;
-        this.assetQuery = assetQuery;
-        this.commandBus = commandBus;
-        this.urlGenerator = urlGenerator;
-    }
 
     protected override Task<(string Description, DeepDetectJob Data)> CreateJobAsync(EnrichedEvent @event, DeepDetectAction action)
     {

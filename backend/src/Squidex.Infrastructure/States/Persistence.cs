@@ -11,16 +11,19 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States;
 
-internal sealed class Persistence<T> : IPersistence<T>
+internal sealed class Persistence<T>(
+    DomainId ownerKey,
+    Type ownerType,
+    PersistenceMode persistenceMode,
+    IEventFormatter eventFormatter,
+    IEventStore eventStore,
+    IEventStreamNames eventStreamNames,
+    ISnapshotStore<T> snapshotStore,
+    HandleSnapshot<T>? applyState,
+    HandleEvent? applyEvent)
+    : IPersistence<T>
 {
-    private readonly DomainId ownerKey;
-    private readonly HandleEvent? applyEvent;
-    private readonly HandleSnapshot<T>? applyState;
-    private readonly IEventFormatter eventFormatter;
-    private readonly IEventStore eventStore;
-    private readonly ISnapshotStore<T> snapshotStore;
-    private readonly Lazy<string> streamName;
-    private readonly PersistenceMode persistenceMode;
+    private readonly Lazy<string> streamName = new Lazy<string>(() => eventStreamNames.GetStreamName(ownerType, ownerKey.ToString()!));
     private long versionSnapshot = EtagVersion.Empty;
     private long versionEvents = EtagVersion.Empty;
     private long version = EtagVersion.Empty;
@@ -43,26 +46,6 @@ internal sealed class Persistence<T> : IPersistence<T>
     public bool IsSnapshotStale
     {
         get => UseSnapshots && UseEventSourcing && versionSnapshot < versionEvents;
-    }
-
-    public Persistence(DomainId ownerKey, Type ownerType,
-        PersistenceMode persistenceMode,
-        IEventFormatter eventFormatter,
-        IEventStore eventStore,
-        IEventStreamNames eventStreamNames,
-        ISnapshotStore<T> snapshotStore,
-        HandleSnapshot<T>? applyState,
-        HandleEvent? applyEvent)
-    {
-        this.applyEvent = applyEvent;
-        this.applyState = applyState;
-        this.eventFormatter = eventFormatter;
-        this.eventStore = eventStore;
-        this.ownerKey = ownerKey;
-        this.persistenceMode = persistenceMode;
-        this.snapshotStore = snapshotStore;
-
-        streamName = new Lazy<string>(() => eventStreamNames.GetStreamName(ownerType, ownerKey.ToString()!));
     }
 
     public async Task DeleteAsync(

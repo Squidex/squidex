@@ -19,11 +19,11 @@ using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject;
 
-public sealed class ContentsBulkUpdateCommandMiddleware : ICommandMiddleware
+public sealed class ContentsBulkUpdateCommandMiddleware(
+    IContentQueryService contentQuery,
+    IContextProvider contextProvider)
+    : ICommandMiddleware
 {
-    private readonly IContentQueryService contentQuery;
-    private readonly IContextProvider contextProvider;
-
     private sealed record BulkTask(
         BulkUpdateJob BulkJob,
         BulkUpdateContents Bulk,
@@ -44,14 +44,6 @@ public sealed class ContentsBulkUpdateCommandMiddleware : ICommandMiddleware
         {
             return new BulkTask(bulkJob, bulk, jobIndex, null).SetResult(exception);
         }
-    }
-
-    public ContentsBulkUpdateCommandMiddleware(
-        IContentQueryService contentQuery,
-        IContextProvider contextProvider)
-    {
-        this.contentQuery = contentQuery;
-        this.contextProvider = contextProvider;
     }
 
     public async Task HandleAsync(CommandContext context, NextDelegate next,

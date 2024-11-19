@@ -11,17 +11,12 @@ using Squidex.Infrastructure.Migrations;
 
 namespace Migrations.Migrations;
 
-public sealed class RebuildSnapshots : IMigration
+public sealed class RebuildSnapshots(
+    Rebuilder rebuilder,
+    IOptions<RebuildOptions> rebuildOptions)
+    : IMigration
 {
-    private readonly Rebuilder rebuilder;
-    private readonly RebuildOptions rebuildOptions;
-
-    public RebuildSnapshots(Rebuilder rebuilder,
-        IOptions<RebuildOptions> rebuildOptions)
-    {
-        this.rebuilder = rebuilder;
-        this.rebuildOptions = rebuildOptions.Value;
-    }
+    private readonly RebuildOptions rebuildOptions = rebuildOptions.Value;
 
     public async Task UpdateAsync(
         CancellationToken ct)

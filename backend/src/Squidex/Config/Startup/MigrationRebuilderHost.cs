@@ -9,15 +9,8 @@ using Migrations;
 
 namespace Squidex.Config.Startup;
 
-public sealed class MigrationRebuilderHost : IHostedService
+public sealed class MigrationRebuilderHost(RebuildRunner rebuildRunner) : IHostedService
 {
-    private readonly RebuildRunner rebuildRunner;
-
-    public MigrationRebuilderHost(RebuildRunner rebuildRunner)
-    {
-        this.rebuildRunner = rebuildRunner;
-    }
-
     public Task StartAsync(
         CancellationToken cancellationToken)
     {

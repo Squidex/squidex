@@ -18,16 +18,8 @@ namespace Squidex.Areas.Api.Controllers.Search;
 /// Retrieves search results.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Search))]
-public class SearchController : ApiController
+public class SearchController(ISearchManager searchManager, ICommandBus commandBus) : ApiController(commandBus)
 {
-    private readonly ISearchManager searchManager;
-
-    public SearchController(ISearchManager searchManager, ICommandBus commandBus)
-        : base(commandBus)
-    {
-        this.searchManager = searchManager;
-    }
-
     /// <summary>
     /// Get search results.
     /// </summary>

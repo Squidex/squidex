@@ -10,14 +10,9 @@ using Squidex.Infrastructure.Translations;
 namespace Squidex.Infrastructure;
 
 [Serializable]
-public class DomainObjectConflictException : DomainObjectException
+public class DomainObjectConflictException(string id, Exception? inner = null) : DomainObjectException(FormatMessage(id), id, ExposedErrorCode, inner)
 {
     private const string ExposedErrorCode = "OBJECT_CONFLICT";
-
-    public DomainObjectConflictException(string id, Exception? inner = null)
-        : base(FormatMessage(id), id, ExposedErrorCode, inner)
-    {
-    }
 
     private static string FormatMessage(string id)
     {

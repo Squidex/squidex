@@ -12,19 +12,9 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.ConvertContent;
 
-public sealed class UpdateValues : IContentValueConverter, IContentDataConverter
+public sealed class UpdateValues(ContentData existingData, IScriptEngine scriptEngine, bool canUnset) : IContentValueConverter, IContentDataConverter
 {
-    private readonly ContentData existingData;
-    private readonly IScriptEngine scriptEngine;
-    private readonly bool canUnset;
     private ScriptVars? vars;
-
-    public UpdateValues(ContentData existingData, IScriptEngine scriptEngine, bool canUnset)
-    {
-        this.existingData = existingData;
-        this.scriptEngine = scriptEngine;
-        this.canUnset = canUnset;
-    }
 
     public void ConvertDataBefore(Schema schema, ContentData source)
     {

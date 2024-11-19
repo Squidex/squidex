@@ -10,15 +10,9 @@ using Squidex.Domain.Apps.Entities.Contents.Repositories;
 
 namespace Squidex.Extensions.Validation;
 
-public sealed class CompositeUniqueValidatorFactory : IValidatorsFactory
+public sealed class CompositeUniqueValidatorFactory(IContentRepository contentRepository) : IValidatorsFactory
 {
     private const string Prefix = "unique:";
-    private readonly IContentRepository contentRepository;
-
-    public CompositeUniqueValidatorFactory(IContentRepository contentRepository)
-    {
-        this.contentRepository = contentRepository;
-    }
 
     public IEnumerable<IValidator> CreateContentValidators(ValidationContext context, ValidatorFactory createFieldValidator)
     {

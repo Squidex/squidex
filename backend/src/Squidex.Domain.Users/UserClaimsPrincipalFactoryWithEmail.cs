@@ -14,14 +14,9 @@ using Squidex.Shared.Identity;
 
 namespace Squidex.Domain.Users;
 
-public sealed class UserClaimsPrincipalFactoryWithEmail : UserClaimsPrincipalFactory<IdentityUser, IdentityRole>
+public sealed class UserClaimsPrincipalFactoryWithEmail(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<IdentityOptions> optionsAccessor) : UserClaimsPrincipalFactory<IdentityUser, IdentityRole>(userManager, roleManager, optionsAccessor)
 {
     private const string AdministratorRole = "ADMINISTRATOR";
-
-    public UserClaimsPrincipalFactoryWithEmail(UserManager<IdentityUser> userManager, RoleManager<IdentityRole> roleManager, IOptions<IdentityOptions> optionsAccessor)
-        : base(userManager, roleManager, optionsAccessor)
-    {
-    }
 
     public override async Task<ClaimsPrincipal> CreateAsync(IdentityUser user)
     {

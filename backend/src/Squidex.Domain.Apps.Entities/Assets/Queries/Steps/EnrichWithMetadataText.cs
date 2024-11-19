@@ -10,15 +10,8 @@ using Squidex.Infrastructure.ObjectPool;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries.Steps;
 
-public sealed class EnrichWithMetadataText : IAssetEnricherStep
+public sealed class EnrichWithMetadataText(IEnumerable<IAssetMetadataSource> assetMetadataSources) : IAssetEnricherStep
 {
-    private readonly IEnumerable<IAssetMetadataSource> assetMetadataSources;
-
-    public EnrichWithMetadataText(IEnumerable<IAssetMetadataSource> assetMetadataSources)
-    {
-        this.assetMetadataSources = assetMetadataSources;
-    }
-
     public Task EnrichAsync(Context context, IEnumerable<EnrichedAsset> assets,
         CancellationToken ct)
     {

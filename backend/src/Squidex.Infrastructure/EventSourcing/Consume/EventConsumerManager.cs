@@ -10,19 +10,13 @@ using Squidex.Messaging;
 
 namespace Squidex.Infrastructure.EventSourcing.Consume;
 
-public sealed class EventConsumerManager : IEventConsumerManager
+public sealed class EventConsumerManager(
+    IPersistenceFactory<EventConsumerState> persistence,
+    IEnumerable<IEventConsumer> eventConsumers,
+    IMessageBus messaging)
+    : IEventConsumerManager
 {
-    private readonly IPersistenceFactory<EventConsumerState> persistence;
-    private readonly IMessageBus messaging;
-    private readonly HashSet<string> activeNames;
-
-    public EventConsumerManager(IPersistenceFactory<EventConsumerState> persistence, IEnumerable<IEventConsumer> eventConsumers,
-        IMessageBus messaging)
-    {
-        this.persistence = persistence;
-        this.messaging = messaging;
-        this.activeNames = eventConsumers.Select(x => x.Name).ToHashSet();
-    }
+    private readonly HashSet<string> activeNames = eventConsumers.Select(x => x.Name).ToHashSet();
 
     public async Task<List<EventConsumerInfo>> GetConsumersAsync(
         CancellationToken ct = default)

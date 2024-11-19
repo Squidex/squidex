@@ -17,16 +17,8 @@ namespace Squidex.Areas.Api.Controllers.News;
 /// Readonly API for news items.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(News))]
-public sealed class NewsController : ApiController
+public sealed class NewsController(ICommandBus commandBus, FeaturesService featuresService) : ApiController(commandBus)
 {
-    private readonly FeaturesService featuresService;
-
-    public NewsController(ICommandBus commandBus, FeaturesService featuresService)
-        : base(commandBus)
-    {
-        this.featuresService = featuresService;
-    }
-
     /// <summary>
     /// Get features since version.
     /// </summary>

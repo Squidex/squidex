@@ -15,15 +15,8 @@ using AssignTeamContributor = Squidex.Domain.Apps.Entities.Teams.Commands.Assign
 
 namespace Squidex.Domain.Apps.Entities.Invitation;
 
-public sealed class InviteUserCommandMiddleware : ICommandMiddleware
+public sealed class InviteUserCommandMiddleware(IUserResolver userResolver) : ICommandMiddleware
 {
-    private readonly IUserResolver userResolver;
-
-    public InviteUserCommandMiddleware(IUserResolver userResolver)
-    {
-        this.userResolver = userResolver;
-    }
-
     public async Task HandleAsync(CommandContext context, NextDelegate next,
         CancellationToken ct)
     {

@@ -20,21 +20,13 @@ using Squidex.Shared.Users;
 namespace Squidex.Areas.IdentityServer.Controllers.Account;
 
 [AutoValidateAntiforgeryToken]
-public sealed class AccountController : IdentityServerController
+public sealed class AccountController(
+    DynamicSchemeProvider schemes,
+    IUserService userService,
+    IOptions<MyIdentityOptions> identityOptions)
+    : IdentityServerController
 {
-    private readonly DynamicSchemeProvider schemes;
-    private readonly IUserService userService;
-    private readonly MyIdentityOptions identityOptions;
-
-    public AccountController(
-        DynamicSchemeProvider schemes,
-        IUserService userService,
-        IOptions<MyIdentityOptions> identityOptions)
-    {
-        this.identityOptions = identityOptions.Value;
-        this.schemes = schemes;
-        this.userService = userService;
-    }
+    private readonly MyIdentityOptions identityOptions = identityOptions.Value;
 
     [HttpGet]
     [Route("account/error/")]

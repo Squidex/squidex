@@ -15,18 +15,12 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Schemas;
 
-public sealed class BackupSchemas : IBackupHandler
+public sealed class BackupSchemas(Rebuilder rebuilder) : IBackupHandler
 {
     private const int BatchSize = 100;
     private readonly HashSet<DomainId> schemaIds = [];
-    private readonly Rebuilder rebuilder;
 
     public string Name { get; } = "Schemas";
-
-    public BackupSchemas(Rebuilder rebuilder)
-    {
-        this.rebuilder = rebuilder;
-    }
 
     public Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context,
         CancellationToken ct)

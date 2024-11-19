@@ -15,21 +15,14 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Users;
 
-public sealed class DefaultKeyStore : IConfigureOptions<OpenIddictServerOptions>
+public sealed class DefaultKeyStore(ISnapshotStore<DefaultKeyStore.State> store) : IConfigureOptions<OpenIddictServerOptions>
 {
-    private readonly ISnapshotStore<State> store;
-
     [CollectionName("Identity_Keys")]
     public sealed class State
     {
         public string Key { get; set; }
 
         public RSAParameters Parameters { get; set; }
-    }
-
-    public DefaultKeyStore(ISnapshotStore<State> store)
-    {
-        this.store = store;
     }
 
     public void Configure(OpenIddictServerOptions options)

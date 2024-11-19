@@ -18,7 +18,7 @@ public interface IRuleEventEntity
 
     RuleJob Job { get; }
 
-    Instant Created { get;  }
+    Instant Created { get; }
 
     Instant? NextAttempt { get; }
 

@@ -16,29 +16,18 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Invitation;
 
-public sealed class InvitationEventConsumer : IEventConsumer
+public sealed class InvitationEventConsumer(
+    IAppProvider appProvider,
+    IUserNotifications userNotifications,
+    IUserResolver userResolver,
+    ILogger<InvitationEventConsumer> log)
+    : IEventConsumer
 {
     private static readonly Duration MaxAge = Duration.FromDays(2);
-    private readonly IUserNotifications userNotifications;
-    private readonly IUserResolver userResolver;
-    private readonly IAppProvider appProvider;
-    private readonly ILogger<InvitationEventConsumer> log;
 
     public string Name => "NotificationEmailSender";
 
     public StreamFilter EventsFilter { get; } = StreamFilter.Prefix("app-");
-
-    public InvitationEventConsumer(
-        IAppProvider appProvider,
-        IUserNotifications userNotifications,
-        IUserResolver userResolver,
-        ILogger<InvitationEventConsumer> log)
-    {
-        this.appProvider = appProvider;
-        this.userNotifications = userNotifications;
-        this.userResolver = userResolver;
-        this.log = log;
-    }
 
     public async Task On(Envelope<IEvent> @event)
     {

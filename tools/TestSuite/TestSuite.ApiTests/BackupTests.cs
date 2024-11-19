@@ -17,18 +17,13 @@ using TestSuite.Utils;
 
 namespace TestSuite.ApiTests;
 
-public class BackupTests : IClassFixture<ClientFixture>
+public class BackupTests(ClientFixture fixture) : IClassFixture<ClientFixture>
 {
     private readonly string appName = Guid.NewGuid().ToString();
     private readonly string appNameRestore = $"{Guid.NewGuid()}-restore";
     private readonly string schemaName = $"schema-{Guid.NewGuid()}";
 
-    public ClientFixture _ { get; }
-
-    public BackupTests(ClientFixture fixture)
-    {
-        _ = fixture;
-    }
+    public ClientFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_backup_and_restore_app()

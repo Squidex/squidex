@@ -12,16 +12,11 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-public class TeamCreationTests : IClassFixture<ClientFixture>
+public class TeamCreationTests(ClientFixture fixture) : IClassFixture<ClientFixture>
 {
     private readonly string teamName = Guid.NewGuid().ToString();
 
-    public ClientFixture _ { get; }
-
-    public TeamCreationTests(ClientFixture fixture)
-    {
-        _ = fixture;
-    }
+    public ClientFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_create_team()

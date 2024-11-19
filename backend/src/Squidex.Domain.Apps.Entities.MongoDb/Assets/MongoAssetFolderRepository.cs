@@ -13,16 +13,11 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Assets;
 
-public sealed partial class MongoAssetFolderRepository : MongoRepositoryBase<MongoAssetFolderEntity>, IAssetFolderRepository
+public sealed partial class MongoAssetFolderRepository(IMongoDatabase database) : MongoRepositoryBase<MongoAssetFolderEntity>(database), IAssetFolderRepository
 {
     static MongoAssetFolderRepository()
     {
         MongoAssetFolderEntity.RegisterClassMap();
-    }
-
-    public MongoAssetFolderRepository(IMongoDatabase database)
-        : base(database)
-    {
     }
 
     protected override string CollectionName()

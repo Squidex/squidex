@@ -1,48 +1,49 @@
-<div
-    class="references-container"
-    [class.expanded]="isExpanded"
-    (sqxResizeCondition)="setCompact($event)"
-    sqxResizeMaxWidth="0"
-    sqxResizeMinWidth="600">
-    <ng-container>
-        <div class="drop-area-container" [class.disabled]="snapshot.isDisabled">
-            <div class="drop-area">
-                <a (click)="createContent()">{{ "contents.referencesCreateNew" | sqxTranslate }}</a>
-
-                &middot;
-
-                <a (click)="contentSelectorDialog.show()">{{ "contents.referencesSelectExisting" | sqxTranslate }}</a>
-            </div>
-        </div>
-
-        @if (snapshot.contentItems && snapshot.contentItems.length > 0) {
-            <table
-                class="table table-items table-fixed"
-                cdkDropList
-                [cdkDropListData]="snapshot.contentItems"
-                [cdkDropListDisabled]="snapshot.isDisabled"
-                (cdkDropListDropped)="sort($event)"
-                [class.disabled]="snapshot.isDisabled">
-                @for (content of snapshot.contentItems; track content.id) {
-                    <tbody
-                        class="table-drag"
-                        cdkDrag
-                        cdkDragLockAxis="y"
-                        (clone)="createContent(content)"
-                        [columns]="snapshot.contentItems | sqxContentsColumns"
-                        (delete)="remove(content)"
-                        [isCompact]="snapshot.isCompact"
-                        [isDisabled]="snapshot.isDisabled"
-                        [language]="language"
-                        [languages]="languages"
-                        [sqxReferenceItem]="content">
-                        <i class="icon-drag2 drag-handle" cdkDragHandle></i>
-                    </tbody>
-                }
-            </table>
-        }
-    </ng-container>
+<div class="row gx-2">
+    <div class="col" [class.disabled]="snapshot.isDisabled">
+        <button class="btn btn-outline-secondary btn-dashed btn-block" (click)="createContent()" type="button">
+            {{ "contents.referencesCreateNew" | sqxTranslate }}
+        </button>
+    </div>
+    <div class="col" [class.disabled]="snapshot.isDisabled">
+        <button class="btn btn-outline-secondary btn-dashed btn-block" (click)="contentSelectorDialog.show()">
+            {{ "contents.referencesSelectExisting" | sqxTranslate }}
+        </button>
+    </div>
 </div>
+
+@if (snapshot.contentItems && snapshot.contentItems.length > 0) {
+    <div
+        class="references-container"
+        [class.expanded]="isExpanded"
+        (sqxResizeCondition)="setCompact($event)"
+        sqxResizeMaxWidth="0"
+        sqxResizeMinWidth="600">
+        <table
+            class="table table-items table-fixed"
+            cdkDropList
+            [cdkDropListData]="snapshot.contentItems"
+            [cdkDropListDisabled]="snapshot.isDisabled"
+            (cdkDropListDropped)="sort($event)"
+            [class.disabled]="snapshot.isDisabled">
+            @for (content of snapshot.contentItems; track content.id) {
+                <tbody
+                    class="table-drag"
+                    cdkDrag
+                    cdkDragLockAxis="y"
+                    (clone)="createContent(content)"
+                    [columns]="snapshot.contentItems | sqxContentsColumns"
+                    (delete)="remove(content)"
+                    [isCompact]="snapshot.isCompact"
+                    [isDisabled]="snapshot.isDisabled"
+                    [language]="language"
+                    [languages]="languages"
+                    [sqxReferenceItem]="content">
+                    <i class="icon-drag2 drag-handle" cdkDragHandle></i>
+                </tbody>
+            }
+        </table>
+    </div>
+}
 
 <sqx-content-creator
     (contentCreate)="select($event)"

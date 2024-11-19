@@ -19,16 +19,11 @@ public sealed class RetrySubscription<T> : IEventSubscription, IEventSubscriber<
     public bool IsSubscribed => currentSubscription != null;
 
     // Holds all information for a current subscription. Therefore we only have to maintain one reference.
-    private sealed class SubscriptionHolder : IDisposable
+    private sealed class SubscriptionHolder(IEventSubscription subscription) : IDisposable
     {
         public CancellationTokenSource Cancellation { get; } = new CancellationTokenSource();
 
-        public IEventSubscription Subscription { get; }
-
-        public SubscriptionHolder(IEventSubscription subscription)
-        {
-            Subscription = subscription;
-        }
+        public IEventSubscription Subscription { get; } = subscription;
 
         public void Dispose()
         {

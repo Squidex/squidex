@@ -9,15 +9,8 @@ using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Core.ValidateContent.Validators;
 
-public class RequiredStringValidator : IValidator
+public class RequiredStringValidator(bool validateEmptyStrings = false) : IValidator
 {
-    private readonly bool validateEmptyStrings;
-
-    public RequiredStringValidator(bool validateEmptyStrings = false)
-    {
-        this.validateEmptyStrings = validateEmptyStrings;
-    }
-
     public void Validate(object? value, ValidationContext context)
     {
         if (context.IsOptional)

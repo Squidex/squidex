@@ -10,20 +10,13 @@ using Squidex.Infrastructure.Translations;
 namespace Squidex.Infrastructure;
 
 [Serializable]
-public class DomainObjectVersionException : DomainObjectException
+public class DomainObjectVersionException(string id, long versionCurrent, long versionExpected, Exception? inner = null) : DomainObjectException(FormatMessage(id, versionCurrent, versionExpected), id, ExposedErrorCode, inner)
 {
     private const string ExposedErrorCode = "OBJECT_VERSION_CONFLICT";
 
-    public long VersionCurrent { get; }
+    public long VersionCurrent { get; } = versionCurrent;
 
-    public long VersionExpected { get; }
-
-    public DomainObjectVersionException(string id, long versionCurrent, long versionExpected, Exception? inner = null)
-        : base(FormatMessage(id, versionCurrent, versionExpected), id, ExposedErrorCode, inner)
-    {
-        VersionCurrent = versionCurrent;
-        VersionExpected = versionExpected;
-    }
+    public long VersionExpected { get; } = versionExpected;
 
     private static string FormatMessage(string id, long currentVersion, long expectedVersion)
     {

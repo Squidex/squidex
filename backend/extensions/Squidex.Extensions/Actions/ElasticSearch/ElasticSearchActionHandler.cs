@@ -18,16 +18,9 @@ using Squidex.Infrastructure.Json;
 
 namespace Squidex.Extensions.Actions.ElasticSearch;
 
-public sealed class ElasticSearchActionHandler : RuleActionHandler<ElasticSearchAction, ElasticSearchJob>
+public sealed class ElasticSearchActionHandler(RuleEventFormatter formatter, IScriptEngine scriptEngine, IJsonSerializer serializer) : RuleActionHandler<ElasticSearchAction, ElasticSearchJob>(formatter)
 {
-    private readonly ClientPool<(Uri Host, string? Username, string? Password), ElasticLowLevelClient> clients;
-    private readonly IScriptEngine scriptEngine;
-    private readonly IJsonSerializer serializer;
-
-    public ElasticSearchActionHandler(RuleEventFormatter formatter, IScriptEngine scriptEngine, IJsonSerializer serializer)
-        : base(formatter)
-    {
-        clients = new ClientPool<(Uri Host, string? Username, string? Password), ElasticLowLevelClient>(key =>
+    private readonly ClientPool<(Uri Host, string? Username, string? Password), ElasticLowLevelClient> clients = new ClientPool<(Uri Host, string? Username, string? Password), ElasticLowLevelClient>(key =>
         {
             var config = new ConnectionConfiguration(key.Host);
 
@@ -38,10 +31,6 @@ public sealed class ElasticSearchActionHandler : RuleActionHandler<ElasticSearch
 
             return new ElasticLowLevelClient(config);
         });
-
-        this.scriptEngine = scriptEngine;
-        this.serializer = serializer;
-    }
 
     protected override async Task<(string Description, ElasticSearchJob Data)> CreateJobAsync(EnrichedEvent @event, ElasticSearchAction action)
     {

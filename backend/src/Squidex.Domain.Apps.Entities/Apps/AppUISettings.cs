@@ -12,10 +12,8 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Apps;
 
-public sealed class AppUISettings : IAppUISettings, IDeleter
+public sealed class AppUISettings(IPersistenceFactory<AppUISettings.State> persistanceFactory) : IAppUISettings, IDeleter
 {
-    private readonly IPersistenceFactory<State> persistanceFactory;
-
     [CollectionName("UISettings")]
     public sealed class State
     {
@@ -106,11 +104,6 @@ public sealed class AppUISettings : IAppUISettings, IDeleter
 
             return current;
         }
-    }
-
-    public AppUISettings(IPersistenceFactory<State> persistanceFactory)
-    {
-        this.persistanceFactory = persistanceFactory;
     }
 
     async Task IDeleter.DeleteContributorAsync(DomainId appId, string contributorId,

@@ -12,30 +12,16 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries;
 
-public sealed class AssetQueryService : IAssetQueryService
+public sealed class AssetQueryService(
+    IAssetEnricher assetEnricher,
+    IAssetRepository assetRepository,
+    IAssetLoader assetLoader,
+    IAssetFolderRepository assetFolderRepository,
+    IOptions<AssetOptions> options,
+    AssetQueryParser queryParser)
+    : IAssetQueryService
 {
-    private readonly IAssetEnricher assetEnricher;
-    private readonly IAssetRepository assetRepository;
-    private readonly IAssetLoader assetLoader;
-    private readonly IAssetFolderRepository assetFolderRepository;
-    private readonly AssetOptions options;
-    private readonly AssetQueryParser queryParser;
-
-    public AssetQueryService(
-        IAssetEnricher assetEnricher,
-        IAssetRepository assetRepository,
-        IAssetLoader assetLoader,
-        IAssetFolderRepository assetFolderRepository,
-        IOptions<AssetOptions> options,
-        AssetQueryParser queryParser)
-    {
-        this.assetEnricher = assetEnricher;
-        this.assetRepository = assetRepository;
-        this.assetLoader = assetLoader;
-        this.assetFolderRepository = assetFolderRepository;
-        this.options = options.Value;
-        this.queryParser = queryParser;
-    }
+    private readonly AssetOptions options = options.Value;
 
     public async Task<IReadOnlyList<AssetFolder>> FindAssetFolderAsync(DomainId appId, DomainId id,
         CancellationToken ct = default)

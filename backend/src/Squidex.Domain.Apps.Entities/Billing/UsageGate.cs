@@ -15,29 +15,16 @@ using Squidex.Messaging;
 
 namespace Squidex.Domain.Apps.Entities.Billing;
 
-public sealed partial class UsageGate : IUsageGate
+public sealed partial class UsageGate(
+    IAppProvider appProvider,
+    IApiUsageTracker apiUsageTracker,
+    IBillingPlans billingPlans,
+    IMessageBus messaging,
+    IUsageTracker usageTracker)
+    : IUsageGate
 {
     private static readonly DateOnly SummaryDate = default;
-    private readonly IApiUsageTracker apiUsageTracker;
-    private readonly IAppProvider appProvider;
-    private readonly IBillingPlans billingPlans;
     private readonly IMemoryCache memoryCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
-    private readonly IMessageBus messaging;
-    private readonly IUsageTracker usageTracker;
-
-    public UsageGate(
-        IAppProvider appProvider,
-        IApiUsageTracker apiUsageTracker,
-        IBillingPlans billingPlans,
-        IMessageBus messaging,
-        IUsageTracker usageTracker)
-    {
-        this.appProvider = appProvider;
-        this.apiUsageTracker = apiUsageTracker;
-        this.billingPlans = billingPlans;
-        this.messaging = messaging;
-        this.usageTracker = usageTracker;
-    }
 
     public async Task TrackRequestAsync(App app, string? clientId, DateOnly date, double costs, long elapsedMs, long bytes,
        CancellationToken ct = default)

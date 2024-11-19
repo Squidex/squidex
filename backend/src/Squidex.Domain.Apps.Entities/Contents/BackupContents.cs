@@ -19,13 +19,11 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public sealed class BackupContents : IBackupHandler
+public sealed class BackupContents(Rebuilder rebuilder, IUrlGenerator urlGenerator) : IBackupHandler
 {
     private const int BatchSize = 100;
     private const string UrlsFile = "Urls.json";
     private readonly Dictionary<DomainId, HashSet<DomainId>> contentIdsBySchemaId = [];
-    private readonly Rebuilder rebuilder;
-    private readonly IUrlGenerator urlGenerator;
     private Urls? assetsUrlNew;
     private Urls? assetsUrlOld;
 
@@ -38,12 +36,6 @@ public sealed class BackupContents : IBackupHandler
         public string Assets { get; set; }
 
         public string AssetsApp { get; set; }
-    }
-
-    public BackupContents(Rebuilder rebuilder, IUrlGenerator urlGenerator)
-    {
-        this.rebuilder = rebuilder;
-        this.urlGenerator = urlGenerator;
     }
 
     public async Task BackupEventAsync(Envelope<IEvent> @event, BackupContext context,

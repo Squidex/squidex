@@ -13,18 +13,9 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb;
 
-internal sealed class MongoCountCollection : MongoRepositoryBase<MongoCountEntity>
+internal sealed class MongoCountCollection(IMongoDatabase database, ILogger log, string name) : MongoRepositoryBase<MongoCountEntity>(database)
 {
-    private readonly string collectionName;
-    private readonly ILogger log;
-
-    public MongoCountCollection(IMongoDatabase database, ILogger log, string name)
-        : base(database)
-    {
-        this.log = log;
-
-        collectionName = $"{name}_Count";
-    }
+    private readonly string collectionName = $"{name}_Count";
 
     protected override string CollectionName()
     {

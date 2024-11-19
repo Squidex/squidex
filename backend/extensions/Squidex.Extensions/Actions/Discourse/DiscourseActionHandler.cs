@@ -13,18 +13,10 @@ using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 
 namespace Squidex.Extensions.Actions.Discourse;
 
-public sealed class DiscourseActionHandler : RuleActionHandler<DiscourseAction, DiscourseJob>
+public sealed class DiscourseActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory) : RuleActionHandler<DiscourseAction, DiscourseJob>(formatter)
 {
     private const string DescriptionCreatePost = "Create discourse Post";
     private const string DescriptionCreateTopic = "Create discourse Topic";
-
-    private readonly IHttpClientFactory httpClientFactory;
-
-    public DiscourseActionHandler(RuleEventFormatter formatter, IHttpClientFactory httpClientFactory)
-        : base(formatter)
-    {
-        this.httpClientFactory = httpClientFactory;
-    }
 
     protected override async Task<(string Description, DiscourseJob Data)> CreateJobAsync(EnrichedEvent @event, DiscourseAction action)
     {

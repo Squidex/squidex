@@ -14,21 +14,13 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Apps.DomainObject;
 
-public sealed class AppCommandMiddleware : AggregateCommandMiddleware<AppCommandBase, AppDomainObject>
+public sealed class AppCommandMiddleware(
+    IDomainObjectFactory domainObjectFactory,
+    IAppImageStore appImageStore,
+    IAssetThumbnailGenerator assetGenerator,
+    IContextProvider contextProvider)
+    : AggregateCommandMiddleware<AppCommandBase, AppDomainObject>(domainObjectFactory)
 {
-    private readonly IAppImageStore appImageStore;
-    private readonly IAssetThumbnailGenerator assetGenerator;
-    private readonly IContextProvider contextProvider;
-
-    public AppCommandMiddleware(IDomainObjectFactory domainObjectFactory,
-        IAppImageStore appImageStore, IAssetThumbnailGenerator assetGenerator, IContextProvider contextProvider)
-        : base(domainObjectFactory)
-    {
-        this.appImageStore = appImageStore;
-        this.assetGenerator = assetGenerator;
-        this.contextProvider = contextProvider;
-    }
-
     public override async Task HandleAsync(CommandContext context, NextDelegate next,
         CancellationToken ct)
     {

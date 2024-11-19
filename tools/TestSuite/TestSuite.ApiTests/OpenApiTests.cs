@@ -11,14 +11,9 @@ using NSwag;
 
 namespace TestSuite.ApiTests;
 
-public class OpenApiTests : IClassFixture<ContentFixture>
+public class OpenApiTests(ContentFixture fixture) : IClassFixture<ContentFixture>
 {
-    public ContentFixture _ { get; }
-
-    public OpenApiTests(ContentFixture fixture)
-    {
-        _ = fixture;
-    }
+    public ContentFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_provide_general_spec()

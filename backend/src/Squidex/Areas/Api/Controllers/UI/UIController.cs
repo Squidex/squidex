@@ -18,20 +18,12 @@ using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.UI;
 
-public sealed class UIController : ApiController
+public sealed class UIController(ICommandBus commandBus, IOptions<MyUIOptions> uiOptions, IAppUISettings appUISettings) : ApiController(commandBus)
 {
     private static readonly DomainId SharedKey = DomainId.Create("__shared");
     private static readonly Permission CreateAppPermission = new Permission(PermissionIds.AdminAppCreate);
     private static readonly Permission CreateTeamPermission = new Permission(PermissionIds.AdminTeamCreate);
-    private readonly MyUIOptions uiOptions;
-    private readonly IAppUISettings appUISettings;
-
-    public UIController(ICommandBus commandBus, IOptions<MyUIOptions> uiOptions, IAppUISettings appUISettings)
-        : base(commandBus)
-    {
-        this.uiOptions = uiOptions.Value;
-        this.appUISettings = appUISettings;
-    }
+    private readonly MyUIOptions uiOptions = uiOptions.Value;
 
     /// <summary>
     /// Get ui settings.

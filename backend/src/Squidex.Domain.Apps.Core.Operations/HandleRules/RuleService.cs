@@ -22,15 +22,19 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Core.HandleRules;
 
-public sealed class RuleService : IRuleService
+public sealed class RuleService(
+    IOptions<RuleOptions> ruleOptions,
+    IEnumerable<IRuleTriggerHandler> ruleTriggerHandlers,
+    IEnumerable<IRuleActionHandler> ruleActionHandlers,
+    IEventEnricher eventEnricher,
+    IJsonSerializer serializer,
+    ILogger<RuleService> log,
+    TypeRegistry typeRegistry)
+    : IRuleService
 {
-    private readonly Dictionary<Type, IRuleActionHandler> ruleActionHandlers;
-    private readonly Dictionary<Type, IRuleTriggerHandler> ruleTriggerHandlers;
-    private readonly TypeRegistry typeRegistry;
-    private readonly RuleOptions ruleOptions;
-    private readonly IEventEnricher eventEnricher;
-    private readonly IJsonSerializer serializer;
-    private readonly ILogger<RuleService> log;
+    private readonly Dictionary<Type, IRuleActionHandler> ruleActionHandlers = ruleActionHandlers.ToDictionary(x => x.ActionType);
+    private readonly Dictionary<Type, IRuleTriggerHandler> ruleTriggerHandlers = ruleTriggerHandlers.ToDictionary(x => x.TriggerType);
+    private readonly RuleOptions ruleOptions = ruleOptions.Value;
 
     private sealed class RuleState
     {
@@ -42,24 +46,6 @@ public sealed class RuleService : IRuleService
     }
 
     public IClock Clock { get; set; } = SystemClock.Instance;
-
-    public RuleService(
-        IOptions<RuleOptions> ruleOptions,
-        IEnumerable<IRuleTriggerHandler> ruleTriggerHandlers,
-        IEnumerable<IRuleActionHandler> ruleActionHandlers,
-        IEventEnricher eventEnricher,
-        IJsonSerializer serializer,
-        ILogger<RuleService> log,
-        TypeRegistry typeRegistry)
-    {
-        this.typeRegistry = typeRegistry;
-        this.eventEnricher = eventEnricher;
-        this.ruleOptions = ruleOptions.Value;
-        this.ruleTriggerHandlers = ruleTriggerHandlers.ToDictionary(x => x.TriggerType);
-        this.ruleActionHandlers = ruleActionHandlers.ToDictionary(x => x.ActionType);
-        this.serializer = serializer;
-        this.log = log;
-    }
 
     public bool CanCreateSnapshotEvents(Rule rule)
     {

@@ -8,12 +8,7 @@
 namespace Squidex.Domain.Apps.Core.HandleRules;
 
 [AttributeUsage(AttributeTargets.Property)]
-public sealed class EditorAttribute : Attribute
+public sealed class EditorAttribute(RuleFieldEditor editor) : Attribute
 {
-    public RuleFieldEditor Editor { get; }
-
-    public EditorAttribute(RuleFieldEditor editor)
-    {
-        Editor = editor;
-    }
+    public RuleFieldEditor Editor { get; } = editor;
 }

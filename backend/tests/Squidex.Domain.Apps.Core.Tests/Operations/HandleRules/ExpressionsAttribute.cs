@@ -10,23 +10,8 @@ using Xunit.Sdk;
 
 namespace Squidex.Domain.Apps.Core.Operations.HandleRules;
 
-public sealed class ExpressionsAttribute : DataAttribute
+public sealed class ExpressionsAttribute(string? interpolationOld, string? interpolationNew, string? script, string? liquid) : DataAttribute
 {
-    private readonly string? script;
-    private readonly string? interpolationOld;
-    private readonly string? interpolationNew;
-    private readonly string? liquid;
-
-    public ExpressionsAttribute(string? interpolationOld, string? interpolationNew, string? script, string? liquid)
-    {
-        this.liquid = liquid;
-
-        this.interpolationOld = interpolationOld;
-        this.interpolationNew = interpolationNew;
-
-        this.script = script;
-    }
-
     public override IEnumerable<object[]> GetData(MethodInfo testMethod)
     {
         if (interpolationOld != null)

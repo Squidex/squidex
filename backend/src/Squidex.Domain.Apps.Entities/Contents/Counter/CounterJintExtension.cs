@@ -13,16 +13,10 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Counter;
 
-public sealed class CounterJintExtension : IJintExtension, IScriptDescriptor
+public sealed class CounterJintExtension(ICounterService counterService) : IJintExtension, IScriptDescriptor
 {
     private delegate long CounterResetDelegate(string name, long value = 0);
     private delegate void CounterResetV2Delegate(string name, Action<JsValue>? callback = null, long value = 0);
-    private readonly ICounterService counterService;
-
-    public CounterJintExtension(ICounterService counterService)
-    {
-        this.counterService = counterService;
-    }
 
     public void Extend(ScriptExecutionContext context)
     {

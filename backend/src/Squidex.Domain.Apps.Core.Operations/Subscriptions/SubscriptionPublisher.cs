@@ -14,11 +14,11 @@ using Squidex.Messaging.Subscriptions;
 
 namespace Squidex.Domain.Apps.Core.Subscriptions;
 
-public sealed class SubscriptionPublisher : IEventConsumer
+public sealed class SubscriptionPublisher(
+    ISubscriptionService subscriptionService,
+    IEnumerable<ISubscriptionEventCreator> subscriptionCreators)
+    : IEventConsumer
 {
-    private readonly ISubscriptionService subscriptionService;
-    private readonly IEnumerable<ISubscriptionEventCreator> subscriptionCreators;
-
     public string Name => "Subscriptions";
 
     public StreamFilter EventsFilter { get; } = StreamFilter.Prefix("content-", "asset-");
@@ -26,13 +26,6 @@ public sealed class SubscriptionPublisher : IEventConsumer
     public bool StartLatest => true;
 
     public bool CanClear => false;
-
-    public SubscriptionPublisher(ISubscriptionService subscriptionService,
-        IEnumerable<ISubscriptionEventCreator> subscriptionCreators)
-    {
-        this.subscriptionService = subscriptionService;
-        this.subscriptionCreators = subscriptionCreators;
-    }
 
     public async ValueTask<bool> HandlesAsync(StoredEvent @event)
     {

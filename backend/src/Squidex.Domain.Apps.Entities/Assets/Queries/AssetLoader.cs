@@ -12,17 +12,8 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Assets.Queries;
 
-public sealed class AssetLoader : IAssetLoader
+public sealed class AssetLoader(IDomainObjectFactory domainObjectFactory, IDomainObjectCache domainObjectCache) : IAssetLoader
 {
-    private readonly IDomainObjectFactory domainObjectFactory;
-    private readonly IDomainObjectCache domainObjectCache;
-
-    public AssetLoader(IDomainObjectFactory domainObjectFactory, IDomainObjectCache domainObjectCache)
-    {
-        this.domainObjectFactory = domainObjectFactory;
-        this.domainObjectCache = domainObjectCache;
-    }
-
     public async Task<Asset?> GetAsync(DomainId appId, DomainId id, long version = EtagVersion.Any,
         CancellationToken ct = default)
     {

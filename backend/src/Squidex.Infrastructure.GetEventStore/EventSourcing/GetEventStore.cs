@@ -14,21 +14,11 @@ using Squidex.Infrastructure.Json;
 
 namespace Squidex.Infrastructure.EventSourcing;
 
-public sealed class GetEventStore : IEventStore, IInitializable
+public sealed class GetEventStore(EventStoreClientSettings settings, IJsonSerializer serializer) : IEventStore, IInitializable
 {
     private const string StreamPrefix = "squidex";
-    private readonly EventStoreClient client;
-    private readonly EventStoreProjectionClient projectionClient;
-    private readonly IJsonSerializer serializer;
-
-    public GetEventStore(EventStoreClientSettings settings, IJsonSerializer serializer)
-    {
-        this.serializer = serializer;
-
-        client = new EventStoreClient(settings);
-
-        projectionClient = new EventStoreProjectionClient(settings, StreamPrefix);
-    }
+    private readonly EventStoreClient client = new EventStoreClient(settings);
+    private readonly EventStoreProjectionClient projectionClient = new EventStoreProjectionClient(settings, StreamPrefix);
 
     public async Task InitializeAsync(
         CancellationToken ct)

@@ -126,7 +126,8 @@ public class UsageGateTests : GivenContext
     {
         App = App with
         {
-            Plan = new AssignedPlan(User, planPaid.Id), TeamId = TeamId
+            Plan = new AssignedPlan(User, planPaid.Id),
+            TeamId = TeamId
         };
 
         var plan = await sut.GetPlanForAppAsync(App, false, CancellationToken);

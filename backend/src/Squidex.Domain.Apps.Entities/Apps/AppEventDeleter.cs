@@ -10,16 +10,9 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Apps;
 
-public sealed class AppEventDeleter : IDeleter
+public sealed class AppEventDeleter(IEventStore eventStore) : IDeleter
 {
-    private readonly IEventStore eventStore;
-
     public int Order => int.MaxValue;
-
-    public AppEventDeleter(IEventStore eventStore)
-    {
-        this.eventStore = eventStore;
-    }
 
     public Task DeleteAppAsync(App app,
         CancellationToken ct)

@@ -10,15 +10,8 @@ using MongoDB.Driver;
 
 namespace Squidex.Infrastructure.Diagnostics;
 
-public sealed class MongoHealthCheck : IHealthCheck
+public sealed class MongoHealthCheck(IMongoDatabase mongoDatabase) : IHealthCheck
 {
-    private readonly IMongoDatabase mongoDatabase;
-
-    public MongoHealthCheck(IMongoDatabase mongoDatabase)
-    {
-        this.mongoDatabase = mongoDatabase;
-    }
-
     public async Task<HealthCheckResult> CheckHealthAsync(HealthCheckContext context,
         CancellationToken cancellationToken = default)
     {

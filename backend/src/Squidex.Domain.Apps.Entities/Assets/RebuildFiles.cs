@@ -13,22 +13,12 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-public sealed class RebuildFiles
+public sealed class RebuildFiles(
+    IAssetFileStore assetFileStore,
+    IEventFormatter eventFormatter,
+    IEventStore eventStore)
 {
     private static readonly MemoryStream DummyStream = new MemoryStream(Encoding.UTF8.GetBytes("dummy"));
-    private readonly IAssetFileStore assetFileStore;
-    private readonly IEventFormatter eventFormatter;
-    private readonly IEventStore eventStore;
-
-    public RebuildFiles(
-        IAssetFileStore assetFileStore,
-        IEventFormatter eventFormatter,
-        IEventStore eventStore)
-    {
-        this.assetFileStore = assetFileStore;
-        this.eventStore = eventStore;
-        this.eventFormatter = eventFormatter;
-    }
 
     public async Task RepairAsync(
         CancellationToken ct = default)

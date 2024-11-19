@@ -14,15 +14,8 @@ using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.HandleRules.Extensions;
 
-public sealed class EventFluidExtensions : IFluidExtension
+public sealed class EventFluidExtensions(IUrlGenerator urlGenerator) : IFluidExtension
 {
-    private readonly IUrlGenerator urlGenerator;
-
-    public EventFluidExtensions(IUrlGenerator urlGenerator)
-    {
-        this.urlGenerator = urlGenerator;
-    }
-
     public void RegisterLanguageExtensions(CustomFluidParser parser, TemplateOptions options)
     {
         options.Filters.AddFilter("contentUrl", ContentUrl);

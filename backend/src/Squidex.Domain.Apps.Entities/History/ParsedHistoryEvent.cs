@@ -11,10 +11,24 @@ using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.History;
 
-public sealed class ParsedHistoryEvent
+public sealed class ParsedHistoryEvent(HistoryEvent item, IReadOnlyDictionary<string, string> texts)
 {
-    private readonly HistoryEvent item;
-    private readonly Lazy<string?> message;
+    private readonly Lazy<string?> message = new Lazy<string?>(() =>
+        {
+            if (texts.TryGetValue(item.EventType, out var translationKey))
+            {
+                var result = T.Get(translationKey);
+
+                foreach (var (key, value) in item.Parameters)
+                {
+                    result = result.Replace("[" + key + "]", value, StringComparison.Ordinal);
+                }
+
+                return result;
+            }
+
+            return null;
+        });
 
     public DomainId Id
     {
@@ -49,27 +63,5 @@ public sealed class ParsedHistoryEvent
     public string? Message
     {
         get => message.Value;
-    }
-
-    public ParsedHistoryEvent(HistoryEvent item, IReadOnlyDictionary<string, string> texts)
-    {
-        this.item = item;
-
-        message = new Lazy<string?>(() =>
-        {
-            if (texts.TryGetValue(item.EventType, out var translationKey))
-            {
-                var result = T.Get(translationKey);
-
-                foreach (var (key, value) in item.Parameters)
-                {
-                    result = result.Replace("[" + key + "]", value, StringComparison.Ordinal);
-                }
-
-                return result;
-            }
-
-            return null;
-        });
     }
 }

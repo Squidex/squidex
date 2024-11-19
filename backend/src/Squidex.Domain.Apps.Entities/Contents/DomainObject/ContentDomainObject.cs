@@ -24,17 +24,13 @@ using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject;
 
-public partial class ContentDomainObject : DomainObject<WriteContent>
+public partial class ContentDomainObject(
+    DomainId id,
+    IPersistenceFactory<WriteContent> persistence,
+    ILogger<ContentDomainObject> log,
+    IServiceProvider serviceProvider)
+    : DomainObject<WriteContent>(id, persistence, log)
 {
-    private readonly IServiceProvider serviceProvider;
-
-    public ContentDomainObject(DomainId id, IPersistenceFactory<WriteContent> persistence, ILogger<ContentDomainObject> log,
-        IServiceProvider serviceProvider)
-        : base(id, persistence, log)
-    {
-        this.serviceProvider = serviceProvider;
-    }
-
     protected override bool IsDeleted(WriteContent snapshot)
     {
         return snapshot.IsDeleted;

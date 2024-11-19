@@ -10,14 +10,9 @@ using Squidex.Infrastructure.Translations;
 namespace Squidex.Infrastructure;
 
 [Serializable]
-public class DomainObjectNotFoundException : DomainObjectException
+public class DomainObjectNotFoundException(string id, Exception? inner = null) : DomainObjectException(FormatMessage(id), id, ExposedErrorCode, inner)
 {
     private const string ExposedErrorCode = "OBJECT_NOTFOUND";
-
-    public DomainObjectNotFoundException(string id, Exception? inner = null)
-        : base(FormatMessage(id), id, ExposedErrorCode, inner)
-    {
-    }
 
     private static string FormatMessage(string id)
     {

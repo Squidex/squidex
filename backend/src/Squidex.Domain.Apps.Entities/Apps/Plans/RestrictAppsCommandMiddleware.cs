@@ -16,16 +16,9 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Plans;
 
-public sealed class RestrictAppsCommandMiddleware : ICommandMiddleware
+public sealed class RestrictAppsCommandMiddleware(IOptions<RestrictAppsOptions> usageOptions, IUserResolver userResolver) : ICommandMiddleware
 {
-    private readonly RestrictAppsOptions usageOptions;
-    private readonly IUserResolver userResolver;
-
-    public RestrictAppsCommandMiddleware(IOptions<RestrictAppsOptions> usageOptions, IUserResolver userResolver)
-    {
-        this.usageOptions = usageOptions.Value;
-        this.userResolver = userResolver;
-    }
+    private readonly RestrictAppsOptions usageOptions = usageOptions.Value;
 
     public async Task HandleAsync(CommandContext context, NextDelegate next,
         CancellationToken ct)

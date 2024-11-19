@@ -19,13 +19,8 @@ namespace Squidex.Areas.Api.Controllers.Schemas;
 /// Update and query information about schemas.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Schemas))]
-public sealed class SchemaFieldsController : ApiController
+public sealed class SchemaFieldsController(ICommandBus commandBus) : ApiController(commandBus)
 {
-    public SchemaFieldsController(ICommandBus commandBus)
-        : base(commandBus)
-    {
-    }
-
     /// <summary>
     /// Add a schema field.
     /// </summary>

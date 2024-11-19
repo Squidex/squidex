@@ -22,17 +22,13 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Rules.DomainObject;
 
-public partial class RuleDomainObject : DomainObject<Rule>
+public partial class RuleDomainObject(
+    DomainId id,
+    IPersistenceFactory<Rule> persistence,
+    ILogger<RuleDomainObject> log,
+    IServiceProvider serviceProvider)
+    : DomainObject<Rule>(id, persistence, log)
 {
-    private readonly IServiceProvider serviceProvider;
-
-    public RuleDomainObject(DomainId id, IPersistenceFactory<Rule> persistence, ILogger<RuleDomainObject> log,
-        IServiceProvider serviceProvider)
-        : base(id, persistence, log)
-    {
-        this.serviceProvider = serviceProvider;
-    }
-
     protected override bool IsDeleted(Rule snapshot)
     {
         return snapshot.IsDeleted;

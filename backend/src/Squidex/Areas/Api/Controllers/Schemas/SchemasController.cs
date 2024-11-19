@@ -27,18 +27,8 @@ namespace Squidex.Areas.Api.Controllers.Schemas;
 /// Update and query information about schemas.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Schemas))]
-public sealed class SchemasController : ApiController
+public sealed class SchemasController(ICommandBus commandBus, IAppProvider appProvider, IContentWorkflow workflow) : ApiController(commandBus)
 {
-    private readonly IAppProvider appProvider;
-    private readonly IContentWorkflow workflow;
-
-    public SchemasController(ICommandBus commandBus, IAppProvider appProvider, IContentWorkflow workflow)
-        : base(commandBus)
-    {
-        this.appProvider = appProvider;
-        this.workflow = workflow;
-    }
-
     /// <summary>
     /// Get schemas.
     /// </summary>

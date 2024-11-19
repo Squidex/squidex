@@ -21,25 +21,15 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-public sealed class AssetChangedTriggerHandler : IRuleTriggerHandler, ISubscriptionEventCreator
+public sealed class AssetChangedTriggerHandler(
+    IScriptEngine scriptEngine,
+    IAssetLoader assetLoader,
+    IAssetRepository assetRepository)
+    : IRuleTriggerHandler, ISubscriptionEventCreator
 {
-    private readonly IScriptEngine scriptEngine;
-    private readonly IAssetLoader assetLoader;
-    private readonly IAssetRepository assetRepository;
-
     public bool CanCreateSnapshotEvents => true;
 
     public Type TriggerType => typeof(AssetChangedTriggerV2);
-
-    public AssetChangedTriggerHandler(
-        IScriptEngine scriptEngine,
-        IAssetLoader assetLoader,
-        IAssetRepository assetRepository)
-    {
-        this.scriptEngine = scriptEngine;
-        this.assetLoader = assetLoader;
-        this.assetRepository = assetRepository;
-    }
 
     public bool Handles(AppEvent @event)
     {

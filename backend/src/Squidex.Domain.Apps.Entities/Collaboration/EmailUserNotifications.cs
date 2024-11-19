@@ -18,12 +18,14 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Collaboration;
 
-public sealed class EmailUserNotifications : IUserNotifications
+public sealed class EmailUserNotifications(
+    IOptions<EmailUserNotificationOptions> texts,
+    IEmailSender emailSender,
+    IUrlGenerator urlGenerator,
+    ILogger<EmailUserNotifications> log)
+    : IUserNotifications
 {
-    private readonly IEmailSender emailSender;
-    private readonly IUrlGenerator urlGenerator;
-    private readonly ILogger<EmailUserNotifications> log;
-    private readonly EmailUserNotificationOptions texts;
+    private readonly EmailUserNotificationOptions texts = texts.Value;
 
     private sealed class TemplatesVars
     {
@@ -45,16 +47,6 @@ public sealed class EmailUserNotifications : IUserNotifications
     public bool IsActive
     {
         get => true;
-    }
-
-    public EmailUserNotifications(IOptions<EmailUserNotificationOptions> texts, IEmailSender emailSender,
-        IUrlGenerator urlGenerator, ILogger<EmailUserNotifications> log)
-    {
-        this.texts = texts.Value;
-        this.emailSender = emailSender;
-        this.urlGenerator = urlGenerator;
-
-        this.log = log;
     }
 
     public Task SendUsageAsync(IUser user, App app, long usage, long usageLimit,

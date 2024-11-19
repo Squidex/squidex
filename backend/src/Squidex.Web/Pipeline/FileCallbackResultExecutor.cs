@@ -13,13 +13,8 @@ using Squidex.Assets;
 
 namespace Squidex.Web.Pipeline;
 
-public sealed class FileCallbackResultExecutor : FileResultExecutorBase
+public sealed class FileCallbackResultExecutor(ILoggerFactory loggerFactory) : FileResultExecutorBase(CreateLogger<FileCallbackResultExecutor>(loggerFactory))
 {
-    public FileCallbackResultExecutor(ILoggerFactory loggerFactory)
-        : base(CreateLogger<FileCallbackResultExecutor>(loggerFactory))
-    {
-    }
-
     public async Task ExecuteAsync(ActionContext context, FileCallbackResult result)
     {
         var response = context.HttpContext.Response;

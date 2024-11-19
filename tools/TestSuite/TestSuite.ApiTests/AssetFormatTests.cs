@@ -14,14 +14,9 @@ using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
-public class AssetFormatTests : IClassFixture<CreatedAppFixture>
+public class AssetFormatTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFixture>
 {
-    public CreatedAppFixture _ { get; }
-
-    public AssetFormatTests(CreatedAppFixture fixture)
-    {
-        _ = fixture;
-    }
+    public CreatedAppFixture _ { get; } = fixture;
 
     [Fact]
     public async Task Should_upload_image_gif_without_extension()

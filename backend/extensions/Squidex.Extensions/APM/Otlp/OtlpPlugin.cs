@@ -17,15 +17,8 @@ namespace Squidex.Extensions.APM.Otlp;
 
 public sealed class OtlpPlugin : IPlugin
 {
-    private sealed class Configurator : ITelemetryConfigurator
+    private sealed class Configurator(IConfiguration config) : ITelemetryConfigurator
     {
-        private readonly IConfiguration config;
-
-        public Configurator(IConfiguration config)
-        {
-            this.config = config;
-        }
-
         public void Configure(TracerProviderBuilder builder)
         {
             builder.AddOtlpExporter(options =>

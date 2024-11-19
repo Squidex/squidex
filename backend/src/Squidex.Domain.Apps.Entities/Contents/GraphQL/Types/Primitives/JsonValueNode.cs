@@ -10,14 +10,9 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 
-internal sealed class JsonValueNode : GraphQLValue
+internal sealed class JsonValueNode(JsonValue value) : GraphQLValue
 {
     public override ASTNodeKind Kind => ASTNodeKind.ObjectValue;
 
-    public JsonValue Value { get; }
-
-    public JsonValueNode(JsonValue value)
-    {
-        Value = value;
-    }
+    public JsonValue Value { get; } = value;
 }
