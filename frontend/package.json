@@ -64,6 +64,8 @@
     "rxjs": "7.8.1",
     "simplemde": "1.11.2",
     "slugify": "1.6.6",
+    "textarea-caret": "github:component/textarea-caret-position",
+    "textarea-caret-position": "^0.1.1",
     "tslib": "2.6.2",
     "tui-calendar": "^1.15.3",
     "typemoq": "^2.1.0",

@@ -5,6 +5,25 @@
     position: relative;
 }
 
+.measurer {
+    @include absolute(0, null, null, 0);
+    white-space: pre;
+    background-color: red;
+    opacity: .2;
+    pointer-events: none;
+}
+
+.anchor {
+    @include absolute(0, null, null, 0);
+}
+
+.anchor span {
+    background-color: blue;
+    opacity: .2;
+    pointer-events: none;
+    margin-top: -.375rem;
+}
+
 .form-icon {
     padding-left: 2.25rem;
 }

@@ -5,6 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { map, Observable, timer } from 'rxjs';
 import { AutocompleteComponent, AutocompleteSource, LocalizerService, RootViewComponent } from '@app/framework';
@@ -29,18 +30,25 @@ export default {
         props: args,
         template: `
             <sqx-root-view>
-                <sqx-autocomplete 
-                    [disabled]="disabled"
-                    [icon]="icon"
-                    [inputStyle]="inputStyle"
-                    [itemsSource]="itemsSource">
-                </sqx-autocomplete>
+                <div style="margin-top: 100px">
+                    <sqx-autocomplete 
+                        [debounceTime]="debounceTime"
+                        [disabled]="disabled"
+                        [dropdownFullWidth]="dropdownFullWidth"
+                        [icon]="icon"
+                        [inputStyle]="inputStyle"
+                        [itemsSource]="itemsSource"
+                        [startCharacter]="startCharacter"
+                        [textArea]="textArea">
+                    </sqx-autocomplete>
+                </div>
             </sqx-root-view>
         `,
     }),
     decorators: [
         moduleMetadata({
             imports: [
+                BrowserAnimationsModule,
                 RootViewComponent,
             ],
             providers: [
@@ -61,7 +69,7 @@ class Source implements AutocompleteSource {
     }
 
     public find(query: string): Observable<readonly any[]> {
-        return timer(this.delay).pipe(map(() => this.values.filter(x => x.indexOf(query) >= 0)));
+        return timer(this.delay).pipe(map(() => this.values.filter(x => query.length > 0 && x.indexOf(query) >= 0)));
     }
 }
 
@@ -102,5 +110,22 @@ export const IconLoading: Story = {
     args: {
         itemsSource: new Source(['Lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing'], 4000),
         icon: 'user',
+    },
+};
+
+export const StartCharacter: Story = {
+    args: {
+        debounceTime: 0,
+        itemsSource: new Source(['Lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing']),
+        startCharacter: '@',
+    },
+};
+
+export const TextArea: Story = {
+    args: {
+        debounceTime: 0,
+        itemsSource: new Source(['Lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing']),
+        startCharacter: '@',
+        textArea: true,
     },
 };
