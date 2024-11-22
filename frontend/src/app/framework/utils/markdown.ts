@@ -55,7 +55,7 @@ export function markdownRender(input: string | undefined | null, inline: boolean
     if (inline) {
         return marked(input, { renderer: RENDERER_INLINE }) as string;
     } else {
-        return marked(input, { renderer: RENDERER_DEFAULT }) as string;
+        return marked(input, { renderer: RENDERER_DEFAULT, breaks: true }) as string;
     }
 }
 

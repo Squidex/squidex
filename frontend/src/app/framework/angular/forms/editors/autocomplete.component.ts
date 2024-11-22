@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, ContentChild, ElementRef, forwardRef, Input, numberAttribute, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, ContentChild, ElementRef, EventEmitter, forwardRef, Input, numberAttribute, OnDestroy, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { merge, Observable, of, Subject } from 'rxjs';
 import { catchError, debounceTime, finalize, map, switchMap, tap } from 'rxjs/operators';
@@ -55,6 +55,8 @@ interface State {
 }
 
 const NO_EMIT = { emitEvent: false };
+const NO_QUERY = { text: '' };
+const RANGE_LIMIT = 30;
 
 @Component({
     standalone: true,
@@ -81,9 +83,17 @@ const NO_EMIT = { emitEvent: false };
 export class AutocompleteComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements OnInit, OnDestroy {
     private readonly subscriptions = new Subscriptions();
     private readonly modalStream = new Subject<Query>();
-    private lastCursor: number | null = null;
-    private lastStart: number | null = null;
+    private lastCursor = 0;
     private timer: any;
+
+    @Output()
+    public editorBlur = new EventEmitter();
+
+    @Output()
+    public editorKeyDown = new EventEmitter<KeyboardEvent>();
+
+    @Output()
+    public editorKeyPress = new EventEmitter<KeyboardEvent>();
 
     @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {
@@ -105,7 +115,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     @Input()
     public formName?: string;
 
-    @Input()
+    @Input({ transform: booleanAttribute })
     public textArea?: boolean;
 
     @Input()
@@ -144,9 +154,6 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     @ViewChild('anchor', { static: false })
     public anchor!: ElementRef<HTMLDivElement>;
 
-    @ViewChild('measurer', { static: false })
-    public measurer!: ElementRef<HTMLDivElement>;
-
     @ViewChild('input', { static: false })
     public inputControl!: ElementRef<HTMLInputElement>;
 
@@ -182,22 +189,33 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
                 }),
                 map((text: string) => {
                     if (!Types.isString(text)) {
-                        return { text: '' };
+                        return NO_QUERY;
                     }
 
-                    if (!this.startCharacter || !Types.isNumber(this.lastStart)) {
+                    if (!this.startCharacter) {
                         return { text: text.trim() };
                     }
 
-                    const rangeFrom = this.lastStart;
-                    const rangeTo = text.length;
-                    if (text[this.lastStart] !== this.startCharacter || rangeTo <= rangeFrom) {
-                        return { text: '' };
-                    } else {
-                        text = text.substring(rangeFrom + 1, rangeTo);
+                    let rangeTo = Math.min(this.lastCursor, text.length);
+                    let rangeFrom = rangeTo - 1;
+                    let rangeLimit = Math.max(0, rangeTo - RANGE_LIMIT);
+
+                    while (rangeFrom >= rangeLimit) {
+                        const char = text[rangeFrom];
+                        if (char === this.startCharacter && rangeFrom + 1 < rangeTo + 1) {
+                            text = text.substring(rangeFrom + 1, rangeTo + 1);
+
+                            return { text, range: { from: rangeFrom, to: rangeTo } };
+                        }
+
+                        if (/[\s]/.test(char)) {
+                            break;
+                        }
+
+                        rangeFrom--;
                     }
 
-                    return { text, range: { from: rangeFrom, to: rangeTo } };
+                    return { text: '' };
                 }),
                 debounceTime(this.debounceTime));
 
@@ -230,25 +248,26 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     }
 
     public onKeyDown(event: KeyboardEvent) {
-        this.lastCursor = this.inputControl.nativeElement.selectionStart;
+        this.lastCursor = this.inputControl.nativeElement.selectionEnd || 0;
+        this.editorKeyDown.emit(event);
 
         if (Keys.isEscape(event)) {
             this.resetForm();
             this.reset();
-        } else if (Keys.isUp(event)) {
+        }
+
+        if (this.snapshot.suggestedItems.length === 0) {
+            return true;
+        }
+
+        if (Keys.isUp(event)) {
             this.selectPrevIndex();
             return false;
         } else if (Keys.isDown(event)) {
             this.selectNextIndex();
             return false;
         } else if (Keys.isEnter(event)) {
-            return !(this.snapshot.suggestedItems.length > 0 && this.selectItem());
-        } else if (this.startCharacter) {
-            if (event.key === this.startCharacter) {
-                this.lastStart = this.lastCursor;
-            } else if (event.key === ' ') {
-                this.lastStart = null;
-            }
+            return !this.selectItem();
         }
 
         return true;
@@ -293,6 +312,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     public blur() {
         this.resetState();
         this.callTouched();
+        this.editorBlur.emit();
     }
 
     public selectItem(selection: any | null = null): boolean {
@@ -320,7 +340,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
             if (query?.range) {
                 const input = this.queryInput.value;
                 const textBefore = input.substring(0, query.range.from);
-                const textAfter = input.substring(query.range.to);
+                const textAfter = input.substring(query.range.to + 1);
 
                 displayString = `${textBefore}${this.startCharacter}${displayString}${textAfter}`;
             }
@@ -363,10 +383,6 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
         }
 
         this.next({ suggestedIndex });
-    }
-
-    public getRows() {
-        return Math.max(2, this.queryInput.value?.split('\n')?.length);
     }
 
     private selectPrevIndex() {

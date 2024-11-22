@@ -106,9 +106,16 @@ export const StyleUnderlined: Story = {
     },
 };
 
+export const StyleFullWidth: Story = {
+    args: {
+        itemsSource: new Source(['Lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing']),
+        dropdownFullWidth: true,
+    },
+};
+
 export const IconLoading: Story = {
     args: {
-        itemsSource: new Source(['Lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing'], 4000),
+        itemsSource: new Source(['Lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing'], 2000),
         icon: 'user',
     },
 };

@@ -6,27 +6,32 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { MentionConfig, MentionModule } from 'angular-mentions';
 import { BehaviorSubject } from 'rxjs';
-import { MessageBus, Subscriptions, TranslatePipe } from '@app/framework';
-import { AnnotationCreateAfterNavigate, AnnotationsSelectAfterNavigate, AuthService, CommentsState, ContributorsState, UpsertCommentForm } from '@app/shared/internal';
+import { AutocompleteComponent, Keys, MessageBus, Subscriptions, TranslatePipe } from '@app/framework';
+import { AnnotationCreateAfterNavigate, AnnotationsSelectAfterNavigate, AuthService, CommentsState, UpsertCommentForm } from '@app/shared/internal';
+import { UserPicturePipe } from '../pipes';
 import { CommentComponent } from './comment.component';
+import { ContributorsDataSource } from './data-source';
 
 @Component({
     standalone: true,
     selector: 'sqx-comments',
     styleUrls: ['./comments.component.scss'],
     templateUrl: './comments.component.html',
+    providers: [
+        ContributorsDataSource,
+    ],
     imports: [
         AsyncPipe,
+        AutocompleteComponent,
         CommentComponent,
         FormsModule,
-        MentionModule,
         ReactiveFormsModule,
         TranslatePipe,
+        UserPicturePipe,
     ],
 })
 export class CommentsComponent implements OnInit {
@@ -35,13 +40,10 @@ export class CommentsComponent implements OnInit {
     private reference?: AnnotationCreateAfterNavigate;
 
     @ViewChild('input', { static: false })
-    public input!: ElementRef<HTMLInputElement>;
+    public input!: AutocompleteComponent;
 
     @Input()
     public commentsId = '';
-
-    public mentionUsers = this.contributorsState.contributors;
-    public mentionConfig: MentionConfig = { dropUp: false, labelKey: 'contributorEmail' };
 
     public commentForm = new UpsertCommentForm();
     public commentsItems = this.commentsState.getGroupedComments(this.selection);
@@ -50,14 +52,14 @@ export class CommentsComponent implements OnInit {
     constructor(authService: AuthService,
         public readonly commentsState: CommentsState,
         public readonly router: Router,
-        private readonly contributorsState: ContributorsState,
+        public readonly contributorsDataSource: ContributorsDataSource,
         private readonly messageBus: MessageBus,
     ) {
         this.commentUser = authService.user!.token;
     }
 
     public ngOnInit() {
-        this.contributorsState.loadIfNotLoaded();
+        this.contributorsDataSource.loadIfNotLoaded();
 
         this.subscriptions.add(
             this.messageBus.of(AnnotationsSelectAfterNavigate)
@@ -70,7 +72,7 @@ export class CommentsComponent implements OnInit {
                 .subscribe(message => {
                     this.reference = message;
 
-                    this.input.nativeElement.focus();
+                    this.input.focus();
                 }));
     }
 
@@ -86,7 +88,14 @@ export class CommentsComponent implements OnInit {
         this.commentForm.submitCompleted();
     }
 
-    public blurComment() {
+    public onKeyPress(event: KeyboardEvent) {
+        if (Keys.isEnter(event) && !event.altKey && !event.shiftKey) {
+            this.comment();
+            event.preventDefault();
+        }
+    }
+
+    public onBlur() {
         setTimeout(() => {
             this.reference = undefined;
         }, 100);

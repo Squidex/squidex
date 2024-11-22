@@ -5,23 +5,17 @@
     position: relative;
 }
 
-.measurer {
-    @include absolute(0, null, null, 0);
-    white-space: pre;
-    background-color: red;
-    opacity: .2;
-    pointer-events: none;
-}
-
 .anchor {
     @include absolute(0, null, null, 0);
-}
+    background-color: red;
 
-.anchor span {
-    background-color: blue;
-    opacity: .2;
-    pointer-events: none;
-    margin-top: -.375rem;
+    &.full-size {
+        @include absolute(0, 0, 0, 0);
+    }
+
+    &.cursor-size {
+        margin-top: -.375rem !important;
+    }
 }
 
 .form-icon {
@@ -43,4 +37,10 @@
     font-weight: normal;
     padding-left: 5px;
     padding-right: 5px;
+}
+
+textarea {
+    overflow-x: hidden;
+    overflow-y: hidden;
+    resize: none;
 }

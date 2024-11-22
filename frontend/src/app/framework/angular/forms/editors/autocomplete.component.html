@@ -1,18 +1,11 @@
 <div class="control-container">
-    <span
-        class="form-control measurer pe-0 w-auto"
-        #measurer
-        [class.form-empty]="inputStyle === 'empty'"
-        [class.form-icon]="!!icon"
-        [class.form-underlined]="inputStyle === 'underlined'">
-    </span>
-
-    <div #anchor class="anchor" style="margin-top: -1px;">
+    <div class="anchor invisible" #anchor [class.cursor-size]="startCharacter" [class.full-size]="!startCharacter">
         <span class="form-control w-100">&nbsp;</span>
     </div>
 
     @if (textArea) {
         <textarea
+            cdkTextareaAutosize
             class="form-control"
             [id]="formId"
             #input
@@ -25,9 +18,11 @@
             [class.form-underlined]="inputStyle === 'underlined'"
             [formControl]="queryInput"
             (keydown)="onKeyDown($event)"
+            (keypress)="editorKeyPress.emit($event)"
             [name]="formName"
+            rows="1"
             [placeholder]="placeholder"
-            [rows]="getRows()"
+            [style.height]="input.scrollHeight + 'px'"
             [sqxFocusOnInit]="autoFocus"></textarea>
     } @else {
         <input
@@ -43,6 +38,7 @@
             [class.form-underlined]="inputStyle === 'underlined'"
             [formControl]="queryInput"
             (keydown)="onKeyDown($event)"
+            (keypress)="editorKeyPress.emit($event)"
             [name]="formName"
             [placeholder]="placeholder"
             [sqxFocusOnInit]="autoFocus" />
@@ -68,7 +64,7 @@
         class="control-dropdown"
         #container
         adjustHeight="false"
-        [adjustWidth]="dropdownFullWidth"
+        [adjustWidth]="dropdownFullWidth && !startCharacter"
         [position]="dropdownPosition"
         scrollX="false"
         scrollY="true"

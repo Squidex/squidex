@@ -10,6 +10,25 @@
     .mention-active > a {
         background: $color-theme-brand !important;
     }
+
+    .comments-header {
+        .form-control {
+            border-color: $color-white;
+            border-bottom-color: $color-border;
+            border-radius: 0;
+        
+            &:focus {
+                box-shadow: none;
+                border-color: $color-theme-brand;
+            }
+        }
+    }
+}
+
+.autocomplete-user {
+    .user-name {
+        margin-left: .25rem;
+    }
 }
 
 .comments {
@@ -23,16 +42,5 @@
 
     &-header {
         flex-shrink: 0;
-    }
-}
-
-.form-control {
-    border-color: $color-white;
-    border-bottom-color: $color-border;
-    border-radius: 0;
-
-    &:focus {
-        box-shadow: none;
-        border-color: $color-theme-brand;
     }
 }
