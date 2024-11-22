@@ -74,7 +74,7 @@ public sealed partial class CommentCollaborationHandler(
                 var commentValue = new Comment(clock.GetCurrentInstant(), actor, text, url, skipHandlers);
                 var commentJson = jsonSerializer.Serialize(commentValue);
 
-                stream.InsertRange(transaction, stream.Length, InputFactory.FromJson(commentJson));
+                stream.InsertRange(transaction, stream.Length(transaction), InputFactory.FromJson(commentJson));
             }
         }, ct);
     }
@@ -157,7 +157,7 @@ public sealed partial class CommentCollaborationHandler(
             var eventBody = Envelope.Create<IEvent>(commentEvent);
             var eventData = eventFormatter.ToEventData(eventBody, Guid.NewGuid());
 
-            await eventStore.AppendAsync(Guid.NewGuid(), streamName, EtagVersion.Any, new List<EventData> { eventData });
+            await eventStore.AppendAsync(Guid.NewGuid(), streamName, EtagVersion.Any, [eventData]);
 
             foreach (var mentionedUser in commentEvent.Mentions.OrEmpty())
             {

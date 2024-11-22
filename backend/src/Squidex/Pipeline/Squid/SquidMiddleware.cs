@@ -11,7 +11,9 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Pipeline.Squid;
 
+#pragma warning disable CS9113 // Parameter is unread.
 public sealed class SquidMiddleware(RequestDelegate next)
+#pragma warning restore CS9113 // Parameter is unread.
 {
     private readonly string squidHappyLG = LoadSvg("happy");
     private readonly string squidHappySM = LoadSvg("happy-sm");
@@ -97,7 +99,7 @@ public sealed class SquidMiddleware(RequestDelegate next)
 
         context.Response.StatusCode = 200;
         context.Response.ContentType = "image/svg+xml";
-        context.Response.Headers["Cache-Control"] = "public, max-age=604800";
+        context.Response.Headers.CacheControl = "public, max-age=604800";
 
         await context.Response.WriteAsync(svg, context.RequestAborted);
     }

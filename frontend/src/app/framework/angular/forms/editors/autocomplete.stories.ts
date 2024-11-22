@@ -123,7 +123,7 @@ export const IconLoading: Story = {
 export const StartCharacter: Story = {
     args: {
         debounceTime: 0,
-        itemsSource: new Source(['Lorem', 'ipsum', 'dolor', 'sit', 'amet', 'consectetur', 'adipiscing']),
+        itemsSource: new Source(['donald@duck.com', 'scrooge@mcduck.com']),
         startCharacter: '@',
     },
 };

@@ -2,6 +2,8 @@
     <form [formGroup]="commentForm.form" (ngSubmit)="comment()">
         <sqx-autocomplete
             autoFocus="true"
+            autoSelectFirst="false"
+            displayProperty="contributorEmail"
             (editorBlur)="onBlur()"
             (editorKeyPress)="onKeyPress($event)"
             formControlName="text"
@@ -27,6 +29,7 @@
             canFollow="false"
             [commentItem]="comment"
             [comments]="commentsState"
+            [contributors]="contributorsDataSource"
             [currentUrl]="router.url"
             [scrollContainer]="'.comments-list'"
             [userToken]="commentUser"></sqx-comment>

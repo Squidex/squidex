@@ -9,10 +9,9 @@
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { AutocompleteComponent, bounceAnimation, ConfirmClickDirective, FromNowPipe, MarkdownPipe, SafeHtmlPipe, ScrollActiveDirective, TooltipDirective, TranslatePipe } from '@app/framework';
+import { AutocompleteComponent, AutocompleteSource, bounceAnimation, ConfirmClickDirective, FromNowPipe, MarkdownPipe, NOOP_DATASOURCE, SafeHtmlPipe, ScrollActiveDirective, TooltipDirective, TranslatePipe } from '@app/framework';
 import { CommentItem, CommentsState, DialogService, Keys, StatefulComponent, UpsertCommentForm } from '@app/shared/internal';
 import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
-import { ContributorsDataSource } from './data-source';
 
 interface State {
     mode?: 'Normal' | 'Edit' | 'Reply';
@@ -65,6 +64,9 @@ export class CommentComponent extends StatefulComponent<State> {
     public comments!: CommentsState;
 
     @Input()
+    public contributors: AutocompleteSource = NOOP_DATASOURCE;
+
+    @Input()
     public userToken = '';
 
     @Input()
@@ -81,7 +83,6 @@ export class CommentComponent extends StatefulComponent<State> {
     public isEditable = false;
 
     constructor(
-        public readonly contributorsDataSource: ContributorsDataSource,
         private readonly dialogs: DialogService,
     ) {
         super({});

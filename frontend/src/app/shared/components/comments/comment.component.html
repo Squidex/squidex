@@ -67,8 +67,9 @@
         <form [formGroup]="updateForm.form" (ngSubmit)="update()">
             <sqx-autocomplete
                 autoFocus="true"
+                autoSelectFirst="false"
                 (editorKeyPress)="onKeyPressUpdate($event)"
-                [itemsSource]="contributorsDataSource"
+                [itemsSource]="contributors"
                 formControlName="text"
                 startCharacter="@"
                 textArea="true">
@@ -99,8 +100,9 @@
                 <form [formGroup]="replyForm.form" (ngSubmit)="reply()">
                     <sqx-autocomplete
                         autoFocus="true"
+                        autoSelectFirst="false"
                         (editorKeyPress)="onKeyPressReply($event)"
-                        [itemsSource]="contributorsDataSource"
+                        [itemsSource]="contributors"
                         formControlName="text"
                         sqxFocusOnInit
                         startCharacter="@"

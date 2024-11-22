@@ -5,7 +5,6 @@
 
     @if (textArea) {
         <textarea
-            cdkTextareaAutosize
             class="form-control"
             [id]="formId"
             #input
@@ -20,9 +19,9 @@
             (keydown)="onKeyDown($event)"
             (keypress)="editorKeyPress.emit($event)"
             [name]="formName"
-            rows="1"
             [placeholder]="placeholder"
-            [style.height]="input.scrollHeight + 'px'"
+            rows="2"
+            sqxAutosize
             [sqxFocusOnInit]="autoFocus"></textarea>
     } @else {
         <input

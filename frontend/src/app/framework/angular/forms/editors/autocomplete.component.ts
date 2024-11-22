@@ -5,13 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
 import { booleanAttribute, ChangeDetectionStrategy, Component, ContentChild, ElementRef, EventEmitter, forwardRef, Input, numberAttribute, OnDestroy, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { merge, Observable, of, Subject } from 'rxjs';
 import { catchError, debounceTime, finalize, map, switchMap, tap } from 'rxjs/operators';
 import getCaretCoordinates from 'textarea-caret';
 import { FloatingPlacement, Keys, ModalModel, StatefulControlComponent, Subscriptions, Types } from '@app/framework/internal';
+import { AutosizeDirective } from '../../autosize.directive';
 import { DropdownMenuComponent } from '../../dropdown-menu.component';
 import { LoaderComponent } from '../../loader.component';
 import { ModalPlacementDirective } from '../../modals/modal-placement.directive';
@@ -24,6 +24,12 @@ import { FocusOnInitDirective } from '../focus-on-init.directive';
 export interface AutocompleteSource {
     find(query: string): Observable<ReadonlyArray<any>>;
 }
+
+export const NOOP_DATASOURCE = {
+    find() {
+        return of([]);
+    },
+};
 
 export const SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => AutocompleteComponent), multi: true,
@@ -56,7 +62,7 @@ interface State {
 
 const NO_EMIT = { emitEvent: false };
 const NO_QUERY = { text: '' };
-const RANGE_LIMIT = 30;
+const RANGE_LIMIT = 60;
 
 @Component({
     standalone: true,
@@ -68,6 +74,7 @@ const RANGE_LIMIT = 30;
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
+        AutosizeDirective,
         DropdownMenuComponent,
         FocusOnInitDirective,
         FormsModule,
@@ -136,6 +143,9 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     @Input({ transform: booleanAttribute })
     public autoFocus?: boolean | null;
 
+    @Input({ transform: booleanAttribute })
+    public autoSelectFirst = true;
+
     @Input({ transform: numberAttribute })
     public debounceTime = 300;
 
@@ -197,22 +207,22 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
                     }
 
                     let rangeTo = Math.min(this.lastCursor, text.length);
-                    let rangeFrom = rangeTo - 1;
-                    let rangeLimit = Math.max(0, rangeTo - RANGE_LIMIT);
-
-                    while (rangeFrom >= rangeLimit) {
-                        const char = text[rangeFrom];
-                        if (char === this.startCharacter && rangeFrom + 1 < rangeTo + 1) {
-                            text = text.substring(rangeFrom + 1, rangeTo + 1);
-
-                            return { text, range: { from: rangeFrom, to: rangeTo } };
+                    let rangeFrom = -1;
+                    for (let j = rangeTo - 1; j >= Math.max(0, rangeTo - RANGE_LIMIT); j--) {
+                        const char = text[j];
+                        if (char === this.startCharacter) {
+                            rangeFrom = j;
                         }
 
                         if (/[\s]/.test(char)) {
                             break;
                         }
+                    }
 
-                        rangeFrom--;
+                    if (rangeFrom >= 0 && rangeFrom < rangeTo) {
+                        text = text.substring(rangeFrom + 1, rangeTo + 1);
+
+                        return { text, range: { from: rangeFrom, to: rangeTo } };
                     }
 
                     return { text: '' };
@@ -320,7 +330,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
             selection = this.snapshot.suggestedItems[this.snapshot.suggestedIndex];
         }
 
-        if (!selection && this.snapshot.suggestedItems.length === 1) {
+        if (!selection && this.snapshot.suggestedItems.length === 1 && this.autoSelectFirst) {
             selection = this.snapshot.suggestedItems[0];
         }
 
