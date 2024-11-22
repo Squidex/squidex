@@ -417,8 +417,21 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
             return;
         }
 
-        const coords = getCaretCoordinates(this.inputControl.nativeElement, query.range.from);
-        this.anchor.nativeElement.style.top = `${coords.top}px`;
-        this.anchor.nativeElement.style.left = `${coords.left}px`;
+        const inputWidth = this.inputControl.nativeElement.getBoundingClientRect().width;
+        const coordsStart = getCaretCoordinates(this.inputControl.nativeElement, query.range.from);
+        const coordsEnd = getCaretCoordinates(this.inputControl.nativeElement, query.range.to + 1);
+
+        let w = coordsEnd.left - coordsStart.left;
+        let x = coordsStart.left;
+        if (coordsEnd.left > inputWidth) {
+            x = inputWidth - w;
+        }
+
+        x = Math.max(0, x);
+        w = Math.min(w, inputWidth);
+
+        this.anchor.nativeElement.style.top = `${coordsStart.top - 2}px`;
+        this.anchor.nativeElement.style.left = `${x}px`;
+        this.anchor.nativeElement.style.width = `${w}px`;
     }
 }
