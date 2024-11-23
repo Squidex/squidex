@@ -19,7 +19,7 @@ public class EventConsumerProcessorTests
         IEventFormatter eventFormatter,
         IEventStore eventStore,
         ILogger<EventConsumerProcessor> log)
-    : EventConsumerProcessor(persistenceFactory, eventConsumer, eventFormatter, eventStore, log)
+        : EventConsumerProcessor(persistenceFactory, eventConsumer, eventFormatter, eventStore, log)
     {
         public IEventSubscriber<StoredEvent>? Subscriber { get; set; }
 
