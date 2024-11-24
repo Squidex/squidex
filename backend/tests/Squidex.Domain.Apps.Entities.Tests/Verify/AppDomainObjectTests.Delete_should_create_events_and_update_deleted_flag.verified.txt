@@ -112,6 +112,7 @@
         EventId: Guid_2
       },
       Payload: {
+        Permanent: false,
         AppId: Guid_1,my-app,
         Actor: subject:me,
         FromRule: false

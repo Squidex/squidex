@@ -285,6 +285,7 @@ public sealed class SchemasController(ICommandBus commandBus, IAppProvider appPr
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema to delete.</param>
+    /// <param name="request">The request parameters.</param>
     /// <response code="204">Schema deleted.</response>
     /// <response code="404">Schema or app not found.</response>
     [HttpDelete]
@@ -292,9 +293,9 @@ public sealed class SchemasController(ICommandBus commandBus, IAppProvider appPr
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ApiPermissionOrAnonymous(PermissionIds.AppSchemasDelete)]
     [ApiCosts(1)]
-    public async Task<IActionResult> DeleteSchema(string app, string schema)
+    public async Task<IActionResult> DeleteSchema(string app, string schema, DeleteSchemaDto request)
     {
-        var command = new DeleteSchema();
+        var command = request.ToCommand();
 
         await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 

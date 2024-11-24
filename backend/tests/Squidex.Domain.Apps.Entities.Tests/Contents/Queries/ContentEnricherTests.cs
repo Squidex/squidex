@@ -35,7 +35,7 @@ public class ContentEnricherTests : GivenContext
         var step1 = A.Fake<IContentEnricherStep>();
         var step2 = A.Fake<IContentEnricherStep>();
 
-        var sut = new ContentEnricher(new[] { step1, step2 }, AppProvider);
+        var sut = new ContentEnricher([step1, step2], AppProvider);
 
         await sut.EnrichAsync(source, ApiContext, CancellationToken);
 
@@ -60,7 +60,7 @@ public class ContentEnricherTests : GivenContext
         var step1 = A.Fake<IContentEnricherStep>();
         var step2 = A.Fake<IContentEnricherStep>();
 
-        var sut = new ContentEnricher(new[] { step1, step2 }, AppProvider);
+        var sut = new ContentEnricher([step1, step2], AppProvider);
 
         await sut.EnrichAsync(source, false, ApiContext, CancellationToken);
 
@@ -85,7 +85,7 @@ public class ContentEnricherTests : GivenContext
         var step1 = new ResolveSchema();
         var step2 = new ResolveSchema();
 
-        var sut = new ContentEnricher(new[] { step1, step2 }, AppProvider);
+        var sut = new ContentEnricher([step1, step2], AppProvider);
 
         await sut.EnrichAsync(source, false, ApiContext, CancellationToken);
 

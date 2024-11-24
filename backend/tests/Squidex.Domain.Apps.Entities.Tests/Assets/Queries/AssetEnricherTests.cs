@@ -19,7 +19,7 @@ public class AssetEnricherTests : GivenContext
         var step1 = A.Fake<IAssetEnricherStep>();
         var step2 = A.Fake<IAssetEnricherStep>();
 
-        var sut = new AssetEnricher(new[] { step1, step2 });
+        var sut = new AssetEnricher([step1, step2]);
 
         await sut.EnrichAsync(assets, ApiContext, CancellationToken);
 
@@ -44,7 +44,7 @@ public class AssetEnricherTests : GivenContext
         var step1 = A.Fake<IAssetEnricherStep>();
         var step2 = A.Fake<IAssetEnricherStep>();
 
-        var sut = new AssetEnricher(new[] { step1, step2 });
+        var sut = new AssetEnricher([step1, step2]);
 
         await sut.EnrichAsync(source, ApiContext, CancellationToken);
 

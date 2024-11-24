@@ -502,9 +502,24 @@ public class AppDomainObjectTests : HandlerTestBase<App>
     }
 
     [Fact]
-    public async Task DeleteApp_should_create_events_and_update_deleted_flag()
+    public async Task Delete_should_create_events_and_update_deleted_flag()
     {
         var command = new DeleteApp();
+
+        await ExecuteCreateAsync();
+
+        var actual = await PublishAsync(sut, command);
+
+        await VerifySutAsync(actual, None.Value);
+
+        A.CallTo(() => billingManager.UnsubscribeAsync(command.Actor.Identifier, A<App>._, default))
+            .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Delete_should_create_events_with_permanent_flag()
+    {
+        var command = new DeleteApp { Permanent = true };
 
         await ExecuteCreateAsync();
 

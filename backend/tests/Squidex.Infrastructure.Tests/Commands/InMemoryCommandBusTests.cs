@@ -67,7 +67,7 @@ public class InMemoryCommandBusTests
     {
         var handler = new NonHandledHandler();
 
-        var sut = new InMemoryCommandBus(new ICommandMiddleware[] { handler });
+        var sut = new InMemoryCommandBus([handler]);
 
         var context = await sut.PublishAsync(command, default);
 
@@ -80,7 +80,7 @@ public class InMemoryCommandBusTests
     {
         var handler = new HandledHandler();
 
-        var sut = new InMemoryCommandBus(new ICommandMiddleware[] { handler });
+        var sut = new InMemoryCommandBus([handler]);
 
         var context = await sut.PublishAsync(command, default);
 
@@ -93,7 +93,7 @@ public class InMemoryCommandBusTests
     {
         var handler = new ThrowHandledHandler();
 
-        var sut = new InMemoryCommandBus(new ICommandMiddleware[] { handler });
+        var sut = new InMemoryCommandBus([handler]);
 
         await Assert.ThrowsAsync<InvalidOperationException>(async () => await sut.PublishAsync(command, default));
 

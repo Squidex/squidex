@@ -22,7 +22,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject;
 
-public sealed partial class SchemaDomainObject(DomainId id, IPersistenceFactory<Schema> persistence, ILogger<SchemaDomainObject> log) : DomainObject<Schema>(id, persistence, log)
+public partial class SchemaDomainObject(DomainId id, IPersistenceFactory<Schema> persistence, ILogger<SchemaDomainObject> log) : DomainObject<Schema>(id, persistence, log)
 {
     protected override bool IsDeleted(Schema snapshot)
     {

@@ -104,7 +104,7 @@ public class ReferencesValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Field is required." });
+            ["Field is required."]);
     }
 
     [Fact]
@@ -117,7 +117,7 @@ public class ReferencesValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Field is required." });
+            ["Field is required."]);
     }
 
     [Fact]
@@ -130,7 +130,7 @@ public class ReferencesValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(ref1), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { $"[1]: Reference '{ref1}' not found." });
+            [$"[1]: Reference '{ref1}' not found."]);
     }
 
     [Fact]
@@ -143,7 +143,7 @@ public class ReferencesValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(ref2), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { $"[1]: Reference '{ref2}' has invalid schema." });
+            [$"[1]: Reference '{ref2}' has invalid schema."]);
     }
 
     [Fact]
@@ -156,7 +156,7 @@ public class ReferencesValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(ref2), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must have at least 2 item(s)." });
+            ["Must have at least 2 item(s)."]);
     }
 
     [Fact]
@@ -169,7 +169,7 @@ public class ReferencesValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(ref1, ref2), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must have at least 2 item(s)." });
+            ["Must have at least 2 item(s)."]);
     }
 
     [Fact]
@@ -182,7 +182,7 @@ public class ReferencesValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(ref1, ref2), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must not have more than 1 item(s)." });
+            ["Must not have more than 1 item(s)."]);
     }
 
     [Fact]
@@ -195,7 +195,7 @@ public class ReferencesValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(ref1, ref1), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must not contain duplicate values." });
+            ["Must not contain duplicate values."]);
     }
 
     private static List<DomainId> CreateValue(params DomainId[] ids)

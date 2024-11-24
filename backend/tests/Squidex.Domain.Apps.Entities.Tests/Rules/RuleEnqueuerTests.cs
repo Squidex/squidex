@@ -186,7 +186,7 @@ public class RuleEnqueuerTests : GivenContext
         A.CallTo(() => ruleEventRepository.EnqueueAsync(A<List<RuleEventWrite>>._, default))
             .Invokes(x => writes = x.GetArgument<List<RuleEventWrite>>(0)?.ToArray());
 
-        await sut.On(new[] { @event });
+        await sut.On([@event]);
 
         Assert.Equal(new[] { new RuleEventWrite(job, job.Created) }, writes);
 
@@ -214,7 +214,7 @@ public class RuleEnqueuerTests : GivenContext
         A.CallTo(() => ruleEventRepository.EnqueueAsync(A<List<RuleEventWrite>>._, default))
             .Invokes(x => writes = x.GetArgument<List<RuleEventWrite>>(0)?.ToArray());
 
-        await sut.On(new[] { @event });
+        await sut.On([@event]);
 
         Assert.Equal(new[] { new RuleEventWrite(job) }, writes);
 
@@ -237,7 +237,7 @@ public class RuleEnqueuerTests : GivenContext
 
         SetupRules(@event, job, default);
 
-        await sut.On(new[] { @event.SetRestored(true) });
+        await sut.On([@event.SetRestored(true)]);
 
         A.CallTo(() => ruleEventRepository.EnqueueAsync(A<List<RuleEventWrite>>._, default))
             .MustNotHaveHappened();

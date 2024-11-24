@@ -96,7 +96,7 @@ public class RolesTests
         var roles_2 = roles_1.Add("role2");
         var roles_3 = roles_2.Remove(firstRole);
 
-        Assert.Equal(new[] { "role1", "role2" }, roles_3.Custom.Select(x => x.Name));
+        Assert.Equal(["role1", "role2"], roles_3.Custom.Select(x => x.Name));
     }
 
     [Fact]

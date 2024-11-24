@@ -43,7 +43,7 @@ public class DateTimeFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(JsonValue.Null, errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Field is required." });
+            ["Field is required."]);
     }
 
     [Fact]
@@ -54,7 +54,7 @@ public class DateTimeFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(FutureDays(0)), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { $"Must be greater or equal to {sut.Properties.MinValue}." });
+            [$"Must be greater or equal to {sut.Properties.MinValue}."]);
     }
 
     [Fact]
@@ -65,7 +65,7 @@ public class DateTimeFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(FutureDays(20)), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { $"Must be less or equal to {FutureDays(10)}." });
+            [$"Must be less or equal to {FutureDays(10)}."]);
     }
 
     [Fact]
@@ -76,7 +76,7 @@ public class DateTimeFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(JsonValue.Create("Invalid"), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "The value string does not match the required number from the format string \"uuuu\". Value being parsed: '^Invalid'. (^ indicates error position.)" });
+            ["The value string does not match the required number from the format string \"uuuu\". Value being parsed: '^Invalid'. (^ indicates error position.)"]);
     }
 
     [Fact]
@@ -87,7 +87,7 @@ public class DateTimeFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(JsonValue.Create(123), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Invalid json type, expected string." });
+            ["Invalid json type, expected string."]);
     }
 
     private static Instant FutureDays(int days)

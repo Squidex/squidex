@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Entities.Apps.DomainObject;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Infrastructure;
@@ -14,9 +15,15 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Entities.Apps;
 
-public sealed class AppPermanentDeleter(IEnumerable<IDeleter> deleters, IDomainObjectFactory factory, TypeRegistry typeRegistry) : IEventConsumer
+public sealed class AppPermanentDeleter(
+    IEnumerable<IDeleter> deleters,
+    IOptions<AppsOptions> options,
+    IDomainObjectFactory factory,
+    TypeRegistry typeRegistry)
+    : IEventConsumer
 {
     private readonly IEnumerable<IDeleter> deleters = deleters.OrderBy(x => x.Order).ToList();
+    private readonly AppsOptions options = options.Value;
     private readonly HashSet<string> consumingTypes =
         [
             typeRegistry.GetName<IEvent, AppDeleted>(),
@@ -39,8 +46,8 @@ public sealed class AppPermanentDeleter(IEnumerable<IDeleter> deleters, IDomainO
 
         switch (@event.Payload)
         {
-            case AppDeleted appArchived:
-                await OnArchiveAsync(appArchived);
+            case AppDeleted appDeleted:
+                await OnDeleteAsync(appDeleted);
                 break;
             case AppContributorRemoved appContributorRemoved:
                 await OnAppContributorRemoved(appContributorRemoved);
@@ -63,17 +70,18 @@ public sealed class AppPermanentDeleter(IEnumerable<IDeleter> deleters, IDomainO
         }
     }
 
-    private async Task OnArchiveAsync(AppDeleted appArchived)
+    private async Task OnDeleteAsync(AppDeleted appDeleted)
     {
+        // The user can either remove the app itself or via a global setting for all apps.
+        if (!appDeleted.Permanent && !options.DeletePermanent)
+        {
+            return;
+        }
+
         using var activity = Telemetry.Activities.StartActivity("RemoveAppFromSystem");
 
-        // Bypass our normal app resolve process, so that we can also retrieve the deleted app.
-        var app = factory.Create<AppDomainObject>(appArchived.AppId.Id);
-
-        await app.EnsureLoadedAsync();
-
-        // If the app does not exist, the version is lower than zero.
-        if (app.Version < 0)
+        var app = await GetAppAsync(appDeleted.AppId.Id);
+        if (app == null)
         {
             return;
         }
@@ -85,5 +93,16 @@ public sealed class AppPermanentDeleter(IEnumerable<IDeleter> deleters, IDomainO
                 await deleter.DeleteAppAsync(app.Snapshot, default);
             }
         }
+    }
+
+    private async Task<AppDomainObject?> GetAppAsync(DomainId appId)
+    {
+        // Bypass our normal resolve process, so that we can also retrieve the deleted app.
+        var app = factory.Create<AppDomainObject>(appId);
+
+        await app.EnsureLoadedAsync();
+
+        // If the app does not exist, the version is lower than zero.
+        return app.Version < 0 ? null : app;
     }
 }

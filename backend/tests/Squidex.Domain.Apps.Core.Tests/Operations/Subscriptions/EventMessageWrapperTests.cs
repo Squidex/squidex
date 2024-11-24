@@ -37,7 +37,7 @@ public class EventMessageWrapperTests
         A.CallTo(() => creator2.CreateEnrichedEventsAsync(envelope, default))
             .Returns(enrichedEvent);
 
-        var sut = new EventMessageWrapper(envelope, new[] { creator1, creator2 });
+        var sut = new EventMessageWrapper(envelope, [creator1, creator2]);
 
         var actual = await sut.CreatePayloadAsync();
 
@@ -54,7 +54,7 @@ public class EventMessageWrapperTests
         A.CallTo(() => creator1.Handles(envelope.Payload))
             .Returns(false);
 
-        var sut = new EventMessageWrapper(envelope, new[] { creator1 });
+        var sut = new EventMessageWrapper(envelope, [creator1]);
 
         Assert.Null(await sut.CreatePayloadAsync());
 

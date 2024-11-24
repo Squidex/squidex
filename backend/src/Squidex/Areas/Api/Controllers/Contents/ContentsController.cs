@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using NSwag.Annotations;
 using Squidex.Areas.Api.Config.OpenApi;

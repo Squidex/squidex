@@ -84,7 +84,7 @@ public class ConvertTagsTests : GivenContext
                 ["id3"] = "name3"
             });
 
-        await sut.EnrichAsync(ApiContext, new[] { asset1, asset2 }, CancellationToken);
+        await sut.EnrichAsync(ApiContext, [asset1, asset2], CancellationToken);
 
         Assert.Equal(["name1", "name2"], asset1.TagNames);
         Assert.Equal(["name2", "name3"], asset2.TagNames);

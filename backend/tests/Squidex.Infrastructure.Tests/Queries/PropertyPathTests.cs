@@ -12,7 +12,7 @@ public class PropertyPathTests
     [Fact]
     public void Should_create()
     {
-        var path = new PropertyPath(new[] { "path", "to", "property" });
+        var path = new PropertyPath(["path", "to", "property"]);
 
         Assert.Equal(new[] { "path", "to", "property" }, path.ToArray());
     }
@@ -20,7 +20,7 @@ public class PropertyPathTests
     [Fact]
     public void Should_convert_to_string()
     {
-        var path = new PropertyPath(new[] { "path", "to", "property" });
+        var path = new PropertyPath(["path", "to", "property"]);
 
         Assert.Equal("path.to.property", path.ToString());
     }

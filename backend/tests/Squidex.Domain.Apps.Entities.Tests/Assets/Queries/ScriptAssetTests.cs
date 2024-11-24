@@ -28,7 +28,7 @@ public class ScriptAssetTests : GivenContext
     {
         var asset = CreateAsset();
 
-        await sut.EnrichAsync(ApiContext, new[] { asset }, CancellationToken);
+        await sut.EnrichAsync(ApiContext, [asset], CancellationToken);
 
         A.CallTo(() => scriptEngine.ExecuteAsync(A<AssetScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -41,7 +41,7 @@ public class ScriptAssetTests : GivenContext
 
         var asset = CreateAsset();
 
-        await sut.EnrichAsync(FrontendContext, new[] { asset }, CancellationToken);
+        await sut.EnrichAsync(FrontendContext, [asset], CancellationToken);
 
         A.CallTo(() => scriptEngine.ExecuteAsync(A<AssetScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -54,7 +54,7 @@ public class ScriptAssetTests : GivenContext
 
         var asset = CreateAsset();
 
-        await sut.EnrichAsync(ContextWithNoScript(), new[] { asset }, CancellationToken);
+        await sut.EnrichAsync(ContextWithNoScript(), [asset], CancellationToken);
 
         A.CallTo(() => scriptEngine.ExecuteAsync(A<AssetScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -67,7 +67,7 @@ public class ScriptAssetTests : GivenContext
 
         var asset = CreateAsset();
 
-        await sut.EnrichAsync(ApiContext, new[] { asset }, CancellationToken);
+        await sut.EnrichAsync(ApiContext, [asset], CancellationToken);
 
         A.CallTo(() => scriptEngine.ExecuteAsync(
                 A<AssetScriptVars>.That.Matches(x =>
@@ -88,7 +88,7 @@ public class ScriptAssetTests : GivenContext
 
         var asset = CreateAsset();
 
-        await sut.EnrichAsync(ApiContext, new[] { asset }, CancellationToken);
+        await sut.EnrichAsync(ApiContext, [asset], CancellationToken);
 
         A.CallTo(() => scriptEngine.ExecuteAsync(
                 A<AssetScriptVars>.That.Matches(x =>

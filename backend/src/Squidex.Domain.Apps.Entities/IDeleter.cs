@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities;
@@ -16,6 +17,12 @@ public interface IDeleter
 
     Task DeleteAppAsync(App app,
         CancellationToken ct);
+
+    Task DeleteSchemaAsync(App app, Schema schema,
+        CancellationToken ct)
+    {
+        return Task.CompletedTask;
+    }
 
     Task DeleteContributorAsync(DomainId appId, string contributorId,
         CancellationToken ct)

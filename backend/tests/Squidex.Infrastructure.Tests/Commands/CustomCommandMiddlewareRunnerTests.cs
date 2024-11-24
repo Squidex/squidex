@@ -16,8 +16,15 @@ public class CustomCommandMiddlewareRunnerTests
         public long ExpectedVersion { get; set; }
     }
 
-    public sealed class CustomMiddleware(int value) : ICustomCommandMiddleware
+    public sealed class CustomMiddleware : ICustomCommandMiddleware
     {
+        private readonly int value;
+
+        public CustomMiddleware(int value)
+        {
+            this.value = value;
+        }
+
         public Task HandleAsync(CommandContext context, NextDelegate next,
             CancellationToken ct)
         {
@@ -36,12 +43,12 @@ public class CustomCommandMiddlewareRunnerTests
         var command = new Command();
         var context = new CommandContext(command, A.Fake<ICommandBus>());
 
-        var sut = new CustomCommandMiddlewareRunner(new[]
-        {
+        var sut = new CustomCommandMiddlewareRunner(
+        [
             new CustomMiddleware(10),
             new CustomMiddleware(12),
             new CustomMiddleware(14)
-        });
+        ]);
 
         var isNextCalled = false;
 

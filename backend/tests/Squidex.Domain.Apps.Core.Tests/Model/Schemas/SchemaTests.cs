@@ -354,8 +354,8 @@ public class SchemaTests
         var schema_1 = schema_0.SetFieldsInLists(FieldNames.Create("2"));
         var schema_2 = schema_1.SetFieldsInLists(FieldNames.Create("2"));
 
-        Assert.Equal(new[] { "2" }, schema_1.FieldsInLists);
-        Assert.Equal(new[] { "2" }, schema_2.FieldsInLists);
+        Assert.Equal(["2"], schema_1.FieldsInLists);
+        Assert.Equal(["2"], schema_2.FieldsInLists);
         Assert.Same(schema_1, schema_2);
     }
 
@@ -365,8 +365,8 @@ public class SchemaTests
         var schema_1 = schema_0.SetFieldsInLists(FieldNames.Create("2", "1"));
         var schema_2 = schema_1.SetFieldsInLists(FieldNames.Create("1", "2"));
 
-        Assert.Equal(new[] { "2", "1" }, schema_1.FieldsInLists);
-        Assert.Equal(new[] { "1", "2" }, schema_2.FieldsInLists);
+        Assert.Equal(["2", "1"], schema_1.FieldsInLists);
+        Assert.Equal(["1", "2"], schema_2.FieldsInLists);
         Assert.NotSame(schema_1, schema_2);
     }
 
@@ -382,8 +382,8 @@ public class SchemaTests
         var schema_1 = schema_0.SetFieldsInReferences(FieldNames.Create("2"));
         var schema_2 = schema_1.SetFieldsInReferences(FieldNames.Create("2"));
 
-        Assert.Equal(new[] { "2" }, schema_1.FieldsInReferences);
-        Assert.Equal(new[] { "2" }, schema_2.FieldsInReferences);
+        Assert.Equal(["2"], schema_1.FieldsInReferences);
+        Assert.Equal(["2"], schema_2.FieldsInReferences);
         Assert.Same(schema_1, schema_2);
     }
 
@@ -393,8 +393,8 @@ public class SchemaTests
         var schema_1 = schema_0.SetFieldsInReferences(FieldNames.Create("2", "1"));
         var schema_2 = schema_1.SetFieldsInReferences(FieldNames.Create("1", "2"));
 
-        Assert.Equal(new[] { "2", "1" }, schema_1.FieldsInReferences);
-        Assert.Equal(new[] { "1", "2" }, schema_2.FieldsInReferences);
+        Assert.Equal(["2", "1"], schema_1.FieldsInReferences);
+        Assert.Equal(["1", "2"], schema_2.FieldsInReferences);
         Assert.NotSame(schema_1, schema_2);
     }
 

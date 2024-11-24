@@ -333,7 +333,7 @@ public class BackupAppsTests : GivenContext
             .Returns(true)
             .AssignsOutAndRefParametersLazily(
                 new Func<string, RefToken, object[]>((x, _) =>
-                    new[] { RefToken.User($"{x}_mapped") }));
+                    [RefToken.User($"{x}_mapped")]));
 
         A.CallTo(() => mapping.TryMap("notfound", out mapped))
             .Returns(false);

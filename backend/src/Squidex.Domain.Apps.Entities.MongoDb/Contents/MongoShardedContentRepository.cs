@@ -103,4 +103,16 @@ public sealed class MongoShardedContentRepository(IShardingStrategy sharding, Fu
             }
         }
     }
+
+    public async IAsyncEnumerable<DomainId> StreamIds(DomainId appId, DomainId schemaId, SearchScope scope,
+       [EnumeratorCancellation] CancellationToken ct = default)
+    {
+        foreach (var shard in Shards)
+        {
+            await foreach (var id in shard.StreamIds(appId, schemaId, scope, ct))
+            {
+                yield return id;
+            }
+        }
+    }
 }

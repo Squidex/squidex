@@ -51,7 +51,7 @@ public class RichTextFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(string.Empty, "unknown"), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Invalid rich text." });
+            ["Invalid rich text."]);
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public class RichTextFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(null), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Field is required." });
+            ["Field is required."]);
     }
 
     [Fact]
@@ -73,7 +73,7 @@ public class RichTextFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(string.Empty), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Field is required." });
+            ["Field is required."]);
     }
 
     [Fact]
@@ -84,7 +84,7 @@ public class RichTextFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue("123"), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must have at least 10 character(s)." });
+            ["Must have at least 10 character(s)."]);
     }
 
     [Fact]
@@ -95,7 +95,7 @@ public class RichTextFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue("12345678"), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must not have more than 5 character(s)." });
+            ["Must not have more than 5 character(s)."]);
     }
 
     [Fact]
@@ -106,7 +106,7 @@ public class RichTextFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue("123"), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must have at least 10 text character(s)." });
+            ["Must have at least 10 text character(s)."]);
     }
 
     [Fact]
@@ -117,7 +117,7 @@ public class RichTextFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue("12345678"), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must not have more than 5 text character(s)." });
+            ["Must not have more than 5 text character(s)."]);
     }
 
     [Fact]
@@ -128,7 +128,7 @@ public class RichTextFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue("word1 word2 word3"), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must have at least 10 word(s)." });
+            ["Must have at least 10 word(s)."]);
     }
 
     [Fact]
@@ -139,7 +139,7 @@ public class RichTextFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue("word1 word2 word3 word4 word5 word6"), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must not have more than 5 word(s)." });
+            ["Must not have more than 5 word(s)."]);
     }
 
     private static JsonValue CreateValue(string? v, string? type = null)

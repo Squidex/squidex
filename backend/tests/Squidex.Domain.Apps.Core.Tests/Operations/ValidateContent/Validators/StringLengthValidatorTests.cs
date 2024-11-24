@@ -64,7 +64,7 @@ public class StringLengthValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateString(4), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must have exactly 2000 character(s)." });
+            ["Must have exactly 2000 character(s)."]);
     }
 
     [Fact]
@@ -75,7 +75,7 @@ public class StringLengthValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateString(1500), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must have at least 2000 character(s)." });
+            ["Must have at least 2000 character(s)."]);
     }
 
     [Fact]
@@ -86,7 +86,7 @@ public class StringLengthValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateString(1500), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must not have more than 1000 character(s)." });
+            ["Must not have more than 1000 character(s)."]);
     }
 
     [Fact]
@@ -97,7 +97,7 @@ public class StringLengthValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateString(1), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must have between 2000 and 5000 character(s)." });
+            ["Must have between 2000 and 5000 character(s)."]);
     }
 
     private static string CreateString(int size)

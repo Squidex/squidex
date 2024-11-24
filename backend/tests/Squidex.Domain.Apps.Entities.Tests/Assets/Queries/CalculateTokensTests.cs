@@ -38,7 +38,7 @@ public class CalculateTokensTests : GivenContext
     {
         var asset = CreateAsset();
 
-        await sut.EnrichAsync(ApiContext, new[] { asset }, CancellationToken);
+        await sut.EnrichAsync(ApiContext, [asset], CancellationToken);
 
         Assert.NotNull(asset.EditToken);
 
@@ -51,7 +51,7 @@ public class CalculateTokensTests : GivenContext
     {
         var asset = CreateAsset();
 
-        await sut.EnrichAsync(FrontendContext, new[] { asset }, CancellationToken);
+        await sut.EnrichAsync(FrontendContext, [asset], CancellationToken);
 
         Assert.NotNull(asset.EditToken);
 

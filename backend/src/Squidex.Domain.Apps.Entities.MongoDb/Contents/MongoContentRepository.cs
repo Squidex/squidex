@@ -81,6 +81,12 @@ public partial class MongoContentRepository(
         return GetCollection(scope).QueryScheduledWithoutDataAsync(now, ct);
     }
 
+    public IAsyncEnumerable<DomainId> StreamIds(DomainId appId, DomainId schemaId, SearchScope scope,
+        CancellationToken ct = default)
+    {
+        return GetCollection(scope).StreamIds(appId, schemaId, ct);
+    }
+
     public Task<IResultList<Content>> QueryAsync(App app, List<Schema> schemas, Q q, SearchScope scope,
         CancellationToken ct = default)
     {

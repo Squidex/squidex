@@ -52,6 +52,6 @@ public class UniqueValuesValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(new[] { 1, 2, 2, 3 }, errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must not contain duplicate values." });
+            ["Must not contain duplicate values."]);
     }
 }

@@ -43,12 +43,12 @@ public sealed class DynamicSchemeProvider(
 
         var serialized = jsonSerializer.SerializeToBytes(scheme);
 
-        var options = new DistributedCacheEntryOptions
+        var cacheOptions = new DistributedCacheEntryOptions
         {
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
         };
 
-        await dynamicCache.SetAsync(CacheKey(id), serialized, options, ct);
+        await dynamicCache.SetAsync(CacheKey(id), serialized, cacheOptions, ct);
         return id;
     }
 
@@ -188,7 +188,7 @@ public sealed class DynamicSchemeProvider(
     {
         var scheme = new AuthenticationScheme(name, config.DisplayName, typeof(DynamicOpenIdConnectHandler));
 
-        var options = new DynamicOpenIdConnectOptions
+        var oidcOptions = new DynamicOpenIdConnectOptions
         {
             Events = new OidcHandler(new MyIdentityOptions
             {
@@ -204,9 +204,9 @@ public sealed class DynamicSchemeProvider(
             SignedOutRedirectUri = new PathString($"/signout-callback-{name}")
         };
 
-        configure.PostConfigure(name, options);
+        configure.PostConfigure(name, oidcOptions);
 
-        return new SchemeResult(scheme, options);
+        return new SchemeResult(scheme, oidcOptions);
     }
 
     public IDisposable? OnChange(Action<DynamicOpenIdConnectOptions, string?> listener)

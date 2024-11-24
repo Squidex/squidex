@@ -51,7 +51,7 @@ public class BooleanFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(null), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Field is required." });
+            ["Field is required."]);
     }
 
     [Fact]
@@ -62,7 +62,7 @@ public class BooleanFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(JsonValue.Create("Invalid"), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Invalid json type, expected boolean." });
+            ["Invalid json type, expected boolean."]);
     }
 
     private static JsonValue CreateValue(bool? v)

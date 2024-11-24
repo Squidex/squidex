@@ -19,9 +19,6 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
 {
     private readonly string fieldName = "age";
     private readonly string arrayName = "array";
-    private readonly NamedId<long> fieldId = NamedId.Of(1L, "age");
-    private readonly NamedId<long> arrayId = NamedId.Of(1L, "array");
-    private readonly NamedId<long> nestedId = NamedId.Of(2L, "age");
     private readonly SchemaDomainObject sut;
 
     protected override DomainId Id
@@ -239,6 +236,17 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
 
         await ExecuteCreateAsync();
 
+        var actual = await PublishAsync(sut, command);
+
+        await VerifySutAsync(actual, None.Value);
+    }
+
+    [Fact]
+    public async Task Delete_should_create_events_with_permanent_flag()
+    {
+        var command = new DeleteSchema { Permanent = true };
+
+        await ExecuteCreateAsync();
         var actual = await PublishAsync(sut, command);
 
         await VerifySutAsync(actual, None.Value);

@@ -53,7 +53,7 @@ public class RangeValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(1500, errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must be exactly 2000." });
+            ["Must be exactly 2000."]);
     }
 
     [Fact]
@@ -64,7 +64,7 @@ public class RangeValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(1500, errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must be greater or equal to 2000." });
+            ["Must be greater or equal to 2000."]);
     }
 
     [Fact]
@@ -75,6 +75,6 @@ public class RangeValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(1500, errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must be less or equal to 1000." });
+            ["Must be less or equal to 1000."]);
     }
 }

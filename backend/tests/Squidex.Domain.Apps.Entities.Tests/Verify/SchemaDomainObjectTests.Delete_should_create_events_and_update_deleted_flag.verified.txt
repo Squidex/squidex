@@ -27,6 +27,7 @@
         EventId: Guid_3
       },
       Payload: {
+        Permanent: false,
         SchemaId: Guid_2,my-schema,
         AppId: Guid_1,my-app,
         Actor: subject:me,

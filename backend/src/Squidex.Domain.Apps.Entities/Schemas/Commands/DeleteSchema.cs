@@ -9,4 +9,5 @@ namespace Squidex.Domain.Apps.Entities.Schemas.Commands;
 
 public sealed class DeleteSchema : SchemaCommand
 {
+    public bool Permanent { get; set; }
 }

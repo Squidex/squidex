@@ -42,10 +42,9 @@ public class CollectionItemValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(new List<int> { 2, 1, 4, 5 }, errors);
 
         errors.Should().BeEquivalentTo(
-            new[]
-            {
+            [
                 "[2]: Must be between 2 and 4.",
                 "[4]: Must be between 2 and 4."
-            });
+            ]);
     }
 }

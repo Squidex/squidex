@@ -167,7 +167,7 @@ public class ImageAssetMetadataSourceTests : GivenContext
 
         var formatted = sut.Format(source);
 
-        Assert.Equal(new[] { "128x55px" }, formatted);
+        Assert.Equal(["128x55px"], formatted);
     }
 
     [Fact]

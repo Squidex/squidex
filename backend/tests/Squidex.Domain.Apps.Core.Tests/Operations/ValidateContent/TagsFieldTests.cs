@@ -62,7 +62,7 @@ public class TagsFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(null), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Field is required." });
+            ["Field is required."]);
     }
 
     [Fact]
@@ -73,7 +73,7 @@ public class TagsFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Field is required." });
+            ["Field is required."]);
     }
 
     [Fact]
@@ -84,7 +84,7 @@ public class TagsFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync((JsonValue)JsonValue.Array(JsonValue.Null), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Invalid json type, expected array of strings." });
+            ["Invalid json type, expected array of strings."]);
     }
 
     [Fact]
@@ -95,7 +95,7 @@ public class TagsFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(string.Empty), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Invalid json type, expected array of strings." });
+            ["Invalid json type, expected array of strings."]);
     }
 
     [Fact]
@@ -106,7 +106,7 @@ public class TagsFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(JsonValue.Create("invalid"), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Invalid json type, expected array of strings." });
+            ["Invalid json type, expected array of strings."]);
     }
 
     [Fact]
@@ -117,7 +117,7 @@ public class TagsFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue("tag-1", "tag-2"), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must have at least 3 item(s)." });
+            ["Must have at least 3 item(s)."]);
     }
 
     [Fact]
@@ -128,7 +128,7 @@ public class TagsFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue("tag-1", "tag-2"), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must not have more than 1 item(s)." });
+            ["Must not have more than 1 item(s)."]);
     }
 
     [Fact]
@@ -139,7 +139,7 @@ public class TagsFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue("tag-1", "tag-2", null), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "[1]: Not an allowed value." });
+            ["[1]: Not an allowed value."]);
     }
 
     private static JsonValue CreateValue(params string?[]? ids)

@@ -81,8 +81,8 @@ public class RuleServiceTests
         var log = A.Fake<ILogger<RuleService>>();
 
         sut = new RuleService(Options.Create(new RuleOptions()),
-            new[] { ruleTriggerHandler },
-            new[] { ruleActionHandler },
+            [ruleTriggerHandler],
+            [ruleActionHandler],
             eventEnricher, TestUtils.DefaultSerializer, log, typeRegistry)
         {
             Clock = clock

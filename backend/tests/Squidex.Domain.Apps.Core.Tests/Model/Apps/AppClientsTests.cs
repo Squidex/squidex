@@ -94,7 +94,7 @@ public class AppClientsTests
         var clients_2 = clients_1.Add("3", "secret3");
         var clients_3 = clients_2.Revoke("2");
 
-        Assert.Equal(new[] { "1", "3" }, clients_3.Keys);
+        Assert.Equal(["1", "3"], clients_3.Keys);
     }
 
     [Fact]

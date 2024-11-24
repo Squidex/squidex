@@ -122,7 +122,7 @@ public sealed class DefaultAppLogStore(IRequestLogStore requestLogStore) : IAppL
         }
         finally
         {
-            await writer.FlushAsync();
+            await writer.FlushAsync(ct);
         }
     }
 

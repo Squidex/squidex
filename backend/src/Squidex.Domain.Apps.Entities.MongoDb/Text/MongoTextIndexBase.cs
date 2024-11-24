@@ -9,6 +9,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Infrastructure;
@@ -57,10 +58,16 @@ public abstract class MongoTextIndexBase<T>(IMongoDatabase database, string shar
         return $"TextIndex2{shardKey}";
     }
 
-    async Task IDeleter.DeleteAppAsync(App app,
+    Task IDeleter.DeleteAppAsync(App app,
         CancellationToken ct)
     {
-        await Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, app.Id), ct);
+        return Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, app.Id), ct);
+    }
+
+    Task IDeleter.DeleteSchemaAsync(App app, Schema schema,
+        CancellationToken ct)
+    {
+        return Collection.DeleteManyAsync(Filter.Eq(x => x.SchemaId, schema.Id), ct);
     }
 
     public async virtual Task ExecuteAsync(IndexCommand[] commands,

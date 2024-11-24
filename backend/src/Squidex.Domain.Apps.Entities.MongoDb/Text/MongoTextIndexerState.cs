@@ -8,6 +8,9 @@
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Infrastructure;
@@ -15,7 +18,10 @@ using Squidex.Infrastructure.MongoDb;
 
 namespace Squidex.Domain.Apps.Entities.MongoDb.Text;
 
-public sealed class MongoTextIndexerState(IMongoDatabase database) : MongoRepositoryBase<TextContentState>(database), ITextIndexerState, IDeleter
+public sealed class MongoTextIndexerState(
+    IMongoDatabase database,
+    IContentRepository contentRepository)
+    : MongoRepositoryBase<TextContentState>(database), ITextIndexerState, IDeleter
 {
     static MongoTextIndexerState()
     {
@@ -29,6 +35,8 @@ public sealed class MongoTextIndexerState(IMongoDatabase database) : MongoReposi
                 .SetElementName("s");
         });
     }
+
+    int IDeleter.Order => -2000;
 
     protected override string CollectionName()
     {
@@ -44,6 +52,20 @@ public sealed class MongoTextIndexerState(IMongoDatabase database) : MongoReposi
                 Filter.Lt(x => x.UniqueContentId, BsonUniqueContentIdSerializer.NextAppId(app.Id)));
 
         await Collection.DeleteManyAsync(filter, ct);
+    }
+
+    async Task IDeleter.DeleteSchemaAsync(App app, Schema schema,
+        CancellationToken ct)
+    {
+        var ids = contentRepository.StreamIds(app.Id, schema.Id, SearchScope.All, ct).Batch(1000, ct);
+
+        await foreach (var batch in ids.WithCancellation(ct))
+        {
+            var filter =
+                Filter.In(x => x.UniqueContentId, batch.Select(x => new UniqueContentId(app.Id, x)));
+
+            await Collection.DeleteManyAsync(filter, ct);
+        }
     }
 
     public async Task<Dictionary<UniqueContentId, TextContentState>> GetAsync(HashSet<UniqueContentId> ids,

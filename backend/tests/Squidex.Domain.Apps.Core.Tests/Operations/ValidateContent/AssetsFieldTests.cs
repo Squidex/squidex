@@ -104,7 +104,7 @@ public class AssetsFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(null), errors, factory: factory);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Field is required." });
+            ["Field is required."]);
     }
 
     [Fact]
@@ -115,7 +115,7 @@ public class AssetsFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(), errors, factory: factory);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Field is required." });
+            ["Field is required."]);
     }
 
     [Fact]
@@ -126,7 +126,7 @@ public class AssetsFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(asset1, asset2), errors, factory: factory);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must have at least 3 item(s)." });
+            ["Must have at least 3 item(s)."]);
     }
 
     [Fact]
@@ -137,7 +137,7 @@ public class AssetsFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(asset1, asset2), errors, factory: factory);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must not have more than 1 item(s)." });
+            ["Must not have more than 1 item(s)."]);
     }
 
     [Fact]
@@ -148,7 +148,7 @@ public class AssetsFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(asset1, asset1), errors, factory: factory);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must not contain duplicate values." });
+            ["Must not contain duplicate values."]);
     }
 
     private static JsonValue CreateValue(params DomainId[]? ids)

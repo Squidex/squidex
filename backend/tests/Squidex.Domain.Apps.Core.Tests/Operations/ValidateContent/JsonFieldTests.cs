@@ -41,7 +41,7 @@ public class JsonFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(JsonValue.Null), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Field is required." });
+            ["Field is required."]);
     }
 
     private static JsonValue CreateValue(JsonValue v)

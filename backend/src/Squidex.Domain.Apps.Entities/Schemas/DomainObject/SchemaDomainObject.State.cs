@@ -13,7 +13,7 @@ using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Schemas.DomainObject;
 
-public sealed partial class SchemaDomainObject
+public partial class SchemaDomainObject
 {
     protected override Schema Apply(Schema snapshot, Envelope<IEvent> @event)
     {

@@ -49,7 +49,7 @@ public class CollectionValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(null, errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Field is required." });
+            ["Field is required."]);
     }
 
     [Fact]
@@ -60,7 +60,7 @@ public class CollectionValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(new List<int> { 1 }, errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must have exactly 2 item(s)." });
+            ["Must have exactly 2 item(s)."]);
     }
 
     [Fact]
@@ -71,7 +71,7 @@ public class CollectionValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(new List<int> { 1 }, errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must have at least 2 item(s)." });
+            ["Must have at least 2 item(s)."]);
     }
 
     [Fact]
@@ -82,7 +82,7 @@ public class CollectionValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(new List<int> { 1, 2, 3, 4 }, errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must not have more than 3 item(s)." });
+            ["Must not have more than 3 item(s)."]);
     }
 
     [Fact]
@@ -93,6 +93,6 @@ public class CollectionValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(new List<int> { 1 }, errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must have between 2 and 5 item(s)." });
+            ["Must have between 2 and 5 item(s)."]);
     }
 }

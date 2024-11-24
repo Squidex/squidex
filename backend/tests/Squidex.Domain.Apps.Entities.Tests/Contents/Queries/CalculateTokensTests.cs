@@ -29,7 +29,7 @@ public class CalculateTokensTests : GivenContext
     {
         var content = CreateContent();
 
-        await sut.EnrichAsync(ApiContext, new[] { content }, SchemaProvider(), CancellationToken);
+        await sut.EnrichAsync(ApiContext, [content], SchemaProvider(), CancellationToken);
 
         Assert.NotNull(content.EditToken);
 
@@ -42,7 +42,7 @@ public class CalculateTokensTests : GivenContext
     {
         var content = CreateContent();
 
-        await sut.EnrichAsync(FrontendContext, new[] { content }, SchemaProvider(), CancellationToken);
+        await sut.EnrichAsync(FrontendContext, [content], SchemaProvider(), CancellationToken);
 
         Assert.NotNull(content.EditToken);
 

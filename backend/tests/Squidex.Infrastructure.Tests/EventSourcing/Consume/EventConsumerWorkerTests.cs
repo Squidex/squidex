@@ -25,7 +25,7 @@ public class EventConsumerWorkerTests
         A.CallTo(() => consumer1.Name).Returns("1");
         A.CallTo(() => consumer2.Name).Returns("2");
 
-        sut = new EventConsumerWorker(new[] { consumer1, consumer2 }, factory);
+        sut = new EventConsumerWorker([consumer1, consumer2], factory);
     }
 
     [Fact]

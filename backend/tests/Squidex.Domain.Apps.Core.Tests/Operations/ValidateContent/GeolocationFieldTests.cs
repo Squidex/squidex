@@ -69,7 +69,7 @@ public class GeolocationFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(200, 0), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Latitude must be between -90 and 90." });
+            ["Latitude must be between -90 and 90."]);
     }
 
     [Fact]
@@ -80,7 +80,7 @@ public class GeolocationFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(0, 200), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Longitude must be between -180 and 180." });
+            ["Longitude must be between -180 and 180."]);
     }
 
     [Fact]
@@ -91,7 +91,7 @@ public class GeolocationFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(JsonValue.Null, errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Field is required." });
+            ["Field is required."]);
     }
 
     private static JsonValue CreateValue(double lat, double lon)

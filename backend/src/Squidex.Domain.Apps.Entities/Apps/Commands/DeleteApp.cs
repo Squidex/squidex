@@ -9,4 +9,5 @@ namespace Squidex.Domain.Apps.Entities.Apps.Commands;
 
 public sealed class DeleteApp : AppCommand
 {
+    public bool Permanent { get; set; }
 }

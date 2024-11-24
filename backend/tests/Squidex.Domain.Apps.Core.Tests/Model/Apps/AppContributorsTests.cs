@@ -51,7 +51,7 @@ public class AppContributorsTests
         var contributors_3 = contributors_2.Assign("3", Role.Developer);
         var contributors_4 = contributors_3.Remove("2");
 
-        Assert.Equal(new[] { "1", "3" }, contributors_4.Keys);
+        Assert.Equal(["1", "3"], contributors_4.Keys);
     }
 
     [Fact]

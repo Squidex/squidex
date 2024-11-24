@@ -41,7 +41,7 @@ public class PersistenceEventSourcingTests
 
         await persistence.ReadAsync();
 
-        Assert.Equal(persistedEvents.ToArray(), new[] { event1, event2 });
+        Assert.Equal(persistedEvents.ToArray(), [event1, event2]);
     }
 
     [Fact]
@@ -57,7 +57,7 @@ public class PersistenceEventSourcingTests
 
         await persistence.ReadAsync();
 
-        Assert.Equal(persistedEvents.ToArray(), new[] { event1 });
+        Assert.Equal(persistedEvents.ToArray(), [event1]);
     }
 
     [Fact]

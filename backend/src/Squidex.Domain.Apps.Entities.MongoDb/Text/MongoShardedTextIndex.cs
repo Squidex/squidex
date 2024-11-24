@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Infrastructure;
@@ -46,12 +47,21 @@ public sealed class MongoShardedTextIndex<T>(IShardingStrategy sharding, Func<st
         return Shard(app.Id).SearchAsync(app, query, scope, ct);
     }
 
-    public async Task DeleteAppAsync(App app,
+    async Task IDeleter.DeleteAppAsync(App app,
         CancellationToken ct)
     {
         if (Shard(app.Id) is IDeleter shard)
         {
             await shard.DeleteAppAsync(app, ct);
+        }
+    }
+
+    async Task IDeleter.DeleteSchemaAsync(App app, Schema schema,
+        CancellationToken ct)
+    {
+        if (Shard(app.Id) is IDeleter shard)
+        {
+            await shard.DeleteSchemaAsync(app, schema, ct);
         }
     }
 }
