@@ -5,12 +5,13 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { booleanAttribute, ChangeDetectionStrategy, Component, ContentChild, ElementRef, forwardRef, Input, numberAttribute, OnDestroy, OnInit, TemplateRef, ViewChild } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, ContentChild, ElementRef, EventEmitter, forwardRef, Input, numberAttribute, OnDestroy, OnInit, Output, TemplateRef, ViewChild } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { merge, Observable, of, Subject } from 'rxjs';
 import { catchError, debounceTime, finalize, map, switchMap, tap } from 'rxjs/operators';
+import getCaretCoordinates from 'textarea-caret';
 import { FloatingPlacement, Keys, ModalModel, StatefulControlComponent, Subscriptions, Types } from '@app/framework/internal';
+import { AutosizeDirective } from '../../autosize.directive';
 import { DropdownMenuComponent } from '../../dropdown-menu.component';
 import { LoaderComponent } from '../../loader.component';
 import { ModalPlacementDirective } from '../../modals/modal-placement.directive';
@@ -24,9 +25,23 @@ export interface AutocompleteSource {
     find(query: string): Observable<ReadonlyArray<any>>;
 }
 
+export const NOOP_DATASOURCE = {
+    find() {
+        return of([]);
+    },
+};
+
 export const SQX_AUTOCOMPLETE_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => AutocompleteComponent), multi: true,
 };
+
+interface Query {
+    // The query text.
+    text: string;
+
+    // The range.
+    range?: { from: number; to: number };
+}
 
 interface State {
     // The suggested items.
@@ -38,11 +53,16 @@ interface State {
     // True, when the searching is in progress.
     isSearching?: boolean;
 
+    // The last query.
+    lastQuery?: Query;
+
     // Indicates whether the loading is in progress.
     isLoading?: boolean;
 }
 
 const NO_EMIT = { emitEvent: false };
+const NO_QUERY = { text: '' };
+const RANGE_LIMIT = 60;
 
 @Component({
     standalone: true,
@@ -54,6 +74,7 @@ const NO_EMIT = { emitEvent: false };
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
+        AutosizeDirective,
         DropdownMenuComponent,
         FocusOnInitDirective,
         FormsModule,
@@ -68,8 +89,23 @@ const NO_EMIT = { emitEvent: false };
 })
 export class AutocompleteComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements OnInit, OnDestroy {
     private readonly subscriptions = new Subscriptions();
-    private readonly modalStream = new Subject<string>();
+    private readonly modalStream = new Subject<Query>();
+    private lastCursor = 0;
     private timer: any;
+
+    @Output()
+    public editorBlur = new EventEmitter();
+
+    @Output()
+    public editorKeyDown = new EventEmitter<KeyboardEvent>();
+
+    @Output()
+    public editorKeyPress = new EventEmitter<KeyboardEvent>();
+
+    @Input({ transform: booleanAttribute })
+    public set disabled(value: boolean | undefined | null) {
+        this.setDisabledState(value === true);
+    }
 
     @Input({ required: true })
     public itemsSource!: AutocompleteSource;
@@ -86,6 +122,9 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     @Input()
     public formName?: string;
 
+    @Input({ transform: booleanAttribute })
+    public textArea?: boolean;
+
     @Input()
     public displayProperty = '';
 
@@ -96,10 +135,16 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     public placeholder = '';
 
     @Input()
+    public startCharacter = '';
+
+    @Input()
     public icon = '';
 
     @Input({ transform: booleanAttribute })
     public autoFocus?: boolean | null;
+
+    @Input({ transform: booleanAttribute })
+    public autoSelectFirst = true;
 
     @Input({ transform: numberAttribute })
     public debounceTime = 300;
@@ -113,13 +158,11 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     @Input()
     public dropdownStyles: any = {};
 
-    @Input({ transform: booleanAttribute })
-    public set disabled(value: boolean | undefined | null) {
-        this.setDisabledState(value === true);
-    }
-
     @ContentChild(TemplateRef, { static: false })
     public itemTemplate!: TemplateRef<any>;
+
+    @ViewChild('anchor', { static: false })
+    public anchor!: ElementRef<HTMLDivElement>;
 
     @ViewChild('input', { static: false })
     public inputControl!: ElementRef<HTMLInputElement>;
@@ -148,29 +191,55 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
             }
         });
 
-        const inputStream =
+        const queryStream: Observable<Query> =
             this.queryInput.valueChanges.pipe(
                 tap(query => {
                     this.callChange(query);
+                    this.next({ lastQuery: undefined });
                 }),
-                map(query => {
-                    if (Types.isString(query)) {
-                        return query.trim();
-                    } else {
-                        return '';
+                map((text: string) => {
+                    if (!Types.isString(text)) {
+                        return NO_QUERY;
                     }
+
+                    if (!this.startCharacter) {
+                        return { text: text.trim() };
+                    }
+
+                    let rangeTo = Math.min(this.lastCursor, text.length);
+                    let rangeFrom = -1;
+                    for (let j = rangeTo - 1; j >= Math.max(0, rangeTo - RANGE_LIMIT); j--) {
+                        const char = text[j];
+                        if (char === this.startCharacter) {
+                            rangeFrom = j;
+                        }
+
+                        if (/[\s]/.test(char)) {
+                            break;
+                        }
+                    }
+
+                    if (rangeFrom >= 0 && rangeFrom < rangeTo) {
+                        text = text.substring(rangeFrom + 1, rangeTo + 1);
+
+                        return { text, range: { from: rangeFrom, to: rangeTo } };
+                    }
+
+                    return { text: '' };
                 }),
                 debounceTime(this.debounceTime));
 
         this.subscriptions.add(
-            merge(inputStream, this.modalStream).pipe(
+            merge(queryStream, this.modalStream).pipe(
                 switchMap(query => {
-                    if (!this.itemsSource) {
+                    this.next({ lastQuery: query });
+
+                    if (!this.itemsSource || query.text === '') {
                         return of([]);
                     } else {
                         this.setLoading(true);
 
-                        return this.itemsSource.find(query).pipe(
+                        return this.itemsSource.find(query.text ).pipe(
                             finalize(() => {
                                 this.setLoading(false);
                             }),
@@ -179,6 +248,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
                     }
                 }))
             .subscribe(items => {
+                this.updateAnchor();
                 this.next({
                     suggestedIndex: -1,
                     suggestedItems: items || [],
@@ -188,17 +258,26 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     }
 
     public onKeyDown(event: KeyboardEvent) {
+        this.lastCursor = this.inputControl.nativeElement.selectionEnd || 0;
+        this.editorKeyDown.emit(event);
+
         if (Keys.isEscape(event)) {
             this.resetForm();
             this.reset();
-        } else if (Keys.isUp(event)) {
+        }
+
+        if (this.snapshot.suggestedItems.length === 0) {
+            return true;
+        }
+
+        if (Keys.isUp(event)) {
             this.selectPrevIndex();
             return false;
         } else if (Keys.isDown(event)) {
             this.selectNextIndex();
             return false;
         } else if (Keys.isEnter(event)) {
-            return !(this.snapshot.suggestedItems.length > 0 && this.selectItem());
+            return !this.selectItem();
         }
 
         return true;
@@ -227,25 +306,23 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
     }
 
     public openModal() {
-        this.modalStream.next('');
+        this.modalStream.next({ text: '' });
     }
 
     public reset() {
         this.resetState();
-
         this.queryInput.setValue('', NO_EMIT);
     }
 
     public focus() {
         this.resetState();
-
         this.inputControl.nativeElement.focus();
     }
 
     public blur() {
         this.resetState();
-
         this.callTouched();
+        this.editorBlur.emit();
     }
 
     public selectItem(selection: any | null = null): boolean {
@@ -253,7 +330,7 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
             selection = this.snapshot.suggestedItems[this.snapshot.suggestedIndex];
         }
 
-        if (!selection && this.snapshot.suggestedItems.length === 1) {
+        if (!selection && this.snapshot.suggestedItems.length === 1 && this.autoSelectFirst) {
             selection = this.snapshot.suggestedItems[0];
         }
 
@@ -262,14 +339,25 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
         }
 
         try {
+            let displayString: string;
             if (this.displayProperty && this.displayProperty.length > 0) {
-                this.queryInput.setValue(selection[this.displayProperty], NO_EMIT);
+                displayString = selection[this.displayProperty];
             } else {
-                this.queryInput.setValue(selection.toString(), NO_EMIT);
+                displayString = selection.toString();
             }
 
-            let value = selection;
+            const query = this.snapshot.lastQuery;
+            if (query?.range) {
+                const input = this.queryInput.value;
+                const textBefore = input.substring(0, query.range.from);
+                const textAfter = input.substring(query.range.to + 1);
 
+                displayString = `${textBefore}${this.startCharacter}${displayString}${textAfter}`;
+            }
+
+            this.queryInput.setValue(displayString, NO_EMIT);
+
+            let value = selection;
             if (this.valueProperty) {
                 value = selection[this.valueProperty];
             }
@@ -317,5 +405,33 @@ export class AutocompleteComponent extends StatefulControlComponent<State, Reado
 
     private resetForm() {
         this.queryInput.setValue('', NO_EMIT);
+    }
+
+    private updateAnchor() {
+        if (!this.startCharacter) {
+            return;
+        }
+
+        const query = this.snapshot.lastQuery;
+        if (!query?.range) {
+            return;
+        }
+
+        const inputWidth = this.inputControl.nativeElement.getBoundingClientRect().width;
+        const coordsStart = getCaretCoordinates(this.inputControl.nativeElement, query.range.from);
+        const coordsEnd = getCaretCoordinates(this.inputControl.nativeElement, query.range.to + 1);
+
+        let w = coordsEnd.left - coordsStart.left;
+        let x = coordsStart.left;
+        if (coordsEnd.left > inputWidth) {
+            x = inputWidth - w;
+        }
+
+        x = Math.max(0, x);
+        w = Math.min(w, inputWidth);
+
+        this.anchor.nativeElement.style.top = `${coordsStart.top - 2}px`;
+        this.anchor.nativeElement.style.left = `${x}px`;
+        this.anchor.nativeElement.style.width = `${w}px`;
     }
 }

@@ -64,24 +64,22 @@
     }
 
     @if (snapshot.mode === "Edit") {
-        <form (ngSubmit)="update()">
-            <textarea
-                class="form-control mb-1"
-                autocapitalize="off"
-                autocomplete="off"
-                autocorrect="off"
-                (keydown)="updateOnEnter($event)"
-                [mention]="$any(mentionUsers)"
-                [mentionConfig]="mentionConfig"
-                name="{{ commentItem.comment }}"
-                [(ngModel)]="editingText"
-                sqxFocusOnInit></textarea>
-            <div>
+        <form [formGroup]="updateForm.form" (ngSubmit)="update()">
+            <sqx-autocomplete
+                autoFocus="true"
+                autoSelectFirst="false"
+                (editorKeyPress)="onKeyPressUpdate($event)"
+                [itemsSource]="contributors"
+                formControlName="text"
+                startCharacter="@"
+                textArea="true">
+            </sqx-autocomplete>
+            <div class="mt-2">
                 <button class="btn btn-sm btn-primary" type="submit">
                     <i class="icon-enter"></i>
                     {{ "common.save" | sqxTranslate }}
                 </button>
-                <button class="btn btn-sm btn-text-secondary me-1" (click)="cancelEditOrReply()" type="button">
+                <button class="btn btn-sm btn-text-secondary me-1" (click)="cancelUpdateOrReply()" type="button">
                     {{ "common.cancel" | sqxTranslate }}
                 </button>
             </div>
@@ -96,29 +94,26 @@
                     canFollow="false"
                     [commentItem]="item"
                     [comments]="comments"
-                    [mentionConfig]="mentionConfig"
-                    [mentionUsers]="mentionUsers"
                     [userToken]="userToken"></sqx-comment>
             }
             @if (snapshot.mode === "Reply") {
                 <form [formGroup]="replyForm.form" (ngSubmit)="reply()">
-                    <textarea
-                        class="form-control mb-1"
-                        autocapitalize="off"
-                        autocomplete="off"
-                        autocorrect="off"
+                    <sqx-autocomplete
+                        autoFocus="true"
+                        autoSelectFirst="false"
+                        (editorKeyPress)="onKeyPressReply($event)"
+                        [itemsSource]="contributors"
                         formControlName="text"
-                        (keydown)="replayOnEnter($event)"
-                        [mention]="$any(mentionUsers)"
-                        [mentionConfig]="mentionConfig"
-                        name="text"
-                        sqxFocusOnInit></textarea>
-                    <div>
+                        sqxFocusOnInit
+                        startCharacter="@"
+                        textArea="true">
+                    </sqx-autocomplete>
+                    <div class="mt-2">
                         <button class="btn btn-sm btn-primary" type="submit">
                             <i class="icon-enter"></i>
                             {{ "common.reply" | sqxTranslate }}
                         </button>
-                        <button class="btn btn-sm btn-text-secondary me-1" (click)="cancelEditOrReply()" type="button">
+                        <button class="btn btn-sm btn-text-secondary me-1" (click)="cancelUpdateOrReply()" type="button">
                             {{ "common.cancel" | sqxTranslate }}
                         </button>
                     </div>

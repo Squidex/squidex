@@ -8,6 +8,11 @@
 declare module 'pikaday/pikaday';
 declare module 'progressbar.js';
 
+declare module 'textarea-caret' {
+    function getCaretCoordinates(element: any, position: number | null): { top: number; left: number };
+    export default getCaretCoordinates;
+}
+
 declare class SquidexEditorWrapper {
     constructor(element: HTMLElement, props: EditorProps);
 

@@ -29,7 +29,6 @@ namespace Squidex.Areas.Api.Controllers.Assets;
 public sealed class AssetsController(
     ICommandBus commandBus,
     IAssetQueryService assetQuery,
-    IAssetUsageTracker assetUsageTracker,
     ITagService tagService,
     AssetTusRunner assetTusRunner)
     : ApiController(commandBus)

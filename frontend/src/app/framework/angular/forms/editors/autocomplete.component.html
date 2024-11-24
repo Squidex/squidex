@@ -1,20 +1,47 @@
 <div class="control-container">
-    <input
-        class="form-control"
-        [id]="formId"
-        #input
-        autocapitalize="off"
-        autocomplete="off"
-        autocorrect="off"
-        (blur)="blur()"
-        [class.form-empty]="inputStyle === 'empty'"
-        [class.form-icon]="!!icon"
-        [class.form-underlined]="inputStyle === 'underlined'"
-        [formControl]="queryInput"
-        (keydown)="onKeyDown($event)"
-        [name]="formName"
-        [placeholder]="placeholder"
-        [sqxFocusOnInit]="autoFocus" />
+    <div class="anchor invisible2" #anchor [class.cursor-size]="startCharacter" [class.full-size]="!startCharacter">
+        <span class="form-control w-100">&nbsp;</span>
+    </div>
+
+    @if (textArea) {
+        <textarea
+            class="form-control"
+            [id]="formId"
+            #input
+            autocapitalize="off"
+            autocomplete="off"
+            autocorrect="off"
+            (blur)="blur()"
+            [class.form-empty]="inputStyle === 'empty'"
+            [class.form-icon]="!!icon"
+            [class.form-underlined]="inputStyle === 'underlined'"
+            [formControl]="queryInput"
+            (keydown)="onKeyDown($event)"
+            (keypress)="editorKeyPress.emit($event)"
+            [name]="formName"
+            [placeholder]="placeholder"
+            rows="2"
+            sqxAutosize
+            [sqxFocusOnInit]="autoFocus"></textarea>
+    } @else {
+        <input
+            class="form-control"
+            [id]="formId"
+            #input
+            autocapitalize="off"
+            autocomplete="off"
+            autocorrect="off"
+            (blur)="blur()"
+            [class.form-empty]="inputStyle === 'empty'"
+            [class.form-icon]="!!icon"
+            [class.form-underlined]="inputStyle === 'underlined'"
+            [formControl]="queryInput"
+            (keydown)="onKeyDown($event)"
+            (keypress)="editorKeyPress.emit($event)"
+            [name]="formName"
+            [placeholder]="placeholder"
+            [sqxFocusOnInit]="autoFocus" />
+    }
 
     @if (icon) {
         <div class="icon">
@@ -36,11 +63,11 @@
         class="control-dropdown"
         #container
         adjustHeight="false"
-        [adjustWidth]="dropdownFullWidth"
+        [adjustWidth]="dropdownFullWidth && !startCharacter"
         [position]="dropdownPosition"
         scrollX="false"
         scrollY="true"
-        [sqxAnchoredTo]="input"
+        [sqxAnchoredTo]="anchor"
         *sqxModal="suggestionsModal"
         [style]="dropdownStyles">
         @for (item of snapshot.suggestedItems; track item; let i = $index) {

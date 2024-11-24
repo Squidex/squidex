@@ -38,6 +38,7 @@ export class UsersDataSource implements AutocompleteSource {
                         results.push(user);
                     }
                 }
+
                 return results;
             }));
     }

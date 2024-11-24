@@ -5,6 +5,25 @@
     position: relative;
 }
 
+.anchor {
+    @include absolute(0, null, null, 0);
+    background-color: red !important;
+    z-index: 1000;
+    opacity: .1;
+
+    & * {    
+        background-color: red !important;
+    }
+
+    &.full-size {
+        @include absolute(0, 0, 0, 0);
+    }
+
+    &.cursor-size {
+        margin-top: -.375rem !important;
+    }
+}
+
 .form-icon {
     padding-left: 2.25rem;
 }
@@ -24,4 +43,10 @@
     font-weight: normal;
     padding-left: 5px;
     padding-right: 5px;
+}
+
+textarea {
+    overflow-x: hidden;
+    overflow-y: hidden;
+    resize: none;
 }

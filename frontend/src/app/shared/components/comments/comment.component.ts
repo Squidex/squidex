@@ -7,11 +7,10 @@
 
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { MentionConfig, MentionModule } from 'angular-mentions';
-import { bounceAnimation, ConfirmClickDirective, FocusOnInitDirective, FromNowPipe, MarkdownPipe, SafeHtmlPipe, ScrollActiveDirective, TooltipDirective, TranslatePipe } from '@app/framework';
-import { CommentItem, CommentsState, ContributorDto, DialogService, Keys, StatefulComponent, UpsertCommentForm } from '@app/shared/internal';
+import { AutocompleteComponent, AutocompleteSource, bounceAnimation, ConfirmClickDirective, FromNowPipe, MarkdownPipe, NOOP_DATASOURCE, SafeHtmlPipe, ScrollActiveDirective, TooltipDirective, TranslatePipe } from '@app/framework';
+import { CommentItem, CommentsState, DialogService, Keys, StatefulComponent, UpsertCommentForm } from '@app/shared/internal';
 import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
 
 interface State {
@@ -28,12 +27,10 @@ interface State {
         bounceAnimation,
     ],
     imports: [
+        AutocompleteComponent,
         ConfirmClickDirective,
-        FocusOnInitDirective,
-        FormsModule,
         FromNowPipe,
         MarkdownPipe,
-        MentionModule,
         ReactiveFormsModule,
         RouterLink,
         SafeHtmlPipe,
@@ -67,26 +64,23 @@ export class CommentComponent extends StatefulComponent<State> {
     public comments!: CommentsState;
 
     @Input()
+    public contributors: AutocompleteSource = NOOP_DATASOURCE;
+
+    @Input()
     public userToken = '';
 
     @Input()
     public currentUrl = '';
-
-    @Input({ required: true })
-    public mentionUsers?: ReadonlyArray<ContributorDto>;
-
-    @Input({ required: true })
-    public mentionConfig!: MentionConfig;
 
     @Input()
     public scrollContainer?: string;
 
     public replyForm = new UpsertCommentForm();
 
+    public updateForm = new UpsertCommentForm();
+
     public isDeletable = false;
     public isEditable = false;
-
-    public editingText = '';
 
     constructor(
         private readonly dialogs: DialogService,
@@ -102,8 +96,7 @@ export class CommentComponent extends StatefulComponent<State> {
     }
 
     public startEdit() {
-        this.editingText = this.commentItem.comment.text;
-
+        this.updateForm.load({ text: this.commentItem.comment.text });
         this.next({ mode: 'Edit' });
     }
 
@@ -111,7 +104,7 @@ export class CommentComponent extends StatefulComponent<State> {
         this.next({ mode: 'Reply' });
     }
 
-    public cancelEditOrReply() {
+    public cancelUpdateOrReply() {
         this.next({ mode: 'Normal' });
     }
 
@@ -137,7 +130,7 @@ export class CommentComponent extends StatefulComponent<State> {
         }
 
         this.replyForm.submitCompleted();
-        this.cancelEditOrReply();
+        this.cancelUpdateOrReply();
     }
 
     public update() {
@@ -145,7 +138,7 @@ export class CommentComponent extends StatefulComponent<State> {
             return;
         }
 
-        const text = this.editingText;
+        const { text } = this.updateForm.submit() || {};
 
         if (!text || text.length === 0) {
             this.dialogs.confirm('i18n:comments.deleteConfirmTitle', 'i18n:comments.deleteConfirmText')
@@ -158,20 +151,21 @@ export class CommentComponent extends StatefulComponent<State> {
             this.comments.update(this.commentItem.index, { text });
         }
 
-        this.cancelEditOrReply();
+        this.updateForm.submitCompleted();
+        this.cancelUpdateOrReply();
     }
 
-    public replayOnEnter(event: KeyboardEvent) {
+    public onKeyPressReply(event: KeyboardEvent) {
         if (Keys.isEnter(event) && !event.altKey && !event.shiftKey) {
-            event.preventDefault();
             this.reply();
+            event.preventDefault();
         }
     }
 
-    public updateOnEnter(event: KeyboardEvent) {
+    public onKeyPressUpdate(event: KeyboardEvent) {
         if (Keys.isEnter(event) && !event.altKey && !event.shiftKey) {
-            event.preventDefault();
             this.update();
+            event.preventDefault();
         }
     }
 }
