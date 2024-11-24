@@ -6,27 +6,19 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Apps;
-using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Entities;
+namespace Squidex.Domain.Apps.Entities.Contents;
 
-public interface IDeleter
+public sealed class ContentEventDeleter(IEventStore eventStore) : IDeleter
 {
-    int Order => 0;
+    public int Order => int.MaxValue;
 
-    Task DeleteAppAsync(App app,
-        CancellationToken ct);
-
-    Task DeleteSchemaAsync(App app, Schema schema,
+    public Task DeleteAppAsync(App app,
         CancellationToken ct)
     {
-        return Task.CompletedTask;
-    }
+        var streamFilter = StreamFilter.Prefix($"content-{app.Id}");
 
-    Task DeleteContributorAsync(DomainId appId, string contributorId,
-        CancellationToken ct)
-    {
-        return Task.CompletedTask;
+        return eventStore.DeleteAsync(streamFilter, ct);
     }
 }

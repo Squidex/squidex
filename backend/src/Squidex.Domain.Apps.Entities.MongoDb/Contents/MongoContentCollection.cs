@@ -127,12 +127,27 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
         return queryScheduled.QueryAsync(now, ct);
     }
 
+    public IAsyncEnumerable<DomainId> StreamIds(DomainId appId, DomainId schemaId,
+        CancellationToken ct)
+    {
+        return queryAsStream.StreamAllIds(appId, schemaId, ct);
+    }
+
     public async Task DeleteAppAsync(DomainId appId,
         CancellationToken ct)
     {
         using (Telemetry.Activities.StartActivity("MongoContentCollection/DeleteAppAsync"))
         {
             await Collection.DeleteManyAsync(Filter.Eq(x => x.IndexedAppId, appId), ct);
+        }
+    }
+
+    public async Task DeleteSchemaAsync(DomainId schemaId,
+        CancellationToken ct)
+    {
+        using (Telemetry.Activities.StartActivity("MongoContentCollection/DeleteSchemaAsync"))
+        {
+            await Collection.DeleteManyAsync(Filter.Eq(x => x.IndexedSchemaId, schemaId), ct);
         }
     }
 

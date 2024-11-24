@@ -39,6 +39,12 @@ public sealed class MongoSchemaRepository(IMongoDatabase database) : MongoSnapsh
         return Collection.DeleteManyAsync(Filter.Eq(x => x.IndexedAppId, app.Id), ct);
     }
 
+    Task IDeleter.DeleteSchemaAsync(App app, Schema schema,
+        CancellationToken ct)
+    {
+        return Collection.DeleteManyAsync(Filter.Eq(x => x.IndexedId, schema.Id), ct);
+    }
+
     public async Task<List<Schema>> QueryAllAsync(DomainId appId, CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("MongoSchemaRepository/QueryAllAsync"))

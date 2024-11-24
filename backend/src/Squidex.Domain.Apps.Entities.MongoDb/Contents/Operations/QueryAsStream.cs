@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Runtime.CompilerServices;
+using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
@@ -14,6 +15,12 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Contents.Operations;
 
 public sealed class QueryAsStream : OperationBase
 {
+    public sealed class IdOnly
+    {
+        [BsonElement("id")]
+        public DomainId Id { get; set; }
+    }
+
     public async IAsyncEnumerable<Content> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds,
         [EnumeratorCancellation] CancellationToken ct)
     {
@@ -26,6 +33,26 @@ public sealed class QueryAsStream : OperationBase
                 foreach (var entity in cursor.Current)
                 {
                     yield return entity;
+                }
+            }
+        }
+    }
+
+    public async IAsyncEnumerable<DomainId> StreamAllIds(DomainId appId, DomainId schemaId,
+        [EnumeratorCancellation] CancellationToken ct)
+    {
+        var filter = CreateFilter(appId, [schemaId]);
+
+        // Only query the ID from the database to improve performance.
+        var projection = Builders<MongoContentEntity>.Projection.Include(x => x.Id);
+
+        using (var cursor = await Collection.Find(filter).Project<IdOnly>(projection).ToCursorAsync(ct))
+        {
+            while (await cursor.MoveNextAsync(ct))
+            {
+                foreach (var entity in cursor.Current)
+                {
+                    yield return entity.Id;
                 }
             }
         }

@@ -31,10 +31,10 @@ public sealed class MongoSchemasHash(IMongoDatabase database) : MongoRepositoryB
         return "SchemasHash";
     }
 
-    async Task IDeleter.DeleteAppAsync(App app,
+    Task IDeleter.DeleteAppAsync(App app,
         CancellationToken ct)
     {
-        await Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, app.Id), ct);
+        return Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, app.Id), ct);
     }
 
     public Task On(IEnumerable<Envelope<IEvent>> events)
