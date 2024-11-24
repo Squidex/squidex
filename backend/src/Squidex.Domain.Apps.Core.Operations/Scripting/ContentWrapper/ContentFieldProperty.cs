@@ -40,7 +40,9 @@ public sealed class ContentFieldProperty(ContentFieldObject contentField, JsonVa
             {
                 this.value = value;
 
+#pragma warning disable MA0143 // Primary constructor parameters should be readonly
                 contentValue = newContentValue;
+#pragma warning restore MA0143 // Primary constructor parameters should be readonly
                 contentField.MarkChanged();
 
                 isChanged = true;

@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Apps.Commands;
+namespace Squidex.Domain.Apps.Entities.Apps;
 
-public sealed class DeleteApp : AppCommand
+public sealed class AppsOptions
 {
-    public bool Permanent { get; set; }
+    public bool DeletePermanent { get; set; }
 }

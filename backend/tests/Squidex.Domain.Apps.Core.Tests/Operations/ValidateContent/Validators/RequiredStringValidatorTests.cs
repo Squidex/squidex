@@ -56,7 +56,7 @@ public class RequiredStringValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(string.Empty, errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Field is required." });
+            ["Field is required."]);
     }
 
     [Fact]
@@ -67,6 +67,6 @@ public class RequiredStringValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(null, errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Field is required." });
+            ["Field is required."]);
     }
 }

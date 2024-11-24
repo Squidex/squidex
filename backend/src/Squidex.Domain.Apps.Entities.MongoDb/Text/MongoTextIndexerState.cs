@@ -36,6 +36,8 @@ public sealed class MongoTextIndexerState(
         });
     }
 
+    int IDeleter.Order => -2000;
+
     protected override string CollectionName()
     {
         return "TextIndexerState";

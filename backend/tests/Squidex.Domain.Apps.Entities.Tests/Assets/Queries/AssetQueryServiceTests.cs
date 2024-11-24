@@ -217,7 +217,7 @@ public class AssetQueryServiceTests : GivenContext
 
         var actual = await sut.FindAssetFolderAsync(AppId.Id, folder1.Id, CancellationToken);
 
-        Assert.Equal(actual, new[] { folder1 });
+        Assert.Equal(actual, [folder1]);
     }
 
     [Fact]
@@ -238,7 +238,7 @@ public class AssetQueryServiceTests : GivenContext
 
         var actual = await sut.FindAssetFolderAsync(AppId.Id, folder3.Id, CancellationToken);
 
-        Assert.Equal(actual, new[] { folder1, folder2, folder3 });
+        Assert.Equal(actual, [folder1, folder2, folder3]);
     }
 
     [Fact]

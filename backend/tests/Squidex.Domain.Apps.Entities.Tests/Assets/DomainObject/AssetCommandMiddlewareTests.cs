@@ -47,7 +47,7 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<Asset>
             assetEnricher,
             assetFileStore,
             assetQuery,
-            ApiContextProvider, new[] { assetMetadataSource });
+            ApiContextProvider, [assetMetadataSource]);
     }
 
     [Fact]

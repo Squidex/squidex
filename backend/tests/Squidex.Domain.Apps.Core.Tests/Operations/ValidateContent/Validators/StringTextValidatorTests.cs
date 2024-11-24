@@ -71,7 +71,7 @@ public class StringTextValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateString(4), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must have exactly 5 text character(s)." });
+            ["Must have exactly 5 text character(s)."]);
     }
 
     [Fact]
@@ -82,7 +82,7 @@ public class StringTextValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateString(1500), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must have at least 2000 text character(s)." });
+            ["Must have at least 2000 text character(s)."]);
     }
 
     [Fact]
@@ -93,7 +93,7 @@ public class StringTextValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateString(1500), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must not have more than 1000 text character(s)." });
+            ["Must not have more than 1000 text character(s)."]);
     }
 
     [Fact]
@@ -104,7 +104,7 @@ public class StringTextValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateString(1), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must have between 2000 and 5000 text character(s)." });
+            ["Must have between 2000 and 5000 text character(s)."]);
     }
 
     [Theory]
@@ -129,7 +129,7 @@ public class StringTextValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateSentence(4), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must have exactly 5 word(s)." });
+            ["Must have exactly 5 word(s)."]);
     }
 
     [Fact]
@@ -140,7 +140,7 @@ public class StringTextValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateSentence(1500), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must have at least 2000 word(s)." });
+            ["Must have at least 2000 word(s)."]);
     }
 
     [Fact]
@@ -151,7 +151,7 @@ public class StringTextValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateSentence(1500), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must not have more than 1000 word(s)." });
+            ["Must not have more than 1000 word(s)."]);
     }
 
     [Fact]
@@ -162,7 +162,7 @@ public class StringTextValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateSentence(1), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must have between 2000 and 5000 word(s)." });
+            ["Must have between 2000 and 5000 word(s)."]);
     }
 
     private static string CreateString(int size)

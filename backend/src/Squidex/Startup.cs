@@ -55,7 +55,7 @@ public sealed class Startup(IConfiguration config)
         services.AddSquidexOpenApiSettings();
         services.AddSquidexQueries(config);
         services.AddSquidexRules(config);
-        services.AddSquidexSchemas();
+        services.AddSquidexSchemas(config);
         services.AddSquidexSearch();
         services.AddSquidexSerializers();
         services.AddSquidexStoreServices(config);

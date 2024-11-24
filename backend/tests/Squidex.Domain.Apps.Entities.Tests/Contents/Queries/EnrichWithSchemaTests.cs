@@ -25,7 +25,7 @@ public class EnrichWithSchemaTests : GivenContext
     {
         var content = CreateContent();
 
-        await sut.EnrichAsync(FrontendContext, new[] { content }, SchemaProvider(), CancellationToken);
+        await sut.EnrichAsync(FrontendContext, [content], SchemaProvider(), CancellationToken);
 
         Assert.NotNull(content.ReferenceFields);
     }
@@ -35,7 +35,7 @@ public class EnrichWithSchemaTests : GivenContext
     {
         var content = CreateContent();
 
-        await sut.EnrichAsync(ApiContext, new[] { content }, SchemaProvider(), CancellationToken);
+        await sut.EnrichAsync(ApiContext, [content], SchemaProvider(), CancellationToken);
 
         Assert.Null(content.ReferenceFields);
     }
@@ -45,7 +45,7 @@ public class EnrichWithSchemaTests : GivenContext
     {
         var content = CreateContent();
 
-        await sut.EnrichAsync(ApiContext, new[] { content }, SchemaProvider(), CancellationToken);
+        await sut.EnrichAsync(ApiContext, [content], SchemaProvider(), CancellationToken);
 
         Assert.Equal("my-schema", content.SchemaDisplayName);
     }

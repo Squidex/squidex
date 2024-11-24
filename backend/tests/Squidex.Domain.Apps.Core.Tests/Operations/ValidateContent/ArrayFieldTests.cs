@@ -72,7 +72,7 @@ public class ArrayFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(null), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Field is required." });
+            ["Field is required."]);
     }
 
     [Fact]
@@ -83,7 +83,7 @@ public class ArrayFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Field is required." });
+            ["Field is required."]);
     }
 
     [Fact]
@@ -94,7 +94,7 @@ public class ArrayFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(JsonValue.Create("invalid"), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Invalid json type, expected array of objects." });
+            ["Invalid json type, expected array of objects."]);
     }
 
     [Fact]
@@ -105,7 +105,7 @@ public class ArrayFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(Object(), Object()), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must have at least 3 item(s)." });
+            ["Must have at least 3 item(s)."]);
     }
 
     [Fact]
@@ -116,7 +116,7 @@ public class ArrayFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(Object(), Object()), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must not have more than 1 item(s)." });
+            ["Must not have more than 1 item(s)."]);
     }
 
     [Fact]
@@ -127,7 +127,7 @@ public class ArrayFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(Object("myString", "1"), Object("myString", "1")), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must not contain items with duplicate 'myString' fields." });
+            ["Must not contain items with duplicate 'myString' fields."]);
     }
 
     private static JsonValue CreateValue(params JsonObject[]? objects)

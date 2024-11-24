@@ -34,7 +34,7 @@ public class NoValueValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(JsonValue.Null, errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Value must not be defined." });
+            ["Value must not be defined."]);
     }
 
     [Fact]
@@ -45,6 +45,6 @@ public class NoValueValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(JsonValue.True, errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Value must not be defined." });
+            ["Value must not be defined."]);
     }
 }

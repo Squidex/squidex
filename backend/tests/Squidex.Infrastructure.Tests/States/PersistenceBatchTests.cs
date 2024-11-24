@@ -46,7 +46,7 @@ public class PersistenceBatchTests
             [key2] = [event2_1, event2_2]
         });
 
-        await bulk.LoadAsync(new[] { key1, key2 });
+        await bulk.LoadAsync([key1, key2]);
 
         var persistedEvents1 = Save.Events();
         var persistence1 = bulk.WithEventSourcing(None.Type, key1, persistedEvents1.Write);
@@ -58,8 +58,8 @@ public class PersistenceBatchTests
 
         await persistence2.ReadAsync();
 
-        Assert.Equal(persistedEvents1.ToArray(), new[] { event1_1, event1_2 });
-        Assert.Equal(persistedEvents2.ToArray(), new[] { event2_1, event2_2 });
+        Assert.Equal(persistedEvents1.ToArray(), [event1_1, event1_2]);
+        Assert.Equal(persistedEvents2.ToArray(), [event2_1, event2_2]);
     }
 
     [Fact]
@@ -69,7 +69,7 @@ public class PersistenceBatchTests
 
         var bulk = sut.WithBatchContext(None.Type);
 
-        await bulk.LoadAsync(new[] { key });
+        await bulk.LoadAsync([key]);
 
         var persistedEvents = Save.Events();
         var persistence = bulk.WithEventSourcing(None.Type, key, persistedEvents.Write);
@@ -98,7 +98,7 @@ public class PersistenceBatchTests
 
         var bulk = sut.WithBatchContext(None.Type);
 
-        await bulk.LoadAsync(new[] { key1, key2 });
+        await bulk.LoadAsync([key1, key2]);
 
         var persistedEvents1 = Save.Events();
         var persistence1 = bulk.WithEventSourcing(None.Type, key1, persistedEvents1.Write);
@@ -130,7 +130,7 @@ public class PersistenceBatchTests
 
         var bulk = sut.WithBatchContext(None.Type);
 
-        await bulk.LoadAsync(new[] { key1, key2 });
+        await bulk.LoadAsync([key1, key2]);
 
         var persistedEvents1_1 = Save.Events();
         var persistence1_1 = bulk.WithEventSourcing(None.Type, key1, persistedEvents1_1.Write);
@@ -162,7 +162,7 @@ public class PersistenceBatchTests
 
         var bulk = sut.WithBatchContext(None.Type);
 
-        await bulk.LoadAsync(new[] { key1, key2 });
+        await bulk.LoadAsync([key1, key2]);
 
         var persistedEvents1 = Save.Events();
         var persistence1 = bulk.WithEventSourcing(None.Type, key1, persistedEvents1.Write);

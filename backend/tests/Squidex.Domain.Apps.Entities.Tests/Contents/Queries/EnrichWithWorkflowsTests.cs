@@ -36,7 +36,7 @@ public class EnrichWithWorkflowsTests : GivenContext
         A.CallTo(() => workflow.GetNextAsync(content, content.Status, FrontendContext.UserPrincipal))
             .Returns(nexts);
 
-        await sut.EnrichAsync(FrontendContext, new[] { content }, null!, CancellationToken);
+        await sut.EnrichAsync(FrontendContext, [content], null!, CancellationToken);
 
         Assert.Equal(nexts, content.NextStatuses);
     }
@@ -46,7 +46,7 @@ public class EnrichWithWorkflowsTests : GivenContext
     {
         var content = CreateContent() with { IsSingleton = true, Status = Status.Draft };
 
-        await sut.EnrichAsync(FrontendContext, new[] { content }, null!, default);
+        await sut.EnrichAsync(FrontendContext, [content], null!, default);
 
         Assert.Equal(Status.Published, content.NextStatuses?.Single().Status);
 
@@ -59,7 +59,7 @@ public class EnrichWithWorkflowsTests : GivenContext
     {
         var content = CreateContent() with { IsSingleton = true };
 
-        await sut.EnrichAsync(FrontendContext, new[] { content }, null!, CancellationToken);
+        await sut.EnrichAsync(FrontendContext, [content], null!, CancellationToken);
 
         Assert.Empty(content.NextStatuses!);
 
@@ -75,7 +75,7 @@ public class EnrichWithWorkflowsTests : GivenContext
         A.CallTo(() => workflow.GetInfoAsync(content, content.Status))
             .Returns(new StatusInfo(Status.Published, StatusColors.Published));
 
-        await sut.EnrichAsync(FrontendContext, new[] { content }, null!, CancellationToken);
+        await sut.EnrichAsync(FrontendContext, [content], null!, CancellationToken);
 
         Assert.Equal(StatusColors.Published, content.StatusColor);
     }
@@ -88,7 +88,7 @@ public class EnrichWithWorkflowsTests : GivenContext
         A.CallTo(() => workflow.GetInfoAsync(content, content.NewStatus!.Value))
             .Returns(new StatusInfo(Status.Published, StatusColors.Archived));
 
-        await sut.EnrichAsync(FrontendContext, new[] { content }, null!, CancellationToken);
+        await sut.EnrichAsync(FrontendContext, [content], null!, CancellationToken);
 
         Assert.Equal(StatusColors.Archived, content.NewStatusColor);
     }
@@ -101,7 +101,7 @@ public class EnrichWithWorkflowsTests : GivenContext
         A.CallTo(() => workflow.GetInfoAsync(content, content.ScheduleJob.Status))
             .Returns(new StatusInfo(Status.Published, StatusColors.Archived));
 
-        await sut.EnrichAsync(FrontendContext, new[] { content }, null!, CancellationToken);
+        await sut.EnrichAsync(FrontendContext, [content], null!, CancellationToken);
 
         Assert.Equal(StatusColors.Archived, content.ScheduledStatusColor);
     }
@@ -114,7 +114,7 @@ public class EnrichWithWorkflowsTests : GivenContext
         A.CallTo(() => workflow.GetInfoAsync(content, content.Status))
             .Returns(ValueTask.FromResult<StatusInfo?>(null!));
 
-        await sut.EnrichAsync(FrontendContext, new[] { content }, null!, CancellationToken);
+        await sut.EnrichAsync(FrontendContext, [content], null!, CancellationToken);
 
         Assert.Equal(StatusColors.Draft, content.StatusColor);
     }
@@ -127,7 +127,7 @@ public class EnrichWithWorkflowsTests : GivenContext
         A.CallTo(() => workflow.CanUpdateAsync(content, content.Status, FrontendContext.UserPrincipal))
             .Returns(true);
 
-        await sut.EnrichAsync(FrontendContext, new[] { content }, null!, CancellationToken);
+        await sut.EnrichAsync(FrontendContext, [content], null!, CancellationToken);
 
         Assert.True(content.CanUpdate);
     }
@@ -137,7 +137,7 @@ public class EnrichWithWorkflowsTests : GivenContext
     {
         var content = CreateContent();
 
-        await sut.EnrichAsync(ApiContext.Clone(b => b.WithResolveFlow(false)), new[] { content }, null!, CancellationToken);
+        await sut.EnrichAsync(ApiContext.Clone(b => b.WithResolveFlow(false)), [content], null!, CancellationToken);
 
         Assert.False(content.CanUpdate);
 

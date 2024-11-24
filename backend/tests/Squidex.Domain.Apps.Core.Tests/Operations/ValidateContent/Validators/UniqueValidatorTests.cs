@@ -73,7 +73,7 @@ public class UniqueValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync("hello", errors, updater: c => c.Nested("property").Nested("iv"));
 
         errors.Should().BeEquivalentTo(
-            new[] { "property.iv: Another content with the same value exists." });
+            ["property.iv: Another content with the same value exists."]);
 
         Assert.Equal("Data.property.iv == 'hello'", filter);
     }
@@ -88,7 +88,7 @@ public class UniqueValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(12.5, errors, updater: c => c.Nested("property").Nested("iv"));
 
         errors.Should().BeEquivalentTo(
-            new[] { "property.iv: Another content with the same value exists." });
+            ["property.iv: Another content with the same value exists."]);
 
         Assert.Equal("Data.property.iv == 12.5", filter);
     }

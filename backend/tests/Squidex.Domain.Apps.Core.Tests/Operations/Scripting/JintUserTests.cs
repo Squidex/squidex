@@ -111,7 +111,7 @@ public class JintUserTests
     {
         var engine = new Engine();
 
-        engine.SetValue("user", JintUser.Create(engine, new ClaimsPrincipal(new[] { identity })));
+        engine.SetValue("user", JintUser.Create(engine, new ClaimsPrincipal([identity])));
 
         return engine.Evaluate(script).ToObject();
     }

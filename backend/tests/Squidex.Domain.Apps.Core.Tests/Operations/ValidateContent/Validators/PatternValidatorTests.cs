@@ -52,7 +52,7 @@ public class PatternValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync("foo", errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must follow the pattern." });
+            ["Must follow the pattern."]);
     }
 
     [Fact]
@@ -63,7 +63,7 @@ public class PatternValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync("foo", errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Custom Error Message." });
+            ["Custom Error Message."]);
     }
 
     [Fact]
@@ -74,6 +74,6 @@ public class PatternValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync("https://archiverbx.blob.core.windows.net/static/C:/Users/USR/Documents/Projects/PROJ/static/images/full/1234567890.jpg", errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Regex is too slow." });
+            ["Regex is too slow."]);
     }
 }

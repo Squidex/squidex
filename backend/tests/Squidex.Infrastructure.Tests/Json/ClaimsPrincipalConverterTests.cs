@@ -16,23 +16,20 @@ public class ClaimsPrincipalConverterTests
     public void Should_serialize_and_deserialize()
     {
         var value = new ClaimsPrincipal(
-            new[]
-            {
+            [
                 new ClaimsIdentity(
-                    new[]
-                    {
+                    [
                         new Claim("email", "me@email.com"),
                         new Claim("username", "me@email.com")
-                    },
+                    ],
                     "Cookie"),
                 new ClaimsIdentity(
-                    new[]
-                    {
+                    [
                         new Claim("user_id", "12345"),
                         new Claim("login", "me")
-                    },
+                    ],
                     "Google")
-            });
+            ]);
 
         var serialized = value.SerializeAndDeserialize();
 

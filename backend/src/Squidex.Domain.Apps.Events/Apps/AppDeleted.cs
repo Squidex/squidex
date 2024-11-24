@@ -12,4 +12,5 @@ namespace Squidex.Domain.Apps.Events.Apps;
 [EventType(nameof(AppDeleted))]
 public sealed class AppDeleted : AppEvent
 {
+    public bool Permanent { get; set; }
 }

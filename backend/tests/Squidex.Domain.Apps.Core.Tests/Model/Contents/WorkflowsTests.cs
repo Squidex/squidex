@@ -40,7 +40,7 @@ public class WorkflowsTests
 
         var workflows_1 = workflows_0.Add(id, "1");
 
-        Assert.Equal(workflows_1[id].Steps.Keys, new[] { Status.Archived, Status.Draft, Status.Published });
+        Assert.Equal(workflows_1[id].Steps.Keys, [Status.Archived, Status.Draft, Status.Published]);
     }
 
     [Fact]

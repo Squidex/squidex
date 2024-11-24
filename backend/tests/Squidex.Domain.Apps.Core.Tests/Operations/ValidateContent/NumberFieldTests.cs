@@ -42,7 +42,7 @@ public class NumberFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(JsonValue.Null, errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Field is required." });
+            ["Field is required."]);
     }
 
     [Fact]
@@ -53,7 +53,7 @@ public class NumberFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(5), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must be greater or equal to 10." });
+            ["Must be greater or equal to 10."]);
     }
 
     [Fact]
@@ -64,7 +64,7 @@ public class NumberFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(20), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must be less or equal to 10." });
+            ["Must be less or equal to 10."]);
     }
 
     [Fact]
@@ -75,7 +75,7 @@ public class NumberFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(20), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Not an allowed value." });
+            ["Not an allowed value."]);
     }
 
     [Fact]
@@ -86,7 +86,7 @@ public class NumberFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(JsonValue.Create("Invalid"), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Invalid json type, expected number." });
+            ["Invalid json type, expected number."]);
     }
 
     private static JsonValue CreateValue(double v)

@@ -26,18 +26,18 @@ public sealed class CommandRequest(IAggregateCommand command, string culture, st
 
     public void ApplyContext()
     {
-        var culture = GetCulture(Culture);
+        var currentCulture = GetCulture(Culture);
 
-        if (culture != null)
+        if (currentCulture != null)
         {
-            CultureInfo.CurrentCulture = culture;
+            CultureInfo.CurrentCulture = currentCulture;
         }
 
-        var uiCulture = GetCulture(CultureUI);
+        var currentUICulture = GetCulture(CultureUI);
 
-        if (uiCulture != null)
+        if (currentUICulture != null)
         {
-            CultureInfo.CurrentUICulture = uiCulture;
+            CultureInfo.CurrentUICulture = currentUICulture;
         }
     }
 

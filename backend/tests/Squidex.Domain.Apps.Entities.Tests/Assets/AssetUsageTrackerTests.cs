@@ -75,7 +75,7 @@ public class AssetUsageTrackerTests : GivenContext
             Envelope.Create<IEvent>(@event)
                 .SetTimestamp(Instant.FromDateTimeUtc(DateTime.UtcNow.Date.AddDays(13)));
 
-        await sut.On(new[] { envelope });
+        await sut.On([envelope]);
 
         A.CallTo(() => assetUsageTracker.TrackAsync(AppId.Id, date, sizeDiff, countDiff, default))
             .MustHaveHappened();
@@ -104,7 +104,7 @@ public class AssetUsageTrackerTests : GivenContext
         A.CallTo(() => tagService.UpdateAsync(AppId.Id, TagGroups.Assets, A<Dictionary<string, int>>._, default))
             .Invokes(x => { update = x.GetArgument<Dictionary<string, int>>(2); });
 
-        await sut.On(new[] { envelope });
+        await sut.On([envelope]);
 
         update.Should().BeEquivalentTo(new Dictionary<string, int>
         {
@@ -151,7 +151,7 @@ public class AssetUsageTrackerTests : GivenContext
         A.CallTo(() => tagService.UpdateAsync(AppId.Id, TagGroups.Assets, A<Dictionary<string, int>>._, default))
             .Invokes(x => { update = x.GetArgument<Dictionary<string, int>>(2); });
 
-        await sut.On(new[] { envelope1, envelope2 });
+        await sut.On([envelope1, envelope2]);
 
         update.Should().BeEquivalentTo(new Dictionary<string, int>
         {
@@ -202,7 +202,7 @@ public class AssetUsageTrackerTests : GivenContext
         A.CallTo(() => tagService.UpdateAsync(AppId.Id, TagGroups.Assets, A<Dictionary<string, int>>._, default))
             .Invokes(x => { update = x.GetArgument<Dictionary<string, int>>(2); });
 
-        await sut.On(new[] { envelope1, envelope2 });
+        await sut.On([envelope1, envelope2]);
 
         update.Should().BeEquivalentTo(new Dictionary<string, int>
         {
@@ -250,8 +250,8 @@ public class AssetUsageTrackerTests : GivenContext
         A.CallTo(() => tagService.UpdateAsync(AppId.Id, TagGroups.Assets, A<Dictionary<string, int>>._, default))
             .Invokes(x => { update = x.GetArgument<Dictionary<string, int>>(2); });
 
-        await sut.On(new[] { envelope1 });
-        await sut.On(new[] { envelope2 });
+        await sut.On([envelope1]);
+        await sut.On([envelope2]);
 
         update.Should().BeEquivalentTo(new Dictionary<string, int>
         {
@@ -290,7 +290,7 @@ public class AssetUsageTrackerTests : GivenContext
         A.CallTo(() => tagService.UpdateAsync(AppId.Id, TagGroups.Assets, A<Dictionary<string, int>>._, default))
             .Invokes(x => { update = x.GetArgument<Dictionary<string, int>>(2); });
 
-        await sut.On(new[] { Envelope.Create<IEvent>(@event1), Envelope.Create<IEvent>(@event2) });
+        await sut.On([Envelope.Create<IEvent>(@event1), Envelope.Create<IEvent>(@event2)]);
 
         update.Should().BeEquivalentTo(new Dictionary<string, int>
         {
@@ -325,7 +325,7 @@ public class AssetUsageTrackerTests : GivenContext
         A.CallTo(() => tagService.UpdateAsync(AppId.Id, TagGroups.Assets, A<Dictionary<string, int>>._, default))
             .Invokes(x => { update = x.GetArgument<Dictionary<string, int>>(2); });
 
-        await sut.On(new[] { envelope });
+        await sut.On([envelope]);
 
         update.Should().BeEquivalentTo(new Dictionary<string, int>
         {
@@ -357,7 +357,7 @@ public class AssetUsageTrackerTests : GivenContext
         A.CallTo(() => tagService.UpdateAsync(AppId.Id, TagGroups.Assets, A<Dictionary<string, int>>._, default))
             .Invokes(x => { update = x.GetArgument<Dictionary<string, int>>(2); });
 
-        await sut.On(new[] { envelope });
+        await sut.On([envelope]);
 
         update.Should().BeEquivalentTo(new Dictionary<string, int>
         {

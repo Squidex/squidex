@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.MongoDb.Text;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure.MongoDb;
@@ -14,6 +15,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
 public sealed class MongoTextIndexerStateFixture : IAsyncLifetime
 {
+    public IContentRepository ContentRepository { get; } = A.Fake<IContentRepository>();
+
     public MongoTextIndexerState State { get; }
 
     public MongoTextIndexerStateFixture()
@@ -23,7 +26,7 @@ public sealed class MongoTextIndexerStateFixture : IAsyncLifetime
         var mongoClient = MongoClientFactory.Create(TestConfig.Configuration["mongoDb:configuration"]!);
         var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["mongodb:database"]!);
 
-        State = new MongoTextIndexerState(mongoDatabase);
+        State = new MongoTextIndexerState(mongoDatabase, ContentRepository);
     }
 
     public Task InitializeAsync()

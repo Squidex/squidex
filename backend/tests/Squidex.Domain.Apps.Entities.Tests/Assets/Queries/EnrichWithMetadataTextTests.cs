@@ -56,10 +56,10 @@ public class EnrichWithMetadataTextTests : GivenContext
         };
 
         A.CallTo(() => assetMetadataSource1.Format(asset))
-            .Returns(new[] { "metadata1" });
+            .Returns(["metadata1"]);
 
         A.CallTo(() => assetMetadataSource2.Format(asset))
-            .Returns(new[] { "metadata2", "metadata3" });
+            .Returns(["metadata2", "metadata3"]);
 
         await sut.EnrichAsync(FrontendContext, Enumerable.Repeat(asset, 1), CancellationToken);
 

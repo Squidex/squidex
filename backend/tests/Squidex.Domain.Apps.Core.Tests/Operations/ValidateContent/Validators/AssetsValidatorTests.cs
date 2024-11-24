@@ -88,7 +88,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Field is required." });
+            ["Field is required."]);
     }
 
     [Fact]
@@ -101,7 +101,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(id), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { $"[1]: Id {id} not found." });
+            [$"[1]: Id {id} not found."]);
     }
 
     [Fact]
@@ -112,7 +112,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(Document.Id, Image1.Id), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "[1]: Size of 4 kB must be greater than 5 kB." });
+            ["[1]: Size of 4 kB must be greater than 5 kB."]);
     }
 
     [Fact]
@@ -123,7 +123,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(Document.Id, Image1.Id), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "[2]: Size of 8 kB must be less than 5 kB." });
+            ["[2]: Size of 8 kB must be less than 5 kB."]);
     }
 
     [Fact]
@@ -134,7 +134,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(Document.Id, Image1.Id), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "[1]: Not of expected type: Image." });
+            ["[1]: Not of expected type: Image."]);
     }
 
     [Theory]
@@ -146,7 +146,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(Document.Id, videoOrImageId), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "[2]: Width 800px must be greater than 1000px." });
+            ["[2]: Width 800px must be greater than 1000px."]);
     }
 
     [Theory]
@@ -158,7 +158,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(Document.Id, videoOrImageId), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "[2]: Width 800px must be less than 700px." });
+            ["[2]: Width 800px must be less than 700px."]);
     }
 
     [Theory]
@@ -170,7 +170,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(Document.Id, videoOrImageId), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "[2]: Height 600px must be greater than 800px." });
+            ["[2]: Height 600px must be greater than 800px."]);
     }
 
     [Theory]
@@ -182,7 +182,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(Document.Id, videoOrImageId), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "[2]: Height 600px must be less than 500px." });
+            ["[2]: Height 600px must be less than 500px."]);
     }
 
     [Theory]
@@ -194,7 +194,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(Document.Id, videoOrImageId), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "[2]: Must have aspect ratio 1:1." });
+            ["[2]: Must have aspect ratio 1:1."]);
     }
 
     [Fact]
@@ -205,7 +205,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(Image1.Id), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must have at least 2 item(s)." });
+            ["Must have at least 2 item(s)."]);
     }
 
     [Fact]
@@ -216,7 +216,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(Image1.Id, Image2.Id), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must not have more than 1 item(s)." });
+            ["Must not have more than 1 item(s)."]);
     }
 
     [Fact]
@@ -227,7 +227,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(Image1.Id, Image1.Id), errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must not contain duplicate values." });
+            ["Must not contain duplicate values."]);
     }
 
     [Fact]
@@ -238,11 +238,10 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(Document.Id, Image1.Id), errors);
 
         errors.Should().BeEquivalentTo(
-            new[]
-            {
+            [
                 "[1]: Must be an allowed extension.",
                 "[2]: Must be an allowed extension."
-            });
+            ]);
     }
 
     private static object CreateValue(params DomainId[] ids)

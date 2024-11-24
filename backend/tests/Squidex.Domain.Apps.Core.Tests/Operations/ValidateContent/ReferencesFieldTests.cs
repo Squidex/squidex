@@ -23,8 +23,15 @@ public class ReferencesFieldTests : IClassFixture<TranslationsFixture>
     private readonly DomainId ref2 = DomainId.NewGuid();
     private readonly IValidatorsFactory factory;
 
-    private sealed class CustomFactory(DomainId schemaId) : IValidatorsFactory
+    private sealed class CustomFactory : IValidatorsFactory
     {
+        private readonly DomainId schemaId;
+
+        public CustomFactory(DomainId schemaId)
+        {
+            this.schemaId = schemaId;
+        }
+
         public IEnumerable<IValidator> CreateValueValidators(ValidationContext context, IField field, ValidatorFactory createFieldValidator)
         {
             if (field is IField<ReferencesFieldProperties> references)
@@ -105,7 +112,7 @@ public class ReferencesFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(null), errors, factory: factory);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Field is required." });
+            ["Field is required."]);
     }
 
     [Fact]
@@ -116,7 +123,7 @@ public class ReferencesFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(), errors, factory: factory);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Field is required." });
+            ["Field is required."]);
     }
 
     [Fact]
@@ -127,7 +134,7 @@ public class ReferencesFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(ref1, ref2), errors, factory: factory);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must have at least 3 item(s)." });
+            ["Must have at least 3 item(s)."]);
     }
 
     [Fact]
@@ -138,7 +145,7 @@ public class ReferencesFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(ref1, ref2), errors, factory: factory);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must not have more than 1 item(s)." });
+            ["Must not have more than 1 item(s)."]);
     }
 
     [Fact]
@@ -149,7 +156,7 @@ public class ReferencesFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(ref1, ref1), errors, factory: factory);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must not contain duplicate values." });
+            ["Must not contain duplicate values."]);
     }
 
     private static JsonValue CreateValue(params DomainId[]? ids)

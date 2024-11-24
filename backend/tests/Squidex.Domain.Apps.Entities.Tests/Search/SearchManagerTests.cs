@@ -19,7 +19,7 @@ public class SearchManagerTests : GivenContext
 
     public SearchManagerTests()
     {
-        sut = new SearchManager(new[] { source1, source2 }, log);
+        sut = new SearchManager([source1, source2], log);
     }
 
     [Fact]

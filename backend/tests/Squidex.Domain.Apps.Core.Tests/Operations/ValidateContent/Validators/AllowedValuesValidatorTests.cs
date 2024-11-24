@@ -42,6 +42,6 @@ public class AllowedValuesValidatorTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(50, errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Not an allowed value." });
+            ["Not an allowed value."]);
     }
 }

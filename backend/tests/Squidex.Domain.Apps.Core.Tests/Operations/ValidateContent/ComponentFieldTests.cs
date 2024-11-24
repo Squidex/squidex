@@ -56,7 +56,7 @@ public class ComponentFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(null, errors, components: components);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Field is required." });
+            ["Field is required."]);
     }
 
     [Fact]
@@ -67,7 +67,7 @@ public class ComponentFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(id.ToString(), "componentField", default), errors, components: components);
 
         errors.Should().BeEquivalentTo(
-            new[] { "componentField: Field is required." });
+            ["componentField: Field is required."]);
     }
 
     [Fact]
@@ -78,7 +78,7 @@ public class ComponentFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(JsonValue.Create("Invalid"), errors, components: components);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Invalid json object, expected object with 'schemaId' field." });
+            ["Invalid json object, expected object with 'schemaId' field."]);
     }
 
     [Fact]
@@ -89,7 +89,7 @@ public class ComponentFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(null, "field", 1), errors, components: components);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Invalid component. No 'schemaId' field found." });
+            ["Invalid component. No 'schemaId' field found."]);
     }
 
     [Fact]
@@ -100,7 +100,7 @@ public class ComponentFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue("invalid", "field", 1), errors, components: components);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Invalid component. Cannot find schema." });
+            ["Invalid component. Cannot find schema."]);
     }
 
     [Fact]
@@ -111,7 +111,7 @@ public class ComponentFieldTests : IClassFixture<TranslationsFixture>
         await sut.ValidateAsync(CreateValue(schemaId1.ToString(), "field", 1), errors, components: components);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Invalid component. Cannot find schema." });
+            ["Invalid component. Cannot find schema."]);
     }
 
     [Fact]

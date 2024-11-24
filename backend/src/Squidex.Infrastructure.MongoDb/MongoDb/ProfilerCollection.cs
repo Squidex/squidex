@@ -27,8 +27,6 @@ public sealed class ProfilerCollection(IMongoDatabase database)
     public async Task ClearAsync(
         CancellationToken ct = default)
     {
-        var database = collection.Database;
-
         await database.RunCommandAsync<BsonDocument>("{ profile : 0 }", cancellationToken: ct);
         await database.DropCollectionAsync(ProfilerDocument.CollectionName, ct);
         await database.RunCommandAsync<BsonDocument>("{ profile : 2 }", cancellationToken: ct);

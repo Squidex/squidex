@@ -36,7 +36,7 @@ public class DefaultJobsServiceTests : GivenContext
         A.CallTo(() => runner2.Name)
             .Returns("job2");
 
-        sut = new DefaultJobService(messaging, new[] { runner1, runner2 }, state.PersistenceFactory);
+        sut = new DefaultJobService(messaging, [runner1, runner2], state.PersistenceFactory);
     }
 
     [Fact]

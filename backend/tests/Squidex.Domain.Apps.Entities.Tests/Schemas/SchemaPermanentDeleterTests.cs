@@ -7,31 +7,32 @@
 
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.TestHelpers;
-using Squidex.Domain.Apps.Entities.Apps.DomainObject;
+using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Domain.Apps.Events.Apps;
+using Squidex.Domain.Apps.Events.Schemas;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 
-namespace Squidex.Domain.Apps.Entities.Apps;
+namespace Squidex.Domain.Apps.Entities.Schemas;
 
-public class AppPermanentDeleterTests : GivenContext
+public class SchemaPermanentDeleterTests : GivenContext
 {
     private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
     private readonly IDeleter deleter1 = A.Fake<IDeleter>();
     private readonly IDeleter deleter2 = A.Fake<IDeleter>();
-    private readonly AppsOptions options = new AppsOptions();
-    private readonly AppPermanentDeleter sut;
+    private readonly SchemasOptions options = new SchemasOptions();
+    private readonly SchemaPermanentDeleter sut;
 
-    public AppPermanentDeleterTests()
+    public SchemaPermanentDeleterTests()
     {
-        sut = new AppPermanentDeleter([deleter1, deleter2], Options.Create(options), domainObjectFactory, TestUtils.TypeRegistry);
+        sut = new SchemaPermanentDeleter(AppProvider, [deleter1, deleter2], Options.Create(options), domainObjectFactory, TestUtils.TypeRegistry);
     }
 
     [Fact]
     public void Should_return_assets_filter_for_events_filter()
     {
-        Assert.Equal(StreamFilter.Prefix("app-"), sut.EventsFilter);
+        Assert.Equal(StreamFilter.Prefix("schema-"), sut.EventsFilter);
     }
 
     [Fact]
@@ -43,25 +44,13 @@ public class AppPermanentDeleterTests : GivenContext
     [Fact]
     public void Should_return_type_name_for_name()
     {
-        Assert.Equal(nameof(AppPermanentDeleter), ((IEventConsumer)sut).Name);
+        Assert.Equal(nameof(SchemaPermanentDeleter), ((IEventConsumer)sut).Name);
     }
 
     [Fact]
     public async Task Should_handle_delete_event()
     {
-        var eventType = TestUtils.TypeRegistry.GetName<IEvent, AppDeleted>();
-
-        var storedEvent =
-            new StoredEvent("stream", "1", 1,
-                new EventData(eventType, [], "payload"));
-
-        Assert.True(await sut.HandlesAsync(storedEvent));
-    }
-
-    [Fact]
-    public async Task Should_handle_contributor_event()
-    {
-        var eventType = TestUtils.TypeRegistry.GetName<IEvent, AppContributorRemoved>();
+        var eventType = TestUtils.TypeRegistry.GetName<IEvent, SchemaDeleted>();
 
         var storedEvent =
             new StoredEvent("stream", "1", 1,
@@ -73,7 +62,7 @@ public class AppPermanentDeleterTests : GivenContext
     [Fact]
     public async Task Should_not_handle_creation_event()
     {
-        var eventType = TestUtils.TypeRegistry.GetName<IEvent, AppCreated>();
+        var eventType = TestUtils.TypeRegistry.GetName<IEvent, SchemaCreated>();
 
         var storedEvent =
             new StoredEvent("stream", "1", 1,
@@ -83,56 +72,42 @@ public class AppPermanentDeleterTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_call_deleters_when_contributor_removed()
-    {
-        await sut.On(Envelope.Create(new AppContributorRemoved
-        {
-            AppId = AppId,
-            ContributorId = "user1"
-        }));
-
-        A.CallTo(() => deleter1.DeleteContributorAsync(AppId.Id, "user1", default))
-            .MustHaveHappened();
-
-        A.CallTo(() => deleter2.DeleteContributorAsync(AppId.Id, "user1", default))
-            .MustHaveHappened();
-    }
-
-    [Fact]
-    public async Task Should_call_deleters_when_app_deleted_and_enabled_globally()
+    public async Task Should_call_deleters_when_schema_deleted_and_enabled_globally()
     {
         options.DeletePermanent = true;
         SetupDomainObject();
 
-        await sut.On(Envelope.Create(new AppDeleted
+        await sut.On(Envelope.Create(new SchemaDeleted
         {
             AppId = AppId,
+            SchemaId = SchemaId,
             Permanent = false
         }));
 
-        A.CallTo(() => deleter1.DeleteAppAsync(App, default))
+        A.CallTo(() => deleter1.DeleteSchemaAsync(App, Schema, default))
             .MustHaveHappened();
 
-        A.CallTo(() => deleter2.DeleteAppAsync(App, default))
+        A.CallTo(() => deleter2.DeleteSchemaAsync(App, Schema, default))
             .MustHaveHappened();
     }
 
     [Fact]
-    public async Task Should_call_deleters_when_app_deleted_and_enabled_per_event()
+    public async Task Should_call_deleters_when_schema_deleted_and_enabled_per_event()
     {
         options.DeletePermanent = false;
         SetupDomainObject();
 
-        await sut.On(Envelope.Create(new AppDeleted
+        await sut.On(Envelope.Create(new SchemaDeleted
         {
             AppId = AppId,
+            SchemaId = SchemaId,
             Permanent = true
         }));
 
-        A.CallTo(() => deleter1.DeleteAppAsync(App, default))
+        A.CallTo(() => deleter1.DeleteSchemaAsync(App, Schema, default))
             .MustHaveHappened();
 
-        A.CallTo(() => deleter2.DeleteAppAsync(App, default))
+        A.CallTo(() => deleter2.DeleteSchemaAsync(App, Schema, default))
             .MustHaveHappened();
     }
 
@@ -141,27 +116,28 @@ public class AppPermanentDeleterTests : GivenContext
     {
         options.DeletePermanent = false;
 
-        await sut.On(Envelope.Create(new AppDeleted
+        await sut.On(Envelope.Create(new SchemaDeleted
         {
             AppId = AppId,
+            SchemaId = SchemaId,
             Permanent = false
         }));
 
-        A.CallTo(() => deleter1.DeleteAppAsync(App, default))
+        A.CallTo(() => deleter1.DeleteSchemaAsync(App, Schema, default))
             .MustNotHaveHappened();
 
-        A.CallTo(() => deleter2.DeleteAppAsync(App, default))
+        A.CallTo(() => deleter2.DeleteSchemaAsync(App, Schema, default))
             .MustNotHaveHappened();
     }
 
     private void SetupDomainObject()
     {
-        var domainObject = A.Fake<AppDomainObject>();
+        var domainObject = A.Fake<SchemaDomainObject>();
 
         A.CallTo(() => domainObject.Snapshot)
-            .Returns(App);
+            .Returns(Schema);
 
-        A.CallTo(() => domainObjectFactory.Create<AppDomainObject>(App.Id))
+        A.CallTo(() => domainObjectFactory.Create<SchemaDomainObject>(DomainId.Combine(App.Id, Schema.Id)))
             .Returns(domainObject);
     }
 }

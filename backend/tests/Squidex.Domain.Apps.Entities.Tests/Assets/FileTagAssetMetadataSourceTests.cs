@@ -99,7 +99,7 @@ public class FileTagAssetMetadataSourceTests : GivenContext
 
         var formatted = sut.Format(source);
 
-        Assert.Equal(new[] { "128x55pt", "00:10:12" }, formatted);
+        Assert.Equal(["128x55pt", "00:10:12"], formatted);
     }
 
     [Fact]

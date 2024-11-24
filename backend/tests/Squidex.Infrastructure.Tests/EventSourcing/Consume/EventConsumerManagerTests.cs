@@ -30,7 +30,7 @@ public class EventConsumerManagerTests
         A.CallTo(() => consumer2.Name)
             .Returns(consumerName2);
 
-        sut = new EventConsumerManager(persistenceFactory, new[] { consumer1, consumer2 }, messaging);
+        sut = new EventConsumerManager(persistenceFactory, [consumer1, consumer2], messaging);
     }
 
     [Fact]

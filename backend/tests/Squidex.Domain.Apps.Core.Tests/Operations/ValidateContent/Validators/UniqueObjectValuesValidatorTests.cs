@@ -18,7 +18,7 @@ public class UniqueObjectValuesValidatorTests : IClassFixture<TranslationsFixtur
     [Fact]
     public async Task Should_not_add_errors_if_value_is_invalid()
     {
-        var sut = new UniqueObjectValuesValidator(new[] { "myString" });
+        var sut = new UniqueObjectValuesValidator(["myString"]);
 
         await sut.ValidateAsync(1, errors);
 
@@ -28,7 +28,7 @@ public class UniqueObjectValuesValidatorTests : IClassFixture<TranslationsFixtur
     [Fact]
     public async Task Should_not_add_errors_if_value_is_null()
     {
-        var sut = new UniqueObjectValuesValidator(new[] { "myString" });
+        var sut = new UniqueObjectValuesValidator(["myString"]);
 
         await sut.ValidateAsync(null, errors);
 
@@ -38,7 +38,7 @@ public class UniqueObjectValuesValidatorTests : IClassFixture<TranslationsFixtur
     [Fact]
     public async Task Should_not_add_error_if_objects_contain_not_duplicates()
     {
-        var sut = new UniqueObjectValuesValidator(new[] { "myString" });
+        var sut = new UniqueObjectValuesValidator(["myString"]);
 
         await sut.ValidateAsync(new[]
         {
@@ -55,7 +55,7 @@ public class UniqueObjectValuesValidatorTests : IClassFixture<TranslationsFixtur
     [Fact]
     public async Task Should_not_add_error_if_objects_contain_unchecked_duplicates()
     {
-        var sut = new UniqueObjectValuesValidator(new[] { "myString" });
+        var sut = new UniqueObjectValuesValidator(["myString"]);
 
         await sut.ValidateAsync(new[]
         {
@@ -72,7 +72,7 @@ public class UniqueObjectValuesValidatorTests : IClassFixture<TranslationsFixtur
     [Fact]
     public async Task Should_add_error_if_objects_contain_duplicates()
     {
-        var sut = new UniqueObjectValuesValidator(new[] { "myString" });
+        var sut = new UniqueObjectValuesValidator(["myString"]);
 
         await sut.ValidateAsync(new[]
         {
@@ -84,13 +84,13 @@ public class UniqueObjectValuesValidatorTests : IClassFixture<TranslationsFixtur
         errors);
 
         errors.Should().BeEquivalentTo(
-            new[] { "Must not contain items with duplicate 'myString' fields." });
+            ["Must not contain items with duplicate 'myString' fields."]);
     }
 
     [Fact]
     public async Task Should_add_errors_if_objects_contain_multiple_duplicates()
     {
-        var sut = new UniqueObjectValuesValidator(new[] { "myString", "myNumber" });
+        var sut = new UniqueObjectValuesValidator(["myString", "myNumber"]);
 
         await sut.ValidateAsync(new[]
         {
@@ -104,10 +104,9 @@ public class UniqueObjectValuesValidatorTests : IClassFixture<TranslationsFixtur
         errors);
 
         errors.Should().BeEquivalentTo(
-            new[]
-            {
+            [
                 "Must not contain items with duplicate 'myString' fields.",
                 "Must not contain items with duplicate 'myNumber' fields."
-            });
+            ]);
     }
 }

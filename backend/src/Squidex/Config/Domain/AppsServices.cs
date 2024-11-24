@@ -22,14 +22,14 @@ public static class AppsServices
 {
     public static void AddSquidexApps(this IServiceCollection services, IConfiguration config)
     {
-        if (config.GetValue<bool>("apps:deletePermanent"))
-        {
-            services.AddSingletonAs<AppPermanentDeleter>()
-                .As<IEventConsumer>();
-        }
+        services.Configure<AppsOptions>(config,
+            "apps");
 
         services.AddSingletonAs<RolePermissionsProvider>()
             .AsSelf();
+
+        services.AddSingletonAs<AppPermanentDeleter>()
+            .As<IEventConsumer>();
 
         services.AddSingletonAs<AppEventDeleter>()
             .As<IDeleter>();

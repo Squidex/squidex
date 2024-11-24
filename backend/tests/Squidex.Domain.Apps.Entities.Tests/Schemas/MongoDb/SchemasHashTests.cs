@@ -18,9 +18,14 @@ using Squidex.Infrastructure.EventSourcing;
 namespace Squidex.Domain.Apps.Entities.Schemas.MongoDb;
 
 [Trait("Category", "Dependencies")]
-public class SchemasHashTests(SchemasHashFixture fixture) : GivenContext, IClassFixture<SchemasHashFixture>
+public class SchemasHashTests : GivenContext, IClassFixture<SchemasHashFixture>
 {
-    public SchemasHashFixture _ { get; } = fixture;
+    public SchemasHashFixture _ { get; }
+
+    public SchemasHashTests(SchemasHashFixture fixture)
+    {
+        _ = fixture;
+    }
 
     [Fact]
     public async Task Should_compute_cache_independent_from_order()
@@ -28,8 +33,8 @@ public class SchemasHashTests(SchemasHashFixture fixture) : GivenContext, IClass
         var schema1 = Schema.WithId(DomainId.NewGuid(), "my-schema");
         var schema2 = Schema.WithId(DomainId.NewGuid(), "my-schema") with { Version = 3 };
 
-        var hash1 = await _.SchemasHash.ComputeHashAsync(App, new[] { schema1, schema2 }, CancellationToken);
-        var hash2 = await _.SchemasHash.ComputeHashAsync(App, new[] { schema2, schema1 }, CancellationToken);
+        var hash1 = await _.SchemasHash.ComputeHashAsync(App, [schema1, schema2], CancellationToken);
+        var hash2 = await _.SchemasHash.ComputeHashAsync(App, [schema2, schema1], CancellationToken);
 
         Assert.NotNull(hash1);
         Assert.NotNull(hash2);
@@ -44,10 +49,10 @@ public class SchemasHashTests(SchemasHashFixture fixture) : GivenContext, IClass
 
         var timestamp = SystemClock.Instance.GetCurrentInstant().WithoutMs();
 
-        var computedHash = await _.SchemasHash.ComputeHashAsync(App, new[] { schema1, schema2 }, CancellationToken);
+        var computedHash = await _.SchemasHash.ComputeHashAsync(App, [schema1, schema2], CancellationToken);
 
-        await _.SchemasHash.On(new[]
-        {
+        await _.SchemasHash.On(
+        [
             Envelope.Create<IEvent>(new SchemaCreated
             {
                 AppId = AppId,
@@ -59,7 +64,7 @@ public class SchemasHashTests(SchemasHashFixture fixture) : GivenContext, IClass
                 AppId = AppId,
                 SchemaId = schema2.NamedId()
             }).SetEventStreamNumber(schema2.Version).SetTimestamp(timestamp)
-        });
+        ]);
 
         var (dbTime, dbHash) = await _.SchemasHash.GetCurrentHashAsync(App, CancellationToken);
 

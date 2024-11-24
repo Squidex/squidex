@@ -28,7 +28,7 @@ public class ScriptingCompleterTests
 
         dataSchema = schema.BuildDataSchema(LanguagesConfig.English.ToResolver(), ResolvedComponents.Empty);
 
-        sut = new ScriptingCompleter(new[] { scriptDescriptor1, scriptDescriptor2 });
+        sut = new ScriptingCompleter([scriptDescriptor1, scriptDescriptor2]);
     }
 
     [Fact]

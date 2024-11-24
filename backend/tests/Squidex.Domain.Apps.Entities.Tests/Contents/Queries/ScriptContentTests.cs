@@ -31,7 +31,7 @@ public class ScriptContentTests : GivenContext
     {
         var content = CreateContent();
 
-        await sut.EnrichAsync(ApiContext, new[] { content }, SchemaProvider(), CancellationToken);
+        await sut.EnrichAsync(ApiContext, [content], SchemaProvider(), CancellationToken);
 
         A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -47,7 +47,7 @@ public class ScriptContentTests : GivenContext
 
         var content = CreateContent();
 
-        await sut.EnrichAsync(FrontendContext, new[] { content }, SchemaProvider(), CancellationToken);
+        await sut.EnrichAsync(FrontendContext, [content], SchemaProvider(), CancellationToken);
 
         A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -63,7 +63,7 @@ public class ScriptContentTests : GivenContext
 
         var content = CreateContent();
 
-        await sut.EnrichAsync(ContextWithNoScript(), new[] { content }, SchemaProvider(), CancellationToken);
+        await sut.EnrichAsync(ContextWithNoScript(), [content], SchemaProvider(), CancellationToken);
 
         A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -80,7 +80,7 @@ public class ScriptContentTests : GivenContext
         var contentBefore = CreateContent();
         var contentData = contentBefore.Data;
 
-        await sut.EnrichAsync(ApiContext, new[] { contentBefore }, SchemaProvider(), CancellationToken);
+        await sut.EnrichAsync(ApiContext, [contentBefore], SchemaProvider(), CancellationToken);
 
         Assert.NotSame(contentBefore.Data, contentData);
 
@@ -109,7 +109,7 @@ public class ScriptContentTests : GivenContext
         var contentBefore = CreateContent();
         var contentData = contentBefore.Data;
 
-        await sut.EnrichAsync(ApiContext, new[] { contentBefore }, SchemaProvider(), CancellationToken);
+        await sut.EnrichAsync(ApiContext, [contentBefore], SchemaProvider(), CancellationToken);
 
         Assert.NotSame(contentBefore.Data, contentData);
 
@@ -160,7 +160,7 @@ public class ScriptContentTests : GivenContext
 
         var sut2 = new ScriptContent(realScriptEngine);
 
-        await sut2.EnrichAsync(ApiContext, new[] { content }, SchemaProvider(), CancellationToken);
+        await sut2.EnrichAsync(ApiContext, [content], SchemaProvider(), CancellationToken);
 
         Assert.Equal(JsonValue.Create(123), content.Data["test"]!["iv"]);
     }

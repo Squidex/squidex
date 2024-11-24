@@ -63,11 +63,11 @@ public class ContentsSearchSourceTests : GivenContext
                     .AddField("field2",
                         new ContentFieldData()
                             .AddInvariant("world")),
-            ReferenceFields = new[]
-            {
+            ReferenceFields =
+            [
                 Fields.String(1, "field1", Partitioning.Invariant),
                 Fields.String(2, "field2", Partitioning.Invariant)
-            },
+            ],
             SchemaId = schemaId1
         };
 
@@ -84,10 +84,10 @@ public class ContentsSearchSourceTests : GivenContext
                     .AddField("field",
                         new ContentFieldData()
                             .AddInvariant("hello")),
-            ReferenceFields = new[]
-            {
+            ReferenceFields =
+            [
                 Fields.String(1, "field", Partitioning.Invariant)
-            },
+            ],
             SchemaId = schemaId1
         };
 
@@ -105,10 +105,10 @@ public class ContentsSearchSourceTests : GivenContext
                     .AddField("field",
                         new ContentFieldData()
                             .AddLocalized("en", "hello")),
-            ReferenceFields = new[]
-            {
+            ReferenceFields =
+            [
                 Fields.String(1, "field", Partitioning.Language)
-            },
+            ],
             SchemaId = schemaId1
         };
 
@@ -130,10 +130,10 @@ public class ContentsSearchSourceTests : GivenContext
                     .AddField("field",
                         new ContentFieldData()
                             .AddLocalized("en", "resolved")),
-            ReferenceFields = new[]
-            {
+            ReferenceFields =
+            [
                 Fields.String(1, "field", Partitioning.Language)
-            },
+            ],
             SchemaId = schemaId1
         };
 

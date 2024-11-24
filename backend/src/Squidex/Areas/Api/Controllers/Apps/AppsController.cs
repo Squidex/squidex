@@ -220,6 +220,7 @@ public sealed class AppsController(ICommandBus commandBus, IAppProvider appProvi
     /// Delete the app.
     /// </summary>
     /// <param name="app">The name of the app to delete.</param>
+    /// <param name="request">The request parameters.</param>
     /// <response code="204">App deleted.</response>
     /// <response code="404">App not found.</response>
     [HttpDelete]
@@ -227,9 +228,9 @@ public sealed class AppsController(ICommandBus commandBus, IAppProvider appProvi
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ApiPermission(PermissionIds.AppDelete)]
     [ApiCosts(0)]
-    public async Task<IActionResult> DeleteApp(string app)
+    public async Task<IActionResult> DeleteApp(string app, DeleteAppDto request)
     {
-        var command = new DeleteApp();
+        var command = request.ToCommand();
 
         await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
