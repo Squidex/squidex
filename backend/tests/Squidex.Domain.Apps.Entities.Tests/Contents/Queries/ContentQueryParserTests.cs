@@ -26,7 +26,7 @@ public class ContentQueryParserTests : GivenContext
 
     public ContentQueryParserTests()
     {
-        var options = Options.Create(new ContentOptions { DefaultPageSize = 30 });
+        var options = Options.Create(new ContentsOptions { DefaultPageSize = 30 });
 
         Schema = Schema
             .AddString(1, "firstName", Partitioning.Invariant)

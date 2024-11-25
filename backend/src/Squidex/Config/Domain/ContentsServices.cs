@@ -24,7 +24,7 @@ public static class ContentsServices
 {
     public static void AddSquidexContents(this IServiceCollection services, IConfiguration config)
     {
-        services.Configure<ContentOptions>(config,
+        services.Configure<ContentsOptions>(config,
             "contents");
 
         services.Configure<TemplatesOptions>(config,

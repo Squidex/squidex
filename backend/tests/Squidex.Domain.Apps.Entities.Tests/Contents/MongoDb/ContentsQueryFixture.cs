@@ -75,7 +75,7 @@ public abstract class ContentsQueryFixture : GivenContext, IAsyncLifetime
 
         var services =
             new ServiceCollection()
-                .AddSingleton(Options.Create(new ContentOptions { OptimizeForSelfHosting = selfHosting }))
+                .AddSingleton(Options.Create(new ContentsOptions { OptimizeForSelfHosting = selfHosting }))
                 .AddSingleton(CreateAppProvider())
                 .AddSingleton(mongoClient)
                 .AddSingleton(mongoDatabase)

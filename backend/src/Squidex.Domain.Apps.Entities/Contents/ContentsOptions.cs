@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public sealed class ContentOptions
+public sealed class ContentsOptions
 {
     public bool CanCache { get; set; }
 

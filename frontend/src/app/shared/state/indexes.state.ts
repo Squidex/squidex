@@ -93,7 +93,7 @@ export class IndexesState extends State<Snapshot> {
             finalize(() => {
                 this.next({ isLoading: false }, 'Loading Done');
             }),
-            shareSubscribed(this.dialogs));
+            shareSubscribed(this.dialogs, { silent }));
     }
 
     public create(request: CreateIndexDto): Observable<any> {

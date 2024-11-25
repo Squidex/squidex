@@ -9,6 +9,7 @@ using System.Text.Json;
 using Microsoft.Extensions.Options;
 using Squidex.AI;
 using Squidex.Areas.Api.Controllers.UI;
+using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Hosting;
 using Squidex.Text.Translations;
@@ -54,6 +55,13 @@ public static class FontendServices
             var chatAgent = services.GetRequiredService<IChatAgent>();
 
             options.More["canUseChatBot"] = chatAgent.IsConfigured;
+        });
+
+        services.Configure<MyUIOptions>((services, options) =>
+        {
+            var contentsOptions = services.GetRequiredService<IOptions<ContentsOptions>>();
+
+            options.More["canCreateIndexes"] = contentsOptions.Value.OptimizeForSelfHosting;
         });
 
         services.Configure<MyUIOptions>((services, options) =>

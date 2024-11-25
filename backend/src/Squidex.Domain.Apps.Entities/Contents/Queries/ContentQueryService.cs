@@ -22,12 +22,12 @@ public sealed class ContentQueryService(
     IContentEnricher contentEnricher,
     IContentRepository contentRepository,
     IContentLoader contentLoader,
-    IOptions<ContentOptions> options,
+    IOptions<ContentsOptions> options,
     ContentQueryParser queryParser)
     : IContentQueryService
 {
     private const string SingletonId = "_schemaId_";
-    private readonly ContentOptions options = options.Value;
+    private readonly ContentsOptions options = options.Value;
 
     public async IAsyncEnumerable<EnrichedContent> StreamAsync(Context context, string schemaIdOrName, int skip,
         [EnumeratorCancellation] CancellationToken ct = default)

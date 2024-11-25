@@ -27,12 +27,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries;
 public class ContentQueryParser(
     IAppProvider appprovider,
     ITextIndex textIndex,
-    IOptions<ContentOptions> options,
+    IOptions<ContentsOptions> options,
     IMemoryCache cache,
     IJsonSerializer serializer)
 {
     private static readonly TimeSpan CacheTime = TimeSpan.FromMinutes(60);
-    private readonly ContentOptions options = options.Value;
+    private readonly ContentsOptions options = options.Value;
 
     public virtual async Task<Q> ParseAsync(Context context, Q q, Schema? schema = null,
         CancellationToken ct = default)

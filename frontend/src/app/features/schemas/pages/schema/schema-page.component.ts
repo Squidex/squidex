@@ -6,10 +6,10 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { map } from 'rxjs/operators';
-import { ConfirmClickDirective, defined, DropdownMenuComponent, LayoutComponent, ListViewComponent, MessageBus, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, SchemasState, SidebarMenuDirective, Subscriptions, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { ConfirmClickDirective, defined, DropdownMenuComponent, LayoutComponent, ListViewComponent, MessageBus, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, SchemasState, SidebarMenuDirective, Subscriptions, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, UIOptions } from '@app/shared';
 import { SchemaCloning } from '../messages';
 import { SchemaEditFormComponent } from './common/schema-edit-form.component';
 import { SchemaExportFormComponent } from './export/schema-export-form.component';
@@ -54,7 +54,7 @@ import { SchemaUIFormComponent } from './ui/schema-ui-form.component';
 export class SchemaPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();
 
-    public readonly exact = { exact: true };
+    public readonly canCreateIndexes = inject(UIOptions).value.canCreateIndexes;
 
     public schema!: SchemaDto;
     public schemaTab = this.route.queryParams.pipe(map(x => x['tab'] || 'fields'));

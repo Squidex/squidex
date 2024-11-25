@@ -28,11 +28,13 @@
                         {{ "schemas.tabJson" | sqxTranslate }}
                     </a>
                 </li>
-                <li>
-                    <a class="nav-link" [class.active]="tab === 'indexes'" [queryParams]="{ tab: 'indexes' }" [routerLink]="[]">
-                        {{ "schemas.tabIndexes" | sqxTranslate }}
-                    </a>
-                </li>
+                @if (canCreateIndexes) {
+                    <li>
+                        <a class="nav-link" [class.active]="tab === 'indexes'" [queryParams]="{ tab: 'indexes' }" [routerLink]="[]">
+                            {{ "schemas.tabIndexes" | sqxTranslate }}
+                        </a>
+                    </li>
+                }
                 <li>
                     <a class="nav-link" [class.active]="tab === 'more'" [queryParams]="{ tab: 'more' }" [routerLink]="[]">
                         {{ "schemas.tabMore" | sqxTranslate }}

@@ -91,7 +91,7 @@ describe('JobsService', () => {
                     ]));
         }));
 
-    it('should return null if get restore return 404',
+    it('should return null if get restore returns 404',
         inject([JobsService, HttpTestingController], (jobsService: JobsService, httpMock: HttpTestingController) => {
             let restore: RestoreDto | null;
 
@@ -109,7 +109,7 @@ describe('JobsService', () => {
             expect(restore!).toBeNull();
         }));
 
-    it('should throw error if get restore return non 404',
+    it('should throw error if get restore returns non 404',
         inject([JobsService, HttpTestingController], (jobsService: JobsService, httpMock: HttpTestingController) => {
             let error: any;
 
