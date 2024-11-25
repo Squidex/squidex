@@ -28,9 +28,9 @@
                     <div class="card card-body mb-4">
                         <h5 class="card-title">Squidex Referal Program</h5>
                         <sqx-form-hint>
-                            <div [innerHTML]="'plans.referralHint' | sqxTranslate: referral | sqxMarkdown | sqxSafeHtml"></div>
-                            <div [innerHTML]="referral.condition | sqxMarkdown | sqxSafeHtml"></div>
-                            <div [innerHTML]="'plans.referralEarned' | sqxTranslate: referral | sqxMarkdown | sqxSafeHtml"></div>
+                            <div [sqxMarkdown]="'plans.referralHint' | sqxTranslate: referral"></div>
+                            <div [sqxMarkdown]="referral.condition"></div>
+                            <div [sqxMarkdown]="'plans.referralEarned' | sqxTranslate: referral"></div>
                         </sqx-form-hint>
                     </div>
                 }

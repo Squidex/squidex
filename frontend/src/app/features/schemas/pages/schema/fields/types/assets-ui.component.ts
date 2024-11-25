@@ -7,7 +7,7 @@
 
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { AssetFolderDropdownComponent, AssetsFieldPropertiesDto, FieldDto, FormHintComponent, MarkdownInlinePipe, SafeHtmlPipe, TranslatePipe } from '@app/shared';
+import { AssetFolderDropdownComponent, AssetsFieldPropertiesDto, FieldDto, FormHintComponent, MarkdownDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -18,9 +18,8 @@ import { AssetFolderDropdownComponent, AssetsFieldPropertiesDto, FieldDto, FormH
         AssetFolderDropdownComponent,
         FormHintComponent,
         FormsModule,
-        MarkdownInlinePipe,
+        MarkdownDirective,
         ReactiveFormsModule,
-        SafeHtmlPipe,
         TranslatePipe,
     ],
 })

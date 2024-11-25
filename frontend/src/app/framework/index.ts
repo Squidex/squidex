@@ -73,7 +73,6 @@ export * from './angular/pipes/colors.pipes';
 export * from './angular/pipes/date-time.pipes';
 export * from './angular/pipes/highlight.pipe';
 export * from './angular/pipes/keys.pipe';
-export * from './angular/pipes/markdown.pipe';
 export * from './angular/pipes/name.pipe';
 export * from './angular/pipes/numbers.pipes';
 export * from './angular/pipes/strings.pipes';

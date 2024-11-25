@@ -14,6 +14,7 @@ import { SchemaCloning } from '../messages';
 import { SchemaEditFormComponent } from './common/schema-edit-form.component';
 import { SchemaExportFormComponent } from './export/schema-export-form.component';
 import { SchemaFieldsComponent } from './fields/schema-fields.component';
+import { SchemaIndexesComponent } from './indexes/schema-indexes.component';
 import { SchemaPreviewUrlsFormComponent } from './preview/schema-preview-urls-form.component';
 import { SchemaFieldRulesFormComponent } from './rules/schema-field-rules-form.component';
 import { SchemaScriptsFormComponent } from './scripts/schema-scripts-form.component';
@@ -39,6 +40,7 @@ import { SchemaUIFormComponent } from './ui/schema-ui-form.component';
         SchemaExportFormComponent,
         SchemaFieldRulesFormComponent,
         SchemaFieldsComponent,
+        SchemaIndexesComponent,
         SchemaPreviewUrlsFormComponent,
         SchemaScriptsFormComponent,
         SchemaUIFormComponent,

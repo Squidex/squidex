@@ -8,9 +8,8 @@
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ErrorDto, TypedSimpleChanges } from '@app/framework/internal';
-import { MarkdownPipe } from '../pipes/markdown.pipe';
+import { MarkdownDirective } from '../markdown.directive';
 import { TranslatePipe } from '../pipes/translate.pipe';
-import { SafeHtmlPipe } from '../safe-html.pipe';
 
 @Component({
     standalone: true,
@@ -19,8 +18,7 @@ import { SafeHtmlPipe } from '../safe-html.pipe';
     templateUrl: './form-error.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        MarkdownPipe,
-        SafeHtmlPipe,
+        MarkdownDirective,
         TranslatePipe,
     ],
 })

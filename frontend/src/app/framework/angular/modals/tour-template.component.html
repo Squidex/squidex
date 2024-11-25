@@ -19,9 +19,9 @@
             </div>
 
             <div class="col">
-                <h5 [innerHTML]="currentStep.title | sqxTranslate | sqxMarkdownInline | sqxSafeHtml"></h5>
+                <h5 inline="true" [sqxMarkdown]="currentStep.title | sqxTranslate"></h5>
 
-                <div [innerHTML]="currentStep.content | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
+                <div [sqxMarkdown]="currentStep.content | sqxTranslate"></div>
             </div>
 
             <div class="col-auto">

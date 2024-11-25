@@ -8,7 +8,7 @@
 
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { fadeAnimation, MarkdownPipe, ModalDialogComponent, SafeHtmlPipe, slideAnimation, TourState, TranslatePipe, UsersService } from '@app/shared';
+import { fadeAnimation, MarkdownDirective, ModalDialogComponent, slideAnimation, TourState, TranslatePipe, UsersService } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -20,10 +20,9 @@ import { fadeAnimation, MarkdownPipe, ModalDialogComponent, SafeHtmlPipe, slideA
     ],
     imports: [
         FormsModule,
-        MarkdownPipe,
+        MarkdownDirective,
         ModalDialogComponent,
         ReactiveFormsModule,
-        SafeHtmlPipe,
         TranslatePipe,
     ],
 })

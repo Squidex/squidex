@@ -29,6 +29,11 @@
                     </a>
                 </li>
                 <li>
+                    <a class="nav-link" [class.active]="tab === 'indexes'" [queryParams]="{ tab: 'indexes' }" [routerLink]="[]">
+                        {{ "schemas.tabIndexes" | sqxTranslate }}
+                    </a>
+                </li>
+                <li>
                     <a class="nav-link" [class.active]="tab === 'more'" [queryParams]="{ tab: 'more' }" [routerLink]="[]">
                         {{ "schemas.tabMore" | sqxTranslate }}
                     </a>
@@ -93,6 +98,9 @@
                 }
                 @case ("json") {
                     <sqx-schema-export-form [schema]="schema"></sqx-schema-export-form>
+                }
+                @case ("indexes") {
+                    <sqx-schema-indexes [schema]="schema"></sqx-schema-indexes>
                 }
                 @case ("more") {
                     <sqx-list-view innerWidth="50rem">

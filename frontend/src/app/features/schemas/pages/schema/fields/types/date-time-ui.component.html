@@ -21,7 +21,7 @@
             <input class="form-control" id="{{ field.fieldId }}_fieldFormat" formControlName="format" maxlength="100" />
 
             <sqx-form-hint>
-                <span [innerHTML]="'schemas.fieldTypes.dateTime.formatHint' | sqxTranslate | sqxMarkdownInline | sqxSafeHtml"></span>
+                <span inline="true" [sqxMarkdown]="'schemas.fieldTypes.dateTime.formatHint' | sqxTranslate"></span>
             </sqx-form-hint>
         </div>
     </div>

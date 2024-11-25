@@ -9,7 +9,7 @@
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { AutocompleteComponent, AutocompleteSource, bounceAnimation, ConfirmClickDirective, FromNowPipe, MarkdownPipe, NOOP_DATASOURCE, SafeHtmlPipe, ScrollActiveDirective, TooltipDirective, TranslatePipe } from '@app/framework';
+import { AutocompleteComponent, AutocompleteSource, bounceAnimation, ConfirmClickDirective, FromNowPipe, MarkdownDirective, NOOP_DATASOURCE, ScrollActiveDirective, TooltipDirective, TranslatePipe } from '@app/framework';
 import { CommentItem, CommentsState, DialogService, Keys, StatefulComponent, UpsertCommentForm } from '@app/shared/internal';
 import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
 
@@ -30,10 +30,9 @@ interface State {
         AutocompleteComponent,
         ConfirmClickDirective,
         FromNowPipe,
-        MarkdownPipe,
+        MarkdownDirective,
         ReactiveFormsModule,
         RouterLink,
-        SafeHtmlPipe,
         ScrollActiveDirective,
         TooltipDirective,
         TranslatePipe,

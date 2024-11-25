@@ -7,13 +7,6 @@
 
 .anchor {
     @include absolute(0, null, null, 0);
-    background-color: red !important;
-    z-index: 1000;
-    opacity: .1;
-
-    & * {    
-        background-color: red !important;
-    }
 
     &.full-size {
         @include absolute(0, 0, 0, 0);

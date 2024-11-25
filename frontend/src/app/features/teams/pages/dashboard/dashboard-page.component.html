@@ -7,7 +7,7 @@
                 <h1 class="dashboard-title">{{ "dashboard.welcomeTitle" | sqxTranslate: { user: user } }}</h1>
                 <div
                     class="subtext"
-                    [innerHTML]="'dashboard.welcomeTextTeam' | sqxTranslate: { team: team.name } | sqxMarkdown | sqxSafeHtml"></div>
+                    [sqxMarkdown]="'dashboard.welcomeTextTeam' | sqxTranslate: { team: team.name }"></div>
             </div>
         }
         <gridster #grid [options]="gridOptions">

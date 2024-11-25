@@ -94,7 +94,7 @@
                         [query]="query"
                         (queryChange)="changeQuery($event)"></sqx-query>
 
-                    <div class="link" [innerHTML]="'search.help' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
+                    <div class="link" [sqxMarkdown]="'search.help' | sqxTranslate"></div>
                 </div>
             }
         } @else if (queries && queriesTypes) {

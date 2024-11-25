@@ -7,7 +7,7 @@
 
 import { AsyncPipe, KeyValuePipe } from '@angular/common';
 import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, ClientTourStated, CodeComponent, DialogService, ExternalLinkDirective, FormHintComponent, HelpService, MarkdownDirective, MarkdownInlinePipe, MarkdownPipe, MessageBus, ModalDialogComponent, SafeHtmlPipe, SDKEntry, TooltipDirective, TranslatePipe } from '@app/shared';
+import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, ClientTourStated, CodeComponent, DialogService, ExternalLinkDirective, FormHintComponent, HelpService, MarkdownDirective, MessageBus, ModalDialogComponent, SDKEntry, TooltipDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -21,10 +21,7 @@ import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, Cli
         FormHintComponent,
         KeyValuePipe,
         MarkdownDirective,
-        MarkdownInlinePipe,
-        MarkdownPipe,
         ModalDialogComponent,
-        SafeHtmlPipe,
         TooltipDirective,
         TranslatePipe,
     ],

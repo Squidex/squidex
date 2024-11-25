@@ -1132,9 +1132,6 @@
   <data name="users.lockYourselfError" xml:space="preserve">
     <value>You cannot lock yourself.</value>
   </data>
-  <data name="users.login.askAdmin" xml:space="preserve">
-    <value />
-  </data>
   <data name="users.login.custom" xml:space="preserve">
     <value>Enter your E-Mail Address to login with your Company Account and single sign on (SSO).</value>
   </data>
@@ -1149,18 +1146,6 @@
   </data>
   <data name="users.login.loginWith" xml:space="preserve">
     <value>{action} with &lt;strong&gt;{provider}&lt;/strong&gt;</value>
-  </data>
-  <data name="users.login.noAccountLoginAction" xml:space="preserve">
-    <value>Click here to login</value>
-  </data>
-  <data name="users.login.noAccountLoginQuestion" xml:space="preserve">
-    <value>Already registered?</value>
-  </data>
-  <data name="users.login.noAccountSignupAction" xml:space="preserve">
-    <value>Click here to signup</value>
-  </data>
-  <data name="users.login.noAccountSignupQuestion" xml:space="preserve">
-    <value>No account yet?</value>
   </data>
   <data name="users.login.passwordPlaceholder" xml:space="preserve">
     <value>Enter Password</value>

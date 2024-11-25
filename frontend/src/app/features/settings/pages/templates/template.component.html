@@ -25,7 +25,7 @@
             </div>
             <div class="table-items-row-details-tab">
                 @if (details | async; as loadedDetails) {
-                    <div class="help" [innerHTML]="loadedDetails | sqxMarkdown | sqxSafeHtml"></div>
+                    <div class="help" [sqxMarkdown]="loadedDetails"></div>
                 } @else {
                     <sqx-loader></sqx-loader>
                 }

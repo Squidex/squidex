@@ -11,9 +11,8 @@ import { FormsModule } from '@angular/forms';
 import { timer } from 'rxjs';
 import { DialogModel, DialogRequest, DialogService, fadeAnimation, Notification, StatefulComponent, Subscriptions, Tooltip } from '@app/framework/internal';
 import { FocusOnInitDirective } from '../forms/focus-on-init.directive';
-import { MarkdownPipe } from '../pipes/markdown.pipe';
+import { MarkdownDirective } from '../markdown.directive';
 import { TranslatePipe } from '../pipes/translate.pipe';
-import { SafeHtmlPipe } from '../safe-html.pipe';
 import { ModalDialogComponent } from './modal-dialog.component';
 import { ModalPlacementDirective } from './modal-placement.directive';
 import { ModalDirective } from './modal.directive';
@@ -42,11 +41,10 @@ interface State {
     imports: [
         FocusOnInitDirective,
         FormsModule,
-        MarkdownPipe,
+        MarkdownDirective,
         ModalDialogComponent,
         ModalDirective,
         ModalPlacementDirective,
-        SafeHtmlPipe,
         TooltipDirective,
         TranslatePipe,
     ],

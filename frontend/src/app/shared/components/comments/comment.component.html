@@ -26,7 +26,7 @@
                             {{ commentItem.comment.user | sqxUserNameRef: null }}
                         </div>
                     </div>
-                    <div [innerHTML]="commentItem.comment.text | sqxMarkdown | sqxSafeHtml"></div>
+                    <div [sqxMarkdown]="commentItem.comment.text"></div>
                     <div class="comment-created text-muted">
                         @if (canFollow && commentItem.comment.url) {
                             <a [routerLink]="commentItem.comment.url">{{ "comments.follow" | sqxTranslate }}</a>

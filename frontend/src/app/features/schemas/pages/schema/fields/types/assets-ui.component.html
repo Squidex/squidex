@@ -26,7 +26,7 @@
             <input class="form-control" id="{{ field.fieldId }}_previewFormat" formControlName="previewFormat" />
 
             <sqx-form-hint>
-                <span [innerHTML]="'schemas.fieldTypes.assets.previewFormatHint' | sqxTranslate | sqxMarkdownInline | sqxSafeHtml"></span>
+                <span inline="true" [sqxMarkdown]="'schemas.fieldTypes.assets.previewFormatHint' | sqxTranslate"></span>
             </sqx-form-hint>
         </div>
     </div>
@@ -41,7 +41,7 @@
             </div>
 
             <sqx-form-hint>
-                {{ "schemas.fieldTypes.assets.resolveHint" | sqxTranslate | sqxMarkdownInline }}
+                <span inline="true" [sqxMarkdown]="'schemas.fieldTypes.assets.resolveHint' | sqxTranslate"></span>
             </sqx-form-hint>
         </div>
     </div>
