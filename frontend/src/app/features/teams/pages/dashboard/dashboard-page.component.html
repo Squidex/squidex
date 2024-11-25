@@ -5,9 +5,7 @@
         @if (!isScrolled) {
             <div class="dashboard-summary" @fade>
                 <h1 class="dashboard-title">{{ "dashboard.welcomeTitle" | sqxTranslate: { user: user } }}</h1>
-                <div
-                    class="subtext"
-                    [sqxMarkdown]="'dashboard.welcomeTextTeam' | sqxTranslate: { team: team.name }"></div>
+                <div class="subtext" [sqxMarkdown]="'dashboard.welcomeTextTeam' | sqxTranslate: { team: team.name }"></div>
             </div>
         }
         <gridster #grid [options]="gridOptions">

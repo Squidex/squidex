@@ -69,8 +69,8 @@
                 autoFocus="true"
                 autoSelectFirst="false"
                 (editorKeyPress)="onKeyPressUpdate($event)"
-                [itemsSource]="contributors"
                 formControlName="text"
+                [itemsSource]="contributors"
                 startCharacter="@"
                 textArea="true">
             </sqx-autocomplete>
@@ -102,8 +102,8 @@
                         autoFocus="true"
                         autoSelectFirst="false"
                         (editorKeyPress)="onKeyPressReply($event)"
-                        [itemsSource]="contributors"
                         formControlName="text"
+                        [itemsSource]="contributors"
                         sqxFocusOnInit
                         startCharacter="@"
                         textArea="true">

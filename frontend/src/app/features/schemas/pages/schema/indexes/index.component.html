@@ -1,0 +1,57 @@
+<div class="table-items-row table-items-row-expandable">
+    <div class="table-items-row-summary row gx-2 align-items-center">
+        <div class="col">
+            <span class="truncate">{{ index.name }}</span>
+        </div>
+        <div class="col-auto">
+            <div class="float-end">
+                <button
+                    class="btn btn-outline-secondary btn-expand me-1"
+                    attr.aria-label="{{ 'common.options' | sqxTranslate }}"
+                    [class.expanded]="isExpanded"
+                    (click)="toggleExpanded()"
+                    type="button">
+                    <span class="hidden">{{ "common.settings" | sqxTranslate }}</span>
+                    <i class="icon-settings"></i>
+                </button>
+
+                <button
+                    class="btn btn-text-danger"
+                    attr.aria-label="{{ 'common.delete' | sqxTranslate }}"
+                    confirmRememberKey="deleteIndex"
+                    confirmText="i18n:schemas.indexes.deleteConfirmText"
+                    confirmTitle="i18n:schemas.indexes.deleteConfirmTitle"
+                    [disabled]="!index.canDelete"
+                    (sqxConfirmClick)="delete()"
+                    type="button">
+                    <i class="icon-bin2"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    @if (isExpanded) {
+        <div class="table-items-row-details">
+            <table class="table table-sm table-fixed mb-0">
+                <colgroup>
+                    <col />
+                    <col style="width: 300px" />
+                </colgroup>
+                <thead>
+                    <tr>
+                        <th>{{ 'common.field' | sqxTranslate }}</th>
+                        <th>{{ 'common.order' | sqxTranslate }}</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (field of index.fields; track field.name) {
+                        <tr>
+                            <td>{{ field.name }}</td>
+                            <td>{{ field.order }}</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</div>
