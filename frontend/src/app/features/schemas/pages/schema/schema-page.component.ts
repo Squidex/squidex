@@ -54,7 +54,7 @@ import { SchemaUIFormComponent } from './ui/schema-ui-form.component';
 export class SchemaPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();
 
-    public readonly canCreateIndexes = inject(UIOptions).value.canCreateIndexes;
+    public readonly hideIndexes = inject(UIOptions).value.hideIndexes;
 
     public schema!: SchemaDto;
     public schemaTab = this.route.queryParams.pipe(map(x => x['tab'] || 'fields'));

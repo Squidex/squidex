@@ -28,7 +28,7 @@
                         {{ "schemas.tabJson" | sqxTranslate }}
                     </a>
                 </li>
-                @if (canCreateIndexes) {
+                @if (!hideIndexes) {
                     <li>
                         <a class="nav-link" [class.active]="tab === 'indexes'" [queryParams]="{ tab: 'indexes' }" [routerLink]="[]">
                             {{ "schemas.tabIndexes" | sqxTranslate }}

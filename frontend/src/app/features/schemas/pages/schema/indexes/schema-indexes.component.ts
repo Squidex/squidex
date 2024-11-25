@@ -7,9 +7,9 @@
 
 
 import { AsyncPipe } from '@angular/common';
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, inject, Input, OnInit } from '@angular/core';
 import { switchMap, timer } from 'rxjs';
-import { DialogModel, IndexesState, LanguagesState, ListViewComponent, ModalDirective, SchemaDto, Subscriptions, TranslatePipe } from '@app/shared';
+import { CodeComponent, DialogModel, IndexesState, LanguagesState, ListViewComponent, MarkdownDirective, ModalDirective, SchemaDto, Subscriptions, TranslatePipe, UIOptions } from '@app/shared';
 import { IndexFormComponent } from './index-form.component';
 import { IndexComponent } from './index.component';
 
@@ -20,8 +20,10 @@ import { IndexComponent } from './index.component';
     templateUrl: './schema-indexes.component.html',
     imports: [
         AsyncPipe,
+        CodeComponent,
         IndexFormComponent,
         IndexComponent,
+        MarkdownDirective,
         ModalDirective,
         ListViewComponent,
         TranslatePipe,
@@ -29,6 +31,8 @@ import { IndexComponent } from './index.component';
 })
 export class SchemaIndexesComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();
+
+    public readonly canCreateIndexes = inject(UIOptions).value.canCreateIndexes;
 
     @Input({ required: true })
     public schema!: SchemaDto;

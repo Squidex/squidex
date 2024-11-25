@@ -968,6 +968,8 @@
   "schemas.indexes.empty": "No index created yet.",
   "schemas.indexes.hint": "Indexes can be expensive. Analyze your queries and read the following documentation before creating an index: [Documentation](https://www.mongodb.com/docs/manual/core/indexes/index-types/index-compound/)",
   "schemas.indexes.loadFailed": "Failed to load indexes. Please reload.",
+  "schemas.indexes.notEnableHint1": "Indexes cannot be created. You have turn on a feature, which creates a dedicated collection per schema. Use the following environment variable:",
+  "schemas.indexes.notEnableHint2": "Please note, that this does not insert your existing content items to the new collections automatically. You have to run a migration by setting the following environment variable. Start Squidex with rebuild setting once and wait for completion. Then turn it off again.",
   "schemas.indexes.reloaded": "Indexes reloaded.",
   "schemas.listFields": "List Fields",
   "schemas.listFieldsEmpty": "Drop field here or reorder them to show the fields in the content list. When no list field is defined, the first field is used.",
