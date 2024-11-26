@@ -20,7 +20,7 @@
     } @else {
         <div class="table-items-row table-items-row-summary table-items-row-empty text-sm">
             {{ "schemas.indexes.empty" | sqxTranslate }}
-            
+
             <div class="section">
                 <span [sqxMarkdown]="'schemas.indexes.notEnableHint1' | sqxTranslate" trusted="true"></span>
 
@@ -40,7 +40,7 @@
     @if (indexesState.canCreate | async) {
         <button class="btn btn-success index-button" (click)="addIndexDialog.show()" type="button">
             <i class="icon icon-plus index-button-icon"></i>
-            <div class="field-button-text">{{ "schemas.indexes.addIndexButton" | sqxTranslate }}</div>
+            <div class="index-button-text">{{ "schemas.indexes.addIndexButton" | sqxTranslate }}</div>
         </button>
     }
 

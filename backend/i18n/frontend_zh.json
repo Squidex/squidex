@@ -955,7 +955,7 @@
   "schemas.hideFieldFailed": "隐藏字段失败。请重新加载。",
   "schemas.import": "导入Schemas",
   "schemas.indexes.addIndex": "Add Index",
-  "schemas.indexes.addIndexButton": "Index",
+  "schemas.indexes.addIndexButton": "Add Index",
   "schemas.indexes.addTitle": "Add Index",
   "schemas.indexes.created": "Index has been scheduled for creation. It might take a while, depending on the number of existing content items. This page is updated automatically.",
   "schemas.indexes.createFailed": "Failed to create index. Please reload.",
