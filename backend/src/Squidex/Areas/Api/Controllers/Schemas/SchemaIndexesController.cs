@@ -79,7 +79,7 @@ public class SchemaIndexesController(ICommandBus commandBus, IJobService jobServ
     /// <param name="name">The name of the index.</param>
     /// <response code="204">Schema index deletion added to job queue.</response>
     /// <response code="404">Schema or app not found.</response>
-    [HttpPost]
+    [HttpDelete]
     [Route("apps/{app}/schemas/{schema}/indexes/{name}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ApiPermissionOrAnonymous(PermissionIds.AppSchemasIndexes)]

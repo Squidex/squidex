@@ -7,7 +7,7 @@
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ApiUrlConfig, CodeEditorComponent, ConfirmClickDirective, Duration, ExternalLinkDirective, FromNowPipe, JobDto, JobsState, KNumberPipe, StatusIconComponent, TooltipDirective, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { ApiUrlConfig, CodeEditorComponent, ConfirmClickDirective, Duration, ExternalLinkDirective, FromNowPipe, JobDto, JobsState, StatusIconComponent, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -21,9 +21,7 @@ import { ApiUrlConfig, CodeEditorComponent, ConfirmClickDirective, Duration, Ext
         ExternalLinkDirective,
         FormsModule,
         FromNowPipe,
-        KNumberPipe,
         StatusIconComponent,
-        TooltipDirective,
         TranslatePipe,
     ],
 })
@@ -34,7 +32,7 @@ export class JobComponent {
     public duration = '';
     public details = '';
 
-    public expanded = false;
+    public isExpanded = false;
 
     constructor(
         public readonly apiUrl: ApiUrlConfig,
@@ -65,6 +63,6 @@ export class JobComponent {
     }
 
     public toggleExpanded() {
-        this.expanded = !this.expanded;
+        this.isExpanded = !this.isExpanded;
     }
 }

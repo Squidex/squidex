@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { ClientsState, FormAlertComponent, LayoutComponent, ListViewComponent, MarkdownInlinePipe, SafeHtmlPipe, ShortcutDirective, SidebarMenuDirective, TemplatesState, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { ClientsState, FormAlertComponent, LayoutComponent, ListViewComponent, MarkdownDirective, ShortcutDirective, SidebarMenuDirective, TemplatesState, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { TemplateComponent } from './template.component';
 
 @Component({
@@ -21,11 +21,10 @@ import { TemplateComponent } from './template.component';
         FormAlertComponent,
         LayoutComponent,
         ListViewComponent,
-        MarkdownInlinePipe,
+        MarkdownDirective,
         RouterLink,
         RouterLinkActive,
         RouterOutlet,
-        SafeHtmlPipe,
         ShortcutDirective,
         SidebarMenuDirective,
         TemplateComponent,

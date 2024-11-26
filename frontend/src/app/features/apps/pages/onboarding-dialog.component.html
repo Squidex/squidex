@@ -16,7 +16,7 @@
                         {{ "tour.welcome" | sqxTranslate }}
                         <span class="header-focus">{{ "tour.welcomeProduct" | sqxTranslate }}</span>
                     </h1>
-                    <div [innerHTML]="'tour.stepIntroText' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
+                    <div [sqxMarkdown]="'tour.stepIntroText' | sqxTranslate"></div>
                     <div class="mt-4">
                         <button class="btn btn-success" (click)="next()">
                             {{ "tour.stepIntroNext" | sqxTranslate }}
@@ -32,7 +32,7 @@
                 <div class="onboarding-enter-leave" @slide>
                     <form [formGroup]="answersForm" (ngSubmit)="submitAnswers()">
                         <h2>{{ "tour.stepDataTitle" | sqxTranslate }}</h2>
-                        <div [innerHTML]="'tour.stepDataText' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
+                        <div [sqxMarkdown]="'tour.stepDataText' | sqxTranslate"></div>
                         <div class="form-group mt-4">
                             <label for="role">{{ "tour.stepDataCompanyRole" | sqxTranslate }}</label>
                             <select class="form-select" id="companyRole" formControlName="companyRole">
@@ -79,7 +79,7 @@
                 <img class="header-left" @fade src="./images/logo-white-small.png" />
                 <div class="onboarding-enter-leave text-center" @slide>
                     <h2>{{ "tour.stepTourTitle" | sqxTranslate }}</h2>
-                    <div [innerHTML]="'tour.stepTourText' | sqxTranslate | sqxMarkdown | sqxSafeHtml"></div>
+                    <div [sqxMarkdown]="'tour.stepTourText' | sqxTranslate"></div>
                     <div class="mt-4">
                         <button class="btn btn-success" (click)="start()">
                             {{ "tour.startYes" | sqxTranslate }}

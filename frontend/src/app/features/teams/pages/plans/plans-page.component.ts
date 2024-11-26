@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { ApiUrlConfig, ExternalLinkDirective, FormHintComponent, LayoutComponent, ListViewComponent, MarkdownPipe, NotifoComponent, SafeHtmlPipe, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { ApiUrlConfig, ExternalLinkDirective, FormHintComponent, LayoutComponent, ListViewComponent, MarkdownDirective, NotifoComponent, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { TeamPlansState } from '../../internal';
 import { PlanComponent } from './plan.component';
 
@@ -23,13 +23,12 @@ import { PlanComponent } from './plan.component';
         FormHintComponent,
         LayoutComponent,
         ListViewComponent,
-        MarkdownPipe,
+        MarkdownDirective,
         NotifoComponent,
         PlanComponent,
         RouterLink,
         RouterLinkActive,
         RouterOutlet,
-        SafeHtmlPipe,
         ShortcutDirective,
         SidebarMenuDirective,
         TitleComponent,

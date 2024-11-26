@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { AfterViewInit, Component, NgZone, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { GridsterComponent, GridsterConfig, GridsterItem, GridsterItemComponent, GridType } from 'angular-gridster2';
-import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCardComponent, ApiTrafficCardComponent, ApiTrafficSummaryCardComponent, AssetUploadsCountCardComponent, AssetUploadsSizeCardComponent, AssetUploadsSizeSummaryCardComponent, AuthService, CallsUsageDto, CurrentStorageDto, DateTime, defined, fadeAnimation, IFrameCardComponent, LocalStoreService, MarkdownPipe, RandomCatCardComponent, RandomDogCardComponent, SafeHtmlPipe, Settings, StorageUsagePerDateDto, Subscriptions, SupportCardComponent, switchSafe, TeamsState, TitleComponent, TranslatePipe, UsagesService } from '@app/shared';
+import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCardComponent, ApiTrafficCardComponent, ApiTrafficSummaryCardComponent, AssetUploadsCountCardComponent, AssetUploadsSizeCardComponent, AssetUploadsSizeSummaryCardComponent, AuthService, CallsUsageDto, CurrentStorageDto, DateTime, defined, fadeAnimation, IFrameCardComponent, LocalStoreService, MarkdownDirective, RandomCatCardComponent, RandomDogCardComponent, Settings, StorageUsagePerDateDto, Subscriptions, SupportCardComponent, switchSafe, TeamsState, TitleComponent, TranslatePipe, UsagesService } from '@app/shared';
 import { AppsCardComponent } from './cards/apps-card.component';
 
 @Component({
@@ -33,10 +33,9 @@ import { AppsCardComponent } from './cards/apps-card.component';
         GridsterComponent,
         GridsterItemComponent,
         IFrameCardComponent,
-        MarkdownPipe,
+        MarkdownDirective,
         RandomCatCardComponent,
         RandomDogCardComponent,
-        SafeHtmlPipe,
         SupportCardComponent,
         TitleComponent,
         TranslatePipe,

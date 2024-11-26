@@ -114,7 +114,7 @@ public partial class TranslateTemplates(DirectoryInfo folder, TranslationService
                         else
                         {
                             // Keep our original indentation.
-                            textNode.Text = originalPrefix + $"{{{{ '{key}' | sqxTranslate }}}}" + originalSuffix;
+                            textNode.Text = originalPrefix + $"{{{{ \"{key}\" | sqxTranslate }}}}" + originalSuffix;
 
                             isReplaced = true;
                         }
@@ -140,7 +140,7 @@ public partial class TranslateTemplates(DirectoryInfo folder, TranslationService
                         {
                             if (attribute.Name.Contains('[', StringComparison.Ordinal))
                             {
-                                node.SetAttributeValue(attribute.Name, $"{{{{ '{key}' | sqxTranslate }}}}");
+                                node.SetAttributeValue(attribute.Name, $"{{{{ \"{key}\" | sqxTranslate }}}}");
                             }
                             else
                             {

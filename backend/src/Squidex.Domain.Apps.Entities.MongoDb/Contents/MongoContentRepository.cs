@@ -28,7 +28,7 @@ public partial class MongoContentRepository(
     IMongoDatabase database,
     IAppProvider appProvider,
     string shardKey,
-    IOptions<ContentOptions> options,
+    IOptions<ContentsOptions> options,
     ILogger<MongoContentRepository> log)
     : MongoBase<MongoContentEntity>, IContentRepository, IInitializable
 {
@@ -38,7 +38,7 @@ public partial class MongoContentRepository(
     private readonly MongoContentCollection collectionPublished =
             new MongoContentCollection($"States_Contents_Published3{shardKey}", database, log,
                 ReadPreference.Secondary, options.Value.OptimizeForSelfHosting);
-    private readonly ContentOptions options = options.Value;
+    private readonly ContentsOptions options = options.Value;
 
     public bool CanUseTransactions { get; private set; }
 

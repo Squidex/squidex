@@ -35,7 +35,7 @@
 
                 <button
                     class="btn btn-outline-secondary btn-expand ms-1"
-                    [class.expanded]="expanded"
+                    [class.expanded]="isExpanded"
                     (click)="toggleExpanded()"
                     type="button">
                     <span class="hidden">{{ "common.settings" | sqxTranslate }}</span>
@@ -56,7 +56,7 @@
         </div>
     </div>
 
-    @if (expanded) {
+    @if (isExpanded) {
         <div class="table-items-row-details">
             <div class="job-header">
                 <h4>{{ "common.details" | sqxTranslate }}</h4>

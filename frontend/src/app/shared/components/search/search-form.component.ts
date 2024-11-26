@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { ControlErrorsComponent, FocusOnInitDirective, MarkdownPipe, ModalDialogComponent, ModalDirective, SafeHtmlPipe, ShortcutComponent, ShortcutDirective, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/framework';
+import { ControlErrorsComponent, FocusOnInitDirective, MarkdownDirective, ModalDialogComponent, ModalDirective, ShortcutComponent, ShortcutDirective, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/framework';
 import { DialogModel, equalsQuery, hasFilter, LanguageDto, Queries, Query, QueryModel, SaveQueryForm, TypedSimpleChanges } from '@app/shared/internal';
 import { TourHintDirective } from '../tour-hint.directive';
 import { QueryComponent } from './queries/query.component';
@@ -26,12 +26,11 @@ import { SavedQueriesComponent } from './shared-queries.component';
         ControlErrorsComponent,
         FocusOnInitDirective,
         FormsModule,
-        MarkdownPipe,
+        MarkdownDirective,
         ModalDialogComponent,
         ModalDirective,
         QueryComponent,
         ReactiveFormsModule,
-        SafeHtmlPipe,
         SavedQueriesComponent,
         ShortcutComponent,
         ShortcutDirective,

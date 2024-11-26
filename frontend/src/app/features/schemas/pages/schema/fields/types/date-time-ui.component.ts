@@ -8,7 +8,7 @@
 
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { DATETIME_FIELD_EDITORS, DateTimeFieldPropertiesDto, FieldDto, FloatConverter, FormHintComponent, MarkdownInlinePipe, SafeHtmlPipe, TranslatePipe } from '@app/shared';
+import { DATETIME_FIELD_EDITORS, DateTimeFieldPropertiesDto, FieldDto, FloatConverter, FormHintComponent, MarkdownDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -18,9 +18,8 @@ import { DATETIME_FIELD_EDITORS, DateTimeFieldPropertiesDto, FieldDto, FloatConv
     imports: [
         FormHintComponent,
         FormsModule,
-        MarkdownInlinePipe,
+        MarkdownDirective,
         ReactiveFormsModule,
-        SafeHtmlPipe,
         TranslatePipe,
     ],
 })

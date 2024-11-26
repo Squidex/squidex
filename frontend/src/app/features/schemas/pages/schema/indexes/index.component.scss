@@ -1,0 +1,12 @@
+@import 'mixins';
+@import 'vars';
+
+th {
+    padding-left: 1rem !important;
+    padding-right: 1rem;
+    background: $color-border-light !important;
+}
+
+td {
+    padding-left: 1rem;
+}

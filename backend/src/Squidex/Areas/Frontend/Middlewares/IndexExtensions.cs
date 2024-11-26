@@ -32,7 +32,6 @@ public static class IndexExtensions
         };
 
         var uiOptions = httpContext.RequestServices.GetService<IOptions<MyUIOptions>>()?.Value;
-
         if (uiOptions != null)
         {
             var clonedOptions = uiOptions with

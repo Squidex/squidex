@@ -45,7 +45,7 @@ public class ContentQueryServiceTests : GivenContext
         A.CallTo(() => queryParser.ParseAsync(A<Context>._, A<Q>._, A<Schema?>._, CancellationToken))
             .ReturnsLazily(c => Task.FromResult(c.GetArgument<Q>(1)!));
 
-        var options = Options.Create(new ContentOptions());
+        var options = Options.Create(new ContentsOptions());
 
         sut = new ContentQueryService(
             AppProvider,

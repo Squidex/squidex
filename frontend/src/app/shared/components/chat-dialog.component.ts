@@ -9,7 +9,7 @@
 import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { HTTP, MathHelper, ModalDialogComponent, ResizedDirective, TooltipDirective, TranslatePipe } from '@app/framework';
+import { HTTP, MathHelper, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AppsState, AuthService, ChatEventDto, StatefulComponent, TranslationsService } from '@app/shared/internal';
 import { ChatItemComponent } from './chat-item.component';
 
@@ -33,7 +33,6 @@ interface State {
         ChatItemComponent,
         FormsModule,
         ModalDialogComponent,
-        ResizedDirective,
         TooltipDirective,
         TranslatePipe,
     ],

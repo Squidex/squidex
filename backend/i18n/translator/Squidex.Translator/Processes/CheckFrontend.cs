@@ -92,7 +92,8 @@ public class CheckFrontend(DirectoryInfo folder, TranslationService service)
         AddTranslations("\"i18n\\:(?<Key>[^\"]+)\"");
         AddTranslations("\'i18n\\:(?<Key>[^\']+)\'");
 
-        AddTranslations("'(?<Key>[^\']+)' \\| sqxTranslate");
+        AddTranslations("\"(?<Key>[^\"]+)\"[\\s]*\\|[\\s]*sqxTranslate");
+        AddTranslations("\'(?<Key>[^\']+)\'[\\s]*\\|[\\s]*sqxTranslate");
 
         return translations;
     }

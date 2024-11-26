@@ -20,11 +20,11 @@ public sealed class UrlGenerator(
     IGenericUrlGenerator urlGenerator,
     IAssetFileStore assetFileStore,
     IOptions<AssetOptions> assetOptions,
-    IOptions<ContentOptions> contentOptions)
+    IOptions<ContentsOptions> contentOptions)
     : IUrlGenerator, IHttpImageEndpoint
 {
     private readonly AssetOptions assetOptions = assetOptions.Value;
-    private readonly ContentOptions contentOptions = contentOptions.Value;
+    private readonly ContentsOptions contentOptions = contentOptions.Value;
 
     public string? AssetThumbnail(NamedId<DomainId> appId, string idOrSlug, AssetType assetType)
     {

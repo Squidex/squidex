@@ -16,7 +16,7 @@
     <ng-container>
         <sqx-list-view innerWidth="50rem" [isLoading]="templatesState.isLoading | async">
             <sqx-form-alert light="true">
-                <div [innerHTML]="'templates.cliHint' | sqxTranslate | sqxMarkdownInline | sqxSafeHtml"></div>
+                <div inline="true" [sqxMarkdown]="'templates.cliHint' | sqxTranslate"></div>
             </sqx-form-alert>
 
             @if ((templatesState.isLoaded | async) && (templatesState.templates | async); as templates) {

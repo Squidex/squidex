@@ -10,7 +10,7 @@ using Squidex.Translator.State;
 
 namespace Squidex.Translator.Processes;
 
-public class TranslateBackend(DirectoryInfo folder, TranslationService service)
+public partial class TranslateBackend(DirectoryInfo folder, TranslationService service)
 {
     private readonly DirectoryInfo folder = Backend.GetFolder(folder);
 
@@ -22,7 +22,7 @@ public class TranslateBackend(DirectoryInfo folder, TranslationService service)
 
             var isReplaced = false;
 
-            content = Regex.Replace(content, "\"[^\"]*\"", match =>
+            content = VariableRegex().Replace(content, match =>
             {
                 var value = match.Value[1..^1];
 
@@ -50,4 +50,7 @@ public class TranslateBackend(DirectoryInfo folder, TranslationService service)
             }
         }
     }
+
+    [GeneratedRegex("\"[^\"]*\"")]
+    private static partial Regex VariableRegex();
 }

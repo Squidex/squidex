@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { map, Observable, shareReplay } from 'rxjs';
-import { AppsState, ClientsState, FormHintComponent, LoaderComponent, MarkdownPipe, SafeHtmlPipe, TemplateDetailsDto, TemplateDto, TemplatesService, TranslatePipe } from '@app/shared';
+import { AppsState, ClientsState, FormHintComponent, LoaderComponent, MarkdownDirective, TemplateDetailsDto, TemplateDto, TemplatesService, TranslatePipe } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -20,8 +20,7 @@ import { AppsState, ClientsState, FormHintComponent, LoaderComponent, MarkdownPi
         AsyncPipe,
         FormHintComponent,
         LoaderComponent,
-        MarkdownPipe,
-        SafeHtmlPipe,
+        MarkdownDirective,
         TranslatePipe,
     ],
 })

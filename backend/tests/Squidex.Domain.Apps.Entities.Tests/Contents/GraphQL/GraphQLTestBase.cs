@@ -126,7 +126,7 @@ public abstract class GraphQLTestBase : IClassFixture<TranslationsFixture>
                 {
                     x.CanCache = true;
                 })
-                .Configure<ContentOptions>(x =>
+                .Configure<ContentsOptions>(x =>
                 {
                     x.CanCache = true;
                 })

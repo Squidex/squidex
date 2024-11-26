@@ -36,7 +36,7 @@
             @case ("Start") {
                 <h3>{{ "clients.connectWizard.step1Title" | sqxTranslate }}</h3>
                 <sqx-form-hint>
-                    <span [innerHTML]="'clients.connectWizard.postManDocs' | sqxTranslate | sqxMarkdownInline: true | sqxSafeHtml"></span>
+                    <span inline="true" [sqxMarkdown]="'clients.connectWizard.postManDocs' | sqxTranslate" trusted="true"></span>
                 </sqx-form-hint>
                 <div class="section">
                     <div class="option" (click)="go('HTTP')">
@@ -108,7 +108,7 @@
                         <span class="badge rounded-pill bg-dark">1</span>
                         {{ "clients.connectWizard.cliStep1" | sqxTranslate }}
                     </h5>
-                    <div [innerHTML]="'clients.connectWizard.cliStep1Download' | sqxTranslate | sqxMarkdown: true | sqxSafeHtml"></div>
+                    <div [sqxMarkdown]="'clients.connectWizard.cliStep1Download' | sqxTranslate" trusted="true"></div>
                     <sqx-form-hint>
                         {{ "clients.connectWizard.cliStep1Hint" | sqxTranslate }}
                     </sqx-form-hint>
@@ -116,7 +116,7 @@
                 <div class="section step">
                     <h5>
                         <span class="badge rounded-pill bg-dark">2</span>
-                        <span [innerHTML]="'clients.connectWizard.cliStep2' | sqxTranslate | sqxMarkdownInline: true | sqxSafeHtml"></span>
+                        <span [sqxMarkdown]="'clients.connectWizard.cliStep2' | sqxTranslate" trusted="true"></span>
                     </h5>
                 </div>
                 <div class="section step">
@@ -150,7 +150,7 @@
                             <div class="sdk-header" [class.active]="sdk === availableSDK.value" (click)="select(availableSDK.value)">
                                 <div
                                     class="logo d-flex align-items-center justify-content-center"
-                                    [innerHTML]="availableSDK.value.logo | sqxSafeHtml"></div>
+                                    [sqxMarkdown]="availableSDK.value.logo"></div>
                                 {{ availableSDK.value.name }}
                             </div>
                         }

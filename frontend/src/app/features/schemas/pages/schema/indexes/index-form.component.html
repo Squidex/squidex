@@ -1,0 +1,73 @@
+<form (ngSubmit)="createSchema()">
+    <sqx-modal-dialog (dialogClose)="dialogClose.emit()" size="md">
+        <ng-container title>
+            {{ "schemas.indexes.addTitle" | sqxTranslate }}
+        </ng-container>
+
+        <ng-container content>
+            <sqx-form-hint>
+                <span inline="true" [sqxMarkdown]="'schemas.indexes.hint' | sqxTranslate" trusted="true"></span>
+            </sqx-form-hint>
+
+            @for (form of createForm.controls; track form; let i = $index) {
+                <div class="form-group row gx-2" attr.data-testid="pattern_{{ form.get('name')?.value }}" [formGroup]="form">
+                    <div class="col">
+                        <sqx-control-errors for="name"></sqx-control-errors>
+                        <select class="form-select" formControlName="name">
+                            @for (fieldName of fieldNames; track fieldName) {
+                                <option [ngValue]="fieldName">{{ fieldName }}</option>
+                            }
+                        </select>
+                    </div>
+                    <div class="col-4">
+                        <sqx-control-errors for="order"></sqx-control-errors>
+                        <select class="form-select" formControlName="order">
+                            <option [ngValue]="'Ascending'">Ascending</option>
+                            <option [ngValue]="'Descending'">Descending</option>
+                        </select>
+                    </div>
+                    <div class="col-auto">
+                        <button
+                            class="btn btn-text-danger"
+                            attr.aria-label="{{ 'common.delete' | sqxTranslate }}"
+                            confirmRememberKey="deleteIndexField"
+                            confirmText="i18n:schemas.indexes.deleteFieldConfirmText"
+                            confirmTitle="i18n:schemas.indexes.deleteFieldConfirmTitle"
+                            (sqxConfirmClick)="createForm.form.removeAt(i)"
+                            type="button">
+                            <i class="icon-bin2"></i>
+                        </button>
+                    </div>
+                </div>
+            }
+
+            <div class="form-group row gx-2">
+                <div class="col">
+                    <div class="form-control preview">{{ "common.name" | sqxTranslate }}</div>
+                </div>
+                <div class="col-4">
+                    <div class="form-control preview">{{ "common.order" | sqxTranslate }}</div>
+                </div>
+                <div class="col-auto">
+                    <button
+                        class="btn btn-success"
+                        attr.aria-label="{{ 'common.add' | sqxTranslate }}"
+                        (click)="createForm.form.add()"
+                        type="button">
+                        <i class="icon-add"></i>
+                    </button>
+                </div>
+            </div>
+        </ng-container>
+
+        <ng-container footer>
+            <button class="btn btn-text-secondary" (click)="dialogClose.emit()" type="button">
+                {{ "common.cancel" | sqxTranslate }}
+            </button>
+
+            <button class="btn btn-success" type="submit">
+                {{ "common.create" | sqxTranslate }}
+            </button>
+        </ng-container>
+    </sqx-modal-dialog>
+</form>

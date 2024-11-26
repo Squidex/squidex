@@ -14,16 +14,10 @@
                     <a (click)="loadLatest.emit()">{{ "contents.viewLatest" | sqxTranslate }}</a>
                 </div>
                 @if (isDeleted) {
-                    <div
-                        [innerHTML]="
-                            'contents.versionViewingDeleted' | sqxTranslate: { version: contentVersion } | sqxMarkdownInline | sqxSafeHtml
-                        "></div>
+                    <div inline="true" [sqxMarkdown]="'contents.versionViewingDeleted' | sqxTranslate: { version: contentVersion }"></div>
                 }
                 @if (!isDeleted) {
-                    <div
-                        [innerHTML]="
-                            'contents.versionViewing' | sqxTranslate: { version: contentVersion } | sqxMarkdownInline | sqxSafeHtml
-                        "></div>
+                    <div inline="true" [sqxMarkdown]="'contents.versionViewing' | sqxTranslate: { version: contentVersion }"></div>
                 }
             </div>
         }

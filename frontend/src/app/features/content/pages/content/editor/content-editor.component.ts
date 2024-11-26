@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AppLanguageDto, CursorsComponent, CursorsDirective, EditContentForm, FormErrorComponent, ListViewComponent, MarkdownInlinePipe, SafeHtmlPipe, SchemaDto, TranslatePipe, Version } from '@app/shared';
+import { AppLanguageDto, CursorsComponent, CursorsDirective, EditContentForm, FormErrorComponent, ListViewComponent, MarkdownDirective, SchemaDto, TranslatePipe, Version } from '@app/shared';
 import { ContentSectionComponent } from '../../../shared/forms/content-section.component';
 
 @Component({
@@ -24,8 +24,7 @@ import { ContentSectionComponent } from '../../../shared/forms/content-section.c
         FormErrorComponent,
         FormsModule,
         ListViewComponent,
-        MarkdownInlinePipe,
-        SafeHtmlPipe,
+        MarkdownDirective,
         TranslatePipe,
     ],
 })
