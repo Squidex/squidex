@@ -46,16 +46,16 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ### Global parameters
 
-| Name                      | Description                    | Value             |
-| ------------------------- | ------------------------------ | ----------------- |
-| `service.type`            | Kubernetes Service type        | `ClusterIP`       |
-| `service.port`            | Kubernetes Service port        | `80`              |
-| `deployment.replicaCount` | Number of instances.           | `1`               |
-| `image.repository`        | Squidex image registry         | `squidex/squidex` |
-| `image.tag`               | Squidex image tag              | `7.0.2`           |
-| `image.pullPolicy`        | Squidex image pull policy      | `IfNotPresent`    |
-| `ingress.enabled`         | True to deploy an ingress      | `true`            |
-| `ingress.hostName`        | The host name for the ingress. | `squidex.local`   |
+| Name                      | Description                    | Value                          |
+| ------------------------- | ------------------------------ | ------------------------------ |
+| `service.type`            | Kubernetes Service type        | `ClusterIP`                    |
+| `service.port`            | Kubernetes Service port        | `80`                           |
+| `deployment.replicaCount` | Number of instances.           | `1`                            |
+| `image.repository`        | Squidex image registry         | `squidex/squidex`              |
+| `image.tag`               | Squidex image tag              | null: Uses chart's App Version |
+| `image.pullPolicy`        | Squidex image pull policy      | `IfNotPresent`                 |
+| `ingress.enabled`         | True to deploy an ingress      | `true`                         |
+| `ingress.hostName`        | The host name for the ingress. | `squidex.local`                |
 
 
 ### Squidex parameters
