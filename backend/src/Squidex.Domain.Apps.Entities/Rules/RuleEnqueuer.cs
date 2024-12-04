@@ -26,7 +26,7 @@ public sealed class RuleEnqueuer(
     IRuleEventRepository ruleEventRepository,
     IRuleService ruleService,
     IRuleUsageTracker ruleUsageTracker,
-    IOptions<RuleOptions> options,
+    IOptions<RulesOptions> options,
     ILogger<RuleEnqueuer> log)
     : IEventConsumer, IRuleEnqueuer
 {

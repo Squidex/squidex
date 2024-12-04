@@ -29,7 +29,7 @@ public static class RuleServices
 {
     public static void AddSquidexRules(this IServiceCollection services, IConfiguration config)
     {
-        services.Configure<RuleOptions>(config,
+        services.Configure<RulesOptions>(config,
             "rules");
 
         services.AddSingletonAs<EventEnricher>()

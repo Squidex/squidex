@@ -80,7 +80,8 @@ public class RuleServiceTests
 
         var log = A.Fake<ILogger<RuleService>>();
 
-        sut = new RuleService(Options.Create(new RuleOptions()),
+        sut = new RuleService(
+            Options.Create(new RulesOptions()),
             [ruleTriggerHandler],
             [ruleActionHandler],
             eventEnricher, TestUtils.DefaultSerializer, log, typeRegistry)

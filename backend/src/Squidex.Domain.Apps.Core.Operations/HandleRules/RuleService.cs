@@ -23,7 +23,7 @@ using Squidex.Infrastructure.Tasks;
 namespace Squidex.Domain.Apps.Core.HandleRules;
 
 public sealed class RuleService(
-    IOptions<RuleOptions> ruleOptions,
+    IOptions<RulesOptions> options,
     IEnumerable<IRuleTriggerHandler> ruleTriggerHandlers,
     IEnumerable<IRuleActionHandler> ruleActionHandlers,
     IEventEnricher eventEnricher,
@@ -34,7 +34,7 @@ public sealed class RuleService(
 {
     private readonly Dictionary<Type, IRuleActionHandler> ruleActionHandlers = ruleActionHandlers.ToDictionary(x => x.ActionType);
     private readonly Dictionary<Type, IRuleTriggerHandler> ruleTriggerHandlers = ruleTriggerHandlers.ToDictionary(x => x.TriggerType);
-    private readonly RuleOptions ruleOptions = ruleOptions.Value;
+    private readonly RulesOptions options = options.Value;
 
     private sealed class RuleState
     {
@@ -451,6 +451,6 @@ public sealed class RuleService(
 
     private int GetTimeoutInMs()
     {
-        return ruleOptions.ExecutionTimeoutInSeconds * 1000;
+        return options.ExecutionTimeoutInSeconds * 1000;
     }
 }

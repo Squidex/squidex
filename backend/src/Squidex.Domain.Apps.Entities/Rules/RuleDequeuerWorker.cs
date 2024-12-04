@@ -7,6 +7,7 @@
 
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
@@ -22,6 +23,7 @@ public sealed class RuleDequeuerWorker : IBackgroundProcess
 {
     private readonly ConcurrentDictionary<DomainId, bool> executing = new ConcurrentDictionary<DomainId, bool>();
     private readonly PartitionedScheduler<IRuleEventEntity> requestScheduler;
+    private readonly RulesOptions options;
     private readonly IRuleEventRepository ruleEventRepository;
     private readonly IRuleService ruleService;
     private readonly IRuleUsageTracker ruleUsageTracker;
@@ -34,11 +36,13 @@ public sealed class RuleDequeuerWorker : IBackgroundProcess
         IRuleService ruleService,
         IRuleUsageTracker ruleUsageTracker,
         IRuleEventRepository ruleEventRepository,
+        IOptions<RulesOptions> options,
         ILogger<RuleDequeuerWorker> log)
     {
         this.ruleEventRepository = ruleEventRepository;
         this.ruleService = ruleService;
         this.ruleUsageTracker = ruleUsageTracker;
+        this.options = options.Value;
         this.log = log;
 
         requestScheduler = new PartitionedScheduler<IRuleEventEntity>(HandleAsync, 32, 2);
@@ -47,7 +51,7 @@ public sealed class RuleDequeuerWorker : IBackgroundProcess
     public Task StartAsync(
         CancellationToken ct)
     {
-        timer = new CompletionTimer((int)TimeSpan.FromSeconds(10).TotalMilliseconds, QueryAsync);
+        timer = new CompletionTimer((int)options.JobQueryInterval.TotalMilliseconds, QueryAsync);
 
         return Task.CompletedTask;
     }
