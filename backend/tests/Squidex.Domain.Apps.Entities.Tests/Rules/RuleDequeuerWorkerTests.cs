@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
@@ -28,7 +29,12 @@ public class RuleDequeuerWorkerTests
         A.CallTo(() => clock.GetCurrentInstant())
             .Returns(SystemClock.Instance.GetCurrentInstant().WithoutMs());
 
-        sut = new RuleDequeuerWorker(ruleService, ruleUsageTracker, ruleEventRepository, log)
+        sut = new RuleDequeuerWorker(
+            ruleService,
+            ruleUsageTracker,
+            ruleEventRepository,
+            Options.Create(new RulesOptions()),
+            log)
         {
             Clock = clock
         };

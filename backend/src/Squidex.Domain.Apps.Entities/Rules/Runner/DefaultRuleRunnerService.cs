@@ -63,7 +63,7 @@ public sealed class DefaultRuleRunnerService(
                 continue;
             }
 
-            // Also create jobs for rules with failing conditions because we want to show them in th table.
+            // Also create jobs for rules with failing conditions because we want to show them in the table.
             await foreach (var job in ruleService.CreateJobsAsync(@event, context, ct).Take(MaxSimulatedEvents).WithCancellation(ct))
             {
                 var eventName = job.Job?.EventName;

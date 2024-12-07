@@ -32,7 +32,7 @@ public sealed class EnrichedAssetEvent : EnrichedUserEventBase, IEnrichedEntityE
     public RefToken LastModifiedBy { get; set; }
 
     [FieldDescription(nameof(FieldDescriptions.AssetParentId))]
-    public DomainId ParentId { get; }
+    public DomainId ParentId { get; set; }
 
     [FieldDescription(nameof(FieldDescriptions.AssetMimeType))]
     public string MimeType { get; set; }

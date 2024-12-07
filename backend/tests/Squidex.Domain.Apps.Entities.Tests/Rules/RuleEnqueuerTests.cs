@@ -37,7 +37,7 @@ public class RuleEnqueuerTests : GivenContext
 
     public RuleEnqueuerTests()
     {
-        var options = Options.Create(new RuleOptions());
+        var options = Options.Create(new RulesOptions());
 
         sut = new RuleEnqueuer(cache, A.Fake<ILocalCache>(),
             AppProvider,
