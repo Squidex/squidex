@@ -33,7 +33,7 @@ jobs:
           node-version: 18
 
       - name: Build - BUILD
-        uses: docker/build-push-action@v6.9.0
+        uses: docker/build-push-action@v6.10.0
         with:
           load: true
           cache-from: type=gha
@@ -148,7 +148,7 @@ jobs:
 
       - name: Publish - Build & Push for Multi-Platforms
         if: github.event_name != 'pull_request'
-        uses: docker/build-push-action@v6.9.0
+        uses: docker/build-push-action@v6.10.0
         with:
           build-args: "SQUIDEX__RUNTIME__VERSION=7.0.0-dev-${{ env.BUILD_NUMBER }}"
           cache-from: type=gha
