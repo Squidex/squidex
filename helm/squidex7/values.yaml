@@ -27,9 +27,9 @@ image:
   ## @param image.repository Squidex image registry
   ##
   repository: squidex/squidex
-  ## @param image.tag Squidex image tag
+  ## @param image.tag Override Squidex image tag; use chart's AppVersion otherwise
   ##
-  tag: "7.0.2"
+  # tag: "7.0.2"
   ## @param image.pullPolicy Squidex image pull policy
   ##
   pullPolicy: IfNotPresent
