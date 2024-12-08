@@ -26,14 +26,17 @@ public sealed class WebhookRequest
     [JsonPropertyName("method")]
     public string Method { get; set; }
 
-    [JsonPropertyName("content_base64")]
+    [JsonIgnore]
     public string Content { get; set; }
 
     [JsonIgnore]
     public Dictionary<string, string> Headers { get; set; } = [];
 
+    [JsonPropertyName("request_payload_base64")]
+    public string EncodedContent { get; set; }
+
     [JsonPropertyName("headers")]
-    public WebhookHeader[] HeaderValues { get; set; }
+    public WebhookHeader[] HeaderList { get; set; }
 }
 
 public sealed class WebhookHeader
@@ -77,36 +80,37 @@ public sealed class WebhookCatcherClient
     public async Task<(string, string)> CreateSessionAsync(
         CancellationToken ct = default)
     {
-        var response = await httpClient.PostAsJsonAsync("/api/session", new { }, ct);
+        var request = new { status_code = 200, };
+        var response = await httpClient.PostAsJsonAsync("/api/session", request, ct);
 
         response.EnsureSuccessStatusCode();
 
-        var responseObj = await response.Content.ReadFromJsonAsync<WebhookSession>(ct);
-
-        return ($"http://{EndpointHost}:{EndpointPort}/{responseObj!.Uuid}", responseObj!.Uuid);
+        var json = await response.Content.ReadFromJsonAsync<WebhookSession>(ct);
+        return ($"http://{EndpointHost}:{EndpointPort}/{json!.Uuid}", json!.Uuid);
     }
 
     public async Task<WebhookRequest[]> GetRequestsAsync(string sessionId,
         CancellationToken ct = default)
     {
-        var responseObj = await httpClient.GetFromJsonAsync<WebhookRequest[]>($"/api/session/{sessionId}/requests", ct);
+        var response = await httpClient.GetFromJsonAsync<WebhookRequest[]>($"/api/session/{sessionId}/requests", ct);
 
-        foreach (var request in responseObj!)
+        foreach (var request in response!)
         {
-            if (request.Content != null)
+            var content = request.EncodedContent;
+            if (content != null)
             {
-                request.Content = Encoding.Default.GetString(Convert.FromBase64String(request.Content));
+                request.Content = Encoding.Default.GetString(Convert.FromBase64String(content));
             }
 
-            if (request.HeaderValues != null)
+            if (request.HeaderList != null)
             {
-                foreach (var header in request.HeaderValues)
+                foreach (var header in request.HeaderList)
                 {
                     request.Headers[header.Name] = header.Value;
                 }
             }
         }
 
-        return responseObj;
+        return response;
     }
 }
