@@ -1,4 +1,3 @@
-version: '3'
 services:
   mongo:
     image: mongo:latest
@@ -75,7 +74,7 @@ services:
       - mongo
 
   webhookcatcher:
-    image: tarampampam/webhook-tester
+    image: tarampampam/webhook-tester:2
     command: serve --port 1026
     ports:
       - "1026:1026"
