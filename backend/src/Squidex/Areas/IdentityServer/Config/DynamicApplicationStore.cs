@@ -130,7 +130,6 @@ public class DynamicApplicationStore(IServiceProvider serviceProvider) : InMemor
         var urlGenerator = serviceProvider.GetRequiredService<IUrlGenerator>();
 
         var frontendId = Constants.ClientFrontendId;
-
         yield return (frontendId, new OpenIddictApplicationDescriptor
         {
             DisplayName = "Frontend Client",
@@ -164,7 +163,6 @@ public class DynamicApplicationStore(IServiceProvider serviceProvider) : InMemor
         });
 
         var internalClientId = Constants.ClientInternalId;
-
         yield return (internalClientId, new OpenIddictApplicationDescriptor
         {
             DisplayName = "Internal Client",
@@ -200,7 +198,6 @@ public class DynamicApplicationStore(IServiceProvider serviceProvider) : InMemor
         }
 
         var adminClientId = identityOptions.AdminClientId;
-
         yield return (adminClientId, new OpenIddictApplicationDescriptor
         {
             DisplayName = "Admin Client",
