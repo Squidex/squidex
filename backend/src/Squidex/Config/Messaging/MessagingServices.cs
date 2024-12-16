@@ -7,6 +7,7 @@
 
 using System.Text.Json;
 using Squidex.AI;
+using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Subscriptions;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -44,14 +45,12 @@ public static class MessagingServices
         if (isWorker)
         {
             services.AddAICleaner();
+            services.AddFlowWorker<RuleFlowContext>();
 
             services.AddSingletonAs<AssetCleanupProcess>()
                 .AsSelf();
 
             services.AddSingletonAs<ContentSchedulerProcess>()
-                .AsSelf();
-
-            services.AddSingletonAs<RuleDequeuerWorker>()
                 .AsSelf();
 
             services.AddSingletonAs<EventConsumerWorker>()

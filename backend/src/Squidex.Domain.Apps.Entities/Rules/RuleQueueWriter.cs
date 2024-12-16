@@ -6,50 +6,52 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Logging;
+using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
-using Squidex.Domain.Apps.Entities.Rules.Repositories;
+using Squidex.Flows.Execution;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Rules;
 
-public sealed class RuleQueueWriter(IRuleEventRepository ruleEventRepository, IRuleUsageTracker ruleUsageTracker, ILogger? log) : IAsyncDisposable
+public sealed class RuleQueueWriter(IFlowStateStore<RuleFlowContext> flowStore, IRuleUsageTracker ruleUsageTracker, ILogger? log)
+    : IAsyncDisposable
 {
-    private readonly List<RuleEventWrite> writes = [];
+    private readonly List<FlowExecutionState<RuleFlowContext>> writes = [];
+
+    public IClock Clock { get; set; } = SystemClock.Instance;
 
     public async Task<bool> WriteAsync(JobResult result)
     {
         // We do not want to handle events without a job in the normal flow.
-        if (result.Job == null)
+        if (result.State == null)
         {
             return false;
         }
 
-        if (result.EnrichmentError != null || result.SkipReason is SkipReason.Failed)
+        if (result.State != null)
         {
-            writes.Add(new RuleEventWrite(result.Job, Error: result.EnrichmentError));
-        }
-        else if (result.SkipReason is SkipReason.None or SkipReason.Disabled)
-        {
-            writes.Add(new RuleEventWrite(result.Job, result.Job.Created));
+            writes.Add(result.State);
         }
         else
         {
             return false;
         }
 
-        if (result.Rule != null)
-        {
-            log?.LogInformation("Adding rule job {jobId} for Rule(action={ruleAction}, trigger={ruleTrigger})",
-                result.Job.Id,
-                result.Rule.Action.GetType().Name,
-                result.Rule.Trigger.GetType().Name);
-        }
+        log?.LogInformation("Adding rule job {jobId} for Rule(trigger={ruleTrigger})",
+            result.State.InstanceId,
+            result.Rule.Trigger.GetType().Name);
 
         var totalFailure = result.SkipReason == SkipReason.Failed ? 1 : 0;
         var totalCreated = 1;
 
         // Unfortunately we cannot write in batches here, because the result could be from multiple rules.
-        await ruleUsageTracker.TrackAsync(result.Job.AppId, result.Rule?.Id ?? default, result.Job.Created.ToDateOnly(), totalCreated, 0, totalFailure);
+        await ruleUsageTracker.TrackAsync(
+            result.Rule.AppId.Id,
+            result.Rule.Id,
+            Clock.GetCurrentInstant().ToDateOnly(),
+            totalCreated,
+            0,
+            totalFailure);
 
         if (writes.Count >= 100)
         {
@@ -81,7 +83,7 @@ public sealed class RuleQueueWriter(IRuleEventRepository ruleEventRepository, IR
 
     private async Task FlushCoreAsync()
     {
-        await ruleEventRepository.EnqueueAsync(writes, default);
+        await flowStore.StoreAsync(writes, default);
         writes.Clear();
     }
 }

@@ -15,6 +15,7 @@ public sealed class SignalRPlugin : IPlugin
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        services.AddRuleAction<SignalRAction, SignalRActionHandler>();
+        services.AddSingleton<SignalRClientPool>();
+        services.AddFlowStep<SignalRStep>();
     }
 }

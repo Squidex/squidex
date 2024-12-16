@@ -5,11 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
-using Squidex.Domain.Apps.Entities.Rules;
+using Squidex.Flows.Execution;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Reflection;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models;
@@ -22,51 +20,17 @@ public sealed class RuleEventDto : Resource
     public DomainId Id { get; set; }
 
     /// <summary>
-    /// The time when the event has been created.
+    /// The state of the flow.
     /// </summary>
-    public Instant Created { get; set; }
+    public FlowExecutionState<RuleFlowContext> State { get; set; }
 
-    /// <summary>
-    /// The description.
-    /// </summary>
-    public string Description { get; set; }
-
-    /// <summary>
-    /// The name of the event.
-    /// </summary>
-    public string EventName { get; set; }
-
-    /// <summary>
-    /// The last dump.
-    /// </summary>
-    public string? LastDump { get; set; }
-
-    /// <summary>
-    /// The number of calls.
-    /// </summary>
-    public int NumCalls { get; set; }
-
-    /// <summary>
-    /// The next attempt.
-    /// </summary>
-    public Instant? NextAttempt { get; set; }
-
-    /// <summary>
-    /// The result of the event.
-    /// </summary>
-    public RuleResult Result { get; set; }
-
-    /// <summary>
-    /// The result of the job.
-    /// </summary>
-    public RuleJobResult JobResult { get; set; }
-
-    public static RuleEventDto FromDomain(IRuleEventEntity ruleEvent, Resources resources)
+    public static RuleEventDto FromDomain(FlowExecutionState<RuleFlowContext> state, Resources resources)
     {
-        var result = new RuleEventDto();
-
-        SimpleMapper.Map(ruleEvent, result);
-        SimpleMapper.Map(ruleEvent.Job, result);
+        var result = new RuleEventDto
+        {
+            Id = DomainId.Create(state.InstanceId.ToString()),
+            State = state
+        };
 
         return result.CreateLinks(resources);
     }
@@ -81,7 +45,7 @@ public sealed class RuleEventDto : Resource
                 resources.Url<RulesController>(x => nameof(x.PutEvent), values));
         }
 
-        if (resources.CanDeleteRuleEvents && NextAttempt != null)
+        if (resources.CanDeleteRuleEvents && State.NextRun != null)
         {
             AddDeleteLink("cancel",
                 resources.Url<RulesController>(x => nameof(x.DeleteEvent), values));

@@ -11,8 +11,8 @@ using Microsoft.Extensions.Options;
 using Squidex.Caching;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Events;
+using Squidex.Flows.Execution;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.EventSourcing;
@@ -20,13 +20,13 @@ using Squidex.Infrastructure.EventSourcing;
 namespace Squidex.Domain.Apps.Entities.Rules;
 
 public sealed class RuleEnqueuer(
-    IMemoryCache cache,
-    ILocalCache localCache,
     IAppProvider appProvider,
-    IRuleEventRepository ruleEventRepository,
+    IFlowStateStore<RuleFlowContext> flowStore,
+    ILocalCache localCache,
+    IMemoryCache cache,
+    IOptions<RulesOptions> options,
     IRuleService ruleService,
     IRuleUsageTracker ruleUsageTracker,
-    IOptions<RulesOptions> options,
     ILogger<RuleEnqueuer> log)
     : IEventConsumer, IRuleEnqueuer
 {
@@ -65,9 +65,9 @@ public sealed class RuleEnqueuer(
         };
 
         // Write in batches of 100 items for better performance. Dispose completes the last write.
-        await using var batch = new RuleQueueWriter(ruleEventRepository, ruleUsageTracker, log);
+        await using var batch = new RuleQueueWriter(flowStore, ruleUsageTracker, log);
 
-        await foreach (var result in ruleService.CreateJobsAsync(@event, context))
+        await foreach (var result in ruleService.CreateJobsAsync(@event.To<AppEvent>(), context))
         {
             await batch.WriteAsync(result);
         }
@@ -78,7 +78,7 @@ public sealed class RuleEnqueuer(
         using (localCache.StartContext())
         {
             // Write in batches of 100 items for better performance. Dispose completes the last write.
-            await using var batch = new RuleQueueWriter(ruleEventRepository, ruleUsageTracker, log);
+            await using var batch = new RuleQueueWriter(flowStore, ruleUsageTracker, log);
 
             foreach (var @event in events)
             {
@@ -104,7 +104,7 @@ public sealed class RuleEnqueuer(
                     MaxEvents = maxExtraEvents
                 };
 
-                await foreach (var result in ruleService.CreateJobsAsync(@event, context))
+                await foreach (var result in ruleService.CreateJobsAsync(@event.To<AppEvent>(), context))
                 {
                     await batch.WriteAsync(result);
                 }

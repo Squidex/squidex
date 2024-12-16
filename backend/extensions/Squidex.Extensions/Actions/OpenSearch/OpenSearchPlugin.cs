@@ -15,6 +15,7 @@ public sealed class OpenSearchPlugin : IPlugin
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        services.AddRuleAction<OpenSearchAction, OpenSearchActionHandler>();
+        services.AddSingleton<OpenSearchClientPool>();
+        services.AddFlowStep<OpenSearchStep>();
     }
 }

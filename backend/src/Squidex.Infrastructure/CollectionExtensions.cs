@@ -203,7 +203,7 @@ public static class CollectionExtensions
 
     public static IEnumerable<T> OrEmpty<T>(this IEnumerable<T>? source)
     {
-        return source ?? Enumerable.Empty<T>();
+        return source ?? [];
     }
 
     public static IEnumerable<T> NotNull<T>(this IEnumerable<T?> source) where T : class
@@ -444,6 +444,16 @@ public static class CollectionExtensions
 
             yield return takenElement.Value;
         }
+    }
+
+    public static IAsyncEnumerable<T> Take<T>(this IAsyncEnumerable<T> source, long? take)
+    {
+        if (take > 0 && take < long.MaxValue)
+        {
+            return source.Take(take.Value);
+        }
+
+        return source;
     }
 
     public static IAsyncEnumerable<TSource> Catch<TSource>(this IAsyncEnumerable<TSource> source, Func<Exception, IEnumerable<TSource>> handler)

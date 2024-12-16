@@ -16,6 +16,7 @@ using MongoDB.Driver.Core.Extensions.DiagnosticSources;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Teams;
@@ -80,6 +81,8 @@ public static class StoreServices
                         options.CollectionName = "Chat";
                     });
 
+                services.AddMongoFlowStore<RuleFlowContext>();
+
                 services.AddMessaging()
                     .AddMongoDataStore(config);
 
@@ -130,9 +133,6 @@ public static class StoreServices
 
                 services.AddSingletonAs<MongoUsageRepository>()
                     .As<IUsageRepository>();
-
-                services.AddSingletonAs<MongoRuleEventRepository>()
-                    .As<IRuleEventRepository>().As<IDeleter>();
 
                 services.AddSingletonAs<MongoHistoryEventRepository>()
                     .As<IHistoryEventRepository>().As<IDeleter>();

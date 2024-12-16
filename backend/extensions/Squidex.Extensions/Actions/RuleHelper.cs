@@ -7,27 +7,20 @@
 
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
-using Squidex.Domain.Apps.Core.Scripting;
-using Squidex.Infrastructure.Http;
+using Squidex.Flows;
 
 namespace Squidex.Extensions.Actions;
 
 public static class RuleHelper
 {
-    public static bool ShouldDelete(this EnrichedEvent @event, IScriptEngine scriptEngine, string? expression)
+    public static bool ShouldDelete(this FlowExecutionContext executionContext, RuleFlowContext context, string? expression)
     {
         if (!string.IsNullOrWhiteSpace(expression))
         {
-            // Script vars are just wrappers over dictionaries for better performance.
-            var vars = new EventScriptVars
-            {
-                Event = @event
-            };
-
-            return scriptEngine.Evaluate(vars, expression);
+            return executionContext.Evaluate(expression, context);
         }
 
-        return IsContentDeletion(@event) || IsAssetDeletion(@event);
+        return IsContentDeletion(context.Event) || IsAssetDeletion(context.Event);
     }
 
     public static bool IsContentDeletion(this EnrichedEvent @event)
@@ -38,35 +31,5 @@ public static class RuleHelper
     public static bool IsAssetDeletion(this EnrichedEvent @event)
     {
         return @event is EnrichedAssetEvent { Type: EnrichedAssetEventType.Deleted };
-    }
-
-    public static async Task<Result> OneWayRequestAsync(this HttpClient client, HttpRequestMessage request, string? requestBody = null,
-        CancellationToken ct = default)
-    {
-        HttpResponseMessage? response = null;
-        try
-        {
-            response = await client.SendAsync(request, ct);
-
-            var responseString = await response.Content.ReadAsStringAsync(ct);
-            var requestDump = DumpFormatter.BuildDump(request, response, requestBody, responseString);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                var ex = new HttpRequestException($"Response code does not indicate success: {(int)response.StatusCode} ({response.StatusCode}).");
-
-                return Result.Failed(ex, requestDump);
-            }
-            else
-            {
-                return Result.Success(requestDump);
-            }
-        }
-        catch (Exception ex)
-        {
-            var requestDump = DumpFormatter.BuildDump(request, response, requestBody, ex.ToString());
-
-            return Result.Failed(ex, requestDump);
-        }
     }
 }

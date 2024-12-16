@@ -5,17 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.HandleRules;
-using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Flows;
 
 namespace Microsoft.Extensions.DependencyInjection;
 
 public static class DependencyInjectionExtensions
 {
-    public static IServiceCollection AddRuleAction<TAction, THandler>(this IServiceCollection services) where THandler : class, IRuleActionHandler where TAction : RuleAction
+    public static IServiceCollection AddFlowStep<T>(this IServiceCollection services) where T : IFlowStep
     {
-        services.AddSingleton<IRuleActionHandler, THandler>();
-        services.AddSingleton(new RuleActionRegistration(typeof(TAction)));
+        services.Configure<FlowOptions>(options =>
+        {
+            options.Steps.Add(typeof(T));
+        });
 
         return services;
     }

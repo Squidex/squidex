@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Flows.Execution;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Runner;
 
@@ -21,9 +22,7 @@ public sealed record SimulatedRuleEvent
 
     public object? EnrichedEvent { get; init; }
 
-    public string? ActionName { get; init; }
-
-    public string? ActionData { get; init; }
+    public FlowExecutionState<RuleFlowContext>? State { get; init; }
 
     public string? Error { get; init; }
 

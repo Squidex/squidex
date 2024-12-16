@@ -20,6 +20,6 @@ public sealed class SlackPlugin : IPlugin
             options.Timeout = TimeSpan.FromSeconds(2);
         });
 
-        services.AddRuleAction<SlackAction, SlackActionHandler>();
+        services.AddFlowStep<SlackStep>();
     }
 }

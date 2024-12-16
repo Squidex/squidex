@@ -81,7 +81,7 @@ public sealed class ContentChangedTriggerHandler(
             yield break;
         }
 
-        // When the content has just been created, it cannot be referenced by another content. Therefore we can skip it.1
+        // When the content has just been created, it cannot be referenced by another content. Therefore we can skip it.
         if (enrichedEvent.Type == EnrichedContentEventType.Created)
         {
             yield break;

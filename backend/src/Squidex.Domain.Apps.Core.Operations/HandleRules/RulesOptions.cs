@@ -16,4 +16,6 @@ public sealed class RulesOptions
     public TimeSpan JobQueryInterval { get; set; } = TimeSpan.FromSeconds(10);
 
     public TimeSpan RulesCacheDuration { get; set; } = TimeSpan.FromSeconds(10);
+
+    public TimeSpan StaleTime { get; set; } = TimeSpan.FromDays(2);
 }

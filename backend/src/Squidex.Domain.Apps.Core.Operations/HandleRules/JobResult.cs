@@ -7,87 +7,33 @@
 
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
+using Squidex.Flows.Execution;
 
 namespace Squidex.Domain.Apps.Core.HandleRules;
 
 public sealed record JobResult
 {
-    public static readonly JobResult ConditionPrecheckDoesNotMatch = new JobResult
-    {
-        SkipReason = SkipReason.ConditionPrecheckDoesNotMatch
-    };
+    public Rule Rule { get; init; }
 
-    public static readonly JobResult Disabled = new JobResult
-    {
-        SkipReason = SkipReason.Disabled
-    };
-
-    public static readonly JobResult WrongEvent = new JobResult
-    {
-        SkipReason = SkipReason.WrongEvent
-    };
-
-    public static readonly JobResult FromRule = new JobResult
-    {
-        SkipReason = SkipReason.FromRule
-    };
-
-    public static readonly JobResult NoAction = new JobResult
-    {
-        SkipReason = SkipReason.NoAction
-    };
-
-    public static readonly JobResult NoTrigger = new JobResult
-    {
-        SkipReason = SkipReason.NoTrigger
-    };
-
-    public static readonly JobResult TooOld = new JobResult
-    {
-        SkipReason = SkipReason.TooOld
-    };
-
-    public static readonly JobResult WrongEventForTrigger = new JobResult
-    {
-        SkipReason = SkipReason.WrongEventForTrigger
-    };
-
-    public Rule? Rule { get; init; }
-
-    public RuleJob? Job { get; init; }
+    public FlowExecutionState<RuleFlowContext>? State { get; init; }
 
     public EnrichedEvent? EnrichedEvent { get; init; }
 
     public Exception? EnrichmentError { get; init; }
 
-    public SkipReason SkipReason { get; init; }
+    required public string EventName { get; init; }
 
-    public int Offset { get; set; }
+    required public SkipReason SkipReason { get; init; }
 
-    public static JobResult Skipped(Rule rule, SkipReason reason)
-    {
-        return new JobResult { Rule = rule, SkipReason = reason };
-    }
-
-    public static JobResult ConditionDoesNotMatch(EnrichedEvent? enrichedEvent = null, RuleJob? job = null)
+    public static JobResult Failed(string eventName, SkipReason reason, Rule rule, EnrichedEvent? @event = null, Exception? exception = null)
     {
         return new JobResult
         {
-            Job = job,
-            EnrichedEvent = enrichedEvent,
-            EnrichmentError = null,
-            SkipReason = SkipReason.ConditionDoesNotMatch,
-        };
-    }
-
-    public static JobResult Failed(Exception exception, EnrichedEvent? enrichedEvent = null, RuleJob? job = null)
-    {
-        return new JobResult
-        {
-            Job = job,
-            EnrichedEvent = enrichedEvent,
+            Rule = rule,
+            EnrichedEvent = @event,
             EnrichmentError = exception,
-            SkipReason = SkipReason.Failed
+            EventName = eventName,
+            SkipReason = reason,
         };
     }
 }

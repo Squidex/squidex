@@ -13,11 +13,9 @@ namespace Squidex.Extensions.Actions.Twitter;
 
 public sealed class TwitterPlugin : IPlugin
 {
+    [Obsolete("Not supported anymore.")]
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        services.Configure<TwitterOptions>(
-            config.GetSection("twitter"));
-
-        services.AddRuleAction<TweetAction, TweetActionHandler>();
+        services.AddFlowStep<TweetStep>();
     }
 }

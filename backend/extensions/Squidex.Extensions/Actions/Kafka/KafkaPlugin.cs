@@ -20,7 +20,7 @@ public sealed class KafkaPlugin : IPlugin
 
         if (options.IsProducerConfigured())
         {
-            services.AddRuleAction<KafkaAction, KafkaActionHandler>();
+            services.AddFlowStep<KafkaStep>();
 
             services.AddSingleton<KafkaProducer>();
             services.AddSingleton(Options.Create(options));

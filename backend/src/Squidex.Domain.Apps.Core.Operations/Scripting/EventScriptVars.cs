@@ -8,6 +8,7 @@
 using System.Security.Claims;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Scripting;
 
@@ -28,7 +29,12 @@ public sealed class EventScriptVars : ScriptVars
         set => SetInitial(value);
     }
 
-    public EnrichedEvent Event
+    public object? Event
+    {
+        set => SetInitial(value);
+    }
+
+    public JsonObject Shared
     {
         set => SetInitial(value);
     }

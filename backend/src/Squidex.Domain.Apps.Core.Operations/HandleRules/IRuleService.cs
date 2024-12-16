@@ -15,14 +15,9 @@ public interface IRuleService
 {
     bool CanCreateSnapshotEvents(Rule rule);
 
-    string GetName(AppEvent @event);
-
     IAsyncEnumerable<JobResult> CreateSnapshotJobsAsync(RuleContext context,
         CancellationToken ct = default);
 
-    IAsyncEnumerable<JobResult> CreateJobsAsync(Envelope<IEvent> @event, RulesContext context,
-        CancellationToken ct = default);
-
-    Task<(Result Result, TimeSpan Elapsed)> InvokeAsync(string actionName, string job,
+    IAsyncEnumerable<JobResult> CreateJobsAsync(Envelope<AppEvent> @event, RulesContext context,
         CancellationToken ct = default);
 }

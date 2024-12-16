@@ -5,8 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
+using Squidex.Flows.Internal;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Web;
@@ -27,9 +27,9 @@ public sealed class UpdateRuleDto
     public RuleTriggerDto? Trigger { get; set; }
 
     /// <summary>
-    /// The action properties.
+    /// The flow that defines the actions.
     /// </summary>
-    public RuleAction? Action { get; set; }
+    public FlowDefinition? Flow { get; set; }
 
     /// <summary>
     /// Enable or disable the rule.

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Text.Json.Serialization;
+using Squidex.Domain.Apps.Core.Rules.Old;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
@@ -16,6 +17,9 @@ public sealed record RuleSorrgate : Rule, ISurrogate<Rule>
 {
     [Obsolete("Old serialization format.")]
     private Rule? ruleDef;
+
+    [Obsolete("Old rule action system.")]
+    public RuleAction? Action { get; set; }
 
     [JsonPropertyName("ruleDef")]
     [Obsolete("Old serialization format.")]
@@ -32,13 +36,13 @@ public sealed record RuleSorrgate : Rule, ISurrogate<Rule>
 
     public Rule ToSource()
     {
-        var result = this;
+        Rule result = this;
 
 #pragma warning disable CS0618 // Type or member is obsolete
         if (ruleDef != null)
         {
             // In previous versions, the actual rule was stored in a nested object.
-            return ruleDef with
+            result = ruleDef with
             {
                 Id = Id,
                 AppId = AppId,
@@ -50,13 +54,27 @@ public sealed record RuleSorrgate : Rule, ISurrogate<Rule>
                 Version = Version,
             };
         }
+
+        if (Action != null)
+        {
+            var action = Action;
+            if (action is IMigrated<RuleAction> migratedAction)
+            {
+                action = migratedAction.Migrate();
+            }
+
+            result = result with
+            {
+                Flow = action.ToFlow()
+            };
+        }
 #pragma warning restore CS0618 // Type or member is obsolete
 
-        if (result.Trigger is IMigrated<RuleTrigger> migrated)
+        if (result.Trigger is IMigrated<RuleTrigger> migratedTrigger)
         {
-            return this with { Trigger = migrated.Migrate() };
+            result = result with { Trigger = migratedTrigger.Migrate() };
         }
 
-        return this;
+        return result;
     }
 }

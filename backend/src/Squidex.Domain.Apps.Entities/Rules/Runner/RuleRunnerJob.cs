@@ -10,47 +10,29 @@ using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Jobs;
-using Squidex.Domain.Apps.Entities.Rules.Repositories;
+using Squidex.Domain.Apps.Events;
+using Squidex.Flows.Execution;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Runner;
 
-public sealed class RuleRunnerJob : IJobRunner
+public sealed class RuleRunnerJob(
+    IAppProvider appProvider,
+    IEventFormatter eventFormatter,
+    IEventStore eventStore,
+    IFlowStateStore<RuleFlowContext> flowStore,
+    IRuleService ruleService,
+    IRuleUsageTracker ruleUsageTracker,
+    ILogger<RuleRunnerJob> log) : IJobRunner
 {
     public const string TaskName = "run-rule";
     public const string ArgRuleId = "ruleId";
     public const string ArgSnapshot = "snapshots";
-
     private const int MaxErrors = 10;
-    private readonly IAppProvider appProvider;
-    private readonly IEventFormatter eventFormatter;
-    private readonly IEventStore eventStore;
-    private readonly IRuleEventRepository ruleEventRepository;
-    private readonly IRuleService ruleService;
-    private readonly IRuleUsageTracker ruleUsageTracker;
-    private readonly ILogger<RuleRunnerJob> log;
 
     public string Name => TaskName;
-
-    public RuleRunnerJob(
-        IAppProvider appProvider,
-        IEventFormatter eventFormatter,
-        IEventStore eventStore,
-        IRuleEventRepository ruleEventRepository,
-        IRuleService ruleService,
-        IRuleUsageTracker ruleUsageTracker,
-        ILogger<RuleRunnerJob> log)
-    {
-        this.appProvider = appProvider;
-        this.eventStore = eventStore;
-        this.eventFormatter = eventFormatter;
-        this.ruleEventRepository = ruleEventRepository;
-        this.ruleService = ruleService;
-        this.ruleUsageTracker = ruleUsageTracker;
-        this.log = log;
-    }
 
     public static DomainId? GetRunningRuleId(Job job)
     {
@@ -153,8 +135,8 @@ public sealed class RuleRunnerJob : IJobRunner
         // We collect errors and allow a few erors before we throw an exception.
         var errors = 0;
 
-        // Write in batches of 100 items for better performance. Using completes the last write.
-        await using var batch = new RuleQueueWriter(ruleEventRepository, ruleUsageTracker, null);
+        // Write in batches for better performance. DisposeAsync completes the last write.
+        await using var batch = new RuleQueueWriter(flowStore, ruleUsageTracker, null);
 
         await foreach (var result in ruleService.CreateSnapshotJobsAsync(context, ct))
         {
@@ -182,22 +164,26 @@ public sealed class RuleRunnerJob : IJobRunner
         // We collect errors and allow a few erors before we throw an exception.
         var errors = 0;
 
-        // Write in batches of 100 items for better performance. Using completes the last write.
-        await using var batch = new RuleQueueWriter(ruleEventRepository, ruleUsageTracker, null);
+        // Write in batches for better performance. DisposeAsync completes the last write.
+        await using var batch = new RuleQueueWriter(flowStore, ruleUsageTracker, null);
 
         // Use a prefix query so that the storage can use an index for the query.
         var streamFilter = StreamFilter.Prefix($"([a-zA-Z0-9]+)\\-{run.OwnerId}");
+
+        // Create the context once.
+        var rulesContext = context.ToRulesContext();
 
         await foreach (var storedEvent in eventStore.QueryAllAsync(streamFilter, ct: ct))
         {
             var @event = eventFormatter.ParseIfKnown(storedEvent);
 
-            if (@event == null)
+            // Also fetch restored events here, in contrast to the normal flow.
+            if (@event?.Payload is not AppEvent appEvent)
             {
                 continue;
             }
 
-            await foreach (var result in ruleService.CreateJobsAsync(@event, context.ToRulesContext(), ct))
+            await foreach (var result in ruleService.CreateJobsAsync(@event.To<AppEvent>(), rulesContext, ct))
             {
                 await batch.WriteAsync(result);
 

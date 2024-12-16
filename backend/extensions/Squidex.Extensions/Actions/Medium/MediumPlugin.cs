@@ -24,6 +24,6 @@ public sealed class MediumPlugin : IPlugin
             options.DefaultRequestHeaders.Add("User-Agent", "Squidex Headless CMS");
         });
 
-        services.AddRuleAction<MediumAction, MediumActionHandler>();
+        services.AddFlowStep<MediumStep>();
     }
 }

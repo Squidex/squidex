@@ -16,8 +16,9 @@ using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
-using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Entities.Rules.Runner;
+using Squidex.Flows;
+using Squidex.Flows.Execution;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
@@ -33,10 +34,10 @@ namespace Squidex.Areas.Api.Controllers.Rules;
 public sealed class RulesController(
     ICommandBus commandBus,
     IAppProvider appProvider,
-    IRuleEventRepository ruleEventsRepository,
+    IFlowStepRegistry flowStepRegistry,
+    IFlowStateStore<RuleFlowContext> flowStore,
     IRuleQueryService ruleQuery,
     IRuleRunnerService ruleRunnerService,
-    RuleTypeProvider ruleRegistry,
     EventJsonSchemaGenerator eventJsonSchemaGenerator)
     : ApiController(commandBus)
 {
@@ -51,11 +52,11 @@ public sealed class RulesController(
     [ApiCosts(0)]
     public IActionResult GetActions()
     {
-        var etag = string.Concat(ruleRegistry.Actions.Select(x => x.Key)).ToSha256Base64();
+        var etag = string.Concat(flowStepRegistry.Steps.Select(x => x.Key)).ToSha256Base64();
 
         var response = Deferred.Response(() =>
         {
-            return ruleRegistry.Actions.ToDictionary(x => x.Key, x => RuleElementDto.FromDomain(x.Value));
+            return flowStepRegistry.Steps.ToDictionary(x => x.Key, x => RuleElementDto.FromDomain(x.Value));
         });
 
         Response.Headers[HeaderNames.ETag] = etag;
@@ -243,7 +244,7 @@ public sealed class RulesController(
     [ApiCosts(1)]
     public async Task<IActionResult> DeleteRuleEvents(string app, DomainId id)
     {
-        await ruleEventsRepository.CancelByRuleAsync(id, HttpContext.RequestAborted);
+        await flowStore.CancelByDefinitionIdAsync(id.ToString(), HttpContext.RequestAborted);
 
         return NoContent();
     }
@@ -336,9 +337,9 @@ public sealed class RulesController(
     [ApiCosts(0)]
     public async Task<IActionResult> GetEvents(string app, [FromQuery] DomainId? ruleId = null, [FromQuery] int skip = 0, [FromQuery] int take = 20)
     {
-        var ruleEvents = await ruleEventsRepository.QueryByAppAsync(AppId, ruleId, skip, take, HttpContext.RequestAborted);
+        var (states, total) = await flowStore.QueryByOwnerAsync(AppId.ToString(), ruleId?.ToString(), skip, take, HttpContext.RequestAborted);
 
-        var response = RuleEventsDto.FromDomain(ruleEvents, Resources, ruleId);
+        var response = RuleEventsDto.FromDomain(states, total, Resources, ruleId);
 
         return Ok(response);
     }
@@ -357,14 +358,18 @@ public sealed class RulesController(
     [ApiCosts(0)]
     public async Task<IActionResult> PutEvent(string app, DomainId id)
     {
-        var ruleEvent = await ruleEventsRepository.FindAsync(id, HttpContext.RequestAborted);
-
-        if (ruleEvent == null)
+        if (Guid.TryParse(id.ToString(), out var instanceId))
         {
             return NotFound();
         }
 
-        await ruleEventsRepository.EnqueueAsync(id, SystemClock.Instance.GetCurrentInstant(), HttpContext.RequestAborted);
+        var state = await flowStore.FindAsync(instanceId, HttpContext.RequestAborted);
+        if (state == null)
+        {
+            return NotFound();
+        }
+
+        await flowStore.EnqueueAsync(instanceId, SystemClock.Instance.GetCurrentInstant(), HttpContext.RequestAborted);
 
         return NoContent();
     }
@@ -383,15 +388,18 @@ public sealed class RulesController(
     [ApiCosts(0)]
     public async Task<IActionResult> DeleteEvent(string app, DomainId id)
     {
-        var ruleEvent = await ruleEventsRepository.FindAsync(id, HttpContext.RequestAborted);
-
-        if (ruleEvent == null)
+        if (Guid.TryParse(id.ToString(), out var instanceId))
         {
             return NotFound();
         }
 
-        await ruleEventsRepository.CancelByEventAsync(id, HttpContext.RequestAborted);
+        var state = await flowStore.FindAsync(instanceId, HttpContext.RequestAborted);
+        if (state == null)
+        {
+            return NotFound();
+        }
 
+        await flowStore.CancelByInstanceIdAsync(instanceId, HttpContext.RequestAborted);
         return NoContent();
     }
 
@@ -407,7 +415,7 @@ public sealed class RulesController(
     [ApiCosts(1)]
     public async Task<IActionResult> DeleteEvents(string app)
     {
-        await ruleEventsRepository.CancelByAppAsync(App.Id, HttpContext.RequestAborted);
+        await flowStore.CancelByOwnerIdAsync(App.Id.ToString(), HttpContext.RequestAborted);
 
         return NoContent();
     }

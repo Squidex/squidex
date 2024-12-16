@@ -7,11 +7,13 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Rules;
+using Squidex.Flows.Execution;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
@@ -62,7 +64,7 @@ public partial class RuleDomainObject(
             case CreateRule createRule:
                 return ApplyReturnAsync(createRule, async (c, ct) =>
                 {
-                    await GuardRule.CanCreate(c, AppProvider());
+                    await GuardRule.CanCreate(c, AppProvider(), FlowExecutor(), ct);
 
                     Create(c);
 
@@ -72,7 +74,7 @@ public partial class RuleDomainObject(
             case UpdateRule updateRule:
                 return ApplyReturnAsync(updateRule, async (c, ct) =>
                 {
-                    await GuardRule.CanUpdate(c, Snapshot, AppProvider());
+                    await GuardRule.CanUpdate(c, Snapshot, AppProvider(), FlowExecutor(), ct);
 
                     Update(c);
 
@@ -158,6 +160,11 @@ public partial class RuleDomainObject(
     private void Raise<T, TEvent>(T command, TEvent @event) where T : class where TEvent : AppEvent
     {
         RaiseEvent(Envelope.Create(SimpleMapper.Map(command, @event)));
+    }
+
+    private IFlowExecutor<RuleFlowContext> FlowExecutor()
+    {
+        return serviceProvider.GetRequiredService<IFlowExecutor<RuleFlowContext>>();
     }
 
     private IAppProvider AppProvider()

@@ -5,16 +5,21 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
+using Squidex.Flows;
+using Squidex.Flows.Execution;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards;
 
 public static class GuardRule
 {
-    public static Task CanCreate(CreateRule command, IAppProvider appProvider)
+    public static Task CanCreate(CreateRule command, IAppProvider appProvider, IFlowExecutor<RuleFlowContext> executor,
+        CancellationToken ct)
     {
         Guard.NotNull(command);
 
@@ -31,20 +36,19 @@ public static class GuardRule
                 errors.Foreach((x, _) => x.AddTo(e));
             }
 
-            if (command.Action == null)
+            if (command.Flow == null)
             {
-                e(Not.Defined(nameof(command.Action)), nameof(command.Action));
+                e(Not.Defined(nameof(command.Flow)), nameof(command.Flow));
             }
             else
             {
-                var errors = command.Action.Validate();
-
-                errors.Foreach((x, _) => x.AddTo(e));
+                await executor.ValidateAsync(command.Flow, FormatError(e), ct);
             }
         });
     }
 
-    public static Task CanUpdate(UpdateRule command, Rule rule, IAppProvider appProvider)
+    public static Task CanUpdate(UpdateRule command, Rule rule, IAppProvider appProvider, IFlowExecutor<RuleFlowContext> executor,
+        CancellationToken ct)
     {
         Guard.NotNull(command);
 
@@ -57,11 +61,40 @@ public static class GuardRule
                 errors.Foreach((x, _) => x.AddTo(e));
             }
 
-            if (command.Action != null)
+            if (command.Flow != null)
             {
-                var errors = command.Action.Validate();
+                await executor.ValidateAsync(command.Flow, FormatError(e), ct);
+            }
+        });
+    }
 
-                errors.Foreach((x, _) => x.AddTo(e));
+    private static AddError FormatError(AddValidation e)
+    {
+        return new AddError((path, type, message) =>
+        {
+            var property = "flow";
+            if (!string.IsNullOrWhiteSpace(path))
+            {
+                property = $"{property}.{path}";
+            }
+
+            switch (type)
+            {
+                case ValidationErrorType.NoSteps:
+                    e(T.Get("rules.noStep"), property);
+                    break;
+                case ValidationErrorType.NoStartStep:
+                    e(T.Get("rules.noStartStep"), property);
+                    break;
+                case ValidationErrorType.InvalidNextStep:
+                    e(T.Get("rules.invalidNextStep"), property);
+                    break;
+                case ValidationErrorType.InvalidStepId:
+                    e(T.Get("rules.invalidNextStep"), property);
+                    break;
+                case ValidationErrorType.InvalidProperty when message != null:
+                    e(message, property);
+                    break;
             }
         });
     }

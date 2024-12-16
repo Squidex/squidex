@@ -16,9 +16,7 @@ public enum SkipReason
     Disabled = 1 << 2,
     Failed = 1 << 3,
     FromRule = 1 << 4,
-    NoAction = 1 << 5,
-    NoTrigger = 1 << 6,
-    TooOld = 1 << 7,
-    WrongEvent = 1 << 8,
-    WrongEventForTrigger = 1 << 9
+    NoTrigger = 1 << 5,
+    TooOld = 1 << 6,
+    WrongEventForTrigger = 1 << 7
 }

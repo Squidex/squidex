@@ -15,6 +15,6 @@ public sealed class NotificationPlugin : IPlugin
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        services.AddRuleAction<NotificationAction, NotificationActionHandler>();
+        services.AddFlowStep<NotificationStep>();
     }
 }

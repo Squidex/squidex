@@ -10,6 +10,7 @@ using Squidex.Areas.Api.Controllers.Rules.Models.Converters;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Runner;
+using Squidex.Flows.Internal;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Web;
@@ -64,9 +65,9 @@ public sealed class RuleDto : Resource
     public RuleTriggerDto Trigger { get; set; }
 
     /// <summary>
-    /// The action properties.
+    /// The flow that defines the actions.
     /// </summary>
-    public RuleAction Action { get; set; }
+    public FlowDefinition Flow { get; set; }
 
     /// <summary>
     /// The number of completed executions.

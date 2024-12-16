@@ -15,6 +15,7 @@ public sealed class AzureQueuePlugin : IPlugin
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        services.AddRuleAction<AzureQueueAction, AzureQueueActionHandler>();
+        services.AddSingleton<AzureQueuePool>();
+        services.AddFlowStep<AzureQueueStep>();
     }
 }

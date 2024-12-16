@@ -33,9 +33,9 @@ public partial class RuleDomainObject
                         newSnapshot = newSnapshot.Update(e.Trigger);
                     }
 
-                    if (e.Action != null)
+                    if (e.Flow != null)
                     {
-                        newSnapshot = newSnapshot.Update(e.Action);
+                        newSnapshot = newSnapshot.Update(e.Flow);
                     }
 
                     if (e.Name != null)

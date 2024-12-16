@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Diagnostics.Contracts;
+using Squidex.Flows.Internal;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Rules;
@@ -16,7 +17,7 @@ public record Rule : AppEntity
 
     public RuleTrigger Trigger { get; init; }
 
-    public RuleAction Action { get; init; }
+    public FlowDefinition Flow { get; init; }
 
     public bool IsEnabled { get; init; } = true;
 
@@ -63,11 +64,6 @@ public record Rule : AppEntity
     {
         Guard.NotNull(newTrigger);
 
-        if (newTrigger.GetType() != Trigger.GetType())
-        {
-            ThrowHelper.ArgumentException("New trigger has another type.", nameof(newTrigger));
-        }
-
         if (Trigger.Equals(newTrigger))
         {
             return this;
@@ -77,20 +73,10 @@ public record Rule : AppEntity
     }
 
     [Pure]
-    public Rule Update(RuleAction newAction)
+    public Rule Update(FlowDefinition flow)
     {
-        Guard.NotNull(newAction);
+        Guard.NotNull(flow);
 
-        if (newAction.GetType() != Action.GetType())
-        {
-            ThrowHelper.ArgumentException("New action has another type.", nameof(newAction));
-        }
-
-        if (Action.Equals(newAction))
-        {
-            return this;
-        }
-
-        return this with { Action = newAction };
+        return this with { Flow = flow };
     }
 }

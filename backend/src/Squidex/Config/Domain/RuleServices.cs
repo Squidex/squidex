@@ -32,6 +32,8 @@ public static class RuleServices
         services.Configure<RulesOptions>(config,
             "rules");
 
+        services.AddFlows<RuleFlowContext>(config, configPath: "rules");
+
         services.AddSingletonAs<EventEnricher>()
             .As<IEventEnricher>();
 

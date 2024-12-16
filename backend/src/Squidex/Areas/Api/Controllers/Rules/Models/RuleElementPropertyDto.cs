@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.HandleRules;
-
 namespace Squidex.Areas.Api.Controllers.Rules.Models;
 
 public sealed class RuleElementPropertyDto
@@ -14,7 +12,7 @@ public sealed class RuleElementPropertyDto
     /// <summary>
     /// The html editor.
     /// </summary>
-    public RuleFieldEditor Editor { get; set; }
+    public string Editor { get; set; }
 
     /// <summary>
     /// The name of the editor.
@@ -42,7 +40,17 @@ public sealed class RuleElementPropertyDto
     public bool IsFormattable { get; set; }
 
     /// <summary>
+    /// Indicates if the property is a script.
+    /// </summary>
+    public bool IsScript { get; set; }
+
+    /// <summary>
     /// Indicates if the property is required.
     /// </summary>
     public bool IsRequired { get; set; }
+
+    /// <summary>
+    /// Indicates if the property is obsolete and not supported anymore.
+    /// </summary>
+    public bool IsObsolete { get; set; }
 }

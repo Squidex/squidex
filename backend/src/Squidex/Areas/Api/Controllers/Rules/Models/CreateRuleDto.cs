@@ -7,6 +7,7 @@
 
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
+using Squidex.Flows.Internal;
 using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
@@ -22,18 +23,18 @@ public sealed class CreateRuleDto
     public RuleTriggerDto Trigger { get; set; }
 
     /// <summary>
-    /// The action properties.
+    /// The flow that defines the actions.
     /// </summary>
     [LocalizedRequired]
-    public RuleAction Action { get; set; }
+    public FlowDefinition Flow { get; set; }
 
     public Rule ToRule()
     {
-        return new Rule { Trigger = Trigger.ToTrigger(), Action = Action };
+        return new Rule { Trigger = Trigger.ToTrigger(), Flow = Flow };
     }
 
     public CreateRule ToCommand()
     {
-        return new CreateRule { Action = Action, Trigger = Trigger?.ToTrigger() };
+        return new CreateRule { Trigger = Trigger?.ToTrigger(), Flow = Flow };
     }
 }

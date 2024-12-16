@@ -1,0 +1,68 @@
+﻿// ==========================================================================
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
+//  All rights reserved. Licensed under the MIT license.
+// ==========================================================================
+
+using System.ComponentModel.DataAnnotations;
+using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
+using Squidex.Domain.Apps.Entities.Collaboration;
+using Squidex.Flows;
+using Squidex.Infrastructure;
+using Squidex.Infrastructure.Validation;
+using Squidex.Shared.Users;
+
+namespace Squidex.Extensions.Actions.Notification;
+
+[FlowStep(
+    Title = "Notification",
+    IconImage = "<svg version='1.1' xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24'><path d='M20.016 15.984v-12h-16.031v14.016l2.016-2.016h14.016zM20.016 2.016c1.078 0 1.969 0.891 1.969 1.969v12c0 1.078-0.891 2.016-1.969 2.016h-14.016l-3.984 3.984v-18c0-1.078 0.891-1.969 1.969-1.969h16.031z'></path></svg>",
+    IconColor = "#3389ff",
+    Display = "Send a notification",
+    Description = "Send an integrated notification to a user.")]
+public sealed class NotificationStep : RuleFlowStep<EnrichedUserEventBase>
+{
+    [LocalizedRequired]
+    [Display(Name = "User", Description = "The user id or email.")]
+    [Editor(FlowStepEditor.Text)]
+    public string User { get; set; }
+
+    [LocalizedRequired]
+    [Display(Name = "Title", Description = "The text to send.")]
+    [Editor(FlowStepEditor.TextArea)]
+    [Expression]
+    public string Text { get; set; }
+
+    [Display(Name = "Url", Description = "The optional url to attach to the notification.")]
+    [Editor(FlowStepEditor.Text)]
+    [Expression]
+    public string? Url { get; set; }
+
+    [Display(Name = "Client", Description = "An optional client name.")]
+    [Editor(FlowStepEditor.Text)]
+    public string? Client { get; set; }
+
+    protected override async ValueTask<FlowStepResult> ExecuteAsync(RuleFlowContext context, EnrichedUserEventBase @event, FlowExecutionContext executionContext,
+        CancellationToken ct)
+    {
+        var userResolver = executionContext.Resolve<IUserResolver>();
+
+        var user = await userResolver.FindByIdOrEmailAsync(User, ct)
+            ?? throw new InvalidOperationException($"Cannot find user by '{User}'");
+
+        var actor = @event.Actor;
+        if (!string.IsNullOrEmpty(Client))
+        {
+            actor = RefToken.Client(Client);
+        }
+
+        Uri.TryCreate(Url, UriKind.RelativeOrAbsolute, out var uri);
+
+        var collaboration = executionContext.Resolve<ICollaborationService>();
+        await collaboration.NotifyAsync(user.Id, Text, actor, uri, true, ct);
+
+        return FlowStepResult.Next();
+    }
+}

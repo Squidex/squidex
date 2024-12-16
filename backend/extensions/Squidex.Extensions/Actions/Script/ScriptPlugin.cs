@@ -7,6 +7,7 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Flows;
 using Squidex.Infrastructure.Plugins;
 
 namespace Squidex.Extensions.Actions.Script;
@@ -15,6 +16,10 @@ public sealed class ScriptPlugin : IPlugin
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        services.AddRuleAction<ScriptAction, ScriptActionHandler>();
+        services.AddFlowStep<ScriptStep>();
+        services.Configure<FlowOptions>(options =>
+        {
+            options.Steps.Remove(typeof(Flows.Steps.ScriptStep));
+        });
     }
 }

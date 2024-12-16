@@ -5,7 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Rules;
+using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Flows.Execution;
 using Squidex.Infrastructure;
 using Squidex.Web;
 
@@ -23,12 +24,12 @@ public sealed class RuleEventsDto : Resource
     /// </summary>
     public RuleEventDto[] Items { get; set; }
 
-    public static RuleEventsDto FromDomain(IResultList<IRuleEventEntity> ruleEvents, Resources resources, DomainId? ruleId)
+    public static RuleEventsDto FromDomain(List<FlowExecutionState<RuleFlowContext>> states, long total, Resources resources, DomainId? ruleId)
     {
         var result = new RuleEventsDto
         {
-            Total = ruleEvents.Total,
-            Items = ruleEvents.Select(x => RuleEventDto.FromDomain(x, resources)).ToArray()
+            Total = total,
+            Items = states.Select(x => RuleEventDto.FromDomain(x, resources)).ToArray()
         };
 
         return result.CreateLinks(resources, ruleId);

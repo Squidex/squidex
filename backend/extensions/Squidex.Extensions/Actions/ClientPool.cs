@@ -12,7 +12,7 @@ using Microsoft.Extensions.Options;
 
 namespace Squidex.Extensions.Actions;
 
-internal sealed class ClientPool<TKey, TClient> where TKey : notnull
+internal class ClientPool<TKey, TClient> where TKey : notnull
 {
     private static readonly TimeSpan TimeToLive = TimeSpan.FromMinutes(30);
     private readonly MemoryCache memoryCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
