@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, Input, OnInit } from '@angular/core';
+import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
 import { AuthService, ContentDto, DropdownMenuComponent, interpolate, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, Settings, StatefulComponent, TranslatePipe } from '@app/shared';
@@ -32,7 +32,7 @@ interface State {
         TranslatePipe,
     ],
 })
-export class PreviewButtonComponent extends StatefulComponent<State> implements OnInit {
+export class PreviewButtonComponent extends StatefulComponent<State> implements OnChanges {
     @Input()
     public confirm?: () => Observable<boolean>;
 
@@ -51,7 +51,7 @@ export class PreviewButtonComponent extends StatefulComponent<State> implements 
         super({ previewNamesMore: [] });
     }
 
-    public ngOnInit() {
+    public ngOnChanges() {
         let selectedName = this.localStore.get(this.configKey());
 
         if (!selectedName || !this.schema.previewUrls[selectedName]) {
@@ -81,11 +81,10 @@ export class PreviewButtonComponent extends StatefulComponent<State> implements 
     }
 
     private navigateTo(name: string) {
-        const vars = { ...this.content, ...this.authService.user || {} };
+        const urlVars = { ...this.content, ...this.authService.user || {} };
+        const urlLink = interpolate(this.schema.previewUrls[name], urlVars, 'iv');
 
-        const url = interpolate(this.schema.previewUrls[name], vars, 'iv');
-
-        window.open(url, '_blank');
+        window.open(urlLink, '_blank');
     }
 
     private selectUrl(selectedName: string) {

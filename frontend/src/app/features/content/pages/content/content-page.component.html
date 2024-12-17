@@ -75,7 +75,7 @@
                         (languageChange)="changeLanguage($event)"
                         [languages]="languages"
                         [percents]="contentForm.translationStatus | async"></sqx-language-selector>
-                    @if (content.canDelete) {
+                    @if (content.canDelete && schema.type !== 'Singleton') {
                         <button
                             class="btn btn-outline-secondary ms-2"
                             #buttonOptions
