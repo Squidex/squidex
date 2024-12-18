@@ -48,7 +48,7 @@ export function getContentValue(content: ContentDto, language: LanguageDto, fiel
     const actualReference = getValue(content.referenceData, language, field, true);
     const actualValue = getValue(content.data, language, field);
 
-    if (!actualReference && !actualValue) {
+    if (Types.isUndefined(actualReference) && Types.isUndefined(actualValue)) {
         return { value: actualValue, formatted: '' };
     }
 
