@@ -53,7 +53,6 @@ export function getContentValue(content: ContentDto, language: LanguageDto, fiel
     }
 
     const formatted = FieldFormatter.format(field, actualValue, actualReference, allowHtml);
-
     return { value: actualValue, formatted };
 }
 
