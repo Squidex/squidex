@@ -397,6 +397,23 @@ describe('GetContentValue', () => {
         });
     });
 
+    it('should resolve value from invariant field as zero', () => {
+        const content: any = {
+            data: {
+                field1: {
+                    iv: 0,
+                },
+            },
+        };
+
+        const result = getContentValue(content, language, fieldInvariant);
+
+        expect(result).toEqual({
+            value: 0,
+            formatted: '0',
+        });
+    });
+
     it('should resolve value from localized field', () => {
         const content: any = {
             data: {

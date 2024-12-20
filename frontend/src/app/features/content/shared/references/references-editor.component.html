@@ -5,7 +5,7 @@
         </button>
     </div>
     <div class="col" [class.disabled]="snapshot.isDisabled">
-        <button class="btn btn-outline-secondary btn-dashed btn-block" (click)="contentSelectorDialog.show()">
+        <button class="btn btn-outline-secondary btn-dashed btn-block" (click)="contentSelectorDialog.show()" type="button">
             {{ "contents.referencesSelectExisting" | sqxTranslate }}
         </button>
     </div>
