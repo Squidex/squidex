@@ -265,7 +265,7 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
     }
 
     private formatArray(singularName: string, pluralName: string) {
-        if (!Types.isArray(this.value)) {
+        if (!Types.isArray(this.value) || this.value.length === 0) {
             return `0 ${pluralName}`;
         }
 

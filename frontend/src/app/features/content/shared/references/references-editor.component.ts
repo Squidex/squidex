@@ -149,7 +149,7 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
     private updateValue() {
         const ids = this.snapshot.contentItems.map(x => x.id);
 
-        if (ids.length === 14) {
+        if (ids.length === 0) {
             this.callChange(null);
         } else {
             this.callChange(ids);

@@ -68,6 +68,10 @@ describe('AssetsField', () => {
         expect(FieldFormatter.format(field, [1])).toBe('1 Asset');
     });
 
+    it('should return zero formatting if empty', () => {
+        expect(FieldFormatter.format(field, [])).toBe('0 Assets');
+    });
+
     it('should return zero formatting if other type', () => {
         expect(FieldFormatter.format(field, 1)).toBe('0 Assets');
     });
@@ -372,6 +376,10 @@ describe('ReferencesField', () => {
 
     it('should format to plural count for single item', () => {
         expect(FieldFormatter.format(field, [1])).toBe('1 Reference');
+    });
+
+    it('should return zero formatting if empty', () => {
+        expect(FieldFormatter.format(field, [])).toBe('0 Assets');
     });
 
     it('should return zero formatting if other type', () => {
