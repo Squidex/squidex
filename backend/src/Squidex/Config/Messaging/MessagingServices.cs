@@ -43,7 +43,8 @@ public static class MessagingServices
 
         if (isWorker)
         {
-            services.AddAICleaner();
+            services.AddAI()
+                .AddCleaner();
 
             services.AddSingletonAs<AssetCleanupProcess>()
                 .AsSelf();

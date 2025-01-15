@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Events;
+
 namespace Squidex.Infrastructure.EventSourcing;
 
 public interface IEventConsumer

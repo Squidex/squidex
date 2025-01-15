@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Domain.Apps.Events;
+using Squidex.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.EventSourcing;
@@ -51,7 +52,7 @@ public sealed class DefaultRuleRunnerService(
 
         var simulatedEvents = new List<SimulatedRuleEvent>(MaxSimulatedEvents);
 
-        var streamStart = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(7));
+        var streamStart = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(7)).ToDateTimeUtc();
         var streamFilter = StreamFilter.Prefix($"([a-zA-Z0-9]+)-{appId.Id}");
 
         await foreach (var storedEvent in eventStore.QueryAllReverseAsync(streamFilter, streamStart, MaxSimulatedEvents, ct))

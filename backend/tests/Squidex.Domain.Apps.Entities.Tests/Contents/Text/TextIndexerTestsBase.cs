@@ -10,6 +10,7 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Contents;
+using Squidex.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json.Objects;
@@ -20,14 +21,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
 public abstract class TextIndexerTestsBase : GivenContext
 {
+    private TextIndexingProcess? process;
+
     protected readonly List<DomainId> ids1 = [DomainId.NewGuid()];
     protected readonly List<DomainId> ids2 = [DomainId.NewGuid()];
-    private readonly Lazy<TextIndexingProcess> sut;
-
-    protected TextIndexingProcess Sut
-    {
-        get { return sut.Value; }
-    }
 
     public virtual bool SupportsQuerySyntax => true;
 
@@ -35,24 +32,14 @@ public abstract class TextIndexerTestsBase : GivenContext
 
     public virtual int WaitAfterUpdate => 0;
 
-    protected TextIndexerTestsBase()
-    {
-        sut = new Lazy<TextIndexingProcess>(CreateSut);
-    }
-
-    private TextIndexingProcess CreateSut()
-    {
-        var index = CreateIndex();
-
-        return new TextIndexingProcess(TestUtils.DefaultSerializer, index, new InMemoryTextIndexerState());
-    }
-
-    public abstract ITextIndex CreateIndex();
+    public abstract Task<ITextIndex> CreateSutAsync();
 
     [Fact]
-    public void Should_return_content_filter_for_events_filter()
+    public async Task Should_return_content_filter_for_events_filter()
     {
-        Assert.Equal(StreamFilter.Prefix("content-"), Sut.EventsFilter);
+        var sut = await GetProcessAsync();
+
+        Assert.Equal(StreamFilter.Prefix("content-"), sut.EventsFilter);
     }
 
     [Fact]
@@ -410,11 +397,13 @@ public abstract class TextIndexerTestsBase : GivenContext
 
     private async Task UpdateAsync(DomainId id, ContentEvent contentEvent)
     {
+        var sut = await GetProcessAsync();
+
         contentEvent.ContentId = id;
         contentEvent.AppId = AppId;
         contentEvent.SchemaId = SchemaId;
 
-        await Sut.On(Enumerable.Repeat(Envelope.Create<IEvent>(contentEvent), 1));
+        await sut.On(Enumerable.Repeat(Envelope.Create<IEvent>(contentEvent), 1));
 
         await Task.Delay(WaitAfterUpdate, default);
     }
@@ -450,10 +439,14 @@ public abstract class TextIndexerTestsBase : GivenContext
 
     protected async Task SearchGeo(List<DomainId>? expected, string field, double latitude, double longitude, SearchScope target = SearchScope.All)
     {
-        var query = new GeoQuery(SchemaId.Id, field, latitude, longitude, 1000, 1000);
+        var query = new GeoQuery(SchemaId.Id, field, latitude, longitude, 1000, 1000)
+        {
+            SchemaId = default
+        };
 
-        var actual = await Sut.TextIndex.SearchAsync(App, query, target, default);
+        var sut = await GetProcessAsync();
 
+        var actual = await sut.TextIndex.SearchAsync(App, query, target, default);
         if (expected != null)
         {
             actual.Should().BeEquivalentTo(expected.ToHashSet());
@@ -468,11 +461,12 @@ public abstract class TextIndexerTestsBase : GivenContext
     {
         var query = new TextQuery(text, 1000)
         {
-            RequiredSchemaIds = new List<DomainId> { SchemaId.Id }
+            RequiredSchemaIds = [SchemaId.Id]
         };
 
-        var actual = await Sut.TextIndex.SearchAsync(App, query, target, default);
+        var sut = await GetProcessAsync();
 
+        var actual = await sut.TextIndex.SearchAsync(App, query, target, default);
         if (expected != null)
         {
             actual.Should().BeEquivalentTo(expected.ToHashSet());
@@ -490,8 +484,9 @@ public abstract class TextIndexerTestsBase : GivenContext
             PreferredSchemaId = Schema.Id
         };
 
-        var actual = await Sut.TextIndex.SearchAsync(App, query, target, default);
+        var sut = await GetProcessAsync();
 
+        var actual = await sut.TextIndex.SearchAsync(App, query, target, default);
         if (expected != null)
         {
             actual.Should().BeEquivalentTo(expected.ToHashSet());
@@ -500,5 +495,17 @@ public abstract class TextIndexerTestsBase : GivenContext
         {
             actual.Should().BeEmpty();
         }
+    }
+
+    private async Task<TextIndexingProcess> GetProcessAsync()
+    {
+        if (process == null)
+        {
+            var index = await CreateSutAsync();
+
+            process = new TextIndexingProcess(TestUtils.DefaultSerializer, index, new InMemoryTextIndexerState());
+        }
+
+        return process;
     }
 }

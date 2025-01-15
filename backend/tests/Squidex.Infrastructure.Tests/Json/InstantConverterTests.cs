@@ -17,7 +17,7 @@ public class InstantConverterTests
     {
         var value = Instant.FromUtc(2012, 12, 10, 9, 8, 45);
 
-        var serialized = value.SerializeAndDeserialize();
+        var serialized = value.SerializeAndDeserializeJson();
 
         Assert.Equal(value, serialized);
     }
@@ -27,7 +27,7 @@ public class InstantConverterTests
     {
         Instant? value = Instant.FromUtc(2012, 12, 10, 9, 8, 45);
 
-        var serialized = value.SerializeAndDeserialize();
+        var serialized = value.SerializeAndDeserializeJson();
 
         Assert.Equal(value, serialized);
     }
@@ -37,7 +37,7 @@ public class InstantConverterTests
     {
         Instant? value = null;
 
-        var serialized = value.SerializeAndDeserialize();
+        var serialized = value.SerializeAndDeserializeJson();
 
         Assert.Equal(value, serialized);
     }

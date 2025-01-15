@@ -8,6 +8,7 @@
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Domain.Apps.Events.Contents;
+using Squidex.Events;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
 

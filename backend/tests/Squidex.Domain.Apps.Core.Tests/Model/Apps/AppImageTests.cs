@@ -37,7 +37,7 @@ public class AppImageTests
     {
         var appImage = new AppImage("image/png");
 
-        var serialized = appImage.SerializeAndDeserialize();
+        var serialized = appImage.SerializeAndDeserializeAsJson();
 
         Assert.Equal(appImage, serialized);
     }

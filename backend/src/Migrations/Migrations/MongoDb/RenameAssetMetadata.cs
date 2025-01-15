@@ -7,8 +7,8 @@
 
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
-using Squidex.Infrastructure.MongoDb;
 
 namespace Migrations.Migrations.MongoDb;
 

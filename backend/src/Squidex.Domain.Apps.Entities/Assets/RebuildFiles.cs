@@ -8,6 +8,7 @@
 using System.Text;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Events.Assets;
+using Squidex.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 

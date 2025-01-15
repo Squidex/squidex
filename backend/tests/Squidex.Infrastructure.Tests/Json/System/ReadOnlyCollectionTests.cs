@@ -28,7 +28,7 @@ public class ReadOnlyCollectionTests
             }
         };
 
-        var serialized = source.SerializeAndDeserialize();
+        var serialized = source.SerializeAndDeserializeJson();
 
         Assert.Equal(2, serialized.Values.Count);
     }
@@ -45,7 +45,7 @@ public class ReadOnlyCollectionTests
             }
         };
 
-        var serialized = source.SerializeAndDeserialize();
+        var serialized = source.SerializeAndDeserializeJson();
 
         Assert.Equal(2, serialized.Values.Count);
     }

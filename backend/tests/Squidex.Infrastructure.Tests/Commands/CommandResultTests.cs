@@ -16,7 +16,7 @@ public class CommandResultTests
     {
         var sut = new CommandResult(DomainId.NewGuid(), 3, 2, null!);
 
-        var serialized = sut.SerializeAndDeserialize();
+        var serialized = sut.SerializeAndDeserializeJson();
 
         Assert.Equal(sut, serialized);
     }

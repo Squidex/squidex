@@ -10,6 +10,7 @@ using NodaTime;
 using Squidex.Domain.Apps.Entities.Collaboration;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Teams;
+using Squidex.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Shared.Users;
@@ -41,11 +42,10 @@ public sealed class InvitationEventConsumer(
             return;
         }
 
-        var now = SystemClock.Instance.GetCurrentInstant();
+        var timestamp = @event.Headers.TimestampAsInstant();
 
-        var timestamp = @event.Headers.Timestamp();
-
-        if (now - timestamp > MaxAge)
+        var currentTime = SystemClock.Instance.GetCurrentInstant();
+        if (currentTime - timestamp > MaxAge)
         {
             return;
         }

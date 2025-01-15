@@ -33,7 +33,7 @@ public class WorkflowJsonTests
             }.ToReadonlyDictionary(),
             ReadonlyList.Create(DomainId.NewGuid()), "MyName");
 
-        var serialized = workflow.SerializeAndDeserialize();
+        var serialized = workflow.SerializeAndDeserializeAsJson();
 
         Assert.Equal(workflow, serialized);
     }
@@ -43,7 +43,7 @@ public class WorkflowJsonTests
     {
         var workflow = Workflow.Default;
 
-        var serialized = workflow.SerializeAndDeserialize();
+        var serialized = workflow.SerializeAndDeserializeAsJson();
 
         Assert.Equal(workflow, serialized);
     }
@@ -53,7 +53,7 @@ public class WorkflowJsonTests
     {
         var jsonStep = new { noUpdate = true };
 
-        var serialized = jsonStep.SerializeAndDeserialize<WorkflowStep, object>();
+        var serialized = jsonStep.SerializeAndDeserializeAsJson<WorkflowStep, object>();
 
         Assert.Equal(new WorkflowStep(null, null, NoUpdate.Always), serialized);
     }
@@ -63,7 +63,7 @@ public class WorkflowJsonTests
     {
         var step = new WorkflowStep(NoUpdate: NoUpdate.When("Expression", "Role1", "Role2"));
 
-        var serialized = step.SerializeAndDeserialize();
+        var serialized = step.SerializeAndDeserializeAsJson();
 
         Assert.Equal(step, serialized);
     }
@@ -73,7 +73,7 @@ public class WorkflowJsonTests
     {
         var source = new WorkflowTransitionSurrogate { Expression = "expression_1", Role = "role_1" };
 
-        var serialized = source.SerializeAndDeserialize();
+        var serialized = source.SerializeAndDeserializeAsJson();
 
         var actual = serialized.ToSource();
 

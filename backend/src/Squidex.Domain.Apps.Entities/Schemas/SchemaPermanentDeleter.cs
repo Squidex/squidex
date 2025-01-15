@@ -8,6 +8,7 @@
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
 using Squidex.Domain.Apps.Events.Schemas;
+using Squidex.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
@@ -60,7 +61,7 @@ public sealed class SchemaPermanentDeleter(
             return;
         }
 
-        using var activity = Telemetry.Activities.StartActivity("RemoveAppFromSystem");
+        using var activity = Infrastructure.Telemetry.Activities.StartActivity("RemoveAppFromSystem");
 
         var app = await appProvider.GetAppAsync(schemaDeleted.AppId.Id);
         if (app == null)
@@ -76,7 +77,7 @@ public sealed class SchemaPermanentDeleter(
 
         foreach (var deleter in deleters)
         {
-            using (Telemetry.Activities.StartActivity(deleter.GetType().Name))
+            using (Infrastructure.Telemetry.Activities.StartActivity(deleter.GetType().Name))
             {
                 await deleter.DeleteSchemaAsync(app, schema.Snapshot, default);
             }

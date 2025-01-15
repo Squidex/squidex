@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.EventSourcing;
+using Squidex.Events;
 
 namespace Squidex.Domain.Apps.Entities.Backup;
 

@@ -104,7 +104,7 @@ public class StatusTests
     {
         var status = Status.Draft;
 
-        var serialized = status.SerializeAndDeserialize();
+        var serialized = status.SerializeAndDeserializeAsJson();
 
         Assert.Equal(status, serialized);
     }
@@ -117,7 +117,7 @@ public class StatusTests
             [Status.Draft] = 123
         };
 
-        var serialized = dictionary.SerializeAndDeserialize();
+        var serialized = dictionary.SerializeAndDeserializeAsJson();
 
         Assert.Equal(123, serialized[Status.Draft]);
     }

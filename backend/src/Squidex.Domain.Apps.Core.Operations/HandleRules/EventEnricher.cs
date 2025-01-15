@@ -22,7 +22,7 @@ public sealed class EventEnricher(IMemoryCache userCache, IUserResolver userReso
     {
         if (@event != null)
         {
-            enrichedEvent.Timestamp = @event.Headers.Timestamp();
+            enrichedEvent.Timestamp = @event.Headers.TimestampAsInstant();
 
             enrichedEvent.AppId = @event.Payload.AppId;
         }

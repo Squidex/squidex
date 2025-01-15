@@ -18,7 +18,7 @@ public class WorkflowsJsonTests
     {
         var workflows = Workflows.Empty.Add(DomainId.NewGuid(), "my-workflow");
 
-        var serialized = workflows.SerializeAndDeserialize();
+        var serialized = workflows.SerializeAndDeserializeAsJson();
 
         Assert.Equal(workflows, serialized);
     }

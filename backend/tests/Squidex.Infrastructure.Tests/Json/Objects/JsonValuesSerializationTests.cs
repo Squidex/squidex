@@ -5,141 +5,107 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.TestHelpers;
 
 namespace Squidex.Infrastructure.Json.Objects;
 
 public class JsonValuesSerializationTests
 {
-    public enum SerializerMode
-    {
-        Json,
-        Bson
-    }
-
-    public static readonly TheoryData<SerializerMode> Serializers = new TheoryData<SerializerMode>
-    {
-        { SerializerMode.Json },
-        { SerializerMode.Bson }
-    };
-
-    private static T Serialize<T>(T input, SerializerMode mode)
-    {
-        if (mode == SerializerMode.Bson)
-        {
-            return input.SerializeAndDeserializeBson();
-        }
-        else
-        {
-            return input.SerializeAndDeserialize();
-        }
-    }
-
     [Fact]
     public void Should_deserialize_integer()
     {
         var value = 123;
 
-        var serialized = value.SerializeAndDeserialize<JsonValue, int>();
+        var serialized = value.SerializeAndDeserializeJson<JsonValue, int>();
 
         Assert.Equal(JsonValue.Create(value), serialized);
     }
 
-    [Theory]
-    [MemberData(nameof(Serializers))]
-    public void Should_serialize_and_deserialize_null(SerializerMode mode)
+    [Fact]
+    public void Should_serialize_and_deserialize_null()
     {
         var value = JsonValue.Null;
 
-        var serialized = Serialize(value, mode);
+        var serialized = value.SerializeAndDeserializeJson();
 
         Assert.Equal(value, serialized);
     }
 
-    [Theory]
-    [MemberData(nameof(Serializers))]
-    public void Should_serialize_and_deserialize_date(SerializerMode mode)
+    [Fact]
+    public void Should_serialize_and_deserialize_date()
     {
         var value = JsonValue.Create("2008-09-15T15:53:00");
 
-        var serialized = Serialize(value, mode);
+        var serialized = value.SerializeAndDeserializeJson();
 
         Assert.Equal(value, serialized);
     }
 
-    [Theory]
-    [MemberData(nameof(Serializers))]
-    public void Should_serialize_and_deserialize_string(SerializerMode mode)
+    [Fact]
+    public void Should_serialize_and_deserialize_string()
     {
         var value = JsonValue.Create("my-string");
 
-        var serialized = Serialize(value, mode);
+        var serialized = value.SerializeAndDeserializeJson();
 
         Assert.Equal(value, serialized);
     }
 
-    [Theory]
-    [MemberData(nameof(Serializers))]
-    public void Should_serialize_and_deserialize_boolean(SerializerMode mode)
+    [Fact]
+    public void Should_serialize_and_deserialize_boolean()
     {
         var value = JsonValue.Create(true);
 
-        var serialized = Serialize(value, mode);
+        var serialized = value.SerializeAndDeserializeJson();
 
         Assert.Equal(value, serialized);
     }
 
-    [Theory]
-    [MemberData(nameof(Serializers))]
-    public void Should_serialize_and_deserialize_number(SerializerMode mode)
+    [Fact]
+    public void Should_serialize_and_deserialize_number()
     {
         var value = JsonValue.Create(123);
 
-        var serialized = Serialize(value, mode);
+        var serialized = value.SerializeAndDeserializeJson();
 
         Assert.Equal(value, serialized);
     }
 
-    [Theory]
-    [MemberData(nameof(Serializers))]
-    public void Should_serialize_and_deserialize_double_number(SerializerMode mode)
+    [Fact]
+    public void Should_serialize_and_deserialize_double_number()
     {
         var value = JsonValue.Create(123.5);
 
-        var serialized = Serialize(value, mode);
+        var serialized = value.SerializeAndDeserializeJson();
 
         Assert.Equal(value, serialized);
     }
 
-    [Theory]
-    [MemberData(nameof(Serializers))]
-    public void Should_serialize_and_deserialize_array(SerializerMode mode)
+    [Fact]
+    public void Should_serialize_and_deserialize_array()
     {
         var value = JsonValue.Array(1, 2);
 
-        var serialized = Serialize(value, mode);
+        var serialized = value.SerializeAndDeserializeJson();
 
         Assert.Equal(value, serialized);
     }
 
-    [Theory]
-    [MemberData(nameof(Serializers))]
-    public void Should_serialize_and_deserialize_object(SerializerMode mode)
+    [Fact]
+    public void Should_serialize_and_deserialize_object()
     {
         var value =
             JsonValue.Object()
                 .Add("1", 1)
                 .Add("2", 1);
 
-        var serialized = Serialize(value, mode);
+        var serialized = value.SerializeAndDeserializeJson();
 
         Assert.Equal(value, serialized);
     }
 
-    [Theory]
-    [MemberData(nameof(Serializers))]
-    public void Should_serialize_and_deserialize_complex_object(SerializerMode mode)
+    [Fact]
+    public void Should_serialize_and_deserialize_complex_object()
     {
         var value =
             JsonValue.Object()
@@ -150,25 +116,8 @@ public class JsonValuesSerializationTests
                 .Add("2",
                     JsonValue.Object().Add("2_1", 11));
 
-        var serialized = Serialize(value, mode);
+        var serialized = value.SerializeAndDeserializeJson();
 
         Assert.Equal(value, serialized);
-    }
-
-    [Fact]
-    public void Should_deserialize_from_escaped_dot()
-    {
-        var value = new Dictionary<string, int>
-        {
-            ["key.with.dot".JsonToBsonName()] = 10
-        };
-
-        var expected =
-            JsonValue.Object()
-                .Add("key.with.dot", 10);
-
-        var serialized = TestUtils.SerializeAndDeserializeBson<JsonObject, Dictionary<string, int>>(value);
-
-        Assert.Equal(expected, serialized);
     }
 }

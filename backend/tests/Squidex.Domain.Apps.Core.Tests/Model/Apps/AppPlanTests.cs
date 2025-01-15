@@ -17,7 +17,7 @@ public class AppPlanTests
     {
         var plan = new AssignedPlan(RefToken.Client("Me"), "free");
 
-        var serialized = plan.SerializeAndDeserialize();
+        var serialized = plan.SerializeAndDeserializeAsJson();
 
         Assert.Equal(plan, serialized);
     }

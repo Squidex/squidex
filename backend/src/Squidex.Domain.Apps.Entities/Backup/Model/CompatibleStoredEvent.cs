@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using System.Text.Json.Serialization;
-using Squidex.Infrastructure.EventSourcing;
+using Squidex.Events;
 using Squidex.Infrastructure.Json.System;
 
 #pragma warning disable MA0048 // File name must match type name
@@ -35,7 +35,7 @@ public sealed class CompatibleStoredEvent
         return new CompatibleStoredEvent
         {
             Data = CompatibleEventData.V1(stored.Data),
-            EventPosition = stored.EventPosition,
+            EventPosition = stored.EventPosition.Token!,
             EventStreamNumber = stored.EventStreamNumber,
             StreamName = stored.StreamName
         };

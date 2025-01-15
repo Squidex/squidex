@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Events;
+
 namespace Squidex.Infrastructure.EventSourcing;
 
 public sealed class Envelope<T>(T payload, EnvelopeHeaders? headers = null) where T : class, IEvent

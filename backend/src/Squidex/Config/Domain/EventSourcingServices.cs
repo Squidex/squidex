@@ -6,8 +6,8 @@
 // ==========================================================================
 
 using EventStore.Client;
+using Squidex.Events.GetEventStore;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.EventSourcing.Consume;
 using Squidex.Infrastructure.States;
@@ -22,17 +22,7 @@ public static class EventSourcingServices
         {
             ["MongoDb"] = () =>
             {
-                var mongoConfiguration = config.GetRequiredValue("eventStore:mongoDb:configuration");
-                var mongoDatabaseName = config.GetRequiredValue("eventStore:mongoDb:database");
-
-                services.AddSingletonAs(c =>
-                    {
-                        var mongoClient = StoreServices.GetMongoClient(mongoConfiguration);
-                        var mongoDatabase = mongoClient.GetDatabase(mongoDatabaseName);
-
-                        return new MongoEventStore(mongoDatabase);
-                    })
-                    .As<IEventStore>();
+                services.AddSquidexMongoEventStore(config);
             },
             ["GetEventStore"] = () =>
             {
@@ -41,11 +31,7 @@ public static class EventSourcingServices
                 services.AddSingletonAs(_ => EventStoreClientSettings.Create(configuration))
                     .AsSelf();
 
-                services.AddSingletonAs<GetEventStore>()
-                    .As<IEventStore>();
-
-                services.AddHealthChecks()
-                    .AddCheck<GetEventStoreHealthCheck>("EventStore", tags: ["node"]);
+                services.AddGetEventStore(config);
             }
         });
 

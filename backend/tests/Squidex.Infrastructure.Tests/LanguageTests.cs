@@ -139,7 +139,7 @@ public class LanguageTests
     {
         Language? value = null;
 
-        var serialized = value.SerializeAndDeserialize();
+        var serialized = value.SerializeAndDeserializeJson();
 
         Assert.Equal(value, serialized);
     }
@@ -149,7 +149,7 @@ public class LanguageTests
     {
         var value = Language.DE;
 
-        var serialized = value.SerializeAndDeserialize();
+        var serialized = value.SerializeAndDeserializeJson();
 
         Assert.Equal(value, serialized);
     }

@@ -31,7 +31,7 @@ public class ClaimsPrincipalConverterTests
                     "Google")
             ]);
 
-        var serialized = value.SerializeAndDeserialize();
+        var serialized = value.SerializeAndDeserializeJson();
 
         Assert.Equal(value.Identities.ElementAt(0).AuthenticationType, serialized.Identities.ElementAt(0).AuthenticationType);
         Assert.Equal(value.Identities.ElementAt(1).AuthenticationType, serialized.Identities.ElementAt(1).AuthenticationType);
@@ -42,7 +42,7 @@ public class ClaimsPrincipalConverterTests
     {
         ClaimsPrincipal? value = null;
 
-        var serialized = value.SerializeAndDeserialize();
+        var serialized = value.SerializeAndDeserializeJson();
 
         Assert.Null(serialized);
     }

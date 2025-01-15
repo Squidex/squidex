@@ -5,10 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using NodaTime.Extensions;
 using Squidex.Domain.Apps.Entities.History.Repositories;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Comments;
 using Squidex.Domain.Apps.Events.Teams;
+using Squidex.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 
@@ -113,7 +115,7 @@ public sealed class HistoryService : IHistoryService, IEventConsumer
             {
                 historyEvent.Actor = actor;
                 historyEvent.OwnerId = ownerId;
-                historyEvent.Created = @event.Headers.Timestamp();
+                historyEvent.Created = @event.Headers.Timestamp().ToInstant();
                 historyEvent.Version = @event.Headers.EventStreamNumber();
                 return historyEvent;
             }

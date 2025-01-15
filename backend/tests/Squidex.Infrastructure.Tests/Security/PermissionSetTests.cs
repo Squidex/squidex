@@ -137,7 +137,7 @@ public sealed class PermissionSetTests
     {
         var permissions = new PermissionSet("a", "b", "c");
 
-        var serialized = permissions.SerializeAndDeserialize();
+        var serialized = permissions.SerializeAndDeserializeJson();
 
         Assert.Equal(permissions, serialized);
     }

@@ -7,9 +7,10 @@
 
 using MongoDB.Bson;
 using MongoDB.Driver;
-using Squidex.Infrastructure.EventSourcing;
+using Squidex.Events;
+using Squidex.Events.Mongo;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
-using Squidex.Infrastructure.MongoDb;
 
 namespace Migrations.Migrations;
 
