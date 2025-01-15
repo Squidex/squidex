@@ -21,7 +21,7 @@
     "@angular/common": "18.0.1",
     "@angular/core": "18.0.1",
     "@angular/forms": "18.0.1",
-    "@angular/localize": "18.0.1",
+    "@angular/localize": "19.0.6",
     "@angular/platform-browser": "18.0.1",
     "@angular/platform-browser-dynamic": "18.0.1",
     "@angular/platform-server": "18.0.1",
