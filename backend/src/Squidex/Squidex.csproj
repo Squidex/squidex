@@ -66,7 +66,6 @@
     <PackageReference Include="Squidex.Assets.FTP" Version="6.26.0" />
     <PackageReference Include="Squidex.Assets.ImageMagick" Version="6.26.0" />
     <PackageReference Include="Squidex.Assets.ImageSharp" Version="6.26.0" />
-    <PackageReference Include="Squidex.Assets.Mongo" Version="6.26.0" />
     <PackageReference Include="Squidex.Assets.S3" Version="6.26.0" />
     <PackageReference Include="Squidex.Assets.TusAdapter" Version="6.26.0" />
     <PackageReference Include="Squidex.ClientLibrary" Version="20.1.0" />
@@ -74,7 +73,6 @@
     <PackageReference Include="Squidex.Hosting" Version="6.26.0" />
     <PackageReference Include="Squidex.Messaging.All" Version="6.26.0" />
     <PackageReference Include="Squidex.Messaging.Subscriptions" Version="6.26.0" />
-    <PackageReference Include="Squidex.OpenIddict.MongoDb" Version="5.8.1" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="YDotNet" Version="0.4.1" />
     <PackageReference Include="YDotNet.Native" Version="0.4.1" />
