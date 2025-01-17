@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using Argon;
 using NodaTime;
 using NodaTime.Text;
+using Squidex.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
@@ -44,6 +45,25 @@ public static partial class VerifySettings
             }
 
             writer.WriteEndObject();
+        }
+    }
+
+    private sealed class HeaderValueConverter : WriteOnlyJsonConverter<HeaderValue>
+    {
+        public override void Write(VerifyJsonWriter writer, HeaderValue value)
+        {
+            switch (value)
+            {
+                case HeaderStringValue s:
+                    writer.WriteValue(s.Value);
+                    break;
+                case HeaderNumberValue n:
+                    writer.WriteValue(n.Value);
+                    break;
+                case HeaderBooleanValue b:
+                    writer.WriteValue(b.Value);
+                    break;
+            }
         }
     }
 
@@ -128,6 +148,7 @@ public static partial class VerifySettings
 
         VerifierSettings.AddExtraSettings(s =>
         {
+            s.Converters.Add(new HeaderValueConverter());
             s.Converters.Add(new JsonArrayConverter());
             s.Converters.Add(new JsonObjectConverter());
             s.Converters.Add(new JsonValueConverter());
@@ -136,7 +157,14 @@ public static partial class VerifySettings
 
         VerifierSettings.ScrubInlineGuids();
         VerifierSettings.IgnoreMembersWithType<Instant>();
-        VerifierSettings.IgnoreInstance<JsonValue>(x => x.Type == JsonValueType.String && InstantPattern.ExtendedIso.Parse(x.ToString()).Success);
+        VerifierSettings.IgnoreInstance<HeaderStringValue>(x => IsDateTime(x.Value));
+        VerifierSettings.IgnoreInstance<HeaderValue>(x => x is HeaderStringValue s && IsDateTime(s.Value));
+        VerifierSettings.IgnoreInstance<JsonValue>(x => x.Type == JsonValueType.String && IsDateTime(x.ToString()));
         VerifierSettings.IgnoreMember("Secret");
+    }
+
+    private static bool IsDateTime(string value)
+    {
+        return InstantPattern.ExtendedIso.Parse(value).Success;
     }
 }

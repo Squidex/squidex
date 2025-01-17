@@ -118,6 +118,7 @@ public abstract class GraphQLTestBase : IClassFixture<TranslationsFixture>
 
         var serviceProvider =
             new ServiceCollection()
+                .AddSingleton(TimeProvider.System)
                 .AddLogging(options =>
                 {
                     options.AddDebug();

@@ -10,6 +10,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
+using Squidex.Events.Utils;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Json.System;
@@ -47,6 +48,7 @@ public static class TestUtils
 
         options.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
         options.Converters.Add(new JsonValueConverter());
+        options.Converters.Add(new HeaderValueConverter());
         options.Converters.Add(new ReadonlyDictionaryConverterFactory());
         options.Converters.Add(new ReadonlyListConverterFactory());
         options.Converters.Add(new SurrogateJsonConverter<ClaimsPrincipal, ClaimsPrincipalSurrogate>());
