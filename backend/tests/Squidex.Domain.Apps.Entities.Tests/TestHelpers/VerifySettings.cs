@@ -52,16 +52,19 @@ public static partial class VerifySettings
     {
         public override void Write(VerifyJsonWriter writer, HeaderValue value)
         {
-            switch (value)
+            switch (value.Value)
             {
-                case HeaderStringValue s:
-                    writer.WriteValue(s.Value);
+                case string s:
+                    writer.WriteValue(s);
                     break;
-                case HeaderNumberValue n:
-                    writer.WriteValue(n.Value);
+                case double n:
+                    writer.WriteValue(n);
                     break;
-                case HeaderBooleanValue b:
-                    writer.WriteValue(b.Value);
+                case bool b:
+                    writer.WriteValue(b);
+                    break;
+                case null:
+                    writer.WriteNull();
                     break;
             }
         }
@@ -155,16 +158,15 @@ public static partial class VerifySettings
             s.ContractResolver = new ContractResolver(s.ContractResolver!);
         });
 
+        static bool IsDateTime(object? value)
+        {
+            return value is string s && InstantPattern.ExtendedIso.Parse(s).Success;
+        }
+
         VerifierSettings.ScrubInlineGuids();
         VerifierSettings.IgnoreMembersWithType<Instant>();
-        VerifierSettings.IgnoreInstance<HeaderStringValue>(x => IsDateTime(x.Value));
-        VerifierSettings.IgnoreInstance<HeaderValue>(x => x is HeaderStringValue s && IsDateTime(s.Value));
-        VerifierSettings.IgnoreInstance<JsonValue>(x => x.Type == JsonValueType.String && IsDateTime(x.ToString()));
+        VerifierSettings.IgnoreInstance<HeaderValue>(x => IsDateTime(x.Value));
+        VerifierSettings.IgnoreInstance<JsonValue>(x => IsDateTime(x.Value));
         VerifierSettings.IgnoreMember("Secret");
-    }
-
-    private static bool IsDateTime(string value)
-    {
-        return InstantPattern.ExtendedIso.Parse(value).Success;
     }
 }

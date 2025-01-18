@@ -26,6 +26,7 @@ using Squidex.Domain.Apps.Core.Rules.Json;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Domain.Apps.Events;
+using Squidex.Events.Utils;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
@@ -48,6 +49,7 @@ public static class SerializationServices
         options.Converters.Add(new StringConverter<PropertyPath>(x => x));
 
         options.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
+        options.Converters.Add(new HeaderValueConverter());
         options.Converters.Add(new GeoJsonConverterFactory());
         options.Converters.Add(new PolymorphicConverter<IEvent>(typeRegistry));
         options.Converters.Add(new PolymorphicConverter<EnrichedEvent>(typeRegistry));
