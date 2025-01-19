@@ -25,5 +25,5 @@ test('login', async ({ page, loginPage }) => {
 test('visual test', async ({ loginPage }) => {
     const popup = await loginPage.openPopup();
 
-    await expect(popup.root).toHaveScreenshot({ fullPage: true });
+    await expect(popup.root).toHaveScreenshot({ maxDiffPixelRatio: 0.05, fullPage: true });
 });

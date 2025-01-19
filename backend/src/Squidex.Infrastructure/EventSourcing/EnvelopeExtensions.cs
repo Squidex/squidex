@@ -5,9 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Globalization;
 using NodaTime;
 using NodaTime.Text;
+using Squidex.Events;
 
 namespace Squidex.Infrastructure.EventSourcing;
 
@@ -56,7 +56,7 @@ public static class EnvelopeExtensions
 
     public static Envelope<T> SetAggregateId<T>(this Envelope<T> envelope, DomainId value) where T : class, IEvent
     {
-        envelope.Headers[CommonHeaders.AggregateId] = value;
+        envelope.Headers[CommonHeaders.AggregateId] = value.ToString();
 
         return envelope;
     }
@@ -73,14 +73,14 @@ public static class EnvelopeExtensions
         return envelope;
     }
 
-    public static Instant Timestamp(this EnvelopeHeaders headers)
+    public static Instant TimestampAsInstant(this EnvelopeHeaders headers)
     {
         return headers.GetInstant(CommonHeaders.Timestamp);
     }
 
     public static Envelope<T> SetTimestamp<T>(this Envelope<T> envelope, Instant value) where T : class, IEvent
     {
-        envelope.Headers[CommonHeaders.Timestamp] = value;
+        envelope.Headers[CommonHeaders.Timestamp] = value.ToString();
 
         return envelope;
     }
@@ -97,26 +97,11 @@ public static class EnvelopeExtensions
         return envelope;
     }
 
-    public static long GetLong(this EnvelopeHeaders obj, string key)
-    {
-        if (obj.TryGetValue(key, out var found))
-        {
-            if (found.Value is double d)
-            {
-                return (long)d;
-            }
-            else if (found.Value is string s && double.TryParse(s, NumberStyles.Any, CultureInfo.InvariantCulture, out var result))
-            {
-                return (long)result;
-            }
-        }
-
-        return 0;
-    }
-
     public static Guid GetGuid(this EnvelopeHeaders obj, string key)
     {
-        if (obj.TryGetValue(key, out var found) && found.Value is string s && Guid.TryParse(s, out var guid))
+        var s = obj.GetString(key);
+
+        if (Guid.TryParse(s, out var guid))
         {
             return guid;
         }
@@ -126,31 +111,13 @@ public static class EnvelopeExtensions
 
     public static Instant GetInstant(this EnvelopeHeaders obj, string key)
     {
-        if (obj.TryGetValue(key, out var found) && found.Value is string s && InstantPattern.ExtendedIso.Parse(s).TryGetValue(default, out var instant))
+        var s = obj.GetString(key);
+
+        if (InstantPattern.ExtendedIso.Parse(s).TryGetValue(default, out var instant))
         {
             return instant;
         }
 
         return default;
-    }
-
-    public static string GetString(this EnvelopeHeaders obj, string key)
-    {
-        if (obj.TryGetValue(key, out var found))
-        {
-            return found.ToString();
-        }
-
-        return string.Empty;
-    }
-
-    public static bool GetBoolean(this EnvelopeHeaders obj, string key)
-    {
-        if (obj.TryGetValue(key, out var found) && found.Value is bool b)
-        {
-            return b;
-        }
-
-        return false;
     }
 }

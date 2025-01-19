@@ -8,6 +8,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Squidex.Caching;
+using Squidex.Events;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;

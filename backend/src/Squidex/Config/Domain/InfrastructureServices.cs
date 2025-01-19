@@ -143,17 +143,18 @@ public static class InfrastructureServices
 
         if (!string.IsNullOrWhiteSpace(apiKey))
         {
-            services.AddOpenAIChat(config);
-            services.AddAIImagePipe();
-            services.AddDallE(config, options =>
-            {
-                options.DownloadImage = true;
-
-                if (string.IsNullOrEmpty(options.ApiKey))
+            services.AddAI()
+                .AddOpenAIChat(config)
+                .AddAIImagePipe()
+                .AddDallE(config, options =>
                 {
-                    options.ApiKey = apiKey;
-                }
-            });
+                    options.DownloadImage = true;
+
+                    if (string.IsNullOrEmpty(options.ApiKey))
+                    {
+                        options.ApiKey = apiKey;
+                    }
+                });
         }
 
         services.AddDeepLTranslations(config);

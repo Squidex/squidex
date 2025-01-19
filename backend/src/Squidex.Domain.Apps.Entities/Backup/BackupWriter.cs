@@ -8,8 +8,8 @@
 using System.IO.Compression;
 using Squidex.Domain.Apps.Entities.Backup.Helpers;
 using Squidex.Domain.Apps.Entities.Backup.Model;
+using Squidex.Events;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Entities.Backup;

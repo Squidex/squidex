@@ -180,7 +180,7 @@ public class RuleTests
     {
         var json = File.ReadAllText("Model/Rules/Rule.json").CleanJson();
 
-        var serialized = TestUtils.SerializeWithoutNulls(TestUtils.DefaultSerializer.Deserialize<Rule>(json));
+        var serialized = TestUtils.SerializeWithoutNullsAsJson(TestUtils.DefaultSerializer.Deserialize<Rule>(json));
 
         Assert.Equal(json, serialized);
     }
@@ -190,7 +190,7 @@ public class RuleTests
     {
         var rule_X = new Rule { Trigger = new MigratedTrigger(), Action = new TestAction1() };
 
-        var serialized = rule_X.SerializeAndDeserialize();
+        var serialized = rule_X.SerializeAndDeserializeAsJson();
 
         Assert.IsType<OtherTrigger>(serialized.Trigger);
     }

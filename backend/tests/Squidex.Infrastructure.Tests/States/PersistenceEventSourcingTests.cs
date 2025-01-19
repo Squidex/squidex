@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Globalization;
+using Squidex.Events;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.TestHelpers;
 

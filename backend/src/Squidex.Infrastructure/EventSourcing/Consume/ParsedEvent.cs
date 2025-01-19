@@ -8,8 +8,10 @@
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 #pragma warning disable MA0048 // File name must match type name
 
+using Squidex.Events;
+
 namespace Squidex.Infrastructure.EventSourcing.Consume;
 
-public record struct ParsedEvent(Envelope<IEvent>? Event, string Position);
+public record struct ParsedEvent(Envelope<IEvent>? Event, StreamPosition Position);
 
-public record struct ParsedEvents(List<Envelope<IEvent>> Events, string Position);
+public record struct ParsedEvents(List<Envelope<IEvent>> Events, StreamPosition Position);

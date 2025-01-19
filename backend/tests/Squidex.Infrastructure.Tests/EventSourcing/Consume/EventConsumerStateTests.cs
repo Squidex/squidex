@@ -22,7 +22,7 @@ public class EventConsumerStateTests
             Position = "Position"
         };
 
-        var serialized = state.SerializeAndDeserialize();
+        var serialized = state.SerializeAndDeserializeJson();
 
         serialized.Should().BeEquivalentTo(state);
     }

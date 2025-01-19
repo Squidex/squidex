@@ -158,7 +158,7 @@ public class DomainIdTests
     {
         var domainId = DomainId.Create("123");
 
-        var serialized = domainId.SerializeAndDeserialize();
+        var serialized = domainId.SerializeAndDeserializeJson();
 
         Assert.Equal(domainId, serialized);
     }
@@ -173,7 +173,7 @@ public class DomainIdTests
             Id2 = NamedId.Of(DomainId.NewGuid(), "2")
         };
 
-        var serialized = obj.SerializeAndDeserialize();
+        var serialized = obj.SerializeAndDeserializeJson();
 
         serialized.Should().BeEquivalentTo(obj);
     }

@@ -8,8 +8,8 @@
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
+using Squidex.Events;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 

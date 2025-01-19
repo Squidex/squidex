@@ -71,7 +71,7 @@ public class ReadonlyListTests
             3
         }.ToReadonlyList();
 
-        var serialized = sut.SerializeAndDeserialize();
+        var serialized = sut.SerializeAndDeserializeJson();
 
         Assert.Equal(sut, serialized);
     }
@@ -86,7 +86,7 @@ public class ReadonlyListTests
             3
         });
 
-        var serialized = sut.SerializeAndDeserialize();
+        var serialized = sut.SerializeAndDeserializeJson();
 
         Assert.Equal(sut, serialized);
     }

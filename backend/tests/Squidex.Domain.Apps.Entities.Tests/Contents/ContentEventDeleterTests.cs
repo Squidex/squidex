@@ -7,8 +7,8 @@
 
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
+using Squidex.Events;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 

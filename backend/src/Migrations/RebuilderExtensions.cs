@@ -15,8 +15,8 @@ using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject;
 using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
+using Squidex.Events;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.EventSourcing;
 
 namespace Migrations;
 

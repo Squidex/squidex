@@ -6,14 +6,10 @@
 // ==========================================================================
 
 using System.Reflection;
-using System.Runtime.Serialization.Formatters.Binary;
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
-using MongoDB.Bson.IO;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Attributes;
 using NetTopologySuite.IO.Converters;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
@@ -27,13 +23,13 @@ using Squidex.Domain.Apps.Core.Rules.Json;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Domain.Apps.Events;
+using Squidex.Events.Utils;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Json.System;
-using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Queries.Json;
 using Squidex.Infrastructure.Reflection;
@@ -48,32 +44,11 @@ public static class TestUtils
 
     public static readonly IJsonSerializer DefaultSerializer = CreateSerializer();
 
-    public sealed class ObjectHolder<T>
+    private sealed class ObjectHolder<T>
     {
-        [BsonRequired]
         public T Value1 { get; set; }
 
-        [BsonRequired]
         public T Value2 { get; set; }
-    }
-
-    static TestUtils()
-    {
-        SetupBson();
-    }
-
-    public static void SetupBson()
-    {
-        BsonDefaultConventions.Register();
-        BsonDomainIdSerializer.Register();
-        BsonEscapedDictionarySerializer<ContentFieldData, ContentData>.Register();
-        BsonEscapedDictionarySerializer<JsonValue, ContentFieldData>.Register();
-        BsonEscapedDictionarySerializer<JsonValue, JsonObject>.Register();
-        BsonInstantSerializer.Register();
-        BsonJsonConvention.Register(DefaultOptions());
-        BsonJsonValueSerializer.Register();
-        BsonStringSerializer<RefToken>.Register();
-        BsonStringSerializer<Status>.Register();
     }
 
     public static TypeRegistry CreateTypeRegistry(Assembly assembly)
@@ -106,13 +81,23 @@ public static class TestUtils
 
         options.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
         options.Converters.Add(new GeoJsonConverterFactory());
-        options.Converters.Add(new PolymorphicConverter<IEvent>(TypeRegistry));
+        options.Converters.Add(new HeaderValueConverter());
+        options.Converters.Add(new JsonValueConverter());
         options.Converters.Add(new PolymorphicConverter<FieldProperties>(TypeRegistry));
+        options.Converters.Add(new PolymorphicConverter<IEvent>(TypeRegistry));
         options.Converters.Add(new PolymorphicConverter<RuleAction>(TypeRegistry));
         options.Converters.Add(new PolymorphicConverter<RuleTrigger>(TypeRegistry));
-        options.Converters.Add(new JsonValueConverter());
         options.Converters.Add(new ReadonlyDictionaryConverterFactory());
         options.Converters.Add(new ReadonlyListConverterFactory());
+        options.Converters.Add(new StringConverter<CompareOperator>());
+        options.Converters.Add(new StringConverter<DomainId>());
+        options.Converters.Add(new StringConverter<Language>());
+        options.Converters.Add(new StringConverter<NamedId<DomainId>>());
+        options.Converters.Add(new StringConverter<NamedId<Guid>>());
+        options.Converters.Add(new StringConverter<NamedId<long>>());
+        options.Converters.Add(new StringConverter<NamedId<string>>());
+        options.Converters.Add(new StringConverter<RefToken>());
+        options.Converters.Add(new StringConverter<Status>());
         options.Converters.Add(new SurrogateJsonConverter<ClaimsPrincipal, ClaimsPrincipalSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<FieldCollection<RootField>, FieldsSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<FilterNode<JsonValue>, JsonFilterSurrogate>());
@@ -123,15 +108,6 @@ public static class TestUtils
         options.Converters.Add(new SurrogateJsonConverter<Schema, SchemaSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<WorkflowStep, WorkflowStepSurrogate>());
         options.Converters.Add(new SurrogateJsonConverter<WorkflowTransition, WorkflowTransitionSurrogate>());
-        options.Converters.Add(new StringConverter<CompareOperator>());
-        options.Converters.Add(new StringConverter<DomainId>());
-        options.Converters.Add(new StringConverter<NamedId<DomainId>>());
-        options.Converters.Add(new StringConverter<NamedId<Guid>>());
-        options.Converters.Add(new StringConverter<NamedId<long>>());
-        options.Converters.Add(new StringConverter<NamedId<string>>());
-        options.Converters.Add(new StringConverter<Language>());
-        options.Converters.Add(new StringConverter<RefToken>());
-        options.Converters.Add(new StringConverter<Status>());
         options.Converters.Add(new JsonStringEnumConverter());
         options.IncludeFields = true;
         options.TypeInfoResolver = new DefaultJsonTypeInfoResolver()
@@ -143,62 +119,26 @@ public static class TestUtils
         return options;
     }
 
-    public static T SerializeAndDeserializeBinary<T>(this T source)
+    public static T SerializeAndDeserializeAsJson<T>(this T value)
     {
-        using (var stream = new MemoryStream())
-        {
-            var formatter = new BinaryFormatter();
-
-            formatter.Serialize(stream, source!);
-
-            stream.Position = 0;
-
-            return (T)formatter.Deserialize(stream);
-        }
+        return SerializeAndDeserializeAsJson<T, T>(value);
     }
 
-    public static T SerializeAndDeserializeBson<T>(this T value)
-    {
-        return SerializeAndDeserializeBson<T, T>(value);
-    }
-
-    public static TOut SerializeAndDeserializeBson<TOut, TIn>(this TIn value)
-    {
-        using var stream = new MemoryStream();
-
-        using (var writer = new BsonBinaryWriter(stream))
-        {
-            BsonSerializer.Serialize(writer, new ObjectHolder<TIn> { Value1 = value, Value2 = value });
-        }
-
-        stream.Position = 0;
-
-        using (var reader = new BsonBinaryReader(stream))
-        {
-            return BsonSerializer.Deserialize<ObjectHolder<TOut>>(reader).Value1;
-        }
-    }
-
-    public static T SerializeAndDeserialize<T>(this T value)
-    {
-        return SerializeAndDeserialize<T, T>(value);
-    }
-
-    public static TOut SerializeAndDeserialize<TOut, TIn>(this TIn value)
+    public static TOut SerializeAndDeserializeAsJson<TOut, TIn>(this TIn value)
     {
         var json = DefaultSerializer.Serialize(new ObjectHolder<TIn> { Value1 = value, Value2 = value });
 
         return DefaultSerializer.Deserialize<ObjectHolder<TOut>>(json).Value1;
     }
 
-    public static T Deserialize<T>(string value)
+    public static T DeserializeJson<T>(string value)
     {
         var json = DefaultSerializer.Serialize(new ObjectHolder<string> { Value1 = value, Value2 = value });
 
         return DefaultSerializer.Deserialize<ObjectHolder<T>>(json).Value1;
     }
 
-    public static string SerializeWithoutNulls<T>(this T value)
+    public static string SerializeWithoutNullsAsJson<T>(this T value)
     {
         var options = DefaultOptions(options =>
         {

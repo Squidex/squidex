@@ -18,9 +18,9 @@ public class ElasticSearchTextIndexTests(ElasticSearchTextIndexFixture fixture) 
 
     public ElasticSearchTextIndexFixture _ { get; } = fixture;
 
-    public override ITextIndex CreateIndex()
+    public override Task<ITextIndex> CreateSutAsync()
     {
-        return _.Index;
+        return Task.FromResult<ITextIndex>(_.Index);
     }
 
     [Fact]

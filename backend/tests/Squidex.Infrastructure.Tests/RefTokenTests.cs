@@ -95,7 +95,7 @@ public class RefTokenTests
     {
         RefToken? value = null;
 
-        var serialized = value.SerializeAndDeserialize();
+        var serialized = value.SerializeAndDeserializeJson();
 
         Assert.Equal(value, serialized);
     }
@@ -105,7 +105,7 @@ public class RefTokenTests
     {
         var value = RefToken.Parse("client:client1");
 
-        var serialized = value.SerializeAndDeserialize();
+        var serialized = value.SerializeAndDeserializeJson();
 
         Assert.Equal(value, serialized);
     }

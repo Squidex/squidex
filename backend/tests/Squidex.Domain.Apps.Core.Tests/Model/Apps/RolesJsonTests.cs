@@ -34,7 +34,7 @@ public class RolesJsonTests
                         "Permission1",
                         "Permission2"));
 
-        var roles = source.SerializeAndDeserialize<Roles, Dictionary<string, string[]>>();
+        var roles = source.SerializeAndDeserializeAsJson<Roles, Dictionary<string, string[]>>();
 
         roles.Should().BeEquivalentTo(expected);
     }
@@ -53,7 +53,7 @@ public class RolesJsonTests
                         .Add("Property1", true)
                         .Add("Property2", true));
 
-        var roles = sut.SerializeAndDeserialize();
+        var roles = sut.SerializeAndDeserializeAsJson();
 
         roles.Should().BeEquivalentTo(sut);
     }
@@ -63,7 +63,7 @@ public class RolesJsonTests
     {
         var sut = Roles.Empty;
 
-        var roles = sut.SerializeAndDeserialize();
+        var roles = sut.SerializeAndDeserializeAsJson();
 
         Assert.Same(Roles.Empty, roles);
     }

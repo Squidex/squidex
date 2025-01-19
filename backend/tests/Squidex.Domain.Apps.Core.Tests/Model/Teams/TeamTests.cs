@@ -95,7 +95,7 @@ public class TeamTests
     {
         var json = File.ReadAllText("Model/Teams/Team.json").CleanJson();
 
-        var serialized = TestUtils.SerializeWithoutNulls(TestUtils.DefaultSerializer.Deserialize<Team>(json));
+        var serialized = TestUtils.SerializeWithoutNullsAsJson(TestUtils.DefaultSerializer.Deserialize<Team>(json));
 
         Assert.Equal(json, serialized);
     }

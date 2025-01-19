@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Squidex.Areas.Api.Controllers.UI;
 using Squidex.Assets;
+using Squidex.Assets.FTP;
 using Squidex.Config;
 using Squidex.Domain.Users;
 using Squidex.Hosting;

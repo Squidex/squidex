@@ -170,7 +170,7 @@ public sealed class RuleService(
 
         var eventTime =
             @event.Headers.ContainsKey(CommonHeaders.Timestamp) ?
-            @event.Headers.Timestamp() :
+            @event.Headers.TimestampAsInstant() :
             now;
 
         if (!context.IncludeStale && eventTime.Plus(Constants.StaleTime) < now)

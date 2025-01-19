@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using NodaTime;
+using Squidex.Events;
 
 namespace Squidex.Infrastructure.EventSourcing;
 
@@ -24,7 +25,7 @@ public class EnvelopeExtensionsTests
 
         sut.SetTimestamp(timestamp);
 
-        Assert.Equal(timestamp, sut.Headers.Timestamp());
+        Assert.Equal(timestamp, sut.Headers.TimestampAsInstant());
         Assert.Equal(timestamp, sut.Headers.GetInstant("Timestamp"));
     }
 

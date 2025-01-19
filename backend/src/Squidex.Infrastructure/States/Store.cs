@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Events;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Infrastructure.States;

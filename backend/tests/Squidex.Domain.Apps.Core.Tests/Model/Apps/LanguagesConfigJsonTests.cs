@@ -23,7 +23,7 @@ public class LanguagesConfigJsonTests
                 .Set(Language.DE, true, Language.IT)
                 .MakeMaster(Language.FR);
 
-        var serialized = languages.SerializeAndDeserialize();
+        var serialized = languages.SerializeAndDeserializeAsJson();
 
         serialized.Should().BeEquivalentTo(languages);
     }

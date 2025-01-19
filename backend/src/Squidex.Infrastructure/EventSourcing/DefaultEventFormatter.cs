@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Events;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
@@ -49,7 +50,7 @@ public sealed class DefaultEventFormatter(TypeRegistry typeRegistry, IJsonSerial
 
         var envelope = new Envelope<IEvent>(payload, storedEvent.Data.Headers);
 
-        envelope.SetEventPosition(storedEvent.EventPosition);
+        envelope.SetEventPosition(storedEvent.EventPosition!);
         envelope.SetEventStreamNumber(storedEvent.EventStreamNumber);
 
         return envelope;

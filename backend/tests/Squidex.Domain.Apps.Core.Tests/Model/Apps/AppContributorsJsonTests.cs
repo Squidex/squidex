@@ -21,7 +21,7 @@ public class AppContributorsJsonTests
         contributors = contributors.Assign("2", Role.Editor);
         contributors = contributors.Assign("3", Role.Owner);
 
-        var serialized = contributors.SerializeAndDeserialize();
+        var serialized = contributors.SerializeAndDeserializeAsJson();
 
         Assert.Equal(contributors, serialized);
     }

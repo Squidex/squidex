@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Apps;
+using Squidex.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
@@ -265,7 +266,7 @@ public sealed class RestoreJob(
         {
             var commits =
                 batch.Select(item =>
-                    EventCommit.Create(
+                    EventCommitBuilder.Create(
                         item.Stream,
                         item.Offset,
                         item.Event,

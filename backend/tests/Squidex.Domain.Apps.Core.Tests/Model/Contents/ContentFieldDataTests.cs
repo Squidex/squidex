@@ -20,7 +20,7 @@ public class ContentFieldDataTests
             new ContentFieldData()
                 .AddInvariant(12);
 
-        var serialized = fieldData.SerializeAndDeserialize();
+        var serialized = fieldData.SerializeAndDeserializeAsJson();
 
         Assert.Equal(fieldData, serialized);
     }
@@ -32,7 +32,7 @@ public class ContentFieldDataTests
             new ContentFieldData()
                 .AddInvariant(12);
 
-        var serialized = fieldData.SerializeAndDeserialize();
+        var serialized = fieldData.SerializeAndDeserializeAsJson();
 
         Assert.NotNull(string.IsInterned(serialized.Keys.First()));
     }
@@ -44,7 +44,7 @@ public class ContentFieldDataTests
             new ContentFieldData()
                 .AddLocalized("en", 12);
 
-        var serialized = fieldData.SerializeAndDeserialize();
+        var serialized = fieldData.SerializeAndDeserializeAsJson();
 
         Assert.NotNull(string.IsInterned(serialized.Keys.First()));
     }
@@ -56,7 +56,7 @@ public class ContentFieldDataTests
             new ContentFieldData()
                 .AddLocalized(Guid.NewGuid().ToString(), 12);
 
-        var serialized = fieldData.SerializeAndDeserialize();
+        var serialized = fieldData.SerializeAndDeserializeAsJson();
 
         Assert.Null(string.IsInterned(serialized.Keys.First()));
     }

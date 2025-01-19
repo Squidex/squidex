@@ -153,7 +153,7 @@ public class NotifoService : IUserEvents
 
             var batches = events
                 .Where(x => x.AppEvent.Headers.Restored() == false)
-                .Where(x => x.AppEvent.Headers.Timestamp() > maxAge)
+                .Where(x => x.AppEvent.Headers.TimestampAsInstant() > maxAge)
                 .SelectMany(x => CreateRequests(x.AppEvent, x.HistoryEvent))
                 .Batch(50);
 

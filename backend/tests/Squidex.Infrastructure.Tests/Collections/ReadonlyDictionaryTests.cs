@@ -95,7 +95,7 @@ public class ReadonlyDictionaryTests
             [13] = 3
         }.ToReadonlyDictionary();
 
-        var serialized = sut.SerializeAndDeserialize();
+        var serialized = sut.SerializeAndDeserializeJson();
 
         Assert.Equal(sut, serialized);
     }
@@ -110,7 +110,7 @@ public class ReadonlyDictionaryTests
             [13] = 3
         });
 
-        var serialized = sut.SerializeAndDeserialize();
+        var serialized = sut.SerializeAndDeserializeJson();
 
         Assert.Equal(sut, serialized);
     }

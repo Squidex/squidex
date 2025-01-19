@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Threading.Channels;
+using Squidex.Events;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.EventSourcing.Consume;

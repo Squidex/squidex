@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using MongoDB.Driver.GridFS;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Queries;
@@ -128,20 +127,7 @@ public static class AssetServices
             },
             ["MongoDb"] = () =>
             {
-                var mongoConfiguration = config.GetRequiredValue("assetStore:mongoDb:configuration");
-                var mongoDatabaseName = config.GetRequiredValue("assetStore:mongoDb:database");
-                var mongoGridFsBucketName = config.GetRequiredValue("assetStore:mongoDb:bucket");
-
-                services.AddMongoAssetStore(c =>
-                {
-                    var mongoClient = StoreServices.GetMongoClient(mongoConfiguration);
-                    var mongoDatabase = mongoClient.GetDatabase(mongoDatabaseName);
-
-                    return new GridFSBucket<string>(mongoDatabase, new GridFSBucketOptions
-                    {
-                        BucketName = mongoGridFsBucketName
-                    });
-                });
+                services.AddSquidexMongoAssetStore(config);
             }
         });
     }

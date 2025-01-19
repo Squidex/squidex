@@ -18,16 +18,13 @@
   <ItemGroup>
     <ProjectReference Include="..\..\extensions\Squidex.Extensions\Squidex.Extensions.csproj" />
     <ProjectReference Include="..\Migrations\Migrations.csproj" />
+    <ProjectReference Include="..\Squidex.Data.MongoDb\Squidex.Data.MongoDb.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Apps.Core.Model\Squidex.Domain.Apps.Core.Model.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Apps.Core.Operations\Squidex.Domain.Apps.Core.Operations.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Apps.Entities\Squidex.Domain.Apps.Entities.csproj" />
-    <ProjectReference Include="..\Squidex.Domain.Apps.Entities.MongoDb\Squidex.Domain.Apps.Entities.MongoDb.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Apps.Events\Squidex.Domain.Apps.Events.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Users\Squidex.Domain.Users.csproj" />
-    <ProjectReference Include="..\Squidex.Domain.Users.MongoDb\Squidex.Domain.Users.MongoDb.csproj" />
-    <ProjectReference Include="..\Squidex.Infrastructure.GetEventStore\Squidex.Infrastructure.GetEventStore.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />
-    <ProjectReference Include="..\Squidex.Infrastructure.MongoDb\Squidex.Infrastructure.MongoDb.csproj" />
     <ProjectReference Include="..\Squidex.Shared\Squidex.Shared.csproj" />
     <ProjectReference Include="..\Squidex.Web\Squidex.Web.csproj" />
   </ItemGroup>
@@ -54,8 +51,6 @@
     <PackageReference Include="Microsoft.Extensions.Options" Version="8.0.2" />
     <PackageReference Include="Microsoft.IdentityModel.Protocols.OpenIdConnect" Version="8.2.1" />
     <PackageReference Include="Microsoft.OData.Core" Version="8.2.1" />
-    <PackageReference Include="MongoDB.Driver" Version="2.30.0" />
-    <PackageReference Include="MongoDB.Driver.Core.Extensions.DiagnosticSources" Version="1.5.0" />
     <PackageReference Include="NetTopologySuite.IO.GeoJSON4STJ" Version="4.0.0" />
     <PackageReference Include="NJsonSchema" Version="11.0.2" />
     <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.2.0" />
@@ -66,24 +61,22 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.9.0" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
     <PackageReference Include="ReportGenerator" Version="5.4.1" PrivateAssets="all" />
-    <PackageReference Include="Squidex.Assets.Azure" Version="6.22.0" />
-    <PackageReference Include="Squidex.Assets.GoogleCloud" Version="6.22.0" />
-    <PackageReference Include="Squidex.Assets.FTP" Version="6.22.0" />
-    <PackageReference Include="Squidex.Assets.ImageMagick" Version="6.22.0" />
-    <PackageReference Include="Squidex.Assets.ImageSharp" Version="6.22.0" />
-    <PackageReference Include="Squidex.Assets.Mongo" Version="6.22.0" />
-    <PackageReference Include="Squidex.Assets.S3" Version="6.22.0" />
-    <PackageReference Include="Squidex.Assets.TusAdapter" Version="6.22.0" />
+    <PackageReference Include="Squidex.Assets.Azure" Version="6.28.0" />
+    <PackageReference Include="Squidex.Assets.GoogleCloud" Version="6.28.0" />
+    <PackageReference Include="Squidex.Assets.FTP" Version="6.28.0" />
+    <PackageReference Include="Squidex.Assets.ImageMagick" Version="6.28.0" />
+    <PackageReference Include="Squidex.Assets.ImageSharp" Version="6.28.0" />
+    <PackageReference Include="Squidex.Assets.S3" Version="6.28.0" />
+    <PackageReference Include="Squidex.Assets.TusAdapter" Version="6.28.0" />
     <PackageReference Include="Squidex.ClientLibrary" Version="20.1.0" />
-    <PackageReference Include="Squidex.Hosting" Version="6.22.0" />
-    <PackageReference Include="Squidex.Messaging.All" Version="6.22.0" />
-    <PackageReference Include="Squidex.Messaging.Subscriptions" Version="6.22.0" />
-    <PackageReference Include="Squidex.OpenIddict.MongoDb" Version="5.8.1" />
+    <PackageReference Include="Squidex.Events.GetEventStore" Version="6.28.0" />
+    <PackageReference Include="Squidex.Hosting" Version="6.28.0" />
+    <PackageReference Include="Squidex.Messaging.All" Version="6.28.0" />
+    <PackageReference Include="Squidex.Messaging.Subscriptions" Version="6.28.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="YDotNet" Version="0.4.1" />
     <PackageReference Include="YDotNet.Native" Version="0.4.1" />
     <PackageReference Include="YDotNet.Server" Version="0.4.1" />
-    <PackageReference Include="YDotNet.Server.MongoDB" Version="0.4.1" />
     <PackageReference Include="YDotNet.Server.Redis" Version="0.4.1" />
     <PackageReference Include="YDotNet.Server.WebSockets" Version="0.4.1" />
   </ItemGroup>

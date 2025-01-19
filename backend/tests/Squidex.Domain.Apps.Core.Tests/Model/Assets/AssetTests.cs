@@ -175,7 +175,7 @@ public class AssetTests
     {
         var json = File.ReadAllText("Model/Assets/Asset.json").CleanJson();
 
-        var serialized = TestUtils.SerializeWithoutNulls(TestUtils.DefaultSerializer.Deserialize<Asset>(json));
+        var serialized = TestUtils.SerializeWithoutNullsAsJson(TestUtils.DefaultSerializer.Deserialize<Asset>(json));
 
         Assert.Equal(json, serialized);
     }

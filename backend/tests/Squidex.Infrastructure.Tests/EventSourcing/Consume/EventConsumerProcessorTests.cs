@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Logging;
+using Squidex.Events;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.TestHelpers;
 
@@ -58,7 +59,7 @@ public class EventConsumerProcessorTests
             }
         };
 
-        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<StreamFilter>._, A<string>._))
+        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<StreamFilter>._, A<StreamPosition>._))
             .Returns(eventSubscription);
 
         A.CallTo(() => eventConsumer.Name)
@@ -127,7 +128,7 @@ public class EventConsumerProcessorTests
 
         AssertGrainState(isStopped: true, position: initialPosition);
 
-        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<StreamFilter>._, A<string>._))
+        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<StreamFilter>._, A<StreamPosition>._))
             .MustNotHaveHappened();
     }
 
@@ -141,7 +142,7 @@ public class EventConsumerProcessorTests
 
         AssertGrainState(isStopped: false, position: initialPosition);
 
-        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<StreamFilter>._, A<string>._))
+        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<StreamFilter>._, A<StreamPosition>._))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -157,7 +158,7 @@ public class EventConsumerProcessorTests
 
         AssertGrainState(isStopped: false, position: initialPosition);
 
-        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<StreamFilter>._, A<string>._))
+        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<StreamFilter>._, A<StreamPosition>._))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -171,7 +172,7 @@ public class EventConsumerProcessorTests
 
         AssertGrainState(isStopped: false, position: initialPosition);
 
-        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<StreamFilter>._, A<string>._))
+        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<StreamFilter>._, A<StreamPosition>._))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -528,7 +529,7 @@ public class EventConsumerProcessorTests
         A.CallTo(() => eventSubscription.Dispose())
             .MustHaveHappenedOnceExactly();
 
-        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<StreamFilter>._, A<string>._))
+        A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<StreamFilter>._, A<StreamPosition>._))
             .MustHaveHappened(2, Times.Exactly);
     }
 

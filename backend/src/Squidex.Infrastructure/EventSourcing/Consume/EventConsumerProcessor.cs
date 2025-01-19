@@ -7,6 +7,7 @@
 
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
+using Squidex.Events;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 

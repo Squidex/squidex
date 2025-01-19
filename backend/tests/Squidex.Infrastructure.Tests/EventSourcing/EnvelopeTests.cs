@@ -21,7 +21,7 @@ public class EnvelopeTests
     {
         var value = Envelope.Create(new MyEvent { Value = 1 });
 
-        var deserialized = value.SerializeAndDeserialize();
+        var deserialized = value.SerializeAndDeserializeJson();
 
         Assert.Equal(1, deserialized.Payload.Value);
     }

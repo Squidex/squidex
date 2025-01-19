@@ -27,7 +27,7 @@ public class AppClientJsonTests
         clients = clients.Update("1", allowAnonymous: true, apiCallsLimit: 3);
         clients = clients.Revoke("4");
 
-        var serialized = clients.SerializeAndDeserialize();
+        var serialized = clients.SerializeAndDeserializeAsJson();
 
         Assert.Equal(clients, serialized);
     }

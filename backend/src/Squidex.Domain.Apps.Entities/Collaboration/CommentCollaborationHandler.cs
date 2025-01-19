@@ -10,6 +10,7 @@ using Microsoft.Extensions.Logging;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Comments;
 using Squidex.Domain.Apps.Events.Comments;
+using Squidex.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Json;

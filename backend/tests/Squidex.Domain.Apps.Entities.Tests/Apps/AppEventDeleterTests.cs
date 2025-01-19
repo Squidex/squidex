@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure.EventSourcing;
+using Squidex.Events;
 
 namespace Squidex.Domain.Apps.Entities.Apps;
 

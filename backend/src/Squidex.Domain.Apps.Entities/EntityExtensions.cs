@@ -17,7 +17,7 @@ public static class EntityExtensions
     {
         var headers = @event.Headers;
 
-        var timestamp = headers.Timestamp();
+        var timestamp = headers.TimestampAsInstant();
         var created = source.Created;
         var createdBy = source.CreatedBy;
 

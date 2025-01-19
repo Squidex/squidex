@@ -8,15 +8,12 @@
 using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
-using MongoDB.Bson.IO;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
+using Squidex.Events.Utils;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Json.System;
-using Squidex.Infrastructure.MongoDb;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Queries.Json;
 
@@ -28,29 +25,11 @@ public static class TestUtils
 {
     public static readonly IJsonSerializer DefaultSerializer = CreateSerializer();
 
-    public sealed class ObjectHolder<T>
+    private sealed class ObjectHolder<T>
     {
-        [BsonRequired]
         public T Value1 { get; set; }
 
-        [BsonRequired]
         public T Value2 { get; set; }
-    }
-
-    static TestUtils()
-    {
-        SetupBson();
-    }
-
-    public static void SetupBson()
-    {
-        BsonDefaultConventions.Register();
-        BsonDomainIdSerializer.Register();
-        BsonEscapedDictionarySerializer<JsonValue, JsonObject>.Register();
-        BsonInstantSerializer.Register();
-        BsonJsonConvention.Register(DefaultOptions());
-        BsonJsonValueSerializer.Register();
-        BsonStringSerializer<RefToken>.Register();
     }
 
     public static IJsonSerializer CreateSerializer(Action<JsonSerializerOptions>? configure = null)
@@ -69,6 +48,7 @@ public static class TestUtils
 
         options.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
         options.Converters.Add(new JsonValueConverter());
+        options.Converters.Add(new HeaderValueConverter());
         options.Converters.Add(new ReadonlyDictionaryConverterFactory());
         options.Converters.Add(new ReadonlyListConverterFactory());
         options.Converters.Add(new SurrogateJsonConverter<ClaimsPrincipal, ClaimsPrincipalSurrogate>());
@@ -87,41 +67,19 @@ public static class TestUtils
         return options;
     }
 
-    public static T SerializeAndDeserializeBson<T>(this T value)
+    public static T SerializeAndDeserializeJson<T>(this T value)
     {
-        return SerializeAndDeserializeBson<T, T>(value);
+        return SerializeAndDeserializeJson<T, T>(value);
     }
 
-    public static TOut SerializeAndDeserializeBson<TOut, TIn>(this TIn value)
-    {
-        using var stream = new MemoryStream();
-
-        using (var writer = new BsonBinaryWriter(stream))
-        {
-            BsonSerializer.Serialize(writer, new ObjectHolder<TIn> { Value1 = value, Value2 = value });
-        }
-
-        stream.Position = 0;
-
-        using (var reader = new BsonBinaryReader(stream))
-        {
-            return BsonSerializer.Deserialize<ObjectHolder<TOut>>(reader).Value1;
-        }
-    }
-
-    public static T SerializeAndDeserialize<T>(this T value)
-    {
-        return SerializeAndDeserialize<T, T>(value);
-    }
-
-    public static TOut SerializeAndDeserialize<TOut, TIn>(this TIn value)
+    public static TOut SerializeAndDeserializeJson<TOut, TIn>(this TIn value)
     {
         var json = DefaultSerializer.Serialize(new ObjectHolder<TIn> { Value1 = value, Value2 = value });
 
         return DefaultSerializer.Deserialize<ObjectHolder<TOut>>(json).Value1;
     }
 
-    public static T Deserialize<T>(string value)
+    public static T DeserializeJson<T>(string value)
     {
         var json = DefaultSerializer.Serialize(new ObjectHolder<string> { Value1 = value, Value2 = value });
 

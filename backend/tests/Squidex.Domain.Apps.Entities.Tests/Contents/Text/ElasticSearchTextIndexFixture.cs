@@ -8,24 +8,30 @@
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Extensions.Text.ElasticSearch;
+using Testcontainers.Elasticsearch;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
 public sealed class ElasticSearchTextIndexFixture : IAsyncLifetime
 {
-    public ElasticSearchTextIndex Index { get; }
+    private readonly ElasticsearchContainer elastic =
+        new ElasticsearchBuilder()
+            .WithReuse(true)
+            .WithLabel("resuse-id", "elastic-text")
+            .Build();
 
-    public ElasticSearchTextIndexFixture()
+    public ElasticSearchTextIndex Index { get; private set; }
+
+    public async Task InitializeAsync()
     {
+        await elastic.StopAsync();
+
         Index = new ElasticSearchTextIndex(
-            new ElasticSearchClient(TestConfig.Configuration["elastic:configuration"]!),
+            new ElasticSearchClient(elastic.GetConnectionString()),
             TestConfig.Configuration["elastic:indexName"]!,
             TestUtils.DefaultSerializer);
-    }
 
-    public Task InitializeAsync()
-    {
-        return Index.InitializeAsync(default);
+        await Index.InitializeAsync(default);
     }
 
     public Task DisposeAsync()

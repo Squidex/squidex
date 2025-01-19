@@ -10,7 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Areas.Api.Config.OpenApi;
 using Squidex.Areas.Api.Controllers.Assets.Models;
-using Squidex.Assets;
+using Squidex.Assets.TusAdapter;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Tags;
 using Squidex.Domain.Apps.Entities;

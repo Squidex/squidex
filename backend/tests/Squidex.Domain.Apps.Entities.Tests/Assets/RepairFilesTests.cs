@@ -8,6 +8,7 @@
 using Squidex.Assets;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Assets;
+using Squidex.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 

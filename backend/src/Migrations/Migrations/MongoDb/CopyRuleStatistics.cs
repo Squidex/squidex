@@ -11,7 +11,6 @@ using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
-using Squidex.Infrastructure.MongoDb;
 
 namespace Migrations.Migrations.MongoDb;
 

@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Entities.Collaboration;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Apps;
 using Squidex.Domain.Apps.Events.Teams;
+using Squidex.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Shared.Users;
