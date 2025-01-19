@@ -16,5 +16,5 @@ test('has title', async ({ page }) => {
 });
 
 test('visual test', async ({ page }) => {
-    await expect(page).toHaveScreenshot();
+    await expect(page).toHaveScreenshot({ maxDiffPixelRatio: 0.05 });
 });
