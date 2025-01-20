@@ -11,7 +11,6 @@ using NodaTime;
 using NodaTime.Text;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
-using Squidex.Infrastructure.TestHelpers;
 using Squidex.TestHelpers;
 using ClrFilter = Squidex.Infrastructure.Queries.ClrFilter;
 
@@ -19,7 +18,7 @@ namespace Squidex.MongoDb.Infrastructure;
 
 public class MongoQueryTests
 {
-    private sealed class TestEntity
+    public sealed class TestEntity
     {
         public DomainId Id { get; set; }
 

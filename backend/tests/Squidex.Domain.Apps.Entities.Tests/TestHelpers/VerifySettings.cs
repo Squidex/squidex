@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using Argon;
 using NodaTime;
 using NodaTime.Text;
+using Squidex.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
@@ -44,6 +45,28 @@ public static partial class VerifySettings
             }
 
             writer.WriteEndObject();
+        }
+    }
+
+    private sealed class HeaderValueConverter : WriteOnlyJsonConverter<HeaderValue>
+    {
+        public override void Write(VerifyJsonWriter writer, HeaderValue value)
+        {
+            switch (value.Value)
+            {
+                case string s:
+                    writer.WriteValue(s);
+                    break;
+                case double n:
+                    writer.WriteValue(n);
+                    break;
+                case bool b:
+                    writer.WriteValue(b);
+                    break;
+                case null:
+                    writer.WriteNull();
+                    break;
+            }
         }
     }
 
@@ -128,15 +151,22 @@ public static partial class VerifySettings
 
         VerifierSettings.AddExtraSettings(s =>
         {
+            s.Converters.Add(new HeaderValueConverter());
             s.Converters.Add(new JsonArrayConverter());
             s.Converters.Add(new JsonObjectConverter());
             s.Converters.Add(new JsonValueConverter());
             s.ContractResolver = new ContractResolver(s.ContractResolver!);
         });
 
+        static bool IsDateTime(object? value)
+        {
+            return value is string s && InstantPattern.ExtendedIso.Parse(s).Success;
+        }
+
         VerifierSettings.ScrubInlineGuids();
         VerifierSettings.IgnoreMembersWithType<Instant>();
-        VerifierSettings.IgnoreInstance<JsonValue>(x => x.Type == JsonValueType.String && InstantPattern.ExtendedIso.Parse(x.ToString()).Success);
+        VerifierSettings.IgnoreInstance<HeaderValue>(x => IsDateTime(x.Value));
+        VerifierSettings.IgnoreInstance<JsonValue>(x => IsDateTime(x.Value));
         VerifierSettings.IgnoreMember("Secret");
     }
 }
