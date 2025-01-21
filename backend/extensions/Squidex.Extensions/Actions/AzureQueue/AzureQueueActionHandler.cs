@@ -46,7 +46,7 @@ public sealed class AzureQueueActionHandler(RuleEventFormatter formatter) : Rule
         {
             QueueConnectionString = action.ConnectionString,
             QueueName = queueName!,
-            MessageBodyV2 = requestBody
+            MessageBodyV2 = requestBody,
         };
 
         return (ruleText, ruleJob);

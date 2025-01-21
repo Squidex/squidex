@@ -14,6 +14,6 @@ public static class Batching
     public static readonly FindOptions Options = new FindOptions
     {
         // Use a relatively small batch size to keep the memory pressure low.
-        BatchSize = 200
+        BatchSize = 200,
     };
 }

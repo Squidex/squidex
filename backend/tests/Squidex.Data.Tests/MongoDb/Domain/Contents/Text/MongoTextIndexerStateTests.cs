@@ -34,7 +34,7 @@ public class MongoTextIndexerStateTests(MongoTextIndexerStateFixture fixture) : 
         [
             new TextContentState { UniqueContentId = id1, State = TextState.Stage0_Draft__Stage1_None },
             new TextContentState { UniqueContentId = id2, State = TextState.Stage0_Published__Stage1_Draft },
-            new TextContentState { UniqueContentId = id3, State = TextState.Stage0_Published__Stage1_None }
+            new TextContentState { UniqueContentId = id3, State = TextState.Stage0_Published__Stage1_None },
         ]);
 
         var actual = await _.State.GetAsync(HashSet.Of(id1, id2));
@@ -42,7 +42,7 @@ public class MongoTextIndexerStateTests(MongoTextIndexerStateFixture fixture) : 
         actual.Should().BeEquivalentTo(new Dictionary<UniqueContentId, TextContentState>
         {
             [id1] = new TextContentState { UniqueContentId = id1, State = TextState.Stage0_Draft__Stage1_None },
-            [id2] = new TextContentState { UniqueContentId = id2, State = TextState.Stage0_Published__Stage1_Draft }
+            [id2] = new TextContentState { UniqueContentId = id2, State = TextState.Stage0_Published__Stage1_Draft },
         });
     }
 
@@ -53,12 +53,12 @@ public class MongoTextIndexerStateTests(MongoTextIndexerStateFixture fixture) : 
 
         await _.State.SetAsync(
         [
-            new TextContentState { UniqueContentId = id, State = TextState.Stage0_Draft__Stage1_None }
+            new TextContentState { UniqueContentId = id, State = TextState.Stage0_Draft__Stage1_None },
         ]);
 
         await _.State.SetAsync(
         [
-            new TextContentState { UniqueContentId = id, State = TextState.Deleted }
+            new TextContentState { UniqueContentId = id, State = TextState.Deleted },
         ]);
 
         var actual = await _.State.GetAsync(HashSet.Of(id));
@@ -81,7 +81,7 @@ public class MongoTextIndexerStateTests(MongoTextIndexerStateFixture fixture) : 
         [
             new TextContentState { UniqueContentId = id1, State = TextState.Stage0_Draft__Stage1_None },
             new TextContentState { UniqueContentId = id2, State = TextState.Stage0_Published__Stage1_Draft },
-            new TextContentState { UniqueContentId = id3, State = TextState.Stage0_Published__Stage1_None }
+            new TextContentState { UniqueContentId = id3, State = TextState.Stage0_Published__Stage1_None },
         ]);
 
         await ((IDeleter)_.State).DeleteAppAsync(app2, default);
@@ -90,7 +90,7 @@ public class MongoTextIndexerStateTests(MongoTextIndexerStateFixture fixture) : 
 
         actual.Should().BeEquivalentTo(new Dictionary<UniqueContentId, TextContentState>
         {
-            [id3] = new TextContentState { UniqueContentId = id3, State = TextState.Stage0_Published__Stage1_None }
+            [id3] = new TextContentState { UniqueContentId = id3, State = TextState.Stage0_Published__Stage1_None },
         });
     }
 
@@ -111,7 +111,7 @@ public class MongoTextIndexerStateTests(MongoTextIndexerStateFixture fixture) : 
         [
             new TextContentState { UniqueContentId = id1, State = TextState.Stage0_Draft__Stage1_None },
             new TextContentState { UniqueContentId = id2, State = TextState.Stage0_Published__Stage1_Draft },
-            new TextContentState { UniqueContentId = id3, State = TextState.Stage0_Published__Stage1_None }
+            new TextContentState { UniqueContentId = id3, State = TextState.Stage0_Published__Stage1_None },
         ]);
 
         A.CallTo(() => _.ContentRepository.StreamIds(appId, schemaId, SearchScope.All, default))
@@ -123,7 +123,7 @@ public class MongoTextIndexerStateTests(MongoTextIndexerStateFixture fixture) : 
 
         actual.Should().BeEquivalentTo(new Dictionary<UniqueContentId, TextContentState>
         {
-            [id3] = new TextContentState { UniqueContentId = id3, State = TextState.Stage0_Published__Stage1_None }
+            [id3] = new TextContentState { UniqueContentId = id3, State = TextState.Stage0_Published__Stage1_None },
         });
     }
 }

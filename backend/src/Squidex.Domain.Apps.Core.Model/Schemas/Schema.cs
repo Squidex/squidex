@@ -175,7 +175,7 @@ public record Schema : AppEntity
         {
             FieldCollection = FieldCollection.Remove(fieldId),
             FieldsInLists = FieldsInLists.Remove(field.Name),
-            FieldsInReferences = FieldsInReferences.Remove(field.Name)
+            FieldsInReferences = FieldsInReferences.Remove(field.Name),
         };
     }
 

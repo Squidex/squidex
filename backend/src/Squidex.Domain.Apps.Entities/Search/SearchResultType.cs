@@ -14,5 +14,5 @@ public enum SearchResultType
     Dashboard,
     Setting,
     Rule,
-    Schema
+    Schema,
 }

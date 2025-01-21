@@ -71,7 +71,7 @@ public sealed partial class MongoAssetFolderRepository : ISnapshotStore<AssetFol
                     Filter.Eq(y => y.DocumentId, x.DocumentId),
                     x)
                 {
-                    IsUpsert = true
+                    IsUpsert = true,
                 }).ToList();
 
             if (updates.Count == 0)

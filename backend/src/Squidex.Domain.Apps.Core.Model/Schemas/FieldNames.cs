@@ -29,7 +29,7 @@ public sealed class FieldNames : ReadonlyList<string>
         "status.next",
         "version",
         "translationStatus",
-        "translationStatusAverage"
+        "translationStatusAverage",
     ];
 
     public static readonly new FieldNames Empty = new FieldNames([]);

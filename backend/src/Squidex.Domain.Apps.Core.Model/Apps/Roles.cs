@@ -51,7 +51,7 @@ public sealed class Roles
                     WithoutPrefix(PermissionIds.AppRules),
                     WithoutPrefix(PermissionIds.AppSchemas),
                     WithoutPrefix(PermissionIds.AppWorkflows)),
-                JsonValue.Object())
+                JsonValue.Object()),
     };
 
     public static readonly Roles Empty = new Roles(new ReadonlyDictionary<string, Role>());

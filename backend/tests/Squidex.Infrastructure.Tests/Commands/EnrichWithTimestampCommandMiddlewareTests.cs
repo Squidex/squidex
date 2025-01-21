@@ -23,7 +23,7 @@ public class EnrichWithTimestampCommandMiddlewareTests
 
         sut = new EnrichWithTimestampCommandMiddleware
         {
-            Clock = clock
+            Clock = clock,
         };
     }
 

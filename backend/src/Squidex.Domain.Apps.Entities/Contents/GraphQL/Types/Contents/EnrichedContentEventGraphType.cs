@@ -24,7 +24,7 @@ internal sealed class EnrichedContentEventGraphType : SharedObjectGraphType<Enri
             Name = "type",
             ResolvedType = Scalars.EnrichedContentEventType,
             Resolver = Resolve(x => x.Type),
-            Description = FieldDescriptions.EventType
+            Description = FieldDescriptions.EventType,
         });
 
         AddField(new FieldType
@@ -32,7 +32,7 @@ internal sealed class EnrichedContentEventGraphType : SharedObjectGraphType<Enri
             Name = "id",
             ResolvedType = Scalars.NonNullString,
             Resolver = Resolve(x => x.Id.ToString()),
-            Description = FieldDescriptions.EntityId
+            Description = FieldDescriptions.EntityId,
         });
 
         AddField(new FieldType
@@ -40,7 +40,7 @@ internal sealed class EnrichedContentEventGraphType : SharedObjectGraphType<Enri
             Name = "version",
             ResolvedType = Scalars.NonNullInt,
             Resolver = Resolve(x => x.Version),
-            Description = FieldDescriptions.EntityVersion
+            Description = FieldDescriptions.EntityVersion,
         });
 
         AddField(new FieldType
@@ -48,7 +48,7 @@ internal sealed class EnrichedContentEventGraphType : SharedObjectGraphType<Enri
             Name = "created",
             ResolvedType = Scalars.NonNullDateTime,
             Resolver = Resolve(x => x.Created.ToDateTimeUtc()),
-            Description = FieldDescriptions.EntityCreated
+            Description = FieldDescriptions.EntityCreated,
         });
 
         AddField(new FieldType
@@ -56,7 +56,7 @@ internal sealed class EnrichedContentEventGraphType : SharedObjectGraphType<Enri
             Name = "createdBy",
             ResolvedType = Scalars.NonNullString,
             Resolver = Resolve(x => x.CreatedBy.ToString()),
-            Description = FieldDescriptions.EntityCreatedBy
+            Description = FieldDescriptions.EntityCreatedBy,
         });
 
         AddField(new FieldType
@@ -64,7 +64,7 @@ internal sealed class EnrichedContentEventGraphType : SharedObjectGraphType<Enri
             Name = "createdByUser",
             ResolvedType = UserGraphType.NonNull,
             Resolver = Resolve(x => x.CreatedBy),
-            Description = FieldDescriptions.EntityCreatedBy
+            Description = FieldDescriptions.EntityCreatedBy,
         });
 
         AddField(new FieldType
@@ -72,7 +72,7 @@ internal sealed class EnrichedContentEventGraphType : SharedObjectGraphType<Enri
             Name = "lastModified",
             ResolvedType = Scalars.NonNullDateTime,
             Resolver = Resolve(x => x.LastModified.ToDateTimeUtc()),
-            Description = FieldDescriptions.EntityLastModified
+            Description = FieldDescriptions.EntityLastModified,
         });
 
         AddField(new FieldType
@@ -80,7 +80,7 @@ internal sealed class EnrichedContentEventGraphType : SharedObjectGraphType<Enri
             Name = "lastModifiedBy",
             ResolvedType = Scalars.NonNullString,
             Resolver = Resolve(x => x.LastModifiedBy.ToString()),
-            Description = FieldDescriptions.EntityLastModifiedBy
+            Description = FieldDescriptions.EntityLastModifiedBy,
         });
 
         AddField(new FieldType
@@ -88,7 +88,7 @@ internal sealed class EnrichedContentEventGraphType : SharedObjectGraphType<Enri
             Name = "lastModifiedByUser",
             ResolvedType = UserGraphType.NonNull,
             Resolver = Resolve(x => x.LastModifiedBy),
-            Description = FieldDescriptions.EntityLastModifiedBy
+            Description = FieldDescriptions.EntityLastModifiedBy,
         });
 
         AddField(new FieldType
@@ -96,7 +96,7 @@ internal sealed class EnrichedContentEventGraphType : SharedObjectGraphType<Enri
             Name = "status",
             ResolvedType = Scalars.NonNullString,
             Resolver = Resolve(x => x.Status.ToString()),
-            Description = FieldDescriptions.ContentStatus
+            Description = FieldDescriptions.ContentStatus,
         });
 
         AddField(new FieldType
@@ -104,7 +104,7 @@ internal sealed class EnrichedContentEventGraphType : SharedObjectGraphType<Enri
             Name = "newStatus",
             ResolvedType = Scalars.String,
             Resolver = Resolve(x => x.NewStatus?.ToString()),
-            Description = FieldDescriptions.ContentNewStatus
+            Description = FieldDescriptions.ContentNewStatus,
         });
 
         AddField(new FieldType
@@ -112,7 +112,7 @@ internal sealed class EnrichedContentEventGraphType : SharedObjectGraphType<Enri
             Name = "data",
             ResolvedType = Scalars.Json,
             Resolver = Resolve(x => x.Data),
-            Description = FieldDescriptions.ContentData
+            Description = FieldDescriptions.ContentData,
         });
 
         AddField(new FieldType
@@ -120,7 +120,7 @@ internal sealed class EnrichedContentEventGraphType : SharedObjectGraphType<Enri
             Name = "dataOld",
             ResolvedType = Scalars.Json,
             Resolver = Resolve(x => x.DataOld),
-            Description = FieldDescriptions.ContentDataOld
+            Description = FieldDescriptions.ContentDataOld,
         });
 
         Description = "An content event";

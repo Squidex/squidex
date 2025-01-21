@@ -51,7 +51,7 @@ public interface IUpsertCommand
                 {
                     IsLocked = eventField.IsLocked,
                     IsHidden = eventField.IsHidden,
-                    IsDisabled = eventField.IsDisabled
+                    IsDisabled = eventField.IsDisabled,
                 };
 
                 if (field is ArrayField arrayField && eventField.Nested?.Length > 0)
@@ -66,7 +66,7 @@ public interface IUpsertCommand
                         {
                             IsLocked = nestedEventField.IsLocked,
                             IsHidden = nestedEventField.IsHidden,
-                            IsDisabled = nestedEventField.IsDisabled
+                            IsDisabled = nestedEventField.IsDisabled,
                         };
 
                         arrayFields.Add(nestedField);

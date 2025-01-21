@@ -128,7 +128,7 @@ public static class AssetServices
             ["MongoDb"] = () =>
             {
                 services.AddSquidexMongoAssetStore(config);
-            }
+            },
         });
     }
 }

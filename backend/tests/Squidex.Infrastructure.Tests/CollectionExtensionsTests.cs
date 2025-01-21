@@ -38,7 +38,7 @@ public class CollectionExtensionsTests
         var source = new List<(int Value, int Other)>
         {
             (5, 5),
-            (4, 4)
+            (4, 4),
         };
 
         var index = source.IndexOf(x => x.Other == 4);
@@ -52,7 +52,7 @@ public class CollectionExtensionsTests
         var source = new List<(int Value, int Other)>
         {
             (5, 5),
-            (4, 4)
+            (4, 4),
         };
 
         var index = source.IndexOf(x => x.Other == 2);
@@ -171,12 +171,12 @@ public class CollectionExtensionsTests
         var lhs = new Dictionary<int, int>
         {
             [1] = 1,
-            [2] = 2
+            [2] = 2,
         };
         var rhs = new Dictionary<int, int>
         {
             [1] = 1,
-            [2] = 2
+            [2] = 2,
         };
 
         Assert.True(lhs.EqualsDictionary(rhs));
@@ -188,11 +188,11 @@ public class CollectionExtensionsTests
         var lhs = new Dictionary<int, int>
         {
             [1] = 1,
-            [2] = 2
+            [2] = 2,
         };
         var rhs = new Dictionary<int, int>
         {
-            [1] = 1
+            [1] = 1,
         };
 
         Assert.False(lhs.EqualsDictionary(rhs));
@@ -204,12 +204,12 @@ public class CollectionExtensionsTests
         var lhs = new Dictionary<int, int>
         {
             [1] = 1,
-            [2] = 2
+            [2] = 2,
         };
         var rhs = new Dictionary<int, int>
         {
             [1] = 1,
-            [3] = 3
+            [3] = 3,
         };
 
         Assert.False(lhs.EqualsDictionary(rhs));
@@ -221,12 +221,12 @@ public class CollectionExtensionsTests
         var lhs = new Dictionary<int, int>
         {
             [1] = 1,
-            [2] = 2
+            [2] = 2,
         };
         var rhs = new Dictionary<int, int>
         {
             [1] = 1,
-            [2] = 2
+            [2] = 2,
         };
 
         Assert.Equal(lhs.DictionaryHashCode(), rhs.DictionaryHashCode());
@@ -238,12 +238,12 @@ public class CollectionExtensionsTests
         var lhs = new Dictionary<int, int>
         {
             [1] = 1,
-            [2] = 2
+            [2] = 2,
         };
         var rhs = new Dictionary<int, int>
         {
             [1] = 1,
-            [3] = 3
+            [3] = 3,
         };
 
         Assert.NotEqual(lhs.DictionaryHashCode(), rhs.DictionaryHashCode());
@@ -255,12 +255,12 @@ public class CollectionExtensionsTests
         var lhs = new List<int>
         {
             1,
-            2
+            2,
         };
         var rhs = new List<int>
         {
             1,
-            2
+            2,
         };
 
         Assert.True(lhs.EqualsList(rhs));
@@ -272,11 +272,11 @@ public class CollectionExtensionsTests
         var lhs = new List<int>
         {
             1,
-            2
+            2,
         };
         var rhs = new List<int>
         {
-            1
+            1,
         };
 
         Assert.False(lhs.EqualsList(rhs));
@@ -288,12 +288,12 @@ public class CollectionExtensionsTests
         var lhs = new List<int>
         {
             1,
-            2
+            2,
         };
         var rhs = new List<int>
         {
             1,
-            3
+            3,
         };
 
         Assert.False(lhs.EqualsList(rhs));
@@ -305,12 +305,12 @@ public class CollectionExtensionsTests
         var lhs = new List<int>
         {
             1,
-            2
+            2,
         };
         var rhs = new List<int>
         {
             2,
-            1
+            1,
         };
 
         Assert.False(lhs.EqualsList(rhs));

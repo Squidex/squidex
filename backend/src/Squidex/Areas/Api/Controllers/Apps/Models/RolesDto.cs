@@ -26,7 +26,7 @@ public sealed class RolesDto : Resource
                     .Select(x => RoleDto.FromDomain(x, app))
                     .Select(x => x.CreateLinks(resources))
                     .OrderBy(x => x.Name)
-                    .ToArray()
+                    .ToArray(),
         };
 
         return result.CreateLinks(resources);

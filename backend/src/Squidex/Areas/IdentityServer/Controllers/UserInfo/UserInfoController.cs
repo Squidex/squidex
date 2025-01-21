@@ -32,14 +32,14 @@ public class UserInfoController(IUserService userService) : IdentityServerContro
                 new AuthenticationProperties(new Dictionary<string, string?>
                 {
                     [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidToken,
-                    [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "The specified access token is bound to an account that no longer exists."
+                    [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "The specified access token is bound to an account that no longer exists.",
                 }),
                 OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
         }
 
         var claims = new Dictionary<string, object>(StringComparer.Ordinal)
         {
-            [Claims.Subject] = user.Id
+            [Claims.Subject] = user.Id,
         };
 
         if (User.HasScope(Scopes.Email))

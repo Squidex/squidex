@@ -19,7 +19,7 @@ public sealed class PermissionSetTests
         {
             new Permission("c"),
             new Permission("b"),
-            new Permission("a")
+            new Permission("a"),
         };
 
         var sut = new PermissionSet(source);

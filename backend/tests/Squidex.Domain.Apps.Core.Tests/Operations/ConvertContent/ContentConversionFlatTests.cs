@@ -53,7 +53,7 @@ public class ContentConversionFlatTests
                     .AddLocalized("it", 4)
             },
             { "field3", JsonValue.Create(6) },
-            { "field4", JsonValue.Create(7) }
+            { "field4", JsonValue.Create(7) },
         };
 
         Assert.True(expected.EqualsDictionary(output));
@@ -69,7 +69,7 @@ public class ContentConversionFlatTests
             { "field1", JsonValue.Create(1) },
             { "field2", JsonValue.Create(4) },
             { "field3", JsonValue.Create(6) },
-            { "field4", JsonValue.Create(7) }
+            { "field4", JsonValue.Create(7) },
         };
 
         Assert.True(expected.EqualsDictionary(output));

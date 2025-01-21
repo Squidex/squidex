@@ -47,7 +47,7 @@ public sealed class ImportContentsDto
             var job = new BulkUpdateJob
             {
                 Type = BulkUpdateContentType.Create,
-                Data = x
+                Data = x,
             };
 
 #pragma warning disable CS0618 // Type or member is obsolete

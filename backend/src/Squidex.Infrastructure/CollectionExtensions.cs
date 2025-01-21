@@ -35,7 +35,7 @@ public static class CollectionExtensions
         {
             var clone = new Dictionary<TKey, TValue>(source)
             {
-                [key] = value
+                [key] = value,
             };
 
             result = clone;
@@ -54,7 +54,7 @@ public static class CollectionExtensions
         {
             var clone = new Dictionary<TKey, TValue>(source)
             {
-                [key] = value
+                [key] = value,
             };
 
             result = clone;
@@ -73,7 +73,7 @@ public static class CollectionExtensions
         {
             var clone = new Dictionary<TKey, TValue>(source)
             {
-                [key] = value
+                [key] = value,
             };
 
             result = clone;

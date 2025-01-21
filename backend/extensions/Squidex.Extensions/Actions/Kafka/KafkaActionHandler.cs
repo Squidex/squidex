@@ -46,7 +46,7 @@ public sealed class KafkaActionHandler(RuleEventFormatter formatter, KafkaProduc
             Headers = await ParseHeadersAsync(action.Headers, @event),
             Schema = action.Schema,
             PartitionKey = await FormatAsync(action.PartitionKey, @event),
-            PartitionCount = action.PartitionCount
+            PartitionCount = action.PartitionCount,
         };
 
         return (Description, ruleJob);

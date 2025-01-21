@@ -6,14 +6,11 @@
 // ==========================================================================
 
 using MongoDB.Driver;
-using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Events;
 using Squidex.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.ObjectPool;
 
 namespace Squidex.Domain.Apps.Entities.Schemas;
 
@@ -56,7 +53,7 @@ public sealed class MongoSchemasHash(IMongoDatabase database) : MongoRepositoryB
                             .Set($"s.{schemaEvent.SchemaId.Id}", @event.Headers.EventStreamNumber())
                             .Set(x => x.Updated, @event.Headers.TimestampAsInstant()))
                     {
-                        IsUpsert = true
+                        IsUpsert = true,
                     });
             }
         }
@@ -69,56 +66,20 @@ public sealed class MongoSchemasHash(IMongoDatabase database) : MongoRepositoryB
         return Collection.BulkWriteAsync(writes, BulkUnordered);
     }
 
-    public async Task<(Instant Create, string Hash)> GetCurrentHashAsync(App app,
+    public async Task<SchemasHashKey> GetCurrentHashAsync(App app,
         CancellationToken ct = default)
     {
         Guard.NotNull(app);
 
         var entity = await Collection.Find(x => x.AppId == app.Id).FirstOrDefaultAsync(ct);
-
         if (entity == null)
         {
-            return (default, string.Empty);
+            return SchemasHashKey.Empty;
         }
 
-        var ids =
-            entity.SchemaVersions.Select(x => (x.Key, x.Value))
-                .Union(Enumerable.Repeat((app.Id.ToString(), app.Version), 1));
-
-        var hash = CreateHash(ids);
-
-        return (entity.Updated, hash);
-    }
-
-    public ValueTask<string> ComputeHashAsync(App app, IEnumerable<Schema> schemas,
-        CancellationToken ct = default)
-    {
-        var ids =
-            schemas.Select(x => (x.Id.ToString(), x.Version))
-                .Union(Enumerable.Repeat((app.Id.ToString(), app.Version), 1));
-
-        var hash = CreateHash(ids);
-
-        return new ValueTask<string>(hash);
-    }
-
-    private static string CreateHash(IEnumerable<(string, long)> ids)
-    {
-        var sb = DefaultPools.StringBuilder.Get();
-        try
-        {
-            foreach (var (id, version) in ids.OrderBy(x => x.Item1))
-            {
-                sb.Append(id);
-                sb.Append(version);
-                sb.Append(';');
-            }
-
-            return sb.ToString().ToSha256Base64();
-        }
-        finally
-        {
-            DefaultPools.StringBuilder.Return(sb);
-        }
+        return SchemasHashKey.Create(
+            app,
+            entity.SchemaVersions.ToDictionary(x => DomainId.Create(x.Key), x => x.Value),
+            entity.Updated);
     }
 }

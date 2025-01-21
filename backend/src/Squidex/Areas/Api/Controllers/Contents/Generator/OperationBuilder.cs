@@ -119,7 +119,7 @@ internal sealed class OperationBuilder(OperationsBuilder operations, OpenApiOper
     {
         var response = new OpenApiResponse
         {
-            Description = description
+            Description = description,
         };
 
         if (schema != null && statusCode == 204)
@@ -142,8 +142,8 @@ internal sealed class OperationBuilder(OperationsBuilder operations, OpenApiOper
         {
             new OpenApiSecurityRequirement
             {
-                [Constants.SecurityDefinition] = [fullId]
-            }
+                [Constants.SecurityDefinition] = [fullId],
+            },
         };
 
         return this;

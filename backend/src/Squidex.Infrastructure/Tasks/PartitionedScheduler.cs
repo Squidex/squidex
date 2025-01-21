@@ -25,7 +25,7 @@ public sealed class PartitionedScheduler<T> : IAsyncDisposable
             channel = Channel.CreateBounded<T>(new BoundedChannelOptions(bufferSize)
             {
                 SingleReader = true,
-                SingleWriter = false
+                SingleWriter = false,
             });
 
             worker = Task.Run(async () =>

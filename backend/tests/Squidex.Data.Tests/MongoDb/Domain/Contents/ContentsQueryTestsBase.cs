@@ -71,7 +71,7 @@ public abstract class ContentsQueryTestsBase(ContentsQueryFixture fixture)
     {
         var query = new ClrQuery
         {
-            Filter = F.Eq("data.field1.iv", 12)
+            Filter = F.Eq("data.field1.iv", 12),
         };
 
         var contents = await QueryAsync(_.ContentRepository, query, 1000, 0);
@@ -120,8 +120,8 @@ public abstract class ContentsQueryTestsBase(ContentsQueryFixture fixture)
         {
             Sort =
             [
-                new SortNode("data.value.iv", SortOrder.Ascending)
-            ]
+                new SortNode("data.value.iv", SortOrder.Ascending),
+            ],
         };
 
         var contents = await QueryAsync(_.ContentRepository, query, 1000, 9000);
@@ -135,7 +135,7 @@ public abstract class ContentsQueryTestsBase(ContentsQueryFixture fixture)
     {
         var query = new ClrQuery
         {
-            FullText = "hello"
+            FullText = "hello",
         };
 
         var contents = await QueryAsync(_.ContentRepository, query);
@@ -149,7 +149,7 @@ public abstract class ContentsQueryTestsBase(ContentsQueryFixture fixture)
     {
         var query = new ClrQuery
         {
-            Filter = F.Eq("data.field1.iv", 200)
+            Filter = F.Eq("data.field1.iv", 200),
         };
 
         var contents = await QueryAsync(_.ContentRepository, query, 1000, 0);
@@ -163,7 +163,7 @@ public abstract class ContentsQueryTestsBase(ContentsQueryFixture fixture)
     {
         var query = new ClrQuery
         {
-            Filter = F.Eq("data.value.iv", 12)
+            Filter = F.Eq("data.value.iv", 12),
         };
 
         var contents = await QueryAsync(_.ContentRepository, query, 1000, 0, reference: DomainId.NewGuid());
@@ -177,7 +177,7 @@ public abstract class ContentsQueryTestsBase(ContentsQueryFixture fixture)
     {
         var query = new ClrQuery
         {
-            Random = 40
+            Random = 40,
         };
 
         var contents = await QueryAsync(_.ContentRepository, query);

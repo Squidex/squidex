@@ -95,7 +95,7 @@ public partial class RuleEventFormatter(IJsonSerializer serializer, IEnumerable<
         {
             var vars = new TemplateVars
             {
-                ["event"] = @event
+                ["event"] = @event,
             };
 
             return await templateEngine.RenderAsync(template, vars);
@@ -109,7 +109,7 @@ public partial class RuleEventFormatter(IJsonSerializer serializer, IEnumerable<
                 Event = @event,
                 AppId = @event.AppId.Id,
                 AppName = @event.AppId.Name,
-                User = Admin()
+                User = Admin(),
             };
 
             var result = (await scriptEngine.ExecuteAsync(vars, script)).ToString();

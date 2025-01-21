@@ -147,7 +147,7 @@ public partial class MongoContentRepository : ISnapshotStore<WriteContent>, IDel
             {
                 CancellationToken = ct,
                 // This is just an estimate, but we do not want ot have unlimited parallelism.
-                MaxDegreeOfParallelism = 8
+                MaxDegreeOfParallelism = 8,
             };
 
             // Make one update per collection.

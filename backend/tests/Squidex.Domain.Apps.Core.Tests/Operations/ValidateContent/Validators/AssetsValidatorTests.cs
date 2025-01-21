@@ -27,7 +27,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
     public static readonly TheoryData<DomainId> AssetsWithDimensions = new TheoryData<DomainId>
     {
         { Image1.Id },
-        { Video.Id }
+        { Video.Id },
     };
 
     [Fact]
@@ -240,7 +240,7 @@ public class AssetsValidatorTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             [
                 "[1]: Must be an allowed extension.",
-                "[2]: Must be an allowed extension."
+                "[2]: Must be an allowed extension.",
             ]);
     }
 

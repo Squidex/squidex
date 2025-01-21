@@ -24,7 +24,7 @@ internal sealed class ContentResultGraphType : ObjectGraphType<IResultList<Conte
             Name = "total",
             ResolvedType = Scalars.NonNullInt,
             Resolver = ContentResolvers.ListTotal,
-            Description = FieldDescriptions.ContentsTotal
+            Description = FieldDescriptions.ContentsTotal,
         });
 
         AddField(new FieldType
@@ -32,7 +32,7 @@ internal sealed class ContentResultGraphType : ObjectGraphType<IResultList<Conte
             Name = "items",
             ResolvedType = new ListGraphType(new NonNullGraphType(contentType)),
             Resolver = ContentResolvers.ListItems,
-            Description = FieldDescriptions.ContentsItems
+            Description = FieldDescriptions.ContentsItems,
         });
 
         Description = $"List of {schemaInfo.DisplayName} items and total count.";

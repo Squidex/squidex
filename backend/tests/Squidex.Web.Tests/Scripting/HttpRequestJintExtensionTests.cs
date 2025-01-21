@@ -21,14 +21,14 @@ public class HttpRequestJintExtensionTests
     {
         var extensions = new IJintExtension[]
         {
-            new HttpRequestJintExtension(httpContextAccessor)
+            new HttpRequestJintExtension(httpContextAccessor),
         };
 
         sut = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
             Options.Create(new JintScriptOptions
             {
                 TimeoutScript = TimeSpan.FromSeconds(2),
-                TimeoutExecution = TimeSpan.FromSeconds(10)
+                TimeoutExecution = TimeSpan.FromSeconds(10),
             }), extensions);
     }
 

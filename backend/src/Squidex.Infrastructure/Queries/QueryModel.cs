@@ -17,7 +17,7 @@ public sealed class QueryModel
             CompareOperator.Equals,
             CompareOperator.Exists,
             CompareOperator.In,
-            CompareOperator.NotEquals
+            CompareOperator.NotEquals,
         ],
         [FilterSchemaType.DateTime] =
         [
@@ -33,12 +33,12 @@ public sealed class QueryModel
             CompareOperator.LessThanOrEqual,
             CompareOperator.Matchs,
             CompareOperator.NotEquals,
-            CompareOperator.StartsWith
+            CompareOperator.StartsWith,
         ],
         [FilterSchemaType.GeoObject] =
         [
             CompareOperator.LessThan,
-            CompareOperator.Exists
+            CompareOperator.Exists,
         ],
         [FilterSchemaType.Guid] =
         [
@@ -54,7 +54,7 @@ public sealed class QueryModel
             CompareOperator.LessThanOrEqual,
             CompareOperator.Matchs,
             CompareOperator.NotEquals,
-            CompareOperator.StartsWith
+            CompareOperator.StartsWith,
         ],
         [FilterSchemaType.Object] = [],
         [FilterSchemaType.ObjectArray] =
@@ -63,7 +63,7 @@ public sealed class QueryModel
             CompareOperator.Exists,
             CompareOperator.Equals,
             CompareOperator.In,
-            CompareOperator.NotEquals
+            CompareOperator.NotEquals,
         ],
         [FilterSchemaType.Number] =
         [
@@ -74,7 +74,7 @@ public sealed class QueryModel
             CompareOperator.GreaterThan,
             CompareOperator.GreaterThanOrEqual,
             CompareOperator.In,
-            CompareOperator.NotEquals
+            CompareOperator.NotEquals,
         ],
         [FilterSchemaType.String] =
         [
@@ -90,7 +90,7 @@ public sealed class QueryModel
             CompareOperator.LessThanOrEqual,
             CompareOperator.Matchs,
             CompareOperator.NotEquals,
-            CompareOperator.StartsWith
+            CompareOperator.StartsWith,
         ],
         [FilterSchemaType.StringArray] =
         [
@@ -106,8 +106,8 @@ public sealed class QueryModel
             CompareOperator.LessThanOrEqual,
             CompareOperator.Matchs,
             CompareOperator.NotEquals,
-            CompareOperator.StartsWith
-        ]
+            CompareOperator.StartsWith,
+        ],
     };
 
     public FilterSchema Schema { get; init; } = FilterSchema.Any;

@@ -63,7 +63,7 @@ public sealed class RuleTypeProvider : ITypeProvider
                 Description = metadata.Description,
                 IconColor = metadata.IconColor,
                 IconImage = metadata.IconImage,
-                ReadMore = metadata.ReadMore
+                ReadMore = metadata.ReadMore,
             };
 
         foreach (var property in actionType.GetProperties())
@@ -72,7 +72,7 @@ public sealed class RuleTypeProvider : ITypeProvider
             {
                 var actionProperty = new RuleActionProperty
                 {
-                    Name = property.Name.ToCamelCase()
+                    Name = property.Name.ToCamelCase(),
                 };
 
                 var display = property.GetCustomAttribute<DisplayAttribute>();

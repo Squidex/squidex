@@ -34,7 +34,7 @@ public static class SharedTypes
         Arguments = AssetActions.Find.Arguments,
         ResolvedType = Asset,
         Resolver = AssetActions.Find.Resolver,
-        Description = "Find an asset by id."
+        Description = "Find an asset by id.",
     };
 
     public static readonly FieldType QueryAssets = new FieldType
@@ -43,7 +43,7 @@ public static class SharedTypes
         Arguments = AssetActions.Query.Arguments,
         ResolvedType = new NonNullGraphType(AssetsList),
         Resolver = AssetActions.Query.Resolver,
-        Description = "Get assets."
+        Description = "Get assets.",
     };
 
     public static readonly FieldType QueryAssetsWithTotal = new FieldType
@@ -52,6 +52,6 @@ public static class SharedTypes
         Arguments = AssetActions.Query.Arguments,
         ResolvedType = new NonNullGraphType(AssetsResult),
         Resolver = AssetActions.Query.ResolverWithTotal,
-        Description = "Get assets and total count."
+        Description = "Get assets and total count.",
     };
 }

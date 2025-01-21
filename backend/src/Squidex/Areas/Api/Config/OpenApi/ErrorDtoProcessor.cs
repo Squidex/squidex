@@ -32,7 +32,7 @@ public sealed class ErrorDtoProcessor : IOperationProcessor
             {
                 operation.Responses.Add(code, new OpenApiResponse
                 {
-                    Description = description
+                    Description = description,
                 });
             }
         }

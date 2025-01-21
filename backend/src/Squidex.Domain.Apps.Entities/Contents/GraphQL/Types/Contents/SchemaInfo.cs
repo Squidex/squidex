@@ -60,7 +60,7 @@ internal sealed class SchemaInfo
 
             yield return new SchemaInfo(schema, typeName, typeNames)
             {
-                Fields = FieldInfo.Build(schema.Fields, $"{typeName}Data", typeNames).ToList()
+                Fields = FieldInfo.Build(schema.Fields, $"{typeName}Data", typeNames).ToList(),
             };
         }
     }
@@ -146,7 +146,7 @@ internal sealed class FieldInfo
                 fieldTypeName,
                 typeNames)
             {
-                Fields = nested
+                Fields = nested,
             };
         }
     }

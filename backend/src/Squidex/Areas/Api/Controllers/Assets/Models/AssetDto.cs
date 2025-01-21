@@ -160,7 +160,7 @@ public sealed class AssetDto : Resource
         {
             result.Meta = new AssetMeta
             {
-                IsDuplicate = "true"
+                IsDuplicate = "true",
             };
         }
 

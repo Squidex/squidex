@@ -86,7 +86,7 @@ internal sealed class Builder
 
         var newSchema = new GraphQLSchema
         {
-            Query = new ApplicationQueries(this, normalSchemas)
+            Query = new ApplicationQueries(this, normalSchemas),
         };
 
         newSchema.RegisterType(ComponentInterface);

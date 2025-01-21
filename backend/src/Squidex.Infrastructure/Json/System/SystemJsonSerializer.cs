@@ -19,12 +19,12 @@ public sealed class SystemJsonSerializer : IJsonSerializer
     {
         optionsNormal = new JsonSerializerOptions(options)
         {
-            WriteIndented = false
+            WriteIndented = false,
         };
 
         optionsIndented = new JsonSerializerOptions(options)
         {
-            WriteIndented = true
+            WriteIndented = true,
         };
     }
 

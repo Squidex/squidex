@@ -24,7 +24,7 @@ public sealed class ClientsDto : Resource
             Items = app.Clients
                 .Select(x => ClientDto.FromClient(x.Key, x.Value))
                 .Select(x => x.CreateLinks(resources))
-                .ToArray()
+                .ToArray(),
         };
 
         return result.CreateLinks(resources);

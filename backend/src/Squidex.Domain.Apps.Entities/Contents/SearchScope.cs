@@ -10,5 +10,5 @@ namespace Squidex.Domain.Apps.Entities.Contents;
 public enum SearchScope
 {
     All,
-    Published
+    Published,
 }

@@ -19,7 +19,7 @@ public static class ScriptingExtensions
     {
         AsContext = true,
         CanDisallow = true,
-        CanReject = true
+        CanReject = true,
     };
 
     public static async Task ExecuteCreateScriptAsync(this AssetOperation operation, CreateAsset create,
@@ -49,9 +49,9 @@ public static class ScriptingExtensions
                 MimeType = create.File.MimeType,
                 ParentId = create.ParentId,
                 ParentPath = parentPath,
-                Tags = create.Tags
+                Tags = create.Tags,
             },
-            Operation = "Create"
+            Operation = "Create",
         };
 
         var asset = new AssetEntityScriptVars
@@ -67,7 +67,7 @@ public static class ScriptingExtensions
             MimeType = create.File.MimeType,
             ParentId = create.ParentId,
             ParentPath = await GetPathAsync(operation, create.ParentId, ct),
-            Tags = create.Tags?.ToReadonlyList()
+            Tags = create.Tags?.ToReadonlyList(),
         };
 
         await ExecuteScriptAsync(operation, script, vars, asset, ct);
@@ -95,9 +95,9 @@ public static class ScriptingExtensions
                 FileName = update.File.FileName,
                 FileSize = update.File.FileSize,
                 MimeType = update.File.MimeType,
-                Tags = update.Tags
+                Tags = update.Tags,
             },
-            Operation = "Update"
+            Operation = "Update",
         };
 
         return ExecuteScriptAsync(operation, script, vars, null, ct);
@@ -123,9 +123,9 @@ public static class ScriptingExtensions
                 Metadata = annotate.Metadata,
                 FileName = annotate.FileName,
                 FileSlug = annotate.Slug,
-                Tags = annotate.Tags
+                Tags = annotate.Tags,
             },
-            Operation = "Annotate"
+            Operation = "Annotate",
         };
 
         return ExecuteScriptAsync(operation, script, vars, null, ct);
@@ -149,9 +149,9 @@ public static class ScriptingExtensions
             Command = new AssetCommandScriptVars
             {
                 ParentId = move.ParentId,
-                ParentPath = parentPath
+                ParentPath = parentPath,
             },
-            Operation = "Move"
+            Operation = "Move",
         };
 
         await ExecuteScriptAsync(operation, script, vars, null, ct);
@@ -172,9 +172,9 @@ public static class ScriptingExtensions
         {
             Command = new AssetCommandScriptVars
             {
-                Permanent = delete.Permanent
+                Permanent = delete.Permanent,
             },
-            Operation = "Delete"
+            Operation = "Delete",
         };
 
         return ExecuteScriptAsync(operation, script, vars, null, ct);

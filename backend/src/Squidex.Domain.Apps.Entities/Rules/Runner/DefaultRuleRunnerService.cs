@@ -46,8 +46,8 @@ public sealed class DefaultRuleRunnerService(
             IncludeStale = true,
             Rules = new Dictionary<DomainId, Rule>
             {
-                [ruleId] = rule
-            }.ToReadonlyDictionary()
+                [ruleId] = rule,
+            }.ToReadonlyDictionary(),
         };
 
         var simulatedEvents = new List<SimulatedRuleEvent>(MaxSimulatedEvents);

@@ -34,5 +34,5 @@ public enum RequestType
 {
     Get,
     Login,
-    LoginCustom
+    LoginCustom,
 }

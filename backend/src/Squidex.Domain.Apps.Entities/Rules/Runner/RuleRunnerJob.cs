@@ -79,10 +79,10 @@ public sealed class RuleRunnerJob : IJobRunner
             new Dictionary<string, string>
             {
                 [ArgRuleId] = ruleId.ToString(),
-                [ArgSnapshot] = snapshot.ToString()
+                [ArgSnapshot] = snapshot.ToString(),
             }) with
         {
-            AppId = app.NamedId()
+            AppId = app.NamedId(),
         };
     }
 

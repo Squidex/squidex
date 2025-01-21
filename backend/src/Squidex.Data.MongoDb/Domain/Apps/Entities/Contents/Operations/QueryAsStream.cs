@@ -64,7 +64,7 @@ public sealed class QueryAsStream : OperationBase
         {
             Filter.Gt(x => x.LastModified, default),
             Filter.Gt(x => x.Id, default),
-            Filter.Eq(x => x.IndexedAppId, appId)
+            Filter.Eq(x => x.IndexedAppId, appId),
         };
 
         if (schemaIds != null)

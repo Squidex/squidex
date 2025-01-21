@@ -18,7 +18,7 @@ public sealed class ConfigurePreviewUrlsDto : Dictionary<string, string>
     {
         return new ConfigurePreviewUrls
         {
-            PreviewUrls = new Dictionary<string, string>(this).ToReadonlyDictionary()
+            PreviewUrls = new Dictionary<string, string>(this).ToReadonlyDictionary(),
         };
     }
 }

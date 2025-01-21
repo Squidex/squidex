@@ -9,5 +9,5 @@ namespace Squidex.Domain.Apps.Core.Schemas;
 
 public enum UIFieldEditor
 {
-    Separator
+    Separator,
 }

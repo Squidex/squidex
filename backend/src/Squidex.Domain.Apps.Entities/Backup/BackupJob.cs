@@ -44,10 +44,10 @@ public sealed class BackupJob(
             new Dictionary<string, string>
             {
                 [ArgAppId] = app.Id.ToString(),
-                [ArgAppName] = app.Name
+                [ArgAppName] = app.Name,
             }) with
         {
-            AppId = app.NamedId()
+            AppId = app.NamedId(),
         };
     }
 

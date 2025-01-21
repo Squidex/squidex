@@ -155,7 +155,7 @@ public sealed class ProfileController(
 
         var update = new UserValues
         {
-            PictureUrl = SquidexClaimTypes.PictureUrlStore
+            PictureUrl = SquidexClaimTypes.PictureUrlStore,
         };
 
         await userService.UpdateAsync(id, update, ct: ct);
@@ -169,7 +169,7 @@ public sealed class ProfileController(
         var resizeOptions = new ResizeOptions
         {
             TargetWidth = 128,
-            TargetHeight = 128
+            TargetHeight = 128,
         };
 
         try
@@ -256,7 +256,7 @@ public sealed class ProfileController(
             IsHidden = user.Claims.IsHidden(),
             Project = user.Claims.Answer("project"),
             ShowAbout = identityOptions.ShowAbout,
-            SuccessMessage = successMessage
+            SuccessMessage = successMessage,
         };
 
         if (model != null)

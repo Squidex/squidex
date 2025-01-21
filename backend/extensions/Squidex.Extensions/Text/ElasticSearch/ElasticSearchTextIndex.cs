@@ -71,22 +71,22 @@ public sealed partial class ElasticSearchTextIndex(IElasticSearchClient elasticC
                         {
                             term = new Dictionary<string, object>
                             {
-                                ["schemaId.keyword"] = query.SchemaId.ToString()
-                            }
+                                ["schemaId.keyword"] = query.SchemaId.ToString(),
+                            },
                         },
                         new
                         {
                             term = new Dictionary<string, string>
                             {
-                                ["geoField.keyword"] = query.Field
-                            }
+                                ["geoField.keyword"] = query.Field,
+                            },
                         },
                         new
                         {
                             term = new Dictionary<string, string>
                             {
-                                [serveField] = "true"
-                            }
+                                [serveField] = "true",
+                            },
                         },
                         new
                         {
@@ -95,19 +95,19 @@ public sealed partial class ElasticSearchTextIndex(IElasticSearchClient elasticC
                                 geoObject = new
                                 {
                                     lat = query.Latitude,
-                                    lon = query.Longitude
+                                    lon = query.Longitude,
                                 },
-                                distance = $"{query.Radius}m"
-                            }
-                        }
-                    }
-                }
+                                distance = $"{query.Radius}m",
+                            },
+                        },
+                    },
+                },
             },
             _source = new[]
             {
-                "contentId"
+                "contentId",
             },
-            size = query.Take
+            size = query.Take,
         };
 
         return await SearchAsync(elasticQuery, ct);
@@ -140,32 +140,32 @@ public sealed partial class ElasticSearchTextIndex(IElasticSearchClient elasticC
                         {
                             term = new Dictionary<string, object>
                             {
-                                ["appId.keyword"] = app.Id.ToString()
-                            }
+                                ["appId.keyword"] = app.Id.ToString(),
+                            },
                         },
                         new
                         {
                             term = new Dictionary<string, string>
                             {
-                                [serveField] = "true"
-                            }
-                        }
+                                [serveField] = "true",
+                            },
+                        },
                     },
                     must = new
                     {
                         query_string = new
                         {
-                            query = parsed.Text
-                        }
+                            query = parsed.Text,
+                        },
                     },
-                    should = new List<object>()
-                }
+                    should = new List<object>(),
+                },
             },
             _source = new[]
             {
-                "contentId"
+                "contentId",
             },
-            size = query.Take
+            size = query.Take,
         };
 
         if (query.RequiredSchemaIds?.Count > 0)
@@ -174,8 +174,8 @@ public sealed partial class ElasticSearchTextIndex(IElasticSearchClient elasticC
             {
                 terms = new Dictionary<string, object>
                 {
-                    ["schemaId.keyword"] = query.RequiredSchemaIds.Select(x => x.ToString()).ToArray()
-                }
+                    ["schemaId.keyword"] = query.RequiredSchemaIds.Select(x => x.ToString()).ToArray(),
+                },
             };
 
             elasticQuery.query.@bool.filter.Add(bySchema);
@@ -186,8 +186,8 @@ public sealed partial class ElasticSearchTextIndex(IElasticSearchClient elasticC
             {
                 terms = new Dictionary<string, object?>
                 {
-                    ["schemaId.keyword"] = query.PreferredSchemaId.ToString()
-                }
+                    ["schemaId.keyword"] = query.PreferredSchemaId.ToString(),
+                },
             };
 
             elasticQuery.query.@bool.should.Add(bySchema);

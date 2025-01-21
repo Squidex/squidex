@@ -27,7 +27,7 @@ public sealed class UsersDto : Resource
         var result = new UsersDto
         {
             Total = total,
-            Items = items.Select(x => UserDto.FromDomain(x, resources)).ToArray()
+            Items = items.Select(x => UserDto.FromDomain(x, resources)).ToArray(),
         };
 
         return result.CreateLinks(resources);

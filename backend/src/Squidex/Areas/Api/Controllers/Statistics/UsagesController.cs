@@ -75,7 +75,7 @@ public sealed class UsagesController(
             return usageLog.ReadLogAsync(appId, fileDate.AddDays(-30), fileDate, body, ct);
         })
         {
-            FileDownloadName = fileName
+            FileDownloadName = fileName,
         };
     }
 

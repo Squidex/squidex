@@ -53,7 +53,7 @@ public abstract class ContentsQueryFixture : GivenContext, IAsyncLifetime
     public NamedId<DomainId>[] AppIds { get; } =
     [
         NamedId.Of(DomainId.Create("3b5ba909-e5a5-4858-9d0d-df4ff922d452"), "my-app1"),
-        NamedId.Of(DomainId.Create("4b3672c1-97c6-4e0b-a067-71e9e9a29db9"), "my-app1")
+        NamedId.Of(DomainId.Create("4b3672c1-97c6-4e0b-a067-71e9e9a29db9"), "my-app1"),
     ];
 
     public NamedId<DomainId>[] SchemaIds { get; } =
@@ -62,7 +62,7 @@ public abstract class ContentsQueryFixture : GivenContext, IAsyncLifetime
         NamedId.Of(DomainId.Create("4b3672c1-97c6-4e0b-a067-71e9e9a29db9"), "my-schema2"),
         NamedId.Of(DomainId.Create("76357c9b-0514-4377-9fcc-a632e7ef960d"), "my-schema3"),
         NamedId.Of(DomainId.Create("164c451e-e5a8-41f8-8aaf-e4b56603d7e7"), "my-schema4"),
-        NamedId.Of(DomainId.Create("741e902c-fdfa-41ad-8e5a-b7cb9d6e3d94"), "my-schema5")
+        NamedId.Of(DomainId.Create("741e902c-fdfa-41ad-8e5a-b7cb9d6e3d94"), "my-schema5"),
     ];
 
     protected ContentsQueryFixture(bool selfHosting)
@@ -144,7 +144,7 @@ public abstract class ContentsQueryFixture : GivenContext, IAsyncLifetime
                                 .AddField("field2",
                                     new ContentFieldData()
                                         .AddInvariant(JsonValue.Create(Lorem.Paragraph(200, 20))))),
-                        SchemaId = schemaId
+                        SchemaId = schemaId,
                     };
 
                     await ExecuteBatchAsync(content);

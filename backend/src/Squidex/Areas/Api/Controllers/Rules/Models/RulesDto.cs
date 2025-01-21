@@ -31,7 +31,7 @@ public sealed class RulesDto : Resource
 
         var result = new RulesDto
         {
-            Items = items.Select(x => RuleDto.FromDomain(x, runningAvailable, ruleRunnerService, resources)).ToArray()
+            Items = items.Select(x => RuleDto.FromDomain(x, runningAvailable, ruleRunnerService, resources)).ToArray(),
         };
 
         result.RunningRuleId = runningRuleId;

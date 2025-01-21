@@ -19,7 +19,7 @@ public static class TestAssets
             Id = id,
             FileName = "MyDocument.pdf",
             FileSize = 1024 * 4,
-            Type = AssetType.Unknown
+            Type = AssetType.Unknown,
         };
     }
 
@@ -35,7 +35,7 @@ public static class TestAssets
             {
                 [KnownMetadataKeys.PixelWidth] = 800,
                 [KnownMetadataKeys.PixelHeight] = 600,
-            }
+            },
         };
     }
 
@@ -51,7 +51,7 @@ public static class TestAssets
             {
                 [KnownMetadataKeys.VideoWidth] = 800,
                 [KnownMetadataKeys.VideoHeight] = 600,
-            }
+            },
         };
     }
 
@@ -63,7 +63,7 @@ public static class TestAssets
             FileName = "MyImage.png",
             FileSize = 1024 * 8,
             Type = AssetType.Unknown,
-            MimeType = "image/svg+xml"
+            MimeType = "image/svg+xml",
         };
     }
 }

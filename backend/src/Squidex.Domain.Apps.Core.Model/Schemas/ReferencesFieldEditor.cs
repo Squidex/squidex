@@ -14,5 +14,5 @@ public enum ReferencesFieldEditor
     Tags,
     Checkboxes,
     Input,
-    Radio
+    Radio,
 }

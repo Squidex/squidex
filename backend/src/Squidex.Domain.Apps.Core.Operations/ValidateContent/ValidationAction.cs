@@ -10,5 +10,5 @@ namespace Squidex.Domain.Apps.Core.ValidateContent;
 public enum ValidationAction
 {
     Upsert,
-    Publish
+    Publish,
 }

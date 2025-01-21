@@ -30,7 +30,7 @@ public sealed class GCHealthCheck(IOptions<GCHealthCheckOptions> options) : IHea
             { "HeapSizeBytes", heapSize },
             { "HeapSizeString", heapSize.ToReadableSize() },
             { "WorkingSetBytes", workingSet },
-            { "WorkingSetString", workingSet.ToReadableSize() }
+            { "WorkingSetString", workingSet.ToReadableSize() },
         };
 
         var status = workingSet < threshold ?

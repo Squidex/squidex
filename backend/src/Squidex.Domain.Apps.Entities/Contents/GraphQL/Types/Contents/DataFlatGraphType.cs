@@ -29,7 +29,7 @@ internal sealed class DataFlatGraphType : ObjectGraphType<FlatContentData>
                     ResolvedType = Scalars.Json,
                     Resolver = FieldVisitor.JsonPath,
                     Description = fieldInfo.Field.RawProperties.Hints,
-                    SourceName = fieldInfo.Field.Name
+                    SourceName = fieldInfo.Field.Name,
                 });
             }
 
@@ -44,7 +44,7 @@ internal sealed class DataFlatGraphType : ObjectGraphType<FlatContentData>
                     ResolvedType = resolvedType,
                     Resolver = resolver,
                     Description = fieldInfo.Field.RawProperties.Hints,
-                    SourceName = fieldInfo.Field.Name
+                    SourceName = fieldInfo.Field.Name,
                 });
             }
         }

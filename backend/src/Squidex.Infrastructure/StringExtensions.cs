@@ -19,7 +19,7 @@ public static partial class StringExtensions
     private static readonly Regex RegexProperty = BuildPropertyRegex();
     private static readonly JsonSerializerOptions JsonEscapeOptions = new JsonSerializerOptions
     {
-        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
 
     public static string JsonEscape(this string value)

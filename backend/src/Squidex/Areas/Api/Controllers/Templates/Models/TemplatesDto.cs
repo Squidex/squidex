@@ -21,7 +21,7 @@ public sealed class TemplatesDto : Resource
     {
         var result = new TemplatesDto
         {
-            Items = items.Select(x => TemplateDto.FromDomain(x, resources)).ToArray()
+            Items = items.Select(x => TemplateDto.FromDomain(x, resources)).ToArray(),
         };
 
         return result.CreateLinks(resources);

@@ -49,7 +49,7 @@ public sealed class ReadonlyDictionaryConverterFactory : JsonConverterFactory
             [
                 typeToCreate.GetGenericArguments()[0],
                 typeToCreate.GetGenericArguments()[1],
-                typeToConvert
+                typeToConvert,
             ]);
 
         var converter = (JsonConverter)Activator.CreateInstance(concreteType)!;

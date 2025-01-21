@@ -64,7 +64,7 @@ public class SchemaSynchronizerTests
     {
         var scripts = new SchemaScripts
         {
-            Create = "<create-script>"
+            Create = "<create-script>",
         };
 
         var sourceSchema =
@@ -86,7 +86,7 @@ public class SchemaSynchronizerTests
     {
         var previewUrls = new Dictionary<string, string>
         {
-            ["web"] = "Url"
+            ["web"] = "Url",
         }.ToReadonlyDictionary();
 
         var sourceSchema =

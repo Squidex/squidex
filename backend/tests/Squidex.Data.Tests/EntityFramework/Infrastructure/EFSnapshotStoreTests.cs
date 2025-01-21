@@ -1,0 +1,22 @@
+﻿// ==========================================================================
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
+//  All rights reserved. Licensed under the MIT license.
+// ==========================================================================
+
+using Squidex.EntityFramework.TestHelpers;
+using Squidex.Infrastructure.States;
+using Squidex.Shared;
+
+namespace Squidex.EntityFramework.Infrastructure;
+
+public class EFSnapshotStoreTests(PostgresFixture fixture) : Shared.SnapshotStoreTests, IClassFixture<PostgresFixture>
+{
+    protected override Task<ISnapshotStore<TestValue>> CreateSutAsync()
+    {
+        var sut = new EFSnapshotStore<TestContext, TestValue, EFState<TestValue>>(fixture.DbContextFactory);
+
+        return Task.FromResult<ISnapshotStore<TestValue>>(sut);
+    }
+}

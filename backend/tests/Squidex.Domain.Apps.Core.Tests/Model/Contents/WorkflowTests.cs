@@ -21,13 +21,13 @@ public class WorkflowTests
                     new Dictionary<Status, WorkflowTransition>
                     {
                         [Status.Archived] = WorkflowTransition.When("ToArchivedExpr", "ToArchivedRole"),
-                        [Status.Published] = WorkflowTransition.When("ToPublishedExpr", "ToPublishedRole")
+                        [Status.Published] = WorkflowTransition.When("ToPublishedExpr", "ToPublishedRole"),
                     }.ToReadonlyDictionary(),
                     StatusColors.Draft),
             [Status.Archived] =
                 new WorkflowStep(),
             [Status.Published] =
-                new WorkflowStep()
+                new WorkflowStep(),
         }.ToReadonlyDictionary());
 
     [Fact]

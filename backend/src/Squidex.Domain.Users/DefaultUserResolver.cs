@@ -30,7 +30,7 @@ public sealed class DefaultUserResolver(IServiceProvider serviceProvider) : IUse
             {
                 var values = new UserValues
                 {
-                    Invited = invited
+                    Invited = invited,
                 };
 
                 var user = await userService.CreateAsync(email, values, ct: ct);
@@ -62,8 +62,8 @@ public sealed class DefaultUserResolver(IServiceProvider serviceProvider) : IUse
             {
                 CustomClaims =
                 [
-                    new Claim(type, value)
-                ]
+                    new Claim(type, value),
+                ],
             };
 
             await userService.UpdateAsync(id, values, silent, ct);

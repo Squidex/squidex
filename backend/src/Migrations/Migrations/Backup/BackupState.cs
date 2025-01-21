@@ -17,7 +17,7 @@ public sealed class BackupState
     {
         var result = new JobsState
         {
-            Jobs = Jobs.Select(ToState).ToList()
+            Jobs = Jobs.Select(ToState).ToList(),
         };
 
         return result;
@@ -39,12 +39,12 @@ public sealed class BackupState
                 BackupStatus.Created => JobStatus.Created,
                 BackupStatus.Failed => JobStatus.Failed,
                 BackupStatus.Started => JobStatus.Started,
-                _ => JobStatus.Failed
+                _ => JobStatus.Failed,
             },
             Log =
             [
-                new JobLogMessage(source.Stopped ?? source.Started, $"Total events: {source.HandledEvents}, assets: {source.HandledAssets}")
-            ]
+                new JobLogMessage(source.Stopped ?? source.Started, $"Total events: {source.HandledEvents}, assets: {source.HandledAssets}"),
+            ],
         };
     }
 }

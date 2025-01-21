@@ -26,7 +26,7 @@ public sealed class RecursiveDeleter(
 {
     private readonly HashSet<string> consumingTypes =
         [
-            typeRegistry.GetName<IEvent, AssetFolderDeleted>()
+            typeRegistry.GetName<IEvent, AssetFolderDeleted>(),
         ];
 
     public StreamFilter EventsFilter { get; } = StreamFilter.Prefix("assetFolder-");

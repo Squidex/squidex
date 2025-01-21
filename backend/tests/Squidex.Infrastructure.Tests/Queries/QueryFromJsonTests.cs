@@ -27,7 +27,7 @@ public sealed class QueryFromJsonTests
         ("LessThanOrEqual", "le", "$FIELD <= $VALUE"),
         ("LessThan", "lt", "$FIELD < $VALUE"),
         ("NotEquals", "ne", "$FIELD != $VALUE"),
-        ("StartsWith", "startswith", "startsWith($FIELD, $VALUE)")
+        ("StartsWith", "startswith", "startsWith($FIELD, $VALUE)"),
     ];
 
     private static readonly QueryModel Model = new QueryModel();
@@ -36,7 +36,7 @@ public sealed class QueryFromJsonTests
     {
         var nestedSchema = new FilterSchema(FilterSchemaType.Object)
         {
-            Fields = ReadonlyList.Create(new FilterField(FilterSchema.String, "property"))
+            Fields = ReadonlyList.Create(new FilterField(FilterSchema.String, "property")),
         };
 
         var fields = new List<FilterField>
@@ -58,12 +58,12 @@ public sealed class QueryFromJsonTests
             new FilterField(FilterSchema.String, "union"),
             new FilterField(FilterSchema.StringArray, "stringArray"),
             new FilterField(FilterSchema.StringArray, "stringArrayNullable", IsNullable: true),
-            new FilterField(FilterSchema.String, "nested2.value")
+            new FilterField(FilterSchema.String, "nested2.value"),
         };
 
         var schema = new FilterSchema(FilterSchemaType.Object)
         {
-            Fields = fields.ToReadonlyList()
+            Fields = fields.ToReadonlyList(),
         };
 
         Model = new QueryModel { Schema = schema };
@@ -706,7 +706,7 @@ public sealed class QueryFromJsonTests
     {
         var fields = new[]
         {
-            $"{field}"
+            $"{field}",
         };
 
         var data = new TheoryData<string, string, T, string>();
@@ -733,7 +733,7 @@ public sealed class QueryFromJsonTests
         {
             $"{field}",
             $"json.{field}",
-            $"json.nested.{field}"
+            $"json.nested.{field}",
         };
 
         var data = new TheoryData<string, string, T, string>();
@@ -760,7 +760,7 @@ public sealed class QueryFromJsonTests
         {
             $"{field}",
             $"json.{field}",
-            $"json.nested.{field}"
+            $"json.nested.{field}",
         };
 
         var data = new TheoryData<string, T, string>();

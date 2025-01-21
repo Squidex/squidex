@@ -60,7 +60,7 @@ public sealed class CreateAdminInitializer(IServiceProvider serviceProvider) : I
                     var values = new UserValues
                     {
                         Password = adminPass,
-                        Permissions = permissions
+                        Permissions = permissions,
                     };
 
                     await userService.UpdateAsync(user.Id, values, ct: ct);
@@ -74,7 +74,7 @@ public sealed class CreateAdminInitializer(IServiceProvider serviceProvider) : I
                 {
                     Password = adminPass,
                     Permissions = permissions,
-                    DisplayName = adminEmail
+                    DisplayName = adminEmail,
                 };
 
                 await userService.CreateAsync(adminEmail, values, ct: ct);

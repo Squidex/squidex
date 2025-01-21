@@ -33,7 +33,7 @@ public sealed class ScriptAsset(IScriptEngine scriptEngine) : IAssetEnricherStep
         {
             AppId = context.App.Id,
             AppName = context.App.Name,
-            User = context.UserPrincipal
+            User = context.UserPrincipal,
         };
 
         var preScript = context.App.AssetScripts.QueryPre;
@@ -42,7 +42,7 @@ public sealed class ScriptAsset(IScriptEngine scriptEngine) : IAssetEnricherStep
         {
             var options = new ScriptOptions
             {
-                AsContext = true
+                AsContext = true,
             };
 
             await scriptEngine.ExecuteAsync(vars, preScript, options, ct);
@@ -74,8 +74,8 @@ public sealed class ScriptAsset(IScriptEngine scriptEngine) : IAssetEnricherStep
                 MimeType = asset.MimeType,
                 ParentId = asset.ParentId,
                 ParentPath = null,
-                Tags = asset.Tags?.ToReadonlyList()
-            }
+                Tags = asset.Tags?.ToReadonlyList(),
+            },
         };
 
         vars.CopyFrom(sharedVars);
@@ -84,7 +84,7 @@ public sealed class ScriptAsset(IScriptEngine scriptEngine) : IAssetEnricherStep
         {
             AsContext = true,
             CanDisallow = true,
-            CanReject = true
+            CanReject = true,
         };
 
         await scriptEngine.ExecuteAsync(vars, script, options, ct);

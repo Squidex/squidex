@@ -350,7 +350,7 @@ public static class SimpleMapper
         var context = new MappingContext
         {
             Culture = culture,
-            NullableAsOptional = nullableAsOptional
+            NullableAsOptional = nullableAsOptional,
         };
 
         return ClassMapper<TSource, TTarget>.MapClass(source, target, ref context);

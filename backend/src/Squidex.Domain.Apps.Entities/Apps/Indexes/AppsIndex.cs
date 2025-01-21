@@ -239,7 +239,7 @@ public sealed class AppsIndex(
         return appCache.RemoveAsync(
         [
             GetCacheKey(id),
-            GetCacheKey(name)
+            GetCacheKey(name),
         ]);
     }
 }

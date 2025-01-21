@@ -50,7 +50,7 @@ public sealed record FilterSchema(FilterSchemaType Type)
 
                 var schema = field.Schema with
                 {
-                    Fields = null
+                    Fields = null,
                 };
 
                 result?.Add(field with { Path = path, Schema = schema });
@@ -78,7 +78,7 @@ public sealed record FilterSchema(FilterSchemaType Type)
 
         return this with
         {
-            Fields = conflictFree.ToReadonlyList()
+            Fields = conflictFree.ToReadonlyList(),
         };
     }
 

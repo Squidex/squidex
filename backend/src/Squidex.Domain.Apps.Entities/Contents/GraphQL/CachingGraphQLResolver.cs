@@ -10,7 +10,6 @@ using GraphQL;
 using GraphQL.DI;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
-using NodaTime;
 using Squidex.Caching;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
@@ -32,7 +31,7 @@ public sealed class CachingGraphQLResolver(
 {
     private readonly GraphQLOptions options = options.Value;
 
-    private sealed record CacheEntry(GraphQLSchema Model, string Hash, Instant Created);
+    private sealed record CacheEntry(GraphQLSchema Model, SchemasHashKey HashKey);
 
     public float SortOrder => 0;
 
@@ -73,20 +72,18 @@ public sealed class CachingGraphQLResolver(
         },
         async entry =>
         {
-            var (created, hash) = await schemasHash.GetCurrentHashAsync(app);
+            var hashKey = await schemasHash.GetCurrentHashAsync(app);
 
-            return created < entry.Created || string.Equals(hash, entry.Hash, StringComparison.OrdinalIgnoreCase);
+            return hashKey.Equals(entry.HashKey);
         });
     }
 
     private async Task<CacheEntry> CreateModelAsync(App app)
     {
         var schemasList = await serviceProvider.GetRequiredService<IAppProvider>().GetSchemasAsync(app.Id);
-        var schemasKey = await schemasHash.ComputeHashAsync(app, schemasList);
+        var schemasKey = SchemasHashKey.Create(app, schemasList);
 
-        var now = SystemClock.Instance.GetCurrentInstant();
-
-        return new CacheEntry(new Builder(app, options).BuildSchema(schemasList), schemasKey, now);
+        return new CacheEntry(new Builder(app, options).BuildSchema(schemasList), schemasKey);
     }
 
     private static object CreateCacheKey(DomainId appId, string etag)

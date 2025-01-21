@@ -25,7 +25,7 @@ public sealed class AssetsQueryFixture : GivenContext, IAsyncLifetime
     private readonly NamedId<DomainId>[] appIds =
     [
         NamedId.Of(DomainId.Create("3b5ba909-e5a5-4858-9d0d-df4ff922d452"), "my-app1"),
-        NamedId.Of(DomainId.Create("4b3672c1-97c6-4e0b-a067-71e9e9a29db9"), "my-app1")
+        NamedId.Of(DomainId.Create("4b3672c1-97c6-4e0b-a067-71e9e9a29db9"), "my-app1"),
     ];
 
     public IMongoDatabase Database { get; }
@@ -106,13 +106,13 @@ public sealed class AssetsQueryFixture : GivenContext, IAsyncLifetime
                         FileName = fileName,
                         Metadata = new AssetMetadata
                         {
-                            ["value"] = JsonValue.Create(tag)
+                            ["value"] = JsonValue.Create(tag),
                         },
                         Tags =
                         [
-                            tag
+                            tag,
                         ],
-                        Slug = fileName
+                        Slug = fileName,
                     };
 
                     await ExecuteBatchAsync(asset);

@@ -128,7 +128,7 @@ public class FieldNamesTests
             "lastModified",
             "lastModifiedBy.avatar",
             "data.data1",
-            "data.data2.iv"
+            "data.data2.iv",
         }, migrated.ToArray());
     }
 }

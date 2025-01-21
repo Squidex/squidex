@@ -43,7 +43,7 @@ public sealed class MongoRoleStore(IMongoDatabase database) : MongoRepositoryBas
                     .Ascending(x => x.NormalizedName),
                 new CreateIndexOptions
                 {
-                    Unique = true
+                    Unique = true,
                 }),
             cancellationToken: ct);
     }

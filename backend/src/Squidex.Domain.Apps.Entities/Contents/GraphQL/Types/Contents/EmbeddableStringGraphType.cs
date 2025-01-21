@@ -32,7 +32,7 @@ internal sealed class EmbeddableStringGraphType : ObjectGraphType<string>
                 Name = "contents",
                 ResolvedType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(referenceType))),
                 Resolver = ContentFields.ResolveStringFieldContents,
-                Description = FieldDescriptions.StringFieldReferences
+                Description = FieldDescriptions.StringFieldReferences,
             });
         }
     }

@@ -47,7 +47,7 @@ public class ReferenceExtractionTests
 
         components = new ResolvedComponents(new Dictionary<DomainId, Schema>
         {
-            [DomainId.Empty] = schema
+            [DomainId.Empty] = schema,
         });
     }
 

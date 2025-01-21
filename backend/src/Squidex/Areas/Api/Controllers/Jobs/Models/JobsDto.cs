@@ -22,7 +22,7 @@ public sealed class JobsDto : Resource
     {
         var result = new JobsDto
         {
-            Items = jobs.Select(x => JobDto.FromDomain(x, resources)).ToArray()
+            Items = jobs.Select(x => JobDto.FromDomain(x, resources)).ToArray(),
         };
 
         return result.CreateLinks(resources);

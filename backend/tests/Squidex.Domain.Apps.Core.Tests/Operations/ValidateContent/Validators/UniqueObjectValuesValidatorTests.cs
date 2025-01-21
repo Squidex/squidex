@@ -45,7 +45,7 @@ public class UniqueObjectValuesValidatorTests : IClassFixture<TranslationsFixtur
             JsonValue.Object()
                 .Add("myString", "1"),
             JsonValue.Object()
-                .Add("myString", "2")
+                .Add("myString", "2"),
         },
         errors);
 
@@ -62,7 +62,7 @@ public class UniqueObjectValuesValidatorTests : IClassFixture<TranslationsFixtur
             JsonValue.Object()
                 .Add("other", "1"),
             JsonValue.Object()
-                .Add("other", "1")
+                .Add("other", "1"),
         },
         errors);
 
@@ -79,7 +79,7 @@ public class UniqueObjectValuesValidatorTests : IClassFixture<TranslationsFixtur
             JsonValue.Object()
                 .Add("myString", "1"),
             JsonValue.Object()
-                .Add("myString", "1")
+                .Add("myString", "1"),
         },
         errors);
 
@@ -99,14 +99,14 @@ public class UniqueObjectValuesValidatorTests : IClassFixture<TranslationsFixtur
                 .Add("myNumber", 1),
             JsonValue.Object()
                 .Add("myString", "1")
-                .Add("myNumber", 1)
+                .Add("myNumber", 1),
         },
         errors);
 
         errors.Should().BeEquivalentTo(
             [
                 "Must not contain items with duplicate 'myString' fields.",
-                "Must not contain items with duplicate 'myNumber' fields."
+                "Must not contain items with duplicate 'myNumber' fields.",
             ]);
     }
 }

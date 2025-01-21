@@ -112,7 +112,7 @@ public record MongoContentEntity : Content, IVersionedEntity<DomainId>
                 NewVersion = new ContentVersion(NewStatus.Value, Data),
                 ScheduleJob = ScheduleJob,
                 SchemaId = SchemaId,
-                Version = Version
+                Version = Version,
             };
         }
         else
@@ -130,7 +130,7 @@ public record MongoContentEntity : Content, IVersionedEntity<DomainId>
                 NewVersion = null,
                 ScheduleJob = ScheduleJob,
                 SchemaId = SchemaId,
-                Version = Version
+                Version = Version,
             };
         }
     }

@@ -44,7 +44,7 @@ public class PersistenceBatchTests
         SetupEventStore(new Dictionary<DomainId, List<MyEvent>>
         {
             [key1] = [event1_1, event1_2],
-            [key2] = [event2_1, event2_2]
+            [key2] = [event2_1, event2_2],
         });
 
         await bulk.LoadAsync([key1, key2]);

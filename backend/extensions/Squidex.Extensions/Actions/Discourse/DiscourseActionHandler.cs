@@ -24,7 +24,7 @@ public sealed class DiscourseActionHandler(RuleEventFormatter formatter, IHttpCl
 
         var json = new Dictionary<string, object?>
         {
-            ["title"] = await FormatAsync(action.Title!, @event)
+            ["title"] = await FormatAsync(action.Title!, @event),
         };
 
         if (action.Topic != null)
@@ -46,7 +46,7 @@ public sealed class DiscourseActionHandler(RuleEventFormatter formatter, IHttpCl
             ApiKey = action.ApiKey,
             ApiUserName = action.ApiUsername,
             RequestUrl = url,
-            RequestBody = requestBody
+            RequestBody = requestBody,
         };
 
         var description =
@@ -64,7 +64,7 @@ public sealed class DiscourseActionHandler(RuleEventFormatter formatter, IHttpCl
 
         var request = new HttpRequestMessage(HttpMethod.Post, job.RequestUrl)
         {
-            Content = new StringContent(job.RequestBody, Encoding.UTF8, "application/json")
+            Content = new StringContent(job.RequestBody, Encoding.UTF8, "application/json"),
         };
 
         request.Headers.TryAddWithoutValidation("Api-Key", job.ApiKey);

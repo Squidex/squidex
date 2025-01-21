@@ -6,10 +6,10 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
+using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Domain.Apps.Entities.Text;
 using Squidex.Infrastructure;
-using Squidex.TestHelpers;
+using Squidex.MongoDb.TestHelpers;
 using Testcontainers.MongoDb;
 
 namespace Squidex.MongoDb.Domain.Contents.Text;

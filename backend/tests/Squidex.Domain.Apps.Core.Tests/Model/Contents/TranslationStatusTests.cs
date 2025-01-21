@@ -27,7 +27,7 @@ public class TranslationStatusTests
         {
             [Language.EN] = 100,
             [Language.DE] = 100,
-            [Language.IT] = 100
+            [Language.IT] = 100,
         }, actual);
     }
 
@@ -44,7 +44,7 @@ public class TranslationStatusTests
         {
             [Language.EN] = 100,
             [Language.DE] = 100,
-            [Language.IT] = 100
+            [Language.IT] = 100,
         }, actual);
     }
 
@@ -61,7 +61,7 @@ public class TranslationStatusTests
         {
             [Language.EN] = 0,
             [Language.DE] = 0,
-            [Language.IT] = 0
+            [Language.IT] = 0,
         }, actual);
     }
 
@@ -95,7 +95,7 @@ public class TranslationStatusTests
         {
             [Language.EN] = 100,
             [Language.DE] = 67,
-            [Language.IT] = 0
+            [Language.IT] = 0,
         }, actual);
     }
 }

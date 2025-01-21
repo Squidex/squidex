@@ -52,7 +52,7 @@ public sealed class RoleDto : Resource
             NumContributors = GetNumContributors(role, app),
             Permissions = role.Permissions.ToIds().ToArray(),
             Properties = role.Properties,
-            IsDefaultRole = role.IsDefault
+            IsDefaultRole = role.IsDefault,
         };
 
         return result;

@@ -80,8 +80,8 @@ public static class AppsServices
             {
                 Settings = new AppSettings
                 {
-                    Patterns = patterns.ToReadonlyList()
-                }
+                    Patterns = patterns.ToReadonlyList(),
+                },
             };
         });
     }

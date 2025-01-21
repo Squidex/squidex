@@ -55,7 +55,7 @@ public sealed class StringAsyncJintExtension(ITranslator translator, IChatAgent 
 
                 var request = new ChatRequest
                 {
-                    Prompt = prompt
+                    Prompt = prompt,
                 };
 
                 var result = await chatAgent.PromptAsync(request, ct: ct);

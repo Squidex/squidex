@@ -50,7 +50,7 @@ public record WriteContent : AppEntity
             ScheduleJob = ScheduleJob,
             SchemaId = SchemaId,
             Status = CurrentVersion.Status,
-            Version = Version
+            Version = Version,
         };
     }
 }

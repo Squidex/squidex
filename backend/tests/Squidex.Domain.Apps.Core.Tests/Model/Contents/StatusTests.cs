@@ -114,7 +114,7 @@ public class StatusTests
     {
         var dictionary = new Dictionary<Status, int>
         {
-            [Status.Draft] = 123
+            [Status.Draft] = 123,
         };
 
         var serialized = dictionary.SerializeAndDeserializeAsJson();

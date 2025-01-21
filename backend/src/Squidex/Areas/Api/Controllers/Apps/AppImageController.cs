@@ -65,7 +65,7 @@ public sealed class AppImageController(
 
         return new FileCallbackResult(App.Image.MimeType, callback)
         {
-            ErrorAs404 = true
+            ErrorAs404 = true,
         };
     }
 
@@ -83,7 +83,7 @@ public sealed class AppImageController(
         var resizeOptions = new ResizeOptions
         {
             TargetWidth = 50,
-            TargetHeight = 50
+            TargetHeight = 50,
         };
 
         using (Telemetry.Activities.StartActivity("Read"))

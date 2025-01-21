@@ -27,7 +27,7 @@ public static class BsonDefaultConventions
 
             ConventionRegistry.Register("IgnoreExtraElements", new ConventionPack
             {
-                new IgnoreExtraElementsConvention(true)
+                new IgnoreExtraElementsConvention(true),
             }, t => true);
 
             // Allow all types, independent from the actual assembly.

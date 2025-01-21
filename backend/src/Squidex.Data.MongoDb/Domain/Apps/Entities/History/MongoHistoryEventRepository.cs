@@ -49,7 +49,7 @@ public sealed class MongoHistoryEventRepository(IMongoDatabase database) : Mongo
                 Index
                     .Ascending(x => x.OwnerId)
                     .Descending(x => x.Created)
-                    .Descending(x => x.Version))
+                    .Descending(x => x.Version)),
         ], ct);
     }
 
@@ -77,7 +77,7 @@ public sealed class MongoHistoryEventRepository(IMongoDatabase database) : Mongo
             .Select(x =>
                 new ReplaceOneModel<HistoryEvent>(Filter.Eq(y => y.Id, x.Id), x)
                 {
-                    IsUpsert = true
+                    IsUpsert = true,
                 })
             .ToList();
 

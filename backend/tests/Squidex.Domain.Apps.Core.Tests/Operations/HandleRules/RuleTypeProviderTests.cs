@@ -23,7 +23,7 @@ public class RuleTypeProviderTests
     public enum ActionEnum
     {
         Yes,
-        No
+        No,
     }
 
     [RuleAction(
@@ -83,7 +83,7 @@ public class RuleTypeProviderTests
             IconColor = "#1e5470",
             Display = "Action display",
             Description = "Action description.",
-            ReadMore = "https://www.readmore.com/"
+            ReadMore = "https://www.readmore.com/",
         };
 
         expected.Properties.Add(new RuleActionProperty
@@ -93,7 +93,7 @@ public class RuleTypeProviderTests
             Description = "Url Description",
             Editor = RuleFieldEditor.Url,
             IsFormattable = true,
-            IsRequired = true
+            IsRequired = true,
         });
 
         expected.Properties.Add(new RuleActionProperty
@@ -102,7 +102,7 @@ public class RuleTypeProviderTests
             Display = "Script",
             Description = null,
             Editor = RuleFieldEditor.Javascript,
-            IsRequired = false
+            IsRequired = false,
         });
 
         expected.Properties.Add(new RuleActionProperty
@@ -111,7 +111,7 @@ public class RuleTypeProviderTests
             Display = "Text",
             Description = null,
             Editor = RuleFieldEditor.Text,
-            IsRequired = false
+            IsRequired = false,
         });
 
         expected.Properties.Add(new RuleActionProperty
@@ -120,7 +120,7 @@ public class RuleTypeProviderTests
             Display = "TextMultiline",
             Description = null,
             Editor = RuleFieldEditor.TextArea,
-            IsRequired = false
+            IsRequired = false,
         });
 
         expected.Properties.Add(new RuleActionProperty
@@ -129,7 +129,7 @@ public class RuleTypeProviderTests
             Display = "Password",
             Description = null,
             Editor = RuleFieldEditor.Password,
-            IsRequired = false
+            IsRequired = false,
         });
 
         expected.Properties.Add(new RuleActionProperty
@@ -139,7 +139,7 @@ public class RuleTypeProviderTests
             Description = null,
             Editor = RuleFieldEditor.Dropdown,
             IsRequired = false,
-            Options = ["Yes", "No"]
+            Options = ["Yes", "No"],
         });
 
         expected.Properties.Add(new RuleActionProperty
@@ -149,7 +149,7 @@ public class RuleTypeProviderTests
             Description = null,
             Editor = RuleFieldEditor.Dropdown,
             IsRequired = false,
-            Options = ["Yes", "No"]
+            Options = ["Yes", "No"],
         });
 
         expected.Properties.Add(new RuleActionProperty
@@ -158,7 +158,7 @@ public class RuleTypeProviderTests
             Display = "Boolean",
             Description = null,
             Editor = RuleFieldEditor.Checkbox,
-            IsRequired = false
+            IsRequired = false,
         });
 
         expected.Properties.Add(new RuleActionProperty
@@ -167,7 +167,7 @@ public class RuleTypeProviderTests
             Display = "BooleanOptional",
             Description = null,
             Editor = RuleFieldEditor.Checkbox,
-            IsRequired = false
+            IsRequired = false,
         });
 
         expected.Properties.Add(new RuleActionProperty
@@ -176,7 +176,7 @@ public class RuleTypeProviderTests
             Display = "Number",
             Description = null,
             Editor = RuleFieldEditor.Number,
-            IsRequired = true
+            IsRequired = true,
         });
 
         expected.Properties.Add(new RuleActionProperty
@@ -185,7 +185,7 @@ public class RuleTypeProviderTests
             Display = "NumberOptional",
             Description = null,
             Editor = RuleFieldEditor.Number,
-            IsRequired = false
+            IsRequired = false,
         });
 
         sut.Add<MyRuleAction>();

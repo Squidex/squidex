@@ -28,7 +28,7 @@ public sealed class ExpressionsAttribute(string? interpolationOld, string? inter
         {
             yield return new object[]
             {
-                $"Script(`{script}`)"
+                $"Script(`{script}`)",
             };
         }
 
@@ -36,7 +36,7 @@ public sealed class ExpressionsAttribute(string? interpolationOld, string? inter
         {
             yield return new object[]
             {
-                $"Liquid({liquid})"
+                $"Liquid({liquid})",
             };
         }
     }

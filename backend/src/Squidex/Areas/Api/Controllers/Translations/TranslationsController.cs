@@ -39,7 +39,7 @@ public sealed class TranslationsController(ICommandBus commandBus, IAssetStore a
             await assetStore.DownloadAsync(path, body, range, ct);
         })
         {
-            ErrorAs404 = true
+            ErrorAs404 = true,
         };
     }
 
@@ -79,7 +79,7 @@ public sealed class TranslationsController(ICommandBus commandBus, IAssetStore a
         {
             Configuration = request.Configuration,
             ConversationId = request.ConversationId,
-            Prompt = request.Prompt
+            Prompt = request.Prompt,
         };
 
         var context = new AppChatContext

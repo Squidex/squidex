@@ -36,7 +36,7 @@ public sealed record Workflow(Status Initial, ReadonlyDictionary<Status, Workflo
                     new WorkflowStep(
                         new Dictionary<Status, WorkflowTransition>
                         {
-                            [Status.Draft] = WorkflowTransition.Always
+                            [Status.Draft] = WorkflowTransition.Always,
                         }.ToReadonlyDictionary(),
                         StatusColors.Archived, NoUpdate.Always),
                 [Status.Draft] =
@@ -44,7 +44,7 @@ public sealed record Workflow(Status Initial, ReadonlyDictionary<Status, Workflo
                         new Dictionary<Status, WorkflowTransition>
                         {
                             [Status.Archived] = WorkflowTransition.Always,
-                            [Status.Published] = WorkflowTransition.Always
+                            [Status.Published] = WorkflowTransition.Always,
                         }.ToReadonlyDictionary(),
                         StatusColors.Draft),
                 [Status.Published] =
@@ -52,9 +52,9 @@ public sealed record Workflow(Status Initial, ReadonlyDictionary<Status, Workflo
                         new Dictionary<Status, WorkflowTransition>
                         {
                             [Status.Archived] = WorkflowTransition.Always,
-                            [Status.Draft] = WorkflowTransition.Always
+                            [Status.Draft] = WorkflowTransition.Always,
                         }.ToReadonlyDictionary(),
-                        StatusColors.Published)
+                        StatusColors.Published),
             }.ToReadonlyDictionary(), null, name);
     }
 

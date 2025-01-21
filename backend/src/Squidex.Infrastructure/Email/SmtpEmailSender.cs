@@ -43,7 +43,7 @@ public sealed class SmtpEmailSender(IOptions<SmtpOptions> options) : IEmailSende
 
                 smtpMessage.Body = new TextPart(TextFormat.Html)
                 {
-                    Text = body
+                    Text = body,
                 };
 
                 smtpMessage.Subject = subject;

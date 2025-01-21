@@ -28,8 +28,8 @@ public static class IdentityServerConfiguration
                 Name = Constants.ScopeApi,
                 Resources =
                 {
-                    Permissions.Prefixes.Scope + Constants.ScopeApi
-                }
+                    Permissions.Prefixes.Scope + Constants.ScopeApi,
+                },
             });
         }
     }

@@ -169,7 +169,7 @@ public class DefaultUserServiceTests
 
         var values = new UserValues
         {
-            Email = identity.Email!
+            Email = identity.Email!,
         };
 
         SetupCreation(identity, 1);
@@ -199,7 +199,7 @@ public class DefaultUserServiceTests
 
         var values = new UserValues
         {
-            Consent = true
+            Consent = true,
         };
 
         SetupCreation(identity, 1);
@@ -217,7 +217,7 @@ public class DefaultUserServiceTests
 
         var values = new UserValues
         {
-            Consent = true
+            Consent = true,
         };
 
         SetupCreation(identity, 0);
@@ -235,7 +235,7 @@ public class DefaultUserServiceTests
 
         var values = new UserValues
         {
-            Consent = true
+            Consent = true,
         };
 
         SetupCreation(identity, 0);
@@ -253,7 +253,7 @@ public class DefaultUserServiceTests
 
         var values = new UserValues
         {
-            Consent = true
+            Consent = true,
         };
 
         SetupCreation(identity, 1);
@@ -271,7 +271,7 @@ public class DefaultUserServiceTests
 
         var values = new UserValues
         {
-            Password = "password"
+            Password = "password",
         };
 
         SetupCreation(identity, 1);
@@ -287,7 +287,7 @@ public class DefaultUserServiceTests
     {
         var update = new UserValues
         {
-            Email = "new@email.com"
+            Email = "new@email.com",
         };
 
         var identity = CreateIdentity(found: false);
@@ -326,7 +326,7 @@ public class DefaultUserServiceTests
     {
         var update = new UserValues
         {
-            Password = "password"
+            Password = "password",
         };
 
         var identity = CreateIdentity(found: true);
@@ -348,7 +348,7 @@ public class DefaultUserServiceTests
     {
         var update = new UserValues
         {
-            Email = "new@email.com"
+            Email = "new@email.com",
         };
 
         var identity = CreateIdentity(found: true);
@@ -367,7 +367,7 @@ public class DefaultUserServiceTests
     {
         var update = new UserValues
         {
-            Consent = true
+            Consent = true,
         };
 
         var identity = CreateIdentity(found: true);
@@ -386,7 +386,7 @@ public class DefaultUserServiceTests
     {
         var update = new UserValues
         {
-            ConsentForEmails = true
+            ConsentForEmails = true,
         };
 
         var identity = CreateIdentity(found: true);
@@ -610,7 +610,7 @@ public class DefaultUserServiceTests
         return new IdentityUser
         {
             Id = id,
-            Email = $"{id}@email.com"
+            Email = $"{id}@email.com",
         };
     }
 }

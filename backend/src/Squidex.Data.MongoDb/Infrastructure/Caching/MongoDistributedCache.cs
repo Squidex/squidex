@@ -25,7 +25,7 @@ public sealed class MongoDistributedCache(IMongoDatabase database) : MongoReposi
                 Index.Ascending(x => x.Expires),
                 new CreateIndexOptions
                 {
-                    ExpireAfter = TimeSpan.Zero
+                    ExpireAfter = TimeSpan.Zero,
                 }),
             null, ct);
     }

@@ -37,7 +37,7 @@ public sealed class AssetFolderOperation : OperationContextBase<AssetFolderComma
         {
             App = app,
             Command = command,
-            CommandId = id
+            CommandId = id,
         };
     }
 }

@@ -108,7 +108,7 @@ public sealed class RuleDequeuerWorker : IBackgroundProcess
                 ExecutionResult = response.Status,
                 Finished = now,
                 JobNext = jobDelay,
-                JobResult = jobResult
+                JobResult = jobResult,
             };
 
             await ruleEventRepository.UpdateAsync(@event.Job, update, default);

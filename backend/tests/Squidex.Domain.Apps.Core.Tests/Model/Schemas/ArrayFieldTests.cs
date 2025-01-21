@@ -137,11 +137,11 @@ public class ArrayfieldTests
     {
         var properties1 = new NumberFieldProperties
         {
-            MinValue = 10
+            MinValue = 10,
         };
         var properties2 = new NumberFieldProperties
         {
-            MinValue = 10
+            MinValue = 10,
         };
 
         var parent_1 = parent_0.AddField(CreateField(1));

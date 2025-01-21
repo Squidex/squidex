@@ -36,7 +36,7 @@ public static class EntityExtensions
             Created = created,
             CreatedBy = createdBy,
             LastModified = timestamp,
-            LastModifiedBy = @event.Payload.Actor
+            LastModifiedBy = @event.Payload.Actor,
         };
     }
 }

@@ -22,7 +22,7 @@ internal sealed class ApplicationSubscriptions : ObjectGraphType
             ResolvedType = SharedTypes.EnrichedAssetEvent,
             Resolver = null,
             StreamResolver = AssetActions.Subscription.Resolver,
-            Description = "Subscribe to asset events."
+            Description = "Subscribe to asset events.",
         });
 
         AddField(new FieldType
@@ -32,7 +32,7 @@ internal sealed class ApplicationSubscriptions : ObjectGraphType
             ResolvedType = SharedTypes.EnrichedContentEvent,
             Resolver = null,
             StreamResolver = ContentActions.Subscription.Resolver,
-            Description = "Subscribe to content events."
+            Description = "Subscribe to content events.",
         });
     }
 }

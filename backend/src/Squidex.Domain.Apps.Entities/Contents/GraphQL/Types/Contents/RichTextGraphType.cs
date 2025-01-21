@@ -36,7 +36,7 @@ internal sealed class RichTextGraphType : ObjectGraphType<RichTextNode>
                 Name = "contents",
                 ResolvedType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(referenceType))),
                 Resolver = ContentFields.ResolveRichTextFieldContents,
-                Description = FieldDescriptions.RichTextFieldReferences
+                Description = FieldDescriptions.RichTextFieldReferences,
             });
         }
     }

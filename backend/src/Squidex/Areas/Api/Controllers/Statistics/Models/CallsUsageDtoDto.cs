@@ -69,7 +69,7 @@ public sealed class CallsUsageDtoDto
             TotalCalls = summary.TotalCalls,
             MonthBytes = summary.MonthBytes,
             MonthCalls = summary.MonthCalls,
-            Details = details.ToDictionary(x => x.Key, x => x.Value.Select(CallsUsagePerDateDto.FromDomain).ToArray())
+            Details = details.ToDictionary(x => x.Key, x => x.Value.Select(CallsUsagePerDateDto.FromDomain).ToArray()),
         };
     }
 }

@@ -41,7 +41,7 @@ public class UsageMiddlewareTests : GivenContext
 
         sut = new UsageMiddleware(usageLog, usageGate)
         {
-            Clock = clock
+            Clock = clock,
         };
     }
 

@@ -35,7 +35,7 @@ public sealed class MongoTeamEntity : MongoState<Team>
     {
         var users = new HashSet<string>
         {
-            Document.CreatedBy.Identifier
+            Document.CreatedBy.Identifier,
         };
 
         users.AddRange(Document.Contributors.Keys);

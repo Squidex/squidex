@@ -26,7 +26,7 @@ public class ChangeAboutModel
                 ["companyRole"] = CompanyRole,
                 ["companySize"] = CompanySize,
                 ["project"] = Project,
-            }
+            },
         };
     }
 }

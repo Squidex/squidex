@@ -12,5 +12,5 @@ public enum NumberFieldEditor
     Input,
     Radio,
     Dropdown,
-    Stars
+    Stars,
 }

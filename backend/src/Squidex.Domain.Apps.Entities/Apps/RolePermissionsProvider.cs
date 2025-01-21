@@ -83,7 +83,7 @@ public sealed class RolePermissionsProvider
 
         var schemaNames = new List<string>
         {
-            Permission.Any
+            Permission.Any,
         };
 
         schemaNames.AddRange(schemas.Select(x => x.Name));

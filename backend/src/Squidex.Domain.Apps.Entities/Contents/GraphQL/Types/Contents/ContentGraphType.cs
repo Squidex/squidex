@@ -60,7 +60,7 @@ internal sealed class ContentGraphType : ObjectGraphType<EnrichedContent>
                 Name = "data",
                 ResolvedType = new NonNullGraphType(contentDataType),
                 Resolver = ContentResolvers.Data,
-                Description = FieldDescriptions.ContentData
+                Description = FieldDescriptions.ContentData,
             });
         }
 
@@ -73,7 +73,7 @@ internal sealed class ContentGraphType : ObjectGraphType<EnrichedContent>
                 Name = "flatData",
                 ResolvedType = new NonNullGraphType(contentDataTypeFlat),
                 Resolver = ContentResolvers.FlatData,
-                Description = FieldDescriptions.ContentFlatData
+                Description = FieldDescriptions.ContentFlatData,
             });
         }
 
@@ -104,7 +104,7 @@ internal sealed class ContentGraphType : ObjectGraphType<EnrichedContent>
             ResolvedType = new ListGraphType(new NonNullGraphType(contentType)),
             Resolver = ContentActions.QueryOrReferencing.Referencing,
             Description = $"Query {referencingSchemaInfo.DisplayName} content items.",
-            SchemaId = referencingSchemaInfo.Schema.Id
+            SchemaId = referencingSchemaInfo.Schema.Id,
         });
 
         var contentResultTyp = builder.GetContentResultType(referencingSchemaInfo);
@@ -121,7 +121,7 @@ internal sealed class ContentGraphType : ObjectGraphType<EnrichedContent>
             ResolvedType = contentResultTyp,
             Resolver = ContentActions.QueryOrReferencing.ReferencingWithTotal,
             Description = $"Query {referencingSchemaInfo.DisplayName} content items with total count.",
-            SchemaId = referencingSchemaInfo.Schema.Id
+            SchemaId = referencingSchemaInfo.Schema.Id,
         });
     }
 
@@ -137,7 +137,7 @@ internal sealed class ContentGraphType : ObjectGraphType<EnrichedContent>
             ResolvedType = new ListGraphType(new NonNullGraphType(contentType)),
             Resolver = ContentActions.QueryOrReferencing.References,
             Description = $"Query {referencesSchemaInfo.DisplayName} content items.",
-            SchemaId = referencesSchemaInfo.Schema.Id
+            SchemaId = referencesSchemaInfo.Schema.Id,
         });
 
         var contentResultTyp = builder.GetContentResultType(referencesSchemaInfo);
@@ -154,7 +154,7 @@ internal sealed class ContentGraphType : ObjectGraphType<EnrichedContent>
             ResolvedType = contentResultTyp,
             Resolver = ContentActions.QueryOrReferencing.ReferencesWithTotal,
             Description = $"Query {referencesSchemaInfo.DisplayName} content items with total count.",
-            SchemaId = referencesSchemaInfo.Schema.Id
+            SchemaId = referencesSchemaInfo.Schema.Id,
         });
     }
 

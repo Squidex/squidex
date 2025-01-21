@@ -39,13 +39,13 @@ public sealed class CommonProcessor : IDocumentProcessor
             {
                 url = logoUrl,
                 backgroundStyle = string.Empty,
-                backgroundColor = logoColor
-            }
+                backgroundColor = logoColor,
+            },
         };
 
         context.Document.ExternalDocumentation = new OpenApiExternalDocumentation
         {
-            Url = "https://docs.squidex.io"
+            Url = "https://docs.squidex.io",
         };
     }
 }

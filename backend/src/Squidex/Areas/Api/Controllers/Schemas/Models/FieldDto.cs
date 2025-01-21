@@ -68,7 +68,7 @@ public sealed class FieldDto : Resource
                 new NestedFieldDto
                 {
                     FieldId = field.Id,
-                    Properties = properties
+                    Properties = properties,
                 });
 
         return result;
@@ -84,7 +84,7 @@ public sealed class FieldDto : Resource
                 {
                     FieldId = field.Id,
                     Properties = properties,
-                    Partitioning = field.Partitioning.Key
+                    Partitioning = field.Partitioning.Key,
                 });
 
         if (field is IArrayField arrayField)

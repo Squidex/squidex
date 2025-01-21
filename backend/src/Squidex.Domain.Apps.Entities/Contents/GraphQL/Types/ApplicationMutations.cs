@@ -46,7 +46,7 @@ internal sealed class ApplicationMutations : ObjectGraphType
                 ResolvedType = contentType,
                 Resolver = ContentActions.Create.Resolver,
                 Description = $"Creates an {schemaInfo.DisplayName} content.",
-                SchemaId = schemaInfo.Schema.NamedId()
+                SchemaId = schemaInfo.Schema.NamedId(),
             });
 
             AddField(new FieldTypeWithSchemaNamedId
@@ -56,7 +56,7 @@ internal sealed class ApplicationMutations : ObjectGraphType
                 ResolvedType = contentType,
                 Resolver = ContentActions.Update.Resolver,
                 Description = $"Update an {schemaInfo.DisplayName} content by id.",
-                SchemaId = schemaInfo.Schema.NamedId()
+                SchemaId = schemaInfo.Schema.NamedId(),
             });
 
             AddField(new FieldTypeWithSchemaNamedId
@@ -66,7 +66,7 @@ internal sealed class ApplicationMutations : ObjectGraphType
                 ResolvedType = contentType,
                 Resolver = ContentActions.Upsert.Resolver,
                 Description = $"Upsert an {schemaInfo.DisplayName} content by id.",
-                SchemaId = schemaInfo.Schema.NamedId()
+                SchemaId = schemaInfo.Schema.NamedId(),
             });
 
             AddField(new FieldTypeWithSchemaNamedId
@@ -76,7 +76,7 @@ internal sealed class ApplicationMutations : ObjectGraphType
                 ResolvedType = contentType,
                 Resolver = ContentActions.Patch.Resolver,
                 Description = $"Patch an {schemaInfo.DisplayName} content by id.",
-                SchemaId = schemaInfo.Schema.NamedId()
+                SchemaId = schemaInfo.Schema.NamedId(),
             });
 
             AddField(new FieldTypeWithSchemaNamedId
@@ -86,7 +86,7 @@ internal sealed class ApplicationMutations : ObjectGraphType
                 ResolvedType = contentType,
                 Resolver = ContentActions.ChangeStatus.Resolver,
                 Description = $"Change a {schemaInfo.DisplayName} content.",
-                SchemaId = schemaInfo.Schema.NamedId()
+                SchemaId = schemaInfo.Schema.NamedId(),
             });
 
             AddField(new FieldTypeWithSchemaNamedId
@@ -96,7 +96,7 @@ internal sealed class ApplicationMutations : ObjectGraphType
                 ResolvedType = EntitySavedGraphType.NonNull,
                 Resolver = ContentActions.Delete.Resolver,
                 Description = $"Delete an {schemaInfo.DisplayName} content.",
-                SchemaId = schemaInfo.Schema.NamedId()
+                SchemaId = schemaInfo.Schema.NamedId(),
             });
 
             AddField(new FieldTypeWithSchemaNamedId
@@ -107,7 +107,7 @@ internal sealed class ApplicationMutations : ObjectGraphType
                 Resolver = ContentActions.ChangeStatus.Resolver,
                 Description = $"Publish a {schemaInfo.DisplayName} content.",
                 DeprecationReason = $"Use 'change{schemaInfo.TypeName}Content' instead",
-                SchemaId = schemaInfo.Schema.NamedId()
+                SchemaId = schemaInfo.Schema.NamedId(),
             });
         }
 

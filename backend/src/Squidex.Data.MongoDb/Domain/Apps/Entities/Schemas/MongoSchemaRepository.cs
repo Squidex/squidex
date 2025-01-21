@@ -29,7 +29,7 @@ public sealed class MongoSchemaRepository(IMongoDatabase database) : MongoSnapsh
             new CreateIndexModel<MongoSchemaEntity>(
                 Index
                     .Ascending(x => x.IndexedAppId)
-                    .Ascending(x => x.IndexedName))
+                    .Ascending(x => x.IndexedName)),
         ], ct);
     }
 

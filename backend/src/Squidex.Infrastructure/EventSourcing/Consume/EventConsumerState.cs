@@ -49,7 +49,7 @@ public sealed record EventConsumerState(string? Position, int Count, bool IsStop
     {
         return SimpleMapper.Map(this, new EventConsumerInfo
         {
-            Name = name
+            Name = name,
         });
     }
 }

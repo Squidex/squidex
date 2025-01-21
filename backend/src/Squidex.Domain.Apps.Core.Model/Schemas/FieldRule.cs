@@ -31,7 +31,7 @@ public sealed record FieldRule
     {
         return new FieldRule(FieldRuleAction.Disable, field)
         {
-            Condition = condition
+            Condition = condition,
         };
     }
 
@@ -39,7 +39,7 @@ public sealed record FieldRule
     {
         return new FieldRule(FieldRuleAction.Hide, field)
         {
-            Condition = condition
+            Condition = condition,
         };
     }
 }

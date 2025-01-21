@@ -25,13 +25,13 @@ public sealed class AzureMetadataSource : IAssetMetadataSource
     [
         ' ',
         '_',
-        '-'
+        '-',
     ];
     private readonly List<VisualFeatureTypes?> features =
     [
         VisualFeatureTypes.Categories,
         VisualFeatureTypes.Description,
-        VisualFeatureTypes.Color
+        VisualFeatureTypes.Color,
     ];
 
     public int Order => int.MaxValue;
@@ -41,7 +41,7 @@ public sealed class AzureMetadataSource : IAssetMetadataSource
     {
         client = new ComputerVisionClient(new ApiKeyServiceClientCredentials(options.Value.ApiKey))
         {
-            Endpoint = options.Value.Endpoint
+            Endpoint = options.Value.Endpoint,
         };
 
         this.log = log;

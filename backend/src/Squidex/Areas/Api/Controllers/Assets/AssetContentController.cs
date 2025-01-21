@@ -179,7 +179,7 @@ public sealed class AssetContentController(
             FileDownloadName = asset.FileName,
             FileSize = contentLength,
             LastModified = asset.LastModified.ToDateTimeOffset(),
-            SendInline = request.Download != 1
+            SendInline = request.Download != 1,
         };
     }
 

@@ -28,7 +28,7 @@ public sealed class ContentOpenApiController(
     {
         var vm = new DocsVM
         {
-            Specification = $"~/api/content/{app}/swagger/v1/swagger.json"
+            Specification = $"~/api/content/{app}/swagger/v1/swagger.json",
         };
 
         return View(nameof(Docs), vm);
@@ -42,7 +42,7 @@ public sealed class ContentOpenApiController(
     {
         var vm = new DocsVM
         {
-            Specification = $"~/api/content/{app}/flat/swagger/v1/swagger.json"
+            Specification = $"~/api/content/{app}/flat/swagger/v1/swagger.json",
         };
 
         return View(nameof(Docs), vm);

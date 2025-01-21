@@ -49,7 +49,7 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Validation failed with internal error.", "myField.iv")
+                new ValidationError("Validation failed with internal error.", "myField.iv"),
             });
     }
 
@@ -80,7 +80,7 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Validation failed with internal error.", "myField")
+                new ValidationError("Validation failed with internal error.", "myField"),
             });
     }
 
@@ -97,7 +97,7 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Not a known field.", "unknown")
+                new ValidationError("Not a known field.", "unknown"),
             });
     }
 
@@ -118,7 +118,7 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Must be less or equal to 100.", "myField.iv")
+                new ValidationError("Must be less or equal to 100.", "myField.iv"),
             });
     }
 
@@ -140,7 +140,7 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
             new List<ValidationError>
             {
                 new ValidationError("Not a known invariant value.", "myField.es"),
-                new ValidationError("Not a known invariant value.", "myField.it")
+                new ValidationError("Not a known invariant value.", "myField.it"),
             });
     }
 
@@ -159,7 +159,7 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
             new List<ValidationError>
             {
                 new ValidationError("Field is required.", "myField.de"),
-                new ValidationError("Field is required.", "myField.en")
+                new ValidationError("Field is required.", "myField.en"),
             });
     }
 
@@ -177,7 +177,7 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Field is required.", "myField.iv")
+                new ValidationError("Field is required.", "myField.iv"),
             });
     }
 
@@ -195,7 +195,7 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Field is required.", "myField.iv")
+                new ValidationError("Field is required.", "myField.iv"),
             });
     }
 
@@ -216,7 +216,7 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Not a known language.", "myField.ru")
+                new ValidationError("Not a known language.", "myField.ru"),
             });
     }
 
@@ -261,7 +261,7 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
             new List<ValidationError>
             {
                 new ValidationError("Not a known language.", "myField.es"),
-                new ValidationError("Not a known language.", "myField.it")
+                new ValidationError("Not a known language.", "myField.it"),
             });
     }
 
@@ -278,7 +278,7 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Not a known field.", "unknown")
+                new ValidationError("Not a known field.", "unknown"),
             });
     }
 
@@ -299,7 +299,7 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Must be less or equal to 100.", "myField.iv")
+                new ValidationError("Must be less or equal to 100.", "myField.iv"),
             });
     }
 
@@ -321,7 +321,7 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
             new List<ValidationError>
             {
                 new ValidationError("Not a known invariant value.", "myField.es"),
-                new ValidationError("Not a known invariant value.", "myField.it")
+                new ValidationError("Not a known invariant value.", "myField.it"),
             });
     }
 
@@ -370,7 +370,7 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Not a known language.", "myField.ru")
+                new ValidationError("Not a known language.", "myField.ru"),
             });
     }
 
@@ -392,7 +392,7 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
             new List<ValidationError>
             {
                 new ValidationError("Not a known language.", "myField.es"),
-                new ValidationError("Not a known language.", "myField.it")
+                new ValidationError("Not a known language.", "myField.it"),
             });
     }
 
@@ -418,7 +418,7 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
             new List<ValidationError>
             {
                 new ValidationError("Field is required.", "myField.iv[1].myNested"),
-                new ValidationError("Field is required.", "myField.iv[3].myNested")
+                new ValidationError("Field is required.", "myField.iv[3].myNested"),
             });
     }
 
@@ -471,7 +471,7 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Field is required.", "myField.iv")
+                new ValidationError("Field is required.", "myField.iv"),
             });
     }
 
@@ -494,7 +494,7 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Field is required.", "myField.iv")
+                new ValidationError("Field is required.", "myField.iv"),
             });
     }
 
@@ -515,7 +515,7 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Field is required.", "myField.iv")
+                new ValidationError("Field is required.", "myField.iv"),
             });
     }
 
@@ -538,7 +538,7 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Field is required.", "myField.iv")
+                new ValidationError("Field is required.", "myField.iv"),
             });
     }
 }

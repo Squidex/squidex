@@ -71,7 +71,7 @@ public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAsse
             new CreateIndexModel<MongoAssetEntity>(
                 Index
                     .Ascending(x => x.Id)
-                    .Ascending(x => x.IsDeleted))
+                    .Ascending(x => x.IsDeleted)),
         ], ct);
     }
 

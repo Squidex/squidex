@@ -32,7 +32,7 @@ public class ApiPermissionAttributeTests : GivenContext
     {
         var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor
         {
-            FilterDescriptors = new List<FilterDescriptor>()
+            FilterDescriptors = new List<FilterDescriptor>(),
         });
 
         actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object?>(), this);

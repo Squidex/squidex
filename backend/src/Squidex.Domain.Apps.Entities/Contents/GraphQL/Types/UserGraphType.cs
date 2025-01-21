@@ -29,7 +29,7 @@ internal sealed class UserGraphType : SharedObjectGraphType<IUser>
             Name = "id",
             Resolver = Resolve(x => x.Id),
             ResolvedType = Scalars.NonNullString,
-            Description = FieldDescriptions.UserId
+            Description = FieldDescriptions.UserId,
         });
 
         AddField(new FieldType
@@ -37,7 +37,7 @@ internal sealed class UserGraphType : SharedObjectGraphType<IUser>
             Name = "displayName",
             Resolver = ResolveOrHide(x => x.Claims.DisplayName()),
             ResolvedType = Scalars.String,
-            Description = FieldDescriptions.UserDisplayName
+            Description = FieldDescriptions.UserDisplayName,
         });
 
         AddField(new FieldType
@@ -45,7 +45,7 @@ internal sealed class UserGraphType : SharedObjectGraphType<IUser>
             Name = "email",
             Resolver = ResolveOrHide(x => x.Email),
             ResolvedType = Scalars.String,
-            Description = FieldDescriptions.UserEmail
+            Description = FieldDescriptions.UserEmail,
         });
 
         Description = "A user that created or modified a content or asset.";

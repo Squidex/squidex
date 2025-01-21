@@ -27,7 +27,7 @@ public class SquidexClaimExtensionsTests
         Assert.Equal(new[]
         {
             ("key1", "value1"),
-            ("key2", "value2")
+            ("key2", "value2"),
         }, result.ToArray());
     }
 
@@ -46,7 +46,7 @@ public class SquidexClaimExtensionsTests
         Assert.Equal(new[]
         {
             ("key1", "value1"),
-            ("key2", "value2")
+            ("key2", "value2"),
         }, result.ToArray());
     }
 
@@ -65,7 +65,7 @@ public class SquidexClaimExtensionsTests
         Assert.Equal(new[]
         {
             ("key1", JsonValue.Create("value1")),
-            ("key2", JsonValue.Create("value2"))
+            ("key2", JsonValue.Create("value2")),
         }, result.ToArray());
     }
 
@@ -85,7 +85,7 @@ public class SquidexClaimExtensionsTests
         Assert.Equal(new[]
         {
             ("key1", JsonValue.Create("value1")),
-            ("key2", JsonValue.Create("value2"))
+            ("key2", JsonValue.Create("value2")),
         }, result.ToArray());
     }
 

@@ -34,7 +34,7 @@ public sealed class AssetFoldersDto : Resource
         {
             Total = assetFolders.Total,
             Items = assetFolders.Select(x => AssetFolderDto.FromDomain(x, resources)).ToArray(),
-            Path = path.Select(x => AssetFolderDto.FromDomain(x, resources)).ToArray()
+            Path = path.Select(x => AssetFolderDto.FromDomain(x, resources)).ToArray(),
         };
 
         return result.CreateLinks(resources);

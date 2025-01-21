@@ -12,5 +12,5 @@ public enum BackupStatus
     Created,
     Started,
     Completed,
-    Failed
+    Failed,
 }

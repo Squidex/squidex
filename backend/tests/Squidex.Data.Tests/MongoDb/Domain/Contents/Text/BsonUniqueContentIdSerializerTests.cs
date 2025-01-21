@@ -8,7 +8,7 @@
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.MongoDb;
 using Squidex.Infrastructure;
-using Squidex.TestHelpers;
+using Squidex.MongoDb.TestHelpers;
 
 namespace Squidex.MongoDb.Domain.Contents.Text;
 
@@ -24,7 +24,7 @@ public class BsonUniqueContentIdSerializerTests
         "id",
         "id-short",
         "id-and-guid-size",
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua."
+        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
     };
 
     [Fact]

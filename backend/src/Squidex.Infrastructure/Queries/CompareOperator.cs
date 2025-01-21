@@ -24,5 +24,5 @@ public enum CompareOperator
     LessThanOrEqual,
     Matchs,
     NotEquals,
-    StartsWith
+    StartsWith,
 }

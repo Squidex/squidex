@@ -27,7 +27,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
     {
         CanReject = true,
         CanDisallow = true,
-        AsContext = true
+        AsContext = true,
     };
 
     private readonly IHttpClientFactory httpClientFactory = A.Fake<IHttpClientFactory>();
@@ -46,7 +46,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
 
         var httpResponse = new HttpResponseMessage(HttpStatusCode.OK)
         {
-            Content = new StringContent("{ \"key\": 42 }")
+            Content = new StringContent("{ \"key\": 42 }"),
         };
 
         var httpHandler = new MockupHttpHandler(httpResponse);
@@ -58,7 +58,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
             Options.Create(new JintScriptOptions
             {
                 TimeoutScript = TimeSpan.FromSeconds(2),
-                TimeoutExecution = TimeSpan.FromSeconds(10)
+                TimeoutExecution = TimeSpan.FromSeconds(10),
             }),
             extensions);
     }
@@ -118,7 +118,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
 
         var vars = new DataScriptVars
         {
-            ["data"] = content
+            ["data"] = content,
         };
 
         const string script = @"
@@ -152,7 +152,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
 
         var vars = new DataScriptVars
         {
-            ["data"] = content
+            ["data"] = content,
         };
 
         const string script = @"
@@ -186,7 +186,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
     {
         var vars = new DataScriptVars
         {
-            ["data"] = new ContentData()
+            ["data"] = new ContentData(),
         };
 
         const string script = @"
@@ -201,7 +201,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
     {
         var vars = new DataScriptVars
         {
-            ["data"] = new ContentData()
+            ["data"] = new ContentData(),
         };
 
         const string script = @"
@@ -218,7 +218,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
     {
         var vars = new DataScriptVars
         {
-            ["data"] = new ContentData()
+            ["data"] = new ContentData(),
         };
 
         const string script = @"
@@ -249,7 +249,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
         {
             ["data"] = content,
             ["dataOld"] = null,
-            ["operation"] = "MyOperation"
+            ["operation"] = "MyOperation",
         };
 
         const string script = @"
@@ -280,7 +280,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
         {
             ["data"] = content,
             ["dataOld"] = null,
-            ["operation"] = "MyOperation"
+            ["operation"] = "MyOperation",
         };
 
         const string script = @"
@@ -306,7 +306,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
         {
             ["data"] = new ContentData(),
             ["dataOld"] = null,
-            ["operation"] = "MyOperation"
+            ["operation"] = "MyOperation",
         };
 
         const string script = @"
@@ -332,7 +332,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
         {
             ["data"] = new ContentData(),
             ["dataOld"] = null,
-            ["operation"] = "MyOperation"
+            ["operation"] = "MyOperation",
         };
 
         const string script = @"
@@ -368,7 +368,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
 
         var vars = new DataScriptVars
         {
-            ["data"] = content
+            ["data"] = content,
         };
 
         const string script = @"
@@ -417,7 +417,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
         {
             ["data"] = content,
             ["dataOld"] = oldContent,
-            ["user"] = userPrincipal
+            ["user"] = userPrincipal,
         };
 
         const string script = @"
@@ -436,7 +436,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
     {
         var vars = new ScriptVars
         {
-            ["value"] = new { i = 2 }
+            ["value"] = new { i = 2 },
         };
 
         const string script = @"
@@ -453,7 +453,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
     {
         var vars = new ScriptVars
         {
-            ["value"] = new { status = Status.Published }
+            ["value"] = new { status = Status.Published },
         };
 
         const string script = @"
@@ -470,7 +470,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
     {
         var vars = new ScriptVars
         {
-            ["value"] = new { i = 2 }
+            ["value"] = new { i = 2 },
         };
 
         const string script = @"
@@ -487,7 +487,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
     {
         var vars = new ScriptVars
         {
-            ["value"] = new { i = 2 }
+            ["value"] = new { i = 2 },
         };
 
         const string script = @"
@@ -506,7 +506,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
 
         var vars = new ScriptVars
         {
-            ["value"] = id
+            ["value"] = id,
         };
 
         const string script = @"
@@ -523,7 +523,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
     {
         var vars = new ScriptVars
         {
-            ["value"] = null
+            ["value"] = null,
         };
 
         const string script = @"
@@ -554,7 +554,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
     {
         var vars = new ScriptVars
         {
-            ["value"] = 13
+            ["value"] = 13,
         };
 
         const string script1 = @"
@@ -577,7 +577,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
     {
         var vars = new ScriptVars
         {
-            ["value"] = 13
+            ["value"] = 13,
         };
 
         const string script1 = @"
@@ -600,7 +600,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
     {
         var vars = new DataScriptVars
         {
-            ["value"] = 13
+            ["value"] = 13,
         };
 
         const string script1 = @"
@@ -616,7 +616,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
 
         var vars2 = new DataScriptVars
         {
-            ["data"] = new ContentData()
+            ["data"] = new ContentData(),
         };
 
         vars2.CopyFrom(vars);
@@ -635,7 +635,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
     {
         var vars = new DataScriptVars
         {
-            ["value"] = 13
+            ["value"] = 13,
         };
 
         var script = @$"
@@ -662,7 +662,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
     {
         var vars = new DataScriptVars
         {
-            ["value"] = 13
+            ["value"] = 13,
         };
 
         var script = @$"
@@ -687,7 +687,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
     {
         var vars = new DataScriptVars
         {
-            ["metadata"] = new AssetMetadata()
+            ["metadata"] = new AssetMetadata(),
         };
 
         var script = @$"

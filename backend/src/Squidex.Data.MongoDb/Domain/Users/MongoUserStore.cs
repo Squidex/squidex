@@ -54,7 +54,7 @@ public sealed class MongoUserStore(IMongoDatabase database) :
                 .SetArguments(new[]
                 {
                     nameof(Claim.Type),
-                    nameof(Claim.Value)
+                    nameof(Claim.Value),
                 });
 
             cm.MapMember(x => x.Type);
@@ -74,7 +74,7 @@ public sealed class MongoUserStore(IMongoDatabase database) :
                 {
                     nameof(UserLogin.LoginProvider),
                     nameof(UserLogin.ProviderKey),
-                    nameof(UserLogin.ProviderDisplayName)
+                    nameof(UserLogin.ProviderDisplayName),
                 });
 
             cm.AutoMap();
@@ -142,15 +142,15 @@ public sealed class MongoUserStore(IMongoDatabase database) :
                     .Ascending(x => x.NormalizedUserName),
                 new CreateIndexOptions
                 {
-                    Unique = true
+                    Unique = true,
                 }),
             new CreateIndexModel<MongoUser>(
                 Index
                     .Ascending(x => x.NormalizedEmail),
                 new CreateIndexOptions
                 {
-                    Unique = true
-                })
+                    Unique = true,
+                }),
         ], ct);
     }
 

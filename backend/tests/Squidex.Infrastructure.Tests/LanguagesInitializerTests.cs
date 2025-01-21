@@ -16,7 +16,7 @@ public sealed class LanguagesInitializerTests
     {
         var options = Options.Create(new LanguagesOptions
         {
-            ["en-NO"] = "English (Norwegian)"
+            ["en-NO"] = "English (Norwegian)",
         });
 
         var sut = new LanguagesInitializer(options);
@@ -31,7 +31,7 @@ public sealed class LanguagesInitializerTests
     {
         var options = Options.Create(new LanguagesOptions
         {
-            ["en-Error"] = null!
+            ["en-Error"] = null!,
         });
 
         var sut = new LanguagesInitializer(options);
@@ -46,7 +46,7 @@ public sealed class LanguagesInitializerTests
     {
         var options = Options.Create(new LanguagesOptions
         {
-            ["de"] = "German (Germany)"
+            ["de"] = "German (Germany)",
         });
 
         var sut = new LanguagesInitializer(options);

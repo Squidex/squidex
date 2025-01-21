@@ -19,5 +19,5 @@ public enum FilterSchemaType
     Object,
     ObjectArray,
     String,
-    StringArray
+    StringArray,
 }

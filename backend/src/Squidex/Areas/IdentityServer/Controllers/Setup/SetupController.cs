@@ -65,7 +65,7 @@ public class SetupController(
         {
             var user = await userService.CreateAsync(model.Email, new UserValues
             {
-                Password = model.Password
+                Password = model.Password,
             }, ct: HttpContext.RequestAborted);
 
             await SignInManager.SignInAsync((IdentityUser)user.Identity, true);
@@ -99,7 +99,7 @@ public class SetupController(
             IsAssetStoreFile = assetStore is FolderAssetStore,
             IsAssetStoreFtp = assetStore is FTPAssetStore,
             HasExternalLogin = externalProviders.Count != 0,
-            HasPasswordAuth = identityOptions.AllowPasswordAuth
+            HasPasswordAuth = identityOptions.AllowPasswordAuth,
         };
 
         if (model != null)

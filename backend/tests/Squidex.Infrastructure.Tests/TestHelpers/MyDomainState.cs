@@ -49,7 +49,7 @@ public sealed class MultipleByTwiceEvent : IEvent, IMigratedStateEvent<MyDomainS
     {
         return new ValueChanged
         {
-            Value = state.Value * 2
+            Value = state.Value * 2,
         };
     }
 }

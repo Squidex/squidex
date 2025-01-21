@@ -103,7 +103,7 @@ public abstract partial class DomainObject<T> : IAggregate where T : Entity, new
 
         var result = new T
         {
-            Version = EtagVersion.Empty
+            Version = EtagVersion.Empty,
         };
 
         if (version == result.Version)
@@ -214,7 +214,7 @@ public abstract partial class DomainObject<T> : IAggregate where T : Entity, new
 
             snapshot = new T
             {
-                Version = EtagVersion.Empty
+                Version = EtagVersion.Empty,
             };
 
             return new CommandResult(UniqueId, Version, previousVersion, result);
@@ -365,7 +365,7 @@ public abstract partial class DomainObject<T> : IAggregate where T : Entity, new
 
             previousSnapshot = new T
             {
-                Version = Version
+                Version = Version,
             };
         }
 

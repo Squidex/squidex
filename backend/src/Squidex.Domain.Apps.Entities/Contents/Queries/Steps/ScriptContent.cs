@@ -39,7 +39,7 @@ public sealed class ScriptContent(IScriptEngine scriptEngine) : IContentEnricher
                 AppName = schema.AppId.Name,
                 SchemaId = schema.Id,
                 SchemaName = schema.Name,
-                User = context.UserPrincipal
+                User = context.UserPrincipal,
             };
 
             var preScript = schema.Scripts.QueryPre;
@@ -48,7 +48,7 @@ public sealed class ScriptContent(IScriptEngine scriptEngine) : IContentEnricher
             {
                 var options = new ScriptOptions
                 {
-                    AsContext = true
+                    AsContext = true,
                 };
 
                 await scriptEngine.ExecuteAsync(vars, preScript, options, ct);
@@ -71,7 +71,7 @@ public sealed class ScriptContent(IScriptEngine scriptEngine) : IContentEnricher
             Data = content.Data,
             DataOld = default,
             Status = content.Status,
-            StatusOld = default
+            StatusOld = default,
         };
 
         vars.CopyFrom(sharedVars);
@@ -80,7 +80,7 @@ public sealed class ScriptContent(IScriptEngine scriptEngine) : IContentEnricher
         {
             AsContext = true,
             CanDisallow = true,
-            CanReject = true
+            CanReject = true,
         };
 
         content.Data = await scriptEngine.TransformAsync(vars, script, options, ct);

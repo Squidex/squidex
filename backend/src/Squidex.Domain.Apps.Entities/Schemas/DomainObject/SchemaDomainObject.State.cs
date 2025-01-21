@@ -28,7 +28,7 @@ public partial class SchemaDomainObject
                     // The schema usually does not contain any metadata.
                     AppId = e.AppId,
                     // Just update the total count to be more reliabble.
-                    SchemaFieldsTotal = e.Schema.MaxId()
+                    SchemaFieldsTotal = e.Schema.MaxId(),
                 };
                 break;
 

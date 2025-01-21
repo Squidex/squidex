@@ -37,8 +37,8 @@ public sealed class MongoRuleEventRepository(IMongoDatabase database) : MongoRep
                     .Ascending(x => x.Expires),
                 new CreateIndexOptions
                 {
-                    ExpireAfter = TimeSpan.Zero
-                })
+                    ExpireAfter = TimeSpan.Zero,
+                }),
         ], ct);
     }
 

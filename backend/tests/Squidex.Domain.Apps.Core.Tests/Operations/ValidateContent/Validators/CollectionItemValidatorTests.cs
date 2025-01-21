@@ -44,7 +44,7 @@ public class CollectionItemValidatorTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             [
                 "[2]: Must be between 2 and 4.",
-                "[4]: Must be between 2 and 4."
+                "[4]: Must be between 2 and 4.",
             ]);
     }
 }

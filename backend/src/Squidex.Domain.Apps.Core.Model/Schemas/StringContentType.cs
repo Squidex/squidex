@@ -11,5 +11,5 @@ public enum StringContentType
 {
     Unspecified,
     Html,
-    Markdown
+    Markdown,
 }

@@ -27,7 +27,7 @@ internal sealed class ParseSubscription : IEventSubscriber<StoredEvent>, IEventS
         {
             AllowSynchronousContinuations = true,
             SingleReader = true,
-            SingleWriter = true
+            SingleWriter = true,
         });
 
 #pragma warning disable MA0040 // Flow the cancellation token

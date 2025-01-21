@@ -34,7 +34,7 @@ public sealed class DefaultAppLogStore(IRequestLogStore requestLogStore) : IAppL
     private static readonly CsvConfiguration CsvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture)
     {
         DetectDelimiter = false,
-        Delimiter = "|"
+        Delimiter = "|",
     };
 
     Task IDeleter.DeleteAppAsync(App app,
@@ -53,7 +53,7 @@ public sealed class DefaultAppLogStore(IRequestLogStore requestLogStore) : IAppL
 
         var storedRequest = new Request
         {
-            Key = appId.ToString()
+            Key = appId.ToString(),
         };
 
         Append(storedRequest, FieldAuthClientId, request.UserClientId);

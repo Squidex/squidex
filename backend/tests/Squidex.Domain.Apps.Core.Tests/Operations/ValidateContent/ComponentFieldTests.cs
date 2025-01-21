@@ -181,7 +181,7 @@ public class ComponentFieldTests : IClassFixture<TranslationsFixture>
         var components = new ResolvedComponents(new Dictionary<DomainId, Schema>
         {
             [schemaId1] = schema,
-            [schemaId2] = schema
+            [schemaId2] = schema,
         });
 
         return (schemaId1, field, components);

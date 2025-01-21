@@ -32,7 +32,7 @@ public class PolymorphicConverterTests
 
         Base source = new A
         {
-            PropertyA = 42
+            PropertyA = 42,
         };
 
         var serialized = serializer.Deserialize<Base>(serializer.Serialize(source));
@@ -49,7 +49,7 @@ public class PolymorphicConverterTests
         {
             ["$baseType"] = "A",
             ["propertyA"] = 42,
-            ["propertyOther"] = 44
+            ["propertyOther"] = 44,
         };
 
         var serialized = serializer.Deserialize<Base>(serializer.Serialize(source));
@@ -66,7 +66,7 @@ public class PolymorphicConverterTests
         {
             ["$type"] = "A",
             ["propertyA"] = 42,
-            ["propertyOther"] = 44
+            ["propertyOther"] = 44,
         };
 
         var serialized = serializer.Deserialize<Base>(serializer.Serialize(source));
@@ -83,7 +83,7 @@ public class PolymorphicConverterTests
         {
             ["propertyB"] = 42,
             ["propertyOther"] = 44,
-            ["$baseType"] = "B"
+            ["$baseType"] = "B",
         };
 
         var serialized = serializer.Deserialize<Base>(serializer.Serialize(source));

@@ -25,7 +25,7 @@ public class AssetsQueryIntegrationTests : IClassFixture<AssetsQueryFixture>, IA
     public static readonly TheoryData<DomainId?> ParentIds = new TheoryData<DomainId?>
     {
         { null },
-        { DomainId.Empty }
+        { DomainId.Empty },
     };
 
     public AssetsQueryFixture _ { get; }
@@ -103,7 +103,7 @@ public class AssetsQueryIntegrationTests : IClassFixture<AssetsQueryFixture>, IA
     {
         var query = new ClrQuery
         {
-            Random = 40
+            Random = 40,
         };
 
         var assets = await QueryAsync(parentId, query);
@@ -120,7 +120,7 @@ public class AssetsQueryIntegrationTests : IClassFixture<AssetsQueryFixture>, IA
 
         var query = new ClrQuery
         {
-            Filter = F.Eq("Tags", random)
+            Filter = F.Eq("Tags", random),
         };
 
         var assets = await QueryAsync(parentId, query);
@@ -137,7 +137,7 @@ public class AssetsQueryIntegrationTests : IClassFixture<AssetsQueryFixture>, IA
 
         var query = new ClrQuery
         {
-            Filter = F.And(F.Eq("Tags", random), F.Contains("FileName", random))
+            Filter = F.And(F.Eq("Tags", random), F.Contains("FileName", random)),
         };
 
         var assets = await QueryAsync(parentId, query);
@@ -154,7 +154,7 @@ public class AssetsQueryIntegrationTests : IClassFixture<AssetsQueryFixture>, IA
 
         var query = new ClrQuery
         {
-            Filter = F.Contains("FileName", random)
+            Filter = F.Contains("FileName", random),
         };
 
         var assets = await QueryAsync(parentId, query);
@@ -171,7 +171,7 @@ public class AssetsQueryIntegrationTests : IClassFixture<AssetsQueryFixture>, IA
 
         var query = new ClrQuery
         {
-            Filter = F.And(F.Contains("FileName", random), F.Eq("Tags", random))
+            Filter = F.And(F.Contains("FileName", random), F.Eq("Tags", random)),
         };
 
         var assets = await QueryAsync(parentId, query);

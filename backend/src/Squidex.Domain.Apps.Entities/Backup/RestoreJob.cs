@@ -69,7 +69,7 @@ public sealed class RestoreJob(
             new Dictionary<string, string>
             {
                 [ArgUrl] = url.ToString(),
-                [ArgName] = appName ?? string.Empty
+                [ArgName] = appName ?? string.Empty,
             });
     }
 
@@ -92,7 +92,7 @@ public sealed class RestoreJob(
             // Required argument.
             Url = url,
             // Optional argument.
-            NewAppName = context.Job.Arguments.GetValueOrDefault(ArgName)
+            NewAppName = context.Job.Arguments.GetValueOrDefault(ArgName),
         };
 
         // Use a readable name to describe the job.
@@ -190,7 +190,7 @@ public sealed class RestoreJob(
                 ContributorId = run.Actor.Identifier,
                 IgnoreActor = true,
                 IgnorePlans = true,
-                Role = Role.Owner
+                Role = Role.Owner,
             });
 
             await run.LogAsync("Assigned current user.");

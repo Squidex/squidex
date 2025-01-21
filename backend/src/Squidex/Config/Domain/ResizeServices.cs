@@ -26,7 +26,7 @@ public static class ResizeServices
             new CompositeThumbnailGenerator(
             [
                 c.GetRequiredService<ImageSharpThumbnailGenerator>(),
-                c.GetRequiredService<ImageMagickThumbnailGenerator>()
+                c.GetRequiredService<ImageMagickThumbnailGenerator>(),
             ]))
             .AsSelf();
 

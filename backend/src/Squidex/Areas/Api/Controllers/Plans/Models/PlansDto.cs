@@ -49,7 +49,7 @@ public sealed class PlansDto
             CurrentPlanId = planId,
             Plans = plans.Select(PlanDto.FromDomain).ToArray(),
             PlanOwner = owner,
-            Referral = referral
+            Referral = referral,
         };
 
         if (locked == PlansLockedReason.None)

@@ -45,7 +45,7 @@ public class WriteContentTests
                     .AddField("location",
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Create("London"))),
-            NewStatus = Status.Draft
+            NewStatus = Status.Draft,
         };
 
         var actual = source.ToContent();
@@ -76,7 +76,7 @@ public class WriteContentTests
                     .AddField("location",
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Create("Berlin"))),
-            NewStatus = null
+            NewStatus = null,
         };
 
         var actual = source.ToContent();

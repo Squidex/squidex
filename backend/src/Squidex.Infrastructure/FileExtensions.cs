@@ -17,12 +17,12 @@ public static class FileExtensions
         "kB",
         "MB",
         "GB",
-        "TB"
+        "TB",
     ];
 
     private static readonly Dictionary<string, string> UnifiedExtensions = new Dictionary<string, string>
     {
-        ["jpeg"] = "jpg"
+        ["jpeg"] = "jpg",
     };
 
     public static string FileType(this string fileName)

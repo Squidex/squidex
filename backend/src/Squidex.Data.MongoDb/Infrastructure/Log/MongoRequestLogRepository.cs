@@ -42,8 +42,8 @@ public sealed class MongoRequestLogRepository : MongoRepositoryBase<MongoRequest
                     .Ascending(x => x.Timestamp),
                 new CreateIndexOptions
                 {
-                    ExpireAfter = TimeSpan.FromDays(options.StoreRetentionInDays)
-                })
+                    ExpireAfter = TimeSpan.FromDays(options.StoreRetentionInDays),
+                }),
         ], ct);
     }
 

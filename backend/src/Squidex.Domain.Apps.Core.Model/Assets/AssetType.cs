@@ -12,5 +12,5 @@ public enum AssetType
     Unknown,
     Image,
     Audio,
-    Video
+    Video,
 }

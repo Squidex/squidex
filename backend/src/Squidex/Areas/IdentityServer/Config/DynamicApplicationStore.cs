@@ -99,8 +99,8 @@ public class DynamicApplicationStore(IServiceProvider serviceProvider) : InMemor
                 Permissions.Scopes.Profile,
                 Permissions.Scopes.Roles,
                 Permissions.Prefixes.Scope + Constants.ScopeApi,
-                Permissions.Prefixes.Scope + Constants.ScopePermissions
-            }
+                Permissions.Prefixes.Scope + Constants.ScopePermissions,
+            },
         }.CopyClaims(user));
     }
 
@@ -120,8 +120,8 @@ public class DynamicApplicationStore(IServiceProvider serviceProvider) : InMemor
                 Permissions.Scopes.Profile,
                 Permissions.Scopes.Roles,
                 Permissions.Prefixes.Scope + Constants.ScopeApi,
-                Permissions.Prefixes.Scope + Constants.ScopePermissions
-            }
+                Permissions.Prefixes.Scope + Constants.ScopePermissions,
+            },
         });
     }
 
@@ -139,11 +139,11 @@ public class DynamicApplicationStore(IServiceProvider serviceProvider) : InMemor
             {
                 new Uri(urlGenerator.BuildUrl("login;")),
                 new Uri(urlGenerator.BuildUrl("client-callback-silent.html", false)),
-                new Uri(urlGenerator.BuildUrl("client-callback-popup.html", false))
+                new Uri(urlGenerator.BuildUrl("client-callback-popup.html", false)),
             },
             PostLogoutRedirectUris =
             {
-                new Uri(urlGenerator.BuildUrl("logout", false))
+                new Uri(urlGenerator.BuildUrl("logout", false)),
             },
             Permissions =
             {
@@ -157,9 +157,9 @@ public class DynamicApplicationStore(IServiceProvider serviceProvider) : InMemor
                 Permissions.Scopes.Profile,
                 Permissions.Scopes.Roles,
                 Permissions.Prefixes.Scope + Constants.ScopeApi,
-                Permissions.Prefixes.Scope + Constants.ScopePermissions
+                Permissions.Prefixes.Scope + Constants.ScopePermissions,
             },
-            ClientType = ClientTypes.Public
+            ClientType = ClientTypes.Public,
         });
 
         var internalClientId = Constants.ClientInternalId;
@@ -170,7 +170,7 @@ public class DynamicApplicationStore(IServiceProvider serviceProvider) : InMemor
             ClientSecret = Constants.ClientInternalSecret,
             RedirectUris =
             {
-                new Uri(urlGenerator.BuildUrl("/signin-internal", false))
+                new Uri(urlGenerator.BuildUrl("/signin-internal", false)),
             },
             Permissions =
             {
@@ -185,9 +185,9 @@ public class DynamicApplicationStore(IServiceProvider serviceProvider) : InMemor
                 Permissions.Scopes.Profile,
                 Permissions.Scopes.Roles,
                 Permissions.Prefixes.Scope + Constants.ScopeApi,
-                Permissions.Prefixes.Scope + Constants.ScopePermissions
+                Permissions.Prefixes.Scope + Constants.ScopePermissions,
             },
-            ClientType = ClientTypes.Public
+            ClientType = ClientTypes.Public,
         });
 
         var identityOptions = serviceProvider.GetRequiredService<IOptions<MyIdentityOptions>>().Value;
@@ -212,8 +212,8 @@ public class DynamicApplicationStore(IServiceProvider serviceProvider) : InMemor
                 Permissions.Scopes.Profile,
                 Permissions.Scopes.Roles,
                 Permissions.Prefixes.Scope + Constants.ScopeApi,
-                Permissions.Prefixes.Scope + Constants.ScopePermissions
-            }
+                Permissions.Prefixes.Scope + Constants.ScopePermissions,
+            },
         }.SetAdmin());
     }
 }

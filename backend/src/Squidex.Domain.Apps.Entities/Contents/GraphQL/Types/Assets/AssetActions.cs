@@ -30,7 +30,7 @@ internal static class AssetActions
             {
                 Name = "path",
                 Description = FieldDescriptions.JsonPath,
-                DefaultValue = null
+                DefaultValue = null,
             },
         ];
 
@@ -56,7 +56,7 @@ internal static class AssetActions
             {
                 Name = "id",
                 Description = "The ID of the asset (usually GUID).",
-                DefaultValue = null
+                DefaultValue = null,
             },
         ];
 
@@ -77,25 +77,25 @@ internal static class AssetActions
             {
                 Name = "top",
                 Description = FieldDescriptions.QueryTop,
-                DefaultValue = null
+                DefaultValue = null,
             },
             new QueryArgument(Scalars.Int)
             {
                 Name = "skip",
                 Description = FieldDescriptions.QuerySkip,
-                DefaultValue = 0
+                DefaultValue = 0,
             },
             new QueryArgument(Scalars.String)
             {
                 Name = "filter",
                 Description = FieldDescriptions.QueryFilter,
-                DefaultValue = null
+                DefaultValue = null,
             },
             new QueryArgument(Scalars.String)
             {
                 Name = "orderby",
                 Description = FieldDescriptions.QueryOrderBy,
-                DefaultValue = null
+                DefaultValue = null,
             },
         ];
 
@@ -128,7 +128,7 @@ internal static class AssetActions
             {
                 Name = "type",
                 Description = FieldDescriptions.EventType,
-                DefaultValue = null
+                DefaultValue = null,
             },
         ];
 
@@ -147,7 +147,7 @@ internal static class AssetActions
 
             var subscription = new AssetSubscription
             {
-                Type = fieldContext.GetArgument<EnrichedAssetEventType?>("type")
+                Type = fieldContext.GetArgument<EnrichedAssetEventType?>("type"),
             };
 
             var observable =

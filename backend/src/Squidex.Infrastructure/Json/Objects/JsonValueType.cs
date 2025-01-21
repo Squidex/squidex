@@ -14,5 +14,5 @@ public enum JsonValueType
     Boolean,
     Number,
     Object,
-    String
+    String,
 }

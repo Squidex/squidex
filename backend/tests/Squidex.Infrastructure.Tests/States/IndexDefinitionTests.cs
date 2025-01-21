@@ -24,7 +24,7 @@ public class IndexDefinitionTests
     {
         var definition = new IndexDefinition
         {
-            new IndexField("field1", SortOrder.Ascending)
+            new IndexField("field1", SortOrder.Ascending),
         };
 
         Assert.Equal("field1_asc", definition.ToName());
@@ -35,7 +35,7 @@ public class IndexDefinitionTests
     {
         var definition = new IndexDefinition
         {
-            new IndexField("field1", SortOrder.Descending)
+            new IndexField("field1", SortOrder.Descending),
         };
 
         Assert.Equal("field1_desc", definition.ToName());
@@ -47,7 +47,7 @@ public class IndexDefinitionTests
         var definition = new IndexDefinition
         {
             new IndexField("field1", SortOrder.Ascending),
-            new IndexField("field2", SortOrder.Descending)
+            new IndexField("field2", SortOrder.Descending),
         };
 
         Assert.Equal("field1_asc_field2_desc", definition.ToName());

@@ -12,5 +12,5 @@ public enum DomainObjectState
     Undefined,
     Empty,
     Created,
-    Deleted
+    Deleted,
 }

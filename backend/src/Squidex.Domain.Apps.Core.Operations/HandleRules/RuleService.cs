@@ -334,7 +334,7 @@ public sealed class RuleService(
                         EnrichedEvent = enrichedEvent,
                         EnrichmentError = null,
                         Rule = state.Rule,
-                        SkipReason = SkipReason.ConditionDoesNotMatch
+                        SkipReason = SkipReason.ConditionDoesNotMatch,
                     };
 
                     continue;
@@ -370,7 +370,7 @@ public sealed class RuleService(
             EventName = enrichedEvent.Name,
             ExecutionPartition = enrichedEvent.Partition,
             Expires = expires,
-            RuleId = rule.Id
+            RuleId = rule.Id,
         };
 
         try

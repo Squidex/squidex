@@ -31,7 +31,7 @@ internal sealed class DataInputGraphType : InputObjectGraphType
             var fieldGraphType = new InputObjectGraphType
             {
                 // The name is used for equal comparison. Therefore it is important to treat it as readonly.
-                Name = fieldInfo.LocalizedInputType
+                Name = fieldInfo.LocalizedInputType,
             };
 
             var partitioning = builder.ResolvePartition(((RootField)fieldInfo.Field).Partitioning);
@@ -44,7 +44,7 @@ internal sealed class DataInputGraphType : InputObjectGraphType
                     ResolvedType = resolvedType,
                     Resolver = null,
                     Description = fieldInfo.Field.RawProperties.Hints,
-                    SourceName = partitionKey
+                    SourceName = partitionKey,
                 });
             }
 

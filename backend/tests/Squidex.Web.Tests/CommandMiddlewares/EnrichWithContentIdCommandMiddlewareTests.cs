@@ -26,7 +26,7 @@ public class EnrichWithContentIdCommandMiddlewareTests : GivenContext
     {
         var command = new UpdateContent
         {
-            ContentId = DomainId.Create("_schemaId_")
+            ContentId = DomainId.Create("_schemaId_"),
         };
 
         await HandleAsync(command);
@@ -39,7 +39,7 @@ public class EnrichWithContentIdCommandMiddlewareTests : GivenContext
     {
         var command = new CreateContent
         {
-            ContentId = DomainId.Create("_SchemaId_")
+            ContentId = DomainId.Create("_SchemaId_"),
         };
 
         await HandleAsync(command);
@@ -52,7 +52,7 @@ public class EnrichWithContentIdCommandMiddlewareTests : GivenContext
     {
         var command = new UpdateContent
         {
-            ContentId = DomainId.Create("{custom}")
+            ContentId = DomainId.Create("{custom}"),
         };
 
         await HandleAsync(command);

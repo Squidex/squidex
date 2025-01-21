@@ -44,28 +44,28 @@ public class ReadonlyDictionaryTests
     {
         var obj1a = new Dictionary<int, int>
         {
-            [1] = 1
+            [1] = 1,
         }.ToReadonlyDictionary();
 
         var obj1b = new Dictionary<int, int>
         {
-            [1] = 1
+            [1] = 1,
         }.ToReadonlyDictionary();
 
         var dictionaryOtherValue = new Dictionary<int, int>
         {
-            [1] = 2
+            [1] = 2,
         }.ToReadonlyDictionary();
 
         var dictionaryOtherKey = new Dictionary<int, int>
         {
-            [2] = 1
+            [2] = 1,
         }.ToReadonlyDictionary();
 
         var dictionaryOtherCount = new Dictionary<int, int>
         {
             [1] = 1,
-            [2] = 2
+            [2] = 2,
         }.ToReadonlyDictionary();
 
         Assert.Equal(obj1a, obj1b);
@@ -92,7 +92,7 @@ public class ReadonlyDictionaryTests
         {
             [11] = 1,
             [12] = 2,
-            [13] = 3
+            [13] = 3,
         }.ToReadonlyDictionary();
 
         var serialized = sut.SerializeAndDeserializeJson();
@@ -107,7 +107,7 @@ public class ReadonlyDictionaryTests
         {
             [11] = 1,
             [12] = 2,
-            [13] = 3
+            [13] = 3,
         });
 
         var serialized = sut.SerializeAndDeserializeJson();

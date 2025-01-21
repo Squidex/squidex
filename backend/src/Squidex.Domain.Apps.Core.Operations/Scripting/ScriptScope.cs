@@ -19,5 +19,5 @@ public enum ScriptScope
     ContentTrigger = 32,
     SchemaTrigger = 128,
     Transform = 256,
-    UsageTrigger = 512
+    UsageTrigger = 512,
 }

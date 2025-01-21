@@ -52,7 +52,7 @@ public sealed class WorkflowStepDto
         {
             Transitions = step.Transitions.ToDictionary(
                 y => y.Key,
-                y => WorkflowTransitionDto.FromDomain(y.Value))
+                y => WorkflowTransitionDto.FromDomain(y.Value)),
         });
 
         if (step.NoUpdate != null)

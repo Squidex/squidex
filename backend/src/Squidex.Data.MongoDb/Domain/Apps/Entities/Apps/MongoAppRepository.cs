@@ -33,7 +33,7 @@ public sealed class MongoAppRepository(IMongoDatabase database) : MongoSnapshotS
                     .Ascending(x => x.IndexedUserIds)),
             new CreateIndexModel<MongoAppEntity>(
                 Index
-                    .Ascending(x => x.IndexedTeamId))
+                    .Ascending(x => x.IndexedTeamId)),
         ], ct);
     }
 

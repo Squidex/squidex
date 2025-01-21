@@ -35,7 +35,7 @@ public sealed class UsageTriggerHandler : IRuleTriggerHandler
         {
             CallsCurrent = usageEvent.CallsCurrent,
             CallsLimit = usageEvent.CallsLimit,
-            Name = EventName
+            Name = EventName,
         };
 
         await Task.Yield();

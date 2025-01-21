@@ -93,7 +93,7 @@ public sealed class TextIndexingProcess(
 
             var state = new TextContentState
             {
-                UniqueContentId = uniqueId
+                UniqueContentId = uniqueId,
             };
 
             Index(@event,
@@ -277,7 +277,7 @@ public sealed class TextIndexingProcess(
                     Stage = stage,
                     ServeAll = all,
                     ServePublished = published,
-                    Texts = data.ToTexts()
+                    Texts = data.ToTexts(),
                 });
         }
 

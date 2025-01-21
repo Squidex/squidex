@@ -29,7 +29,7 @@ public class QueryJsonTests
         {
             path = "property",
             op,
-            value = 12
+            value = 12,
         };
 
         var filter = SerializeAndDeserialize(json);
@@ -95,8 +95,8 @@ public class QueryJsonTests
             and = new[]
             {
                 new { path = "property", op = "ge", value = 10 },
-                new { path = "property", op = "lt", value = 20 }
-            }
+                new { path = "property", op = "lt", value = 20 },
+            },
         };
 
         var filter = SerializeAndDeserialize(json);
@@ -112,8 +112,8 @@ public class QueryJsonTests
             or = new[]
             {
                 new { path = "property", op = "ge", value = 10 },
-                new { path = "property", op = "lt", value = 20 }
-            }
+                new { path = "property", op = "lt", value = 20 },
+            },
         };
 
         var filter = SerializeAndDeserialize(json);
@@ -126,7 +126,7 @@ public class QueryJsonTests
     {
         var json = new
         {
-            not = new { path = "property", op = "ge", value = 10 }
+            not = new { path = "property", op = "ge", value = 10 },
         };
 
         var filter = SerializeAndDeserialize(json);
@@ -166,9 +166,9 @@ public class QueryJsonTests
             and = new[]
             {
                 new { path = "property", op = "ge", value = 10 },
-                new { path = "property", op = "lt", value = 20 }
+                new { path = "property", op = "lt", value = 20 },
             },
-            additional = 1
+            additional = 1,
         };
 
         SerializeAndDeserialize(json);

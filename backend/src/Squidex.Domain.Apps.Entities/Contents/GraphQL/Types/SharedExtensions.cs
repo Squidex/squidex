@@ -31,7 +31,7 @@ public static class SharedExtensions
             Name = source.Name,
             ResolvedType = source.ResolvedType,
             Resolver = null,
-            Description = source.Name
+            Description = source.Name,
         };
     }
 

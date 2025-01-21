@@ -43,7 +43,7 @@ public static class CommandFactory
                     geoObject = new
                     {
                         lat = point.Coordinate.X,
-                        lon = point.Coordinate.Y
+                        lon = point.Coordinate.Y,
                     };
                     break;
                 }
@@ -57,8 +57,8 @@ public static class CommandFactory
                 index = new
                 {
                     _id = upsert.ToDocId(),
-                    _index = indexName
-                }
+                    _index = indexName,
+                },
             });
 
             var texts = new Dictionary<string, string>();
@@ -91,7 +91,7 @@ public static class CommandFactory
                 servePublished = upsert.ServePublished,
                 texts,
                 geoField,
-                geoObject
+                geoObject,
             });
         }
     }
@@ -103,8 +103,8 @@ public static class CommandFactory
             update = new
             {
                 _id = update.ToDocId(),
-                _index = indexName
-            }
+                _index = indexName,
+            },
         });
 
         args.Add(new
@@ -112,8 +112,8 @@ public static class CommandFactory
             doc = new
             {
                 serveAll = update.ServeAll,
-                servePublished = update.ServePublished
-            }
+                servePublished = update.ServePublished,
+            },
         });
     }
 
@@ -124,8 +124,8 @@ public static class CommandFactory
             delete = new
             {
                 _id = delete.ToDocId(),
-                _index = indexName
-            }
+                _index = indexName,
+            },
         });
     }
 }

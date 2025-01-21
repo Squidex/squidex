@@ -50,7 +50,7 @@ public sealed class RuleEnricher(IRuleUsageTracker ruleUsageTracker, IRequestCac
                         result = result with
                         {
                             NumFailed = statistic.TotalFailed,
-                            NumSucceeded = statistic.TotalSucceeded
+                            NumSucceeded = statistic.TotalSucceeded,
                         };
                     }
 

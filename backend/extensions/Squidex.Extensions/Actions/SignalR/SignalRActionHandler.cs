@@ -54,7 +54,7 @@ public sealed class SignalRActionHandler(RuleEventFormatter formatter) : RuleAct
             HubName = hubName!,
             MethodName = action.MethodName,
             MethodPayload = requestBody!,
-            Targets = target.Split("\n")
+            Targets = target.Split("\n"),
         };
 
         return (ruleText, ruleJob);

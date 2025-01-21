@@ -195,11 +195,11 @@ public class SchemaTests
     {
         var properties1 = new NumberFieldProperties
         {
-            MinValue = 10
+            MinValue = 10,
         };
         var properties2 = new NumberFieldProperties
         {
-            MinValue = 10
+            MinValue = 10,
         };
 
         var schema_1 = schema_0.AddField(CreateField(1));
@@ -426,11 +426,11 @@ public class SchemaTests
     {
         var scripts1 = new SchemaScripts
         {
-            Query = "<query-script>"
+            Query = "<query-script>",
         };
         var scripts2 = new SchemaScripts
         {
-            Query = "<query-script>"
+            Query = "<query-script>",
         };
 
         var schema_1 = schema_0.SetScripts(scripts1);
@@ -454,11 +454,11 @@ public class SchemaTests
     {
         var urls1 = new Dictionary<string, string>
         {
-            ["web"] = "Url"
+            ["web"] = "Url",
         }.ToReadonlyDictionary();
         var urls2 = new Dictionary<string, string>
         {
-            ["web"] = "Url"
+            ["web"] = "Url",
         }.ToReadonlyDictionary();
 
         var schema_1 = schema_0.SetPreviewUrls(urls1);

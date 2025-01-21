@@ -17,5 +17,5 @@ public enum RuleFieldEditor
     Password,
     Text,
     TextArea,
-    Url
+    Url,
 }

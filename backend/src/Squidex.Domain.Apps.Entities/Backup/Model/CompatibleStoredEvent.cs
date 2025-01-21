@@ -37,7 +37,7 @@ public sealed class CompatibleStoredEvent
             Data = CompatibleEventData.V1(stored.Data),
             EventPosition = stored.EventPosition.Token!,
             EventStreamNumber = stored.EventStreamNumber,
-            StreamName = stored.StreamName
+            StreamName = stored.StreamName,
         };
     }
 
@@ -79,7 +79,7 @@ public sealed class CompatibleEventData
         {
             Type = data.Type,
             EventPayload = data.Payload,
-            EventHeaders = data.Headers
+            EventHeaders = data.Headers,
         };
     }
 
@@ -110,7 +110,7 @@ public sealed class NewEvent
             EventType = stored.Data.Type,
             EventHeaders = stored.Data.Headers,
             EventPayload = stored.Data.Payload,
-            StreamName = stored.StreamName
+            StreamName = stored.StreamName,
         };
     }
 

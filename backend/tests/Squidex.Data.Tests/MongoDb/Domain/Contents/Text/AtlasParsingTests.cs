@@ -11,7 +11,7 @@ using Lucene.Net.Analysis.Standard;
 using Lucene.Net.Analysis.Util;
 using Lucene.Net.Util;
 using MongoDB.Bson;
-using Squidex.Domain.Apps.Entities.Text;
+using Squidex.Domain.Apps.Entities.Contents.Text;
 using LuceneQueryAnalyzer = Lucene.Net.QueryParsers.Classic.QueryParser;
 
 namespace Squidex.MongoDb.Domain.Contents.Text;
@@ -24,7 +24,7 @@ public class AtlasParsingTests
             new StandardAnalyzer(LuceneVersion.LUCENE_48, CharArraySet.EMPTY_SET));
     private static readonly JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions
     {
-        WriteIndented = true
+        WriteIndented = true,
     };
 
     [Fact]
@@ -38,10 +38,10 @@ public class AtlasParsingTests
             {
                 path = new
                 {
-                    wildcard = "*"
+                    wildcard = "*",
                 },
-                query = "hello"
-            }
+                query = "hello",
+            },
         });
 
         Assert.Equal(expected, actual);
@@ -58,10 +58,10 @@ public class AtlasParsingTests
             {
                 path = new
                 {
-                    wildcard = "*"
+                    wildcard = "*",
                 },
-                query = new[] { "hello", "dolly" }
-            }
+                query = new[] { "hello", "dolly" },
+            },
         });
 
         Assert.Equal(expected, actual);
@@ -87,20 +87,20 @@ public class AtlasParsingTests
                             {
                                 "the",
                                 "right",
-                                "way"
-                            }
-                        }
+                                "way",
+                            },
+                        },
                     },
                     new
                     {
                         text = new
                         {
                             path = "text",
-                            query = "go"
-                        }
-                    }
-                }
-            }
+                            query = "go",
+                        },
+                    },
+                },
+            },
         });
 
         Assert.Equal(expected, actual);
@@ -126,9 +126,9 @@ public class AtlasParsingTests
                             {
                                 "do",
                                 "it",
-                                "right"
-                            }
-                        }
+                                "right",
+                            },
+                        },
                     },
                     new
                     {
@@ -136,13 +136,13 @@ public class AtlasParsingTests
                         {
                             path = new
                             {
-                                wildcard = "*"
+                                wildcard = "*",
                             },
-                            query = "right"
-                        }
-                    }
-                }
-            }
+                            query = "right",
+                        },
+                    },
+                },
+            },
         });
 
         Assert.Equal(expected, actual);
@@ -159,10 +159,10 @@ public class AtlasParsingTests
             {
                 path = new
                 {
-                    wildcard = "*"
+                    wildcard = "*",
                 },
-                query = "te?t"
-            }
+                query = "te?t",
+            },
         });
 
         Assert.Equal(expected, actual);
@@ -179,10 +179,10 @@ public class AtlasParsingTests
             {
                 path = new
                 {
-                    wildcard = "*"
+                    wildcard = "*",
                 },
-                query = "test*"
-            }
+                query = "test*",
+            },
         });
 
         Assert.Equal(expected, actual);
@@ -199,14 +199,14 @@ public class AtlasParsingTests
             {
                 path = new
                 {
-                    wildcard = "*"
+                    wildcard = "*",
                 },
                 query = "roam",
                 fuzzy = new
                 {
-                    maxEdits = 2
-                }
-            }
+                    maxEdits = 2,
+                },
+            },
         });
 
         Assert.Equal(expected, actual);
@@ -223,14 +223,14 @@ public class AtlasParsingTests
             {
                 path = new
                 {
-                    wildcard = "*"
+                    wildcard = "*",
                 },
                 query = "roam",
                 fuzzy = new
                 {
-                    maxEdits = 1
-                }
-            }
+                    maxEdits = 1,
+                },
+            },
         });
 
         Assert.Equal(expected, actual);
@@ -247,15 +247,15 @@ public class AtlasParsingTests
             {
                 path = new
                 {
-                    wildcard = "*"
+                    wildcard = "*",
                 },
                 query = new[]
                 {
                     "jakarta",
-                    "apache"
+                    "apache",
                 },
-                slop = 10
-            }
+                slop = 10,
+            },
         });
 
         Assert.Equal(expected, actual);
@@ -284,10 +284,10 @@ public class AtlasParsingTests
                                     {
                                         path = new
                                         {
-                                            wildcard = "*"
+                                            wildcard = "*",
                                         },
-                                        query = "jakarta"
-                                    }
+                                        query = "jakarta",
+                                    },
                                 },
                                 new
                                 {
@@ -295,13 +295,13 @@ public class AtlasParsingTests
                                     {
                                         path = new
                                         {
-                                            wildcard = "*"
+                                            wildcard = "*",
                                         },
-                                        query = "apache"
-                                    }
-                                }
-                            }
-                        }
+                                        query = "apache",
+                                    },
+                                },
+                            },
+                        },
                     },
                     new
                     {
@@ -309,13 +309,13 @@ public class AtlasParsingTests
                         {
                             path = new
                             {
-                                wildcard = "*"
+                                wildcard = "*",
                             },
-                            query = "website"
-                        }
-                    }
-                }
-            }
+                            query = "website",
+                        },
+                    },
+                },
+            },
         });
 
         Assert.Equal(expected, actual);
@@ -337,8 +337,8 @@ public class AtlasParsingTests
                         text = new
                         {
                             path = "title",
-                            query = "return"
-                        }
+                            query = "return",
+                        },
                     },
                     new
                     {
@@ -348,12 +348,12 @@ public class AtlasParsingTests
                             query = new[]
                             {
                                 "pink",
-                                "panther"
-                            }
-                        }
-                    }
-                }
-            }
+                                "panther",
+                            },
+                        },
+                    },
+                },
+            },
         });
 
         Assert.Equal(expected, actual);
@@ -370,8 +370,8 @@ public class AtlasParsingTests
             {
                 path = "mod_date",
                 gte = 20020101,
-                lte = 20030101
-            }
+                lte = 20030101,
+            },
         });
 
         Assert.Equal(expected, actual);
@@ -388,8 +388,8 @@ public class AtlasParsingTests
             {
                 path = "mod_date",
                 gt = 20020101,
-                lt = 20030101
-            }
+                lt = 20030101,
+            },
         });
 
         Assert.Equal(expected, actual);

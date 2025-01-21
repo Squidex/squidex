@@ -201,7 +201,7 @@ internal sealed class JsonTypeVisitor : IFieldVisitor<JsonSchemaProperty?, JsonT
 
         property.ExtensionData = new Dictionary<string, object?>
         {
-            ["schemaIds"] = field.Properties.SchemaIds ?? []
+            ["schemaIds"] = field.Properties.SchemaIds ?? [],
         };
 
         property.UniqueItems = !field.Properties.AllowDuplicates;
@@ -263,7 +263,7 @@ internal sealed class JsonTypeVisitor : IFieldVisitor<JsonSchemaProperty?, JsonT
         {
             var discriminator = new OpenApiDiscriminator
             {
-                PropertyName = Component.Discriminator
+                PropertyName = Component.Discriminator,
             };
 
             foreach (var schema in args.Components.Resolve(schemaIds).Values)

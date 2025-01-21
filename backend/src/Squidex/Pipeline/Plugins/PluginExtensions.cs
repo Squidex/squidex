@@ -26,7 +26,7 @@ public static class PluginExtensions
         typeof(SquidexEntities),
         typeof(SquidexEvents),
         typeof(SquidexInfrastructure),
-        typeof(SquidexWeb)
+        typeof(SquidexWeb),
     }.Select(x => x.Assembly.GetName()).ToArray();
 
     public static IMvcBuilder AddSquidexPlugins(this IMvcBuilder mvcBuilder, IConfiguration config)

@@ -63,7 +63,7 @@ internal sealed class FilterVisitor : IFieldVisitor<FilterSchema?, FilterVisitor
 
         return new FilterSchema(FilterSchemaType.ObjectArray)
         {
-            Fields = fields.ToReadonlyList()
+            Fields = fields.ToReadonlyList(),
         };
     }
 
@@ -106,8 +106,8 @@ internal sealed class FilterVisitor : IFieldVisitor<FilterSchema?, FilterVisitor
                 AllowedValues = field.Properties.AllowedValues?.ToArray(),
                 Extra = new
                 {
-                    options = field.Properties.AllowedValues
-                }
+                    options = field.Properties.AllowedValues,
+                },
             };
         }
 
@@ -133,7 +133,7 @@ internal sealed class FilterVisitor : IFieldVisitor<FilterSchema?, FilterVisitor
 
         return new FilterSchema(FilterSchemaType.Object)
         {
-            Fields = BuildComponent(field.Properties.SchemaIds, args)
+            Fields = BuildComponent(field.Properties.SchemaIds, args),
         };
     }
 
@@ -146,7 +146,7 @@ internal sealed class FilterVisitor : IFieldVisitor<FilterSchema?, FilterVisitor
 
         return new FilterSchema(FilterSchemaType.Object)
         {
-            Fields = BuildComponent(field.Properties.SchemaIds, args)
+            Fields = BuildComponent(field.Properties.SchemaIds, args),
         };
     }
 
@@ -166,8 +166,8 @@ internal sealed class FilterVisitor : IFieldVisitor<FilterSchema?, FilterVisitor
         {
             Extra = new
             {
-                schemaIds = field.Properties.SchemaIds
-            }
+                schemaIds = field.Properties.SchemaIds,
+            },
         };
     }
 
@@ -199,7 +199,7 @@ internal sealed class FilterVisitor : IFieldVisitor<FilterSchema?, FilterVisitor
 
             fields.Add(new FilterField(FilterSchema.String, Component.Discriminator)
             {
-                Description = FieldDescriptions.ComponentSchemaId
+                Description = FieldDescriptions.ComponentSchemaId,
             });
         }
 

@@ -24,7 +24,7 @@ public static class MongoExtensions
     {
         var options = new ListCollectionNamesOptions
         {
-            Filter = new BsonDocument("name", collectionName)
+            Filter = new BsonDocument("name", collectionName),
         };
 
         var collections = await database.ListCollectionNamesAsync(options, ct);
@@ -209,7 +209,7 @@ public static class MongoExtensions
         var command =
             new BsonDocumentCommand<BsonDocument>(new BsonDocument
             {
-                { "buildInfo", 1 }
+                { "buildInfo", 1 },
             });
 
         var document = await database.RunCommandAsync(command, cancellationToken: ct);

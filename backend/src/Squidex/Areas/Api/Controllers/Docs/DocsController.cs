@@ -19,7 +19,7 @@ public sealed class DocsController(ICommandBus commandBus) : ApiController(comma
     {
         var vm = new DocsVM
         {
-            Specification = "~/api/swagger/v1/swagger.json"
+            Specification = "~/api/swagger/v1/swagger.json",
         };
 
         return View(nameof(Docs), vm);

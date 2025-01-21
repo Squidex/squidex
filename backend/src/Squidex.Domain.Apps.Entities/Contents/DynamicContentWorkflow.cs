@@ -112,7 +112,7 @@ public sealed class DynamicContentWorkflow(IScriptEngine scriptEngine, IAppProvi
         {
             var vars = new DataScriptVars
             {
-                Data = data
+                Data = data,
             };
 
             return scriptEngine.Evaluate(vars, condition.Expression);

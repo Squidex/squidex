@@ -30,7 +30,7 @@ public sealed class FastlyActionHandler(RuleEventFormatter formatter, IHttpClien
         {
             Key = id,
             FastlyApiKey = action.ApiKey,
-            FastlyServiceID = action.ServiceId
+            FastlyServiceID = action.ServiceId,
         };
 
         return (Description, ruleJob);

@@ -12,5 +12,5 @@ public enum AppContributorPermission
 {
     Owner,
     Developer,
-    Editor
+    Editor,
 }

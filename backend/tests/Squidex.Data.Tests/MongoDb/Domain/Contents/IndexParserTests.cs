@@ -23,7 +23,7 @@ public class IndexParserTests
                 ["mt"] = 1,
                 ["mb"] = -1,
                 ["do.field1"] = 1,
-            }
+            },
         };
 
     static IndexParserTests()

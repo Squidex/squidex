@@ -44,7 +44,7 @@ public sealed class WebhookActionHandler(RuleEventFormatter formatter, IHttpClie
             RequestSignature = requestSignature,
             RequestBody = requestBody!,
             RequestBodyType = action.PayloadType,
-            Headers = await ParseHeadersAsync(action.Headers, @event)
+            Headers = await ParseHeadersAsync(action.Headers, @event),
         };
 
         return (ruleText, ruleJob);

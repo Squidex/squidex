@@ -55,7 +55,7 @@ public class JobsContentController(
         {
             FileDownloadName = job.File.Name,
             FileSize = null,
-            ErrorAs404 = true
+            ErrorAs404 = true,
         };
     }
 }

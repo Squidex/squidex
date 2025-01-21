@@ -10,5 +10,5 @@ namespace Squidex.Domain.Apps.Entities.Backup;
 public enum BackupVersion
 {
     V2,
-    V1
+    V1,
 }

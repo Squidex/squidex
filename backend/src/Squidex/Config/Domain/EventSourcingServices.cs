@@ -32,7 +32,7 @@ public static class EventSourcingServices
                     .AsSelf();
 
                 services.AddGetEventStore(config);
-            }
+            },
         });
 
         services.AddTransientAs<Rebuilder>()

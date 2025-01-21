@@ -37,7 +37,7 @@ public partial class ContentDomainObject
                     AppId = e.AppId,
                     ScheduleJob = null,
                     SchemaId = e.SchemaId,
-                    CurrentVersion = new ContentVersion(e.Status, e.Data)
+                    CurrentVersion = new ContentVersion(e.Status, e.Data),
                 };
 
                 break;
@@ -97,14 +97,14 @@ public partial class ContentDomainObject
             case ContentUpdated e when snapshot.NewVersion != null:
                 newSnapshot = snapshot with
                 {
-                    NewVersion = snapshot.NewVersion with { Data = e.Data.UseSameFields(Data()) }
+                    NewVersion = snapshot.NewVersion with { Data = e.Data.UseSameFields(Data()) },
                 };
                 break;
 
             case ContentUpdated e:
                 newSnapshot = snapshot with
                 {
-                    CurrentVersion = snapshot.CurrentVersion with { Data = e.Data.UseSameFields(CurrentData()) }
+                    CurrentVersion = snapshot.CurrentVersion with { Data = e.Data.UseSameFields(CurrentData()) },
                 };
                 break;
 

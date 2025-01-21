@@ -239,7 +239,7 @@ public partial class AssetDomainObject(
             MimeType = command.File.MimeType,
             FileName = command.File.FileName,
             FileSize = command.File.FileSize,
-            Slug = command.File.FileName.ToAssetSlug()
+            Slug = command.File.FileName.ToAssetSlug(),
         });
     }
 
@@ -249,7 +249,7 @@ public partial class AssetDomainObject(
         {
             MimeType = command.File.MimeType,
             FileVersion = Snapshot.FileVersion + 1,
-            FileSize = command.File.FileSize
+            FileSize = command.File.FileSize,
         });
     }
 

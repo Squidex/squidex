@@ -43,9 +43,9 @@ public class IgnoreHashFileProviderTests
             (string.Empty,
                 new[]
                 {
-                    fileHashed
+                    fileHashed,
                 }
-            )
+            ),
         };
 
         var sut = CreateSut(directories);
@@ -78,15 +78,15 @@ public class IgnoreHashFileProviderTests
             (string.Empty,
                 new[]
                 {
-                    directory
+                    directory,
                 }
             ),
             (directory.Name,
                 new[]
                 {
-                    fileHashed
+                    fileHashed,
                 }
-            )
+            ),
         };
 
         var sut = CreateSut(directories);
@@ -113,9 +113,9 @@ public class IgnoreHashFileProviderTests
             (string.Empty,
                 new[]
                 {
-                    fileNormal
+                    fileNormal,
                 }
-            )
+            ),
         };
 
         var sut = CreateSut(directories);
@@ -142,9 +142,9 @@ public class IgnoreHashFileProviderTests
             (string.Empty,
                 new[]
                 {
-                    fileNormal
+                    fileNormal,
                 }
-            )
+            ),
         };
 
         var sut = CreateSut(directories);

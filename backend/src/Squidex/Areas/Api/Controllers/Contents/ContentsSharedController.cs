@@ -32,7 +32,7 @@ public sealed class ContentsSharedController(
     {
         DefaultResponseContentType = new MediaTypeHeaderValue("application/json"),
         CsrfProtectionEnabled = false,
-        CsrfProtectionHeaders = []
+        CsrfProtectionHeaders = [],
     };
 
     /// <summary>

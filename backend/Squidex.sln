@@ -56,6 +56,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Data.MongoDb", "src
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Data.Tests", "tests\Squidex.Data.Tests\Squidex.Data.Tests.csproj", "{AA2F3C32-E3C8-4DF3-A365-F25C7EC19BCD}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squidex.Data.EntityFramework", "src\Squidex.Data.EntityFramework\Squidex.Data.EntityFramework.csproj", "{0348CFDA-4DA1-4DB5-9C6F-0D234FE3E4DA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -262,6 +264,18 @@ Global
 		{AA2F3C32-E3C8-4DF3-A365-F25C7EC19BCD}.Release|x64.Build.0 = Release|Any CPU
 		{AA2F3C32-E3C8-4DF3-A365-F25C7EC19BCD}.Release|x86.ActiveCfg = Release|Any CPU
 		{AA2F3C32-E3C8-4DF3-A365-F25C7EC19BCD}.Release|x86.Build.0 = Release|Any CPU
+		{0348CFDA-4DA1-4DB5-9C6F-0D234FE3E4DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0348CFDA-4DA1-4DB5-9C6F-0D234FE3E4DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0348CFDA-4DA1-4DB5-9C6F-0D234FE3E4DA}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0348CFDA-4DA1-4DB5-9C6F-0D234FE3E4DA}.Debug|x64.Build.0 = Debug|Any CPU
+		{0348CFDA-4DA1-4DB5-9C6F-0D234FE3E4DA}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0348CFDA-4DA1-4DB5-9C6F-0D234FE3E4DA}.Debug|x86.Build.0 = Debug|Any CPU
+		{0348CFDA-4DA1-4DB5-9C6F-0D234FE3E4DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0348CFDA-4DA1-4DB5-9C6F-0D234FE3E4DA}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0348CFDA-4DA1-4DB5-9C6F-0D234FE3E4DA}.Release|x64.ActiveCfg = Release|Any CPU
+		{0348CFDA-4DA1-4DB5-9C6F-0D234FE3E4DA}.Release|x64.Build.0 = Release|Any CPU
+		{0348CFDA-4DA1-4DB5-9C6F-0D234FE3E4DA}.Release|x86.ActiveCfg = Release|Any CPU
+		{0348CFDA-4DA1-4DB5-9C6F-0D234FE3E4DA}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -284,6 +298,7 @@ Global
 		{23615A39-F3FB-4575-A91C-535899DFB636} = {94207AA6-4923-4183-A558-E0F8196B8CA3}
 		{F754F05E-02FF-47B2-AB46-BB05C7E6B29D} = {3378B841-53F8-48CC-87C1-1B30CF912BFD}
 		{AA2F3C32-E3C8-4DF3-A365-F25C7EC19BCD} = {3378B841-53F8-48CC-87C1-1B30CF912BFD}
+		{0348CFDA-4DA1-4DB5-9C6F-0D234FE3E4DA} = {3378B841-53F8-48CC-87C1-1B30CF912BFD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {02F2E872-3141-44F5-BD6A-33CD84E9FE08}

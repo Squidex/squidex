@@ -29,7 +29,7 @@ public class TypeConverterStringSerializerTests
     {
         var source = new ValueHolder<TimeSpan>
         {
-            Value = TimeSpan.Zero
+            Value = TimeSpan.Zero,
         };
 
         var deserialized = SerializeAndDeserializeBson(source);
@@ -42,7 +42,7 @@ public class TypeConverterStringSerializerTests
     {
         var source = new ValueHolder<TimeSpan?>
         {
-            Value = TimeSpan.Zero
+            Value = TimeSpan.Zero,
         };
 
         var deserialized = SerializeAndDeserializeBson(source);
@@ -55,7 +55,7 @@ public class TypeConverterStringSerializerTests
     {
         var source = new ValueHolder<TimeSpan?>
         {
-            Value = null
+            Value = null,
         };
 
         var deserialized = SerializeAndDeserializeBson(source);
@@ -68,7 +68,7 @@ public class TypeConverterStringSerializerTests
     {
         var source = new ValueHolder<RefToken>
         {
-            Value = RefToken.Client("client")
+            Value = RefToken.Client("client"),
         };
 
         var deserialized = SerializeAndDeserializeBson(source);
@@ -81,7 +81,7 @@ public class TypeConverterStringSerializerTests
     {
         var source = new ValueHolder<RefToken?>
         {
-            Value = null
+            Value = null,
         };
 
         var deserialized = SerializeAndDeserializeBson(source);

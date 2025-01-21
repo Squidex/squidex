@@ -83,7 +83,7 @@ public sealed class AddAppIdToEventStream(IMongoDatabase database) : MongoBase<B
 
                 writes.Add(new ReplaceOneModel<BsonDocument>(filter, document)
                 {
-                    IsUpsert = true
+                    IsUpsert = true,
                 });
             }
 

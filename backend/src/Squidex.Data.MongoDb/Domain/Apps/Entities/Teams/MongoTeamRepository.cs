@@ -27,7 +27,7 @@ public sealed class MongoTeamRepository(IMongoDatabase database) : MongoSnapshot
         [
             new CreateIndexModel<MongoTeamEntity>(
                 Index
-                    .Ascending(x => x.IndexedUserIds))
+                    .Ascending(x => x.IndexedUserIds)),
         ], ct);
     }
 

@@ -70,7 +70,7 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
     {
         return new MongoCollectionSettings
         {
-            ReadPreference = readPreference
+            ReadPreference = readPreference,
         };
     }
 
@@ -85,7 +85,7 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
             queryByQuery,
             queryReferences,
             queryReferrers,
-            queryScheduled
+            queryScheduled,
         };
 
         foreach (var operation in operations)

@@ -24,7 +24,7 @@ public sealed class SlackActionHandler(RuleEventFormatter formatter, IHttpClient
         var ruleJob = new SlackJob
         {
             RequestUrl = action.WebhookUrl.ToString(),
-            RequestBody = ToJson(body)
+            RequestBody = ToJson(body),
         };
 
         return (Description, ruleJob);
@@ -37,7 +37,7 @@ public sealed class SlackActionHandler(RuleEventFormatter formatter, IHttpClient
 
         var request = new HttpRequestMessage(HttpMethod.Post, job.RequestUrl)
         {
-            Content = new StringContent(job.RequestBody, Encoding.UTF8, "application/json")
+            Content = new StringContent(job.RequestBody, Encoding.UTF8, "application/json"),
         };
 
         return await httpClient.OneWayRequestAsync(request, job.RequestBody, ct);

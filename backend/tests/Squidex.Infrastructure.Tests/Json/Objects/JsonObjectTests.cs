@@ -124,7 +124,7 @@ public class JsonObjectTests
             new JsonValue((string?)null),
             JsonValue.Create((string?)null),
             JsonValue.Create((object?)null),
-            default
+            default,
         };
 
         foreach (var json in jsons)
@@ -148,7 +148,7 @@ public class JsonObjectTests
             new JsonValue(true),
             JsonValue.Create(true),
             JsonValue.Create((object?)true),
-            true
+            true,
         };
 
         foreach (var json in jsons)
@@ -173,7 +173,7 @@ public class JsonObjectTests
             JsonValue.Create(12.5),
             JsonValue.Create((object?)12.5),
             JsonValue.Create((object?)12.5f),
-            12.5
+            12.5,
         };
 
         foreach (var json in jsons)
@@ -198,7 +198,7 @@ public class JsonObjectTests
             JsonValue.Create(12),
             JsonValue.Create((object?)12L),
             JsonValue.Create((object?)12),
-            12
+            12,
         };
 
         foreach (var json in jsons)
@@ -222,7 +222,7 @@ public class JsonObjectTests
             new JsonValue("text"),
             JsonValue.Create("text"),
             JsonValue.Create((object?)"text"),
-            "text"
+            "text",
         };
 
         foreach (var json in jsons)
@@ -247,7 +247,7 @@ public class JsonObjectTests
         {
             JsonValue.Create(instant),
             JsonValue.Create((object?)instant),
-            instant
+            instant,
         };
 
         foreach (var json in jsons)
@@ -272,7 +272,7 @@ public class JsonObjectTests
         {
             JsonValue.Create(id),
             JsonValue.Create((object?)id),
-            id
+            id,
         };
 
         var actual = id.ToString();
@@ -303,7 +303,7 @@ public class JsonObjectTests
             JsonValue.Create(input),
             JsonValue.Create((object?)input),
             JsonValue.Create(new object[] { 1, 2 }),
-            input
+            input,
         };
 
         var actual = new JsonArray { 1, 2 };
@@ -332,7 +332,7 @@ public class JsonObjectTests
             JsonValue.Create(input),
             JsonValue.Create((object?)input),
             JsonValue.Create(input.ToDictionary(x => x.Key, x => x.Value.Value)),
-            input
+            input,
         };
 
         var actual = JsonValue.Object().Add("1", 1).Add("2", 2);

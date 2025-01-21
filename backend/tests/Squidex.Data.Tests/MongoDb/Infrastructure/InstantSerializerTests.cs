@@ -7,7 +7,7 @@
 
 using NodaTime;
 using Squidex.Infrastructure;
-using Squidex.TestHelpers;
+using Squidex.MongoDb.TestHelpers;
 
 namespace Squidex.MongoDb.Infrastructure;
 
@@ -18,7 +18,7 @@ public class InstantSerializerTests
     {
         var source = new BsonAsDefaultEntity<Instant>
         {
-            Value = GetTime()
+            Value = GetTime(),
         };
 
         var deserialized = source.SerializeAndDeserializeBson();
@@ -31,7 +31,7 @@ public class InstantSerializerTests
     {
         var source = new BsonAsStringEntity<Instant>
         {
-            Value = GetTime()
+            Value = GetTime(),
         };
 
         var deserialized = source.SerializeAndDeserializeBson();
@@ -44,7 +44,7 @@ public class InstantSerializerTests
     {
         var source = new BsonAsInt64Entity<Instant>
         {
-            Value = GetTime()
+            Value = GetTime(),
         };
 
         var deserialized = source.SerializeAndDeserializeBson();
@@ -57,7 +57,7 @@ public class InstantSerializerTests
     {
         var source = new BsonAsDateTimeEntity<Instant>
         {
-            Value = GetTime()
+            Value = GetTime(),
         };
 
         var deserialized = source.SerializeAndDeserializeBson();

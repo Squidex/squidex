@@ -42,7 +42,6 @@ using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Repositories;
 using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Domain.Apps.Entities.Teams.Repositories;
-using Squidex.Domain.Apps.Entities.Text;
 using Squidex.Domain.Users;
 using Squidex.Domain.Users.InMemory;
 using Squidex.Domain.Users.MongoDb;
@@ -93,7 +92,7 @@ public static class ServiceExtensions
 
             return new GridFSBucket<string>(mongoDatabase, new GridFSBucketOptions
             {
-                BucketName = mongoGridFsBucketName
+                BucketName = mongoGridFsBucketName,
             });
         });
     }
@@ -188,9 +187,6 @@ public static class ServiceExtensions
         services.AddSingletonAs<MongoAppRepository>()
             .As<IAppRepository>().As<ISnapshotStore<App>>().As<IDeleter>();
 
-        services.AddSingletonAs<MongoTeamRepository>()
-            .As<ITeamRepository>().As<ISnapshotStore<Team>>();
-
         services.AddSingletonAs<MongoRuleRepository>()
             .As<IRuleRepository>().As<ISnapshotStore<Rule>>().As<IDeleter>();
 
@@ -199,6 +195,9 @@ public static class ServiceExtensions
 
         services.AddSingletonAs<MongoSchemasHash>()
             .AsOptional<ISchemasHash>().As<IEventConsumer>().As<IDeleter>();
+
+        services.AddSingletonAs<MongoTeamRepository>()
+            .As<ITeamRepository>().As<ISnapshotStore<Team>>();
 
         services.AddSingletonAs<MongoTextIndexerState>()
             .As<ITextIndexerState>().As<IDeleter>();
@@ -242,7 +241,7 @@ public static class ServiceExtensions
             {
                 return new HttpClientHandler
                 {
-                    Credentials = new NetworkCredential(atlasOptions.PublicKey, atlasOptions.PrivateKey, "cloud.mongodb.com")
+                    Credentials = new NetworkCredential(atlasOptions.PublicKey, atlasOptions.PrivateKey, "cloud.mongodb.com"),
                 };
             });
 

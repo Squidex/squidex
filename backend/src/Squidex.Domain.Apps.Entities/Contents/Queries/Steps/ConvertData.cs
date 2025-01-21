@@ -130,7 +130,7 @@ public sealed class ConvertData(
                 IgnoreNonMasterFields = true,
                 IgnoreRequiredFields = false,
                 // If field names are given we run the enrichment only on the specified fields.
-                FieldNames = fieldNames
+                FieldNames = fieldNames,
             });
         }
 
@@ -141,7 +141,7 @@ public sealed class ConvertData(
             {
                 ResolveFallback = !context.IsFrontendClient && !context.NoResolveLanguages(),
                 // If field names are given we run the enrichment only on the specified fields.
-                FieldNames = fieldNames
+                FieldNames = fieldNames,
             });
 
         if (!context.IsFrontendClient)

@@ -41,7 +41,7 @@ internal sealed class QueryInDedicatedCollection(IMongoClient mongoClient, strin
                     new CreateIndexModel<MongoContentEntity>(Index
                         .Ascending(x => x.IndexedSchemaId)
                         .Ascending(x => x.IsDeleted)
-                        .Descending(x => x.LastModified))
+                        .Descending(x => x.LastModified)),
                 ]);
 
             return schemaCollection;
@@ -190,7 +190,7 @@ internal sealed class QueryInDedicatedCollection(IMongoClient mongoClient, strin
         var filters = new List<FilterDefinition<MongoContentEntity>>
         {
             Filter.Exists(x => x.LastModified),
-            Filter.Exists(x => x.Id)
+            Filter.Exists(x => x.Id),
         };
 
         if (filter?.HasField(Field.Of<MongoContentEntity>(x => nameof(x.IsDeleted))) != true)
@@ -212,7 +212,7 @@ internal sealed class QueryInDedicatedCollection(IMongoClient mongoClient, strin
         var filters = new List<FilterDefinition<MongoContentEntity>>
         {
             Filter.Gt(x => x.LastModified, default),
-            Filter.Gt(x => x.Id, default)
+            Filter.Gt(x => x.Id, default),
         };
 
         if (query?.Filter?.HasField(Field.Of<MongoContentEntity>(x => nameof(x.IsDeleted))) != true)

@@ -62,7 +62,7 @@ public sealed class RequestExceptionMiddleware(RequestDelegate next)
 
         await writer.ExecuteAsync(actionContext, new ObjectResult(error)
         {
-            StatusCode = error.StatusCode
+            StatusCode = error.StatusCode,
         });
     }
 

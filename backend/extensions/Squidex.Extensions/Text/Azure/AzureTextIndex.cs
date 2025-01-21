@@ -144,7 +144,7 @@ public sealed class AzureTextIndex : IInitializable, ITextIndex
     {
         var searchOptions = new SearchOptions
         {
-            Filter = filter
+            Filter = filter,
         };
 
         searchOptions.Select.Add("contentId");

@@ -37,7 +37,7 @@ public sealed class UpdateValues(ContentData existingData, IScriptEngine scriptE
                 // Reuse the vars to save allocations.
                 vars ??= new ScriptVars
                 {
-                    ["$data"] = existingData
+                    ["$data"] = existingData,
                 };
 
                 // Give access to the current update statement to carry extra values from the request.

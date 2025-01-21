@@ -56,7 +56,7 @@ public static class StoreServices
                     .As<IMigration>();
 
                 services.AddSquidexMongoStore(config);
-            }
+            },
         });
 
         services.AddSingleton(typeof(IStore<>),

@@ -12,5 +12,5 @@ public enum PersistenceMode
 {
     EventSourcing = 1,
     Snapshots = 2,
-    SnapshotsAndEventSourcing = 3
+    SnapshotsAndEventSourcing = 3,
 }

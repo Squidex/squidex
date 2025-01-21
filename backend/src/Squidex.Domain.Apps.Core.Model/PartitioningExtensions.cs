@@ -12,7 +12,7 @@ public static class PartitioningExtensions
     private static readonly HashSet<string> AllowedPartitions = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
     {
         Partitioning.Language.Key,
-        Partitioning.Invariant.Key
+        Partitioning.Invariant.Key,
     };
 
     public static bool IsValidPartitioning(this string? value)

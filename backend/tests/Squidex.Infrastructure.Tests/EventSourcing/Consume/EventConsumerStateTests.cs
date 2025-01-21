@@ -19,7 +19,7 @@ public class EventConsumerStateTests
             Count = 1,
             IsStopped = true,
             Error = "Error",
-            Position = "Position"
+            Position = "Position",
         };
 
         var serialized = state.SerializeAndDeserializeJson();

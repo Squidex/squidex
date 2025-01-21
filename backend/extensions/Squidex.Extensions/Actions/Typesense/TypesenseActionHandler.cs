@@ -41,7 +41,7 @@ public sealed class TypesenseActionHandler(RuleEventFormatter formatter, IHttpCl
         {
             ServerUrl = $"{action.Host.ToString().TrimEnd('/')}/collections/{indexName}/documents",
             ServerKey = action.ApiKey,
-            ContentId = contentId
+            ContentId = contentId,
         };
 
         if (delete)
@@ -75,8 +75,8 @@ public sealed class TypesenseActionHandler(RuleEventFormatter formatter, IHttpCl
                 {
                     More = new Dictionary<string, object>
                     {
-                        ["error"] = $"Invalid JSON: {ex.Message}"
-                    }
+                        ["error"] = $"Invalid JSON: {ex.Message}",
+                    },
                 };
             }
 
@@ -104,7 +104,7 @@ public sealed class TypesenseActionHandler(RuleEventFormatter formatter, IHttpCl
         {
             request = new HttpRequestMessage(HttpMethod.Post, $"{job.ServerUrl}?action=upsert")
             {
-                Content = new StringContent(job.Content, Encoding.UTF8, "application/json")
+                Content = new StringContent(job.Content, Encoding.UTF8, "application/json"),
             };
         }
         else

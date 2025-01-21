@@ -36,7 +36,7 @@ public sealed class ResolveFromPreviousPartitioning(LanguagesConfig languages) :
         {
             source = new ContentFieldData
             {
-                [languages.Master] = value
+                [languages.Master] = value,
             };
         }
 

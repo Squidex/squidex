@@ -16,7 +16,7 @@ public sealed class LanguagesConfig : IFieldPartitioning
     public static readonly LanguagesConfig English = new (
         new Dictionary<string, LanguageConfig>
         {
-            [Language.EN] = new LanguageConfig()
+            [Language.EN] = new LanguageConfig(),
         },
         Language.EN);
 
@@ -64,7 +64,7 @@ public sealed class LanguagesConfig : IFieldPartitioning
 
         var newLanguages = new Dictionary<string, LanguageConfig>(values)
         {
-            [language] = new LanguageConfig(isOptional, ReadonlyList.Create(fallbacks))
+            [language] = new LanguageConfig(isOptional, ReadonlyList.Create(fallbacks)),
         };
 
         return Build(newLanguages, master);

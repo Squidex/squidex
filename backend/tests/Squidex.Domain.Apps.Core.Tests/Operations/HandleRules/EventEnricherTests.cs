@@ -54,7 +54,7 @@ public class EventEnricherTests
         var @event =
             Envelope.Create<AppEvent>(new ContentCreated
             {
-                AppId = appId
+                AppId = appId,
             });
 
         var enrichedEvent = new EnrichedContentEvent();
@@ -72,7 +72,7 @@ public class EventEnricherTests
         var @event =
             Envelope.Create<AppEvent>(new ContentCreated
             {
-                Actor = actor
+                Actor = actor,
             });
 
         var enrichedEvent = new EnrichedContentEvent();
@@ -98,7 +98,7 @@ public class EventEnricherTests
         var @event =
             Envelope.Create<AppEvent>(new ContentCreated
             {
-                Actor = actor
+                Actor = actor,
             });
 
         var enrichedEvent = new EnrichedContentEvent();
@@ -124,13 +124,13 @@ public class EventEnricherTests
         var event1 =
             Envelope.Create<AppEvent>(new ContentCreated
             {
-                Actor = actor
+                Actor = actor,
             });
 
         var event2 =
             Envelope.Create<AppEvent>(new ContentCreated
             {
-                Actor = actor
+                Actor = actor,
             });
 
         var enrichedEvent1 = new EnrichedContentEvent();
