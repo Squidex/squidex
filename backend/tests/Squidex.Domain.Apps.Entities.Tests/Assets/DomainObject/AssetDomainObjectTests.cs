@@ -46,8 +46,8 @@ public class AssetDomainObjectTests : HandlerTestBase<Asset>
                 Create = "<create-script>",
                 Delete = "<delete-script>",
                 Move = "<move-script>",
-                Update = "<update-script>"
-            }
+                Update = "<update-script>",
+            },
         };
 
         A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId.Id, parentId, A<CancellationToken>._))

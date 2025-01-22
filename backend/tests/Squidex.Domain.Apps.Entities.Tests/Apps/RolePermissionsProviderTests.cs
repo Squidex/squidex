@@ -28,7 +28,7 @@ public class RolePermissionsProviderTests : GivenContext
             .Returns(
             [
                 Schema.WithId(DomainId.NewGuid(), "my-schema1"),
-                Schema.WithId(DomainId.NewGuid(), "my-schema2")
+                Schema.WithId(DomainId.NewGuid(), "my-schema2"),
             ]);
 
         var actual = await sut.GetPermissionsAsync(App);

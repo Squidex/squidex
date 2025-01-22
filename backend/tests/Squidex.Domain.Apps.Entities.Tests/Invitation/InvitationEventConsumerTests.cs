@@ -313,7 +313,7 @@ public class InvitationEventConsumerTests : GivenContext
             AppId = AppId,
             ContributorId = assigneeId,
             IsCreated = isNewUser,
-            IsAdded = isNewContributor
+            IsAdded = isNewContributor,
         };
 
         var envelope = Envelope.Create(@event);
@@ -332,7 +332,7 @@ public class InvitationEventConsumerTests : GivenContext
             ContributorId = assigneeId,
             IsCreated = isNewUser,
             IsAdded = isNewContributor,
-            TeamId = TeamId
+            TeamId = TeamId,
         };
 
         var envelope = Envelope.Create(@event);

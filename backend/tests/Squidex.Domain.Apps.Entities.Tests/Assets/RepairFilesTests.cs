@@ -109,7 +109,7 @@ public class RepairFilesTests : GivenContext
 
         var storedEvents = new List<StoredEvent>
         {
-            storedEvent
+            storedEvent,
         };
 
         if (@event != null)

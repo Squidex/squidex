@@ -43,22 +43,22 @@ public class BackupRulesTests : GivenContext
 
         await sut.RestoreEventAsync(AppEvent(new RuleCreated
         {
-            RuleId = ruleId1
+            RuleId = ruleId1,
         }), context, CancellationToken);
 
         await sut.RestoreEventAsync(AppEvent(new RuleCreated
         {
-            RuleId = ruleId2
+            RuleId = ruleId2,
         }), context, CancellationToken);
 
         await sut.RestoreEventAsync(AppEvent(new RuleCreated
         {
-            RuleId = ruleId3
+            RuleId = ruleId3,
         }), context, CancellationToken);
 
         await sut.RestoreEventAsync(AppEvent(new RuleDeleted
         {
-            RuleId = ruleId3
+            RuleId = ruleId3,
         }), context, CancellationToken);
 
         var rebuildAssets = new HashSet<DomainId>();
@@ -71,7 +71,7 @@ public class BackupRulesTests : GivenContext
         Assert.Equal(
         [
             DomainId.Combine(AppId, ruleId1),
-            DomainId.Combine(AppId, ruleId2)
+            DomainId.Combine(AppId, ruleId2),
         ], rebuildAssets);
     }
 

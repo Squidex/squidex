@@ -107,7 +107,7 @@ public class DefaultAppLogStoreTests : GivenContext
                 CreateRecord(),
                 CreateRecord(),
                 CreateRecord(),
-                CreateRecord()
+                CreateRecord(),
             }.ToAsyncEnumerable());
 
         var stream = new MemoryStream();

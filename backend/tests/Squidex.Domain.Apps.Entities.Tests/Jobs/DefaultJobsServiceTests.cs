@@ -115,7 +115,7 @@ public class DefaultJobsServiceTests : GivenContext
         {
             Id = jobId,
             Started = SystemClock.Instance.GetCurrentInstant(),
-            Stopped = SystemClock.Instance.GetCurrentInstant()
+            Stopped = SystemClock.Instance.GetCurrentInstant(),
         };
 
         state.Snapshot.Jobs.Add(job);

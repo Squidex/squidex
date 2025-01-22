@@ -50,7 +50,7 @@ public class AppUISettingsTests : GivenContext
     {
         App = App with
         {
-            Contributors = Contributors.Empty.Assign(userId, Role.Owner)
+            Contributors = Contributors.Empty.Assign(userId, Role.Owner),
         };
 
         var rootState = new TestState<AppUISettings.State>(AppId.Id, state.PersistenceFactory);

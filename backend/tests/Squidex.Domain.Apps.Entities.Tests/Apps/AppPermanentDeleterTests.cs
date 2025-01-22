@@ -89,7 +89,7 @@ public class AppPermanentDeleterTests : GivenContext
         await sut.On(Envelope.Create(new AppContributorRemoved
         {
             AppId = AppId,
-            ContributorId = "user1"
+            ContributorId = "user1",
         }));
 
         A.CallTo(() => deleter1.DeleteContributorAsync(AppId.Id, "user1", default))
@@ -108,7 +108,7 @@ public class AppPermanentDeleterTests : GivenContext
         await sut.On(Envelope.Create(new AppDeleted
         {
             AppId = AppId,
-            Permanent = false
+            Permanent = false,
         }));
 
         A.CallTo(() => deleter1.DeleteAppAsync(App, default))
@@ -127,7 +127,7 @@ public class AppPermanentDeleterTests : GivenContext
         await sut.On(Envelope.Create(new AppDeleted
         {
             AppId = AppId,
-            Permanent = true
+            Permanent = true,
         }));
 
         A.CallTo(() => deleter1.DeleteAppAsync(App, default))
@@ -145,7 +145,7 @@ public class AppPermanentDeleterTests : GivenContext
         await sut.On(Envelope.Create(new AppDeleted
         {
             AppId = AppId,
-            Permanent = false
+            Permanent = false,
         }));
 
         A.CallTo(() => deleter1.DeleteAppAsync(App, default))

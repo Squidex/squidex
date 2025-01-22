@@ -44,22 +44,22 @@ public class BackupSchemasTests : GivenContext
 
         await sut.RestoreEventAsync(AppEvent(new SchemaCreated
         {
-            SchemaId = schemaId1
+            SchemaId = schemaId1,
         }), context, CancellationToken);
 
         await sut.RestoreEventAsync(AppEvent(new SchemaCreated
         {
-            SchemaId = schemaId2
+            SchemaId = schemaId2,
         }), context, CancellationToken);
 
         await sut.RestoreEventAsync(AppEvent(new SchemaCreated
         {
-            SchemaId = schemaId3
+            SchemaId = schemaId3,
         }), context, CancellationToken);
 
         await sut.RestoreEventAsync(AppEvent(new SchemaDeleted
         {
-            SchemaId = schemaId3
+            SchemaId = schemaId3,
         }), context, CancellationToken);
 
         var rebuildContents = new HashSet<DomainId>();
@@ -72,7 +72,7 @@ public class BackupSchemasTests : GivenContext
         Assert.Equal(
         [
             DomainId.Combine(AppId, schemaId1.Id),
-            DomainId.Combine(AppId, schemaId2.Id)
+            DomainId.Combine(AppId, schemaId2.Id),
         ], rebuildContents);
     }
 

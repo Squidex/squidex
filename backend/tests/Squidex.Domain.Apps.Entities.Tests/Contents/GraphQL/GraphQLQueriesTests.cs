@@ -25,7 +25,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
     {
         var actual = await ExecuteAsync(new TestQuery
         {
-            Query = query
+            Query = query,
         });
 
         var expected = new
@@ -40,11 +40,11 @@ public class GraphQLQueriesTests : GraphQLTestBase
                         code = "NO_OPERATION",
                         codes = new[]
                         {
-                            "NO_OPERATION"
-                        }
-                    }
-                }
-            }
+                            "NO_OPERATION",
+                        },
+                    },
+                },
+            },
         };
 
         AssertResult(expected, actual);
@@ -71,8 +71,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                fields = TestContent.AllFlatFields
-            }
+                fields = TestContent.AllFlatFields,
+            },
         });
 
         var expected = new
@@ -81,9 +81,9 @@ public class GraphQLQueriesTests : GraphQLTestBase
             {
                 queryMySchemaContents = new[]
                 {
-                    TestContent.FlatResponse(content)
-                }
-            }
+                    TestContent.FlatResponse(content),
+                },
+            },
         };
 
         AssertResult(expected, actual);
@@ -110,8 +110,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                fields = TestContent.AllFlatFields
-            }
+                fields = TestContent.AllFlatFields,
+            },
         });
 
         var expected = new
@@ -120,9 +120,9 @@ public class GraphQLQueriesTests : GraphQLTestBase
             {
                 queryMySchemaContents = new[]
                 {
-                    TestContent.FlatResponse(content)
-                }
-            }
+                    TestContent.FlatResponse(content),
+                },
+            },
         };
 
         AssertResult(expected, actual);
@@ -156,8 +156,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                contentId
-            }
+                contentId,
+            },
         });
 
         var expected = new
@@ -171,11 +171,11 @@ public class GraphQLQueriesTests : GraphQLTestBase
                         id = contentId,
                         flatData = new
                         {
-                            myNumber = 1
-                        }
-                    }
-                }
-            }
+                            myNumber = 1,
+                        },
+                    },
+                },
+            },
         };
 
         AssertResult(expected, actual);
@@ -204,8 +204,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                contentId
-            }
+                contentId,
+            },
         });
 
         var expected = new
@@ -216,10 +216,10 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 {
                     new
                     {
-                        data = content.Data
-                    }
-                }
-            }
+                        data = content.Data,
+                    },
+                },
+            },
         };
 
         AssertResult(expected, actual);
@@ -245,8 +245,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                fields = TestAsset.AllFields
-            }
+                fields = TestAsset.AllFields,
+            },
         });
 
         var expected = new
@@ -255,9 +255,9 @@ public class GraphQLQueriesTests : GraphQLTestBase
             {
                 queryAssets = new[]
                 {
-                    TestAsset.Response(asset)
-                }
-            }
+                    TestAsset.Response(asset),
+                },
+            },
         };
 
         AssertResult(expected, actual);
@@ -286,8 +286,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                fields = TestAsset.AllFields
-            }
+                fields = TestAsset.AllFields,
+            },
         });
 
         var expected = new
@@ -299,10 +299,10 @@ public class GraphQLQueriesTests : GraphQLTestBase
                     total = 10,
                     items = new[]
                     {
-                        TestAsset.Response(asset)
-                    }
-                }
-            }
+                        TestAsset.Response(asset),
+                    },
+                },
+            },
         };
 
         AssertResult(expected, actual);
@@ -329,16 +329,16 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                assetId
-            }
+                assetId,
+            },
         });
 
         var expected = new
         {
             data = new
             {
-                findAsset = (object?)null
-            }
+                findAsset = (object?)null,
+            },
         };
 
         AssertResult(expected, actual);
@@ -366,16 +366,16 @@ public class GraphQLQueriesTests : GraphQLTestBase
             Args = new
             {
                 assetId,
-                fields = TestAsset.AllFields
-            }
+                fields = TestAsset.AllFields,
+            },
         });
 
         var expected = new
         {
             data = new
             {
-                findAsset = TestAsset.Response(asset)
-            }
+                findAsset = TestAsset.Response(asset),
+            },
         };
 
         AssertResult(expected, actual);
@@ -402,8 +402,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                fields = TestContent.AllFlatFields
-            }
+                fields = TestContent.AllFlatFields,
+            },
         });
 
         var expected = new
@@ -412,9 +412,9 @@ public class GraphQLQueriesTests : GraphQLTestBase
             {
                 queryMySchemaContents = new[]
                 {
-                    TestContent.FlatResponse(content)
-                }
-            }
+                    TestContent.FlatResponse(content),
+                },
+            },
         };
 
         AssertResult(expected, actual);
@@ -441,8 +441,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                fields = TestContent.AllFields
-            }
+                fields = TestContent.AllFields,
+            },
         });
 
         var expected = new
@@ -451,9 +451,9 @@ public class GraphQLQueriesTests : GraphQLTestBase
             {
                 queryMySchemaContents = new[]
                 {
-                    TestContent.Response(content)
-                }
-            }
+                    TestContent.Response(content),
+                },
+            },
         };
 
         AssertResult(expected, actual);
@@ -483,8 +483,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                fields = TestContent.AllFields
-            }
+                fields = TestContent.AllFields,
+            },
         });
 
         var expected = new
@@ -496,10 +496,10 @@ public class GraphQLQueriesTests : GraphQLTestBase
                     total = 10,
                     items = new[]
                     {
-                        TestContent.Response(content)
-                    }
-                }
-            }
+                        TestContent.Response(content),
+                    },
+                },
+            },
         };
 
         AssertResult(expected, actual);
@@ -526,16 +526,16 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                contentId
-            }
+                contentId,
+            },
         });
 
         var expected = new
         {
             data = new
             {
-                findMySchemaContent = (object?)null
-            }
+                findMySchemaContent = (object?)null,
+            },
         };
 
         AssertResult(expected, actual);
@@ -563,16 +563,16 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                contentId
-            }
+                contentId,
+            },
         });
 
         var expected = new
         {
             data = new
             {
-                findMySchemaContent = (object?)null
-            }
+                findMySchemaContent = (object?)null,
+            },
         };
 
         AssertResult(expected, actual);
@@ -600,16 +600,16 @@ public class GraphQLQueriesTests : GraphQLTestBase
             Args = new
             {
                 contentId,
-                fields = TestContent.AllFields
-            }
+                fields = TestContent.AllFields,
+            },
         });
 
         var expected = new
         {
             data = new
             {
-                findMySchemaContent = TestContent.Response(content)
-            }
+                findMySchemaContent = TestContent.Response(content),
+            },
         };
 
         AssertResult(expected, actual);
@@ -636,16 +636,16 @@ public class GraphQLQueriesTests : GraphQLTestBase
             Args = new
             {
                 contentId,
-                fields = TestContent.AllFields
-            }
+                fields = TestContent.AllFields,
+            },
         });
 
         var expected = new
         {
             data = new
             {
-                findMySchemaContent = TestContent.Response(content)
-            }
+                findMySchemaContent = TestContent.Response(content),
+            },
         };
 
         AssertResult(expected, actual);
@@ -675,8 +675,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                contentId
-            }
+                contentId,
+            },
         });
 
         var expected = new
@@ -688,10 +688,10 @@ public class GraphQLQueriesTests : GraphQLTestBase
                     id = contentId,
                     flatData = new
                     {
-                        singletonField = "Hello"
-                    }
-                }
-            }
+                        singletonField = "Hello",
+                    },
+                },
+            },
         };
 
         AssertResult(expected, actual);
@@ -720,8 +720,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                contentId
-            }
+                contentId,
+            },
         });
 
         var expected = new
@@ -733,10 +733,10 @@ public class GraphQLQueriesTests : GraphQLTestBase
                     id = contentId,
                     flatData = new
                     {
-                        singletonField = "Hello"
-                    }
-                }
-            }
+                        singletonField = "Hello",
+                    },
+                },
+            },
         };
 
         AssertResult(expected, actual);
@@ -796,8 +796,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                contentId
-            }
+                contentId,
+            },
         });
 
         var expected = new
@@ -823,16 +823,16 @@ public class GraphQLQueriesTests : GraphQLTestBase
                                         {
                                             reference1Field = new
                                             {
-                                                iv = "reference1"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+                                                iv = "reference1",
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         };
 
         AssertResult(expected, actual);
@@ -898,8 +898,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                contentId
-            }
+                contentId,
+            },
         });
 
         var expected = new
@@ -925,10 +925,10 @@ public class GraphQLQueriesTests : GraphQLTestBase
                                             type = "link",
                                             attrs = new
                                             {
-                                                href = $"contents:{contentRefId}"
-                                            }
-                                        }
-                                    }
+                                                href = $"contents:{contentRefId}",
+                                            },
+                                        },
+                                    },
                                 },
                                 contents = new[]
                                 {
@@ -939,16 +939,16 @@ public class GraphQLQueriesTests : GraphQLTestBase
                                         {
                                             reference1Field = new
                                             {
-                                                iv = "reference1"
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+                                                iv = "reference1",
+                                            },
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         };
 
         AssertResult(expected, actual);
@@ -1001,8 +1001,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                contentId
-            }
+                contentId,
+            },
         });
 
         var expected = new
@@ -1025,15 +1025,15 @@ public class GraphQLQueriesTests : GraphQLTestBase
                                     {
                                         reference1Field = new
                                         {
-                                            iv = "reference1"
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+                                            iv = "reference1",
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         };
 
         AssertResult(expected, actual);
@@ -1079,8 +1079,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                contentId
-            }
+                contentId,
+            },
         });
 
         var expected = new
@@ -1096,12 +1096,12 @@ public class GraphQLQueriesTests : GraphQLTestBase
                         {
                             new
                             {
-                                id = contentRefId
-                            }
-                        }
-                    }
-                }
-            }
+                                id = contentRefId,
+                            },
+                        },
+                    },
+                },
+            },
         };
 
         AssertResult(expected, actual);
@@ -1147,8 +1147,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                contentId
-            }
+                contentId,
+            },
         };
 
         var actual1 = await ExecuteAsync(query);
@@ -1167,12 +1167,12 @@ public class GraphQLQueriesTests : GraphQLTestBase
                         {
                             new
                             {
-                                id = contentRefId
-                            }
-                        }
-                    }
-                }
-            }
+                                id = contentRefId,
+                            },
+                        },
+                    },
+                },
+            },
         };
 
         AssertResult(expected, actual1);
@@ -1230,8 +1230,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                contentId = contentRefId
-            }
+                contentId = contentRefId,
+            },
         });
 
         var expected = new
@@ -1250,13 +1250,13 @@ public class GraphQLQueriesTests : GraphQLTestBase
                             {
                                 myLocalizedString = new
                                 {
-                                    de_DE = "de-DE"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+                                    de_DE = "de-DE",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         };
 
         AssertResult(expected, actual);
@@ -1311,8 +1311,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                contentId = contentRefId
-            }
+                contentId = contentRefId,
+            },
         });
 
         var expected = new
@@ -1334,14 +1334,14 @@ public class GraphQLQueriesTests : GraphQLTestBase
                                 {
                                     myLocalizedString = new
                                     {
-                                        de_DE = "de-DE"
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+                                        de_DE = "de-DE",
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         };
 
         AssertResult(expected, actual);
@@ -1385,8 +1385,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                contentId
-            }
+                contentId,
+            },
         });
 
         var expected = new
@@ -1400,11 +1400,11 @@ public class GraphQLQueriesTests : GraphQLTestBase
                     {
                         new
                         {
-                            id = contentRefId
-                        }
-                    }
-                }
-            }
+                            id = contentRefId,
+                        },
+                    },
+                },
+            },
         };
 
         AssertResult(expected, actual);
@@ -1451,8 +1451,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                contentId
-            }
+                contentId,
+            },
         });
 
         var expected = new
@@ -1469,12 +1469,12 @@ public class GraphQLQueriesTests : GraphQLTestBase
                         {
                             new
                             {
-                                id = contentRefId
-                            }
-                        }
-                    }
-                }
-            }
+                                id = contentRefId,
+                            },
+                        },
+                    },
+                },
+            },
         };
 
         AssertResult(expected, actual);
@@ -1532,8 +1532,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                contentId
-            }
+                contentId,
+            },
         });
 
         var expected = new
@@ -1556,16 +1556,16 @@ public class GraphQLQueriesTests : GraphQLTestBase
                                     {
                                         reference1Field = new
                                         {
-                                            iv = "reference1"
-                                        }
+                                            iv = "reference1",
+                                        },
                                     },
-                                    __typename = "MyReference1"
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+                                    __typename = "MyReference1",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         };
 
         AssertResult(expected, actual);
@@ -1616,8 +1616,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                contentId
-            }
+                contentId,
+            },
         });
 
         var expected = new
@@ -1638,14 +1638,14 @@ public class GraphQLQueriesTests : GraphQLTestBase
                                 {
                                     new
                                     {
-                                        id = assetRefId
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+                                        id = assetRefId,
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         };
 
         AssertResult(expected, actual);
@@ -1699,8 +1699,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                contentId
-            }
+                contentId,
+            },
         });
 
         var expected = new
@@ -1721,21 +1721,21 @@ public class GraphQLQueriesTests : GraphQLTestBase
                                     type = "image",
                                     attrs = new
                                     {
-                                        src = $"assets:{assetRefId}"
-                                    }
+                                        src = $"assets:{assetRefId}",
+                                    },
                                 },
                                 assets = new[]
                                 {
                                     new
                                     {
-                                        id = assetRefId
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+                                        id = assetRefId,
+                                    },
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         };
 
         AssertResult(expected, actual);
@@ -1783,8 +1783,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                contentId
-            }
+                contentId,
+            },
         });
 
         var expected = new
@@ -1802,13 +1802,13 @@ public class GraphQLQueriesTests : GraphQLTestBase
                             {
                                 new
                                 {
-                                    id = assetRefId
-                                }
-                            }
-                        }
-                    }
-                }
-            }
+                                    id = assetRefId,
+                                },
+                            },
+                        },
+                    },
+                },
+            },
         };
 
         AssertResult(expected, actual);
@@ -1846,8 +1846,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                contentId
-            }
+                contentId,
+            },
         });
 
         var json = serializer.Serialize(actual);
@@ -1869,7 +1869,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
                       }
                     }
                   }
-                }"
+                }",
         });
 
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(),
@@ -1890,7 +1890,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
                       myNumber
                     }
                   }
-                }"
+                }",
         });
 
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(),
@@ -1913,7 +1913,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
                       }
                     }
                   }
-                }"
+                }",
         });
 
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(),
@@ -1935,7 +1935,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
                     }
                     data__dynamic
                   }
-                }"
+                }",
         });
 
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(), TestSchemas.Default.Id.ToString(),
@@ -1958,7 +1958,7 @@ public class GraphQLQueriesTests : GraphQLTestBase
                       }
                     }
                   }
-                }"
+                }",
         });
 
         A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
@@ -1990,8 +1990,8 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                contentId
-            }
+                contentId,
+            },
         });
 
         var expected = new
@@ -2002,10 +2002,10 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 {
                     createdByUser = new
                     {
-                        id = content.CreatedBy.Identifier
-                    }
-                }
-            }
+                        id = content.CreatedBy.Identifier,
+                    },
+                },
+            },
         };
 
         AssertResult(expected, actual);
@@ -2044,9 +2044,9 @@ public class GraphQLQueriesTests : GraphQLTestBase
                 }",
             Args = new
             {
-                assetId
+                assetId,
             },
-            Permissions = [PermissionIds.AppPii]
+            Permissions = [PermissionIds.AppPii],
         });
 
         var expected = new
@@ -2059,16 +2059,16 @@ public class GraphQLQueriesTests : GraphQLTestBase
                     {
                         id = asset.CreatedBy.Identifier,
                         email = $"{asset.CreatedBy.Identifier}@email.com",
-                        displayName = $"{asset.CreatedBy.Identifier}name"
+                        displayName = $"{asset.CreatedBy.Identifier}name",
                     },
                     lastModifiedByUser = new
                     {
                         id = asset.LastModifiedBy.Identifier,
                         email = $"{asset.LastModifiedBy}",
-                        displayName = asset.LastModifiedBy.Identifier
-                    }
-                }
-            }
+                        displayName = asset.LastModifiedBy.Identifier,
+                    },
+                },
+            },
         };
 
         AssertResult(expected, actual);

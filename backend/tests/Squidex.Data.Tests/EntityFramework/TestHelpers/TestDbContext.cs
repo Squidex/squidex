@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Microsoft.EntityFrameworkCore;
-using Squidex.Data.EntityFramework;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.States;
 using Squidex.Shared;

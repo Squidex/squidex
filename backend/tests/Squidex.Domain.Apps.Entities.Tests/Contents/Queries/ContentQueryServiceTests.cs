@@ -32,9 +32,9 @@ public class ContentQueryServiceTests : GivenContext
         {
             Scripts = new SchemaScripts
             {
-                Query = "<query-script>"
+                Query = "<query-script>",
             },
-            IsPublished = true
+            IsPublished = true,
         };
 
         SetupEnricher();

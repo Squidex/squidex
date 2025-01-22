@@ -40,7 +40,7 @@ public class ContentChangedTriggerHandlerTests : GivenContext
         { TestUtils.CreateEvent<ContentDeleted>(), EnrichedContentEventType.Deleted },
         { TestUtils.CreateEvent<ContentStatusChanged>(x => x.Change = StatusChange.Change), EnrichedContentEventType.StatusChanged },
         { TestUtils.CreateEvent<ContentStatusChanged>(x => x.Change = StatusChange.Published), EnrichedContentEventType.Published },
-        { TestUtils.CreateEvent<ContentStatusChanged>(x => x.Change = StatusChange.Unpublished), EnrichedContentEventType.Unpublished }
+        { TestUtils.CreateEvent<ContentStatusChanged>(x => x.Change = StatusChange.Unpublished), EnrichedContentEventType.Unpublished },
     };
 
     public ContentChangedTriggerHandlerTests()
@@ -129,7 +129,7 @@ public class ContentChangedTriggerHandlerTests : GivenContext
             .Returns(new List<Content>
             {
                 CreateContent() with { SchemaId = schemaMatching },
-                CreateContent() with { SchemaId = schemaNotMatching }
+                CreateContent() with { SchemaId = schemaNotMatching },
             }.ToAsyncEnumerable());
 
         var actual = await sut.CreateSnapshotEventsAsync(ctx, CancellationToken).ToListAsync(CancellationToken);
@@ -151,8 +151,8 @@ public class ContentChangedTriggerHandlerTests : GivenContext
             Schemas = ReadonlyList.Create(
                 new SchemaCondition
                 {
-                    SchemaId = schemaMatching.Id
-                })
+                    SchemaId = schemaMatching.Id,
+                }),
         };
 
         var ctx = Context(trigger);
@@ -161,7 +161,7 @@ public class ContentChangedTriggerHandlerTests : GivenContext
             .Returns(new List<Content>
             {
                 CreateContent() with { SchemaId = schemaMatching },
-                CreateContent() with { SchemaId = schemaMatching }
+                CreateContent() with { SchemaId = schemaMatching },
             }.ToAsyncEnumerable());
 
         var actual = await sut.CreateSnapshotEventsAsync(ctx, CancellationToken).ToListAsync(CancellationToken);
@@ -235,7 +235,7 @@ public class ContentChangedTriggerHandlerTests : GivenContext
             .Returns(new List<Content>
             {
                 new Content { SchemaId = schemaMatching },
-                new Content { SchemaId = schemaMatching }
+                new Content { SchemaId = schemaMatching },
             }.ToAsyncEnumerable());
 
         var actual = await sut.CreateEnrichedEventsAsync(envelope, ctx, CancellationToken).ToListAsync(CancellationToken);
@@ -457,7 +457,7 @@ public class ContentChangedTriggerHandlerTests : GivenContext
     {
         var trigger = new ContentChangedTriggerV2
         {
-            HandleAll = handleAll
+            HandleAll = handleAll,
         };
 
         if (schemaId != null)
@@ -468,8 +468,8 @@ public class ContentChangedTriggerHandlerTests : GivenContext
                     new SchemaCondition
                     {
                         SchemaId = schemaId.Id,
-                        Condition = condition
-                    })
+                        Condition = condition,
+                    }),
             };
         }
 
@@ -510,8 +510,8 @@ public class ContentChangedTriggerHandlerTests : GivenContext
                 new SchemaCondition
                 {
                     SchemaId = schemaId.Id,
-                }
-            }.ToReadonlyList()
+                },
+            }.ToReadonlyList(),
         };
 
         return new RulesContext
@@ -522,9 +522,9 @@ public class ContentChangedTriggerHandlerTests : GivenContext
             IncludeStale = true,
             Rules = new Dictionary<DomainId, Rule>
             {
-                [DomainId.NewGuid()] = CreateRule() with { Trigger = trigger }
+                [DomainId.NewGuid()] = CreateRule() with { Trigger = trigger },
             }.ToReadonlyDictionary(),
-            AllowExtraEvents = allowExtra
+            AllowExtraEvents = allowExtra,
         };
     }
 
@@ -537,7 +537,7 @@ public class ContentChangedTriggerHandlerTests : GivenContext
             AppId = AppId,
             IncludeSkipped = false,
             IncludeStale = false,
-            Rule = CreateRule() with { Trigger = trigger }
+            Rule = CreateRule() with { Trigger = trigger },
         };
     }
 }

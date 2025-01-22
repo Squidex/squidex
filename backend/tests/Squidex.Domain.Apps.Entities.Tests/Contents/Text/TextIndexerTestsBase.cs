@@ -441,7 +441,7 @@ public abstract class TextIndexerTestsBase : GivenContext
     {
         var query = new GeoQuery(SchemaId.Id, field, latitude, longitude, 1000, 1000)
         {
-            SchemaId = default
+            SchemaId = default,
         };
 
         var sut = await GetProcessAsync();
@@ -461,7 +461,7 @@ public abstract class TextIndexerTestsBase : GivenContext
     {
         var query = new TextQuery(text, 1000)
         {
-            RequiredSchemaIds = [SchemaId.Id]
+            RequiredSchemaIds = [SchemaId.Id],
         };
 
         var sut = await GetProcessAsync();
@@ -481,7 +481,7 @@ public abstract class TextIndexerTestsBase : GivenContext
     {
         var query = new TextQuery(text, 1000)
         {
-            PreferredSchemaId = Schema.Id
+            PreferredSchemaId = Schema.Id,
         };
 
         var sut = await GetProcessAsync();

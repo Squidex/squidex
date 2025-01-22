@@ -23,7 +23,7 @@ public class AssetsFieldPropertiesTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Max items must be greater or equal to min items.", "MinItems", "MaxItems")
+                new ValidationError("Max items must be greater or equal to min items.", "MinItems", "MaxItems"),
             });
     }
 
@@ -47,7 +47,7 @@ public class AssetsFieldPropertiesTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Max width must be greater or equal to min width.", "MinWidth", "MaxWidth")
+                new ValidationError("Max width must be greater or equal to min width.", "MinWidth", "MaxWidth"),
             });
     }
 
@@ -71,7 +71,7 @@ public class AssetsFieldPropertiesTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Max height must be greater or equal to min height.", "MinHeight", "MaxHeight")
+                new ValidationError("Max height must be greater or equal to min height.", "MinHeight", "MaxHeight"),
             });
     }
 
@@ -95,7 +95,7 @@ public class AssetsFieldPropertiesTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Max size must be greater than min size.", "MinSize", "MaxSize")
+                new ValidationError("Max size must be greater than min size.", "MinSize", "MaxSize"),
             });
     }
 
@@ -109,7 +109,7 @@ public class AssetsFieldPropertiesTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("If aspect width or aspect height is used both must be defined.", "AspectWidth", "AspectHeight")
+                new ValidationError("If aspect width or aspect height is used both must be defined.", "AspectWidth", "AspectHeight"),
             });
     }
 
@@ -123,7 +123,7 @@ public class AssetsFieldPropertiesTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("If aspect width or aspect height is used both must be defined.", "AspectWidth", "AspectHeight")
+                new ValidationError("If aspect width or aspect height is used both must be defined.", "AspectWidth", "AspectHeight"),
             });
     }
 }

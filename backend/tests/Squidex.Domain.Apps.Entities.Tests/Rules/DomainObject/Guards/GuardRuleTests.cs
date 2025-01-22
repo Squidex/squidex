@@ -32,9 +32,9 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
         {
             Action = new TestAction
             {
-                Url = validUrl
+                Url = validUrl,
             },
-            Trigger = null!
+            Trigger = null!,
         });
 
         await ValidationAssert.ThrowsAsync(() => GuardRule.CanCreate(command, AppProvider),
@@ -48,9 +48,9 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
         {
             Trigger = new ContentChangedTriggerV2
             {
-                Schemas = []
+                Schemas = [],
             },
-            Action = null!
+            Action = null!,
         });
 
         await ValidationAssert.ThrowsAsync(() => GuardRule.CanCreate(command, AppProvider),
@@ -64,12 +64,12 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
         {
             Trigger = new ContentChangedTriggerV2
             {
-                Schemas = []
+                Schemas = [],
             },
             Action = new TestAction
             {
-                Url = validUrl
-            }
+                Url = validUrl,
+            },
         });
 
         await GuardRule.CanCreate(command, AppProvider);
@@ -98,13 +98,13 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
         {
             Trigger = new ContentChangedTriggerV2
             {
-                Schemas = []
+                Schemas = [],
             },
             Action = new TestAction
             {
-                Url = validUrl
+                Url = validUrl,
             },
-            Name = "NewName"
+            Name = "NewName",
         };
 
         await GuardRule.CanUpdate(command, CreateRule(), AppProvider);

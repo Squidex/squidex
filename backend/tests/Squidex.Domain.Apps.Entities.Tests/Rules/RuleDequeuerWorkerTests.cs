@@ -36,7 +36,7 @@ public class RuleDequeuerWorkerTests
             Options.Create(new RulesOptions()),
             log)
         {
-            Clock = clock
+            Clock = clock,
         };
     }
 
@@ -170,7 +170,7 @@ public class RuleDequeuerWorkerTests
             ActionData = actionData,
             ActionName = actionName,
             Created = clock.GetCurrentInstant(),
-            RuleId = DomainId.NewGuid()
+            RuleId = DomainId.NewGuid(),
         };
 
         A.CallTo(() => @event.Id).Returns(id);

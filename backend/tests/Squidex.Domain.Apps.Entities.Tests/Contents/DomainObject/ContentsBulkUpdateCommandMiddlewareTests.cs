@@ -583,9 +583,9 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
             AppId = AppId,
             Jobs =
             [
-                job
+                job,
             ],
-            SchemaId = schemaId
+            SchemaId = schemaId,
         };
     }
 

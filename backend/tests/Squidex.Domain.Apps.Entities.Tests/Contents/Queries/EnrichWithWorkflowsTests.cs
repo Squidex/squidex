@@ -30,7 +30,7 @@ public class EnrichWithWorkflowsTests : GivenContext
 
         var nexts = new[]
         {
-            new StatusInfo(Status.Published, StatusColors.Published)
+            new StatusInfo(Status.Published, StatusColors.Published),
         };
 
         A.CallTo(() => workflow.GetNextAsync(content, content.Status, FrontendContext.UserPrincipal))

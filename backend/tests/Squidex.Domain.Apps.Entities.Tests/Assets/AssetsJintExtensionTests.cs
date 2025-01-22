@@ -49,14 +49,14 @@ public class AssetsJintExtensionTests : GivenContext, IClassFixture<Translations
 
         var extensions = new IJintExtension[]
         {
-            new AssetsJintExtension(serviceProvider)
+            new AssetsJintExtension(serviceProvider),
         };
 
         sut = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
             Options.Create(new JintScriptOptions
             {
                 TimeoutScript = TimeSpan.FromSeconds(2),
-                TimeoutExecution = TimeSpan.FromSeconds(10)
+                TimeoutExecution = TimeSpan.FromSeconds(10),
             }),
             extensions);
     }
@@ -232,7 +232,7 @@ public class AssetsJintExtensionTests : GivenContext, IClassFixture<Translations
             Id = DomainId.NewGuid(),
             FileVersion = 0,
             FileSize = 100,
-            AppId = AppId
+            AppId = AppId,
         };
 
         SetupText(@event.ToRef(), Encode(encoding, "hello+assets"));
@@ -345,7 +345,7 @@ public class AssetsJintExtensionTests : GivenContext, IClassFixture<Translations
             AssetType = AssetType.Image,
             FileVersion = 0,
             FileSize = 100,
-            AppId = AppId
+            AppId = AppId,
         };
 
         SetupBlurHash(@event.ToRef(), "Hash");
@@ -388,7 +388,7 @@ public class AssetsJintExtensionTests : GivenContext, IClassFixture<Translations
                 [KnownMetadataKeys.PixelWidth] = 100,
                 [KnownMetadataKeys.PixelHeight] = 50,
             },
-            AppId = AppId
+            AppId = AppId,
         };
 
         var vars = new ScriptVars
@@ -446,7 +446,7 @@ public class AssetsJintExtensionTests : GivenContext, IClassFixture<Translations
             ["data"] = data,
             ["appId"] = AppId.Id,
             ["appName"] = AppId.Name,
-            ["user"] = user
+            ["user"] = user,
         };
 
         return (vars, assets);
@@ -461,7 +461,7 @@ public class AssetsJintExtensionTests : GivenContext, IClassFixture<Translations
             FileSize = fileSize,
             FileName = $"file{index}.jpg",
             MimeType = "image/jpg",
-            Type = type
+            Type = type,
         };
     }
 

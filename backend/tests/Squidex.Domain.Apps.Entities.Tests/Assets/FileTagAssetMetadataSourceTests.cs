@@ -92,9 +92,9 @@ public class FileTagAssetMetadataSourceTests : GivenContext
             {
                 [KnownMetadataKeys.VideoWidth] = JsonValue.Create(128),
                 [KnownMetadataKeys.VideoHeight] = JsonValue.Create(55),
-                [KnownMetadataKeys.Duration] = JsonValue.Create("00:10:12")
+                [KnownMetadataKeys.Duration] = JsonValue.Create("00:10:12"),
             },
-            Type = AssetType.Video
+            Type = AssetType.Video,
         };
 
         var formatted = sut.Format(source);
@@ -109,9 +109,9 @@ public class FileTagAssetMetadataSourceTests : GivenContext
         {
             Metadata = new AssetMetadata
             {
-                [KnownMetadataKeys.Duration] = JsonValue.Create("00:10:12")
+                [KnownMetadataKeys.Duration] = JsonValue.Create("00:10:12"),
             },
-            Type = AssetType.Audio
+            Type = AssetType.Audio,
         };
 
         var formatted = sut.Format(source);
@@ -124,7 +124,7 @@ public class FileTagAssetMetadataSourceTests : GivenContext
     {
         var source = CreateAsset() with
         {
-            Type = AssetType.Image
+            Type = AssetType.Image,
         };
 
         var formatted = sut.Format(source);
@@ -138,7 +138,7 @@ public class FileTagAssetMetadataSourceTests : GivenContext
 
         return new CreateAsset
         {
-            File = new DelegateAssetFile(file.Name, "mime", file.Length, file.OpenRead)
+            File = new DelegateAssetFile(file.Name, "mime", file.Length, file.OpenRead),
         };
     }
 
@@ -148,7 +148,7 @@ public class FileTagAssetMetadataSourceTests : GivenContext
 
         return new CreateAsset
         {
-            File = new DelegateAssetFile(name, "mime", stream.Length, () => stream)
+            File = new DelegateAssetFile(name, "mime", stream.Length, () => stream),
         };
     }
 }

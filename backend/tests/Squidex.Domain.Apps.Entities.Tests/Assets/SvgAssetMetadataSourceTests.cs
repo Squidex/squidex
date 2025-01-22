@@ -112,9 +112,9 @@ public class SvgAssetMetadataSourceTests : GivenContext
             Metadata = new AssetMetadata
             {
                 [KnownMetadataKeys.SvgWidth] = "128",
-                [KnownMetadataKeys.SvgHeight] = "55"
+                [KnownMetadataKeys.SvgHeight] = "55",
             },
-            MimeType = "image/svg+xml"
+            MimeType = "image/svg+xml",
         };
 
         var formatted = sut.Format(source);
@@ -130,9 +130,9 @@ public class SvgAssetMetadataSourceTests : GivenContext
             Metadata = new AssetMetadata
             {
                 [KnownMetadataKeys.SvgWidth] = 128,
-                [KnownMetadataKeys.SvgHeight] = 55
+                [KnownMetadataKeys.SvgHeight] = 55,
             },
-            MimeType = "image/svg+xml"
+            MimeType = "image/svg+xml",
         };
 
         var formatted = sut.Format(source);
@@ -146,7 +146,7 @@ public class SvgAssetMetadataSourceTests : GivenContext
 
         return new CreateAsset
         {
-            File = new DelegateAssetFile(file.Name, "mime", file.Length, file.OpenRead)
+            File = new DelegateAssetFile(file.Name, "mime", file.Length, file.OpenRead),
         };
     }
 
@@ -156,7 +156,7 @@ public class SvgAssetMetadataSourceTests : GivenContext
 
         return new CreateAsset
         {
-            File = new DelegateAssetFile(name, "mime", stream.Length, () => stream)
+            File = new DelegateAssetFile(name, "mime", stream.Length, () => stream),
         };
     }
 }

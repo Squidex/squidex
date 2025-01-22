@@ -32,7 +32,7 @@ public class ReferencesFluidExtensionTests : GivenContext
         var extensions = new IFluidExtension[]
         {
             new ContentFluidExtension(),
-            new ReferencesFluidExtension(serviceProvider)
+            new ReferencesFluidExtension(serviceProvider),
         };
 
         sut = new FluidTemplateEngine(extensions);
@@ -91,7 +91,7 @@ public class ReferencesFluidExtensionTests : GivenContext
                     .AddField("references",
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Array(referenceId1, referenceId2))),
-            AppId = AppId
+            AppId = AppId,
         };
 
         A.CallTo(() => contentQuery.QueryAsync(A<Context>._, A<Q>.That.HasIds(referenceId1), A<CancellationToken>._))
@@ -102,7 +102,7 @@ public class ReferencesFluidExtensionTests : GivenContext
 
         var vars = new TemplateVars
         {
-            ["event"] = @event
+            ["event"] = @event,
         };
 
         var expected = $@"
@@ -127,7 +127,7 @@ public class ReferencesFluidExtensionTests : GivenContext
                     .AddField("field2",
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Create($"World {index}"))),
-            Id = referenceId
+            Id = referenceId,
         };
     }
 

@@ -1,0 +1,31 @@
+services:
+  migration_postgres:
+    image: postgres
+    environment:
+      - POSTGRES_DB=test
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+    ports:
+      - "54320:5432"
+
+  migration_mysql:
+    image: mysql
+    environment:
+      - MYSQL_DATABASE=test
+      - MYSQL_USER=mysql
+      - MYSQL_PASSWORD=mysql
+      - MYSQL_ROOT_PASSWORD=mysql
+    ports:
+      - "33060:3306"
+    volumes:
+      - mysql:/var/lib/mysql
+
+  migration_sqlserver:
+    image: mcr.microsoft.com/mssql/server:2017-latest
+    environment:
+      - SA_PASSWORD=sqlserver
+      - ACCEPT_EULA=Y
+    ports:
+      - "14330:1433"
+volumes:
+  mysql:

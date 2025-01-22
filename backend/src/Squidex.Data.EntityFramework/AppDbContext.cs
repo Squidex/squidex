@@ -20,7 +20,7 @@ using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
 
-namespace Squidex.Data.EntityFramework;
+namespace Squidex;
 
 public class AppDbContext(DbContextOptions options, IJsonSerializer jsonSerializer) : IdentityDbContext(options)
 {

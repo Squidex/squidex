@@ -48,7 +48,7 @@ public class AppDomainObjectTests : HandlerTestBase<App>
 
         Team = Team with
         {
-            Contributors = Contributors.Empty.Assign(User.Identifier, Role.Owner)
+            Contributors = Contributors.Empty.Assign(User.Identifier, Role.Owner),
         };
 
         A.CallTo(() => userResolver.FindByIdOrEmailAsync(contributorId, CancellationToken))
@@ -71,8 +71,8 @@ public class AppDomainObjectTests : HandlerTestBase<App>
         {
             Settings = new AppSettings
             {
-                HideScheduler = true
-            }
+                HideScheduler = true,
+            },
         };
 
         var serviceProvider =
@@ -140,8 +140,8 @@ public class AppDomainObjectTests : HandlerTestBase<App>
         {
             Settings = new AppSettings
             {
-                HideDateTimeModeButton = true
-            }
+                HideDateTimeModeButton = true,
+            },
         };
 
         await ExecuteCreateAsync();

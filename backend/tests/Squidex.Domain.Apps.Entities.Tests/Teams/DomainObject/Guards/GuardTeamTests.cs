@@ -45,7 +45,7 @@ public class GuardTeamTests : GivenContext, IClassFixture<TranslationsFixture>
             DisplayName = "Squidex",
             Authority = "https://identity.squidex.io",
             ClientId = "clientId",
-            ClientSecret = "clientSecret"
+            ClientSecret = "clientSecret",
         };
     }
 

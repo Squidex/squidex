@@ -225,7 +225,7 @@ public class AssetCommandMiddlewareTests : HandlerTestBase<Asset>
         duplicate = CreateAsset() with
         {
             FileName = fileName,
-            FileSize = fileSize
+            FileSize = fileSize,
         };
 
         A.CallTo(() => assetQuery.FindByHashAsync(ApiContext, A<string>._, fileName, fileSize, CancellationToken))

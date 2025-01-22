@@ -75,7 +75,7 @@ public class GuardAppContributorsTests : GivenContext, IClassFixture<Translation
 
         App = App with
         {
-            Contributors = Contributors.Empty.Assign("1", Role.Owner)
+            Contributors = Contributors.Empty.Assign("1", Role.Owner),
         };
 
         await GuardAppContributors.CanAssign(command, App, users, planWithoutLimit);
@@ -88,7 +88,7 @@ public class GuardAppContributorsTests : GivenContext, IClassFixture<Translation
 
         App = App with
         {
-            Contributors = Contributors.Empty.Assign("1", Role.Owner)
+            Contributors = Contributors.Empty.Assign("1", Role.Owner),
         };
 
         await GuardAppContributors.CanAssign(command, App, users, planWithoutLimit);
@@ -117,7 +117,7 @@ public class GuardAppContributorsTests : GivenContext, IClassFixture<Translation
 
         App = App with
         {
-            Contributors = Contributors.Empty.Assign("1", Role.Owner).Assign("2", Role.Editor)
+            Contributors = Contributors.Empty.Assign("1", Role.Owner).Assign("2", Role.Editor),
         };
 
         await ValidationAssert.ThrowsAsync(() => GuardAppContributors.CanAssign(command, App, users, planWithLimit),
@@ -131,7 +131,7 @@ public class GuardAppContributorsTests : GivenContext, IClassFixture<Translation
 
         App = App with
         {
-            Contributors = Contributors.Empty.Assign("1", Role.Owner).Assign("2", Role.Editor)
+            Contributors = Contributors.Empty.Assign("1", Role.Owner).Assign("2", Role.Editor),
         };
 
         await GuardAppContributors.CanAssign(command, App, users, planWithLimit);
@@ -152,7 +152,7 @@ public class GuardAppContributorsTests : GivenContext, IClassFixture<Translation
 
         App = App with
         {
-            Contributors = Contributors.Empty.Assign("1", Role.Developer)
+            Contributors = Contributors.Empty.Assign("1", Role.Developer),
         };
 
         await GuardAppContributors.CanAssign(command, App, users, planWithoutLimit);
@@ -165,7 +165,7 @@ public class GuardAppContributorsTests : GivenContext, IClassFixture<Translation
 
         App = App with
         {
-            Contributors = Contributors.Empty.Assign("1", Role.Developer).Assign("2", Role.Developer)
+            Contributors = Contributors.Empty.Assign("1", Role.Developer).Assign("2", Role.Developer),
         };
 
         await GuardAppContributors.CanAssign(command, App, users, planWithLimit);
@@ -178,7 +178,7 @@ public class GuardAppContributorsTests : GivenContext, IClassFixture<Translation
 
         App = App with
         {
-            Contributors = Contributors.Empty.Assign("1", Role.Editor).Assign("2", Role.Editor)
+            Contributors = Contributors.Empty.Assign("1", Role.Editor).Assign("2", Role.Editor),
         };
 
         await GuardAppContributors.CanAssign(command, App, users, planWithoutLimit);
@@ -208,7 +208,7 @@ public class GuardAppContributorsTests : GivenContext, IClassFixture<Translation
 
         App = App with
         {
-            Contributors = Contributors.Empty.Assign("1", Role.Owner).Assign("2", Role.Editor)
+            Contributors = Contributors.Empty.Assign("1", Role.Owner).Assign("2", Role.Editor),
         };
 
         ValidationAssert.Throws(() => GuardAppContributors.CanRemove(command, App),
@@ -222,7 +222,7 @@ public class GuardAppContributorsTests : GivenContext, IClassFixture<Translation
 
         App = App with
         {
-            Contributors = Contributors.Empty.Assign("1", Role.Owner).Assign("2", Role.Owner)
+            Contributors = Contributors.Empty.Assign("1", Role.Owner).Assign("2", Role.Owner),
         };
 
         GuardAppContributors.CanRemove(command, App);

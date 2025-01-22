@@ -72,7 +72,7 @@ public class GuardTeamContributorsTests : GivenContext, IClassFixture<Translatio
 
         Team = Team with
         {
-            Contributors = Contributors.Empty.Assign("1", Role.Owner)
+            Contributors = Contributors.Empty.Assign("1", Role.Owner),
         };
 
         await GuardTeamContributors.CanAssign(command, Team, users);
@@ -85,7 +85,7 @@ public class GuardTeamContributorsTests : GivenContext, IClassFixture<Translatio
 
         Team = Team with
         {
-            Contributors = Contributors.Empty.Assign("1", Role.Owner)
+            Contributors = Contributors.Empty.Assign("1", Role.Owner),
         };
 
         await GuardTeamContributors.CanAssign(command, Team, users);
@@ -122,7 +122,7 @@ public class GuardTeamContributorsTests : GivenContext, IClassFixture<Translatio
 
         Team = Team with
         {
-            Contributors = Contributors.Empty.Assign("1", Role.Owner)
+            Contributors = Contributors.Empty.Assign("1", Role.Owner),
         };
 
         await GuardTeamContributors.CanAssign(command, Team, users);
@@ -135,7 +135,7 @@ public class GuardTeamContributorsTests : GivenContext, IClassFixture<Translatio
 
         Team = Team with
         {
-            Contributors = Contributors.Empty.Assign("1", Role.Owner).Assign("2", Role.Owner)
+            Contributors = Contributors.Empty.Assign("1", Role.Owner).Assign("2", Role.Owner),
         };
 
         await GuardTeamContributors.CanAssign(command, Team, users);
@@ -148,7 +148,7 @@ public class GuardTeamContributorsTests : GivenContext, IClassFixture<Translatio
 
         Team = Team with
         {
-            Contributors = Contributors.Empty.Assign("1", Role.Editor).Assign("2", Role.Editor)
+            Contributors = Contributors.Empty.Assign("1", Role.Editor).Assign("2", Role.Editor),
         };
 
         await GuardTeamContributors.CanAssign(command, Team, users);
@@ -178,7 +178,7 @@ public class GuardTeamContributorsTests : GivenContext, IClassFixture<Translatio
 
         Team = Team with
         {
-            Contributors = Contributors.Empty.Assign("1", Role.Owner).Assign("2", Role.Editor)
+            Contributors = Contributors.Empty.Assign("1", Role.Owner).Assign("2", Role.Editor),
         };
 
         ValidationAssert.Throws(() => GuardTeamContributors.CanRemove(command, Team),
@@ -192,7 +192,7 @@ public class GuardTeamContributorsTests : GivenContext, IClassFixture<Translatio
 
         Team = Team with
         {
-            Contributors = Contributors.Empty.Assign("1", Role.Owner).Assign("2", Role.Owner)
+            Contributors = Contributors.Empty.Assign("1", Role.Owner).Assign("2", Role.Owner),
         };
 
         GuardTeamContributors.CanRemove(command, Team);

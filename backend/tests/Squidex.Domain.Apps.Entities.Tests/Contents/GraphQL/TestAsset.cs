@@ -85,7 +85,7 @@ public static class TestAsset
             [
                 "tag1",
                 "tag2",
-            ]
+            ],
         };
 
         return asset;
@@ -103,7 +103,7 @@ public static class TestAsset
             {
                 id = asset.CreatedBy.Identifier,
                 email = "Hidden",
-                displayName = "Hidden"
+                displayName = "Hidden",
             },
             editToken = $"token_{asset.Id}",
             lastModified = asset.LastModified,
@@ -112,7 +112,7 @@ public static class TestAsset
             {
                 id = asset.LastModifiedBy.Identifier,
                 email = "Hidden",
-                displayName = "Hidden"
+                displayName = "Hidden",
             },
             url = $"assets/{asset.AppId.Name}/{asset.Id}",
             thumbnailUrl = $"assets/{asset.AppId.Name}/{asset.Id}?width=100",
@@ -135,9 +135,9 @@ public static class TestAsset
             metadata = new
             {
                 pixelWidth = asset.Metadata.GetInt32(KnownMetadataKeys.PixelWidth),
-                pixelHeight = asset.Metadata.GetInt32(KnownMetadataKeys.PixelHeight)
+                pixelHeight = asset.Metadata.GetInt32(KnownMetadataKeys.PixelHeight),
             },
-            slug = asset.Slug
+            slug = asset.Slug,
         };
     }
 }

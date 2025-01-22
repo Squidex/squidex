@@ -47,7 +47,7 @@ public class RuleEnricherTests : GivenContext
 
         var stats = new Dictionary<DomainId, RuleCounters>
         {
-            [source.Id] = new RuleCounters(42, 17, 12)
+            [source.Id] = new RuleCounters(42, 17, 12),
         };
 
         A.CallTo(() => ruleUsageTracker.GetTotalByAppAsync(AppId.Id, CancellationToken))

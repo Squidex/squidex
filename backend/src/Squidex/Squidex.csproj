@@ -18,6 +18,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\extensions\Squidex.Extensions\Squidex.Extensions.csproj" />
     <ProjectReference Include="..\Migrations\Migrations.csproj" />
+    <ProjectReference Include="..\Squidex.Data.EntityFramework\Squidex.Data.EntityFramework.csproj" />
     <ProjectReference Include="..\Squidex.Data.MongoDb\Squidex.Data.MongoDb.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Apps.Core.Model\Squidex.Domain.Apps.Core.Model.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Apps.Core.Operations\Squidex.Domain.Apps.Core.Operations.csproj" />
@@ -74,11 +75,11 @@
     <PackageReference Include="Squidex.Messaging.All" Version="6.28.0" />
     <PackageReference Include="Squidex.Messaging.Subscriptions" Version="6.28.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
-    <PackageReference Include="YDotNet" Version="0.4.1" />
-    <PackageReference Include="YDotNet.Native" Version="0.4.1" />
-    <PackageReference Include="YDotNet.Server" Version="0.4.1" />
-    <PackageReference Include="YDotNet.Server.Redis" Version="0.4.1" />
-    <PackageReference Include="YDotNet.Server.WebSockets" Version="0.4.1" />
+    <PackageReference Include="YDotNet" Version="0.4.2" />
+    <PackageReference Include="YDotNet.Native" Version="0.4.2" />
+    <PackageReference Include="YDotNet.Server" Version="0.4.2" />
+    <PackageReference Include="YDotNet.Server.Redis" Version="0.4.2" />
+    <PackageReference Include="YDotNet.Server.WebSockets" Version="0.4.2" />
   </ItemGroup>
 
   <PropertyGroup>

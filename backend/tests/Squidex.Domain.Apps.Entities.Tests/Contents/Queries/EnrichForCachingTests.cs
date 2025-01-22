@@ -43,7 +43,7 @@ public class EnrichForCachingTests : GivenContext
             "X-NoResolveLanguages",
             "X-ResolveFlow",
             "X-ResolveUrls",
-            "X-Unpublished"
+            "X-Unpublished",
         ], headers);
     }
 

@@ -48,10 +48,10 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                 {
                     Name = "invalid name",
                     Properties = new StringFieldProperties(),
-                    Partitioning = Partitioning.Invariant.Key
+                    Partitioning = Partitioning.Invariant.Key,
                 },
             ],
-            Name = "new-schema"
+            Name = "new-schema",
         });
 
         ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
@@ -70,10 +70,10 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                 {
                     Name = "field1",
                     Properties = null!,
-                    Partitioning = Partitioning.Invariant.Key
+                    Partitioning = Partitioning.Invariant.Key,
                 },
             ],
-            Name = "new-schema"
+            Name = "new-schema",
         });
 
         ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
@@ -92,10 +92,10 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                 {
                     Name = "field1",
                     Properties = new StringFieldProperties { MinLength = 10, MaxLength = 5 },
-                    Partitioning = Partitioning.Invariant.Key
+                    Partitioning = Partitioning.Invariant.Key,
                 },
             ],
-            Name = "new-schema"
+            Name = "new-schema",
         });
 
         ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
@@ -115,10 +115,10 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                 {
                     Name = "field1",
                     Properties = new StringFieldProperties(),
-                    Partitioning = "INVALID"
+                    Partitioning = "INVALID",
                 },
             ],
-            Name = "new-schema"
+            Name = "new-schema",
         });
 
         ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
@@ -137,16 +137,16 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                 {
                     Name = "field1",
                     Properties = new StringFieldProperties(),
-                    Partitioning = Partitioning.Invariant.Key
+                    Partitioning = Partitioning.Invariant.Key,
                 },
                 new UpsertSchemaField
                 {
                     Name = "field1",
                     Properties = new StringFieldProperties(),
-                    Partitioning = Partitioning.Invariant.Key
+                    Partitioning = Partitioning.Invariant.Key,
                 },
             ],
-            Name = "new-schema"
+            Name = "new-schema",
         });
 
         ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
@@ -171,12 +171,12 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                         new UpsertSchemaNestedField
                         {
                             Name = "invalid name",
-                            Properties = new StringFieldProperties()
+                            Properties = new StringFieldProperties(),
                         },
-                    ]
+                    ],
                 },
             ],
-            Name = "new-schema"
+            Name = "new-schema",
         });
 
         ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
@@ -201,12 +201,12 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                         new UpsertSchemaNestedField
                         {
                             Name = "nested1",
-                            Properties = null!
+                            Properties = null!,
                         },
-                    ]
+                    ],
                 },
             ],
-            Name = "new-schema"
+            Name = "new-schema",
         });
 
         ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
@@ -231,12 +231,12 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                         new UpsertSchemaNestedField
                         {
                             Name = "nested1",
-                            Properties = new ArrayFieldProperties()
+                            Properties = new ArrayFieldProperties(),
                         },
-                    ]
+                    ],
                 },
             ],
-            Name = "new-schema"
+            Name = "new-schema",
         });
 
         ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
@@ -261,12 +261,12 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                         new UpsertSchemaNestedField
                         {
                             Name = "nested1",
-                            Properties = new StringFieldProperties { MinLength = 10, MaxLength = 5 }
+                            Properties = new StringFieldProperties { MinLength = 10, MaxLength = 5 },
                         },
-                    ]
+                    ],
                 },
             ],
-            Name = "new-schema"
+            Name = "new-schema",
         });
 
         ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
@@ -292,17 +292,17 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                         new UpsertSchemaNestedField
                         {
                             Name = "nested1",
-                            Properties = new StringFieldProperties()
+                            Properties = new StringFieldProperties(),
                         },
                         new UpsertSchemaNestedField
                         {
                             Name = "nested1",
-                            Properties = new StringFieldProperties()
+                            Properties = new StringFieldProperties(),
                         },
-                    ]
+                    ],
                 },
             ],
-            Name = "new-schema"
+            Name = "new-schema",
         });
 
         ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
@@ -323,12 +323,12 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                     Properties = new UIFieldProperties(),
                     IsHidden = true,
                     IsDisabled = true,
-                    Partitioning = Partitioning.Invariant.Key
+                    Partitioning = Partitioning.Invariant.Key,
                 },
             ],
             FieldsInLists = FieldNames.Create("data.field1"),
             FieldsInReferences = FieldNames.Create("data.field1"),
-            Name = "new-schema"
+            Name = "new-schema",
         });
 
         ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
@@ -353,18 +353,18 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                 {
                     Name = "field1",
                     Properties = new StringFieldProperties(),
-                    Partitioning = Partitioning.Invariant.Key
+                    Partitioning = Partitioning.Invariant.Key,
                 },
                 new UpsertSchemaField
                 {
                     Name = "field4",
                     Properties = new UIFieldProperties(),
-                    Partitioning = Partitioning.Invariant.Key
+                    Partitioning = Partitioning.Invariant.Key,
                 },
             ],
             FieldsInLists = FieldNames.Create(null!, null!, "data.field3", "data.field1", "data.field1", "data.field4"),
             FieldsInReferences = null,
-            Name = "new-schema"
+            Name = "new-schema",
         });
 
         ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
@@ -391,18 +391,18 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                 {
                     Name = "field1",
                     Properties = new StringFieldProperties(),
-                    Partitioning = Partitioning.Invariant.Key
+                    Partitioning = Partitioning.Invariant.Key,
                 },
                 new UpsertSchemaField
                 {
                     Name = "field4",
                     Properties = new UIFieldProperties(),
-                    Partitioning = Partitioning.Invariant.Key
+                    Partitioning = Partitioning.Invariant.Key,
                 },
             ],
             FieldsInLists = null,
             FieldsInReferences = FieldNames.Create(null!, null!, "data.field3", "data.field1", "data.field1", "data.field4"),
-            Name = "new-schema"
+            Name = "new-schema",
         });
 
         ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
@@ -425,7 +425,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
         {
             FieldsInLists = null,
             FieldsInReferences = FieldNames.Create("id"),
-            Name = "new-schema"
+            Name = "new-schema",
         });
 
         ValidationAssert.Throws(() => GuardSchema.CanCreate(command),
@@ -446,13 +446,13 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                     Properties = new StringFieldProperties(),
                     IsHidden = true,
                     IsDisabled = true,
-                    Partitioning = Partitioning.Invariant.Key
+                    Partitioning = Partitioning.Invariant.Key,
                 },
                 new UpsertSchemaField
                 {
                     Name = "field2",
                     Properties = ValidProperties(),
-                    Partitioning = Partitioning.Invariant.Key
+                    Partitioning = Partitioning.Invariant.Key,
                 },
                 new UpsertSchemaField
                 {
@@ -464,19 +464,19 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
                         new UpsertSchemaNestedField
                         {
                             Name = "nested1",
-                            Properties = ValidProperties()
+                            Properties = ValidProperties(),
                         },
                         new UpsertSchemaNestedField
                         {
                             Name = "nested2",
-                            Properties = ValidProperties()
+                            Properties = ValidProperties(),
                         },
-                    ]
+                    ],
                 },
             ],
             FieldsInLists = FieldNames.Create("data.field1", "id"),
             FieldsInReferences = FieldNames.Create("data.field1"),
-            Name = "new-schema"
+            Name = "new-schema",
         });
 
         GuardSchema.CanCreate(command);
@@ -488,7 +488,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
         var command = new ConfigureUIFields
         {
             FieldsInLists = FieldNames.Create(null!, null!, "data.field3", "data.field1", "data.field1", "data.field4"),
-            FieldsInReferences = null
+            FieldsInReferences = null,
         };
 
         ValidationAssert.Throws(() => GuardSchema.CanConfigureUIFields(command, Schema),
@@ -510,7 +510,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
         var command = new ConfigureUIFields
         {
             FieldsInLists = null,
-            FieldsInReferences = FieldNames.Create(null!, null!, "data.field3", "data.field1", "data.field1", "data.field4")
+            FieldsInReferences = FieldNames.Create(null!, null!, "data.field3", "data.field1", "data.field1", "data.field4"),
         };
 
         ValidationAssert.Throws(() => GuardSchema.CanConfigureUIFields(command, Schema),
@@ -532,7 +532,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
         var command = new ConfigureUIFields
         {
             FieldsInLists = null,
-            FieldsInReferences = FieldNames.Create("meta.id")
+            FieldsInReferences = FieldNames.Create("meta.id"),
         };
 
         ValidationAssert.Throws(() => GuardSchema.CanConfigureUIFields(command, Schema),
@@ -546,7 +546,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
         var command = new ConfigureUIFields
         {
             FieldsInLists = FieldNames.Create("data.field1", "id"),
-            FieldsInReferences = FieldNames.Create("data.field2")
+            FieldsInReferences = FieldNames.Create("data.field2"),
         };
 
         GuardSchema.CanConfigureUIFields(command, Schema);
@@ -560,8 +560,8 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
             FieldRules =
             [
                 new FieldRuleCommand { Field = "field", Action = (FieldRuleAction)5 },
-                new FieldRuleCommand()
-            ]
+                new FieldRuleCommand(),
+            ],
         };
 
         ValidationAssert.Throws(() => GuardSchema.CanConfigureFieldRules(command),
@@ -579,8 +579,8 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
             FieldRules =
             [
                 new FieldRuleCommand { Field = "field1", Action = FieldRuleAction.Disable, Condition = "a == b" },
-                new FieldRuleCommand { Field = "field2" }
-            ]
+                new FieldRuleCommand { Field = "field2" },
+            ],
         };
 
         GuardSchema.CanConfigureFieldRules(command);
@@ -591,7 +591,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = new ConfigureFieldRules
         {
-            FieldRules = null
+            FieldRules = null,
         };
 
         GuardSchema.CanConfigureFieldRules(command);

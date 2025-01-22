@@ -24,6 +24,10 @@ public static class EventSourcingServices
             {
                 services.AddSquidexMongoEventStore(config);
             },
+            ["Sql"] = () =>
+            {
+                services.AddSquidexEntityFrameworkEventStore(config);
+            },
             ["GetEventStore"] = () =>
             {
                 var configuration = config.GetRequiredValue("eventStore:getEventStore:configuration");

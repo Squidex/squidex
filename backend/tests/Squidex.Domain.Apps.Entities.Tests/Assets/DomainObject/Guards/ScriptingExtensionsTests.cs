@@ -76,8 +76,8 @@ public class ScriptingExtensionsTests : GivenContext
         {
             AssetScripts = new AssetScripts
             {
-                Annotate = script
-            }
+                Annotate = script,
+            },
         };
 
         var serviceProvider =
@@ -95,7 +95,7 @@ public class ScriptingExtensionsTests : GivenContext
         {
             App = App,
             CommandId = asset.Id,
-            Command = command
+            Command = command,
         };
     }
 }

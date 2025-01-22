@@ -120,8 +120,8 @@ public class ScriptAssetTests : GivenContext
             AssetScripts = new AssetScripts
             {
                 Query = query,
-                QueryPre = queryPre
-            }
+                QueryPre = queryPre,
+            },
         };
     }
 

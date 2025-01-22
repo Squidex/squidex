@@ -34,7 +34,7 @@ public class AppProviderExtensionsTests : GivenContext
         Schema = Schema
             .AddComponent(1, "1", Partitioning.Invariant, new ComponentFieldProperties
             {
-                SchemaId = SchemaId.Id
+                SchemaId = SchemaId.Id,
             });
 
         var components = await AppProvider.GetComponentsAsync(Schema, ct: CancellationToken);
@@ -54,7 +54,7 @@ public class AppProviderExtensionsTests : GivenContext
         Schema = Schema
             .AddComponent(1, "1", Partitioning.Invariant, new ComponentFieldProperties
             {
-                SchemaId = componentId1.Id
+                SchemaId = componentId1.Id,
             });
 
         A.CallTo(() => AppProvider.GetSchemaAsync(AppId.Id, componentId1.Id, false, CancellationToken))
@@ -74,7 +74,7 @@ public class AppProviderExtensionsTests : GivenContext
         Schema = Schema
             .AddComponents(1, "1", Partitioning.Invariant, new ComponentsFieldProperties
             {
-                SchemaId = componentId1.Id
+                SchemaId = componentId1.Id,
             });
 
         A.CallTo(() => AppProvider.GetSchemaAsync(AppId.Id, componentId1.Id, false, CancellationToken))
@@ -95,7 +95,7 @@ public class AppProviderExtensionsTests : GivenContext
             .AddArray(1, "1", Partitioning.Invariant, a => a
                 .AddComponent(2, "2", new ComponentFieldProperties
                 {
-                    SchemaId = componentId1.Id
+                    SchemaId = componentId1.Id,
                 }));
 
         A.CallTo(() => AppProvider.GetSchemaAsync(AppId.Id, componentId1.Id, false, CancellationToken))
@@ -113,13 +113,13 @@ public class AppProviderExtensionsTests : GivenContext
         var component = new Schema { Id = componentId1.Id, Name = componentId1.Name }
             .AddComponent(1, "1", Partitioning.Invariant, new ComponentFieldProperties
             {
-                SchemaId = componentId1.Id
+                SchemaId = componentId1.Id,
             });
 
         Schema = Schema
             .AddComponent(1, "1", Partitioning.Invariant, new ComponentFieldProperties
             {
-                SchemaId = componentId1.Id
+                SchemaId = componentId1.Id,
             });
 
         A.CallTo(() => AppProvider.GetSchemaAsync(AppId.Id, componentId1.Id, false, CancellationToken))
@@ -137,13 +137,13 @@ public class AppProviderExtensionsTests : GivenContext
         var component1 = new Schema { Id = componentId1.Id, Name = componentId1.Name }
             .AddComponent(1, "1", Partitioning.Invariant, new ComponentFieldProperties
             {
-                SchemaId = componentId2.Id
+                SchemaId = componentId2.Id,
             });
 
         var component2 = new Schema { Id = componentId2.Id, Name = componentId2.Name }
             .AddComponent(1, "1", Partitioning.Invariant, new ComponentFieldProperties
             {
-                SchemaId = componentId1.Id
+                SchemaId = componentId1.Id,
             });
 
         A.CallTo(() => AppProvider.GetSchemaAsync(AppId.Id, componentId1.Id, false, CancellationToken))
@@ -155,7 +155,7 @@ public class AppProviderExtensionsTests : GivenContext
         Schema = Schema
             .AddComponent(1, "1", Partitioning.Invariant, new ComponentFieldProperties
             {
-                SchemaId = componentId1.Id
+                SchemaId = componentId1.Id,
             });
 
         var components = await AppProvider.GetComponentsAsync(Schema, ct: CancellationToken);

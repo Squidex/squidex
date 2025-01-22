@@ -30,7 +30,7 @@ public class DynamicContentWorkflowTests : GivenContext
                 new WorkflowStep(
                     new Dictionary<Status, WorkflowTransition>
                     {
-                        [Status.Draft] = WorkflowTransition.Always
+                        [Status.Draft] = WorkflowTransition.Always,
                     }.ToReadonlyDictionary(),
                     StatusColors.Archived, NoUpdate.Always, Validate: true),
             [Status.Draft] =
@@ -38,7 +38,7 @@ public class DynamicContentWorkflowTests : GivenContext
                     new Dictionary<Status, WorkflowTransition>
                     {
                         [Status.Archived] = WorkflowTransition.Always,
-                        [Status.Published] = WorkflowTransition.When("data.field.iv === 2", Role.Editor)
+                        [Status.Published] = WorkflowTransition.When("data.field.iv === 2", Role.Editor),
                     }.ToReadonlyDictionary(),
                     StatusColors.Draft),
             [Status.Published] =
@@ -46,9 +46,9 @@ public class DynamicContentWorkflowTests : GivenContext
                     new Dictionary<Status, WorkflowTransition>
                     {
                         [Status.Archived] = WorkflowTransition.Always,
-                        [Status.Draft] = WorkflowTransition.Always
+                        [Status.Draft] = WorkflowTransition.Always,
                     }.ToReadonlyDictionary(),
-                    StatusColors.Published, NoUpdate.When("data.field.iv === 2", Role.Owner, Role.Editor))
+                    StatusColors.Published, NoUpdate.When("data.field.iv === 2", Role.Owner, Role.Editor)),
         }.ToReadonlyDictionary());
 
     public DynamicContentWorkflowTests()
@@ -61,29 +61,29 @@ public class DynamicContentWorkflowTests : GivenContext
                     new WorkflowStep(
                         new Dictionary<Status, WorkflowTransition>
                         {
-                            [Status.Published] = WorkflowTransition.Always
+                            [Status.Published] = WorkflowTransition.Always,
                         }.ToReadonlyDictionary(),
                         StatusColors.Draft),
                 [Status.Published] =
                     new WorkflowStep(
                         new Dictionary<Status, WorkflowTransition>
                         {
-                            [Status.Draft] = WorkflowTransition.Always
+                            [Status.Draft] = WorkflowTransition.Always,
                         }.ToReadonlyDictionary(),
-                        StatusColors.Published)
+                        StatusColors.Published),
             }.ToReadonlyDictionary(),
             ReadonlyList.Create(simpleSchemaId));
 
         App = App with
         {
-            Workflows = Workflows.Empty.Set(workflow).Set(DomainId.NewGuid(), simpleWorkflow)
+            Workflows = Workflows.Empty.Set(workflow).Set(DomainId.NewGuid(), simpleWorkflow),
         };
 
         var scriptEngine = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
             Options.Create(new JintScriptOptions
             {
                 TimeoutScript = TimeSpan.FromSeconds(2),
-                TimeoutExecution = TimeSpan.FromSeconds(10)
+                TimeoutExecution = TimeSpan.FromSeconds(10),
             }));
 
         sut = new DynamicContentWorkflow(scriptEngine, AppProvider);
@@ -260,7 +260,7 @@ public class DynamicContentWorkflowTests : GivenContext
 
         var expected = new[]
         {
-            new StatusInfo(Status.Archived, StatusColors.Archived)
+            new StatusInfo(Status.Archived, StatusColors.Archived),
         };
 
         var actual = await sut.GetNextAsync(content, content.Status, Mocks.FrontendUser(Role.Developer));
@@ -275,7 +275,7 @@ public class DynamicContentWorkflowTests : GivenContext
 
         var expected = new[]
         {
-            new StatusInfo(Status.Archived, StatusColors.Archived)
+            new StatusInfo(Status.Archived, StatusColors.Archived),
         };
 
         var actual = await sut.GetNextAsync(content, content.Status, Mocks.FrontendUser(Role.Editor));
@@ -291,7 +291,7 @@ public class DynamicContentWorkflowTests : GivenContext
         var expected = new[]
         {
             new StatusInfo(Status.Archived, StatusColors.Archived),
-            new StatusInfo(Status.Published, StatusColors.Published)
+            new StatusInfo(Status.Published, StatusColors.Published),
         };
 
         var actual = await sut.GetNextAsync(content, content.Status, Mocks.FrontendUser(Role.Editor));
@@ -306,7 +306,7 @@ public class DynamicContentWorkflowTests : GivenContext
 
         var expected = new[]
         {
-            new StatusInfo(Status.Draft, StatusColors.Draft)
+            new StatusInfo(Status.Draft, StatusColors.Draft),
         };
 
         var actual = await sut.GetNextAsync(content, content.Status, null!);
@@ -322,7 +322,7 @@ public class DynamicContentWorkflowTests : GivenContext
         var expected = new[]
         {
             new StatusInfo(Status.Archived, StatusColors.Archived),
-            new StatusInfo(Status.Draft, StatusColors.Draft)
+            new StatusInfo(Status.Draft, StatusColors.Draft),
         };
 
         var actual = await sut.GetNextAsync(content, content.Status, null!);
@@ -337,7 +337,7 @@ public class DynamicContentWorkflowTests : GivenContext
         {
             new StatusInfo(Status.Archived, StatusColors.Archived),
             new StatusInfo(Status.Draft, StatusColors.Draft),
-            new StatusInfo(Status.Published, StatusColors.Published)
+            new StatusInfo(Status.Published, StatusColors.Published),
         };
 
         var actual = await sut.GetAllAsync(Schema);
@@ -351,7 +351,7 @@ public class DynamicContentWorkflowTests : GivenContext
         var expected = new[]
         {
             new StatusInfo(Status.Draft, StatusColors.Draft),
-            new StatusInfo(Status.Published, StatusColors.Published)
+            new StatusInfo(Status.Published, StatusColors.Published),
         };
 
         var actual = await sut.GetAllAsync(Schema.WithId(simpleSchemaId, "simple-schema"));
@@ -364,14 +364,14 @@ public class DynamicContentWorkflowTests : GivenContext
     {
         App = App with
         {
-            Workflows = Workflows.Empty
+            Workflows = Workflows.Empty,
         };
 
         var expected = new[]
         {
             new StatusInfo(Status.Archived, StatusColors.Archived),
             new StatusInfo(Status.Draft, StatusColors.Draft),
-            new StatusInfo(Status.Published, StatusColors.Published)
+            new StatusInfo(Status.Published, StatusColors.Published),
         };
 
         var actual = await sut.GetAllAsync(Schema);
@@ -392,7 +392,7 @@ public class DynamicContentWorkflowTests : GivenContext
     {
         var schema = Schema with
         {
-            Properties = new SchemaProperties { ValidateOnPublish = false }
+            Properties = new SchemaProperties { ValidateOnPublish = false },
         };
 
         var actual = await sut.ShouldValidateAsync(schema, Status.Published);
@@ -405,7 +405,7 @@ public class DynamicContentWorkflowTests : GivenContext
     {
         var schema = Schema with
         {
-            Properties = new SchemaProperties { ValidateOnPublish = true }
+            Properties = new SchemaProperties { ValidateOnPublish = true },
         };
 
         var actual = await sut.ShouldValidateAsync(schema, Status.Published);
@@ -429,7 +429,7 @@ public class DynamicContentWorkflowTests : GivenContext
         {
             content = content with
             {
-                SchemaId = NamedId.Of(simpleSchemaId, "my-simple-schema")
+                SchemaId = NamedId.Of(simpleSchemaId, "my-simple-schema"),
             };
         }
 
@@ -440,7 +440,7 @@ public class DynamicContentWorkflowTests : GivenContext
                 new ContentData()
                     .AddField("field",
                         new ContentFieldData()
-                            .AddInvariant(value))
+                            .AddInvariant(value)),
         };
 
         return content;

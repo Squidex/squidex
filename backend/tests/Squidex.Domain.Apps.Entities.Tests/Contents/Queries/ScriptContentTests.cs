@@ -42,7 +42,7 @@ public class ScriptContentTests : GivenContext
     {
         Schema = Schema.SetScripts(new SchemaScripts
         {
-            Query = "my-query"
+            Query = "my-query",
         });
 
         var content = CreateContent();
@@ -58,7 +58,7 @@ public class ScriptContentTests : GivenContext
     {
         Schema = Schema.SetScripts(new SchemaScripts
         {
-            Query = "my-query"
+            Query = "my-query",
         });
 
         var content = CreateContent();
@@ -74,7 +74,7 @@ public class ScriptContentTests : GivenContext
     {
         Schema = Schema.SetScripts(new SchemaScripts
         {
-            Query = "my-query"
+            Query = "my-query",
         });
 
         var contentBefore = CreateContent();
@@ -145,7 +145,7 @@ public class ScriptContentTests : GivenContext
             Query = @"
                     ctx.data.test = { iv: ctx.custom };
                     replace()",
-            QueryPre = "ctx.custom = 123;"
+            QueryPre = "ctx.custom = 123;",
         });
 
         var content = CreateContent();
@@ -155,7 +155,7 @@ public class ScriptContentTests : GivenContext
                 Options.Create(new JintScriptOptions
                 {
                     TimeoutScript = TimeSpan.FromSeconds(20),
-                    TimeoutExecution = TimeSpan.FromSeconds(100)
+                    TimeoutExecution = TimeSpan.FromSeconds(100),
                 }));
 
         var sut2 = new ScriptContent(realScriptEngine);

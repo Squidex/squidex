@@ -21,14 +21,14 @@ public class CounterJintExtensionTests : GivenContext
     {
         var extensions = new IJintExtension[]
         {
-            new CounterJintExtension(counterService)
+            new CounterJintExtension(counterService),
         };
 
         sut = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
             Options.Create(new JintScriptOptions
             {
                 TimeoutScript = TimeSpan.FromSeconds(2),
-                TimeoutExecution = TimeSpan.FromSeconds(10)
+                TimeoutExecution = TimeSpan.FromSeconds(10),
             }), extensions);
     }
 
@@ -44,7 +44,7 @@ public class CounterJintExtensionTests : GivenContext
 
         var vars = new ScriptVars
         {
-            ["appId"] = AppId.Id
+            ["appId"] = AppId.Id,
         };
 
         var actual = sut.Execute(vars, script).ToString();
@@ -66,7 +66,7 @@ public class CounterJintExtensionTests : GivenContext
 
         var vars = new ScriptVars
         {
-            ["appId"] = AppId.Id
+            ["appId"] = AppId.Id,
         };
 
         var actual = (await sut.ExecuteAsync(vars, script, ct: CancellationToken)).ToString();
@@ -86,7 +86,7 @@ public class CounterJintExtensionTests : GivenContext
 
         var vars = new ScriptVars
         {
-            ["appId"] = AppId.Id
+            ["appId"] = AppId.Id,
         };
 
         var actual = sut.Execute(vars, script).ToString();
@@ -108,7 +108,7 @@ public class CounterJintExtensionTests : GivenContext
 
         var vars = new ScriptVars
         {
-            ["appId"] = AppId.Id
+            ["appId"] = AppId.Id,
         };
 
         var actual = (await sut.ExecuteAsync(vars, script, ct: CancellationToken)).ToString();

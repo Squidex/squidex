@@ -160,9 +160,9 @@ public class ImageAssetMetadataSourceTests : GivenContext
             Metadata = new AssetMetadata
             {
                 [KnownMetadataKeys.PixelWidth] = 128,
-                [KnownMetadataKeys.PixelHeight] = 55
+                [KnownMetadataKeys.PixelHeight] = 55,
             },
-            Type = AssetType.Image
+            Type = AssetType.Image,
         };
 
         var formatted = sut.Format(source);
@@ -175,7 +175,7 @@ public class ImageAssetMetadataSourceTests : GivenContext
     {
         var source = CreateAsset() with
         {
-            Type = AssetType.Video
+            Type = AssetType.Video,
         };
 
         var formatted = sut.Format(source);
@@ -188,7 +188,7 @@ public class ImageAssetMetadataSourceTests : GivenContext
     {
         var source = CreateAsset() with
         {
-            Type = AssetType.Audio
+            Type = AssetType.Audio,
         };
 
         var formatted = sut.Format(source);

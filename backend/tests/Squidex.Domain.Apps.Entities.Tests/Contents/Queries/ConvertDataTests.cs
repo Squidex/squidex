@@ -64,7 +64,7 @@ public class ConvertDataTests : GivenContext
 
         var content = CreateContent() with
         {
-            Data = source
+            Data = source,
         };
 
         var expected =
@@ -97,7 +97,7 @@ public class ConvertDataTests : GivenContext
 
         var content = CreateContent() with
         {
-            Data = source
+            Data = source,
         };
 
         var expected =
@@ -136,7 +136,7 @@ public class ConvertDataTests : GivenContext
 
         var content = CreateContent() with
         {
-            Data = source
+            Data = source,
         };
 
         var expected =

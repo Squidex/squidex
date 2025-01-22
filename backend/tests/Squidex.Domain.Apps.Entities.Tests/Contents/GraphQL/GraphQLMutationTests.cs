@@ -39,7 +39,7 @@ public class GraphQLMutationTests : GraphQLTestBase
                   createMySchemaContent(data: { }) {
                     id
                   }
-                }"
+                }",
         });
 
         var expected = new
@@ -54,27 +54,27 @@ public class GraphQLMutationTests : GraphQLTestBase
                         new
                         {
                             line = 3,
-                            column = 19
-                        }
+                            column = 19,
+                        },
                     },
                     path = new[]
                     {
-                        "createMySchemaContent"
+                        "createMySchemaContent",
                     },
                     extensions = new
                     {
                         code = "DOMAIN_FORBIDDEN",
                         codes = new[]
                         {
-                            "DOMAIN_FORBIDDEN"
-                        }
-                    }
-                }
+                            "DOMAIN_FORBIDDEN",
+                        },
+                    },
+                },
             },
             data = new
             {
-                createMySchemaContent = (object?)null
-            }
+                createMySchemaContent = (object?)null,
+            },
         };
 
         AssertResult(expected, actual);
@@ -98,21 +98,21 @@ public class GraphQLMutationTests : GraphQLTestBase
                 }",
             Args = new
             {
-                fields = TestContent.AllFields
+                fields = TestContent.AllFields,
             },
             Variables = new
             {
                 data = TestContent.Input(content),
             },
-            Permissions = [PermissionIds.AppContentsCreate]
+            Permissions = [PermissionIds.AppContentsCreate],
         });
 
         var expected = new
         {
             data = new
             {
-                createMySchemaContent = TestContent.Response(content)
-            }
+                createMySchemaContent = TestContent.Response(content),
+            },
         };
 
         AssertResult(expected, actual);
@@ -146,17 +146,17 @@ public class GraphQLMutationTests : GraphQLTestBase
                 }",
             Args = new
             {
-                fields = TestContent.AllFields
+                fields = TestContent.AllFields,
             },
             Variables = new
             {
                 location = new
                 {
                     latitude = 42,
-                    longitude = 13
-                }
+                    longitude = 13,
+                },
             },
-            Permissions = [PermissionIds.AppContentsCreate]
+            Permissions = [PermissionIds.AppContentsCreate],
         });
 
         var expected = new
@@ -166,8 +166,8 @@ public class GraphQLMutationTests : GraphQLTestBase
                 createMySchemaContent = new
                 {
                     id = content.Id,
-                }
-            }
+                },
+            },
         };
 
         AssertResult(expected, actual);
@@ -196,21 +196,21 @@ public class GraphQLMutationTests : GraphQLTestBase
             Args = new
             {
                 contentId,
-                fields = TestContent.AllFields
+                fields = TestContent.AllFields,
             },
             Variables = new
             {
-                data = TestContent.Input(content)
+                data = TestContent.Input(content),
             },
-            Permissions = [PermissionIds.AppContentsCreate]
+            Permissions = [PermissionIds.AppContentsCreate],
         });
 
         var expected = new
         {
             data = new
             {
-                createMySchemaContent = TestContent.Response(content)
-            }
+                createMySchemaContent = TestContent.Response(content),
+            },
         };
 
         AssertResult(expected, actual);
@@ -239,8 +239,8 @@ public class GraphQLMutationTests : GraphQLTestBase
                 }",
             Args = new
             {
-                contentId
-            }
+                contentId,
+            },
         });
 
         var expected = new
@@ -255,27 +255,27 @@ public class GraphQLMutationTests : GraphQLTestBase
                         new
                         {
                             line = 3,
-                            column = 19
-                        }
+                            column = 19,
+                        },
                     },
                     path = new[]
                     {
-                        "updateMySchemaContent"
+                        "updateMySchemaContent",
                     },
                     extensions = new
                     {
                         code = "DOMAIN_FORBIDDEN",
                         codes = new[]
                         {
-                            "DOMAIN_FORBIDDEN"
-                        }
-                    }
-                }
+                            "DOMAIN_FORBIDDEN",
+                        },
+                    },
+                },
             },
             data = new
             {
-                updateMySchemaContent = (object?)null
-            }
+                updateMySchemaContent = (object?)null,
+            },
         };
 
         AssertResult(expected, actual);
@@ -300,21 +300,21 @@ public class GraphQLMutationTests : GraphQLTestBase
             Args = new
             {
                 contentId,
-                fields = TestContent.AllFields
+                fields = TestContent.AllFields,
             },
             Variables = new
             {
-                data = TestContent.Input(content)
+                data = TestContent.Input(content),
             },
-            Permissions = [PermissionIds.AppContentsUpdateOwn]
+            Permissions = [PermissionIds.AppContentsUpdateOwn],
         });
 
         var expected = new
         {
             data = new
             {
-                updateMySchemaContent = TestContent.Response(content)
-            }
+                updateMySchemaContent = TestContent.Response(content),
+            },
         };
 
         AssertResult(expected, actual);
@@ -339,7 +339,7 @@ public class GraphQLMutationTests : GraphQLTestBase
                   upsertMySchemaContent(id: '{contentId}', data: { }) {
                     id
                   }
-                }"
+                }",
         });
 
         var expected = new
@@ -354,27 +354,27 @@ public class GraphQLMutationTests : GraphQLTestBase
                         new
                         {
                             line = 3,
-                            column = 19
-                        }
+                            column = 19,
+                        },
                     },
                     path = new[]
                     {
-                        "upsertMySchemaContent"
+                        "upsertMySchemaContent",
                     },
                     extensions = new
                     {
                         code = "DOMAIN_FORBIDDEN",
                         codes = new[]
                         {
-                            "DOMAIN_FORBIDDEN"
-                        }
-                    }
-                }
+                            "DOMAIN_FORBIDDEN",
+                        },
+                    },
+                },
             },
             data = new
             {
-                upsertMySchemaContent = (object?)null
-            }
+                upsertMySchemaContent = (object?)null,
+            },
         };
 
         AssertResult(expected, actual);
@@ -399,21 +399,21 @@ public class GraphQLMutationTests : GraphQLTestBase
             Args = new
             {
                 contentId,
-                fields = TestContent.AllFields
+                fields = TestContent.AllFields,
             },
             Variables = new
             {
-                data = TestContent.Input(content)
+                data = TestContent.Input(content),
             },
-            Permissions = [PermissionIds.AppContentsUpsert]
+            Permissions = [PermissionIds.AppContentsUpsert],
         });
 
         var expected = new
         {
             data = new
             {
-                upsertMySchemaContent = TestContent.Response(content)
-            }
+                upsertMySchemaContent = TestContent.Response(content),
+            },
         };
 
         AssertResult(expected, actual);
@@ -442,7 +442,7 @@ public class GraphQLMutationTests : GraphQLTestBase
                 }",
             Args = new
             {
-                contentId
+                contentId,
             },
         });
 
@@ -458,27 +458,27 @@ public class GraphQLMutationTests : GraphQLTestBase
                         new
                         {
                             line = 3,
-                            column = 19
-                        }
+                            column = 19,
+                        },
                     },
                     path = new[]
                     {
-                        "patchMySchemaContent"
+                        "patchMySchemaContent",
                     },
                     extensions = new
                     {
                         code = "DOMAIN_FORBIDDEN",
                         codes = new[]
                         {
-                            "DOMAIN_FORBIDDEN"
-                        }
-                    }
-                }
+                            "DOMAIN_FORBIDDEN",
+                        },
+                    },
+                },
             },
             data = new
             {
-                patchMySchemaContent = (object?)null
-            }
+                patchMySchemaContent = (object?)null,
+            },
         };
 
         AssertResult(expected, actual);
@@ -503,21 +503,21 @@ public class GraphQLMutationTests : GraphQLTestBase
             Args = new
             {
                 contentId,
-                fields = TestContent.AllFields
+                fields = TestContent.AllFields,
             },
             Variables = new
             {
-                data = TestContent.Input(content)
+                data = TestContent.Input(content),
             },
-            Permissions = [PermissionIds.AppContentsUpdateOwn]
+            Permissions = [PermissionIds.AppContentsUpdateOwn],
         });
 
         var expected = new
         {
             data = new
             {
-                patchMySchemaContent = TestContent.Response(content)
-            }
+                patchMySchemaContent = TestContent.Response(content),
+            },
         };
 
         AssertResult(expected, actual);
@@ -545,7 +545,7 @@ public class GraphQLMutationTests : GraphQLTestBase
                 }",
             Args = new
             {
-                contentId
+                contentId,
             },
         });
 
@@ -561,27 +561,27 @@ public class GraphQLMutationTests : GraphQLTestBase
                         new
                         {
                             line = 3,
-                            column = 19
-                        }
+                            column = 19,
+                        },
                     },
                     path = new[]
                     {
-                        "changeMySchemaContent"
+                        "changeMySchemaContent",
                     },
                     extensions = new
                     {
                         code = "DOMAIN_FORBIDDEN",
                         codes = new[]
                         {
-                            "DOMAIN_FORBIDDEN"
-                        }
-                    }
-                }
+                            "DOMAIN_FORBIDDEN",
+                        },
+                    },
+                },
             },
             data = new
             {
-                changeMySchemaContent = (object?)null
-            }
+                changeMySchemaContent = (object?)null,
+            },
         };
 
         AssertResult(expected, actual);
@@ -608,17 +608,17 @@ public class GraphQLMutationTests : GraphQLTestBase
             Args = new
             {
                 contentId,
-                fields = TestContent.AllFields
+                fields = TestContent.AllFields,
             },
-            Permissions = [PermissionIds.AppContentsChangeStatusOwn]
+            Permissions = [PermissionIds.AppContentsChangeStatusOwn],
         });
 
         var expected = new
         {
             data = new
             {
-                changeMySchemaContent = TestContent.Response(content)
-            }
+                changeMySchemaContent = TestContent.Response(content),
+            },
         };
 
         AssertResult(expected, actual);
@@ -650,17 +650,17 @@ public class GraphQLMutationTests : GraphQLTestBase
             Args = new
             {
                 contentId,
-                fields = TestContent.AllFields
+                fields = TestContent.AllFields,
             },
-            Permissions = [PermissionIds.AppContentsChangeStatusOwn]
+            Permissions = [PermissionIds.AppContentsChangeStatusOwn],
         });
 
         var expected = new
         {
             data = new
             {
-                changeMySchemaContent = TestContent.Response(content)
-            }
+                changeMySchemaContent = TestContent.Response(content),
+            },
         };
 
         AssertResult(expected, actual);
@@ -692,17 +692,17 @@ public class GraphQLMutationTests : GraphQLTestBase
             Args = new
             {
                 contentId,
-                fields = TestContent.AllFields
+                fields = TestContent.AllFields,
             },
-            Permissions = [PermissionIds.AppContentsChangeStatusOwn]
+            Permissions = [PermissionIds.AppContentsChangeStatusOwn],
         });
 
         var expected = new
         {
             data = new
             {
-                changeMySchemaContent = TestContent.Response(content)
-            }
+                changeMySchemaContent = TestContent.Response(content),
+            },
         };
 
         AssertResult(expected, actual);
@@ -731,7 +731,7 @@ public class GraphQLMutationTests : GraphQLTestBase
                 }",
             Args = new
             {
-                contentId
+                contentId,
             },
         });
 
@@ -747,24 +747,24 @@ public class GraphQLMutationTests : GraphQLTestBase
                         new
                         {
                             line = 3,
-                            column = 19
-                        }
+                            column = 19,
+                        },
                     },
                     path = new[]
                     {
-                        "deleteMySchemaContent"
+                        "deleteMySchemaContent",
                     },
                     extensions = new
                     {
                         code = "DOMAIN_FORBIDDEN",
                         codes = new[]
                         {
-                            "DOMAIN_FORBIDDEN"
-                        }
-                    }
-                }
+                            "DOMAIN_FORBIDDEN",
+                        },
+                    },
+                },
             },
-            data = (object?)null
+            data = (object?)null,
         };
 
         AssertResult(expected, actual);
@@ -788,9 +788,9 @@ public class GraphQLMutationTests : GraphQLTestBase
                 }",
             Args = new
             {
-                contentId
+                contentId,
             },
-            Permissions = [PermissionIds.AppContentsDeleteOwn]
+            Permissions = [PermissionIds.AppContentsDeleteOwn],
         });
 
         var expected = new
@@ -799,9 +799,9 @@ public class GraphQLMutationTests : GraphQLTestBase
             {
                 deleteMySchemaContent = new
                 {
-                    version = 1
-                }
-            }
+                    version = 1,
+                },
+            },
         };
 
         AssertResult(expected, actual);

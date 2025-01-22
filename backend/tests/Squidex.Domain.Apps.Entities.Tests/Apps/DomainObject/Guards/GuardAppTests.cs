@@ -37,12 +37,12 @@ public class GuardAppTests : GivenContext, IClassFixture<TranslationsFixture>
 
         App = App with
         {
-            TeamId = default
+            TeamId = default,
         };
 
         Team = Team with
         {
-            Contributors = Contributors.Empty.Assign(User.Identifier, Role.Owner)
+            Contributors = Contributors.Empty.Assign(User.Identifier, Role.Owner),
         };
     }
 
@@ -105,7 +105,7 @@ public class GuardAppTests : GivenContext, IClassFixture<TranslationsFixture>
 
         App = App with
         {
-            Plan = new AssignedPlan(RefToken.User("other"), "premium")
+            Plan = new AssignedPlan(RefToken.User("other"), "premium"),
         };
 
         ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, App, billingPlans),
@@ -119,7 +119,7 @@ public class GuardAppTests : GivenContext, IClassFixture<TranslationsFixture>
 
         App = App with
         {
-            TeamId = Team.Id
+            TeamId = Team.Id,
         };
 
         ValidationAssert.Throws(() => GuardApp.CanChangePlan(command, App, billingPlans),
@@ -133,7 +133,7 @@ public class GuardAppTests : GivenContext, IClassFixture<TranslationsFixture>
 
         App = App with
         {
-            Plan = new AssignedPlan(User, "premium")
+            Plan = new AssignedPlan(User, "premium"),
         };
 
         GuardApp.CanChangePlan(command, App, billingPlans);
@@ -146,7 +146,7 @@ public class GuardAppTests : GivenContext, IClassFixture<TranslationsFixture>
 
         App = App with
         {
-            Plan = new AssignedPlan(User, "premium")
+            Plan = new AssignedPlan(User, "premium"),
         };
 
         GuardApp.CanChangePlan(command, App, billingPlans);
@@ -199,7 +199,7 @@ public class GuardAppTests : GivenContext, IClassFixture<TranslationsFixture>
 
         App = App with
         {
-            Plan = new AssignedPlan(RefToken.User("other"), "premium")
+            Plan = new AssignedPlan(RefToken.User("other"), "premium"),
         };
 
         await ValidationAssert.ThrowsAsync(() => GuardApp.CanTransfer(command, App, AppProvider, default),
@@ -222,8 +222,8 @@ public class GuardAppTests : GivenContext, IClassFixture<TranslationsFixture>
         {
             Settings = new AppSettings
             {
-                Patterns = null!
-            }
+                Patterns = null!,
+            },
         };
 
         ValidationAssert.Throws(() => GuardApp.CanUpdateSettings(command),
@@ -238,8 +238,8 @@ public class GuardAppTests : GivenContext, IClassFixture<TranslationsFixture>
             Settings = new AppSettings
             {
                 Patterns = ReadonlyList.Create(
-                    new Pattern(null!, "[a-z]"))
-            }
+                    new Pattern(null!, "[a-z]")),
+            },
         };
 
         ValidationAssert.Throws(() => GuardApp.CanUpdateSettings(command),
@@ -254,8 +254,8 @@ public class GuardAppTests : GivenContext, IClassFixture<TranslationsFixture>
             Settings = new AppSettings
             {
                 Patterns = ReadonlyList.Create(
-                    new Pattern("name", null!))
-            }
+                    new Pattern("name", null!)),
+            },
         };
 
         ValidationAssert.Throws(() => GuardApp.CanUpdateSettings(command),
@@ -269,8 +269,8 @@ public class GuardAppTests : GivenContext, IClassFixture<TranslationsFixture>
         {
             Settings = new AppSettings
             {
-                Editors = null!
-            }
+                Editors = null!,
+            },
         };
 
         ValidationAssert.Throws(() => GuardApp.CanUpdateSettings(command),
@@ -285,8 +285,8 @@ public class GuardAppTests : GivenContext, IClassFixture<TranslationsFixture>
             Settings = new AppSettings
             {
                 Editors = ReadonlyList.Create(
-                    new Editor(null!, "[a-z]"))
-            }
+                    new Editor(null!, "[a-z]")),
+            },
         };
 
         ValidationAssert.Throws(() => GuardApp.CanUpdateSettings(command),
@@ -301,8 +301,8 @@ public class GuardAppTests : GivenContext, IClassFixture<TranslationsFixture>
             Settings = new AppSettings
             {
                 Editors = ReadonlyList.Create(
-                    new Editor("name", null!))
-            }
+                    new Editor("name", null!)),
+            },
         };
 
         ValidationAssert.Throws(() => GuardApp.CanUpdateSettings(command),
@@ -319,8 +319,8 @@ public class GuardAppTests : GivenContext, IClassFixture<TranslationsFixture>
                 Patterns = ReadonlyList.Create(
                     new Pattern("name", "[a-z]")),
                 Editors = ReadonlyList.Create(
-                    new Editor("name", "url/to/editor"))
-            }
+                    new Editor("name", "url/to/editor")),
+            },
         };
 
         GuardApp.CanUpdateSettings(command);

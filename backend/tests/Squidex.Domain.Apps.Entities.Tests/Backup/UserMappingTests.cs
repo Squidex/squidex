@@ -36,7 +36,7 @@ public class UserMappingTests : GivenContext
         var users = new Dictionary<string, IUser>
         {
             [user1.Id] = user1,
-            [user2.Id] = user2
+            [user2.Id] = user2,
         };
 
         var userResolver = A.Fake<IUserResolver>();
@@ -56,7 +56,7 @@ public class UserMappingTests : GivenContext
         Assert.Equal(new Dictionary<string, string>
         {
             [user1.Id] = user1.Email,
-            [user2.Id] = user2.Email
+            [user2.Id] = user2.Email,
         }, storedUsers);
     }
 

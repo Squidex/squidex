@@ -23,7 +23,7 @@ public class GuardAppWorkflowTests : GivenContext, IClassFixture<TranslationsFix
     {
         App = App with
         {
-            Workflows = Workflows.Empty.Add(workflowId, "name")
+            Workflows = Workflows.Empty.Add(workflowId, "name"),
         };
     }
 
@@ -50,7 +50,7 @@ public class GuardAppWorkflowTests : GivenContext, IClassFixture<TranslationsFix
         var command = new UpdateWorkflow
         {
             Workflow = Workflow.Empty,
-            WorkflowId = DomainId.NewGuid()
+            WorkflowId = DomainId.NewGuid(),
         };
 
         Assert.Throws<DomainObjectNotFoundException>(() => GuardAppWorkflows.CanUpdate(command, App));
@@ -74,9 +74,9 @@ public class GuardAppWorkflowTests : GivenContext, IClassFixture<TranslationsFix
                 default,
                 new Dictionary<Status, WorkflowStep>
                 {
-                    [Status.Published] = new WorkflowStep()
+                    [Status.Published] = new WorkflowStep(),
                 }.ToReadonlyDictionary()),
-            WorkflowId = workflowId
+            WorkflowId = workflowId,
         };
 
         ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command, App),
@@ -92,9 +92,9 @@ public class GuardAppWorkflowTests : GivenContext, IClassFixture<TranslationsFix
                 Status.Published,
                 new Dictionary<Status, WorkflowStep>
                 {
-                    [Status.Published] = new WorkflowStep()
+                    [Status.Published] = new WorkflowStep(),
                 }.ToReadonlyDictionary()),
-            WorkflowId = workflowId
+            WorkflowId = workflowId,
         };
 
         ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command, App),
@@ -110,9 +110,9 @@ public class GuardAppWorkflowTests : GivenContext, IClassFixture<TranslationsFix
                 Status.Draft,
                 new Dictionary<Status, WorkflowStep>
                 {
-                    [Status.Draft] = new WorkflowStep()
+                    [Status.Draft] = new WorkflowStep(),
                 }.ToReadonlyDictionary()),
-            WorkflowId = workflowId
+            WorkflowId = workflowId,
         };
 
         ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command, App),
@@ -129,9 +129,9 @@ public class GuardAppWorkflowTests : GivenContext, IClassFixture<TranslationsFix
                 new Dictionary<Status, WorkflowStep>
                 {
                     [Status.Published] = null!,
-                    [Status.Draft] = new WorkflowStep()
+                    [Status.Draft] = new WorkflowStep(),
                 }.ToReadonlyDictionary()),
-            WorkflowId = workflowId
+            WorkflowId = workflowId,
         };
 
         ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command, App),
@@ -151,11 +151,11 @@ public class GuardAppWorkflowTests : GivenContext, IClassFixture<TranslationsFix
                         new WorkflowStep(
                             new Dictionary<Status, WorkflowTransition>
                             {
-                                [Status.Archived] = WorkflowTransition.Always
+                                [Status.Archived] = WorkflowTransition.Always,
                             }.ToReadonlyDictionary()),
-                    [Status.Draft] = new WorkflowStep()
+                    [Status.Draft] = new WorkflowStep(),
                 }.ToReadonlyDictionary()),
-            WorkflowId = workflowId
+            WorkflowId = workflowId,
         };
 
         ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command, App),
@@ -177,10 +177,10 @@ public class GuardAppWorkflowTests : GivenContext, IClassFixture<TranslationsFix
                         new WorkflowStep(
                             new Dictionary<Status, WorkflowTransition>
                             {
-                                [Status.Draft] = null!
-                            }.ToReadonlyDictionary())
+                                [Status.Draft] = null!,
+                            }.ToReadonlyDictionary()),
                 }.ToReadonlyDictionary()),
-            WorkflowId = workflowId
+            WorkflowId = workflowId,
         };
 
         ValidationAssert.Throws(() => GuardAppWorkflows.CanUpdate(command, App),

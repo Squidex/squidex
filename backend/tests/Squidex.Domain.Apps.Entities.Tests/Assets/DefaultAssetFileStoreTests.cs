@@ -28,13 +28,13 @@ public class DefaultAssetFileStoreTests : GivenContext
         { true, "resize=100", "{appId}/{assetId}_{assetFileVersion}_resize=100" },
         { true, string.Empty, "{appId}/{assetId}_{assetFileVersion}" },
         { false, "resize=100", "{appId}_{assetId}_{assetFileVersion}_resize=100" },
-        { false, string.Empty, "{appId}_{assetId}_{assetFileVersion}" }
+        { false, string.Empty, "{appId}_{assetId}_{assetFileVersion}" },
     };
 
     public static readonly TheoryData<string, string> PathCasesOld = new TheoryData<string, string>
     {
         { "resize=100", "{assetId}_{assetFileVersion}_resize=100" },
-        { string.Empty, "{assetId}_{assetFileVersion}" }
+        { string.Empty, "{assetId}_{assetFileVersion}" },
     };
 
     public DefaultAssetFileStoreTests()

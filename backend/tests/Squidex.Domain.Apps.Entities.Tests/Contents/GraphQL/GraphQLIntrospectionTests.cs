@@ -110,7 +110,7 @@ public class GraphQLIntrospectionTests : GraphQLTestBase
                     }
                   }
                 }",
-            OperationName = "IntrospectionQuery"
+            OperationName = "IntrospectionQuery",
         });
 
         var json = serializer.Serialize(actual);

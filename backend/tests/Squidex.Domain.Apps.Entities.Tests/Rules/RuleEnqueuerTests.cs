@@ -116,7 +116,7 @@ public class RuleEnqueuerTests : GivenContext
             AppId = AppId.Id,
             ActionData = string.Empty,
             ActionName = string.Empty,
-            Created = now
+            Created = now,
         };
 
         RuleEventWrite[]? writes = null;
@@ -147,7 +147,7 @@ public class RuleEnqueuerTests : GivenContext
             AppId = AppId.Id,
             ActionData = string.Empty,
             ActionName = string.Empty,
-            Created = now
+            Created = now,
         };
 
         RuleEventWrite[]? writes = null;
@@ -176,7 +176,7 @@ public class RuleEnqueuerTests : GivenContext
             AppId = AppId.Id,
             ActionData = string.Empty,
             ActionName = string.Empty,
-            Created = now
+            Created = now,
         };
 
         SetupRules(@event, job, default);
@@ -204,7 +204,7 @@ public class RuleEnqueuerTests : GivenContext
             AppId = AppId.Id,
             ActionData = string.Empty,
             ActionName = string.Empty,
-            Created = now
+            Created = now,
         };
 
         SetupRules(@event, job, SkipReason.Failed);
@@ -232,7 +232,7 @@ public class RuleEnqueuerTests : GivenContext
             AppId = AppId.Id,
             ActionData = string.Empty,
             ActionName = string.Empty,
-            Created = now
+            Created = now,
         };
 
         SetupRules(@event, job, default);
@@ -253,7 +253,7 @@ public class RuleEnqueuerTests : GivenContext
             AppId = AppId.Id,
             ActionData = string.Empty,
             ActionName = string.Empty,
-            Created = now
+            Created = now,
         };
 
         SetupRules(@event, job, default);

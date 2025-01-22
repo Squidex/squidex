@@ -29,22 +29,22 @@ public class SchemaCommandsTests
                     IsLocked = true,
                     Properties = new StringFieldProperties
                     {
-                        IsRequired = true
+                        IsRequired = true,
                     },
-                    Partitioning = "language"
+                    Partitioning = "language",
                 },
             ],
-            Category = "myCategory"
+            Category = "myCategory",
         };
 
         var field = Fields.String(1, "myString", Partitioning.Language, new StringFieldProperties
         {
-            IsRequired = true
+            IsRequired = true,
         }) with
         {
             IsDisabled = true,
             IsHidden = true,
-            IsLocked = true
+            IsLocked = true,
         };
 
         var expected = new Schema
@@ -55,7 +55,7 @@ public class SchemaCommandsTests
             FieldsInReferences = FieldNames.Create(),
             Scripts = new SchemaScripts(),
             PreviewUrls = ReadonlyDictionary.Empty<string, string>(),
-            Category = "myCategory"
+            Category = "myCategory",
         };
 
         expected = expected.AddField(field);
@@ -72,7 +72,7 @@ public class SchemaCommandsTests
         {
             Properties = new SchemaProperties
             {
-                Hints = "MyHints"
+                Hints = "MyHints",
             },
             IsPublished = true,
             Fields =
@@ -85,9 +85,9 @@ public class SchemaCommandsTests
                     IsLocked = true,
                     Properties = new StringFieldProperties
                     {
-                        IsRequired = true
+                        IsRequired = true,
                     },
-                    Partitioning = "language"
+                    Partitioning = "language",
                 },
             ],
             FieldsInLists = FieldNames.Create(
@@ -100,23 +100,23 @@ public class SchemaCommandsTests
             ),
             Scripts = new SchemaScripts
             {
-                Change = "change-script"
+                Change = "change-script",
             },
             PreviewUrls = new Dictionary<string, string>
             {
-                ["mobile"] = "http://mobile"
+                ["mobile"] = "http://mobile",
             }.ToReadonlyDictionary(),
-            Category = "myCategory"
+            Category = "myCategory",
         };
 
         var field = Fields.String(1, "myString", Partitioning.Language, new StringFieldProperties
         {
-            IsRequired = true
+            IsRequired = true,
         }) with
         {
             IsDisabled = true,
             IsHidden = true,
-            IsLocked = true
+            IsLocked = true,
         };
 
         var expected = new Schema
@@ -124,7 +124,7 @@ public class SchemaCommandsTests
             Name = "my-schema",
             Properties = new SchemaProperties
             {
-                Hints = "MyHints"
+                Hints = "MyHints",
             },
             IsPublished = true,
             FieldsInLists = FieldNames.Create(
@@ -137,13 +137,13 @@ public class SchemaCommandsTests
             ),
             Scripts = new SchemaScripts
             {
-                Change = "change-script"
+                Change = "change-script",
             },
             PreviewUrls = new Dictionary<string, string>
             {
-                ["mobile"] = "http://mobile"
+                ["mobile"] = "http://mobile",
             }.ToReadonlyDictionary(),
-            Category = "myCategory"
+            Category = "myCategory",
         };
 
         expected = expected.AddField(field);

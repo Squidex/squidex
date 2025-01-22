@@ -29,7 +29,7 @@ public class FileTypeAssetMetadataSourceTests : GivenContext
     {
         var command = new CreateAsset
         {
-            File = new NoopAssetFile("File.DOCX")
+            File = new NoopAssetFile("File.DOCX"),
         };
 
         await sut.EnhanceAsync(command, default);
@@ -42,7 +42,7 @@ public class FileTypeAssetMetadataSourceTests : GivenContext
     {
         var command = new CreateAsset
         {
-            File = new NoopAssetFile("File")
+            File = new NoopAssetFile("File"),
         };
 
         await sut.EnhanceAsync(command, default);

@@ -27,12 +27,12 @@ public class RuleQueryServiceTests : GivenContext
     {
         var original = new List<Rule>
         {
-            new Rule()
+            new Rule(),
         };
 
         var enriched = new List<EnrichedRule>
         {
-            CreateRule()
+            CreateRule(),
         };
 
         A.CallTo(() => rulesIndex.GetRulesAsync(AppId.Id, CancellationToken))
