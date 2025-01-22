@@ -13,7 +13,7 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Rules.DomainObject;
 
-public sealed class RuleCommandMiddlewareTests : HandlerTestBase<Rule>
+public class RuleCommandMiddlewareTests : HandlerTestBase<Rule>
 {
     private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();
     private readonly IRuleEnricher ruleEnricher = A.Fake<IRuleEnricher>();

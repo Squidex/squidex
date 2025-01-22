@@ -8,14 +8,15 @@
 using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Domain.Apps.Entities.Teams.Repositories;
 using Squidex.EntityFramework.TestHelpers;
+using Squidex.Shared;
 
 namespace Squidex.EntityFramework.Domain.Teams;
 
-public class EFTeamRepositoryTests(PostgresFixture fixture) : Shared.TeamRepositoryTests, IClassFixture<PostgresFixture>
+public class EFTeamRepositoryTests(PostgresFixture fixture) : TeamRepositoryTests, IClassFixture<PostgresFixture>
 {
     protected override Task<ITeamRepository> CreateSutAsync()
     {
-        var sut = new EFTeamRepository<TestContext>(fixture.DbContextFactory);
+        var sut = new EFTeamRepository<TestDbContext>(fixture.DbContextFactory);
 
         return Task.FromResult<ITeamRepository>(sut);
     }

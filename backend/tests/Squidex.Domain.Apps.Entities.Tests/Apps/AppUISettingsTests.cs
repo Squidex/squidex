@@ -13,7 +13,7 @@ using Squidex.Infrastructure.TestHelpers;
 
 namespace Squidex.Domain.Apps.Entities.Apps;
 
-public sealed class AppUISettingsTests : GivenContext
+public class AppUISettingsTests : GivenContext
 {
     private readonly TestState<AppUISettings.State> state;
     private readonly string userId = Guid.NewGuid().ToString();

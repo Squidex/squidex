@@ -5,19 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Apps;
-using Squidex.Domain.Apps.Entities.Apps.Repositories;
 using Squidex.EntityFramework.TestHelpers;
+using Squidex.Infrastructure.UsageTracking;
 using Squidex.Shared;
 
-namespace Squidex.EntityFramework.Domain.Apps;
+namespace Squidex.EntityFramework.Infrastructure;
 
-public class EFAppRepositoryTests(PostgresFixture fixture) : AppRepositoryTests, IClassFixture<PostgresFixture>
+public class EFUsageRepositoryTests(PostgresFixture fixture) : UsageRepositoryTests, IClassFixture<PostgresFixture>
 {
-    protected override Task<IAppRepository> CreateSutAsync()
+    protected override Task<IUsageRepository> CreateSutAsync()
     {
-        var sut = new EFAppRepository<TestDbContext>(fixture.DbContextFactory);
+        var sut = new EFUsageRepository<TestDbContext>(fixture.DbContextFactory);
 
-        return Task.FromResult<IAppRepository>(sut);
+        return Task.FromResult<IUsageRepository>(sut);
     }
 }

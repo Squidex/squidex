@@ -11,7 +11,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Users;
 
-public sealed class DefaultXmlRepositoryTests
+public class DefaultXmlRepositoryTests
 {
     private readonly ISnapshotStore<DefaultXmlRepository.State> store = A.Fake<ISnapshotStore<DefaultXmlRepository.State>>();
     private readonly DefaultXmlRepository sut;

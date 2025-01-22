@@ -13,7 +13,7 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Infrastructure.Queries;
 
-public sealed class QueryFromJsonTests
+public class QueryFromJsonTests
 {
     private static readonly (string Name, string Operator, string Output)[] AllOps =
     [

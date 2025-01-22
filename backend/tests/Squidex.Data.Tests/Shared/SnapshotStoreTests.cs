@@ -13,7 +13,7 @@ namespace Squidex.Shared;
 
 public abstract class SnapshotStoreTests
 {
-    protected abstract Task<ISnapshotStore<TestValue>> CreateSutAsync();
+    protected abstract Task<ISnapshotStore<SnapshotValue>> CreateSutAsync();
 
     [Fact]
     public async Task Should_insert_value()
@@ -21,9 +21,9 @@ public abstract class SnapshotStoreTests
         var sut = await CreateSutAsync();
 
         var sourceId = DomainId.NewGuid();
-        var sourceValue = new TestValue { Value = $"{sourceId}" };
+        var sourceValue = new SnapshotValue { Value = $"{sourceId}" };
 
-        await sut.WriteAsync(new SnapshotWriteJob<TestValue>(sourceId, sourceValue, 0));
+        await sut.WriteAsync(new SnapshotWriteJob<SnapshotValue>(sourceId, sourceValue, 0));
 
         var expected = await sut.ReadAsync(sourceId);
 
@@ -36,11 +36,11 @@ public abstract class SnapshotStoreTests
         var sut = await CreateSutAsync();
 
         var sourceId = DomainId.NewGuid();
-        var sourceValue0 = new TestValue { Value = $"{sourceId}_0" };
-        var sourceValue1 = new TestValue { Value = $"{sourceId}_1" };
+        var sourceValue0 = new SnapshotValue { Value = $"{sourceId}_0" };
+        var sourceValue1 = new SnapshotValue { Value = $"{sourceId}_1" };
 
-        await sut.WriteAsync(new SnapshotWriteJob<TestValue>(sourceId, sourceValue0, 0));
-        await sut.WriteAsync(new SnapshotWriteJob<TestValue>(sourceId, sourceValue1, 1));
+        await sut.WriteAsync(new SnapshotWriteJob<SnapshotValue>(sourceId, sourceValue0, 0));
+        await sut.WriteAsync(new SnapshotWriteJob<SnapshotValue>(sourceId, sourceValue1, 1));
 
         var found = await sut.ReadAsync(sourceId);
 
@@ -53,11 +53,11 @@ public abstract class SnapshotStoreTests
         var sut = await CreateSutAsync();
 
         var sourceId = DomainId.NewGuid();
-        var sourceValue0 = new TestValue { Value = $"{sourceId}_0" };
-        var sourceValue1 = new TestValue { Value = $"{sourceId}_1" };
+        var sourceValue0 = new SnapshotValue { Value = $"{sourceId}_0" };
+        var sourceValue1 = new SnapshotValue { Value = $"{sourceId}_1" };
 
-        await sut.WriteAsync(new SnapshotWriteJob<TestValue>(sourceId, sourceValue0, 0));
-        await sut.WriteAsync(new SnapshotWriteJob<TestValue>(sourceId, sourceValue1, 1, 0));
+        await sut.WriteAsync(new SnapshotWriteJob<SnapshotValue>(sourceId, sourceValue0, 0));
+        await sut.WriteAsync(new SnapshotWriteJob<SnapshotValue>(sourceId, sourceValue1, 1, 0));
 
         var found = await sut.ReadAsync(sourceId);
 
@@ -70,9 +70,9 @@ public abstract class SnapshotStoreTests
         var sut = await CreateSutAsync();
 
         var sourceId = DomainId.NewGuid();
-        var sourceValue = new TestValue { Value = $"{sourceId}" };
+        var sourceValue = new SnapshotValue { Value = $"{sourceId}" };
 
-        await sut.WriteAsync(new SnapshotWriteJob<TestValue>(sourceId, sourceValue, 2, 1));
+        await sut.WriteAsync(new SnapshotWriteJob<SnapshotValue>(sourceId, sourceValue, 2, 1));
     }
 
     [Fact]
@@ -81,11 +81,11 @@ public abstract class SnapshotStoreTests
         var sut = await CreateSutAsync();
 
         var sourceId = DomainId.NewGuid();
-        var sourceValue = new TestValue { Value = $"{sourceId}" };
+        var sourceValue = new SnapshotValue { Value = $"{sourceId}" };
 
-        await sut.WriteAsync(new SnapshotWriteJob<TestValue>(sourceId, sourceValue, 42));
+        await sut.WriteAsync(new SnapshotWriteJob<SnapshotValue>(sourceId, sourceValue, 42));
 
-        var ex = await Assert.ThrowsAsync<InconsistentStateException>(() => sut.WriteAsync(new SnapshotWriteJob<TestValue>(sourceId, sourceValue, 2, 1)));
+        var ex = await Assert.ThrowsAsync<InconsistentStateException>(() => sut.WriteAsync(new SnapshotWriteJob<SnapshotValue>(sourceId, sourceValue, 2, 1)));
 
         Assert.Equal(42, ex.VersionCurrent);
     }
@@ -96,9 +96,9 @@ public abstract class SnapshotStoreTests
         var sut = await CreateSutAsync();
 
         var sourceId = DomainId.NewGuid();
-        var sourceValue = new TestValue { Value = $"{sourceId}" };
+        var sourceValue = new SnapshotValue { Value = $"{sourceId}" };
 
-        await sut.WriteAsync(new SnapshotWriteJob<TestValue>(sourceId, sourceValue, 42));
+        await sut.WriteAsync(new SnapshotWriteJob<SnapshotValue>(sourceId, sourceValue, 42));
         await sut.RemoveAsync(sourceId);
 
         var found = await sut.ReadAsync(sourceId);
@@ -112,9 +112,9 @@ public abstract class SnapshotStoreTests
         var sut = await CreateSutAsync();
 
         var sourceId = DomainId.NewGuid();
-        var sourceValue = new TestValue { Value = $"{sourceId}" };
+        var sourceValue = new SnapshotValue { Value = $"{sourceId}" };
 
-        await sut.WriteAsync(new SnapshotWriteJob<TestValue>(sourceId, sourceValue, 42));
+        await sut.WriteAsync(new SnapshotWriteJob<SnapshotValue>(sourceId, sourceValue, 42));
         await sut.ClearAsync();
 
         var found = await sut.ReadAsync(sourceId);
@@ -128,18 +128,18 @@ public abstract class SnapshotStoreTests
         var sut = await CreateSutAsync();
 
         var sourceId1 = DomainId.NewGuid();
-        var sourceValue1 = new TestValue { Value = $"{sourceId1}" };
+        var sourceValue1 = new SnapshotValue { Value = $"{sourceId1}" };
 
         var sourceId2 = DomainId.NewGuid();
-        var sourceValue2 = new TestValue { Value = $"{sourceId2}" };
+        var sourceValue2 = new SnapshotValue { Value = $"{sourceId2}" };
 
-        await sut.WriteAsync(new SnapshotWriteJob<TestValue>(sourceId1, sourceValue1, 41));
-        await sut.WriteAsync(new SnapshotWriteJob<TestValue>(sourceId2, sourceValue2, 42));
+        await sut.WriteAsync(new SnapshotWriteJob<SnapshotValue>(sourceId1, sourceValue1, 41));
+        await sut.WriteAsync(new SnapshotWriteJob<SnapshotValue>(sourceId2, sourceValue2, 42));
 
         var found = await sut.ReadAllAsync().ToListAsync();
 
-        Assert.Contains(new SnapshotResult<TestValue>(sourceId1, sourceValue1, 41), found);
-        Assert.Contains(new SnapshotResult<TestValue>(sourceId2, sourceValue2, 42), found);
+        Assert.Contains(new SnapshotResult<SnapshotValue>(sourceId1, sourceValue1, 41), found);
+        Assert.Contains(new SnapshotResult<SnapshotValue>(sourceId2, sourceValue2, 42), found);
     }
 
     [Fact]
@@ -148,19 +148,19 @@ public abstract class SnapshotStoreTests
         var sut = await CreateSutAsync();
 
         var sourceId1 = DomainId.NewGuid();
-        var sourceValue1 = new TestValue { Value = $"{sourceId1}" };
+        var sourceValue1 = new SnapshotValue { Value = $"{sourceId1}" };
 
         var sourceId2 = DomainId.NewGuid();
-        var sourceValue2 = new TestValue { Value = $"{sourceId2}" };
+        var sourceValue2 = new SnapshotValue { Value = $"{sourceId2}" };
 
         await sut.WriteManyAsync([
-            new SnapshotWriteJob<TestValue>(sourceId1, sourceValue1, 41),
-            new SnapshotWriteJob<TestValue>(sourceId2, sourceValue2, 42),
+            new SnapshotWriteJob<SnapshotValue>(sourceId1, sourceValue1, 41),
+            new SnapshotWriteJob<SnapshotValue>(sourceId2, sourceValue2, 42),
         ]);
 
         var found = await sut.ReadAllAsync().ToListAsync();
 
-        Assert.Contains(new SnapshotResult<TestValue>(sourceId1, sourceValue1, 41), found);
-        Assert.Contains(new SnapshotResult<TestValue>(sourceId2, sourceValue2, 42), found);
+        Assert.Contains(new SnapshotResult<SnapshotValue>(sourceId1, sourceValue1, 41), found);
+        Assert.Contains(new SnapshotResult<SnapshotValue>(sourceId2, sourceValue2, 42), found);
     }
 }

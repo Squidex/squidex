@@ -5,15 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.States;
+using Squidex.Domain.Apps.Entities.Rules;
+using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.MongoDb.TestHelpers;
 using Squidex.Shared;
 
-namespace Squidex.MongoDb.Infrastructure;
+namespace Squidex.MongoDb.Domain.Rules;
 
-public class MongoSnapshotStoreTests(MongoFixture fixture) : SnapshotStoreTests, IClassFixture<MongoFixture>, IAsyncLifetime
+public class MongoRuleRepositoryTests(MongoFixture fixture) : RuleRepositoryTests, IClassFixture<MongoFixture>, IAsyncLifetime
 {
-    private readonly MongoSnapshotStore<SnapshotValue> sut = new MongoSnapshotStore<SnapshotValue>(fixture.Database);
+    private readonly MongoRuleRepository sut = new MongoRuleRepository(fixture.Database);
 
     public async Task InitializeAsync()
     {
@@ -25,8 +26,8 @@ public class MongoSnapshotStoreTests(MongoFixture fixture) : SnapshotStoreTests,
         return Task.CompletedTask;
     }
 
-    protected override Task<ISnapshotStore<SnapshotValue>> CreateSutAsync()
+    protected override Task<IRuleRepository> CreateSutAsync()
     {
-        return Task.FromResult<ISnapshotStore<SnapshotValue>>(sut);
+        return Task.FromResult<IRuleRepository>(sut);
     }
 }

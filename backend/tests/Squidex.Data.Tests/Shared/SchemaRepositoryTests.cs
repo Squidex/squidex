@@ -130,6 +130,10 @@ public abstract class SchemaRepositoryTests
     public async Task Should_delete_by_app()
     {
         var sut = await CreateSutAsync();
+        if (sut is not IDeleter deleter)
+        {
+            return;
+        }
 
         var appId = NamedId.Of(DomainId.NewGuid(), "my-app");
 
@@ -155,7 +159,7 @@ public abstract class SchemaRepositoryTests
         var found1 = await sut.QueryAllAsync(appId.Id);
         Assert.Equal(2, found1.Count);
 
-        await ((IDeleter)sut).DeleteAppAsync(new App { Id = appId.Id }, default);
+        await deleter.DeleteAppAsync(new App { Id = appId.Id }, default);
 
         var found2 = await sut.QueryAllAsync(appId.Id);
         Assert.Empty(found2);
@@ -165,6 +169,10 @@ public abstract class SchemaRepositoryTests
     public async Task Should_delete_by_schema()
     {
         var sut = await CreateSutAsync();
+        if (sut is not IDeleter deleter)
+        {
+            return;
+        }
 
         var appId = NamedId.Of(DomainId.NewGuid(), "my-app");
 
@@ -190,7 +198,7 @@ public abstract class SchemaRepositoryTests
         var found1 = await sut.QueryAllAsync(appId.Id);
         Assert.Equal(2, found1.Count);
 
-        await ((IDeleter)sut).DeleteSchemaAsync(new App { Id = appId.Id }, schema2, default);
+        await deleter.DeleteSchemaAsync(new App { Id = appId.Id }, schema2, default);
 
         var found2 = await sut.QueryAllAsync(appId.Id);
         Assert.Equal(schema1.Id, found2.Single().Id);

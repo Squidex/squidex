@@ -9,7 +9,7 @@ using Microsoft.Extensions.Options;
 
 namespace Squidex.Infrastructure;
 
-public sealed class LanguagesInitializerTests
+public class LanguagesInitializerTests
 {
     [Fact]
     public async Task Should_add_custom_languages()

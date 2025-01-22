@@ -5,11 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure;
+namespace Squidex.Infrastructure;
 
-namespace Squidex.Shared;
-
-public record TestValue
+[AttributeUsage(AttributeTargets.Property)]
+public sealed class JsonAttribute : Attribute
 {
-    public string Value { get; set; }
 }

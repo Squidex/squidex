@@ -11,7 +11,6 @@ using Microsoft.EntityFrameworkCore.Query;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Schemas.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;

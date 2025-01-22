@@ -16,7 +16,7 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards;
 
-public sealed class ScriptingExtensionsTests : GivenContext
+public class ScriptingExtensionsTests : GivenContext
 {
     [Fact]
     public async Task Should_add_tag_in_script()

@@ -5,10 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Query;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Teams;
-using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Teams.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
@@ -68,5 +69,15 @@ public sealed class EFTeamRepository<TContext>(IDbContextFactory<TContext> dbCon
 
             return entity?.Document;
         }
+    }
+
+    protected override Expression<Func<SetPropertyCalls<EFTeamEntity>, SetPropertyCalls<EFTeamEntity>>> BuildUpdate(EFTeamEntity entity)
+    {
+        return u => u
+            .SetProperty(x => x.Document, entity.Document)
+            .SetProperty(x => x.IndexedAuthDomain, entity.IndexedAuthDomain)
+            .SetProperty(x => x.IndexedDeleted, entity.IndexedDeleted)
+            .SetProperty(x => x.IndexedUserIds, entity.IndexedUserIds)
+            .SetProperty(x => x.Version, entity.Version);
     }
 }

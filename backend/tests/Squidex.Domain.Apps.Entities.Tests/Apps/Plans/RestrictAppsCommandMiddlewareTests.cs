@@ -17,7 +17,7 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Plans;
 
-public sealed class RestrictAppsCommandMiddlewareTests : GivenContext
+public class RestrictAppsCommandMiddlewareTests : GivenContext
 {
     private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
     private readonly ICommandBus commandBus = A.Fake<ICommandBus>();

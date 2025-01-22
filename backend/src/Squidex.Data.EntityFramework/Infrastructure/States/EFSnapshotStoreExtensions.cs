@@ -13,6 +13,12 @@ namespace Squidex.Infrastructure.States;
 
 public static class EFSnapshotStoreExtensions
 {
+    public static ModelBuilder AddSnapshot<T>(this ModelBuilder modelBuilder, IJsonSerializer jsonSerializer, Action<EntityTypeBuilder<EFState<T>>>? builder = null)
+        where T : class
+    {
+        return modelBuilder.AddSnapshot<T, EFState<T>>(jsonSerializer, builder);
+    }
+
     public static ModelBuilder AddSnapshot<T, TEntity>(this ModelBuilder modelBuilder, IJsonSerializer jsonSerializer, Action<EntityTypeBuilder<TEntity>>? builder = null)
         where TEntity : EFState<T> where T : class
     {
@@ -23,6 +29,7 @@ public static class EFSnapshotStoreExtensions
 
         modelBuilder.Entity<TEntity>(b =>
         {
+            b.ToTable(tableName);
             b.Property(x => x.Document).HasJsonValueConversion(jsonSerializer);
 
             builder?.Invoke(b);

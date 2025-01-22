@@ -6,13 +6,14 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations.Schema;
-using Squidex.Domain.Apps.Core.Schemas;
+using MongoDB.Bson.Serialization.Attributes;
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 
-namespace Squidex.Domain.Apps.Entities.Schemas;
+namespace Squidex.Domain.Apps.Entities.Rules;
 
-public sealed class EFSchemaEntity : EFState<Schema>
+public sealed class EFRuleEntity : EFState<Rule>
 {
     [Column("AppId")]
     public DomainId IndexedAppId { get; set; }
@@ -20,10 +21,8 @@ public sealed class EFSchemaEntity : EFState<Schema>
     [Column("Id")]
     public DomainId IndexedId { get; set; }
 
-    [Column("Name")]
-    public string IndexedName { get; set; }
-
-    [Column("Deleted")]
+    [BsonRequired]
+    [BsonElement("_dl")]
     public bool IndexedDeleted { get; set; }
 
     public override void Prepare()
@@ -31,6 +30,5 @@ public sealed class EFSchemaEntity : EFState<Schema>
         IndexedAppId = Document.AppId.Id;
         IndexedDeleted = Document.IsDeleted;
         IndexedId = Document.Id;
-        IndexedName = Document.Name;
     }
 }

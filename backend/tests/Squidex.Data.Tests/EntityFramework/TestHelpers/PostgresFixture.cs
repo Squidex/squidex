@@ -25,7 +25,7 @@ public sealed class PostgresFixture : IAsyncLifetime
 
     private IServiceProvider services;
 
-    public IDbContextFactory<TestContext> DbContextFactory => services.GetRequiredService<IDbContextFactory<TestContext>>();
+    public IDbContextFactory<TestDbContext> DbContextFactory => services.GetRequiredService<IDbContextFactory<TestDbContext>>();
 
     public async Task InitializeAsync()
     {
@@ -33,14 +33,14 @@ public sealed class PostgresFixture : IAsyncLifetime
 
         services =
             new ServiceCollection()
-                 .AddDbContextFactory<TestContext>(b =>
+                 .AddDbContextFactory<TestDbContext>(b =>
                  {
                      b.UseNpgsql(postgreSql.GetConnectionString());
                  })
                  .AddSingleton(TestUtils.DefaultSerializer)
                  .BuildServiceProvider();
 
-        var factory = services.GetRequiredService<IDbContextFactory<TestContext>>();
+        var factory = services.GetRequiredService<IDbContextFactory<TestDbContext>>();
         var context = await factory.CreateDbContextAsync();
         var creator = (RelationalDatabaseCreator)context.Database.GetService<IDatabaseCreator>();
 

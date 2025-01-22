@@ -11,12 +11,12 @@ using Squidex.Shared;
 
 namespace Squidex.EntityFramework.Infrastructure;
 
-public class EFSnapshotStoreTests(PostgresFixture fixture) : Shared.SnapshotStoreTests, IClassFixture<PostgresFixture>
+public class EFSnapshotStoreTests(PostgresFixture fixture) : SnapshotStoreTests, IClassFixture<PostgresFixture>
 {
-    protected override Task<ISnapshotStore<TestValue>> CreateSutAsync()
+    protected override Task<ISnapshotStore<SnapshotValue>> CreateSutAsync()
     {
-        var sut = new EFSnapshotStore<TestContext, TestValue, EFState<TestValue>>(fixture.DbContextFactory);
+        var sut = new EFSnapshotStore<TestDbContext, SnapshotValue, EFState<SnapshotValue>>(fixture.DbContextFactory);
 
-        return Task.FromResult<ISnapshotStore<TestValue>>(sut);
+        return Task.FromResult<ISnapshotStore<SnapshotValue>>(sut);
     }
 }

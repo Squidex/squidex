@@ -8,14 +8,15 @@
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Repositories;
 using Squidex.EntityFramework.TestHelpers;
+using Squidex.Shared;
 
 namespace Squidex.EntityFramework.Domain.Schemas;
 
-public class EFSchemaRepositoryTests(PostgresFixture fixture) : Shared.SchemaRepositoryTests, IClassFixture<PostgresFixture>
+public class EFSchemaRepositoryTests(PostgresFixture fixture) : SchemaRepositoryTests, IClassFixture<PostgresFixture>
 {
     protected override Task<ISchemaRepository> CreateSutAsync()
     {
-        var sut = new EFSchemaRepository<TestContext>(fixture.DbContextFactory);
+        var sut = new EFSchemaRepository<TestDbContext>(fixture.DbContextFactory);
 
         return Task.FromResult<ISchemaRepository>(sut);
     }

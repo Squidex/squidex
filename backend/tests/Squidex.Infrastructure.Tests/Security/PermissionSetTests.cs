@@ -10,7 +10,7 @@ using Squidex.Infrastructure.TestHelpers;
 
 namespace Squidex.Infrastructure.Security;
 
-public sealed class PermissionSetTests
+public class PermissionSetTests
 {
     [Fact]
     public void Should_provide_collection_features()

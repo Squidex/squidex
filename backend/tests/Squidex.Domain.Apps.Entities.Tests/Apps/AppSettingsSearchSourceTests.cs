@@ -12,7 +12,7 @@ using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Apps;
 
-public sealed class AppSettingsSearchSourceTests : GivenContext
+public class AppSettingsSearchSourceTests : GivenContext
 {
     private readonly IUrlGenerator urlGenerator = A.Fake<IUrlGenerator>();
     private readonly AppSettingsSearchSource sut;
