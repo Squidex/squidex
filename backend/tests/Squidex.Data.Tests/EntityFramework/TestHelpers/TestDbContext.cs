@@ -19,6 +19,15 @@ public class TestDbContext(DbContextOptions options, IJsonSerializer jsonSeriali
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.AddSnapshot<SnapshotValue, EFState<SnapshotValue>>(jsonSerializer);
+
+        builder.Entity<TestEntity>().OwnsOne(
+            test => test.Json, property =>
+            {
+                property.ToJson();
+            });
+
+        // builder.Entity<TestEntity>().Property(test => test.Json).HasColumnType("json");
+
         base.OnModelCreating(builder);
     }
 }

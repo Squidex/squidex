@@ -8,7 +8,9 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using MongoDB.Driver;
 using Squidex.AI;
+using Squidex.Infrastructure.Queries;
 using Squidex.Providers.MySql;
 using Squidex.Providers.Postgres;
 using Squidex.Providers.SqlServer;
@@ -24,15 +26,27 @@ public static class ServiceExtensions
         {
             ["MySql"] = () =>
             {
-                services.AddEntityFrameworkEventStore<MySqlDbContext>(config);
+                services.AddSingletonAs<PostgresDialect>()
+                    .As<SqlDialect>();
+
+                services.AddEntityFrameworkEventStore<MySqlDbContext>(config)
+                    .AddMysqlAdapter();
             },
             ["Postgres"] = () =>
             {
-                services.AddEntityFrameworkEventStore<PostgresDbContext>(config);
+                services.AddSingletonAs<PostgresDialect>()
+                    .As<SqlDialect>();
+
+                services.AddEntityFrameworkEventStore<PostgresDbContext>(config)
+                    .AddPostgresAdapter();
             },
             ["SqlServer"] = () =>
             {
-                services.AddEntityFrameworkEventStore<SqlServerDbContext>(config);
+                services.AddSingletonAs<PostgresDialect>()
+                    .As<SqlDialect>();
+
+                services.AddEntityFrameworkEventStore<SqlServerDbContext>(config)
+                    .AddSqlServerAdapter();
             },
         });
     }
@@ -47,6 +61,10 @@ public static class ServiceExtensions
             {
                 services.AddDbContextPool<MySqlDbContext>(builder =>
                 {
+                    builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), mysql =>
+                    {
+                        mysql.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
+                    });
                     builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
                 });
 
