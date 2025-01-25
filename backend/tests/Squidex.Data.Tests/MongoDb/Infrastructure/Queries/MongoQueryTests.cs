@@ -14,7 +14,7 @@ using Squidex.Infrastructure.Queries;
 using Squidex.MongoDb.TestHelpers;
 using ClrFilter = Squidex.Infrastructure.Queries.ClrFilter;
 
-namespace Squidex.MongoDb.Infrastructure;
+namespace Squidex.MongoDb.Infrastructure.Queries;
 
 public class MongoQueryTests
 {

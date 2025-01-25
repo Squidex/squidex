@@ -12,11 +12,14 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
 
@@ -26,7 +29,13 @@ public class AppDbContext(DbContextOptions options, IJsonSerializer jsonSerializ
 {
     public DbSet<EFAppEntity> Apps { get; set; }
 
+    public DbSet<EFCacheEntity> Cache { get; set; }
+
     public DbSet<EFUsageCounterEntity> Counters { get; set; }
+
+    public DbSet<HistoryEvent> History { get; set; }
+
+    public DbSet<EFMigrationEntity> Migrations { get; set; }
 
     public DbSet<EFRuleEntity> Rules { get; set; }
 
@@ -47,19 +56,28 @@ public class AppDbContext(DbContextOptions options, IJsonSerializer jsonSerializ
 
         builder.AddSnapshot<App, EFAppEntity>(jsonSerializer, b =>
         {
-            b.Property(x => x.IndexedTeamId).HasDomainIdConverter();
+            b.Property(x => x.IndexedTeamId).AsString();
         });
 
         builder.AddSnapshot<Rule, EFRuleEntity>(jsonSerializer, b =>
         {
-            b.Property(x => x.IndexedAppId).HasDomainIdConverter();
-            b.Property(x => x.IndexedId).HasDomainIdConverter();
+            b.Property(x => x.IndexedAppId).AsString();
+            b.Property(x => x.IndexedId).AsString();
         });
 
         builder.AddSnapshot<Schema, EFSchemaEntity>(jsonSerializer, b =>
         {
-            b.Property(x => x.IndexedAppId).HasDomainIdConverter();
-            b.Property(x => x.IndexedId).HasDomainIdConverter();
+            b.Property(x => x.IndexedAppId).AsString();
+            b.Property(x => x.IndexedId).AsString();
+        });
+
+        builder.Entity<HistoryEvent>(b =>
+        {
+            b.Property(x => x.Actor).AsRefToken();
+            b.Property(x => x.Id).AsString();
+            b.Property(x => x.OwnerId).AsString();
+            b.Property(x => x.Parameters).AsJsonString(jsonSerializer);
+            b.Property(x => x.Created).AsDateTimeOffset();
         });
 
         base.OnModelCreating(builder);

@@ -11,7 +11,7 @@ namespace Squidex.Domain.Apps.Entities.History.Repositories;
 
 public interface IHistoryEventRepository
 {
-    Task<IReadOnlyList<HistoryEvent>> QueryByChannelAsync(DomainId appId, string channelPrefix, int count,
+    Task<IReadOnlyList<HistoryEvent>> QueryByChannelAsync(DomainId ownerId, string? channel, int count,
         CancellationToken ct = default);
 
     Task InsertManyAsync(IEnumerable<HistoryEvent> historyEvents,

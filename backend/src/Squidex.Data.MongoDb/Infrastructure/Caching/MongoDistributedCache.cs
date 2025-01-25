@@ -10,7 +10,8 @@ using MongoDB.Driver;
 
 namespace Squidex.Infrastructure.Caching;
 
-public sealed class MongoDistributedCache(IMongoDatabase database) : MongoRepositoryBase<MongoCacheEntry>(database), IDistributedCache
+public sealed class MongoDistributedCache(IMongoDatabase database, TimeProvider timeProvider)
+    : MongoRepositoryBase<MongoCacheEntry>(database), IDistributedCache
 {
     protected override string CollectionName()
     {
@@ -65,9 +66,10 @@ public sealed class MongoDistributedCache(IMongoDatabase database) : MongoReposi
     public async Task<byte[]?> GetAsync(string key,
         CancellationToken token = default)
     {
-        var entry = await Collection.Find(x => x.Key == key).FirstOrDefaultAsync(token);
+        var now = timeProvider.GetUtcNow().UtcDateTime;
 
-        if (entry != null && entry.Expires > DateTime.UtcNow)
+        var entry = await Collection.Find(x => x.Key == key).FirstOrDefaultAsync(token);
+        if (entry != null && entry.Expires > now)
         {
             return entry.Value;
         }
@@ -78,7 +80,7 @@ public sealed class MongoDistributedCache(IMongoDatabase database) : MongoReposi
     public Task SetAsync(string key, byte[] value, DistributedCacheEntryOptions options,
         CancellationToken token = default)
     {
-        var expires = DateTime.UtcNow;
+        var expires = timeProvider.GetUtcNow().UtcDateTime;
 
         if (options.AbsoluteExpiration.HasValue)
         {
@@ -91,6 +93,10 @@ public sealed class MongoDistributedCache(IMongoDatabase database) : MongoReposi
         else if (options.SlidingExpiration.HasValue)
         {
             expires += options.SlidingExpiration.Value;
+        }
+        else
+        {
+            expires = DateTime.MaxValue;
         }
 
         return Collection.UpdateOneAsync(x => x.Key == key,

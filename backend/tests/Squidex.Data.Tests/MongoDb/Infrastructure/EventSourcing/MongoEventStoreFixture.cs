@@ -13,7 +13,7 @@ using Squidex.Infrastructure.TestHelpers;
 
 #pragma warning disable MA0048 // File name must match type name
 
-namespace Squidex.MongoDb.Infrastructure;
+namespace Squidex.MongoDb.Infrastructure.EventSourcing;
 
 public sealed class MongoEventStoreFixture_Direct : MongoEventStoreFixture
 {

@@ -15,7 +15,7 @@ using Squidex.Infrastructure.TestHelpers;
 
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 
-namespace Squidex.MongoDb.Infrastructure;
+namespace Squidex.MongoDb.Infrastructure.EventSourcing;
 
 [Trait("Category", "Dependencies")]
 public class MongoEventStoreParallelInsertTests : IClassFixture<MongoEventStoreFixture_Replica>

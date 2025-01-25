@@ -44,9 +44,9 @@ public abstract class HistoryEventsCreatorBase : IHistoryEventsCreator
 
     protected HistoryEvent ForEvent(IEvent @event, string channel)
     {
-        var message = typeRegistry.GetName<IEvent>(@event.GetType());
+        var eventType = typeRegistry.GetName<IEvent>(@event.GetType());
 
-        return new HistoryEvent(channel, message);
+        return new HistoryEvent { Channel = channel, EventType = eventType };
     }
 
     public Task<HistoryEvent?> CreateEventAsync(Envelope<IEvent> @event)

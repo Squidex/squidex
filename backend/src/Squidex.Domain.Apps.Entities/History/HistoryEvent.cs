@@ -28,20 +28,6 @@ public sealed class HistoryEvent
 
     public Dictionary<string, string> Parameters { get; set; } = [];
 
-    public HistoryEvent()
-    {
-    }
-
-    public HistoryEvent(string channel, string eventType)
-    {
-        Guard.NotNullOrEmpty(channel);
-        Guard.NotNullOrEmpty(eventType);
-
-        Channel = channel;
-
-        EventType = eventType;
-    }
-
     public HistoryEvent Param(string key, object? value)
     {
         var formatted = value?.ToString();

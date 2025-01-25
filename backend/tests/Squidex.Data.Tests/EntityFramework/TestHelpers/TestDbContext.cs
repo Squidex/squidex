@@ -10,23 +10,41 @@ using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.States;
 using Squidex.Shared;
 
+#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.EntityFramework.TestHelpers;
 
-#pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
-public class TestDbContext(DbContextOptions options, IJsonSerializer jsonSerializer) : AppDbContext(options, jsonSerializer)
-#pragma warning restore CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
+public class TestDbContextMySql(DbContextOptions options, IJsonSerializer jsonSerializer)
+    : TestDbContextBase(options, jsonSerializer)
+{
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        builder.Entity<TestEntity>()
+            .Property(test => test.Json).HasColumnType("json");
+
+        base.OnModelCreating(builder);
+    }
+}
+
+public class TestDbContext(DbContextOptions options, IJsonSerializer jsonSerializer)
+    : TestDbContextBase(options, jsonSerializer)
+{
+    protected override void OnModelCreating(ModelBuilder builder)
+    {
+        builder.Entity<TestEntity>()
+            .OwnsOne(test => test.Json).ToJson();
+
+        base.OnModelCreating(builder);
+    }
+}
+
+public class TestDbContextBase(DbContextOptions options, IJsonSerializer jsonSerializer)
+    : AppDbContext(options, jsonSerializer)
 {
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.AddSnapshot<SnapshotValue, EFState<SnapshotValue>>(jsonSerializer);
-
-        builder.Entity<TestEntity>().OwnsOne(
-            test => test.Json, property =>
-            {
-                property.ToJson();
-            });
-
-        // builder.Entity<TestEntity>().Property(test => test.Json).HasColumnType("json");
 
         base.OnModelCreating(builder);
     }

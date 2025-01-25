@@ -12,7 +12,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Hosting;
 using Testcontainers.MySql;
-using Testcontainers.PostgreSql;
 
 namespace Squidex.EntityFramework.TestHelpers;
 
@@ -26,7 +25,7 @@ public sealed class MySqlFixture : IAsyncLifetime
 
     private IServiceProvider services;
 
-    public IDbContextFactory<TestDbContext> DbContextFactory => services.GetRequiredService<IDbContextFactory<TestDbContext>>();
+    public IDbContextFactory<TestDbContextMySql> DbContextFactory => services.GetRequiredService<IDbContextFactory<TestDbContextMySql>>();
 
     public async Task InitializeAsync()
     {
@@ -34,7 +33,7 @@ public sealed class MySqlFixture : IAsyncLifetime
 
         services =
             new ServiceCollection()
-                 .AddDbContextFactory<TestDbContext>(b =>
+                 .AddDbContextFactory<TestDbContextMySql>(b =>
                  {
                      b.UseMySql(mysql.GetConnectionString(), ServerVersion.AutoDetect(mysql.GetConnectionString()), mysql =>
                      {
@@ -44,7 +43,7 @@ public sealed class MySqlFixture : IAsyncLifetime
                  .AddSingleton(TestUtils.DefaultSerializer)
                  .BuildServiceProvider();
 
-        var factory = services.GetRequiredService<IDbContextFactory<TestDbContext>>();
+        var factory = services.GetRequiredService<IDbContextFactory<TestDbContextMySql>>();
         var context = await factory.CreateDbContextAsync();
         var creator = (RelationalDatabaseCreator)context.Database.GetService<IDatabaseCreator>();
 

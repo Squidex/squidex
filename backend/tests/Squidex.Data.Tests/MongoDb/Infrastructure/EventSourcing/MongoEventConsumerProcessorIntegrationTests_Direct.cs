@@ -9,7 +9,7 @@
 
 using Squidex.Events;
 
-namespace Squidex.MongoDb.Infrastructure;
+namespace Squidex.MongoDb.Infrastructure.EventSourcing;
 
 [Trait("Category", "Dependencies")]
 public class MongoEventConsumerProcessorIntegrationTests_Direct(MongoEventStoreFixture_Direct fixture) : EventConsumerProcessorIntegrationTests, IClassFixture<MongoEventStoreFixture_Direct>

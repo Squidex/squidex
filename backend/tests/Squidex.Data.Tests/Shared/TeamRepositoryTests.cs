@@ -9,8 +9,6 @@ using NodaTime;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Teams;
-using Squidex.Domain.Apps.Entities;
-using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Domain.Apps.Entities.Teams.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;

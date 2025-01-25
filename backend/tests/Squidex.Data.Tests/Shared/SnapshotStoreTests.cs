@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using LoremNET;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 

@@ -5,15 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Infrastructure.UsageTracking;
+using Squidex.Domain.Apps.Entities.History;
+using Squidex.Domain.Apps.Entities.History.Repositories;
 using Squidex.MongoDb.TestHelpers;
 using Squidex.Shared;
 
-namespace Squidex.MongoDb.Infrastructure;
+namespace Squidex.MongoDb.Domain.History;
 
-public class MongoUsageRepositoryTests(MongoFixture fixture) : UsageRepositoryTests, IClassFixture<MongoFixture>, IAsyncLifetime
+public class MongoHistoryEventRepositoryTests(MongoFixture fixture) : HistoryEventRepositoryTests, IClassFixture<MongoFixture>, IAsyncLifetime
 {
-    private readonly MongoUsageRepository sut = new MongoUsageRepository(fixture.Database);
+    private readonly MongoHistoryEventRepository sut = new MongoHistoryEventRepository(fixture.Database);
 
     public async Task InitializeAsync()
     {
@@ -25,8 +26,8 @@ public class MongoUsageRepositoryTests(MongoFixture fixture) : UsageRepositoryTe
         return Task.CompletedTask;
     }
 
-    protected override Task<IUsageRepository> CreateSutAsync()
+    protected override Task<IHistoryEventRepository> CreateSutAsync()
     {
-        return Task.FromResult<IUsageRepository>(sut);
+        return Task.FromResult<IHistoryEventRepository>(sut);
     }
 }

@@ -11,9 +11,9 @@ using Squidex.Infrastructure.Queries;
 
 namespace Squidex.EntityFramework.Infrastructure.Queries;
 
-public abstract class SqlQueryTests
+public abstract class SqlQueryTests<TContext> where TContext : DbContext
 {
-    protected abstract Task<TestDbContext> CreateDbContextAsync();
+    protected abstract Task<TContext> CreateDbContextAsync();
 
     protected abstract SqlDialect CreateDialect();
 
@@ -25,7 +25,7 @@ public abstract class SqlQueryTests
         }
     }
 
-    private async Task<TestDbContext> CreateAndPrepareDbContextAsync()
+    private async Task<TContext> CreateAndPrepareDbContextAsync()
     {
         var dbContext = await CreateDbContextAsync();
 
@@ -42,14 +42,14 @@ public abstract class SqlQueryTests
                 Boolean = i > 10,
                 Number = i,
                 Nullable = i > 10 ? null : i,
-                Text = $"{i}",
+                Text = $"Prefix{i}Suffix",
                 Json = new TestJson
                 {
                     Boolean = i > 10,
                     Number = i,
                     Nullable = i > 10 ? null : i,
                     Array = [0, i],
-                    Text = $"{i}",
+                    Text = $"Prefix{i}Suffix",
                 },
             });
         }
@@ -63,7 +63,7 @@ public abstract class SqlQueryTests
     {
         var actual = await QueryAsync(new ClrQuery());
 
-        Assert.Equal(CreateExpected(1, 20), actual.Order().ToArray());
+        Assert.Equal(Range(1, 20), actual.Order().ToArray());
     }
 
     [Fact]
@@ -76,7 +76,7 @@ public abstract class SqlQueryTests
             Sort = [new SortNode("Number", SortOrder.Ascending)],
         });
 
-        Assert.Equal(CreateExpected(1, 5), actual);
+        Assert.Equal(Range(1, 5), actual);
     }
 
     [Fact]
@@ -89,7 +89,7 @@ public abstract class SqlQueryTests
             Sort = [new SortNode("Number", SortOrder.Ascending)],
         });
 
-        Assert.Equal(CreateExpected(16, 20), actual);
+        Assert.Equal(Range(16, 20), actual);
     }
 
     [Fact]
@@ -102,29 +102,73 @@ public abstract class SqlQueryTests
             Sort = [new SortNode("Number", SortOrder.Ascending)],
         });
 
-        Assert.Equal(CreateExpected(6, 15), actual);
+        Assert.Equal(Range(6, 15), actual);
     }
 
     [Fact]
-    public async Task Should_query_with_sorting()
+    public async Task Should_query_with_json_text_sorting()
     {
         var actual = await QueryAsync(new ClrQuery
         {
-            Sort = [new SortNode("Number", SortOrder.Descending)],
+            Sort = [new SortNode("Json.Text", SortOrder.Descending)],
         });
 
-        Assert.Equal(CreateExpected(1, 20).OrderDescending().ToArray(), actual);
+        Assert.Equal([.. Range(9, 3), 2, 20, 1, .. Range(19, 10)], actual);
     }
 
     [Fact]
-    public async Task Should_query_with_json_sorting()
+    public async Task Should_query_with_text_sorting()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Sort = [new SortNode("Text", SortOrder.Descending)],
+        });
+
+        Assert.Equal([..Range(9, 3), 2, 20, 1, .. Range(19, 10)], actual);
+    }
+
+    [Fact]
+    public async Task Should_query_with_json_number_sorting()
     {
         var actual = await QueryAsync(new ClrQuery
         {
             Sort = [new SortNode("Json.Number", SortOrder.Descending)],
         });
 
-        Assert.Equal(CreateExpected(1, 20).OrderDescending().ToArray(), actual);
+        Assert.Equal(Range(20, 1), actual);
+    }
+
+    [Fact]
+    public async Task Should_query_with_number_sorting()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Sort = [new SortNode("Number", SortOrder.Descending)],
+        });
+
+        Assert.Equal(Range(20, 1), actual);
+    }
+
+    [Fact]
+    public async Task Should_query_with_boolean_json_sorting()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Sort = [new SortNode("Json.Boolean", SortOrder.Descending), new SortNode("Number", SortOrder.Ascending)],
+        });
+
+        Assert.Equal([.. Range(11, 20), .. Range(1, 10)], actual);
+    }
+
+    [Fact]
+    public async Task Should_query_with_boolean_sorting()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Sort = [new SortNode("Boolean", SortOrder.Descending), new SortNode("Number", SortOrder.Ascending)],
+        });
+
+        Assert.Equal([..Range(11, 20), ..Range(1, 10)], actual);
     }
 
     [Fact]
@@ -146,7 +190,7 @@ public abstract class SqlQueryTests
             Filter = ClrFilter.Not(ClrFilter.Gt("Number", 10)),
         });
 
-        Assert.Equal(CreateExpected(1, 10), actual.Order().ToArray());
+        Assert.Equal(Range(1, 10), actual.Order().ToArray());
     }
 
     [Fact]
@@ -157,7 +201,7 @@ public abstract class SqlQueryTests
             Filter = ClrFilter.Gt("Number", 5),
         });
 
-        Assert.Equal(CreateExpected(6, 20), actual.Order().ToArray());
+        Assert.Equal(Range(6, 20), actual.Order().ToArray());
     }
 
     [Fact]
@@ -168,7 +212,7 @@ public abstract class SqlQueryTests
             Filter = ClrFilter.Eq("Nullable", ClrValue.Null),
         });
 
-        Assert.Equal(CreateExpected(11, 20), actual.Order().ToArray());
+        Assert.Equal(Range(11, 20), actual.Order().ToArray());
     }
 
     [Fact]
@@ -201,7 +245,7 @@ public abstract class SqlQueryTests
             Filter = ClrFilter.Eq("Json.Nullable", ClrValue.Null),
         });
 
-        Assert.Equal(CreateExpected(11, 20), actual.Order().ToArray());
+        Assert.Equal(Range(11, 20), actual.Order().ToArray());
     }
 
     [Fact]
@@ -212,7 +256,7 @@ public abstract class SqlQueryTests
             Filter = ClrFilter.And(ClrFilter.Gt("Json.Number", 5), ClrFilter.Lt("Json.Number", 16)),
         });
 
-        Assert.Equal(CreateExpected(6, 15), actual.Order().ToArray());
+        Assert.Equal(Range(6, 15), actual.Order().ToArray());
     }
 
     [Fact]
@@ -223,7 +267,7 @@ public abstract class SqlQueryTests
             Filter = ClrFilter.And(ClrFilter.Gt("Json.Array.1", 5), ClrFilter.Lt("Json.Array.1", 16)),
         });
 
-        Assert.Equal(CreateExpected(6, 15), actual.Order().ToArray());
+        Assert.Equal(Range(6, 15), actual.Order().ToArray());
     }
 
     [Fact]
@@ -234,7 +278,7 @@ public abstract class SqlQueryTests
             Filter = ClrFilter.Eq("Boolean", true),
         });
 
-        Assert.Equal(CreateExpected(11, 20), actual.Order().ToArray());
+        Assert.Equal(Range(11, 20), actual.Order().ToArray());
     }
 
     [Fact]
@@ -245,7 +289,7 @@ public abstract class SqlQueryTests
             Filter = ClrFilter.Eq("Json.Boolean", true),
         });
 
-        Assert.Equal(CreateExpected(11, 20), actual.Order().ToArray());
+        Assert.Equal(Range(11, 20), actual.Order().ToArray());
     }
 
     [Fact]
@@ -275,7 +319,7 @@ public abstract class SqlQueryTests
     {
         var actual = await QueryAsync(new ClrQuery
         {
-            Filter = ClrFilter.StartsWith("Text", "5"),
+            Filter = ClrFilter.StartsWith("Text", "Prefix5"),
         });
 
         Assert.Equal([5], actual.Order().ToArray());
@@ -286,7 +330,7 @@ public abstract class SqlQueryTests
     {
         var actual = await QueryAsync(new ClrQuery
         {
-            Filter = ClrFilter.StartsWith("Json.Text", "5"),
+            Filter = ClrFilter.StartsWith("Json.Text", "Prefix5"),
         });
 
         Assert.Equal([5], actual.Order().ToArray());
@@ -297,7 +341,7 @@ public abstract class SqlQueryTests
     {
         var actual = await QueryAsync(new ClrQuery
         {
-            Filter = ClrFilter.EndsWith("Text", "5"),
+            Filter = ClrFilter.EndsWith("Text", "5Suffix"),
         });
 
         Assert.Equal([5, 15], actual.Order().ToArray());
@@ -308,15 +352,31 @@ public abstract class SqlQueryTests
     {
         var actual = await QueryAsync(new ClrQuery
         {
-            Filter = ClrFilter.EndsWith("Json.Text", "5"),
+            Filter = ClrFilter.EndsWith("Json.Text", "5Suffix"),
         });
 
         Assert.Equal([5, 15], actual.Order().ToArray());
     }
 
-    private static long[] CreateExpected(int from, int to)
+    private static long[] Range(int from, int to)
     {
-        return Enumerable.Range(from, to - from + 1).Select(x => (long)x).ToArray();
+        var result = new List<long>();
+        if (to >= from)
+        {
+            for (var i = from; i <= to; i++)
+            {
+                result.Add(i);
+            }
+        }
+        else
+        {
+            for (var i = from; i >= to; i--)
+            {
+                result.Add(i);
+            }
+        }
+
+        return result.ToArray();
     }
 
     private async Task<List<long>> QueryAsync(ClrQuery query)

@@ -9,7 +9,7 @@ using Squidex.EntityFramework.TestHelpers;
 using Squidex.Infrastructure.States;
 using Squidex.Shared;
 
-namespace Squidex.EntityFramework.Infrastructure;
+namespace Squidex.EntityFramework.Infrastructure.States;
 
 public class EFSnapshotStoreTests(PostgresFixture fixture) : SnapshotStoreTests, IClassFixture<PostgresFixture>
 {

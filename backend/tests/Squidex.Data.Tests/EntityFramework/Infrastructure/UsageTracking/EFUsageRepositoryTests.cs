@@ -9,7 +9,7 @@ using Squidex.EntityFramework.TestHelpers;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Shared;
 
-namespace Squidex.EntityFramework.Infrastructure;
+namespace Squidex.EntityFramework.Infrastructure.UsageTracking;
 
 public class EFUsageRepositoryTests(PostgresFixture fixture) : UsageRepositoryTests, IClassFixture<PostgresFixture>
 {

@@ -11,9 +11,9 @@ using Squidex.Providers.MySql;
 
 namespace Squidex.EntityFramework.Infrastructure.Queries;
 
-public class MySqlQueryTests(MySqlFixture fixture) : SqlQueryTests, IClassFixture<MySqlFixture>
+public class MySqlQueryTests(MySqlFixture fixture) : SqlQueryTests<TestDbContextMySql>, IClassFixture<MySqlFixture>
 {
-    protected override async Task<TestDbContext> CreateDbContextAsync()
+    protected override async Task<TestDbContextMySql> CreateDbContextAsync()
     {
         var context = await fixture.DbContextFactory.CreateDbContextAsync();
 
