@@ -8,8 +8,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using MongoDB.Driver;
 using Squidex.AI;
+using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Queries;
 using Squidex.Providers.MySql;
 using Squidex.Providers.Postgres;
@@ -93,6 +93,11 @@ public static class ServiceExtensions
 
     private static void AddSquidexEntityFramework<TContext>(this IServiceCollection services, IConfiguration config) where TContext : AppDbContext
     {
+        services.AddSingletonAs<DatabaseMigrator<TContext>>();
+
+        services.AddHealthChecks()
+            .AddDbContextCheck<TContext>();
+
         services.AddYDotNet()
             .AddEntityFrameworkStorage<TContext>();
 
