@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using NodaTime;
+
 namespace Squidex.Infrastructure.Log;
 
 public interface IRequestLogStore
@@ -17,6 +19,6 @@ public interface IRequestLogStore
     Task DeleteAsync(string key,
         CancellationToken ct = default);
 
-    IAsyncEnumerable<Request> QueryAllAsync(string key, DateTime fromDate, DateTime toDate,
+    IAsyncEnumerable<Request> QueryAllAsync(string key, Instant fromTime, Instant toTime,
         CancellationToken ct = default);
 }

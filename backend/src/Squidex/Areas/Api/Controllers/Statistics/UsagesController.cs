@@ -7,6 +7,7 @@
 
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Mvc;
+using NodaTime;
 using Squidex.Areas.Api.Controllers.Statistics.Models;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -72,7 +73,10 @@ public sealed class UsagesController(
 
         return new FileCallbackResult("text/csv", (body, range, ct) =>
         {
-            return usageLog.ReadLogAsync(appId, fileDate.AddDays(-30), fileDate, body, ct);
+            var timeTo = Instant.FromDateTimeUtc(fileDate);
+            var timeFrom = timeTo.Minus(Duration.FromDays(30));
+
+            return usageLog.ReadLogAsync(appId, timeFrom, timeTo, body, ct);
         })
         {
             FileDownloadName = fileName,

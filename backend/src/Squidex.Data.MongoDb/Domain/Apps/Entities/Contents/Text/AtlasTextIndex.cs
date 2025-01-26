@@ -12,7 +12,6 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Apps;
-using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Infrastructure;
 using LuceneQueryAnalyzer = Lucene.Net.QueryParsers.Classic.QueryParser;
 

@@ -8,6 +8,7 @@
 using System.Globalization;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using NodaTime;
 
 namespace Squidex.Infrastructure.Log;
 
@@ -66,13 +67,13 @@ public class BackgroundRequestLogStoreTests
     {
         var key = "my-key";
 
-        var dateFrom = DateTime.Today;
-        var dateTo = dateFrom.AddDays(4);
+        var timeFrom = SystemClock.Instance.GetCurrentInstant();
+        var timeTo = timeFrom.Plus(Duration.FromDays(4));
 
-        A.CallTo(() => requestLogRepository.QueryAllAsync(key, dateFrom, dateTo, ct))
+        A.CallTo(() => requestLogRepository.QueryAllAsync(key, timeFrom, timeTo, ct))
             .Returns(AsyncEnumerable.Repeat(new Request { Key = key }, 1));
 
-        var actuals = await sut.QueryAllAsync(key, dateFrom, dateTo, ct).ToListAsync(ct);
+        var actuals = await sut.QueryAllAsync(key, timeFrom, timeTo, ct).ToListAsync(ct);
 
         Assert.NotEmpty(actuals);
     }
@@ -84,14 +85,14 @@ public class BackgroundRequestLogStoreTests
 
         var key = "my-key";
 
-        var dateFrom = DateTime.Today;
-        var dateTo = dateFrom.AddDays(4);
+        var timeFrom = SystemClock.Instance.GetCurrentInstant();
+        var timeTo = timeFrom.Plus(Duration.FromDays(4));
 
-        var actuals = await sut.QueryAllAsync(key, dateFrom, dateTo, ct).ToListAsync(ct);
+        var actuals = await sut.QueryAllAsync(key, timeFrom, timeTo, ct).ToListAsync(ct);
 
         Assert.Empty(actuals);
 
-        A.CallTo(() => requestLogRepository.QueryAllAsync(key, dateFrom, dateTo, A<CancellationToken>._))
+        A.CallTo(() => requestLogRepository.QueryAllAsync(key, timeFrom, timeTo, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 

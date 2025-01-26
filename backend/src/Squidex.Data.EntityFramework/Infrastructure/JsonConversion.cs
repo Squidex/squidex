@@ -8,7 +8,6 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NodaTime;
-using NodaTime.Extensions;
 using Squidex.Infrastructure.Json;
 
 namespace Squidex.Infrastructure;

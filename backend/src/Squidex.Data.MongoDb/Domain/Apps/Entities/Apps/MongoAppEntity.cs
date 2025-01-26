@@ -5,8 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
 using NodaTime;
+using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
@@ -34,6 +36,20 @@ public sealed class MongoAppEntity : MongoState<App>
     [BsonIgnoreIfDefault]
     [BsonElement("_ct")]
     public Instant IndexedCreated { get; set; }
+
+    public static void RegisterClassMap()
+    {
+        BsonClassMap.TryRegisterClassMap<AppEntity>(cm =>
+        {
+            cm.MapProperty(x => x.AppId)
+                .SetElementName("ai")
+                .SetIsRequired(true);
+
+            cm.MapProperty(x => x.IsDeleted)
+                .SetElementName("dl")
+                .SetIgnoreIfDefault(false);
+        });
+    }
 
     public override void Prepare()
     {

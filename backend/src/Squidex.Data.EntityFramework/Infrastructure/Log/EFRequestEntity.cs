@@ -5,37 +5,34 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization.Attributes;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 using NodaTime;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Infrastructure.Log;
 
-public sealed class MongoRequest
+[Table("Request")]
+[Index(nameof(Key))]
+public sealed class EFRequestEntity
 {
-    [BsonId]
-    [BsonElement("_id")]
-    public ObjectId Id { get; set; }
+    [Key]
+    public int Id { get; set; }
 
-    [BsonRequired]
-    [BsonElement(nameof(Key))]
     public string Key { get; set; }
 
-    [BsonRequired]
-    [BsonElement(nameof(Timestamp))]
     public Instant Timestamp { get; set; }
 
-    [BsonRequired]
-    [BsonElement(nameof(Properties))]
     public Dictionary<string, string> Properties { get; set; }
 
-    public static MongoRequest FromRequest(Request request)
+    public static EFRequestEntity FromRequest(Request request)
     {
-        return new MongoRequest { Key = request.Key, Timestamp = request.Timestamp, Properties = request.Properties };
+        return SimpleMapper.Map(request, new EFRequestEntity());
     }
 
     public Request ToRequest()
     {
-        return new Request { Key = Key, Timestamp = Timestamp, Properties = Properties };
+        return SimpleMapper.Map(this, new Request());
     }
 }

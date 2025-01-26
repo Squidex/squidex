@@ -9,7 +9,7 @@ using MongoDB.Bson.Serialization.Attributes;
 
 namespace Squidex.Infrastructure.Caching;
 
-public sealed class MongoCacheEntry
+public sealed class MongoCacheEntity
 {
     [BsonId]
     [BsonElement("_id")]

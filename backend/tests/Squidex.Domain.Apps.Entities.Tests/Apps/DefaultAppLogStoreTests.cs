@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Globalization;
+using NodaTime;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure.Log;
 
@@ -98,10 +99,10 @@ public class DefaultAppLogStoreTests : GivenContext
     [Fact]
     public async Task Should_write_to_stream()
     {
-        var dateFrom = DateTime.UtcNow.Date.AddDays(-30);
-        var dateTo = DateTime.UtcNow.Date;
+        var timeFrom = SystemClock.Instance.GetCurrentInstant();
+        var timeTo = timeFrom.Plus(Duration.FromDays(4));
 
-        A.CallTo(() => requestLogStore.QueryAllAsync(AppId.Id.ToString(), dateFrom, dateTo, CancellationToken))
+        A.CallTo(() => requestLogStore.QueryAllAsync(AppId.Id.ToString(), timeFrom, timeTo, CancellationToken))
             .Returns(new[]
             {
                 CreateRecord(),
@@ -112,12 +113,10 @@ public class DefaultAppLogStoreTests : GivenContext
 
         var stream = new MemoryStream();
 
-        await sut.ReadLogAsync(AppId.Id, dateFrom, dateTo, stream, CancellationToken);
-
+        await sut.ReadLogAsync(AppId.Id, timeFrom, timeTo, stream, CancellationToken);
         stream.Position = 0;
 
         var lines = 0;
-
         using (var reader = new StreamReader(stream))
         {
             while (await reader.ReadLineAsync(default) != null)

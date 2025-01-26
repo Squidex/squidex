@@ -8,6 +8,7 @@
 using System.Collections.Concurrent;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using NodaTime;
 using Squidex.Infrastructure.Timers;
 
 namespace Squidex.Infrastructure.Log;
@@ -101,7 +102,7 @@ public sealed class BackgroundRequestLogStore : DisposableObjectBase, IRequestLo
         return logRepository.DeleteAsync(key, ct);
     }
 
-    public IAsyncEnumerable<Request> QueryAllAsync(string key, DateTime fromDate, DateTime toDate,
+    public IAsyncEnumerable<Request> QueryAllAsync(string key, Instant fromTime, Instant toTime,
         CancellationToken ct = default)
     {
         if (!IsEnabled)
@@ -109,7 +110,7 @@ public sealed class BackgroundRequestLogStore : DisposableObjectBase, IRequestLo
             return AsyncEnumerable.Empty<Request>();
         }
 
-        return logRepository.QueryAllAsync(key, fromDate, toDate, ct);
+        return logRepository.QueryAllAsync(key, fromTime, toTime, ct);
     }
 
     public Task LogAsync(Request request,

@@ -11,18 +11,18 @@ using MongoDB.Driver;
 namespace Squidex.Infrastructure.Caching;
 
 public sealed class MongoDistributedCache(IMongoDatabase database, TimeProvider timeProvider)
-    : MongoRepositoryBase<MongoCacheEntry>(database), IDistributedCache
+    : MongoRepositoryBase<MongoCacheEntity>(database), IDistributedCache
 {
     protected override string CollectionName()
     {
         return "Cache";
     }
 
-    protected override Task SetupCollectionAsync(IMongoCollection<MongoCacheEntry> collection,
+    protected override Task SetupCollectionAsync(IMongoCollection<MongoCacheEntity> collection,
         CancellationToken ct)
     {
         return Collection.Indexes.CreateOneAsync(
-            new CreateIndexModel<MongoCacheEntry>(
+            new CreateIndexModel<MongoCacheEntity>(
                 Index.Ascending(x => x.Expires),
                 new CreateIndexOptions
                 {

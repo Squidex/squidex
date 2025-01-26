@@ -8,8 +8,8 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using MongoDB.Driver;
-using Squidex.Events.Utils;
 using Squidex.Hosting;
+using Squidex.Infrastructure.Timers;
 
 namespace Squidex.Infrastructure.Caching;
 
@@ -19,7 +19,7 @@ public sealed class EFDistributedCache<TContext>(IDbContextFactory<TContext> dbC
 #pragma warning disable RECS0108 // Warns about static fields in generic types
     private static readonly TimeSpan CleanupTime = TimeSpan.FromMinutes(10);
 #pragma warning restore RECS0108 // Warns about static fields in generic types
-    private CompletionTimer timer;
+    private CompletionTimer? timer;
 
     public Task InitializeAsync(
         CancellationToken ct)
@@ -31,7 +31,7 @@ public sealed class EFDistributedCache<TContext>(IDbContextFactory<TContext> dbC
     public Task ReleaseAsync(
         CancellationToken ct)
     {
-        return timer.StopAsync();
+        return timer?.StopAsync() ?? Task.CompletedTask;
     }
 
     public byte[] Get(string key)

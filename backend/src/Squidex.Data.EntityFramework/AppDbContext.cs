@@ -19,6 +19,7 @@ using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
@@ -32,6 +33,8 @@ public class AppDbContext(DbContextOptions options, IJsonSerializer jsonSerializ
     public DbSet<EFCacheEntity> Cache { get; set; }
 
     public DbSet<EFUsageCounterEntity> Counters { get; set; }
+
+    public DbSet<EFRequestEntity> Log { get; set; }
 
     public DbSet<HistoryEvent> History { get; set; }
 
@@ -78,6 +81,12 @@ public class AppDbContext(DbContextOptions options, IJsonSerializer jsonSerializ
             b.Property(x => x.OwnerId).AsString();
             b.Property(x => x.Parameters).AsJsonString(jsonSerializer);
             b.Property(x => x.Created).AsDateTimeOffset();
+        });
+
+        builder.Entity<EFRequestEntity>(b =>
+        {
+            b.Property(x => x.Timestamp).AsDateTimeOffset();
+            b.Property(x => x.Properties).AsJsonString(jsonSerializer);
         });
 
         base.OnModelCreating(builder);

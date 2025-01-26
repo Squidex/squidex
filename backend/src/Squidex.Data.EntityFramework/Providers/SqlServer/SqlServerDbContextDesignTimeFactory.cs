@@ -9,7 +9,6 @@ using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 using Squidex.Infrastructure.Json.System;
-using Squidex.Providers.Postgres;
 
 namespace Squidex.Providers.SqlServer;
 
