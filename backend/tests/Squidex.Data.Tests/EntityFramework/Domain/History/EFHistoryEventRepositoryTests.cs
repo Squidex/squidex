@@ -12,6 +12,7 @@ using Squidex.Shared;
 
 namespace Squidex.EntityFramework.Domain.History;
 
+[Trait("Category", "TestContainer")]
 public class EFHistoryEventRepositoryTests(PostgresFixture fixture) : HistoryEventRepositoryTests, IClassFixture<PostgresFixture>
 {
     protected override Task<IHistoryEventRepository> CreateSutAsync()

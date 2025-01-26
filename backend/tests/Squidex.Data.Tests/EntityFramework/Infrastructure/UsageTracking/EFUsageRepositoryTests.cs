@@ -11,6 +11,7 @@ using Squidex.Shared;
 
 namespace Squidex.EntityFramework.Infrastructure.UsageTracking;
 
+[Trait("Category", "TestContainer")]
 public class EFUsageRepositoryTests(PostgresFixture fixture) : UsageRepositoryTests, IClassFixture<PostgresFixture>
 {
     protected override Task<IUsageRepository> CreateSutAsync()

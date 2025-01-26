@@ -11,6 +11,7 @@ using Squidex.Providers.Postgres;
 
 namespace Squidex.EntityFramework.Infrastructure.Queries;
 
+[Trait("Category", "TestContainer")]
 public class PostgresQueryTests(PostgresFixture fixture) : SqlQueryTests<TestDbContext>, IClassFixture<PostgresFixture>
 {
     protected override async Task<TestDbContext> CreateDbContextAsync()

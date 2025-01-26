@@ -5,20 +5,20 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.Extensions.Caching.Distributed;
+using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.EntityFramework.TestHelpers;
-using Squidex.Infrastructure.Caching;
 using Squidex.Shared;
 
-namespace Squidex.EntityFramework.Infrastructure.Caching;
+namespace Squidex.EntityFramework.Domain.Assets;
 
 [Trait("Category", "TestContainer")]
-public class EFDistributedCacheTests(PostgresFixture fixture) : DistributedCacheTests, IClassFixture<PostgresFixture>
+public class EFAssetRepositoryTests(PostgresFixture fixture) : AssetRepositoryTests, IClassFixture<PostgresFixture>
 {
-    protected override Task<IDistributedCache> CreateSutAsync()
+    protected override Task<IAssetRepository> CreateSutAsync()
     {
-        var sut = new EFDistributedCache<TestDbContext>(fixture.DbContextFactory, TimeProvider);
+        var sut = new EFAssetRepository<TestDbContext>(fixture.DbContextFactory, fixture.Dialect);
 
-        return Task.FromResult<IDistributedCache>(sut);
+        return Task.FromResult<IAssetRepository>(sut);
     }
 }

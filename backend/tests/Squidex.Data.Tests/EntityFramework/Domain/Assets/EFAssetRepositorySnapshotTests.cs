@@ -5,19 +5,21 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Assets;
+using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.EntityFramework.TestHelpers;
 using Squidex.Infrastructure.States;
 using Squidex.Shared;
 
-namespace Squidex.EntityFramework.Infrastructure.States;
+namespace Squidex.EntityFramework.Domain.Assets;
 
 [Trait("Category", "TestContainer")]
-public class EFSnapshotStoreTests(PostgresFixture fixture) : SnapshotStoreTests, IClassFixture<PostgresFixture>
+public class EFAssetRepositorySnapshotTests(PostgresFixture fixture) : AssetSnapshotStoreTests, IClassFixture<PostgresFixture>
 {
-    protected override Task<ISnapshotStore<SnapshotValue>> CreateSutAsync()
+    protected override Task<ISnapshotStore<Asset>> CreateSutAsync()
     {
-        var sut = new EFSnapshotStore<TestDbContext, SnapshotValue, EFState<SnapshotValue>>(fixture.DbContextFactory);
+        var sut = new EFAssetRepository<TestDbContext>(fixture.DbContextFactory, fixture.Dialect);
 
-        return Task.FromResult<ISnapshotStore<SnapshotValue>>(sut);
+        return Task.FromResult<ISnapshotStore<Asset>>(sut);
     }
 }

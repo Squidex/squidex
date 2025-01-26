@@ -12,6 +12,7 @@ using Squidex.Shared;
 
 namespace Squidex.MongoDb.Domain.Apps;
 
+[Trait("Category", "TestContainer")]
 public class MongoAppRepositoryTests(MongoFixture fixture) : AppRepositoryTests, IClassFixture<MongoFixture>, IAsyncLifetime
 {
     private readonly MongoAppRepository sut = new MongoAppRepository(fixture.Database);

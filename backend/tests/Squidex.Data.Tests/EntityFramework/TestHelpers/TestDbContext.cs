@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.EntityFrameworkCore;
+using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.States;
 using Squidex.Shared;
@@ -21,7 +22,7 @@ public class TestDbContextMySql(DbContextOptions options, IJsonSerializer jsonSe
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.Entity<TestEntity>()
-            .Property(test => test.Json).HasColumnType("json");
+            .Property(p => p.Json).HasColumnType("json");
 
         base.OnModelCreating(builder);
     }
@@ -33,7 +34,10 @@ public class TestDbContext(DbContextOptions options, IJsonSerializer jsonSeriali
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.Entity<TestEntity>()
-            .OwnsOne(test => test.Json).ToJson();
+            .OwnsOne(p => p.Json).ToJson();
+
+        builder.Entity<EFAssetEntity>()
+            .Property(p => p.Metadata).HasColumnType("json");
 
         base.OnModelCreating(builder);
     }

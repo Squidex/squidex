@@ -22,9 +22,7 @@ public class AssetMappingTests : GivenContext
         var snapshotJob = new SnapshotWriteJob<Asset>(source.UniqueId, source, source.Version);
         var snapshot = MongoAssetEntity.Create(snapshotJob);
 
-        var mapped = snapshot.ToState();
-
-        mapped.Should().BeEquivalentTo(source);
+        snapshot.Should().BeEquivalentTo(source);
     }
 
     [Fact]

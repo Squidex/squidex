@@ -11,7 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Hosting;
+using Squidex.Infrastructure.Queries;
+using Squidex.Providers.Postgres;
 using Testcontainers.PostgreSql;
+
+#pragma warning disable CA1822 // Mark members as static
 
 namespace Squidex.EntityFramework.TestHelpers;
 
@@ -26,6 +30,8 @@ public sealed class PostgresFixture : IAsyncLifetime
     private IServiceProvider services;
 
     public IDbContextFactory<TestDbContext> DbContextFactory => services.GetRequiredService<IDbContextFactory<TestDbContext>>();
+
+    public SqlDialect Dialect => PostgresDialect.Instance;
 
     public async Task InitializeAsync()
     {

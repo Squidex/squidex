@@ -6,21 +6,25 @@
 // ==========================================================================
 
 using MongoDB.Bson.Serialization;
-using Squidex.Domain.Apps.Core.Assets;
+using Squidex.Domain.Apps.Core;
 
-namespace Squidex.Domain.Apps.Entities.Assets;
+namespace Squidex.Domain.Apps.Entities;
 
-internal static class AssetItemClassMap
+public static class AppEntityClassMap
 {
     public static void Register()
     {
-        AppEntityClassMap.Register();
+        EntityClassMap.Register();
 
-        BsonClassMap.TryRegisterClassMap<AssetItem>(cm =>
+        BsonClassMap.TryRegisterClassMap<AppEntity>(cm =>
         {
-            cm.MapProperty(x => x.ParentId)
-                .SetElementName("pi")
-                .SetIgnoreIfDefault(true);
+            cm.MapProperty(x => x.AppId)
+                .SetElementName("ai")
+                .SetIsRequired(true);
+
+            cm.MapProperty(x => x.IsDeleted)
+                .SetElementName("dl")
+                .SetIgnoreIfDefault(false);
         });
     }
 }

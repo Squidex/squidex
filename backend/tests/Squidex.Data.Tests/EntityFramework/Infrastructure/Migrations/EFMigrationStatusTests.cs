@@ -11,6 +11,7 @@ using Squidex.Shared;
 
 namespace Squidex.EntityFramework.Infrastructure.Migrations;
 
+[Trait("Category", "TestContainer")]
 public class EFMigrationStatusTests(PostgresFixture fixture) : MigrationStatusTests, IClassFixture<PostgresFixture>
 {
     protected override async Task<IMigrationStatus> CreateSutAsync()

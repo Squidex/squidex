@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -76,7 +77,7 @@ public class AppDbContext(DbContextOptions options, IJsonSerializer jsonSerializ
 
         builder.Entity<HistoryEvent>(b =>
         {
-            b.Property(x => x.Actor).AsRefToken();
+            b.Property(x => x.Actor).AsString();
             b.Property(x => x.Id).AsString();
             b.Property(x => x.OwnerId).AsString();
             b.Property(x => x.Parameters).AsJsonString(jsonSerializer);
@@ -87,6 +88,22 @@ public class AppDbContext(DbContextOptions options, IJsonSerializer jsonSerializ
         {
             b.Property(x => x.Timestamp).AsDateTimeOffset();
             b.Property(x => x.Properties).AsJsonString(jsonSerializer);
+        });
+
+        builder.Entity<EFAssetEntity>(b =>
+        {
+            b.Property(x => x.Id).AsString();
+            b.Property(x => x.AppId).AsString();
+            b.Property(x => x.Created).AsDateTimeOffset();
+            b.Property(x => x.CreatedBy).AsString();
+            b.Property(x => x.DocumentId).AsString();
+            b.Property(x => x.IndexedAppId).AsString();
+            b.Property(x => x.LastModified).AsDateTimeOffset();
+            b.Property(x => x.LastModifiedBy).AsString();
+            b.Property(x => x.Metadata).AsJsonString(jsonSerializer);
+            b.Property(x => x.ParentId).AsString();
+            b.Property(x => x.Tags).AsString();
+            b.Property(x => x.Type).AsString();
         });
 
         base.OnModelCreating(builder);

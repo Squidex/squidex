@@ -25,7 +25,7 @@ public sealed class EFAppRepository<TContext>(IDbContextFactory<TContext> dbCont
         {
             await using var dbContext = await CreateDbContextAsync(ct);
 
-            var formattedId = EFAppEntity.FormatUserId(contributorId);
+            var formattedId = TagsConverter.FormatFilter(contributorId);
             var entities =
                 await dbContext.Set<EFAppEntity>()
                     .Where(x => x.IndexedUserIds.Contains(formattedId) || names.Contains(x.IndexedName))

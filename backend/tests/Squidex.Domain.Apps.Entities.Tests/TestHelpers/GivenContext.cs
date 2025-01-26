@@ -21,7 +21,7 @@ using ContentFieldData = Squidex.Domain.Apps.Core.Contents.ContentFieldData;
 
 namespace Squidex.Domain.Apps.Entities.TestHelpers;
 
-public abstract class GivenContext
+public class GivenContext
 {
     private readonly CancellationTokenSource cts = new CancellationTokenSource();
     private IAppProvider? appProvider;
@@ -75,7 +75,7 @@ public abstract class GivenContext
 
     public CancellationToken CancellationToken => cts.Token;
 
-    protected GivenContext()
+    public GivenContext()
     {
         Team = new Team
         {

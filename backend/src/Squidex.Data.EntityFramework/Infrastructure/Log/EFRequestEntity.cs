@@ -13,7 +13,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Infrastructure.Log;
 
-[Table("Request")]
+[Table("Requests")]
 [Index(nameof(Key))]
 public sealed class EFRequestEntity
 {

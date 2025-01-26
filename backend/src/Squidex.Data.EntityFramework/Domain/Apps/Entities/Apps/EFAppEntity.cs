@@ -29,11 +29,6 @@ public sealed class EFAppEntity : EFState<App>
     [Column("Created")]
     public DateTimeOffset IndexedCreated { get; set; }
 
-    internal static string FormatUserId(string userId)
-    {
-        return $"&&{userId}&&";
-    }
-
     public override void Prepare()
     {
         var users = new HashSet<string>
@@ -48,6 +43,6 @@ public sealed class EFAppEntity : EFState<App>
         IndexedDeleted = Document.IsDeleted;
         IndexedName = Document.Name;
         IndexedTeamId = Document.TeamId;
-        IndexedUserIds = string.Join('|', users.Select(FormatUserId));
+        IndexedUserIds = TagsConverter.ToString(users);
     }
 }

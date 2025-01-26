@@ -10,6 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NodaTime;
 using Squidex.Infrastructure.Json;
 
+#pragma warning disable RECS0015 // If an extension method is called as static method convert it to method syntax
+
 namespace Squidex.Infrastructure;
 
 public static class JsonConversion
@@ -48,11 +50,44 @@ public static class JsonConversion
         return propertyBuilder;
     }
 
-    public static PropertyBuilder<RefToken> AsRefToken(this PropertyBuilder<RefToken> propertyBuilder)
+    public static PropertyBuilder<RefToken> AsString(this PropertyBuilder<RefToken> propertyBuilder)
     {
         var converter = new ValueConverter<RefToken, string>(
             v => v.ToString(),
             v => RefToken.Parse(v)
+        );
+
+        propertyBuilder.HasConversion(converter);
+        return propertyBuilder;
+    }
+
+    public static PropertyBuilder<NamedId<DomainId>> AsString(this PropertyBuilder<NamedId<DomainId>> propertyBuilder)
+    {
+        var converter = new ValueConverter<NamedId<DomainId>, string>(
+            v => v.ToString(),
+            v => NamedId<DomainId>.Parse(v, ParseDomainId)
+        );
+
+        propertyBuilder.HasConversion(converter);
+        return propertyBuilder;
+    }
+
+    public static PropertyBuilder<T> AsString<T>(this PropertyBuilder<T> propertyBuilder) where T : struct
+    {
+        var converter = new ValueConverter<T, string>(
+            v => v.ToString()!,
+            v => Enum.Parse<T>(v, true)
+        );
+
+        propertyBuilder.HasConversion(converter);
+        return propertyBuilder;
+    }
+
+    public static PropertyBuilder<HashSet<string>> AsString(this PropertyBuilder<HashSet<string>> propertyBuilder)
+    {
+        var converter = new ValueConverter<HashSet<string>, string>(
+            v => TagsConverter.ToString(v),
+            v => TagsConverter.ToSet(v)
         );
 
         propertyBuilder.HasConversion(converter);
@@ -68,5 +103,12 @@ public static class JsonConversion
 
         propertyBuilder.HasConversion(converter);
         return propertyBuilder;
+    }
+
+    private static bool ParseDomainId(ReadOnlySpan<char> value, out DomainId result)
+    {
+        result = DomainId.Create(new string(value));
+
+        return true;
     }
 }

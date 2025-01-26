@@ -11,6 +11,7 @@ using Squidex.Providers.MySql;
 
 namespace Squidex.EntityFramework.Infrastructure.Queries;
 
+[Trait("Category", "TestContainer")]
 public class MySqlQueryTests(MySqlFixture fixture) : SqlQueryTests<TestDbContextMySql>, IClassFixture<MySqlFixture>
 {
     protected override async Task<TestDbContextMySql> CreateDbContextAsync()

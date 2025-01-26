@@ -7,13 +7,17 @@
 
 namespace Squidex.Infrastructure.Queries;
 
-public class SqlQuery
+public class SqlQuery(string table)
 {
-    required public string Table { get; set; }
+    public string Table => table;
+
+    public bool AsCount { get; set; }
 
     public long Limit { get; set; }
 
     public long Offset { get; set; }
+
+    public List<string> Fields { get; set; } = ["*"];
 
     public List<string> Where { get; set; } = [];
 

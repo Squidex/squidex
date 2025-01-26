@@ -26,7 +26,7 @@ public sealed class EFTeamRepository<TContext>(IDbContextFactory<TContext> dbCon
         {
             await using var dbContext = await CreateDbContextAsync(ct);
 
-            var formattedId = EFTeamEntity.FormatUserId(contributorId);
+            var formattedId = TagsConverter.FormatFilter(contributorId);
             var entities =
                 await dbContext.Set<EFTeamEntity>()
                     .Where(x => x.IndexedUserIds.Contains(formattedId))

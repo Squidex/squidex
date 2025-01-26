@@ -7,7 +7,7 @@
 
 namespace Squidex.Infrastructure.Queries;
 
-public sealed class SqlParameters : List<object>
+public sealed class SqlParams : List<object>
 {
     public string AddPositional(object value)
     {

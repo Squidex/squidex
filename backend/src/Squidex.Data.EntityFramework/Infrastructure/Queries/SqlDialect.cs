@@ -16,9 +16,22 @@ public class SqlDialect
     {
         const string t = "  ";
 
-        var sb = new StringBuilder();
-        sb.AppendLine("SELECT");
-        sb.AppendLine($"{t}*");
+        var sb = new StringBuilder("SELECT");
+
+        var i = 0;
+        foreach (var field in request.Fields)
+        {
+            sb.Append($"{t}{field}");
+
+            if (i < request.Fields.Count - 1)
+            {
+                sb.Append(',');
+            }
+
+            sb.AppendLine();
+            i++;
+        }
+
         sb.AppendLine($"FROM {FormatTable(request.Table)}");
 
         if (request.Where.Count > 0)
@@ -84,17 +97,22 @@ public class SqlDialect
         return $"NOT ({part})";
     }
 
+    public virtual string CountAll()
+    {
+        return "COUNT(*)";
+    }
+
     public virtual string OrderBy(PropertyPath path, SortOrder order, bool isJson)
     {
         return $"{FormatField(path, null, isJson)} {FormatOrder(order)}";
     }
 
-    public virtual string Where(PropertyPath path, CompareOperator op, ClrValue value, SqlParameters queryParameters, bool isJson)
+    public virtual string Where(PropertyPath path, CompareOperator op, ClrValue value, SqlParams queryParameters, bool isJson)
     {
         return $"{FormatField(path, value, isJson)} {FormatOperator(op, value)} {FormatValues(op, value, queryParameters)}";
     }
 
-    protected virtual string FormatValues(CompareOperator op, ClrValue value, SqlParameters queryParameters)
+    protected virtual string FormatValues(CompareOperator op, ClrValue value, SqlParams queryParameters)
     {
         if (!value.IsList && value.ValueType == ClrValueType.Null)
         {

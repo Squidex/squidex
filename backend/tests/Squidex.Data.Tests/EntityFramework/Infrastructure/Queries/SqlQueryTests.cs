@@ -17,7 +17,7 @@ public abstract class SqlQueryTests<TContext> where TContext : DbContext
 
     protected abstract SqlDialect CreateDialect();
 
-    private class TestSqlBuilder(SqlDialect dialect) : SqlQueryBuilder(dialect)
+    private class TestSqlBuilder(SqlDialect dialect, string table) : SqlQueryBuilder(dialect, table)
     {
         public override bool IsJsonPath(PropertyPath path)
         {
@@ -381,9 +381,14 @@ public abstract class SqlQueryTests<TContext> where TContext : DbContext
 
     private async Task<List<long>> QueryAsync(ClrQuery query)
     {
-        var builder = new TestSqlBuilder(CreateDialect());
+        var builder =
+            new TestSqlBuilder(CreateDialect(), "TestEntity")
+                .WithLimit(query)
+                .WithOffset(query)
+                .WithOrders(query)
+                .WithFilter(query);
 
-        var (sql, parameters) = builder.BuildQuery("TestEntity", query);
+        var (sql, parameters) = builder.Compile();
 
         var dbContext = await CreateAndPrepareDbContextAsync();
         var dbResult = await dbContext.Set<TestEntity>().FromSqlRaw(sql, parameters).ToListAsync();

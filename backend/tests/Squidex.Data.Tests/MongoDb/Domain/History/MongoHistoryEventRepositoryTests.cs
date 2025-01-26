@@ -12,6 +12,7 @@ using Squidex.Shared;
 
 namespace Squidex.MongoDb.Domain.History;
 
+[Trait("Category", "TestContainer")]
 public class MongoHistoryEventRepositoryTests(MongoFixture fixture) : HistoryEventRepositoryTests, IClassFixture<MongoFixture>, IAsyncLifetime
 {
     private readonly MongoHistoryEventRepository sut = new MongoHistoryEventRepository(fixture.Database);

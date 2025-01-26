@@ -23,11 +23,6 @@ public sealed class EFTeamEntity : EFState<Team>
     [Column("AuthDomain")]
     public string? IndexedAuthDomain { get; set; }
 
-    internal static string FormatUserId(string userId)
-    {
-        return $"&&{userId}&&";
-    }
-
     public override void Prepare()
     {
         var users = new HashSet<string>
@@ -39,6 +34,6 @@ public sealed class EFTeamEntity : EFState<Team>
 
         IndexedAuthDomain = Document.AuthScheme?.Domain;
         IndexedDeleted = Document.IsDeleted;
-        IndexedUserIds = string.Join('|', users.Select(FormatUserId));
+        IndexedUserIds = TagsConverter.ToString(users);
     }
 }

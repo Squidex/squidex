@@ -12,6 +12,7 @@ using Squidex.Shared;
 
 namespace Squidex.MongoDb.Infrastructure.Caching;
 
+[Trait("Category", "TestContainer")]
 public class MongoDistributedCacheTests(MongoFixture fixture) : DistributedCacheTests, IClassFixture<MongoFixture>, IAsyncLifetime
 {
     private MongoDistributedCache sut;

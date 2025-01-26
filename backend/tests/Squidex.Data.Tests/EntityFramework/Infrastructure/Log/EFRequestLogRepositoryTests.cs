@@ -12,6 +12,7 @@ using Squidex.Shared;
 
 namespace Squidex.EntityFramework.Infrastructure.Log;
 
+[Trait("Category", "TestContainer")]
 public class EFRequestLogRepositoryTests(PostgresFixture fixture) : RequestLogRepositoryTests, IClassFixture<PostgresFixture>
 {
     protected override Task<IRequestLogRepository> CreateSutAsync()

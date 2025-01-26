@@ -15,11 +15,6 @@ namespace Squidex.Domain.Apps.Entities.Apps;
 
 public sealed class MongoAppRepository(IMongoDatabase database) : MongoSnapshotStoreBase<App, MongoAppEntity>(database), IAppRepository, IDeleter
 {
-    static MongoAppRepository()
-    {
-        MongoAppEntity.RegisterClassMap();
-    }
-
     protected override string CollectionName()
     {
         return "States_Apps";
