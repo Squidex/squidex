@@ -34,6 +34,11 @@ public sealed class OidcHandler(MyIdentityOptions options) : OpenIdConnectEvents
         return base.TokenValidated(context);
     }
 
+    public override Task AuthenticationFailed(AuthenticationFailedContext context)
+    {
+        return base.AuthenticationFailed(context);
+    }
+
     public override Task RedirectToIdentityProviderForSignOut(RedirectContext context)
     {
         if (!string.IsNullOrEmpty(options.OidcOnSignoutRedirectUrl))
