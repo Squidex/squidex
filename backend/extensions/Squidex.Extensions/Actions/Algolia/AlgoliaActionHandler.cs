@@ -83,7 +83,7 @@ public sealed class AlgoliaActionHandler(RuleEventFormatter formatter, IScriptEn
         {
             AppId = action.AppId,
             ApiKey = action.ApiKey,
-            Content = serializer.Serialize(content, true),
+            Content = delete ? null : serializer.Serialize(content, true),
             ContentId = contentId,
             IndexName = indexName
         };
@@ -100,7 +100,6 @@ public sealed class AlgoliaActionHandler(RuleEventFormatter formatter, IScriptEn
         }
 
         var index = await clients.GetClientAsync((job.AppId, job.ApiKey, job.IndexName));
-
         try
         {
             if (job.Content != null)
@@ -147,5 +146,5 @@ public sealed class AlgoliaJob
 
     public string IndexName { get; set; }
 
-    public string Content { get; set; }
+    public string? Content { get; set; }
 }
