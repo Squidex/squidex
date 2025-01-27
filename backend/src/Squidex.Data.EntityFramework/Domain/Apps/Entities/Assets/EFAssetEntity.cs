@@ -16,8 +16,8 @@ using Squidex.Infrastructure.States;
 namespace Squidex.Domain.Apps.Entities.Assets;
 
 [Table("Assets")]
-[Index(nameof(IndexedAppId))]
-public record EFAssetEntity : Asset
+[Index(nameof(IndexedAppId), nameof(Id))]
+public record EFAssetEntity : Asset, IVersionedEntity<DomainId>
 {
     [Key]
     public DomainId DocumentId { get; set; }

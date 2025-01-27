@@ -62,7 +62,7 @@ public sealed class EFAppRepository<TContext>(IDbContextFactory<TContext> dbCont
 
             var entity =
                 await dbContext.Set<EFAppEntity>()
-                    .Where(x => x.DocumentId == id.ToString())
+                    .Where(x => x.DocumentId == id)
                     .Where(x => !x.IndexedDeleted)
                     .FirstOrDefaultAsync(ct);
 

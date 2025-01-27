@@ -46,7 +46,7 @@ public sealed class EFTeamRepository<TContext>(IDbContextFactory<TContext> dbCon
 
             var entity =
                 await dbContext.Set<EFTeamEntity>()
-                    .Where(x => x.DocumentId == id.ToString())
+                    .Where(x => x.DocumentId == id)
                     .Where(x => !x.IndexedDeleted)
                     .FirstOrDefaultAsync(ct);
 

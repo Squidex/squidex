@@ -43,7 +43,7 @@ public class EFSnapshotStore<TContext, T, TState>(IDbContextFactory<TContext> db
                     await onRead.OnReadAsync();
                 }
 
-                yield return new SnapshotResult<T>(DomainId.Create(entity.DocumentId), entity.Document, entity.Version);
+                yield return new SnapshotResult<T>(entity.DocumentId, entity.Document, entity.Version);
             }
         }
     }
@@ -55,9 +55,7 @@ public class EFSnapshotStore<TContext, T, TState>(IDbContextFactory<TContext> db
         {
             await using var dbContext = await CreateDbContextAsync(ct);
 
-            var entityId = key.ToString();
-            var entity = await dbContext.Set<TState>().Where(x => x.DocumentId == entityId).FirstOrDefaultAsync(ct);
-
+            var entity = await dbContext.Set<TState>().Where(x => x.DocumentId == key).FirstOrDefaultAsync(ct);
             if (entity == null)
             {
                 return new SnapshotResult<T>(default, default!, EtagVersion.Empty);
@@ -68,7 +66,7 @@ public class EFSnapshotStore<TContext, T, TState>(IDbContextFactory<TContext> db
                 await onRead.OnReadAsync();
             }
 
-            return new SnapshotResult<T>(DomainId.Create(entity.DocumentId), entity.Document, entity.Version);
+            return new SnapshotResult<T>(entity.DocumentId, entity.Document, entity.Version);
         }
     }
 
@@ -79,8 +77,7 @@ public class EFSnapshotStore<TContext, T, TState>(IDbContextFactory<TContext> db
         {
             await using var dbContext = await CreateDbContextAsync(ct);
 
-            var entityId = key.ToString();
-            await dbContext.Set<TState>().Where(x => x.DocumentId == entityId)
+            await dbContext.Set<TState>().Where(x => x.DocumentId == key)
                 .ExecuteDeleteAsync(ct);
         }
     }
@@ -90,38 +87,10 @@ public class EFSnapshotStore<TContext, T, TState>(IDbContextFactory<TContext> db
     {
         using (Telemetry.Activities.StartActivity("EFStateStore/WriteAsync"))
         {
-            await using var dbContext = await CreateDbContextAsync(ct);
-
             var entity = CreateEntity(job.Key, job.Value, job.NewVersion);
-            try
-            {
-                await dbContext.Set<TState>().AddAsync(entity, ct);
-                await dbContext.SaveChangesAsync(ct);
-            }
-            catch (DbUpdateException)
-            {
-                var updateQuery = dbContext.Set<TState>().Where(x => x.DocumentId == entity.DocumentId);
-                if (job.OldVersion > EtagVersion.Any)
-                {
-                    updateQuery = updateQuery.Where(x => x.Version == job.OldVersion);
-                }
 
-                var updateCount =
-                    await updateQuery
-                        .ExecuteUpdateAsync(BuildUpdate(entity), ct);
-
-                if (updateCount != 1)
-                {
-                    var currentVersions =
-                        await dbContext.Set<TState>()
-                            .Where(x => x.DocumentId == entity.DocumentId).Select(x => x.Version)
-                            .ToListAsync(ct);
-
-                    var current = currentVersions.Count == 1 ? currentVersions[0] : EtagVersion.Empty;
-
-                    throw new InconsistentStateException(current, job.OldVersion);
-                }
-            }
+            await using var dbContext = await CreateDbContextAsync(ct);
+            await dbContext.UpsertAsync(entity, job.OldVersion, BuildUpdate, ct);
         }
     }
 
@@ -158,7 +127,7 @@ public class EFSnapshotStore<TContext, T, TState>(IDbContextFactory<TContext> db
         var result = new TState
         {
             Document = doc,
-            DocumentId = id.ToString(),
+            DocumentId = id,
             Version = version,
         };
 

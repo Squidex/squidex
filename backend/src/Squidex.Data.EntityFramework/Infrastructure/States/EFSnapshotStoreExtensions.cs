@@ -30,6 +30,7 @@ public static class EFSnapshotStoreExtensions
         modelBuilder.Entity<TEntity>(b =>
         {
             b.ToTable(tableName);
+            b.Property(x => x.DocumentId).AsString();
             b.Property(x => x.Document).AsJsonString(jsonSerializer);
 
             builder?.Invoke(b);

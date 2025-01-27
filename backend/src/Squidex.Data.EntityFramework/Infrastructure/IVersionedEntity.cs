@@ -5,21 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
+namespace Squidex.Infrastructure;
 
-namespace Squidex.Infrastructure.States;
-
-public class EFState<T> : IVersionedEntity<DomainId>
+public interface IVersionedEntity<T>
 {
-    [Key]
-    public DomainId DocumentId { get; set; }
+    T DocumentId { get; }
 
-    [Json]
-    public T Document { get; set; }
-
-    public long Version { get; set; }
-
-    public virtual void Prepare()
-    {
-    }
+    long Version { get; }
 }

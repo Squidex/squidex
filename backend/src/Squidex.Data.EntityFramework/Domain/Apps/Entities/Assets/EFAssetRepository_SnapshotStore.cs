@@ -87,38 +87,10 @@ public sealed partial class EFAssetRepository<TContext> : ISnapshotStore<Asset>,
     {
         using (Telemetry.Activities.StartActivity("EFAssetRepository/WriteAsync"))
         {
-            await using var dbContext = await CreateDbContextAsync(ct);
-
             var entity = EFAssetEntity.Create(job);
-            try
-            {
-                await dbContext.Set<EFAssetEntity>().AddAsync(entity, ct);
-                await dbContext.SaveChangesAsync(ct);
-            }
-            catch (DbUpdateException)
-            {
-                var updateQuery = dbContext.Set<EFAssetEntity>().Where(x => x.DocumentId == entity.DocumentId);
-                if (job.OldVersion > EtagVersion.Any)
-                {
-                    updateQuery = updateQuery.Where(x => x.Version == job.OldVersion);
-                }
 
-                var updateCount =
-                    await updateQuery
-                        .ExecuteUpdateAsync(BuildUpdate(entity), ct);
-
-                if (updateCount != 1)
-                {
-                    var currentVersions =
-                        await dbContext.Set<EFAssetEntity>()
-                            .Where(x => x.DocumentId == entity.DocumentId).Select(x => x.Version)
-                            .ToListAsync(ct);
-
-                    var current = currentVersions.Count == 1 ? currentVersions[0] : EtagVersion.Empty;
-
-                    throw new InconsistentStateException(current, job.OldVersion);
-                }
-            }
+            await using var dbContext = await CreateDbContextAsync(ct);
+            await dbContext.UpsertAsync(entity, job.OldVersion, BuildUpdate, ct);
         }
     }
 
