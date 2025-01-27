@@ -55,6 +55,8 @@ public sealed class MyIdentityOptions
 
     public string OidcResponseType { get; set; }
 
+    public Dictionary<string, string>? OidcErrorMap { get; set; }
+
     public string? OidcOnSignoutRedirectUrl { get; set; }
 
     public string[] OidcScopes { get; set; }
