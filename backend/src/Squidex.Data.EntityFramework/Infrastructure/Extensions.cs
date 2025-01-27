@@ -14,6 +14,16 @@ namespace Squidex.Infrastructure;
 
 public static class Extensions
 {
+    public static IQueryable<T> WhereIf<T>(this IQueryable<T> source, Expression<Func<T, bool>> predicate, bool valid)
+    {
+        if (!valid)
+        {
+            return source;
+        }
+
+        return source.Where(predicate);
+    }
+
     public static async Task UpsertAsync<T>(this DbContext dbContext, T entity, long oldVersion,
         Func<T, Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>>> update,
         CancellationToken ct) where T : class, IVersionedEntity<DomainId>

@@ -106,6 +106,19 @@ public class AppDbContext(DbContextOptions options, IJsonSerializer jsonSerializ
             b.Property(x => x.Type).AsString();
         });
 
+        builder.Entity<EFAssetFolderEntity>(b =>
+        {
+            b.Property(x => x.Id).AsString();
+            b.Property(x => x.AppId).AsString();
+            b.Property(x => x.Created).AsDateTimeOffset();
+            b.Property(x => x.CreatedBy).AsString();
+            b.Property(x => x.DocumentId).AsString();
+            b.Property(x => x.IndexedAppId).AsString();
+            b.Property(x => x.LastModified).AsDateTimeOffset();
+            b.Property(x => x.LastModifiedBy).AsString();
+            b.Property(x => x.ParentId).AsString();
+        });
+
         base.OnModelCreating(builder);
     }
 }

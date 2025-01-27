@@ -194,13 +194,11 @@ public sealed partial class EFAssetRepository<TContext>(IDbContextFactory<TConte
         {
             await using var dbContext = await CreateDbContextAsync(ct);
 
-            var query = dbContext.Set<EFAssetEntity>().Where(x => x.IndexedAppId == appId && x.Slug == slug);
-            if (!allowDeleted)
-            {
-                query = query.Where(x => !x.IsDeleted);
-            }
-
-            var assetEntity = await query.FirstOrDefaultAsync(ct);
+            var assetEntity =
+                await dbContext.Set<EFAssetEntity>()
+                    .Where(x => x.IndexedAppId == appId && x.Slug == slug)
+                    .WhereIf(x => !x.IsDeleted, !allowDeleted)
+                    .FirstOrDefaultAsync(ct);
 
             return assetEntity;
         }
@@ -213,13 +211,13 @@ public sealed partial class EFAssetRepository<TContext>(IDbContextFactory<TConte
         {
             await using var dbContext = await CreateDbContextAsync(ct);
 
-            var query = dbContext.Set<EFAssetEntity>().Where(x => x.IndexedAppId == appId && x.Id == id);
-            if (!allowDeleted)
-            {
-                query = query.Where(x => !x.IsDeleted);
-            }
+            var docId = DomainId.Combine(appId, id);
 
-            var assetEntity = await query.FirstOrDefaultAsync(ct);
+            var assetEntity =
+                await dbContext.Set<EFAssetEntity>()
+                    .Where(x => x.DocumentId == docId)
+                    .WhereIf(x => !x.IsDeleted, !allowDeleted)
+                    .FirstOrDefaultAsync(ct);
 
             return assetEntity;
         }

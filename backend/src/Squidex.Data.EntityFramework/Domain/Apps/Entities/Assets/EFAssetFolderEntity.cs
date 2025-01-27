@@ -5,7 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using MongoDB.Bson.Serialization;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
@@ -13,38 +15,18 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-public record MongoAssetFolderEntity : AssetFolder, IVersionedEntity<DomainId>
+[Table("AssetFolders")]
+[Index(nameof(IndexedAppId), nameof(Id))]
+public sealed record EFAssetFolderEntity : AssetFolder, IVersionedEntity<DomainId>
 {
+    [Key]
     public DomainId DocumentId { get; set; }
 
     public DomainId IndexedAppId { get; set; }
 
-    public static void RegisterClassMap()
+    public static EFAssetFolderEntity Create(SnapshotWriteJob<AssetFolder> job)
     {
-        BsonClassMap.TryRegisterClassMap<MongoAssetFolderEntity>(cm =>
-        {
-            cm.MapProperty(x => x.DocumentId)
-                .SetElementName("_id")
-                .SetIsRequired(true);
-
-            cm.MapProperty(x => x.IndexedAppId)
-                .SetElementName("_ai")
-                .SetIsRequired(true);
-        });
-
-        BsonClassMap.TryRegisterClassMap<AssetFolder>(cm =>
-        {
-            cm.MapProperty(x => x.FolderName)
-                .SetElementName("fn")
-                .SetIsRequired(true);
-        });
-
-        AssetItemClassMap.Register();
-    }
-
-    public static MongoAssetFolderEntity Create(SnapshotWriteJob<AssetFolder> job)
-    {
-        var entity = new MongoAssetFolderEntity
+        var entity = new EFAssetFolderEntity
         {
             DocumentId = job.Key,
             // Both version and ID cannot be changed by the mapper method anymore.

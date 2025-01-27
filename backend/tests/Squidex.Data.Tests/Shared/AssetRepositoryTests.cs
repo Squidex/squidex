@@ -128,7 +128,7 @@ public abstract class AssetRepositoryTests : GivenContext
     };
 
     [Fact]
-    public async Task Should_find_asset_by_document_id()
+    public async Task Should_find_asset_by_id_only()
     {
         var sut = await CreateAndPrepareSutAsync();
 
@@ -144,11 +144,11 @@ public abstract class AssetRepositoryTests : GivenContext
     {
         var sut = await CreateAndPrepareSutAsync();
 
-        var assetRef = await sut.StreamAll(appId).FirstAsync();
-        var asset = await sut.FindAssetAsync(appId, assetRef.Id, false);
+        var asset1 = await sut.StreamAll(appId).FirstAsync();
+        var asset2 = await sut.FindAssetAsync(appId, asset1.Id, false);
 
         // The Slug is random here, as it does not really matter.
-        Assert.NotNull(asset);
+        Assert.NotNull(asset2);
     }
 
     [Fact]
