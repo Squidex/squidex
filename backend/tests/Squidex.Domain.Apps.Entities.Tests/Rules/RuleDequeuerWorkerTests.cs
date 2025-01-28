@@ -45,14 +45,14 @@ public class RuleDequeuerWorkerTests
     {
         await sut.QueryAsync();
 
-        A.CallTo(() => ruleEventRepository.QueryPendingAsync(A<Instant>._, A<Func<IRuleEventEntity, Task>>._, default))
+        A.CallTo(() => ruleEventRepository.QueryPendingAsync(A<Instant>._, default))
             .MustHaveHappened();
     }
 
     [Fact]
     public async Task Should_ignore_repository_exceptions_and_log()
     {
-        A.CallTo(() => ruleEventRepository.QueryPendingAsync(A<Instant>._, A<Func<IRuleEventEntity, Task>>._, default))
+        A.CallTo(() => ruleEventRepository.QueryPendingAsync(A<Instant>._, default))
             .Throws(new InvalidOperationException());
 
         await sut.QueryAsync();

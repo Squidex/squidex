@@ -105,6 +105,17 @@ public static class JsonConversion
         return propertyBuilder;
     }
 
+    public static PropertyBuilder<Instant?> AsDateTimeOffset(this PropertyBuilder<Instant?> propertyBuilder)
+    {
+        var converter = new ValueConverter<Instant?, DateTimeOffset?>(
+            v => v != null ? v.Value.ToDateTimeOffset() : null,
+            v => v != null ? Instant.FromDateTimeOffset(v.Value) : null
+        );
+
+        propertyBuilder.HasConversion(converter);
+        return propertyBuilder;
+    }
+
     private static bool ParseDomainId(ReadOnlySpan<char> value, out DomainId result)
     {
         result = DomainId.Create(new string(value));
