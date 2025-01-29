@@ -12,24 +12,15 @@ using Squidex.Shared;
 
 namespace Squidex.MongoDb.Infrastructure.Log;
 
-public class MongoRequestLogRepositoryTests(MongoFixture fixture) : RequestLogRepositoryTests, IClassFixture<MongoFixture>, IAsyncLifetime
+public class MongoRequestLogRepositoryTests(MongoFixture fixture) : RequestLogRepositoryTests, IClassFixture<MongoFixture>
 {
-    private readonly MongoRequestLogRepository sut =
-        new MongoRequestLogRepository(fixture.Database,
-            Options.Create(new RequestLogStoreOptions()));
-
-    public async Task InitializeAsync()
+    protected override async Task<IRequestLogRepository> CreateSutAsync()
     {
+        var sut =
+            new MongoRequestLogRepository(fixture.Database,
+                Options.Create(new RequestLogStoreOptions()));
+
         await sut.InitializeAsync(default);
-    }
-
-    public Task DisposeAsync()
-    {
-        return Task.CompletedTask;
-    }
-
-    protected override Task<IRequestLogRepository> CreateSutAsync()
-    {
-        return Task.FromResult<IRequestLogRepository>(sut);
+        return sut;
     }
 }

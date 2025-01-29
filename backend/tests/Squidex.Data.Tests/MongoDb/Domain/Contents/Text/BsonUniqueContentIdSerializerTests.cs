@@ -109,24 +109,4 @@ public class BsonUniqueContentIdSerializerTests
 
         Assert.Contains("App ID cannot be longer than 253 bytes.", exception.Message, StringComparison.Ordinal);
     }
-
-    [Fact]
-    public void Should_calculate_next_custom_id()
-    {
-        var appId = DomainId.Create("x");
-
-        var actual = BsonUniqueContentIdSerializer.NextAppId(appId);
-
-        Assert.Equal(new UniqueContentId(DomainId.Create("y"), DomainId.Empty), actual);
-    }
-
-    [Fact]
-    public void Should_calculate_next_guid_id()
-    {
-        var appId = DomainId.Create("70fb3772-2ab5-4854-b421-054d2479a0f7");
-
-        var actual = BsonUniqueContentIdSerializer.NextAppId(appId);
-
-        Assert.Equal(new UniqueContentId(DomainId.Create("70fb3773-2ab5-4854-b421-054d2479a0f7"), DomainId.Empty), actual);
-    }
 }

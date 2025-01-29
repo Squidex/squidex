@@ -13,24 +13,13 @@ using Squidex.Shared;
 namespace Squidex.MongoDb.Infrastructure.Caching;
 
 [Trait("Category", "TestContainer")]
-public class MongoDistributedCacheTests(MongoFixture fixture) : DistributedCacheTests, IClassFixture<MongoFixture>, IAsyncLifetime
+public class MongoDistributedCacheTests(MongoFixture fixture) : DistributedCacheTests, IClassFixture<MongoFixture>
 {
-    private MongoDistributedCache sut;
-
-    public async Task InitializeAsync()
+    protected override async Task<IDistributedCache> CreateSutAsync(TimeProvider timeProvider)
     {
-        sut = new MongoDistributedCache(fixture.Database, TimeProvider);
+        var sut = new MongoDistributedCache(fixture.Database, timeProvider);
 
         await sut.InitializeAsync(default);
-    }
-
-    public Task DisposeAsync()
-    {
-        return Task.CompletedTask;
-    }
-
-    protected override Task<IDistributedCache> CreateSutAsync()
-    {
-        return Task.FromResult<IDistributedCache>(sut);
+        return sut;
     }
 }

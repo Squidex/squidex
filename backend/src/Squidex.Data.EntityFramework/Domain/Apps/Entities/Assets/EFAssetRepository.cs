@@ -7,7 +7,6 @@
 
 using System.Runtime.CompilerServices;
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
@@ -80,16 +79,16 @@ public sealed partial class EFAssetRepository<TContext>(IDbContextFactory<TConte
                         .WithLimit(query)
                         .WithOffset(query)
                         .WithOrders(query)
-                        .Where(nameof(EFAssetEntity.IndexedAppId), CompareOperator.Equals, appId.ToString());
+                        .RawWhere(nameof(EFAssetEntity.IndexedAppId), CompareOperator.Equals, appId.ToString());
 
                 if (query.Filter?.HasField("IsDeleted") != true)
                 {
-                    sqlQuery.Where(nameof(EFAssetEntity.IsDeleted), CompareOperator.Equals, false);
+                    sqlQuery.RawWhere(nameof(EFAssetEntity.IsDeleted), CompareOperator.Equals, false);
                 }
 
                 if (parentId != null)
                 {
-                    sqlQuery.Where(nameof(EFAssetEntity.ParentId), CompareOperator.Equals, parentId.ToString());
+                    sqlQuery.RawWhere(nameof(EFAssetEntity.ParentId), CompareOperator.Equals, parentId.ToString());
                 }
 
                 sqlQuery.WithFilter(query);

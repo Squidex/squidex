@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Schemas;
@@ -131,6 +132,14 @@ public class AppDbContext(DbContextOptions options, IJsonSerializer jsonSerializ
             b.Property(x => x.NextAttempt).AsDateTimeOffset();
             b.Property(x => x.Result).AsString();
             b.Property(x => x.RuleId).AsString();
+        });
+
+        builder.Entity<TextContentState>(b =>
+        {
+            b.ToTable("TextState");
+            b.HasKey(x => x.UniqueContentId);
+            b.Property(x => x.UniqueContentId).AsString();
+            b.Property(x => x.State).AsString();
         });
 
         base.OnModelCreating(builder);

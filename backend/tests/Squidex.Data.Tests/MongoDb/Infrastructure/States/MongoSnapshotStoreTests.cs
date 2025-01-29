@@ -11,22 +11,13 @@ using Squidex.Shared;
 
 namespace Squidex.MongoDb.Infrastructure.States;
 
-public class MongoSnapshotStoreTests(MongoFixture fixture) : SnapshotStoreTests, IClassFixture<MongoFixture>, IAsyncLifetime
+public class MongoSnapshotStoreTests(MongoFixture fixture) : SnapshotStoreTests, IClassFixture<MongoFixture>
 {
-    private readonly MongoSnapshotStore<SnapshotValue> sut = new MongoSnapshotStore<SnapshotValue>(fixture.Database);
-
-    public async Task InitializeAsync()
+    protected override async Task<ISnapshotStore<SnapshotValue>> CreateSutAsync()
     {
+        var sut = new MongoSnapshotStore<SnapshotValue>(fixture.Database);
+
         await sut.InitializeAsync(default);
-    }
-
-    public Task DisposeAsync()
-    {
-        return Task.CompletedTask;
-    }
-
-    protected override Task<ISnapshotStore<SnapshotValue>> CreateSutAsync()
-    {
-        return Task.FromResult<ISnapshotStore<SnapshotValue>>(sut);
+        return sut;
     }
 }

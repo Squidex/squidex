@@ -13,22 +13,13 @@ using Squidex.Shared;
 namespace Squidex.MongoDb.Domain.Schemas;
 
 [Trait("Category", "TestContainer")]
-public class MongoSchemaRepositoryTests(MongoFixture fixture) : SchemaRepositoryTests, IClassFixture<MongoFixture>, IAsyncLifetime
+public class MongoSchemaRepositoryTests(MongoFixture fixture) : SchemaRepositoryTests, IClassFixture<MongoFixture>
 {
-    private readonly MongoSchemaRepository sut = new MongoSchemaRepository(fixture.Database);
-
-    public async Task InitializeAsync()
+    protected override async Task<ISchemaRepository> CreateSutAsync()
     {
+        var sut = new MongoSchemaRepository(fixture.Database);
+
         await sut.InitializeAsync(default);
-    }
-
-    public Task DisposeAsync()
-    {
-        return Task.CompletedTask;
-    }
-
-    protected override Task<ISchemaRepository> CreateSutAsync()
-    {
-        return Task.FromResult<ISchemaRepository>(sut);
+        return sut;
     }
 }

@@ -7,7 +7,6 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
-using MongoDB.Driver;
 using Squidex.Hosting;
 using Squidex.Infrastructure.Timers;
 

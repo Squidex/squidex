@@ -14,9 +14,15 @@ public class SqlQueryBuilder(SqlDialect dialect, string table) : FilterNodeVisit
     private readonly SqlQuery sqlQuery = new SqlQuery(table);
     private readonly SqlParams parameters = [];
 
-    public SqlQueryBuilder Where(PropertyPath path, CompareOperator op, ClrValue value)
+    public SqlQueryBuilder RawWhere(PropertyPath path, CompareOperator op, ClrValue value)
     {
         sqlQuery.Where.Add(dialect.Where(Visit(path), op, value, parameters, IsJsonPath(path)));
+        return this;
+    }
+
+    public SqlQueryBuilder RawOrder(PropertyPath path, SortOrder order = SortOrder.Ascending)
+    {
+        sqlQuery.Order.Add(dialect.OrderBy(Visit(path), order, IsJsonPath(path)));
         return this;
     }
 

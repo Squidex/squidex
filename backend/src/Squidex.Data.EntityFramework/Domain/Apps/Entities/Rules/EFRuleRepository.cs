@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;

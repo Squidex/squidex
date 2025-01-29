@@ -11,25 +11,16 @@ using Squidex.Infrastructure.States;
 using Squidex.MongoDb.TestHelpers;
 using Squidex.Shared;
 
-namespace Squidex.MongoDb.Domain.AssetFolders;
+namespace Squidex.MongoDb.Domain.Assets;
 
 [Trait("Category", "TestContainer")]
-public class MongoAssetFolderRepositorySnapshotTests(MongoFixture fixture) : AssetFolderSnapshotStoreTests, IClassFixture<MongoFixture>, IAsyncLifetime
+public class MongoAssetFolderRepositorySnapshotTests(MongoFixture fixture) : AssetFolderSnapshotStoreTests, IClassFixture<MongoFixture>
 {
-    private readonly MongoAssetFolderRepository sut = new MongoAssetFolderRepository(fixture.Database);
-
-    public async Task InitializeAsync()
+    protected override async Task<ISnapshotStore<AssetFolder>> CreateSutAsync()
     {
+        var sut = new MongoAssetFolderRepository(fixture.Database);
+
         await sut.InitializeAsync(default);
-    }
-
-    public Task DisposeAsync()
-    {
-        return Task.CompletedTask;
-    }
-
-    protected override Task<ISnapshotStore<AssetFolder>> CreateSutAsync()
-    {
-        return Task.FromResult<ISnapshotStore<AssetFolder>>(sut);
+        return sut;
     }
 }

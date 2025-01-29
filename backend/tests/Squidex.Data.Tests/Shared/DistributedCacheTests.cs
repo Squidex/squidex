@@ -14,20 +14,18 @@ public abstract class DistributedCacheTests
     private readonly TimeProvider timeProvider = A.Fake<TimeProvider>();
     private DateTimeOffset now = DateTimeOffset.UtcNow;
 
-    protected TimeProvider TimeProvider => timeProvider;
-
     protected DistributedCacheTests()
     {
         A.CallTo(() => timeProvider.GetUtcNow())
             .ReturnsLazily(() => now);
     }
 
-    protected abstract Task<IDistributedCache> CreateSutAsync();
+    protected abstract Task<IDistributedCache> CreateSutAsync(TimeProvider timeProvider);
 
     [Fact]
     public async Task Should_add_and_get_entry_without_expiration()
     {
-        var sut = await CreateSutAsync();
+        var sut = await CreateSutAsync(timeProvider);
 
         var cacheKey = Guid.NewGuid().ToString();
         var cacheValue = cacheKey;
@@ -43,7 +41,7 @@ public abstract class DistributedCacheTests
     [Fact]
     public async Task Should_add_and_get_entry()
     {
-        var sut = await CreateSutAsync();
+        var sut = await CreateSutAsync(timeProvider);
 
         var cacheKey = Guid.NewGuid().ToString();
         var cacheValue = cacheKey;
@@ -59,7 +57,7 @@ public abstract class DistributedCacheTests
     [Fact]
     public async Task Should_not_return_result_if_expired()
     {
-        var sut = await CreateSutAsync();
+        var sut = await CreateSutAsync(timeProvider);
 
         var cacheKey = Guid.NewGuid().ToString();
         var cacheValue = cacheKey;
@@ -77,7 +75,7 @@ public abstract class DistributedCacheTests
     [Fact]
     public async Task Should_not_return_result_if_removed()
     {
-        var sut = await CreateSutAsync();
+        var sut = await CreateSutAsync(timeProvider);
 
         var cacheKey = Guid.NewGuid().ToString();
         var cacheValue = cacheKey;

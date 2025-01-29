@@ -22,40 +22,6 @@ public partial class BsonUniqueContentIdSerializer : SerializerBase<UniqueConten
         BsonSerializer.TryRegisterSerializer(Instance);
     }
 
-    public static UniqueContentId NextAppId(DomainId appId)
-    {
-        static void IncrementByteArray(byte[] bytes)
-        {
-            for (var i = 0; i < bytes.Length; i++)
-            {
-                var value = bytes[i];
-                if (value < byte.MaxValue)
-                {
-                    value += 1;
-                    bytes[i] = value;
-                    break;
-                }
-            }
-        }
-
-        if (Guid.TryParse(appId.ToString(), out var id))
-        {
-            var bytes = id.ToByteArray();
-
-            IncrementByteArray(bytes);
-
-            return new UniqueContentId(DomainId.Create(new Guid(bytes)), DomainId.Empty);
-        }
-        else
-        {
-            var bytes = Encoding.UTF8.GetBytes(appId.ToString());
-
-            IncrementByteArray(bytes);
-
-            return new UniqueContentId(DomainId.Create(Encoding.UTF8.GetString(bytes)), DomainId.Empty);
-        }
-    }
-
     public override UniqueContentId Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
     {
         var buffer = context.Reader.ReadBytes()!.AsSpan();

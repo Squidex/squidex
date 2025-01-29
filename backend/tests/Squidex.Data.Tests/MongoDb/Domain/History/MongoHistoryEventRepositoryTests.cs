@@ -13,22 +13,13 @@ using Squidex.Shared;
 namespace Squidex.MongoDb.Domain.History;
 
 [Trait("Category", "TestContainer")]
-public class MongoHistoryEventRepositoryTests(MongoFixture fixture) : HistoryEventRepositoryTests, IClassFixture<MongoFixture>, IAsyncLifetime
+public class MongoHistoryEventRepositoryTests(MongoFixture fixture) : HistoryEventRepositoryTests, IClassFixture<MongoFixture>
 {
-    private readonly MongoHistoryEventRepository sut = new MongoHistoryEventRepository(fixture.Database);
-
-    public async Task InitializeAsync()
+    protected override async Task<IHistoryEventRepository> CreateSutAsync()
     {
+        var sut = new MongoHistoryEventRepository(fixture.Database);
+
         await sut.InitializeAsync(default);
-    }
-
-    public Task DisposeAsync()
-    {
-        return Task.CompletedTask;
-    }
-
-    protected override Task<IHistoryEventRepository> CreateSutAsync()
-    {
-        return Task.FromResult<IHistoryEventRepository>(sut);
+        return sut;
     }
 }

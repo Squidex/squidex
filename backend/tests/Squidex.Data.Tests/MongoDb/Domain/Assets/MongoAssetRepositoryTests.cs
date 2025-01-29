@@ -14,22 +14,13 @@ using Squidex.Shared;
 namespace Squidex.MongoDb.Domain.Assets;
 
 [Trait("Category", "TestContainer")]
-public class MongoAssetRepositoryTests(MongoFixture fixture) : AssetRepositoryTests, IClassFixture<MongoFixture>, IAsyncLifetime
+public class MongoAssetRepositoryTests(MongoFixture fixture) : AssetRepositoryTests, IClassFixture<MongoFixture>
 {
-    private readonly MongoAssetRepository sut = new MongoAssetRepository(fixture.Database, A.Fake<ILogger<MongoAssetRepository>>(), string.Empty);
-
-    public async Task InitializeAsync()
+    protected override async Task<IAssetRepository> CreateSutAsync()
     {
+        var sut = new MongoAssetRepository(fixture.Database, A.Fake<ILogger<MongoAssetRepository>>(), string.Empty);
+
         await sut.InitializeAsync(default);
-    }
-
-    public Task DisposeAsync()
-    {
-        return Task.CompletedTask;
-    }
-
-    protected override Task<IAssetRepository> CreateSutAsync()
-    {
-        return Task.FromResult<IAssetRepository>(sut);
+        return sut;
     }
 }

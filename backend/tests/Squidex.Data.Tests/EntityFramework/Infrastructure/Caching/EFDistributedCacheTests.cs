@@ -15,9 +15,9 @@ namespace Squidex.EntityFramework.Infrastructure.Caching;
 [Trait("Category", "TestContainer")]
 public class EFDistributedCacheTests(PostgresFixture fixture) : DistributedCacheTests, IClassFixture<PostgresFixture>
 {
-    protected override Task<IDistributedCache> CreateSutAsync()
+    protected override Task<IDistributedCache> CreateSutAsync(TimeProvider timeProvider)
     {
-        var sut = new EFDistributedCache<TestDbContext>(fixture.DbContextFactory, TimeProvider);
+        var sut = new EFDistributedCache<TestDbContext>(fixture.DbContextFactory, timeProvider);
 
         return Task.FromResult<IDistributedCache>(sut);
     }

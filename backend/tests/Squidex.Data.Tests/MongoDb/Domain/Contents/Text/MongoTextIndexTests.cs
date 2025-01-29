@@ -8,21 +8,23 @@
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 
 using Squidex.Domain.Apps.Entities.Contents.Text;
+using Squidex.MongoDb.TestHelpers;
 
 namespace Squidex.MongoDb.Domain.Contents.Text;
 
 [Trait("Category", "Dependencies")]
-public class MongoTextIndexTests(MongoTextIndexFixture fixture) : TextIndexerTestsBase, IClassFixture<MongoTextIndexFixture>
+public class MongoTextIndexTests(MongoFixture fixture) : TextIndexerTestsBase, IClassFixture<MongoFixture>
 {
     public override bool SupportsQuerySyntax => false;
 
     public override bool SupportsGeo => true;
 
-    public MongoTextIndexFixture _ { get; } = fixture;
-
-    public override Task<ITextIndex> CreateSutAsync()
+    public override async Task<ITextIndex> CreateSutAsync()
     {
-        return Task.FromResult<ITextIndex>(_.Index);
+        var sut = new MongoTextIndex(fixture.Database, string.Empty);
+
+        await sut.InitializeAsync(default);
+        return sut;
     }
 
     [Fact]

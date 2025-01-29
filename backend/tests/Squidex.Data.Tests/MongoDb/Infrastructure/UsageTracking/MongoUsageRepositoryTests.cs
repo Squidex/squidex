@@ -11,22 +11,13 @@ using Squidex.Shared;
 
 namespace Squidex.MongoDb.Infrastructure.UsageTracking;
 
-public class MongoUsageRepositoryTests(MongoFixture fixture) : UsageRepositoryTests, IClassFixture<MongoFixture>, IAsyncLifetime
+public class MongoUsageRepositoryTests(MongoFixture fixture) : UsageRepositoryTests, IClassFixture<MongoFixture>
 {
-    private readonly MongoUsageRepository sut = new MongoUsageRepository(fixture.Database);
-
-    public async Task InitializeAsync()
+    protected override async Task<IUsageRepository> CreateSutAsync()
     {
+        var sut = new MongoUsageRepository(fixture.Database);
+
         await sut.InitializeAsync(default);
-    }
-
-    public Task DisposeAsync()
-    {
-        return Task.CompletedTask;
-    }
-
-    protected override Task<IUsageRepository> CreateSutAsync()
-    {
-        return Task.FromResult<IUsageRepository>(sut);
+        return sut;
     }
 }

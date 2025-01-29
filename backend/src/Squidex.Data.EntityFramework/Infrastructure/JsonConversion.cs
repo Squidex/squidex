@@ -8,6 +8,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NodaTime;
+using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Infrastructure.Json;
 
 #pragma warning disable RECS0015 // If an extension method is called as static method convert it to method syntax
@@ -88,6 +89,17 @@ public static class JsonConversion
         var converter = new ValueConverter<HashSet<string>, string>(
             v => TagsConverter.ToString(v),
             v => TagsConverter.ToSet(v)
+        );
+
+        propertyBuilder.HasConversion(converter);
+        return propertyBuilder;
+    }
+
+    public static PropertyBuilder<UniqueContentId> AsString(this PropertyBuilder<UniqueContentId> propertyBuilder)
+    {
+        var converter = new ValueConverter<UniqueContentId, string>(
+            v => v.ToParseableString(),
+            v => v.ToUniqueContentId()
         );
 
         propertyBuilder.HasConversion(converter);

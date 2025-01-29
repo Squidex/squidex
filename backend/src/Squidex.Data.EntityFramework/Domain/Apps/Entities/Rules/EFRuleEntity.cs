@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations.Schema;
-using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
@@ -21,8 +20,7 @@ public sealed class EFRuleEntity : EFState<Rule>
     [Column("Id")]
     public DomainId IndexedId { get; set; }
 
-    [BsonRequired]
-    [BsonElement("_dl")]
+    [Column("Deleted")]
     public bool IndexedDeleted { get; set; }
 
     public override void Prepare()

@@ -11,22 +11,13 @@ using Squidex.Shared;
 
 namespace Squidex.MongoDb.Infrastructure.Migrations;
 
-public class MongoMigrationStatusTests(MongoFixture fixture) : MigrationStatusTests, IClassFixture<MongoFixture>, IAsyncLifetime
+public class MongoMigrationStatusTests(MongoFixture fixture) : MigrationStatusTests, IClassFixture<MongoFixture>
 {
-    private readonly MongoMigrationStatus sut = new MongoMigrationStatus(fixture.Database);
-
-    public async Task InitializeAsync()
+    protected override async Task<IMigrationStatus> CreateSutAsync()
     {
+        var sut = new MongoMigrationStatus(fixture.Database);
+
         await sut.InitializeAsync(default);
-    }
-
-    public Task DisposeAsync()
-    {
-        return Task.CompletedTask;
-    }
-
-    protected override Task<IMigrationStatus> CreateSutAsync()
-    {
-        return Task.FromResult<IMigrationStatus>(sut);
+        return sut;
     }
 }

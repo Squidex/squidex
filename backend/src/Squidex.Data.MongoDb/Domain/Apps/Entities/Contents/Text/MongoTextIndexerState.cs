@@ -44,23 +44,32 @@ public sealed class MongoTextIndexerState(
     async Task IDeleter.DeleteAppAsync(App app,
         CancellationToken ct)
     {
-        var filter =
-            Filter.And(
-                Filter.Gte(x => x.UniqueContentId, new UniqueContentId(app.Id, DomainId.Empty)),
-                Filter.Lt(x => x.UniqueContentId, BsonUniqueContentIdSerializer.NextAppId(app.Id)));
+        var ids =
+            Collection.Find(Filter.Gte(x => x.UniqueContentId, new UniqueContentId(app.Id, DomainId.Empty)))
+                .Sort(Sort.Ascending(x => x.UniqueContentId))
+                .ToAsyncEnumerable(ct).Select(x => x.UniqueContentId)
+                .Take(int.MaxValue)
+                .TakeWhile(x => x.AppId == app.Id);
 
-        await Collection.DeleteManyAsync(filter, ct);
+        await DeleteInBatchesAsync(ids, ct);
     }
 
     async Task IDeleter.DeleteSchemaAsync(App app, Schema schema,
         CancellationToken ct)
     {
-        var ids = contentRepository.StreamIds(app.Id, schema.Id, SearchScope.All, ct).Batch(1000, ct);
+        var ids =
+            contentRepository.StreamIds(app.Id, schema.Id, SearchScope.All, ct)
+                .Select(x => new UniqueContentId(app.Id, x));
 
-        await foreach (var batch in ids.WithCancellation(ct))
+        await DeleteInBatchesAsync(ids, ct);
+    }
+
+    private async Task DeleteInBatchesAsync(IAsyncEnumerable<UniqueContentId> ids,
+        CancellationToken ct)
+    {
+        await foreach (var batch in ids.Batch(1000, ct).WithCancellation(ct))
         {
-            var filter =
-                Filter.In(x => x.UniqueContentId, batch.Select(x => new UniqueContentId(app.Id, x)));
+            var filter = Filter.In(x => x.UniqueContentId, batch);
 
             await Collection.DeleteManyAsync(filter, ct);
         }

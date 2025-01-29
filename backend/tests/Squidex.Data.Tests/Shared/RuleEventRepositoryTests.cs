@@ -79,7 +79,7 @@ public abstract class RuleEventRepositoryTests
                             Expires = created,
                             RuleId = ruleId.Id,
                         },
-                        NextAttempt = created.Plus(Duration.FromDays(1)),
+                        NextAttempt = created.Plus(Duration.FromDays(i)),
                     });
                 }
             }
@@ -155,7 +155,7 @@ public abstract class RuleEventRepositoryTests
         var result = await sut.QueryPendingAsync(now).ToListAsync();
 
         // Result does not return all items.
-        Assert.True(result.Count < NumValues * 4);
+        Assert.InRange(result.Count, 50, 100);
     }
 
     [Fact]

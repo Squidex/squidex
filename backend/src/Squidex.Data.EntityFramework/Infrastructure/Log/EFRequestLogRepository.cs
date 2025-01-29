@@ -9,7 +9,6 @@ using System.Runtime.CompilerServices;
 using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
-using MongoDB.Driver;
 using NodaTime;
 using Squidex.Hosting;
 using Squidex.Infrastructure.Timers;
