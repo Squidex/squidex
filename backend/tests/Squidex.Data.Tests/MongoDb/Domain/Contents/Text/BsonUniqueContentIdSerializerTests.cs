@@ -19,13 +19,13 @@ public class BsonUniqueContentIdSerializerTests
         BsonUniqueContentIdSerializer.Register();
     }
 
-    public static readonly TheoryData<string> CustomIds = new TheoryData<string>
-    {
+    public static readonly TheoryData<string> CustomIds =
+    [
         "id",
         "id-short",
         "id-and-guid-size",
         "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    };
+    ];
 
     [Fact]
     public void Should_serialize_and_deserialize_guid_guid()

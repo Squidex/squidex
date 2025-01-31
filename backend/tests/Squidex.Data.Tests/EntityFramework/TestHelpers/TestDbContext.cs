@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using Microsoft.EntityFrameworkCore;
-using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.States;
 using Squidex.Shared;
@@ -17,38 +17,39 @@ using Squidex.Shared;
 namespace Squidex.EntityFramework.TestHelpers;
 
 public class TestDbContextMySql(DbContextOptions options, IJsonSerializer jsonSerializer)
-    : TestDbContextBase(options, jsonSerializer)
+    : TestDbContext(options, jsonSerializer)
 {
-    protected override void OnModelCreating(ModelBuilder builder)
+    protected override string? JsonColumnType()
     {
-        builder.Entity<TestEntity>()
-            .Property(p => p.Json).HasColumnType("json");
-
-        base.OnModelCreating(builder);
+        return "json";
     }
+}
+
+public class TestDbContextPostgres(DbContextOptions options, IJsonSerializer jsonSerializer)
+    : TestDbContext(options, jsonSerializer)
+{
+    protected override string? JsonColumnType()
+    {
+        return "jsonb";
+    }
+}
+
+public class TestDbContexSqlServer(DbContextOptions options, IJsonSerializer jsonSerializer)
+    : TestDbContext(options, jsonSerializer)
+{
 }
 
 public class TestDbContext(DbContextOptions options, IJsonSerializer jsonSerializer)
-    : TestDbContextBase(options, jsonSerializer)
-{
-    protected override void OnModelCreating(ModelBuilder builder)
-    {
-        builder.Entity<TestEntity>()
-            .OwnsOne(p => p.Json).ToJson();
-
-        builder.Entity<EFAssetEntity>()
-            .Property(p => p.Metadata).HasColumnType("json");
-
-        base.OnModelCreating(builder);
-    }
-}
-
-public class TestDbContextBase(DbContextOptions options, IJsonSerializer jsonSerializer)
     : AppDbContext(options, jsonSerializer)
 {
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.AddSnapshot<SnapshotValue, EFState<SnapshotValue>>(jsonSerializer);
+
+        builder.Entity<TestEntity>(b =>
+        {
+            b.Property(x => x.Json).AsJsonString(jsonSerializer).HasColumnType(JsonColumnType());
+        });
 
         base.OnModelCreating(builder);
     }

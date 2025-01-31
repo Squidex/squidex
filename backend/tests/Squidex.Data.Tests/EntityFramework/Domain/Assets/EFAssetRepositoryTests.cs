@@ -17,7 +17,7 @@ public class EFAssetRepositoryTests(PostgresFixture fixture) : AssetRepositoryTe
 {
     protected override Task<IAssetRepository> CreateSutAsync()
     {
-        var sut = new EFAssetRepository<TestDbContext>(fixture.DbContextFactory, fixture.Dialect);
+        var sut = new EFAssetRepository<TestDbContextPostgres>(fixture.DbContextFactory, fixture.Dialect);
 
         return Task.FromResult<IAssetRepository>(sut);
     }

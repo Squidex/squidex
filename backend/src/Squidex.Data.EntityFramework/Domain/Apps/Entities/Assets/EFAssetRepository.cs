@@ -11,7 +11,6 @@ using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
-using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
@@ -42,91 +41,38 @@ public sealed partial class EFAssetRepository<TContext>(IDbContextFactory<TConte
         {
             await using var dbContext = await CreateDbContextAsync(ct);
 
-            var query = q.Query;
             if (q.Ids is { Count: > 0 })
             {
-                var assetEntities =
+                var result =
                     await dbContext.Set<EFAssetEntity>()
                         .Where(x => x.IndexedAppId == appId)
                         .Where(x => q.Ids.Contains(x.Id))
                         .Where(x => !x.IsDeleted)
-                        .ToListAsync(ct);
-                long assetTotal = assetEntities.Count;
+                        .QueryAsync(q, ct);
 
-                if (assetEntities.Count >= query.Take || query.Skip > 0)
-                {
-                    if (q.NoTotal)
-                    {
-                        assetTotal = -1;
-                    }
-                    else
-                    {
-                        assetTotal =
-                            await dbContext.Set<EFAssetEntity>()
-                                .Where(x => x.IndexedAppId == appId)
-                                .Where(x => q.Ids.Contains(x.Id))
-                                .Where(x => !x.IsDeleted)
-                                .CountAsync(ct);
-                    }
-                }
-
-                return ResultList.Create(assetTotal, assetEntities.OfType<Asset>());
+                return result;
             }
-            else
+
+            var sqlQuery =
+                new AssetSqlQueryBuilder(dialect)
+                    .WithLimit(q.Query)
+                    .WithOffset(q.Query)
+                    .WithOrders(q.Query)
+                    .RawWhere(nameof(EFAssetEntity.IndexedAppId), CompareOperator.Equals, appId.ToString());
+
+            if (q.Query.Filter?.HasField("IsDeleted") != true)
             {
-                var sqlQuery =
-                    new AssetSqlQueryBuilder(dialect)
-                        .WithLimit(query)
-                        .WithOffset(query)
-                        .WithOrders(query)
-                        .RawWhere(nameof(EFAssetEntity.IndexedAppId), CompareOperator.Equals, appId.ToString());
-
-                if (query.Filter?.HasField("IsDeleted") != true)
-                {
-                    sqlQuery.RawWhere(nameof(EFAssetEntity.IsDeleted), CompareOperator.Equals, false);
-                }
-
-                if (parentId != null)
-                {
-                    sqlQuery.RawWhere(nameof(EFAssetEntity.ParentId), CompareOperator.Equals, parentId.ToString());
-                }
-
-                sqlQuery.WithFilter(query);
-
-                var (sql, parameters) = sqlQuery.Compile();
-
-                var assetEntities = await dbContext.Set<EFAssetEntity>().FromSqlRaw(sql, parameters).ToListAsync(ct);
-                var assetTotal = (long)assetEntities.Count;
-
-                if (assetEntities.Count >= query.Take || query.Skip > 0)
-                {
-                    if (q.NoTotal || q.NoSlowTotal)
-                    {
-                        assetTotal = -1;
-                    }
-                    else
-                    {
-                        sqlQuery
-                            .WithCount()
-                            .WithoutOrder()
-                            .WithLimit(long.MaxValue)
-                            .WithOffset(0);
-
-                        var (countSql, countParams) = sqlQuery.Compile();
-
-                        assetTotal =
-                            await dbContext.Database.SqlQueryRaw<long>(countSql, countParams, ct)
-                                .FirstOrDefaultAsync(ct);
-                    }
-                }
-
-                if (query.Random > 0)
-                {
-                    assetEntities = assetEntities.TakeRandom(query.Random).ToList();
-                }
-
-                return ResultList.Create<Asset>(assetTotal, assetEntities);
+                sqlQuery.RawWhere(nameof(EFAssetEntity.IsDeleted), CompareOperator.Equals, false);
             }
+
+            if (parentId != null)
+            {
+                sqlQuery.RawWhere(nameof(EFAssetEntity.ParentId), CompareOperator.Equals, parentId.ToString());
+            }
+
+            sqlQuery.WithFilter(q.Query);
+
+            return await dbContext.QueryAsync<EFAssetEntity>(sqlQuery, q, ct);
         }
     }
 

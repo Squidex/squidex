@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Google.Protobuf.WellKnownTypes;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Contents;
@@ -32,6 +33,11 @@ public record WriteContent : AppEntity
     public bool IsPublished
     {
         get => (NewVersion?.Status ?? CurrentVersion?.Status ?? default) == Status.Published;
+    }
+
+    public bool ShouldWritePublished
+    {
+        get => CurrentVersion.Status == Status.Published && !IsDeleted;
     }
 
     public Content ToContent()

@@ -16,7 +16,7 @@ namespace Squidex.Shared;
 
 public abstract class AppRepositoryTests
 {
-    private readonly DomainId knownId = DomainId.Create("3e764e15-3cf5-427f-bb6f-f0fa29a40a2d");
+    private static readonly DomainId KnownId = DomainId.Create("3e764e15-3cf5-427f-bb6f-f0fa29a40a2d");
 
     protected abstract Task<IAppRepository> CreateSutAsync();
 
@@ -36,7 +36,7 @@ public abstract class AppRepositoryTests
     {
         var sut = await CreateSutAsync();
 
-        if (await sut.FindAsync(knownId) != null)
+        if (await sut.FindAsync(KnownId) != null)
         {
             return sut;
         }
@@ -46,7 +46,7 @@ public abstract class AppRepositoryTests
 
         var defaultNotDeleted = new App
         {
-            Id = knownId,
+            Id = KnownId,
             Name = "default",
             Description = "default-not-deleted",
             IsDeleted = false,
@@ -171,7 +171,7 @@ public abstract class AppRepositoryTests
     {
         var sut = await CreateAndPrepareSutAsync();
 
-        var result = await sut.FindAsync(knownId);
+        var result = await sut.FindAsync(KnownId);
 
         Assert.Equal("default-not-deleted", result?.Description);
     }

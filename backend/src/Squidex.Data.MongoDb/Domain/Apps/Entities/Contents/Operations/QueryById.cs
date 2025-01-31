@@ -20,7 +20,6 @@ internal sealed class QueryById : OperationBase
         var filter = Filter.Eq(x => x.DocumentId, DomainId.Combine(schema.AppId, id));
 
         var contentEntity = await Collection.Find(filter).SelectFields(null).FirstOrDefaultAsync(ct);
-
         if (contentEntity == null || contentEntity.IndexedSchemaId != schema.Id)
         {
             return null;

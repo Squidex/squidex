@@ -93,6 +93,22 @@ public sealed partial class EFAssetRepository<TContext> : ISnapshotStore<Asset>,
         }
     }
 
+    async Task ISnapshotStore<Asset>.WriteManyAsync(IEnumerable<SnapshotWriteJob<Asset>> jobs,
+        CancellationToken ct)
+    {
+        using (Telemetry.Activities.StartActivity("EFAssetRepository/WriteManyAsync"))
+        {
+            var entities = jobs.Select(EFAssetEntity.Create).ToList();
+            if (entities.Count == 0)
+            {
+                return;
+            }
+
+            await using var dbContext = await CreateDbContextAsync(ct);
+            await dbContext.BulkInsertAsync(entities, cancellationToken: ct);
+        }
+    }
+
     private static Expression<Func<SetPropertyCalls<EFAssetEntity>, SetPropertyCalls<EFAssetEntity>>> BuildUpdate(EFAssetEntity entity)
     {
         return b => b
@@ -115,21 +131,5 @@ public sealed partial class EFAssetRepository<TContext> : ISnapshotStore<Asset>,
             .SetProperty(x => x.TotalSize, entity.TotalSize)
             .SetProperty(x => x.Type, entity.Type)
             .SetProperty(x => x.Version, entity.Version);
-    }
-
-    async Task ISnapshotStore<Asset>.WriteManyAsync(IEnumerable<SnapshotWriteJob<Asset>> jobs,
-        CancellationToken ct)
-    {
-        using (Telemetry.Activities.StartActivity("EFAssetRepository/WriteManyAsync"))
-        {
-            var entities = jobs.Select(EFAssetEntity.Create).ToList();
-            if (entities.Count == 0)
-            {
-                return;
-            }
-
-            await using var dbContext = await CreateDbContextAsync(ct);
-            await dbContext.BulkInsertOrUpdateAsync(entities, cancellationToken: ct);
-        }
     }
 }

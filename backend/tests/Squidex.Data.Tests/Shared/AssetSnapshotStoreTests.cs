@@ -14,11 +14,11 @@ namespace Squidex.Shared;
 
 public abstract class AssetSnapshotStoreTests : SnapshotStoreTests<Asset>
 {
+    public GivenContext Context { get; } = new GivenContext();
+
     protected override Asset CreateEntity(DomainId id, int version)
     {
-        var context = new GivenContext();
-
-        return Cleanup(context.CreateAsset() with { Id = id, Version = version });
+        return Cleanup(Context.CreateAsset() with { Id = id, Version = version });
     }
 
     protected override Asset Cleanup(Asset expected)

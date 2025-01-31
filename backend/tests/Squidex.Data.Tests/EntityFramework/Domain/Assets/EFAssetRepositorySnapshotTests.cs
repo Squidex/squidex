@@ -18,7 +18,7 @@ public class EFAssetRepositorySnapshotTests(PostgresFixture fixture) : AssetSnap
 {
     protected override Task<ISnapshotStore<Asset>> CreateSutAsync()
     {
-        var sut = new EFAssetRepository<TestDbContext>(fixture.DbContextFactory, fixture.Dialect);
+        var sut = new EFAssetRepository<TestDbContextPostgres>(fixture.DbContextFactory, fixture.Dialect);
 
         return Task.FromResult<ISnapshotStore<Asset>>(sut);
     }

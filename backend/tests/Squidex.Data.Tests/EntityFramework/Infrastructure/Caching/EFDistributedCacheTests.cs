@@ -17,7 +17,7 @@ public class EFDistributedCacheTests(PostgresFixture fixture) : DistributedCache
 {
     protected override Task<IDistributedCache> CreateSutAsync(TimeProvider timeProvider)
     {
-        var sut = new EFDistributedCache<TestDbContext>(fixture.DbContextFactory, timeProvider);
+        var sut = new EFDistributedCache<TestDbContextPostgres>(fixture.DbContextFactory, timeProvider);
 
         return Task.FromResult<IDistributedCache>(sut);
     }

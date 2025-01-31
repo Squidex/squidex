@@ -16,7 +16,7 @@ public class EFUsageRepositoryTests(PostgresFixture fixture) : UsageRepositoryTe
 {
     protected override Task<IUsageRepository> CreateSutAsync()
     {
-        var sut = new EFUsageRepository<TestDbContext>(fixture.DbContextFactory);
+        var sut = new EFUsageRepository<TestDbContextPostgres>(fixture.DbContextFactory);
 
         return Task.FromResult<IUsageRepository>(sut);
     }

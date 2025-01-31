@@ -17,7 +17,7 @@ public class EFSchemaRepositoryTests(PostgresFixture fixture) : SchemaRepository
 {
     protected override Task<ISchemaRepository> CreateSutAsync()
     {
-        var sut = new EFSchemaRepository<TestDbContext>(fixture.DbContextFactory);
+        var sut = new EFSchemaRepository<TestDbContextPostgres>(fixture.DbContextFactory);
 
         return Task.FromResult<ISchemaRepository>(sut);
     }

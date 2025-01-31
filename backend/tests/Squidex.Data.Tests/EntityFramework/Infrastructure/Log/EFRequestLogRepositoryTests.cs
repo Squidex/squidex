@@ -18,7 +18,7 @@ public class EFRequestLogRepositoryTests(PostgresFixture fixture) : RequestLogRe
     protected override Task<IRequestLogRepository> CreateSutAsync()
     {
         var sut =
-            new EFRequestLogRepository<TestDbContext>(
+            new EFRequestLogRepository<TestDbContextPostgres>(
                 fixture.DbContextFactory, Options.Create(new RequestLogStoreOptions()));
 
         return Task.FromResult<IRequestLogRepository>(sut);

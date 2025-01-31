@@ -93,20 +93,6 @@ public sealed partial class EFAssetFolderRepository<TContext> : ISnapshotStore<A
         }
     }
 
-    private static Expression<Func<SetPropertyCalls<EFAssetFolderEntity>, SetPropertyCalls<EFAssetFolderEntity>>> BuildUpdate(EFAssetFolderEntity entity)
-    {
-        return b => b
-            .SetProperty(x => x.AppId, entity.AppId)
-            .SetProperty(x => x.Created, entity.Created)
-            .SetProperty(x => x.CreatedBy, entity.CreatedBy)
-            .SetProperty(x => x.FolderName, entity.FolderName)
-            .SetProperty(x => x.IsDeleted, entity.IsDeleted)
-            .SetProperty(x => x.LastModified, entity.LastModified)
-            .SetProperty(x => x.LastModifiedBy, entity.LastModifiedBy)
-            .SetProperty(x => x.ParentId, entity.ParentId)
-            .SetProperty(x => x.Version, entity.Version);
-    }
-
     async Task ISnapshotStore<AssetFolder>.WriteManyAsync(IEnumerable<SnapshotWriteJob<AssetFolder>> jobs,
         CancellationToken ct)
     {
@@ -119,12 +105,26 @@ public sealed partial class EFAssetFolderRepository<TContext> : ISnapshotStore<A
             }
 
             await using var dbContext = await CreateDbContextAsync(ct);
-            await dbContext.BulkInsertOrUpdateAsync(entities, cancellationToken: ct);
+            await dbContext.BulkInsertAsync(entities, cancellationToken: ct);
         }
     }
 
     private Task<TContext> CreateDbContextAsync(CancellationToken ct)
     {
         return dbContextFactory.CreateDbContextAsync(ct);
+    }
+
+    private static Expression<Func<SetPropertyCalls<EFAssetFolderEntity>, SetPropertyCalls<EFAssetFolderEntity>>> BuildUpdate(EFAssetFolderEntity entity)
+    {
+        return b => b
+            .SetProperty(x => x.AppId, entity.AppId)
+            .SetProperty(x => x.Created, entity.Created)
+            .SetProperty(x => x.CreatedBy, entity.CreatedBy)
+            .SetProperty(x => x.FolderName, entity.FolderName)
+            .SetProperty(x => x.IsDeleted, entity.IsDeleted)
+            .SetProperty(x => x.LastModified, entity.LastModified)
+            .SetProperty(x => x.LastModifiedBy, entity.LastModifiedBy)
+            .SetProperty(x => x.ParentId, entity.ParentId)
+            .SetProperty(x => x.Version, entity.Version);
     }
 }

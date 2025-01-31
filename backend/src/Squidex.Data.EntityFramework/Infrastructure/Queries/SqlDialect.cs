@@ -18,12 +18,18 @@ public class SqlDialect
 
         var sb = new StringBuilder("SELECT");
 
+        var fields = request.Fields;
+        if (fields.Count == 0)
+        {
+            fields = ["*"];
+        }
+
         var i = 0;
-        foreach (var field in request.Fields)
+        foreach (var field in fields)
         {
             sb.Append($"{t}{field}");
 
-            if (i < request.Fields.Count - 1)
+            if (i < fields.Count - 1)
             {
                 sb.Append(',');
             }
@@ -100,6 +106,11 @@ public class SqlDialect
     public virtual string CountAll()
     {
         return "COUNT(*)";
+    }
+
+    public virtual string Field(PropertyPath path, bool isJson)
+    {
+        return $"{FormatField(path, null, isJson)}";
     }
 
     public virtual string OrderBy(PropertyPath path, SortOrder order, bool isJson)

@@ -17,7 +17,7 @@ namespace Squidex.Shared;
 
 public abstract class RuleRepositoryTests
 {
-    private readonly DomainId knownId = DomainId.Create("3e764e15-3cf5-427f-bb6f-f0fa29a40a2d");
+    private static readonly DomainId KnownId = DomainId.Create("3e764e15-3cf5-427f-bb6f-f0fa29a40a2d");
 
     protected abstract Task<IRuleRepository> CreateSutAsync();
 
@@ -37,7 +37,7 @@ public abstract class RuleRepositoryTests
     {
         var sut = await CreateSutAsync();
 
-        if ((await sut.QueryAllAsync(knownId)).Count > 0)
+        if ((await sut.QueryAllAsync(KnownId)).Count > 0)
         {
             return sut;
         }
@@ -47,7 +47,7 @@ public abstract class RuleRepositoryTests
 
         var rule1 = new Rule
         {
-            AppId = NamedId.Of(knownId, "my-app"),
+            AppId = NamedId.Of(KnownId, "my-app"),
             Id = DomainId.NewGuid(),
             Name = "rule1",
             Created = created,
@@ -56,8 +56,8 @@ public abstract class RuleRepositoryTests
 
         var rule2 = new Rule
         {
-            AppId = NamedId.Of(knownId, "my-app"),
-            Id = knownId,
+            AppId = NamedId.Of(KnownId, "my-app"),
+            Id = KnownId,
             Name = "rule2",
             Created = created,
             CreatedBy = createdBy,
@@ -86,7 +86,7 @@ public abstract class RuleRepositoryTests
     {
         var sut = await CreateAndPrepareSutAsync();
 
-        var found = await sut.QueryAllAsync(knownId);
+        var found = await sut.QueryAllAsync(KnownId);
 
         Assert.Equal(2, found.Count);
     }

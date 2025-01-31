@@ -25,7 +25,7 @@ public sealed class SqlServerFixture : IAsyncLifetime
 
     private IServiceProvider services;
 
-    public IDbContextFactory<TestDbContext> DbContextFactory => services.GetRequiredService<IDbContextFactory<TestDbContext>>();
+    public IDbContextFactory<TestDbContexSqlServer> DbContextFactory => services.GetRequiredService<IDbContextFactory<TestDbContexSqlServer>>();
 
     public async Task InitializeAsync()
     {
@@ -33,14 +33,14 @@ public sealed class SqlServerFixture : IAsyncLifetime
 
         services =
             new ServiceCollection()
-                 .AddDbContextFactory<TestDbContext>(b =>
+                 .AddDbContextFactory<TestDbContexSqlServer>(b =>
                  {
                      b.UseSqlServer(sqlServer.GetConnectionString());
                  })
                  .AddSingleton(TestUtils.DefaultSerializer)
                  .BuildServiceProvider();
 
-        var factory = services.GetRequiredService<IDbContextFactory<TestDbContext>>();
+        var factory = services.GetRequiredService<IDbContextFactory<TestDbContexSqlServer>>();
         var context = await factory.CreateDbContextAsync();
         var creator = (RelationalDatabaseCreator)context.Database.GetService<IDatabaseCreator>();
 

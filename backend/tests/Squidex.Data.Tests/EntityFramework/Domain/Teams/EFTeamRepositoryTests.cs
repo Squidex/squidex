@@ -17,7 +17,7 @@ public class EFTeamRepositoryTests(PostgresFixture fixture) : TeamRepositoryTest
 {
     protected override Task<ITeamRepository> CreateSutAsync()
     {
-        var sut = new EFTeamRepository<TestDbContext>(fixture.DbContextFactory);
+        var sut = new EFTeamRepository<TestDbContextPostgres>(fixture.DbContextFactory);
 
         return Task.FromResult<ITeamRepository>(sut);
     }

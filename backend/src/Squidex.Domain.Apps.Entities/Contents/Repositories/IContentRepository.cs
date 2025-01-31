@@ -47,7 +47,7 @@ public interface IContentRepository
     Task<bool> HasReferrersAsync(App app, DomainId reference, SearchScope scope,
         CancellationToken ct = default);
 
-    Task ResetScheduledAsync(DomainId appId, DomainId contentId, SearchScope scope,
+    Task ResetScheduledAsync(DomainId appId, DomainId id, SearchScope scope,
         CancellationToken ct = default);
 
     Task CreateIndexAsync(DomainId appId, DomainId schemaId, IndexDefinition index,

@@ -16,8 +16,8 @@ namespace Squidex.Shared;
 
 public abstract class HistoryEventRepositoryTests
 {
-    private readonly RefToken actor = RefToken.Client("client");
-    private readonly DomainId knownId = DomainId.Create("3e764e15-3cf5-427f-bb6f-f0fa29a40a2d");
+    private static readonly RefToken Actor = RefToken.Client("client");
+    private static readonly DomainId KnownId = DomainId.Create("3e764e15-3cf5-427f-bb6f-f0fa29a40a2d");
 
     protected abstract Task<IHistoryEventRepository> CreateSutAsync();
 
@@ -25,7 +25,7 @@ public abstract class HistoryEventRepositoryTests
     {
         var sut = await CreateSutAsync();
 
-        if ((await sut.QueryByChannelAsync(knownId, string.Empty, 10)).Any())
+        if ((await sut.QueryByChannelAsync(KnownId, string.Empty, 10)).Any())
         {
             return sut;
         }
@@ -36,25 +36,25 @@ public abstract class HistoryEventRepositoryTests
             new HistoryEvent
             {
                 Id = DomainId.NewGuid(),
-                Actor = actor,
+                Actor = Actor,
                 Channel = "parent1.child1",
                 Created = created.Plus(Duration.FromHours(10)),
                 EventType = "type",
-                OwnerId = knownId,
+                OwnerId = KnownId,
             },
             new HistoryEvent
             {
                 Id = DomainId.NewGuid(),
-                Actor = actor,
+                Actor = Actor,
                 Channel = "parent1.child2",
                 Created = created.Plus(Duration.FromHours(9)),
                 EventType = "type",
-                OwnerId = knownId,
+                OwnerId = KnownId,
             },
             new HistoryEvent
             {
                 Id = DomainId.NewGuid(),
-                Actor = actor,
+                Actor = Actor,
                 Channel = "channel",
                 Created = created.Plus(Duration.FromHours(6)),
                 EventType = "type",
@@ -68,7 +68,7 @@ public abstract class HistoryEventRepositoryTests
     [Fact]
     public async Task Query_all_async()
     {
-        var result = await QueryAsync(knownId, string.Empty, 100);
+        var result = await QueryAsync(KnownId, string.Empty, 100);
 
         Assert.Equal(["parent1.child1", "parent1.child2"], result);
     }
@@ -76,7 +76,7 @@ public abstract class HistoryEventRepositoryTests
     [Fact]
     public async Task Query_with_limited_count()
     {
-        var result = await QueryAsync(knownId, string.Empty, 1);
+        var result = await QueryAsync(KnownId, string.Empty, 1);
 
         Assert.Equal(["parent1.child1"], result);
     }
@@ -84,7 +84,7 @@ public abstract class HistoryEventRepositoryTests
     [Fact]
     public async Task Query_with_channel()
     {
-        var result = await QueryAsync(knownId, "parent1.child1", 100);
+        var result = await QueryAsync(KnownId, "parent1.child1", 100);
 
         Assert.Equal(["parent1.child1"], result);
     }
@@ -100,7 +100,7 @@ public abstract class HistoryEventRepositoryTests
             new HistoryEvent
             {
                 Id = appId,
-                Actor = actor,
+                Actor = Actor,
                 Channel = "channel1",
                 Created = default,
                 EventType = "type",
@@ -112,7 +112,7 @@ public abstract class HistoryEventRepositoryTests
             new HistoryEvent
             {
                 Id = appId,
-                Actor = actor,
+                Actor = Actor,
                 Channel = "channel2",
                 Created = default,
                 EventType = "type",
@@ -139,7 +139,7 @@ public abstract class HistoryEventRepositoryTests
             new HistoryEvent
             {
                 Id = appId,
-                Actor = actor,
+                Actor = Actor,
                 Channel = "channel1",
                 Created = default,
                 EventType = "type",

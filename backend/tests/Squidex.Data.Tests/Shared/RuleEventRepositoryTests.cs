@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.AspNetCore.Http.HttpResults;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules;
@@ -17,16 +16,17 @@ namespace Squidex.Shared;
 public abstract class RuleEventRepositoryTests
 {
     private const int NumValues = 250;
-    private readonly DomainId appId;
-    private readonly NamedId<DomainId>[] appIds =
+    private static readonly NamedId<DomainId>[] AppIds =
     [
         NamedId.Of(DomainId.Create("3b5ba909-e5a5-4858-9d0d-df4ff922d452"), "my-app1"),
         NamedId.Of(DomainId.Create("3b5ba909-e5a5-4858-9d0d-df4ff922d453"), "my-app1"),
     ];
 
+    private readonly DomainId appId;
+
     protected RuleEventRepositoryTests()
     {
-        appId = appIds[Random.Shared.Next(appIds.Length)].Id;
+        appId = AppIds[Random.Shared.Next(AppIds.Length)].Id;
     }
 
     protected abstract Task<IRuleEventRepository> CreateSutAsync();
@@ -35,7 +35,7 @@ public abstract class RuleEventRepositoryTests
     {
         var sut = await CreateSutAsync();
 
-        if ((await sut.QueryByAppAsync(appIds[0].Id, null)).Count > 0)
+        if ((await sut.QueryByAppAsync(AppIds[0].Id, null)).Count > 0)
         {
             return sut;
         }
@@ -58,9 +58,9 @@ public abstract class RuleEventRepositoryTests
 
         var created = SystemClock.Instance.GetCurrentInstant();
 
-        foreach (var forAppId in appIds)
+        foreach (var forAppId in AppIds)
         {
-            foreach (var ruleId in appIds)
+            foreach (var ruleId in AppIds)
             {
                 for (var i = 0; i < NumValues; i++)
                 {

@@ -23,18 +23,19 @@ namespace Squidex.Shared;
 public abstract class AssetRepositoryTests : GivenContext
 {
     private const int NumValues = 250;
-    private readonly string randomValue = Random.Shared.Next(NumValues).ToString(CultureInfo.InvariantCulture);
-    private readonly DomainId appId;
-    private readonly DomainId parentId = DomainId.Create("3b5ba909-e5a5-4858-9d0d-df4ff922d451");
-    private readonly NamedId<DomainId>[] appIds =
+    private static readonly DomainId ParentId = DomainId.Create("3b5ba909-e5a5-4858-9d0d-df4ff922d451");
+    private static readonly NamedId<DomainId>[] AppIds =
     [
         NamedId.Of(DomainId.Create("3b5ba909-e5a5-4858-9d0d-df4ff922d452"), "my-app1"),
-        NamedId.Of(DomainId.Create("3b5ba909-e5a5-4858-9d0d-df4ff922d453"), "my-app1"),
+        NamedId.Of(DomainId.Create("3b5ba909-e5a5-4858-9d0d-df4ff922d453"), "my-app2"),
     ];
+
+    private readonly string randomValue = Random.Shared.Next(NumValues).ToString(CultureInfo.InvariantCulture);
+    private readonly DomainId appId;
 
     protected AssetRepositoryTests()
     {
-        appId = appIds[Random.Shared.Next(appIds.Length)].Id;
+        appId = AppIds[Random.Shared.Next(AppIds.Length)].Id;
     }
 
     protected abstract Task<IAssetRepository> CreateSutAsync();
@@ -42,13 +43,12 @@ public abstract class AssetRepositoryTests : GivenContext
     protected async Task<IAssetRepository> CreateAndPrepareSutAsync()
     {
         var sut = await CreateSutAsync();
-
-        if (await sut.StreamAll(appIds[0].Id).AnyAsync())
+        if (sut is not ISnapshotStore<Asset> store)
         {
             return sut;
         }
 
-        if (sut is not ISnapshotStore<Asset> store)
+        if (await sut.StreamAll(AppIds[0].Id).AnyAsync())
         {
             return sut;
         }
@@ -69,7 +69,7 @@ public abstract class AssetRepositoryTests : GivenContext
             }
         }
 
-        foreach (var forAppId in appIds)
+        foreach (var forAppId in AppIds)
         {
             for (var i = 0; i < NumValues; i++)
             {
@@ -100,7 +100,7 @@ public abstract class AssetRepositoryTests : GivenContext
             var byParent = CreateAsset() with
             {
                 AppId = forAppId,
-                ParentId = parentId,
+                ParentId = ParentId,
                 FileHash = "0",
                 FileName = "0",
                 Metadata = new AssetMetadata
@@ -147,7 +147,7 @@ public abstract class AssetRepositoryTests : GivenContext
         var asset1 = await sut.StreamAll(appId).FirstAsync();
         var asset2 = await sut.FindAssetAsync(appId, asset1.Id, false);
 
-        // The Slug is random here, as it does not really matter.
+        // The ID is random here, as it does not really matter.
         Assert.NotNull(asset2);
     }
 
@@ -181,8 +181,8 @@ public abstract class AssetRepositoryTests : GivenContext
         var assetIds = await sut.StreamAll(appId).Take(100).Select(x => x.Id).ToHashSetAsync();
         var assets = await sut.QueryIdsAsync(appId, assetIds);
 
-        // The IDs are random here, as it does not really matter.
-        Assert.NotEmpty(assets);
+        // The IDs are valid.
+        Assert.Equal(assetIds.Count, assets.Count);
     }
 
     [Fact]
@@ -190,7 +190,7 @@ public abstract class AssetRepositoryTests : GivenContext
     {
         var sut = await CreateAndPrepareSutAsync();
 
-        var assets = await sut.QueryChildIdsAsync(appId, parentId);
+        var assets = await sut.QueryChildIdsAsync(appId, ParentId);
 
         // No pagination is going on here.
         Assert.Single(assets);
@@ -336,7 +336,9 @@ public abstract class AssetRepositoryTests : GivenContext
     }
 
     private async Task<IResultList<Asset>> QueryAsync(DomainId? parentId,
-        ClrQuery clrQuery, int top = 1000, int skip = 0)
+        ClrQuery clrQuery,
+        int top = 1000,
+        int skip = 0)
     {
         var sut = await CreateAndPrepareSutAsync();
 

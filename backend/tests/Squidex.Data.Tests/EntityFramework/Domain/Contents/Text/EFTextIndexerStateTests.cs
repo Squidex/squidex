@@ -17,7 +17,7 @@ public sealed class EFTextIndexerStateTests(PostgresFixture fixture) : TextIndex
 {
     protected override Task<ITextIndexerState> CreateSutAsync(IContentRepository contentRepository)
     {
-        var sut = new EFTextIndexerState<TestDbContext>(fixture.DbContextFactory, fixture.Dialect, contentRepository);
+        var sut = new EFTextIndexerState<TestDbContextPostgres>(fixture.DbContextFactory, fixture.Dialect, contentRepository);
 
         return Task.FromResult<ITextIndexerState>(sut);
     }

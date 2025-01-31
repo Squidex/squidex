@@ -18,7 +18,7 @@ namespace Squidex.Shared;
 
 public abstract class SchemaRepositoryTests
 {
-    private readonly DomainId knownId = DomainId.Create("3e764e15-3cf5-427f-bb6f-f0fa29a40a2d");
+    private static readonly DomainId KnownId = DomainId.Create("3e764e15-3cf5-427f-bb6f-f0fa29a40a2d");
 
     protected abstract Task<ISchemaRepository> CreateSutAsync();
 
@@ -38,7 +38,7 @@ public abstract class SchemaRepositoryTests
     {
         var sut = await CreateSutAsync();
 
-        if (await sut.FindAsync(knownId, knownId) != null)
+        if (await sut.FindAsync(KnownId, KnownId) != null)
         {
             return sut;
         }
@@ -48,7 +48,7 @@ public abstract class SchemaRepositoryTests
 
         var schema1 = new Schema
         {
-            AppId = NamedId.Of(knownId, "my-app"),
+            AppId = NamedId.Of(KnownId, "my-app"),
             Id = DomainId.NewGuid(),
             Name = "schema1",
             Created = created,
@@ -57,8 +57,8 @@ public abstract class SchemaRepositoryTests
 
         var schema2 = new Schema
         {
-            AppId = NamedId.Of(knownId, "my-app"),
-            Id = knownId,
+            AppId = NamedId.Of(KnownId, "my-app"),
+            Id = KnownId,
             Name = "schema2",
             Created = created,
             CreatedBy = createdBy,
@@ -87,9 +87,9 @@ public abstract class SchemaRepositoryTests
     {
         var sut = await CreateAndPrepareSutAsync();
 
-        var found = await sut.FindAsync(knownId, knownId);
+        var found = await sut.FindAsync(KnownId, KnownId);
 
-        Assert.Equal(knownId, found!.Id);
+        Assert.Equal(KnownId, found!.Id);
     }
 
     [Fact]
@@ -97,9 +97,9 @@ public abstract class SchemaRepositoryTests
     {
         var sut = await CreateAndPrepareSutAsync();
 
-        var found = await sut.FindAsync(knownId, "schema2");
+        var found = await sut.FindAsync(KnownId, "schema2");
 
-        Assert.Equal(knownId, found!.Id);
+        Assert.Equal(KnownId, found!.Id);
     }
 
     [Fact]
@@ -107,7 +107,7 @@ public abstract class SchemaRepositoryTests
     {
         var sut = await CreateAndPrepareSutAsync();
 
-        var found = await sut.QueryAllAsync(knownId);
+        var found = await sut.QueryAllAsync(KnownId);
 
         Assert.Equal(2, found.Count);
     }
@@ -121,7 +121,7 @@ public abstract class SchemaRepositoryTests
             return;
         }
 
-        var found = await hash.GetCurrentHashAsync(new App { Id = knownId });
+        var found = await hash.GetCurrentHashAsync(new App { Id = KnownId });
 
         Assert.Equal(2, found.Count);
     }

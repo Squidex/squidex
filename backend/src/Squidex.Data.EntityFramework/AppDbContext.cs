@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
+using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Rules;
@@ -101,7 +102,7 @@ public class AppDbContext(DbContextOptions options, IJsonSerializer jsonSerializ
             b.Property(x => x.IndexedAppId).AsString();
             b.Property(x => x.LastModified).AsDateTimeOffset();
             b.Property(x => x.LastModifiedBy).AsString();
-            b.Property(x => x.Metadata).AsJsonString(jsonSerializer);
+            b.Property(x => x.Metadata).AsJsonString(jsonSerializer).HasColumnType(JsonColumnType());
             b.Property(x => x.ParentId).AsString();
             b.Property(x => x.Tags).AsString();
             b.Property(x => x.Type).AsString();
@@ -142,6 +143,55 @@ public class AppDbContext(DbContextOptions options, IJsonSerializer jsonSerializ
             b.Property(x => x.State).AsString();
         });
 
+        AddContentEntity<EFContentCompleteEntity>(builder, "ContentsAll");
+        AddContentReference<EFReferenceCompleteEntity>(builder, "ContentReferencesAll");
+
+        AddContentEntity<EFContentPublishedEntity>(builder, "ContentsPublished");
+        AddContentReference<EFReferencePublishedEntity>(builder, "ContentReferencesPublished");
+
         base.OnModelCreating(builder);
+    }
+
+    protected virtual void AddContentEntity<T>(ModelBuilder builder, string tableName) where T : EFContentEntity
+    {
+        builder.Entity<T>(b =>
+        {
+            b.ToTable(tableName);
+            b.Property(x => x.Id).AsString();
+            b.Property(x => x.AppId).AsString();
+            b.Property(x => x.Created).AsDateTimeOffset();
+            b.Property(x => x.CreatedBy).AsString();
+            b.Property(x => x.Data).AsJsonString(jsonSerializer).HasColumnType(JsonColumnType());
+            b.Property(x => x.DocumentId).AsString();
+            b.Property(x => x.IndexedAppId).AsString();
+            b.Property(x => x.IndexedSchemaId).AsString();
+            b.Property(x => x.LastModified).AsDateTimeOffset();
+            b.Property(x => x.LastModifiedBy).AsString();
+            b.Property(x => x.NewData).AsNullableJsonString(jsonSerializer).HasColumnType(JsonColumnType());
+            b.Property(x => x.NewStatus).AsNullableString();
+            b.Property(x => x.SchemaId).AsString();
+            b.Property(x => x.ScheduledAt).AsDateTimeOffset();
+            b.Property(x => x.ScheduleJob).AsNullableJsonString(jsonSerializer);
+            b.Property(x => x.Status).AsString();
+            b.Property(x => x.TranslationStatus).AsNullableJsonString(jsonSerializer);
+        });
+    }
+
+    protected virtual void AddContentReference<T>(ModelBuilder builder, string tableName) where T : EFReferenceEntity
+    {
+        builder.Entity<T>(b =>
+        {
+            b.ToTable(tableName);
+            b.HasKey("AppId", "FromKey", "ToId");
+
+            b.Property(x => x.AppId).AsString();
+            b.Property(x => x.FromKey).AsString();
+            b.Property(x => x.ToId).AsString();
+        });
+    }
+
+    protected virtual string? JsonColumnType()
+    {
+        return null;
     }
 }

@@ -16,7 +16,7 @@ public class EFSnapshotStoreTests(PostgresFixture fixture) : SnapshotStoreTests,
 {
     protected override Task<ISnapshotStore<SnapshotValue>> CreateSutAsync()
     {
-        var sut = new EFSnapshotStore<TestDbContext, SnapshotValue, EFState<SnapshotValue>>(fixture.DbContextFactory);
+        var sut = new EFSnapshotStore<TestDbContextPostgres, SnapshotValue, EFState<SnapshotValue>>(fixture.DbContextFactory);
 
         return Task.FromResult<ISnapshotStore<SnapshotValue>>(sut);
     }

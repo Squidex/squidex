@@ -17,7 +17,7 @@ namespace Squidex.Shared;
 
 public abstract class TeamRepositoryTests
 {
-    private readonly DomainId knownId = DomainId.Create("3e764e15-3cf5-427f-bb6f-f0fa29a40a2d");
+    private static readonly DomainId KnownId = DomainId.Create("3e764e15-3cf5-427f-bb6f-f0fa29a40a2d");
 
     protected abstract Task<ITeamRepository> CreateSutAsync();
 
@@ -37,7 +37,7 @@ public abstract class TeamRepositoryTests
     {
         var sut = await CreateSutAsync();
 
-        if (await sut.FindAsync(knownId) != null)
+        if (await sut.FindAsync(KnownId) != null)
         {
             return sut;
         }
@@ -47,7 +47,7 @@ public abstract class TeamRepositoryTests
 
         var known = new Team
         {
-            Id = knownId,
+            Id = KnownId,
             Name = "team1",
             Created = created,
             CreatedBy = createdBy,
@@ -85,9 +85,9 @@ public abstract class TeamRepositoryTests
     {
         var sut = await CreateAndPrepareSutAsync();
 
-        var found = await sut.FindAsync(knownId);
+        var found = await sut.FindAsync(KnownId);
 
-        Assert.Equal(knownId, found!.Id);
+        Assert.Equal(KnownId, found!.Id);
     }
 
     [Fact]

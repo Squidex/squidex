@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using NodaTime;
-
 namespace Squidex.Infrastructure.Queries;
 
 public class SqlQueryBuilder(SqlDialect dialect, string table) : FilterNodeVisitor<string, ClrValue, None>
@@ -23,6 +21,12 @@ public class SqlQueryBuilder(SqlDialect dialect, string table) : FilterNodeVisit
     public SqlQueryBuilder RawOrder(PropertyPath path, SortOrder order = SortOrder.Ascending)
     {
         sqlQuery.Order.Add(dialect.OrderBy(Visit(path), order, IsJsonPath(path)));
+        return this;
+    }
+
+    public SqlQueryBuilder WithField(PropertyPath path)
+    {
+        sqlQuery.Fields.Add(dialect.Field(Visit(path), IsJsonPath(path)));
         return this;
     }
 
@@ -47,6 +51,14 @@ public class SqlQueryBuilder(SqlDialect dialect, string table) : FilterNodeVisit
     public SqlQueryBuilder WithoutOrder()
     {
         sqlQuery.Order = [];
+        return this;
+    }
+
+    public SqlQueryBuilder WithFilter(FilterNode<ClrValue> filter)
+    {
+        Guard.NotNull(filter);
+
+        sqlQuery.Where.Add(filter.Accept(this, None.Value));
         return this;
     }
 

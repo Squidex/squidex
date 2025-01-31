@@ -17,7 +17,7 @@ public class EFHistoryEventRepositoryTests(PostgresFixture fixture) : HistoryEve
 {
     protected override Task<IHistoryEventRepository> CreateSutAsync()
     {
-        var sut = new EFHistoryEventRepository<TestDbContext>(fixture.DbContextFactory);
+        var sut = new EFHistoryEventRepository<TestDbContextPostgres>(fixture.DbContextFactory);
 
         return Task.FromResult<IHistoryEventRepository>(sut);
     }

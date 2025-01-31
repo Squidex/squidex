@@ -16,7 +16,7 @@ public class EFMigrationStatusTests(PostgresFixture fixture) : MigrationStatusTe
 {
     protected override async Task<IMigrationStatus> CreateSutAsync()
     {
-        var sut = new EFMigrationStatus<TestDbContext>(fixture.DbContextFactory);
+        var sut = new EFMigrationStatus<TestDbContextPostgres>(fixture.DbContextFactory);
 
         await sut.InitializeAsync(default);
 

@@ -5,21 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Infrastructure.Queries;
+namespace Squidex.Domain.Apps.Entities.Contents;
 
-public class SqlQuery(string table)
+public class QueriedStatus
 {
-    public string Table => table;
+    public string IndexedSchemaId { get; set; }
 
-    public bool AsCount { get; set; }
+    public string Id { get; set; }
 
-    public long Limit { get; set; }
-
-    public long Offset { get; set; }
-
-    public List<string> Fields { get; set; } = [];
-
-    public List<string> Where { get; set; } = [];
-
-    public List<string> Order { get; set; } = [];
+    public string Status { get; set; }
 }

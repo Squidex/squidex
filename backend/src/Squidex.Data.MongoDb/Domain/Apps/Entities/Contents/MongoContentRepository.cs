@@ -32,11 +32,19 @@ public partial class MongoContentRepository(
     : MongoBase<MongoContentEntity>, IContentRepository, IInitializable
 {
     private readonly MongoContentCollection collectionComplete =
-            new MongoContentCollection($"States_Contents_All3{shardKey}", database, log,
-                ReadPreference.Primary, options.Value.OptimizeForSelfHosting);
+        new MongoContentCollection(
+            $"States_Contents_All3{shardKey}",
+            database,
+            log,
+            ReadPreference.Primary,
+            options.Value.OptimizeForSelfHosting);
     private readonly MongoContentCollection collectionPublished =
-            new MongoContentCollection($"States_Contents_Published3{shardKey}", database, log,
-                ReadPreference.Secondary, options.Value.OptimizeForSelfHosting);
+        new MongoContentCollection(
+            $"States_Contents_Published3{shardKey}",
+            database,
+            log,
+            ReadPreference.Secondary,
+            options.Value.OptimizeForSelfHosting);
     private readonly ContentsOptions options = options.Value;
 
     public bool CanUseTransactions { get; private set; }
@@ -122,10 +130,10 @@ public partial class MongoContentRepository(
         return GetCollection(scope).QueryIdsAsync(app, schema, filterNode, ct);
     }
 
-    public Task ResetScheduledAsync(DomainId appId, DomainId contentId, SearchScope scope,
+    public Task ResetScheduledAsync(DomainId appId, DomainId id, SearchScope scope,
         CancellationToken ct = default)
     {
-        return GetCollection(SearchScope.All).ResetScheduledAsync(appId, contentId, ct);
+        return GetCollection(SearchScope.All).ResetScheduledAsync(appId, id, ct);
     }
 
     public Task CreateIndexAsync(DomainId appId, DomainId schemaId, IndexDefinition index,

@@ -8,6 +8,7 @@
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NodaTime;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Infrastructure.Json;
 
@@ -23,6 +24,18 @@ public static class JsonConversion
         var converter = new ValueConverter<T, string>(
             v => jsonSerializer.Serialize(v, false),
             v => jsonSerializer.Deserialize<T>(v, null)!
+        );
+
+        propertyBuilder.HasConversion(converter);
+        return propertyBuilder;
+    }
+
+    public static PropertyBuilder<T?> AsNullableJsonString<T>(this PropertyBuilder<T?> propertyBuilder, IJsonSerializer jsonSerializer)
+        where T : class
+    {
+        var converter = new ValueConverter<T?, string?>(
+            v => v != null ? jsonSerializer.Serialize(v, false) : null,
+            v => v != null ? jsonSerializer.Deserialize<T>(v, null) : null!
         );
 
         propertyBuilder.HasConversion(converter);
@@ -84,11 +97,44 @@ public static class JsonConversion
         return propertyBuilder;
     }
 
+    public static PropertyBuilder<T?> AsNullableString<T>(this PropertyBuilder<T?> propertyBuilder) where T : struct
+    {
+        var converter = new ValueConverter<T?, string?>(
+            v => v != null ? v.ToString() : null,
+            v => v != null ? Enum.Parse<T>(v, true) : null
+        );
+
+        propertyBuilder.HasConversion(converter);
+        return propertyBuilder;
+    }
+
     public static PropertyBuilder<HashSet<string>> AsString(this PropertyBuilder<HashSet<string>> propertyBuilder)
     {
         var converter = new ValueConverter<HashSet<string>, string>(
             v => TagsConverter.ToString(v),
             v => TagsConverter.ToSet(v)
+        );
+
+        propertyBuilder.HasConversion(converter);
+        return propertyBuilder;
+    }
+
+    public static PropertyBuilder<Status> AsString(this PropertyBuilder<Status> propertyBuilder)
+    {
+        var converter = new ValueConverter<Status, string>(
+            v => v.ToString()!,
+            v => new Status(v)
+        );
+
+        propertyBuilder.HasConversion(converter);
+        return propertyBuilder;
+    }
+
+    public static PropertyBuilder<Status?> AsNullableString(this PropertyBuilder<Status?> propertyBuilder)
+    {
+        var converter = new ValueConverter<Status?, string?>(
+            v => v != null ? v.ToString()! : null,
+            v => v != null ? new Status(v) : null
         );
 
         propertyBuilder.HasConversion(converter);

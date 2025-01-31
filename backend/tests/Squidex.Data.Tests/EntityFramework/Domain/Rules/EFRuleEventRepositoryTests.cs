@@ -17,7 +17,7 @@ public class EFRuleEventRepositoryTests(PostgresFixture fixture) : RuleEventRepo
 {
     protected override Task<IRuleEventRepository> CreateSutAsync()
     {
-        var sut = new EFRuleEventRepository<TestDbContext>(fixture.DbContextFactory);
+        var sut = new EFRuleEventRepository<TestDbContextPostgres>(fixture.DbContextFactory);
 
         return Task.FromResult<IRuleEventRepository>(sut);
     }

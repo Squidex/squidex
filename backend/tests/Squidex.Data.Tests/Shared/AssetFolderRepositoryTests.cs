@@ -20,17 +20,18 @@ namespace Squidex.Shared;
 public abstract class AssetFolderRepositoryTests : GivenContext
 {
     private const int NumValues = 250;
-    private readonly DomainId appId;
-    private readonly DomainId parentId = DomainId.Create("3b5ba909-e5a5-4858-9d0d-df4ff922d451");
-    private readonly NamedId<DomainId>[] appIds =
+    private static readonly DomainId ParentId = DomainId.Create("3b5ba909-e5a5-4858-9d0d-df4ff922d451");
+    private static readonly NamedId<DomainId>[] AppIds =
     [
         NamedId.Of(DomainId.Create("3b5ba909-e5a5-4858-9d0d-df4ff922d452"), "my-app1"),
         NamedId.Of(DomainId.Create("3b5ba909-e5a5-4858-9d0d-df4ff922d453"), "my-app1"),
     ];
 
+    private readonly DomainId appId;
+
     protected AssetFolderRepositoryTests()
     {
-        appId = appIds[Random.Shared.Next(appIds.Length)].Id;
+        appId = AppIds[Random.Shared.Next(AppIds.Length)].Id;
     }
 
     protected abstract Task<IAssetFolderRepository> CreateSutAsync();
@@ -39,7 +40,7 @@ public abstract class AssetFolderRepositoryTests : GivenContext
     {
         var sut = await CreateSutAsync();
 
-        if ((await sut.QueryAsync(appIds[0].Id, null)).Count > 0)
+        if ((await sut.QueryAsync(AppIds[0].Id, null)).Count > 0)
         {
             return sut;
         }
@@ -65,7 +66,7 @@ public abstract class AssetFolderRepositoryTests : GivenContext
             }
         }
 
-        foreach (var forAppId in appIds)
+        foreach (var forAppId in AppIds)
         {
             for (var i = 0; i < NumValues; i++)
             {
@@ -83,7 +84,7 @@ public abstract class AssetFolderRepositoryTests : GivenContext
             var byParent = CreateAssetFolder() with
             {
                 AppId = forAppId,
-                ParentId = parentId,
+                ParentId = ParentId,
                 FolderName = "0",
             };
 
@@ -117,7 +118,7 @@ public abstract class AssetFolderRepositoryTests : GivenContext
     {
         var sut = await CreateAndPrepareSutAsync();
 
-        var assets = await sut.QueryChildIdsAsync(appId, parentId);
+        var assets = await sut.QueryChildIdsAsync(appId, ParentId);
 
         // No pagination is going on here.
         Assert.Single(assets);
