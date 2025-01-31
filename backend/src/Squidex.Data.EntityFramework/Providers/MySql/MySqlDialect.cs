@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Globalization;
-using System.Text;
 using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Providers.MySql;
@@ -59,84 +57,44 @@ public sealed class MySqlDialect : SqlDialect
         }
     }
 
-    protected override string FormatField(PropertyPath path, ClrValue? value, bool isJson)
+    public override string OrderBy(PropertyPath path, SortOrder order, bool isJson)
     {
-        var isBoolean = value?.ValueType is ClrValueType.Boolean;
-
-        if (isJson && path.Count > 1)
+        if (isJson)
         {
-            var sb = new StringBuilder();
+            var sqlOrder = FormatOrder(order);
+            var sqlPath = path.JsonPath();
 
+            return $"IF(JSON_TYPE(JSON_EXTRACT({sqlPath})) IN ('INTEGER', 'DOUBLE', 'DECIMAL'), CAST(JSON_VALUE({sqlPath}) AS DOUBLE), NULL) {sqlOrder}, JSON_VALUE({sqlPath}) {sqlOrder}";
+        }
+
+        return base.OrderBy(path, order, isJson);
+    }
+
+    public override string Where(PropertyPath path, CompareOperator op, ClrValue value, SqlParams queryParameters, bool isJson)
+    {
+        if (isJson)
+        {
+            var isBoolean = value.ValueType is ClrValueType.Boolean;
             if (isBoolean)
             {
-                sb.Append("IF(");
-                sb.Append("JSON_VALUE(");
-                sb.AppendJsonPath(path);
-                sb.Append(')'); // END JSON_VALUE
-                sb.Append(" = 'true', 1, 0");
-                sb.Append(')'); // END IF
-            }
-            else if (value == null)
-            {
-                sb.Append("IF(");
-                sb.Append("JSON_TYPE(");
-                sb.Append("JSON_EXTRACT(");
-                sb.AppendJsonPath(path);
-                sb.Append(')'); // END JSON_VALUE
-                sb.Append(')'); // END JSON_TYPE
-                sb.Append(" IN ('INTEGER', 'DOUBLE', 'DECIMAL'), ");
-                sb.Append("LPAD(");
-                sb.Append("FORMAT(");
-                sb.Append("JSON_VALUE(");
-                sb.AppendJsonPath(path);
-                sb.Append(')'); // END JSON_VALUE
-                sb.Append(", 6");
-                sb.Append(')'); // END FORMAT
-                sb.Append(", 20, '0'");
-                sb.Append(')'); // END LPAD
-                sb.Append(", ");
-                sb.Append("JSON_EXTRACT(");
-                sb.AppendJsonPath(path);
-                sb.Append(')');
-                sb.Append(')'); // END IF
-            }
-            else
-            {
-                sb.Append("JSON_VALUE(");
-                sb.AppendJsonPath(path);
-                sb.Append(')');
-            }
+                var sqlPath = path.JsonPath();
+                var sqlOp = FormatOperator(op, value);
+                var sqlRhs = FormatValues(op, value, queryParameters);
 
-            return sb.ToString();
+                return $"IF(JSON_VALUE({sqlPath}) = 'true', 1, 0) {sqlOp} {sqlRhs}";
+            }
+        }
+
+        return base.Where(path, op, value, queryParameters, isJson);
+    }
+
+    protected override string FormatField(PropertyPath path, bool isJson)
+    {
+        if (isJson && path.Count > 1)
+        {
+            return $"JSON_VALUE({path.JsonPath()})";
         }
 
         return $"`{path[0]}`";
-    }
-}
-
-#pragma warning disable MA0048 // File name must match type name
-internal static class MySqlDialectExtensions
-#pragma warning restore MA0048 // File name must match type name
-{
-    public static void AppendJsonPath(this StringBuilder sb, PropertyPath path)
-    {
-        sb.Append('`');
-        sb.Append(path[0]);
-        sb.Append("`, \'$");
-
-        foreach (var property in path.Skip(1))
-        {
-            if (int.TryParse(property, NumberStyles.Integer, CultureInfo.InvariantCulture, out var index))
-            {
-                sb.Append(CultureInfo.InvariantCulture, $"[{index}]");
-            }
-            else
-            {
-                sb.Append('.');
-                sb.Append(property);
-            }
-        }
-
-        sb.Append('\'');
     }
 }

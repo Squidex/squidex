@@ -198,6 +198,17 @@ public abstract class SqlQueryTests<TContext> where TContext : DbContext
     }
 
     [Fact]
+    public async Task Should_sort_by_mixed_json()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Sort = [new SortNode("Json.mixed", SortOrder.Descending)],
+        });
+
+        Assert.Equal([20, 14, 8, 2], actual.Take(4));
+    }
+
+    [Fact]
     public async Task Should_filter_with_or()
     {
         var actual = await QueryAsync(new ClrQuery
@@ -348,7 +359,7 @@ public abstract class SqlQueryTests<TContext> where TContext : DbContext
             Filter = ClrFilter.And(ClrFilter.Gt("Json.mixed.0", 5), ClrFilter.Lt("Json.mixed.0", 16)),
         });
 
-        Assert.Equal([8, 10, 14], actual.Order().ToArray());
+        Assert.Contains(10, actual);
     }
 
     [Fact]

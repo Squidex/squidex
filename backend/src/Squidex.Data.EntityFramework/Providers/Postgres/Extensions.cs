@@ -45,4 +45,9 @@ public static class Extensions
 
         return sb;
     }
+
+    public static string JsonPath(this PropertyPath path, bool asString)
+    {
+        return new StringBuilder().AppendJsonPath(path, asString).ToString();
+    }
 }

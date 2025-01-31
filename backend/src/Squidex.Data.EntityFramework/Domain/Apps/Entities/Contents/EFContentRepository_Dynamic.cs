@@ -45,7 +45,12 @@ public sealed partial class EFContentRepository<TContext>
         }
     }
 
-    private async Task<IResultList<Content>> QueryAsync<T, TReference>(DomainId appId, List<DomainId> schemaIds, bool isSingle, Q q, SqlQueryBuilder queryBuilder,
+    private async Task<IResultList<Content>> QueryAsync<T, TReference>(
+        DomainId appId,
+        List<DomainId> schemaIds,
+        bool isSingle,
+        Q q,
+        SqlQueryBuilder queryBuilder,
         CancellationToken ct = default) where T : EFContentEntity where TReference : EFReferenceEntity
     {
         if (q.Ids is { Count: > 0 } && schemaIds.Count > 0)
@@ -83,15 +88,19 @@ public sealed partial class EFContentRepository<TContext>
             await using var dbContext = await CreateDbContextAsync(ct);
 
             var fromKey = DomainId.Combine(appId, q.Referencing);
+
+            var toIds =
+                dbContext.Set<TReference>()
+                    .Where(x => x.AppId == appId && x.FromKey == fromKey)
+                    .Select(x => x.ToId)
+                    .ToList();
+
             var result =
                 await dbContext.Set<T>()
-                    .Join(dbContext.Set<TReference>(), t => t.Id, r => r.ToId, (t, r) => new { T = t, R = r })
-                    .Where(x => x.R.FromKey == fromKey)
-                    .Where(x => x.R.AppId == appId)
-                    .Where(x => x.T.IndexedAppId == appId)
-                    .Where(x => schemaIds.Contains(x.T.IndexedSchemaId))
-                    .Where(x => !x.T.IsDeleted)
-                    .Select(x => x.T).Distinct()
+                    .Where(x => x.IndexedAppId == appId)
+                    .Where(x => schemaIds.Contains(x.IndexedSchemaId))
+                    .Where(x => toIds.Contains(x.Id))
+                    .Where(x => !x.IsDeleted)
                     .QueryAsync(q, ct);
 
             return result;
@@ -101,16 +110,16 @@ public sealed partial class EFContentRepository<TContext>
         {
             await using var dbContext = await CreateDbContextAsync(ct);
 
-            var toId = q.Reference;
+            var fromKeys =
+                dbContext.Set<TReference>()
+                    .Where(x => x.AppId == appId && x.ToId == q.Reference)
+                    .Select(x => x.FromKey);
+
             var result =
                 await dbContext.Set<T>()
-                    .Join(dbContext.Set<TReference>(), t => t.DocumentId, r => r.FromKey, (t, r) => new { T = t, R = r })
-                    .Where(x => x.R.ToId == toId)
-                    .Where(x => x.R.AppId == appId)
-                    .Where(x => x.T.IndexedAppId == appId)
-                    .Where(x => schemaIds.Contains(x.T.IndexedSchemaId))
-                    .Where(x => !x.T.IsDeleted)
-                    .Select(x => x.T).Distinct()
+                    .Where(x => fromKeys.Contains(x.DocumentId))
+                    .Where(x => schemaIds.Contains(x.IndexedSchemaId))
+                    .Where(x => !x.IsDeleted)
                     .QueryAsync(q, ct);
 
             return result;
@@ -120,8 +129,9 @@ public sealed partial class EFContentRepository<TContext>
         {
             await using var dbContext = await CreateDbContextAsync(ct);
 
-            queryBuilder.RawWhere("IndexedAppId", CompareOperator.Equals, appId.ToString());
-            queryBuilder.RawWhere("IndexedSchemaId", CompareOperator.Equals, schemaIds.Single().ToString());
+            queryBuilder.RawWhere(nameof(EFContentEntity.IndexedAppId), CompareOperator.Equals, appId.ToString());
+            queryBuilder.RawWhere(nameof(EFContentEntity.IndexedSchemaId), CompareOperator.Equals, schemaIds.Single().ToString());
+            queryBuilder.RawWhere(nameof(EFContentEntity.IsDeleted), CompareOperator.Equals, false);
             queryBuilder.WithFilter(q.Query);
             queryBuilder.WithOrders(q.Query);
 
@@ -148,11 +158,12 @@ public sealed partial class EFContentRepository<TContext>
 
         var (query, parameters) =
             queryBuilder
-                .RawWhere("IndexedAppId", CompareOperator.Equals, appId.ToString())
-                .RawWhere("IndexedSchemaId", CompareOperator.Equals, schemaId.ToString())
-                .WithField("IndexedSchemaId")
-                .WithField("Id")
-                .WithField("Status")
+                .RawWhere(nameof(EFContentEntity.IndexedAppId), CompareOperator.Equals, appId.ToString())
+                .RawWhere(nameof(EFContentEntity.IndexedSchemaId), CompareOperator.Equals, schemaId.ToString())
+                .RawWhere(nameof(EFContentEntity.IsDeleted), CompareOperator.Equals, false)
+                .WithField(nameof(EFContentEntity.IndexedSchemaId))
+                .WithField(nameof(EFContentEntity.Id))
+                .WithField(nameof(EFContentEntity.Status))
                 .WithFilter(filterNode)
                 .Compile();
 

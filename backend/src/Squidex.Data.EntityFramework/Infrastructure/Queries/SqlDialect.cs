@@ -110,17 +110,17 @@ public class SqlDialect
 
     public virtual string Field(PropertyPath path, bool isJson)
     {
-        return $"{FormatField(path, null, isJson)}";
+        return $"{FormatField(path, isJson)}";
     }
 
     public virtual string OrderBy(PropertyPath path, SortOrder order, bool isJson)
     {
-        return $"{FormatField(path, null, isJson)} {FormatOrder(order)}";
+        return $"{FormatField(path, isJson)} {FormatOrder(order)}";
     }
 
     public virtual string Where(PropertyPath path, CompareOperator op, ClrValue value, SqlParams queryParameters, bool isJson)
     {
-        return $"{FormatField(path, value, isJson)} {FormatOperator(op, value)} {FormatValues(op, value, queryParameters)}";
+        return $"{FormatField(path, isJson)} {FormatOperator(op, value)} {FormatValues(op, value, queryParameters)}";
     }
 
     protected virtual string FormatValues(CompareOperator op, ClrValue value, SqlParams queryParameters)
@@ -225,7 +225,7 @@ public class SqlDialect
         return tableName;
     }
 
-    protected virtual string FormatField(PropertyPath path, ClrValue? value, bool isJson)
+    protected virtual string FormatField(PropertyPath path, bool isJson)
     {
         if (isJson)
         {

@@ -24,8 +24,13 @@ public record EFContentCompleteEntity : EFContentEntity
         CancellationToken ct)
     {
         var source = job.Value;
+
         var appId = source.AppId.Id;
         var (referencedIds, translationStatus) = await CreateExtendedValuesAsync(source, source.CurrentVersion.Data, appProvider, ct);
+        var references =
+            referencedIds
+                .Select(x => new EFReferenceCompleteEntity { AppId = appId, FromKey = job.Key, ToId = x })
+                .ToArray();
 
         var entity = new EFContentCompleteEntity
         {
@@ -50,11 +55,6 @@ public record EFContentCompleteEntity : EFContentEntity
             Version = source.Version,
         };
 
-        var references =
-            referencedIds
-                .Select(x => new EFReferenceCompleteEntity { AppId = appId, FromKey = job.Key, ToId = x })
-                .ToArray();
-
         return (entity, references);
     }
 }
@@ -67,8 +67,13 @@ public record EFContentPublishedEntity : EFContentEntity
         CancellationToken ct)
     {
         var source = job.Value;
+
         var appId = source.AppId.Id;
         var (referencedIds, translationStatus) = await CreateExtendedValuesAsync(source, source.CurrentVersion.Data, appProvider, ct);
+        var references =
+            referencedIds
+                .Select(x => new EFReferencePublishedEntity { AppId = appId, FromKey = job.Key, ToId = x })
+                .ToArray();
 
         var entity = new EFContentPublishedEntity
         {
@@ -92,11 +97,6 @@ public record EFContentPublishedEntity : EFContentEntity
             TranslationStatus = translationStatus,
             Version = source.Version,
         };
-
-        var references =
-            referencedIds
-                .Select(x => new EFReferencePublishedEntity { AppId = appId, FromKey = job.Key, ToId = x })
-                .ToArray();
 
         return (entity, references);
     }

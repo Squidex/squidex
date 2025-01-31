@@ -9,15 +9,15 @@ using System.Globalization;
 using System.Text;
 using Squidex.Infrastructure.Queries;
 
-namespace Squidex.Providers.SqlServer;
+namespace Squidex.Providers.MySql;
 
 internal static class Extensions
 {
     public static StringBuilder AppendJsonPath(this StringBuilder sb, PropertyPath path)
     {
-        sb.Append('[');
+        sb.Append('`');
         sb.Append(path[0]);
-        sb.Append("], \'$");
+        sb.Append("`, \'$");
 
         foreach (var property in path.Skip(1))
         {

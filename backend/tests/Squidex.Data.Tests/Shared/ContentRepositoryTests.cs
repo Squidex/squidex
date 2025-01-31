@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using LoremNET;
+using Microsoft.Extensions.Azure;
 using NodaTime;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
@@ -110,16 +111,24 @@ public abstract class ContentRepositoryTests : GivenContext
             }
         }
 
-        var previousIds = new Queue<DomainId>();
         foreach (var forAppId in AppIds)
         {
             foreach (var forSchemaId in SchemaIds)
             {
+                var previousIds = new List<DomainId>();
+
                 for (var i = 0; i < NumValues; i++)
                 {
+                    var contentId = DomainId.NewGuid();
+
+                    if (i == 0)
+                    {
+                        previousIds = [contentId];
+                    }
+
                     var content = CreateWriteContent() with
                     {
-                        AppId = forAppId,
+                        Id = contentId,
                         CurrentVersion = new ContentVersion(
                             Status.Published,
                             new ContentData()
@@ -138,13 +147,8 @@ public abstract class ContentRepositoryTests : GivenContext
                             i > NumValues / 2
                             ? new ScheduleJob(DomainId.NewGuid(), Status.Archived, User, now.Plus(Duration.FromDays(i)))
                             : null,
+                        AppId = forAppId,
                     };
-
-                    previousIds.Enqueue(content.Id);
-                    if (previousIds.Count > 3)
-                    {
-                        previousIds.TryDequeue(out _);
-                    }
 
                     await ExecuteBatchAsync(content);
                 }
@@ -224,7 +228,7 @@ public abstract class ContentRepositoryTests : GivenContext
     {
         var sut = await CreateAndPrepareSutAsync();
 
-        var contents = await sut.StreamScheduledWithoutDataAsync(now, SearchScope.All).ToListAsync();
+        var contents = await sut.StreamScheduledWithoutDataAsync(now.Plus(Duration.FromDays(30)), default).ToListAsync();
 
         // The IDs are random here, as it does not really matter.
         Assert.NotEmpty(contents);
@@ -289,31 +293,26 @@ public abstract class ContentRepositoryTests : GivenContext
     [Fact]
     public async Task Should_query_contents_with_reference()
     {
-        var query = new ClrQuery
+        var baseQuery = new ClrQuery
         {
-            Filter = ClrFilter.Eq("data.value.iv", 12),
+            Filter = ClrFilter.Eq("data.field1.iv", 0),
         };
 
-        var content = await QueryAsync(new ClrQuery(), 1);
-        var contents = await QueryAsync(query, 1000, 0, reference: content[0].Id);
+        var content = await QueryAsync(baseQuery, 1);
+        var contents = await QueryAsync(new ClrQuery(), reference: content[0].Id);
 
         // We do not insert test entities with references, so we cannot verify the actual result.
-        Assert.Equal(3, contents.Count);
+        Assert.Equal(NumValues, contents.Count);
     }
 
     [Fact]
     public async Task Should_query_contents_with_referencing()
     {
-        var query = new ClrQuery
-        {
-            Filter = ClrFilter.Eq("data.value.iv", 12),
-        };
-
-        var content = await QueryAsync(new ClrQuery(), 1);
-        var contents = await QueryAsync(query, 1000, 0, referencing: content[0].Id);
+        var content = await QueryAsync(new ClrQuery(), 1, NumValues / 2);
+        var contents = await QueryAsync(new ClrQuery(), 1000, 0, referencing: content[0].Id);
 
         // We do not insert test entities with references, so we cannot verify the actual result.
-        Assert.Equal(3, contents.Count);
+        Assert.Single(contents);
     }
 
     [Fact]
