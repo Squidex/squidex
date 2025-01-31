@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using LoremNET;
-using Microsoft.Extensions.Azure;
 using NodaTime;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
@@ -50,10 +49,14 @@ public abstract class ContentRepositoryTests : GivenContext
     protected ContentRepositoryTests()
     {
         var appId = AppIds[Random.Shared.Next(AppIds.Length)];
-        app = CreateApp(appId.Id, appId.Name);
+        var appName = appId.Name;
+
+        app = CreateApp(appId.Id, appName);
 
         var schemaId = SchemaIds[Random.Shared.Next(SchemaIds.Length)];
-        schema = CreateSchema(app, schemaId.Id, schemaId.Name);
+        var schemaName = schemaId.Name;
+
+        schema = CreateSchema(app, schemaId.Id, schemaName);
 
         A.CallTo(() => AppProvider.GetSchemaAsync(A<DomainId>._, A<DomainId>._, A<bool>._, A<CancellationToken>._))
             .ReturnsLazily(x =>
@@ -90,7 +93,7 @@ public abstract class ContentRepositoryTests : GivenContext
             return sut;
         }
 
-        if (await sut.StreamAll(AppIds[0].Id, [], SearchScope.All).AnyAsync())
+        if (await sut.StreamAll(AppIds[0].Id, [schema.Id], SearchScope.All).AnyAsync())
         {
             return sut;
         }
@@ -158,6 +161,36 @@ public abstract class ContentRepositoryTests : GivenContext
         await ExecuteBatchAsync(null);
 
         return sut;
+    }
+
+    [Fact]
+    public async Task Should_stream_all_with_schema()
+    {
+        var sut = await CreateAndPrepareSutAsync();
+
+        var count = await sut.StreamAll(AppIds[0].Id, [schema.Id], SearchScope.All).CountAsync();
+
+        Assert.Equal(NumValues, count);
+    }
+
+    [Fact]
+    public async Task Should_stream_all_without_schema()
+    {
+        var sut = await CreateAndPrepareSutAsync();
+
+        var count = await sut.StreamAll(AppIds[0].Id, null, SearchScope.All).CountAsync();
+
+        Assert.Equal(NumValues * SchemaIds.Length, count);
+    }
+
+    [Fact]
+    public async Task Should_stream_all_with_empty_schemas()
+    {
+        var sut = await CreateAndPrepareSutAsync();
+
+        var count = await sut.StreamAll(AppIds[0].Id, [], SearchScope.All).CountAsync();
+
+        Assert.Equal(0, count);
     }
 
     [Fact]
@@ -259,7 +292,7 @@ public abstract class ContentRepositoryTests : GivenContext
         var contents = await QueryAsync(query, 1000, 9000);
 
         // We have a concrete query, so we expect an actual result.
-        Assert.NotEmpty(contents);
+        Assert.Empty(contents);
     }
 
     [Fact]

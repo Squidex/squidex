@@ -7,6 +7,7 @@
 
 using System.Collections;
 using System.Globalization;
+using Google.Protobuf.WellKnownTypes;
 using NodaTime;
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
@@ -59,6 +60,11 @@ public sealed record ClrValue(object? Value, ClrValueType ValueType, bool IsList
         return new ClrValue(value, ClrValueType.Int64, false);
     }
 
+    public static implicit operator ClrValue(DomainId value)
+    {
+        return new ClrValue(value.ToString(), ClrValueType.String, false);
+    }
+
     public static implicit operator ClrValue(string? value)
     {
         return value != null ? new ClrValue(value, ClrValueType.String, false) : Null;
@@ -107,6 +113,11 @@ public sealed record ClrValue(object? Value, ClrValueType ValueType, bool IsList
     public static implicit operator ClrValue(List<string> value)
     {
         return value != null ? new ClrValue(value, ClrValueType.String, true) : Null;
+    }
+
+    public static implicit operator ClrValue(List<DomainId> value)
+    {
+        return value != null ? new ClrValue(value.Select(x => x.ToString()).ToList(), ClrValueType.String, true) : Null;
     }
 
     public static implicit operator ClrValue(List<object?> value)

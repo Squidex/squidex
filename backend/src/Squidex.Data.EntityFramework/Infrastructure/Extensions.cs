@@ -72,6 +72,11 @@ public static class Extensions
     public static async Task<IResultList<T>> QueryAsync<T>(this DbContext dbContext, SqlQueryBuilder sqlQuery, Q q,
         CancellationToken ct) where T : class
     {
+        sqlQuery.Limit(q.Query);
+        sqlQuery.Offset(q.Query);
+        sqlQuery.Order(q.Query);
+        sqlQuery.Where(q.Query);
+
         var (sql, parameters) = sqlQuery.Compile();
 
         var queryEntities = await dbContext.Set<T>().FromSqlRaw(sql, parameters).ToListAsync(ct);
@@ -85,13 +90,7 @@ public static class Extensions
             }
             else
             {
-                sqlQuery
-                    .WithCount()
-                    .WithoutOrder()
-                    .WithLimit(long.MaxValue)
-                    .WithOffset(0);
-
-                var (countSql, countParams) = sqlQuery.Compile();
+                var (countSql, countParams) = sqlQuery.Count().Compile();
 
                 queryTotal =
                     await dbContext.Database.SqlQueryRaw<long>(countSql, countParams, ct)

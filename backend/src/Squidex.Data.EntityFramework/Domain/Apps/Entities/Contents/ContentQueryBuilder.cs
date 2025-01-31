@@ -10,18 +10,8 @@ using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public class ContentQueryBuilder(SqlDialect dialect, string table) : SqlQueryBuilder(dialect, table)
+public class ContentQueryBuilder(SqlDialect dialect, string table, SqlParams? parameters = null) : SqlQueryBuilder(dialect, table, parameters)
 {
-    public static ContentQueryBuilder CreatePublished(SqlDialect dialect)
-    {
-        return new ContentQueryBuilder(dialect, "ContentsPublished");
-    }
-
-    public static ContentQueryBuilder CreateComplete(SqlDialect dialect)
-    {
-        return new ContentQueryBuilder(dialect, "ContentsAll");
-    }
-
     public override PropertyPath Visit(PropertyPath path)
     {
         var elements = path.ToList();

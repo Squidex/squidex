@@ -12,32 +12,13 @@ namespace Squidex.Infrastructure.Queries;
 
 public class SqlDialect
 {
+    private const string Tab = "  ";
+
     public virtual string BuildSelectStatement(SqlQuery request)
     {
-        const string t = "  ";
-
         var sb = new StringBuilder("SELECT");
 
-        var fields = request.Fields;
-        if (fields.Count == 0)
-        {
-            fields = ["*"];
-        }
-
-        var i = 0;
-        foreach (var field in fields)
-        {
-            sb.Append($"{t}{field}");
-
-            if (i < fields.Count - 1)
-            {
-                sb.Append(',');
-            }
-
-            sb.AppendLine();
-            i++;
-        }
-
+        sb.AppendLines(request.Fields, Tab);
         sb.AppendLine($"FROM {FormatTable(request.Table)}");
 
         if (request.Where.Count > 0)
@@ -45,15 +26,15 @@ public class SqlDialect
             var query = And(request.Where);
 
             sb.AppendLine("WHERE");
-            sb.AppendLine($"{t}{query}");
+            sb.Append(Tab);
+            sb.Append(query);
+            sb.AppendLine();
         }
 
         if (request.Order.Count > 0)
         {
-            var order = string.Join(", ", request.Order);
-
-            sb.AppendLine("ORDER BY");
-            sb.AppendLine($"{order}");
+            sb.Append("ORDER BY");
+            sb.AppendLines(request.Order, Tab);
         }
 
         var pagination = FormatLimitOffset(request.Limit, request.Offset, request.Order.Count > 0);
@@ -103,6 +84,11 @@ public class SqlDialect
         return $"NOT ({part})";
     }
 
+    public virtual string SelectAll()
+    {
+        return "*";
+    }
+
     public virtual string CountAll()
     {
         return "COUNT(*)";
@@ -121,6 +107,11 @@ public class SqlDialect
     public virtual string Where(PropertyPath path, CompareOperator op, ClrValue value, SqlParams queryParameters, bool isJson)
     {
         return $"{FormatField(path, isJson)} {FormatOperator(op, value)} {FormatValues(op, value, queryParameters)}";
+    }
+
+    public virtual string WhereQuery(PropertyPath path, CompareOperator op, string query, bool isJson)
+    {
+        return $"{FormatField(path, isJson)} {FormatOperator(op, ClrValue.Null)} ({query})";
     }
 
     protected virtual string FormatValues(CompareOperator op, ClrValue value, SqlParams queryParameters)

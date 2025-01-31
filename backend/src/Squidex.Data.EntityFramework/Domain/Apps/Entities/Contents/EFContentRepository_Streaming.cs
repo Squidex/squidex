@@ -27,6 +27,11 @@ public sealed partial class EFContentRepository<TContext>
     private async IAsyncEnumerable<Content> StreamAll<T>(DomainId appId, HashSet<DomainId>? schemaIds,
         [EnumeratorCancellation] CancellationToken ct = default) where T : EFContentEntity
     {
+        if (schemaIds is { Count: 0 })
+        {
+            yield break;
+        }
+
         await using var dbContext = await CreateDbContextAsync(ct);
 
         var query =

@@ -10,6 +10,7 @@ using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
+using static Google.Protobuf.WellKnownTypes.Field.Types;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Operations;
 
@@ -24,37 +25,32 @@ public sealed class QueryAsStream : OperationBase
     public async IAsyncEnumerable<Content> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds,
         [EnumeratorCancellation] CancellationToken ct)
     {
-        var filter = CreateFilter(appId, schemaIds);
-
-        using (var cursor = await Collection.Find(filter).SelectFields(null).ToCursorAsync(ct))
+        if (schemaIds is { Count: 0 })
         {
-            while (await cursor.MoveNextAsync(ct))
-            {
-                foreach (var entity in cursor.Current)
-                {
-                    yield return entity;
-                }
-            }
+            yield break;
+        }
+
+        var filter = CreateFilter(appId, schemaIds);
+        var find = Collection.Find(filter).SelectFields(null).ToAsyncEnumerable(ct);
+
+        await foreach (var entity in find.WithCancellation(ct))
+        {
+            yield return entity;
         }
     }
 
     public async IAsyncEnumerable<DomainId> StreamAllIds(DomainId appId, DomainId schemaId,
         [EnumeratorCancellation] CancellationToken ct)
     {
-        var filter = CreateFilter(appId, [schemaId]);
-
         // Only query the ID from the database to improve performance.
         var projection = Builders<MongoContentEntity>.Projection.Include(x => x.Id);
 
-        using (var cursor = await Collection.Find(filter).Project<IdOnly>(projection).ToCursorAsync(ct))
+        var filter = CreateFilter(appId, [schemaId]);
+        var find = Collection.Find(filter).Project<IdOnly>(projection);
+
+        await foreach (var entity in find.ToAsyncEnumerable(ct).WithCancellation(ct))
         {
-            while (await cursor.MoveNextAsync(ct))
-            {
-                foreach (var entity in cursor.Current)
-                {
-                    yield return entity.Id;
-                }
-            }
+            yield return entity.Id;
         }
     }
 

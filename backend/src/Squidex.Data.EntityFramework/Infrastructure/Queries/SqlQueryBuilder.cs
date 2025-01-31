@@ -7,86 +7,91 @@
 
 namespace Squidex.Infrastructure.Queries;
 
-public class SqlQueryBuilder(SqlDialect dialect, string table) : FilterNodeVisitor<string, ClrValue, None>
+public class SqlQueryBuilder(SqlDialect dialect, string table, SqlParams? parameters = null) : FilterNodeVisitor<string, ClrValue, None>
 {
     private readonly SqlQuery sqlQuery = new SqlQuery(table);
-    private readonly SqlParams parameters = [];
+    private readonly SqlParams sqlParameters = parameters ?? [];
 
-    public SqlQueryBuilder RawWhere(PropertyPath path, CompareOperator op, ClrValue value)
+    public SqlQueryBuilder Count()
     {
-        sqlQuery.Where.Add(dialect.Where(Visit(path), op, value, parameters, IsJsonPath(path)));
+        sqlQuery.Fields = [dialect.CountAll()];
+        sqlQuery.Order.Clear();
+        sqlQuery.Offset = 0;
+        sqlQuery.Limit = long.MaxValue;
         return this;
     }
 
-    public SqlQueryBuilder RawOrder(PropertyPath path, SortOrder order = SortOrder.Ascending)
+    public SqlQueryBuilder WhereQuery(PropertyPath path, CompareOperator op, Func<SqlParams, SqlDialect, SqlQueryBuilder> factory)
+    {
+        var builder = factory(sqlParameters, dialect);
+
+        sqlQuery.Where.Add(dialect.WhereQuery(Visit(path), op, builder.CompileQuery(), IsJsonPath(path)));
+        return this;
+    }
+
+    public SqlQueryBuilder Where(FilterNode<ClrValue> filter)
+    {
+        sqlQuery.Where.Add(filter.Accept(this, None.Value));
+        return this;
+    }
+
+    public SqlQueryBuilder Order(PropertyPath path, SortOrder order)
     {
         sqlQuery.Order.Add(dialect.OrderBy(Visit(path), order, IsJsonPath(path)));
         return this;
     }
 
-    public SqlQueryBuilder WithField(PropertyPath path)
+    public SqlQueryBuilder Select(PropertyPath path)
     {
         sqlQuery.Fields.Add(dialect.Field(Visit(path), IsJsonPath(path)));
         return this;
     }
 
-    public SqlQueryBuilder WithCount()
-    {
-        sqlQuery.Fields = [dialect.CountAll()];
-        return this;
-    }
-
-    public SqlQueryBuilder WithLimit(long limit)
+    public SqlQueryBuilder Limit(long limit)
     {
         sqlQuery.Limit = limit;
         return this;
     }
 
-    public SqlQueryBuilder WithOffset(long offset)
+    public SqlQueryBuilder Offset(long offset)
     {
         sqlQuery.Offset = offset;
         return this;
     }
 
-    public SqlQueryBuilder WithoutOrder()
+    public SqlQueryBuilder OrderAsc(PropertyPath path)
     {
-        sqlQuery.Order = [];
-        return this;
+        return Order(path, SortOrder.Ascending);
     }
 
-    public SqlQueryBuilder WithFilter(FilterNode<ClrValue> filter)
+    public SqlQueryBuilder OrderDesc(PropertyPath path)
     {
-        Guard.NotNull(filter);
-
-        sqlQuery.Where.Add(filter.Accept(this, None.Value));
-        return this;
+        return Order(path, SortOrder.Descending);
     }
 
-    public SqlQueryBuilder WithLimit(ClrQuery query)
+    public SqlQueryBuilder Limit(ClrQuery query)
     {
-        Guard.NotNull(query);
-        return WithLimit(query.Take);
+        return Limit(query.Take);
     }
 
-    public SqlQueryBuilder WithOffset(ClrQuery query)
+    public SqlQueryBuilder Offset(ClrQuery query)
     {
-        Guard.NotNull(query);
-        return WithOffset(query.Skip);
+        return Offset(query.Skip);
     }
 
-    public SqlQueryBuilder WithFilter(ClrQuery query)
+    public SqlQueryBuilder Where(ClrQuery query)
     {
         Guard.NotNull(query);
 
         if (query.Filter != null)
         {
-            sqlQuery.Where.Add(query.Filter.Accept(this, None.Value));
+            return Where(query.Filter);
         }
 
         return this;
     }
 
-    public SqlQueryBuilder WithOrders(ClrQuery query)
+    public SqlQueryBuilder Order(ClrQuery query)
     {
         Guard.NotNull(query);
 
@@ -94,11 +99,7 @@ public class SqlQueryBuilder(SqlDialect dialect, string table) : FilterNodeVisit
         {
             foreach (var sort in query.Sort)
             {
-                sqlQuery.Order.Add(
-                    dialect.OrderBy(
-                        Visit(sort.Path),
-                        sort.Order,
-                        IsJsonPath(sort.Path)));
+                Order(sort.Path, sort.Order);
             }
         }
 
@@ -107,7 +108,17 @@ public class SqlQueryBuilder(SqlDialect dialect, string table) : FilterNodeVisit
 
     public (string Sql, object[] Parameters) Compile()
     {
-        return (dialect.BuildSelectStatement(sqlQuery), parameters.ToArray());
+        return (CompileQuery(), sqlParameters.ToArray());
+    }
+
+    public virtual string CompileQuery()
+    {
+        if (sqlQuery.Fields.Count == 0)
+        {
+            sqlQuery.Fields.Add(dialect.SelectAll());
+        }
+
+        return dialect.BuildSelectStatement(sqlQuery);
     }
 
     public virtual bool IsJsonPath(PropertyPath path)
@@ -126,7 +137,7 @@ public class SqlQueryBuilder(SqlDialect dialect, string table) : FilterNodeVisit
             Visit(nodeIn.Path),
             nodeIn.Operator,
             nodeIn.Value,
-            parameters,
+            sqlParameters,
             IsJsonPath(nodeIn.Path));
     }
 

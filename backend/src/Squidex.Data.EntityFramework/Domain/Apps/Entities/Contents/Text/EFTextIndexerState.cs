@@ -28,8 +28,9 @@ public sealed class EFTextIndexerState<TContext>(IDbContextFactory<TContext> dbC
 
         var (query, parameters) =
             new SqlQueryBuilder(dialect, "TextState")
-                .RawWhere("UniqueContentId", CompareOperator.GreaterThan, new UniqueContentId(app.Id, DomainId.Empty).ToParseableString())
-                .RawOrder("UniqueContentId")
+                .Where(ClrFilter.Gt(nameof(TextContentState.UniqueContentId), new UniqueContentId(app.Id, DomainId.Empty).ToParseableString()))
+                .OrderAsc(nameof(TextContentState.UniqueContentId))
+                .OrderAsc(nameof(TextContentState.State))
                 .Compile();
 
         var ids =

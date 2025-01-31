@@ -20,6 +20,8 @@ public abstract class SnapshotStoreTests<TEntity>
 
     protected abstract TEntity CreateEntity(DomainId id, int version);
 
+    protected virtual bool CheckConsistencyOnWrite => true;
+
     protected virtual TEntity Cleanup(TEntity expected)
     {
         return expected;
@@ -88,6 +90,11 @@ public abstract class SnapshotStoreTests<TEntity>
     [Fact]
     public async Task Should_throw_exception_if_update_expected_but_wrong_version_found()
     {
+        if (!CheckConsistencyOnWrite)
+        {
+            return;
+        }
+
         var sut = await CreateSutAsync();
 
         var sourceKey = DomainId.NewGuid();

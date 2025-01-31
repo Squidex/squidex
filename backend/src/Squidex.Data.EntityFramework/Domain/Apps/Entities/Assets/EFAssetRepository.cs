@@ -55,22 +55,20 @@ public sealed partial class EFAssetRepository<TContext>(IDbContextFactory<TConte
 
             var sqlQuery =
                 new AssetSqlQueryBuilder(dialect)
-                    .WithLimit(q.Query)
-                    .WithOffset(q.Query)
-                    .WithOrders(q.Query)
-                    .RawWhere(nameof(EFAssetEntity.IndexedAppId), CompareOperator.Equals, appId.ToString());
+                    .Where(ClrFilter.Eq(nameof(EFAssetEntity.IndexedAppId), appId))
+                    .Order(q.Query);
 
             if (q.Query.Filter?.HasField("IsDeleted") != true)
             {
-                sqlQuery.RawWhere(nameof(EFAssetEntity.IsDeleted), CompareOperator.Equals, false);
+                sqlQuery.Where(ClrFilter.Eq(nameof(EFAssetEntity.IsDeleted), false));
             }
 
             if (parentId != null)
             {
-                sqlQuery.RawWhere(nameof(EFAssetEntity.ParentId), CompareOperator.Equals, parentId.ToString());
+                sqlQuery.Where(ClrFilter.Eq(nameof(EFAssetEntity.ParentId), parentId));
             }
 
-            sqlQuery.WithFilter(q.Query);
+            sqlQuery.Where(q.Query);
 
             return await dbContext.QueryAsync<EFAssetEntity>(sqlQuery, q, ct);
         }

@@ -13,7 +13,7 @@ public class SqlQuery(string table)
 
     public bool AsCount { get; set; }
 
-    public long Limit { get; set; }
+    public long Limit { get; set; } = long.MaxValue;
 
     public long Offset { get; set; }
 

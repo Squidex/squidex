@@ -486,10 +486,10 @@ public abstract class SqlQueryTests<TContext> where TContext : DbContext
     {
         var builder =
             new TestSqlBuilder(CreateDialect(), "TestEntity")
-                .WithLimit(query)
-                .WithOffset(query)
-                .WithOrders(query)
-                .WithFilter(query);
+                .Limit(query)
+                .Offset(query)
+                .Order(query)
+                .Where(query);
 
         var (sql, parameters) = builder.Compile();
 

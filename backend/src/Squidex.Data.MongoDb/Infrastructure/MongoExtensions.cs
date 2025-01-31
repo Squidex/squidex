@@ -55,7 +55,7 @@ public static class MongoExtensions
         return true;
     }
 
-    public static async IAsyncEnumerable<T> ToAsyncEnumerable<T>(this IFindFluent<T, T> find,
+    public static async IAsyncEnumerable<TR> ToAsyncEnumerable<T, TR>(this IFindFluent<T, TR> find,
         [EnumeratorCancellation] CancellationToken ct = default)
     {
         using var cursor = await find.ToCursorAsync(ct);
