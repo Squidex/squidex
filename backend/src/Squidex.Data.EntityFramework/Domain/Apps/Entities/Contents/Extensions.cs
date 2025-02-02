@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using LibGit2Sharp;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
@@ -25,5 +25,46 @@ internal static class Extensions
         }
 
         return builder;
+    }
+
+    public static void LimitFields(this ContentData data, IReadOnlySet<string> fields)
+    {
+        List<string>? toDelete = null;
+        foreach (var (key, value) in data)
+        {
+            if (!fields.Any(x => IsMatch(key, x)))
+            {
+                toDelete ??= [];
+                toDelete.Add(key);
+            }
+        }
+
+        if (toDelete != null)
+        {
+            foreach (var key in toDelete)
+            {
+                data.Remove(key);
+            }
+        }
+
+        static bool IsMatch(string actual, string filter)
+        {
+            const string Prefix = "data.";
+
+            var span = filter.AsSpan();
+            if (span.Equals(actual, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+
+            if (span.Length <= Prefix.Length || !span.StartsWith(Prefix, StringComparison.Ordinal))
+            {
+                return false;
+            }
+
+            span = span[Prefix.Length..];
+
+            return span.Equals(actual, StringComparison.Ordinal);
+        }
     }
 }

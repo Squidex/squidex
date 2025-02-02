@@ -51,6 +51,7 @@ public sealed class MongoSchemaRepository(IMongoDatabase database) : MongoSnapsh
         {
             var entities =
                 await Collection.Find(x => x.IndexedAppId == appId && !x.IndexedDeleted)
+                    .Sort(Sort.Ascending(x => x.IndexedName))
                     .ToListAsync(ct);
 
             return entities.Select(x => x.Document).ToList();

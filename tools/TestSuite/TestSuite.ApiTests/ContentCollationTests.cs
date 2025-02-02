@@ -34,6 +34,7 @@ public class ContentCollationTests(CreatedAppFixture fixture) : IClassFixture<Cr
     }
 
     [Fact]
+    [Trait("Category", "MongoOnly")]
     public async Task Should_search_based_on_collation()
     {
         // STEP 0: Create schema.

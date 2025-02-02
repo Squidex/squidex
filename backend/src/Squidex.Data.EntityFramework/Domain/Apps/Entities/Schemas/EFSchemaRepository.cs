@@ -47,6 +47,7 @@ public sealed class EFSchemaRepository<TContext>(IDbContextFactory<TContext> dbC
                 await dbContext.Set<EFSchemaEntity>()
                     .Where(x => x.IndexedAppId == appId)
                     .Where(x => !x.IndexedDeleted)
+                    .OrderBy(x => x.IndexedName)
                     .ToListAsync(ct);
 
             return entities.Select(x => x.Document).ToList();

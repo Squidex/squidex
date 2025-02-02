@@ -85,7 +85,7 @@ public sealed class BackupJob(
             var backupUsers = new UserMapping(context.Actor);
             var backupContext = new BackupContext(appId, backupUsers, writer);
 
-            var streamFilter = StreamFilter.Prefix($"[^\\-]*-{appId}");
+            var streamFilter = StreamFilter.Prefix($"%-{appId}");
 
             await foreach (var storedEvent in eventStore.QueryAllAsync(streamFilter, ct: ct))
             {

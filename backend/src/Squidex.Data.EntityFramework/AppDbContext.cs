@@ -11,6 +11,7 @@ using Squidex.Assets.TusAdapter;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Billing;
+using Squidex.Domain.Apps.Entities.Contents.Counter;
 using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
 using Squidex.Domain.Apps.Entities.Tags;
@@ -32,6 +33,7 @@ public class AppDbContext(DbContextOptions options, IJsonSerializer jsonSerializ
         builder.UseAssetKeyValueStore<TusMetadata>();
         builder.UseAssets(jsonSerializer, jsonColumnType);
         builder.UseCache();
+        builder.UseCounters(jsonSerializer, jsonColumnType);
         builder.UseChatStore();
         builder.UseContent(jsonSerializer, jsonColumnType);
         builder.UseEvents(jsonSerializer, jsonColumnType);
@@ -78,6 +80,11 @@ internal static class Extensions
         builder.UseSnapshot<AssetUsageTracker.State>(jsonSerializer, jsonColumn);
         builder.UseSnapshot<UsageNotifierWorker.State>(jsonSerializer, jsonColumn);
         builder.UseSnapshot<UsageTrackerWorker.State>(jsonSerializer, jsonColumn);
+    }
+
+    public static void UseCounters(this ModelBuilder builder, IJsonSerializer jsonSerializer, string? jsonColumn)
+    {
+        builder.UseSnapshot<CounterService.State>(jsonSerializer, jsonColumn);
     }
 
     public static void UseEvents(this ModelBuilder builder, IJsonSerializer jsonSerializer, string? jsonColumn)

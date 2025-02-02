@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using LibGit2Sharp;
 using Microsoft.EntityFrameworkCore;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
@@ -113,7 +112,7 @@ public sealed partial class EFContentRepository<TContext>
                     )
                     .WhereNotDeleted(q.Query);
 
-            return await dbContext.QueryAsync<T>(queryBuilder, q, ct);
+            return await QueryAsync<T>(dbContext, queryBuilder, q, ct);
         }
 
         if (q.Reference != default && schemaIds.Count > 0)
@@ -136,7 +135,7 @@ public sealed partial class EFContentRepository<TContext>
                 queryBuilder.Where(ClrFilter.Eq(nameof(EFContentEntity.IsDeleted), false));
             }
 
-            return await dbContext.QueryAsync<T>(queryBuilder, q, ct);
+            return await QueryAsync<T>(dbContext, queryBuilder, q, ct);
         }
 
         if (isSingle)
@@ -149,10 +148,25 @@ public sealed partial class EFContentRepository<TContext>
                     .Where(ClrFilter.Eq(nameof(EFContentEntity.IndexedSchemaId), schemaIds.Single()))
                     .WhereNotDeleted(q.Query);
 
-            return await dbContext.QueryAsync<T>(queryBuilder, q, ct);
+            return await QueryAsync<T>(dbContext, queryBuilder, q, ct);
         }
 
         return ResultList.Empty<Content>();
+    }
+
+    private static async Task<IResultList<Content>> QueryAsync<T>(TContext dbContext, SqlQueryBuilder queryBuilder, Q q,
+        CancellationToken ct) where T : EFContentEntity
+    {
+        var result = await dbContext.QueryAsync<T>(queryBuilder, q, ct);
+        if (result.Count > 0 && q.Fields is { Count: > 0 })
+        {
+            foreach (var content in result)
+            {
+                content.Data.LimitFields(q.Fields);
+            }
+        }
+
+        return result;
     }
 
     public Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(App app, Schema schema, FilterNode<ClrValue> filterNode, SearchScope scope,

@@ -40,11 +40,19 @@ jobs:
           cache-to: type=gha,mode=max
           tags: squidex-local
 
+      - name: Build - TestContainers
+        uses: kohlerdominik/docker-run-action@v2.0.0
+        with:
+          image: mcr.microsoft.com/dotnet/sdk:8.0
+          default_network: host
+          volumes: ${{ github.workspace }}:/src
+          run: dotnet test /src/backend/Squidex.sln --filter Category==TestContainers
+
       - name: Test - Start Compose
         run: docker compose up -d
         working-directory: tools/TestSuite
 
-      - name: Test - RUN
+      - name: Test - RUN on Mongo
         uses: kohlerdominik/docker-run-action@v2.0.0
         with:
           image: mcr.microsoft.com/dotnet/sdk:8.0
@@ -58,7 +66,7 @@ jobs:
           volumes: ${{ github.workspace }}:/src
           run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
 
-      - name: Test - RUN on path
+      - name: Test - RUN on Mongo with path
         uses: kohlerdominik/docker-run-action@v2.0.0
         with:
           image: mcr.microsoft.com/dotnet/sdk:8.0
@@ -72,7 +80,7 @@ jobs:
           volumes: ${{ github.workspace }}:/src
           run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
 
-      - name: Test - RUN with dedicated collections
+      - name: Test - RUN on Mongo with dedicated collections
         uses: kohlerdominik/docker-run-action@v2.0.0
         with:
           image: mcr.microsoft.com/dotnet/sdk:8.0
@@ -85,6 +93,20 @@ jobs:
           options: --name test3
           volumes: ${{ github.workspace }}:/src
           run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
+
+      - name: Test - RUN on Postgres
+        uses: kohlerdominik/docker-run-action@v2.0.0
+        with:
+          image: mcr.microsoft.com/dotnet/sdk:8.0
+          environment: |
+            CONFIG__BACKUPURL=http://localhost:5000
+            CONFIG__WAIT=60
+            CONFIG__SERVER__URL=http://localhost:8083
+            WEBHOOKCATCHER__HOST__ENDPOINT=webhookcatcher
+          default_network: host
+          options: --name test4
+          volumes: ${{ github.workspace }}:/src
+          run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated --filter Category!=MongoOnly
 
       - name: Test - Install Playwright Dependencies
         run: npm ci

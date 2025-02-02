@@ -28,7 +28,7 @@ RUN dotnet restore
 COPY backend .
  
 # Test Backend
-RUN dotnet test --no-restore --filter Category!=Dependencies
+RUN dotnet test --no-restore --filter Category!=Dependencies --filter Category!=TestContainer
 
 # Publish
 RUN dotnet publish --no-restore src/Squidex/Squidex.csproj --output /build/ --configuration Release -p:version=$SQUIDEX__BUILD__VERSION
