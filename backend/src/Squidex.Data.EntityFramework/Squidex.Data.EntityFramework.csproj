@@ -11,7 +11,6 @@
     <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\..\squidex-tools\Squidex.OpenIdDict\Squidex.OpenIdDict.EntityFramework\Squidex.OpenIdDict.EntityFramework.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Apps.Entities\Squidex.Domain.Apps.Entities.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Users\Squidex.Domain.Users.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />
@@ -40,6 +39,7 @@
     <PackageReference Include="Squidex.Events.EntityFramework" Version="6.31.0" />
     <PackageReference Include="Squidex.Hosting" Version="6.31.0" />
     <PackageReference Include="Squidex.Messaging.EntityFramework" Version="6.31.0" />
+    <PackageReference Include="Squidex.OpenIdDict.EntityFramework" Version="5.8.4" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="YDotNet.Server.EntityFramework" Version="0.4.2" />

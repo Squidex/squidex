@@ -145,7 +145,7 @@ services:
       - internal
     restart: unless-stopped
 
-  squidex_postgres:
+  squidex_postgres_proxy:
     image: squidex/caddy-proxy-path:2.6.2
     ports:
       - "8082:8082"
