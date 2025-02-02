@@ -206,7 +206,7 @@ public abstract class ContentRepositoryTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_query_contents_by_ids()
+    public async Task Should_query_by_ids()
     {
         var sut = await CreateAndPrepareSutAsync();
 
@@ -218,7 +218,7 @@ public abstract class ContentRepositoryTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_query_contents_by_ids_and_schema()
+    public async Task Should_query_by_ids_and_schema()
     {
         var sut = await CreateAndPrepareSutAsync();
 
@@ -230,7 +230,7 @@ public abstract class ContentRepositoryTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_query_contents_ids_by_filter()
+    public async Task Should_query_ids_by_filter()
     {
         var sut = await CreateAndPrepareSutAsync();
 
@@ -243,7 +243,17 @@ public abstract class ContentRepositoryTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_query_contents_by_filter()
+    public async Task Should_query_with_limit_and_total()
+    {
+        var contents = await QueryAsync(new ClrQuery(), 20, 0, withTotal: true);
+
+        // We have a concrete query, so we expect an actual.
+        Assert.Equal(20, contents.Count);
+        Assert.Equal(50, contents.Total);
+    }
+
+    [Fact]
+    public async Task Should_query_by_filter()
     {
         var query = new ClrQuery
         {
@@ -257,7 +267,7 @@ public abstract class ContentRepositoryTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_query_contents_scheduled()
+    public async Task Should_query_scheduled()
     {
         var sut = await CreateAndPrepareSutAsync();
 
@@ -268,7 +278,7 @@ public abstract class ContentRepositoryTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_query_contents_with_default_query()
+    public async Task Should_query_with_default_query()
     {
         var query = new ClrQuery();
 
@@ -279,7 +289,7 @@ public abstract class ContentRepositoryTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_query_contents_with_large_skip()
+    public async Task Should_query_with_large_skip()
     {
         var query = new ClrQuery
         {
@@ -296,7 +306,7 @@ public abstract class ContentRepositoryTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_query_contents_with_query_fulltext()
+    public async Task Should_query_with_query_fulltext()
     {
         var query = new ClrQuery
         {
@@ -310,7 +320,7 @@ public abstract class ContentRepositoryTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_query_contents_with_query_filter()
+    public async Task Should_query_with_query_filter()
     {
         var query = new ClrQuery
         {
@@ -324,7 +334,7 @@ public abstract class ContentRepositoryTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_query_contents_with_reference()
+    public async Task Should_query_with_reference()
     {
         var baseQuery = new ClrQuery
         {
@@ -339,7 +349,7 @@ public abstract class ContentRepositoryTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_query_contents_with_referencing()
+    public async Task Should_query_with_referencing()
     {
         var content = await QueryAsync(new ClrQuery(), 1, NumValues / 2);
         var contents = await QueryAsync(new ClrQuery(), 1000, 0, referencing: content[0].Id);
@@ -349,7 +359,7 @@ public abstract class ContentRepositoryTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_query_contents_with_random_count()
+    public async Task Should_query_with_random_count()
     {
         var query = new ClrQuery
         {
@@ -367,7 +377,8 @@ public abstract class ContentRepositoryTests : GivenContext
         int top = 1000,
         int skip = 0,
         DomainId reference = default,
-        DomainId referencing = default)
+        DomainId referencing = default,
+        bool withTotal = false)
     {
         clrQuery.Take = top;
         clrQuery.Skip = skip;
@@ -385,7 +396,7 @@ public abstract class ContentRepositoryTests : GivenContext
 
         var q =
             Q.Empty
-                .WithoutTotal()
+                .WithoutTotal(!withTotal)
                 .WithQuery(clrQuery)
                 .WithReference(reference)
                 .WithReferencing(referencing);

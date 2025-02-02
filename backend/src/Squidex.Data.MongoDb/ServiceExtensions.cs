@@ -43,8 +43,6 @@ using Squidex.Domain.Apps.Entities.Schemas.Repositories;
 using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Domain.Apps.Entities.Teams.Repositories;
 using Squidex.Domain.Users;
-using Squidex.Domain.Users.InMemory;
-using Squidex.Domain.Users.MongoDb;
 using Squidex.Events;
 using Squidex.Events.Mongo;
 using Squidex.Infrastructure;
@@ -55,7 +53,8 @@ using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
-using Squidex.Migrations.MongoDb;
+using Squidex.Migrations;
+using Squidex.Migrations.Backup;
 using YDotNet.Server.MongoDB;
 
 namespace Squidex;
@@ -103,8 +102,18 @@ public static class ServiceExtensions
         var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database")!;
         var mongoContentDatabaseName = config.GetOptionalValue("store:mongoDb:contentDatabase", mongoDatabaseName)!;
 
+        var contentDatabase = new Func<IServiceProvider, IMongoDatabase>(c =>
+        {
+            return GetDatabase(c, mongoDatabaseName);
+        });
+
+        services.AddSingletonAs(c => GetMongoClient(mongoConfiguration))
+            .As<IMongoClient>();
+
+        services.AddSingletonAs(c => GetDatabase(c, mongoDatabaseName))
+            .As<IMongoDatabase>();
+
         services.AddMongoAssetKeyValueStore();
-        services.AddSingleton(typeof(ISnapshotStore<>), typeof(MongoSnapshotStore<>));
 
         services.AddYDotNet()
             .AddMongoStorage(options =>
@@ -118,44 +127,17 @@ public static class ServiceExtensions
                 options.CollectionName = "Chat";
             });
 
+        services.AddOpenIddict()
+            .AddCore(builder =>
+            {
+                builder.UseMongoDb().SetTokensCollectionName("Identity_Tokens");
+            });
+
         services.AddMessaging()
             .AddMongoDataStore(config);
 
-        services.AddSingletonAs(c => GetMongoClient(mongoConfiguration))
-            .As<IMongoClient>();
-
-        services.AddSingletonAs(c => GetDatabase(c, mongoDatabaseName))
-            .As<IMongoDatabase>();
-
-        services.AddSingletonAs<MongoMigrationStatus>()
-            .As<IMigrationStatus>();
-
-        services.AddTransientAs<ConvertOldSnapshotStores>()
-            .As<IMigration>();
-
-        services.AddTransientAs<CopyRuleStatistics>()
-            .As<IMigration>();
-
-        services.AddTransientAs(c => new DeleteContentCollections(GetDatabase(c, mongoContentDatabaseName)))
-            .As<IMigration>();
-
-        services.AddTransientAs(c => new RestructureContentCollection(GetDatabase(c, mongoContentDatabaseName)))
-            .As<IMigration>();
-
-        services.AddTransientAs(c => new ConvertDocumentIds(GetDatabase(c, mongoDatabaseName), GetDatabase(c, mongoContentDatabaseName)))
-            .As<IMigration>();
-
-        services.AddTransientAs<ConvertRuleEventsJson>()
-            .As<IMigration>();
-
-        services.AddTransientAs<RenameAssetSlugField>()
-            .As<IMigration>();
-
-        services.AddTransientAs<RenameAssetMetadata>()
-            .As<IMigration>();
-
-        services.AddTransientAs<AddAppIdToEventStream>()
-            .As<IMigration>();
+        services.AddSingleton(typeof(ISnapshotStore<>), typeof(MongoSnapshotStore<>));
+        services.AddMigrations(contentDatabase);
 
         services.AddSingletonAs<MongoDistributedCache>()
             .As<IDistributedCache>();
@@ -163,32 +145,26 @@ public static class ServiceExtensions
         services.AddHealthChecks()
             .AddCheck<MongoHealthCheck>("MongoDB", tags: ["node"]);
 
-        services.AddSingletonAs<MongoRequestLogRepository>()
-            .As<IRequestLogRepository>();
-
-        services.AddSingletonAs<MongoUsageRepository>()
-            .As<IUsageRepository>();
-
-        services.AddSingletonAs<MongoRuleEventRepository>()
-            .As<IRuleEventRepository>().As<IDeleter>();
-
-        services.AddSingletonAs<MongoHistoryEventRepository>()
-            .As<IHistoryEventRepository>().As<IDeleter>();
-
-        services.AddSingletonAs<MongoRoleStore>()
-            .As<IRoleStore<IdentityRole>>();
-
-        services.AddSingletonAs<MongoUserStore>()
-            .As<IUserStore<IdentityUser>>().As<IUserFactory>();
+        services.AddSingletonAs<MongoAppRepository>()
+            .As<IAppRepository>().As<ISnapshotStore<App>>().As<IDeleter>();
 
         services.AddSingletonAs<MongoAssetFolderRepository>()
             .As<IAssetFolderRepository>().As<ISnapshotStore<AssetFolder>>().As<IDeleter>();
 
-        services.AddSingletonAs<MongoAppRepository>()
-            .As<IAppRepository>().As<ISnapshotStore<App>>().As<IDeleter>();
+        services.AddSingletonAs<MongoHistoryEventRepository>()
+            .As<IHistoryEventRepository>().As<IDeleter>();
+
+        services.AddSingletonAs<MongoRequestLogRepository>()
+            .As<IRequestLogRepository>();
+
+        services.AddSingletonAs<MongoRoleStore>()
+            .As<IRoleStore<IdentityRole>>();
 
         services.AddSingletonAs<MongoRuleRepository>()
             .As<IRuleRepository>().As<ISnapshotStore<Rule>>().As<IDeleter>();
+
+        services.AddSingletonAs<MongoRuleEventRepository>()
+            .As<IRuleEventRepository>().As<IDeleter>();
 
         services.AddSingletonAs<MongoSchemaRepository>()
             .As<ISchemaRepository>().As<ISnapshotStore<Schema>>().As<IDeleter>();
@@ -201,6 +177,15 @@ public static class ServiceExtensions
 
         services.AddSingletonAs<MongoTextIndexerState>()
             .As<ITextIndexerState>().As<IDeleter>();
+
+        services.AddSingletonAs<MongoTokenStoreInitializer>()
+            .AsSelf();
+
+        services.AddSingletonAs<MongoUsageRepository>()
+            .As<IUsageRepository>();
+
+        services.AddSingletonAs<MongoUserStore>()
+            .As<IUserStore<IdentityUser>>().As<IUserFactory>();
 
         services.AddSingletonAs(c =>
         {
@@ -215,17 +200,6 @@ public static class ServiceExtensions
             return new MongoShardedContentRepository(GetSharding(config, "store:mongoDB:contentShardCount"),
                 shardKey => ActivatorUtilities.CreateInstance<MongoContentRepository>(c, shardKey, contentDatabase));
         }).As<IContentRepository>().As<ISnapshotStore<WriteContent>>().As<IDeleter>();
-
-        services.AddOpenIddict()
-            .AddCore(builder =>
-            {
-                builder.UseMongoDb()
-                    .SetScopesCollectionName("Identity_Scopes")
-                    .SetTokensCollectionName("Identity_Tokens");
-
-                builder.SetDefaultScopeEntity<ImmutableScope>();
-                builder.SetDefaultApplicationEntity<ImmutableApplication>();
-            });
 
         var atlasOptions = config.GetSection("store:mongoDb:atlas").Get<AtlasOptions>() ?? new ();
 
@@ -266,6 +240,42 @@ public static class ServiceExtensions
 
             BsonJsonConvention.Register(jsonSerializerOptions, representation);
         }, int.MinValue);
+    }
+
+    private static void AddMigrations(this IServiceCollection services, Func<IServiceProvider, IMongoDatabase> contentDatabase)
+    {
+        services.AddSingletonAs<MongoMigrationStatus>()
+            .As<IMigrationStatus>();
+
+        services.AddTransientAs<ConvertOldSnapshotStores>()
+            .As<IMigration>();
+
+        services.AddTransientAs<CopyRuleStatistics>()
+            .As<IMigration>();
+
+        services.AddTransientAs(c => new DeleteContentCollections(contentDatabase(c)))
+            .As<IMigration>();
+
+        services.AddTransientAs(c => new RestructureContentCollection(contentDatabase(c)))
+            .As<IMigration>();
+
+        services.AddTransientAs(c => new ConvertDocumentIds(c.GetRequiredService<IMongoDatabase>(), contentDatabase(c)))
+            .As<IMigration>();
+
+        services.AddTransientAs<ConvertRuleEventsJson>()
+            .As<IMigration>();
+
+        services.AddTransientAs<RenameAssetSlugField>()
+            .As<IMigration>();
+
+        services.AddTransientAs<RenameAssetMetadata>()
+            .As<IMigration>();
+
+        services.AddTransientAs<AddAppIdToEventStream>()
+            .As<IMigration>();
+
+        services.AddTransientAs<ConvertBackup>()
+            .As<IMigration>();
     }
 
     private static IMongoClient GetMongoClient(string configuration)

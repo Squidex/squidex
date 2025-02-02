@@ -5,22 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using NodaTime;
-using Squidex.Infrastructure;
+using Squidex.Infrastructure.Migrations;
 
-namespace Migrations.Migrations.Backup;
+namespace Microsoft.EntityFrameworkCore;
 
-public sealed class BackupJob
+public static class EFMigrationBuilder
 {
-    public DomainId Id { get; set; }
-
-    public Instant Started { get; set; }
-
-    public Instant? Stopped { get; set; }
-
-    public int HandledEvents { get; set; }
-
-    public int HandledAssets { get; set; }
-
-    public BackupStatus Status { get; set; }
+    public static void UseMigration(this ModelBuilder builder)
+    {
+        builder.Entity<EFMigrationEntity>(b =>
+        {
+            b.ToTable("Migrations");
+        });
+    }
 }

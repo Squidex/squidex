@@ -7,7 +7,7 @@
 
 using Squidex.Domain.Apps.Entities.Jobs;
 
-namespace Migrations.Migrations.Backup;
+namespace Squidex.Migrations.Backup;
 
 public sealed class BackupState
 {

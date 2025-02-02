@@ -69,6 +69,11 @@ public class SqlDialect
         return string.Empty;
     }
 
+    public virtual string? JsonColumnType()
+    {
+        return null;
+    }
+
     public virtual string And(IEnumerable<string> parts)
     {
         return $"({string.Join(" AND ", parts)})";
@@ -91,7 +96,7 @@ public class SqlDialect
 
     public virtual string CountAll()
     {
-        return "COUNT(*)";
+        return $"COUNT(*) as {Field("Value", false)}";
     }
 
     public virtual string Field(PropertyPath path, bool isJson)

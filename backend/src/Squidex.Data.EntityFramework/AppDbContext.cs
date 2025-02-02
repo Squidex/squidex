@@ -7,191 +7,101 @@
 
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
-using Squidex.Domain.Apps.Core.Apps;
-using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Core.Teams;
+using Squidex.Assets.TusAdapter;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
-using Squidex.Domain.Apps.Entities.Contents;
-using Squidex.Domain.Apps.Entities.Contents.Text.State;
-using Squidex.Domain.Apps.Entities.History;
-using Squidex.Domain.Apps.Entities.Rules;
-using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Domain.Apps.Entities.Teams;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.Caching;
+using Squidex.Domain.Apps.Entities.Billing;
+using Squidex.Domain.Apps.Entities.Jobs;
+using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
+using Squidex.Domain.Apps.Entities.Tags;
+using Squidex.Domain.Users;
+using Squidex.Infrastructure.EventSourcing.Consume;
 using Squidex.Infrastructure.Json;
-using Squidex.Infrastructure.Log;
-using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.States;
-using Squidex.Infrastructure.UsageTracking;
+using YDotNet.Server.EntityFramework;
 
 namespace Squidex;
 
 public class AppDbContext(DbContextOptions options, IJsonSerializer jsonSerializer) : IdentityDbContext(options)
 {
-    public DbSet<EFAppEntity> Apps { get; set; }
-
-    public DbSet<EFCacheEntity> Cache { get; set; }
-
-    public DbSet<EFUsageCounterEntity> Counters { get; set; }
-
-    public DbSet<EFRequestEntity> Log { get; set; }
-
-    public DbSet<HistoryEvent> History { get; set; }
-
-    public DbSet<EFMigrationEntity> Migrations { get; set; }
-
-    public DbSet<EFRuleEntity> Rules { get; set; }
-
-    public DbSet<EFSchemaEntity> Schemas { get; set; }
-
-    public DbSet<EFTeamEntity> Teams { get; set; }
-
     protected override void OnModelCreating(ModelBuilder builder)
     {
+        var jsonColumnType = JsonColumnType();
+
+        builder.UseApps(jsonSerializer, jsonColumnType);
+        builder.UseAssetKeyValueStore<TusMetadata>();
+        builder.UseAssets(jsonSerializer, jsonColumnType);
+        builder.UseCache();
+        builder.UseChatStore();
+        builder.UseContent(jsonSerializer, jsonColumnType);
+        builder.UseEvents(jsonSerializer, jsonColumnType);
+        builder.UseEventStore();
+        builder.UseHistory(jsonSerializer, jsonColumnType);
+        builder.UseIdentity(jsonSerializer, jsonColumnType);
+        builder.UseJobs(jsonSerializer, jsonColumnType);
+        builder.UseMessagingDataStore();
+        builder.UseMessagingTransport();
+        builder.UseMigration();
+        builder.UseNames(jsonSerializer, jsonColumnType);
         builder.UseOpenIddict();
-
-        builder.AddChatStore();
-        builder.AddEventStore();
-        builder.AddMessagingDataStore();
-        builder.AddMessagingTransport();
-
-        builder.AddSnapshot<Team, EFTeamEntity>(jsonSerializer);
-
-        builder.AddSnapshot<App, EFAppEntity>(jsonSerializer, b =>
-        {
-            b.Property(x => x.IndexedTeamId).AsString();
-        });
-
-        builder.AddSnapshot<Rule, EFRuleEntity>(jsonSerializer, b =>
-        {
-            b.Property(x => x.IndexedAppId).AsString();
-            b.Property(x => x.IndexedId).AsString();
-        });
-
-        builder.AddSnapshot<Schema, EFSchemaEntity>(jsonSerializer, b =>
-        {
-            b.Property(x => x.IndexedAppId).AsString();
-            b.Property(x => x.IndexedId).AsString();
-        });
-
-        builder.Entity<HistoryEvent>(b =>
-        {
-            b.Property(x => x.Actor).AsString();
-            b.Property(x => x.Id).AsString();
-            b.Property(x => x.OwnerId).AsString();
-            b.Property(x => x.Parameters).AsJsonString(jsonSerializer);
-            b.Property(x => x.Created).AsDateTimeOffset();
-        });
-
-        builder.Entity<EFRequestEntity>(b =>
-        {
-            b.Property(x => x.Timestamp).AsDateTimeOffset();
-            b.Property(x => x.Properties).AsJsonString(jsonSerializer);
-        });
-
-        builder.Entity<EFAssetEntity>(b =>
-        {
-            b.Property(x => x.Id).AsString();
-            b.Property(x => x.AppId).AsString();
-            b.Property(x => x.Created).AsDateTimeOffset();
-            b.Property(x => x.CreatedBy).AsString();
-            b.Property(x => x.DocumentId).AsString();
-            b.Property(x => x.IndexedAppId).AsString();
-            b.Property(x => x.LastModified).AsDateTimeOffset();
-            b.Property(x => x.LastModifiedBy).AsString();
-            b.Property(x => x.Metadata).AsJsonString(jsonSerializer).HasColumnType(JsonColumnType());
-            b.Property(x => x.ParentId).AsString();
-            b.Property(x => x.Tags).AsString();
-            b.Property(x => x.Type).AsString();
-        });
-
-        builder.Entity<EFAssetFolderEntity>(b =>
-        {
-            b.Property(x => x.Id).AsString();
-            b.Property(x => x.AppId).AsString();
-            b.Property(x => x.Created).AsDateTimeOffset();
-            b.Property(x => x.CreatedBy).AsString();
-            b.Property(x => x.DocumentId).AsString();
-            b.Property(x => x.IndexedAppId).AsString();
-            b.Property(x => x.LastModified).AsDateTimeOffset();
-            b.Property(x => x.LastModifiedBy).AsString();
-            b.Property(x => x.ParentId).AsString();
-        });
-
-        builder.Entity<EFRuleEventEntity>(b =>
-        {
-            b.Property(x => x.Id).AsString();
-            b.Property(x => x.AppId).AsString();
-            b.Property(x => x.Created).AsDateTimeOffset();
-            b.Property(x => x.Expires).AsDateTimeOffset();
-            b.Property(x => x.Job).AsJsonString(jsonSerializer);
-            b.Property(x => x.JobResult).AsString();
-            b.Property(x => x.LastModified).AsDateTimeOffset();
-            b.Property(x => x.NextAttempt).AsDateTimeOffset();
-            b.Property(x => x.Result).AsString();
-            b.Property(x => x.RuleId).AsString();
-        });
-
-        builder.Entity<TextContentState>(b =>
-        {
-            b.ToTable("TextState");
-            b.HasKey(x => x.UniqueContentId);
-            b.Property(x => x.UniqueContentId).AsString();
-            b.Property(x => x.State).AsString();
-        });
-
-        AddContentEntity<EFContentCompleteEntity>(builder, "ContentsAll");
-        AddContentReference<EFReferenceCompleteEntity>(builder, "ContentReferencesAll");
-
-        AddContentEntity<EFContentPublishedEntity>(builder, "ContentsPublished");
-        AddContentReference<EFReferencePublishedEntity>(builder, "ContentReferencesPublished");
+        builder.UseRequest(jsonSerializer, jsonColumnType);
+        builder.UseRules(jsonSerializer, jsonColumnType);
+        builder.UseSchema(jsonSerializer, jsonColumnType);
+        builder.UseSettings(jsonSerializer, jsonColumnType);
+        builder.UseTags(jsonSerializer, jsonColumnType);
+        builder.UseTeams(jsonSerializer, jsonColumnType);
+        builder.UseUsage();
+        builder.UseUsageTracking(jsonSerializer, jsonColumnType);
+        builder.UseYDotNet();
 
         base.OnModelCreating(builder);
-    }
-
-    protected virtual void AddContentEntity<T>(ModelBuilder builder, string tableName) where T : EFContentEntity
-    {
-        builder.Entity<T>(b =>
-        {
-            b.ToTable(tableName);
-            b.Property(x => x.Id).AsString();
-            b.Property(x => x.AppId).AsString();
-            b.Property(x => x.Created).AsDateTimeOffset();
-            b.Property(x => x.CreatedBy).AsString();
-            b.Property(x => x.Data).AsJsonString(jsonSerializer).HasColumnType(JsonColumnType());
-            b.Property(x => x.DocumentId).AsString();
-            b.Property(x => x.IndexedAppId).AsString();
-            b.Property(x => x.IndexedSchemaId).AsString();
-            b.Property(x => x.LastModified).AsDateTimeOffset();
-            b.Property(x => x.LastModifiedBy).AsString();
-            b.Property(x => x.NewData).AsNullableJsonString(jsonSerializer).HasColumnType(JsonColumnType());
-            b.Property(x => x.NewStatus).AsNullableString();
-            b.Property(x => x.SchemaId).AsString();
-            b.Property(x => x.ScheduledAt).AsDateTimeOffset();
-            b.Property(x => x.ScheduleJob).AsNullableJsonString(jsonSerializer);
-            b.Property(x => x.Status).AsString();
-            b.Property(x => x.TranslationStatus).AsNullableJsonString(jsonSerializer);
-        });
-    }
-
-    protected virtual void AddContentReference<T>(ModelBuilder builder, string tableName) where T : EFReferenceEntity
-    {
-        builder.Entity<T>(b =>
-        {
-            b.ToTable(tableName);
-            b.HasKey("AppId", "FromKey", "ToId");
-
-            b.Property(x => x.AppId).AsString();
-            b.Property(x => x.FromKey).AsString();
-            b.Property(x => x.ToId).AsString();
-        });
     }
 
     protected virtual string? JsonColumnType()
     {
         return null;
+    }
+}
+
+#pragma warning disable MA0048 // File name must match type name
+internal static class Extensions
+#pragma warning restore MA0048 // File name must match type name
+{
+    public static void UseIdentity(this ModelBuilder builder, IJsonSerializer jsonSerializer, string? jsonColumn)
+    {
+        builder.UseSnapshot<DefaultKeyStore.State>(jsonSerializer, jsonColumn);
+        builder.UseSnapshot<DefaultXmlRepository.State>(jsonSerializer, jsonColumn);
+    }
+
+    public static void UseUsageTracking(this ModelBuilder builder, IJsonSerializer jsonSerializer, string? jsonColumn)
+    {
+        builder.UseSnapshot<AssetUsageTracker.State>(jsonSerializer, jsonColumn);
+        builder.UseSnapshot<UsageNotifierWorker.State>(jsonSerializer, jsonColumn);
+        builder.UseSnapshot<UsageTrackerWorker.State>(jsonSerializer, jsonColumn);
+    }
+
+    public static void UseEvents(this ModelBuilder builder, IJsonSerializer jsonSerializer, string? jsonColumn)
+    {
+        builder.UseSnapshot<EventConsumerState>(jsonSerializer, jsonColumn);
+    }
+
+    public static void UseNames(this ModelBuilder builder, IJsonSerializer jsonSerializer, string? jsonColumn)
+    {
+        builder.UseSnapshot<NameReservationState.State>(jsonSerializer, jsonColumn);
+    }
+
+    public static void UseJobs(this ModelBuilder builder, IJsonSerializer jsonSerializer, string? jsonColumn)
+    {
+        builder.UseSnapshot<JobsState>(jsonSerializer, jsonColumn);
+    }
+
+    public static void UseSettings(this ModelBuilder builder, IJsonSerializer jsonSerializer, string? jsonColumn)
+    {
+        builder.UseSnapshot<AppUISettings.State>(jsonSerializer, jsonColumn);
+    }
+
+    public static void UseTags(this ModelBuilder builder, IJsonSerializer jsonSerializer, string? jsonColumn)
+    {
+        builder.UseSnapshot<TagService.State>(jsonSerializer, jsonColumn);
     }
 }

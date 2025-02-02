@@ -174,7 +174,7 @@ public sealed partial class EFContentRepository<TContext> : ISnapshotStore<Write
                 }
                 else
                 {
-                    await dbContext.Set<EFContentPublishedEntity>().Where(x => x.IndexedAppId == job.Key)
+                    await dbContext.Set<EFContentPublishedEntity>().Where(x => x.DocumentId == job.Key)
                         .ExecuteDeleteAsync(ct);
                 }
 

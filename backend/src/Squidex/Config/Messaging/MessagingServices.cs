@@ -99,7 +99,7 @@ public static class MessagingServices
             .As<IJobService>().As<IDeleter>();
 
         services.AddMessaging()
-            .AddTransport(config)
+            .AddSquidexTransport(config)
             .AddSubscriptions(!isWorker)
             .AddReplicatedCache(true, options =>
             {
@@ -133,5 +133,17 @@ public static class MessagingServices
             {
                 options.Scheduler = InlineScheduler.Instance;
             });
+    }
+
+    public static MessagingBuilder AddSquidexTransport(this MessagingBuilder builder, IConfiguration config)
+    {
+        var type = config.GetValue<string>("messaging:type");
+
+        if (string.Equals(type, "Sql", StringComparison.OrdinalIgnoreCase))
+        {
+            return builder.AddSquidexEntityFrameworkTransport(config);
+        }
+
+        return builder.AddTransport(config);
     }
 }

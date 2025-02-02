@@ -93,7 +93,7 @@ public static class Extensions
                 var (countSql, countParams) = sqlQuery.Count().Compile();
 
                 queryTotal =
-                    await dbContext.Database.SqlQueryRaw<long>(countSql, countParams, ct)
+                    await dbContext.Database.SqlQueryRaw<long>(countSql, countParams)
                         .FirstOrDefaultAsync(ct);
             }
         }

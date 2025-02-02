@@ -45,17 +45,16 @@ public sealed class DefaultUserService(
         Guard.NotNull(ids);
 
         ids = ids.Where(userFactory.IsId);
-
         if (!ids.Any())
         {
             return ResultList.Empty<IUser>();
         }
 
-        var users = userManager.Users.Where(x => ids.Contains(x.Id)).ToList();
+        var userItems = userManager.Users.Where(x => ids.Contains(x.Id)).ToList();
+        var userTotal = userItems.Count;
+        var resolved = await ResolveAsync(userItems);
 
-        var resolved = await ResolveAsync(users);
-
-        return ResultList.Create(users.Count, resolved);
+        return ResultList.Create(userTotal, resolved);
     }
 
     public async Task<IResultList<IUser>> QueryAsync(string? query = null, int take = 10, int skip = 0,
@@ -80,7 +79,6 @@ public sealed class DefaultUserService(
 
         var userItems = QueryUsers(query).Skip(skip).Take(take).ToList();
         var userTotal = QueryUsers(query).LongCount();
-
         var resolved = await ResolveAsync(userItems);
 
         return ResultList.Create(userTotal, resolved);
@@ -109,7 +107,7 @@ public sealed class DefaultUserService(
 
         var user = await userManager.FindByLoginAsync(provider, key);
 
-        return await ResolveOptionalAsync(user);
+        return user != null ? await ResolveAsync(user) : null;
     }
 
     public async Task<IUser?> FindByEmailAsync(string email,
@@ -119,7 +117,7 @@ public sealed class DefaultUserService(
 
         var user = await userManager.FindByEmailAsync(email);
 
-        return await ResolveOptionalAsync(user);
+        return user != null ? await ResolveAsync(user) : null;
     }
 
     public async Task<IUser?> GetAsync(ClaimsPrincipal principal,
@@ -129,7 +127,7 @@ public sealed class DefaultUserService(
 
         var user = await userManager.GetUserAsync(principal);
 
-        return await ResolveOptionalAsync(user);
+        return user != null ? await ResolveAsync(user) : null;
     }
 
     public async Task<IUser?> FindByIdAsync(string id,
@@ -142,7 +140,7 @@ public sealed class DefaultUserService(
 
         var user = await userManager.FindByIdAsync(id);
 
-        return await ResolveOptionalAsync(user);
+        return user != null ? await ResolveAsync(user) : null;
     }
 
     public async Task<IUser> CreateAsync(string email, UserValues? values = null, bool lockAutomatically = false,
@@ -327,14 +325,17 @@ public sealed class DefaultUserService(
 
         var user = await GetUserAsync(id);
 
-        var resolved = await ResolveAsync(user);
+        if (userEvents.Any())
+        {
+            var resolved = await ResolveAsync(user);
+
+            foreach (var events in userEvents)
+            {
+                await events.OnUserDeletedAsync(resolved);
+            }
+        }
 
         await userManager.DeleteAsync(user).Throw(log);
-
-        foreach (var events in userEvents)
-        {
-            await events.OnUserDeletedAsync(resolved);
-        }
     }
 
     private async Task<IUser> ForUserAsync(string id, Func<IdentityUser, Task> action)
@@ -358,12 +359,15 @@ public sealed class DefaultUserService(
         return user ?? throw new DomainObjectNotFoundException(id);
     }
 
-    private Task<IUser[]> ResolveAsync(IEnumerable<IdentityUser> users)
+    private async Task<List<IUser>> ResolveAsync(IEnumerable<IdentityUser> users)
     {
-        return Task.WhenAll(users.Select(async user =>
+        var result = new List<IUser>();
+        foreach (var user in users)
         {
-            return await ResolveAsync(user);
-        }));
+            result.Add(await ResolveAsync(user));
+        }
+
+        return result;
     }
 
     private async Task<IUser> ResolveAsync(IdentityUser user)
@@ -376,16 +380,6 @@ public sealed class DefaultUserService(
         }
 
         return new UserWithClaims(user, claims.ToList());
-    }
-
-    private async Task<IUser?> ResolveOptionalAsync(IdentityUser? user)
-    {
-        if (user == null)
-        {
-            return null;
-        }
-
-        return await ResolveAsync(user);
     }
 
     private static bool HasConsentGiven(UserValues values, IUser? oldUser)

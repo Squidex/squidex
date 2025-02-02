@@ -7,10 +7,10 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Migrations.Migrations;
-using Migrations.Migrations.Backup;
 using Migrations.Migrations.MongoDb;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
+using Squidex.Migrations.Backup;
 
 namespace Migrations;
 
@@ -35,25 +35,25 @@ public sealed class MigrationPath(IServiceProvider serviceProvider) : IMigration
         // Version 06: Convert Event store. Must always be executed first.
         if (version < 6)
         {
-            yield return serviceProvider.GetRequiredService<ConvertEventStore>();
+            yield return serviceProvider.GetService<ConvertEventStore>();
         }
 
         // Version 22: Integrate Domain Id.
         if (version < 22)
         {
-            yield return serviceProvider.GetRequiredService<AddAppIdToEventStream>();
+            yield return serviceProvider.GetService<AddAppIdToEventStream>();
         }
 
         // Version 07: Introduces AppId for backups.
         else if (version < 7)
         {
-            yield return serviceProvider.GetRequiredService<ConvertEventStoreAppId>();
+            yield return serviceProvider.GetService<ConvertEventStoreAppId>();
         }
 
         // Version 05: Fixes the broken command architecture and requires a rebuild of all snapshots.
         if (version < 5)
         {
-            yield return serviceProvider.GetRequiredService<RebuildSnapshots>();
+            yield return serviceProvider.GetService<RebuildSnapshots>();
         }
         else
         {
@@ -68,9 +68,9 @@ public sealed class MigrationPath(IServiceProvider serviceProvider) : IMigration
             // Version 25: Introduce full deletion.
             if (version < 25)
             {
-                yield return serviceProvider.GetRequiredService<RebuildApps>();
-                yield return serviceProvider.GetRequiredService<RebuildSchemas>();
-                yield return serviceProvider.GetRequiredService<RebuildRules>();
+                yield return serviceProvider.GetService<RebuildApps>();
+                yield return serviceProvider.GetService<RebuildSchemas>();
+                yield return serviceProvider.GetService<RebuildRules>();
             }
 
             // Version 18: Rebuild assets.
@@ -91,7 +91,7 @@ public sealed class MigrationPath(IServiceProvider serviceProvider) : IMigration
                 // Version 23: Fix parent id.
                 if (version < 23)
                 {
-                    yield return serviceProvider.GetRequiredService<ConvertDocumentIds>().ForAssets();
+                    yield return serviceProvider.GetService<ConvertDocumentIds>()?.ForAssets();
                 }
             }
 
@@ -99,32 +99,32 @@ public sealed class MigrationPath(IServiceProvider serviceProvider) : IMigration
             // Version 25: Convert content ids to names.
             if (version < 25)
             {
-                yield return serviceProvider.GetRequiredService<RebuildContents>();
+                yield return serviceProvider.GetService<RebuildContents>();
             }
 
             // Version 16: Introduce file name slugs for assets.
             if (version < 16)
             {
-                yield return serviceProvider.GetRequiredService<CreateAssetSlugs>();
+                yield return serviceProvider.GetService<CreateAssetSlugs>();
             }
         }
 
         // Version 13: Json refactoring.
         if (version < 13)
         {
-            yield return serviceProvider.GetRequiredService<ConvertRuleEventsJson>();
+            yield return serviceProvider.GetService<ConvertRuleEventsJson>();
         }
 
         // Version 26: New rule statistics using normal usage collection.
         if (version < 26)
         {
-            yield return serviceProvider.GetRequiredService<CopyRuleStatistics>();
+            yield return serviceProvider.GetService<CopyRuleStatistics>();
         }
 
         // Version 27: General jobs state.
         if (version < 27)
         {
-            yield return serviceProvider.GetRequiredService<ConvertBackup>();
+            yield return serviceProvider.GetService<ConvertBackup>();
         }
     }
 }

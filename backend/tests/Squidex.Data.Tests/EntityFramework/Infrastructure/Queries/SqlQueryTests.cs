@@ -461,6 +461,21 @@ public abstract class SqlQueryTests<TContext> where TContext : DbContext
         Assert.Equal([5, 15], actual.Order().ToArray());
     }
 
+    [Fact]
+    public async Task Should_query_count()
+    {
+        var builder =
+            new TestSqlBuilder(CreateDialect(), "TestEntity")
+                .Count();
+
+        var (sql, parameters) = builder.Compile();
+
+        var dbContext = await CreateAndPrepareDbContextAsync();
+        var dbResult = await dbContext.Database.SqlQueryRaw<long>(sql, parameters).FirstOrDefaultAsync();
+
+        Assert.Equal(20, dbResult);
+    }
+
     private static long[] Range(int from, int to)
     {
         var result = new List<long>();

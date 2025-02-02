@@ -44,11 +44,11 @@ public class TestDbContext(DbContextOptions options, IJsonSerializer jsonSeriali
 {
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        builder.AddSnapshot<SnapshotValue, EFState<SnapshotValue>>(jsonSerializer);
+        builder.UseSnapshot<SnapshotValue, EFState<SnapshotValue>>(jsonSerializer, JsonColumnType());
 
         builder.Entity<TestEntity>(b =>
         {
-            b.Property(x => x.Json).AsJsonString(jsonSerializer).HasColumnType(JsonColumnType());
+            b.Property(x => x.Json).AsJsonString(jsonSerializer, JsonColumnType());
         });
 
         base.OnModelCreating(builder);

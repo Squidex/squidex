@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Tasks;
 
-namespace Squidex.Migrations.MongoDb;
+namespace Squidex.Migrations;
 
 public sealed class ConvertDocumentIds(IMongoDatabase databaseDefault, IMongoDatabase databaseContent) : MongoBase<BsonDocument>, IMigration
 {

@@ -5,12 +5,22 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Migrations.Migrations.Backup;
+using NodaTime;
+using Squidex.Infrastructure;
 
-public enum BackupStatus
+namespace Squidex.Migrations.Backup;
+
+public sealed class BackupJob
 {
-    Created,
-    Started,
-    Completed,
-    Failed,
+    public DomainId Id { get; set; }
+
+    public Instant Started { get; set; }
+
+    public Instant? Stopped { get; set; }
+
+    public int HandledEvents { get; set; }
+
+    public int HandledAssets { get; set; }
+
+    public BackupStatus Status { get; set; }
 }

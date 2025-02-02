@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using LibGit2Sharp;
 using Microsoft.EntityFrameworkCore;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
@@ -110,7 +111,7 @@ public sealed partial class EFContentRepository<TContext>
                             .Where(ClrFilter.Eq(nameof(EFReferenceEntity.FromKey), DomainId.Combine(appId, q.Referencing)))
                             .Select(nameof(EFReferenceEntity.ToId))
                     )
-                    .Where(ClrFilter.Eq(nameof(EFContentEntity.IsDeleted), false));
+                    .WhereNotDeleted(q.Query);
 
             return await dbContext.QueryAsync<T>(queryBuilder, q, ct);
         }
@@ -128,7 +129,12 @@ public sealed partial class EFContentRepository<TContext>
                             .Select(nameof(EFReferenceEntity.FromKey))
                     )
                     .Where(ClrFilter.In(nameof(EFContentEntity.IndexedSchemaId), schemaIds))
-                    .Where(ClrFilter.Eq(nameof(EFContentEntity.IsDeleted), false));
+                    .WhereNotDeleted(q.Query);
+
+            if (q.Query.Filter?.HasField("IsDeleted") != true)
+            {
+                queryBuilder.Where(ClrFilter.Eq(nameof(EFContentEntity.IsDeleted), false));
+            }
 
             return await dbContext.QueryAsync<T>(queryBuilder, q, ct);
         }
@@ -141,7 +147,7 @@ public sealed partial class EFContentRepository<TContext>
                 new ContentQueryBuilder(dialect, tableName)
                     .Where(ClrFilter.Eq(nameof(EFContentEntity.IndexedAppId), appId))
                     .Where(ClrFilter.Eq(nameof(EFContentEntity.IndexedSchemaId), schemaIds.Single()))
-                    .Where(ClrFilter.Eq(nameof(EFContentEntity.IsDeleted), false));
+                    .WhereNotDeleted(q.Query);
 
             return await dbContext.QueryAsync<T>(queryBuilder, q, ct);
         }
@@ -168,7 +174,7 @@ public sealed partial class EFContentRepository<TContext>
             new ContentQueryBuilder(dialect, table)
                 .Where(ClrFilter.Eq(nameof(EFContentEntity.IndexedAppId), appId))
                 .Where(ClrFilter.Eq(nameof(EFContentEntity.IndexedSchemaId), schemaId))
-                .Where(ClrFilter.Eq(nameof(EFContentEntity.IsDeleted), false))
+                .WhereNotDeleted(filterNode)
                 .Where(filterNode)
                 .Select(nameof(EFContentEntity.IndexedSchemaId))
                 .Select(nameof(EFContentEntity.Id))

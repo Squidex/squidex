@@ -9,7 +9,7 @@ using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.States;
 
-namespace Migrations.Migrations.Backup;
+namespace Squidex.Migrations.Backup;
 
 public sealed class ConvertBackup(
     ISnapshotStore<BackupState> stateBackups,

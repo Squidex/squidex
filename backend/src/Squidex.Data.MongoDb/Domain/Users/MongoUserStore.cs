@@ -13,7 +13,7 @@ using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Users.MongoDb;
+namespace Squidex.Domain.Users;
 
 public sealed class MongoUserStore(IMongoDatabase database) :
     MongoRepositoryBase<MongoUser>(database),

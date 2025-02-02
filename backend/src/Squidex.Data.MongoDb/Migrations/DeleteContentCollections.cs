@@ -8,7 +8,7 @@
 using MongoDB.Driver;
 using Squidex.Infrastructure.Migrations;
 
-namespace Squidex.Migrations.MongoDb;
+namespace Squidex.Migrations;
 
 public sealed class DeleteContentCollections(IMongoDatabase database) : IMigration
 {

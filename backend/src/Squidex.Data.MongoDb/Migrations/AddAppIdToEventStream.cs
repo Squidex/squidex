@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Tasks;
 
-namespace Squidex.Migrations.MongoDb;
+namespace Squidex.Migrations;
 
 public sealed class AddAppIdToEventStream(IMongoDatabase database) : MongoBase<BsonDocument>, IMigration
 {

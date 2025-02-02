@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NodaTime;
@@ -18,7 +19,7 @@ namespace Squidex.Infrastructure;
 
 public static class JsonConversion
 {
-    public static PropertyBuilder<T> AsJsonString<T>(this PropertyBuilder<T> propertyBuilder, IJsonSerializer jsonSerializer)
+    public static PropertyBuilder<T> AsJsonString<T>(this PropertyBuilder<T> propertyBuilder, IJsonSerializer jsonSerializer, string? columnType)
         where T : class
     {
         var converter = new ValueConverter<T, string>(
@@ -26,11 +27,11 @@ public static class JsonConversion
             v => jsonSerializer.Deserialize<T>(v, null)!
         );
 
-        propertyBuilder.HasConversion(converter);
+        propertyBuilder.HasConversion(converter).HasColumnType(columnType);
         return propertyBuilder;
     }
 
-    public static PropertyBuilder<T?> AsNullableJsonString<T>(this PropertyBuilder<T?> propertyBuilder, IJsonSerializer jsonSerializer)
+    public static PropertyBuilder<T?> AsNullableJsonString<T>(this PropertyBuilder<T?> propertyBuilder, IJsonSerializer jsonSerializer, string? columnType)
         where T : class
     {
         var converter = new ValueConverter<T?, string?>(
@@ -38,7 +39,7 @@ public static class JsonConversion
             v => v != null ? jsonSerializer.Deserialize<T>(v, null) : null!
         );
 
-        propertyBuilder.HasConversion(converter);
+        propertyBuilder.HasConversion(converter).HasColumnType(columnType);
         return propertyBuilder;
     }
 

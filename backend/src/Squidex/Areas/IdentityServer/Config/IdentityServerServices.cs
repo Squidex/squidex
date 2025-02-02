@@ -54,9 +54,6 @@ public static class IdentityServerServices
         services.AddSingletonAs<ApiPermissionUnifier>()
             .As<IClaimsTransformation>();
 
-        services.AddSingletonAs<TokenStoreInitializer>()
-            .AsSelf();
-
         services.AddSingletonAs<CreateAdminInitializer>()
             .AsSelf();
 
@@ -78,6 +75,9 @@ public static class IdentityServerServices
         services.AddOpenIddict()
             .AddCore(builder =>
             {
+                builder.SetDefaultScopeEntity<ImmutableScope>();
+                builder.SetDefaultApplicationEntity<ImmutableApplication>();
+
                 builder.Services.AddSingletonAs<IdentityServerConfiguration.Scopes>()
                     .As<IOpenIddictScopeStore<ImmutableScope>>();
 

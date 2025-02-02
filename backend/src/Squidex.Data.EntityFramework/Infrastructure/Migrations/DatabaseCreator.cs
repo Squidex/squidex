@@ -6,11 +6,13 @@
 // ==========================================================================
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Storage;
 using Squidex.Hosting;
 
 namespace Squidex.Infrastructure.Migrations;
 
-public sealed class DatabaseMigrator<TContext>(IDbContextFactory<TContext> dbContextFactory) : IInitializable
+public sealed class DatabaseCreator<TContext>(IDbContextFactory<TContext> dbContextFactory) : IInitializable
     where TContext : DbContext
 {
     public int Order => -1000;
@@ -20,6 +22,11 @@ public sealed class DatabaseMigrator<TContext>(IDbContextFactory<TContext> dbCon
     {
         await using var context = await dbContextFactory.CreateDbContextAsync(ct);
 
-        await context.Database.MigrateAsync(ct);
+        if (context.Database.GetService<IDatabaseCreator>() is not RelationalDatabaseCreator relationalDatabaseCreator)
+        {
+            return;
+        }
+
+        await relationalDatabaseCreator.EnsureCreatedAsync(ct);
     }
 }

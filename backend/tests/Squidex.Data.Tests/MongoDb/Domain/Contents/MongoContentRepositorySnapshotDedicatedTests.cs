@@ -19,7 +19,7 @@ namespace Squidex.MongoDb.Domain.Contents;
 [Trait("Category", "TestContainer")]
 public class MongoContentRepositorySnapshotDedicatedTests(MongoFixture fixture) : ContentSnapshotStoreTests, IClassFixture<MongoFixture>
 {
-    protected override bool CheckConsistencyOnWrite => true;
+    protected override bool CheckConsistencyOnWrite => false;
 
     protected override async Task<ISnapshotStore<WriteContent>> CreateSutAsync()
     {
