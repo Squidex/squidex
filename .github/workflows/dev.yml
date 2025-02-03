@@ -162,8 +162,14 @@ jobs:
         if: failure()
         uses: jwalton/gh-docker-logs@v2.2.2
         with:
-         images: 'squidex-local,squidex/resizer'
-         tail: '100'
+            dest: './logs'
+
+      - name: Test - Upload docker logs
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+            name: docker-logs
+            path: './docker-logs'
 
       - name: Test - Cleanup
         if: always()
