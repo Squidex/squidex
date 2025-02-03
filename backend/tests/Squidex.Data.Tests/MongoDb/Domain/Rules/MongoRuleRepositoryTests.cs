@@ -13,7 +13,8 @@ using Squidex.Shared;
 namespace Squidex.MongoDb.Domain.Rules;
 
 [Trait("Category", "TestContainer")]
-public class MongoRuleRepositoryTests(MongoFixture fixture) : RuleRepositoryTests, IClassFixture<MongoFixture>
+[Collection("Mongo")]
+public class MongoRuleRepositoryTests(MongoFixture fixture) : RuleRepositoryTests
 {
     protected override async Task<IRuleRepository> CreateSutAsync()
     {

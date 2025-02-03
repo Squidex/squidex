@@ -12,7 +12,8 @@ using Squidex.Providers.SqlServer;
 namespace Squidex.EntityFramework.Infrastructure.Queries;
 
 [Trait("Category", "TestContainer")]
-public class SqlServerQueryTests(SqlServerFixture fixture) : SqlQueryTests<TestDbContext>, IClassFixture<SqlServerFixture>
+[Collection("SqlServer")]
+public class SqlServerQueryTests(SqlServerFixture fixture) : SqlQueryTests<TestDbContext>
 {
     protected override async Task<TestDbContext> CreateDbContextAsync()
     {

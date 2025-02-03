@@ -12,6 +12,11 @@ namespace Squidex.Domain.Apps.Entities.Contents;
 
 internal static class Extensions
 {
+    public static bool ShouldWritePublished(this WriteContent content)
+    {
+        return content.CurrentVersion.Status == Status.Published && !content.IsDeleted;
+    }
+
     public static SqlQueryBuilder WhereNotDeleted(this SqlQueryBuilder builder, Query<ClrValue>? query)
     {
         return builder.WhereNotDeleted(query?.Filter);

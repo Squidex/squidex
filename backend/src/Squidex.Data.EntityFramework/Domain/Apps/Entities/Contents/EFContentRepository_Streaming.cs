@@ -16,6 +16,37 @@ namespace Squidex.Domain.Apps.Entities.Contents;
 
 public sealed partial class EFContentRepository<TContext>
 {
+    public IAsyncEnumerable<DomainId> StreamIds(DomainId appId, HashSet<DomainId>? schemaIds, SearchScope scope,
+        CancellationToken ct = default)
+    {
+        return scope == SearchScope.All ?
+            StreamIds<EFContentCompleteEntity>(appId, schemaIds, ct) :
+            StreamIds<EFContentPublishedEntity>(appId, schemaIds, ct);
+    }
+
+    private async IAsyncEnumerable<DomainId> StreamIds<T>(DomainId appId, HashSet<DomainId>? schemaIds,
+        [EnumeratorCancellation] CancellationToken ct = default) where T : EFContentEntity
+    {
+        if (schemaIds is { Count: 0 })
+        {
+            yield break;
+        }
+
+        await using var dbContext = await CreateDbContextAsync(ct);
+
+        var query =
+            dbContext.Set<T>()
+                .Where(x => x.IndexedAppId == appId)
+                .WhereIf(x => schemaIds!.Contains(x.IndexedSchemaId), schemaIds is { Count: > 0 })
+                .Select(x => x.Id)
+                .ToAsyncEnumerable();
+
+        await foreach (var id in query.WithCancellation(ct))
+        {
+            yield return id;
+        }
+    }
+
     public IAsyncEnumerable<Content> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds, SearchScope scope,
         CancellationToken ct = default)
     {
@@ -38,6 +69,7 @@ public sealed partial class EFContentRepository<TContext>
             dbContext.Set<T>()
                 .Where(x => x.IndexedAppId == appId)
                 .WhereIf(x => schemaIds!.Contains(x.IndexedSchemaId), schemaIds is { Count: > 0 })
+                .Select(x => x)
                 .ToAsyncEnumerable();
 
         await foreach (var entity in query.WithCancellation(ct))
@@ -96,32 +128,6 @@ public sealed partial class EFContentRepository<TContext>
         await foreach (var entity in query.WithCancellation(ct))
         {
             yield return entity;
-        }
-    }
-
-    public IAsyncEnumerable<DomainId> StreamIds(DomainId appId, DomainId schemaId, SearchScope scope,
-        CancellationToken ct = default)
-    {
-        return scope == SearchScope.All ?
-            StreamIds<EFContentCompleteEntity>(appId, schemaId, ct) :
-            StreamIds<EFContentPublishedEntity>(appId, schemaId, ct);
-    }
-
-    private async IAsyncEnumerable<DomainId> StreamIds<T>(DomainId appId, DomainId schemaId,
-        [EnumeratorCancellation] CancellationToken ct = default) where T : EFContentEntity
-    {
-        await using var dbContext = await CreateDbContextAsync(ct);
-
-        var query =
-            dbContext.Set<T>()
-                .Where(x => x.IndexedAppId == appId)
-                .Where(x => x.IndexedSchemaId == schemaId)
-                .Select(x => x.Id)
-                .ToAsyncEnumerable();
-
-        await foreach (var id in query.WithCancellation(ct))
-        {
-            yield return id;
         }
     }
 }

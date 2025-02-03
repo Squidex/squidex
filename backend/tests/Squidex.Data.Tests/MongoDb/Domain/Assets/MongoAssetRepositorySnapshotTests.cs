@@ -15,7 +15,8 @@ using Squidex.Shared;
 namespace Squidex.MongoDb.Domain.Assets;
 
 [Trait("Category", "TestContainer")]
-public class MongoAssetRepositorySnapshotTests(MongoFixture fixture) : AssetSnapshotStoreTests, IClassFixture<MongoFixture>
+[Collection("Mongo")]
+public class MongoAssetRepositorySnapshotTests(MongoFixture fixture) : AssetSnapshotStoreTests
 {
     protected override async Task<ISnapshotStore<Asset>> CreateSutAsync()
     {

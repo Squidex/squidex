@@ -13,7 +13,8 @@ using Squidex.Shared;
 namespace Squidex.EntityFramework.Domain.Rules;
 
 [Trait("Category", "TestContainer")]
-public class EFRuleRepositoryTests(PostgresFixture fixture) : RuleRepositoryTests, IClassFixture<PostgresFixture>
+[Collection("Postgres")]
+public class EFRuleRepositoryTests(PostgresFixture fixture) : RuleRepositoryTests
 {
     protected override Task<IRuleRepository> CreateSutAsync()
     {

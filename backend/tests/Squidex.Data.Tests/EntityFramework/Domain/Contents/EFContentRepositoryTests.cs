@@ -12,7 +12,9 @@ using Squidex.Shared;
 
 namespace Squidex.EntityFramework.Domain.Contents;
 
-public class EFContentRepositoryTests(PostgresFixture fixture) : ContentRepositoryTests, IClassFixture<PostgresFixture>
+[Trait("Category", "TestContainer")]
+[Collection("Postgres")]
+public class EFContentRepositoryTests(PostgresFixture fixture) : ContentRepositoryTests
 {
     protected override Task<IContentRepository> CreateSutAsync()
     {

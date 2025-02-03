@@ -13,7 +13,8 @@ using Squidex.Shared;
 namespace Squidex.EntityFramework.Domain.Assets;
 
 [Trait("Category", "TestContainer")]
-public class EFAssetFolderRepositoryTests(PostgresFixture fixture) : AssetFolderRepositoryTests, IClassFixture<PostgresFixture>
+[Collection("Postgres")]
+public class EFAssetFolderRepositoryTests(PostgresFixture fixture) : AssetFolderRepositoryTests
 {
     protected override Task<IAssetFolderRepository> CreateSutAsync()
     {

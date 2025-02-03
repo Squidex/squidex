@@ -13,7 +13,14 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Hosting;
 using Testcontainers.MySql;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.EntityFramework.TestHelpers;
+
+[CollectionDefinition("MySql")]
+public sealed class MySqlFixtureCollection : ICollectionFixture<MySqlFixture>
+{
+}
 
 public sealed class MySqlFixture : IAsyncLifetime
 {

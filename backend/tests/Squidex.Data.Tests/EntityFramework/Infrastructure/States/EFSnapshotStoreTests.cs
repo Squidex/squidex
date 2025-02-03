@@ -12,7 +12,8 @@ using Squidex.Shared;
 namespace Squidex.EntityFramework.Infrastructure.States;
 
 [Trait("Category", "TestContainer")]
-public class EFSnapshotStoreTests(PostgresFixture fixture) : SnapshotStoreTests, IClassFixture<PostgresFixture>
+[Collection("Postgres")]
+public class EFSnapshotStoreTests(PostgresFixture fixture) : SnapshotStoreTests
 {
     protected override Task<ISnapshotStore<SnapshotValue>> CreateSutAsync()
     {

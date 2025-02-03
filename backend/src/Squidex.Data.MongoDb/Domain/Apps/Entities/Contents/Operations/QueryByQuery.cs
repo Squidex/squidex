@@ -42,9 +42,9 @@ internal sealed class QueryByQuery(MongoCountCollection countCollection) : Opera
         var filter = BuildFilter(app.Id, schema.Id, adjustedFilter);
 
         var contentEntities = await Collection.FindStatusAsync(filter, ct);
-        var contentResults = contentEntities.Select(x => new ContentIdStatus(x.IndexedSchemaId, x.Id, x.Status)).ToList();
+        var contentStatuses = contentEntities.Select(x => new ContentIdStatus(x.IndexedSchemaId, x.Id, x.Status)).ToList();
 
-        return contentResults;
+        return contentStatuses;
     }
 
     public async Task<IResultList<Content>> QueryAsync(App app, List<Schema> schemas, Q q,

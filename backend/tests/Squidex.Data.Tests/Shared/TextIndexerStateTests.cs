@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
@@ -94,6 +95,9 @@ public abstract class TextIndexerStateTests : GivenContext
             new TextContentState { UniqueContentId = id3, State = TextState.Stage0_Published__Stage1_None },
         ]);
 
+        A.CallTo(() => contentRepository.StreamIds(app1.Id, null, SearchScope.All, default))
+            .Returns(new[] { id1.ContentId, id2.ContentId }.ToAsyncEnumerable());
+
         await deleter.DeleteAppAsync(app1, default);
 
         var actual = await sut.GetAsync(HashSet.Of(id1, id2, id3));
@@ -124,10 +128,10 @@ public abstract class TextIndexerStateTests : GivenContext
             new TextContentState { UniqueContentId = id3, State = TextState.Stage0_Published__Stage1_None },
         ]);
 
-        A.CallTo(() => contentRepository.StreamIds(AppId.Id, SchemaId.Id, SearchScope.All, default))
+        A.CallTo(() => contentRepository.StreamIds(AppId.Id, A<HashSet<DomainId>>.That.Is(Schema.Id), SearchScope.All, default))
             .Returns(new[] { id1.ContentId, id2.ContentId }.ToAsyncEnumerable());
 
-        await ((IDeleter)sut).DeleteSchemaAsync(App, Schema, default);
+        await deleter.DeleteSchemaAsync(App, Schema, default);
 
         var actual = await sut.GetAsync(HashSet.Of(id1, id2, id3));
 

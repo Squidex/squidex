@@ -127,10 +127,10 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
         return queryScheduled.QueryAsync(now, ct);
     }
 
-    public IAsyncEnumerable<DomainId> StreamIds(DomainId appId, DomainId schemaId,
+    public IAsyncEnumerable<DomainId> StreamIds(DomainId appId, HashSet<DomainId>? schemaIds,
         CancellationToken ct)
     {
-        return queryAsStream.StreamAllIds(appId, schemaId, ct);
+        return queryAsStream.StreamAllIds(appId, schemaIds, ct);
     }
 
     public async Task DeleteAppAsync(DomainId appId,

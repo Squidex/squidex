@@ -45,11 +45,8 @@ public sealed class MongoTextIndexerState(
         CancellationToken ct)
     {
         var ids =
-            Collection.Find(Filter.Gte(x => x.UniqueContentId, new UniqueContentId(app.Id, DomainId.Empty)))
-                .Sort(Sort.Ascending(x => x.UniqueContentId))
-                .ToAsyncEnumerable(ct).Select(x => x.UniqueContentId)
-                .Take(int.MaxValue)
-                .TakeWhile(x => x.AppId == app.Id);
+            contentRepository.StreamIds(app.Id, null, SearchScope.All, ct)
+                .Select(x => new UniqueContentId(app.Id, x));
 
         await DeleteInBatchesAsync(ids, ct);
     }
@@ -58,7 +55,7 @@ public sealed class MongoTextIndexerState(
         CancellationToken ct)
     {
         var ids =
-            contentRepository.StreamIds(app.Id, schema.Id, SearchScope.All, ct)
+            contentRepository.StreamIds(app.Id, [schema.Id], SearchScope.All, ct)
                 .Select(x => new UniqueContentId(app.Id, x));
 
         await DeleteInBatchesAsync(ids, ct);

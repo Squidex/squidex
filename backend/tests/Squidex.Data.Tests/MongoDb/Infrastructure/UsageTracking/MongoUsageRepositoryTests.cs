@@ -11,7 +11,9 @@ using Squidex.Shared;
 
 namespace Squidex.MongoDb.Infrastructure.UsageTracking;
 
-public class MongoUsageRepositoryTests(MongoFixture fixture) : UsageRepositoryTests, IClassFixture<MongoFixture>
+[Trait("Category", "TestContainer")]
+[Collection("Mongo")]
+public class MongoUsageRepositoryTests(MongoFixture fixture) : UsageRepositoryTests
 {
     protected override async Task<IUsageRepository> CreateSutAsync()
     {

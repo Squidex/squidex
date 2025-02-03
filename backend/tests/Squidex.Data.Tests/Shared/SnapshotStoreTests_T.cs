@@ -145,10 +145,10 @@ public abstract class SnapshotStoreTests<TEntity>
         var sut = await CreateSutAsync();
 
         var sourceKey1 = DomainId.NewGuid();
-        var sourceValue1 = CreateEntity(sourceKey1, 0);
+        var sourceValue1 = CreateEntity(sourceKey1, 41);
 
         var sourceKey2 = DomainId.NewGuid();
-        var sourceValue2 = CreateEntity(sourceKey2, 0);
+        var sourceValue2 = CreateEntity(sourceKey2, 42);
 
         await sut.WriteAsync(new SnapshotWriteJob<TEntity>(sourceKey1, sourceValue1, 41));
         await sut.WriteAsync(new SnapshotWriteJob<TEntity>(sourceKey2, sourceValue2, 42));
@@ -158,8 +158,8 @@ public abstract class SnapshotStoreTests<TEntity>
         var found1 = found.Single(x => x.Key == sourceKey1);
         var found2 = found.Single(x => x.Key == sourceKey2);
 
-        found1.Should().NotBeEquivalentTo(new SnapshotResult<TEntity>(sourceKey1, sourceValue1, 41), CompareOptions);
-        found2.Should().NotBeEquivalentTo(new SnapshotResult<TEntity>(sourceKey2, sourceValue2, 41), CompareOptions);
+        found1.Should().BeEquivalentTo(new SnapshotResult<TEntity>(sourceKey1, sourceValue1, 41), CompareOptions);
+        found2.Should().BeEquivalentTo(new SnapshotResult<TEntity>(sourceKey2, sourceValue2, 42), CompareOptions);
     }
 
     [Fact]
@@ -168,10 +168,10 @@ public abstract class SnapshotStoreTests<TEntity>
         var sut = await CreateSutAsync();
 
         var sourceKey1 = DomainId.NewGuid();
-        var sourceValue1 = CreateEntity(sourceKey1, 0);
+        var sourceValue1 = CreateEntity(sourceKey1, 41);
 
         var sourceKey2 = DomainId.NewGuid();
-        var sourceValue2 = CreateEntity(sourceKey2, 0);
+        var sourceValue2 = CreateEntity(sourceKey2, 42);
 
         await sut.WriteManyAsync([
             new SnapshotWriteJob<TEntity>(sourceKey1, sourceValue1, 41),
@@ -183,8 +183,8 @@ public abstract class SnapshotStoreTests<TEntity>
         var found1 = found.Single(x => x.Key == sourceKey1);
         var found2 = found.Single(x => x.Key == sourceKey2);
 
-        found1.Should().NotBeEquivalentTo(new SnapshotResult<TEntity>(sourceKey1, sourceValue1, 41), CompareOptions);
-        found2.Should().NotBeEquivalentTo(new SnapshotResult<TEntity>(sourceKey2, sourceValue2, 41), CompareOptions);
+        found1.Should().BeEquivalentTo(new SnapshotResult<TEntity>(sourceKey1, sourceValue1, 41), CompareOptions);
+        found2.Should().BeEquivalentTo(new SnapshotResult<TEntity>(sourceKey2, sourceValue2, 42), CompareOptions);
     }
 
     protected virtual EquivalencyAssertionOptions<T> CompareOptions<T>(EquivalencyAssertionOptions<T> options)

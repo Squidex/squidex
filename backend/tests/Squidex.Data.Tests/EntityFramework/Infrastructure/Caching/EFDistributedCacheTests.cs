@@ -13,7 +13,8 @@ using Squidex.Shared;
 namespace Squidex.EntityFramework.Infrastructure.Caching;
 
 [Trait("Category", "TestContainer")]
-public class EFDistributedCacheTests(PostgresFixture fixture) : DistributedCacheTests, IClassFixture<PostgresFixture>
+[Collection("Postgres")]
+public class EFDistributedCacheTests(PostgresFixture fixture) : DistributedCacheTests
 {
     protected override Task<IDistributedCache> CreateSutAsync(TimeProvider timeProvider)
     {

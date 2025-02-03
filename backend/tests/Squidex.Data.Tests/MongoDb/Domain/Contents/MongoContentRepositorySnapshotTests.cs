@@ -17,7 +17,8 @@ using Squidex.Shared;
 namespace Squidex.MongoDb.Domain.Contents;
 
 [Trait("Category", "TestContainer")]
-public class MongoContentRepositorySnapshotTests(MongoFixture fixture) : ContentSnapshotStoreTests, IClassFixture<MongoFixture>
+[Collection("Mongo")]
+public class MongoContentRepositorySnapshotTests(MongoFixture fixture) : ContentSnapshotStoreTests
 {
     protected override bool CheckConsistencyOnWrite => false;
 

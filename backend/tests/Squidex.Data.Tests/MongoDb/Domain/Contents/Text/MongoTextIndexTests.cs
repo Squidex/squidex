@@ -13,7 +13,8 @@ using Squidex.MongoDb.TestHelpers;
 namespace Squidex.MongoDb.Domain.Contents.Text;
 
 [Trait("Category", "Dependencies")]
-public class MongoTextIndexTests(MongoFixture fixture) : TextIndexerTestsBase, IClassFixture<MongoFixture>
+[Collection("Mongo")]
+public class MongoTextIndexTests(MongoFixture fixture) : TextIndexerTestsBase
 {
     public override bool SupportsQuerySyntax => false;
 

@@ -13,7 +13,8 @@ using Squidex.Shared;
 
 namespace Squidex.EntityFramework.Domain.Contents;
 
-public class EFContentRepositorySnapshotTests(PostgresFixture fixture) : ContentSnapshotStoreTests, IClassFixture<PostgresFixture>
+[Collection("Postgres")]
+public class EFContentRepositorySnapshotTests(PostgresFixture fixture) : ContentSnapshotStoreTests
 {
     protected override Task<ISnapshotStore<WriteContent>> CreateSutAsync()
     {

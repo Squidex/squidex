@@ -25,7 +25,7 @@ public sealed class ContentEventDeleter(IContentRepository contentRepository, IE
     public async Task DeleteSchemAsync(App app, Schema schema,
         CancellationToken ct)
     {
-        await foreach (var id in contentRepository.StreamIds(app.Id, schema.Id, SearchScope.All, ct))
+        await foreach (var id in contentRepository.StreamIds(app.Id, [schema.Id], SearchScope.All, ct))
         {
             var streamFilter = StreamFilter.Prefix($"content-{DomainId.Combine(app.Id, id)}");
 

@@ -121,7 +121,7 @@ public partial class MongoContentRepository : ISnapshotStore<WriteContent>, IDel
 
             foreach (var job in jobs)
             {
-                if (job.Value.ShouldWritePublished)
+                if (job.Value.ShouldWritePublished())
                 {
                     await collectionPublished.AddCollectionsAsync(
                         await MongoContentEntity.CreatePublishedAsync(job, appProvider, ct), add, ct);
@@ -149,7 +149,7 @@ public partial class MongoContentRepository : ISnapshotStore<WriteContent>, IDel
     private async Task UpsertPublishedAsync(SnapshotWriteJob<WriteContent> job,
         CancellationToken ct)
     {
-        if (job.Value.ShouldWritePublished)
+        if (job.Value.ShouldWritePublished())
         {
             var entityJob = job.As(await MongoContentEntity.CreatePublishedAsync(job, appProvider, ct));
 
@@ -164,7 +164,7 @@ public partial class MongoContentRepository : ISnapshotStore<WriteContent>, IDel
     private async Task UpsertVersionedPublishedAsync(IClientSessionHandle session, SnapshotWriteJob<WriteContent> job,
         CancellationToken ct)
     {
-        if (job.Value.ShouldWritePublished)
+        if (job.Value.ShouldWritePublished())
         {
             var entityJob = job.As(await MongoContentEntity.CreatePublishedAsync(job, appProvider, ct));
 

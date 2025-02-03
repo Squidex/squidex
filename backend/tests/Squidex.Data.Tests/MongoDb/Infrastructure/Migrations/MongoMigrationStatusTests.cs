@@ -11,7 +11,9 @@ using Squidex.Shared;
 
 namespace Squidex.MongoDb.Infrastructure.Migrations;
 
-public class MongoMigrationStatusTests(MongoFixture fixture) : MigrationStatusTests, IClassFixture<MongoFixture>
+[Trait("Category", "TestContainer")]
+[Collection("Mongo")]
+public class MongoMigrationStatusTests(MongoFixture fixture) : MigrationStatusTests
 {
     protected override async Task<IMigrationStatus> CreateSutAsync()
     {

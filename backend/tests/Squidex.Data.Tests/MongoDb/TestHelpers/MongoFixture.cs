@@ -8,7 +8,14 @@
 using MongoDB.Driver;
 using Testcontainers.MongoDb;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.MongoDb.TestHelpers;
+
+[CollectionDefinition("Mongo")]
+public sealed class MongoFixtureCollection : ICollectionFixture<MongoFixture>
+{
+}
 
 public class MongoFixture : IAsyncLifetime
 {

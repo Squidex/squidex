@@ -39,13 +39,18 @@ public sealed class QueryAsStream : OperationBase
         }
     }
 
-    public async IAsyncEnumerable<DomainId> StreamAllIds(DomainId appId, DomainId schemaId,
+    public async IAsyncEnumerable<DomainId> StreamAllIds(DomainId appId, HashSet<DomainId>? schemaIds,
         [EnumeratorCancellation] CancellationToken ct)
     {
+        if (schemaIds is { Count: 0 })
+        {
+            yield break;
+        }
+
         // Only query the ID from the database to improve performance.
         var projection = Builders<MongoContentEntity>.Projection.Include(x => x.Id);
 
-        var filter = CreateFilter(appId, [schemaId]);
+        var filter = CreateFilter(appId, schemaIds);
         var find = Collection.Find(filter).Project<IdOnly>(projection);
 
         await foreach (var entity in find.ToAsyncEnumerable(ct).WithCancellation(ct))

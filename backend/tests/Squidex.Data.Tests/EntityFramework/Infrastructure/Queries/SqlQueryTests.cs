@@ -471,7 +471,7 @@ public abstract class SqlQueryTests<TContext> where TContext : DbContext
         var (sql, parameters) = builder.Compile();
 
         var dbContext = await CreateAndPrepareDbContextAsync();
-        var dbResult = await dbContext.Database.SqlQueryRaw<long>(sql, parameters).FirstOrDefaultAsync();
+        var dbResult = await dbContext.Database.SqlQueryRaw<int>(sql, parameters).FirstOrDefaultAsync();
 
         Assert.Equal(20, dbResult);
     }

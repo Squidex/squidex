@@ -13,7 +13,14 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Hosting;
 using Testcontainers.MsSql;
 
+#pragma warning disable MA0048 // File name must match type name
+
 namespace Squidex.EntityFramework.TestHelpers;
+
+[CollectionDefinition("SqlServer")]
+public sealed class SqlServerFixtureCollection : ICollectionFixture<SqlServerFixture>
+{
+}
 
 public sealed class SqlServerFixture : IAsyncLifetime
 {

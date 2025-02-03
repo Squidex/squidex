@@ -168,7 +168,7 @@ public sealed partial class EFContentRepository<TContext> : ISnapshotStore<Write
                 await dbContext.Set<EFReferencePublishedEntity>().Where(x => x.FromKey == job.Key)
                     .ExecuteDeleteAsync(ct);
 
-                if (job.Value.ShouldWritePublished)
+                if (job.Value.ShouldWritePublished())
                 {
                     await UpsertVersionedPublishedAsync(dbContext, job, ct);
                 }
@@ -217,7 +217,7 @@ public sealed partial class EFContentRepository<TContext> : ISnapshotStore<Write
                         writesToCompleteReferences.AddRange(references);
                     }
 
-                    if (job.Value.ShouldWritePublished)
+                    if (job.Value.ShouldWritePublished())
                     {
                         var (entity, references) = await EFContentPublishedEntity.CreateAsync(job, appProvider, ct);
 

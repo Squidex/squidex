@@ -13,7 +13,8 @@ using Squidex.Shared;
 namespace Squidex.EntityFramework.Domain.Teams;
 
 [Trait("Category", "TestContainer")]
-public class EFTeamRepositoryTests(PostgresFixture fixture) : TeamRepositoryTests, IClassFixture<PostgresFixture>
+[Collection("Postgres")]
+public class EFTeamRepositoryTests(PostgresFixture fixture) : TeamRepositoryTests
 {
     protected override Task<ITeamRepository> CreateSutAsync()
     {

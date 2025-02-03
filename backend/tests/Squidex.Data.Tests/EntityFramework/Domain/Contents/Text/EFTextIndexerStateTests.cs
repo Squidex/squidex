@@ -13,7 +13,9 @@ using Squidex.Shared;
 
 namespace Squidex.EntityFramework.Domain.Contents.Text;
 
-public sealed class EFTextIndexerStateTests(PostgresFixture fixture) : TextIndexerStateTests, IClassFixture<PostgresFixture>
+[Trait("Category", "TestContainer")]
+[Collection("Postgres")]
+public sealed class EFTextIndexerStateTests(PostgresFixture fixture) : TextIndexerStateTests
 {
     protected override Task<ITextIndexerState> CreateSutAsync(IContentRepository contentRepository)
     {

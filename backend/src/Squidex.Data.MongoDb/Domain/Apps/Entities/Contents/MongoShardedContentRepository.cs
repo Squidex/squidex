@@ -18,7 +18,8 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public sealed class MongoShardedContentRepository(IShardingStrategy sharding, Func<string, MongoContentRepository> factory) : ShardedSnapshotStore<MongoContentRepository, WriteContent>(sharding, factory, x => x.AppId.Id), IContentRepository, IDeleter
+public sealed class MongoShardedContentRepository(IShardingStrategy sharding, Func<string, MongoContentRepository> factory)
+    : ShardedSnapshotStore<MongoContentRepository, WriteContent>(sharding, factory, x => x.AppId.Id), IContentRepository, IDeleter
 {
     public Task<Content?> FindContentAsync(App app, Schema schema, DomainId id, SearchScope scope,
         CancellationToken ct = default)
@@ -68,6 +69,12 @@ public sealed class MongoShardedContentRepository(IShardingStrategy sharding, Fu
         return Shard(appId).StreamAll(appId, schemaIds, scope, ct);
     }
 
+    public IAsyncEnumerable<DomainId> StreamIds(DomainId appId, HashSet<DomainId>? schemaIds, SearchScope scope,
+       CancellationToken ct = default)
+    {
+        return Shard(appId).StreamIds(appId, schemaIds, scope, ct);
+    }
+
     public IAsyncEnumerable<Content> StreamReferencing(DomainId appId, DomainId references, int take, SearchScope scope,
         CancellationToken ct = default)
     {
@@ -100,18 +107,6 @@ public sealed class MongoShardedContentRepository(IShardingStrategy sharding, Fu
             await foreach (var content in shard.StreamScheduledWithoutDataAsync(now, scope, ct))
             {
                 yield return content;
-            }
-        }
-    }
-
-    public async IAsyncEnumerable<DomainId> StreamIds(DomainId appId, DomainId schemaId, SearchScope scope,
-       [EnumeratorCancellation] CancellationToken ct = default)
-    {
-        foreach (var shard in Shards)
-        {
-            await foreach (var id in shard.StreamIds(appId, schemaId, scope, ct))
-            {
-                yield return id;
             }
         }
     }

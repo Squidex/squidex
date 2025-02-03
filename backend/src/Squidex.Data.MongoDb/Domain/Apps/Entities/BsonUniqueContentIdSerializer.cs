@@ -33,7 +33,6 @@ public partial class BsonUniqueContentIdSerializer : SerializerBase<UniqueConten
     public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, UniqueContentId value)
     {
         var appId = IdInfo.Create(value.AppId);
-
         if (appId.Length >= IdInfo.LongIdIndicator)
         {
             ThrowHelper.InvalidOperationException("App ID cannot be longer than 253 bytes.");

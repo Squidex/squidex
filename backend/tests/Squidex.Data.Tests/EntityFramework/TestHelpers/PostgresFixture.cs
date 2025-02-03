@@ -16,8 +16,14 @@ using Squidex.Providers.Postgres;
 using Testcontainers.PostgreSql;
 
 #pragma warning disable CA1822 // Mark members as static
+#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.EntityFramework.TestHelpers;
+
+[CollectionDefinition("Postgres")]
+public sealed class PostgresFixtureCollection : ICollectionFixture<PostgresFixture>
+{
+}
 
 public sealed class PostgresFixture : IAsyncLifetime
 {

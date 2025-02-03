@@ -16,7 +16,8 @@ using Squidex.Shared;
 namespace Squidex.MongoDb.Domain.Contents.Text;
 
 [Trait("Category", "TestContainer")]
-public class MongoTextIndexerStateTests(MongoFixture fixture) : TextIndexerStateTests, IClassFixture<MongoFixture>
+[Collection("Mongo")]
+public class MongoTextIndexerStateTests(MongoFixture fixture) : TextIndexerStateTests
 {
     protected override async Task<ITextIndexerState> CreateSutAsync(IContentRepository contentRepository)
     {

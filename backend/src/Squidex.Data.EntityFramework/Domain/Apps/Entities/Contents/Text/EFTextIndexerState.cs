@@ -48,7 +48,7 @@ public sealed class EFTextIndexerState<TContext>(IDbContextFactory<TContext> dbC
         CancellationToken ct)
     {
         var ids =
-            contentRepository.StreamIds(app.Id, schema.Id, SearchScope.All, ct)
+            contentRepository.StreamIds(app.Id, [schema.Id], SearchScope.All, ct)
                 .Select(x => new UniqueContentId(app.Id, x));
 
         await DeleteInBatchesAsync(ids, ct);
