@@ -21,7 +21,7 @@ services:
       - mysql:/var/lib/mysql
 
   migration_sqlserver:
-    image: mcr.microsoft.com/mssql/server:2017-latest
+    image: mcr.microsoft.com/mssql/server:2022-CU14-ubuntu-22.04
     environment:
       - SA_PASSWORD=sqlserver
       - ACCEPT_EULA=Y

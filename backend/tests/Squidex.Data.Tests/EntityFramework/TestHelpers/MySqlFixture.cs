@@ -42,7 +42,9 @@ public sealed class MySqlFixture : IAsyncLifetime
             new ServiceCollection()
                  .AddDbContextFactory<TestDbContextMySql>(b =>
                  {
-                     b.UseMySql(mysql.GetConnectionString(), ServerVersion.AutoDetect(mysql.GetConnectionString()), mysql =>
+                     var connectionString = mysql.GetConnectionString();
+
+                     b.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), mysql =>
                      {
                          mysql.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
                      });
