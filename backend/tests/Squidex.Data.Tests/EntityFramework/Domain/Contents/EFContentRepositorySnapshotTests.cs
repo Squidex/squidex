@@ -13,6 +13,7 @@ using Squidex.Shared;
 
 namespace Squidex.EntityFramework.Domain.Contents;
 
+[Trait("Category", "TestContainer")]
 [Collection("Postgres")]
 public class EFContentRepositorySnapshotTests(PostgresFixture fixture) : ContentSnapshotStoreTests
 {

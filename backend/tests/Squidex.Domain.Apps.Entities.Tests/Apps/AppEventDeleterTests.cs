@@ -34,7 +34,7 @@ public class AppEventDeleterTests : GivenContext
         await sut.DeleteAppAsync(App, CancellationToken);
 
         A.CallTo(() => eventStore.DeleteAsync(
-                A<StreamFilter>.That.Matches(x => x.Prefixes!.Contains($"([a-zA-Z0-9]+)-{AppId.Id}")),
+                A<StreamFilter>.That.Matches(x => x.Prefixes!.Contains($"%-{AppId.Id}")),
                 CancellationToken))
             .MustHaveHappened();
     }

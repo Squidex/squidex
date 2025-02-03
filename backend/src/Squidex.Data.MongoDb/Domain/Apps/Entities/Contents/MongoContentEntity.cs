@@ -34,6 +34,8 @@ public record MongoContentEntity : Content, IVersionedEntity<DomainId>
 
     public static void RegisterClassMap()
     {
+        AppEntityClassMap.Register();
+
         BsonClassMap.TryRegisterClassMap<MongoContentEntity>(cm =>
         {
             cm.MapProperty(x => x.DocumentId)
