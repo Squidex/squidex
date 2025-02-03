@@ -16,7 +16,7 @@ using Squidex.Infrastructure.Timers;
 
 namespace Squidex.Domain.Users;
 
-public sealed class MongoTokenStoreInitializer(IOptions<OpenIddictMongoDbOptions> options, IServiceProvider serviceProvider) 
+public sealed class MongoTokenStoreInitializer(IOptions<OpenIddictMongoDbOptions> options, IServiceProvider serviceProvider)
     : IInitializable, IBackgroundProcess
 {
     private readonly OpenIddictMongoDbOptions options = options.Value;

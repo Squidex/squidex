@@ -1,13 +1,13 @@
 services:
-  mongo:
-    image: mongo:latest
+  db_mongo:
+    image: mongo
     ports:
       - "27019:27017"
     networks:
       - internal
 
-  postgres:
-    image: "postgres:15.1"
+  db_postgres:
+    image: "postgres"
     ports:
       - "5432:5432"
     environment:
@@ -21,7 +21,7 @@ services:
       interval: 10s
       retries: 10
 
-  mysql:
+  db_mysql:
     image: mysql
     ports:
       - "3306:3306"
@@ -40,7 +40,7 @@ services:
       interval: 10s
       retries: 10
 
-  sqlserver:
+  db_sqlserver:
     image: squidex/mssql-dev
     ports:
       - "1433:1433"
@@ -65,7 +65,7 @@ services:
       - STORE__MONGODB__DATABASE=squidex_mongo1
       - URLS__BASEURL=http://localhost:8080
     depends_on:
-      - mongo
+      - db_mongo
 
   # Hosted on path and separate worker
   squidex_mongo2:
@@ -81,7 +81,7 @@ services:
       - URLS__BASEPATH=squidex/
       - URLS__BASEURL=http://localhost:8081/squidex/
     depends_on:
-      - mongo
+      - db_mongo
 
   # Hosted on path and separate worker
   squidex_mongo2_worker:
@@ -97,7 +97,7 @@ services:
       - URLS__BASEPATH=squidex/
       - URLS__BASEURL=http://localhost:8081/squidex/
     depends_on:
-      - mongo
+      - db_mongo
 
   # Separate datbases
   squidex_mongo3:
@@ -112,7 +112,7 @@ services:
       - STORE__MONGODB__DATABASE=squidex3
       - URLS__BASEURL=http://localhost:8082
     depends_on:
-      - mongo
+      - db_mongo
 
   squidex_postgres:
     extends:
@@ -121,12 +121,12 @@ services:
     environment:
       - EVENTSTORE__TYPE=Sql
       - STORE__TYPE=Sql
-      - STORE__SQL__CONNECTIONSTRING=Server=postgres;Port=5432;Database=squidex;Pooling=true;Username=admin;Password=secret;SSL Mode=Disable;
+      - STORE__SQL__CONNECTIONSTRING=Server=db_postgres;Port=5432;Database=squidex;Pooling=true;Username=admin;Password=secret;SSL Mode=Disable;
       - STORE__SQL__PROVIDER=Postgres
       - MESSAGING__TYPE=Sql
       - URLS__BASEURL=http://localhost:8083
     depends_on:
-      postgres:
+      db_postgres:
         condition: service_healthy
 
   squidex_mysql:
@@ -136,12 +136,12 @@ services:
     environment:
       - EVENTSTORE__TYPE=Sql
       - STORE__TYPE=Sql
-      - STORE__SQL__CONNECTIONSTRING=Server=mysql;Port=3306;Database=squidex;User=admin;Password=secret;
+      - STORE__SQL__CONNECTIONSTRING=Server=db_mysql;Port=3306;Database=squidex;User=admin;Password=secret;
       - STORE__SQL__PROVIDER=MySql
       - MESSAGING__TYPE=Sql
       - URLS__BASEURL=http://localhost:8084
     depends_on:
-      mysql:
+      db_mysql:
         condition: service_healthy
 
   squidex_sqlserver:
@@ -151,20 +151,18 @@ services:
     environment:
       - EVENTSTORE__TYPE=Sql
       - STORE__TYPE=Sql
-      - STORE__SQL__CONNECTIONSTRING=Server=sqlserver;Database=squidex;User=sa;Password=1q2w3e!R;TrustServerCertificate=True;
+      - STORE__SQL__CONNECTIONSTRING=Server=db_sqlserver;Database=squidex;User=sa;Password=1q2w3e!R;TrustServerCertificate=True;
       - STORE__SQL__PROVIDER=SqlServer
       - MESSAGING__TYPE=Sql
       - URLS__BASEURL=http://localhost:8085
     depends_on:
-      sqlserver:
+      db_sqlserver:
         condition: service_healthy
 
   resizer:
     image: squidex/resizer:1.3.0
     networks:
       - internal
-    depends_on:
-      - mongo
 
   webhookcatcher:
     image: tarampampam/webhook-tester:2
