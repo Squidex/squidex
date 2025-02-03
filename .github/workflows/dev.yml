@@ -162,7 +162,7 @@ jobs:
         if: failure()
         uses: jwalton/gh-docker-logs@v2.2.2
         with:
-            dest: './logs'
+            dest: './docker-logs'
 
       - name: Test - Upload docker logs
         if: failure()
