@@ -78,7 +78,7 @@ jobs:
           default_network: host
           options: --name test2
           volumes: ${{ github.workspace }}:/src
-          run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated & Category!=MongoOnly
+          run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter "Category!=NotAutomated & Category!=MongoOnly"
 
       - name: Test - RUN on Mongo with path
         uses: kohlerdominik/docker-run-action@v2.0.0
