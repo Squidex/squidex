@@ -148,7 +148,7 @@ services:
   squidex_postgres_proxy:
     image: squidex/caddy-proxy-path:2.6.2
     ports:
-      - "8082:8082"
+      - "8083:8083"
     environment:
       - SITE_ADDRESS=http://localhost:8083
       - SITE_PATH=*
