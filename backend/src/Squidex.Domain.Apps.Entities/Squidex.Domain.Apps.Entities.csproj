@@ -35,9 +35,9 @@
     <PackageReference Include="Notifo.SDK" Version="1.7.5" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
     <PackageReference Include="Squidex.CLI.Core" Version="13.7.0" />
-    <PackageReference Include="YDotNet" Version="0.4.2" />
-    <PackageReference Include="YDotNet.Extensions" Version="0.4.2" />
-    <PackageReference Include="YDotNet.Server" Version="0.4.2" />
+    <PackageReference Include="YDotNet" Version="0.4.3" />
+    <PackageReference Include="YDotNet.Extensions" Version="0.4.3" />
+    <PackageReference Include="YDotNet.Server" Version="0.4.3" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="System.Collections.Immutable" Version="8.0.0" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />

@@ -75,11 +75,11 @@
     <PackageReference Include="Squidex.Messaging.All" Version="6.31.0" />
     <PackageReference Include="Squidex.Messaging.Subscriptions" Version="6.31.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
-    <PackageReference Include="YDotNet" Version="0.4.2" />
-    <PackageReference Include="YDotNet.Native" Version="0.4.2" />
-    <PackageReference Include="YDotNet.Server" Version="0.4.2" />
-    <PackageReference Include="YDotNet.Server.Redis" Version="0.4.2" />
-    <PackageReference Include="YDotNet.Server.WebSockets" Version="0.4.2" />
+    <PackageReference Include="YDotNet" Version="0.4.3" />
+    <PackageReference Include="YDotNet.Native" Version="0.4.3" />
+    <PackageReference Include="YDotNet.Server" Version="0.4.3" />
+    <PackageReference Include="YDotNet.Server.Redis" Version="0.4.3" />
+    <PackageReference Include="YDotNet.Server.WebSockets" Version="0.4.3" />
   </ItemGroup>
 
   <PropertyGroup>
