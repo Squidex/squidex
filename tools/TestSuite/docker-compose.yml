@@ -14,6 +14,8 @@ services:
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=secret
       - POSTGRES_DB=squidex
+    networks:
+      - internal
 
   # Base configuration
   squidex_mongo1:
@@ -81,7 +83,8 @@ services:
       service: squidex_base
     environment:
       - EVENTSTORE__TYPE=Sql
-      - STORE__SQL__CONNECTIONSTRING=Server=localhost;Port=5432;Database=squidex;Pooling=true;Username=admin;Password=secret;SSL Mode=Disable;Include Error Detail=true;Minimum Pool Size=0;Maximum Pool Size=1000;
+      - STORE__TYPE=Sql
+      - STORE__SQL__CONNECTIONSTRING=Server=postgres;Port=5432;Database=squidex;Pooling=true;Username=admin;Password=secret;SSL Mode=Disable;Include Error Detail=true;Minimum Pool Size=0;Maximum Pool Size=1000;
       - STORE__SQL__PROVIDER=Postgres
       - MESSAGING__TYPE=Sql
       - URLS__BASEURL=http://localhost:8083
