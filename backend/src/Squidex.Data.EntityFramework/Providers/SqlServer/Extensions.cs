@@ -27,8 +27,11 @@ internal static class Extensions
             }
             else
             {
-                sb.Append('.');
+                sb.Append('[');
+                sb.Append('"');
                 sb.Append(property);
+                sb.Append('"');
+                sb.Append(']');
             }
         }
 
