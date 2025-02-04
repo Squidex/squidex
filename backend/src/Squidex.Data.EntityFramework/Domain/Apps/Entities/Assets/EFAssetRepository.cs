@@ -55,8 +55,7 @@ public sealed partial class EFAssetRepository<TContext>(IDbContextFactory<TConte
 
             var sqlQuery =
                 new AssetSqlQueryBuilder(dialect)
-                    .Where(ClrFilter.Eq(nameof(EFAssetEntity.IndexedAppId), appId))
-                    .Order(q.Query);
+                    .Where(ClrFilter.Eq(nameof(EFAssetEntity.IndexedAppId), appId));
 
             if (q.Query.Filter?.HasField("IsDeleted") != true)
             {
