@@ -138,6 +138,7 @@ services:
       - STORE__TYPE=Sql
       - STORE__SQL__CONNECTIONSTRING=Server=db_mysql;Port=3306;Database=squidex;User=admin;Password=secret;
       - STORE__SQL__PROVIDER=MySql
+      - STORE__SQL__VERSION=9.2.0-mysql
       - MESSAGING__TYPE=Sql
       - URLS__BASEURL=http://localhost:8084
     depends_on:

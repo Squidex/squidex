@@ -63,8 +63,15 @@ public static class ServiceExtensions
             {
                 services.AddDbContextFactory<MySqlDbContext>(builder =>
                 {
+                    var versionString = config.GetOptionalValue<string>("store:sql:version");
+
+                    var version =
+                        !string.IsNullOrWhiteSpace(versionString) ?
+                        ServerVersion.Parse(versionString) :
+                        ServerVersion.AutoDetect(connectionString);
+
                     builder.ConfigureWarnings(w => w.Ignore(CoreEventId.CollectionWithoutComparer));
-                    builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), mysql =>
+                    builder.UseMySql(connectionString, version, mysql =>
                     {
                         mysql.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
                     });
