@@ -104,13 +104,16 @@ public static class ServiceExtensions
                 services.AddSingleton(typeof(ISnapshotStore<>), typeof(SqlServerSnapshotStore<>));
                 services.AddSingleton(SqlServerDialect.Instance);
                 services.AddSquidexEntityFramework<SqlServerDbContext>(config);
-            },
+            }
         });
     }
 
     private static void AddSquidexEntityFramework<TContext>(this IServiceCollection services, IConfiguration config) where TContext : AppDbContext
     {
-        services.AddSingletonAs<DatabaseMigrator<TContext>>();
+        if (config.GetValue<bool>("store:sql:runMigration"))
+        {
+            services.AddSingletonAs<DatabaseMigrator<TContext>>();
+        }
 
         services.AddOpenIddict()
             .AddCore(builder =>
