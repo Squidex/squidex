@@ -1,0 +1,1 @@
+SET GLOBAL local_infile = true;
