@@ -110,7 +110,7 @@ public static class ServiceExtensions
 
     private static void AddSquidexEntityFramework<TContext>(this IServiceCollection services, IConfiguration config) where TContext : AppDbContext
     {
-        services.AddSingletonAs<DatabaseCreator<TContext>>();
+        services.AddSingletonAs<DatabaseMigrator<TContext>>();
 
         services.AddOpenIddict()
             .AddCore(builder =>
