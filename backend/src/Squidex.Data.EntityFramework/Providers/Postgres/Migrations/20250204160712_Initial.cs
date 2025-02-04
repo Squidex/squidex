@@ -1,9 +1,10 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Squidex.Providers.SqlServer.Migrations
+namespace Squidex.Providers.Postgres.Migrations
 {
     /// <inheritdoc />
     public partial class Initial : Migration
@@ -15,10 +16,10 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "AspNetRoles",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    NormalizedName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -29,21 +30,21 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "AspNetUsers",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    UserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedUserName = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    Email = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    NormalizedEmail = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: true),
-                    EmailConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    PasswordHash = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    SecurityStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ConcurrencyStamp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumber = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    PhoneNumberConfirmed = table.Column<bool>(type: "bit", nullable: false),
-                    TwoFactorEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    LockoutEnd = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    LockoutEnabled = table.Column<bool>(type: "bit", nullable: false),
-                    AccessFailedCount = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    UserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    NormalizedUserName = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    Email = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    NormalizedEmail = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: true),
+                    EmailConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    PasswordHash = table.Column<string>(type: "text", nullable: true),
+                    SecurityStamp = table.Column<string>(type: "text", nullable: true),
+                    ConcurrencyStamp = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumber = table.Column<string>(type: "text", nullable: true),
+                    PhoneNumberConfirmed = table.Column<bool>(type: "boolean", nullable: false),
+                    TwoFactorEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    LockoutEnd = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    LockoutEnabled = table.Column<bool>(type: "boolean", nullable: false),
+                    AccessFailedCount = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -54,18 +55,18 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "AssetFolders",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    IndexedAppId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LastModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Created = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    LastModified = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    DocumentId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    IndexedAppId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Id = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    CreatedBy = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    LastModifiedBy = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     Version = table.Column<long>(type: "bigint", nullable: false),
-                    AppId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    ParentId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FolderName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    AppId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    ParentId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    FolderName = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -76,9 +77,9 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "AssetKeyValueStore_TusMetadata",
                 columns: table => new
                 {
-                    Key = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Expires = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false)
+                    Key = table.Column<string>(type: "text", nullable: false),
+                    Value = table.Column<string>(type: "text", nullable: false),
+                    Expires = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -89,28 +90,28 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "Assets",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    IndexedAppId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LastModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Created = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    LastModified = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    DocumentId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    IndexedAppId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Id = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    CreatedBy = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    LastModifiedBy = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     Version = table.Column<long>(type: "bigint", nullable: false),
-                    AppId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    ParentId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FileName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    FileHash = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MimeType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Slug = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AppId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    ParentId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    FileName = table.Column<string>(type: "text", nullable: false),
+                    FileHash = table.Column<string>(type: "text", nullable: false),
+                    MimeType = table.Column<string>(type: "text", nullable: false),
+                    Slug = table.Column<string>(type: "text", nullable: false),
                     FileSize = table.Column<long>(type: "bigint", nullable: false),
                     FileVersion = table.Column<long>(type: "bigint", nullable: false),
                     TotalSize = table.Column<long>(type: "bigint", nullable: false),
-                    IsProtected = table.Column<bool>(type: "bit", nullable: false),
-                    Tags = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Metadata = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Type = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    IsProtected = table.Column<bool>(type: "boolean", nullable: false),
+                    Tags = table.Column<string>(type: "character varying(1000)", maxLength: 1000, nullable: false),
+                    Metadata = table.Column<string>(type: "jsonb", nullable: false),
+                    Type = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -121,9 +122,9 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "Cache",
                 columns: table => new
                 {
-                    Key = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Expires = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Value = table.Column<byte[]>(type: "varbinary(max)", nullable: false)
+                    Key = table.Column<string>(type: "text", nullable: false),
+                    Expires = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Value = table.Column<byte[]>(type: "bytea", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -134,10 +135,10 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "Chats",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Value = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LastUpdated = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Version = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    Value = table.Column<string>(type: "text", nullable: false),
+                    LastUpdated = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Version = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -148,9 +149,9 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "ContentReferencesAll",
                 columns: table => new
                 {
-                    AppId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    FromKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ToId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    AppId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    FromKey = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    ToId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -161,9 +162,9 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "ContentReferencesPublished",
                 columns: table => new
                 {
-                    AppId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    FromKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ToId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    AppId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    FromKey = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    ToId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -174,25 +175,25 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "ContentsAll",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Id = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LastModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Created = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    LastModified = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    DocumentId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Id = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    CreatedBy = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    LastModifiedBy = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     Version = table.Column<long>(type: "bigint", nullable: false),
-                    AppId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    SchemaId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NewStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Data = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ScheduleJob = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IndexedAppId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IndexedSchemaId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ScheduledAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    NewData = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TranslationStatus = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    AppId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    SchemaId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    NewStatus = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    Status = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Data = table.Column<string>(type: "jsonb", nullable: false),
+                    ScheduleJob = table.Column<string>(type: "jsonb", nullable: true),
+                    IndexedAppId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    IndexedSchemaId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    ScheduledAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    NewData = table.Column<string>(type: "jsonb", nullable: true),
+                    TranslationStatus = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -203,25 +204,25 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "ContentsPublished",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Id = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CreatedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LastModifiedBy = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Created = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    LastModified = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
+                    DocumentId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Id = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    CreatedBy = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    LastModifiedBy = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
                     Version = table.Column<long>(type: "bigint", nullable: false),
-                    AppId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false),
-                    SchemaId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    NewStatus = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Data = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ScheduleJob = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IndexedAppId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    IndexedSchemaId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ScheduledAt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true),
-                    NewData = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    TranslationStatus = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    AppId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    IsDeleted = table.Column<bool>(type: "boolean", nullable: false),
+                    SchemaId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    NewStatus = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    Status = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Data = table.Column<string>(type: "jsonb", nullable: false),
+                    ScheduleJob = table.Column<string>(type: "jsonb", nullable: true),
+                    IndexedAppId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    IndexedSchemaId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    ScheduledAt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true),
+                    NewData = table.Column<string>(type: "jsonb", nullable: true),
+                    TranslationStatus = table.Column<string>(type: "jsonb", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -232,11 +233,11 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "Counter",
                 columns: table => new
                 {
-                    Date = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Key = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Category = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    CounterKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    CounterValue = table.Column<double>(type: "float", nullable: false)
+                    Date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    Key = table.Column<string>(type: "text", nullable: false),
+                    Category = table.Column<string>(type: "text", nullable: false),
+                    CounterKey = table.Column<string>(type: "text", nullable: false),
+                    CounterValue = table.Column<double>(type: "double precision", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -259,12 +260,12 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "Events",
                 columns: table => new
                 {
-                    Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    EventStream = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Id = table.Column<Guid>(type: "uuid", nullable: false),
+                    EventStream = table.Column<string>(type: "text", nullable: false),
                     EventStreamOffset = table.Column<long>(type: "bigint", nullable: false),
                     EventsCount = table.Column<long>(type: "bigint", nullable: false),
-                    Events = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Timestamp = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    Events = table.Column<string[]>(type: "text[]", nullable: false),
+                    Timestamp = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Position = table.Column<long>(type: "bigint", nullable: true)
                 },
                 constraints: table =>
@@ -276,14 +277,14 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "HistoryEvent",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    OwnerId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Created = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    Actor = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Id = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    OwnerId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    Actor = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
                     Version = table.Column<long>(type: "bigint", nullable: false),
-                    Channel = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    EventType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Parameters = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Channel = table.Column<string>(type: "text", nullable: false),
+                    EventType = table.Column<string>(type: "text", nullable: false),
+                    Parameters = table.Column<string>(type: "jsonb", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -294,14 +295,14 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "Messages",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ChannelName = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    QueueName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MessageData = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
-                    MessageHeaders = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TimeToLive = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    TimeHandled = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Version = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    ChannelName = table.Column<string>(type: "text", nullable: false),
+                    QueueName = table.Column<string>(type: "text", nullable: false),
+                    MessageData = table.Column<byte[]>(type: "bytea", nullable: false),
+                    MessageHeaders = table.Column<string>(type: "text", nullable: false),
+                    TimeToLive = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    TimeHandled = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Version = table.Column<Guid>(type: "uuid", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -312,12 +313,12 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "MessagingData",
                 columns: table => new
                 {
-                    Group = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Key = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ValueType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ValueFormat = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ValueData = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
-                    Expiration = table.Column<DateTime>(type: "datetime2", nullable: false)
+                    Group = table.Column<string>(type: "text", nullable: false),
+                    Key = table.Column<string>(type: "text", nullable: false),
+                    ValueType = table.Column<string>(type: "text", nullable: false),
+                    ValueFormat = table.Column<string>(type: "text", nullable: true),
+                    ValueData = table.Column<byte[]>(type: "bytea", nullable: false),
+                    Expiration = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -328,9 +329,9 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "Migrations",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false),
-                    IsLocked = table.Column<bool>(type: "bit", nullable: false),
-                    Version = table.Column<int>(type: "int", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false),
+                    IsLocked = table.Column<bool>(type: "boolean", nullable: false),
+                    Version = table.Column<int>(type: "integer", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -341,15 +342,15 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "OpenIddictAuthorizations",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ApplicationId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ConcurrencyToken = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Properties = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Scopes = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Subject = table.Column<string>(type: "nvarchar(400)", maxLength: 400, nullable: true),
-                    Type = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    ApplicationId = table.Column<string>(type: "text", nullable: false),
+                    ConcurrencyToken = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Properties = table.Column<string>(type: "text", nullable: true),
+                    Scopes = table.Column<string>(type: "text", nullable: true),
+                    Status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    Subject = table.Column<string>(type: "character varying(400)", maxLength: 400, nullable: true),
+                    Type = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -360,11 +361,11 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "Requests",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Key = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Timestamp = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    Properties = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Key = table.Column<string>(type: "text", nullable: false),
+                    Timestamp = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    Properties = table.Column<string>(type: "jsonb", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -375,18 +376,18 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "RuleEvents",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    AppId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    RuleId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Created = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    LastModified = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    Result = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    JobResult = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Job = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LastDump = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    NumCalls = table.Column<int>(type: "int", nullable: false),
-                    Expires = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    NextAttempt = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: true)
+                    Id = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    AppId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    RuleId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    LastModified = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    Result = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    JobResult = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
+                    Job = table.Column<string>(type: "jsonb", nullable: false),
+                    LastDump = table.Column<string>(type: "text", nullable: true),
+                    NumCalls = table.Column<int>(type: "integer", nullable: false),
+                    Expires = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    NextAttempt = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -397,13 +398,13 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "States_App",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    UserIds = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TeamId = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Deleted = table.Column<bool>(type: "bit", nullable: false),
-                    Created = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    Document = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DocumentId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    UserIds = table.Column<string>(type: "text", nullable: false),
+                    TeamId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: true),
+                    Deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    Created = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    Document = table.Column<string>(type: "jsonb", nullable: true),
                     Version = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
@@ -415,8 +416,8 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "States_Counters",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Document = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DocumentId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Document = table.Column<string>(type: "jsonb", nullable: true),
                     Version = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
@@ -428,8 +429,8 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "States_EventConsumerState",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Document = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DocumentId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Document = table.Column<string>(type: "jsonb", nullable: true),
                     Version = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
@@ -441,8 +442,8 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "States_Identity_Keys",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Document = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DocumentId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Document = table.Column<string>(type: "jsonb", nullable: true),
                     Version = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
@@ -454,8 +455,8 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "States_Identity_Xml",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Document = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DocumentId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Document = table.Column<string>(type: "jsonb", nullable: true),
                     Version = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
@@ -467,8 +468,8 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "States_Index_TagHistory",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Document = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DocumentId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Document = table.Column<string>(type: "jsonb", nullable: true),
                     Version = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
@@ -480,8 +481,8 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "States_Index_Tags",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Document = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DocumentId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Document = table.Column<string>(type: "jsonb", nullable: true),
                     Version = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
@@ -493,8 +494,8 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "States_JobsState",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Document = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DocumentId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Document = table.Column<string>(type: "jsonb", nullable: true),
                     Version = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
@@ -506,8 +507,8 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "States_Names",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Document = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DocumentId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Document = table.Column<string>(type: "jsonb", nullable: true),
                     Version = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
@@ -519,11 +520,11 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "States_Rule",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    AppId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Id = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Deleted = table.Column<bool>(type: "bit", nullable: false),
-                    Document = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DocumentId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    AppId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Id = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    Document = table.Column<string>(type: "jsonb", nullable: true),
                     Version = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
@@ -535,12 +536,12 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "States_Schema",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    AppId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Id = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Deleted = table.Column<bool>(type: "bit", nullable: false),
-                    Document = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DocumentId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    AppId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Id = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    Document = table.Column<string>(type: "jsonb", nullable: true),
                     Version = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
@@ -552,11 +553,11 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "States_Team",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    UserIds = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    Deleted = table.Column<bool>(type: "bit", nullable: false),
-                    AuthDomain = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Document = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DocumentId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    UserIds = table.Column<string>(type: "text", nullable: false),
+                    Deleted = table.Column<bool>(type: "boolean", nullable: false),
+                    AuthDomain = table.Column<string>(type: "text", nullable: true),
+                    Document = table.Column<string>(type: "jsonb", nullable: true),
                     Version = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
@@ -568,8 +569,8 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "States_UISettings",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Document = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DocumentId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Document = table.Column<string>(type: "jsonb", nullable: true),
                     Version = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
@@ -581,8 +582,8 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "States_UsageNotifications",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Document = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DocumentId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Document = table.Column<string>(type: "jsonb", nullable: true),
                     Version = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
@@ -594,8 +595,8 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "States_UsageTracker",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Document = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    DocumentId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    Document = table.Column<string>(type: "jsonb", nullable: true),
                     Version = table.Column<long>(type: "bigint", nullable: false)
                 },
                 constraints: table =>
@@ -607,8 +608,8 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "TextState",
                 columns: table => new
                 {
-                    UniqueContentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    State = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    UniqueContentId = table.Column<string>(type: "character varying(255)", maxLength: 255, nullable: false),
+                    State = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false)
                 },
                 constraints: table =>
                 {
@@ -619,9 +620,9 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "YDotNetDocument",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(256)", maxLength: 256, nullable: false),
-                    Data = table.Column<byte[]>(type: "varbinary(max)", nullable: false),
-                    Expiration = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    Id = table.Column<string>(type: "character varying(256)", maxLength: 256, nullable: false),
+                    Data = table.Column<byte[]>(type: "bytea", nullable: false),
+                    Expiration = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -632,11 +633,11 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "AspNetRoleClaims",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    RoleId = table.Column<string>(type: "text", nullable: false),
+                    ClaimType = table.Column<string>(type: "text", nullable: true),
+                    ClaimValue = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -653,11 +654,11 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "AspNetUserClaims",
                 columns: table => new
                 {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ClaimType = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ClaimValue = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Id = table.Column<int>(type: "integer", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    UserId = table.Column<string>(type: "text", nullable: false),
+                    ClaimType = table.Column<string>(type: "text", nullable: true),
+                    ClaimValue = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -674,10 +675,10 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    LoginProvider = table.Column<string>(type: "text", nullable: false),
+                    ProviderKey = table.Column<string>(type: "text", nullable: false),
+                    ProviderDisplayName = table.Column<string>(type: "text", nullable: true),
+                    UserId = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -694,8 +695,8 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "AspNetUserRoles",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    RoleId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    UserId = table.Column<string>(type: "text", nullable: false),
+                    RoleId = table.Column<string>(type: "text", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -718,10 +719,10 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "AspNetUserTokens",
                 columns: table => new
                 {
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    UserId = table.Column<string>(type: "text", nullable: false),
+                    LoginProvider = table.Column<string>(type: "text", nullable: false),
+                    Name = table.Column<string>(type: "text", nullable: false),
+                    Value = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -738,19 +739,19 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "OpenIddictTokens",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    ApplicationId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    AuthorizationId = table.Column<string>(type: "nvarchar(450)", nullable: true),
-                    ConcurrencyToken = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    CreationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ExpirationDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    Payload = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Properties = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    RedemptionDate = table.Column<DateTime>(type: "datetime2", nullable: true),
-                    ReferenceId = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: true),
-                    Status = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true),
-                    Subject = table.Column<string>(type: "nvarchar(400)", maxLength: 400, nullable: true),
-                    Type = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: true)
+                    Id = table.Column<string>(type: "text", nullable: false),
+                    ApplicationId = table.Column<string>(type: "text", nullable: true),
+                    AuthorizationId = table.Column<string>(type: "text", nullable: true),
+                    ConcurrencyToken = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    ExpirationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    Payload = table.Column<string>(type: "text", nullable: true),
+                    Properties = table.Column<string>(type: "text", nullable: true),
+                    RedemptionDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    ReferenceId = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
+                    Status = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true),
+                    Subject = table.Column<string>(type: "character varying(400)", maxLength: 400, nullable: true),
+                    Type = table.Column<string>(type: "character varying(50)", maxLength: 50, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -771,8 +772,7 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "RoleNameIndex",
                 table: "AspNetRoles",
                 column: "NormalizedName",
-                unique: true,
-                filter: "[NormalizedName] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_AspNetUserClaims_UserId",
@@ -798,8 +798,7 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "UserNameIndex",
                 table: "AspNetUsers",
                 column: "NormalizedUserName",
-                unique: true,
-                filter: "[NormalizedUserName] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_AssetFolders_IndexedAppId_Id",
@@ -866,8 +865,7 @@ namespace Squidex.Providers.SqlServer.Migrations
                 name: "IX_OpenIddictTokens_ReferenceId",
                 table: "OpenIddictTokens",
                 column: "ReferenceId",
-                unique: true,
-                filter: "[ReferenceId] IS NOT NULL");
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Requests_Key",

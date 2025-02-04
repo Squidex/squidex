@@ -50,7 +50,7 @@ public static class JsonConversion
             v => DomainId.Create(v)
         );
 
-        propertyBuilder.HasConversion(converter);
+        propertyBuilder.HasConversion(converter).HasMaxLength(255);
         return propertyBuilder;
     }
 
@@ -61,7 +61,7 @@ public static class JsonConversion
             v => v != null ? DomainId.Create(v) : null
         );
 
-        propertyBuilder.HasConversion(converter);
+        propertyBuilder.HasConversion(converter).HasMaxLength(255);
         return propertyBuilder;
     }
 
@@ -72,7 +72,7 @@ public static class JsonConversion
             v => RefToken.Parse(v)
         );
 
-        propertyBuilder.HasConversion(converter);
+        propertyBuilder.HasConversion(converter).HasMaxLength(100);
         return propertyBuilder;
     }
 
@@ -83,7 +83,7 @@ public static class JsonConversion
             v => NamedId<DomainId>.Parse(v, ParseDomainId)
         );
 
-        propertyBuilder.HasConversion(converter);
+        propertyBuilder.HasConversion(converter).HasMaxLength(255);
         return propertyBuilder;
     }
 
@@ -94,7 +94,7 @@ public static class JsonConversion
             v => Enum.Parse<T>(v, true)
         );
 
-        propertyBuilder.HasConversion(converter);
+        propertyBuilder.HasConversion(converter).HasMaxLength(100);
         return propertyBuilder;
     }
 
@@ -105,7 +105,7 @@ public static class JsonConversion
             v => v != null ? Enum.Parse<T>(v, true) : null
         );
 
-        propertyBuilder.HasConversion(converter);
+        propertyBuilder.HasConversion(converter).HasMaxLength(100);
         return propertyBuilder;
     }
 
@@ -116,7 +116,7 @@ public static class JsonConversion
             v => TagsConverter.ToSet(v)
         );
 
-        propertyBuilder.HasConversion(converter);
+        propertyBuilder.HasConversion(converter).HasMaxLength(1000);
         return propertyBuilder;
     }
 
@@ -127,7 +127,7 @@ public static class JsonConversion
             v => new Status(v)
         );
 
-        propertyBuilder.HasConversion(converter);
+        propertyBuilder.HasConversion(converter).HasMaxLength(100);
         return propertyBuilder;
     }
 
@@ -138,7 +138,7 @@ public static class JsonConversion
             v => v != null ? new Status(v) : null
         );
 
-        propertyBuilder.HasConversion(converter);
+        propertyBuilder.HasConversion(converter).HasMaxLength(100);
         return propertyBuilder;
     }
 
@@ -149,7 +149,7 @@ public static class JsonConversion
             v => v.ToUniqueContentId()
         );
 
-        propertyBuilder.HasConversion(converter);
+        propertyBuilder.HasConversion(converter).HasMaxLength(255);
         return propertyBuilder;
     }
 

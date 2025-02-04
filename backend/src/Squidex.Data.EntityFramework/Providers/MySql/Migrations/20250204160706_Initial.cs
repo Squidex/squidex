@@ -73,23 +73,23 @@ namespace Squidex.Providers.MySql.Migrations
                 name: "AssetFolders",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    DocumentId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    IndexedAppId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    IndexedAppId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
+                    Id = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedBy = table.Column<string>(type: "longtext", nullable: false)
+                    CreatedBy = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    LastModifiedBy = table.Column<string>(type: "longtext", nullable: false)
+                    LastModifiedBy = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Created = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
                     LastModified = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
                     Version = table.Column<long>(type: "bigint", nullable: false),
-                    AppId = table.Column<string>(type: "longtext", nullable: false)
+                    AppId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    ParentId = table.Column<string>(type: "longtext", nullable: false)
+                    ParentId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     FolderName = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
@@ -120,23 +120,23 @@ namespace Squidex.Providers.MySql.Migrations
                 name: "Assets",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    DocumentId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    IndexedAppId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    IndexedAppId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
+                    Id = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedBy = table.Column<string>(type: "longtext", nullable: false)
+                    CreatedBy = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    LastModifiedBy = table.Column<string>(type: "longtext", nullable: false)
+                    LastModifiedBy = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Created = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
                     LastModified = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
                     Version = table.Column<long>(type: "bigint", nullable: false),
-                    AppId = table.Column<string>(type: "longtext", nullable: false)
+                    AppId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    ParentId = table.Column<string>(type: "longtext", nullable: false)
+                    ParentId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     FileName = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -150,11 +150,11 @@ namespace Squidex.Providers.MySql.Migrations
                     FileVersion = table.Column<long>(type: "bigint", nullable: false),
                     TotalSize = table.Column<long>(type: "bigint", nullable: false),
                     IsProtected = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    Tags = table.Column<string>(type: "longtext", nullable: false)
+                    Tags = table.Column<string>(type: "varchar(1000)", maxLength: 1000, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Metadata = table.Column<string>(type: "json", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Type = table.Column<string>(type: "longtext", nullable: false)
+                    Type = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
@@ -199,11 +199,11 @@ namespace Squidex.Providers.MySql.Migrations
                 name: "ContentReferencesAll",
                 columns: table => new
                 {
-                    AppId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    AppId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    FromKey = table.Column<string>(type: "varchar(255)", nullable: false)
+                    FromKey = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    ToId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    ToId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
@@ -216,11 +216,11 @@ namespace Squidex.Providers.MySql.Migrations
                 name: "ContentReferencesPublished",
                 columns: table => new
                 {
-                    AppId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    AppId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    FromKey = table.Column<string>(type: "varchar(255)", nullable: false)
+                    FromKey = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    ToId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    ToId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
@@ -233,33 +233,33 @@ namespace Squidex.Providers.MySql.Migrations
                 name: "ContentsAll",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    DocumentId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Id = table.Column<string>(type: "longtext", nullable: false)
+                    Id = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedBy = table.Column<string>(type: "longtext", nullable: false)
+                    CreatedBy = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    LastModifiedBy = table.Column<string>(type: "longtext", nullable: false)
+                    LastModifiedBy = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Created = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
                     LastModified = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
                     Version = table.Column<long>(type: "bigint", nullable: false),
-                    AppId = table.Column<string>(type: "longtext", nullable: false)
+                    AppId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    SchemaId = table.Column<string>(type: "longtext", nullable: false)
+                    SchemaId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    NewStatus = table.Column<string>(type: "longtext", nullable: true)
+                    NewStatus = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Status = table.Column<string>(type: "longtext", nullable: false)
+                    Status = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Data = table.Column<string>(type: "json", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ScheduleJob = table.Column<string>(type: "json", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    IndexedAppId = table.Column<string>(type: "longtext", nullable: false)
+                    IndexedAppId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    IndexedSchemaId = table.Column<string>(type: "longtext", nullable: false)
+                    IndexedSchemaId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ScheduledAt = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: true),
                     NewData = table.Column<string>(type: "json", nullable: true)
@@ -277,33 +277,33 @@ namespace Squidex.Providers.MySql.Migrations
                 name: "ContentsPublished",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    DocumentId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Id = table.Column<string>(type: "longtext", nullable: false)
+                    Id = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    CreatedBy = table.Column<string>(type: "longtext", nullable: false)
+                    CreatedBy = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    LastModifiedBy = table.Column<string>(type: "longtext", nullable: false)
+                    LastModifiedBy = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Created = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
                     LastModified = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
                     Version = table.Column<long>(type: "bigint", nullable: false),
-                    AppId = table.Column<string>(type: "longtext", nullable: false)
+                    AppId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     IsDeleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    SchemaId = table.Column<string>(type: "longtext", nullable: false)
+                    SchemaId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    NewStatus = table.Column<string>(type: "longtext", nullable: true)
+                    NewStatus = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Status = table.Column<string>(type: "longtext", nullable: false)
+                    Status = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Data = table.Column<string>(type: "json", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ScheduleJob = table.Column<string>(type: "json", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    IndexedAppId = table.Column<string>(type: "longtext", nullable: false)
+                    IndexedAppId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    IndexedSchemaId = table.Column<string>(type: "longtext", nullable: false)
+                    IndexedSchemaId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     ScheduledAt = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: true),
                     NewData = table.Column<string>(type: "json", nullable: true)
@@ -373,12 +373,12 @@ namespace Squidex.Providers.MySql.Migrations
                 name: "HistoryEvent",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
+                    Id = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    OwnerId = table.Column<string>(type: "longtext", nullable: false)
+                    OwnerId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Created = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
-                    Actor = table.Column<string>(type: "longtext", nullable: false)
+                    Actor = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Version = table.Column<long>(type: "bigint", nullable: false),
                     Channel = table.Column<string>(type: "longtext", nullable: false)
@@ -502,17 +502,17 @@ namespace Squidex.Providers.MySql.Migrations
                 name: "RuleEvents",
                 columns: table => new
                 {
-                    Id = table.Column<string>(type: "varchar(255)", nullable: false)
+                    Id = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    AppId = table.Column<string>(type: "longtext", nullable: false)
+                    AppId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    RuleId = table.Column<string>(type: "longtext", nullable: false)
+                    RuleId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Created = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
                     LastModified = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
-                    Result = table.Column<string>(type: "longtext", nullable: false)
+                    Result = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    JobResult = table.Column<string>(type: "longtext", nullable: false)
+                    JobResult = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Job = table.Column<string>(type: "json", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -532,13 +532,13 @@ namespace Squidex.Providers.MySql.Migrations
                 name: "States_App",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    DocumentId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Name = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     UserIds = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    TeamId = table.Column<string>(type: "longtext", nullable: true)
+                    TeamId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Deleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     Created = table.Column<DateTimeOffset>(type: "datetime(6)", nullable: false),
@@ -556,7 +556,7 @@ namespace Squidex.Providers.MySql.Migrations
                 name: "States_Counters",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    DocumentId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Document = table.Column<string>(type: "json", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -572,7 +572,7 @@ namespace Squidex.Providers.MySql.Migrations
                 name: "States_EventConsumerState",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    DocumentId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Document = table.Column<string>(type: "json", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -588,7 +588,7 @@ namespace Squidex.Providers.MySql.Migrations
                 name: "States_Identity_Keys",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    DocumentId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Document = table.Column<string>(type: "json", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -604,7 +604,7 @@ namespace Squidex.Providers.MySql.Migrations
                 name: "States_Identity_Xml",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    DocumentId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Document = table.Column<string>(type: "json", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -620,7 +620,7 @@ namespace Squidex.Providers.MySql.Migrations
                 name: "States_Index_TagHistory",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    DocumentId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Document = table.Column<string>(type: "json", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -636,7 +636,7 @@ namespace Squidex.Providers.MySql.Migrations
                 name: "States_Index_Tags",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    DocumentId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Document = table.Column<string>(type: "json", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -652,7 +652,7 @@ namespace Squidex.Providers.MySql.Migrations
                 name: "States_JobsState",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    DocumentId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Document = table.Column<string>(type: "json", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -668,7 +668,7 @@ namespace Squidex.Providers.MySql.Migrations
                 name: "States_Names",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    DocumentId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Document = table.Column<string>(type: "json", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -684,11 +684,11 @@ namespace Squidex.Providers.MySql.Migrations
                 name: "States_Rule",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    DocumentId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    AppId = table.Column<string>(type: "longtext", nullable: false)
+                    AppId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Id = table.Column<string>(type: "longtext", nullable: false)
+                    Id = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Deleted = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     Document = table.Column<string>(type: "json", nullable: true)
@@ -705,11 +705,11 @@ namespace Squidex.Providers.MySql.Migrations
                 name: "States_Schema",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    DocumentId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    AppId = table.Column<string>(type: "longtext", nullable: false)
+                    AppId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Id = table.Column<string>(type: "longtext", nullable: false)
+                    Id = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Name = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -728,7 +728,7 @@ namespace Squidex.Providers.MySql.Migrations
                 name: "States_Team",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    DocumentId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     UserIds = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -749,7 +749,7 @@ namespace Squidex.Providers.MySql.Migrations
                 name: "States_UISettings",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    DocumentId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Document = table.Column<string>(type: "json", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -765,7 +765,7 @@ namespace Squidex.Providers.MySql.Migrations
                 name: "States_UsageNotifications",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    DocumentId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Document = table.Column<string>(type: "json", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -781,7 +781,7 @@ namespace Squidex.Providers.MySql.Migrations
                 name: "States_UsageTracker",
                 columns: table => new
                 {
-                    DocumentId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    DocumentId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Document = table.Column<string>(type: "json", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
@@ -797,9 +797,9 @@ namespace Squidex.Providers.MySql.Migrations
                 name: "TextState",
                 columns: table => new
                 {
-                    UniqueContentId = table.Column<string>(type: "varchar(255)", nullable: false)
+                    UniqueContentId = table.Column<string>(type: "varchar(255)", maxLength: 255, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    State = table.Column<string>(type: "longtext", nullable: false)
+                    State = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4")
                 },
                 constraints: table =>
