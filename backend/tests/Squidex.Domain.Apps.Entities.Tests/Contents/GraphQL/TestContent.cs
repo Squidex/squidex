@@ -357,7 +357,7 @@ public static class TestContent
             Status = Status.Draft,
             StatusColor = "red",
             NewStatus = Status.Published,
-            NewStatusColor = "blue"
+            NewStatusColor = "blue",
         };
 
         return content;
@@ -388,7 +388,7 @@ public static class TestContent
             Status = Status.Draft,
             StatusColor = "red",
             NewStatus = Status.Published,
-            NewStatusColor = "blue"
+            NewStatusColor = "blue",
         };
 
         return content;
@@ -406,7 +406,7 @@ public static class TestContent
             {
                 id = content.CreatedBy.Identifier,
                 email = "Hidden",
-                displayName = "Hidden"
+                displayName = "Hidden",
             },
             editToken = $"token_{content.Id}",
             lastModified = content.LastModified,
@@ -415,14 +415,14 @@ public static class TestContent
             {
                 id = content.LastModifiedBy.Identifier,
                 email = "Hidden",
-                displayName = "Hidden"
+                displayName = "Hidden",
             },
             status = "DRAFT",
             statusColor = "red",
             newStatus = "PUBLISHED",
             newStatusColor = "blue",
             url = $"contents/my-schema/{content.Id}",
-            data = Data(content)
+            data = Data(content),
         };
     }
 
@@ -454,7 +454,7 @@ public static class TestContent
             newStatus = "PUBLISHED",
             newStatusColor = "blue",
             url = $"contents/my-schema/{content.Id}",
-            flatData = FlatData(content)
+            flatData = FlatData(content),
         };
     }
 
@@ -466,8 +466,8 @@ public static class TestContent
             {
                 iv = new
                 {
-                    value = 1
-                }
+                    value = 1,
+                },
             },
             ["myJson2"] = new
             {
@@ -485,61 +485,61 @@ public static class TestContent
                         ["nestedFloat"] = 3.14,
                         ["nestedBoolean"] = true,
                         ["nestedArray"] = new[] { "1", "2", "3" },
-                    }
-                }
+                    },
+                },
             },
             ["myString"] = new
             {
-                iv = (string?)null
+                iv = (string?)null,
             },
             ["myStringEnum"] = new
             {
-                iv = "EnumA"
+                iv = "EnumA",
             },
             ["myLocalizedString"] = new
             {
-                de_DE = "de-DE"
+                de_DE = "de-DE",
             },
             ["myNumber"] = new
             {
-                iv = 1.0
+                iv = 1.0,
             },
             ["myAssets"] = new
             {
                 iv = new[]
                 {
-                    TestSchemas.Component.Id
-                }
+                    TestSchemas.Component.Id,
+                },
             },
             ["myBoolean"] = new
             {
-                iv = true
+                iv = true,
             },
             ["myDatetime"] = new
             {
-                iv = content.LastModified.ToString()
+                iv = content.LastModified.ToString(),
             },
             ["myReferences"] = new
             {
                 iv = new[]
                 {
-                    TestSchemas.Reference1.Id
-                }
+                    TestSchemas.Reference1.Id,
+                },
             },
             ["myUnion"] = new
             {
                 iv = new[]
                 {
-                    TestSchemas.Reference2.Id
-                }
+                    TestSchemas.Reference2.Id,
+                },
             },
             ["myGeolocation"] = new
             {
                 iv = new
                 {
                     latitude = 10,
-                    longitude = 20
-                }
+                    longitude = 20,
+                },
             },
             ["myComponent"] = new
             {
@@ -547,8 +547,8 @@ public static class TestContent
                 {
                     ["schemaId"] = TestSchemas.Component.Id.ToString(),
                     ["schemaName"] = TestSchemas.Component.Name,
-                    ["componentField"] = "Component1"
-                }
+                    ["componentField"] = "Component1",
+                },
             },
             ["myComponents"] = new
             {
@@ -558,37 +558,37 @@ public static class TestContent
                     {
                         ["schemaId"] = TestSchemas.Reference1.Id.ToString(),
                         ["schemaName"] = TestSchemas.Reference1.Name,
-                        ["reference1Field"] = "Component1"
+                        ["reference1Field"] = "Component1",
                     },
                     new Dictionary<string, object>
                     {
                         ["schemaId"] = TestSchemas.Reference2.Id.ToString(),
                         ["schemaName"] = TestSchemas.Reference2.Name,
-                        ["reference2Field"] = "Component2"
+                        ["reference2Field"] = "Component2",
                     },
                     new Dictionary<string, object>
                     {
                         ["schemaId"] = TestSchemas.Component.Id.ToString(),
                         ["schemaName"] = TestSchemas.Component.Name,
-                        ["componentField"] = "Component3"
-                    }
-                }
+                        ["componentField"] = "Component3",
+                    },
+                },
             },
             ["myTags"] = new
             {
                 iv = new[]
                 {
                     "tag1",
-                    "tag2"
-                }
+                    "tag2",
+                },
             },
             ["myTagsEnum"] = new
             {
                 iv = new[]
                 {
                     "EnumA",
-                    "EnumB"
-                }
+                    "EnumB",
+                },
             },
             ["myArray"] = new
             {
@@ -597,14 +597,14 @@ public static class TestContent
                     new
                     {
                         nestedNumber = 42.0,
-                        nestedBoolean = true
+                        nestedBoolean = true,
                     },
                     new
                     {
                         nestedNumber = 3.14,
-                        nestedBoolean = false
-                    }
-                }
+                        nestedBoolean = false,
+                    },
+                },
             },
             ["myRichtext"] = new
             {
@@ -617,10 +617,10 @@ public static class TestContent
                         {
                             type = "text",
                             text = "Rich Text",
-                        }
-                    }
-                }
-            }
+                        },
+                    },
+                },
+            },
         };
 
         return actual;
@@ -634,9 +634,9 @@ public static class TestContent
             {
                 iv = new
                 {
-                    value = 1
+                    value = 1,
                 },
-                ivValue = 1
+                ivValue = 1,
             },
             ["myJson2"] = new
             {
@@ -656,40 +656,40 @@ public static class TestContent
                         ["nestedFloat"] = 3.14,
                         ["nestedBoolean"] = true,
                         ["nestedArray"] = new[] { "1", "2", "3" },
-                    }
-                }
+                    },
+                },
             },
             ["myString"] = new
             {
-                iv = (string?)null
+                iv = (string?)null,
             },
             ["myStringEnum"] = new
             {
-                iv = "EnumA"
+                iv = "EnumA",
             },
             ["myLocalizedString"] = new
             {
-                de_DE = "de-DE"
+                de_DE = "de-DE",
             },
             ["myNumber"] = new
             {
-                iv = 1.0
+                iv = 1.0,
             },
             ["myBoolean"] = new
             {
-                iv = true
+                iv = true,
             },
             ["myDatetime"] = new
             {
-                iv = content.LastModified.ToString()
+                iv = content.LastModified.ToString(),
             },
             ["myGeolocation"] = new
             {
                 iv = new
                 {
                     latitude = 10,
-                    longitude = 20
-                }
+                    longitude = 20,
+                },
             },
             ["myComponent__Dynamic"] = new
             {
@@ -697,8 +697,8 @@ public static class TestContent
                 {
                     ["schemaId"] = TestSchemas.Component.Id.ToString(),
                     ["schemaName"] = TestSchemas.Component.Name,
-                    ["component-field"] = "Component1"
-                }
+                    ["component-field"] = "Component1",
+                },
             },
             ["myComponent"] = new
             {
@@ -706,8 +706,8 @@ public static class TestContent
                 {
                     ["schemaId"] = TestSchemas.Component.Id.ToString(),
                     ["schemaName"] = TestSchemas.Component.Name,
-                    ["componentField"] = "Component1"
-                }
+                    ["componentField"] = "Component1",
+                },
             },
             ["myComponents__Dynamic"] = new
             {
@@ -717,21 +717,21 @@ public static class TestContent
                     {
                         ["schemaId"] = TestSchemas.Reference1.Id.ToString(),
                         ["schemaName"] = TestSchemas.Reference1.Name,
-                        ["reference1-field"] = "Component1"
+                        ["reference1-field"] = "Component1",
                     },
                     new Dictionary<string, object>
                     {
                         ["schemaId"] = TestSchemas.Reference2.Id.ToString(),
                         ["schemaName"] = TestSchemas.Reference2.Name,
-                        ["reference2-field"] = "Component2"
+                        ["reference2-field"] = "Component2",
                     },
                     new Dictionary<string, object>
                     {
                         ["schemaId"] = TestSchemas.Component.Id.ToString(),
                         ["schemaName"] = TestSchemas.Component.Name,
-                        ["component-field"] = "Component3"
-                    }
-                }
+                        ["component-field"] = "Component3",
+                    },
+                },
             },
             ["myComponents"] = new
             {
@@ -742,39 +742,39 @@ public static class TestContent
                         ["__typename"] = "MyReference1Component",
                         ["schemaId"] = TestSchemas.Reference1.Id.ToString(),
                         ["schemaName"] = TestSchemas.Reference1.Name,
-                        ["reference1Field"] = "Component1"
+                        ["reference1Field"] = "Component1",
                     },
                     new Dictionary<string, object>
                     {
                         ["__typename"] = "MyReference2Component",
                         ["schemaId"] = TestSchemas.Reference2.Id.ToString(),
                         ["schemaName"] = TestSchemas.Reference2.Name,
-                        ["reference2Field"] = "Component2"
+                        ["reference2Field"] = "Component2",
                     },
                     new Dictionary<string, object>
                     {
                         ["__typename"] = "MyComponentComponent",
                         ["schemaId"] = TestSchemas.Component.Id.ToString(),
                         ["schemaName"] = TestSchemas.Component.Name,
-                        ["componentField"] = "Component3"
-                    }
-                }
+                        ["componentField"] = "Component3",
+                    },
+                },
             },
             ["myTags"] = new
             {
                 iv = new[]
                 {
                     "tag1",
-                    "tag2"
-                }
+                    "tag2",
+                },
             },
             ["myTagsEnum"] = new
             {
                 iv = new[]
                 {
                     "EnumA",
-                    "EnumB"
-                }
+                    "EnumB",
+                },
             },
             ["myArray"] = new
             {
@@ -783,14 +783,14 @@ public static class TestContent
                     new
                     {
                         nestedNumber = 42.0,
-                        nestedBoolean = true
+                        nestedBoolean = true,
                     },
                     new
                     {
                         nestedNumber = 3.14,
-                        nestedBoolean = false
-                    }
-                }
+                        nestedBoolean = false,
+                    },
+                },
             },
             ["myRichtext"] = new
             {
@@ -805,15 +805,15 @@ public static class TestContent
                             {
                                 type = "text",
                                 text = "Rich Text",
-                            }
-                        }
+                            },
+                        },
                     },
                     htmlMinimized = "<h1>Rich Text</h1>",
                     htmlNormal = "<h1>Rich Text</h1>",
                     markdown = "# Rich Text",
-                    text = "Rich Text"
-                }
-            }
+                    text = "Rich Text",
+                },
+            },
         };
 
         return actual;
@@ -825,7 +825,7 @@ public static class TestContent
         {
             ["myJson"] = new
             {
-                value = 1
+                value = 1,
             },
             ["myJsonValue"] = 1,
             ["myJson2"] = new Dictionary<string, object>
@@ -844,7 +844,7 @@ public static class TestContent
                     ["nestedFloat"] = 3.14,
                     ["nestedBoolean"] = true,
                     ["nestedArray"] = new[] { "1", "2", "3" },
-                }
+                },
             },
             ["myString"] = null,
             ["myStringEnum"] = "EnumA",
@@ -855,19 +855,19 @@ public static class TestContent
             ["myGeolocation"] = new
             {
                 latitude = 10,
-                longitude = 20
+                longitude = 20,
             },
             ["myComponent__Dynamic"] = new Dictionary<string, object>
             {
                 ["schemaId"] = TestSchemas.Component.Id.ToString(),
                 ["schemaName"] = TestSchemas.Component.Name,
-                ["component-field"] = "Component1"
+                ["component-field"] = "Component1",
             },
             ["myComponent"] = new Dictionary<string, object>
             {
                 ["schemaId"] = TestSchemas.Component.Id.ToString(),
                 ["schemaName"] = TestSchemas.Component.Name,
-                ["componentField"] = "Component1"
+                ["componentField"] = "Component1",
             },
             ["myComponents__Dynamic"] = new[]
             {
@@ -875,20 +875,20 @@ public static class TestContent
                 {
                     ["schemaId"] = TestSchemas.Reference1.Id.ToString(),
                     ["schemaName"] = TestSchemas.Reference1.Name,
-                    ["reference1-field"] = "Component1"
+                    ["reference1-field"] = "Component1",
                 },
                 new Dictionary<string, object>
                 {
                     ["schemaId"] = TestSchemas.Reference2.Id.ToString(),
                     ["schemaName"] = TestSchemas.Reference2.Name,
-                    ["reference2-field"] = "Component2"
+                    ["reference2-field"] = "Component2",
                 },
                 new Dictionary<string, object>
                 {
                     ["schemaId"] = TestSchemas.Component.Id.ToString(),
                     ["schemaName"] = TestSchemas.Component.Name,
-                    ["component-field"] = "Component3"
-                }
+                    ["component-field"] = "Component3",
+                },
             },
             ["myComponents"] = new object[]
             {
@@ -897,45 +897,45 @@ public static class TestContent
                     ["__typename"] = "MyReference1Component",
                     ["schemaId"] = TestSchemas.Reference1.Id.ToString(),
                     ["schemaName"] = TestSchemas.Reference1.Name,
-                    ["reference1Field"] = "Component1"
+                    ["reference1Field"] = "Component1",
                 },
                 new Dictionary<string, object>
                 {
                     ["__typename"] = "MyReference2Component",
                     ["schemaId"] = TestSchemas.Reference2.Id.ToString(),
                     ["schemaName"] = TestSchemas.Reference2.Name,
-                    ["reference2Field"] = "Component2"
+                    ["reference2Field"] = "Component2",
                 },
                 new Dictionary<string, object>
                 {
                     ["__typename"] = "MyComponentComponent",
                     ["schemaId"] = TestSchemas.Component.Id.ToString(),
                     ["schemaName"] = TestSchemas.Component.Name,
-                    ["componentField"] = "Component3"
-                }
+                    ["componentField"] = "Component3",
+                },
             },
             ["myTags"] = new[]
             {
                 "tag1",
-                "tag2"
+                "tag2",
             },
             ["myTagsEnum"] = new[]
             {
                 "EnumA",
-                "EnumB"
+                "EnumB",
             },
             ["myArray"] = new[]
             {
                 new
                 {
                     nestedNumber = 42.0,
-                    nestedBoolean = true
+                    nestedBoolean = true,
                 },
                 new
                 {
                     nestedNumber = 3.14,
-                    nestedBoolean = false
-                }
+                    nestedBoolean = false,
+                },
             },
             ["myRichtext"] = new
             {
@@ -948,14 +948,14 @@ public static class TestContent
                         {
                             type = "text",
                             text = "Rich Text",
-                        }
-                    }
+                        },
+                    },
                 },
                 htmlMinimized = "<h1>Rich Text</h1>",
                 htmlNormal = "<h1>Rich Text</h1>",
                 markdown = "# Rich Text",
-                text = "Rich Text"
-            }
+                text = "Rich Text",
+            },
         };
 
         return actual;

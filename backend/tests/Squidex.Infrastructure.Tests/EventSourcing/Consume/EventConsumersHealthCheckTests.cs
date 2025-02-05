@@ -40,17 +40,17 @@ public class EventConsumersHealthCheckTests
     {
         consumers.Add(new EventConsumerInfo
         {
-            Name = "Consumer1"
+            Name = "Consumer1",
         });
 
         consumers.Add(new EventConsumerInfo
         {
-            Name = "Consumer2"
+            Name = "Consumer2",
         });
 
         consumers.Add(new EventConsumerInfo
         {
-            Name = "Consumer2"
+            Name = "Consumer2",
         });
 
         var status = await sut.CheckHealthAsync(null!, ct);
@@ -64,19 +64,19 @@ public class EventConsumersHealthCheckTests
         consumers.Add(new EventConsumerInfo
         {
             Name = "Consumer1",
-            Error = "Failed1"
+            Error = "Failed1",
         });
 
         consumers.Add(new EventConsumerInfo
         {
             Name = "Consumer2",
-            Error = "Failed2"
+            Error = "Failed2",
         });
 
         consumers.Add(new EventConsumerInfo
         {
             Name = "Consumer3",
-            Error = "Failed3"
+            Error = "Failed3",
         });
 
         var status = await sut.CheckHealthAsync(null!, ct);
@@ -90,19 +90,19 @@ public class EventConsumersHealthCheckTests
         consumers.Add(new EventConsumerInfo
         {
             Name = "Consumer1",
-            Error = "Failed1"
+            Error = "Failed1",
         });
 
         consumers.Add(new EventConsumerInfo
         {
             Name = "Consumer2",
-            IsStopped = true
+            IsStopped = true,
         });
 
         consumers.Add(new EventConsumerInfo
         {
             Name = "Consumer3",
-            IsStopped = false
+            IsStopped = false,
         });
 
         var status = await sut.CheckHealthAsync(null!, ct);

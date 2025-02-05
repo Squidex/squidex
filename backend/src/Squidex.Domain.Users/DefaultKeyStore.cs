@@ -50,7 +50,7 @@ public sealed class DefaultKeyStore(ISnapshotStore<DefaultKeyStore.State> store)
         {
             securityKey = new RsaSecurityKey(RSA.Create(2048))
             {
-                KeyId = CryptoRandom.CreateUniqueId(16)
+                KeyId = CryptoRandom.CreateUniqueId(16),
             };
 
             state = new State { Key = securityKey.KeyId };
@@ -86,7 +86,7 @@ public sealed class DefaultKeyStore(ISnapshotStore<DefaultKeyStore.State> store)
 
         securityKey = new RsaSecurityKey(state.Parameters)
         {
-            KeyId = state.Key
+            KeyId = state.Key,
         };
 
         return securityKey;

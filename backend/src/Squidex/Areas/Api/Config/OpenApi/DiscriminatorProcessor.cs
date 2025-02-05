@@ -31,7 +31,7 @@ public sealed class DiscriminatorProcessor(TypeRegistry typeRegistry) : ISchemaP
         var discriminatorName = config.DiscriminatorProperty;
         var discriminatorObject = new OpenApiDiscriminator
         {
-            PropertyName = discriminatorName
+            PropertyName = discriminatorName,
         };
 
         var schema = context.Schema;
@@ -42,7 +42,7 @@ public sealed class DiscriminatorProcessor(TypeRegistry typeRegistry) : ISchemaP
 
             discriminatorObject.Mapping[typeName] = new JsonSchema
             {
-                Reference = derivedSchema
+                Reference = derivedSchema,
             };
         }
 
@@ -52,7 +52,7 @@ public sealed class DiscriminatorProcessor(TypeRegistry typeRegistry) : ISchemaP
         {
             schema.Properties[discriminatorName] = existingProperty = new JsonSchemaProperty
             {
-                Type = JsonObjectType.String
+                Type = JsonObjectType.String,
             };
         }
 

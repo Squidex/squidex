@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-#define LOG_ALL_IDENTITY_SERVER_NONE
-
 using Squidex.Infrastructure.Log;
 using Squidex.Log;
 using Squidex.Web.Pipeline;
@@ -31,5 +29,8 @@ public static class LoggingServices
 
         builder.Services.AddSingletonAs<ActionContextLogAppender>()
             .As<ILogAppender>();
+
+        // Warnings are useful for improper queries but errors only log exceptions that we get anyway.
+        builder.AddFilter("Microsoft.EntityFrameworkCore", level => level is LogLevel.Warning or LogLevel.Critical);
     }
 }

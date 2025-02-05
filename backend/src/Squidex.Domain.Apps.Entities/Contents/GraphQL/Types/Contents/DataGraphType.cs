@@ -27,7 +27,7 @@ internal sealed class DataGraphType : ObjectGraphType<ContentData>
                 var fieldGraphType = new ObjectGraphType
                 {
                     // The name is used for equal comparison. Therefore it is important to treat it as readonly.
-                    Name = fieldInfo.LocalizedTypeDynamic
+                    Name = fieldInfo.LocalizedTypeDynamic,
                 };
 
                 foreach (var partitionKey in partitioning.AllKeys)
@@ -39,7 +39,7 @@ internal sealed class DataGraphType : ObjectGraphType<ContentData>
                         ResolvedType = Scalars.Json,
                         Resolver = FieldVisitor.JsonPath,
                         Description = fieldInfo.Field.RawProperties.Hints,
-                        SourceName = partitionKey
+                        SourceName = partitionKey,
                     });
                 }
 
@@ -50,7 +50,7 @@ internal sealed class DataGraphType : ObjectGraphType<ContentData>
                     Name = fieldInfo.FieldNameDynamic,
                     ResolvedType = fieldGraphType,
                     Resolver = ContentResolvers.Field,
-                    SourceName = fieldInfo.Field.Name
+                    SourceName = fieldInfo.Field.Name,
                 });
             }
 
@@ -61,7 +61,7 @@ internal sealed class DataGraphType : ObjectGraphType<ContentData>
                 var fieldGraphType = new ObjectGraphType
                 {
                     // The name is used for equal comparison. Therefore it is important to treat it as readonly.
-                    Name = fieldInfo.LocalizedType
+                    Name = fieldInfo.LocalizedType,
                 };
 
                 foreach (var partitionKey in partitioning.AllKeys)
@@ -73,7 +73,7 @@ internal sealed class DataGraphType : ObjectGraphType<ContentData>
                         ResolvedType = resolvedType,
                         Resolver = resolver,
                         Description = fieldInfo.Field.RawProperties.Hints,
-                        SourceName = partitionKey
+                        SourceName = partitionKey,
                     });
                 }
 

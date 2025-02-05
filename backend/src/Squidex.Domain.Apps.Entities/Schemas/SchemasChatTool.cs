@@ -46,9 +46,9 @@ public sealed class SchemasChatTool(IAppProvider appProvider, IJsonSerializer se
                                 x.IsPublished,
                                 x.Type,
                                 FieldCount = x.Fields.Count,
-                                Url = urlGenerator.SchemaUI(context.App.NamedId(), x.NamedId())
+                                Url = urlGenerator.SchemaUI(context.App.NamedId(), x.NamedId()),
                             }),
-                        Url = urlGenerator.SchemasUI(context.App.NamedId())
+                        Url = urlGenerator.SchemasUI(context.App.NamedId()),
                     };
 
                     var json = serializer.Serialize(result, true);

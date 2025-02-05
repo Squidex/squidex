@@ -80,6 +80,7 @@ public sealed class GraphQLTests(GraphQLFixture fixture) : IClassFixture<GraphQL
 
         var settings = new VerifySettings();
         settings.IgnoreMember("editToken");
+        settings.IgnoreMember("metadata");
         settings.IgnoreMember("thumbnailUrl");
         settings.IgnoreMember("url");
         settings.IgnoreMember("version");

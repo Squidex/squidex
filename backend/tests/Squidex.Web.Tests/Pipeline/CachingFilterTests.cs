@@ -38,7 +38,7 @@ public class CachingFilterTests
         executingContext = new ActionExecutingContext(actionContext, actionFilters, new Dictionary<string, object?>(), this);
         executedContext = new ActionExecutedContext(actionContext, actionFilters, this)
         {
-            Result = new OkResult()
+            Result = new OkResult(),
         };
 
         sut = new CachingFilter(cachingManager);
@@ -70,7 +70,7 @@ public class CachingFilterTests
     {
         executingContext.ActionDescriptor.EndpointMetadata = new List<object>
         {
-            new IgnoreCacheFilterAttribute()
+            new IgnoreCacheFilterAttribute(),
         };
 
         httpContext.Request.Method = HttpMethods.Get;

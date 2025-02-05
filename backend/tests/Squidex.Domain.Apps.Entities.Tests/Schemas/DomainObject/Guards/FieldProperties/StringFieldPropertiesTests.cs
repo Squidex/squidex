@@ -24,7 +24,7 @@ public class StringFieldPropertiesTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Max length must be greater or equal to min length.", "MinLength", "MaxLength")
+                new ValidationError("Max length must be greater or equal to min length.", "MinLength", "MaxLength"),
             });
     }
 
@@ -48,7 +48,7 @@ public class StringFieldPropertiesTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Max characters must be greater or equal to min characters.", "MinCharacters", "MaxCharacters")
+                new ValidationError("Max characters must be greater or equal to min characters.", "MinCharacters", "MaxCharacters"),
             });
     }
 
@@ -72,7 +72,7 @@ public class StringFieldPropertiesTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Max words must be greater or equal to min words.", "MinWords", "MaxWords")
+                new ValidationError("Max words must be greater or equal to min words.", "MinWords", "MaxWords"),
             });
     }
 
@@ -96,7 +96,7 @@ public class StringFieldPropertiesTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Radio buttons or dropdown list need allowed values.", "AllowedValues")
+                new ValidationError("Radio buttons or dropdown list need allowed values.", "AllowedValues"),
             });
     }
 
@@ -110,7 +110,7 @@ public class StringFieldPropertiesTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Editor is not a valid value.", "Editor")
+                new ValidationError("Editor is not a valid value.", "Editor"),
             });
     }
 
@@ -124,7 +124,7 @@ public class StringFieldPropertiesTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Content type is not a valid value.", "ContentType")
+                new ValidationError("Content type is not a valid value.", "ContentType"),
             });
     }
 
@@ -138,7 +138,7 @@ public class StringFieldPropertiesTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Pattern is not a valid value.", "Pattern")
+                new ValidationError("Pattern is not a valid value.", "Pattern"),
             });
     }
 
@@ -156,7 +156,7 @@ public class StringFieldPropertiesTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Inline editing is only allowed for dropdowns, slugs and input fields.", "InlineEditable", "Editor")
+                new ValidationError("Inline editing is only allowed for dropdowns, slugs and input fields.", "InlineEditable", "Editor"),
             });
     }
 

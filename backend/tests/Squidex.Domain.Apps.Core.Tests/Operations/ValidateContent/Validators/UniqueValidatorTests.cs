@@ -101,7 +101,7 @@ public class UniqueValidatorTests : IClassFixture<TranslationsFixture>
 
             var foundIds = new List<ContentIdStatus>
             {
-                new ContentIdStatus(id, id, Status.Draft)
+                new ContentIdStatus(id, id, Status.Draft),
             };
 
             return Task.FromResult<IReadOnlyList<ContentIdStatus>>(foundIds);

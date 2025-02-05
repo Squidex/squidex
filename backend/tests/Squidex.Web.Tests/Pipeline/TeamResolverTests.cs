@@ -37,7 +37,7 @@ public class TeamResolverTests : GivenContext
     {
         actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor
         {
-            EndpointMetadata = new List<object>()
+            EndpointMetadata = new List<object>(),
         });
 
         actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object?>(), this);
@@ -132,7 +132,7 @@ public class TeamResolverTests : GivenContext
 
         Team = Team with
         {
-            Contributors = Contributors.Empty.Assign(User.Identifier, Role.Reader)
+            Contributors = Contributors.Empty.Assign(User.Identifier, Role.Reader),
         };
 
         A.CallTo(() => AppProvider.GetTeamAsync(TeamId, httpContext.RequestAborted))

@@ -90,7 +90,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
                 Change = "<change-script>",
                 Create = "<create-script>",
                 Delete = "<delete-script>",
-                Update = "<update-script>"
+                Update = "<update-script>",
             })
             .Publish();
 

@@ -17,10 +17,10 @@ namespace Squidex.Domain.Apps.Entities.Contents.Repositories;
 
 public interface IContentRepository
 {
-    IAsyncEnumerable<DomainId> StreamIds(DomainId appId, DomainId schemaId, SearchScope scope,
+    IAsyncEnumerable<Content> StreamScheduledWithoutDataAsync(Instant now, SearchScope scope,
         CancellationToken ct = default);
 
-    IAsyncEnumerable<Content> StreamScheduledWithoutDataAsync(Instant now, SearchScope scope,
+    IAsyncEnumerable<DomainId> StreamIds(DomainId appId, HashSet<DomainId>? schemaIds, SearchScope scope,
         CancellationToken ct = default);
 
     IAsyncEnumerable<Content> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds, SearchScope scope,
@@ -47,7 +47,7 @@ public interface IContentRepository
     Task<bool> HasReferrersAsync(App app, DomainId reference, SearchScope scope,
         CancellationToken ct = default);
 
-    Task ResetScheduledAsync(DomainId appId, DomainId contentId, SearchScope scope,
+    Task ResetScheduledAsync(DomainId appId, DomainId id, SearchScope scope,
         CancellationToken ct = default);
 
     Task CreateIndexAsync(DomainId appId, DomainId schemaId, IndexDefinition index,

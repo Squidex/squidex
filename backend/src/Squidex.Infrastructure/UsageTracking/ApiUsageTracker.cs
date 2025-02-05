@@ -50,7 +50,7 @@ public sealed class ApiUsageTracker(IUsageTracker usageTracker) : IApiUsageTrack
         {
             [CounterTotalCalls] = weight,
             [CounterTotalElapsedMs] = elapsedMs,
-            [CounterTotalBytes] = bytes
+            [CounterTotalBytes] = bytes,
         };
 
         return usageTracker.TrackAsync(date, apiKey, category, counters, ct);

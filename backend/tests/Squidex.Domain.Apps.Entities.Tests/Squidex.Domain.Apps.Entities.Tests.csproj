@@ -34,7 +34,7 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageReference Include="NodaTime.Serialization.JsonNet" Version="3.1.0" />
     <PackageReference Include="Testcontainers.Elasticsearch" Version="4.1.0" />
-    <PackageReference Include="YDotNet.Native" Version="0.4.1" />
+    <PackageReference Include="YDotNet.Native" Version="0.4.3" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="System.Reactive.Linq" Version="6.0.1" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />

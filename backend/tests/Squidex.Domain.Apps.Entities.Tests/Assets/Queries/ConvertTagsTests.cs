@@ -48,14 +48,14 @@ public class ConvertTagsTests : GivenContext
     {
         var asset = CreateAsset() with
         {
-            Tags = ["id1", "id2"]
+            Tags = ["id1", "id2"],
         };
 
         A.CallTo(() => tagService.GetTagNamesAsync(AppId.Id, TagGroups.Assets, A<HashSet<string>>.That.Is("id1", "id2"), CancellationToken))
             .Returns(new Dictionary<string, string>
             {
                 ["id1"] = "name1",
-                ["id2"] = "name2"
+                ["id2"] = "name2",
             });
 
         await sut.EnrichAsync(ApiContext, Enumerable.Repeat(asset, 1), CancellationToken);
@@ -68,12 +68,12 @@ public class ConvertTagsTests : GivenContext
     {
         var asset1 = CreateAsset() with
         {
-            Tags = ["id1", "id2"]
+            Tags = ["id1", "id2"],
         };
 
         var asset2 = CreateAsset() with
         {
-            Tags = ["id2", "id3"]
+            Tags = ["id2", "id3"],
         };
 
         A.CallTo(() => tagService.GetTagNamesAsync(AppId.Id, TagGroups.Assets, A<HashSet<string>>.That.Is("id1", "id2", "id3"), CancellationToken))
@@ -81,7 +81,7 @@ public class ConvertTagsTests : GivenContext
             {
                 ["id1"] = "name1",
                 ["id2"] = "name2",
-                ["id3"] = "name3"
+                ["id3"] = "name3",
             });
 
         await sut.EnrichAsync(ApiContext, [asset1, asset2], CancellationToken);

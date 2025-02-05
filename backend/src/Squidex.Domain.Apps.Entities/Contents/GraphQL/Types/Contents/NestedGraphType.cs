@@ -29,7 +29,7 @@ internal sealed class NestedGraphType : ObjectGraphType<JsonObject>
                     ResolvedType = Scalars.Json,
                     Resolver = FieldVisitor.JsonPath,
                     Description = nestedFieldInfo.Field.RawProperties.Hints,
-                    SourceName = nestedFieldInfo.Field.Name
+                    SourceName = nestedFieldInfo.Field.Name,
                 });
             }
 
@@ -44,7 +44,7 @@ internal sealed class NestedGraphType : ObjectGraphType<JsonObject>
                     ResolvedType = resolvedType,
                     Resolver = resolver,
                     Description = nestedFieldInfo.Field.RawProperties.Hints,
-                    SourceName = nestedFieldInfo.Field.Name
+                    SourceName = nestedFieldInfo.Field.Name,
                 });
             }
         }

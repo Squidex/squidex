@@ -36,15 +36,15 @@ public sealed class AppPatternUpdated : AppEvent, IMigratedStateEvent<App>
             {
                 new Pattern(Name, Pattern)
                 {
-                    Message = Message
-                }
+                    Message = Message,
+                },
             }.ToReadonlyList(),
-            Editors = state.Settings.Editors
+            Editors = state.Settings.Editors,
         };
 
         var newEvent = new AppSettingsUpdated
         {
-            Settings = newSettings
+            Settings = newSettings,
         };
 
         return SimpleMapper.Map(this, newEvent);

@@ -59,7 +59,7 @@ public sealed class EmailUserNotifications(
         {
             ApiCalls = usage,
             ApiCallsLimit = usageLimit,
-            AppName = app.DisplayName()
+            AppName = app.DisplayName(),
         };
 
         return SendEmailAsync("Usage",

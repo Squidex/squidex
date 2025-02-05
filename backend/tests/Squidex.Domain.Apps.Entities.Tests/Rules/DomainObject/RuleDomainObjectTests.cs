@@ -100,7 +100,7 @@ public class RuleDomainObjectTests : HandlerTestBase<Rule>
     {
         var command = new UpdateRule
         {
-            IsEnabled = true
+            IsEnabled = true,
         };
 
         await ExecuteCreateAsync();
@@ -128,7 +128,7 @@ public class RuleDomainObjectTests : HandlerTestBase<Rule>
     {
         var command = new UpdateRule
         {
-            IsEnabled = false
+            IsEnabled = false,
         };
 
         await ExecuteCreateAsync();
@@ -187,12 +187,12 @@ public class RuleDomainObjectTests : HandlerTestBase<Rule>
         {
             Trigger = new ContentChangedTriggerV2
             {
-                HandleAll = false
+                HandleAll = false,
             },
             Action = new TestAction
             {
-                Value = 123
-            }
+                Value = 123,
+            },
         };
     }
 
@@ -203,12 +203,12 @@ public class RuleDomainObjectTests : HandlerTestBase<Rule>
             Name = "NewName",
             Trigger = new ContentChangedTriggerV2
             {
-                HandleAll = true
+                HandleAll = true,
             },
             Action = new TestAction
             {
-                Value = 456
-            }
+                Value = 456,
+            },
         };
     }
 

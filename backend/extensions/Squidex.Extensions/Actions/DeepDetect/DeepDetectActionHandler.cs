@@ -54,7 +54,7 @@ internal sealed partial class DeepDetectActionHandler(
             AssetId = assetEvent.Id,
             MaximumTags = action.MaximumTags,
             MinimumPropability = action.MinimumProbability,
-            Url = urlGenerator.AssetContent(assetEvent.AppId, assetEvent.Id.ToString(), assetEvent.FileVersion)
+            Url = urlGenerator.AssetContent(assetEvent.AppId, assetEvent.Id.ToString(), assetEvent.FileVersion),
         };
 
         return Task.FromResult((Description, ruleJob));
@@ -81,7 +81,7 @@ internal sealed partial class DeepDetectActionHandler(
             data = new[]
             {
                 job.Url,
-            }
+            },
         }, ct);
 
         var body = await response.Content.ReadAsStringAsync(ct);
@@ -120,7 +120,7 @@ internal sealed partial class DeepDetectActionHandler(
             AssetId = asset.Id,
             AppId = asset.AppId,
             Actor = job.Actor,
-            FromRule = true
+            FromRule = true,
         };
 
         foreach (var tag in tags)

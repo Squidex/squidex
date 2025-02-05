@@ -18,7 +18,7 @@ public class ExposedValuesTests
         {
             ["name1"] = "config1",
             ["name2"] = "config2",
-            ["name3"] = "config3"
+            ["name3"] = "config3",
         };
 
         var configuration = A.Fake<IConfiguration>();
@@ -56,7 +56,7 @@ public class ExposedValuesTests
     {
         var values = new ExposedValues
         {
-            ["name1"] = "value1"
+            ["name1"] = "value1",
         };
 
         Assert.Equal("name1: value1", values.ToString());
@@ -68,7 +68,7 @@ public class ExposedValuesTests
         var values = new ExposedValues
         {
             ["name1"] = "value1",
-            ["name2"] = "value2"
+            ["name2"] = "value2",
         };
 
         Assert.Equal("name1: value1, name2: value2", values.ToString());

@@ -53,7 +53,7 @@ public static class Startup
                 Transform = (html, context) =>
                 {
                     return new ValueTask<string>(html.AddOptions(context));
-                }
+                },
             });
         });
 
@@ -109,7 +109,7 @@ public static class Startup
                     response.Headers[HeaderNames.CacheControl] = "max-age=5184000";
                 }
             },
-            FileProvider = fileProvider
+            FileProvider = fileProvider,
         });
     }
 

@@ -57,7 +57,7 @@ internal static class ContentFields
         Name = "id",
         ResolvedType = Scalars.NonNullString,
         Resolver = EntityResolvers.Id,
-        Description = FieldDescriptions.EntityId
+        Description = FieldDescriptions.EntityId,
     };
 
     public static readonly FieldType IdNoResolver = Id.WithouthResolver();
@@ -67,7 +67,7 @@ internal static class ContentFields
         Name = "version",
         ResolvedType = Scalars.NonNullInt,
         Resolver = EntityResolvers.Version,
-        Description = FieldDescriptions.EntityVersion
+        Description = FieldDescriptions.EntityVersion,
     };
 
     public static readonly FieldType VersionNoResolver = Version.WithouthResolver();
@@ -77,7 +77,7 @@ internal static class ContentFields
         Name = "created",
         ResolvedType = Scalars.NonNullDateTime,
         Resolver = EntityResolvers.Created,
-        Description = FieldDescriptions.EntityCreated
+        Description = FieldDescriptions.EntityCreated,
     };
 
     public static readonly FieldType CreatedNoResolver = Created.WithouthResolver();
@@ -87,7 +87,7 @@ internal static class ContentFields
         Name = "createdBy",
         ResolvedType = Scalars.NonNullString,
         Resolver = EntityResolvers.CreatedBy,
-        Description = FieldDescriptions.EntityCreatedBy
+        Description = FieldDescriptions.EntityCreatedBy,
     };
 
     public static readonly FieldType CreatedByNoResolver = CreatedBy.WithouthResolver();
@@ -97,7 +97,7 @@ internal static class ContentFields
         Name = "createdByUser",
         ResolvedType = UserGraphType.NonNull,
         Resolver = EntityResolvers.CreatedByUser,
-        Description = FieldDescriptions.EntityCreatedBy
+        Description = FieldDescriptions.EntityCreatedBy,
     };
 
     public static readonly FieldType CreatedByUserNoResolver = CreatedByUser.WithouthResolver();
@@ -107,7 +107,7 @@ internal static class ContentFields
         Name = "lastModified",
         ResolvedType = Scalars.NonNullDateTime,
         Resolver = EntityResolvers.LastModified,
-        Description = FieldDescriptions.EntityLastModified
+        Description = FieldDescriptions.EntityLastModified,
     };
 
     public static readonly FieldType LastModifiedNoResolver = LastModified.WithouthResolver();
@@ -117,7 +117,7 @@ internal static class ContentFields
         Name = "lastModifiedBy",
         ResolvedType = Scalars.NonNullString,
         Resolver = EntityResolvers.LastModifiedBy,
-        Description = FieldDescriptions.EntityLastModifiedBy
+        Description = FieldDescriptions.EntityLastModifiedBy,
     };
 
     public static readonly FieldType LastModifiedByNoResolver = LastModifiedBy.WithouthResolver();
@@ -127,7 +127,7 @@ internal static class ContentFields
         Name = "lastModifiedByUser",
         ResolvedType = UserGraphType.NonNull,
         Resolver = EntityResolvers.LastModifiedByUser,
-        Description = FieldDescriptions.EntityLastModifiedBy
+        Description = FieldDescriptions.EntityLastModifiedBy,
     };
 
     public static readonly FieldType LastModifiedByUserNoResolver = LastModifiedByUser.WithouthResolver();
@@ -137,7 +137,7 @@ internal static class ContentFields
         Name = "status",
         ResolvedType = Scalars.NonNullString,
         Resolver = Resolve(x => x.Status.ToString().ToUpperInvariant()),
-        Description = FieldDescriptions.ContentStatus
+        Description = FieldDescriptions.ContentStatus,
     };
 
     public static readonly FieldType StatusNoResolver = Status.WithouthResolver();
@@ -147,7 +147,7 @@ internal static class ContentFields
         Name = "statusColor",
         ResolvedType = Scalars.NonNullString,
         Resolver = Resolve(x => x.StatusColor),
-        Description = FieldDescriptions.ContentStatusColor
+        Description = FieldDescriptions.ContentStatusColor,
     };
 
     public static readonly FieldType StatusColorNoResolver = StatusColor.WithouthResolver();
@@ -157,7 +157,7 @@ internal static class ContentFields
         Name = "newStatus",
         ResolvedType = Scalars.String,
         Resolver = Resolve(x => x.NewStatus?.ToString().ToUpperInvariant()),
-        Description = FieldDescriptions.ContentNewStatus
+        Description = FieldDescriptions.ContentNewStatus,
     };
 
     public static readonly FieldType NewStatusNoResolver = NewStatus.WithouthResolver();
@@ -167,7 +167,7 @@ internal static class ContentFields
         Name = "newStatusColor",
         ResolvedType = Scalars.String,
         Resolver = Resolve(x => x.NewStatusColor),
-        Description = FieldDescriptions.ContentStatusColor
+        Description = FieldDescriptions.ContentStatusColor,
     };
 
     public static readonly FieldType NewStatusColorNoResolver = NewStatusColor.WithouthResolver();
@@ -177,7 +177,7 @@ internal static class ContentFields
         Name = "schemaId",
         ResolvedType = Scalars.NonNullString,
         Resolver = Resolve(x => x[Component.Discriminator].ToString()),
-        Description = FieldDescriptions.ContentSchemaId
+        Description = FieldDescriptions.ContentSchemaId,
     };
 
     public static readonly FieldType SchemaIdNoResolver = SchemaId.WithouthResolver();
@@ -187,7 +187,7 @@ internal static class ContentFields
         Name = "schemaName",
         ResolvedType = Scalars.String,
         Resolver = Resolve(x => GetSchemaName(x)),
-        Description = FieldDescriptions.ContentSchemaName
+        Description = FieldDescriptions.ContentSchemaName,
     };
 
     public static readonly FieldType SchemaNameNoResolver = SchemaName.WithouthResolver();
@@ -197,7 +197,7 @@ internal static class ContentFields
         Name = "url",
         ResolvedType = Scalars.NonNullString,
         Resolver = ContentResolvers.Url,
-        Description = FieldDescriptions.ContentUrl
+        Description = FieldDescriptions.ContentUrl,
     };
 
     public static readonly FieldType UrlNoResolver = Url.WithouthResolver();
@@ -207,7 +207,7 @@ internal static class ContentFields
         Name = "editToken",
         ResolvedType = Scalars.String,
         Resolver = Resolve(x => x.EditToken),
-        Description = FieldDescriptions.EditToken
+        Description = FieldDescriptions.EditToken,
     };
 
     public static readonly FieldType EditTokenNoResolver = EditToken.WithouthResolver();
@@ -217,7 +217,7 @@ internal static class ContentFields
         Name = "data__dynamic",
         ResolvedType = Scalars.Json,
         Resolver = Resolve(x => x.Data),
-        Description = FieldDescriptions.ContentData
+        Description = FieldDescriptions.ContentData,
     };
 
     public static readonly FieldType DataDynamicNoResolver = DataDynamic.WithouthResolver();
@@ -227,7 +227,7 @@ internal static class ContentFields
         Name = "text",
         ResolvedType = Scalars.String,
         Resolver = Resolvers.Sync<string, string>(x => x),
-        Description = FieldDescriptions.StringFieldText
+        Description = FieldDescriptions.StringFieldText,
     };
 
     public static readonly FieldType StringFieldAssets = new FieldType
@@ -235,7 +235,7 @@ internal static class ContentFields
         Name = "assets",
         ResolvedType = new NonNullGraphType(SharedTypes.AssetsList),
         Resolver = ResolveStringFieldAssets,
-        Description = FieldDescriptions.StringFieldAssets
+        Description = FieldDescriptions.StringFieldAssets,
     };
 
     public static readonly FieldType RichTextFieldValue = new FieldType
@@ -243,7 +243,7 @@ internal static class ContentFields
         Name = "value",
         ResolvedType = Scalars.Json,
         Resolver = Resolvers.Sync<RichTextNode, JsonObject?>(x => x.Root),
-        Description = FieldDescriptions.RichTextFieldValue
+        Description = FieldDescriptions.RichTextFieldValue,
     };
 
     public static readonly FieldType RichTextFieldAssets = new FieldType
@@ -251,7 +251,7 @@ internal static class ContentFields
         Name = "assets",
         ResolvedType = new NonNullGraphType(SharedTypes.AssetsList),
         Resolver = ResolveRichTextFieldAssets,
-        Description = FieldDescriptions.RichTextFieldAssets
+        Description = FieldDescriptions.RichTextFieldAssets,
     };
 
     public static readonly FieldType RichTextFieldMarkdown = new FieldType
@@ -259,7 +259,7 @@ internal static class ContentFields
         Name = "markdown",
         ResolvedType = Scalars.NonNullString,
         Resolver = Resolvers.Sync<RichTextNode, string>(x => x.ToMarkdown()),
-        Description = FieldDescriptions.RichTextFieldMarkdown
+        Description = FieldDescriptions.RichTextFieldMarkdown,
     };
 
     public static readonly FieldType RichTextFieldText = new FieldType
@@ -267,7 +267,7 @@ internal static class ContentFields
         Name = "text",
         ResolvedType = Scalars.NonNullString,
         Resolver = Resolvers.Sync<RichTextNode, string>(x => x.ToText()),
-        Description = FieldDescriptions.RichTextFieldMarkdown
+        Description = FieldDescriptions.RichTextFieldMarkdown,
     };
 
     public static readonly FieldType RichTextFieldHtml = new FieldType
@@ -279,12 +279,12 @@ internal static class ContentFields
             {
                 Name = "indentation",
                 Description = FieldDescriptions.Indentation,
-                DefaultValue = 4
+                DefaultValue = 4,
             },
         ],
         ResolvedType = Scalars.NonNullString,
         Resolver = Resolvers.Sync<RichTextNode, string>((x, ctx, _) => x.ToHtml(ctx.GetArgument<int>("indentation", 4))),
-        Description = FieldDescriptions.RichTextFieldHtml
+        Description = FieldDescriptions.RichTextFieldHtml,
     };
 
     private static IFieldResolver Resolve<T>(Func<JsonObject, T> resolver)

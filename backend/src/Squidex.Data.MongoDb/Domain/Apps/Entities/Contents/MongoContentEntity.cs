@@ -34,6 +34,8 @@ public record MongoContentEntity : Content, IVersionedEntity<DomainId>
 
     public static void RegisterClassMap()
     {
+        AppEntityClassMap.Register();
+
         BsonClassMap.TryRegisterClassMap<MongoContentEntity>(cm =>
         {
             cm.MapProperty(x => x.DocumentId)
@@ -112,7 +114,7 @@ public record MongoContentEntity : Content, IVersionedEntity<DomainId>
                 NewVersion = new ContentVersion(NewStatus.Value, Data),
                 ScheduleJob = ScheduleJob,
                 SchemaId = SchemaId,
-                Version = Version
+                Version = Version,
             };
         }
         else
@@ -130,7 +132,7 @@ public record MongoContentEntity : Content, IVersionedEntity<DomainId>
                 NewVersion = null,
                 ScheduleJob = ScheduleJob,
                 SchemaId = SchemaId,
-                Version = Version
+                Version = Version,
             };
         }
     }

@@ -15,5 +15,5 @@ public enum JsonType
     Function,
     Number,
     Object,
-    String
+    String,
 }

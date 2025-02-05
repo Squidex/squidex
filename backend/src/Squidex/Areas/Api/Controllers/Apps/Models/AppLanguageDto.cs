@@ -46,7 +46,7 @@ public sealed class AppLanguageDto : Resource
             IsMaster = languages.IsMaster(language),
             IsOptional = languages.IsOptional(language),
             Iso2Code = language.Iso2Code,
-            Fallback = config.Fallbacks.ToArray()
+            Fallback = config.Fallbacks.ToArray(),
         };
 
         return result;

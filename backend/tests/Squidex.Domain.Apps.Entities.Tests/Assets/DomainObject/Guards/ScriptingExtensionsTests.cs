@@ -16,7 +16,7 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject.Guards;
 
-public sealed class ScriptingExtensionsTests : GivenContext
+public class ScriptingExtensionsTests : GivenContext
 {
     [Fact]
     public async Task Should_add_tag_in_script()
@@ -76,8 +76,8 @@ public sealed class ScriptingExtensionsTests : GivenContext
         {
             AssetScripts = new AssetScripts
             {
-                Annotate = script
-            }
+                Annotate = script,
+            },
         };
 
         var serviceProvider =
@@ -95,7 +95,7 @@ public sealed class ScriptingExtensionsTests : GivenContext
         {
             App = App,
             CommandId = asset.Id,
-            Command = command
+            Command = command,
         };
     }
 }

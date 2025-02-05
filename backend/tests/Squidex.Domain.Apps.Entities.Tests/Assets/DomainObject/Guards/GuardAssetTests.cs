@@ -115,7 +115,7 @@ public class GuardAssetTests : GivenContext, IClassFixture<TranslationsFixture>
         {
             App = App,
             CommandId = asset.Id,
-            Command = new CreateAsset { User = currentUser, Actor = User }
+            Command = new CreateAsset { User = currentUser, Actor = User },
         };
     }
 }

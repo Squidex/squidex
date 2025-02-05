@@ -42,11 +42,6 @@ public record MongoAssetFolderEntity : AssetFolder, IVersionedEntity<DomainId>
         AssetItemClassMap.Register();
     }
 
-    public AssetFolder ToState()
-    {
-        return this;
-    }
-
     public static MongoAssetFolderEntity Create(SnapshotWriteJob<AssetFolder> job)
     {
         var entity = new MongoAssetFolderEntity

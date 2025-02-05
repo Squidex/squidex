@@ -27,7 +27,7 @@ internal sealed class EntitySavedGraphType : SharedObjectGraphType<CommandResult
             Name = "version",
             Resolver = ResolveVersion(),
             ResolvedType = Scalars.NonNullLong,
-            Description = "The new version of the item."
+            Description = "The new version of the item.",
         });
 
         Description = "The result of a mutation";

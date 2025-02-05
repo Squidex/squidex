@@ -9,6 +9,7 @@
     <NeutralLanguage>en</NeutralLanguage>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\src\Squidex.Data.EntityFramework\Squidex.Data.EntityFramework.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Data.MongoDb\Squidex.Data.MongoDb.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Apps.Core.Tests\Squidex.Domain.Apps.Core.Tests.csproj" />
@@ -31,6 +32,9 @@
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="Testcontainers.MongoDb" Version="4.1.0" />
+    <PackageReference Include="Testcontainers.MsSql" Version="4.1.0" />
+    <PackageReference Include="Testcontainers.MySql" Version="4.1.0" />
+    <PackageReference Include="Testcontainers.PostgreSql" Version="4.1.0" />
     <PackageReference Include="xunit" Version="2.9.2" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
       <PrivateAssets>all</PrivateAssets>

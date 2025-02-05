@@ -30,14 +30,14 @@ internal sealed class BatchSubscription : IEventSubscriber<ParsedEvent>, IEventS
         taskQueue = Channel.CreateBounded<object>(new BoundedChannelOptions(2)
         {
             SingleReader = true,
-            SingleWriter = true
+            SingleWriter = true,
         });
 
         batchQueue = Channel.CreateBounded<object>(new BoundedChannelOptions(batchSize)
         {
             AllowSynchronousContinuations = true,
             SingleReader = true,
-            SingleWriter = true
+            SingleWriter = true,
         });
 
         batchQueue.Batch<ParsedEvent>(taskQueue, batchSize, batchDelay, completed.Token);

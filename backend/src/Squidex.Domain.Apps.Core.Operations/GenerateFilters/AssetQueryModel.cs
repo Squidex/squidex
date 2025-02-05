@@ -18,81 +18,81 @@ public static class AssetQueryModel
         {
             new FilterField(FilterSchema.String, "id")
             {
-                Description = FieldDescriptions.EntityId
+                Description = FieldDescriptions.EntityId,
             },
             new FilterField(FilterSchema.Boolean, "isDeleted")
             {
-                Description = FieldDescriptions.EntityIsDeleted
+                Description = FieldDescriptions.EntityIsDeleted,
             },
             new FilterField(FilterSchema.DateTime, "created")
             {
-                Description = FieldDescriptions.EntityCreated
+                Description = FieldDescriptions.EntityCreated,
             },
             new FilterField(SharedSchemas.User, "createdBy")
             {
-                Description = FieldDescriptions.EntityCreatedBy
+                Description = FieldDescriptions.EntityCreatedBy,
             },
             new FilterField(FilterSchema.DateTime, "lastModified")
             {
-                Description = FieldDescriptions.EntityLastModified
+                Description = FieldDescriptions.EntityLastModified,
             },
             new FilterField(SharedSchemas.User, "lastModifiedBy")
             {
-                Description = FieldDescriptions.EntityLastModifiedBy
+                Description = FieldDescriptions.EntityLastModifiedBy,
             },
             new FilterField(FilterSchema.String, "status")
             {
-                Description = FieldDescriptions.ContentStatus
+                Description = FieldDescriptions.ContentStatus,
             },
             new FilterField(FilterSchema.String, "version")
             {
-                Description = FieldDescriptions.EntityVersion
+                Description = FieldDescriptions.EntityVersion,
             },
             new FilterField(FilterSchema.String, "fileHash")
             {
-                Description = FieldDescriptions.AssetFileHash
+                Description = FieldDescriptions.AssetFileHash,
             },
             new FilterField(FilterSchema.String, "fileName")
             {
-                Description = FieldDescriptions.AssetFileName
+                Description = FieldDescriptions.AssetFileName,
             },
             new FilterField(FilterSchema.Number, "fileSize")
             {
-                Description = FieldDescriptions.AssetFileSize
+                Description = FieldDescriptions.AssetFileSize,
             },
             new FilterField(FilterSchema.Number, "fileVersion")
             {
-                Description = FieldDescriptions.AssetFileVersion
+                Description = FieldDescriptions.AssetFileVersion,
             },
             new FilterField(FilterSchema.Boolean, "isProtected")
             {
-                Description = FieldDescriptions.AssetIsProtected
+                Description = FieldDescriptions.AssetIsProtected,
             },
             new FilterField(FilterSchema.Any, "metadata")
             {
-                Description = FieldDescriptions.AssetMetadata
+                Description = FieldDescriptions.AssetMetadata,
             },
             new FilterField(FilterSchema.String, "mimeType")
             {
-                Description = FieldDescriptions.AssetMimeType
+                Description = FieldDescriptions.AssetMimeType,
             },
             new FilterField(FilterSchema.String, "slug")
             {
-                Description = FieldDescriptions.AssetSlug
+                Description = FieldDescriptions.AssetSlug,
             },
             new FilterField(FilterSchema.StringArray, "tags")
             {
-                Description = FieldDescriptions.AssetTags
+                Description = FieldDescriptions.AssetTags,
             },
             new FilterField(FilterSchema.String, "type")
             {
-                Description = FieldDescriptions.AssetType
-            }
+                Description = FieldDescriptions.AssetType,
+            },
         };
 
         var schema = new FilterSchema(FilterSchemaType.Object)
         {
-            Fields = fields.ToReadonlyList()
+            Fields = fields.ToReadonlyList(),
         };
 
         return new QueryModel { Schema = schema };

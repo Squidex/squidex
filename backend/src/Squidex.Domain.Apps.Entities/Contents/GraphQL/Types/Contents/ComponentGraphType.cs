@@ -40,7 +40,7 @@ internal sealed class ComponentGraphType : ObjectGraphType<JsonObject>
                     ResolvedType = Scalars.Json,
                     Resolver = FieldVisitor.JsonPath,
                     Description = fieldInfo.Field.RawProperties.Hints,
-                    SourceName = fieldInfo.Field.Name
+                    SourceName = fieldInfo.Field.Name,
                 });
             }
 
@@ -55,7 +55,7 @@ internal sealed class ComponentGraphType : ObjectGraphType<JsonObject>
                     ResolvedType = resolvedType,
                     Resolver = resolver,
                     Description = fieldInfo.Field.RawProperties.Hints,
-                    SourceName = fieldInfo.Field.Name
+                    SourceName = fieldInfo.Field.Name,
                 });
             }
         }

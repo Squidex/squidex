@@ -21,7 +21,7 @@ public sealed class EventConsumersDto : Resource
     {
         var result = new EventConsumersDto
         {
-            Items = items.Select(x => EventConsumerDto.FromDomain(x, resources)).ToArray()
+            Items = items.Select(x => EventConsumerDto.FromDomain(x, resources)).ToArray(),
         };
 
         return result.CreateLinks(resources);

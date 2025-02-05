@@ -26,12 +26,12 @@ public class FilterSchemaTests
                         {
                             Fields = new[]
                             {
-                                new FilterField(FilterSchema.Number, "nested3")
-                            }.ToReadonlyList()
-                        }, "nested2")
-                    }.ToReadonlyList()
-                }, "nested1")
-            }.ToReadonlyList()
+                                new FilterField(FilterSchema.Number, "nested3"),
+                            }.ToReadonlyList(),
+                        }, "nested2"),
+                    }.ToReadonlyList(),
+                }, "nested1"),
+            }.ToReadonlyList(),
         };
 
         var expected = new FilterSchema(FilterSchemaType.Object)
@@ -40,8 +40,8 @@ public class FilterSchemaTests
             {
                 new FilterField(new FilterSchema(FilterSchemaType.Object), "nested1"),
                 new FilterField(new FilterSchema(FilterSchemaType.Object), "nested1.nested2"),
-                new FilterField(new FilterSchema(FilterSchemaType.Number), "nested1.nested2.nested3")
-            }.ToReadonlyList()
+                new FilterField(new FilterSchema(FilterSchemaType.Number), "nested1.nested2.nested3"),
+            }.ToReadonlyList(),
         };
 
         var actual = schema.Flatten();
@@ -59,16 +59,16 @@ public class FilterSchemaTests
                 new FilterField(FilterSchema.Number, "property1"),
                 new FilterField(FilterSchema.String, "property1"),
                 new FilterField(FilterSchema.String, "property2"),
-                new FilterField(FilterSchema.String, "property2")
-            }.ToReadonlyList()
+                new FilterField(FilterSchema.String, "property2"),
+            }.ToReadonlyList(),
         };
 
         var expected = new FilterSchema(FilterSchemaType.Object)
         {
             Fields = new[]
             {
-                new FilterField(FilterSchema.String, "property2")
-            }.ToReadonlyList()
+                new FilterField(FilterSchema.String, "property2"),
+            }.ToReadonlyList(),
         };
 
         var actual = schema.Flatten();
@@ -85,8 +85,8 @@ public class FilterSchemaTests
             {
                 new FilterField(FilterSchema.String, "property1", "Description1"),
                 new FilterField(FilterSchema.String, "property2", "Description2"),
-                new FilterField(FilterSchema.String, "property2", "Description3")
-            }.ToReadonlyList()
+                new FilterField(FilterSchema.String, "property2", "Description3"),
+            }.ToReadonlyList(),
         };
 
         var expected = new FilterSchema(FilterSchemaType.Object)
@@ -94,8 +94,8 @@ public class FilterSchemaTests
             Fields = new[]
             {
                 new FilterField(FilterSchema.String, "property1", "Description1"),
-                new FilterField(FilterSchema.String, "property2")
-            }.ToReadonlyList()
+                new FilterField(FilterSchema.String, "property2"),
+            }.ToReadonlyList(),
         };
 
         var actual = schema.Flatten();
@@ -111,16 +111,16 @@ public class FilterSchemaTests
             Fields = new[]
             {
                 new FilterField(new FilterSchema(FilterSchemaType.Object), "property1"),
-                new FilterField(FilterSchema.String, "property2")
-            }.ToReadonlyList()
+                new FilterField(FilterSchema.String, "property2"),
+            }.ToReadonlyList(),
         };
 
         var expected = new FilterSchema(FilterSchemaType.Object)
         {
             Fields = new[]
             {
-                new FilterField(FilterSchema.String, "property2")
-            }.ToReadonlyList()
+                new FilterField(FilterSchema.String, "property2"),
+            }.ToReadonlyList(),
         };
 
         var actual = schema.Flatten(predicate: x => x.Type != FilterSchemaType.Object);
@@ -136,16 +136,16 @@ public class FilterSchemaTests
             Fields = new[]
             {
                 new FilterField(new FilterSchema(FilterSchemaType.Object), "property1"),
-                new FilterField(FilterSchema.String, "property2")
-            }.ToReadonlyList()
+                new FilterField(FilterSchema.String, "property2"),
+            }.ToReadonlyList(),
         };
 
         var expected = new FilterSchema(FilterSchemaType.Object)
         {
             Fields = new[]
             {
-                new FilterField(FilterSchema.String, "property2")
-            }.ToReadonlyList()
+                new FilterField(FilterSchema.String, "property2"),
+            }.ToReadonlyList(),
         };
 
         var actual = new QueryModel { Schema = schema }.Flatten().Schema;
@@ -161,8 +161,8 @@ public class FilterSchemaTests
             Fields = new[]
             {
                 new FilterField(new FilterSchema(FilterSchemaType.Object), "property1"),
-                new FilterField(FilterSchema.String, "property2")
-            }.ToReadonlyList()
+                new FilterField(FilterSchema.String, "property2"),
+            }.ToReadonlyList(),
         };
 
         var expected = new FilterSchema(FilterSchemaType.Object)
@@ -170,8 +170,8 @@ public class FilterSchemaTests
             Fields = new[]
             {
                 new FilterField(new FilterSchema(FilterSchemaType.Object), "property1"),
-                new FilterField(FilterSchema.String, "property2")
-            }.ToReadonlyList()
+                new FilterField(FilterSchema.String, "property2"),
+            }.ToReadonlyList(),
         };
 
         var actual = new QueryModel { Schema = schema }.Flatten(onlyWithOperators: false).Schema;

@@ -82,11 +82,11 @@ public static class WebExtensions
                         Data = value.Data.Count > 0 ? new Dictionary<string, object>(value.Data) : null,
                         value.Description,
                         value.Duration,
-                        value.Status
+                        value.Status,
                     };
                 }),
                 report.Status,
-                report.TotalDuration
+                report.TotalDuration,
             };
 
             var json = serializer.Serialize(response);
@@ -99,19 +99,19 @@ public static class WebExtensions
         app.UseHealthChecks("/readiness", new HealthCheckOptions
         {
             Predicate = check => !check.Tags.Contains("background"),
-            ResponseWriter = writer
+            ResponseWriter = writer,
         });
 
         app.UseHealthChecks("/healthz", new HealthCheckOptions
         {
             Predicate = check => check.Tags.Contains("node"),
-            ResponseWriter = writer
+            ResponseWriter = writer,
         });
 
         app.UseHealthChecks("/background-healthz", new HealthCheckOptions
         {
             Predicate = check => check.Tags.Contains("background"),
-            ResponseWriter = writer
+            ResponseWriter = writer,
         });
 
         return app;

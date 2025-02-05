@@ -12,5 +12,5 @@ public enum EnrichedAssetEventType
     Created,
     Deleted,
     Annotated,
-    Updated
+    Updated,
 }

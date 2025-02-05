@@ -21,7 +21,7 @@ public class IPAddressComparerTests
             IPAddress.Parse("127.0.0.255"),
             IPAddress.Parse("129.0.0.1"),
             IPAddress.Parse("127.0.0.1"),
-            IPAddress.Parse("127.0.0.200")
+            IPAddress.Parse("127.0.0.200"),
         };
 
         var sorted = source.Order(IPAddressComparer.Instance);
@@ -33,7 +33,7 @@ public class IPAddressComparerTests
             IPAddress.Parse("127.0.0.200"),
             IPAddress.Parse("127.0.0.255"),
             IPAddress.Parse("129.0.0.1"),
-            IPAddress.IPv6Loopback
+            IPAddress.IPv6Loopback,
         };
 
         Assert.Equal(expected, sorted);

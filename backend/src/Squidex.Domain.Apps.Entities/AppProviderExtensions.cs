@@ -34,7 +34,7 @@ public static class AppProviderExtensions
                     result ??= [];
                     result[schemaId] = schema;
                 }
-                else if (result == null || !result.TryGetValue(schemaId, out _))
+                else if (result == null || !result.ContainsKey(schemaId))
                 {
                     var resolvedEntity = await appProvider.GetSchemaAsync(appId, schemaId, false, ct);
 

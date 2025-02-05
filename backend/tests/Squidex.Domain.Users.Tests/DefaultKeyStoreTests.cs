@@ -84,12 +84,12 @@ public class DefaultKeyStoreTests
     {
         var key = new RsaSecurityKey(RSA.Create(2048))
         {
-            KeyId = CryptoRandom.CreateUniqueId(16)
+            KeyId = CryptoRandom.CreateUniqueId(16),
         };
 
         return new DefaultKeyStore.State
         {
-            Parameters = key.Rsa.ExportParameters(includePrivateParameters: true)
+            Parameters = key.Rsa.ExportParameters(includePrivateParameters: true),
         };
     }
 }

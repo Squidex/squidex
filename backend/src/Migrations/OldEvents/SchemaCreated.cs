@@ -47,7 +47,7 @@ public sealed class SchemaCreated : SchemaEvent, IMigrated<IEvent>
                 {
                     IsLocked = eventField.IsLocked,
                     IsHidden = eventField.IsHidden,
-                    IsDisabled = eventField.IsDisabled
+                    IsDisabled = eventField.IsDisabled,
                 };
 
                 if (field is ArrayField arrayField && eventField.Nested?.Length > 0)
@@ -62,7 +62,7 @@ public sealed class SchemaCreated : SchemaEvent, IMigrated<IEvent>
                         {
                             IsLocked = nestedEventField.IsLocked,
                             IsHidden = nestedEventField.IsHidden,
-                            IsDisabled = nestedEventField.IsDisabled
+                            IsDisabled = nestedEventField.IsDisabled,
                         };
 
                         arrayFields.Add(nestedField);
@@ -82,7 +82,7 @@ public sealed class SchemaCreated : SchemaEvent, IMigrated<IEvent>
                 SchemaType.Singleton :
                 SchemaType.Default,
             IsPublished = Publish,
-            FieldCollection = FieldCollection<RootField>.Create(fields.ToArray())
+            FieldCollection = FieldCollection<RootField>.Create(fields.ToArray()),
         };
 
         return SimpleMapper.Map(this, new SchemaCreatedV2 { Schema = schema });

@@ -81,9 +81,9 @@ public class AcceptHeader
                     Kind = OpenApiParameterKind.Header,
                     Schema = new JsonSchema
                     {
-                        Type = schemaType
+                        Type = schemaType,
                     },
-                    Description = description
+                    Description = description,
                 };
 
                 context.OperationDescription.Operation.Parameters.Add(parameter);

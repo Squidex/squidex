@@ -16,7 +16,7 @@ public class ConfigPlansProviderTests
         MaxApiCalls = -1,
         MaxAssetSize = -1,
         MaxContributors = -1,
-        BlockingApiCalls = -1
+        BlockingApiCalls = -1,
     };
 
     private static readonly Plan FreePlan = new Plan
@@ -27,7 +27,7 @@ public class ConfigPlansProviderTests
         MaxAssetSize = 1024 * 1024 * 10,
         MaxContributors = 2,
         BlockingApiCalls = 50000,
-        IsFree = true
+        IsFree = true,
     };
 
     private static readonly Plan BasicPlan = new Plan
@@ -40,7 +40,7 @@ public class ConfigPlansProviderTests
         YearlyCosts = "100€",
         YearlyId = "basic_yearly",
         BlockingApiCalls = 150000,
-        IsFree = false
+        IsFree = false,
     };
 
     private static readonly Plan[] Plans = [BasicPlan, FreePlan];

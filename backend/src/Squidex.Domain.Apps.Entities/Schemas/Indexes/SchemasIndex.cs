@@ -230,7 +230,7 @@ public sealed class SchemasIndex(
         return schemaCache.RemoveAsync(
         [
             GetCacheKey(appId, id),
-            GetCacheKey(appId, name)
+            GetCacheKey(appId, name),
         ]);
     }
 }

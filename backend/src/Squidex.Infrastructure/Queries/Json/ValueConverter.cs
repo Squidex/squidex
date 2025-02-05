@@ -19,7 +19,7 @@ public static class ValueConverter
     [
         InstantPattern.General,
         InstantPattern.ExtendedIso,
-        InstantPattern.CreateWithInvariantCulture("yyyy-MM-dd")
+        InstantPattern.CreateWithInvariantCulture("yyyy-MM-dd"),
     ];
 
     public static ClrValue? Convert(FilterField field, JsonValue value, PropertyPath path, List<string> errors)

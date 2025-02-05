@@ -30,7 +30,7 @@ public class AssetUsageTrackerTests : GivenContext
     {
         { new AssetCreated { FileSize = 128 }, 128, 1 },
         { new AssetUpdated { FileSize = 512 }, 512, 0 },
-        { new AssetDeleted { DeletedSize = 512 }, -512, -1 }
+        { new AssetDeleted { DeletedSize = 512 }, -512, -1 },
     };
 
     public AssetUsageTrackerTests()
@@ -91,9 +91,9 @@ public class AssetUsageTrackerTests : GivenContext
             Tags =
             [
                 "tag1",
-                "tag2"
+                "tag2",
             ],
-            AssetId = assetId
+            AssetId = assetId,
         };
 
         var envelope =
@@ -110,7 +110,7 @@ public class AssetUsageTrackerTests : GivenContext
         update.Should().BeEquivalentTo(new Dictionary<string, int>
         {
             ["tag1"] = 1,
-            ["tag2"] = 1
+            ["tag2"] = 1,
         });
     }
 
@@ -123,9 +123,9 @@ public class AssetUsageTrackerTests : GivenContext
             Tags =
             [
                 "tag1",
-                "tag2"
+                "tag2",
             ],
-            AssetId = assetId
+            AssetId = assetId,
         };
 
         var @event2 = new AssetCreated
@@ -134,9 +134,9 @@ public class AssetUsageTrackerTests : GivenContext
             Tags =
             [
                 "tag2",
-                "tag3"
+                "tag3",
             ],
-            AssetId = assetId
+            AssetId = assetId,
         };
 
         var envelope1 =
@@ -158,7 +158,7 @@ public class AssetUsageTrackerTests : GivenContext
         {
             ["tag1"] = 1,
             ["tag2"] = 2,
-            ["tag3"] = 1
+            ["tag3"] = 1,
         });
 
         A.CallTo(() => store.WriteManyAsync(A<IEnumerable<SnapshotWriteJob<AssetUsageTracker.State>>>._, default))
@@ -174,9 +174,9 @@ public class AssetUsageTrackerTests : GivenContext
             Tags =
             [
                 "tag1",
-                "tag2"
+                "tag2",
             ],
-            AssetId = assetId
+            AssetId = assetId,
         };
 
         var @event2 = new AssetAnnotated
@@ -185,9 +185,9 @@ public class AssetUsageTrackerTests : GivenContext
             Tags =
             [
                 "tag2",
-                "tag3"
+                "tag3",
             ],
-            AssetId = assetId
+            AssetId = assetId,
         };
 
         var envelope1 =
@@ -209,7 +209,7 @@ public class AssetUsageTrackerTests : GivenContext
         {
             ["tag1"] = 0,
             ["tag2"] = 1,
-            ["tag3"] = 1
+            ["tag3"] = 1,
         });
     }
 
@@ -222,9 +222,9 @@ public class AssetUsageTrackerTests : GivenContext
             Tags =
             [
                 "tag1",
-                "tag2"
+                "tag2",
             ],
-            AssetId = assetId
+            AssetId = assetId,
         };
 
         var @event2 = new AssetAnnotated
@@ -233,9 +233,9 @@ public class AssetUsageTrackerTests : GivenContext
             Tags =
             [
                 "tag2",
-                "tag3"
+                "tag3",
             ],
-            AssetId = assetId
+            AssetId = assetId,
         };
 
         var envelope1 =
@@ -258,7 +258,7 @@ public class AssetUsageTrackerTests : GivenContext
         {
             ["tag1"] = -1,
             ["tag2"] = 0,
-            ["tag3"] = 1
+            ["tag3"] = 1,
         });
     }
 
@@ -271,9 +271,9 @@ public class AssetUsageTrackerTests : GivenContext
             Tags =
             [
                 "tag1",
-                "tag2"
+                "tag2",
             ],
-            AssetId = assetId
+            AssetId = assetId,
         };
 
         var @event2 = new AssetDeleted { AppId = AppId, AssetId = assetId };
@@ -296,7 +296,7 @@ public class AssetUsageTrackerTests : GivenContext
         update.Should().BeEquivalentTo(new Dictionary<string, int>
         {
             ["tag1"] = 0,
-            ["tag2"] = 0
+            ["tag2"] = 0,
         });
     }
 
@@ -308,8 +308,8 @@ public class AssetUsageTrackerTests : GivenContext
             Tags =
             [
                 "tag1",
-                "tag2"
-            ]
+                "tag2",
+            ],
         };
 
         A.CallTo(() => store.ReadAsync(assetKey, default))
@@ -331,7 +331,7 @@ public class AssetUsageTrackerTests : GivenContext
         update.Should().BeEquivalentTo(new Dictionary<string, int>
         {
             ["tag1"] = -1,
-            ["tag2"] = -1
+            ["tag2"] = -1,
         });
     }
 
@@ -340,7 +340,7 @@ public class AssetUsageTrackerTests : GivenContext
     {
         var asset = CreateAsset() with
         {
-            Tags = ["tag1", "tag2"]
+            Tags = ["tag1", "tag2"],
         };
 
         A.CallTo(() => assetLoader.GetAsync(AppId.Id, assetId, 41, default))
@@ -363,7 +363,7 @@ public class AssetUsageTrackerTests : GivenContext
         update.Should().BeEquivalentTo(new Dictionary<string, int>
         {
             ["tag1"] = -1,
-            ["tag2"] = -1
+            ["tag2"] = -1,
         });
     }
 }

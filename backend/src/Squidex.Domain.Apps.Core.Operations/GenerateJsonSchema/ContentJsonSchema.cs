@@ -24,9 +24,9 @@ public static class ContentJsonSchema
                 ["lastModified"] = JsonTypeBuilder.DateTimeProperty(FieldDescriptions.EntityLastModified, true),
                 ["lastModifiedBy"] = JsonTypeBuilder.StringProperty(FieldDescriptions.EntityLastModifiedBy, true),
                 ["newStatus"] = JsonTypeBuilder.StringProperty(FieldDescriptions.ContentNewStatus),
-                ["status"] = JsonTypeBuilder.StringProperty(FieldDescriptions.ContentStatus, true)
+                ["status"] = JsonTypeBuilder.StringProperty(FieldDescriptions.ContentStatus, true),
             },
-            Type = JsonObjectType.Object
+            Type = JsonObjectType.Object,
         };
 
         if (withDeleted)

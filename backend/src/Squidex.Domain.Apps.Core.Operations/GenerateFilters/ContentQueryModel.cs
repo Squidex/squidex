@@ -20,40 +20,40 @@ public static class ContentQueryModel
         {
             new FilterField(FilterSchema.String, "id")
             {
-                Description = FieldDescriptions.EntityId
+                Description = FieldDescriptions.EntityId,
             },
             new FilterField(FilterSchema.Boolean, "isDeleted")
             {
-                Description = FieldDescriptions.EntityIsDeleted
+                Description = FieldDescriptions.EntityIsDeleted,
             },
             new FilterField(FilterSchema.DateTime, "created")
             {
-                Description = FieldDescriptions.EntityCreated
+                Description = FieldDescriptions.EntityCreated,
             },
             new FilterField(SharedSchemas.User, "createdBy")
             {
-                Description = FieldDescriptions.EntityCreatedBy
+                Description = FieldDescriptions.EntityCreatedBy,
             },
             new FilterField(FilterSchema.DateTime, "lastModified")
             {
-                Description = FieldDescriptions.EntityLastModified
+                Description = FieldDescriptions.EntityLastModified,
             },
             new FilterField(SharedSchemas.User, "lastModifiedBy")
             {
-                Description = FieldDescriptions.EntityLastModifiedBy
+                Description = FieldDescriptions.EntityLastModifiedBy,
             },
             new FilterField(FilterSchema.Number, "version")
             {
-                Description = FieldDescriptions.EntityVersion
+                Description = FieldDescriptions.EntityVersion,
             },
             new FilterField(SharedSchemas.Status, "status")
             {
-                Description = FieldDescriptions.ContentStatus
+                Description = FieldDescriptions.ContentStatus,
             },
             new FilterField(SharedSchemas.Status, "newStatus", IsNullable: true)
             {
-                Description = FieldDescriptions.ContentNewStatus
-            }
+                Description = FieldDescriptions.ContentNewStatus,
+            },
         };
 
         var translationStatusSchema = BuildTranslationStatus(partitionResolver);
@@ -66,13 +66,13 @@ public static class ContentQueryModel
 
             fields.Add(new FilterField(dataSchema, "data")
             {
-                Description = FieldDescriptions.ContentData
+                Description = FieldDescriptions.ContentData,
             });
         }
 
         var filterSchema = new FilterSchema(FilterSchemaType.Object)
         {
-            Fields = fields.ToReadonlyList()
+            Fields = fields.ToReadonlyList(),
         };
 
         return new QueryModel { Schema = filterSchema };
@@ -86,13 +86,13 @@ public static class ContentQueryModel
         {
             fields.Add(new FilterField(FilterSchema.Number, key)
             {
-                Description = string.Format(CultureInfo.InvariantCulture, FieldDescriptions.TranslationStatusLanguage, key)
+                Description = string.Format(CultureInfo.InvariantCulture, FieldDescriptions.TranslationStatusLanguage, key),
             });
         }
 
         return new FilterSchema(FilterSchemaType.Object)
         {
-            Fields = fields.ToReadonlyList()
+            Fields = fields.ToReadonlyList(),
         };
     }
 }

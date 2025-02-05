@@ -32,7 +32,7 @@ public sealed class PrerenderActionHandler(RuleEventFormatter formatter, IHttpCl
 
         var request = new HttpRequestMessage(HttpMethod.Post, "/recache")
         {
-            Content = new StringContent(job.RequestBody, Encoding.UTF8, "application/json")
+            Content = new StringContent(job.RequestBody, Encoding.UTF8, "application/json"),
         };
 
         return await httpClient.OneWayRequestAsync(request, job.RequestBody, ct);

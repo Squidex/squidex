@@ -21,7 +21,7 @@ public sealed class IndexesDto : Resource
     {
         var result = new IndexesDto
         {
-            Items = indexes.Select(x => IndexDto.FromDomain(x, resources)).ToArray()
+            Items = indexes.Select(x => IndexDto.FromDomain(x, resources)).ToArray(),
         };
 
         return result.CreateLinks(resources);

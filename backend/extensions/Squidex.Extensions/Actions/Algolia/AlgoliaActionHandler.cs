@@ -71,8 +71,8 @@ public sealed class AlgoliaActionHandler(RuleEventFormatter formatter, IScriptEn
                 {
                     More = new Dictionary<string, object>
                     {
-                        ["error"] = $"Invalid JSON: {ex.Message}"
-                    }
+                        ["error"] = $"Invalid JSON: {ex.Message}",
+                    },
                 };
             }
 
@@ -85,7 +85,7 @@ public sealed class AlgoliaActionHandler(RuleEventFormatter formatter, IScriptEn
             ApiKey = action.ApiKey,
             Content = delete ? null : serializer.Serialize(content, true),
             ContentId = contentId,
-            IndexName = indexName
+            IndexName = indexName,
         };
 
         return (ruleDescription, ruleJob);
@@ -106,7 +106,7 @@ public sealed class AlgoliaActionHandler(RuleEventFormatter formatter, IScriptEn
             {
                 var raw = new[]
                 {
-                    new JRaw(job.Content)
+                    new JRaw(job.Content),
                 };
 
                 var response = await index.SaveObjectsAsync(raw, null, ct, true);

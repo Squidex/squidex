@@ -56,7 +56,7 @@ public static class TestSchema
         var resolvedComponents = new ResolvedComponents(new Dictionary<DomainId, Schema>
         {
             [componentId1] = component1,
-            [componentId2] = component2
+            [componentId2] = component2,
         });
 
         var schema = new Schema

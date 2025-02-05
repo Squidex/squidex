@@ -82,7 +82,7 @@ public class SchemaPermanentDeleterTests : GivenContext
         {
             AppId = AppId,
             SchemaId = SchemaId,
-            Permanent = false
+            Permanent = false,
         }));
 
         A.CallTo(() => deleter1.DeleteSchemaAsync(App, Schema, default))
@@ -102,7 +102,7 @@ public class SchemaPermanentDeleterTests : GivenContext
         {
             AppId = AppId,
             SchemaId = SchemaId,
-            Permanent = true
+            Permanent = true,
         }));
 
         A.CallTo(() => deleter1.DeleteSchemaAsync(App, Schema, default))
@@ -121,7 +121,7 @@ public class SchemaPermanentDeleterTests : GivenContext
         {
             AppId = AppId,
             SchemaId = SchemaId,
-            Permanent = false
+            Permanent = false,
         }));
 
         A.CallTo(() => deleter1.DeleteSchemaAsync(App, Schema, default))

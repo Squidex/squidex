@@ -45,7 +45,7 @@ public sealed class AppClients : ReadonlyDictionary<string, AppClient>
 
         var newClient = new AppClient(id, secret)
         {
-            Role = role.Or(Role.Editor)
+            Role = role.Or(Role.Editor),
         };
 
         if (!this.TryAdd(id, newClient, out var updated))
@@ -71,7 +71,7 @@ public sealed class AppClients : ReadonlyDictionary<string, AppClient>
 
         var newClient = client with
         {
-            AllowAnonymous = allowAnonymous ?? client.AllowAnonymous
+            AllowAnonymous = allowAnonymous ?? client.AllowAnonymous,
         };
 
         if (!string.IsNullOrWhiteSpace(name))

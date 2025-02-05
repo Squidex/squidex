@@ -47,7 +47,7 @@ public sealed class TestState<T> where T : class, new()
         A.CallTo(() => snapshotStore.ReadAllAsync(A<CancellationToken>._))
             .ReturnsLazily(() => new List<SnapshotResult<T>>
             {
-                new SnapshotResult<T>(id, Snapshot, Version, true)
+                new SnapshotResult<T>(id, Snapshot, Version, true),
             }.ToAsyncEnumerable());
 
         A.CallTo(() => PersistenceFactory.WithEventSourcing(A<Type>._, id, A<HandleEvent>._))

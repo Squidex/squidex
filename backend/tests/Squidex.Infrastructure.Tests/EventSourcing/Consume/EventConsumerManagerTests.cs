@@ -47,18 +47,18 @@ public class EventConsumerManagerTests
                 new SnapshotResult<EventConsumerState>(DomainId.Create(consumerName1),
                     new EventConsumerState
                     {
-                        Position = "1"
+                        Position = "1",
                     }, 1),
                 new SnapshotResult<EventConsumerState>(DomainId.Create(consumerName2),
                     new EventConsumerState
                     {
-                        Position = "2"
+                        Position = "2",
                     }, 2),
                 new SnapshotResult<EventConsumerState>(DomainId.Create("oldConsumer"),
                     new EventConsumerState
                     {
-                        Position = "2"
-                    }, 2)
+                        Position = "2",
+                    }, 2),
             }.ToAsyncEnumerable());
 
         var actual = await sut.GetConsumersAsync(default);
@@ -67,7 +67,7 @@ public class EventConsumerManagerTests
             new List<EventConsumerInfo>
             {
                 new EventConsumerInfo { Name = consumerName1, Position = "1" },
-                new EventConsumerInfo { Name = consumerName2, Position = "2" }
+                new EventConsumerInfo { Name = consumerName2, Position = "2" },
             });
     }
 
@@ -84,9 +84,9 @@ public class EventConsumerManagerTests
         {
             Snapshot = new EventConsumerState
             {
-                Position = "42"
+                Position = "42",
             },
-            Version = 0
+            Version = 0,
         };
 
         var response = await sut.StartAsync(consumerName1, default);
@@ -104,9 +104,9 @@ public class EventConsumerManagerTests
         {
             Snapshot = new EventConsumerState
             {
-                Position = "42"
+                Position = "42",
             },
-            Version = 0
+            Version = 0,
         };
 
         var response = await sut.StopAsync(consumerName1, default);
@@ -124,9 +124,9 @@ public class EventConsumerManagerTests
         {
             Snapshot = new EventConsumerState
             {
-                Position = "42"
+                Position = "42",
             },
-            Version = 0
+            Version = 0,
         };
 
         var response = await sut.ResetAsync(consumerName1, default);

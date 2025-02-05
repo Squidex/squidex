@@ -23,7 +23,7 @@ public class TagsFieldPropertiesTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Max items must be greater or equal to min items.", "MinItems", "MaxItems")
+                new ValidationError("Max items must be greater or equal to min items.", "MinItems", "MaxItems"),
             });
     }
 
@@ -47,7 +47,7 @@ public class TagsFieldPropertiesTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Checkboxes or dropdown list need allowed values.", "AllowedValues")
+                new ValidationError("Checkboxes or dropdown list need allowed values.", "AllowedValues"),
             });
     }
 
@@ -61,7 +61,7 @@ public class TagsFieldPropertiesTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Editor is not a valid value.", "Editor")
+                new ValidationError("Editor is not a valid value.", "Editor"),
             });
     }
 }

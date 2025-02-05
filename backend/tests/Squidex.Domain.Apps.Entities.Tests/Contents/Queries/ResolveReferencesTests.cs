@@ -50,14 +50,14 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
                 ResolveReference = true,
                 MinItems = 1,
                 MaxItems = 1,
-                SchemaId = referenceSchemaId1.Id
+                SchemaId = referenceSchemaId1.Id,
             })
             .AddReferences(2, "ref2", Partitioning.Invariant, new ReferencesFieldProperties
             {
                 ResolveReference = true,
                 MinItems = 1,
                 MaxItems = 1,
-                SchemaId = referenceSchemaId2.Id
+                SchemaId = referenceSchemaId2.Id,
             })
             .SetFieldsInLists(FieldNames.Create("ref1", "ref2"));
 
@@ -95,7 +95,7 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
         var contents = new[]
         {
             CreateContent([ref1_1.Id], [ref2_1.Id]),
-            CreateContent([ref1_2.Id], [ref2_2.Id])
+            CreateContent([ref1_2.Id], [ref2_2.Id]),
         };
 
         A.CallTo(() => contentQuery.QueryAsync(
@@ -134,7 +134,7 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
         var contents = new[]
         {
             CreateContent([ref1_1.Id], [ref2_1.Id]),
-            CreateContent([ref1_2.Id], [ref2_2.Id])
+            CreateContent([ref1_2.Id], [ref2_2.Id]),
         };
 
         A.CallTo(() => contentQuery.QueryAsync(
@@ -187,7 +187,7 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
         var contents = new[]
         {
             CreateContent([ref1_1.Id], [ref2_1.Id, ref2_2.Id]),
-            CreateContent([ref1_2.Id], [ref2_1.Id, ref2_2.Id])
+            CreateContent([ref1_2.Id], [ref2_1.Id, ref2_2.Id]),
         };
 
         A.CallTo(() => contentQuery.QueryAsync(
@@ -234,7 +234,7 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
     {
         var contents = new[]
         {
-            CreateContent([DomainId.NewGuid()], [])
+            CreateContent([DomainId.NewGuid()], []),
         };
 
         await sut.EnrichAsync(ApiContext, contents, schemaProvider, CancellationToken);
@@ -250,7 +250,7 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
     {
         var contents = new[]
         {
-            CreateContent([DomainId.NewGuid()], [])
+            CreateContent([DomainId.NewGuid()], []),
         };
 
         await sut.EnrichAsync(FrontendContext.Clone(b => b.WithNoEnrichment(true)), contents, schemaProvider, CancellationToken);
@@ -266,7 +266,7 @@ public class ResolveReferencesTests : GivenContext, IClassFixture<TranslationsFi
     {
         var contents = new[]
         {
-            CreateContent([], [])
+            CreateContent([], []),
         };
 
         await sut.EnrichAsync(FrontendContext, contents, schemaProvider, CancellationToken);

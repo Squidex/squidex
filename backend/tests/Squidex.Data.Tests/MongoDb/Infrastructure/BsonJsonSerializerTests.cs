@@ -8,7 +8,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using Squidex.Infrastructure;
-using Squidex.TestHelpers;
+using Squidex.MongoDb.TestHelpers;
 
 namespace Squidex.MongoDb.Infrastructure;
 
@@ -104,7 +104,7 @@ public class BsonJsonSerializerTests
                 UInt64 = 164,
                 UInt32 = 132,
                 UInt16 = 116,
-                Uri = new Uri("http://squidex.io")
+                Uri = new Uri("http://squidex.io"),
             };
 
             if (nested)
@@ -122,7 +122,7 @@ public class BsonJsonSerializerTests
     {
         var source = new TestWrapper<TestObject>
         {
-            Value = TestObject.CreateWithValues()
+            Value = TestObject.CreateWithValues(),
         };
 
         var deserialized = source.SerializeAndDeserializeBson();
@@ -135,7 +135,7 @@ public class BsonJsonSerializerTests
     {
         var source = new TestWrapperDocument<TestObject>
         {
-            Value = TestObject.CreateWithValues()
+            Value = TestObject.CreateWithValues(),
         };
 
         var deserialized = source.SerializeAndDeserializeBson();
@@ -148,7 +148,7 @@ public class BsonJsonSerializerTests
     {
         var source = new TestWrapperString<TestObject>
         {
-            Value = TestObject.CreateWithValues()
+            Value = TestObject.CreateWithValues(),
         };
 
         var deserialized = source.SerializeAndDeserializeBson();
@@ -161,7 +161,7 @@ public class BsonJsonSerializerTests
     {
         var source = new TestWrapperBinary<TestObject>
         {
-            Value = TestObject.CreateWithValues()
+            Value = TestObject.CreateWithValues(),
         };
 
         var deserialized = source.SerializeAndDeserializeBson();
@@ -176,8 +176,8 @@ public class BsonJsonSerializerTests
         {
             Value = new Dictionary<string, int>
             {
-                ["$key"] = 12
-            }
+                ["$key"] = 12,
+            },
         };
 
         var deserialized = source.SerializeAndDeserializeBson();
@@ -192,8 +192,8 @@ public class BsonJsonSerializerTests
         {
             Value = new Dictionary<string, int>
             {
-                ["type.of.value"] = 12
-            }
+                ["type.of.value"] = 12,
+            },
         };
 
         var deserialized = source.SerializeAndDeserializeBson();
@@ -208,8 +208,8 @@ public class BsonJsonSerializerTests
         {
             Value = new Dictionary<string, int>
             {
-                [string.Empty] = 12
-            }
+                [string.Empty] = 12,
+            },
         };
 
         var deserialized = source.SerializeAndDeserializeBson();

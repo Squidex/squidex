@@ -33,7 +33,7 @@ public class ValidationExceptionTests
         var errors = new List<ValidationError>
         {
             new ValidationError("Error1"),
-            new ValidationError("Error2")
+            new ValidationError("Error2"),
         };
 
         var ex = new ValidationException(errors);

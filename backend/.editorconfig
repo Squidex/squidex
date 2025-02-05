@@ -55,7 +55,7 @@ dotnet_diagnostic.MA0004.severity = none
 dotnet_diagnostic.MA0006.severity = none
 
 # MA0007: Add a comma after the last value
-dotnet_diagnostic.MA0007.severity = none
+dotnet_diagnostic.MA0007.severity = warning
 
 # MA0008: Add StructLayoutAttribute
 dotnet_diagnostic.MA0008.severity = none    

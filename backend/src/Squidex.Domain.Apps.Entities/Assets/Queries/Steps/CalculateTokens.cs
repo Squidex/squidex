@@ -29,7 +29,7 @@ public sealed class CalculateTokens(IUrlGenerator urlGenerator, IJsonSerializer 
             {
                 a = asset.AppId.Name,
                 i = asset.Id.ToString(),
-                u = url
+                u = url,
             };
 
             var json = serializer.SerializeToBytes(token);

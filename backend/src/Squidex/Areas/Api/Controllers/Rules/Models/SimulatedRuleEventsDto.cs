@@ -27,7 +27,7 @@ public sealed class SimulatedRuleEventsDto : Resource
         var result = new SimulatedRuleEventsDto
         {
             Total = events.Count,
-            Items = events.Select(SimulatedRuleEventDto.FromDomain).ToArray()
+            Items = events.Select(SimulatedRuleEventDto.FromDomain).ToArray(),
         };
 
         return result;

@@ -37,7 +37,7 @@ public sealed class AssetOperation : OperationContextBase<AssetCommand, Asset>
         {
             App = app,
             Command = command,
-            CommandId = id
+            CommandId = id,
         };
     }
 }

@@ -52,7 +52,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
             Name = SchemaId.Name,
             SchemaId = SchemaId.Id,
             Scripts = null!,
-            Properties = new SchemaProperties()
+            Properties = new SchemaProperties(),
         };
 
         var actual = await PublishAsync(sut, command);
@@ -80,10 +80,10 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
                     Nested =
                     [
                         new UpsertSchemaNestedField { Name = "nested1", Properties = ValidProperties() },
-                        new UpsertSchemaNestedField { Name = "nested2", Properties = ValidProperties() }
-                    ]
+                        new UpsertSchemaNestedField { Name = "nested2", Properties = ValidProperties() },
+                    ],
                 },
-            ]
+            ],
         };
 
         var actual = await PublishAsync(sut, command);
@@ -96,7 +96,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
     {
         var command = new UpdateSchema
         {
-            Properties = new SchemaProperties { Label = "My Properties" }
+            Properties = new SchemaProperties { Label = "My Properties" },
         };
 
         await ExecuteCreateAsync();
@@ -113,8 +113,8 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         {
             Scripts = new SchemaScripts
             {
-                Query = "<query-script>"
-            }
+                Query = "<query-script>",
+            },
         };
 
         await ExecuteCreateAsync();
@@ -131,8 +131,8 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         {
             FieldRules =
             [
-                new FieldRuleCommand { Field = "field1" }
-            ]
+                new FieldRuleCommand { Field = "field1" },
+            ],
         };
 
         await ExecuteCreateAsync();
@@ -147,7 +147,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
     {
         var command = new ConfigureUIFields
         {
-            FieldsInLists = FieldNames.Create($"data.{fieldName}")
+            FieldsInLists = FieldNames.Create($"data.{fieldName}"),
         };
 
         await ExecuteCreateAsync();
@@ -163,7 +163,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
     {
         var command = new ConfigureUIFields
         {
-            FieldsInReferences = FieldNames.Create($"data.{fieldName}")
+            FieldsInReferences = FieldNames.Create($"data.{fieldName}"),
         };
 
         await ExecuteCreateAsync();
@@ -218,8 +218,8 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         {
             PreviewUrls = new Dictionary<string, string>
             {
-                ["Web"] = "web-url"
-            }.ToReadonlyDictionary()
+                ["Web"] = "web-url",
+            }.ToReadonlyDictionary(),
         };
 
         await ExecuteCreateAsync();
@@ -258,7 +258,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         var command = new ReorderFields
         {
             ParentFieldId = null,
-            FieldIds = [2L, 1L]
+            FieldIds = [2L, 1L],
         };
 
         await ExecuteCreateAsync();
@@ -276,7 +276,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         var command = new ReorderFields
         {
             ParentFieldId = 1,
-            FieldIds = [3L, 2L]
+            FieldIds = [3L, 2L],
         };
 
         await ExecuteCreateAsync();
@@ -296,7 +296,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         {
             ParentFieldId = null,
             Name = fieldName,
-            Properties = ValidProperties()
+            Properties = ValidProperties(),
         };
 
         await ExecuteCreateAsync();
@@ -313,7 +313,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         {
             ParentFieldId = 1,
             Name = fieldName,
-            Properties = ValidProperties()
+            Properties = ValidProperties(),
         };
 
         await ExecuteCreateAsync();
@@ -331,7 +331,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         {
             ParentFieldId = null,
             FieldId = 1,
-            Properties = new StringFieldProperties()
+            Properties = new StringFieldProperties(),
         };
 
         await ExecuteCreateAsync();
@@ -349,7 +349,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         {
             ParentFieldId = 1,
             FieldId = 2,
-            Properties = new StringFieldProperties()
+            Properties = new StringFieldProperties(),
         };
 
         await ExecuteCreateAsync();
@@ -367,7 +367,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         var command = new LockField
         {
             ParentFieldId = null,
-            FieldId = 1
+            FieldId = 1,
         };
 
         await ExecuteCreateAsync();
@@ -384,7 +384,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         var command = new LockField
         {
             ParentFieldId = 1,
-            FieldId = 2
+            FieldId = 2,
         };
 
         await ExecuteCreateAsync();
@@ -402,7 +402,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         var command = new HideField
         {
             ParentFieldId = null,
-            FieldId = 1
+            FieldId = 1,
         };
 
         await ExecuteCreateAsync();
@@ -419,7 +419,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         var command = new HideField
         {
             ParentFieldId = 1,
-            FieldId = 2
+            FieldId = 2,
         };
 
         await ExecuteCreateAsync();
@@ -437,7 +437,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         var command = new ShowField
         {
             ParentFieldId = null,
-            FieldId = 1
+            FieldId = 1,
         };
 
         await ExecuteCreateAsync();
@@ -455,7 +455,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         var command = new ShowField
         {
             ParentFieldId = 1,
-            FieldId = 2
+            FieldId = 2,
         };
 
         await ExecuteCreateAsync();
@@ -474,7 +474,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         var command = new DisableField
         {
             ParentFieldId = null,
-            FieldId = 1
+            FieldId = 1,
         };
 
         await ExecuteCreateAsync();
@@ -491,7 +491,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         var command = new DisableField
         {
             ParentFieldId = 1,
-            FieldId = 2
+            FieldId = 2,
         };
 
         await ExecuteCreateAsync();
@@ -509,7 +509,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         var command = new EnableField
         {
             ParentFieldId = null,
-            FieldId = 1
+            FieldId = 1,
         };
 
         await ExecuteCreateAsync();
@@ -527,7 +527,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         var command = new EnableField
         {
             ParentFieldId = 1,
-            FieldId = 2
+            FieldId = 2,
         };
 
         await ExecuteCreateAsync();
@@ -546,7 +546,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         var command = new DeleteField
         {
             ParentFieldId = null,
-            FieldId = 1
+            FieldId = 1,
         };
 
         await ExecuteCreateAsync();
@@ -563,7 +563,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
         var command = new DeleteField
         {
             ParentFieldId = 1,
-            FieldId = 2
+            FieldId = 2,
         };
 
         await ExecuteCreateAsync();
@@ -580,7 +580,7 @@ public class SchemaDomainObjectTests : HandlerTestBase<Schema>
     {
         var command = new SynchronizeSchema
         {
-            Category = "My-Category"
+            Category = "My-Category",
         };
 
         await ExecuteCreateAsync();

@@ -27,7 +27,7 @@ public static class ReflectionExtensions
 
         var considered = new List<Type>
         {
-            type
+            type,
         };
 
         var queue = new Queue<Type>();

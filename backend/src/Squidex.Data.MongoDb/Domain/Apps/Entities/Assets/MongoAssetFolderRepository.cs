@@ -34,7 +34,7 @@ public sealed partial class MongoAssetFolderRepository(IMongoDatabase database) 
                 Index
                     .Ascending(x => x.IndexedAppId)
                     .Ascending(x => x.ParentId)
-                    .Ascending(x => x.IsDeleted))
+                    .Ascending(x => x.IsDeleted)),
         ], ct);
     }
 
@@ -90,7 +90,7 @@ public sealed partial class MongoAssetFolderRepository(IMongoDatabase database) 
         var filters = new List<FilterDefinition<MongoAssetFolderEntity>>
         {
             Filter.Eq(x => x.IndexedAppId, appId),
-            Filter.Ne(x => x.IsDeleted, true)
+            Filter.Ne(x => x.IsDeleted, true),
         };
 
         if (parentId != null)

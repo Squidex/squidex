@@ -32,11 +32,19 @@ public partial class MongoContentRepository(
     : MongoBase<MongoContentEntity>, IContentRepository, IInitializable
 {
     private readonly MongoContentCollection collectionComplete =
-            new MongoContentCollection($"States_Contents_All3{shardKey}", database, log,
-                ReadPreference.Primary, options.Value.OptimizeForSelfHosting);
+        new MongoContentCollection(
+            $"States_Contents_All3{shardKey}",
+            database,
+            log,
+            ReadPreference.Primary,
+            options.Value.OptimizeForSelfHosting);
     private readonly MongoContentCollection collectionPublished =
-            new MongoContentCollection($"States_Contents_Published3{shardKey}", database, log,
-                ReadPreference.Secondary, options.Value.OptimizeForSelfHosting);
+        new MongoContentCollection(
+            $"States_Contents_Published3{shardKey}",
+            database,
+            log,
+            ReadPreference.Secondary,
+            options.Value.OptimizeForSelfHosting);
     private readonly ContentsOptions options = options.Value;
 
     public bool CanUseTransactions { get; private set; }
@@ -80,10 +88,10 @@ public partial class MongoContentRepository(
         return GetCollection(scope).QueryScheduledWithoutDataAsync(now, ct);
     }
 
-    public IAsyncEnumerable<DomainId> StreamIds(DomainId appId, DomainId schemaId, SearchScope scope,
+    public IAsyncEnumerable<DomainId> StreamIds(DomainId appId, HashSet<DomainId>? schemaIds, SearchScope scope,
         CancellationToken ct = default)
     {
-        return GetCollection(scope).StreamIds(appId, schemaId, ct);
+        return GetCollection(scope).StreamIds(appId, schemaIds, ct);
     }
 
     public Task<IResultList<Content>> QueryAsync(App app, List<Schema> schemas, Q q, SearchScope scope,
@@ -122,10 +130,10 @@ public partial class MongoContentRepository(
         return GetCollection(scope).QueryIdsAsync(app, schema, filterNode, ct);
     }
 
-    public Task ResetScheduledAsync(DomainId appId, DomainId contentId, SearchScope scope,
+    public Task ResetScheduledAsync(DomainId appId, DomainId id, SearchScope scope,
         CancellationToken ct = default)
     {
-        return GetCollection(SearchScope.All).ResetScheduledAsync(appId, contentId, ct);
+        return GetCollection(SearchScope.All).ResetScheduledAsync(appId, id, ct);
     }
 
     public Task CreateIndexAsync(DomainId appId, DomainId schemaId, IndexDefinition index,

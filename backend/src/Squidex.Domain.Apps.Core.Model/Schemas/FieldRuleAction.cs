@@ -11,5 +11,5 @@ public enum FieldRuleAction
 {
     Disable,
     Hide,
-    Require
+    Require,
 }

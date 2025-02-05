@@ -32,7 +32,7 @@ public class GuardAppClientsTests : GivenContext, IClassFixture<TranslationsFixt
 
         App = App with
         {
-            Clients = AppClients.Empty.Add("android", "secret")
+            Clients = AppClients.Empty.Add("android", "secret"),
         };
 
         ValidationAssert.Throws(() => GuardAppClients.CanAttach(command, App),
@@ -46,7 +46,7 @@ public class GuardAppClientsTests : GivenContext, IClassFixture<TranslationsFixt
 
         App = App with
         {
-            Clients = AppClients.Empty.Add("android", "secret")
+            Clients = AppClients.Empty.Add("android", "secret"),
         };
 
         GuardAppClients.CanAttach(command, App);
@@ -76,7 +76,7 @@ public class GuardAppClientsTests : GivenContext, IClassFixture<TranslationsFixt
 
         App = App with
         {
-            Clients = AppClients.Empty.Add("ios", "secret")
+            Clients = AppClients.Empty.Add("ios", "secret"),
         };
 
         GuardAppClients.CanRevoke(command, App);
@@ -106,7 +106,7 @@ public class GuardAppClientsTests : GivenContext, IClassFixture<TranslationsFixt
 
         App = App with
         {
-            Clients = AppClients.Empty.Add("ios", "secret")
+            Clients = AppClients.Empty.Add("ios", "secret"),
         };
 
         ValidationAssert.Throws(() => GuardAppClients.CanUpdate(command, App),
@@ -120,7 +120,7 @@ public class GuardAppClientsTests : GivenContext, IClassFixture<TranslationsFixt
 
         App = App with
         {
-            Clients = AppClients.Empty.Add("ios", "secret")
+            Clients = AppClients.Empty.Add("ios", "secret"),
         };
 
         ValidationAssert.Throws(() => GuardAppClients.CanUpdate(command, App),
@@ -134,7 +134,7 @@ public class GuardAppClientsTests : GivenContext, IClassFixture<TranslationsFixt
 
         App = App with
         {
-            Clients = AppClients.Empty.Add("ios", "secret")
+            Clients = AppClients.Empty.Add("ios", "secret"),
         };
 
         ValidationAssert.Throws(() => GuardAppClients.CanUpdate(command, App),
@@ -148,7 +148,7 @@ public class GuardAppClientsTests : GivenContext, IClassFixture<TranslationsFixt
 
         App = App with
         {
-            Clients = AppClients.Empty.Add("ios", "secret")
+            Clients = AppClients.Empty.Add("ios", "secret"),
         };
 
         GuardAppClients.CanUpdate(command, App);
@@ -161,7 +161,7 @@ public class GuardAppClientsTests : GivenContext, IClassFixture<TranslationsFixt
 
         App = App with
         {
-            Clients = AppClients.Empty.Add("ios", "secret")
+            Clients = AppClients.Empty.Add("ios", "secret"),
         };
 
         GuardAppClients.CanUpdate(command, App);
@@ -174,7 +174,7 @@ public class GuardAppClientsTests : GivenContext, IClassFixture<TranslationsFixt
 
         App = App with
         {
-            Clients = AppClients.Empty.Add("ios", "secret")
+            Clients = AppClients.Empty.Add("ios", "secret"),
         };
 
         GuardAppClients.CanUpdate(command, App);

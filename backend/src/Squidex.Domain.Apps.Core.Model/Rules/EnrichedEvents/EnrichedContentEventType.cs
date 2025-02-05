@@ -15,5 +15,5 @@ public enum EnrichedContentEventType
     StatusChanged,
     Updated,
     Unpublished,
-    ReferenceUpdated
+    ReferenceUpdated,
 }

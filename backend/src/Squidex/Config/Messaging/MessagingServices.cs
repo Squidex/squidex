@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.IO;
 using System.Text.Json;
 using Squidex.AI;
 using Squidex.Domain.Apps.Core.Subscriptions;
@@ -18,6 +19,7 @@ using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Runner;
 using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
+using Squidex.Hosting.Configuration;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.EventSourcing.Consume;
 using Squidex.Messaging;
@@ -99,7 +101,7 @@ public static class MessagingServices
             .As<IJobService>().As<IDeleter>();
 
         services.AddMessaging()
-            .AddTransport(config)
+            .AddSquidexTransport(config)
             .AddSubscriptions(!isWorker)
             .AddReplicatedCache(true, options =>
             {
@@ -133,5 +135,25 @@ public static class MessagingServices
             {
                 options.Scheduler = InlineScheduler.Instance;
             });
+    }
+
+    public static MessagingBuilder AddSquidexTransport(this MessagingBuilder builder, IConfiguration config)
+    {
+        var type = config.GetValue<string>("messaging:type");
+
+        if (string.Equals(type, "Sql", StringComparison.OrdinalIgnoreCase))
+        {
+            if (!string.Equals(config.GetValue<string>("store:type"), "Sql", StringComparison.OrdinalIgnoreCase))
+            {
+                throw new ConfigurationException(
+                    new ConfigurationError(
+                        "Sql messaging transport is only allowed, when 'store:type' is also set to 'Sql'.",
+                        "messaging:type"));
+            }
+
+            return builder.AddSquidexEntityFrameworkTransport(config);
+        }
+
+        return builder.AddTransport(config);
     }
 }

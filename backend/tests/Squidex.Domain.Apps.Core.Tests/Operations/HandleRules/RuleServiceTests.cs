@@ -86,7 +86,7 @@ public class RuleServiceTests
             [ruleActionHandler],
             eventEnricher, TestUtils.DefaultSerializer, log, typeRegistry)
         {
-            Clock = clock
+            Clock = clock,
         };
     }
 
@@ -256,7 +256,7 @@ public class RuleServiceTests
             .Returns(new List<EnrichedEvent>
             {
                 new EnrichedContentEvent { AppId = appId },
-                new EnrichedContentEvent { AppId = appId }
+                new EnrichedContentEvent { AppId = appId },
             }.ToAsyncEnumerable());
 
         var jobs = await sut.CreateSnapshotJobsAsync(context).ToListAsync();
@@ -279,7 +279,7 @@ public class RuleServiceTests
             .Returns(new List<EnrichedEvent>
             {
                 new EnrichedContentEvent { AppId = appId },
-                new EnrichedContentEvent { AppId = appId }
+                new EnrichedContentEvent { AppId = appId },
             }.ToAsyncEnumerable());
 
         var jobs = await sut.CreateSnapshotJobsAsync(context).ToListAsync();
@@ -302,7 +302,7 @@ public class RuleServiceTests
             .Returns(new List<EnrichedEvent>
             {
                 new EnrichedContentEvent { AppId = appId },
-                new EnrichedContentEvent { AppId = appId }
+                new EnrichedContentEvent { AppId = appId },
             }.ToAsyncEnumerable());
 
         var jobs = await sut.CreateSnapshotJobsAsync(context).ToListAsync();
@@ -787,7 +787,7 @@ public class RuleServiceTests
             AppId = appId,
             IncludeStale = includeStale,
             IncludeSkipped = includeSkipped,
-            Rule = rule
+            Rule = rule,
         };
     }
 

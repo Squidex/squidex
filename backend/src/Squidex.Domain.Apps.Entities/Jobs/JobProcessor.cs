@@ -159,9 +159,9 @@ public sealed class JobProcessor
                     Description = request.TaskName,
                     Started = default,
                     Status = JobStatus.Created,
-                    TaskName = request.TaskName
+                    TaskName = request.TaskName,
                 },
-                OwnerId = ownerId
+                OwnerId = ownerId,
             };
 
             log.LogInformation("Starting new backup with backup id '{backupId}' for owner {ownerId}.", context.Job.Id, ownerId);

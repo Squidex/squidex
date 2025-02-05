@@ -19,16 +19,16 @@ public class FieldCompareTests
         {
             DefaultValues = new LocalizedValue<string?>(new Dictionary<string, string?>
             {
-                ["iv"] = "ABC"
-            })
+                ["iv"] = "ABC",
+            }),
         };
 
         var rhs = new StringFieldProperties
         {
             DefaultValues = new LocalizedValue<string?>(new Dictionary<string, string?>
             {
-                ["iv"] = "ABC"
-            })
+                ["iv"] = "ABC",
+            }),
         };
 
         Assert.Equal(lhs, rhs);
@@ -41,16 +41,16 @@ public class FieldCompareTests
         {
             DefaultValues = new LocalizedValue<ReadonlyList<string>?>(new Dictionary<string, ReadonlyList<string>?>
             {
-                ["iv"] = ReadonlyList.Create("A", "B", "C")
-            })
+                ["iv"] = ReadonlyList.Create("A", "B", "C"),
+            }),
         };
 
         var rhs = new TagsFieldProperties
         {
             DefaultValues = new LocalizedValue<ReadonlyList<string>?>(new Dictionary<string, ReadonlyList<string>?>
             {
-                ["iv"] = ReadonlyList.Create("A", "B", "C")
-            })
+                ["iv"] = ReadonlyList.Create("A", "B", "C"),
+            }),
         };
 
         Assert.Equal(lhs, rhs);

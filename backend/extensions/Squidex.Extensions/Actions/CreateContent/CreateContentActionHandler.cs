@@ -25,7 +25,7 @@ public sealed class CreateContentActionHandler(RuleEventFormatter formatter, IAp
     {
         var ruleJob = new Command
         {
-            AppId = @event.AppId
+            AppId = @event.AppId,
         };
 
         var schema = await appProvider.GetSchemaAsync(@event.AppId.Id, action.Schema, true)

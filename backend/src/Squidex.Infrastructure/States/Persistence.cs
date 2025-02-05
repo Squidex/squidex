@@ -176,7 +176,7 @@ internal sealed class Persistence<T>(
         {
             var job = new SnapshotWriteJob<T>(ownerKey, state, newVersion)
             {
-                OldVersion = oldVersion
+                OldVersion = oldVersion,
             };
 
             await snapshotStore.WriteAsync(job, ct);

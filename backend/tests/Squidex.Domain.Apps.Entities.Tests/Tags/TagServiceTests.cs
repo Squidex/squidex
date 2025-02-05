@@ -51,7 +51,7 @@ public class TagServiceTests : GivenContext
         await sut.UpdateAsync(AppId.Id, group, new Dictionary<string, int>
         {
             [ids["tag1"]] = 1,
-            [ids["tag2"]] = 1
+            [ids["tag2"]] = 1,
         }, CancellationToken);
 
         // Clear is called by the event consumer to fill the counts again, therefore we do not delete other things.
@@ -62,7 +62,7 @@ public class TagServiceTests : GivenContext
         Assert.Equal(new Dictionary<string, int>
         {
             ["tag1"] = 0,
-            ["tag2"] = 0
+            ["tag2"] = 0,
         }, allTags);
 
         A.CallTo(() => state.Persistence.DeleteAsync(CancellationToken))
@@ -87,7 +87,7 @@ public class TagServiceTests : GivenContext
 
         Assert.Equal(new Dictionary<string, int>
         {
-            ["tag_1"] = 0
+            ["tag_1"] = 0,
         }, allTags);
     }
 
@@ -113,7 +113,7 @@ public class TagServiceTests : GivenContext
 
         Assert.Equal(new Dictionary<string, int>
         {
-            ["tag_2"] = 0
+            ["tag_2"] = 0,
         }, allTags);
     }
 
@@ -137,7 +137,7 @@ public class TagServiceTests : GivenContext
 
         Assert.Equal(new Dictionary<string, int>
         {
-            ["tag_0"] = 0
+            ["tag_0"] = 0,
         }, allTags);
     }
 
@@ -149,7 +149,7 @@ public class TagServiceTests : GivenContext
         await sut.UpdateAsync(AppId.Id, group, new Dictionary<string, int>
         {
             [ids["tag1"]] = 1,
-            [ids["tag2"]] = 2
+            [ids["tag2"]] = 2,
         }, CancellationToken);
 
         await sut.RenameTagAsync(AppId.Id, group, "tag2", "tag1", CancellationToken);
@@ -158,7 +158,7 @@ public class TagServiceTests : GivenContext
 
         Assert.Equal(new Dictionary<string, int>
         {
-            ["tag1"] = 3
+            ["tag1"] = 3,
         }, allTags);
     }
 
@@ -170,9 +170,9 @@ public class TagServiceTests : GivenContext
             Tags = new Dictionary<string, Tag>
             {
                 ["id1"] = new Tag { Name = "tag1", Count = 10 },
-                ["id2"] = new Tag { Name = "tag1", Count = 20 }
+                ["id2"] = new Tag { Name = "tag1", Count = 20 },
             },
-            Alias = null!
+            Alias = null!,
         };
 
         await sut.RebuildTagsAsync(AppId.Id, group, tags, CancellationToken);
@@ -181,7 +181,7 @@ public class TagServiceTests : GivenContext
 
         Assert.Equal(new Dictionary<string, int>
         {
-            ["tag1"] = 30
+            ["tag1"] = 30,
         }, allTags);
     }
 
@@ -195,9 +195,9 @@ public class TagServiceTests : GivenContext
                 ["id1"] = new Tag { Name = "tag1 ", Count = 10 },
                 ["id2"] = new Tag { Name = "tag2,", Count = 20 },
                 ["id3"] = new Tag { Name = " tag3,", Count = 30 },
-                ["id4"] = new Tag { Name = ",tag4,", Count = 40 }
+                ["id4"] = new Tag { Name = ",tag4,", Count = 40 },
             },
-            Alias = null!
+            Alias = null!,
         };
 
         await sut.RebuildTagsAsync(AppId.Id, group, tags, CancellationToken);
@@ -209,7 +209,7 @@ public class TagServiceTests : GivenContext
             ["tag1"] = 10,
             ["tag2"] = 20,
             ["tag3"] = 30,
-            ["tag4"] = 40
+            ["tag4"] = 40,
         }, allTags);
     }
 
@@ -222,9 +222,9 @@ public class TagServiceTests : GivenContext
             {
                 ["id1"] = new Tag { Name = "tag1", Count = 1 },
                 ["id2"] = new Tag { Name = "tag2", Count = 2 },
-                ["id3"] = new Tag { Name = "tag3", Count = 6 }
+                ["id3"] = new Tag { Name = "tag3", Count = 6 },
             },
-            Alias = null!
+            Alias = null!,
         };
 
         await sut.RebuildTagsAsync(AppId.Id, group, tags, CancellationToken);
@@ -235,7 +235,7 @@ public class TagServiceTests : GivenContext
         {
             ["tag1"] = 1,
             ["tag2"] = 2,
-            ["tag3"] = 6
+            ["tag3"] = 6,
         }, allTags);
 
         var export = await sut.GetExportableTagsAsync(AppId.Id, group, CancellationToken);
@@ -251,9 +251,9 @@ public class TagServiceTests : GivenContext
         {
             Alias = new Dictionary<string, string>
             {
-                ["id1"] = "id2"
+                ["id1"] = "id2",
             },
-            Tags = null!
+            Tags = null!,
         };
 
         await sut.RebuildTagsAsync(AppId.Id, group, tags, CancellationToken);
@@ -276,7 +276,7 @@ public class TagServiceTests : GivenContext
         {
             ["tag1"] = 0,
             ["tag2"] = 0,
-            ["tag3"] = 0
+            ["tag3"] = 0,
         }, allTags);
     }
 
@@ -288,13 +288,13 @@ public class TagServiceTests : GivenContext
         await sut.UpdateAsync(AppId.Id, group, new Dictionary<string, int>
         {
             [ids["tag1"]] = 1,
-            [ids["tag2"]] = 1
+            [ids["tag2"]] = 1,
         }, CancellationToken);
 
         await sut.UpdateAsync(AppId.Id, group, new Dictionary<string, int>
         {
             [ids["tag2"]] = 1,
-            [ids["tag3"]] = 1
+            [ids["tag3"]] = 1,
         }, CancellationToken);
 
         var allTags = await sut.GetTagsAsync(AppId.Id, group, CancellationToken);
@@ -303,7 +303,7 @@ public class TagServiceTests : GivenContext
         {
             ["tag1"] = 1,
             ["tag2"] = 2,
-            ["tag3"] = 1
+            ["tag3"] = 1,
         }, allTags);
     }
 
@@ -315,13 +315,13 @@ public class TagServiceTests : GivenContext
         await sut.UpdateAsync(AppId.Id, group, new Dictionary<string, int>
         {
             [ids["tag1"]] = 1,
-            [ids["tag2"]] = 1
+            [ids["tag2"]] = 1,
         }, CancellationToken);
 
         await sut.UpdateAsync(AppId.Id, group, new Dictionary<string, int>
         {
             [ids["tag2"]] = -2,
-            [ids["tag3"]] = -2
+            [ids["tag3"]] = -2,
         }, CancellationToken);
 
         var allTags = await sut.GetTagsAsync(AppId.Id, group, CancellationToken);
@@ -330,7 +330,7 @@ public class TagServiceTests : GivenContext
         {
             ["tag1"] = 1,
             ["tag2"] = 0,
-            ["tag3"] = 0
+            ["tag3"] = 0,
         }, allTags);
     }
 
@@ -341,7 +341,7 @@ public class TagServiceTests : GivenContext
         await sut.UpdateAsync(AppId.Id, group, new Dictionary<string, int>
         {
             ["id1"] = 1,
-            ["id2"] = 1
+            ["id2"] = 1,
         }, CancellationToken);
 
         var allTags = await sut.GetTagsAsync(AppId.Id, group, CancellationToken);

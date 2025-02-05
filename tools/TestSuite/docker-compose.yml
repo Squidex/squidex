@@ -1,58 +1,106 @@
 services:
-  mongo:
-    image: mongo:latest
+  db_mongo:
+    image: mongo
     ports:
       - "27019:27017"
     networks:
       - internal
 
+  db_postgres:
+    image: "postgres"
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=squidex
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 10s
+      retries: 10
+
+  db_mysql:
+    image: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=squidex
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=secret
+      - MYSQL_ROOT_PASSWORD=secret
+    command: --log-bin-trust-function-creators=1 --local-infile=1
+    volumes:
+      - mysql_data:/var/lib/mysql
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "admin", "--password=secret"]
+      interval: 10s
+      retries: 10
+
+  db_sqlserver:
+    image: squidex/mssql-dev
+    ports:
+      - "1433:1433"
+    environment:
+      - SA_PASSWORD=1q2w3e!R
+      - ACCEPT_EULA=Y
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 1q2w3e!R -Q 'SELECT 1'"]
+      interval: 10s
+      retries: 10
+
   # Base configuration
-  squidex1:
+  squidex_mongo1:
     extends:
       file: docker-compose-base.yml
       service: squidex_base
     environment:
-      - EVENTSTORE__MONGODB__DATABASE=squidex1
-      - STORE__MONGODB__CONTENTDATABASE=squidex1_content
-      - STORE__MONGODB__DATABASE=squidex1
+      - EVENTSTORE__MONGODB__DATABASE=squidex_mongo1
+      - STORE__MONGODB__CONTENTDATABASE=squidex_mongo1_content
+      - STORE__MONGODB__DATABASE=squidex_mongo1
       - URLS__BASEURL=http://localhost:8080
     depends_on:
-      - mongo
+      - db_mongo
 
   # Hosted on path and separate worker
-  squidex2:
+  squidex_mongo2:
     extends:
       file: docker-compose-base.yml
       service: squidex_base
     environment:
       - CLUSTERING__WORKER=false
-      - EVENTSTORE__MONGODB__DATABASE=squidex2
-      - STORE__MONGODB__CONTENTDATABASE=squidex2_content
-      - STORE__MONGODB__DATABASE=squidex2
+      - EVENTSTORE__MONGODB__DATABASE=squidex_mongo2
+      - STORE__MONGODB__CONTENTDATABASE=squidex_mongo2_content
+      - STORE__MONGODB__DATABASE=squidex_mongo2
       - STORE__MONGODB__TEXTHARDCOUNT=20
       - URLS__BASEPATH=squidex/
       - URLS__BASEURL=http://localhost:8081/squidex/
     depends_on:
-      - mongo
+      - db_mongo
 
   # Hosted on path and separate worker
-  squidex2_worker:
+  squidex_mongo2_worker:
     extends:
       file: docker-compose-base.yml
       service: squidex_base
     environment:
       - CLUSTERING__WORKER=true
-      - EVENTSTORE__MONGODB__DATABASE=squidex2
-      - STORE__MONGODB__CONTENTDATABASE=squidex2_content
-      - STORE__MONGODB__DATABASE=squidex2
+      - EVENTSTORE__MONGODB__DATABASE=squidex_mongo2
+      - STORE__MONGODB__CONTENTDATABASE=squidex_mongo2_content
+      - STORE__MONGODB__DATABASE=squidex_mongo2
       - STORE__MONGODB__TEXTHARDCOUNT=20
       - URLS__BASEPATH=squidex/
       - URLS__BASEURL=http://localhost:8081/squidex/
     depends_on:
-      - mongo
+      - db_mongo
 
   # Separate datbases
-  squidex3:
+  squidex_mongo3:
     extends:
       file: docker-compose-base.yml
       service: squidex_base
@@ -64,14 +112,58 @@ services:
       - STORE__MONGODB__DATABASE=squidex3
       - URLS__BASEURL=http://localhost:8082
     depends_on:
-      - mongo
+      - db_mongo
+
+  squidex_postgres:
+    extends:
+      file: docker-compose-base.yml
+      service: squidex_base
+    environment:
+      - EVENTSTORE__TYPE=Sql
+      - STORE__TYPE=Sql
+      - STORE__SQL__CONNECTIONSTRING=Server=db_postgres;Port=5432;Database=squidex;Pooling=true;Username=admin;Password=secret;SSL Mode=Disable;
+      - STORE__SQL__PROVIDER=Postgres
+      - MESSAGING__TYPE=Sql
+      - URLS__BASEURL=http://localhost:8083
+    depends_on:
+      db_postgres:
+        condition: service_healthy
+
+  squidex_mysql:
+    extends:
+      file: docker-compose-base.yml
+      service: squidex_base
+    environment:
+      - EVENTSTORE__TYPE=Sql
+      - STORE__TYPE=Sql
+      - STORE__SQL__CONNECTIONSTRING=Server=db_mysql;Port=3306;Database=squidex;User=admin;Password=secret;AllowLoadLocalInfile=true;
+      - STORE__SQL__PROVIDER=MySql
+      - STORE__SQL__VERSION=9.2.0-mysql
+      - MESSAGING__TYPE=Sql
+      - URLS__BASEURL=http://localhost:8084
+    depends_on:
+      db_mysql:
+        condition: service_healthy
+
+  squidex_sqlserver:
+    extends:
+      file: docker-compose-base.yml
+      service: squidex_base
+    environment:
+      - EVENTSTORE__TYPE=Sql
+      - STORE__TYPE=Sql
+      - STORE__SQL__CONNECTIONSTRING=Server=db_sqlserver;Database=squidex;User=sa;Password=1q2w3e!R;TrustServerCertificate=True;
+      - STORE__SQL__PROVIDER=SqlServer
+      - MESSAGING__TYPE=Sql
+      - URLS__BASEURL=http://localhost:8085
+    depends_on:
+      db_sqlserver:
+        condition: service_healthy
 
   resizer:
     image: squidex/resizer:1.3.0
     networks:
       - internal
-    depends_on:
-      - mongo
 
   webhookcatcher:
     image: tarampampam/webhook-tester:2
@@ -81,44 +173,86 @@ services:
     networks:
       - internal
 
-  squidex_proxy1:
+  squidex_mongo_proxy1:
     image: squidex/caddy-proxy:2.6.2
     ports:
       - "8080:8080"
     environment:
       - SITE_ADDRESS=http://localhost:8080
       - SITE_PATH=*
-      - SITE_SERVER="squidex1:5000"
+      - SITE_SERVER="squidex_mongo1:5000"
     depends_on:
-      - squidex1
+      - squidex_mongo1
     networks:
       - internal
     restart: unless-stopped
 
-  squidex_proxy2:
+  squidex_mongo_proxy2:
     image: squidex/caddy-proxy-path:2.6.2
     ports:
       - "8081:8081"
     environment:
       - SITE_ADDRESS=http://localhost:8081
       - SITE_PATH=/squidex/*
-      - SITE_SERVER="squidex2:5000"
+      - SITE_SERVER="squidex_mongo2:5000"
     depends_on:
-      - squidex2
+      - squidex_mongo2
     networks:
       - internal
     restart: unless-stopped
 
-  squidex_proxy3:
+  squidex_mongo_proxy3:
     image: squidex/caddy-proxy-path:2.6.2
     ports:
       - "8082:8082"
     environment:
       - SITE_ADDRESS=http://localhost:8082
       - SITE_PATH=*
-      - SITE_SERVER="squidex3:5000"
+      - SITE_SERVER="squidex_mongo3:5000"
     depends_on:
-      - squidex2
+      - squidex_mongo3
+    networks:
+      - internal
+    restart: unless-stopped
+
+  squidex_postgres_proxy:
+    image: squidex/caddy-proxy-path:2.6.2
+    ports:
+      - "8083:8083"
+    environment:
+      - SITE_ADDRESS=http://localhost:8083
+      - SITE_PATH=*
+      - SITE_SERVER="squidex_postgres:5000"
+    depends_on:
+      - squidex_postgres
+    networks:
+      - internal
+    restart: unless-stopped
+
+  squidex_mysql_proxy:
+    image: squidex/caddy-proxy-path:2.6.2
+    ports:
+      - "8084:8084"
+    environment:
+      - SITE_ADDRESS=http://localhost:8084
+      - SITE_PATH=*
+      - SITE_SERVER="squidex_mysql:5000"
+    depends_on:
+      - squidex_mysql
+    networks:
+      - internal
+    restart: unless-stopped
+
+  squidex_sqlserver_proxy:
+    image: squidex/caddy-proxy-path:2.6.2
+    ports:
+      - "8085:8085"
+    environment:
+      - SITE_ADDRESS=http://localhost:8085
+      - SITE_PATH=*
+      - SITE_SERVER="squidex_sqlserver:5000"
+    depends_on:
+      - squidex_sqlserver
     networks:
       - internal
     restart: unless-stopped
@@ -126,3 +260,6 @@ services:
 networks:
   internal:
     driver: bridge
+
+volumes:
+  mysql_data:

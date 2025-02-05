@@ -34,14 +34,14 @@ public class ReferencesJintExtensionTests : GivenContext, IClassFixture<Translat
 
         var extensions = new IJintExtension[]
         {
-            new ReferencesJintExtension(serviceProvider)
+            new ReferencesJintExtension(serviceProvider),
         };
 
         sut = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
             Options.Create(new JintScriptOptions
             {
                 TimeoutScript = TimeSpan.FromSeconds(2),
-                TimeoutExecution = TimeSpan.FromSeconds(10)
+                TimeoutExecution = TimeSpan.FromSeconds(10),
             }),
             extensions);
     }
@@ -164,7 +164,7 @@ public class ReferencesJintExtensionTests : GivenContext, IClassFixture<Translat
             ["appName"] = AppId.Name,
             ["data"] = data,
             ["dataOld"] = null,
-            ["user"] = user
+            ["user"] = user,
         };
 
         return (vars, references);
@@ -181,7 +181,7 @@ public class ReferencesJintExtensionTests : GivenContext, IClassFixture<Translat
                             .AddInvariant(JsonValue.Create($"Hello {index}")))
                     .AddField("field2",
                         new ContentFieldData()
-                            .AddInvariant(JsonValue.Create($"World {index}")))
+                            .AddInvariant(JsonValue.Create($"World {index}"))),
         };
     }
 

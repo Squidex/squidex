@@ -21,7 +21,7 @@ public class AuthSchemeValueDto
     {
         return new UpsertAuth
         {
-            Scheme = Scheme?.ToDomain()
+            Scheme = Scheme?.ToDomain(),
         };
     }
 

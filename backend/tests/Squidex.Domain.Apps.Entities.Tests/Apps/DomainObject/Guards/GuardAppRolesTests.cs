@@ -23,12 +23,12 @@ public class GuardAppRolesTests : GivenContext, IClassFixture<TranslationsFixtur
     {
         App = App with
         {
-            Contributors = Contributors.Empty.Assign(User.Identifier, "contributorRole")
+            Contributors = Contributors.Empty.Assign(User.Identifier, "contributorRole"),
         };
 
         App = App with
         {
-            Clients = AppClients.Empty.Add(Client.Identifier, "secret", "clientRole")
+            Clients = AppClients.Empty.Add(Client.Identifier, "secret", "clientRole"),
         };
     }
 
@@ -46,7 +46,7 @@ public class GuardAppRolesTests : GivenContext, IClassFixture<TranslationsFixtur
     {
         App = App with
         {
-            Roles = Roles.Empty.Add(roleName)
+            Roles = Roles.Empty.Add(roleName),
         };
 
         var command = new AddRole { Name = roleName };
@@ -85,7 +85,7 @@ public class GuardAppRolesTests : GivenContext, IClassFixture<TranslationsFixtur
     {
         App = App with
         {
-            Roles = Roles.Empty.Add("contributorRole")
+            Roles = Roles.Empty.Add("contributorRole"),
         };
 
         var command = new DeleteRole { Name = "contributorRole" };
@@ -99,7 +99,7 @@ public class GuardAppRolesTests : GivenContext, IClassFixture<TranslationsFixtur
     {
         App = App with
         {
-            Roles = Roles.Empty.Add("clientRole")
+            Roles = Roles.Empty.Add("clientRole"),
         };
 
         var command = new DeleteRole { Name = "clientRole" };
@@ -113,7 +113,7 @@ public class GuardAppRolesTests : GivenContext, IClassFixture<TranslationsFixtur
     {
         App = App with
         {
-            Roles = Roles.Empty.Add(Role.Developer)
+            Roles = Roles.Empty.Add(Role.Developer),
         };
 
         var command = new DeleteRole { Name = Role.Developer };
@@ -127,7 +127,7 @@ public class GuardAppRolesTests : GivenContext, IClassFixture<TranslationsFixtur
     {
         App = App with
         {
-            Roles = Roles.Empty.Add(roleName)
+            Roles = Roles.Empty.Add(roleName),
         };
 
         var command = new DeleteRole { Name = roleName };
@@ -140,7 +140,7 @@ public class GuardAppRolesTests : GivenContext, IClassFixture<TranslationsFixtur
     {
         App = App with
         {
-            Roles = Roles.Empty.Add(roleName)
+            Roles = Roles.Empty.Add(roleName),
         };
 
         var command = new UpdateRole { Name = null!, Permissions = ["P1"] };
@@ -154,7 +154,7 @@ public class GuardAppRolesTests : GivenContext, IClassFixture<TranslationsFixtur
     {
         App = App with
         {
-            Roles = Roles.Empty.Add(roleName)
+            Roles = Roles.Empty.Add(roleName),
         };
 
         var command = new UpdateRole { Name = roleName };
@@ -168,7 +168,7 @@ public class GuardAppRolesTests : GivenContext, IClassFixture<TranslationsFixtur
     {
         App = App with
         {
-            Roles = Roles.Empty.Add(Role.Developer)
+            Roles = Roles.Empty.Add(Role.Developer),
         };
 
         var command = new UpdateRole { Name = Role.Developer, Permissions = ["P1"] };
@@ -190,7 +190,7 @@ public class GuardAppRolesTests : GivenContext, IClassFixture<TranslationsFixtur
     {
         App = App with
         {
-            Roles = Roles.Empty.Add(roleName)
+            Roles = Roles.Empty.Add(roleName),
         };
 
         var command = new UpdateRole { Name = roleName, Permissions = ["P1"] };
@@ -203,7 +203,7 @@ public class GuardAppRolesTests : GivenContext, IClassFixture<TranslationsFixtur
     {
         App = App with
         {
-            Roles = Roles.Empty.Add(roleName)
+            Roles = Roles.Empty.Add(roleName),
         };
 
         var command = new UpdateRole { Name = roleName, Permissions = ["P1"] };

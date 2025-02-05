@@ -28,7 +28,7 @@ public sealed class MongoRuleRepository(IMongoDatabase database) : MongoSnapshot
         [
             new CreateIndexModel<MongoRuleEntity>(
                 Index
-                    .Ascending(x => x.IndexedAppId))
+                    .Ascending(x => x.IndexedAppId)),
         ], ct);
     }
 

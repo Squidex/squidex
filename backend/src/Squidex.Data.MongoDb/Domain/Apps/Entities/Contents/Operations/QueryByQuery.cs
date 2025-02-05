@@ -42,9 +42,9 @@ internal sealed class QueryByQuery(MongoCountCollection countCollection) : Opera
         var filter = BuildFilter(app.Id, schema.Id, adjustedFilter);
 
         var contentEntities = await Collection.FindStatusAsync(filter, ct);
-        var contentResults = contentEntities.Select(x => new ContentIdStatus(x.IndexedSchemaId, x.Id, x.Status)).ToList();
+        var contentStatuses = contentEntities.Select(x => new ContentIdStatus(x.IndexedSchemaId, x.Id, x.Status)).ToList();
 
-        return contentResults;
+        return contentStatuses;
     }
 
     public async Task<IResultList<Content>> QueryAsync(App app, List<Schema> schemas, Q q,
@@ -125,7 +125,7 @@ internal sealed class QueryByQuery(MongoCountCollection countCollection) : Opera
             Filter.Exists(x => x.LastModified),
             Filter.Exists(x => x.Id),
             Filter.Eq(x => x.IndexedAppId, appId),
-            Filter.Eq(x => x.IndexedSchemaId, schemaId)
+            Filter.Eq(x => x.IndexedSchemaId, schemaId),
         };
 
         if (filter?.HasField(Field.Of<MongoContentEntity>(x => nameof(x.IsDeleted))) != true)
@@ -149,7 +149,7 @@ internal sealed class QueryByQuery(MongoCountCollection countCollection) : Opera
             Filter.Gt(x => x.LastModified, default),
             Filter.Gt(x => x.Id, default),
             Filter.Eq(x => x.IndexedAppId, appId),
-            Filter.In(x => x.IndexedSchemaId, schemaIds)
+            Filter.In(x => x.IndexedSchemaId, schemaIds),
         };
 
         var isDefault = false;

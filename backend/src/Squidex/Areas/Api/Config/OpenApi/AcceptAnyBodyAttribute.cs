@@ -33,7 +33,7 @@ public sealed class AcceptAnyBodyAttribute : OpenApiOperationProcessorAttribute
                     Schema = new JsonSchema
                     {
                     },
-                    Description = FieldDescriptions.GraphqlRequest
+                    Description = FieldDescriptions.GraphqlRequest,
                 });
 
             return true;

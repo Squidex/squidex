@@ -25,11 +25,11 @@ public class WorkflowJsonTests
                 [Status.Draft] = new WorkflowStep(
                     new Dictionary<Status, WorkflowTransition>
                     {
-                        [Status.Published] = WorkflowTransition.When("Expression", "Role1", "Role2")
+                        [Status.Published] = WorkflowTransition.When("Expression", "Role1", "Role2"),
                     }.ToReadonlyDictionary(),
                     "#00ff00",
                     NoUpdate.When("Expression", "Role1", "Role2"),
-                    true)
+                    true),
             }.ToReadonlyDictionary(),
             ReadonlyList.Create(DomainId.NewGuid()), "MyName");
 

@@ -16,7 +16,7 @@ public static class ScriptingExtensions
     {
         AsContext = true,
         CanDisallow = true,
-        CanReject = true
+        CanReject = true,
     };
 
     public static Task<ContentData> ExecuteCreateScriptAsync(this ContentOperation operation, ContentData data, Status status,
@@ -38,7 +38,7 @@ public static class ScriptingExtensions
             OldStatus = default,
             Operation = "Create",
             Status = status,
-            StatusOld = default
+            StatusOld = default,
         });
 
         return TransformAsync(operation, script, vars, ct);
@@ -63,7 +63,7 @@ public static class ScriptingExtensions
             OldStatus = operation.Snapshot.EditingStatus,
             Operation = "Update",
             Status = operation.Snapshot.EditingStatus,
-            StatusOld = default
+            StatusOld = default,
         });
 
         return TransformAsync(operation, script, vars, ct);
@@ -89,7 +89,7 @@ public static class ScriptingExtensions
             Operation = change.ToString(),
             Status = status,
             StatusOld = operation.Snapshot.EditingStatus,
-            Validate = Validate(operation, status)
+            Validate = Validate(operation, status),
         });
 
         return TransformAsync(operation, script, vars, ct);
@@ -115,7 +115,7 @@ public static class ScriptingExtensions
             Operation = "Delete",
             Permanent = permanent,
             Status = operation.Snapshot.EditingStatus,
-            StatusOld = default
+            StatusOld = default,
         });
 
         return ExecuteAsync(operation, script, vars, ct);

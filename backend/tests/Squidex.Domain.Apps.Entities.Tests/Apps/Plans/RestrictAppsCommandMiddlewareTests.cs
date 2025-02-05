@@ -17,7 +17,7 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Plans;
 
-public sealed class RestrictAppsCommandMiddlewareTests : GivenContext
+public class RestrictAppsCommandMiddlewareTests : GivenContext
 {
     private readonly IUserResolver userResolver = A.Fake<IUserResolver>();
     private readonly ICommandBus commandBus = A.Fake<ICommandBus>();
@@ -36,7 +36,7 @@ public sealed class RestrictAppsCommandMiddlewareTests : GivenContext
 
         var command = new CreateApp
         {
-            Actor = RefToken.User(userId)
+            Actor = RefToken.User(userId),
         };
 
         var commandContext = new CommandContext(command, commandBus);
@@ -73,7 +73,7 @@ public sealed class RestrictAppsCommandMiddlewareTests : GivenContext
 
         var command = new CreateApp
         {
-            Actor = RefToken.User(userId)
+            Actor = RefToken.User(userId),
         };
 
         var commandContext = new CommandContext(command, commandBus);
@@ -107,7 +107,7 @@ public sealed class RestrictAppsCommandMiddlewareTests : GivenContext
     {
         var command = new CreateApp
         {
-            Actor = RefToken.Client(Guid.NewGuid().ToString())
+            Actor = RefToken.Client(Guid.NewGuid().ToString()),
         };
 
         var commandContext = new CommandContext(command, commandBus);
@@ -130,7 +130,7 @@ public sealed class RestrictAppsCommandMiddlewareTests : GivenContext
     {
         var command = new CreateApp
         {
-            Actor = RefToken.User(Guid.NewGuid().ToString())
+            Actor = RefToken.User(Guid.NewGuid().ToString()),
         };
 
         var commandContext = new CommandContext(command, commandBus);
@@ -153,7 +153,7 @@ public sealed class RestrictAppsCommandMiddlewareTests : GivenContext
     {
         var command = new UpdateApp
         {
-            Actor = RefToken.User(Guid.NewGuid().ToString())
+            Actor = RefToken.User(Guid.NewGuid().ToString()),
         };
 
         var commandContext = new CommandContext(command, commandBus);

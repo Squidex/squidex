@@ -198,7 +198,7 @@ public class CommentTriggerHandlerTests : GivenContext
         {
             var @event = new EnrichedCommentEvent
             {
-                MentionedUser = UserMocks.User("1", "1@email.com")
+                MentionedUser = UserMocks.User("1", "1@email.com"),
             };
 
             var actual = handler.Trigger(@event, ctx.Rule.Trigger);
@@ -214,7 +214,7 @@ public class CommentTriggerHandlerTests : GivenContext
         {
             var @event = new EnrichedCommentEvent
             {
-                MentionedUser = UserMocks.User("1", "1@email.com")
+                MentionedUser = UserMocks.User("1", "1@email.com"),
             };
 
             var actual = handler.Trigger(@event, ctx.Rule.Trigger);
@@ -230,7 +230,7 @@ public class CommentTriggerHandlerTests : GivenContext
         {
             var @event = new EnrichedCommentEvent
             {
-                Text = "very_urgent_text"
+                Text = "very_urgent_text",
             };
 
             var actual = handler.Trigger(@event, ctx.Rule.Trigger);
@@ -246,7 +246,7 @@ public class CommentTriggerHandlerTests : GivenContext
         {
             var @event = new EnrichedCommentEvent
             {
-                Text = "just_gossip"
+                Text = "just_gossip",
             };
 
             var actual = handler.Trigger(@event, ctx.Rule.Trigger);
@@ -259,7 +259,7 @@ public class CommentTriggerHandlerTests : GivenContext
     {
         var trigger = new CommentTrigger
         {
-            Condition = condition
+            Condition = condition,
         };
 
         var realScriptEngine =
@@ -267,7 +267,7 @@ public class CommentTriggerHandlerTests : GivenContext
                 Options.Create(new JintScriptOptions
                 {
                     TimeoutScript = TimeSpan.FromSeconds(2),
-                    TimeoutExecution = TimeSpan.FromSeconds(10)
+                    TimeoutExecution = TimeSpan.FromSeconds(10),
                 }));
 
         var handler = new CommentTriggerHandler(realScriptEngine, userResolver);
@@ -279,7 +279,7 @@ public class CommentTriggerHandlerTests : GivenContext
     {
         var trigger = new CommentTrigger
         {
-            Condition = condition
+            Condition = condition,
         };
 
         action(Context(trigger));
@@ -305,7 +305,7 @@ public class CommentTriggerHandlerTests : GivenContext
             AppId = AppId,
             IncludeSkipped = false,
             IncludeStale = false,
-            Rule = CreateRule() with { Trigger = trigger }
+            Rule = CreateRule() with { Trigger = trigger },
         };
     }
 }

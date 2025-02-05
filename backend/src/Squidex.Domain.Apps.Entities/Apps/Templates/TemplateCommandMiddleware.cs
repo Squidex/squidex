@@ -80,7 +80,7 @@ public sealed class TemplateCommandMiddleware(
                     new RulesSynchronizer(cliLog),
                     new SchemasSynchronizer(cliLog),
                     new WorkflowsSynchronizer(cliLog),
-                    new ContentsSynchronizer(cliLog)
+                    new ContentsSynchronizer(cliLog),
                 };
 
                 foreach (var target in targets)
@@ -121,7 +121,7 @@ public sealed class TemplateCommandMiddleware(
                 AppName = app.Name,
                 ClientId = $"{app.Name}:{client.Key}",
                 ClientSecret = client.Value.Secret,
-                Url = url
+                Url = url,
             }));
     }
 }

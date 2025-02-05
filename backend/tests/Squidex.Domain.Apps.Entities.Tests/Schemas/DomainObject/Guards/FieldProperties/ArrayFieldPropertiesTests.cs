@@ -23,7 +23,7 @@ public class ArrayFieldPropertiesTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Max items must be greater or equal to min items.", "MinItems", "MaxItems")
+                new ValidationError("Max items must be greater or equal to min items.", "MinItems", "MaxItems"),
             });
     }
 

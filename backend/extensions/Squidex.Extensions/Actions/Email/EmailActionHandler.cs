@@ -28,7 +28,7 @@ public sealed class EmailActionHandler(RuleEventFormatter formatter) : RuleActio
             MessageFrom = (await FormatAsync(action.MessageFrom, @event))!,
             MessageTo = (await FormatAsync(action.MessageTo, @event))!,
             MessageSubject = (await FormatAsync(action.MessageSubject, @event))!,
-            MessageBody = (await FormatAsync(action.MessageBody, @event))!
+            MessageBody = (await FormatAsync(action.MessageBody, @event))!,
         };
 
         var description = $"Send an email to {ruleJob.MessageTo}";
@@ -58,7 +58,7 @@ public sealed class EmailActionHandler(RuleEventFormatter formatter) : RuleActio
 
             smtpMessage.Body = new TextPart(TextFormat.Html)
             {
-                Text = job.MessageBody
+                Text = job.MessageBody,
             };
 
             smtpMessage.Subject = job.MessageSubject;

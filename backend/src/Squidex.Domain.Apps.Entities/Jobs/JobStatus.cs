@@ -13,5 +13,5 @@ public enum JobStatus
     Started,
     Completed,
     Cancelled,
-    Failed
+    Failed,
 }

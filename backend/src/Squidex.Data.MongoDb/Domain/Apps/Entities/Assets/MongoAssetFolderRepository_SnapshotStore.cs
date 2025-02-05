@@ -29,7 +29,7 @@ public sealed partial class MongoAssetFolderRepository : ISnapshotStore<AssetFol
     {
         var documents = Collection.Find(FindAll, Batching.Options).ToAsyncEnumerable(ct);
 
-        return documents.Select(x => new SnapshotResult<AssetFolder>(x.DocumentId, x.ToState(), x.Version, true));
+        return documents.Select(x => new SnapshotResult<AssetFolder>(x.DocumentId, x, x.Version, true));
     }
 
     async Task<SnapshotResult<AssetFolder>> ISnapshotStore<AssetFolder>.ReadAsync(DomainId key,
@@ -43,7 +43,7 @@ public sealed partial class MongoAssetFolderRepository : ISnapshotStore<AssetFol
 
             if (existing != null)
             {
-                return new SnapshotResult<AssetFolder>(existing.DocumentId, existing.ToState(), existing.Version);
+                return new SnapshotResult<AssetFolder>(existing.DocumentId, existing, existing.Version);
             }
 
             return new SnapshotResult<AssetFolder>(default, null!, EtagVersion.Empty);
@@ -71,7 +71,7 @@ public sealed partial class MongoAssetFolderRepository : ISnapshotStore<AssetFol
                     Filter.Eq(y => y.DocumentId, x.DocumentId),
                     x)
                 {
-                    IsUpsert = true
+                    IsUpsert = true,
                 }).ToList();
 
             if (updates.Count == 0)

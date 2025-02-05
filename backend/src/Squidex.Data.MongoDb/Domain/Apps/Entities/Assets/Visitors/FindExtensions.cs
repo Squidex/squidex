@@ -41,7 +41,7 @@ public static class FindExtensions
         {
             Filter.Ne(x => x.LastModified, default),
             Filter.Ne(x => x.Id, default),
-            Filter.Eq(x => x.IndexedAppId, appId)
+            Filter.Eq(x => x.IndexedAppId, appId),
         };
 
         var isDefault = false;

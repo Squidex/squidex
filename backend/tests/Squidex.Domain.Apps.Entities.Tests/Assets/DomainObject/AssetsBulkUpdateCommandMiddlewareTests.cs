@@ -173,9 +173,9 @@ public class AssetsBulkUpdateCommandMiddlewareTests : GivenContext
                 {
                     Type = type,
                     Id = id,
-                    FileName = fileName
+                    FileName = fileName,
                 },
-            ]
+            ],
         };
     }
 

@@ -11,7 +11,7 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Users;
 
-public sealed class DefaultXmlRepositoryTests
+public class DefaultXmlRepositoryTests
 {
     private readonly ISnapshotStore<DefaultXmlRepository.State> store = A.Fake<ISnapshotStore<DefaultXmlRepository.State>>();
     private readonly DefaultXmlRepository sut;
@@ -29,12 +29,12 @@ public sealed class DefaultXmlRepositoryTests
             {
                 new SnapshotResult<DefaultXmlRepository.State>(default, new DefaultXmlRepository.State
                 {
-                    Xml = new XElement("xml").ToString()
+                    Xml = new XElement("xml").ToString(),
                 }, 0L),
                 new SnapshotResult<DefaultXmlRepository.State>(default, new DefaultXmlRepository.State
                 {
-                    Xml = new XElement("xml").ToString()
-                }, 0L)
+                    Xml = new XElement("xml").ToString(),
+                }, 0L),
             }.ToAsyncEnumerable());
 
         var xml = sut.GetAllElements();

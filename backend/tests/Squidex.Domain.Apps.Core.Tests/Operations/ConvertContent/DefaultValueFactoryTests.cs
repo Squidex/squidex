@@ -68,9 +68,9 @@ public class DefaultValueFactoryTests
                 {
                     DefaultValues = new LocalizedValue<ReadonlyList<string>?>(new Dictionary<string, ReadonlyList<string>?>
                     {
-                        [language.Iso2Code] = null
+                        [language.Iso2Code] = null,
                     }),
-                    DefaultValue = ReadonlyList.Create("1", "2")
+                    DefaultValue = ReadonlyList.Create("1", "2"),
                 });
 
         Assert.Equal(new JsonArray(), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
@@ -95,9 +95,9 @@ public class DefaultValueFactoryTests
                 {
                     DefaultValues = new LocalizedValue<bool?>(new Dictionary<string, bool?>
                     {
-                        [language.Iso2Code] = null
+                        [language.Iso2Code] = null,
                     }),
-                    DefaultValue = true
+                    DefaultValue = true,
                 });
 
         Assert.Equal(JsonValue.Null, DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
@@ -162,9 +162,9 @@ public class DefaultValueFactoryTests
                 {
                     DefaultValues = new LocalizedValue<Instant?>(new Dictionary<string, Instant?>
                     {
-                        [language.Iso2Code] = null
+                        [language.Iso2Code] = null,
                     }),
-                    DefaultValue = FutureDays(15)
+                    DefaultValue = FutureDays(15),
                 });
 
         Assert.Equal(JsonValue.Null, DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
@@ -209,9 +209,9 @@ public class DefaultValueFactoryTests
                 {
                     DefaultValues = new LocalizedValue<double?>(new Dictionary<string, double?>
                     {
-                        [language.Iso2Code] = null
+                        [language.Iso2Code] = null,
                     }),
-                    DefaultValue = 12
+                    DefaultValue = 12,
                 });
 
         Assert.Equal(JsonValue.Null, DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
@@ -246,9 +246,9 @@ public class DefaultValueFactoryTests
                 {
                     DefaultValues = new LocalizedValue<ReadonlyList<string>?>(new Dictionary<string, ReadonlyList<string>?>
                     {
-                        [language.Iso2Code] = null
+                        [language.Iso2Code] = null,
                     }),
-                    DefaultValue = ReadonlyList.Create("1", "2")
+                    DefaultValue = ReadonlyList.Create("1", "2"),
                 });
 
         Assert.Equal(new JsonArray(), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
@@ -281,9 +281,9 @@ public class DefaultValueFactoryTests
                 {
                     DefaultValues = new LocalizedValue<string?>(new Dictionary<string, string?>
                     {
-                        [language.Iso2Code] = null
+                        [language.Iso2Code] = null,
                     }),
-                    DefaultValue = "default"
+                    DefaultValue = "default",
                 });
 
         Assert.Equal(JsonValue.Null, DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
@@ -308,9 +308,9 @@ public class DefaultValueFactoryTests
                 {
                     DefaultValues = new LocalizedValue<ReadonlyList<string>?>(new Dictionary<string, ReadonlyList<string>?>
                     {
-                        [language.Iso2Code] = null
+                        [language.Iso2Code] = null,
                     }),
-                    DefaultValue = ReadonlyList.Create("tag1", "tag2")
+                    DefaultValue = ReadonlyList.Create("tag1", "tag2"),
                 });
 
         Assert.Equal(new JsonArray(), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));

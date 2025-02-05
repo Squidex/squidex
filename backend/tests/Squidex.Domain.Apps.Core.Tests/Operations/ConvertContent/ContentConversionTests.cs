@@ -32,7 +32,7 @@ public class ContentConversionTests
 
         components = new ResolvedComponents(new Dictionary<DomainId, Schema>
         {
-            [DomainId.Empty] = schema
+            [DomainId.Empty] = schema,
         });
     }
 

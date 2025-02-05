@@ -28,7 +28,7 @@ public sealed class AssetsDto : Resource
         var result = new AssetsDto
         {
             Total = assets.Total,
-            Items = assets.Select(x => AssetDto.FromDomain(x, resources)).ToArray()
+            Items = assets.Select(x => AssetDto.FromDomain(x, resources)).ToArray(),
         };
 
         return result.CreateLinks(resources);

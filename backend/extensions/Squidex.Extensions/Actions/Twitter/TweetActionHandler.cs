@@ -26,7 +26,7 @@ public sealed class TweetActionHandler(RuleEventFormatter formatter, IOptions<Tw
         {
             Text = (await FormatAsync(action.Text, @event))!,
             AccessToken = action.AccessToken,
-            AccessSecret = action.AccessSecret
+            AccessSecret = action.AccessSecret,
         };
 
         return (Description, ruleJob);
@@ -43,7 +43,7 @@ public sealed class TweetActionHandler(RuleEventFormatter formatter, IOptions<Tw
 
         var request = new Dictionary<string, object>
         {
-            ["status"] = job.Text
+            ["status"] = job.Text,
         };
 
         await tokens.Statuses.UpdateAsync(request, ct);

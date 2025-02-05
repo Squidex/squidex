@@ -18,8 +18,8 @@ public class QueryTests
             [
                 new SortNode("field1", SortOrder.Ascending),
                 new SortNode("field1", SortOrder.Ascending),
-                new SortNode("field2", SortOrder.Ascending)
-            ]
+                new SortNode("field2", SortOrder.Ascending),
+            ],
         };
 
         var fields = query.GetAllFields();
@@ -27,7 +27,7 @@ public class QueryTests
         var expected = new HashSet<string>
         {
             "field1",
-            "field2"
+            "field2",
         };
 
         Assert.Equal(expected, fields);
@@ -44,7 +44,7 @@ public class QueryTests
                         ClrFilter.Eq("field1", 1)),
                     ClrFilter.Or(
                         ClrFilter.Eq("field2", 2),
-                        ClrFilter.Eq("field2", 4)))
+                        ClrFilter.Eq("field2", 4))),
         };
 
         var fields = query.GetAllFields();
@@ -52,7 +52,7 @@ public class QueryTests
         var expected = new HashSet<string>
         {
             "field1",
-            "field2"
+            "field2",
         };
 
         Assert.Equal(expected, fields);

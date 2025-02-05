@@ -90,7 +90,7 @@ public class LanguagesConfigTests
         config_0.Values.Should().BeEquivalentTo(
             new Dictionary<string, LanguageConfig>
             {
-                [Language.EN] = new LanguageConfig()
+                [Language.EN] = new LanguageConfig(),
             });
 
         Assert.Equal(Language.EN, config_0.Master);
@@ -112,7 +112,7 @@ public class LanguagesConfigTests
                 [Language.EN] = new LanguageConfig(),
                 [Language.DE] = new LanguageConfig(),
                 [Language.ES] = new LanguageConfig(true),
-                [Language.IT] = new LanguageConfig(true, ReadonlyList.Create(Language.ES))
+                [Language.IT] = new LanguageConfig(true, ReadonlyList.Create(Language.ES)),
             });
 
         Assert.Equal(Language.DE, config.Master);
@@ -146,7 +146,7 @@ public class LanguagesConfigTests
             {
                 [Language.EN] = new LanguageConfig(),
                 [Language.DE] = new LanguageConfig(),
-                [Language.IT] = new LanguageConfig()
+                [Language.IT] = new LanguageConfig(),
             });
 
         Assert.Equal(Language.IT, config.Master);
@@ -186,7 +186,7 @@ public class LanguagesConfigTests
             new Dictionary<string, LanguageConfig>
             {
                 [Language.EN] = new LanguageConfig(),
-                [Language.IT] = new LanguageConfig()
+                [Language.IT] = new LanguageConfig(),
             });
 
         Assert.Equal(Language.EN, config_3.Master);
@@ -203,7 +203,7 @@ public class LanguagesConfigTests
             new Dictionary<string, LanguageConfig>
             {
                 [Language.EN] = new LanguageConfig(),
-                [Language.IT] = new LanguageConfig(true)
+                [Language.IT] = new LanguageConfig(true),
             });
 
         Assert.Equal(Language.EN, config_3.Master);
@@ -228,7 +228,7 @@ public class LanguagesConfigTests
             new Dictionary<string, LanguageConfig>
             {
                 [Language.DE] = new LanguageConfig(),
-                [Language.IT] = new LanguageConfig()
+                [Language.IT] = new LanguageConfig(),
             });
 
         Assert.Equal(Language.DE, config_3.Master);
@@ -252,7 +252,7 @@ public class LanguagesConfigTests
             new Dictionary<string, LanguageConfig>
             {
                 [Language.EN] = new LanguageConfig(),
-                [Language.IT] = new LanguageConfig(true, ReadonlyList.Create(Language.EN))
+                [Language.IT] = new LanguageConfig(true, ReadonlyList.Create(Language.EN)),
             });
 
         Assert.Equal(Language.EN, config_2.Master);
@@ -269,7 +269,7 @@ public class LanguagesConfigTests
             new Dictionary<string, LanguageConfig>
             {
                 [Language.EN] = new LanguageConfig(),
-                [Language.IT] = new LanguageConfig(true, ReadonlyList.Create(Language.EN))
+                [Language.IT] = new LanguageConfig(true, ReadonlyList.Create(Language.EN)),
             });
 
         Assert.Equal(Language.EN, config_2.Master);

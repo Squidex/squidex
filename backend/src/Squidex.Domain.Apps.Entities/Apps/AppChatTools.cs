@@ -42,9 +42,9 @@ public sealed class AppChatTools(IJsonSerializer serializer, IUrlGenerator urlGe
                                 Id = x.Key,
                                 ClientId = $"{context.App.Name}:{x.Key}",
                                 ClientSecret = "obfuscated",
-                                x.Value.Role
+                                x.Value.Role,
                             }),
-                        Url = urlGenerator.ClientsUI(context.App.NamedId())
+                        Url = urlGenerator.ClientsUI(context.App.NamedId()),
                     };
 
                     var json = serializer.Serialize(result, true);
@@ -66,9 +66,9 @@ public sealed class AppChatTools(IJsonSerializer serializer, IUrlGenerator urlGe
                             {
                                 Iso2Code = x.Key,
                                 IsMaster = context.App.Languages.Master.Equals(x.Key),
-                                x.Value.IsOptional
+                                x.Value.IsOptional,
                             }),
-                        Url = urlGenerator.LanguagesUI(context.App.NamedId())
+                        Url = urlGenerator.LanguagesUI(context.App.NamedId()),
                     };
 
                     var json = serializer.Serialize(result, true);
@@ -88,9 +88,9 @@ public sealed class AppChatTools(IJsonSerializer serializer, IUrlGenerator urlGe
                         Roles = context.App.Roles.Custom.Select(x =>
                             new
                             {
-                                x.Name
+                                x.Name,
                             }),
-                        Url = urlGenerator.RolesUI(context.App.NamedId())
+                        Url = urlGenerator.RolesUI(context.App.NamedId()),
                     };
 
                     var json = serializer.Serialize(result, true);
@@ -111,7 +111,7 @@ public sealed class AppChatTools(IJsonSerializer serializer, IUrlGenerator urlGe
                         {
                             Name = context.App.Plan?.PlanId,
                         },
-                        Url = urlGenerator.PlansUI(context.App.NamedId())
+                        Url = urlGenerator.PlansUI(context.App.NamedId()),
                     };
 
                     var json = serializer.Serialize(result, true);

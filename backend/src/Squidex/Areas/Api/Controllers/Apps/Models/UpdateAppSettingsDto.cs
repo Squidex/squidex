@@ -47,8 +47,8 @@ public sealed class UpdateAppSettingsDto
                 Editors = Editors?.Select(x => x.ToEditor()).ToReadonlyList()!,
                 HideScheduler = HideScheduler,
                 HideDateTimeModeButton = HideDateTimeModeButton,
-                Patterns = Patterns?.Select(x => x.ToPattern()).ToReadonlyList()!
-            }
+                Patterns = Patterns?.Select(x => x.ToPattern()).ToReadonlyList()!,
+            },
         };
     }
 }

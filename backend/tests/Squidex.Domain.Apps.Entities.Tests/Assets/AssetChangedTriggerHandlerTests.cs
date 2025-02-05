@@ -33,7 +33,7 @@ public class AssetChangedTriggerHandlerTests : GivenContext
         { TestUtils.CreateEvent<AssetCreated>(), EnrichedAssetEventType.Created },
         { TestUtils.CreateEvent<AssetUpdated>(), EnrichedAssetEventType.Updated },
         { TestUtils.CreateEvent<AssetAnnotated>(), EnrichedAssetEventType.Annotated },
-        { TestUtils.CreateEvent<AssetDeleted>(), EnrichedAssetEventType.Deleted }
+        { TestUtils.CreateEvent<AssetDeleted>(), EnrichedAssetEventType.Deleted },
     };
 
     public AssetChangedTriggerHandlerTests()
@@ -80,7 +80,7 @@ public class AssetChangedTriggerHandlerTests : GivenContext
             .Returns(new List<Asset>
             {
                 CreateAsset(),
-                CreateAsset()
+                CreateAsset(),
             }.ToAsyncEnumerable());
 
         var actual = await sut.CreateSnapshotEventsAsync(ctx, CancellationToken).ToListAsync(CancellationToken);
@@ -155,7 +155,7 @@ public class AssetChangedTriggerHandlerTests : GivenContext
     {
         var trigger = new AssetChangedTriggerV2
         {
-            Condition = condition
+            Condition = condition,
         };
 
         action(Context(trigger));
@@ -181,7 +181,7 @@ public class AssetChangedTriggerHandlerTests : GivenContext
             AppId = AppId,
             IncludeSkipped = false,
             IncludeStale = false,
-            Rule = CreateRule() with { Trigger = trigger }
+            Rule = CreateRule() with { Trigger = trigger },
         };
     }
 }

@@ -170,7 +170,7 @@ public class DomainIdTests
         {
             Id0 = DomainId.NewGuid(),
             Id1 = NamedId.Of(DomainId.NewGuid(), "1"),
-            Id2 = NamedId.Of(DomainId.NewGuid(), "2")
+            Id2 = NamedId.Of(DomainId.NewGuid(), "2"),
         };
 
         var serialized = obj.SerializeAndDeserializeJson();

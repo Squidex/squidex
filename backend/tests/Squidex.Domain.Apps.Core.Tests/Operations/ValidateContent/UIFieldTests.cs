@@ -80,7 +80,7 @@ public class UIFieldTests : IClassFixture<TranslationsFixture>
             new[]
             {
                 new ValidationError("Value must not be defined.", "myUI1"),
-                new ValidationError("Value must not be defined.", "myUI2")
+                new ValidationError("Value must not be defined.", "myUI2"),
             });
     }
 
@@ -107,7 +107,7 @@ public class UIFieldTests : IClassFixture<TranslationsFixture>
         dataErrors.Should().BeEquivalentTo(
             new[]
             {
-                new ValidationError("Value must not be defined.", "myArray.iv[1].myUI")
+                new ValidationError("Value must not be defined.", "myArray.iv[1].myUI"),
             });
     }
 

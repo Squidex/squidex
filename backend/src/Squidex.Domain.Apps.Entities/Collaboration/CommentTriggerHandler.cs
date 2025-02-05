@@ -49,7 +49,7 @@ public sealed class CommentTriggerHandler(IScriptEngine scriptEngine, IUserResol
         {
             var enrichedEvent = new EnrichedCommentEvent
             {
-                MentionedUser = user
+                MentionedUser = user,
             };
 
             enrichedEvent.Name = "UserMentioned";
@@ -73,7 +73,7 @@ public sealed class CommentTriggerHandler(IScriptEngine scriptEngine, IUserResol
         // Script vars are just wrappers over dictionaries for better performance.
         var vars = new EventScriptVars
         {
-            Event = @event
+            Event = @event,
         };
 
         return scriptEngine.Evaluate(vars, commentTrigger.Condition);

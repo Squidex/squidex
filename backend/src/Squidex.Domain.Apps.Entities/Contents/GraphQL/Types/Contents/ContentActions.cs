@@ -32,7 +32,7 @@ internal static class ContentActions
             {
                 Name = "path",
                 Description = FieldDescriptions.JsonPath,
-                DefaultValue = null
+                DefaultValue = null,
             },
         ];
 
@@ -57,7 +57,7 @@ internal static class ContentActions
         {
             Name = "path",
             Description = FieldDescriptions.JsonPath,
-            DefaultValue = null
+            DefaultValue = null,
         },
     ];
 
@@ -69,13 +69,13 @@ internal static class ContentActions
             {
                 Name = "id",
                 Description = FieldDescriptions.EntityId,
-                DefaultValue = null
+                DefaultValue = null,
             },
             new QueryArgument(Scalars.Int)
             {
                 Name = "version",
                 Description = FieldDescriptions.QueryVersion,
-                DefaultValue = null
+                DefaultValue = null,
             },
         ];
 
@@ -107,7 +107,7 @@ internal static class ContentActions
             {
                 Name = "version",
                 Description = FieldDescriptions.QueryVersion,
-                DefaultValue = null
+                DefaultValue = null,
             },
         ];
 
@@ -159,43 +159,43 @@ internal static class ContentActions
             {
                 Name = "top",
                 Description = FieldDescriptions.QueryTop,
-                DefaultValue = null
+                DefaultValue = null,
             },
             new QueryArgument(Scalars.Int)
             {
                 Name = "skip",
                 Description = FieldDescriptions.QuerySkip,
-                DefaultValue = 0
+                DefaultValue = 0,
             },
             new QueryArgument(Scalars.String)
             {
                 Name = "filter",
                 Description = FieldDescriptions.QueryFilter,
-                DefaultValue = null
+                DefaultValue = null,
             },
             new QueryArgument(Scalars.String)
             {
                 Name = "orderby",
                 Description = FieldDescriptions.QueryOrderBy,
-                DefaultValue = null
+                DefaultValue = null,
             },
             new QueryArgument(Scalars.String)
             {
                 Name = "search",
                 Description = FieldDescriptions.QuerySearch,
-                DefaultValue = null
+                DefaultValue = null,
             },
             new QueryArgument(Scalars.String)
             {
                 Name = "collation",
                 Description = FieldDescriptions.QueryCollation,
-                DefaultValue = null
+                DefaultValue = null,
             },
             new QueryArgument(Scalars.Int)
             {
                 Name = "random",
                 Description = FieldDescriptions.QueryRandom,
-                DefaultValue = null
+                DefaultValue = null,
             },
         ];
 
@@ -289,25 +289,25 @@ internal static class ContentActions
                 {
                     Name = "data",
                     Description = FieldDescriptions.ContentRequestData,
-                    DefaultValue = null
+                    DefaultValue = null,
                 },
                 new QueryArgument(Scalars.Boolean)
                 {
                     Name = "publish",
                     Description = FieldDescriptions.ContentRequestPublish,
-                    DefaultValue = false
+                    DefaultValue = false,
                 },
                 new QueryArgument(Scalars.String)
                 {
                     Name = "status",
                     Description = FieldDescriptions.ContentRequestOptionalStatus,
-                    DefaultValue = null
+                    DefaultValue = null,
                 },
                 new QueryArgument(Scalars.String)
                 {
                     Name = "id",
                     Description = FieldDescriptions.ContentRequestOptionalId,
-                    DefaultValue = null
+                    DefaultValue = null,
                 },
             ];
         }
@@ -317,7 +317,7 @@ internal static class ContentActions
             var command = new CreateContent
             {
                 // The data is converted from input args.
-                Data = c.GetArgument<ContentData>("data")
+                Data = c.GetArgument<ContentData>("data"),
             };
 
             var status = c.GetArgument<string?>("status");
@@ -345,37 +345,37 @@ internal static class ContentActions
                 {
                     Name = "id",
                     Description = FieldDescriptions.EntityId,
-                    DefaultValue = null
+                    DefaultValue = null,
                 },
                 new QueryArgument(new NonNullGraphType(inputType))
                 {
                     Name = "data",
                     Description = FieldDescriptions.ContentRequestData,
-                    DefaultValue = null
+                    DefaultValue = null,
                 },
                 new QueryArgument(Scalars.Boolean)
                 {
                     Name = "publish",
                     Description = FieldDescriptions.ContentRequestPublish,
-                    DefaultValue = false
+                    DefaultValue = false,
                 },
                 new QueryArgument(Scalars.Boolean)
                 {
                     Name = "patch",
                     Description = FieldDescriptions.ContentRequestPatch,
-                    DefaultValue = false
+                    DefaultValue = false,
                 },
                 new QueryArgument(Scalars.String)
                 {
                     Name = "status",
                     Description = FieldDescriptions.ContentRequestOptionalStatus,
-                    DefaultValue = null
+                    DefaultValue = null,
                 },
                 new QueryArgument(Scalars.Int)
                 {
                     Name = "expectedVersion",
                     Description = FieldDescriptions.EntityExpectedVersion,
-                    DefaultValue = EtagVersion.Any
+                    DefaultValue = EtagVersion.Any,
                 },
             ];
         }
@@ -416,19 +416,19 @@ internal static class ContentActions
                 {
                     Name = "id",
                     Description = FieldDescriptions.EntityId,
-                    DefaultValue = null
+                    DefaultValue = null,
                 },
                 new QueryArgument(new NonNullGraphType(inputType))
                 {
                     Name = "data",
                     Description = FieldDescriptions.ContentRequestData,
-                    DefaultValue = null
+                    DefaultValue = null,
                 },
                 new QueryArgument(Scalars.Int)
                 {
                     Name = "expectedVersion",
                     Description = FieldDescriptions.EntityExpectedVersion,
-                    DefaultValue = EtagVersion.Any
+                    DefaultValue = EtagVersion.Any,
                 },
             ];
         }
@@ -438,7 +438,7 @@ internal static class ContentActions
             return new PatchContent
             {
                 // The data is converted from input args.
-                Data = c.GetArgument<ContentData>("data")!
+                Data = c.GetArgument<ContentData>("data")!,
             };
         });
     }
@@ -453,19 +453,19 @@ internal static class ContentActions
                 {
                     Name = "id",
                     Description = FieldDescriptions.EntityId,
-                    DefaultValue = null
+                    DefaultValue = null,
                 },
                 new QueryArgument(new NonNullGraphType(inputType))
                 {
                     Name = "data",
                     Description = FieldDescriptions.ContentRequestData,
-                    DefaultValue = null
+                    DefaultValue = null,
                 },
                 new QueryArgument(Scalars.Int)
                 {
                     Name = "expectedVersion",
                     Description = FieldDescriptions.EntityExpectedVersion,
-                    DefaultValue = EtagVersion.Any
+                    DefaultValue = EtagVersion.Any,
                 },
             ];
         }
@@ -475,7 +475,7 @@ internal static class ContentActions
             return new PatchContent
             {
                 // The data is converted from input args.
-                Data = c.GetArgument<ContentData>("data")!
+                Data = c.GetArgument<ContentData>("data")!,
             };
         });
     }
@@ -488,25 +488,25 @@ internal static class ContentActions
             {
                 Name = "id",
                 Description = FieldDescriptions.EntityId,
-                DefaultValue = null
+                DefaultValue = null,
             },
             new QueryArgument(Scalars.NonNullString)
             {
                 Name = "status",
                 Description = FieldDescriptions.ContentRequestStatus,
-                DefaultValue = null
+                DefaultValue = null,
             },
             new QueryArgument(Scalars.DateTime)
             {
                 Name = "dueTime",
                 Description = FieldDescriptions.ContentRequestDueTime,
-                DefaultValue = null
+                DefaultValue = null,
             },
             new QueryArgument(Scalars.Int)
             {
                 Name = "expectedVersion",
                 Description = FieldDescriptions.EntityExpectedVersion,
-                DefaultValue = EtagVersion.Any
+                DefaultValue = EtagVersion.Any,
             },
         ];
 
@@ -531,13 +531,13 @@ internal static class ContentActions
             {
                 Name = "id",
                 Description = "The ID of the content (usually GUID).",
-                DefaultValue = null
+                DefaultValue = null,
             },
             new QueryArgument(Scalars.Int)
             {
                 Name = "expectedVersion",
                 Description = FieldDescriptions.EntityExpectedVersion,
-                DefaultValue = EtagVersion.Any
+                DefaultValue = EtagVersion.Any,
             },
         ];
 
@@ -555,13 +555,13 @@ internal static class ContentActions
             {
                 Name = "type",
                 Description = FieldDescriptions.EventType,
-                DefaultValue = null
+                DefaultValue = null,
             },
             new QueryArgument(Scalars.String)
             {
                 Name = "schemaName",
                 Description = FieldDescriptions.ContentSchemaName,
-                DefaultValue = null
+                DefaultValue = null,
             },
         ];
 

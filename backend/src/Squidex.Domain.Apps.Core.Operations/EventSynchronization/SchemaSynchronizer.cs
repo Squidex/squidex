@@ -148,7 +148,7 @@ public static class SchemaSynchronizer
                     Name = targetField.Name,
                     Partitioning = partitioning,
                     Properties = targetField.RawProperties,
-                    FieldId = id
+                    FieldId = id,
                 };
 
                 sourceIds.Add(id);

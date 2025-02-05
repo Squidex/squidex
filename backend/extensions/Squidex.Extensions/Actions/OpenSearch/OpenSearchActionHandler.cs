@@ -54,7 +54,7 @@ public sealed class OpenSearchActionHandler(RuleEventFormatter formatter, IScrip
             ServerHost = action.Host.ToString(),
             ServerUser = action.Username,
             ServerPassword = action.Password,
-            ContentId = contentId
+            ContentId = contentId,
         };
 
         if (delete)
@@ -88,8 +88,8 @@ public sealed class OpenSearchActionHandler(RuleEventFormatter formatter, IScrip
                 {
                     More = new Dictionary<string, object>
                     {
-                        ["error"] = $"Invalid JSON: {ex.Message}"
-                    }
+                        ["error"] = $"Invalid JSON: {ex.Message}",
+                    },
                 };
             }
 

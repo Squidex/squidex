@@ -9,6 +9,7 @@ using System.Globalization;
 using System.Text;
 using CsvHelper;
 using CsvHelper.Configuration;
+using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Log;
@@ -34,7 +35,7 @@ public sealed class DefaultAppLogStore(IRequestLogStore requestLogStore) : IAppL
     private static readonly CsvConfiguration CsvConfiguration = new CsvConfiguration(CultureInfo.InvariantCulture)
     {
         DetectDelimiter = false,
-        Delimiter = "|"
+        Delimiter = "|",
     };
 
     Task IDeleter.DeleteAppAsync(App app,
@@ -53,7 +54,7 @@ public sealed class DefaultAppLogStore(IRequestLogStore requestLogStore) : IAppL
 
         var storedRequest = new Request
         {
-            Key = appId.ToString()
+            Key = appId.ToString(),
         };
 
         Append(storedRequest, FieldAuthClientId, request.UserClientId);
@@ -74,7 +75,7 @@ public sealed class DefaultAppLogStore(IRequestLogStore requestLogStore) : IAppL
         return requestLogStore.LogAsync(storedRequest, ct);
     }
 
-    public async Task ReadLogAsync(DomainId appId, DateTime fromDate, DateTime toDate, Stream stream,
+    public async Task ReadLogAsync(DomainId appId, Instant fromTime, Instant toTime, Stream stream,
         CancellationToken ct = default)
     {
         Guard.NotNull(appId);
@@ -100,7 +101,7 @@ public sealed class DefaultAppLogStore(IRequestLogStore requestLogStore) : IAppL
 
                 await csv.NextRecordAsync();
 
-                await foreach (var request in requestLogStore.QueryAllAsync(appId.ToString(), fromDate, toDate, ct))
+                await foreach (var request in requestLogStore.QueryAllAsync(appId.ToString(), fromTime, toTime, ct))
                 {
                     csv.WriteField(request.Timestamp.ToString());
                     csv.WriteField(GetString(request, FieldRequestPath));

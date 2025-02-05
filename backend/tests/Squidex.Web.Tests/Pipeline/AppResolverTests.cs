@@ -36,7 +36,7 @@ public class AppResolverTests : GivenContext
     {
         actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor
         {
-            EndpointMetadata = new List<object>()
+            EndpointMetadata = new List<object>(),
         });
 
         actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object?>(), this);
@@ -131,7 +131,7 @@ public class AppResolverTests : GivenContext
 
         App = App with
         {
-            Contributors = Contributors.Empty.Assign(User.Identifier, Role.Reader)
+            Contributors = Contributors.Empty.Assign(User.Identifier, Role.Reader),
         };
 
         A.CallTo(() => AppProvider.GetAppAsync(AppId.Name, true, httpContext.RequestAborted))
@@ -158,7 +158,7 @@ public class AppResolverTests : GivenContext
 
         App = App with
         {
-            Contributors = Contributors.Empty.Assign(User.Identifier, Role.Reader)
+            Contributors = Contributors.Empty.Assign(User.Identifier, Role.Reader),
         };
 
         A.CallTo(() => AppProvider.GetAppAsync(AppId.Name, false, httpContext.RequestAborted))
@@ -184,7 +184,7 @@ public class AppResolverTests : GivenContext
 
         App = App with
         {
-            Clients = AppClients.Empty.Add(Client.Identifier, Role.Reader)
+            Clients = AppClients.Empty.Add(Client.Identifier, Role.Reader),
         };
 
         A.CallTo(() => AppProvider.GetAppAsync(AppId.Name, true, httpContext.RequestAborted))
@@ -204,7 +204,7 @@ public class AppResolverTests : GivenContext
 
         App = App with
         {
-            Clients = AppClients.Empty.Add(Client.Identifier, Role.Reader).Update(Client.Identifier, allowAnonymous: true)
+            Clients = AppClients.Empty.Add(Client.Identifier, Role.Reader).Update(Client.Identifier, allowAnonymous: true),
         };
 
         A.CallTo(() => AppProvider.GetAppAsync(AppId.Name, true, httpContext.RequestAborted))
@@ -264,7 +264,7 @@ public class AppResolverTests : GivenContext
 
         App = App with
         {
-            Contributors = Contributors.Empty.Assign(User.Identifier, Role.Reader)
+            Contributors = Contributors.Empty.Assign(User.Identifier, Role.Reader),
         };
 
         A.CallTo(() => AppProvider.GetAppAsync(AppId.Name, false, httpContext.RequestAborted))

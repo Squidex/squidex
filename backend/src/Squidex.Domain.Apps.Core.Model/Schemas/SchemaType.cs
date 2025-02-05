@@ -11,5 +11,5 @@ public enum SchemaType
 {
     Default,
     Singleton,
-    Component
+    Component,
 }

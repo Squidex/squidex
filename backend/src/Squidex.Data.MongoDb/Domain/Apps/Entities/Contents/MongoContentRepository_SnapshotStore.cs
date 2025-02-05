@@ -30,13 +30,10 @@ public partial class MongoContentRepository : ISnapshotStore<WriteContent>, IDel
     {
         using (Telemetry.Activities.StartActivity("MongoContentRepository/ReadAsync"))
         {
-            var existing =
-                await collectionComplete.FindAsync(key, ct);
-
-            // Support for all versions, where we do not have full snapshots in the collection.
-            if (existing?.IsSnapshot == true)
+            var entity = await collectionComplete.FindAsync(key, ct);
+            if (entity?.IsSnapshot == true)
             {
-                return new SnapshotResult<WriteContent>(existing.DocumentId, existing.ToState(), existing.Version);
+                return new SnapshotResult<WriteContent>(entity.DocumentId, entity.ToState(), entity.Version);
             }
 
             return new SnapshotResult<WriteContent>(default, null!, EtagVersion.Empty);
@@ -68,12 +65,6 @@ public partial class MongoContentRepository : ISnapshotStore<WriteContent>, IDel
     {
         using (Telemetry.Activities.StartActivity("MongoContentRepository/RemoveAsync"))
         {
-            // Some data is corrupt and might throw an exception if we do not ignore it.
-            if (key == DomainId.Empty)
-            {
-                return;
-            }
-
             await Task.WhenAll(
                 collectionComplete.RemoveAsync(key, ct),
                 collectionPublished.RemoveAsync(key, ct));
@@ -83,14 +74,14 @@ public partial class MongoContentRepository : ISnapshotStore<WriteContent>, IDel
     async Task ISnapshotStore<WriteContent>.WriteAsync(SnapshotWriteJob<WriteContent> job,
         CancellationToken ct)
     {
+        // Some data is corrupt and might throw an exception if we do not ignore it.
+        if (!IsValid(job.Value))
+        {
+            return;
+        }
+
         using (Telemetry.Activities.StartActivity("MongoContentRepository/WriteAsync"))
         {
-            // Some data is corrupt and might throw an exception if we do not ignore it.
-            if (!IsValid(job.Value))
-            {
-                return;
-            }
-
             if (!CanUseTransactions)
             {
                 // If transactions are not supported we update the documents without version checks,
@@ -117,6 +108,8 @@ public partial class MongoContentRepository : ISnapshotStore<WriteContent>, IDel
     async Task ISnapshotStore<WriteContent>.WriteManyAsync(IEnumerable<SnapshotWriteJob<WriteContent>> jobs,
         CancellationToken ct)
     {
+        var validJobs = jobs.Where(x => IsValid(x.Value)).ToList();
+
         using (Telemetry.Activities.StartActivity("MongoContentRepository/WriteManyAsync"))
         {
             var collectionUpdates = new Dictionary<IMongoCollection<MongoContentEntity>, List<MongoContentEntity>>();
@@ -128,26 +121,21 @@ public partial class MongoContentRepository : ISnapshotStore<WriteContent>, IDel
 
             foreach (var job in jobs)
             {
-                var isValid = IsValid(job.Value);
-
-                if (isValid && ShouldWritePublished(job.Value))
+                if (job.Value.ShouldWritePublished())
                 {
                     await collectionPublished.AddCollectionsAsync(
                         await MongoContentEntity.CreatePublishedAsync(job, appProvider, ct), add, ct);
                 }
 
-                if (isValid)
-                {
-                    await collectionComplete.AddCollectionsAsync(
-                        await MongoContentEntity.CreateCompleteAsync(job, appProvider, ct), add, ct);
-                }
+                await collectionComplete.AddCollectionsAsync(
+                    await MongoContentEntity.CreateCompleteAsync(job, appProvider, ct), add, ct);
             }
 
             var parallelOptions = new ParallelOptions
             {
                 CancellationToken = ct,
                 // This is just an estimate, but we do not want ot have unlimited parallelism.
-                MaxDegreeOfParallelism = 8
+                MaxDegreeOfParallelism = 8,
             };
 
             // Make one update per collection.
@@ -161,7 +149,7 @@ public partial class MongoContentRepository : ISnapshotStore<WriteContent>, IDel
     private async Task UpsertPublishedAsync(SnapshotWriteJob<WriteContent> job,
         CancellationToken ct)
     {
-        if (ShouldWritePublished(job.Value))
+        if (job.Value.ShouldWritePublished())
         {
             var entityJob = job.As(await MongoContentEntity.CreatePublishedAsync(job, appProvider, ct));
 
@@ -176,7 +164,7 @@ public partial class MongoContentRepository : ISnapshotStore<WriteContent>, IDel
     private async Task UpsertVersionedPublishedAsync(IClientSessionHandle session, SnapshotWriteJob<WriteContent> job,
         CancellationToken ct)
     {
-        if (ShouldWritePublished(job.Value))
+        if (job.Value.ShouldWritePublished())
         {
             var entityJob = job.As(await MongoContentEntity.CreatePublishedAsync(job, appProvider, ct));
 
@@ -202,12 +190,6 @@ public partial class MongoContentRepository : ISnapshotStore<WriteContent>, IDel
         var entityJob = job.As(await MongoContentEntity.CreateCompleteAsync(job, appProvider, ct));
 
         await collectionComplete.UpsertVersionedAsync(session, entityJob, ct);
-    }
-
-    private static bool ShouldWritePublished(WriteContent value)
-    {
-        // Only published content is written to the published collection.
-        return value.CurrentVersion.Status == Status.Published && !value.IsDeleted;
     }
 
     private static bool IsValid(WriteContent state)

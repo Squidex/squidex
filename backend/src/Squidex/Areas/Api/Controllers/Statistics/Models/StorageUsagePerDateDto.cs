@@ -32,7 +32,7 @@ public sealed class StorageUsagePerDateDto
         {
             Date = stats.Date,
             TotalCount = stats.Counters.TotalAssets,
-            TotalSize = stats.Counters.TotalSize
+            TotalSize = stats.Counters.TotalSize,
         };
 
         return result;

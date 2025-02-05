@@ -60,8 +60,8 @@ public sealed class RuleEnqueuer(
             IncludeStale = false,
             Rules = new Dictionary<DomainId, Rule>
             {
-                [ruleId] = rule
-            }.ToReadonlyDictionary()
+                [ruleId] = rule,
+            }.ToReadonlyDictionary(),
         };
 
         // Write in batches of 100 items for better performance. Dispose completes the last write.
@@ -101,7 +101,7 @@ public sealed class RuleEnqueuer(
                     IncludeSkipped = false,
                     IncludeStale = false,
                     Rules = rules.ToReadonlyDictionary(x => x.Id),
-                    MaxEvents = maxExtraEvents
+                    MaxEvents = maxExtraEvents,
                 };
 
                 await foreach (var result in ruleService.CreateJobsAsync(@event, context))

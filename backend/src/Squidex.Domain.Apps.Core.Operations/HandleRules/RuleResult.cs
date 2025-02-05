@@ -12,5 +12,5 @@ public enum RuleResult
     Pending,
     Success,
     Failed,
-    Timeout
+    Timeout,
 }

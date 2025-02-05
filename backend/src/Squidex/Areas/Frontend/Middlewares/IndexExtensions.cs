@@ -28,7 +28,7 @@ public static class IndexExtensions
 
         var scripts = new List<string>
         {
-            $"var texts = {GetText(CultureInfo.CurrentUICulture.Name)};"
+            $"var texts = {GetText(CultureInfo.CurrentUICulture.Name)};",
         };
 
         var uiOptions = httpContext.RequestServices.GetService<IOptions<MyUIOptions>>()?.Value;
@@ -38,8 +38,8 @@ public static class IndexExtensions
             {
                 More = new Dictionary<string, object>(uiOptions.More)
                 {
-                    ["culture"] = CultureInfo.CurrentUICulture.Name
-                }
+                    ["culture"] = CultureInfo.CurrentUICulture.Name,
+                },
             };
 
             var options = httpContext.Features.Get<OptionsFeature>();

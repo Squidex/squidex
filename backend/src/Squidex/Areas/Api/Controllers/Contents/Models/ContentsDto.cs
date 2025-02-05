@@ -35,7 +35,7 @@ public sealed class ContentsDto : Resource
         var result = new ContentsDto
         {
             Total = contents.Total,
-            Items = contents.Select(x => ContentDto.FromDomain(x, resources)).ToArray()
+            Items = contents.Select(x => ContentDto.FromDomain(x, resources)).ToArray(),
         };
 
         if (schema != null)

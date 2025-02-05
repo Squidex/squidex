@@ -49,7 +49,7 @@ public class BackupAppsTests : GivenContext
 
         await sut.RestoreEventAsync(Envelope.Create(new AppCreated
         {
-            Name = AppId.Name
+            Name = AppId.Name,
         }), context, CancellationToken);
 
         A.CallTo(() => appsIndex.ReserveAsync(AppId.Id, AppId.Name, A<CancellationToken>._))
@@ -74,7 +74,7 @@ public class BackupAppsTests : GivenContext
 
         await sut.RestoreEventAsync(Envelope.Create(new AppCreated
         {
-            Name = AppId.Name
+            Name = AppId.Name,
         }), context, CancellationToken);
 
         await sut.RestoreAsync(context, CancellationToken);
@@ -97,7 +97,7 @@ public class BackupAppsTests : GivenContext
 
         await sut.RestoreEventAsync(Envelope.Create(new AppCreated
         {
-            Name = AppId.Name
+            Name = AppId.Name,
         }), context, CancellationToken);
 
         await sut.CleanupRestoreErrorAsync(AppId.Id);
@@ -116,7 +116,7 @@ public class BackupAppsTests : GivenContext
 
         var @event = Envelope.Create(new AppCreated
         {
-            Name = AppId.Name
+            Name = AppId.Name,
         });
 
         await Assert.ThrowsAsync<BackupRestoreException>(() => sut.RestoreEventAsync(@event, context, CancellationToken));
@@ -189,7 +189,7 @@ public class BackupAppsTests : GivenContext
 
         var @event = Envelope.Create(new AppContributorAssigned
         {
-            ContributorId = "found"
+            ContributorId = "found",
         });
 
         var actual = await sut.RestoreEventAsync(@event, context, CancellationToken);
@@ -205,7 +205,7 @@ public class BackupAppsTests : GivenContext
 
         var @event = Envelope.Create(new AppContributorAssigned
         {
-            ContributorId = "unknown"
+            ContributorId = "unknown",
         });
 
         var actual = await sut.RestoreEventAsync(@event, context, CancellationToken);
@@ -221,7 +221,7 @@ public class BackupAppsTests : GivenContext
 
         var @event = Envelope.Create(new AppContributorRemoved
         {
-            ContributorId = "found"
+            ContributorId = "found",
         });
 
         var actual = await sut.RestoreEventAsync(@event, context, CancellationToken);
@@ -237,7 +237,7 @@ public class BackupAppsTests : GivenContext
 
         var @event = Envelope.Create(new AppContributorRemoved
         {
-            ContributorId = "unknown"
+            ContributorId = "unknown",
         });
 
         var actual = await sut.RestoreEventAsync(@event, context, CancellationToken);

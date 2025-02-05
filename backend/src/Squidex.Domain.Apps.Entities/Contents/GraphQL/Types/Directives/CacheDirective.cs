@@ -22,7 +22,7 @@ public sealed class CacheDirective : Directive
         {
             Name = "duration",
             Description = "Cache duration in seconds.",
-            DefaultValue = 600
+            DefaultValue = 600,
         });
     }
 

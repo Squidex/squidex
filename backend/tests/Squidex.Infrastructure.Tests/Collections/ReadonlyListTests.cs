@@ -68,7 +68,7 @@ public class ReadonlyListTests
         {
             1,
             2,
-            3
+            3,
         }.ToReadonlyList();
 
         var serialized = sut.SerializeAndDeserializeJson();
@@ -83,7 +83,7 @@ public class ReadonlyListTests
         {
             1,
             2,
-            3
+            3,
         });
 
         var serialized = sut.SerializeAndDeserializeJson();

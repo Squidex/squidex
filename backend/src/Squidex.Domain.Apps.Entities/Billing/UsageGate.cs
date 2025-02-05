@@ -63,7 +63,7 @@ public sealed partial class UsageGate(
                     AppId = appId,
                     Usage = usage,
                     UsageLimit = blockLimit,
-                    Users = GetUsers(app)
+                    Users = GetUsers(app),
                 };
 
                 await messaging.PublishAsync(notification, ct: ct);

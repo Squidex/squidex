@@ -13,5 +13,5 @@ public enum RuleJobResult
     Success,
     Retry,
     Failed,
-    Cancelled
+    Cancelled,
 }

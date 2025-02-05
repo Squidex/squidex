@@ -13,5 +13,5 @@ public enum EnrichedSchemaEventType
     Deleted,
     Published,
     Unpublished,
-    Updated
+    Updated,
 }

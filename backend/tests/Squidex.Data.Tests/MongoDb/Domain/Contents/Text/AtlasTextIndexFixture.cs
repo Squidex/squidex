@@ -9,10 +9,10 @@ using System.Net;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Domain.Apps.Entities.Text;
 using Squidex.Infrastructure;
-using Squidex.TestHelpers;
+using Squidex.MongoDb.TestHelpers;
 
 namespace Squidex.MongoDb.Domain.Contents.Text;
 
@@ -42,7 +42,7 @@ public sealed class AtlasTextIndexFixture : IAsyncLifetime
                 {
                     return new HttpClientHandler
                     {
-                        Credentials = new NetworkCredential(options.PublicKey, options.PrivateKey, "cloud.mongodb.com")
+                        Credentials = new NetworkCredential(options.PublicKey, options.PrivateKey, "cloud.mongodb.com"),
                     };
                 }).Services
                 .BuildServiceProvider();

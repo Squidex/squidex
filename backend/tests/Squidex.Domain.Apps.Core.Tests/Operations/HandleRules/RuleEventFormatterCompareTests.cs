@@ -73,7 +73,7 @@ public class RuleEventFormatterCompareTests
         var formatters = new IRuleEventFormatter[]
         {
             new PredefinedPatternsFormatter(urlGenerator),
-            new FakeContentResolver()
+            new FakeContentResolver(),
         };
 
         sut = new RuleEventFormatter(TestUtils.DefaultSerializer, formatters, BuildTemplateEngine(), BuildScriptEngine());
@@ -88,7 +88,7 @@ public class RuleEventFormatterCompareTests
             new EventFluidExtensions(urlGenerator),
             new StringFluidExtension(),
             new StringWordsFluidExtension(),
-            new UserFluidExtension()
+            new UserFluidExtension(),
         };
 
         return new FluidTemplateEngine(extensions);
@@ -101,14 +101,14 @@ public class RuleEventFormatterCompareTests
             new DateTimeJintExtension(),
             new EventJintExtension(urlGenerator),
             new StringJintExtension(),
-            new StringWordsJintExtension()
+            new StringWordsJintExtension(),
         };
 
         return new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
             Options.Create(new JintScriptOptions
             {
                 TimeoutScript = TimeSpan.FromSeconds(2),
-                TimeoutExecution = TimeSpan.FromSeconds(10)
+                TimeoutExecution = TimeSpan.FromSeconds(10),
             }),
             extensions);
     }
@@ -503,7 +503,7 @@ public class RuleEventFormatterCompareTests
                 new ContentData()
                     .AddField("country",
                         new ContentFieldData()
-                            .AddLocalized("zh-TW", "Berlin"))
+                            .AddLocalized("zh-TW", "Berlin")),
         };
 
         var actual = await sut.FormatAsync(script, @event);
@@ -527,7 +527,7 @@ public class RuleEventFormatterCompareTests
                 new ContentData()
                     .AddField("city",
                         new ContentFieldData()
-                            .AddInvariant("Berlin"))
+                            .AddInvariant("Berlin")),
         };
 
         var actual = await sut.FormatAsync(script, @event);
@@ -551,7 +551,7 @@ public class RuleEventFormatterCompareTests
                 new ContentData()
                     .AddField("city",
                         new ContentFieldData()
-                            .AddInvariant("Berlin"))
+                            .AddInvariant("Berlin")),
         };
 
         var actual = await sut.FormatAsync(script, @event);
@@ -575,7 +575,7 @@ public class RuleEventFormatterCompareTests
                 new ContentData()
                     .AddField("city",
                         new ContentFieldData()
-                            .AddInvariant(new JsonArray()))
+                            .AddInvariant(new JsonArray())),
         };
 
         var actual = await sut.FormatAsync(script, @event);
@@ -599,7 +599,7 @@ public class RuleEventFormatterCompareTests
                 new ContentData()
                     .AddField("city",
                         new ContentFieldData()
-                            .AddInvariant(JsonValue.Object().Add("name", "Berlin")))
+                            .AddInvariant(JsonValue.Object().Add("name", "Berlin"))),
         };
 
         var actual = await sut.FormatAsync(script, @event);
@@ -623,7 +623,7 @@ public class RuleEventFormatterCompareTests
                 new ContentData()
                     .AddField("city",
                         new ContentFieldData()
-                            .AddInvariant("Berlin"))
+                            .AddInvariant("Berlin")),
         };
 
         var actual = await sut.FormatAsync(script, @event);
@@ -647,7 +647,7 @@ public class RuleEventFormatterCompareTests
                 new ContentData()
                     .AddField("city",
                         new ContentFieldData()
-                            .AddInvariant(JsonValue.Array("Berlin")))
+                            .AddInvariant(JsonValue.Array("Berlin"))),
         };
 
         var actual = await sut.FormatAsync(script, @event);
@@ -671,7 +671,7 @@ public class RuleEventFormatterCompareTests
                 new ContentData()
                     .AddField("city",
                         new ContentFieldData()
-                            .AddInvariant(JsonValue.Object().Add("name", "Berlin")))
+                            .AddInvariant(JsonValue.Object().Add("name", "Berlin"))),
         };
 
         var actual = await sut.FormatAsync(script, @event);
@@ -695,7 +695,7 @@ public class RuleEventFormatterCompareTests
                 new ContentData()
                     .AddField("city",
                         new ContentFieldData()
-                            .AddInvariant(JsonValue.Object().Add("name", "Berlin")))
+                            .AddInvariant(JsonValue.Object().Add("name", "Berlin"))),
         };
 
         var actual = await sut.FormatAsync(script, @event);
@@ -719,7 +719,7 @@ public class RuleEventFormatterCompareTests
                 new ContentData()
                     .AddField("city",
                         new ContentFieldData()
-                            .AddInvariant(JsonValue.Array(1, 2, 3)))
+                            .AddInvariant(JsonValue.Array(1, 2, 3))),
         };
 
         var actual = await sut.FormatAsync(script, @event);
@@ -743,7 +743,7 @@ public class RuleEventFormatterCompareTests
                 new ContentData()
                     .AddField("city",
                         new ContentFieldData()
-                            .AddInvariant(JsonValue.Object().Add("name", "Berlin")))
+                            .AddInvariant(JsonValue.Object().Add("name", "Berlin"))),
         };
 
         var actual = await sut.FormatAsync(script, @event);
@@ -798,7 +798,7 @@ public class RuleEventFormatterCompareTests
                 new ContentData()
                     .AddField("time",
                         new ContentFieldData()
-                            .AddInvariant("2020-06-01T10:10:20Z"))
+                            .AddInvariant("2020-06-01T10:10:20Z")),
         };
 
         var actual = await sut.FormatAsync(script, @event);

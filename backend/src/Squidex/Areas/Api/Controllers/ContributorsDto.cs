@@ -45,7 +45,7 @@ public sealed class ContributorsDto : Resource
                 .Select(x => x.CreateUser(users))
                 .Select(x => x.CreateAppLinks(resources))
                 .OrderBy(x => x.ContributorName)
-                .ToArray()
+                .ToArray(),
         };
 
         result.CreateInvited(invited);
@@ -65,7 +65,7 @@ public sealed class ContributorsDto : Resource
                 .Select(x => x.CreateUser(users))
                 .Select(x => x.CreateTeamLinks(resources))
                 .OrderBy(x => x.ContributorName)
-                .ToArray()
+                .ToArray(),
         };
 
         result.CreateInvited(invited);
@@ -84,7 +84,7 @@ public sealed class ContributorsDto : Resource
         {
             Metadata = new ContributorsMetadata
             {
-                IsInvited = "true"
+                IsInvited = "true",
             };
         }
     }

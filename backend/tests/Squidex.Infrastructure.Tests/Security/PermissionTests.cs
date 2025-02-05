@@ -155,7 +155,7 @@ public class PermissionTests
         {
             new Permission("c"),
             new Permission("b"),
-            new Permission("a")
+            new Permission("a"),
         };
 
         var sorted = source.Order().ToList();

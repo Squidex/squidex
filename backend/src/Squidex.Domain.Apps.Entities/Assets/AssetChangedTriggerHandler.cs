@@ -43,7 +43,7 @@ public sealed class AssetChangedTriggerHandler(
         {
             var result = new EnrichedAssetEvent
             {
-                Type = EnrichedAssetEventType.Created
+                Type = EnrichedAssetEventType.Created,
             };
 
             SimpleMapper.Map(asset, result);
@@ -125,7 +125,7 @@ public sealed class AssetChangedTriggerHandler(
         // Script vars are just wrappers over dictionaries for better performance.
         var vars = new EventScriptVars
         {
-            Event = @event
+            Event = @event,
         };
 
         return scriptEngine.Evaluate(vars, assetTrigger.Condition);

@@ -36,7 +36,7 @@ public class RuleDequeuerWorkerTests
             Options.Create(new RulesOptions()),
             log)
         {
-            Clock = clock
+            Clock = clock,
         };
     }
 
@@ -45,14 +45,14 @@ public class RuleDequeuerWorkerTests
     {
         await sut.QueryAsync();
 
-        A.CallTo(() => ruleEventRepository.QueryPendingAsync(A<Instant>._, A<Func<IRuleEventEntity, Task>>._, default))
+        A.CallTo(() => ruleEventRepository.QueryPendingAsync(A<Instant>._, default))
             .MustHaveHappened();
     }
 
     [Fact]
     public async Task Should_ignore_repository_exceptions_and_log()
     {
-        A.CallTo(() => ruleEventRepository.QueryPendingAsync(A<Instant>._, A<Func<IRuleEventEntity, Task>>._, default))
+        A.CallTo(() => ruleEventRepository.QueryPendingAsync(A<Instant>._, default))
             .Throws(new InvalidOperationException());
 
         await sut.QueryAsync();
@@ -170,7 +170,7 @@ public class RuleDequeuerWorkerTests
             ActionData = actionData,
             ActionName = actionName,
             Created = clock.GetCurrentInstant(),
-            RuleId = DomainId.NewGuid()
+            RuleId = DomainId.NewGuid(),
         };
 
         A.CallTo(() => @event.Id).Returns(id);

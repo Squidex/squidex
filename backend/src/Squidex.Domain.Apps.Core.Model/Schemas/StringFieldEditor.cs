@@ -18,5 +18,5 @@ public enum StringFieldEditor
     RichText,
     Slug,
     StockPhoto,
-    TextArea
+    TextArea,
 }

@@ -15,7 +15,7 @@ public static class AzureIndexDefinition
     private static readonly Dictionary<string, (string Field, string Analyzer)> FieldAnalyzers = new (StringComparer.OrdinalIgnoreCase)
     {
         ["iv"] = ("iv", LexicalAnalyzerName.StandardLucene.ToString()),
-        ["zh"] = ("zh", LexicalAnalyzerName.ZhHansLucene.ToString())
+        ["zh"] = ("zh", LexicalAnalyzerName.ZhHansLucene.ToString()),
     };
 
     static AzureIndexDefinition()
@@ -78,44 +78,44 @@ public static class AzureIndexDefinition
         {
             new SimpleField("docId", SearchFieldDataType.String)
             {
-                IsKey = true
+                IsKey = true,
             },
             new SimpleField("appId", SearchFieldDataType.String)
             {
-                IsFilterable = true
+                IsFilterable = true,
             },
             new SimpleField("appName", SearchFieldDataType.String)
             {
-                IsFilterable = false
+                IsFilterable = false,
             },
             new SimpleField("contentId", SearchFieldDataType.String)
             {
-                IsFilterable = false
+                IsFilterable = false,
             },
             new SimpleField("schemaId", SearchFieldDataType.String)
             {
-                IsFilterable = true
+                IsFilterable = true,
             },
             new SimpleField("schemaName", SearchFieldDataType.String)
             {
-                IsFilterable = false
+                IsFilterable = false,
             },
             new SimpleField("serveAll", SearchFieldDataType.Boolean)
             {
-                IsFilterable = true
+                IsFilterable = true,
             },
             new SimpleField("servePublished", SearchFieldDataType.Boolean)
             {
-                IsFilterable = true
+                IsFilterable = true,
             },
             new SimpleField("geoObject", SearchFieldDataType.GeographyPoint)
             {
-                IsFilterable = true
+                IsFilterable = true,
             },
             new SimpleField("geoField", SearchFieldDataType.String)
             {
-                IsFilterable = true
-            }
+                IsFilterable = true,
+            },
         };
 
         foreach (var (field, analyzer) in FieldAnalyzers.Values)
@@ -125,13 +125,13 @@ public static class AzureIndexDefinition
                 {
                     IsFilterable = false,
                     IsFacetable = false,
-                    AnalyzerName = analyzer
+                    AnalyzerName = analyzer,
                 });
         }
 
         var index = new SearchIndex(indexName)
         {
-            Fields = fields
+            Fields = fields,
         };
 
         return index;

@@ -35,7 +35,7 @@ public class SchemaResolverTests : GivenContext
     {
         actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor
         {
-            EndpointMetadata = new List<object>()
+            EndpointMetadata = new List<object>(),
         });
 
         actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object?>(), this);

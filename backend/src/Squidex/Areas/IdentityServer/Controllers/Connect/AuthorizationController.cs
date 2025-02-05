@@ -57,7 +57,7 @@ public class AuthorizationController(
                     new AuthenticationProperties(new Dictionary<string, string?>
                     {
                         [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidGrant,
-                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "The token is no longer valid."
+                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "The token is no longer valid.",
                     }),
                     OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
             }
@@ -68,7 +68,7 @@ public class AuthorizationController(
                     new AuthenticationProperties(new Dictionary<string, string?>
                     {
                         [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.InvalidGrant,
-                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "The user is no longer allowed to sign in."
+                        [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "The user is no longer allowed to sign in.",
                     }),
                     OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
             }
@@ -122,7 +122,7 @@ public class AuthorizationController(
                 var properties = new AuthenticationProperties(new Dictionary<string, string?>
                 {
                     [OpenIddictServerAspNetCoreConstants.Properties.Error] = Errors.LoginRequired,
-                    [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "The user is not logged in."
+                    [OpenIddictServerAspNetCoreConstants.Properties.ErrorDescription] = "The user is not logged in.",
                 });
 
                 return Forbid(properties, OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
@@ -138,7 +138,7 @@ public class AuthorizationController(
             return Challenge(
                new AuthenticationProperties
                {
-                   RedirectUri = redirectUri
+                   RedirectUri = redirectUri,
                });
         }
 

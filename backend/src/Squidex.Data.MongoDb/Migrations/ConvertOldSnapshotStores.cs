@@ -10,7 +10,7 @@ using MongoDB.Driver;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
 
-namespace Squidex.Migrations.MongoDb;
+namespace Squidex.Migrations;
 
 public sealed class ConvertOldSnapshotStores(IMongoDatabase database) : MongoBase<BsonDocument>, IMigration
 {
@@ -22,7 +22,7 @@ public sealed class ConvertOldSnapshotStores(IMongoDatabase database) : MongoBas
         {
             "States_Apps",
             "States_Rules",
-            "States_Schemas"
+            "States_Schemas",
         }.Select(x => database.GetCollection<BsonDocument>(x));
 
         var update = Update.Rename("State", "Doc");

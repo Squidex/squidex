@@ -8,10 +8,4 @@ services:
       - SITE_ADDRESS=http://localhost:8081
       - SITE_PATH=/squidex/*
       - SITE_SERVER="http://172.21.0.1:5000"
-    networks:
-      - internal
     restart: unless-stopped
-    
-networks:
-  internal:
-    driver: host

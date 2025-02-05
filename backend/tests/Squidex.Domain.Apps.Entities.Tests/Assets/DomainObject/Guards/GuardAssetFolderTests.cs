@@ -102,7 +102,7 @@ public class GuardAssetFolderTests : GivenContext, IClassFixture<TranslationsFix
             .Returns(new List<AssetFolder>
             {
                 CreateAssetFolder().WithId(operation.CommandId),
-                CreateAssetFolder().WithId(parentId) with { ParentId = operation.CommandId }
+                CreateAssetFolder().WithId(parentId) with { ParentId = operation.CommandId },
             });
 
         await ValidationAssert.ThrowsAsync(() => operation.MustMoveToValidFolder(parentId, CancellationToken),
@@ -125,7 +125,7 @@ public class GuardAssetFolderTests : GivenContext, IClassFixture<TranslationsFix
         {
             App = App,
             CommandId = assetFolder.Id,
-            Command = new CreateAssetFolder { User = currentUser, Actor = actor }
+            Command = new CreateAssetFolder { User = currentUser, Actor = actor },
         };
     }
 }

@@ -44,7 +44,7 @@ public class ContentsSearchSourceTests : GivenContext
     {
         var content = CreateContent() with
         {
-            SchemaId = schemaId1
+            SchemaId = schemaId1,
         };
 
         await TestContentAsync(content, "Content");
@@ -66,9 +66,9 @@ public class ContentsSearchSourceTests : GivenContext
             ReferenceFields =
             [
                 Fields.String(1, "field1", Partitioning.Invariant),
-                Fields.String(2, "field2", Partitioning.Invariant)
+                Fields.String(2, "field2", Partitioning.Invariant),
             ],
-            SchemaId = schemaId1
+            SchemaId = schemaId1,
         };
 
         await TestContentAsync(content, "hello, world");
@@ -86,9 +86,9 @@ public class ContentsSearchSourceTests : GivenContext
                             .AddInvariant("hello")),
             ReferenceFields =
             [
-                Fields.String(1, "field", Partitioning.Invariant)
+                Fields.String(1, "field", Partitioning.Invariant),
             ],
-            SchemaId = schemaId1
+            SchemaId = schemaId1,
         };
 
         await TestContentAsync(content, "hello");
@@ -107,9 +107,9 @@ public class ContentsSearchSourceTests : GivenContext
                             .AddLocalized("en", "hello")),
             ReferenceFields =
             [
-                Fields.String(1, "field", Partitioning.Language)
+                Fields.String(1, "field", Partitioning.Language),
             ],
-            SchemaId = schemaId1
+            SchemaId = schemaId1,
         };
 
         await TestContentAsync(content, "hello");
@@ -132,9 +132,9 @@ public class ContentsSearchSourceTests : GivenContext
                             .AddLocalized("en", "resolved")),
             ReferenceFields =
             [
-                Fields.String(1, "field", Partitioning.Language)
+                Fields.String(1, "field", Partitioning.Language),
             ],
-            SchemaId = schemaId1
+            SchemaId = schemaId1,
         };
 
         await TestContentAsync(content, "resolved");

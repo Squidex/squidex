@@ -12,7 +12,7 @@ using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
 
-namespace Squidex.Migrations.MongoDb;
+namespace Squidex.Migrations;
 
 public sealed class CopyRuleStatistics(IMongoDatabase database, IRuleUsageTracker ruleUsageTracker) : IMigration
 {

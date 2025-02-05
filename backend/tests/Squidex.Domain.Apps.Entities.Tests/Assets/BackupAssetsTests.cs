@@ -43,7 +43,7 @@ public class BackupAssetsTests : GivenContext
     {
         var tags = new TagsExport
         {
-            Tags = []
+            Tags = [],
         };
 
         var context = CreateBackupContext();
@@ -67,9 +67,9 @@ public class BackupAssetsTests : GivenContext
         {
             Alias = new Dictionary<string, string>
             {
-                ["tag1"] = "new-name"
+                ["tag1"] = "new-name",
             },
-            Tags = []
+            Tags = [],
         };
 
         var context = CreateBackupContext();
@@ -96,7 +96,7 @@ public class BackupAssetsTests : GivenContext
         var envelope =
             new Envelope<IEvent>(new AppCreated
             {
-                AppId = AppId
+                AppId = AppId,
             });
 
         A.CallTo(() => context.Reader.HasFileAsync(A<string>._, CancellationToken))
@@ -121,7 +121,7 @@ public class BackupAssetsTests : GivenContext
         var envelope =
             new Envelope<IEvent>(new AppCreated
             {
-                AppId = AppId
+                AppId = AppId,
             });
 
         A.CallTo(() => context.Reader.HasFileAsync(A<string>._, CancellationToken))
@@ -146,7 +146,7 @@ public class BackupAssetsTests : GivenContext
         var envelope =
             new Envelope<IEvent>(new AppCreated
             {
-                AppId = AppId
+                AppId = AppId,
             });
 
         A.CallTo(() => context.Reader.HasFileAsync(A<string>._, CancellationToken))
@@ -305,17 +305,17 @@ public class BackupAssetsTests : GivenContext
 
         await sut.RestoreEventAsync(AppEvent(new AssetCreated
         {
-            AssetId = assetId1
+            AssetId = assetId1,
         }), context, CancellationToken);
 
         await sut.RestoreEventAsync(AppEvent(new AssetCreated
         {
-            AssetId = assetId2
+            AssetId = assetId2,
         }), context, CancellationToken);
 
         await sut.RestoreEventAsync(AppEvent(new AssetDeleted
         {
-            AssetId = assetId2
+            AssetId = assetId2,
         }), context, CancellationToken);
 
         var rebuildAssets = new HashSet<DomainId>();
@@ -328,7 +328,7 @@ public class BackupAssetsTests : GivenContext
         Assert.Equal(
         [
             DomainId.Combine(AppId, assetId1),
-            DomainId.Combine(AppId, assetId2)
+            DomainId.Combine(AppId, assetId2),
         ], rebuildAssets);
     }
 
@@ -342,17 +342,17 @@ public class BackupAssetsTests : GivenContext
 
         await sut.RestoreEventAsync(AppEvent(new AssetFolderCreated
         {
-            AssetFolderId = assetFolderId1
+            AssetFolderId = assetFolderId1,
         }), context, CancellationToken);
 
         await sut.RestoreEventAsync(AppEvent(new AssetFolderCreated
         {
-            AssetFolderId = assetFolderId2
+            AssetFolderId = assetFolderId2,
         }), context, CancellationToken);
 
         await sut.RestoreEventAsync(AppEvent(new AssetFolderDeleted
         {
-            AssetFolderId = assetFolderId2
+            AssetFolderId = assetFolderId2,
         }), context, CancellationToken);
 
         var rebuildAssetFolders = new HashSet<DomainId>();
@@ -365,7 +365,7 @@ public class BackupAssetsTests : GivenContext
         Assert.Equal(
         [
             DomainId.Combine(AppId, assetFolderId1),
-            DomainId.Combine(AppId, assetFolderId2)
+            DomainId.Combine(AppId, assetFolderId2),
         ], rebuildAssetFolders);
     }
 

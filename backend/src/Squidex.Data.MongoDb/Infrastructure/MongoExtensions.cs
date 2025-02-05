@@ -24,7 +24,7 @@ public static class MongoExtensions
     {
         var options = new ListCollectionNamesOptions
         {
-            Filter = new BsonDocument("name", collectionName)
+            Filter = new BsonDocument("name", collectionName),
         };
 
         var collections = await database.ListCollectionNamesAsync(options, ct);
@@ -55,7 +55,7 @@ public static class MongoExtensions
         return true;
     }
 
-    public static async IAsyncEnumerable<T> ToAsyncEnumerable<T>(this IFindFluent<T, T> find,
+    public static async IAsyncEnumerable<TR> ToAsyncEnumerable<T, TR>(this IFindFluent<T, TR> find,
         [EnumeratorCancellation] CancellationToken ct = default)
     {
         using var cursor = await find.ToCursorAsync(ct);
@@ -209,7 +209,7 @@ public static class MongoExtensions
         var command =
             new BsonDocumentCommand<BsonDocument>(new BsonDocument
             {
-                { "buildInfo", 1 }
+                { "buildInfo", 1 },
             });
 
         var document = await database.RunCommandAsync(command, cancellationToken: ct);

@@ -22,8 +22,8 @@ public class RolesJsonTests
             ["Custom"] =
             [
                 "Permission1",
-                "Permission2"
-            ]
+                "Permission2",
+            ],
         };
 
         var expected =

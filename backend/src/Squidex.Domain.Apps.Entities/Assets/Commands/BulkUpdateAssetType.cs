@@ -11,5 +11,5 @@ public enum BulkUpdateAssetType
 {
     Annotate,
     Move,
-    Delete
+    Delete,
 }

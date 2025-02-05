@@ -10,5 +10,5 @@ namespace Squidex.Infrastructure.Queries;
 public enum SortOrder
 {
     Ascending,
-    Descending
+    Descending,
 }

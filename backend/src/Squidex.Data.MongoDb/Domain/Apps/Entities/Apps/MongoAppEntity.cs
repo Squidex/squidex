@@ -39,7 +39,7 @@ public sealed class MongoAppEntity : MongoState<App>
     {
         var users = new HashSet<string>
         {
-            Document.CreatedBy.Identifier
+            Document.CreatedBy.Identifier,
         };
 
         users.AddRange(Document.Contributors.Keys);

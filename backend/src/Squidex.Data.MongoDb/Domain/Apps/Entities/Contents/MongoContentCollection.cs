@@ -70,7 +70,7 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
     {
         return new MongoCollectionSettings
         {
-            ReadPreference = readPreference
+            ReadPreference = readPreference,
         };
     }
 
@@ -85,7 +85,7 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
             queryByQuery,
             queryReferences,
             queryReferrers,
-            queryScheduled
+            queryScheduled,
         };
 
         foreach (var operation in operations)
@@ -96,10 +96,10 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
         return collection.Indexes.CreateManyAsync(operations.SelectMany(x => x.CreateIndexes()), ct);
     }
 
-    public Task ResetScheduledAsync(DomainId appId, DomainId contentId,
+    public Task ResetScheduledAsync(DomainId appId, DomainId id,
         CancellationToken ct)
     {
-        var documentId = DomainId.Combine(appId, contentId);
+        var documentId = DomainId.Combine(appId, id);
 
         return Collection.UpdateOneAsync(
             x => x.DocumentId == documentId,
@@ -127,10 +127,10 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
         return queryScheduled.QueryAsync(now, ct);
     }
 
-    public IAsyncEnumerable<DomainId> StreamIds(DomainId appId, DomainId schemaId,
+    public IAsyncEnumerable<DomainId> StreamIds(DomainId appId, HashSet<DomainId>? schemaIds,
         CancellationToken ct)
     {
-        return queryAsStream.StreamAllIds(appId, schemaId, ct);
+        return queryAsStream.StreamAllIds(appId, schemaIds, ct);
     }
 
     public async Task DeleteAppAsync(DomainId appId,
@@ -151,7 +151,19 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
         }
     }
 
-    public async Task<IResultList<Content>> QueryAsync(App app, List<Schema> schemas, Q q,
+    public Task<IResultList<Content>> QueryAsync(App app, Schema schema, Q q,
+        CancellationToken ct)
+    {
+        return QueryAsync(app, [schema], true, q, ct);
+    }
+
+    public Task<IResultList<Content>> QueryAsync(App app, List<Schema> schemas, Q q,
+        CancellationToken ct)
+    {
+        return QueryAsync(app, schemas, false, q, ct);
+    }
+
+    private async Task<IResultList<Content>> QueryAsync(App app, List<Schema> schemas, bool isSingle, Q q,
         CancellationToken ct)
     {
         using (Telemetry.Activities.StartActivity("MongoContentCollection/QueryAsync"))
@@ -178,47 +190,17 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
                     return await queryByQuery.QueryAsync(app, schemas, q, ct);
                 }
 
+                if (isSingle && queryInDedicatedCollection != null)
+                {
+                    return await queryInDedicatedCollection.QueryAsync(schemas.Single(), q, ct);
+                }
+
+                if (isSingle)
+                {
+                    return await queryByQuery.QueryAsync(schemas.Single(), q, ct);
+                }
+
                 return ResultList.Empty<Content>();
-            }
-            catch (MongoCommandException ex) when (ex.Code == 96)
-            {
-                throw new DomainException(T.Get("common.resultTooLarge"));
-            }
-            catch (MongoQueryException ex) when (ex.Message.Contains("17406", StringComparison.Ordinal))
-            {
-                throw new DomainException(T.Get("common.resultTooLarge"));
-            }
-        }
-    }
-
-    public async Task<IResultList<Content>> QueryAsync(App app, Schema schema, Q q,
-        CancellationToken ct)
-    {
-        using (Telemetry.Activities.StartActivity("MongoContentCollection/QueryAsync"))
-        {
-            try
-            {
-                if (q.Ids is { Count: > 0 })
-                {
-                    return await queryByIds.QueryAsync(app, [schema], q, ct);
-                }
-
-                if (q.ScheduledFrom != null && q.ScheduledTo != null)
-                {
-                    return await queryScheduled.QueryAsync(app, [schema], q, ct);
-                }
-
-                if (q.Referencing != default)
-                {
-                    return await queryReferences.QueryAsync(app, [schema], q, ct);
-                }
-
-                if (queryInDedicatedCollection != null)
-                {
-                    return await queryInDedicatedCollection.QueryAsync(schema, q, ct);
-                }
-
-                return await queryByQuery.QueryAsync(schema, q, ct);
             }
             catch (MongoCommandException ex) when (ex.Code == 96)
             {

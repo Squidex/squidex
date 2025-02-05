@@ -383,7 +383,7 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
             App = App,
             Command = new CreateContent { User = currentUser, Actor = User },
             CommandId = content.Id,
-            Schema = operationSchema
+            Schema = operationSchema,
         };
     }
 
@@ -409,7 +409,7 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
             LastModified = default,
             LastModifiedBy = User,
             NewVersion = newStatus != null ? new ContentVersion(newStatus.Value, []) : null,
-            SchemaId = SchemaId
+            SchemaId = SchemaId,
         };
     }
 }

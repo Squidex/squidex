@@ -27,7 +27,7 @@ public class ContentSchedulerProcessTests : GivenContext
     {
         sut = new ContentSchedulerProcess(contentRepository, commandBus, A.Fake<ILogger<ContentSchedulerProcess>>())
         {
-            Clock = clock
+            Clock = clock,
         };
     }
 
@@ -38,12 +38,12 @@ public class ContentSchedulerProcessTests : GivenContext
 
         var content1 = CreateContent() with
         {
-            ScheduleJob = new ScheduleJob(DomainId.NewGuid(), Status.Archived, null!, now)
+            ScheduleJob = new ScheduleJob(DomainId.NewGuid(), Status.Archived, null!, now),
         };
 
         var content2 = CreateContent() with
         {
-            ScheduleJob = new ScheduleJob(DomainId.NewGuid(), Status.Draft, null!, now)
+            ScheduleJob = new ScheduleJob(DomainId.NewGuid(), Status.Draft, null!, now),
         };
 
         A.CallTo(() => clock.GetCurrentInstant())
@@ -78,7 +78,7 @@ public class ContentSchedulerProcessTests : GivenContext
 
         var content1 = CreateContent() with
         {
-            ScheduleJob = null
+            ScheduleJob = null,
         };
 
         A.CallTo(() => clock.GetCurrentInstant())
@@ -100,7 +100,7 @@ public class ContentSchedulerProcessTests : GivenContext
 
         var content1 = CreateContent() with
         {
-            ScheduleJob = new ScheduleJob(DomainId.NewGuid(), Status.Archived, null!, now)
+            ScheduleJob = new ScheduleJob(DomainId.NewGuid(), Status.Archived, null!, now),
         };
 
         A.CallTo(() => clock.GetCurrentInstant())

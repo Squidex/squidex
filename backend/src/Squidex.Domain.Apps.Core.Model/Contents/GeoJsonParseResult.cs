@@ -12,5 +12,5 @@ public enum GeoJsonParseResult
     Success,
     InvalidLatitude,
     InvalidLongitude,
-    InvalidValue
+    InvalidValue,
 }

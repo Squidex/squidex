@@ -135,12 +135,12 @@ public class NamedIdTests
     {
         var value = new
         {
-            value = new { id = 42, name = "my-name" }
+            value = new { id = 42, name = "my-name" },
         };
 
         var expected = new Wrapper
         {
-            Value = NamedId.Of(42L, "my-name")
+            Value = NamedId.Of(42L, "my-name"),
         };
 
         var serialized = value.SerializeAndDeserializeJson<Wrapper, object>();

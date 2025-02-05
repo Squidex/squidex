@@ -71,7 +71,7 @@ public class ScriptingCompleterTests
                 "ctx.schemaName",
                 "ctx.status",
                 "ctx.statusOld",
-                "ctx.validate"
+                "ctx.validate",
             ]);
     }
 
@@ -114,7 +114,7 @@ public class ScriptingCompleterTests
                 "ctx.command.parentPath",
                 "ctx.command.permanent",
                 "ctx.command.tags",
-                "ctx.operation"
+                "ctx.operation",
             ]);
     }
 
@@ -167,7 +167,7 @@ public class ScriptingCompleterTests
                 "event.status",
                 "event.timestamp",
                 "event.type",
-                "event.version"
+                "event.version",
             ]);
     }
 
@@ -188,7 +188,7 @@ public class ScriptingCompleterTests
                 "user.displayName",
                 "user.email",
                 "user.id",
-                "user.role"
+                "user.role",
             });
     }
 
@@ -205,7 +205,7 @@ public class ScriptingCompleterTests
                 "data['my-field']",
                 "data['my-field'].iv",
                 "id",
-                "version"
+                "version",
             });
     }
 
@@ -261,7 +261,7 @@ public class ScriptingCompleterTests
                 "event.slug",
                 "event.timestamp",
                 "event.type",
-                "event.version"
+                "event.version",
             ]);
     }
 
@@ -295,7 +295,7 @@ public class ScriptingCompleterTests
                 "event.name",
                 "event.text",
                 "event.timestamp",
-                "event.version"
+                "event.version",
             ]);
     }
 
@@ -331,7 +331,7 @@ public class ScriptingCompleterTests
                 "event.schemaId.name",
                 "event.timestamp",
                 "event.type",
-                "event.version"
+                "event.version",
             ]);
     }
 
@@ -364,7 +364,7 @@ public class ScriptingCompleterTests
                 "event.callsLimit",
                 "event.name",
                 "event.timestamp",
-                "event.version"
+                "event.version",
             });
     }
 
@@ -391,7 +391,7 @@ public class ScriptingCompleterTests
         [
             $"{path}",
             $"{path}.identifier",
-            $"{path}.type"
+            $"{path}.type",
         ];
     }
 
@@ -405,7 +405,7 @@ public class ScriptingCompleterTests
             $"{path}.email",
             $"{path}.id",
             $"{path}.isClient",
-            $"{path}.isUser"
+            $"{path}.isUser",
         ];
     }
 }

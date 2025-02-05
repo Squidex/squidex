@@ -23,7 +23,7 @@ public sealed class QueryParser(Func<string, string> fieldProvider)
 
         return new Query
         {
-            Text = text
+            Text = text,
         };
     }
 

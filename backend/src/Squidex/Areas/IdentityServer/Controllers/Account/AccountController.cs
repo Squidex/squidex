@@ -99,7 +99,7 @@ public sealed class AccountController(
         var update = new UserValues
         {
             Consent = true,
-            ConsentForEmails = model.ConsentToAutomatedEmails
+            ConsentForEmails = model.ConsentToAutomatedEmails,
         };
 
         await userService.UpdateAsync(user.Id, update, ct: HttpContext.RequestAborted);
@@ -213,7 +213,7 @@ public sealed class AccountController(
             HasPasswordAuth = allowPasswordAuth,
             HasCustomAuth = allowCustomDomains,
             RequestType = requestType,
-            ReturnUrl = returnUrl
+            ReturnUrl = returnUrl,
         };
 
         return View(nameof(Login), vm);
@@ -261,7 +261,7 @@ public sealed class AccountController(
             {
                 var values = new UserValues
                 {
-                    CustomClaims = login.Principal.Claims.GetSquidexClaims().ToList()
+                    CustomClaims = login.Principal.Claims.GetSquidexClaims().ToList(),
                 };
 
                 user = await userService.UpdateAsync(user.Id, values, false, HttpContext.RequestAborted);
@@ -289,7 +289,7 @@ public sealed class AccountController(
             {
                 var values = new UserValues
                 {
-                    CustomClaims = login.Principal.Claims.GetSquidexClaims().ToList()
+                    CustomClaims = login.Principal.Claims.GetSquidexClaims().ToList(),
                 };
 
                 var locked = identityOptions.LockAutomatically;

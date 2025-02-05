@@ -48,8 +48,8 @@ public static class CommandFactory
                         coordinates = new[]
                         {
                             point.Coordinate.X,
-                            point.Coordinate.Y
-                        }
+                            point.Coordinate.Y,
+                        },
                     };
                     break;
                 }
@@ -69,7 +69,7 @@ public static class CommandFactory
                 ["serveAll"] = upsert.ServeAll,
                 ["servePublished"] = upsert.ServePublished,
                 ["geoField"] = geoField,
-                ["geoObject"] = geoObject
+                ["geoObject"] = geoObject,
             };
 
             foreach (var (key, value) in upsert.Texts)
@@ -96,7 +96,7 @@ public static class CommandFactory
         {
             ["docId"] = update.ToDocId(),
             ["serveAll"] = update.ServeAll,
-            ["servePublished"] = update.ServePublished
+            ["servePublished"] = update.ServePublished,
         };
 
         batch.Add(IndexDocumentsAction.MergeOrUpload(document));

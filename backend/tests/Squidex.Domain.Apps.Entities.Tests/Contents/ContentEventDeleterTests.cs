@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Events;
@@ -47,7 +48,7 @@ public class ContentEventDeleterTests : GivenContext
         var id2 = DomainId.NewGuid();
         var ids = new[] { id1, id2 };
 
-        A.CallTo(() => contentRepository.StreamIds(App.Id, Schema.Id, SearchScope.All, CancellationToken))
+        A.CallTo(() => contentRepository.StreamIds(App.Id, A<HashSet<DomainId>>.That.Is(Schema.Id), SearchScope.All, CancellationToken))
             .Returns(ids.ToAsyncEnumerable());
 
         await sut.DeleteSchemAsync(App, Schema, CancellationToken);

@@ -76,7 +76,7 @@ public sealed class ContentSchedulerProcess(
                     ContentId = id,
                     SchemaId = content.SchemaId,
                     Status = job.Status,
-                    StatusJobId = job.Id
+                    StatusJobId = job.Id,
                 };
 
                 await commandBus.PublishAsync(command, default);

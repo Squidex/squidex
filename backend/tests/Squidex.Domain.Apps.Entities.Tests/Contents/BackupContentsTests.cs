@@ -57,7 +57,7 @@ public class BackupContentsTests : GivenContext
 
         await sut.BackupEventAsync(Envelope.Create(new AppCreated
         {
-            Name = AppId.Name
+            Name = AppId.Name,
         }), context, CancellationToken);
 
         A.CallTo(() => writer.WriteJsonAsync(A<string>._,
@@ -90,7 +90,7 @@ public class BackupContentsTests : GivenContext
             .Returns(new BackupContents.Urls
             {
                 Assets = oldAssetsUrl,
-                AssetsApp = oldAssetsUrlApp
+                AssetsApp = oldAssetsUrlApp,
             });
 
         var data =
@@ -131,12 +131,12 @@ public class BackupContentsTests : GivenContext
 
         await sut.RestoreEventAsync(Envelope.Create(new AppCreated
         {
-            Name = AppId.Name
+            Name = AppId.Name,
         }), context, CancellationToken);
 
         await sut.RestoreEventAsync(Envelope.Create(new ContentUpdated
         {
-            Data = data
+            Data = data,
         }), context, CancellationToken);
 
         Assert.Equal(updateData, data);
@@ -159,30 +159,30 @@ public class BackupContentsTests : GivenContext
         await sut.RestoreEventAsync(ContentEvent(new ContentCreated
         {
             ContentId = contentId1,
-            SchemaId = schemaId1
+            SchemaId = schemaId1,
         }), context, CancellationToken);
 
         await sut.RestoreEventAsync(ContentEvent(new ContentCreated
         {
             ContentId = contentId2,
-            SchemaId = schemaId1
+            SchemaId = schemaId1,
         }), context, CancellationToken);
 
         await sut.RestoreEventAsync(ContentEvent(new ContentCreated
         {
             ContentId = contentId3,
-            SchemaId = schemaId2
+            SchemaId = schemaId2,
         }), context, CancellationToken);
 
         await sut.RestoreEventAsync(ContentEvent(new ContentDeleted
         {
             ContentId = contentId2,
-            SchemaId = schemaId1
+            SchemaId = schemaId1,
         }), context, CancellationToken);
 
         await sut.RestoreEventAsync(Envelope.Create(new SchemaDeleted
         {
-            SchemaId = schemaId2
+            SchemaId = schemaId2,
         }), context, CancellationToken);
 
         var rebuildContents = new HashSet<DomainId>();
@@ -195,7 +195,7 @@ public class BackupContentsTests : GivenContext
         Assert.Equal(
         [
             DomainId.Combine(AppId, contentId1),
-            DomainId.Combine(AppId, contentId2)
+            DomainId.Combine(AppId, contentId2),
         ], rebuildContents);
     }
 

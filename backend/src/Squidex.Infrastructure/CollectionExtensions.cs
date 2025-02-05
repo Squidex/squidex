@@ -35,7 +35,7 @@ public static class CollectionExtensions
         {
             var clone = new Dictionary<TKey, TValue>(source)
             {
-                [key] = value
+                [key] = value,
             };
 
             result = clone;
@@ -54,7 +54,7 @@ public static class CollectionExtensions
         {
             var clone = new Dictionary<TKey, TValue>(source)
             {
-                [key] = value
+                [key] = value,
             };
 
             result = clone;
@@ -73,7 +73,7 @@ public static class CollectionExtensions
         {
             var clone = new Dictionary<TKey, TValue>(source)
             {
-                [key] = value
+                [key] = value,
             };
 
             result = clone;
@@ -203,7 +203,7 @@ public static class CollectionExtensions
 
     public static IEnumerable<T> OrEmpty<T>(this IEnumerable<T>? source)
     {
-        return source ?? Enumerable.Empty<T>();
+        return source ?? [];
     }
 
     public static IEnumerable<T> NotNull<T>(this IEnumerable<T?> source) where T : class

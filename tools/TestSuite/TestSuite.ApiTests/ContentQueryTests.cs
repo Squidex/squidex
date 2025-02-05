@@ -377,6 +377,7 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
     }
 
     [Fact]
+    [Trait("Category", "MongoOnly")]
     public async Task Should_query_by_full_text_with_odata()
     {
         var q = new ContentQuery { Search = "2" };
@@ -387,6 +388,7 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
     }
 
     [Fact]
+    [Trait("Category", "MongoOnly")]
     public async Task Should_query_by_full_text_with_json()
     {
         var q = new ContentQuery
@@ -403,6 +405,7 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
     }
 
     [Fact]
+    [Trait("Category", "MongoOnly")]
     public async Task Should_query_by_near_location_with_odata()
     {
         var q = new ContentQuery { Filter = "geo.distance(data/geo/iv, geography'POINT(103 3)') lt 1000" };
@@ -413,6 +416,7 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
     }
 
     [Fact]
+    [Trait("Category", "MongoOnly")]
     public async Task Should_query_by_near_location_with_json()
     {
         var q = new ContentQuery
@@ -439,6 +443,7 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
     }
 
     [Fact]
+    [Trait("Category", "MongoOnly")]
     public async Task Should_query_by_near_geoson_location_with_odata()
     {
         var q = new ContentQuery { Filter = "geo.distance(data/geo/iv, geography'POINT(104 4)') lt 1000" };
@@ -498,6 +503,7 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
     }
 
     [Fact]
+    [Trait("Category", "MongoOnly")]
     public async Task Should_query_by_near_geoson_location_with_json()
     {
         var q = new ContentQuery

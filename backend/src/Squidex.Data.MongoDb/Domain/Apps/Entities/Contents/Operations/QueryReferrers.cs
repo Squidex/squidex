@@ -39,16 +39,11 @@ internal sealed class QueryReferrers : OperationBase
         [EnumeratorCancellation] CancellationToken ct)
     {
         var filter = BuildFilter(appId, reference);
+        var find = Collection.Find(filter).Limit(take).SelectFields(null);
 
-        using (var cursor = await Collection.Find(filter).Limit(take).SelectFields(null).ToCursorAsync(ct))
+        await foreach (var entity in find.ToAsyncEnumerable(ct).WithCancellation(ct))
         {
-            while (await cursor.MoveNextAsync(ct))
-            {
-                foreach (var entity in cursor.Current)
-                {
-                    yield return entity;
-                }
-            }
+            yield return entity;
         }
     }
 

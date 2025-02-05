@@ -21,7 +21,7 @@ public sealed class FieldRuleCommand
     {
         return new FieldRule(Action, Field)
         {
-            Condition = Condition
+            Condition = Condition,
         };
     }
 }

@@ -39,7 +39,7 @@ public sealed class MediumActionHandler(RuleEventFormatter formatter, IHttpClien
             contentFormat = action.IsHtml ? "html" : "markdown",
             content = await FormatAsync(action.Content, @event),
             canonicalUrl = await FormatAsync(action.CanonicalUrl, @event),
-            tags = await ParseTagsAsync(@event, action)
+            tags = await ParseTagsAsync(@event, action),
         };
 
         ruleJob.RequestBody = ToJson(requestBody);
@@ -108,7 +108,7 @@ public sealed class MediumActionHandler(RuleEventFormatter formatter, IHttpClien
     {
         var request = new HttpRequestMessage(HttpMethod.Post, path)
         {
-            Content = new StringContent(job.RequestBody, Encoding.UTF8, "application/json")
+            Content = new StringContent(job.RequestBody, Encoding.UTF8, "application/json"),
         };
 
         request.Headers.Add("Authorization", $"Bearer {job.AccessToken}");

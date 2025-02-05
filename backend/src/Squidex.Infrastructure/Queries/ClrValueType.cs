@@ -19,5 +19,5 @@ public enum ClrValueType
     Single,
     Sphere,
     String,
-    Null
+    Null,
 }

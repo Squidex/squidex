@@ -86,7 +86,7 @@ public class UsageTriggerHandlerTests : GivenContext
             AppId = AppId,
             IncludeSkipped = false,
             IncludeStale = false,
-            Rule = CreateRule() with { Trigger = trigger }
+            Rule = CreateRule() with { Trigger = trigger },
         };
     }
 }

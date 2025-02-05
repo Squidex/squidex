@@ -12,5 +12,5 @@ public enum AppClientPermission
 {
     Developer,
     Editor,
-    Reader
+    Reader,
 }

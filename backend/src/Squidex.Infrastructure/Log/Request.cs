@@ -7,15 +7,13 @@
 
 using NodaTime;
 
-#pragma warning disable SA1401 // Fields should be private
-
 namespace Squidex.Infrastructure.Log;
 
 public sealed class Request
 {
-    public Instant Timestamp;
+    public Instant Timestamp { get; set; }
 
-    public string Key;
+    public string Key { get; set; }
 
-    public Dictionary<string, string> Properties = [];
+    public Dictionary<string, string> Properties { get; set; } = [];
 }

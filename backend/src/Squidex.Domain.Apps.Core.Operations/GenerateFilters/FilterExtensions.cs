@@ -54,7 +54,7 @@ public static class FilterExtensions
             var filterable = new FilterField(
                 new FilterSchema(FilterSchemaType.Object)
                 {
-                    Fields = partitionFields.ToReadonlyList()
+                    Fields = partitionFields.ToReadonlyList(),
                 },
                 field.Name,
                 FieldDescription(schemaName, field));
@@ -64,7 +64,7 @@ public static class FilterExtensions
 
         var dataSchema = new FilterSchema(FilterSchemaType.Object)
         {
-            Fields = fields.ToReadonlyList()
+            Fields = fields.ToReadonlyList(),
         };
 
         return dataSchema;

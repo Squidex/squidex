@@ -55,7 +55,7 @@ public sealed class ContentChangedTriggerHandler(
         {
             var result = new EnrichedContentEvent
             {
-                Type = EnrichedContentEventType.Created
+                Type = EnrichedContentEventType.Created,
             };
 
             SimpleMapper.Map(content, result);
@@ -101,7 +101,7 @@ public sealed class ContentChangedTriggerHandler(
         {
             var result = new EnrichedContentEvent
             {
-                Type = EnrichedContentEventType.ReferenceUpdated
+                Type = EnrichedContentEventType.ReferenceUpdated,
             };
 
             SimpleMapper.Map(content, result);
@@ -291,7 +291,7 @@ public sealed class ContentChangedTriggerHandler(
         // Script vars are just wrappers over dictionaries for better performance.
         var vars = new EventScriptVars
         {
-            Event = @event
+            Event = @event,
         };
 
         return scriptEngine.Evaluate(vars, schema.Condition);

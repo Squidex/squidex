@@ -32,7 +32,7 @@ public class ApiExceptionFilterAttributeTests
             new ValidationError("Error2", "property0"),
             new ValidationError("Error3", "property1", "property2"),
             new ValidationError("Error4", "Property3.Property4"),
-            new ValidationError("Error5", "Property5[0].Property6")
+            new ValidationError("Error5", "Property5[0].Property6"),
         };
 
         var ex = new ValidationException(errors);
@@ -52,7 +52,7 @@ public class ApiExceptionFilterAttributeTests
             "property0: Error2",
             "property1, property2: Error3",
             "Property3.Property4: Error4",
-            "Property5[0].Property6: Error5"
+            "Property5[0].Property6: Error5",
         }, ((ErrorDto)actual.Value!).Details);
 
         A.CallTo(log)
@@ -239,7 +239,7 @@ public class ApiExceptionFilterAttributeTests
 
         return new ExceptionContext(actionContext, new List<IFilterMetadata>())
         {
-            Exception = exception
+            Exception = exception,
         };
     }
 
@@ -252,12 +252,12 @@ public class ApiExceptionFilterAttributeTests
 
         var httpContext = new DefaultHttpContext
         {
-            RequestServices = services
+            RequestServices = services,
         };
 
         var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor
         {
-            FilterDescriptors = new List<FilterDescriptor>()
+            FilterDescriptors = new List<FilterDescriptor>(),
         });
 
         return actionContext;

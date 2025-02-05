@@ -41,7 +41,7 @@ public sealed class NotificationActionHandler(RuleEventFormatter formatter, ICol
             CommentId = DomainId.NewGuid(),
             CommentsId = DomainId.Create(user.Id),
             FromRule = true,
-            Text = (await FormatAsync(action.Text, @event))!
+            Text = (await FormatAsync(action.Text, @event))!,
         };
 
         if (!string.IsNullOrWhiteSpace(action.Url))

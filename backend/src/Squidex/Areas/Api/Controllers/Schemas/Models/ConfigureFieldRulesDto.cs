@@ -22,7 +22,7 @@ public sealed class ConfigureFieldRulesDto
     {
         return new ConfigureFieldRules
         {
-            FieldRules = FieldRules?.Select(x => x.ToCommand()).ToArray()
+            FieldRules = FieldRules?.Select(x => x.ToCommand()).ToArray(),
         };
     }
 }

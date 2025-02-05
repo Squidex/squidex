@@ -198,7 +198,7 @@ public sealed class CachingManager : IRequestCache
 
         stringBuilderPool = new DefaultObjectPool<StringBuilder>(new StringBuilderPooledObjectPolicy
         {
-            MaximumRetainedCapacity = cachingOptions.Value.MaxSurrogateKeysSize
+            MaximumRetainedCapacity = cachingOptions.Value.MaxSurrogateKeysSize,
         });
     }
 

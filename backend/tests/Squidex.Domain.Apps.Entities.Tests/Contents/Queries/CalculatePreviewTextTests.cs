@@ -73,7 +73,7 @@ public class CalculatePreviewTextTests : GivenContext
                                             .Add("text", "Text3"),
                                         JsonValue.Object()
                                             .Add("type", "text")
-                                            .Add("text", "Text4")))))
+                                            .Add("text", "Text4"))))),
         };
 
         return content;

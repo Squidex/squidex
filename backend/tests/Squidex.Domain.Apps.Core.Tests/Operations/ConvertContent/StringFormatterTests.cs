@@ -11,7 +11,7 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Core.Operations.ConvertContent;
 
-public sealed class StringFormatterTests
+public class StringFormatterTests
 {
     [Fact]
     public void Should_format_null_value()

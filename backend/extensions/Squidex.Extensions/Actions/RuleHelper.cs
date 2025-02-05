@@ -21,7 +21,7 @@ public static class RuleHelper
             // Script vars are just wrappers over dictionaries for better performance.
             var vars = new EventScriptVars
             {
-                Event = @event
+                Event = @event,
             };
 
             return scriptEngine.Evaluate(vars, expression);

@@ -67,7 +67,7 @@ public class ContentFieldDataTests
         var source = new ContentFieldData
         {
             ["en"] = new JsonArray(),
-            ["de"] = new JsonArray()
+            ["de"] = new JsonArray(),
         };
 
         var clone = source.Clone();

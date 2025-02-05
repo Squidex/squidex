@@ -9,7 +9,7 @@ using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL;
 
-public sealed class NamesTests
+public class NamesTests
 {
     [Fact]
     public void Should_return_name_if_not_taken()

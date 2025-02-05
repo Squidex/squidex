@@ -33,13 +33,13 @@ public class ResolveAssetsTests : GivenContext
             {
                 ResolveFirst = true,
                 MinItems = 2,
-                MaxItems = 3
+                MaxItems = 3,
             })
             .AddAssets(2, "asset2", Partitioning.Language, new AssetsFieldProperties
             {
                 ResolveFirst = true,
                 MinItems = 1,
-                MaxItems = 1
+                MaxItems = 1,
             })
             .SetFieldsInLists(FieldNames.Create("asset1", "asset2"));
 
@@ -74,7 +74,7 @@ public class ResolveAssetsTests : GivenContext
                 [doc1.Id]),
             CreateContent(
                 [doc2.Id],
-                [doc2.Id])
+                [doc2.Id]),
         };
 
         A.CallTo(() => assetQuery.QueryAsync(
@@ -106,7 +106,7 @@ public class ResolveAssetsTests : GivenContext
                 [img2.Id, img1.Id]),
             CreateContent(
                 [doc1.Id],
-                [doc2.Id, doc1.Id])
+                [doc2.Id, doc1.Id]),
         };
 
         A.CallTo(() => assetQuery.QueryAsync(
@@ -141,7 +141,7 @@ public class ResolveAssetsTests : GivenContext
     {
         var contents = new[]
         {
-            CreateContent([DomainId.NewGuid()], [])
+            CreateContent([DomainId.NewGuid()], []),
         };
 
         await sut.EnrichAsync(ApiContext, contents, schemaProvider, CancellationToken);
@@ -157,7 +157,7 @@ public class ResolveAssetsTests : GivenContext
     {
         var contents = new[]
         {
-            CreateContent([DomainId.NewGuid()], [])
+            CreateContent([DomainId.NewGuid()], []),
         };
 
         await sut.EnrichAsync(FrontendContext.Clone(b => b.WithNoEnrichment(true)), contents, schemaProvider, CancellationToken);
@@ -173,7 +173,7 @@ public class ResolveAssetsTests : GivenContext
     {
         var contents = new[]
         {
-            CreateContent([], [])
+            CreateContent([], []),
         };
 
         await sut.EnrichAsync(FrontendContext, contents, schemaProvider, CancellationToken);
@@ -192,7 +192,7 @@ public class ResolveAssetsTests : GivenContext
 
         var contents = new[]
         {
-            CreateContent([id1, id2], [])
+            CreateContent([id1, id2], []),
         };
 
         await sut.EnrichAsync(FrontendContext, contents, schemaProvider, CancellationToken);
@@ -215,7 +215,7 @@ public class ResolveAssetsTests : GivenContext
                             .AddLocalized("iv", JsonValue.Array(assets1.Select(x => x.ToString()))))
                     .AddField("asset2",
                         new ContentFieldData()
-                            .AddLocalized("en", JsonValue.Array(assets2.Select(x => x.ToString()))))
+                            .AddLocalized("en", JsonValue.Array(assets2.Select(x => x.ToString())))),
         };
     }
 }

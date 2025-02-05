@@ -34,7 +34,7 @@ public class CachingTextIndexerStateTests : GivenContext
 
         var states = new Dictionary<UniqueContentId, TextContentState>
         {
-            [contentId] = state
+            [contentId] = state,
         };
 
         A.CallTo(() => inner.GetAsync(A<HashSet<UniqueContentId>>.That.Is(contentIds), CancellationToken))
@@ -99,12 +99,12 @@ public class CachingTextIndexerStateTests : GivenContext
 
         await sut.SetAsync(
         [
-            state
+            state,
         ], CancellationToken);
 
         await sut.SetAsync(
         [
-            new TextContentState { UniqueContentId = contentId, State = TextState.Deleted }
+            new TextContentState { UniqueContentId = contentId, State = TextState.Deleted },
         ], CancellationToken);
 
         var found1 = await sut.GetAsync(contentIds, CancellationToken);

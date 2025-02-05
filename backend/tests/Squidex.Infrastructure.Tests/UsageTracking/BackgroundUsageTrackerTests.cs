@@ -92,7 +92,7 @@ public class BackgroundUsageTrackerTests
             new StoredUsage("category1", date.AddDays(1), Counters(a: 10, b: 15)),
             new StoredUsage("category1", date.AddDays(3), Counters(a: 13, b: 18)),
             new StoredUsage("category2", date.AddDays(5), Counters(a: 15)),
-            new StoredUsage("category2", date.AddDays(7), Counters(b: 22))
+            new StoredUsage("category2", date.AddDays(7), Counters(b: 22)),
         };
 
         A.CallTo(() => usageStore.QueryAsync(key, dateFrom, dateTo, ct))
@@ -118,7 +118,7 @@ public class BackgroundUsageTrackerTests
             new StoredUsage("category1", date.AddDays(1), Counters(a: 10, b: 15)),
             new StoredUsage("category1", date.AddDays(3), Counters(a: 13, b: 18)),
             new StoredUsage("category2", date.AddDays(5), Counters(a: 15)),
-            new StoredUsage("category2", date.AddDays(7), Counters(b: 22))
+            new StoredUsage("category2", date.AddDays(7), Counters(b: 22)),
         };
 
         A.CallTo(() => usageStore.QueryAsync(key, dateFrom, dateTo, ct))
@@ -152,8 +152,8 @@ public class BackgroundUsageTrackerTests
                 (dateFrom.AddDays(1), new Counters()),
                 (dateFrom.AddDays(2), new Counters()),
                 (dateFrom.AddDays(3), new Counters()),
-                (dateFrom.AddDays(4), new Counters())
-            ]
+                (dateFrom.AddDays(4), new Counters()),
+            ],
         };
 
         actual.Should().BeEquivalentTo(expected);
@@ -171,7 +171,7 @@ public class BackgroundUsageTrackerTests
             new StoredUsage("my-category", dateFrom.AddDays(3), Counters(a: 13, b: 18)),
             new StoredUsage("my-category", dateFrom.AddDays(4), Counters(a: 15, b: 20)),
             new StoredUsage(null, dateFrom.AddDays(0), Counters(a: 17, b: 22)),
-            new StoredUsage(null, dateFrom.AddDays(2), Counters(a: 11, b: 14))
+            new StoredUsage(null, dateFrom.AddDays(2), Counters(a: 11, b: 14)),
         };
 
         A.CallTo(() => usageStore.QueryAsync(key, dateFrom, dateTo, ct))
@@ -187,7 +187,7 @@ public class BackgroundUsageTrackerTests
                 (dateFrom.AddDays(1), Counters(a: 10, b: 15)),
                 (dateFrom.AddDays(2), Counters()),
                 (dateFrom.AddDays(3), Counters(a: 13, b: 18)),
-                (dateFrom.AddDays(4), Counters(a: 15, b: 20))
+                (dateFrom.AddDays(4), Counters(a: 15, b: 20)),
             ],
             ["*"] =
             [
@@ -195,8 +195,8 @@ public class BackgroundUsageTrackerTests
                 (dateFrom.AddDays(1), Counters()),
                 (dateFrom.AddDays(2), Counters(a: 11, b: 14)),
                 (dateFrom.AddDays(3), Counters()),
-                (dateFrom.AddDays(4), Counters())
-            ]
+                (dateFrom.AddDays(4), Counters()),
+            ],
         };
 
         actual.Should().BeEquivalentTo(expected);
@@ -236,7 +236,7 @@ public class BackgroundUsageTrackerTests
             new UsageUpdate(date, key1, "my-category", Counters(a: 1.0, b: 1000)),
             new UsageUpdate(date, key2, "my-category", Counters(a: 1.5, b: 5000)),
             new UsageUpdate(date, key3, "my-category", Counters(a: 0.4, b: 9000)),
-            new UsageUpdate(date, key3, "*", Counters(1, 8000))
+            new UsageUpdate(date, key3, "*", Counters(1, 8000)),
         }, o => o.ComparingByMembers<UsageUpdate>());
 
         A.CallTo(() => usageStore.TrackUsagesAsync(A<UsageUpdate[]>._, A<CancellationToken>._))

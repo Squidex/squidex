@@ -71,10 +71,11 @@ public sealed class RuleDequeuerWorker : IBackgroundProcess
         {
             var now = Clock.GetCurrentInstant();
 
-            await ruleEventRepository.QueryPendingAsync(now, async @event =>
+            var events = ruleEventRepository.QueryPendingAsync(now, ct);
+            await foreach (var @event in @events.WithCancellation(ct))
             {
                 await requestScheduler.ScheduleAsync(@event.Job.ExecutionPartition, @event, ct);
-            }, ct);
+            }
         }
         catch (Exception ex)
         {
@@ -108,7 +109,7 @@ public sealed class RuleDequeuerWorker : IBackgroundProcess
                 ExecutionResult = response.Status,
                 Finished = now,
                 JobNext = jobDelay,
-                JobResult = jobResult
+                JobResult = jobResult,
             };
 
             await ruleEventRepository.UpdateAsync(@event.Job, update, default);

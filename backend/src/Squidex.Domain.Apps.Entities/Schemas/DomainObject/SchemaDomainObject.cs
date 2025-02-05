@@ -248,7 +248,7 @@ public partial class SchemaDomainObject(DomainId id, IPersistenceFactory<Schema>
         var options = new SchemaSynchronizationOptions
         {
             NoFieldDeletion = command.NoFieldDeletion,
-            NoFieldRecreation = command.NoFieldRecreation
+            NoFieldRecreation = command.NoFieldRecreation,
         };
 
         var schemaSource = Snapshot;

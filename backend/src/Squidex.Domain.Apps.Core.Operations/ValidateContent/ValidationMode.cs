@@ -10,5 +10,5 @@ namespace Squidex.Domain.Apps.Core.ValidateContent;
 public enum ValidationMode
 {
     Default,
-    Optimized
+    Optimized,
 }

@@ -48,7 +48,7 @@ public sealed class ClientUser : IUser
         claims =
         [
             new Claim(OpenIdClaims.ClientId, token.Identifier),
-            new Claim(SquidexClaimTypes.DisplayName, token.Identifier)
+            new Claim(SquidexClaimTypes.DisplayName, token.Identifier),
         ];
     }
 }

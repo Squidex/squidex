@@ -47,7 +47,7 @@ public class CustomCommandMiddlewareRunnerTests
         [
             new CustomMiddleware(10),
             new CustomMiddleware(12),
-            new CustomMiddleware(14)
+            new CustomMiddleware(14),
         ]);
 
         var isNextCalled = false;

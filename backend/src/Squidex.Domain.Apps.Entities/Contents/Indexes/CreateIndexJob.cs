@@ -38,7 +38,7 @@ public sealed class CreateIndexJob(IContentRepository contentRepository) : IJobR
             [ArgAppId] = app.Id.ToString(),
             [ArgAppName] = app.Name,
             [ArgSchemaId] = schema.Id.ToString(),
-            [ArgSchemaName] = schema.Name
+            [ArgSchemaName] = schema.Name,
         };
 
         foreach (var field in index)
@@ -51,7 +51,7 @@ public sealed class CreateIndexJob(IContentRepository contentRepository) : IJobR
             TaskName,
             args) with
         {
-            AppId = app.NamedId()
+            AppId = app.NamedId(),
         };
     }
 

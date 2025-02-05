@@ -11,5 +11,5 @@ public enum AssetPreviewMode
 {
     ImageAndFileName,
     Image,
-    FileName
+    FileName,
 }

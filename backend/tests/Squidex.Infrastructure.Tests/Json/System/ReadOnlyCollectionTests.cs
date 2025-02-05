@@ -24,8 +24,8 @@ public class ReadOnlyCollectionTests
             Values = new Dictionary<int, int>
             {
                 [2] = 4,
-                [3] = 9
-            }
+                [3] = 9,
+            },
         };
 
         var serialized = source.SerializeAndDeserializeJson();
@@ -41,8 +41,8 @@ public class ReadOnlyCollectionTests
             Values = new List<int>
             {
                 2,
-                3
-            }
+                3,
+            },
         };
 
         var serialized = source.SerializeAndDeserializeJson();

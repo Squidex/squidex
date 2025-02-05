@@ -10,7 +10,7 @@ using Squidex.Infrastructure.TestHelpers;
 
 namespace Squidex.Infrastructure.Security;
 
-public sealed class PermissionSetTests
+public class PermissionSetTests
 {
     [Fact]
     public void Should_provide_collection_features()
@@ -19,7 +19,7 @@ public sealed class PermissionSetTests
         {
             new Permission("c"),
             new Permission("b"),
-            new Permission("a")
+            new Permission("a"),
         };
 
         var sut = new PermissionSet(source);

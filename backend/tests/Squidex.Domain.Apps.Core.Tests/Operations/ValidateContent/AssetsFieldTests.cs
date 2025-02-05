@@ -58,7 +58,7 @@ public class AssetsFieldTests : IClassFixture<TranslationsFixture>
         {
             IsRequired = true,
             MinItems = 1,
-            MaxItems = 3
+            MaxItems = 3,
         });
 
         await sut.ValidateAsync(CreateValue(asset1), errors, factory: factory);

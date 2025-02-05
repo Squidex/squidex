@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Tasks;
 
-namespace Squidex.Migrations.MongoDb;
+namespace Squidex.Migrations;
 
 public sealed class ConvertDocumentIds(IMongoDatabase databaseDefault, IMongoDatabase databaseContent) : MongoBase<BsonDocument>, IMigration
 {
@@ -21,7 +21,7 @@ public sealed class ConvertDocumentIds(IMongoDatabase databaseDefault, IMongoDat
     {
         None,
         Assets,
-        Contents
+        Contents,
     }
 
     public override string ToString()
@@ -109,7 +109,7 @@ public sealed class ConvertDocumentIds(IMongoDatabase databaseDefault, IMongoDat
 
                 writes.Add(new ReplaceOneModel<BsonDocument>(filter, document)
                 {
-                    IsUpsert = true
+                    IsUpsert = true,
                 });
             }
 

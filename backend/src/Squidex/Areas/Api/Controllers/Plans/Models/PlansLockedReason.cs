@@ -27,5 +27,5 @@ public enum PlansLockedReason
     /// <summary>
     /// The plan is managed by the team.
     /// </summary>
-    ManagedByTeam
+    ManagedByTeam,
 }

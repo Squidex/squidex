@@ -32,7 +32,7 @@ public class UsageGateTests : GivenContext
     {
         App = App with
         {
-            TeamId = default
+            TeamId = default,
         };
 
         A.CallTo(() => billingPlans.GetActualPlan(A<string>._))
@@ -87,7 +87,7 @@ public class UsageGateTests : GivenContext
     {
         App = App with
         {
-            TeamId = TeamId
+            TeamId = TeamId,
         };
 
         var plan = await sut.GetPlanForAppAsync(App, false, CancellationToken);
@@ -100,7 +100,7 @@ public class UsageGateTests : GivenContext
     {
         App = App with
         {
-            Plan = new AssignedPlan(User, planPaid.Id)
+            Plan = new AssignedPlan(User, planPaid.Id),
         };
 
         var plan = await sut.GetPlanForAppAsync(App, false, CancellationToken);
@@ -113,7 +113,7 @@ public class UsageGateTests : GivenContext
     {
         App = App with
         {
-            Plan = new AssignedPlan(User, planPaid.Id)
+            Plan = new AssignedPlan(User, planPaid.Id),
         };
 
         var plan = await sut.GetPlanForAppAsync(AppId.Id, false, CancellationToken);
@@ -127,7 +127,7 @@ public class UsageGateTests : GivenContext
         App = App with
         {
             Plan = new AssignedPlan(User, planPaid.Id),
-            TeamId = TeamId
+            TeamId = TeamId,
         };
 
         var plan = await sut.GetPlanForAppAsync(App, false, CancellationToken);
@@ -140,7 +140,7 @@ public class UsageGateTests : GivenContext
     {
         App = App with
         {
-            Clients = AppClients.Empty.Add(clientId, clientId).Update(clientId, apiCallsLimit: 1000)
+            Clients = AppClients.Empty.Add(clientId, clientId).Update(clientId, apiCallsLimit: 1000),
         };
 
         var plan = new Plan { Id = "custom", BlockingApiCalls = 1600, MaxApiCalls = 1600 };
@@ -287,7 +287,7 @@ public class UsageGateTests : GivenContext
     {
         App = App with
         {
-            TeamId = TeamId
+            TeamId = TeamId,
         };
 
         await sut.TrackRequestAsync(App, "client", today, 42, 50, 512, CancellationToken);
@@ -316,7 +316,7 @@ public class UsageGateTests : GivenContext
         {
             [UsageGate.RulesKeys.TotalCreated] = 100,
             [UsageGate.RulesKeys.TotalSucceeded] = 120,
-            [UsageGate.RulesKeys.TotalFailed] = 140
+            [UsageGate.RulesKeys.TotalFailed] = 140,
         };
 
         countersSummary.Should().BeEquivalentTo(expected);
@@ -328,7 +328,7 @@ public class UsageGateTests : GivenContext
     {
         App = App with
         {
-            TeamId = TeamId
+            TeamId = TeamId,
         };
 
         Counters? countersSummary = null;
@@ -348,7 +348,7 @@ public class UsageGateTests : GivenContext
         {
             [UsageGate.RulesKeys.TotalCreated] = 100,
             [UsageGate.RulesKeys.TotalSucceeded] = 120,
-            [UsageGate.RulesKeys.TotalFailed] = 140
+            [UsageGate.RulesKeys.TotalFailed] = 140,
         };
 
         countersSummary.Should().BeEquivalentTo(expected);
@@ -368,16 +368,16 @@ public class UsageGateTests : GivenContext
                         {
                             [UsageGate.RulesKeys.TotalCreated] = 100,
                             [UsageGate.RulesKeys.TotalSucceeded] = 120,
-                            [UsageGate.RulesKeys.TotalFailed] = 140
-                        })
-                    ]
+                            [UsageGate.RulesKeys.TotalFailed] = 140,
+                        }),
+                    ],
                 });
 
         var total = await ((IRuleUsageTracker)sut).GetTotalByAppAsync(AppId.Id, CancellationToken);
 
         total.Should().BeEquivalentTo(new Dictionary<DomainId, RuleCounters>
         {
-            [AppId.Id] = new RuleCounters(100, 120, 140)
+            [AppId.Id] = new RuleCounters(100, 120, 140),
         });
     }
 
@@ -392,7 +392,7 @@ public class UsageGateTests : GivenContext
         {
             new RuleStats(today.AddDays(0), new RuleCounters(100, 120, 140)),
             new RuleStats(today.AddDays(1), new RuleCounters(200, 220, 240)),
-            new RuleStats(today.AddDays(2), new RuleCounters(300, 320, 340))
+            new RuleStats(today.AddDays(2), new RuleCounters(300, 320, 340)),
         });
     }
 
@@ -407,7 +407,7 @@ public class UsageGateTests : GivenContext
         {
             new RuleStats(today.AddDays(0), new RuleCounters(100, 120, 140)),
             new RuleStats(today.AddDays(1), new RuleCounters(200, 220, 240)),
-            new RuleStats(today.AddDays(2), new RuleCounters(300, 320, 340))
+            new RuleStats(today.AddDays(2), new RuleCounters(300, 320, 340)),
         });
     }
 
@@ -422,20 +422,20 @@ public class UsageGateTests : GivenContext
                     {
                         [UsageGate.RulesKeys.TotalCreated] = 50,
                         [UsageGate.RulesKeys.TotalSucceeded] = 60,
-                        [UsageGate.RulesKeys.TotalFailed] = 70
+                        [UsageGate.RulesKeys.TotalFailed] = 70,
                     }),
                     (today.AddDays(1), new Counters
                     {
                         [UsageGate.RulesKeys.TotalCreated] = 200,
                         [UsageGate.RulesKeys.TotalSucceeded] = 220,
-                        [UsageGate.RulesKeys.TotalFailed] = 240
+                        [UsageGate.RulesKeys.TotalFailed] = 240,
                     }),
                     (today.AddDays(2), new Counters
                     {
                         [UsageGate.RulesKeys.TotalCreated] = 300,
                         [UsageGate.RulesKeys.TotalSucceeded] = 320,
-                        [UsageGate.RulesKeys.TotalFailed] = 340
-                    })
+                        [UsageGate.RulesKeys.TotalFailed] = 340,
+                    }),
                 ],
                 ["Custom"] =
                 [
@@ -443,9 +443,9 @@ public class UsageGateTests : GivenContext
                     {
                         [UsageGate.RulesKeys.TotalCreated] = 50,
                         [UsageGate.RulesKeys.TotalSucceeded] = 60,
-                        [UsageGate.RulesKeys.TotalFailed] = 70
-                    })
-                ]
+                        [UsageGate.RulesKeys.TotalFailed] = 70,
+                    }),
+                ],
             });
     }
 
@@ -466,7 +466,7 @@ public class UsageGateTests : GivenContext
         var expected = new Counters
         {
             [UsageGate.AssetsKeys.TotalSize] = 512,
-            [UsageGate.AssetsKeys.TotalAssets] = 3
+            [UsageGate.AssetsKeys.TotalAssets] = 3,
         };
 
         countersSummary.Should().BeEquivalentTo(expected);
@@ -478,7 +478,7 @@ public class UsageGateTests : GivenContext
     {
         App = App with
         {
-            TeamId = TeamId
+            TeamId = TeamId,
         };
 
         Counters? countersSummary = null;
@@ -495,7 +495,7 @@ public class UsageGateTests : GivenContext
         var expected = new Counters
         {
             [UsageGate.AssetsKeys.TotalSize] = 512,
-            [UsageGate.AssetsKeys.TotalAssets] = 3
+            [UsageGate.AssetsKeys.TotalAssets] = 3,
         };
 
         countersSummary.Should().BeEquivalentTo(expected);
@@ -509,7 +509,7 @@ public class UsageGateTests : GivenContext
             .Returns(new Counters
             {
                 [UsageGate.AssetsKeys.TotalSize] = 2048,
-                [UsageGate.AssetsKeys.TotalAssets] = 124
+                [UsageGate.AssetsKeys.TotalAssets] = 124,
             });
 
         var total = await ((IAssetUsageTracker)sut).GetTotalByAppAsync(AppId.Id, CancellationToken);
@@ -524,7 +524,7 @@ public class UsageGateTests : GivenContext
             .Returns(new Counters
             {
                 [UsageGate.AssetsKeys.TotalSize] = 2048,
-                [UsageGate.AssetsKeys.TotalAssets] = 124
+                [UsageGate.AssetsKeys.TotalAssets] = 124,
             });
 
         var total = await ((IAssetUsageTracker)sut).GetTotalByTeamAsync(AppId.Id, CancellationToken);
@@ -543,7 +543,7 @@ public class UsageGateTests : GivenContext
         {
             new AssetStats(today.AddDays(0), new AssetCounters(128, 2)),
             new AssetStats(today.AddDays(1), new AssetCounters(256, 3)),
-            new AssetStats(today.AddDays(2), new AssetCounters(512, 4))
+            new AssetStats(today.AddDays(2), new AssetCounters(512, 4)),
         });
     }
 
@@ -558,7 +558,7 @@ public class UsageGateTests : GivenContext
         {
             new AssetStats(today.AddDays(0), new AssetCounters(128, 2)),
             new AssetStats(today.AddDays(1), new AssetCounters(256, 3)),
-            new AssetStats(today.AddDays(2), new AssetCounters(512, 4))
+            new AssetStats(today.AddDays(2), new AssetCounters(512, 4)),
         });
     }
 
@@ -572,27 +572,27 @@ public class UsageGateTests : GivenContext
                     (today.AddDays(0), new Counters
                     {
                         [UsageGate.AssetsKeys.TotalSize] = 64,
-                        [UsageGate.AssetsKeys.TotalAssets] = 1
+                        [UsageGate.AssetsKeys.TotalAssets] = 1,
                     }),
                     (today.AddDays(1), new Counters
                     {
                         [UsageGate.AssetsKeys.TotalSize] = 256,
-                        [UsageGate.AssetsKeys.TotalAssets] = 3
+                        [UsageGate.AssetsKeys.TotalAssets] = 3,
                     }),
                     (today.AddDays(2), new Counters
                     {
                         [UsageGate.AssetsKeys.TotalSize] = 512,
-                        [UsageGate.AssetsKeys.TotalAssets] = 4
-                    })
+                        [UsageGate.AssetsKeys.TotalAssets] = 4,
+                    }),
                 ],
                 ["Custom"] =
                 [
                     (today.AddDays(0), new Counters
                     {
                         [UsageGate.AssetsKeys.TotalSize] = 64,
-                        [UsageGate.AssetsKeys.TotalAssets] = 1
-                    })
-                ]
+                        [UsageGate.AssetsKeys.TotalAssets] = 1,
+                    }),
+                ],
             });
     }
 }

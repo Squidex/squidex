@@ -90,14 +90,14 @@ public class NotifoService : IUserEvents
                 [Providers.WebPush] = new ChannelSettingDto
                 {
                     Send = ChannelSend.Send,
-                    DelayInSeconds = null
+                    DelayInSeconds = null,
                 },
 
                 [Providers.Email] = new ChannelSettingDto
                 {
                     Send = ChannelSend.Send,
-                    DelayInSeconds = 5 * 60
-                }
+                    DelayInSeconds = 5 * 60,
+                },
             };
 
             var userRequest = new UpsertUserDto
@@ -106,7 +106,7 @@ public class NotifoService : IUserEvents
                 FullName = user.Claims.DisplayName(),
                 PreferredLanguage = "en",
                 PreferredTimezone = null,
-                Settings = settings
+                Settings = settings,
             };
 
             if (user.Email.IsEmail())
@@ -118,8 +118,8 @@ public class NotifoService : IUserEvents
             {
                 Requests =
                 [
-                    userRequest
-                ]
+                    userRequest,
+                ],
             });
 
             var apiKey = response.First().ApiKey;
@@ -161,7 +161,7 @@ public class NotifoService : IUserEvents
             {
                 var request = new PublishManyDto
                 {
-                    Requests = batch.ToList()
+                    Requests = batch.ToList(),
                 };
 
                 await client.Events.PostEventsAsync(options.AppId, request);
@@ -212,7 +212,7 @@ public class NotifoService : IUserEvents
         {
             var request = new AddAllowedTopicDto
             {
-                Prefix = prefix
+                Prefix = prefix,
             };
 
             await actualClient.Users.PostAllowedTopicAsync(options.AppId, userId, request);
@@ -258,7 +258,7 @@ public class NotifoService : IUserEvents
     {
         var publishRequest = new PublishDto
         {
-            Properties = []
+            Properties = [],
         };
 
         foreach (var (key, value) in historyEvent.Parameters)
@@ -311,16 +311,16 @@ public class NotifoService : IUserEvents
             {
                 Subject =
                 {
-                    ["en"] = comment.Text
-                }
-            }
+                    ["en"] = comment.Text,
+                },
+            },
         };
 
         if (comment.AppId != null)
         {
             publishRequest.Properties = new NotificationProperties
             {
-                ["SquidexApp"] = comment.AppId.Name
+                ["SquidexApp"] = comment.AppId.Name,
             };
         }
 
@@ -328,7 +328,7 @@ public class NotifoService : IUserEvents
         {
             publishRequest.Preformatted.LinkUrl = new LocalizedText()
             {
-                ["en"] = comment.Url.ToString()
+                ["en"] = comment.Url.ToString(),
             };
         }
 

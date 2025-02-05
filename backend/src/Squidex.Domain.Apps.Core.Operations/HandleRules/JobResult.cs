@@ -14,42 +14,42 @@ public sealed record JobResult
 {
     public static readonly JobResult ConditionPrecheckDoesNotMatch = new JobResult
     {
-        SkipReason = SkipReason.ConditionPrecheckDoesNotMatch
+        SkipReason = SkipReason.ConditionPrecheckDoesNotMatch,
     };
 
     public static readonly JobResult Disabled = new JobResult
     {
-        SkipReason = SkipReason.Disabled
+        SkipReason = SkipReason.Disabled,
     };
 
     public static readonly JobResult WrongEvent = new JobResult
     {
-        SkipReason = SkipReason.WrongEvent
+        SkipReason = SkipReason.WrongEvent,
     };
 
     public static readonly JobResult FromRule = new JobResult
     {
-        SkipReason = SkipReason.FromRule
+        SkipReason = SkipReason.FromRule,
     };
 
     public static readonly JobResult NoAction = new JobResult
     {
-        SkipReason = SkipReason.NoAction
+        SkipReason = SkipReason.NoAction,
     };
 
     public static readonly JobResult NoTrigger = new JobResult
     {
-        SkipReason = SkipReason.NoTrigger
+        SkipReason = SkipReason.NoTrigger,
     };
 
     public static readonly JobResult TooOld = new JobResult
     {
-        SkipReason = SkipReason.TooOld
+        SkipReason = SkipReason.TooOld,
     };
 
     public static readonly JobResult WrongEventForTrigger = new JobResult
     {
-        SkipReason = SkipReason.WrongEventForTrigger
+        SkipReason = SkipReason.WrongEventForTrigger,
     };
 
     public Rule? Rule { get; init; }
@@ -87,7 +87,7 @@ public sealed record JobResult
             Job = job,
             EnrichedEvent = enrichedEvent,
             EnrichmentError = exception,
-            SkipReason = SkipReason.Failed
+            SkipReason = SkipReason.Failed,
         };
     }
 }

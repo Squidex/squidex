@@ -47,7 +47,7 @@ public sealed class WorkflowDto : Resource
             Steps = workflow.Steps.ToDictionary(
                 x => x.Key,
                 x => WorkflowStepDto.FromDomain(x.Value)),
-            Id = id
+            Id = id,
         });
 
         return result;

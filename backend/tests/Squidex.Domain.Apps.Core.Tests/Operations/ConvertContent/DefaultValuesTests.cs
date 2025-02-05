@@ -221,7 +221,7 @@ public class DefaultValuesTests
             new ContentConverter(ResolvedComponents.Empty, schema)
                 .Add(new AddDefaultValues(languages.ToResolver())
                 {
-                    FieldNames = ["myString"]
+                    FieldNames = ["myString"],
                 })
                 .Convert(source);
 

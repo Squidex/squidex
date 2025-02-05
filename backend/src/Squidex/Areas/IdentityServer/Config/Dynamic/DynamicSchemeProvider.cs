@@ -45,7 +45,7 @@ public sealed class DynamicSchemeProvider(
 
         var cacheOptions = new DistributedCacheEntryOptions
         {
-            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10)
+            AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10),
         };
 
         await dynamicCache.SetAsync(CacheKey(id), serialized, cacheOptions, ct);
@@ -192,7 +192,7 @@ public sealed class DynamicSchemeProvider(
         {
             Events = new OidcHandler(new MyIdentityOptions
             {
-                OidcOnSignoutRedirectUrl = config.SignoutRedirectUrl
+                OidcOnSignoutRedirectUrl = config.SignoutRedirectUrl,
             }),
             Authority = config.Authority,
             CallbackPath = new PathString($"/signin-{name}"),
@@ -201,7 +201,7 @@ public sealed class DynamicSchemeProvider(
             RemoteSignOutPath = new PathString($"/signout-{name}"),
             RequireHttpsMetadata = false,
             ResponseType = "code",
-            SignedOutRedirectUri = new PathString($"/signout-callback-{name}")
+            SignedOutRedirectUri = new PathString($"/signout-callback-{name}"),
         };
 
         configure.PostConfigure(name, oidcOptions);

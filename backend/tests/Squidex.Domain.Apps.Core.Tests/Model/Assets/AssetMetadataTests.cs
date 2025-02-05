@@ -74,7 +74,7 @@ public class AssetMetadataTests
     {
         var sut = new AssetMetadata
         {
-            ["someValue"] = JsonValue.Create(800)
+            ["someValue"] = JsonValue.Create(800),
         };
 
         var found = sut.TryGetByPath("someValue", out var actual);
@@ -103,7 +103,7 @@ public class AssetMetadataTests
                 JsonValue.Object()
                     .Add("nested1",
                         JsonValue.Object()
-                            .Add("nested2", 12))
+                            .Add("nested2", 12)),
         };
 
         var found = sut.TryGetByPath("meta.nested1.nested2", out var actual);
@@ -119,7 +119,7 @@ public class AssetMetadataTests
 
         var sut = new AssetMetadata
         {
-            ["string"] = JsonValue.Create(value)
+            ["string"] = JsonValue.Create(value),
         };
 
         var found = sut.TryGetString("string", out var actual);
@@ -133,7 +133,7 @@ public class AssetMetadataTests
     {
         var sut = new AssetMetadata
         {
-            ["string"] = JsonValue.Create(12)
+            ["string"] = JsonValue.Create(12),
         };
 
         var found = sut.TryGetString("string", out var actual);
@@ -160,7 +160,7 @@ public class AssetMetadataTests
 
         var sut = new AssetMetadata
         {
-            ["number"] = JsonValue.Create(value)
+            ["number"] = JsonValue.Create(value),
         };
 
         var found = sut.TryGetNumber("number", out var actual);
@@ -174,7 +174,7 @@ public class AssetMetadataTests
     {
         var sut = new AssetMetadata
         {
-            ["number"] = JsonValue.Create(true)
+            ["number"] = JsonValue.Create(true),
         };
 
         var found = sut.TryGetNumber("number", out var actual);

@@ -68,7 +68,7 @@ public class SimpleMapperTests
         var obj1 = new Class1<int, int>
         {
             P1 = 6,
-            P2 = 8
+            P2 = 8,
         };
         var obj2 = SimpleMapper.Map(obj1, new Class2<int, int>());
 
@@ -82,7 +82,7 @@ public class SimpleMapperTests
         var obj1 = new Class1<int, int>
         {
             P1 = 6,
-            P2 = 8
+            P2 = 8,
         };
         var obj2 = SimpleMapper.Map(obj1, new Class1<int, int>());
 
@@ -95,7 +95,7 @@ public class SimpleMapperTests
     {
         var obj1 = new Class1<long, long>
         {
-            P2 = 8
+            P2 = 8,
         };
         var obj2 = SimpleMapper.Map(obj1, new Class2<int, int>());
 
@@ -108,7 +108,7 @@ public class SimpleMapperTests
     {
         var obj1 = new Class1<long?, long?>
         {
-            P2 = 8
+            P2 = 8,
         };
         var obj2 = SimpleMapper.Map(obj1, new Class2<long, long>());
 
@@ -121,7 +121,7 @@ public class SimpleMapperTests
     {
         var obj1 = new Class1<ValueType?, ValueType?>
         {
-            P2 = new ValueType(8)
+            P2 = new ValueType(8),
         };
         var obj2 = SimpleMapper.Map(obj1, new Class2<ValueType, ValueType>());
 
@@ -134,7 +134,7 @@ public class SimpleMapperTests
     {
         var obj1 = new Class1<long, long>
         {
-            P2 = 8
+            P2 = 8,
         };
         var obj2 = SimpleMapper.Map(obj1, new Class2<long?, long?>());
 
@@ -147,7 +147,7 @@ public class SimpleMapperTests
     {
         var obj1 = new Class1<ValueType, ValueType>
         {
-            P2 = new ValueType(8)
+            P2 = new ValueType(8),
         };
         var obj2 = SimpleMapper.Map(obj1, new Class2<ValueType?, ValueType?>());
 
@@ -160,7 +160,7 @@ public class SimpleMapperTests
     {
         var obj1 = new Class1<int?, int?>
         {
-            P2 = null
+            P2 = null,
         };
         var obj2 = SimpleMapper.Map(obj1, new Class1<int, int>());
 
@@ -173,7 +173,7 @@ public class SimpleMapperTests
     {
         var obj1 = new Class1<RefToken, RefToken>
         {
-            P2 = RefToken.User("2")
+            P2 = RefToken.User("2"),
         };
         var obj2 = SimpleMapper.Map(obj1, new Class2<string, string>());
 
@@ -186,7 +186,7 @@ public class SimpleMapperTests
     {
         var obj1 = new Class1<long, long>
         {
-            P2 = long.MaxValue
+            P2 = long.MaxValue,
         };
         var obj2 = SimpleMapper.Map(obj1, new Class2<int, int>());
 
@@ -199,7 +199,7 @@ public class SimpleMapperTests
     {
         var obj1 = new Class1<int, int>
         {
-            P1 = 10
+            P1 = 10,
         };
         var obj2 = SimpleMapper.Map(obj1, new Readonly<int>());
 

@@ -223,15 +223,15 @@ public sealed class SchemasOpenApiGenerator(
         {
             Schemes = new List<OpenApiSchema>
             {
-                scheme
+                scheme,
             },
             Consumes = new List<string>
             {
-                "application/json"
+                "application/json",
             },
             Produces = new List<string>
             {
-                "application/json"
+                "application/json",
             },
             Info = new OpenApiInfo
             {
@@ -239,9 +239,9 @@ public sealed class SchemasOpenApiGenerator(
                 Description =
                     Resources.OpenApiContentDescription
                         .Replace("[REDOC_LINK_NORMAL]", urlGenerator.BuildUrl($"api/content/{app.Name}/docs"), StringComparison.Ordinal)
-                        .Replace("[REDOC_LINK_SIMPLE]", urlGenerator.BuildUrl($"api/content/{app.Name}/docs/flat"), StringComparison.Ordinal)
+                        .Replace("[REDOC_LINK_SIMPLE]", urlGenerator.BuildUrl($"api/content/{app.Name}/docs/flat"), StringComparison.Ordinal),
             },
-            SchemaType = NJsonSchema.SchemaType.OpenApi3
+            SchemaType = NJsonSchema.SchemaType.OpenApi3,
         };
 
         if (!string.IsNullOrWhiteSpace(context.Request.Host.Value))

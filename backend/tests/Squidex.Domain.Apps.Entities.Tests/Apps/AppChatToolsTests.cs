@@ -29,12 +29,12 @@ public class AppChatToolsTests : GivenContext
     {
         App = App with
         {
-            Clients = App.Clients.Add("default", "secret")
+            Clients = App.Clients.Add("default", "secret"),
         };
 
         var chatContext = new AppChatContext
         {
-            BaseContext = CreateContext(PermissionIds.ForApp(PermissionIds.AppClientsRead, App.Name).Id)
+            BaseContext = CreateContext(PermissionIds.ForApp(PermissionIds.AppClientsRead, App.Name).Id),
         };
 
         var tool = await sut.GetToolsAsync(chatContext, default).FirstOrDefaultAsync();
@@ -56,12 +56,12 @@ public class AppChatToolsTests : GivenContext
     {
         App = App with
         {
-            Languages = App.Languages.Set(Language.DE)
+            Languages = App.Languages.Set(Language.DE),
         };
 
         var chatContext = new AppChatContext
         {
-            BaseContext = CreateContext(PermissionIds.ForApp(PermissionIds.AppLanguages, App.Name).Id)
+            BaseContext = CreateContext(PermissionIds.ForApp(PermissionIds.AppLanguages, App.Name).Id),
         };
 
         var tool = await sut.GetToolsAsync(chatContext, default).FirstOrDefaultAsync();
@@ -83,12 +83,12 @@ public class AppChatToolsTests : GivenContext
     {
         App = App with
         {
-            Roles = App.Roles.Add("viewers")
+            Roles = App.Roles.Add("viewers"),
         };
 
         var chatContext = new AppChatContext
         {
-            BaseContext = CreateContext(PermissionIds.ForApp(PermissionIds.AppRoles, App.Name).Id)
+            BaseContext = CreateContext(PermissionIds.ForApp(PermissionIds.AppRoles, App.Name).Id),
         };
 
         var tool = await sut.GetToolsAsync(chatContext, default).FirstOrDefaultAsync();
@@ -110,12 +110,12 @@ public class AppChatToolsTests : GivenContext
     {
         App = App with
         {
-            Plan = new AssignedPlan(User, "Business")
+            Plan = new AssignedPlan(User, "Business"),
         };
 
         var chatContext = new AppChatContext
         {
-            BaseContext = CreateContext(PermissionIds.ForApp(PermissionIds.AppPlans, App.Name).Id)
+            BaseContext = CreateContext(PermissionIds.ForApp(PermissionIds.AppPlans, App.Name).Id),
         };
 
         var tool = await sut.GetToolsAsync(chatContext, default).FirstOrDefaultAsync();
@@ -137,7 +137,7 @@ public class AppChatToolsTests : GivenContext
     {
         var chatContext = new AppChatContext
         {
-            BaseContext = FrontendContext
+            BaseContext = FrontendContext,
         };
 
         var tool = await sut.GetToolsAsync(chatContext, default).FirstOrDefaultAsync();

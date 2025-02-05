@@ -208,7 +208,7 @@ public sealed class BackupContents(Rebuilder rebuilder, IUrlGenerator urlGenerat
         return new Urls
         {
             Assets = urlGenerator.AssetContentBase(),
-            AssetsApp = urlGenerator.AssetContentBase(appName)
+            AssetsApp = urlGenerator.AssetContentBase(appName),
         };
     }
 }

@@ -28,7 +28,7 @@ public sealed class RuleEventsDto : Resource
         var result = new RuleEventsDto
         {
             Total = ruleEvents.Total,
-            Items = ruleEvents.Select(x => RuleEventDto.FromDomain(x, resources)).ToArray()
+            Items = ruleEvents.Select(x => RuleEventDto.FromDomain(x, resources)).ToArray(),
         };
 
         return result.CreateLinks(resources, ruleId);

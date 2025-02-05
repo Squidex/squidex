@@ -38,7 +38,7 @@ public sealed class PatternDto
     {
         return new Pattern(Name, Regex)
         {
-            Message = Message
+            Message = Message,
         };
     }
 }

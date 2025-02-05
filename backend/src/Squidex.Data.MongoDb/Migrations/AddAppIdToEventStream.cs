@@ -12,7 +12,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Tasks;
 
-namespace Squidex.Migrations.MongoDb;
+namespace Squidex.Migrations;
 
 public sealed class AddAppIdToEventStream(IMongoDatabase database) : MongoBase<BsonDocument>, IMigration
 {
@@ -83,7 +83,7 @@ public sealed class AddAppIdToEventStream(IMongoDatabase database) : MongoBase<B
 
                 writes.Add(new ReplaceOneModel<BsonDocument>(filter, document)
                 {
-                    IsUpsert = true
+                    IsUpsert = true,
                 });
             }
 

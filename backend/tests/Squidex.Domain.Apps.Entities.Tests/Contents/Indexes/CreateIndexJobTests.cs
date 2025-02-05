@@ -44,7 +44,7 @@ public class CreateIndexJobTests : GivenContext
                 ["schemaId"] = Schema.Id.ToString(),
                 ["schemaName"] = Schema.Name,
                 ["field_field1"] = "Ascending",
-                ["field_field2"] = "Descending"
+                ["field_field2"] = "Descending",
             });
     }
 
@@ -59,8 +59,8 @@ public class CreateIndexJobTests : GivenContext
                 ["appName"] = App.Name,
                 ["schemaName"] = Schema.Name,
                 ["field_field1"] = "Ascending",
-                ["field_field2"] = "Descending"
-            }.ToReadonlyDictionary()
+                ["field_field2"] = "Descending",
+            }.ToReadonlyDictionary(),
         };
 
         var context = CreateContext(job);
@@ -79,8 +79,8 @@ public class CreateIndexJobTests : GivenContext
                 ["appName"] = App.Name,
                 ["schemaId"] = Schema.Id.ToString(),
                 ["field_field1"] = "Ascending",
-                ["field_field2"] = "Descending"
-            }.ToReadonlyDictionary()
+                ["field_field2"] = "Descending",
+            }.ToReadonlyDictionary(),
         };
 
         var context = CreateContext(job);
@@ -100,8 +100,8 @@ public class CreateIndexJobTests : GivenContext
                 ["schemaId"] = Schema.Id.ToString(),
                 ["schemaName"] = Schema.Name,
                 ["field_field1"] = "Invalid",
-                ["field_field2"] = "Descending"
-            }.ToReadonlyDictionary()
+                ["field_field2"] = "Descending",
+            }.ToReadonlyDictionary(),
         };
 
         var context = CreateContext(job);
@@ -120,7 +120,7 @@ public class CreateIndexJobTests : GivenContext
                 ["appName"] = App.Name,
                 ["schemaId"] = Schema.Id.ToString(),
                 ["schemaName"] = Schema.Name,
-            }.ToReadonlyDictionary()
+            }.ToReadonlyDictionary(),
         };
 
         var context = CreateContext(job);
@@ -140,8 +140,8 @@ public class CreateIndexJobTests : GivenContext
                 ["schemaId"] = Schema.Id.ToString(),
                 ["schemaName"] = Schema.Name,
                 ["field_field1"] = "Ascending",
-                ["field_field2"] = "Descending"
-            }.ToReadonlyDictionary()
+                ["field_field2"] = "Descending",
+            }.ToReadonlyDictionary(),
         };
 
         var context = CreateContext(job);
@@ -156,7 +156,7 @@ public class CreateIndexJobTests : GivenContext
         index.Should().BeEquivalentTo(
             [
                 new IndexField("field1", SortOrder.Ascending),
-                new IndexField("field2", SortOrder.Descending)
+                new IndexField("field2", SortOrder.Descending),
             ]);
     }
 

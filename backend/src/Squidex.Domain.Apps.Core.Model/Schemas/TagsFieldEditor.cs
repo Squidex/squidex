@@ -11,5 +11,5 @@ public enum TagsFieldEditor
 {
     Tags,
     Checkboxes,
-    Dropdown
+    Dropdown,
 }

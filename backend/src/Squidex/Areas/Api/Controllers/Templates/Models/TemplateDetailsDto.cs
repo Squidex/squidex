@@ -20,7 +20,7 @@ public class TemplateDetailsDto : Resource
     {
         var result = new TemplateDetailsDto
         {
-            Details = details
+            Details = details,
         };
 
         return result.CreateLinks(name, resources);

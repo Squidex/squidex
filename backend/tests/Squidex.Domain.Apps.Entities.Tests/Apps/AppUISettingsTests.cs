@@ -13,7 +13,7 @@ using Squidex.Infrastructure.TestHelpers;
 
 namespace Squidex.Domain.Apps.Entities.Apps;
 
-public sealed class AppUISettingsTests : GivenContext
+public class AppUISettingsTests : GivenContext
 {
     private readonly TestState<AppUISettings.State> state;
     private readonly string userId = Guid.NewGuid().ToString();
@@ -50,7 +50,7 @@ public sealed class AppUISettingsTests : GivenContext
     {
         App = App with
         {
-            Contributors = Contributors.Empty.Assign(userId, Role.Owner)
+            Contributors = Contributors.Empty.Assign(userId, Role.Owner),
         };
 
         var rootState = new TestState<AppUISettings.State>(AppId.Id, state.PersistenceFactory);

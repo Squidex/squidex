@@ -12,7 +12,7 @@ using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Users.MongoDb;
+namespace Squidex.Domain.Users;
 
 public sealed class MongoRoleStore(IMongoDatabase database) : MongoRepositoryBase<IdentityRole>(database), IRoleStore<IdentityRole>
 {
@@ -43,7 +43,7 @@ public sealed class MongoRoleStore(IMongoDatabase database) : MongoRepositoryBas
                     .Ascending(x => x.NormalizedName),
                 new CreateIndexOptions
                 {
-                    Unique = true
+                    Unique = true,
                 }),
             cancellationToken: ct);
     }

@@ -49,8 +49,8 @@ internal sealed class OperationsBuilder
         {
             Tags =
             [
-                tag
-            ]
+                tag,
+            ],
         };
 
         var operations = Parent.OpenApiDocument.Paths.GetOrAddNew($"{Path}{path}");

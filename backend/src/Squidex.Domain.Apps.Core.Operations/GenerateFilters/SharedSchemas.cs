@@ -15,31 +15,31 @@ internal static class SharedSchemas
     {
         Extra = new
         {
-            editor = "Date"
-        }
+            editor = "Date",
+        },
     };
 
     public static readonly FilterSchema DateTime = new FilterSchema(FilterSchemaType.DateTime)
     {
         Extra = new
         {
-            editor = "DateTime"
-        }
+            editor = "DateTime",
+        },
     };
 
     public static readonly FilterSchema Status = new FilterSchema(FilterSchemaType.String)
     {
         Extra = new
         {
-            editor = "Status"
-        }
+            editor = "Status",
+        },
     };
 
     public static readonly FilterSchema User = new FilterSchema(FilterSchemaType.String)
     {
         Extra = new
         {
-            editor = "User"
-        }
+            editor = "User",
+        },
     };
 }

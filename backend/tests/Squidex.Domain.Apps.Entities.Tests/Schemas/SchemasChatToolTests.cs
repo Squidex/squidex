@@ -28,7 +28,7 @@ public class SchemasChatToolTests : GivenContext
     {
         var chatContext = new AppChatContext
         {
-            BaseContext = CreateContext(PermissionIds.ForApp(PermissionIds.AppSchemasRead, App.Name).Id)
+            BaseContext = CreateContext(PermissionIds.ForApp(PermissionIds.AppSchemasRead, App.Name).Id),
         };
 
         var tool = await sut.GetToolsAsync(chatContext, CancellationToken).FirstOrDefaultAsync(CancellationToken);
@@ -53,7 +53,7 @@ public class SchemasChatToolTests : GivenContext
     {
         var chatContext = new AppChatContext
         {
-            BaseContext = FrontendContext
+            BaseContext = FrontendContext,
         };
 
         var tool = await sut.GetToolsAsync(chatContext, CancellationToken).FirstOrDefaultAsync(CancellationToken);

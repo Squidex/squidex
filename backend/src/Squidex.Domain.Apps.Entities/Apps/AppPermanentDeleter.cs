@@ -28,7 +28,7 @@ public sealed class AppPermanentDeleter(
     private readonly HashSet<string> consumingTypes =
         [
             typeRegistry.GetName<IEvent, AppDeleted>(),
-            typeRegistry.GetName<IEvent, AppContributorRemoved>()
+            typeRegistry.GetName<IEvent, AppContributorRemoved>(),
         ];
 
     public StreamFilter EventsFilter { get; } = StreamFilter.Prefix("app-");

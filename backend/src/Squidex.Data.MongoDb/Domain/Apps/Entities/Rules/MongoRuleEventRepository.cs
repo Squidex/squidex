@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Runtime.CompilerServices;
 using MongoDB.Driver;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
@@ -37,8 +38,8 @@ public sealed class MongoRuleEventRepository(IMongoDatabase database) : MongoRep
                     .Ascending(x => x.Expires),
                 new CreateIndexOptions
                 {
-                    ExpireAfter = TimeSpan.Zero
-                })
+                    ExpireAfter = TimeSpan.Zero,
+                }),
         ], ct);
     }
 
@@ -48,10 +49,15 @@ public sealed class MongoRuleEventRepository(IMongoDatabase database) : MongoRep
         await Collection.DeleteManyAsync(Filter.Eq(x => x.AppId, app.Id), ct);
     }
 
-    public Task QueryPendingAsync(Instant now, Func<IRuleEventEntity, Task> callback,
-        CancellationToken ct = default)
+    public async IAsyncEnumerable<IRuleEventEntity> QueryPendingAsync(Instant now,
+        [EnumeratorCancellation] CancellationToken ct = default)
     {
-        return Collection.Find(x => x.NextAttempt < now).ForEachAsync(callback, ct);
+        var ruleEvents = Collection.Find(x => x.NextAttempt < now).ToAsyncEnumerable(ct);
+
+        await foreach (var ruleEvent in ruleEvents.WithCancellation(ct))
+        {
+            yield return ruleEvent;
+        }
     }
 
     public async Task<IResultList<IRuleEventEntity>> QueryByAppAsync(DomainId appId, DomainId? ruleId = null, int skip = 0, int take = 20,
@@ -75,7 +81,7 @@ public sealed class MongoRuleEventRepository(IMongoDatabase database) : MongoRep
         return ResultList.Create(ruleEventTotal, ruleEventEntities);
     }
 
-    public async Task<IRuleEventEntity> FindAsync(DomainId id,
+    public async Task<IRuleEventEntity?> FindAsync(DomainId id,
         CancellationToken ct = default)
     {
         var ruleEvent =

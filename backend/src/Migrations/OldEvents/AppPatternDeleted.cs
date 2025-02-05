@@ -25,7 +25,7 @@ public sealed class AppPatternDeleted : AppEvent, IMigratedStateEvent<App>
     {
         var newEvent = new AppSettingsUpdated
         {
-            Settings = state.Settings
+            Settings = state.Settings,
         };
 
         return SimpleMapper.Map(this, newEvent);

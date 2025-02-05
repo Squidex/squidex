@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Text;
+using Squidex.Domain.Apps.Entities.Contents.Text;
 
 namespace Squidex.MongoDb.Domain.Contents;
 

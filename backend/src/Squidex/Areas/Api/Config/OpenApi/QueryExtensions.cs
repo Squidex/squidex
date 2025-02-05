@@ -17,12 +17,12 @@ public static class QueryExtensions
     {
         var stringSchema = new JsonSchema
         {
-            Type = JsonObjectType.String
+            Type = JsonObjectType.String,
         };
 
         var numberSchema = new JsonSchema
         {
-            Type = JsonObjectType.Number
+            Type = JsonObjectType.Number,
         };
 
         void AddParameterQuery(OpenApiParameter parameter)
@@ -43,7 +43,7 @@ public static class QueryExtensions
             {
                 Schema = stringSchema,
                 Name = "$search",
-                Description = FieldDescriptions.QuerySkip
+                Description = FieldDescriptions.QuerySkip,
             });
         }
 
@@ -51,42 +51,42 @@ public static class QueryExtensions
         {
             Schema = numberSchema,
             Name = "$top",
-            Description = FieldDescriptions.QueryTop
+            Description = FieldDescriptions.QueryTop,
         });
 
         AddParameterQuery(new OpenApiParameter
         {
             Schema = numberSchema,
             Name = "$skip",
-            Description = FieldDescriptions.QuerySkip
+            Description = FieldDescriptions.QuerySkip,
         });
 
         AddParameterQuery(new OpenApiParameter
         {
             Schema = stringSchema,
             Name = "$orderby",
-            Description = FieldDescriptions.QueryOrderBy
+            Description = FieldDescriptions.QueryOrderBy,
         });
 
         AddParameterQuery(new OpenApiParameter
         {
             Schema = stringSchema,
             Name = "$filter",
-            Description = FieldDescriptions.QueryFilter
+            Description = FieldDescriptions.QueryFilter,
         });
 
         AddParameterQuery(new OpenApiParameter
         {
             Schema = stringSchema,
             Name = "q",
-            Description = FieldDescriptions.QueryQ
+            Description = FieldDescriptions.QueryQ,
         });
 
         AddParameterQuery(new OpenApiParameter
         {
             Schema = stringSchema,
             Name = "ids",
-            Description = FieldDescriptions.QueryIds
+            Description = FieldDescriptions.QueryIds,
         });
 
         operation.SetPositions();

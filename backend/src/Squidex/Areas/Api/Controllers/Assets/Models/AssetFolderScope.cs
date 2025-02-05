@@ -11,5 +11,5 @@ public enum AssetFolderScope
 {
     PathAndItems,
     Path,
-    Items
+    Items,
 }

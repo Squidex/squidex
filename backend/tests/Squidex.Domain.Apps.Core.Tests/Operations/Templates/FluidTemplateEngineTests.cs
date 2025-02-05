@@ -24,7 +24,7 @@ public class FluidTemplateEngineTests
             new ContentFluidExtension(),
             new DateTimeFluidExtension(),
             new StringFluidExtension(),
-            new StringWordsFluidExtension()
+            new StringWordsFluidExtension(),
         };
 
         sut = new FluidTemplateEngine(extensions);
@@ -38,10 +38,10 @@ public class FluidTemplateEngineTests
     {
         var value = new
         {
-            User = RefToken.User("me")
+            User = RefToken.User("me"),
         };
 
-        var actual = await RenderAync(template, value);
+        var actual = await RenderAsync(template, value);
 
         Assert.Equal(expected, actual);
     }
@@ -54,10 +54,10 @@ public class FluidTemplateEngineTests
     {
         var value = new
         {
-            Id = NamedId.Of("42", "my-app")
+            Id = NamedId.Of("42", "my-app"),
         };
 
-        var actual = await RenderAync(template, value);
+        var actual = await RenderAsync(template, value);
 
         Assert.Equal(expected, actual);
     }
@@ -67,12 +67,12 @@ public class FluidTemplateEngineTests
     {
         var value = new
         {
-            Id = DomainId.NewGuid()
+            Id = DomainId.NewGuid(),
         };
 
         var template = "{{ e.id }}";
 
-        var actual = await RenderAync(template, value);
+        var actual = await RenderAsync(template, value);
 
         Assert.Equal(value.Id.ToString(), actual);
     }
@@ -82,12 +82,12 @@ public class FluidTemplateEngineTests
     {
         var value = new
         {
-            Type = EnrichedContentEventType.Created
+            Type = EnrichedContentEventType.Created,
         };
 
         var template = "{{ e.type }}";
 
-        var actual = await RenderAync(template, value);
+        var actual = await RenderAsync(template, value);
 
         Assert.Equal(value.Type.ToString(), actual);
     }
@@ -99,12 +99,12 @@ public class FluidTemplateEngineTests
 
         var value = new
         {
-            Timestamp = now
+            Timestamp = now,
         };
 
         var template = "{{ e.timestamp | format_date: 'yyyy-MM-dd-hh-mm-ss' }}";
 
-        var actual = await RenderAync(template, value);
+        var actual = await RenderAsync(template, value);
 
         Assert.Equal($"{now:yyyy-MM-dd-hh-mm-ss}", actual);
     }
@@ -120,10 +120,10 @@ public class FluidTemplateEngineTests
                 new ContentData()
                     .AddField("value",
                         new ContentFieldData()
-                            .AddLocalized("en", "Hello"))
+                            .AddLocalized("en", "Hello")),
         };
 
-        var actual = await RenderAync(template, value);
+        var actual = await RenderAsync(template, value);
 
         Assert.Equal("Hello", actual);
     }
@@ -135,10 +135,10 @@ public class FluidTemplateEngineTests
 
         var value = new
         {
-            Text = "<script>Invalid</script><STYLE>Invalid</STYLE><p>Hello World</p>"
+            Text = "<script>Invalid</script><STYLE>Invalid</STYLE><p>Hello World</p>",
         };
 
-        var actual = await RenderAync(template, value);
+        var actual = await RenderAsync(template, value);
 
         Assert.Equal("Hello World", actual);
     }
@@ -150,10 +150,10 @@ public class FluidTemplateEngineTests
 
         var value = new
         {
-            Text = "## Hello World"
+            Text = "## Hello World",
         };
 
-        var actual = await RenderAync(template, value);
+        var actual = await RenderAsync(template, value);
 
         Assert.Equal("Hello World", actual);
     }
@@ -165,10 +165,10 @@ public class FluidTemplateEngineTests
 
         var value = new
         {
-            Text = "Hello World"
+            Text = "Hello World",
         };
 
-        var actual = await RenderAync(template, value);
+        var actual = await RenderAsync(template, value);
 
         Assert.Equal("2", actual);
     }
@@ -180,10 +180,10 @@ public class FluidTemplateEngineTests
 
         var value = new
         {
-            text = "Hello World"
+            text = "Hello World",
         };
 
-        var actual = await RenderAync(template, value);
+        var actual = await RenderAsync(template, value);
 
         Assert.Equal("10", actual);
     }
@@ -195,10 +195,10 @@ public class FluidTemplateEngineTests
 
         var value = new
         {
-            text = "HelloWorld"
+            text = "HelloWorld",
         };
 
-        var actual = await RenderAync(template, value);
+        var actual = await RenderAsync(template, value);
 
         Assert.Equal("HelloWorld".ToMD5(), actual);
     }
@@ -210,10 +210,10 @@ public class FluidTemplateEngineTests
 
         var value = new
         {
-            text = "HelloWorld"
+            text = "HelloWorld",
         };
 
-        var actual = await RenderAync(template, value);
+        var actual = await RenderAsync(template, value);
 
         Assert.Equal("HelloWorld".ToSha256(), actual);
     }
@@ -226,7 +226,7 @@ public class FluidTemplateEngineTests
         await Assert.ThrowsAsync<TemplateParseException>(() => sut.RenderAsync(template, []));
     }
 
-    private Task<string> RenderAync(string template, object value)
+    private Task<string> RenderAsync(string template, object value)
     {
         return sut.RenderAsync(template, new TemplateVars { ["e"] = value });
     }

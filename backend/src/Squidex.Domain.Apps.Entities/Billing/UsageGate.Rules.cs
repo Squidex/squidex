@@ -96,14 +96,14 @@ public sealed partial class UsageGate : IRuleUsageTracker
         {
             [RulesKeys.TotalCreated] = created,
             [RulesKeys.TotalSucceeded] = succeeded,
-            [RulesKeys.TotalFailed] = failed
+            [RulesKeys.TotalFailed] = failed,
         };
 
         var appKey = AppRulesKey(appId);
 
         var tasks = new List<Task>
         {
-            usageTracker.TrackAsync(SummaryDate, appKey, ruleId.ToString(), counters, ct)
+            usageTracker.TrackAsync(SummaryDate, appKey, ruleId.ToString(), counters, ct),
         };
 
         if (date != default)

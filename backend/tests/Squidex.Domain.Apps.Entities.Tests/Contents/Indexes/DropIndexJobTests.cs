@@ -36,7 +36,7 @@ public class DropIndexJobTests : GivenContext
                 ["appName"] = App.Name,
                 ["schemaId"] = Schema.Id.ToString(),
                 ["schemaName"] = Schema.Name,
-                ["indexName"] = "MyIndex"
+                ["indexName"] = "MyIndex",
             });
     }
 
@@ -50,8 +50,8 @@ public class DropIndexJobTests : GivenContext
                 ["appId"] = App.Id.ToString(),
                 ["appName"] = App.Name,
                 ["schemaName"] = Schema.Name,
-                ["indexName"] = "MyIndex"
-            }.ToReadonlyDictionary()
+                ["indexName"] = "MyIndex",
+            }.ToReadonlyDictionary(),
         };
 
         var context = CreateContext(job);
@@ -69,8 +69,8 @@ public class DropIndexJobTests : GivenContext
                 ["appId"] = App.Id.ToString(),
                 ["appName"] = App.Name,
                 ["schemaId"] = Schema.Id.ToString(),
-                ["indexName"] = "MyIndex"
-            }.ToReadonlyDictionary()
+                ["indexName"] = "MyIndex",
+            }.ToReadonlyDictionary(),
         };
 
         var context = CreateContext(job);
@@ -89,7 +89,7 @@ public class DropIndexJobTests : GivenContext
                 ["appName"] = App.Name,
                 ["schemaId"] = Schema.Id.ToString(),
                 ["schemaName"] = Schema.Name,
-            }.ToReadonlyDictionary()
+            }.ToReadonlyDictionary(),
         };
 
         var context = CreateContext(job);
@@ -108,8 +108,8 @@ public class DropIndexJobTests : GivenContext
                 ["appName"] = App.Name,
                 ["schemaId"] = Schema.Id.ToString(),
                 ["schemaName"] = Schema.Name,
-                ["indexName"] = "MyIndex"
-            }.ToReadonlyDictionary()
+                ["indexName"] = "MyIndex",
+            }.ToReadonlyDictionary(),
         };
 
         var context = CreateContext(job);

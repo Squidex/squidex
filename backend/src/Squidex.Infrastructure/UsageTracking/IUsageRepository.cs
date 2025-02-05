@@ -9,9 +9,6 @@ namespace Squidex.Infrastructure.UsageTracking;
 
 public interface IUsageRepository
 {
-    Task TrackUsagesAsync(UsageUpdate update,
-        CancellationToken ct = default);
-
     Task TrackUsagesAsync(UsageUpdate[] updates,
         CancellationToken ct = default);
 

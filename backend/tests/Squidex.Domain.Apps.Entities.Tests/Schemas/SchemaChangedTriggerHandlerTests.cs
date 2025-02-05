@@ -137,7 +137,7 @@ public class SchemaChangedTriggerHandlerTests : GivenContext
     {
         var trigger = new SchemaChangedTrigger
         {
-            Condition = condition
+            Condition = condition,
         };
 
         action(Context(trigger));
@@ -163,7 +163,7 @@ public class SchemaChangedTriggerHandlerTests : GivenContext
             AppId = AppId,
             IncludeSkipped = true,
             IncludeStale = true,
-            Rule = CreateRule() with { Trigger = trigger }
+            Rule = CreateRule() with { Trigger = trigger },
         };
     }
 }

@@ -36,12 +36,12 @@ public interface IRuleEventRepository
     Task CancelByAppAsync(DomainId appId,
         CancellationToken ct = default);
 
-    Task QueryPendingAsync(Instant now, Func<IRuleEventEntity, Task> callback,
+    IAsyncEnumerable<IRuleEventEntity> QueryPendingAsync(Instant now,
         CancellationToken ct = default);
 
     Task<IResultList<IRuleEventEntity>> QueryByAppAsync(DomainId appId, DomainId? ruleId = null, int skip = 0, int take = 20,
         CancellationToken ct = default);
 
-    Task<IRuleEventEntity> FindAsync(DomainId id,
+    Task<IRuleEventEntity?> FindAsync(DomainId id,
         CancellationToken ct = default);
 }

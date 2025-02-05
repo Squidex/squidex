@@ -11,39 +11,32 @@ using NodaTime;
 
 namespace Squidex.Infrastructure.Log;
 
-public sealed class MongoRequestLogRepository : MongoRepositoryBase<MongoRequest>, IRequestLogRepository
+public sealed class MongoRequestLogRepository(IMongoDatabase database, IOptions<RequestLogStoreOptions> options)
+    : MongoRepositoryBase<MongoRequestEntity>(database), IRequestLogRepository
 {
-    private readonly RequestLogStoreOptions options;
-
-    public MongoRequestLogRepository(IMongoDatabase database, IOptions<RequestLogStoreOptions> options)
-        : base(database)
-    {
-        Guard.NotNull(options);
-
-        this.options = options.Value;
-    }
+    private readonly RequestLogStoreOptions options = options.Value;
 
     protected override string CollectionName()
     {
         return "RequestLog";
     }
 
-    protected override Task SetupCollectionAsync(IMongoCollection<MongoRequest> collection,
+    protected override Task SetupCollectionAsync(IMongoCollection<MongoRequestEntity> collection,
         CancellationToken ct)
     {
         return collection.Indexes.CreateManyAsync(
         [
-            new CreateIndexModel<MongoRequest>(
+            new CreateIndexModel<MongoRequestEntity>(
                 Index
                     .Ascending(x => x.Key)
                     .Ascending(x => x.Timestamp)),
-            new CreateIndexModel<MongoRequest>(
+            new CreateIndexModel<MongoRequestEntity>(
                 Index
                     .Ascending(x => x.Timestamp),
                 new CreateIndexOptions
                 {
-                    ExpireAfter = TimeSpan.FromDays(options.StoreRetentionInDays)
-                })
+                    ExpireAfter = TimeSpan.FromDays(options.StoreRetentionInDays),
+                }),
         ], ct);
     }
 
@@ -52,7 +45,7 @@ public sealed class MongoRequestLogRepository : MongoRepositoryBase<MongoRequest
     {
         Guard.NotNull(items);
 
-        var entities = items.Select(MongoRequest.FromRequest).ToList();
+        var entities = items.Select(MongoRequestEntity.FromRequest).ToList();
 
         if (entities.Count == 0)
         {
@@ -70,17 +63,17 @@ public sealed class MongoRequestLogRepository : MongoRepositoryBase<MongoRequest
         return Collection.DeleteManyAsync(Filter.Eq(x => x.Key, key), ct);
     }
 
-    public IAsyncEnumerable<Request> QueryAllAsync(string key, DateTime fromDate, DateTime toDate,
+    public IAsyncEnumerable<Request> QueryAllAsync(string key, Instant fromTime, Instant toTime,
         CancellationToken ct = default)
     {
         Guard.NotNullOrEmpty(key);
 
-        var timestampStart = Instant.FromDateTimeUtc(fromDate);
-        var timestampEnd = Instant.FromDateTimeUtc(toDate.AddDays(1));
-
-        var find = Collection.Find(x => x.Key == key && x.Timestamp >= timestampStart && x.Timestamp < timestampEnd);
-
-        var documents = find.ToAsyncEnumerable(ct);
+        var documents =
+            Collection.Find(x =>
+                x.Key == key &&
+                x.Timestamp >= fromTime &&
+                x.Timestamp <= toTime)
+            .ToAsyncEnumerable(ct);
 
         return documents.Select(x => x.ToRequest());
     }

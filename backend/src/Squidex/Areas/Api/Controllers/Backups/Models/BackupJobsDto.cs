@@ -22,7 +22,7 @@ public sealed class BackupJobsDto : Resource
     {
         var result = new BackupJobsDto
         {
-            Items = jobs.Select(x => BackupJobDto.FromDomain(x, resources)).ToArray()
+            Items = jobs.Select(x => BackupJobDto.FromDomain(x, resources)).ToArray(),
         };
 
         return result.CreateLinks(resources);

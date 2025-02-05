@@ -36,7 +36,7 @@ public class DefaultDomainObjectCacheTests
     {
         var options = Options.Create(new DomainObjectCacheOptions
         {
-            CacheDuration = default
+            CacheDuration = default,
         });
 
         var sut2 = new DefaultDomainObjectCache(cache, serializer, distributedCache, options);
@@ -51,7 +51,7 @@ public class DefaultDomainObjectCacheTests
     {
         var options = Options.Create(new DomainObjectCacheOptions
         {
-            CacheDuration = TimeSpan.FromMinutes(-10)
+            CacheDuration = TimeSpan.FromMinutes(-10),
         });
 
         var sut2 = new DefaultDomainObjectCache(cache, serializer, distributedCache, options);

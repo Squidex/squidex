@@ -224,7 +224,7 @@ public class ContentDataTests
         var source = new ContentData
         {
             ["field1"] = [],
-            ["field2"] = []
+            ["field2"] = [],
         };
 
         var clone = source.Clone();

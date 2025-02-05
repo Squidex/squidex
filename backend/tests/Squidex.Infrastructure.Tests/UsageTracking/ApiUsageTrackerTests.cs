@@ -50,7 +50,7 @@ public class ApiUsageTrackerTests
         {
             [ApiUsageTracker.CounterTotalBytes] = 1024,
             [ApiUsageTracker.CounterTotalCalls] = 4,
-            [ApiUsageTracker.CounterTotalElapsedMs] = 120
+            [ApiUsageTracker.CounterTotalElapsedMs] = 120,
         });
     }
 
@@ -59,7 +59,7 @@ public class ApiUsageTrackerTests
     {
         var counters = new Counters
         {
-            [ApiUsageTracker.CounterTotalCalls] = 4
+            [ApiUsageTracker.CounterTotalCalls] = 4,
         };
 
         A.CallTo(() => usageTracker.GetForMonthAsync($"{key}_API", date, category, ct))
@@ -75,7 +75,7 @@ public class ApiUsageTrackerTests
     {
         var counters = new Counters
         {
-            [ApiUsageTracker.CounterTotalBytes] = 14
+            [ApiUsageTracker.CounterTotalBytes] = 14,
         };
 
         A.CallTo(() => usageTracker.GetForMonthAsync($"{key}_API", date, category, ct))
@@ -100,7 +100,7 @@ public class ApiUsageTrackerTests
                 (dateFrom.AddDays(1), Counters(4, 100, 2048)),
                 (dateFrom.AddDays(2), Counters(0, 0, 0)),
                 (dateFrom.AddDays(3), Counters(2, 60, 1024)),
-                (dateFrom.AddDays(4), Counters(3, 30, 512))
+                (dateFrom.AddDays(4), Counters(3, 30, 512)),
             ],
             ["*"] =
             [
@@ -108,14 +108,14 @@ public class ApiUsageTrackerTests
                 (dateFrom.AddDays(1), Counters(0, 0, 0)),
                 (dateFrom.AddDays(2), Counters(5, 90, 16)),
                 (dateFrom.AddDays(3), Counters(0, 0, 0)),
-                (dateFrom.AddDays(4), Counters(0, 0, 0))
-            ]
+                (dateFrom.AddDays(4), Counters(0, 0, 0)),
+            ],
         };
 
         var forMonth = new Counters
         {
             [ApiUsageTracker.CounterTotalCalls] = 120,
-            [ApiUsageTracker.CounterTotalBytes] = 400
+            [ApiUsageTracker.CounterTotalBytes] = 400,
         };
 
         A.CallTo(() => usageTracker.GetForMonthAsync($"{key}_API", dateFrom, null, ct))
@@ -134,7 +134,7 @@ public class ApiUsageTrackerTests
                 new ApiStats(dateFrom.AddDays(1), 4, 25, 2048),
                 new ApiStats(dateFrom.AddDays(2), 0, 0, 0),
                 new ApiStats(dateFrom.AddDays(3), 2, 30, 1024),
-                new ApiStats(dateFrom.AddDays(4), 3, 10, 512)
+                new ApiStats(dateFrom.AddDays(4), 3, 10, 512),
             ],
             ["*"] =
             [
@@ -142,8 +142,8 @@ public class ApiUsageTrackerTests
                 new ApiStats(dateFrom.AddDays(1), 0, 0, 0),
                 new ApiStats(dateFrom.AddDays(2), 5, 18, 16),
                 new ApiStats(dateFrom.AddDays(3), 0, 0, 0),
-                new ApiStats(dateFrom.AddDays(4), 0, 0, 0)
-            ]
+                new ApiStats(dateFrom.AddDays(4), 0, 0, 0),
+            ],
         });
 
         summary.Should().BeEquivalentTo(new ApiStatsSummary(20, 15, 3728, 120, 400));
@@ -155,7 +155,7 @@ public class ApiUsageTrackerTests
         {
             [ApiUsageTracker.CounterTotalBytes] = bytes,
             [ApiUsageTracker.CounterTotalCalls] = calls,
-            [ApiUsageTracker.CounterTotalElapsedMs] = elapsed
+            [ApiUsageTracker.CounterTotalElapsedMs] = elapsed,
         };
     }
 }

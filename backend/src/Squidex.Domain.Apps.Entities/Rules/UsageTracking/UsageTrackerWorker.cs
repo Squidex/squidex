@@ -112,7 +112,7 @@ public sealed class UsageTrackerWorker : IMessageHandler<UsageTrackingMessage>, 
                 AppId = target.AppId,
                 CallsCurrent = costs,
                 CallsLimit = limit,
-                RuleId = key
+                RuleId = key,
             };
 
             await state.WriteEventAsync(Envelope.Create<IEvent>(@event));

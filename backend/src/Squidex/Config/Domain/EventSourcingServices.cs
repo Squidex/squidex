@@ -7,6 +7,7 @@
 
 using EventStore.Client;
 using Squidex.Events.GetEventStore;
+using Squidex.Hosting.Configuration;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.EventSourcing.Consume;
@@ -24,6 +25,18 @@ public static class EventSourcingServices
             {
                 services.AddSquidexMongoEventStore(config);
             },
+            ["Sql"] = () =>
+            {
+                if (!string.Equals(config.GetValue<string>("store:type"), "Sql", StringComparison.OrdinalIgnoreCase))
+                {
+                    throw new ConfigurationException(
+                        new ConfigurationError(
+                            "Sql event store is only allowed, when 'store:type' is also set to 'Sql'.",
+                            "messaging:type"));
+                }
+
+                services.AddSquidexEntityFrameworkEventStore(config);
+            },
             ["GetEventStore"] = () =>
             {
                 var configuration = config.GetRequiredValue("eventStore:getEventStore:configuration");
@@ -32,7 +45,7 @@ public static class EventSourcingServices
                     .AsSelf();
 
                 services.AddGetEventStore(config);
-            }
+            },
         });
 
         services.AddTransientAs<Rebuilder>()

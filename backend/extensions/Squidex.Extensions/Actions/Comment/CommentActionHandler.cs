@@ -26,7 +26,7 @@ public sealed class CommentActionHandler(RuleEventFormatter formatter, ICollabor
 
         var ruleJob = new CommentCreated
         {
-            AppId = contentEvent.AppId
+            AppId = contentEvent.AppId,
         };
 
         var text = await FormatAsync(action.Text, @event);

@@ -49,7 +49,7 @@ public sealed class MongoHistoryEventRepository(IMongoDatabase database) : Mongo
                 Index
                     .Ascending(x => x.OwnerId)
                     .Descending(x => x.Created)
-                    .Descending(x => x.Version))
+                    .Descending(x => x.Version)),
         ], ct);
     }
 
@@ -59,15 +59,17 @@ public sealed class MongoHistoryEventRepository(IMongoDatabase database) : Mongo
         await Collection.DeleteManyAsync(Filter.Eq(x => x.OwnerId, app.Id), ct);
     }
 
-    public async Task<IReadOnlyList<HistoryEvent>> QueryByChannelAsync(DomainId ownerId, string channelPrefix, int count,
+    public async Task<IReadOnlyList<HistoryEvent>> QueryByChannelAsync(DomainId ownerId, string? channel, int count,
         CancellationToken ct = default)
     {
         var find =
-            !string.IsNullOrWhiteSpace(channelPrefix) ?
-                Collection.Find(x => x.OwnerId == ownerId && x.Channel == channelPrefix) :
+            !string.IsNullOrWhiteSpace(channel) ?
+                Collection.Find(x => x.OwnerId == ownerId && x.Channel == channel) :
                 Collection.Find(x => x.OwnerId == ownerId);
 
-        return await find.SortByDescending(x => x.Created).ThenByDescending(x => x.Version).Limit(count).ToListAsync(ct);
+        var result = await find.SortByDescending(x => x.Created).ThenByDescending(x => x.Version).Limit(count).ToListAsync(ct);
+
+        return result;
     }
 
     public Task InsertManyAsync(IEnumerable<HistoryEvent> historyEvents,
@@ -77,7 +79,7 @@ public sealed class MongoHistoryEventRepository(IMongoDatabase database) : Mongo
             .Select(x =>
                 new ReplaceOneModel<HistoryEvent>(Filter.Eq(y => y.Id, x.Id), x)
                 {
-                    IsUpsert = true
+                    IsUpsert = true,
                 })
             .ToList();
 

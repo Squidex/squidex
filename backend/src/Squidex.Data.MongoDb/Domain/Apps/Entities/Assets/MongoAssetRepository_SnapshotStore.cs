@@ -29,7 +29,7 @@ public sealed partial class MongoAssetRepository : ISnapshotStore<Asset>, IDelet
     {
         var documents = Collection.Find(FindAll, Batching.Options).ToAsyncEnumerable(ct);
 
-        return documents.Select(x => new SnapshotResult<Asset>(x.DocumentId, x.ToState(), x.Version));
+        return documents.Select(x => new SnapshotResult<Asset>(x.DocumentId, x, x.Version));
     }
 
     async Task<SnapshotResult<Asset>> ISnapshotStore<Asset>.ReadAsync(DomainId key,
@@ -43,7 +43,7 @@ public sealed partial class MongoAssetRepository : ISnapshotStore<Asset>, IDelet
 
             if (existing != null)
             {
-                return new SnapshotResult<Asset>(existing.DocumentId, existing.ToState(), existing.Version);
+                return new SnapshotResult<Asset>(existing.DocumentId, existing, existing.Version);
             }
 
             return new SnapshotResult<Asset>(default, null!, EtagVersion.Empty);
@@ -71,7 +71,7 @@ public sealed partial class MongoAssetRepository : ISnapshotStore<Asset>, IDelet
                     Filter.Eq(y => y.DocumentId, x.DocumentId),
                     x)
                 {
-                    IsUpsert = true
+                    IsUpsert = true,
                 }).ToList();
 
             if (updates.Count == 0)

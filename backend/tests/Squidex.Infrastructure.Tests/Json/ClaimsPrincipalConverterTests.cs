@@ -20,15 +20,15 @@ public class ClaimsPrincipalConverterTests
                 new ClaimsIdentity(
                     [
                         new Claim("email", "me@email.com"),
-                        new Claim("username", "me@email.com")
+                        new Claim("username", "me@email.com"),
                     ],
                     "Cookie"),
                 new ClaimsIdentity(
                     [
                         new Claim("user_id", "12345"),
-                        new Claim("login", "me")
+                        new Claim("login", "me"),
                     ],
-                    "Google")
+                    "Google"),
             ]);
 
         var serialized = value.SerializeAndDeserializeJson();

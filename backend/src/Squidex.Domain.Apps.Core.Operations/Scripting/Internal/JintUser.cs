@@ -60,7 +60,7 @@ public static class JintUser
             ["isClient"] = isClient,
             ["isUser"] = !isClient,
             ["name"] = name,
-            ["claims"] = claims
+            ["claims"] = claims,
         };
 
         return JsValue.FromObject(engine, result);

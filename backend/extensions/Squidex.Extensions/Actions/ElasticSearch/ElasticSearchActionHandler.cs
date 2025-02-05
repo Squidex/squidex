@@ -54,7 +54,7 @@ public sealed class ElasticSearchActionHandler(RuleEventFormatter formatter, ISc
             ServerHost = action.Host.ToString(),
             ServerUser = action.Username,
             ServerPassword = action.Password,
-            ContentId = contentId
+            ContentId = contentId,
         };
 
         if (delete)
@@ -88,8 +88,8 @@ public sealed class ElasticSearchActionHandler(RuleEventFormatter formatter, ISc
                 {
                     More = new Dictionary<string, object>
                     {
-                        ["error"] = $"Invalid JSON: {ex.Message}"
-                    }
+                        ["error"] = $"Invalid JSON: {ex.Message}",
+                    },
                 };
             }
 

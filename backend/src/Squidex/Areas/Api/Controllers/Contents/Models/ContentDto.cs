@@ -118,7 +118,7 @@ public sealed class ContentDto : Resource
         var response = SimpleMapper.Map(content, new ContentDto
         {
             SchemaId = content.SchemaId.Id,
-            SchemaName = content.SchemaId.Name
+            SchemaName = content.SchemaId.Name,
         });
 
         if (resources.Context.Flatten())
@@ -139,7 +139,7 @@ public sealed class ContentDto : Resource
         {
             response.ScheduleJob = new ScheduleJobDto
             {
-                Color = content.ScheduledStatusColor!
+                Color = content.ScheduledStatusColor!,
             };
 
             SimpleMapper.Map(content.ScheduleJob, response.ScheduleJob);

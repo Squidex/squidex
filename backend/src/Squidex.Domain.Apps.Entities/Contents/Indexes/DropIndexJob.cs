@@ -40,10 +40,10 @@ public sealed class DropIndexJob(IContentRepository contentRepository) : IJobRun
                 [ArgAppName] = app.Name,
                 [ArgSchemaId] = schema.Id.ToString(),
                 [ArgSchemaName] = schema.Name,
-                [ArgIndexName] = name
+                [ArgIndexName] = name,
             }) with
         {
-            AppId = app.NamedId()
+            AppId = app.NamedId(),
         };
     }
 

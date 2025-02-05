@@ -43,7 +43,7 @@ public sealed class EnrichWithWorkflows(IContentWorkflow contentWorkflow) : ICon
             {
                 content.NextStatuses =
                 [
-                    new StatusInfo(Status.Published, StatusColors.Published)
+                    new StatusInfo(Status.Published, StatusColors.Published),
                 ];
             }
             else

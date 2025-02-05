@@ -59,7 +59,7 @@ internal sealed class ApplicationQueries : ObjectGraphType
             Resolver = Find.Resolver,
             DeprecationReason = deprecatedReason,
             Description = $"Find an {schemaInfo.DisplayName} content by id.",
-            SchemaId = schemaInfo.Schema.Id
+            SchemaId = schemaInfo.Schema.Id,
         });
     }
 
@@ -73,7 +73,7 @@ internal sealed class ApplicationQueries : ObjectGraphType
             Resolver = FindSingleton.Resolver,
             DeprecationReason = null,
             Description = $"Find an {schemaInfo.DisplayName} singleton.",
-            SchemaId = schemaInfo.Schema.Id
+            SchemaId = schemaInfo.Schema.Id,
         });
     }
 
@@ -87,7 +87,7 @@ internal sealed class ApplicationQueries : ObjectGraphType
             Resolver = QueryOrReferencing.Query,
             DeprecationReason = deprecatedReason,
             Description = $"Query {schemaInfo.DisplayName} content items.",
-            SchemaId = schemaInfo.Schema.Id
+            SchemaId = schemaInfo.Schema.Id,
         });
 
         var contentResultTyp = builder.GetContentResultType(schemaInfo);
@@ -105,7 +105,7 @@ internal sealed class ApplicationQueries : ObjectGraphType
             Resolver = QueryOrReferencing.QueryWithTotal,
             DeprecationReason = deprecatedReason,
             Description = $"Query {schemaInfo.DisplayName} content items with total count.",
-            SchemaId = schemaInfo.Schema.Id
+            SchemaId = schemaInfo.Schema.Id,
         });
     }
 
@@ -124,7 +124,7 @@ internal sealed class ApplicationQueries : ObjectGraphType
             Arguments = QueryByIds.Arguments,
             ResolvedType = new NonNullGraphType(new ListGraphType(new NonNullGraphType(unionType))),
             Resolver = QueryByIds.Resolver,
-            Description = "Query content items by IDs across schemeas."
+            Description = "Query content items by IDs across schemeas.",
         });
     }
 }

@@ -79,10 +79,10 @@ public sealed class RuleRunnerJob : IJobRunner
             new Dictionary<string, string>
             {
                 [ArgRuleId] = ruleId.ToString(),
-                [ArgSnapshot] = snapshot.ToString()
+                [ArgSnapshot] = snapshot.ToString(),
             }) with
         {
-            AppId = app.NamedId()
+            AppId = app.NamedId(),
         };
     }
 
@@ -187,7 +187,7 @@ public sealed class RuleRunnerJob : IJobRunner
         await using var batch = new RuleQueueWriter(ruleEventRepository, ruleUsageTracker, null);
 
         // Use a prefix query so that the storage can use an index for the query.
-        var streamFilter = StreamFilter.Prefix($"([a-zA-Z0-9]+)\\-{run.OwnerId}");
+        var streamFilter = StreamFilter.Prefix($"%-{run.OwnerId}");
 
         await foreach (var storedEvent in eventStore.QueryAllAsync(streamFilter, ct: ct))
         {

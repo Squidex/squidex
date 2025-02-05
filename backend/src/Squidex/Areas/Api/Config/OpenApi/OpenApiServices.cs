@@ -71,8 +71,8 @@ public static class OpenApiServices
             {
                 SchemaSettings = new SystemTextJsonSchemaGeneratorSettings()
                 {
-                    SerializerOptions = c.GetRequiredService<JsonSerializerOptions>()
-                }
+                    SerializerOptions = c.GetRequiredService<JsonSerializerOptions>(),
+                },
             };
 
             ConfigureSchemaSettings(settings.SchemaSettings, c.GetRequiredService<TypeRegistry>(), true);
@@ -134,7 +134,7 @@ public static class OpenApiServices
 
             schema.AdditionalPropertiesSchema = new JsonSchema
             {
-                Description = "Any"
+                Description = "Any",
             };
         });
     }
@@ -147,7 +147,7 @@ public static class OpenApiServices
 
             schema.Item = new JsonSchema
             {
-                Type = itemType
+                Type = itemType,
             };
         });
     }

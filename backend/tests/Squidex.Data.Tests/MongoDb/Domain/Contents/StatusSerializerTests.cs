@@ -6,11 +6,11 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.TestHelpers;
+using Squidex.MongoDb.TestHelpers;
 
 namespace Squidex.MongoDb.Domain.Contents;
 
-public sealed class StatusSerializerTests
+public class StatusSerializerTests
 {
     [Fact]
     public void Should_serialize_and_deserialize_status()

@@ -47,7 +47,7 @@ public sealed class AppSettingsDto : Resource
             HideDateTimeModeButton = settings.HideDateTimeModeButton,
             HideScheduler = settings.HideScheduler,
             Patterns = settings.Patterns.Select(PatternDto.FromPattern).ToArray(),
-            Version = app.Version
+            Version = app.Version,
         };
 
         return result.CreateLinks(resources);

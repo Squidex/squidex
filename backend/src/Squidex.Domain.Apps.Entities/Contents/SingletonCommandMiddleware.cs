@@ -36,7 +36,7 @@ public sealed class SingletonCommandMiddleware : ICommandMiddleware
                 DoNotScript = true,
                 DoNotValidate = true,
                 SchemaId = schemaId,
-                Status = Status.Published
+                Status = Status.Published,
             };
 
             SimpleMapper.Map(createSchema, content);

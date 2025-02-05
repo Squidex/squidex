@@ -51,6 +51,7 @@ public class SearchTests(ContentFixture fixture) : IClassFixture<ContentFixture>
     }
 
     [Fact]
+    [Trait("Category", "MongoOnly")]
     public async Task Should_search_content()
     {
         // STEP 1: Create content.

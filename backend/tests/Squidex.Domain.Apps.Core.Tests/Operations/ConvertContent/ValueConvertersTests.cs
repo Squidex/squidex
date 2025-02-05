@@ -158,7 +158,7 @@ public class ValueConvertersTests
         var component = new Schema { Name = "my-component" };
         var components = new ResolvedComponents(new Dictionary<DomainId, Schema>
         {
-            [componentId] = component
+            [componentId] = component,
         });
 
         var source =
@@ -186,7 +186,7 @@ public class ValueConvertersTests
         var component = new Schema { Name = "my-component" };
         var components = new ResolvedComponents(new Dictionary<DomainId, Schema>
         {
-            [componentId] = component
+            [componentId] = component,
         });
 
         var source =
@@ -212,7 +212,7 @@ public class ValueConvertersTests
         var component = new Schema { Name = "my-component" };
         var components = new ResolvedComponents(new Dictionary<DomainId, Schema>
         {
-            [componentId] = component
+            [componentId] = component,
         });
 
         var source =
@@ -237,7 +237,7 @@ public class ValueConvertersTests
         var component = new Schema { Name = "my-component" };
         var components = new ResolvedComponents(new Dictionary<DomainId, Schema>
         {
-            [componentId] = component
+            [componentId] = component,
         });
 
         var source =

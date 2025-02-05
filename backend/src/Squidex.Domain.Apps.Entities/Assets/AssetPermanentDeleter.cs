@@ -17,7 +17,7 @@ public sealed class AssetPermanentDeleter(IAssetFileStore assetFileStore, TypeRe
 {
     private readonly HashSet<string> consumingTypes =
         [
-            typeRegistry.GetName<IEvent, AssetDeleted>()
+            typeRegistry.GetName<IEvent, AssetDeleted>(),
         ];
 
     public StreamFilter EventsFilter { get; } = StreamFilter.Prefix("asset-");

@@ -14,7 +14,7 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject;
 
-public sealed class ContentCommandMiddlewareTests : HandlerTestBase<WriteContent>
+public class ContentCommandMiddlewareTests : HandlerTestBase<WriteContent>
 {
     private readonly IDomainObjectCache domainObjectCache = A.Fake<IDomainObjectCache>();
     private readonly IDomainObjectFactory domainObjectFactory = A.Fake<IDomainObjectFactory>();

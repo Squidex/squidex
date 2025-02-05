@@ -35,14 +35,14 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
             new HttpJintExtension(httpClientFactory),
             new StringJintExtension(),
             new StringWordsJintExtension(),
-            new StringAsyncJintExtension(translator, chatAgent)
+            new StringAsyncJintExtension(translator, chatAgent),
         };
 
         sut = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
             Options.Create(new JintScriptOptions
             {
                 TimeoutScript = TimeSpan.FromSeconds(2),
-                TimeoutExecution = TimeSpan.FromSeconds(10)
+                TimeoutExecution = TimeSpan.FromSeconds(10),
             }),
             extensions);
     }
@@ -52,7 +52,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     {
         var vars = new ScriptVars
         {
-            ["value"] = "<script>Invalid</script><STYLE>Invalid</STYLE><p>Hello World</p>"
+            ["value"] = "<script>Invalid</script><STYLE>Invalid</STYLE><p>Hello World</p>",
         };
 
         const string script = @"
@@ -69,7 +69,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     {
         var vars = new ScriptVars
         {
-            ["value"] = "## Hello World"
+            ["value"] = "## Hello World",
         };
 
         const string script = @"
@@ -86,7 +86,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     {
         var vars = new ScriptVars
         {
-            ["value"] = "Hello, World"
+            ["value"] = "Hello, World",
         };
 
         const string script = @"
@@ -103,7 +103,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     {
         var vars = new ScriptVars
         {
-            ["value"] = "Hello, World"
+            ["value"] = "Hello, World",
         };
 
         const string script = @"
@@ -120,7 +120,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     {
         var vars = new ScriptVars
         {
-            ["value"] = "Hello World"
+            ["value"] = "Hello World",
         };
 
         const string script = @"
@@ -137,7 +137,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     {
         var vars = new ScriptVars
         {
-            ["value"] = "Hello World"
+            ["value"] = "Hello World",
         };
 
         const string script = @"
@@ -154,7 +154,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     {
         var vars = new ScriptVars
         {
-            ["value"] = "4 Häuser"
+            ["value"] = "4 Häuser",
         };
 
         const string script = @"
@@ -171,7 +171,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     {
         var vars = new ScriptVars
         {
-            ["value"] = "4 Häuser"
+            ["value"] = "4 Häuser",
         };
 
         const string script = @"
@@ -188,7 +188,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     {
         var vars = new ScriptVars
         {
-            ["value"] = "HelloWorld"
+            ["value"] = "HelloWorld",
         };
 
         const string script = @"
@@ -205,7 +205,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     {
         var vars = new ScriptVars
         {
-            ["value"] = "HelloWorld"
+            ["value"] = "HelloWorld",
         };
 
         const string script = @"
@@ -222,7 +222,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     {
         var vars = new ScriptVars
         {
-            ["value"] = "HelloWorld"
+            ["value"] = "HelloWorld",
         };
 
         const string script = @"
@@ -255,7 +255,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     {
         var options = new ScriptOptions
         {
-            CanReject = true
+            CanReject = true,
         };
 
         var vars = new ScriptVars
@@ -276,7 +276,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     {
         var options = new ScriptOptions
         {
-            CanReject = true
+            CanReject = true,
         };
 
         var vars = new ScriptVars
@@ -297,7 +297,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     {
         var options = new ScriptOptions
         {
-            CanReject = true
+            CanReject = true,
         };
 
         var vars = new ScriptVars
@@ -318,7 +318,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     {
         var options = new ScriptOptions
         {
-            CanDisallow = true
+            CanDisallow = true,
         };
 
         var vars = new ScriptVars
@@ -343,7 +343,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
 
         var options = new ScriptOptions
         {
-            CanDisallow = true
+            CanDisallow = true,
         };
 
         var vars = new ScriptVars
@@ -809,7 +809,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     {
         var httpResponse = new HttpResponseMessage(statusCode)
         {
-            Content = new StringContent("{ \"key\": 42 }", Encoding.UTF8, "application/json")
+            Content = new StringContent("{ \"key\": 42 }", Encoding.UTF8, "application/json"),
         };
 
         var httpHandler = new MockupHttpHandler(httpResponse);

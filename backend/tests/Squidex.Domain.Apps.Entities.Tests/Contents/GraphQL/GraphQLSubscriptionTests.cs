@@ -27,7 +27,7 @@ public class GraphQLSubscriptionTests : GraphQLTestBase
                 {
                     Id = id,
                     FileName = "image.png",
-                    FileSize = 1024
+                    FileSize = 1024,
                 });
 
         A.CallTo(() => subscriptionService.SubscribeAsync($"asset-{TestApp.Default.Id}", A<AssetSubscription>._, default))
@@ -43,7 +43,7 @@ public class GraphQLSubscriptionTests : GraphQLTestBase
                     fileSize
                   }
                 }",
-            Permissions = [PermissionIds.AppAssetsRead]
+            Permissions = [PermissionIds.AppAssetsRead],
         });
 
         var expected = new
@@ -54,9 +54,9 @@ public class GraphQLSubscriptionTests : GraphQLTestBase
                 {
                     id,
                     fileName = "image.png",
-                    fileSize = 1024
-                }
-            }
+                    fileSize = 1024,
+                },
+            },
         };
 
         AssertResult(expected, actual);
@@ -74,7 +74,7 @@ public class GraphQLSubscriptionTests : GraphQLTestBase
                     fileName,
                     fileSize
                   }
-                }"
+                }",
         });
 
         var expected = new
@@ -89,24 +89,24 @@ public class GraphQLSubscriptionTests : GraphQLTestBase
                         new
                         {
                             line = 3,
-                            column = 19
-                        }
+                            column = 19,
+                        },
                     },
                     path = new[]
                     {
-                        "assetChanges"
+                        "assetChanges",
                     },
                     extensions = new
                     {
                         code = "DOMAIN_FORBIDDEN",
                         codes = new[]
                         {
-                            "DOMAIN_FORBIDDEN"
-                        }
-                    }
-                }
+                            "DOMAIN_FORBIDDEN",
+                        },
+                    },
+                },
             },
-            data = (object?)null
+            data = (object?)null,
         };
 
         AssertResult(expected, actual);
@@ -125,7 +125,7 @@ public class GraphQLSubscriptionTests : GraphQLTestBase
                     Data = new ContentData()
                         .AddField("field",
                             new ContentFieldData()
-                                .AddInvariant(42))
+                                .AddInvariant(42)),
                 });
 
         A.CallTo(() => subscriptionService.SubscribeAsync($"content-{TestApp.Default.Id}", A<ContentSubscription>._, default))
@@ -140,7 +140,7 @@ public class GraphQLSubscriptionTests : GraphQLTestBase
                     data
                   }
                 }",
-            Permissions = [PermissionIds.AppContentsRead]
+            Permissions = [PermissionIds.AppContentsRead],
         });
 
         var expected = new
@@ -154,11 +154,11 @@ public class GraphQLSubscriptionTests : GraphQLTestBase
                     {
                         field = new
                         {
-                            iv = 42
-                        }
-                    }
-                }
-            }
+                            iv = 42,
+                        },
+                    },
+                },
+            },
         };
 
         AssertResult(expected, actual);
@@ -175,7 +175,7 @@ public class GraphQLSubscriptionTests : GraphQLTestBase
                     id,
                     data
                   }
-                }"
+                }",
         });
 
         var expected = new
@@ -190,24 +190,24 @@ public class GraphQLSubscriptionTests : GraphQLTestBase
                         new
                         {
                             line = 3,
-                            column = 19
-                        }
+                            column = 19,
+                        },
                     },
                     path = new[]
                     {
-                        "contentChanges"
+                        "contentChanges",
                     },
                     extensions = new
                     {
                         code = "DOMAIN_FORBIDDEN",
                         codes = new[]
                         {
-                            "DOMAIN_FORBIDDEN"
-                        }
-                    }
-                }
+                            "DOMAIN_FORBIDDEN",
+                        },
+                    },
+                },
             },
-            data = (object?)null
+            data = (object?)null,
         };
 
         AssertResult(expected, actual);

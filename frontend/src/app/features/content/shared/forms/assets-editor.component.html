@@ -1,16 +1,11 @@
 <div class="row gx-1" [class.disabled]="snapshot.isDisabled">
-    <div class="col" [class.disabled]="snapshot.isDisabled">
-        <button class="btn btn-outline-secondary btn-dashed btn-block btn-add" (click)="assetsDialog.show()" type="button">
-            {{ "contents.assetsUpload" | sqxTranslate }}
-        </button>
-    </div>
-    <div class="col" [class.disabled]="snapshot.isDisabled">
+    <div class="col">
         <div
             class="btn btn-outline-secondary btn-dashed btn-block btn-add"
             (click)="fileInput.click()"
             [sqxDropDisabled]="snapshot.isDisabled"
             (sqxDropFile)="addFiles($event)">
-            {{ "contents.assetsSelect" | sqxTranslate }}
+            {{ "contents.assetsUpload" | sqxTranslate }}
             <input
                 class="file-drop-button-input hidden"
                 #fileInput
@@ -18,6 +13,11 @@
                 multiple
                 type="file" />
         </div>
+    </div>
+    <div class="col">
+        <button class="btn btn-outline-secondary btn-dashed btn-block btn-add" (click)="assetsDialog.show()" type="button">
+            {{ "contents.assetsSelect" | sqxTranslate }}
+        </button>
     </div>
 
     @if (hasChatBot) {

@@ -47,8 +47,8 @@ public readonly struct RuleContext
             IncludeStale = IncludeStale,
             Rules = new Dictionary<DomainId, Rule>
             {
-                [Rule.Id] = Rule
-            }.ToReadonlyDictionary()
+                [Rule.Id] = Rule,
+            }.ToReadonlyDictionary(),
         };
     }
 }

@@ -21,6 +21,8 @@ public record MongoAssetEntity : Asset, IVersionedEntity<DomainId>
 
     public static void RegisterClassMap()
     {
+        AssetItemClassMap.Register();
+
         BsonClassMap.TryRegisterClassMap<MongoAssetEntity>(cm =>
         {
             cm.MapProperty(x => x.DocumentId)
@@ -78,13 +80,6 @@ public record MongoAssetEntity : Asset, IVersionedEntity<DomainId>
                 .SetElementName("at")
                 .SetIsRequired(true);
         });
-
-        AssetItemClassMap.Register();
-    }
-
-    public Asset ToState()
-    {
-        return this;
     }
 
     public static MongoAssetEntity Create(SnapshotWriteJob<Asset> job)

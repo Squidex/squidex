@@ -22,7 +22,7 @@ public class DateTimeFieldPropertiesTests : IClassFixture<TranslationsFixture>
         {
             MinValue = FutureDays(10),
             MaxValue = FutureDays(20),
-            DefaultValue = FutureDays(15)
+            DefaultValue = FutureDays(15),
         };
 
         var errors = FieldPropertiesValidator.Validate(sut).ToList();
@@ -40,7 +40,7 @@ public class DateTimeFieldPropertiesTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Max value must be greater than min value.", "MinValue", "MaxValue")
+                new ValidationError("Max value must be greater than min value.", "MinValue", "MaxValue"),
             });
     }
 
@@ -54,7 +54,7 @@ public class DateTimeFieldPropertiesTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Editor is not a valid value.", "Editor")
+                new ValidationError("Editor is not a valid value.", "Editor"),
             });
     }
 
@@ -68,7 +68,7 @@ public class DateTimeFieldPropertiesTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Calculated default value is not a valid value.", "CalculatedDefaultValue")
+                new ValidationError("Calculated default value is not a valid value.", "CalculatedDefaultValue"),
             });
     }
 
@@ -82,7 +82,7 @@ public class DateTimeFieldPropertiesTests : IClassFixture<TranslationsFixture>
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Calculated default value and default value cannot be used together.", "CalculatedDefaultValue", "DefaultValue")
+                new ValidationError("Calculated default value and default value cannot be used together.", "CalculatedDefaultValue", "DefaultValue"),
             });
     }
 

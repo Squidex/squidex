@@ -86,7 +86,7 @@ public class ContentQueryParser(
 
         var textQuery = new TextQuery(query.FullText, 1000)
         {
-            PreferredSchemaId = schema.Id
+            PreferredSchemaId = schema.Id,
         };
 
         var fullTextIds = await textIndex.SearchAsync(context.App, textQuery, context.Scope(), ct);

@@ -42,7 +42,7 @@ public class AssetsFluidExtensionTests : GivenContext
         var extensions = new IFluidExtension[]
         {
             new ContentFluidExtension(),
-            new AssetsFluidExtension(serviceProvider)
+            new AssetsFluidExtension(serviceProvider),
         };
 
         sut = new FluidTemplateEngine(extensions);
@@ -169,14 +169,14 @@ public class AssetsFluidExtensionTests : GivenContext
             Id = DomainId.NewGuid(),
             FileVersion = 0,
             FileSize = 100,
-            AppId = AppId
+            AppId = AppId,
         };
 
         SetupText(@event.ToRef(), Encode(encoding, "hello+assets"));
 
         var vars = new TemplateVars
         {
-            ["event"] = @event
+            ["event"] = @event,
         };
 
         var template = $@"
@@ -266,14 +266,14 @@ public class AssetsFluidExtensionTests : GivenContext
             AssetType = AssetType.Image,
             FileVersion = 0,
             FileSize = 100,
-            AppId = AppId
+            AppId = AppId,
         };
 
         SetupBlurHash(@event.ToRef(), "Hash");
 
         var vars = new TemplateVars
         {
-            ["event"] = @event
+            ["event"] = @event,
         };
 
         var template = @"
@@ -313,7 +313,7 @@ public class AssetsFluidExtensionTests : GivenContext
                     .AddField("assets",
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Array(assetId))),
-            AppId = AppId
+            AppId = AppId,
         };
 
         A.CallTo(() => assetQuery.FindAsync(A<Context>._, assetId, false, EtagVersion.Any, A<CancellationToken>._))
@@ -321,7 +321,7 @@ public class AssetsFluidExtensionTests : GivenContext
 
         var vars = new TemplateVars
         {
-            ["event"] = @event
+            ["event"] = @event,
         };
 
         return (vars, asset);
@@ -341,7 +341,7 @@ public class AssetsFluidExtensionTests : GivenContext
                     .AddField("assets",
                         new ContentFieldData()
                             .AddInvariant(JsonValue.Array(assetId1, assetId2))),
-            AppId = AppId
+            AppId = AppId,
         };
 
         A.CallTo(() => assetQuery.FindAsync(A<Context>._, assetId1, false, EtagVersion.Any, A<CancellationToken>._))
@@ -352,7 +352,7 @@ public class AssetsFluidExtensionTests : GivenContext
 
         var vars = new TemplateVars
         {
-            ["event"] = @event
+            ["event"] = @event,
         };
 
         return (vars, new[] { asset1, asset2 });
@@ -367,7 +367,7 @@ public class AssetsFluidExtensionTests : GivenContext
             FileSize = fileSize,
             FileName = $"file{index}.jpg",
             MimeType = "image/jpg",
-            Type = type
+            Type = type,
         };
     }
 

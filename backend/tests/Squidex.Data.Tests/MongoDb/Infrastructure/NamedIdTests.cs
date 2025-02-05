@@ -6,7 +6,7 @@
 // ==========================================================================
 
 using Squidex.Infrastructure;
-using Squidex.TestHelpers;
+using Squidex.MongoDb.TestHelpers;
 
 namespace Squidex.MongoDb.Infrastructure;
 

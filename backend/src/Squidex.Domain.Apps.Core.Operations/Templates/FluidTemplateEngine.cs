@@ -20,7 +20,7 @@ public sealed class FluidTemplateEngine : ITemplateEngine
     {
         options.MemberAccessStrategy = new UnsafeMemberAccessStrategy
         {
-            MemberNameStrategy = MemberNameStrategies.CamelCase
+            MemberNameStrategy = MemberNameStrategies.CamelCase,
         };
 
         foreach (var extension in extensions)

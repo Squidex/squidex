@@ -86,7 +86,7 @@ internal sealed class Builder
             Parent = this,
             SchemaDisplayName = "__Shared",
             SchemaName = "__Shared",
-            SchemaTypeName = "__Shared"
+            SchemaTypeName = "__Shared",
         };
 
         builder.AddTag("API endpoints for operations across all schemas.");
@@ -134,7 +134,7 @@ internal sealed class Builder
             Parent = this,
             SchemaDisplayName = schema.DisplayName(),
             SchemaName = schema.Name,
-            SchemaTypeName = typeName
+            SchemaTypeName = typeName,
         };
 
         builder.AddTag("API endpoints for [schema] content items.");
@@ -150,7 +150,7 @@ internal sealed class Builder
 
         return new JsonSchema
         {
-            Reference = reference
+            Reference = reference,
         };
     }
 
@@ -162,7 +162,7 @@ internal sealed class Builder
         {
             var reference = new JsonSchema
             {
-                Reference = definition
+                Reference = definition,
             };
 
             return (reference, null);
@@ -174,7 +174,7 @@ internal sealed class Builder
 
         return (new JsonSchema
         {
-            Reference = definition
+            Reference = definition,
         }, definition);
     }
 
@@ -188,9 +188,9 @@ internal sealed class Builder
                 ["total"] = JsonTypeBuilder.NumberProperty(
                     FieldDescriptions.ContentsTotal, true),
                 ["items"] = JsonTypeBuilder.ArrayProperty(contentSchema,
-                    FieldDescriptions.ContentsItems, true)
+                    FieldDescriptions.ContentsItems, true),
             },
-            Type = JsonObjectType.Object
+            Type = JsonObjectType.Object,
         };
     }
 }

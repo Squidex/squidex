@@ -43,7 +43,7 @@ public sealed class ContentOperation(IServiceProvider serviceProvider, Func<Writ
             Command = command,
             CommandId = command.ContentId,
             Components = components,
-            Schema = schema
+            Schema = schema,
         };
     }
 }

@@ -40,7 +40,7 @@ public sealed class ContentsSearchSource(
 
         var textQuery = new TextQuery($"{query}~", 10)
         {
-            RequiredSchemaIds = schemaIds
+            RequiredSchemaIds = schemaIds,
         };
 
         var ids = await contentTextIndexer.SearchAsync(context.App, textQuery, context.Scope(), ct);

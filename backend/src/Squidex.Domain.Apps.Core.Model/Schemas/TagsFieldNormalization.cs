@@ -10,5 +10,5 @@ namespace Squidex.Domain.Apps.Core.Schemas;
 public enum TagsFieldNormalization
 {
     None,
-    Schema
+    Schema,
 }

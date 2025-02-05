@@ -23,7 +23,7 @@ public sealed class ContentChangesPublished : ContentEvent, IMigrated<IEvent>
         return SimpleMapper.Map(this, new ContentStatusChangedV2
         {
             Status = Status.Published,
-            Change = StatusChange.Published
+            Change = StatusChange.Published,
         });
     }
 }

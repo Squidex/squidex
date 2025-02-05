@@ -41,7 +41,7 @@ public sealed class AssetRequestSizeLimitAttribute : Attribute, IAuthorizationFi
         {
             var options = new FormOptions
             {
-                MultipartBodyLengthLimit = assetOptions.Value.MaxSize
+                MultipartBodyLengthLimit = assetOptions.Value.MaxSize,
             };
 
             context.HttpContext.Features.Set<IFormFeature>(new FormFeature(context.HttpContext.Request, options));

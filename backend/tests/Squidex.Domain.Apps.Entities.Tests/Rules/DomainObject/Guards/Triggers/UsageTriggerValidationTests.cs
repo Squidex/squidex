@@ -24,7 +24,7 @@ public class UsageTriggerValidationTests : GivenContext, IClassFixture<Translati
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Num days must be between 1 and 30.", "NumDays")
+                new ValidationError("Num days must be between 1 and 30.", "NumDays"),
             });
     }
 
@@ -38,7 +38,7 @@ public class UsageTriggerValidationTests : GivenContext, IClassFixture<Translati
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Num days must be between 1 and 30.", "NumDays")
+                new ValidationError("Num days must be between 1 and 30.", "NumDays"),
             });
     }
 

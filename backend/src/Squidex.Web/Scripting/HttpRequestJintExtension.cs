@@ -41,7 +41,7 @@ public sealed class HttpRequestJintExtension(IHttpContextAccessor httpContextAcc
                 Method = request.Method,
                 Path = request.Path,
                 Query = request.Query.ToDictionary(x => x.Key, x => x.Value.ToArray()),
-                QueryString = request.QueryString.Value
+                QueryString = request.QueryString.Value,
             };
 
             return result;

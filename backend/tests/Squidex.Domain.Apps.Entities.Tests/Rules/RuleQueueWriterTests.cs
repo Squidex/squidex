@@ -53,7 +53,7 @@ public class RuleQueueWriterTests : GivenContext
             SkipReason = reason,
             EnrichedEvent = new EnrichedManualEvent(),
             EnrichmentError = null,
-            Job = new RuleJob()
+            Job = new RuleJob(),
         };
 
         var writes = await EnqueueAndFlushAsync(result);
@@ -69,14 +69,14 @@ public class RuleQueueWriterTests : GivenContext
             SkipReason = SkipReason.Failed,
             EnrichedEvent = new EnrichedManualEvent(),
             EnrichmentError = null,
-            Job = new RuleJob()
+            Job = new RuleJob(),
         };
 
         var writes = await EnqueueAndFlushAsync(result);
 
         Assert.Equal(new[]
         {
-            new RuleEventWrite(result.Job, null, null)
+            new RuleEventWrite(result.Job, null, null),
         }, writes);
     }
 
@@ -88,14 +88,14 @@ public class RuleQueueWriterTests : GivenContext
             SkipReason = SkipReason.Failed,
             EnrichedEvent = new EnrichedManualEvent(),
             EnrichmentError = new InvalidOperationException(),
-            Job = new RuleJob()
+            Job = new RuleJob(),
         };
 
         var writes = await EnqueueAndFlushAsync(result);
 
         Assert.Equal(new[]
         {
-            new RuleEventWrite(result.Job, null, result.EnrichmentError)
+            new RuleEventWrite(result.Job, null, result.EnrichmentError),
         }, writes);
     }
 
@@ -107,14 +107,14 @@ public class RuleQueueWriterTests : GivenContext
             SkipReason = SkipReason.None,
             EnrichedEvent = new EnrichedManualEvent(),
             EnrichmentError = null,
-            Job = new RuleJob()
+            Job = new RuleJob(),
         };
 
         var writes = await EnqueueAndFlushAsync(result);
 
         Assert.Equal(new[]
         {
-            new RuleEventWrite(result.Job, result.Job.Created, null)
+            new RuleEventWrite(result.Job, result.Job.Created, null),
         }, writes);
     }
 
@@ -126,14 +126,14 @@ public class RuleQueueWriterTests : GivenContext
             SkipReason = SkipReason.Disabled,
             EnrichedEvent = new EnrichedManualEvent(),
             EnrichmentError = null,
-            Job = new RuleJob()
+            Job = new RuleJob(),
         };
 
         var writes = await EnqueueAndFlushAsync(result);
 
         Assert.Equal(new[]
         {
-            new RuleEventWrite(result.Job, result.Job.Created, null)
+            new RuleEventWrite(result.Job, result.Job.Created, null),
         }, writes);
     }
 
@@ -145,7 +145,7 @@ public class RuleQueueWriterTests : GivenContext
             SkipReason = SkipReason.Disabled,
             EnrichedEvent = new EnrichedManualEvent(),
             EnrichmentError = null,
-            Job = new RuleJob()
+            Job = new RuleJob(),
         };
 
         for (var i = 0; i < 250; i++)

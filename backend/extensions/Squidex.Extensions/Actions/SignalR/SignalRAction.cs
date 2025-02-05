@@ -72,5 +72,5 @@ public enum ActionTypeEnum
 {
     Broadcast,
     User,
-    Group
+    Group,
 }

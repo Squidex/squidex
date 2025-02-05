@@ -49,7 +49,7 @@ public sealed class ApiExceptionFilterAttribute : ActionFilterAttribute, IExcept
 
         return new ObjectResult(error)
         {
-            StatusCode = error.StatusCode
+            StatusCode = error.StatusCode,
         };
     }
 }

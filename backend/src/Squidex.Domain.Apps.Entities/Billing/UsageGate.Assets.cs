@@ -102,7 +102,7 @@ public sealed partial class UsageGate : IAssetUsageTracker
         var counters = new Counters
         {
             [AssetsKeys.TotalSize] = fileSize,
-            [AssetsKeys.TotalAssets] = count
+            [AssetsKeys.TotalAssets] = count,
         };
 
         var appKey = AppAssetsKey(appId);
@@ -110,7 +110,7 @@ public sealed partial class UsageGate : IAssetUsageTracker
         var tasks = new List<Task>
         {
             usageTracker.TrackAsync(date, appKey, null, counters, ct),
-            usageTracker.TrackAsync(SummaryDate, appKey, null, counters, ct)
+            usageTracker.TrackAsync(SummaryDate, appKey, null, counters, ct),
         };
 
         var (_, _, teamId) = await GetPlanForAppAsync(appId, true, ct);

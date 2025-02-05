@@ -46,7 +46,7 @@ public static class ElasticSearchIndexDefinition
         ["es"] = "spanish",
         ["sv"] = "swedish",
         ["tr"] = "turkish",
-        ["th"] = "thai"
+        ["th"] = "thai",
     };
 
     static ElasticSearchIndexDefinition()
@@ -103,9 +103,9 @@ public static class ElasticSearchIndexDefinition
             {
                 ["geoObject"] = new
                 {
-                    type = "geo_point"
-                }
-            }
+                    type = "geo_point",
+                },
+            },
         };
 
         foreach (var (key, analyzer) in FieldAnalyzers)
@@ -113,7 +113,7 @@ public static class ElasticSearchIndexDefinition
             query.properties[GetFieldPath(key)] = new
             {
                 type = "text",
-                analyzer
+                analyzer,
             };
         }
 

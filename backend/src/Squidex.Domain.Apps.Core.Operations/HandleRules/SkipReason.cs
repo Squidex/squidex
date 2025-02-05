@@ -20,5 +20,5 @@ public enum SkipReason
     NoTrigger = 1 << 6,
     TooOld = 1 << 7,
     WrongEvent = 1 << 8,
-    WrongEventForTrigger = 1 << 9
+    WrongEventForTrigger = 1 << 9,
 }

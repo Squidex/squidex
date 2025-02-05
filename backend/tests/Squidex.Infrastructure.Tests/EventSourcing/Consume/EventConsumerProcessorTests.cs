@@ -55,8 +55,8 @@ public class EventConsumerProcessorTests
         {
             Snapshot = new EventConsumerState
             {
-                Position = initialPosition
-            }
+                Position = initialPosition,
+            },
         };
 
         A.CallTo(() => eventStore.CreateSubscription(A<IEventSubscriber<StoredEvent>>._, A<StreamFilter>._, A<StreamPosition>._))

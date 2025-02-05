@@ -13,7 +13,7 @@ using Squidex.Domain.Apps.Entities.Assets.Visitors;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.Validation;
-using Squidex.TestHelpers;
+using Squidex.MongoDb.TestHelpers;
 using ClrFilter = Squidex.Infrastructure.Queries.ClrFilter;
 
 namespace Squidex.MongoDb.Domain.Assets;
@@ -25,7 +25,6 @@ public class AssetQueryTests
     static AssetQueryTests()
     {
         MongoAssetEntity.RegisterClassMap();
-
         MongoTestUtils.SetupBson();
     }
 

@@ -25,7 +25,7 @@ internal sealed class AssetsResultGraphType : SharedObjectGraphType<IResultList<
             Name = "total",
             ResolvedType = Scalars.NonNullInt,
             Resolver = ResolveList(x => x.Total),
-            Description = FieldDescriptions.AssetsTotal
+            Description = FieldDescriptions.AssetsTotal,
         });
 
         AddField(new FieldType
@@ -33,7 +33,7 @@ internal sealed class AssetsResultGraphType : SharedObjectGraphType<IResultList<
             Name = "items",
             ResolvedType = new NonNullGraphType(assetsList),
             Resolver = ResolveList(x => x),
-            Description = FieldDescriptions.AssetsItems
+            Description = FieldDescriptions.AssetsItems,
         });
 
         Description = "List of assets and total count of assets.";

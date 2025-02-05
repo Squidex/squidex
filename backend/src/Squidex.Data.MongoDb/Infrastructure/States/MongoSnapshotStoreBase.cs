@@ -66,7 +66,7 @@ public abstract class MongoSnapshotStoreBase<T, TState>(IMongoDatabase database)
             var writes = jobs.Select(x =>
                 new ReplaceOneModel<TState>(Filter.Eq(y => y.DocumentId, x.Key), CreateDocument(x.Key, x.Value, x.NewVersion))
                 {
-                    IsUpsert = true
+                    IsUpsert = true,
                 }).ToList();
 
             if (writes.Count == 0)
@@ -112,7 +112,7 @@ public abstract class MongoSnapshotStoreBase<T, TState>(IMongoDatabase database)
         {
             Document = doc,
             DocumentId = id,
-            Version = version
+            Version = version,
         };
 
         result.Prepare();

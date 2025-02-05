@@ -21,7 +21,7 @@ public sealed class SchemasDto : Resource
     {
         var result = new SchemasDto
         {
-            Items = schemas.Select(x => SchemaDto.FromDomain(x, resources)).ToArray()
+            Items = schemas.Select(x => SchemaDto.FromDomain(x, resources)).ToArray(),
         };
 
         return result.CreateLinks(resources);

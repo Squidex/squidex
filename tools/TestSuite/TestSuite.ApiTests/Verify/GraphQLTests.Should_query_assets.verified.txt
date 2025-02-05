@@ -34,11 +34,6 @@
     metadataText: 600x600px, 19 kB,
     metadataPixelWidth: 600,
     metadataUnknown: null,
-    metadata: {
-      pixelWidth: 600,
-      pixelHeight: 600,
-      description: PNG File
-    },
     slug: logo-squared.png
   }
 }

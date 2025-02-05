@@ -28,7 +28,7 @@ public sealed record Role(string Name, PermissionSet? Permissions = null, JsonOb
         PermissionIds.AppSchemasRead,
         PermissionIds.AppSearch,
         PermissionIds.AppTranslate,
-        PermissionIds.AppUsage
+        PermissionIds.AppUsage,
     ];
 
     public const string Editor = nameof(Editor);

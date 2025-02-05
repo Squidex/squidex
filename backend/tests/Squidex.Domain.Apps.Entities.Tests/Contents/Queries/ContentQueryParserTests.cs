@@ -288,7 +288,7 @@ public class ContentQueryParserTests : GivenContext
         var query = Q.Empty.WithJsonQuery(
             new Query<JsonValue>
             {
-                Filter = new CompareFilter<JsonValue>("data.firstName.iv", CompareOperator.Equals, JsonValue.Create("ABC"))
+                Filter = new CompareFilter<JsonValue>("data.firstName.iv", CompareOperator.Equals, JsonValue.Create("ABC")),
             });
 
         var q = await sut.ParseAsync(ApiContext, query, Schema, CancellationToken);

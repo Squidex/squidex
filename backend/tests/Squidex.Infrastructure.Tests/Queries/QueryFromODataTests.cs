@@ -38,12 +38,12 @@ public class QueryFromODataTests
             new FilterField(FilterSchema.Number, "incomeMioNullable", IsNullable: true),
             new FilterField(FilterSchema.GeoObject, "geo"),
             new FilterField(FilterSchema.GeoObject, "geoNullable", IsNullable: true),
-            new FilterField(FilterSchema.Any, "properties")
+            new FilterField(FilterSchema.Any, "properties"),
         };
 
         var filterSchema = new FilterSchema(FilterSchemaType.Object)
         {
-            Fields = fields.ToReadonlyList()
+            Fields = fields.ToReadonlyList(),
         };
 
         var queryModel = new QueryModel { Schema = filterSchema };

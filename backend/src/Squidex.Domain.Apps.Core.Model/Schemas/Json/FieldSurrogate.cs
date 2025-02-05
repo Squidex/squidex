@@ -36,7 +36,7 @@ public sealed class FieldSurrogate
             IsHidden = source.IsHidden,
             IsDisabled = source.IsDisabled,
             Partitioning = source.Partitioning.Key,
-            Properties = source.RawProperties
+            Properties = source.RawProperties,
         };
     }
 
@@ -49,7 +49,7 @@ public sealed class FieldSurrogate
             IsLocked = source.IsLocked,
             IsHidden = source.IsHidden,
             IsDisabled = source.IsDisabled,
-            Properties = source.RawProperties
+            Properties = source.RawProperties,
         };
     }
 
@@ -66,7 +66,7 @@ public sealed class FieldSurrogate
                 FieldCollection = new FieldCollection<NestedField>(nested),
                 IsLocked = IsLocked,
                 IsHidden = IsHidden,
-                IsDisabled = IsDisabled
+                IsDisabled = IsDisabled,
             };
         }
         else
@@ -75,7 +75,7 @@ public sealed class FieldSurrogate
             {
                 IsLocked = IsLocked,
                 IsHidden = IsHidden,
-                IsDisabled = IsDisabled
+                IsDisabled = IsDisabled,
             };
         }
     }
@@ -86,7 +86,7 @@ public sealed class FieldSurrogate
         {
             IsLocked = IsLocked,
             IsHidden = IsHidden,
-            IsDisabled = IsDisabled
+            IsDisabled = IsDisabled,
         };
     }
 }

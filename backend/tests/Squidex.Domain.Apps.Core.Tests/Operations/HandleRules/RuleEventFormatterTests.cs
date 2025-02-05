@@ -67,7 +67,7 @@ public class RuleEventFormatterTests
         var formatters = new IRuleEventFormatter[]
         {
             new PredefinedPatternsFormatter(urlGenerator),
-            new FakeContentResolver()
+            new FakeContentResolver(),
         };
 
         sut = new RuleEventFormatter(TestUtils.DefaultSerializer, formatters, BuildTemplateEngine(), BuildScriptEngine());
@@ -78,7 +78,7 @@ public class RuleEventFormatterTests
         var extensions = new IFluidExtension[]
         {
             new DateTimeFluidExtension(),
-            new UserFluidExtension()
+            new UserFluidExtension(),
         };
 
         return new FluidTemplateEngine(extensions);
@@ -91,14 +91,14 @@ public class RuleEventFormatterTests
             new DateTimeJintExtension(),
             new EventJintExtension(urlGenerator),
             new StringJintExtension(),
-            new StringWordsJintExtension()
+            new StringWordsJintExtension(),
         };
 
         return new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
             Options.Create(new JintScriptOptions
             {
                 TimeoutScript = TimeSpan.FromSeconds(2),
-                TimeoutExecution = TimeSpan.FromSeconds(10)
+                TimeoutExecution = TimeSpan.FromSeconds(10),
             }),
             extensions);
     }
@@ -140,7 +140,7 @@ public class RuleEventFormatterTests
                 new ContentData()
                     .AddField("city",
                         new ContentFieldData()
-                            .AddInvariant(new JsonArray()))
+                            .AddInvariant(new JsonArray())),
         };
 
         var actual = await sut.FormatAsync("${CONTENT_DATA.city.iv.data.name}", @event);
@@ -280,7 +280,7 @@ public class RuleEventFormatterTests
                 new ContentData()
                     .AddField("categories",
                         new ContentFieldData()
-                            .AddInvariant(JsonValue.Array("ref1", "ref2", "ref3")))
+                            .AddInvariant(JsonValue.Array("ref1", "ref2", "ref3"))),
         };
 
         var script = @"

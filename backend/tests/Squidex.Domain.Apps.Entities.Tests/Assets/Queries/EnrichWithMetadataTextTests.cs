@@ -22,7 +22,7 @@ public class EnrichWithMetadataTextTests : GivenContext
         var assetMetadataSources = new[]
         {
             assetMetadataSource1,
-            assetMetadataSource2
+            assetMetadataSource2,
         };
 
         sut = new EnrichWithMetadataText(assetMetadataSources);
@@ -51,8 +51,8 @@ public class EnrichWithMetadataTextTests : GivenContext
             Tags =
             [
                 "id1",
-                "id2"
-            ]
+                "id2",
+            ],
         };
 
         A.CallTo(() => assetMetadataSource1.Format(asset))

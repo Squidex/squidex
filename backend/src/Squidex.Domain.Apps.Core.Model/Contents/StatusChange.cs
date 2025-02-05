@@ -11,5 +11,5 @@ public enum StatusChange
 {
     Change,
     Published,
-    Unpublished
+    Unpublished,
 }

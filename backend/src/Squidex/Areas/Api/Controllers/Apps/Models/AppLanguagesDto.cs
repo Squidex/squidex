@@ -27,7 +27,7 @@ public sealed class AppLanguagesDto : Resource
                 .Select(x => AppLanguageDto.FromDomain(x.Key, x.Value, config))
                 .Select(x => x.CreateLinks(resources, app))
                 .OrderByDescending(x => x.IsMaster).ThenBy(x => x.Iso2Code)
-                .ToArray()
+                .ToArray(),
         };
 
         return result.CreateLinks(resources);

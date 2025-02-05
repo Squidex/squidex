@@ -29,7 +29,7 @@ public sealed class SecurityProcessor(IUrlGenerator urlGenerator) : SecurityDefi
             OpenIdConnectUrl = BuildUrl(".well-known/openid-configuration"),
 
             // Just described the token URL again.
-            Description = Properties.Resources.OpenApiSecurity.Replace("<TOKEN_URL>", BuildUrl($"connect/token"), StringComparison.Ordinal)
+            Description = Properties.Resources.OpenApiSecurity.Replace("<TOKEN_URL>", BuildUrl($"connect/token"), StringComparison.Ordinal),
         };
 
         return security;

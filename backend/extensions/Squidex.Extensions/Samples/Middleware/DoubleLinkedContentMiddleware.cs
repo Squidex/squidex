@@ -69,7 +69,7 @@ public sealed class DoubleLinkedContentMiddleware(IContentLoader contentLoader) 
                     // Add the reference to the new referenced content.
                     data["referencing"] = new ContentFieldData
                     {
-                        ["iv"] = JsonValue.Array(content.Id)
+                        ["iv"] = JsonValue.Array(content.Id),
                     };
 
                     await UpdateReferencing(context, newReferenced, data, ct);
@@ -90,7 +90,7 @@ public sealed class DoubleLinkedContentMiddleware(IContentLoader contentLoader) 
             DoNotScript = true,
             DoNotValidate = true,
             Data = data,
-            ExpectedVersion = reference.Version
+            ExpectedVersion = reference.Version,
         }, ct);
     }
 

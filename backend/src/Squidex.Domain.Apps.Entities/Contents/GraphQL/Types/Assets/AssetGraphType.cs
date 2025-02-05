@@ -28,7 +28,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             Name = "id",
             ResolvedType = Scalars.NonNullString,
             Resolver = EntityResolvers.Id,
-            Description = FieldDescriptions.EntityId
+            Description = FieldDescriptions.EntityId,
         });
 
         AddField(new FieldType
@@ -36,7 +36,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             Name = "version",
             ResolvedType = Scalars.NonNullInt,
             Resolver = EntityResolvers.Version,
-            Description = FieldDescriptions.EntityVersion
+            Description = FieldDescriptions.EntityVersion,
         });
 
         AddField(new FieldType
@@ -44,7 +44,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             Name = "created",
             ResolvedType = Scalars.NonNullDateTime,
             Resolver = EntityResolvers.Created,
-            Description = FieldDescriptions.EntityCreated
+            Description = FieldDescriptions.EntityCreated,
         });
 
         AddField(new FieldType
@@ -52,7 +52,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             Name = "createdBy",
             ResolvedType = Scalars.NonNullString,
             Resolver = EntityResolvers.CreatedBy,
-            Description = FieldDescriptions.EntityCreatedBy
+            Description = FieldDescriptions.EntityCreatedBy,
         });
 
         AddField(new FieldType
@@ -60,7 +60,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             Name = "createdByUser",
             ResolvedType = UserGraphType.NonNull,
             Resolver = EntityResolvers.CreatedByUser,
-            Description = FieldDescriptions.EntityCreatedBy
+            Description = FieldDescriptions.EntityCreatedBy,
         });
 
         AddField(new FieldType
@@ -68,7 +68,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             Name = "lastModified",
             ResolvedType = Scalars.NonNullDateTime,
             Resolver = EntityResolvers.LastModified,
-            Description = FieldDescriptions.EntityLastModified
+            Description = FieldDescriptions.EntityLastModified,
         });
 
         AddField(new FieldType
@@ -76,7 +76,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             Name = "lastModifiedBy",
             ResolvedType = Scalars.NonNullString,
             Resolver = EntityResolvers.LastModifiedBy,
-            Description = FieldDescriptions.EntityLastModifiedBy
+            Description = FieldDescriptions.EntityLastModifiedBy,
         });
 
         AddField(new FieldType
@@ -84,7 +84,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             Name = "lastModifiedByUser",
             ResolvedType = UserGraphType.NonNull,
             Resolver = EntityResolvers.LastModifiedByUser,
-            Description = FieldDescriptions.EntityLastModifiedBy
+            Description = FieldDescriptions.EntityLastModifiedBy,
         });
 
         AddField(new FieldType
@@ -92,7 +92,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             Name = "mimeType",
             ResolvedType = Scalars.NonNullString,
             Resolver = Resolve(x => x.MimeType),
-            Description = FieldDescriptions.AssetMimeType
+            Description = FieldDescriptions.AssetMimeType,
         });
 
         AddField(new FieldType
@@ -100,7 +100,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             Name = "url",
             ResolvedType = Scalars.NonNullString,
             Resolver = Url,
-            Description = FieldDescriptions.AssetUrl
+            Description = FieldDescriptions.AssetUrl,
         });
 
         AddField(new FieldType
@@ -108,7 +108,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             Name = "thumbnailUrl",
             ResolvedType = Scalars.String,
             Resolver = ThumbnailUrl,
-            Description = FieldDescriptions.AssetThumbnailUrl
+            Description = FieldDescriptions.AssetThumbnailUrl,
         });
 
         AddField(new FieldType
@@ -116,7 +116,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             Name = "fileName",
             ResolvedType = Scalars.NonNullString,
             Resolver = Resolve(x => x.FileName),
-            Description = FieldDescriptions.AssetFileName
+            Description = FieldDescriptions.AssetFileName,
         });
 
         AddField(new FieldType
@@ -124,7 +124,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             Name = "fileHash",
             ResolvedType = Scalars.NonNullString,
             Resolver = Resolve(x => x.FileHash),
-            Description = FieldDescriptions.AssetFileHash
+            Description = FieldDescriptions.AssetFileHash,
         });
 
         AddField(new FieldType
@@ -132,7 +132,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             Name = "fileType",
             ResolvedType = Scalars.NonNullString,
             Resolver = Resolve(x => x.FileName.FileType()),
-            Description = FieldDescriptions.AssetFileType
+            Description = FieldDescriptions.AssetFileType,
         });
 
         AddField(new FieldType
@@ -140,7 +140,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             Name = "fileSize",
             ResolvedType = Scalars.NonNullInt,
             Resolver = Resolve(x => x.FileSize),
-            Description = FieldDescriptions.AssetFileSize
+            Description = FieldDescriptions.AssetFileSize,
         });
 
         AddField(new FieldType
@@ -148,7 +148,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             Name = "fileVersion",
             ResolvedType = Scalars.NonNullInt,
             Resolver = Resolve(x => x.FileVersion),
-            Description = FieldDescriptions.AssetFileVersion
+            Description = FieldDescriptions.AssetFileVersion,
         });
 
         AddField(new FieldType
@@ -156,7 +156,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             Name = "parentId",
             ResolvedType = Scalars.NonNullString,
             Resolver = Resolve(x => x.ParentId.ToString()),
-            Description = FieldDescriptions.AssetParentId
+            Description = FieldDescriptions.AssetParentId,
         });
 
         AddField(new FieldType
@@ -164,7 +164,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             Name = "slug",
             ResolvedType = Scalars.NonNullString,
             Resolver = Resolve(x => x.Slug),
-            Description = FieldDescriptions.AssetSlug
+            Description = FieldDescriptions.AssetSlug,
         });
 
         AddField(new FieldType
@@ -172,7 +172,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             Name = "isProtected",
             ResolvedType = Scalars.NonNullBoolean,
             Resolver = Resolve(x => x.IsProtected),
-            Description = FieldDescriptions.AssetIsProtected
+            Description = FieldDescriptions.AssetIsProtected,
         });
 
         AddField(new FieldType
@@ -181,7 +181,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             ResolvedType = Scalars.NonNullBoolean,
             Resolver = Resolve(x => x.Type == AssetType.Image),
             Description = FieldDescriptions.AssetIsImage,
-            DeprecationReason = "Use 'type' field instead."
+            DeprecationReason = "Use 'type' field instead.",
         });
 
         AddField(new FieldType
@@ -190,7 +190,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             ResolvedType = Scalars.Int,
             Resolver = Resolve(x => x.Metadata.GetInt32(KnownMetadataKeys.PixelWidth)),
             Description = FieldDescriptions.AssetPixelWidth,
-            DeprecationReason = "Use 'metadata' field instead."
+            DeprecationReason = "Use 'metadata' field instead.",
         });
 
         AddField(new FieldType
@@ -199,7 +199,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             ResolvedType = Scalars.Int,
             Resolver = Resolve(x => x.Metadata.GetInt32(KnownMetadataKeys.PixelHeight)),
             Description = FieldDescriptions.AssetPixelHeight,
-            DeprecationReason = "Use 'metadata' field instead."
+            DeprecationReason = "Use 'metadata' field instead.",
         });
 
         AddField(new FieldType
@@ -207,7 +207,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             Name = "type",
             ResolvedType = Scalars.NonNullAssetType,
             Resolver = Resolve(x => x.Type),
-            Description = FieldDescriptions.AssetType
+            Description = FieldDescriptions.AssetType,
         });
 
         AddField(new FieldType
@@ -216,7 +216,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             Arguments = AssetActions.Metadata.Arguments,
             ResolvedType = Scalars.Json,
             Resolver = AssetActions.Metadata.Resolver,
-            Description = FieldDescriptions.AssetMetadata
+            Description = FieldDescriptions.AssetMetadata,
         });
 
         AddField(new FieldType
@@ -224,7 +224,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             Name = "metadataText",
             ResolvedType = Scalars.NonNullString,
             Resolver = Resolve(x => x.MetadataText),
-            Description = FieldDescriptions.AssetMetadataText
+            Description = FieldDescriptions.AssetMetadataText,
         });
 
         AddField(new FieldType
@@ -232,7 +232,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             Name = "tags",
             ResolvedType = Scalars.NonNullStrings,
             Resolver = Resolve(x => x.TagNames),
-            Description = FieldDescriptions.AssetTags
+            Description = FieldDescriptions.AssetTags,
         });
 
         AddField(new FieldType
@@ -240,7 +240,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             Name = "editToken",
             ResolvedType = Scalars.String,
             Resolver = Resolve(x => x.EditToken),
-            Description = FieldDescriptions.EditToken
+            Description = FieldDescriptions.EditToken,
         });
 
         AddField(new FieldType
@@ -248,7 +248,7 @@ internal sealed class AssetGraphType : SharedObjectGraphType<EnrichedAsset>
             Name = "sourceUrl",
             ResolvedType = Scalars.String,
             Resolver = SourceUrl,
-            Description = FieldDescriptions.AssetSourceUrl
+            Description = FieldDescriptions.AssetSourceUrl,
         });
 
         Description = "An asset";

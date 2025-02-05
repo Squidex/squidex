@@ -46,14 +46,14 @@ public sealed class DefaultRuleRunnerService(
             IncludeStale = true,
             Rules = new Dictionary<DomainId, Rule>
             {
-                [ruleId] = rule
-            }.ToReadonlyDictionary()
+                [ruleId] = rule,
+            }.ToReadonlyDictionary(),
         };
 
         var simulatedEvents = new List<SimulatedRuleEvent>(MaxSimulatedEvents);
 
         var streamStart = SystemClock.Instance.GetCurrentInstant().Minus(Duration.FromDays(7)).ToDateTimeUtc();
-        var streamFilter = StreamFilter.Prefix($"([a-zA-Z0-9]+)-{appId.Id}");
+        var streamFilter = StreamFilter.Prefix($"%-{appId.Id}");
 
         await foreach (var storedEvent in eventStore.QueryAllReverseAsync(streamFilter, streamStart, MaxSimulatedEvents, ct))
         {

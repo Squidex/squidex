@@ -77,7 +77,7 @@ public sealed class SchemaChangedTriggerHandler(IScriptEngine scriptEngine) : IR
         // Script vars are just wrappers over dictionaries for better performance.
         var vars = new EventScriptVars
         {
-            ["event"] = @event
+            ["event"] = @event,
         };
 
         return scriptEngine.Evaluate(vars, schemaTrigger.Condition);

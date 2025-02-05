@@ -45,46 +45,26 @@ public sealed class MongoUsageRepository(IMongoDatabase database) : MongoReposit
         return Collection.DeleteManyAsync(Filter.Regex(x => x.Key, new BsonRegularExpression(pattern)), ct);
     }
 
-    public async Task TrackUsagesAsync(UsageUpdate update,
-        CancellationToken ct = default)
-    {
-        Guard.NotNull(update);
-
-        if (update.Counters.Count > 0)
-        {
-            var (filter, updateStatement) = CreateOperation(update);
-
-            await Collection.UpdateOneAsync(filter, updateStatement, Upsert, ct);
-        }
-    }
-
     public async Task TrackUsagesAsync(UsageUpdate[] updates,
         CancellationToken ct = default)
     {
         Guard.NotNull(updates);
 
-        if (updates.Length == 1)
+        var writes = new List<WriteModel<MongoUsage>>(updates.Length);
+
+        foreach (var update in updates)
         {
-            await TrackUsagesAsync(updates[0], ct);
+            if (update.Counters.Count > 0)
+            {
+                var (filter, updateStatement) = CreateOperation(update);
+
+                writes.Add(new UpdateOneModel<MongoUsage>(filter, updateStatement) { IsUpsert = true });
+            }
         }
-        else if (updates.Length > 0)
+
+        if (writes.Count > 0)
         {
-            var writes = new List<WriteModel<MongoUsage>>(updates.Length);
-
-            foreach (var update in updates)
-            {
-                if (update.Counters.Count > 0)
-                {
-                    var (filter, updateStatement) = CreateOperation(update);
-
-                    writes.Add(new UpdateOneModel<MongoUsage>(filter, updateStatement) { IsUpsert = true });
-                }
-            }
-
-            if (writes.Count > 0)
-            {
-                await Collection.BulkWriteAsync(writes, BulkUnordered, ct);
-            }
+            await Collection.BulkWriteAsync(writes, BulkUnordered, ct);
         }
     }
 
@@ -113,7 +93,12 @@ public sealed class MongoUsageRepository(IMongoDatabase database) : MongoReposit
         var dateTimeFrom = fromDate.ToDateTime(default);
         var dateTimeTo = toDate.ToDateTime(default);
 
-        var entities = await Collection.Find(x => x.Key == key && x.Date >= dateTimeFrom && x.Date <= dateTimeTo).ToListAsync(ct);
+        var entities = await Collection
+            .Find(x =>
+                x.Key == key &&
+                x.Date >= dateTimeFrom &&
+                x.Date <= dateTimeTo)
+            .ToListAsync(ct);
 
         return entities.Select(x => new StoredUsage(x.Category, x.Date.ToDateOnly(), x.Counters)).ToList();
     }

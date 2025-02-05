@@ -31,7 +31,7 @@ public static class ApiExceptionConverter
         [412] = "https://www.rfc-editor.org/rfc/rfc7231#section-6.5.10",
         [415] = "https://www.rfc-editor.org/rfc/rfc7231#section-6.5.13",
         [422] = "https://www.rfc-editor.org/rfc/rfc4918#section-11.2",
-        [500] = "https://www.rfc-editor.org/rfc/rfc7231#section-6.6.1"
+        [500] = "https://www.rfc-editor.org/rfc/rfc7231#section-6.6.1",
     };
 
     public static (ErrorDto Error, Exception? Unhandled) ToErrorDto(int statusCode, HttpContext? httpContext)
@@ -144,7 +144,7 @@ public static class ApiExceptionConverter
     {
         var error = new ErrorDto
         {
-            StatusCode = status
+            StatusCode = status,
         };
 
         if (!string.IsNullOrWhiteSpace(message))

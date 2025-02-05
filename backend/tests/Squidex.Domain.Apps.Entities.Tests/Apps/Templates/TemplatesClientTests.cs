@@ -33,9 +33,9 @@ public class TemplatesClientTests
             [
                 new TemplateRepository
                 {
-                    ContentUrl = "https://raw.githubusercontent.com/Squidex/templates/main"
+                    ContentUrl = "https://raw.githubusercontent.com/Squidex/templates/main",
                 },
-            ]
+            ],
         }));
     }
 

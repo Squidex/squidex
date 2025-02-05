@@ -10,5 +10,5 @@ namespace Squidex.Infrastructure.Queries;
 public enum LogicalFilterType
 {
     And,
-    Or
+    Or,
 }

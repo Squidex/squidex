@@ -31,7 +31,7 @@ public sealed class WorkflowsDto : Resource
                 app.Workflows
                     .Select(x => WorkflowDto.FromDomain(x.Key, x.Value))
                     .Select(x => x.CreateLinks(resources))
-                    .ToArray()
+                    .ToArray(),
         };
 
         var errors = await workflowsValidator.ValidateAsync(app.Id, app.Workflows);

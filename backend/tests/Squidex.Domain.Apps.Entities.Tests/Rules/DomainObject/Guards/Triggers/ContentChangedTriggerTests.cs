@@ -22,7 +22,7 @@ public class ContentChangedTriggerTests : GivenContext, IClassFixture<Translatio
     {
         var trigger = new ContentChangedTriggerV2
         {
-            Schemas = ReadonlyList.Create(new SchemaCondition())
+            Schemas = ReadonlyList.Create(new SchemaCondition()),
         };
 
         var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider);
@@ -30,7 +30,7 @@ public class ContentChangedTriggerTests : GivenContext, IClassFixture<Translatio
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError("Schema ID is required.", "Schemas")
+                new ValidationError("Schema ID is required.", "Schemas"),
             });
 
         A.CallTo(() => AppProvider.GetSchemaAsync(AppId.Id, A<DomainId>._, false, default))
@@ -45,7 +45,7 @@ public class ContentChangedTriggerTests : GivenContext, IClassFixture<Translatio
 
         var trigger = new ContentChangedTriggerV2
         {
-            Schemas = ReadonlyList.Create(new SchemaCondition { SchemaId = SchemaId.Id })
+            Schemas = ReadonlyList.Create(new SchemaCondition { SchemaId = SchemaId.Id }),
         };
 
         var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider);
@@ -53,7 +53,7 @@ public class ContentChangedTriggerTests : GivenContext, IClassFixture<Translatio
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
             {
-                new ValidationError($"Schema {SchemaId.Id} does not exist.", "Schemas")
+                new ValidationError($"Schema {SchemaId.Id} does not exist.", "Schemas"),
             });
     }
 
@@ -72,7 +72,7 @@ public class ContentChangedTriggerTests : GivenContext, IClassFixture<Translatio
     {
         var trigger = new ContentChangedTriggerV2
         {
-            Schemas = []
+            Schemas = [],
         };
 
         var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider);
@@ -88,7 +88,7 @@ public class ContentChangedTriggerTests : GivenContext, IClassFixture<Translatio
 
         var trigger = new ContentChangedTriggerV2
         {
-            Schemas = ReadonlyList.Create(new SchemaCondition { SchemaId = SchemaId.Id })
+            Schemas = ReadonlyList.Create(new SchemaCondition { SchemaId = SchemaId.Id }),
         };
 
         var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider);

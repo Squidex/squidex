@@ -28,7 +28,7 @@ public sealed partial class ScriptingCompleter(IEnumerable<IScriptDescriptor> de
     {
         Fields = ReadonlyList.Create(
             new FilterField(new FilterSchema(FilterSchemaType.Object), "my-field"),
-            new FilterField(FilterSchema.String, "my-field.iv"))
+            new FilterField(FilterSchema.String, "my-field.iv")),
     };
 
     public IReadOnlyList<ScriptingValue> Trigger(string type)
@@ -484,7 +484,7 @@ public sealed partial class ScriptingCompleter(IEnumerable<IScriptDescriptor> de
             {
                 AllowedValues = allowedValues,
                 Description = description,
-                DeprecationReason = decprecationReason
+                DeprecationReason = decprecationReason,
             };
 
             for (int i = 0; i < parts.Length; i++)

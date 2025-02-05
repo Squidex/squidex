@@ -26,7 +26,7 @@ public sealed class ScopesProcessor : IOperationProcessor
         {
             context.OperationDescription.Operation.Security.Add(new OpenApiSecurityRequirement
             {
-                [Constants.SecurityDefinition] = permissionAttribute.PermissionIds
+                [Constants.SecurityDefinition] = permissionAttribute.PermissionIds,
             });
         }
         else
@@ -42,7 +42,7 @@ public sealed class ScopesProcessor : IOperationProcessor
 
                 context.OperationDescription.Operation.Security.Add(new OpenApiSecurityRequirement
                 {
-                    [Constants.SecurityDefinition] = scopes
+                    [Constants.SecurityDefinition] = scopes,
                 });
             }
         }

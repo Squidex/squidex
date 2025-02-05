@@ -126,7 +126,7 @@ public abstract class EventConsumerProcessorIntegrationTests
             {
                 await persistence.WriteEventsAsync(
                 [
-                    Envelope.Create(new MyEvent())
+                    Envelope.Create(new MyEvent()),
                 ]);
             }
         });
