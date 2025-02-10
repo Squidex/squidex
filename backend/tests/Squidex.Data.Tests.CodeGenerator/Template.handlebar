@@ -1,0 +1,23 @@
+#pragma warning disable
+// Auto-generated code
+using Squidex.EntityFramework.TestHelpers;
+
+namespace {{classNamespace}};
+
+[Trait("Category", "TestContainer")]
+[Collection("Postgres")]
+public class Postgres{{className}}(PostgresFixture fixture) : {{baseName}}<TestDbContextPostgres>(fixture)
+{
+}
+
+[Trait("Category", "TestContainer")]
+[Collection("MySql")]
+public class MySql{{className}}(MySqlFixture fixture) : {{baseName}}<TestDbContextMySql>(fixture)
+{
+}
+
+[Trait("Category", "TestContainer")]
+[Collection("SqlServer")]
+public class SqlServer{{className}}(SqlServerFixture fixture) : {{baseName}}<TestDbContextSqlServer>(fixture)
+{
+}

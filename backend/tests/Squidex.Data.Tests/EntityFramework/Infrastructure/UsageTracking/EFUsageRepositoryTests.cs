@@ -5,19 +5,18 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.EntityFrameworkCore;
 using Squidex.EntityFramework.TestHelpers;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Shared;
 
 namespace Squidex.EntityFramework.Infrastructure.UsageTracking;
 
-[Trait("Category", "TestContainer")]
-[Collection("Postgres")]
-public class EFUsageRepositoryTests(PostgresFixture fixture) : UsageRepositoryTests
+public abstract class EFUsageRepositoryTests<TContext>(ISqlFixture<TContext> fixture) : UsageRepositoryTests where TContext : DbContext
 {
     protected override Task<IUsageRepository> CreateSutAsync()
     {
-        var sut = new EFUsageRepository<TestDbContextPostgres>(fixture.DbContextFactory);
+        var sut = new EFUsageRepository<TContext>(fixture.DbContextFactory);
 
         return Task.FromResult<IUsageRepository>(sut);
     }

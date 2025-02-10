@@ -11,11 +11,12 @@ using Squidex.Infrastructure.Queries;
 
 namespace Squidex.EntityFramework.Infrastructure.Queries;
 
-public abstract class SqlQueryTests<TContext> where TContext : DbContext
+public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture) where TContext : DbContext
 {
-    protected abstract Task<TContext> CreateDbContextAsync();
-
-    protected abstract SqlDialect CreateDialect();
+    protected Task<TContext> CreateDbContextAsync()
+    {
+        return fixture.DbContextFactory.CreateDbContextAsync();
+    }
 
     private class TestSqlBuilder(SqlDialect dialect, string table) : SqlQueryBuilder(dialect, table)
     {
@@ -465,7 +466,7 @@ public abstract class SqlQueryTests<TContext> where TContext : DbContext
     public async Task Should_query_count()
     {
         var builder =
-            new TestSqlBuilder(CreateDialect(), "TestEntity")
+            new TestSqlBuilder(fixture.Dialect, "TestEntity")
                 .Count();
 
         var (sql, parameters) = builder.Compile();
@@ -500,7 +501,7 @@ public abstract class SqlQueryTests<TContext> where TContext : DbContext
     private async Task<List<long>> QueryAsync(ClrQuery query)
     {
         var builder =
-            new TestSqlBuilder(CreateDialect(), "TestEntity")
+            new TestSqlBuilder(fixture.Dialect, "TestEntity")
                 .Limit(query)
                 .Offset(query)
                 .Order(query)

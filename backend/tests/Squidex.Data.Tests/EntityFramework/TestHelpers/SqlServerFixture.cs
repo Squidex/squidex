@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Hosting;
+using Squidex.Infrastructure.Queries;
+using Squidex.Providers.SqlServer;
 using Testcontainers.MsSql;
 
 #pragma warning disable MA0048 // File name must match type name
@@ -22,7 +24,7 @@ public sealed class SqlServerFixtureCollection : ICollectionFixture<SqlServerFix
 {
 }
 
-public sealed class SqlServerFixture : IAsyncLifetime
+public sealed class SqlServerFixture : IAsyncLifetime, ISqlFixture<TestDbContextSqlServer>
 {
     private readonly MsSqlContainer sqlServer =
         new MsSqlBuilder()
@@ -32,7 +34,9 @@ public sealed class SqlServerFixture : IAsyncLifetime
 
     private IServiceProvider services;
 
-    public IDbContextFactory<TestDbContexSqlServer> DbContextFactory => services.GetRequiredService<IDbContextFactory<TestDbContexSqlServer>>();
+    public IDbContextFactory<TestDbContextSqlServer> DbContextFactory => services.GetRequiredService<IDbContextFactory<TestDbContextSqlServer>>();
+
+    public SqlDialect Dialect => SqlServerDialect.Instance;
 
     public async Task InitializeAsync()
     {
@@ -40,14 +44,14 @@ public sealed class SqlServerFixture : IAsyncLifetime
 
         services =
             new ServiceCollection()
-                 .AddDbContextFactory<TestDbContexSqlServer>(b =>
+                 .AddDbContextFactory<TestDbContextSqlServer>(b =>
                  {
                      b.UseSqlServer(sqlServer.GetConnectionString());
                  })
                  .AddSingleton(TestUtils.DefaultSerializer)
                  .BuildServiceProvider();
 
-        var factory = services.GetRequiredService<IDbContextFactory<TestDbContexSqlServer>>();
+        var factory = services.GetRequiredService<IDbContextFactory<TestDbContextSqlServer>>();
         var context = await factory.CreateDbContextAsync();
         var creator = (RelationalDatabaseCreator)context.Database.GetService<IDatabaseCreator>();
 

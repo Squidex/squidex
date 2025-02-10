@@ -25,7 +25,7 @@ public sealed class PostgresFixtureCollection : ICollectionFixture<PostgresFixtu
 {
 }
 
-public sealed class PostgresFixture : IAsyncLifetime
+public sealed class PostgresFixture : IAsyncLifetime, ISqlFixture<TestDbContextPostgres>
 {
     private readonly PostgreSqlContainer postgreSql =
         new PostgreSqlBuilder()

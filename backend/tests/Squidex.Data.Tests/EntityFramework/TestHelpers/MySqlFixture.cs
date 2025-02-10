@@ -11,6 +11,8 @@ using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Hosting;
+using Squidex.Infrastructure.Queries;
+using Squidex.Providers.MySql;
 using Testcontainers.MySql;
 
 #pragma warning disable MA0048 // File name must match type name
@@ -22,7 +24,7 @@ public sealed class MySqlFixtureCollection : ICollectionFixture<MySqlFixture>
 {
 }
 
-public sealed class MySqlFixture : IAsyncLifetime
+public sealed class MySqlFixture : IAsyncLifetime, ISqlFixture<TestDbContextMySql>
 {
     private readonly MySqlContainer mysql =
         new MySqlBuilder()
@@ -33,6 +35,8 @@ public sealed class MySqlFixture : IAsyncLifetime
     private IServiceProvider services;
 
     public IDbContextFactory<TestDbContextMySql> DbContextFactory => services.GetRequiredService<IDbContextFactory<TestDbContextMySql>>();
+
+    public SqlDialect Dialect => MySqlDialect.Instance;
 
     public async Task InitializeAsync()
     {

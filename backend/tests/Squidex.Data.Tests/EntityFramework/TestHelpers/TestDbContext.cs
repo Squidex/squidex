@@ -34,7 +34,7 @@ public class TestDbContextPostgres(DbContextOptions options, IJsonSerializer jso
     }
 }
 
-public class TestDbContexSqlServer(DbContextOptions options, IJsonSerializer jsonSerializer)
+public class TestDbContextSqlServer(DbContextOptions options, IJsonSerializer jsonSerializer)
     : TestDbContext(options, jsonSerializer)
 {
 }
