@@ -17,10 +17,10 @@ jobs:
         uses: rlespinasse/github-slug-action@v5.0.0
 
       - name: Prepare - Setup QEMU
-        uses: docker/setup-qemu-action@v3.3.0
+        uses: docker/setup-qemu-action@v3.4.0
 
       - name: Prepare - Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3.8.0
+        uses: docker/setup-buildx-action@v3.9.0
 
       - name: Prepare - Setup Node
         uses: actions/setup-node@v4.2.0
@@ -84,7 +84,7 @@ jobs:
 
       - name: Test - Upload docker logs
         if: failure()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v4.6.0
         with:
             name: docker-logs
             path: './docker-logs'
