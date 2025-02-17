@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.Contents;
-using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 
@@ -16,14 +15,6 @@ public static class EFContentBuilder
 {
     public static void UseContent(this ModelBuilder builder, IJsonSerializer jsonSerializer, string? jsonColumn)
     {
-        builder.Entity<TextContentState>(b =>
-        {
-            b.ToTable("TextState");
-            b.HasKey(x => x.UniqueContentId);
-            b.Property(x => x.UniqueContentId).AsString();
-            b.Property(x => x.State).AsString();
-        });
-
         builder.UseContentEntity<EFContentCompleteEntity>("ContentsAll", jsonSerializer, jsonColumn);
         builder.UseContentReference<EFReferenceCompleteEntity>("ContentReferencesAll");
 

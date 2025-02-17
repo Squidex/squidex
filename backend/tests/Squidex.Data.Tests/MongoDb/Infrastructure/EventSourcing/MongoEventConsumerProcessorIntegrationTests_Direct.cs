@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-#pragma warning disable SA1300 // Element should begin with upper-case letter
-
 using Squidex.Events;
 
 namespace Squidex.MongoDb.Infrastructure.EventSourcing;

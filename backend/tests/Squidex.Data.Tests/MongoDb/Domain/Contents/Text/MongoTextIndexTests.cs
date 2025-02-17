@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-#pragma warning disable SA1300 // Element should begin with upper-case letter
-
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.MongoDb.TestHelpers;
 
@@ -31,18 +29,18 @@ public class MongoTextIndexTests(MongoFixture fixture) : TextIndexerTestsBase
     [Fact]
     public async Task Should_retrieve_all_stopwords_for_english_query()
     {
-        await CreateTextAsync(ids1[0], "de", "and und");
-        await CreateTextAsync(ids2[0], "en", "and und");
+        await CreateTextAsync(Ids1[0], "de", "and und");
+        await CreateTextAsync(Ids2[0], "en", "and und");
 
-        await SearchText(expected: ids1, text: "de:and");
+        await SearchText(expected: Ids1, text: "de:and");
     }
 
     [Fact]
     public async Task Should_retrieve_all_stopwords_for_german_query()
     {
-        await CreateTextAsync(ids1[0], "de", "and und");
-        await CreateTextAsync(ids2[0], "en", "and und");
+        await CreateTextAsync(Ids1[0], "de", "and und");
+        await CreateTextAsync(Ids2[0], "en", "and und");
 
-        await SearchText(expected: ids2, text: "en:und");
+        await SearchText(expected: Ids2, text: "en:und");
     }
 }

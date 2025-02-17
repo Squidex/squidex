@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Reflection;
+using System.Text;
 using Lucene.Net.Analysis;
 using Lucene.Net.Analysis.Core;
 using Lucene.Net.Analysis.Standard;
@@ -76,29 +77,65 @@ public static class Tokenizer
         return Word(textReader, textLanguage);
     }
 
+    public static string Terms(Dictionary<string, string> source)
+    {
+        Guard.NotNull(source);
+
+        var sb = DefaultPools.StringBuilder.Get();
+        try
+        {
+            foreach (var (language, text) in source)
+            {
+                var stopWords = GetStopWords(language);
+
+                Tokenize(new StringReader(text), sb, stopWords);
+            }
+
+            return sb.ToString();
+        }
+        finally
+        {
+            DefaultPools.StringBuilder.Return(sb);
+        }
+    }
+
     public static string Terms(string query, string language)
     {
-        var stopWords =
-            string.Equals(language, InvariantPartitioning.Key, StringComparison.OrdinalIgnoreCase) ?
-            null :
-            StopWords.GetValueOrDefault(language) ??
-            StopWords["en"];
+        var stopWords = GetStopWords(language);
 
         return Tokenize(new StringReader(query), stopWords);
     }
 
     private static string Word(TextReader reader, string language)
     {
-        var stopWords =
-            string.Equals(language, InvariantPartitioning.Key, StringComparison.OrdinalIgnoreCase) ?
-            null :
-            StopWords.GetValueOrDefault(language) ??
-            StopWords["en"];
+        var stopWords = GetStopWords(language);
 
         return Tokenize(reader, stopWords);
     }
 
+    private static CharArraySet? GetStopWords(string language)
+    {
+        return string.Equals(language, InvariantPartitioning.Key, StringComparison.OrdinalIgnoreCase) ?
+            null :
+            StopWords.GetValueOrDefault(language) ??
+            StopWords["en"];
+    }
+
     private static string Tokenize(TextReader reader, CharArraySet? stopWords)
+    {
+        var sb = DefaultPools.StringBuilder.Get();
+        try
+        {
+            Tokenize(reader, sb, stopWords);
+            return sb.ToString();
+        }
+        finally
+        {
+            DefaultPools.StringBuilder.Return(sb);
+        }
+    }
+
+    private static void Tokenize(TextReader reader, StringBuilder sb, CharArraySet? stopWords)
     {
         var tokenizer = new StandardTokenizer(Version, reader);
         var tokenStream = (TokenStream)new StandardFilter(Version, tokenizer);
@@ -111,34 +148,24 @@ public static class Tokenizer
             tokenStream = new StopFilter(Version, tokenStream, stopWords);
         }
 
-        var sb = DefaultPools.StringBuilder.Get();
-        try
+        // Actually not idea what this is doing, but it seems to work.
+        var attribute = tokenStream.AddAttribute<ICharTermAttribute>();
+
+        tokenStream.Reset();
+
+        using (tokenStream)
         {
-            // Actually not idea what this is doing, but it seems to work.
-            var attribute = tokenStream.AddAttribute<ICharTermAttribute>();
-
-            tokenStream.Reset();
-
-            using (tokenStream)
+            while (tokenStream.IncrementToken())
             {
-                while (tokenStream.IncrementToken())
+                var text = attribute.ToString();
+
+                if (sb.Length > 0)
                 {
-                    var text = attribute.ToString();
-
-                    if (sb.Length > 0)
-                    {
-                        sb.Append(' ');
-                    }
-
-                    sb.Append(text);
+                    sb.Append(' ');
                 }
-            }
 
-            return sb.ToString();
-        }
-        finally
-        {
-            DefaultPools.StringBuilder.Return(sb);
+                sb.Append(text);
+            }
         }
     }
 }

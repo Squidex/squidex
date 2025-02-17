@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -28,6 +29,7 @@ public sealed class SqlServerFixture : IAsyncLifetime, ISqlFixture<TestDbContext
 {
     private readonly MsSqlContainer sqlServer =
         new MsSqlBuilder()
+            .WithImage("vibs2006/sql_server_fts")
             .WithReuse(true)
             .WithLabel("reuse-id", "squidex-mssql")
             .Build();
@@ -41,12 +43,16 @@ public sealed class SqlServerFixture : IAsyncLifetime, ISqlFixture<TestDbContext
     public async Task InitializeAsync()
     {
         await sqlServer.StartAsync();
+        await CreateDatabaseAsync();
 
         services =
             new ServiceCollection()
                  .AddDbContextFactory<TestDbContextSqlServer>(b =>
                  {
-                     b.UseSqlServer(sqlServer.GetConnectionString());
+                     b.UseSqlServer(GetConnectionString(), options =>
+                     {
+                         options.UseNetTopologySuite();
+                     });
                  })
                  .AddSingleton(TestUtils.DefaultSerializer)
                  .BuildServiceProvider();
@@ -63,6 +69,18 @@ public sealed class SqlServerFixture : IAsyncLifetime, ISqlFixture<TestDbContext
         }
     }
 
+    private async Task CreateDatabaseAsync()
+    {
+        try
+        {
+            await sqlServer.ExecScriptAsync("CREATE DATABASE user");
+        }
+        catch
+        {
+            return;
+        }
+    }
+
     public async Task DisposeAsync()
     {
         foreach (var service in services.GetRequiredService<IEnumerable<IInitializable>>())
@@ -71,5 +89,13 @@ public sealed class SqlServerFixture : IAsyncLifetime, ISqlFixture<TestDbContext
         }
 
         await sqlServer.StopAsync();
+    }
+
+    private string GetConnectionString()
+    {
+        var connectionString = sqlServer.GetConnectionString();
+
+        connectionString = connectionString.Replace("Database=master", "Database=user", StringComparison.Ordinal);
+        return connectionString;
     }
 }

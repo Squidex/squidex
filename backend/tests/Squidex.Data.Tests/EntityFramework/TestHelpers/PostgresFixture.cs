@@ -29,6 +29,7 @@ public sealed class PostgresFixture : IAsyncLifetime, ISqlFixture<TestDbContextP
 {
     private readonly PostgreSqlContainer postgreSql =
         new PostgreSqlBuilder()
+            .WithImage("postgis/postgis")
             .WithReuse(true)
             .WithLabel("reuse-id", "squidex-postgres")
             .Build();
@@ -47,7 +48,10 @@ public sealed class PostgresFixture : IAsyncLifetime, ISqlFixture<TestDbContextP
             new ServiceCollection()
                  .AddDbContextFactory<TestDbContextPostgres>(b =>
                  {
-                     b.UseNpgsql(postgreSql.GetConnectionString());
+                     b.UseNpgsql(postgreSql.GetConnectionString(), options =>
+                     {
+                         options.UseNetTopologySuite();
+                     });
                  })
                  .AddSingleton(TestUtils.DefaultSerializer)
                  .BuildServiceProvider();

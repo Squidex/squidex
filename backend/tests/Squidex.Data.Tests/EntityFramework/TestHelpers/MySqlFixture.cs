@@ -30,6 +30,7 @@ public sealed class MySqlFixture : IAsyncLifetime, ISqlFixture<TestDbContextMySq
         new MySqlBuilder()
             .WithReuse(true)
             .WithLabel("reuse-id", "squidex-mysql")
+            .WithCommand("--log-bin-trust-function-creators=1", "--local-infile=1")
             .Build();
 
     private IServiceProvider services;
@@ -46,11 +47,12 @@ public sealed class MySqlFixture : IAsyncLifetime, ISqlFixture<TestDbContextMySq
             new ServiceCollection()
                  .AddDbContextFactory<TestDbContextMySql>(b =>
                  {
-                     var connectionString = mysql.GetConnectionString();
+                     var connectionString = $"{mysql.GetConnectionString()};AllowLoadLocalInfile=true";
 
-                     b.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), mysql =>
+                     b.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), options =>
                      {
-                         mysql.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
+                         options.UseNetTopologySuite();
+                         options.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
                      });
                  })
                  .AddSingleton(TestUtils.DefaultSerializer)

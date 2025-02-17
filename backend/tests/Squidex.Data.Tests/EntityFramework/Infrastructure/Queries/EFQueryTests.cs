@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using Microsoft.EntityFrameworkCore;
+using MongoDB.Driver;
+using NetTopologySuite.Geometries;
 using Squidex.EntityFramework.TestHelpers;
 using Squidex.Infrastructure.Queries;
 
@@ -29,6 +31,9 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture) wher
     private async Task<TContext> CreateAndPrepareDbContextAsync()
     {
         var dbContext = await CreateDbContextAsync();
+
+        await dbContext.Database.CreateGeoIndexAsync(fixture.Dialect, "IDX_GEO", "TestEntity", "Point");
+        await dbContext.Database.CreateTextIndexAsync(fixture.Dialect, "IDX_Text", "TestEntity", "FullText");
 
         var set = dbContext.Set<TestEntity>();
         if (await set.AnyAsync())
@@ -67,6 +72,7 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture) wher
                 BooleanOrNull = i > 10 ? true : null,
                 Number = i,
                 NumberOrNull = i > 10 ? null : i,
+                FullText = "hello world",
                 Text = $"Prefix{i}Suffix",
                 Json = new TestJson
                 {
@@ -78,6 +84,7 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture) wher
                     Array = [0, i],
                     Text = $"Prefix{i}Suffix",
                 },
+                Point = new Point(i * 2, i * 2) { SRID = 4326 },
             });
         }
 
@@ -477,6 +484,32 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture) wher
         Assert.Equal(20, dbResult);
     }
 
+    [Fact]
+    public async Task Should_query_by_distance()
+    {
+        var point = new Point(4, 4) { SRID = 4326 };
+
+        var dbContext = await CreateAndPrepareDbContextAsync();
+        var dbResult = await dbContext.Set<TestEntity>().Where(x => x.Point.Distance(point) < 1).ToListAsync();
+
+        Assert.Single(dbResult);
+    }
+
+    [Fact]
+    public async Task Should_query_full_text()
+    {
+        var builder =
+            new TestSqlBuilder(fixture.Dialect, "TestEntity")
+                .WhereMatch("FullText", "hello");
+
+        var (sql, parameters) = builder.Compile();
+
+        var dbContext = await CreateAndPrepareDbContextAsync();
+        var dbResult = await PollAsync(dbContext, sql, parameters, 20);
+
+        Assert.Equal(20, dbResult.Count);
+    }
+
     private static long[] Range(int from, int to)
     {
         var result = new List<long>();
@@ -513,5 +546,22 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture) wher
         var dbResult = await dbContext.Set<TestEntity>().FromSqlRaw(sql, parameters).ToListAsync();
 
         return dbResult.Select(x => x.Number).ToList();
+    }
+
+    private static async Task<List<TestEntity>> PollAsync(TContext dbContext, string sql, object[] parameters, int expectedCount)
+    {
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(120));
+        while (!cts.IsCancellationRequested)
+        {
+            var dbResult = await dbContext.Set<TestEntity>().FromSqlRaw(sql, parameters).ToListAsync(default);
+            if (dbResult.Count == expectedCount)
+            {
+                return dbResult;
+            }
+
+            await Task.Delay(50, default);
+        }
+
+        return [];
     }
 }
