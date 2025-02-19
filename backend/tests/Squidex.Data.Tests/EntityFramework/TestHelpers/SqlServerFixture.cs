@@ -7,11 +7,10 @@
 
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Hosting;
+using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Queries;
 using Squidex.Providers.SqlServer;
 using Testcontainers.MsSql;
@@ -43,7 +42,6 @@ public sealed class SqlServerFixture : IAsyncLifetime, ISqlFixture<TestDbContext
     public async Task InitializeAsync()
     {
         await sqlServer.StartAsync();
-        await CreateDatabaseAsync();
 
         services =
             new ServiceCollection()
@@ -54,30 +52,13 @@ public sealed class SqlServerFixture : IAsyncLifetime, ISqlFixture<TestDbContext
                          options.UseNetTopologySuite();
                      });
                  })
+                 .AddSingletonAs<DatabaseCreator<TestDbContextSqlServer>>().Done()
                  .AddSingleton(TestUtils.DefaultSerializer)
                  .BuildServiceProvider();
-
-        var factory = services.GetRequiredService<IDbContextFactory<TestDbContextSqlServer>>();
-        var context = await factory.CreateDbContextAsync();
-        var creator = (RelationalDatabaseCreator)context.Database.GetService<IDatabaseCreator>();
-
-        await creator.EnsureCreatedAsync();
 
         foreach (var service in services.GetRequiredService<IEnumerable<IInitializable>>())
         {
             await service.InitializeAsync(default);
-        }
-    }
-
-    private async Task CreateDatabaseAsync()
-    {
-        try
-        {
-            await sqlServer.ExecScriptAsync("CREATE DATABASE user");
-        }
-        catch
-        {
-            return;
         }
     }
 
@@ -93,9 +74,11 @@ public sealed class SqlServerFixture : IAsyncLifetime, ISqlFixture<TestDbContext
 
     private string GetConnectionString()
     {
-        var connectionString = sqlServer.GetConnectionString();
+        var builder = new SqlConnectionStringBuilder(sqlServer.GetConnectionString())
+        {
+            InitialCatalog = "squidex",
+        };
 
-        connectionString = connectionString.Replace("Database=master", "Database=user", StringComparison.Ordinal);
-        return connectionString;
+        return builder.ConnectionString;
     }
 }

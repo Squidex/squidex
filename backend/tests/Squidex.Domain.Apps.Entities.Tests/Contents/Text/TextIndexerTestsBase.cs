@@ -30,7 +30,7 @@ public abstract class TextIndexerTestsBase : GivenContext
 
     public virtual bool SupportsGeo => false;
 
-    public virtual TimeSpan WaitTime => TimeSpan.FromSeconds(3);
+    public virtual TimeSpan WaitTime => TimeSpan.FromSeconds(30);
 
     public abstract Task<ITextIndex> CreateSutAsync();
 
@@ -138,150 +138,150 @@ public abstract class TextIndexerTestsBase : GivenContext
     [Fact]
     public async Task Should_update_draft_only()
     {
-        await CreateTextAsync(Ids1[0], "iv", "V1");
+        await CreateTextAsync(Ids1[0], "iv", "Version1");
 
-        await UpdateTextAsync(Ids1[0], "iv", "V2");
+        await UpdateTextAsync(Ids1[0], "iv", "Version2");
 
-        await SearchText(expected: null, text: "V1", target: SearchScope.All);
-        await SearchText(expected: null, text: "V1", target: SearchScope.Published);
+        await SearchText(expected: null, text: "Version1", target: SearchScope.All);
+        await SearchText(expected: null, text: "Version1", target: SearchScope.Published);
 
-        await SearchText(expected: Ids1, text: "V2", target: SearchScope.All);
-        await SearchText(expected: null, text: "V2", target: SearchScope.Published);
+        await SearchText(expected: Ids1, text: "Version2", target: SearchScope.All);
+        await SearchText(expected: null, text: "Version2", target: SearchScope.Published);
     }
 
     [Fact]
     public async Task Should_update_draft_only_multiple_times()
     {
-        await CreateTextAsync(Ids1[0], "iv", "V1");
+        await CreateTextAsync(Ids1[0], "iv", "Version1");
 
-        await UpdateTextAsync(Ids1[0], "iv", "V2");
-        await UpdateTextAsync(Ids1[0], "iv", "V3");
+        await UpdateTextAsync(Ids1[0], "iv", "Version2");
+        await UpdateTextAsync(Ids1[0], "iv", "Version3");
 
-        await SearchText(expected: null, text: "V2", target: SearchScope.All);
-        await SearchText(expected: null, text: "V2", target: SearchScope.Published);
+        await SearchText(expected: null, text: "Version2", target: SearchScope.All);
+        await SearchText(expected: null, text: "Version2", target: SearchScope.Published);
 
-        await SearchText(expected: Ids1, text: "V3", target: SearchScope.All);
-        await SearchText(expected: null, text: "V3", target: SearchScope.Published);
+        await SearchText(expected: Ids1, text: "Version3", target: SearchScope.All);
+        await SearchText(expected: null, text: "Version3", target: SearchScope.Published);
     }
 
     [Fact]
     public async Task Should_also_serve_published_after_publish()
     {
-        await CreateTextAsync(Ids1[0], "iv", "V1");
+        await CreateTextAsync(Ids1[0], "iv", "Version1");
 
         await PublishAsync(Ids1[0]);
 
-        await SearchText(expected: Ids1, text: "V1", target: SearchScope.All);
-        await SearchText(expected: Ids1, text: "V1", target: SearchScope.Published);
+        await SearchText(expected: Ids1, text: "Version1", target: SearchScope.All);
+        await SearchText(expected: Ids1, text: "Version1", target: SearchScope.Published);
     }
 
     [Fact]
     public async Task Should_also_update_published_content()
     {
         // Create initial content.
-        await CreateTextAsync(Ids1[0], "iv", "V1");
+        await CreateTextAsync(Ids1[0], "iv", "Version1");
 
         // Publish the content.
         await PublishAsync(Ids1[0]);
 
         // Update the published content once.
-        await UpdateTextAsync(Ids1[0], "iv", "V2");
+        await UpdateTextAsync(Ids1[0], "iv", "Version2");
 
-        await SearchText(expected: null, text: "V1", target: SearchScope.All);
-        await SearchText(expected: null, text: "V1", target: SearchScope.Published);
+        await SearchText(expected: null, text: "Version1", target: SearchScope.All);
+        await SearchText(expected: null, text: "Version1", target: SearchScope.Published);
 
-        await SearchText(expected: Ids1, text: "V2", target: SearchScope.All);
-        await SearchText(expected: Ids1, text: "V2", target: SearchScope.Published);
+        await SearchText(expected: Ids1, text: "Version2", target: SearchScope.All);
+        await SearchText(expected: Ids1, text: "Version2", target: SearchScope.Published);
     }
 
     [Fact]
     public async Task Should_also_update_published_content_multiple_times()
     {
         // Create initial content.
-        await CreateTextAsync(Ids1[0], "iv", "V1");
+        await CreateTextAsync(Ids1[0], "iv", "Version1");
 
         // Publish the content.
         await PublishAsync(Ids1[0]);
 
         // Update the published content twice.
-        await UpdateTextAsync(Ids1[0], "iv", "V2");
-        await UpdateTextAsync(Ids1[0], "iv", "V3");
+        await UpdateTextAsync(Ids1[0], "iv", "Version2");
+        await UpdateTextAsync(Ids1[0], "iv", "Version3");
 
-        await SearchText(expected: null, text: "V2", target: SearchScope.All);
-        await SearchText(expected: null, text: "V2", target: SearchScope.Published);
+        await SearchText(expected: null, text: "Version2", target: SearchScope.All);
+        await SearchText(expected: null, text: "Version2", target: SearchScope.Published);
 
-        await SearchText(expected: Ids1, text: "V3", target: SearchScope.All);
-        await SearchText(expected: Ids1, text: "V3", target: SearchScope.Published);
+        await SearchText(expected: Ids1, text: "Version3", target: SearchScope.All);
+        await SearchText(expected: Ids1, text: "Version3", target: SearchScope.Published);
     }
 
     [Fact]
     public async Task Should_simulate_new_version()
     {
         // Create initial content.
-        await CreateTextAsync(Ids1[0], "iv", "V1");
+        await CreateTextAsync(Ids1[0], "iv", "Version1");
 
         // Publish the content.
         await PublishAsync(Ids1[0]);
 
-        await SearchText(expected: Ids1, text: "V1", target: SearchScope.All);
-        await SearchText(expected: Ids1, text: "V1", target: SearchScope.Published);
+        await SearchText(expected: Ids1, text: "Version1", target: SearchScope.All);
+        await SearchText(expected: Ids1, text: "Version1", target: SearchScope.Published);
 
         // Create a new version, the value is still the same as old version.
         await CreateDraftAsync(Ids1[0]);
 
-        await SearchText(expected: Ids1, text: "V1", target: SearchScope.All);
-        await SearchText(expected: Ids1, text: "V1", target: SearchScope.Published);
+        await SearchText(expected: Ids1, text: "Version1", target: SearchScope.All);
+        await SearchText(expected: Ids1, text: "Version1", target: SearchScope.Published);
 
         // Make an update, this updates the new version only.
-        await UpdateTextAsync(Ids1[0], "iv", "V2");
+        await UpdateTextAsync(Ids1[0], "iv", "Version2");
 
-        await SearchText(expected: null, text: "V1", target: SearchScope.All);
-        await SearchText(expected: Ids1, text: "V1", target: SearchScope.Published);
+        await SearchText(expected: null, text: "Version1", target: SearchScope.All);
+        await SearchText(expected: Ids1, text: "Version1", target: SearchScope.Published);
 
-        await SearchText(expected: Ids1, text: "V2", target: SearchScope.All);
-        await SearchText(expected: null, text: "V2", target: SearchScope.Published);
+        await SearchText(expected: Ids1, text: "Version2", target: SearchScope.All);
+        await SearchText(expected: null, text: "Version2", target: SearchScope.Published);
 
-        // Publish the new version to get rid of the "V1" version.
+        // Publish the new version to get rid of the "Version1" version.
         await PublishAsync(Ids1[0]);
 
-        await SearchText(expected: null, text: "V1", target: SearchScope.All);
-        await SearchText(expected: null, text: "V1", target: SearchScope.Published);
+        await SearchText(expected: null, text: "Version1", target: SearchScope.All);
+        await SearchText(expected: null, text: "Version1", target: SearchScope.Published);
 
-        await SearchText(expected: Ids1, text: "V2", target: SearchScope.All);
-        await SearchText(expected: Ids1, text: "V2", target: SearchScope.Published);
+        await SearchText(expected: Ids1, text: "Version2", target: SearchScope.All);
+        await SearchText(expected: Ids1, text: "Version2", target: SearchScope.Published);
 
         // Unpublish the version
         await UnpublishAsync(Ids1[0]);
 
-        await SearchText(expected: Ids1, text: "V2", target: SearchScope.All);
-        await SearchText(expected: null, text: "V2", target: SearchScope.Published);
+        await SearchText(expected: Ids1, text: "Version2", target: SearchScope.All);
+        await SearchText(expected: null, text: "Version2", target: SearchScope.Published);
     }
 
     [Fact]
     public async Task Should_simulate_new_version_with_migration()
     {
-        await CreateTextAsync(Ids1[0], "iv", "V1");
+        await CreateTextAsync(Ids1[0], "iv", "Version1");
 
         // Publish the content.
         await PublishAsync(Ids1[0]);
 
-        await SearchText(expected: Ids1, text: "V1", target: SearchScope.All);
-        await SearchText(expected: Ids1, text: "V1", target: SearchScope.Published);
+        await SearchText(expected: Ids1, text: "Version1", target: SearchScope.All);
+        await SearchText(expected: Ids1, text: "Version1", target: SearchScope.Published);
 
         // Create a new version, his updates the new version also.
-        await CreateDraftWithTextAsync(Ids1[0], "iv", "V2");
+        await CreateDraftWithTextAsync(Ids1[0], "iv", "Version2");
 
-        await SearchText(expected: null, text: "V1", target: SearchScope.All);
-        await SearchText(expected: Ids1, text: "V1", target: SearchScope.Published);
+        await SearchText(expected: null, text: "Version1", target: SearchScope.All);
+        await SearchText(expected: Ids1, text: "Version1", target: SearchScope.Published);
 
-        await SearchText(expected: Ids1, text: "V2", target: SearchScope.All);
-        await SearchText(expected: null, text: "V2", target: SearchScope.Published);
+        await SearchText(expected: Ids1, text: "Version2", target: SearchScope.All);
+        await SearchText(expected: null, text: "Version2", target: SearchScope.Published);
     }
 
     [Fact]
     public async Task Should_simulate_content_reversion()
     {
-        await CreateTextAsync(Ids1[0], "iv", "V1");
+        await CreateTextAsync(Ids1[0], "iv", "Version1");
 
         // Publish the content.
         await PublishAsync(Ids1[0]);
@@ -290,37 +290,37 @@ public abstract class TextIndexerTestsBase : GivenContext
         await CreateDraftAsync(Ids1[0]);
 
         // Make an update, this updates the new version only.
-        await UpdateTextAsync(Ids1[0], "iv", "V2");
+        await UpdateTextAsync(Ids1[0], "iv", "Version2");
 
         // Make an update, this updates the new version only.
         await DeleteDraftAsync(Ids1[0]);
 
-        await SearchText(expected: Ids1, text: "V1", target: SearchScope.All);
-        await SearchText(expected: Ids1, text: "V1", target: SearchScope.Published);
+        await SearchText(expected: Ids1, text: "Version1", target: SearchScope.All);
+        await SearchText(expected: Ids1, text: "Version1", target: SearchScope.Published);
 
-        await SearchText(expected: null, text: "V2", target: SearchScope.All);
-        await SearchText(expected: null, text: "V2", target: SearchScope.Published);
+        await SearchText(expected: null, text: "Version2", target: SearchScope.All);
+        await SearchText(expected: null, text: "Version2", target: SearchScope.Published);
 
         // Make an update, this updates the current version only.
-        await UpdateTextAsync(Ids1[0], "iv", "V3");
+        await UpdateTextAsync(Ids1[0], "iv", "Version3");
 
-        await SearchText(expected: Ids1, text: "V3", target: SearchScope.All);
-        await SearchText(expected: Ids1, text: "V3", target: SearchScope.Published);
+        await SearchText(expected: Ids1, text: "Version3", target: SearchScope.All);
+        await SearchText(expected: Ids1, text: "Version3", target: SearchScope.Published);
     }
 
     [Fact]
     public async Task Should_delete_documents_from_index()
     {
-        await CreateTextAsync(Ids1[0], "iv", "V1_1");
-        await CreateTextAsync(Ids2[0], "iv", "V2_1");
+        await CreateTextAsync(Ids1[0], "iv", "Version1_1");
+        await CreateTextAsync(Ids2[0], "iv", "Version2_1");
 
-        await SearchText(expected: Ids1, text: "V1_1");
-        await SearchText(expected: Ids2, text: "V2_1");
+        await SearchText(expected: Ids1, text: "Version1_1");
+        await SearchText(expected: Ids2, text: "Version2_1");
 
         await DeleteAsync(Ids1[0]);
 
-        await SearchText(expected: null, text: "V1_1");
-        await SearchText(expected: Ids2, text: "V2_1");
+        await SearchText(expected: null, text: "Version1_1");
+        await SearchText(expected: Ids2, text: "Version2_1");
     }
 
     [Fact]

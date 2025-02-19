@@ -6,11 +6,10 @@
 // ==========================================================================
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Hosting;
+using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Queries;
 using Squidex.Providers.MySql;
 using Testcontainers.MySql;
@@ -55,14 +54,9 @@ public sealed class MySqlFixture : IAsyncLifetime, ISqlFixture<TestDbContextMySq
                          options.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
                      });
                  })
+                 .AddSingletonAs<DatabaseCreator<TestDbContextMySql>>().Done()
                  .AddSingleton(TestUtils.DefaultSerializer)
                  .BuildServiceProvider();
-
-        var factory = services.GetRequiredService<IDbContextFactory<TestDbContextMySql>>();
-        var context = await factory.CreateDbContextAsync();
-        var creator = (RelationalDatabaseCreator)context.Database.GetService<IDatabaseCreator>();
-
-        await creator.EnsureCreatedAsync();
 
         foreach (var service in services.GetRequiredService<IEnumerable<IInitializable>>())
         {

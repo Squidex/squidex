@@ -194,6 +194,7 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
             {
                 var (appId, contentId) = command.UniqueContentId;
                 var id = $"{appId}_{contentId}_{command.Stage}";
+
                 switch (command)
                 {
                     case UpsertIndexEntry upsert:

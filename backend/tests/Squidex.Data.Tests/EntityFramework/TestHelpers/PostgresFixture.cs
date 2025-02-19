@@ -6,11 +6,10 @@
 // ==========================================================================
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Hosting;
+using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Queries;
 using Squidex.Providers.Postgres;
 using Testcontainers.PostgreSql;
@@ -53,14 +52,9 @@ public sealed class PostgresFixture : IAsyncLifetime, ISqlFixture<TestDbContextP
                          options.UseNetTopologySuite();
                      });
                  })
+                 .AddSingletonAs<DatabaseCreator<TestDbContextPostgres>>().Done()
                  .AddSingleton(TestUtils.DefaultSerializer)
                  .BuildServiceProvider();
-
-        var factory = services.GetRequiredService<IDbContextFactory<TestDbContextPostgres>>();
-        var context = await factory.CreateDbContextAsync();
-        var creator = (RelationalDatabaseCreator)context.Database.GetService<IDatabaseCreator>();
-
-        await creator.EnsureCreatedAsync();
 
         foreach (var service in services.GetRequiredService<IEnumerable<IInitializable>>())
         {

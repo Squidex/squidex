@@ -10,7 +10,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Providers.MySql;
-using Squidex.Providers.Postgres;
 using Testcontainers.MySql;
 
 namespace Squidex.EntityFramework.Migrations;

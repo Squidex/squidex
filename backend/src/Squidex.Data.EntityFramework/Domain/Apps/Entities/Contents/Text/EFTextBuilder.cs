@@ -26,6 +26,7 @@ public static class EFTextBuilder
         builder.Entity<EFTextIndexEntity>(b =>
         {
             b.ToTable("Texts");
+            b.Property(x => x.Id).HasMaxLength(400);
             b.Property(x => x.AppId).AsString();
             b.Property(x => x.SchemaId).AsString();
             b.Property(x => x.ContentId).AsString();
@@ -34,6 +35,7 @@ public static class EFTextBuilder
         builder.Entity<EFGeoEntity>(b =>
         {
             b.ToTable("Geos");
+            b.Property(x => x.Id).HasMaxLength(400);
             b.Property(x => x.AppId).AsString();
             b.Property(x => x.SchemaId).AsString();
             b.Property(x => x.ContentId).AsString();
