@@ -70,9 +70,10 @@ public static class ServiceExtensions
                         ServerVersion.AutoDetect(connectionString);
 
                     builder.ConfigureWarnings(w => w.Ignore(CoreEventId.CollectionWithoutComparer));
-                    builder.UseMySql(connectionString, version, mysql =>
+                    builder.UseMySql(connectionString, version, options =>
                     {
-                        mysql.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
+                        options.UseNetTopologySuite();
+                        options.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
                     });
                 });
 
@@ -85,7 +86,10 @@ public static class ServiceExtensions
                 services.AddDbContextFactory<PostgresDbContext>(builder =>
                 {
                     builder.ConfigureWarnings(w => w.Ignore(CoreEventId.CollectionWithoutComparer));
-                    builder.UseNpgsql(connectionString);
+                    builder.UseNpgsql(connectionString, options =>
+                    {
+                        options.UseNetTopologySuite();
+                    });
                 });
 
                 services.AddSingleton(typeof(ISnapshotStore<>), typeof(PostgresSnapshotStore<>));
@@ -97,7 +101,10 @@ public static class ServiceExtensions
                 services.AddDbContextFactory<SqlServerDbContext>(builder =>
                 {
                     builder.ConfigureWarnings(w => w.Ignore(CoreEventId.CollectionWithoutComparer));
-                    builder.UseSqlServer(connectionString);
+                    builder.UseSqlServer(connectionString, options =>
+                    {
+                        options.UseNetTopologySuite();
+                    });
                 });
 
                 services.AddSingleton(typeof(ISnapshotStore<>), typeof(SqlServerSnapshotStore<>));

@@ -19,7 +19,10 @@ public sealed class SqlServerDbContextDesignTimeFactory : IDesignTimeDbContextFa
         const string ConnectionString = "Server=localhost;Port=14330;Database=test;User=sa;Password=sqlserver";
 
         var builder = new DbContextOptionsBuilder<SqlServerDbContext>()
-            .UseSqlServer(ConnectionString);
+            .UseSqlServer(ConnectionString, options =>
+            {
+                options.UseNetTopologySuite();
+            });
 
         return new SqlServerDbContext(builder.Options, new SystemJsonSerializer(JsonSerializerOptions.Default));
     }

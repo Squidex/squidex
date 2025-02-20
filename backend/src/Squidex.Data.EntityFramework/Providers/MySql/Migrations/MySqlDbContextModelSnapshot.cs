@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using NetTopologySuite.Geometries;
 using Squidex.Providers.MySql;
 
 #nullable disable
@@ -17,7 +18,7 @@ namespace Squidex.Providers.MySql.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.12")
+                .HasAnnotation("ProductVersion", "8.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
@@ -761,6 +762,89 @@ namespace Squidex.Providers.MySql.Migrations
                     b.HasKey("AppId", "FromKey", "ToId");
 
                     b.ToTable("ContentReferencesPublished", (string)null);
+                });
+
+            modelBuilder.Entity("Squidex.Domain.Apps.Entities.Contents.Text.EFTextIndexGeoEntity", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(400)
+                        .HasColumnType("varchar(400)");
+
+                    b.Property<string>("AppId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("ContentId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("GeoField")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<Geometry>("GeoObject")
+                        .IsRequired()
+                        .HasColumnType("geometry");
+
+                    b.Property<string>("SchemaId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<bool>("ServeAll")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("ServePublished")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<byte>("Stage")
+                        .HasColumnType("tinyint unsigned");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Geos", (string)null);
+                });
+
+            modelBuilder.Entity("Squidex.Domain.Apps.Entities.Contents.Text.EFTextIndexTextEntity", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(400)
+                        .HasColumnType("varchar(400)");
+
+                    b.Property<string>("AppId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("ContentId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("SchemaId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<bool>("ServeAll")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<bool>("ServePublished")
+                        .HasColumnType("tinyint(1)");
+
+                    b.Property<byte>("Stage")
+                        .HasColumnType("tinyint unsigned");
+
+                    b.Property<string>("Texts")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Texts", (string)null);
                 });
 
             modelBuilder.Entity("Squidex.Domain.Apps.Entities.Contents.Text.State.TextContentState", b =>

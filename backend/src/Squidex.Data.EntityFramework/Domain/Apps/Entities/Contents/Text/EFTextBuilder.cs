@@ -39,6 +39,7 @@ public static class EFTextBuilder
             b.Property(x => x.AppId).AsString();
             b.Property(x => x.SchemaId).AsString();
             b.Property(x => x.ContentId).AsString();
+            b.Property(x => x.GeoField).HasMaxLength(255);
         });
     }
 }
