@@ -48,10 +48,10 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
     {
         await using var dbContext = await CreateDbContextAsync(ct);
 
-        await dbContext.Set<EFTextIndexEntity>().Where(x => x.AppId == app.Id)
+        await dbContext.Set<EFTextIndexTextEntity>().Where(x => x.AppId == app.Id)
             .ExecuteDeleteAsync(ct);
 
-        await dbContext.Set<EFGeoEntity>().Where(x => x.AppId == app.Id)
+        await dbContext.Set<EFTextIndexGeoEntity>().Where(x => x.AppId == app.Id)
             .ExecuteDeleteAsync(ct);
     }
 
@@ -60,10 +60,10 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
     {
         await using var dbContext = await CreateDbContextAsync(ct);
 
-        await dbContext.Set<EFTextIndexEntity>().Where(x => x.AppId == app.Id && x.SchemaId == schema.Id)
+        await dbContext.Set<EFTextIndexTextEntity>().Where(x => x.AppId == app.Id && x.SchemaId == schema.Id)
             .ExecuteDeleteAsync(ct);
 
-        await dbContext.Set<EFGeoEntity>().Where(x => x.AppId == app.Id && x.SchemaId == schema.Id)
+        await dbContext.Set<EFTextIndexGeoEntity>().Where(x => x.AppId == app.Id && x.SchemaId == schema.Id)
             .ExecuteDeleteAsync(ct);
     }
 
@@ -71,10 +71,10 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
     {
         await using var dbContext = await CreateDbContextAsync(ct);
 
-        await dbContext.Set<EFTextIndexEntity>()
+        await dbContext.Set<EFTextIndexTextEntity>()
             .ExecuteDeleteAsync(ct);
 
-        await dbContext.Set<EFGeoEntity>()
+        await dbContext.Set<EFTextIndexGeoEntity>()
             .ExecuteDeleteAsync(ct);
     }
 
@@ -88,7 +88,7 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
 
         var point = new Point(query.Latitude, query.Longitude) { SRID = 4326 };
         var ids =
-            await dbContext.Set<EFGeoEntity>()
+            await dbContext.Set<EFTextIndexGeoEntity>()
                 .Where(x => x.AppId == app.Id)
                 .Where(x => x.SchemaId == query.SchemaId)
                 .Where(x => x.GeoField == query.Field)
@@ -175,7 +175,7 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
         var (sql, parameters) = queryBuilder.Compile();
 
         var ids =
-            await context.Set<EFTextIndexEntity>().FromSqlRaw(sql, parameters)
+            await context.Set<EFTextIndexTextEntity>().FromSqlRaw(sql, parameters)
                 .Select(x => x.ContentId)
                 .ToListAsync(ct);
 
@@ -187,8 +187,8 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
     {
         await using var dbContext = await CreateDbContextAsync(ct);
 
-        var insertsText = new List<EFTextIndexEntity>();
-        var insertsGeo = new List<EFGeoEntity>();
+        var insertsText = new List<EFTextIndexTextEntity>();
+        var insertsGeo = new List<EFTextIndexGeoEntity>();
 
         foreach (var batch in commands.Batch(1000))
         {
@@ -202,7 +202,7 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
                     case UpsertIndexEntry upsert:
                         if (upsert.Texts != null)
                         {
-                            insertsText.Add(new EFTextIndexEntity
+                            insertsText.Add(new EFTextIndexTextEntity
                             {
                                 Id = id,
                                 AppId = appId,
@@ -224,7 +224,7 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
                                 continue;
                             }
 
-                            var entity = new EFGeoEntity
+                            var entity = new EFTextIndexGeoEntity
                             {
                                 Id = id,
                                 AppId = appId,
@@ -242,7 +242,7 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
                             {
                                 try
                                 {
-                                    await dbContext.Set<EFGeoEntity>().AddAsync(entity, ct);
+                                    await dbContext.Set<EFTextIndexGeoEntity>().AddAsync(entity, ct);
                                     await dbContext.SaveChangesAsync(ct);
                                 }
                                 catch (DbUpdateException ex) when (ex.InnerException is SqlException { Number: 8023 })
@@ -259,23 +259,23 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
 
                         break;
                     case DeleteIndexEntry:
-                        await dbContext.Set<EFTextIndexEntity>()
+                        await dbContext.Set<EFTextIndexTextEntity>()
                             .Where(x => x.Id == id)
                             .ExecuteDeleteAsync(ct);
 
-                        await dbContext.Set<EFGeoEntity>()
+                        await dbContext.Set<EFTextIndexGeoEntity>()
                             .Where(x => x.Id == id)
                             .ExecuteDeleteAsync(ct);
                         break;
                     case UpdateIndexEntry update:
-                        await dbContext.Set<EFTextIndexEntity>()
+                        await dbContext.Set<EFTextIndexTextEntity>()
                             .Where(x => x.Id == id)
                             .ExecuteUpdateAsync(u => u
                                 .SetProperty(x => x.ServeAll, update.ServeAll)
                                 .SetProperty(x => x.ServePublished, update.ServePublished),
                                 ct);
 
-                        await dbContext.Set<EFGeoEntity>()
+                        await dbContext.Set<EFTextIndexGeoEntity>()
                             .Where(x => x.Id == id)
                             .ExecuteUpdateAsync(u => u
                                 .SetProperty(x => x.ServeAll, update.ServeAll)

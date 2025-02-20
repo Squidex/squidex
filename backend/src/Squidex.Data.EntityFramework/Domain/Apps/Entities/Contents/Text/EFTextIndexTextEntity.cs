@@ -10,7 +10,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
-public sealed class EFTextIndexEntity
+public sealed class EFTextIndexTextEntity
 {
     [Key]
     required public string Id { get; set; }
