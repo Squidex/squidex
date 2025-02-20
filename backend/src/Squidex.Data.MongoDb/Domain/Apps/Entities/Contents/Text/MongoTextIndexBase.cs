@@ -102,13 +102,16 @@ public abstract class MongoTextIndexBase<T>(IMongoDatabase database, string shar
         Guard.NotNull(app);
         Guard.NotNull(query);
 
+        // The distance must be converted to radian (in contrast to MongoDB, which uses degrees).
+        var radian = query.Radius / 6378100;
+
         // Use the filter in the correct order to leverage the index in the best way.
         var findFilter =
             Filter.And(
                 Filter.Eq(x => x.AppId, app.Id),
                 Filter.Eq(x => x.SchemaId, query.SchemaId),
                 Filter.Eq(x => x.GeoField, query.Field),
-                Filter.GeoWithinCenterSphere(x => x.GeoObject, query.Longitude, query.Latitude, query.Radius / 6378100),
+                Filter.GeoWithinCenterSphere(x => x.GeoObject, query.Longitude, query.Latitude, radian),
                 FilterByScope(scope));
 
         var byGeo =

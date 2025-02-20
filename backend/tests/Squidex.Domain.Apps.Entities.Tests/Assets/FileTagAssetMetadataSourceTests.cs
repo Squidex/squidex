@@ -35,7 +35,6 @@ public class FileTagAssetMetadataSourceTests : GivenContext
         await sut.EnhanceAsync(command, default);
 
         Assert.Equal(AssetType.Image, command.Type);
-
         Assert.Equal(272, command.Metadata.GetInt32(KnownMetadataKeys.PixelWidth));
         Assert.Equal(170, command.Metadata.GetInt32(KnownMetadataKeys.PixelHeight));
     }
@@ -59,8 +58,7 @@ public class FileTagAssetMetadataSourceTests : GivenContext
         await sut.EnhanceAsync(command, default);
 
         Assert.Equal(AssetType.Audio, command.Type);
-
-        Assert.Equal(JsonValue.Create("00:00:28.2708750"), command.Metadata[KnownMetadataKeys.Duration]);
+        Assert.Equal(JsonValue.Create("00:00:27.7447500"), command.Metadata[KnownMetadataKeys.Duration]);
         Assert.Equal(JsonValue.Create(2L), command.Metadata[KnownMetadataKeys.AudioChannels]);
         Assert.Equal(JsonValue.Create(128L), command.Metadata[KnownMetadataKeys.AudioBitrate]);
         Assert.Equal(JsonValue.Create(44100L), command.Metadata[KnownMetadataKeys.AudioSampleRate]);
@@ -74,7 +72,6 @@ public class FileTagAssetMetadataSourceTests : GivenContext
         await sut.EnhanceAsync(command, default);
 
         Assert.Equal(AssetType.Video, command.Type);
-
         Assert.Equal(JsonValue.Create("00:00:05.3120000"), command.Metadata[KnownMetadataKeys.Duration]);
         Assert.Equal(JsonValue.Create(2L), command.Metadata[KnownMetadataKeys.AudioChannels]);
         Assert.Equal(JsonValue.Create(384L), command.Metadata[KnownMetadataKeys.AudioBitrate]);

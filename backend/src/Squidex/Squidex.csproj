@@ -62,18 +62,18 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.9.0" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
     <PackageReference Include="ReportGenerator" Version="5.4.1" PrivateAssets="all" />
-    <PackageReference Include="Squidex.Assets.Azure" Version="6.32.0" />
-    <PackageReference Include="Squidex.Assets.GoogleCloud" Version="6.32.0" />
-    <PackageReference Include="Squidex.Assets.FTP" Version="6.32.0" />
-    <PackageReference Include="Squidex.Assets.ImageMagick" Version="6.32.0" />
-    <PackageReference Include="Squidex.Assets.ImageSharp" Version="6.32.0" />
-    <PackageReference Include="Squidex.Assets.S3" Version="6.32.0" />
-    <PackageReference Include="Squidex.Assets.TusAdapter" Version="6.32.0" />
+    <PackageReference Include="Squidex.Assets.Azure" Version="6.33.0" />
+    <PackageReference Include="Squidex.Assets.GoogleCloud" Version="6.33.0" />
+    <PackageReference Include="Squidex.Assets.FTP" Version="6.33.0" />
+    <PackageReference Include="Squidex.Assets.ImageMagick" Version="6.33.0" />
+    <PackageReference Include="Squidex.Assets.ImageSharp" Version="6.33.0" />
+    <PackageReference Include="Squidex.Assets.S3" Version="6.33.0" />
+    <PackageReference Include="Squidex.Assets.TusAdapter" Version="6.33.0" />
     <PackageReference Include="Squidex.ClientLibrary" Version="20.1.0" />
-    <PackageReference Include="Squidex.Events.GetEventStore" Version="6.32.0" />
-    <PackageReference Include="Squidex.Hosting" Version="6.32.0" />
-    <PackageReference Include="Squidex.Messaging.All" Version="6.32.0" />
-    <PackageReference Include="Squidex.Messaging.Subscriptions" Version="6.32.0" />
+    <PackageReference Include="Squidex.Events.GetEventStore" Version="6.33.0" />
+    <PackageReference Include="Squidex.Hosting" Version="6.33.0" />
+    <PackageReference Include="Squidex.Messaging.All" Version="6.33.0" />
+    <PackageReference Include="Squidex.Messaging.Subscriptions" Version="6.33.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="YDotNet" Version="0.4.3" />
     <PackageReference Include="YDotNet.Native" Version="0.4.3" />

@@ -87,12 +87,16 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
         await using var dbContext = await CreateDbContextAsync(ct);
 
         var point = new Point(query.Latitude, query.Longitude) { SRID = 4326 };
+
+        // The distance must be converted to decrees (in contrast to MongoDB, which uses radian).
+        var degrees = query.Radius / (6378100 * Math.PI / 180);
+
         var ids =
             await dbContext.Set<EFTextIndexGeoEntity>()
                 .Where(x => x.AppId == app.Id)
                 .Where(x => x.SchemaId == query.SchemaId)
                 .Where(x => x.GeoField == query.Field)
-                .Where(x => x.GeoObject.Distance(point) < query.Radius)
+                .Where(x => x.GeoObject.Distance(point) < degrees)
                 .WhereScope(scope)
                 .Select(x => x.ContentId)
                 .ToListAsync(ct);
