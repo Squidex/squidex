@@ -37,7 +37,10 @@ public class SqlServerMigrationTests : IAsyncLifetime
             new ServiceCollection()
                  .AddDbContextFactory<SqlServerDbContext>(b =>
                  {
-                     b.UseSqlServer(sqlServer.GetConnectionString());
+                     b.UseSqlServer(sqlServer.GetConnectionString(), options =>
+                     {
+                         options.UseNetTopologySuite();
+                     });
                  })
                  .AddSingleton(TestUtils.DefaultSerializer)
                  .AddSingleton<DatabaseMigrator<SqlServerDbContext>>()

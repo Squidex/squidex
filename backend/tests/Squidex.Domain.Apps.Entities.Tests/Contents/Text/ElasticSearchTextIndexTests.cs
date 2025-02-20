@@ -8,7 +8,7 @@
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
 [Trait("Category", "Dependencies")]
-public class ElasticSearchTextIndexTests(ElasticSearchTextIndexFixture fixture) : TextIndexerTestsBase, IClassFixture<ElasticSearchTextIndexFixture>
+public class ElasticSearchTextIndexTests(ElasticSearchTextIndexFixture fixture) : TextIndexerTests, IClassFixture<ElasticSearchTextIndexFixture>
 {
     public override bool SupportsGeo => true;
 

@@ -11,7 +11,7 @@ using Squidex.EntityFramework.TestHelpers;
 
 namespace Squidex.EntityFramework.Domain.Contents.Text;
 
-public abstract class EFTextIndexTests<TContext>(ISqlFixture<TContext> fixture) : TextIndexerTestsBase where TContext : DbContext
+public abstract class EFTextIndexTests<TContext>(ISqlFixture<TContext> fixture) : TextIndexerTests where TContext : DbContext
 {
     public override bool SupportsQuerySyntax => false;
 

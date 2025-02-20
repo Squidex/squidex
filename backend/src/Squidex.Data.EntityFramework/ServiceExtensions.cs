@@ -11,7 +11,6 @@ using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Squidex.AI;
 using Squidex.Assets.TusAdapter;
 using Squidex.Domain.Apps.Core.Apps;
@@ -104,7 +103,7 @@ public static class ServiceExtensions
                 services.AddSingleton(typeof(ISnapshotStore<>), typeof(SqlServerSnapshotStore<>));
                 services.AddSingleton(SqlServerDialect.Instance);
                 services.AddSquidexEntityFramework<SqlServerDbContext>(config);
-            }
+            },
         });
     }
 
@@ -176,13 +175,14 @@ public static class ServiceExtensions
         services.AddSingletonAs<EFTextIndexerState<TContext>>()
             .As<ITextIndexerState>().As<IDeleter>();
 
+        services.AddSingletonAs<EFTextIndex<TContext>>()
+            .As<ITextIndex>().As<IDeleter>();
+
         services.AddSingletonAs<EFUsageRepository<TContext>>()
             .As<IUsageRepository>();
 
         services.AddSingletonAs<EFUserFactory>()
             .As<IUserFactory>();
-
-        services.TryAddSingleton<ITextIndex, NullTextIndex>();
 
         services.AddEntityFrameworkAssetKeyValueStore<TContext, TusMetadata>();
     }

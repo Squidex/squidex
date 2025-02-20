@@ -8,7 +8,7 @@
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
 [Trait("Category", "Dependencies")]
-public class AzureTextIndexTests(AzureTextIndexFixture fixture) : TextIndexerTestsBase, IClassFixture<AzureTextIndexFixture>
+public class AzureTextIndexTests(AzureTextIndexFixture fixture) : TextIndexerTests, IClassFixture<AzureTextIndexFixture>
 {
     public override bool SupportsGeo => true;
 

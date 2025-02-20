@@ -11,7 +11,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
-public sealed class EFGeoEntity
+public sealed class EFTextIndexGeoEntity
 {
     [Key]
     required public string Id { get; set; }

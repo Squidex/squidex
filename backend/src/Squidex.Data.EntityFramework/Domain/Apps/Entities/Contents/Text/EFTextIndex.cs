@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using EFCore.BulkExtensions;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
 using Squidex.Domain.Apps.Core.Apps;
@@ -13,6 +14,7 @@ using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
+using Squidex.Providers.SqlServer;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
@@ -217,7 +219,12 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
                         {
                             obj.SRID = 4326;
 
-                            insertsGeo.Add(new EFGeoEntity
+                            if (!obj.IsValid)
+                            {
+                                continue;
+                            }
+
+                            var entity = new EFGeoEntity
                             {
                                 Id = id,
                                 AppId = appId,
@@ -228,7 +235,26 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
                                 ServeAll = upsert.ServeAll,
                                 ServePublished = upsert.ServePublished,
                                 Stage = upsert.Stage,
-                            });
+                            };
+
+                            // We can only check the validatity by inserting them one by one.
+                            if (dialect is SqlServerDialect)
+                            {
+                                try
+                                {
+                                    await dbContext.Set<EFGeoEntity>().AddAsync(entity, ct);
+                                    await dbContext.SaveChangesAsync(ct);
+                                }
+                                catch (DbUpdateException ex) when (ex.InnerException is SqlException { Number: 8023 })
+                                {
+                                    // Geo object is not valid.
+                                    dbContext.Entry(entity).State = EntityState.Detached;
+                                }
+                            }
+                            else
+                            {
+                                insertsGeo.Add(entity);
+                            }
                         }
 
                         break;

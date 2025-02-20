@@ -42,6 +42,7 @@ public sealed class SqlServerFixture : IAsyncLifetime, ISqlFixture<TestDbContext
     public async Task InitializeAsync()
     {
         await sqlServer.StartAsync();
+        await sqlServer.ExecScriptAsync($"create database squidex;");
 
         services =
             new ServiceCollection()

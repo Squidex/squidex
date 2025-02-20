@@ -23,7 +23,7 @@ public static class EFTextBuilder
             b.Property(x => x.State).AsString();
         });
 
-        builder.Entity<EFTextIndexEntity>(b =>
+        builder.Entity<EFTextIndexTextEntity>(b =>
         {
             b.ToTable("Texts");
             b.Property(x => x.Id).HasMaxLength(400);
@@ -32,7 +32,7 @@ public static class EFTextBuilder
             b.Property(x => x.ContentId).AsString();
         });
 
-        builder.Entity<EFGeoEntity>(b =>
+        builder.Entity<EFTextIndexGeoEntity>(b =>
         {
             b.ToTable("Geos");
             b.Property(x => x.Id).HasMaxLength(400);

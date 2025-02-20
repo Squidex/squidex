@@ -19,7 +19,7 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
-public abstract class TextIndexerTestsBase : GivenContext
+public abstract class TextIndexerTests : GivenContext
 {
     private TextIndexingProcess? process;
 

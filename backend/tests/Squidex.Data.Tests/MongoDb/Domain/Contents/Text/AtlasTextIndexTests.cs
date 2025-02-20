@@ -10,7 +10,7 @@ using Squidex.Domain.Apps.Entities.Contents.Text;
 namespace Squidex.MongoDb.Domain.Contents.Text;
 
 [Trait("Category", "Dependencies")]
-public class AtlasTextIndexTests(AtlasTextIndexFixture fixture) : TextIndexerTestsBase, IClassFixture<AtlasTextIndexFixture>
+public class AtlasTextIndexTests(AtlasTextIndexFixture fixture) : TextIndexerTests, IClassFixture<AtlasTextIndexFixture>
 {
     public override bool SupportsQuerySyntax => true;
 

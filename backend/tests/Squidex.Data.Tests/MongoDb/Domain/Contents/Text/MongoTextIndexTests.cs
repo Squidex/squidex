@@ -12,7 +12,7 @@ namespace Squidex.MongoDb.Domain.Contents.Text;
 
 [Trait("Category", "Dependencies")]
 [Collection("Mongo")]
-public class MongoTextIndexTests(MongoFixture fixture) : TextIndexerTestsBase
+public class MongoTextIndexTests(MongoFixture fixture) : TextIndexerTests
 {
     public override bool SupportsQuerySyntax => false;
 

@@ -23,7 +23,7 @@ internal static class Extensions
         }
     }
 
-    public static IQueryable<EFTextIndexEntity> WhereScope(this IQueryable<EFTextIndexEntity> query, SearchScope scope)
+    public static IQueryable<EFTextIndexTextEntity> WhereScope(this IQueryable<EFTextIndexTextEntity> query, SearchScope scope)
     {
         if (scope == SearchScope.All)
         {
@@ -35,7 +35,7 @@ internal static class Extensions
         }
     }
 
-    public static IQueryable<EFGeoEntity> WhereScope(this IQueryable<EFGeoEntity> query, SearchScope scope)
+    public static IQueryable<EFTextIndexGeoEntity> WhereScope(this IQueryable<EFTextIndexGeoEntity> query, SearchScope scope)
     {
         if (scope == SearchScope.All)
         {
