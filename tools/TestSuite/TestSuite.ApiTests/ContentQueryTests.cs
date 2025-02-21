@@ -379,7 +379,7 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
     [Fact]
     public async Task Should_query_by_full_text_with_odata()
     {
-        var q = new ContentQuery { Search = "2" };
+        var q = new ContentQuery { Search = "text2" };
 
         var items = await _.Contents.PollAsync(q, x => true);
 
@@ -393,7 +393,7 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
         {
             JsonQuery = new
             {
-                fullText = "2"
+                fullText = "text2"
             }
         };
 

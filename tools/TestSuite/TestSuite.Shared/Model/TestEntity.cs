@@ -43,6 +43,14 @@ public sealed class TestEntity : Content<TestEntityData>
                 },
                 new UpsertSchemaFieldDto
                 {
+                    Name = TestEntityData.SearchableField,
+                    Properties = new StringFieldPropertiesDto
+                    {
+                        IsRequired = false
+                    }
+                },
+                new UpsertSchemaFieldDto
+                {
                     Name = TestEntityData.GeoField,
                     Properties = new GeolocationFieldPropertiesDto
                     {
@@ -123,6 +131,8 @@ public sealed class TestEntityData
 {
     public static readonly string LocalizedField = nameof(Localized).ToLowerInvariant();
 
+    public static readonly string SearchableField = nameof(Searchable).ToLowerInvariant();
+
     public static readonly string StringField = nameof(String).ToLowerInvariant();
 
     public static readonly string NumberField = nameof(Number).ToLowerInvariant();
@@ -143,6 +153,9 @@ public sealed class TestEntityData
 
     [JsonConverter(typeof(InvariantConverter))]
     public string? String { get; set; }
+
+    [JsonConverter(typeof(InvariantConverter))]
+    public string? Searchable { get; set; }
 
     [JsonConverter(typeof(InvariantConverter))]
     public JToken? Json { get; set; }
