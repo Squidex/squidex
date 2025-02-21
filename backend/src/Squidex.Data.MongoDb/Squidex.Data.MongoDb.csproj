@@ -16,7 +16,6 @@
     <ProjectReference Include="..\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Lucene.Net.QueryParser" Version="4.8.0-beta00016" />
     <PackageReference Include="Meziantou.Analyzer" Version="2.0.179">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -25,11 +24,11 @@
     <PackageReference Include="MongoDB.Driver.Core.Extensions.DiagnosticSources" Version="1.5.0" />
     <PackageReference Include="MongoDB.Driver.GridFS" Version="2.30.0" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
-    <PackageReference Include="Squidex.AI.Mongo" Version="6.32.0" />
-    <PackageReference Include="Squidex.Assets.Mongo" Version="6.32.0" />
-    <PackageReference Include="Squidex.Events.Mongo" Version="6.32.0" />
-    <PackageReference Include="Squidex.Hosting" Version="6.32.0" />
-    <PackageReference Include="Squidex.Messaging.Mongo" Version="6.32.0" />
+    <PackageReference Include="Squidex.AI.Mongo" Version="6.33.0" />
+    <PackageReference Include="Squidex.Assets.Mongo" Version="6.33.0" />
+    <PackageReference Include="Squidex.Events.Mongo" Version="6.33.0" />
+    <PackageReference Include="Squidex.Hosting" Version="6.33.0" />
+    <PackageReference Include="Squidex.Messaging.Mongo" Version="6.33.0" />
     <PackageReference Include="Squidex.OpenIddict.MongoDb" Version="5.8.4" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />

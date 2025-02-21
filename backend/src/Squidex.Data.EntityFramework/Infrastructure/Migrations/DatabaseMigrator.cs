@@ -8,18 +8,28 @@
 using Microsoft.EntityFrameworkCore;
 using Squidex.Hosting;
 
+#pragma warning disable RECS0108 // Warns about static fields in generic types
+
 namespace Squidex.Infrastructure.Migrations;
 
 public sealed class DatabaseMigrator<TContext>(IDbContextFactory<TContext> dbContextFactory) : IInitializable
     where TContext : DbContext
 {
+    private static readonly TimeSpan WaitTime = TimeSpan.FromSeconds(30);
+
     public int Order => -1000;
 
     public async Task InitializeAsync(
         CancellationToken ct)
     {
-        await using var context = await dbContextFactory.CreateDbContextAsync(ct);
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync(ct);
 
-        await context.Database.MigrateAsync(ct);
+        using var cts = new CancellationTokenSource(WaitTime);
+        while (!await dbContext.Database.CanConnectAsync(cts.Token))
+        {
+            await Task.Delay(100, cts.Token);
+        }
+
+        await dbContext.Database.MigrateAsync(ct);
     }
 }

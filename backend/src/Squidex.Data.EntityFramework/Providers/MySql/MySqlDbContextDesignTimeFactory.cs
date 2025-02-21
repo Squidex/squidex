@@ -19,7 +19,10 @@ public sealed class MySqlDbContextDesignTimeFactory : IDesignTimeDbContextFactor
         const string ConnectionString = "Server=localhost;Port=33060;Database=test;User=mysql;Password=mysql";
 
         var builder = new DbContextOptionsBuilder<MySqlDbContext>()
-            .UseMySql(ConnectionString, ServerVersion.AutoDetect(ConnectionString));
+            .UseMySql(ConnectionString, ServerVersion.AutoDetect(ConnectionString), options =>
+            {
+                options.UseNetTopologySuite();
+            });
 
         return new MySqlDbContext(builder.Options, new SystemJsonSerializer(JsonSerializerOptions.Default));
     }

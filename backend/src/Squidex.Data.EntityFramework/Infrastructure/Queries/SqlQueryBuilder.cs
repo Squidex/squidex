@@ -35,6 +35,12 @@ public class SqlQueryBuilder(SqlDialect dialect, string table, SqlParams? parame
         return this;
     }
 
+    public SqlQueryBuilder WhereMatch(PropertyPath path, string query)
+    {
+        sqlQuery.Where.Add(dialect.WhereMatch(Visit(path), query, sqlParameters));
+        return this;
+    }
+
     public SqlQueryBuilder Order(PropertyPath path, SortOrder order)
     {
         sqlQuery.Order.Add(dialect.OrderBy(Visit(path), order, IsJsonPath(path)));

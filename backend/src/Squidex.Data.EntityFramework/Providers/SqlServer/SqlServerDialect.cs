@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Infrastructure.Queries;
+using SqlException = Microsoft.Data.SqlClient.SqlException;
 
 namespace Squidex.Providers.SqlServer;
 
@@ -15,6 +16,26 @@ public sealed class SqlServerDialect : SqlDialect
 
     private SqlServerDialect()
     {
+    }
+
+    public override bool IsDuplicateIndexException(Exception exception, string name)
+    {
+        return exception is SqlException ex && ex.Number is 1913 or 7642 or 7652;
+    }
+
+    public override string GeoIndex(string name, string table, string field)
+    {
+        return $"CREATE SPATIAL INDEX {name} ON {FormatTable(table)} ({FormatField(field, false)}) USING GEOGRAPHY_GRID;";
+    }
+
+    public override string TextIndex(string name, string table, string field)
+    {
+        return $"CREATE FULLTEXT INDEX ON {FormatTable(table)} ({FormatField(field, false)}) KEY INDEX PK_{table} ON {name} WITH CHANGE_TRACKING AUTO;";
+    }
+
+    public override string TextIndexPrepare(string name)
+    {
+        return $"CREATE FULLTEXT CATALOG {name};";
     }
 
     public override string FormatLimitOffset(long limit, long offset, bool hasOrder)
@@ -50,6 +71,16 @@ public sealed class SqlServerDialect : SqlDialect
         }
 
         return base.OrderBy(path, order, isJson);
+    }
+
+    public override string WhereMatch(PropertyPath path, string query, SqlParams queryParameters)
+    {
+        if (query.Contains(' ', StringComparison.OrdinalIgnoreCase))
+        {
+            query = $"\"{query}\"";
+        }
+
+        return $"CONTAINS({FormatField(path, false)}, {queryParameters.AddPositional(query)})";
     }
 
     public override string Where(PropertyPath path, CompareOperator op, ClrValue value, SqlParams queryParameters, bool isJson)

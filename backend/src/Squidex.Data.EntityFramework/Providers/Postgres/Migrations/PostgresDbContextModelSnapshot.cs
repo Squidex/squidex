@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 using Squidex.Providers.Postgres;
 
@@ -17,9 +18,10 @@ namespace Squidex.Providers.Postgres.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.12")
+                .HasAnnotation("ProductVersion", "8.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
+            NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "postgis");
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -761,6 +763,89 @@ namespace Squidex.Providers.Postgres.Migrations
                     b.HasKey("AppId", "FromKey", "ToId");
 
                     b.ToTable("ContentReferencesPublished", (string)null);
+                });
+
+            modelBuilder.Entity("Squidex.Domain.Apps.Entities.Contents.Text.EFTextIndexGeoEntity", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(400)
+                        .HasColumnType("character varying(400)");
+
+                    b.Property<string>("AppId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("ContentId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("GeoField")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<Geometry>("GeoObject")
+                        .IsRequired()
+                        .HasColumnType("geometry");
+
+                    b.Property<string>("SchemaId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<bool>("ServeAll")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("ServePublished")
+                        .HasColumnType("boolean");
+
+                    b.Property<byte>("Stage")
+                        .HasColumnType("smallint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Geos", (string)null);
+                });
+
+            modelBuilder.Entity("Squidex.Domain.Apps.Entities.Contents.Text.EFTextIndexTextEntity", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(400)
+                        .HasColumnType("character varying(400)");
+
+                    b.Property<string>("AppId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("ContentId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("SchemaId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<bool>("ServeAll")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("ServePublished")
+                        .HasColumnType("boolean");
+
+                    b.Property<byte>("Stage")
+                        .HasColumnType("smallint");
+
+                    b.Property<string>("Texts")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Texts", (string)null);
                 });
 
             modelBuilder.Entity("Squidex.Domain.Apps.Entities.Contents.Text.State.TextContentState", b =>

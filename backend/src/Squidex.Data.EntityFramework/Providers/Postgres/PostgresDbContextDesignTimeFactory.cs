@@ -19,7 +19,10 @@ public sealed class PostgresDbContextDesignTimeFactory : IDesignTimeDbContextFac
         const string ConnectionString = "Server=localhost;Port=54320;Database=test;User=postgres;Password=postgres";
 
         var builder = new DbContextOptionsBuilder<PostgresDbContext>()
-            .UseNpgsql(ConnectionString);
+            .UseNpgsql(ConnectionString, options =>
+            {
+                options.UseNetTopologySuite();
+            });
 
         return new PostgresDbContext(builder.Options, new SystemJsonSerializer(JsonSerializerOptions.Default));
     }

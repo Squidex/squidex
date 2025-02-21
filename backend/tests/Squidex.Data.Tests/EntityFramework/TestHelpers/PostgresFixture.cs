@@ -6,11 +6,10 @@
 // ==========================================================================
 
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Hosting;
+using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Queries;
 using Squidex.Providers.Postgres;
 using Testcontainers.PostgreSql;
@@ -25,10 +24,11 @@ public sealed class PostgresFixtureCollection : ICollectionFixture<PostgresFixtu
 {
 }
 
-public sealed class PostgresFixture : IAsyncLifetime
+public sealed class PostgresFixture : IAsyncLifetime, ISqlFixture<TestDbContextPostgres>
 {
     private readonly PostgreSqlContainer postgreSql =
         new PostgreSqlBuilder()
+            .WithImage("postgis/postgis")
             .WithReuse(true)
             .WithLabel("reuse-id", "squidex-postgres")
             .Build();
@@ -47,16 +47,14 @@ public sealed class PostgresFixture : IAsyncLifetime
             new ServiceCollection()
                  .AddDbContextFactory<TestDbContextPostgres>(b =>
                  {
-                     b.UseNpgsql(postgreSql.GetConnectionString());
+                     b.UseNpgsql(postgreSql.GetConnectionString(), options =>
+                     {
+                         options.UseNetTopologySuite();
+                     });
                  })
+                 .AddSingletonAs<DatabaseCreator<TestDbContextPostgres>>().Done()
                  .AddSingleton(TestUtils.DefaultSerializer)
                  .BuildServiceProvider();
-
-        var factory = services.GetRequiredService<IDbContextFactory<TestDbContextPostgres>>();
-        var context = await factory.CreateDbContextAsync();
-        var creator = (RelationalDatabaseCreator)context.Database.GetService<IDatabaseCreator>();
-
-        await creator.EnsureCreatedAsync();
 
         foreach (var service in services.GetRequiredService<IEnumerable<IInitializable>>())
         {

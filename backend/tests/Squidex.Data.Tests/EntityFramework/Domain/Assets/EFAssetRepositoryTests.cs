@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.EntityFrameworkCore;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.EntityFramework.TestHelpers;
@@ -12,13 +13,11 @@ using Squidex.Shared;
 
 namespace Squidex.EntityFramework.Domain.Assets;
 
-[Trait("Category", "TestContainer")]
-[Collection("Postgres")]
-public class EFAssetRepositoryTests(PostgresFixture fixture) : AssetRepositoryTests
+public abstract class EFAssetRepositoryTests<TContext>(ISqlFixture<TContext> fixture) : AssetRepositoryTests where TContext : DbContext
 {
     protected override Task<IAssetRepository> CreateSutAsync()
     {
-        var sut = new EFAssetRepository<TestDbContextPostgres>(fixture.DbContextFactory, fixture.Dialect);
+        var sut = new EFAssetRepository<TContext>(fixture.DbContextFactory, fixture.Dialect);
 
         return Task.FromResult<IAssetRepository>(sut);
     }

@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using NetTopologySuite.Geometries;
 using Squidex.Providers.SqlServer;
 
 #nullable disable
@@ -17,7 +18,7 @@ namespace Squidex.Providers.SqlServer.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.12")
+                .HasAnnotation("ProductVersion", "8.0.13")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -764,6 +765,89 @@ namespace Squidex.Providers.SqlServer.Migrations
                     b.HasKey("AppId", "FromKey", "ToId");
 
                     b.ToTable("ContentReferencesPublished", (string)null);
+                });
+
+            modelBuilder.Entity("Squidex.Domain.Apps.Entities.Contents.Text.EFTextIndexGeoEntity", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(400)
+                        .HasColumnType("nvarchar(400)");
+
+                    b.Property<string>("AppId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("ContentId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("GeoField")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<Geometry>("GeoObject")
+                        .IsRequired()
+                        .HasColumnType("geography");
+
+                    b.Property<string>("SchemaId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<bool>("ServeAll")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ServePublished")
+                        .HasColumnType("bit");
+
+                    b.Property<byte>("Stage")
+                        .HasColumnType("tinyint");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Geos", (string)null);
+                });
+
+            modelBuilder.Entity("Squidex.Domain.Apps.Entities.Contents.Text.EFTextIndexTextEntity", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(400)
+                        .HasColumnType("nvarchar(400)");
+
+                    b.Property<string>("AppId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("ContentId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("SchemaId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<bool>("ServeAll")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ServePublished")
+                        .HasColumnType("bit");
+
+                    b.Property<byte>("Stage")
+                        .HasColumnType("tinyint");
+
+                    b.Property<string>("Texts")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Texts", (string)null);
                 });
 
             modelBuilder.Entity("Squidex.Domain.Apps.Entities.Contents.Text.State.TextContentState", b =>

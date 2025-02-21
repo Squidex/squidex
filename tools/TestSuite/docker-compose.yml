@@ -7,7 +7,7 @@ services:
       - internal
 
   db_postgres:
-    image: "postgres"
+    image: "postgis/postgis"
     ports:
       - "5432:5432"
     environment:
@@ -41,11 +41,12 @@ services:
       retries: 10
 
   db_sqlserver:
-    image: squidex/mssql-dev
+    image: squidex/mssql-dev:2
     ports:
       - "1433:1433"
     environment:
       - SA_PASSWORD=1q2w3e!R
+      - SA_USER=none
       - ACCEPT_EULA=Y
     networks:
       - internal
@@ -53,6 +54,16 @@ services:
       test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 1q2w3e!R -Q 'SELECT 1'"]
       interval: 10s
       retries: 10
+
+  db_sqlserver_init:
+    image: mcr.microsoft.com/mssql-tools
+    entrypoint: >
+      /opt/mssql-tools/bin/sqlcmd -S db_sqlserver -U sa -P 1q2w3e!R -d master -Q 'CREATE DATABASE ''squidex'''
+    networks:
+      - internal
+    depends_on:
+      db_sqlserver:
+        condition: service_healthy
 
   # Base configuration
   squidex_mongo1:

@@ -41,12 +41,13 @@ public class QueryFromODataTests
             new FilterField(FilterSchema.Any, "properties"),
         };
 
-        var filterSchema = new FilterSchema(FilterSchemaType.Object)
+        var queryModel = new QueryModel
         {
-            Fields = fields.ToReadonlyList(),
+            Schema = new FilterSchema(FilterSchemaType.Object)
+            {
+                Fields = fields.ToReadonlyList(),
+            },
         };
-
-        var queryModel = new QueryModel { Schema = filterSchema };
 
         EdmModel = queryModel.ConvertToEdm("Squidex", "Content");
     }

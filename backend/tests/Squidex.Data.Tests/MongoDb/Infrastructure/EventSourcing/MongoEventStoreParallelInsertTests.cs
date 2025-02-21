@@ -13,8 +13,6 @@ using Squidex.Infrastructure.EventSourcing.Consume;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.TestHelpers;
 
-#pragma warning disable SA1300 // Element should begin with upper-case letter
-
 namespace Squidex.MongoDb.Infrastructure.EventSourcing;
 
 [Trait("Category", "Dependencies")]

@@ -17,7 +17,10 @@ namespace Squidex.EntityFramework.Migrations;
 [Trait("Category", "TestContainer")]
 public class PostgresMigrationTests : IAsyncLifetime
 {
-    private readonly PostgreSqlContainer postgreSql = new PostgreSqlBuilder().Build();
+    private readonly PostgreSqlContainer postgreSql =
+        new PostgreSqlBuilder()
+            .WithImage("postgis/postgis")
+            .Build();
 
     public async Task InitializeAsync()
     {
@@ -36,7 +39,10 @@ public class PostgresMigrationTests : IAsyncLifetime
             new ServiceCollection()
                  .AddDbContextFactory<PostgresDbContext>(b =>
                  {
-                     b.UseNpgsql(postgreSql.GetConnectionString());
+                     b.UseNpgsql(postgreSql.GetConnectionString(), options =>
+                     {
+                         options.UseNetTopologySuite();
+                     });
                  })
                  .AddSingleton(TestUtils.DefaultSerializer)
                  .AddSingleton<DatabaseMigrator<PostgresDbContext>>()

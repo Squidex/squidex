@@ -52,6 +52,7 @@ public class AppDbContext(DbContextOptions options, IJsonSerializer jsonSerializ
         builder.UseSettings(jsonSerializer, jsonColumnType);
         builder.UseTags(jsonSerializer, jsonColumnType);
         builder.UseTeams(jsonSerializer, jsonColumnType);
+        builder.UseTextIndex();
         builder.UseUsage();
         builder.UseUsageTracking(jsonSerializer, jsonColumnType);
         builder.UseYDotNet();

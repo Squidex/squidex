@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/mssql/server:2022-CU14-ubuntu-22.04
+FROM vibs2006/sql_server_fts
 
 # Switch to root to perform installation
 USER root

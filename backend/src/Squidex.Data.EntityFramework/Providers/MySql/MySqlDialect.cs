@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using MySqlConnector;
 using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Providers.MySql;
@@ -15,6 +16,21 @@ public sealed class MySqlDialect : SqlDialect
 
     private MySqlDialect()
     {
+    }
+
+    public override bool IsDuplicateIndexException(Exception exception, string name)
+    {
+        return exception is MySqlException ex && ex.Number == 1061;
+    }
+
+    public override string GeoIndex(string name, string table, string field)
+    {
+        return $"CREATE SPATIAL INDEX {name} ON {FormatTable(table)} ({FormatField(field, false)});";
+    }
+
+    public override string TextIndex(string name, string table, string field)
+    {
+        return $"CREATE FULLTEXT INDEX {name} ON {FormatTable(table)} ({FormatField(field, false)});";
     }
 
     public override string FormatLimitOffset(long limit, long offset, bool hasOrder)
@@ -68,6 +84,11 @@ public sealed class MySqlDialect : SqlDialect
         }
 
         return base.OrderBy(path, order, isJson);
+    }
+
+    public override string WhereMatch(PropertyPath path, string query, SqlParams queryParameters)
+    {
+        return $"MATCH({FormatField(path, false)}) AGAINST({queryParameters.AddPositional(query)})";
     }
 
     public override string Where(PropertyPath path, CompareOperator op, ClrValue value, SqlParams queryParameters, bool isJson)

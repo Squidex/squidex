@@ -5,16 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-#pragma warning disable SA1300 // Element should begin with upper-case letter
-
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
 [Trait("Category", "Dependencies")]
-public class ElasticSearchTextIndexTests(ElasticSearchTextIndexFixture fixture) : TextIndexerTestsBase, IClassFixture<ElasticSearchTextIndexFixture>
+public class ElasticSearchTextIndexTests(ElasticSearchTextIndexFixture fixture) : TextIndexerTests, IClassFixture<ElasticSearchTextIndexFixture>
 {
     public override bool SupportsGeo => true;
-
-    public override int WaitAfterUpdate => 2000;
 
     public ElasticSearchTextIndexFixture _ { get; } = fixture;
 
@@ -26,26 +22,26 @@ public class ElasticSearchTextIndexTests(ElasticSearchTextIndexFixture fixture) 
     [Fact]
     public async Task Should_retrieve_english_stopword_only_for_german_query()
     {
-        await CreateTextAsync(ids1[0], "de", "and y");
-        await CreateTextAsync(ids2[0], "en", "and y");
+        await CreateTextAsync(Ids1[0], "de", "and y");
+        await CreateTextAsync(Ids2[0], "en", "and y");
 
-        await SearchText(expected: ids2, text: "und");
+        await SearchText(expected: Ids2, text: "und");
     }
 
     [Fact]
     public async Task Should_retrieve_german_stopword_only_for_english_query()
     {
-        await CreateTextAsync(ids1[0], "de", "and und");
-        await CreateTextAsync(ids2[0], "en", "and und");
+        await CreateTextAsync(Ids1[0], "de", "and und");
+        await CreateTextAsync(Ids2[0], "en", "and und");
 
-        await SearchText(expected: ids1, text: "and");
+        await SearchText(expected: Ids1, text: "and");
     }
 
     [Fact]
     public async Task Should_index_cjk_content_and_retrieve()
     {
-        await CreateTextAsync(ids1[0], "zh", "東京大学");
+        await CreateTextAsync(Ids1[0], "zh", "東京大学");
 
-        await SearchText(expected: ids1, text: "東京");
+        await SearchText(expected: Ids1, text: "東京");
     }
 }

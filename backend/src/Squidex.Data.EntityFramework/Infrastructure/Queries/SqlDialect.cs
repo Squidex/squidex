@@ -14,6 +14,11 @@ public class SqlDialect
 {
     private const string Tab = "  ";
 
+    public virtual bool IsDuplicateIndexException(Exception exception, string name)
+    {
+        return false;
+    }
+
     public virtual string BuildSelectStatement(SqlQuery request)
     {
         var sb = new StringBuilder("SELECT");
@@ -45,6 +50,21 @@ public class SqlDialect
         }
 
         return sb.ToString();
+    }
+
+    public virtual string GeoIndex(string name, string table, string field)
+    {
+        throw new NotSupportedException();
+    }
+
+    public virtual string TextIndex(string name, string table, string field)
+    {
+        throw new NotSupportedException();
+    }
+
+    public virtual string TextIndexPrepare(string name)
+    {
+        return string.Empty;
     }
 
     public virtual string FormatLimitOffset(long limit, long offset, bool hasOrder)
@@ -117,6 +137,11 @@ public class SqlDialect
     public virtual string WhereQuery(PropertyPath path, CompareOperator op, string query, bool isJson)
     {
         return $"{FormatField(path, isJson)} {FormatOperator(op, ClrValue.Null)} ({query})";
+    }
+
+    public virtual string WhereMatch(PropertyPath path, string query, SqlParams queryParameters)
+    {
+        throw new NotSupportedException();
     }
 
     protected virtual string FormatValues(CompareOperator op, ClrValue value, SqlParams queryParameters)

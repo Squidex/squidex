@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Npgsql;
 using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Providers.Postgres;
@@ -15,6 +16,21 @@ public class PostgresDialect : SqlDialect
 
     private PostgresDialect()
     {
+    }
+
+    public override bool IsDuplicateIndexException(Exception exception, string name)
+    {
+        return exception is PostgresException ex && ex.SqlState == "42P07";
+    }
+
+    public override string GeoIndex(string name, string table, string field)
+    {
+        return $"CREATE INDEX {name} ON {FormatTable(table)} USING GIST ({FormatField(field, false)});";
+    }
+
+    public override string TextIndex(string name, string table, string field)
+    {
+        return $"CREATE INDEX {name} ON {FormatTable(table)} USING GIN (to_tsvector('simple', {FormatField(field, false)}));";
     }
 
     protected override string FormatTable(string tableName)
@@ -33,6 +49,16 @@ public class PostgresDialect : SqlDialect
         }
 
         return base.OrderBy(path, order, isJson);
+    }
+
+    public override string WhereMatch(PropertyPath path, string query, SqlParams queryParameters)
+    {
+        if (query.Contains(' ', StringComparison.OrdinalIgnoreCase))
+        {
+            query = query.Replace(" ", " & ", StringComparison.Ordinal);
+        }
+
+        return $"to_tsvector('simple', {FormatField(path, false)}) @@ to_tsquery({queryParameters.AddPositional(query)})";
     }
 
     public override string Where(PropertyPath path, CompareOperator op, ClrValue value, SqlParams queryParameters, bool isJson)

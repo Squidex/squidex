@@ -35,7 +35,7 @@ internal static class Extensions
     public static void LimitFields(this ContentData data, IReadOnlySet<string> fields)
     {
         List<string>? toDelete = null;
-        foreach (var (key, value) in data)
+        foreach (var (key, _) in data)
         {
             if (!fields.Any(x => IsMatch(key, x)))
             {

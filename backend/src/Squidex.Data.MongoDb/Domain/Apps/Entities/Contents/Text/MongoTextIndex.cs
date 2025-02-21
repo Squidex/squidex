@@ -82,7 +82,7 @@ public sealed class MongoTextIndex(IMongoDatabase database, string shardKey) : M
     }
 
     private Task SearchBySchemaAsync(SearchOperation search, IEnumerable<DomainId> schemaIds, double factor,
-        CancellationToken ct = default)
+        CancellationToken ct)
     {
         var filter =
             Filter.And(
@@ -95,7 +95,7 @@ public sealed class MongoTextIndex(IMongoDatabase database, string shardKey) : M
     }
 
     private Task SearchByAppAsync(SearchOperation search, double factor,
-        CancellationToken ct = default)
+        CancellationToken ct)
     {
         var filter =
             Filter.And(
@@ -107,7 +107,7 @@ public sealed class MongoTextIndex(IMongoDatabase database, string shardKey) : M
     }
 
     private async Task SearchAsync(SearchOperation search, FilterDefinition<MongoTextIndexEntity<List<MongoTextIndexEntityText>>> filter, double factor,
-        CancellationToken ct = default)
+        CancellationToken ct)
     {
         var byText =
             await GetCollection(search.SearchScope).Find(filter).Limit(search.Take)

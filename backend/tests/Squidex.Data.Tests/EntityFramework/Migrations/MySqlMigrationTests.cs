@@ -10,7 +10,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Providers.MySql;
-using Squidex.Providers.Postgres;
 using Testcontainers.MySql;
 
 namespace Squidex.EntityFramework.Migrations;
@@ -39,9 +38,10 @@ public class MySqlMigrationTests : IAsyncLifetime
                  {
                      var connectionString = mysql.GetConnectionString();
 
-                     b.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), mysql =>
+                     b.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), options =>
                      {
-                         mysql.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
+                         options.UseNetTopologySuite();
+                         options.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
                      });
                  })
                  .AddSingleton(TestUtils.DefaultSerializer)

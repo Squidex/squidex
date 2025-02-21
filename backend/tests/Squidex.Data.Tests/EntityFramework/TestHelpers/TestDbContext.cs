@@ -5,6 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using EFCore.BulkExtensions.SqlAdapters;
+using EFCore.BulkExtensions.SqlAdapters.MySql;
+using EFCore.BulkExtensions.SqlAdapters.PostgreSql;
+using EFCore.BulkExtensions.SqlAdapters.SqlServer;
 using Microsoft.EntityFrameworkCore;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
@@ -19,6 +23,8 @@ namespace Squidex.EntityFramework.TestHelpers;
 public class TestDbContextMySql(DbContextOptions options, IJsonSerializer jsonSerializer)
     : TestDbContext(options, jsonSerializer)
 {
+    public static readonly IDbServer Server = new MySqlDbServer();
+
     protected override string? JsonColumnType()
     {
         return "json";
@@ -28,20 +34,41 @@ public class TestDbContextMySql(DbContextOptions options, IJsonSerializer jsonSe
 public class TestDbContextPostgres(DbContextOptions options, IJsonSerializer jsonSerializer)
     : TestDbContext(options, jsonSerializer)
 {
+    public static readonly IDbServer Server = new PostgreSqlDbServer();
+
     protected override string? JsonColumnType()
     {
         return "jsonb";
     }
 }
 
-public class TestDbContexSqlServer(DbContextOptions options, IJsonSerializer jsonSerializer)
+public class TestDbContextSqlServer(DbContextOptions options, IJsonSerializer jsonSerializer)
     : TestDbContext(options, jsonSerializer)
 {
+    public static readonly IDbServer Server = new SqlServerDbServer();
 }
 
 public class TestDbContext(DbContextOptions options, IJsonSerializer jsonSerializer)
     : AppDbContext(options, jsonSerializer)
 {
+    static TestDbContext()
+    {
+        SqlAdaptersMapping.Provider = context =>
+        {
+            switch (context)
+            {
+                case TestDbContextMySql:
+                    return TestDbContextMySql.Server;
+                case TestDbContextPostgres:
+                    return TestDbContextPostgres.Server;
+                case TestDbContextSqlServer:
+                    return TestDbContextSqlServer.Server;
+            }
+
+            throw new ArgumentException("Not supported.", nameof(context));
+        };
+    }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.UseSnapshot<SnapshotValue, EFState<SnapshotValue>>(jsonSerializer, JsonColumnType());

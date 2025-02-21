@@ -168,9 +168,9 @@ public class AssetFormatTests(CreatedAppFixture fixture) : IClassFixture<Created
 
         // Should parse audio metadata.
         Assert.False(asset.IsImage);
-        Assert.Equal("00:00:28.2708750", asset.Metadata["duration"]);
-        Assert.Equal(128L, asset.Metadata["audioBitrate"]);
+        Assert.Equal("00:00:27.7447500", asset.Metadata["duration"]);
         Assert.Equal(2L, asset.Metadata["audioChannels"]);
+        Assert.Equal(128L, asset.Metadata["audioBitrate"]);
         Assert.Equal(44100L, asset.Metadata["audioSampleRate"]);
         Assert.Equal(AssetType.Audio, asset.Type);
 

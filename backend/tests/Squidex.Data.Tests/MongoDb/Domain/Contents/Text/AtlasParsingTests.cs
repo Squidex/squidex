@@ -395,12 +395,12 @@ public class AtlasParsingTests
         Assert.Equal(expected, actual);
     }
 
-    private static object CreateQuery(object query)
+    private static string CreateQuery(object query)
     {
         return JsonSerializer.Serialize(query, JsonSerializerOptions);
     }
 
-    private static object ParseQuery(string query)
+    private static string ParseQuery(string query)
     {
         var luceneQuery = QueryParser.Parse(query);
 
