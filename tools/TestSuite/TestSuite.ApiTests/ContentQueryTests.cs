@@ -402,7 +402,8 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
         AssertItems(items, 1, [2]);
     }
 
-    [Fact]    public async Task Should_query_by_near_location_with_odata()
+    [Fact]
+    public async Task Should_query_by_near_location_with_odata()
     {
         var q = new ContentQuery { Filter = "geo.distance(data/geo/iv, geography'POINT(103 3)') lt 1000" };
 

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.AspNetCore.Http.HttpResults;
 using Npgsql;
 using Squidex.Infrastructure.Queries;
 
@@ -54,7 +53,9 @@ public class PostgresDialect : SqlDialect
 
     public override string WhereMatch(PropertyPath path, string query, SqlParams queryParameters)
     {
-        return $"to_tsvector('simple', {FormatField(path, false)}) @@ to_tsquery({queryParameters.AddPositional(query)})";
+        var searchTerm = query.Replace(" ", " & ", StringComparison.Ordinal);
+
+        return $"to_tsvector('simple', {FormatField(path, false)}) @@ to_tsquery({queryParameters.AddPositional(searchTerm)})";
     }
 
     public override string Where(PropertyPath path, CompareOperator op, ClrValue value, SqlParams queryParameters, bool isJson)
