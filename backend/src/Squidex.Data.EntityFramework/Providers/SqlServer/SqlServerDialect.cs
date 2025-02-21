@@ -75,6 +75,11 @@ public sealed class SqlServerDialect : SqlDialect
 
     public override string WhereMatch(PropertyPath path, string query, SqlParams queryParameters)
     {
+        if (query.Contains(' ', StringComparison.OrdinalIgnoreCase))
+        {
+            query = $"\"{query}\"";
+        }
+
         return $"CONTAINS({FormatField(path, false)}, {queryParameters.AddPositional(query)})";
     }
 

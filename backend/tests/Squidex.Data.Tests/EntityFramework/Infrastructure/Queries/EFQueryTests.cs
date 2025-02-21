@@ -510,6 +510,21 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture) wher
         Assert.Equal(20, dbResult.Count);
     }
 
+    [Fact]
+    public async Task Should_query_full_text_with_space()
+    {
+        var builder =
+            new TestSqlBuilder(fixture.Dialect, "TestEntity")
+                .WhereMatch("FullText", "hello world");
+
+        var (sql, parameters) = builder.Compile();
+
+        var dbContext = await CreateAndPrepareDbContextAsync();
+        var dbResult = await PollAsync(dbContext, sql, parameters, 0);
+
+        Assert.Empty(dbResult);
+    }
+
     private static long[] Range(int from, int to)
     {
         var result = new List<long>();
