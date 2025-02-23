@@ -12,10 +12,10 @@ jobs:
         uses: actions/checkout@v4.2.2
 
       - name: Prepare - Setup QEMU
-        uses: docker/setup-qemu-action@v3.3.0
+        uses: docker/setup-qemu-action@v3.4.0
 
       - name: Prepare - Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3.8.0
+        uses: docker/setup-buildx-action@v3.9.0
 
       - name: Prepare - Setup Node
         uses: actions/setup-node@v4.2.0
@@ -23,7 +23,7 @@ jobs:
           node-version: 18
 
       - name: Build - BUILD
-        uses: docker/build-push-action@v6.13.0
+        uses: docker/build-push-action@v6.14.0
         with:
           load: true
           cache-from: type=gha
@@ -50,7 +50,7 @@ jobs:
 
       - name: Test - Upload Playwright Artifacts
         if: always()
-        uses: actions/upload-artifact@v4.6.0
+        uses: actions/upload-artifact@v4.6.1
         with:
           name: snapshots
           path: tools/e2e/snapshots/
