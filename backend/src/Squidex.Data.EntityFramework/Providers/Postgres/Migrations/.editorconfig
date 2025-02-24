@@ -1,0 +1,9 @@
+[*.cs]
+# MA0007: Add a comma after the last value
+dotnet_diagnostic.MA0007.severity = none
+
+# MA0048: File name must match type name
+dotnet_diagnostic.MA0048.severity = none
+
+# SA1633: File must have header
+dotnet_diagnostic.SA1633.severity = none

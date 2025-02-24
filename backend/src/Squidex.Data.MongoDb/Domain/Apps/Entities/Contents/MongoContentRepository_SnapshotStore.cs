@@ -108,8 +108,6 @@ public partial class MongoContentRepository : ISnapshotStore<WriteContent>, IDel
     async Task ISnapshotStore<WriteContent>.WriteManyAsync(IEnumerable<SnapshotWriteJob<WriteContent>> jobs,
         CancellationToken ct)
     {
-        var validJobs = jobs.Where(x => IsValid(x.Value)).ToList();
-
         using (Telemetry.Activities.StartActivity("MongoContentRepository/WriteManyAsync"))
         {
             var collectionUpdates = new Dictionary<IMongoCollection<MongoContentEntity>, List<MongoContentEntity>>();

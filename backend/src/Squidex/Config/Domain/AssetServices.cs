@@ -94,6 +94,9 @@ public static class AssetServices
         services.AddSingletonAs<SvgAssetMetadataSource>()
             .As<IAssetMetadataSource>();
 
+        services.AddSingletonAs<FFMpegAssetMetadataSource>()
+            .As<IAssetMetadataSource>();
+
         services.AddAssetTus();
     }
 

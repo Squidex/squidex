@@ -12,11 +12,9 @@ public class ElasticSearchTextIndexTests(ElasticSearchTextIndexFixture fixture) 
 {
     public override bool SupportsGeo => true;
 
-    public ElasticSearchTextIndexFixture _ { get; } = fixture;
-
     public override Task<ITextIndex> CreateSutAsync()
     {
-        return Task.FromResult<ITextIndex>(_.Index);
+        return Task.FromResult<ITextIndex>(fixture.Index);
     }
 
     [Fact]

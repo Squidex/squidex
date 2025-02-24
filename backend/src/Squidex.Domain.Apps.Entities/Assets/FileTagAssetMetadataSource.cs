@@ -45,90 +45,89 @@ public sealed class FileTagAssetMetadataSource : IAssetMetadataSource
     {
         try
         {
-            using (var file = Create(new FileAbstraction(command.File), ReadStyle.Average))
+            using var file = Create(new FileAbstraction(command.File), ReadStyle.Average);
+
+            if (file.Properties == null)
             {
-                if (file.Properties == null)
-                {
-                    return Task.CompletedTask;
-                }
-
-                var type = file.Properties.MediaTypes;
-
-                if (type == MediaTypes.Audio)
-                {
-                    command.Type = AssetType.Audio;
-                }
-                else if (type == MediaTypes.Photo)
-                {
-                    command.Type = AssetType.Image;
-                }
-                else if (type.HasFlag(MediaTypes.Video))
-                {
-                    command.Type = AssetType.Video;
-                }
-
-                var pw = file.Properties.PhotoWidth;
-                var ph = file.Properties.PhotoHeight;
-
-                if (pw > 0 && ph > 0)
-                {
-                    command.Metadata[KnownMetadataKeys.PixelWidth] = pw;
-                    command.Metadata[KnownMetadataKeys.PixelHeight] = ph;
-                }
-
-                void TryAddString(string name, string? value)
-                {
-                    if (!string.IsNullOrWhiteSpace(value))
-                    {
-                        command.Metadata.Add(name, value);
-                    }
-                }
-
-                void TryAddInt(string name, int? value)
-                {
-                    if (value > 0)
-                    {
-                        command.Metadata.Add(name, (double)value.Value);
-                    }
-                }
-
-                void TryAddDouble(string name, double? value)
-                {
-                    if (value > 0)
-                    {
-                        command.Metadata.Add(name, value.Value);
-                    }
-                }
-
-                void TryAddTimeSpan(string name, TimeSpan value)
-                {
-                    if (value != TimeSpan.Zero)
-                    {
-                        command.Metadata.Add(name, value.ToString());
-                    }
-                }
-
-                if (file.Tag is ImageTag imageTag)
-                {
-                    TryAddDouble(KnownMetadataKeys.Latitude, imageTag.Latitude);
-                    TryAddDouble(KnownMetadataKeys.Longitude, imageTag.Longitude);
-
-                    TryAddString(KnownMetadataKeys.Created, imageTag.DateTime?.ToIso8601());
-                }
-
-                TryAddTimeSpan(KnownMetadataKeys.Duration, file.Properties.Duration);
-
-                TryAddInt(KnownMetadataKeys.BitsPerSample, file.Properties.BitsPerSample);
-                TryAddInt(KnownMetadataKeys.AudioBitrate, file.Properties.AudioBitrate);
-                TryAddInt(KnownMetadataKeys.AudioChannels, file.Properties.AudioChannels);
-                TryAddInt(KnownMetadataKeys.AudioSampleRate, file.Properties.AudioSampleRate);
-                TryAddInt(KnownMetadataKeys.ImageQuality, file.Properties.PhotoQuality);
-
-                TryAddInt(KnownMetadataKeys.VideoWidth, file.Properties.VideoWidth);
-                TryAddInt(KnownMetadataKeys.VideoHeight, file.Properties.VideoHeight);
-
-                TryAddString(KnownMetadataKeys.Description, file.Properties.Description);
+                return Task.CompletedTask;
             }
+
+            var type = file.Properties.MediaTypes;
+
+            if (type == MediaTypes.Audio)
+            {
+                command.Type = AssetType.Audio;
+            }
+            else if (type == MediaTypes.Photo)
+            {
+                command.Type = AssetType.Image;
+            }
+            else if (type.HasFlag(MediaTypes.Video))
+            {
+                command.Type = AssetType.Video;
+            }
+
+            var pw = file.Properties.PhotoWidth;
+            var ph = file.Properties.PhotoHeight;
+
+            if (pw > 0 && ph > 0)
+            {
+                command.Metadata[KnownMetadataKeys.PixelWidth] = pw;
+                command.Metadata[KnownMetadataKeys.PixelHeight] = ph;
+            }
+
+            void TryAddString(string name, string? value)
+            {
+                if (!string.IsNullOrWhiteSpace(value))
+                {
+                    command.Metadata.Add(name, value);
+                }
+            }
+
+            void TryAddInt(string name, long? value)
+            {
+                if (value > 0)
+                {
+                    command.Metadata[name] = value.Value;
+                }
+            }
+
+            void TryAddDouble(string name, double? value)
+            {
+                if (value > 0)
+                {
+                    command.Metadata[name] = value.Value;
+                }
+            }
+
+            void TryAddTimeSpan(string name, TimeSpan value)
+            {
+                if (value != TimeSpan.Zero)
+                {
+                    command.Metadata[name] = value.ToString();
+                }
+            }
+
+            if (file.Tag is ImageTag imageTag)
+            {
+                TryAddDouble(KnownMetadataKeys.Latitude, imageTag.Latitude);
+                TryAddDouble(KnownMetadataKeys.Longitude, imageTag.Longitude);
+
+                TryAddString(KnownMetadataKeys.Created, imageTag.DateTime?.ToIso8601());
+            }
+
+            TryAddTimeSpan(KnownMetadataKeys.Duration, file.Properties.Duration);
+
+            TryAddInt(KnownMetadataKeys.BitsPerSample, file.Properties.BitsPerSample);
+            TryAddInt(KnownMetadataKeys.AudioBitrate, file.Properties.AudioBitrate);
+            TryAddInt(KnownMetadataKeys.AudioChannels, file.Properties.AudioChannels);
+            TryAddInt(KnownMetadataKeys.AudioSampleRate, file.Properties.AudioSampleRate);
+            TryAddInt(KnownMetadataKeys.ImageQuality, file.Properties.PhotoQuality);
+
+            TryAddInt(KnownMetadataKeys.VideoWidth, file.Properties.VideoWidth);
+            TryAddInt(KnownMetadataKeys.VideoHeight, file.Properties.VideoHeight);
+
+            TryAddString(KnownMetadataKeys.Description, file.Properties.Description);
 
             return Task.CompletedTask;
         }
