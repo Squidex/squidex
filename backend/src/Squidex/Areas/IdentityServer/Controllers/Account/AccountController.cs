@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
@@ -16,6 +17,7 @@ using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
+using Squidex.Web;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Account;
 
@@ -109,20 +111,22 @@ public sealed class AccountController(
 
     [HttpGet]
     [Route("account/logout/")]
-    public async Task<IActionResult> Logout()
+    public IActionResult Logout()
     {
-        await SignInManager.SignOutAsync();
-
-        return Redirect("~/../");
+        return SignOut(new AuthenticationProperties
+        {
+            RedirectUri = Url.Content("~/../"),
+        });
     }
 
     [HttpGet]
     [Route("account/logout-redirect/")]
-    public async Task<IActionResult> LogoutRedirect()
+    public IActionResult LogoutRedirect()
     {
-        await SignInManager.SignOutAsync();
-
-        return RedirectToAction(nameof(LogoutCompleted));
+        return SignOut(new AuthenticationProperties
+        {
+            RedirectUri = Url.Action(nameof(LogoutCompleted)),
+        });
     }
 
     [HttpGet]
