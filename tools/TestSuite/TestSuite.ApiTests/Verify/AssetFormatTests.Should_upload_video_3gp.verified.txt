@@ -7,11 +7,17 @@
   Slug: samplevideo-176x144-1mb.3gp,
   MimeType: audio/3gpp,
   FileType: 3gp,
-  MetadataText: 1014.4 kB,
+  MetadataText: 00:00:40.6660000, 1014.4 kB,
+  Metadata: {
+    audioBitrate: 12,
+    audioSampleRate: 8000,
+    duration: 00:00:40.6660000
+  },
   Tags: [
     type/3gp
   ],
   FileSize: 1038741,
+  Type: Video,
   Links: {
     content: {
       Method: GET

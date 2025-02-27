@@ -16,12 +16,13 @@ using Squidex.Infrastructure.TestHelpers;
 namespace Squidex.MongoDb.Infrastructure.EventSourcing;
 
 [Trait("Category", "Dependencies")]
-public class MongoEventStoreParallelInsertTests : IClassFixture<MongoEventStoreFixture_Replica>
+public class MongoEventStoreParallelInsertTests(MongoEventStoreFixture_Replica fixture) : IClassFixture<MongoEventStoreFixture_Replica>
 {
     private readonly TestState<EventConsumerState> state = new TestState<EventConsumerState>(DomainId.Empty);
-    private readonly DefaultEventFormatter eventFormatter;
-
-    public MongoEventStoreFixture _ { get; }
+    private readonly DefaultEventFormatter eventFormatter =
+        new DefaultEventFormatter(
+            new TypeRegistry().Add<IEvent, MyEvent>("MyEvent"),
+            TestUtils.DefaultSerializer);
 
     public class MyEvent : IEvent
     {
@@ -58,15 +59,6 @@ public class MongoEventStoreParallelInsertTests : IClassFixture<MongoEventStoreF
                 await EventReceived(Received);
             }
         }
-    }
-
-    public MongoEventStoreParallelInsertTests(MongoEventStoreFixture_Replica fixture)
-    {
-        _ = fixture;
-
-        var typeRegistry = new TypeRegistry().Add<IEvent, MyEvent>("MyEvent");
-
-        eventFormatter = new DefaultEventFormatter(typeRegistry, TestUtils.DefaultSerializer);
     }
 
     [Fact]
@@ -182,7 +174,7 @@ public class MongoEventStoreParallelInsertTests : IClassFixture<MongoEventStoreF
             state.PersistenceFactory,
             eventConsumer,
             eventFormatter,
-            _.EventStore,
+            fixture.EventStore,
             A.Fake<ILogger<EventConsumerProcessor>>());
     }
 
@@ -206,7 +198,7 @@ public class MongoEventStoreParallelInsertTests : IClassFixture<MongoEventStoreF
                         commitList.Add(eventFormatter.ToEventData(Envelope.Create<IEvent>(new MyEvent()), commitId));
                     }
 
-                    await _.EventStore.AppendAsync(commitId, streamName, EtagVersion.Any, commitList);
+                    await fixture.EventStore.AppendAsync(commitId, streamName, EtagVersion.Any, commitList);
                 }
 
                 if (i < iterations - 1)

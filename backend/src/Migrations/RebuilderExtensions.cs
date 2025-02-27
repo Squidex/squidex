@@ -10,11 +10,13 @@ using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Entities.Apps.DomainObject;
 using Squidex.Domain.Apps.Entities.Assets.DomainObject;
 using Squidex.Domain.Apps.Entities.Contents.DomainObject;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject;
 using Squidex.Domain.Apps.Entities.Schemas.DomainObject;
+using Squidex.Domain.Apps.Entities.Teams.DomainObject;
 using Squidex.Events;
 using Squidex.Infrastructure.Commands;
 
@@ -70,5 +72,13 @@ public static class RebuilderExtensions
         var streamFilter = StreamFilter.Prefix("content-");
 
         return rebuilder.RebuildAsync<ContentDomainObject, WriteContent>(streamFilter, batchSize, AllowedErrorRate, ct);
+    }
+
+    public static Task RebuildTeamsAsync(this Rebuilder rebuilder, int batchSize,
+        CancellationToken ct = default)
+    {
+        var streamFilter = StreamFilter.Prefix("team-");
+
+        return rebuilder.RebuildAsync<TeamDomainObject, Team>(streamFilter, batchSize, AllowedErrorRate, ct);
     }
 }

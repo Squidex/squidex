@@ -7,11 +7,18 @@
   Slug: samplevideo-1280x720-1mb.flv,
   MimeType: audio/webm,
   FileType: flv,
-  MetadataText: 1 MB,
+  MetadataText: 1280x720pt, 1 MB,
+  Metadata: {
+    audioBitrate: 384,
+    audioSampleRate: 48000,
+    videoHeight: 720,
+    videoWidth: 1280
+  },
   Tags: [
     type/flv
   ],
   FileSize: 1051185,
+  Type: Video,
   Links: {
     content: {
       Method: GET

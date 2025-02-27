@@ -12,11 +12,9 @@ public class OpenSearchTextIndexTests(OpenSearchTextIndexFixture fixture) : Text
 {
     public override bool SupportsGeo => true;
 
-    public OpenSearchTextIndexFixture _ { get; } = fixture;
-
     public override Task<ITextIndex> CreateSutAsync()
     {
-        return Task.FromResult<ITextIndex>(_.Index);
+        return Task.FromResult<ITextIndex>(fixture.Index);
     }
 
     [Fact]

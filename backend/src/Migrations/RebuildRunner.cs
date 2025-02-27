@@ -16,40 +16,43 @@ public sealed class RebuildRunner(
     Rebuilder rebuilder,
     RebuildFiles rebuildFiles)
 {
-    private readonly RebuildOptions rebuildOptions = rebuildOptions.Value;
-
     public async Task RunAsync(
         CancellationToken ct)
     {
-        var batchSize = rebuildOptions.CalculateBatchSize();
+        var batchSize = rebuildOptions.Value.CalculateBatchSize();
 
-        if (rebuildOptions.Apps)
+        if (rebuildOptions.Value.Apps)
         {
             await rebuilder.RebuildAppsAsync(batchSize, ct);
         }
 
-        if (rebuildOptions.Schemas)
+        if (rebuildOptions.Value.Teams)
+        {
+            await rebuilder.RebuildTeamsAsync(batchSize, ct);
+        }
+
+        if (rebuildOptions.Value.Schemas)
         {
             await rebuilder.RebuildSchemasAsync(batchSize, ct);
         }
 
-        if (rebuildOptions.Rules)
+        if (rebuildOptions.Value.Rules)
         {
             await rebuilder.RebuildRulesAsync(batchSize, ct);
         }
 
-        if (rebuildOptions.Assets)
+        if (rebuildOptions.Value.Assets)
         {
             await rebuilder.RebuildAssetsAsync(batchSize, ct);
             await rebuilder.RebuildAssetFoldersAsync(batchSize, ct);
         }
 
-        if (rebuildOptions.AssetFiles)
+        if (rebuildOptions.Value.AssetFiles)
         {
             await rebuildFiles.RepairAsync(ct);
         }
 
-        if (rebuildOptions.Contents)
+        if (rebuildOptions.Value.Contents)
         {
             await rebuilder.RebuildContentAsync(batchSize, ct);
         }

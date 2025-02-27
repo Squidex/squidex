@@ -8,6 +8,7 @@
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Squidex.Infrastructure;
+using Squidex.Web;
 
 namespace Squidex.Config.Authentication;
 
@@ -17,9 +18,11 @@ public static class OidcServices
     {
         if (identityOptions.IsOidcConfigured())
         {
-            var displayName = !string.IsNullOrWhiteSpace(identityOptions.OidcName) ? identityOptions.OidcName : OpenIdConnectDefaults.DisplayName;
+            var displayName = !string.IsNullOrWhiteSpace(identityOptions.OidcName) ?
+                identityOptions.OidcName :
+                OpenIdConnectDefaults.DisplayName;
 
-            authBuilder.AddOpenIdConnect("ExternalOidc", displayName, options =>
+            authBuilder.AddOpenIdConnect(Constants.ExternalScheme, displayName, options =>
             {
                 options.Events = new OidcHandler(identityOptions);
                 options.Authority = identityOptions.OidcAuthority;

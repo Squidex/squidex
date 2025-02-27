@@ -6,8 +6,8 @@
     <LangVersion>latest</LangVersion>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <NeutralLanguage>en</NeutralLanguage>
     <EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+    <NoWarn>SA0001;NETSDK1206</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Squidex.Data.EntityFramework\Squidex.Data.EntityFramework.csproj" />

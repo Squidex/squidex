@@ -38,7 +38,6 @@ public sealed class AppResolver(IAppProvider appProvider) : IAsyncActionFilter
             var isFrontend = user.IsInClient(DefaultClients.Frontend);
 
             var app = await appProvider.GetAppAsync(appName, !isFrontend, context.HttpContext.RequestAborted);
-
             if (app == null)
             {
                 var log = context.HttpContext.RequestServices?.GetService<ILogger<AppResolver>>();

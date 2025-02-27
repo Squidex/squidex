@@ -63,6 +63,9 @@
     <None Update="Assets\TestFiles\SampleVideo_1280x720_1mb.mp4">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Update="Assets\TestFiles\SampleVideo_Broken.mp4">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Update="Assets\TestFiles\SvgInvalid.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

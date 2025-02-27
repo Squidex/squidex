@@ -16,6 +16,8 @@ public static class Constants
 
     public const string ApiSecurityScheme = "API";
 
+    public const string ExternalScheme = "ExternalOidc";
+
     public const string PrefixApi = "/api";
 
     public const string PrefixIdentityServer = "/identity-server";

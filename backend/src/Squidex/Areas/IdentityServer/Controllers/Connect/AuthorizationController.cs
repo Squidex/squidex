@@ -14,7 +14,6 @@ using Microsoft.IdentityModel.Tokens;
 using OpenIddict.Abstractions;
 using OpenIddict.Server.AspNetCore;
 using Squidex.Areas.IdentityServer.Config;
-using Squidex.Areas.IdentityServer.Controllers;
 using Squidex.Domain.Users;
 using Squidex.Infrastructure;
 using Squidex.Shared.Identity;
@@ -22,7 +21,7 @@ using Squidex.Shared.Users;
 using Squidex.Web;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
-namespace Squidex.Areas.Account.Controllers.Connect;
+namespace Squidex.Areas.IdentityServer.Controllers.Connect;
 
 public class AuthorizationController(
     IOpenIddictScopeManager scopeManager,
@@ -31,7 +30,6 @@ public class AuthorizationController(
     : IdentityServerController
 {
     [HttpPost("connect/token")]
-    [Produces("application/json")]
     public async Task<IActionResult> Exchange()
     {
         var request = HttpContext.GetOpenIddictServerRequest();
@@ -160,7 +158,14 @@ public class AuthorizationController(
     {
         await SignInManager.SignOutAsync();
 
-        return SignOut(OpenIddictServerAspNetCoreDefaults.AuthenticationScheme);
+        List<string> schemes = [OpenIddictServerAspNetCoreDefaults.AuthenticationScheme];
+
+        if (await HttpContext.HasSchemeAsync(Constants.ExternalScheme))
+        {
+            schemes.Add(Constants.ExternalScheme);
+        }
+
+        return SignOut(schemes.ToArray());
     }
 
     private async Task<ClaimsPrincipal> CreatePrincipalAsync(OpenIddictRequest request, IUser user)
