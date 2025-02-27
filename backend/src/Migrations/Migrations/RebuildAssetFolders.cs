@@ -16,11 +16,9 @@ public sealed class RebuildAssetFolders(
     IOptions<RebuildOptions> rebuildOptions)
     : IMigration
 {
-    private readonly RebuildOptions rebuildOptions = rebuildOptions.Value;
-
     public Task UpdateAsync(
         CancellationToken ct)
     {
-        return rebuilder.RebuildAssetFoldersAsync(rebuildOptions.BatchSize, ct);
+        return rebuilder.RebuildAssetFoldersAsync(rebuildOptions.Value.CalculateBatchSize(), ct);
     }
 }

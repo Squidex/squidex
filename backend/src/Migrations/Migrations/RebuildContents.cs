@@ -16,11 +16,9 @@ public sealed class RebuildContents(
     IOptions<RebuildOptions> rebuildOptions)
     : IMigration
 {
-    private readonly RebuildOptions rebuildOptions = rebuildOptions.Value;
-
     public Task UpdateAsync(
         CancellationToken ct)
     {
-        return rebuilder.RebuildContentAsync(rebuildOptions.BatchSize, ct);
+        return rebuilder.RebuildContentAsync(rebuildOptions.Value.CalculateBatchSize(), ct);
     }
 }

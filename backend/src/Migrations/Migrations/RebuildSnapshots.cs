@@ -16,16 +16,17 @@ public sealed class RebuildSnapshots(
     IOptions<RebuildOptions> rebuildOptions)
     : IMigration
 {
-    private readonly RebuildOptions rebuildOptions = rebuildOptions.Value;
-
     public async Task UpdateAsync(
         CancellationToken ct)
     {
-        await rebuilder.RebuildAppsAsync(rebuildOptions.BatchSize, ct);
-        await rebuilder.RebuildSchemasAsync(rebuildOptions.BatchSize, ct);
-        await rebuilder.RebuildRulesAsync(rebuildOptions.BatchSize, ct);
-        await rebuilder.RebuildContentAsync(rebuildOptions.BatchSize, ct);
-        await rebuilder.RebuildAssetsAsync(rebuildOptions.BatchSize, ct);
-        await rebuilder.RebuildAssetFoldersAsync(rebuildOptions.BatchSize, ct);
+        var batchSize = rebuildOptions.Value.CalculateBatchSize();
+
+        await rebuilder.RebuildAppsAsync(batchSize, ct);
+        await rebuilder.RebuildSchemasAsync(batchSize, ct);
+        await rebuilder.RebuildRulesAsync(batchSize, ct);
+        await rebuilder.RebuildContentAsync(batchSize, ct);
+        await rebuilder.RebuildAssetsAsync(batchSize, ct);
+        await rebuilder.RebuildAssetFoldersAsync(batchSize, ct);
+        await rebuilder.RebuildTeamsAsync(batchSize, ct);
     }
 }
