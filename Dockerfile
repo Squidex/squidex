@@ -4,6 +4,10 @@
 
 FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS backend
 
+# FFMPEG for tests
+RUN apt-get update \
+ && apt-get install -y ffmpeg
+
 ARG SQUIDEX__BUILD__VERSION=7.0.0
 
 WORKDIR /src
@@ -73,7 +77,7 @@ ARG SQUIDEX__RUNTIME__VERSION=7.0.0
 
 # Curl for debugging and libc-dev for protobuf
 RUN apt-get update \
- && apt-get install -y curl libc-dev
+ && apt-get install -y curl libc-dev ffmpeg
 
 # Default tool directory
 WORKDIR /tools
