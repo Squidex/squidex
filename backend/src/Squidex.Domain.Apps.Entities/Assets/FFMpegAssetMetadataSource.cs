@@ -65,7 +65,8 @@ public sealed class FFMpegAssetMetadataSource : IAssetMetadataSource
         }
         catch (Exception)
         {
-            throw;
+            // Throws for invalid file types.
+            return;
         }
     }
 
