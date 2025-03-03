@@ -211,7 +211,7 @@ public class AssetFormatTests(CreatedAppFixture fixture) : IClassFixture<Created
         await Verify(asset);
     }
 
-    [Fact]
+    [Fact(Skip = "Platform specific")]
     public async Task Should_upload_video_3gp()
     {
         var asset = await _.Client.Assets.UploadFileAsync("Assets/SampleVideo_176x144_1mb.3gp", "audio/3gpp");
