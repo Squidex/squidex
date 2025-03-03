@@ -5,13 +5,27 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
 using RequestContext = Squidex.Domain.Apps.Entities.Context;
 
 namespace Squidex.Web;
 
 public static class ContextExtensions
 {
+    public static async Task<bool> HasSchemeAsync(this HttpContext httpContext, string name)
+    {
+        var provider = httpContext.RequestServices.GetService<IAuthenticationSchemeProvider>();
+        if (provider == null)
+        {
+            return false;
+        }
+
+        return await provider.GetSchemeAsync(name) != null;
+    }
+
     public static RequestContext Context(this HttpContext httpContext)
     {
         var context = httpContext.Features.Get<RequestContext>();

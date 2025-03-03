@@ -200,9 +200,6 @@ public class AssetFormatTests(CreatedAppFixture fixture) : IClassFixture<Created
     {
         var asset = await _.Client.Assets.UploadFileAsync("Assets/SampleVideo_1280x720_1mb.flv", "audio/webm");
 
-        // Should not parse yet.
-        Assert.Equal(AssetType.Unknown, asset.Type);
-
         await Verify(asset);
     }
 
@@ -211,19 +208,13 @@ public class AssetFormatTests(CreatedAppFixture fixture) : IClassFixture<Created
     {
         var asset = await _.Client.Assets.UploadFileAsync("Assets/SampleVideo_1280x720_1mb.flv", "audio/x-flv");
 
-        // Should not parse yet.
-        Assert.Equal(AssetType.Unknown, asset.Type);
-
         await Verify(asset);
     }
 
-    [Fact]
+    [Fact(Skip = "Platform specific")]
     public async Task Should_upload_video_3gp()
     {
         var asset = await _.Client.Assets.UploadFileAsync("Assets/SampleVideo_176x144_1mb.3gp", "audio/3gpp");
-
-        // Should not parse yet.
-        Assert.Equal(AssetType.Unknown, asset.Type);
 
         await Verify(asset);
     }

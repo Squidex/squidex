@@ -73,6 +73,10 @@ public static class IdentityServerServices
         });
 
         services.AddOpenIddict()
+            .AddValidation(options =>
+            {
+                options.EnableAuthorizationEntryValidation();
+            })
             .AddCore(builder =>
             {
                 builder.SetDefaultScopeEntity<ImmutableScope>();
@@ -145,17 +149,14 @@ public static class IdentityServerServices
 
         services.Configure<OpenIddictServerOptions>((c, options) =>
         {
-            var urlGenerator = c.GetRequiredService<IUrlGenerator>();
+            var urlBuilder = c.GetRequiredService<IUrlGenerator>();
 
-            var identityPrefix = Constants.PrefixIdentityServer;
-            var identityOptions = c.GetRequiredService<IOptions<MyIdentityOptions>>().Value;
-
-            Uri BuildUrl(string path)
+            static Uri BuildUrl(string path)
             {
-                return new Uri($"{identityPrefix.TrimStart('/')}/{path}", UriKind.Relative);
+                return new Uri($"{Constants.PrefixIdentityServer.TrimStart('/')}/{path}", UriKind.Relative);
             }
 
-            options.Issuer = new Uri(urlGenerator.BuildUrl());
+            options.Issuer = new Uri(urlBuilder.BuildUrl());
 
             options.AuthorizationEndpointUris.SetEndpoint(
                 BuildUrl("connect/authorize"));

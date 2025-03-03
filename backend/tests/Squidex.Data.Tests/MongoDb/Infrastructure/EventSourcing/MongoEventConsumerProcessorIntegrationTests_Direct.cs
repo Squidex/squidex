@@ -12,10 +12,8 @@ namespace Squidex.MongoDb.Infrastructure.EventSourcing;
 [Trait("Category", "Dependencies")]
 public class MongoEventConsumerProcessorIntegrationTests_Direct(MongoEventStoreFixture_Direct fixture) : EventConsumerProcessorIntegrationTests, IClassFixture<MongoEventStoreFixture_Direct>
 {
-    public MongoEventStoreFixture _ { get; } = fixture;
-
     public override IEventStore CreateStore()
     {
-        return _.EventStore;
+        return fixture.EventStore;
     }
 }

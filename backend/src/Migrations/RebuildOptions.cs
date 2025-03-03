@@ -23,6 +23,8 @@ public sealed class RebuildOptions
 
     public bool Schemas { get; set; }
 
+    public bool Teams { get; set; }
+
     public int BatchSize { get; set; } = 100;
 
     public int CalculateBatchSize()
