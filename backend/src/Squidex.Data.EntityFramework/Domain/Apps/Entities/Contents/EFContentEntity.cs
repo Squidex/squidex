@@ -26,10 +26,17 @@ public record EFContentCompleteEntity : EFContentEntity
         var source = job.Value;
 
         var appId = source.AppId.Id;
+
         var (referencedIds, translationStatus) = await CreateExtendedValuesAsync(source, source.CurrentVersion.Data, appProvider, ct);
         var references =
             referencedIds
-                .Select(x => new EFReferenceCompleteEntity { AppId = appId, FromKey = job.Key, ToId = x })
+                .Select(x => new EFReferenceCompleteEntity
+                {
+                    AppId = appId,
+                    FromKey = job.Key,
+                    FromSchema = job.Value.SchemaId.Id,
+                    ToId = x,
+                })
                 .ToArray();
 
         var entity = new EFContentCompleteEntity
@@ -69,10 +76,17 @@ public record EFContentPublishedEntity : EFContentEntity
         var source = job.Value;
 
         var appId = source.AppId.Id;
+
         var (referencedIds, translationStatus) = await CreateExtendedValuesAsync(source, source.CurrentVersion.Data, appProvider, ct);
         var references =
             referencedIds
-                .Select(x => new EFReferencePublishedEntity { AppId = appId, FromKey = job.Key, ToId = x })
+                .Select(x => new EFReferencePublishedEntity
+                {
+                    AppId = appId,
+                    FromKey = job.Key,
+                    FromSchema = job.Value.SchemaId.Id,
+                    ToId = x,
+                })
                 .ToArray();
 
         var entity = new EFContentPublishedEntity

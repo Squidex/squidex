@@ -13,10 +13,11 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
 
 #pragma warning disable MA0048 // File name must match type name
+#pragma warning disable RECS0096 // Type parameter is never used
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public sealed partial class EFContentRepository<TContext>
+public sealed partial class EFContentRepository<TContext, TContentContext>
 {
     public Task<IResultList<Content>> QueryAsync(App app, Schema schema, Q q, SearchScope scope,
         CancellationToken ct = default)
@@ -38,7 +39,7 @@ public sealed partial class EFContentRepository<TContext>
             var schemaIds = schemas.Select(x => x.Id).ToList();
 
             return scope == SearchScope.All ?
-                await QueryAsync<EFContentCompleteEntity, EFReferenceCompleteEntity>(
+                await QueryAsync<EFContentCompleteEntity>(
                     app.Id,
                     schemaIds,
                     isSingle,
@@ -46,7 +47,7 @@ public sealed partial class EFContentRepository<TContext>
                     "ContentsAll",
                     "ContentReferencesAll",
                     ct) :
-                await QueryAsync<EFContentPublishedEntity, EFReferencePublishedEntity>(
+                await QueryAsync<EFContentPublishedEntity>(
                     app.Id,
                     schemaIds,
                     isSingle,
@@ -57,14 +58,14 @@ public sealed partial class EFContentRepository<TContext>
         }
     }
 
-    private async Task<IResultList<Content>> QueryAsync<T, TReference>(
+    private async Task<IResultList<Content>> QueryAsync<T>(
         DomainId appId,
         List<DomainId> schemaIds,
         bool isSingle,
         Q q,
         string tableName,
         string referenceTableName,
-        CancellationToken ct = default) where T : EFContentEntity where TReference : EFReferenceEntity
+        CancellationToken ct = default) where T : EFContentEntity
     {
         if (q.Ids is { Count: > 0 } && schemaIds.Count > 0)
         {
@@ -140,21 +141,29 @@ public sealed partial class EFContentRepository<TContext>
 
         if (isSingle)
         {
-            await using var dbContext = await CreateDbContextAsync(ct);
+            var schemaId = schemaIds.Single();
 
-            var queryBuilder =
-                new ContentQueryBuilder(dialect, tableName)
-                    .Where(ClrFilter.Eq(nameof(EFContentEntity.IndexedAppId), appId))
-                    .Where(ClrFilter.Eq(nameof(EFContentEntity.IndexedSchemaId), schemaIds.Single()))
-                    .WhereNotDeleted(q.Query);
+            DbContext dbContext =
+                dedicatedTables ?
+                await CreateDbContextAsync(appId, schemaId, ct) :
+                await CreateDbContextAsync(ct);
 
-            return await QueryAsync<T>(dbContext, queryBuilder, q, ct);
+            await using (dbContext)
+            {
+                var queryBuilder =
+                    new ContentQueryBuilder(dialect, tableName)
+                        .Where(ClrFilter.Eq(nameof(EFContentEntity.IndexedAppId), appId))
+                        .Where(ClrFilter.Eq(nameof(EFContentEntity.IndexedSchemaId), schemaId))
+                        .WhereNotDeleted(q.Query);
+
+                return await QueryAsync<T>(dbContext, queryBuilder, q, ct);
+            }
         }
 
         return ResultList.Empty<Content>();
     }
 
-    private static async Task<IResultList<Content>> QueryAsync<T>(TContext dbContext, SqlQueryBuilder queryBuilder, Q q,
+    private static async Task<IResultList<Content>> QueryAsync<T>(DbContext dbContext, SqlQueryBuilder queryBuilder, Q q,
         CancellationToken ct) where T : EFContentEntity
     {
         var result = await dbContext.QueryAsync<T>(queryBuilder, q, ct);

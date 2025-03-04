@@ -5,7 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using FluentMigrator;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
+using Microsoft.Extensions.Options;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
@@ -17,11 +20,19 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public sealed partial class EFContentRepository<TContext>(
-    IDbContextFactory<TContext> dbContextFactory, IAppProvider appProvider,
+public sealed partial class EFContentRepository<TContext, TContentContext>(
+    IDbContextFactory<TContext> dbContextFactory,
+    IDbContextNamedFactory<TContentContext> dbContentContextFactory,
+    IAppProvider appProvider,
+    IOptions<ContentsOptions> options,
     SqlDialect dialect)
-    : IContentRepository where TContext : DbContext
+    : IContentRepository
+    where TContext : DbContext
+    where TContentContext : ContentDbContext
 {
+    private readonly DynamicTables<TContentContext> dynamicTables = new DynamicTables<TContentContext>(dbContentContextFactory, dialect);
+    private readonly bool dedicatedTables = options.Value.OptimizeForSelfHosting;
+
     public async Task<Content?> FindContentAsync(App app, Schema schema, DomainId id, SearchScope scope,
         CancellationToken ct = default)
     {
@@ -140,8 +151,15 @@ public sealed partial class EFContentRepository<TContext>(
         return Task.CompletedTask;
     }
 
-    private Task<TContext> CreateDbContextAsync(CancellationToken ct)
+    private async Task<TContext> CreateDbContextAsync(
+        CancellationToken ct)
     {
-        return dbContextFactory.CreateDbContextAsync(ct);
+        return await dbContextFactory.CreateDbContextAsync(ct);
+    }
+
+    private async Task<TContentContext> CreateDbContextAsync(DomainId appId, DomainId schemaId,
+        CancellationToken ct)
+    {
+        return await dynamicTables.CreateDbContextAsync(appId, schemaId, ct);
     }
 }

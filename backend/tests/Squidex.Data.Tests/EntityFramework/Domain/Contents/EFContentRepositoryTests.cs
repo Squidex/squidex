@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.EntityFramework.TestHelpers;
@@ -13,11 +14,19 @@ using Squidex.Shared;
 
 namespace Squidex.EntityFramework.Domain.Contents;
 
-public abstract class EFContentRepositoryTests<TContext>(ISqlFixture<TContext> fixture) : ContentRepositoryTests where TContext : DbContext
+public abstract class EFContentRepositoryTests<TContext, TContentContext>(ISqlContentFixture<TContext, TContentContext> fixture)
+    : ContentRepositoryTests
+    where TContext : DbContext where TContentContext : ContentDbContext
 {
     protected override Task<IContentRepository> CreateSutAsync()
     {
-        var sut = new EFContentRepository<TContext>(fixture.DbContextFactory, AppProvider, fixture.Dialect);
+        var sut =
+            new EFContentRepository<TContext, TContentContext>(
+                fixture.DbContextFactory,
+                fixture.DbContextNamedFactory,
+                AppProvider,
+                Options.Create(new ContentsOptions()),
+                fixture.Dialect);
 
         return Task.FromResult<IContentRepository>(sut);
     }

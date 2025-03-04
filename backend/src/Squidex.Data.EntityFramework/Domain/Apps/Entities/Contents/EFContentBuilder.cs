@@ -13,16 +13,19 @@ namespace Microsoft.EntityFrameworkCore;
 
 public static class EFContentBuilder
 {
-    public static void UseContent(this ModelBuilder builder, IJsonSerializer jsonSerializer, string? jsonColumn)
+    public static void UseContent(this ModelBuilder builder, IJsonSerializer jsonSerializer, string? jsonColumn, string prefix)
     {
-        builder.UseContentEntity<EFContentCompleteEntity>("ContentsAll", jsonSerializer, jsonColumn);
-        builder.UseContentReference<EFReferenceCompleteEntity>("ContentReferencesAll");
-
-        builder.UseContentEntity<EFContentPublishedEntity>("ContentsPublished", jsonSerializer, jsonColumn);
-        builder.UseContentReference<EFReferencePublishedEntity>("ContentReferencesPublished");
+        builder.UseContentEntity<EFContentCompleteEntity>(jsonSerializer, jsonColumn, $"{prefix}ContentsAll");
+        builder.UseContentEntity<EFContentPublishedEntity>(jsonSerializer, jsonColumn, $"{prefix}ContentsPublished");
     }
 
-    private static void UseContentEntity<T>(this ModelBuilder builder, string tableName, IJsonSerializer jsonSerializer, string? jsonColumn)
+    public static void UseContentReferences(this ModelBuilder builder, string prefix)
+    {
+        builder.UseContentReference<EFReferenceCompleteEntity>($"{prefix}ContentReferencesAll");
+        builder.UseContentReference<EFReferencePublishedEntity>($"{prefix}ContentReferencesPublished");
+    }
+
+    private static void UseContentEntity<T>(this ModelBuilder builder, IJsonSerializer jsonSerializer, string? jsonColumn, string tableName)
         where T : EFContentEntity
     {
         builder.Entity<T>(b =>
@@ -58,6 +61,7 @@ public static class EFContentBuilder
 
             b.Property(x => x.AppId).AsString();
             b.Property(x => x.FromKey).AsString();
+            b.Property(x => x.FromSchema).AsString().HasDefaultValue(DomainId.Empty);
             b.Property(x => x.ToId).AsString();
         });
     }

@@ -35,7 +35,7 @@ public interface IContentRepository
     Task<IResultList<Content>> QueryAsync(App app, Schema schema, Q q, SearchScope scope,
         CancellationToken ct = default);
 
-    Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(App app, Schema schemaId, FilterNode<ClrValue> filterNode, SearchScope scope,
+    Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(App app, Schema schema, FilterNode<ClrValue> filterNode, SearchScope scope,
         CancellationToken ct = default);
 
     Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(App app, HashSet<DomainId> ids, SearchScope scope,

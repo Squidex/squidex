@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Collections.Concurrent;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
@@ -18,35 +17,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Operations;
 
 internal sealed class QueryInDedicatedCollection(IMongoClient mongoClient, string prefixDatabase, string prefixCollection) : MongoBase<MongoContentEntity>
 {
-    private readonly ConcurrentDictionary<(DomainId, DomainId), Task<IMongoCollection<MongoContentEntity>>> collections =
-        new ConcurrentDictionary<(DomainId, DomainId), Task<IMongoCollection<MongoContentEntity>>>();
+    private readonly CollectionProvider collections = new CollectionProvider(mongoClient, prefixDatabase, prefixCollection);
 
     public Task<IMongoCollection<MongoContentEntity>> GetCollectionAsync(DomainId appId, DomainId schemaId)
     {
-#pragma warning disable MA0106 // Avoid closure by using an overload with the 'factoryArgument' parameter
-        return collections.GetOrAdd((appId, schemaId), async key =>
-        {
-            var (appId, schemaId) = key;
-
-            var schemaDatabase = mongoClient.GetDatabase($"{prefixDatabase}_{appId}");
-            var schemaCollection = schemaDatabase.GetCollection<MongoContentEntity>($"{prefixCollection}_{schemaId}");
-
-            await schemaCollection.Indexes.CreateManyAsync(
-                [
-                    new CreateIndexModel<MongoContentEntity>(Index
-                        .Descending(x => x.LastModified)
-                        .Ascending(x => x.Id)
-                        .Ascending(x => x.IsDeleted)
-                        .Ascending(x => x.ReferencedIds)),
-                    new CreateIndexModel<MongoContentEntity>(Index
-                        .Ascending(x => x.IndexedSchemaId)
-                        .Ascending(x => x.IsDeleted)
-                        .Descending(x => x.LastModified)),
-                ]);
-
-            return schemaCollection;
-        });
-#pragma warning restore MA0106 // Avoid closure by using an overload with the 'factoryArgument' parameter
+        return collections.GetCollectionAsync(appId, schemaId);
     }
 
     public async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(App app, Schema schema, FilterNode<ClrValue> filterNode,

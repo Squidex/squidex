@@ -51,24 +51,6 @@ public class TestDbContextSqlServer(DbContextOptions options, IJsonSerializer js
 public class TestDbContext(DbContextOptions options, IJsonSerializer jsonSerializer)
     : AppDbContext(options, jsonSerializer)
 {
-    static TestDbContext()
-    {
-        SqlAdaptersMapping.Provider = context =>
-        {
-            switch (context)
-            {
-                case TestDbContextMySql:
-                    return TestDbContextMySql.Server;
-                case TestDbContextPostgres:
-                    return TestDbContextPostgres.Server;
-                case TestDbContextSqlServer:
-                    return TestDbContextSqlServer.Server;
-            }
-
-            throw new ArgumentException("Not supported.", nameof(context));
-        };
-    }
-
     protected override void OnModelCreating(ModelBuilder builder)
     {
         builder.UseSnapshot<SnapshotValue, EFState<SnapshotValue>>(jsonSerializer, JsonColumnType());

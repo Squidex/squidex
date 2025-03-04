@@ -7,6 +7,7 @@
 
 using Npgsql;
 using Squidex.Infrastructure.Queries;
+using Squidex.Providers.Postgres.App;
 
 namespace Squidex.Providers.Postgres;
 
@@ -21,6 +22,11 @@ public class PostgresDialect : SqlDialect
     public override bool IsDuplicateIndexException(Exception exception, string name)
     {
         return exception is PostgresException ex && ex.SqlState == "42P07";
+    }
+
+    public override string SelectTables()
+    {
+        return "SELECT tablename AS \"TableName\" FROM pg_tables WHERE schemaname = current_schema();";
     }
 
     public override string GeoIndex(string name, string table, string field)

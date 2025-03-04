@@ -35,7 +35,8 @@ public class AppDbContext(DbContextOptions options, IJsonSerializer jsonSerializ
         builder.UseCache();
         builder.UseCounters(jsonSerializer, jsonColumnType);
         builder.UseChatStore();
-        builder.UseContent(jsonSerializer, jsonColumnType);
+        builder.UseContent(jsonSerializer, jsonColumnType, string.Empty);
+        builder.UseContentReferences(string.Empty);
         builder.UseEvents(jsonSerializer, jsonColumnType);
         builder.UseEventStore();
         builder.UseHistory(jsonSerializer, jsonColumnType);

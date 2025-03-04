@@ -9,54 +9,59 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Hosting;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Queries;
 using Squidex.Providers.MySql;
+using Squidex.Providers.MySql.Content;
 using Testcontainers.MySql;
-
-#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.EntityFramework.TestHelpers;
 
-[CollectionDefinition("MySql")]
-public sealed class MySqlFixtureCollection : ICollectionFixture<MySqlFixture>
-{
-}
-
-public sealed class MySqlFixture : IAsyncLifetime, ISqlFixture<TestDbContextMySql>
+public class MySqlFixture(string? reuseId = null) : IAsyncLifetime, ISqlContentFixture<TestDbContextMySql, MySqlContentDbContext>
 {
     private readonly MySqlContainer mysql =
         new MySqlBuilder()
             .WithReuse(true)
-            .WithLabel("reuse-id", "squidex-mysql")
+            .WithLabel("reuse-id", reuseId)
             .WithCommand("--log-bin-trust-function-creators=1", "--local-infile=1")
             .Build();
 
     private IServiceProvider services;
 
-    public IDbContextFactory<TestDbContextMySql> DbContextFactory => services.GetRequiredService<IDbContextFactory<TestDbContextMySql>>();
+    public IDbContextFactory<TestDbContextMySql> DbContextFactory
+        => services.GetRequiredService<IDbContextFactory<TestDbContextMySql>>();
+
+    public IDbContextNamedFactory<MySqlContentDbContext> DbContextNamedFactory
+        => services.GetRequiredService<IDbContextNamedFactory<MySqlContentDbContext>>();
 
     public SqlDialect Dialect => MySqlDialect.Instance;
 
     public async Task InitializeAsync()
     {
+        BulkHelper.Configure();
+
         await mysql.StartAsync();
+
+        var connectionString = $"{mysql.GetConnectionString()};AllowLoadLocalInfile=true";
 
         services =
             new ServiceCollection()
-                 .AddDbContextFactory<TestDbContextMySql>(b =>
-                 {
-                     var connectionString = $"{mysql.GetConnectionString()};AllowLoadLocalInfile=true";
-
-                     b.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), options =>
-                     {
-                         options.UseNetTopologySuite();
-                         options.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
-                     });
-                 })
-                 .AddSingletonAs<DatabaseCreator<TestDbContextMySql>>().Done()
-                 .AddSingleton(TestUtils.DefaultSerializer)
-                 .BuildServiceProvider();
+                .AddDbContextFactory<TestDbContextMySql>(b =>
+                {
+                    b.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), options =>
+                    {
+                        options.UseNetTopologySuite();
+                        options.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
+                    });
+                })
+                .AddNamedDbContext((jsonSerializer, name) =>
+                {
+                    return new MySqlContentDbContext(name, connectionString, jsonSerializer);
+                })
+                .AddSingletonAs<DatabaseCreator<TestDbContextMySql>>().Done()
+                .AddSingleton(TestUtils.DefaultSerializer)
+                .BuildServiceProvider();
 
         foreach (var service in services.GetRequiredService<IEnumerable<IInitializable>>())
         {

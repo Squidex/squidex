@@ -1,0 +1,30 @@
+#pragma warning disable
+// Auto-generated code
+namespace Squidex.EntityFramework.TestHelpers;
+
+[CollectionDefinition("Postgres{{Name}}")]
+public sealed class Postgres{{Name}}FixtureCollection : ICollectionFixture<Postgres{{Name}}Fixture>
+{
+}
+
+public sealed class Postgres{{Name}}Fixture() : PostgresFixture("squidex-postgres-{{Label}}")
+{
+}
+
+[CollectionDefinition("MySql{{Name}}")]
+public sealed class MySql{{Name}}FixtureCollection : ICollectionFixture<MySql{{Name}}Fixture>
+{
+}
+
+public sealed class MySql{{Name}}Fixture() : MySqlFixture("squidex-mysql-{{Label}}")
+{
+}
+
+[CollectionDefinition("SqlServer{{Name}}")]
+public sealed class SqlServer{{Name}}FixtureCollection : ICollectionFixture<SqlServer{{Name}}Fixture>
+{
+}
+
+public sealed class SqlServer{{Name}}Fixture() : SqlServerFixture("squidex-mssql-{{Label}}")
+{
+}

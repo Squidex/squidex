@@ -25,5 +25,7 @@ public abstract record EFReferenceEntity
 
     public DomainId FromKey { get; set; }
 
+    public DomainId FromSchema { get; set; }
+
     public DomainId ToId { get; set; }
 }

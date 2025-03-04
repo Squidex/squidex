@@ -23,6 +23,11 @@ public sealed class MySqlDialect : SqlDialect
         return exception is MySqlException ex && ex.Number == 1061;
     }
 
+    public override string SelectTables()
+    {
+        return "SELECT table_name AS \"TableName\" FROM information_schema.tables WHERE table_schema = DATABASE();";
+    }
+
     public override string GeoIndex(string name, string table, string field)
     {
         return $"CREATE SPATIAL INDEX {name} ON {FormatTable(table)} ({FormatField(field, false)});";

@@ -10,6 +10,11 @@
     <NoWarn>SA0001;NETSDK1206</NoWarn>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Remove="Providers\**" />
+    <EmbeddedResource Remove="Providers\**" />
+    <None Remove="Providers\**" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\..\src\Squidex.Data.EntityFramework\Squidex.Data.EntityFramework.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Data.MongoDb\Squidex.Data.MongoDb.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />

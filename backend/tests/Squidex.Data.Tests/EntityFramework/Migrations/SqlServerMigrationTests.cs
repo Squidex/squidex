@@ -9,8 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure.Migrations;
-using Squidex.Providers.Postgres;
-using Squidex.Providers.SqlServer;
+using Squidex.Providers.SqlServer.App;
 using Testcontainers.MsSql;
 
 namespace Squidex.EntityFramework.Migrations;
@@ -35,7 +34,7 @@ public class SqlServerMigrationTests : IAsyncLifetime
     {
         var services =
             new ServiceCollection()
-                 .AddDbContextFactory<SqlServerDbContext>(b =>
+                 .AddDbContextFactory<SqlServerAppDbContext>(b =>
                  {
                      b.UseSqlServer(sqlServer.GetConnectionString(), options =>
                      {
@@ -43,11 +42,11 @@ public class SqlServerMigrationTests : IAsyncLifetime
                      });
                  })
                  .AddSingleton(TestUtils.DefaultSerializer)
-                 .AddSingleton<DatabaseMigrator<SqlServerDbContext>>()
+                 .AddSingleton<DatabaseMigrator<SqlServerAppDbContext>>()
                  .BuildServiceProvider();
 
-        var databaseMigrator = services.GetRequiredService<DatabaseMigrator<SqlServerDbContext>>();
-        var databaseFactory = services.GetRequiredService<IDbContextFactory<SqlServerDbContext>>();
+        var databaseMigrator = services.GetRequiredService<DatabaseMigrator<SqlServerAppDbContext>>();
+        var databaseFactory = services.GetRequiredService<IDbContextFactory<SqlServerAppDbContext>>();
 
         await databaseMigrator.InitializeAsync(default);
 

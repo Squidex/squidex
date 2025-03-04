@@ -11,10 +11,11 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 
 #pragma warning disable MA0048 // File name must match type name
+#pragma warning disable RECS0096 // Type parameter is never used
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public sealed partial class EFContentRepository<TContext>
+public sealed partial class EFContentRepository<TContext, TContentContext>
 {
     public IAsyncEnumerable<DomainId> StreamIds(DomainId appId, HashSet<DomainId>? schemaIds, SearchScope scope,
         CancellationToken ct = default)
@@ -78,15 +79,15 @@ public sealed partial class EFContentRepository<TContext>
         }
     }
 
-    public IAsyncEnumerable<Content> StreamReferencing(DomainId appId, DomainId reference, int take, SearchScope scope,
+    public IAsyncEnumerable<Content> StreamReferencing(DomainId appId, DomainId references, int take, SearchScope scope,
         CancellationToken ct = default)
     {
         return scope == SearchScope.All ?
-            StreamReferencing<EFContentCompleteEntity, EFReferenceCompleteEntity>(appId, reference, take, ct) :
-            StreamReferencing<EFContentPublishedEntity, EFReferencePublishedEntity>(appId, reference, take, ct);
+            StreamReferencing<EFContentCompleteEntity, EFReferenceCompleteEntity>(appId, references, take, ct) :
+            StreamReferencing<EFContentPublishedEntity, EFReferencePublishedEntity>(appId, references, take, ct);
     }
 
-    private async IAsyncEnumerable<Content> StreamReferencing<T, TReference>(DomainId appId, DomainId reference, int take,
+    private async IAsyncEnumerable<Content> StreamReferencing<T, TReference>(DomainId appId, DomainId references, int take,
         [EnumeratorCancellation] CancellationToken ct = default) where T : EFContentEntity where TReference : EFReferenceEntity
     {
         await using var dbContext = await CreateDbContextAsync(ct);
@@ -94,7 +95,7 @@ public sealed partial class EFContentRepository<TContext>
         var query =
             dbContext.Set<T>()
                 .Join(dbContext.Set<TReference>(), t => t.DocumentId, r => r.FromKey, (t, r) => new { T = t, R = r })
-                .Where(x => x.R.ToId == reference)
+                .Where(x => x.R.ToId == references)
                 .Where(x => x.R.AppId == appId)
                 .Where(x => x.T.IndexedAppId == appId)
                 .Select(x => x.T).Distinct()
