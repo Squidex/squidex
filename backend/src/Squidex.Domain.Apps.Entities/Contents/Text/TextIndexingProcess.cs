@@ -331,16 +331,15 @@ public sealed class TextIndexingProcess(
 
     public async Task On(IEnumerable<Envelope<IEvent>> events)
     {
-        var states = await QueryStatesAsync(events);
-
-        var updates = new Updates(states, serializer);
+        var textStates = await QueryStatesAsync(events);
+        var textBatch = new Updates(textStates, serializer);
 
         foreach (var @event in events)
         {
-            updates.On(@event);
+            textBatch.On(@event);
         }
 
-        await updates.WriteAsync(textIndex, textIndexerState);
+        await textBatch.WriteAsync(textIndex, textIndexerState);
     }
 
     private Task<Dictionary<UniqueContentId, TextContentState>> QueryStatesAsync(IEnumerable<Envelope<IEvent>> events)

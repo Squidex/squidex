@@ -67,7 +67,7 @@ public sealed class AzureTextIndex : IInitializable, ITextIndex
             return;
         }
 
-        await searchClient.IndexDocumentsAsync(batch, cancellationToken: ct);
+        var x = await searchClient.IndexDocumentsAsync(batch, cancellationToken: ct);
     }
 
     public async Task<List<DomainId>?> SearchAsync(App app, GeoQuery query, SearchScope scope,
