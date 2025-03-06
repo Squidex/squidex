@@ -88,7 +88,7 @@ public sealed partial class EFContentRepository<TContext, TContentContext>
     }
 
     private async IAsyncEnumerable<Content> StreamReferencing<T, TReference>(DomainId appId, DomainId references, int take,
-        [EnumeratorCancellation] CancellationToken ct = default) where T : EFContentEntity where TReference : EFReferenceEntity
+        [EnumeratorCancellation] CancellationToken ct = default) where T : EFContentEntity where TReference : EFContentReferenceEntity
     {
         await using var dbContext = await CreateDbContextAsync(ct);
 

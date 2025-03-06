@@ -14,8 +14,8 @@ using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-public sealed partial class EFAssetRepository<TContext>(IDbContextFactory<TContext> dbContextFactory, SqlDialect dialect)
-    : IAssetRepository where TContext : DbContext
+public sealed partial class EFAssetRepository<TContext>(IDbContextFactory<TContext> dbContextFactory)
+    : IAssetRepository where TContext : DbContext, IDbContextWithDialect
 {
     public async IAsyncEnumerable<Asset> StreamAll(DomainId appId,
         [EnumeratorCancellation] CancellationToken ct = default)
@@ -54,7 +54,7 @@ public sealed partial class EFAssetRepository<TContext>(IDbContextFactory<TConte
             }
 
             var sqlQuery =
-                new AssetSqlQueryBuilder(dialect)
+                dbContext.AssetQuery<EFAssetEntity>()
                     .Where(ClrFilter.Eq(nameof(EFAssetEntity.IndexedAppId), appId));
 
             if (q.Query.Filter?.HasField("IsDeleted") != true)

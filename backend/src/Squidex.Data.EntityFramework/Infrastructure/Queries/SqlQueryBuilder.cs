@@ -21,9 +21,9 @@ public class SqlQueryBuilder(SqlDialect dialect, string table, SqlParams? parame
         return this;
     }
 
-    public SqlQueryBuilder WhereQuery(PropertyPath path, CompareOperator op, Func<SqlParams, SqlDialect, SqlQueryBuilder> factory)
+    public SqlQueryBuilder WhereQuery(PropertyPath path, CompareOperator op, Func<SqlParams, SqlQueryBuilder> factory)
     {
-        var builder = factory(sqlParameters, dialect);
+        var builder = factory(sqlParameters);
 
         sqlQuery.Where.Add(dialect.WhereQuery(Visit(path), op, builder.CompileQuery(), IsJsonPath(path)));
         return this;

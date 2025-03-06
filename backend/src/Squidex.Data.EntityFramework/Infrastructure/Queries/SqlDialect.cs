@@ -19,11 +19,6 @@ public class SqlDialect
         return false;
     }
 
-    public virtual string SelectTables()
-    {
-        return string.Empty;
-    }
-
     public virtual string BuildSelectStatement(SqlQuery request)
     {
         var sb = new StringBuilder("SELECT");

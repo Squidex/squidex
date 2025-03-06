@@ -9,11 +9,13 @@ using Microsoft.EntityFrameworkCore;
 using MongoDB.Driver;
 using NetTopologySuite.Geometries;
 using Squidex.EntityFramework.TestHelpers;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
 
 namespace Squidex.EntityFramework.Infrastructure.Queries;
 
-public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture) where TContext : DbContext
+public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
+    where TContext : DbContext, IDbContextWithDialect
 {
     protected Task<TContext> CreateDbContextAsync()
     {
@@ -32,8 +34,8 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture) wher
     {
         var dbContext = await CreateDbContextAsync();
 
-        await dbContext.Database.CreateGeoIndexAsync(fixture.Dialect, "IDX_GEO", "TestEntity", "Point");
-        await dbContext.Database.CreateTextIndexAsync(fixture.Dialect, "IDX_Text", "TestEntity", "FullText");
+        await dbContext.CreateGeoIndexAsync("IDX_GEO", "TestEntity", "Point");
+        await dbContext.CreateTextIndexAsync("IDX_Text", "TestEntity", "FullText");
 
         var set = dbContext.Set<TestEntity>();
         if (await set.AnyAsync())
@@ -472,13 +474,13 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture) wher
     [Fact]
     public async Task Should_query_count()
     {
+        var dbContext = await CreateAndPrepareDbContextAsync();
+
         var builder =
-            new TestSqlBuilder(fixture.Dialect, "TestEntity")
+            new TestSqlBuilder(dbContext.Dialect, "TestEntity")
                 .Count();
 
         var (sql, parameters) = builder.Compile();
-
-        var dbContext = await CreateAndPrepareDbContextAsync();
         var dbResult = await dbContext.Database.SqlQueryRaw<int>(sql, parameters).FirstOrDefaultAsync();
 
         Assert.Equal(20, dbResult);
@@ -498,13 +500,13 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture) wher
     [Fact]
     public async Task Should_query_full_text()
     {
-        var builder =
-            new TestSqlBuilder(fixture.Dialect, "TestEntity")
+        var dbContext = await CreateAndPrepareDbContextAsync();
+
+        var queryBuilder =
+            new TestSqlBuilder(dbContext.Dialect, "TestEntity")
                 .WhereMatch("FullText", "hello");
 
-        var (sql, parameters) = builder.Compile();
-
-        var dbContext = await CreateAndPrepareDbContextAsync();
+        var (sql, parameters) = queryBuilder.Compile();
         var dbResult = await PollAsync(dbContext, sql, parameters, 20);
 
         Assert.Equal(20, dbResult.Count);
@@ -513,13 +515,13 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture) wher
     [Fact]
     public async Task Should_query_full_text_with_space()
     {
-        var builder =
-            new TestSqlBuilder(fixture.Dialect, "TestEntity")
+        var dbContext = await CreateAndPrepareDbContextAsync();
+
+        var queryBuilder =
+            new TestSqlBuilder(dbContext.Dialect, "TestEntity")
                 .WhereMatch("FullText", "hello world");
 
-        var (sql, parameters) = builder.Compile();
-
-        var dbContext = await CreateAndPrepareDbContextAsync();
+        var (sql, parameters) = queryBuilder.Compile();
         var dbResult = await PollAsync(dbContext, sql, parameters, 0);
 
         Assert.Empty(dbResult);
@@ -548,16 +550,16 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture) wher
 
     private async Task<List<long>> QueryAsync(ClrQuery query)
     {
-        var builder =
-            new TestSqlBuilder(fixture.Dialect, "TestEntity")
+        var dbContext = await CreateAndPrepareDbContextAsync();
+
+        var queryBuilder =
+            new TestSqlBuilder(dbContext.Dialect, "TestEntity")
                 .Limit(query)
                 .Offset(query)
                 .Order(query)
                 .Where(query);
 
-        var (sql, parameters) = builder.Compile();
-
-        var dbContext = await CreateAndPrepareDbContextAsync();
+        var (sql, parameters) = queryBuilder.Compile();
         var dbResult = await dbContext.Set<TestEntity>().FromSqlRaw(sql, parameters).ToListAsync();
 
         return dbResult.Select(x => x.Number).ToList();

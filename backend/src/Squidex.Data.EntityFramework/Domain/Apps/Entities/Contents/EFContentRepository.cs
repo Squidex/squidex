@@ -5,9 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FluentMigrator;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Options;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
@@ -15,7 +13,6 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
@@ -24,14 +21,11 @@ public sealed partial class EFContentRepository<TContext, TContentContext>(
     IDbContextFactory<TContext> dbContextFactory,
     IDbContextNamedFactory<TContentContext> dbContentContextFactory,
     IAppProvider appProvider,
-    IOptions<ContentsOptions> options,
-    SqlDialect dialect)
+    IOptions<ContentsOptions> options)
     : IContentRepository
-    where TContext : DbContext
-    where TContentContext : ContentDbContext
+    where TContext : DbContext, IDbContextWithDialect where TContentContext : ContentDbContext
 {
-    private readonly DynamicTables<TContentContext> dynamicTables = new DynamicTables<TContentContext>(dbContentContextFactory, dialect);
-    private readonly bool dedicatedTables = options.Value.OptimizeForSelfHosting;
+    private readonly DynamicTables<TContext, TContentContext> dynamicTables = new DynamicTables<TContext, TContentContext>(dbContextFactory, dbContentContextFactory);
 
     public async Task<Content?> FindContentAsync(App app, Schema schema, DomainId id, SearchScope scope,
         CancellationToken ct = default)
@@ -96,7 +90,7 @@ public sealed partial class EFContentRepository<TContext, TContentContext>(
     }
 
     public async Task<bool> HasReferrersAsync<TReference>(DomainId appId, DomainId reference,
-        CancellationToken ct = default) where TReference : EFReferenceEntity
+        CancellationToken ct = default) where TReference : EFContentReferenceEntity
     {
         using (Telemetry.Activities.StartActivity("EFContentRepository/QueryIdsAsync"))
         {
@@ -155,11 +149,5 @@ public sealed partial class EFContentRepository<TContext, TContentContext>(
         CancellationToken ct)
     {
         return await dbContextFactory.CreateDbContextAsync(ct);
-    }
-
-    private async Task<TContentContext> CreateDbContextAsync(DomainId appId, DomainId schemaId,
-        CancellationToken ct)
-    {
-        return await dynamicTables.CreateDbContextAsync(appId, schemaId, ct);
     }
 }

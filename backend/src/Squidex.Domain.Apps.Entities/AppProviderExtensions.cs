@@ -20,7 +20,7 @@ public static class AppProviderExtensions
 
         var appId = schema.AppId.Id;
 
-        async Task ResolveWithIdsAsync(IField field, ReadonlyList<DomainId>? schemaIds)
+        async Task ResolveWithIdsAsync(ReadonlyList<DomainId>? schemaIds)
         {
             if (schemaIds == null)
             {
@@ -62,11 +62,11 @@ public static class AppProviderExtensions
             switch (field)
             {
                 case IField<ComponentFieldProperties> component:
-                    await ResolveWithIdsAsync(field, component.Properties.SchemaIds);
+                    await ResolveWithIdsAsync(component.Properties.SchemaIds);
                     break;
 
                 case IField<ComponentsFieldProperties> components:
-                    await ResolveWithIdsAsync(field, components.Properties.SchemaIds);
+                    await ResolveWithIdsAsync(components.Properties.SchemaIds);
                     break;
 
                 case IArrayField arrayField:

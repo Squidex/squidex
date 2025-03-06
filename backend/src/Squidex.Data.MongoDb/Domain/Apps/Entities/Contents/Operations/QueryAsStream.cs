@@ -10,7 +10,6 @@ using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
-using static Google.Protobuf.WellKnownTypes.Field.Types;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Operations;
 

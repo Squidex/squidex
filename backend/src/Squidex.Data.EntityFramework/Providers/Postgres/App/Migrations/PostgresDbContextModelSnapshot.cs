@@ -727,6 +727,32 @@ namespace Squidex.Providers.Postgres.Migrations
                     b.ToTable("ContentsPublished", (string)null);
                 });
 
+            modelBuilder.Entity("Squidex.Domain.Apps.Entities.Contents.EFContentTableEntity", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("AppId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("SchemaId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AppId", "SchemaId")
+                        .IsUnique();
+
+                    b.ToTable("ContentTables", (string)null);
+                });
+
             modelBuilder.Entity("Squidex.Domain.Apps.Entities.Contents.EFReferenceCompleteEntity", b =>
                 {
                     b.Property<string>("AppId")
@@ -740,6 +766,13 @@ namespace Squidex.Providers.Postgres.Migrations
                     b.Property<string>("ToId")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
+
+                    b.Property<string>("FromSchema")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasDefaultValue("00000000-0000-0000-0000-000000000000");
 
                     b.HasKey("AppId", "FromKey", "ToId");
 
@@ -759,6 +792,13 @@ namespace Squidex.Providers.Postgres.Migrations
                     b.Property<string>("ToId")
                         .HasMaxLength(255)
                         .HasColumnType("character varying(255)");
+
+                    b.Property<string>("FromSchema")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasDefaultValue("00000000-0000-0000-0000-000000000000");
 
                     b.HasKey("AppId", "FromKey", "ToId");
 

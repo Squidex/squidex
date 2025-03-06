@@ -9,7 +9,6 @@ using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Query;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -23,6 +22,8 @@ namespace Squidex.Domain.Apps.Entities.Contents;
 
 public sealed partial class EFContentRepository<TContext, TContentContext> : ISnapshotStore<WriteContent>, IDeleter
 {
+    private readonly bool dedicatedTables = options.Value.OptimizeForSelfHosting;
+
     async IAsyncEnumerable<SnapshotResult<WriteContent>> ISnapshotStore<WriteContent>.ReadAllAsync(
         [EnumeratorCancellation] CancellationToken ct)
     {
@@ -106,6 +107,18 @@ public sealed partial class EFContentRepository<TContext, TContentContext> : ISn
         Func<DynamicContextName, bool> filterContexts,
         CancellationToken ct)
     {
+        List<DynamicContextName>? dynamicTableNames = null;
+        if (dedicatedTables)
+        {
+            dynamicTableNames = await dynamicTables.GetContextNames(ct).Where(filterContexts).ToListAsync(ct);
+
+            // Ensure that the tables are created outside of the transaction.
+            foreach (var name in dynamicTableNames)
+            {
+                await dynamicTables.EnsureDbContextAsync(name);
+            }
+        }
+
         await using var dbContext = await CreateDbContextAsync(ct);
         await using var dbTransaction = await dbContext.Database.BeginTransactionAsync(ct);
         try
@@ -122,9 +135,10 @@ public sealed partial class EFContentRepository<TContext, TContentContext> : ISn
             await dbContext.Set<EFReferencePublishedEntity>().Where(filterPublishedReferences)
                 .ExecuteDeleteAsync(ct);
 
-            if (dedicatedTables)
+            // Dynamic tables are only valid if we do use dedicated tables.
+            if (dynamicTableNames != null)
             {
-                await foreach (var contextName in dynamicTables.GetContextNames(ct).Where(filterContexts))
+                foreach (var contextName in dynamicTableNames)
                 {
                     var contentDbContext = await dynamicTables.CreateDbContextAsync(contextName, ct);
 
@@ -150,24 +164,41 @@ public sealed partial class EFContentRepository<TContext, TContentContext> : ISn
     {
         using (Telemetry.Activities.StartActivity("EFContentRepository/RemoveAsync"))
         {
+            WriteContent? existing = null;
+            if (dedicatedTables)
+            {
+                var found = await ReadAsync(key, ct);
+                if (found.Value == null)
+                {
+                    return;
+                }
+
+                existing = found.Value;
+
+                // Ensure that the tables are created outside of the transaction.
+                await dynamicTables.EnsureDbContextAsync(existing.AppId.Id, existing.SchemaId.Id);
+            }
+
             await using var dbContext = await CreateDbContextAsync(ct);
             await using var dbTransaction = await dbContext.Database.BeginTransactionAsync(ct);
             try
             {
-                if (dedicatedTables)
+                // The existing entity is only valid if we use dedicated tables.
+                if (existing != null)
                 {
-                    var (_, existing, _, _) = await ReadAsync(key, ct);
-                    if (existing == null)
-                    {
-                        return;
-                    }
+                    var contentDbContext = await dynamicTables.CreateDbContextAsync(existing.AppId.Id, existing.AppId.Id, ct);
 
-                    var contentDbContext = await CreateDbContextAsync(existing.AppId.Id, existing.AppId.Id, ct);
                     await RemoveCoreAsync(contentDbContext, key, ct);
                 }
 
                 // Remove this last, because we need to query the collection.
                 await RemoveCoreAsync(dbContext, key, ct);
+
+                await dbContext.Set<EFReferenceCompleteEntity>().Where(x => x.FromKey == key)
+                    .ExecuteDeleteAsync(ct);
+
+                await dbContext.Set<EFReferencePublishedEntity>().Where(x => x.FromKey == key)
+                    .ExecuteDeleteAsync(ct);
 
                 await dbTransaction.CommitAsync(ct);
             }
@@ -186,12 +217,6 @@ public sealed partial class EFContentRepository<TContext, TContentContext> : ISn
 
         await dbContext.Set<EFContentPublishedEntity>().Where(x => x.DocumentId == key)
             .ExecuteDeleteAsync(ct);
-
-        await dbContext.Set<EFReferenceCompleteEntity>().Where(x => x.FromKey == key)
-            .ExecuteDeleteAsync(ct);
-
-        await dbContext.Set<EFReferencePublishedEntity>().Where(x => x.FromKey == key)
-            .ExecuteDeleteAsync(ct);
     }
 
     async Task ISnapshotStore<WriteContent>.WriteAsync(SnapshotWriteJob<WriteContent> job,
@@ -205,17 +230,49 @@ public sealed partial class EFContentRepository<TContext, TContentContext> : ISn
 
         using (Telemetry.Activities.StartActivity("EFContentRepository/WriteAsync"))
         {
+            if (dedicatedTables)
+            {
+                // Ensure that the tables are created outside of the transaction.
+                await dynamicTables.EnsureDbContextAsync(job.Value.AppId.Id, job.Value.SchemaId.Id);
+            }
+
             await using var dbContext = await CreateDbContextAsync(ct);
             await using var dbTransaction = await dbContext.Database.BeginTransactionAsync(ct);
 
             try
             {
-                await AddCoreAsync(dbContext, job, ct);
+                await dbContext.Set<EFReferenceCompleteEntity>().Where(x => x.FromKey == job.Key)
+                    .ExecuteDeleteAsync(ct);
+
+                await dbContext.Set<EFReferencePublishedEntity>().Where(x => x.FromKey == job.Key)
+                    .ExecuteDeleteAsync(ct);
+
+                var (completeEntity, completeReferences) = await EFContentCompleteEntity.CreateAsync(job, appProvider, ct);
+
+                await dbContext.AddRangeAsync(completeReferences);
+                await dbContext.UpsertAsync(completeEntity, job.OldVersion, ct);
+
+                EFContentPublishedEntity? publishedEntity = null;
+                if (job.Value.ShouldWritePublished())
+                {
+                    var (entity, publishedReferences) = await EFContentPublishedEntity.CreateAsync(job, appProvider, ct);
+
+                    await dbContext.AddRangeAsync(publishedReferences);
+                    await dbContext.UpsertAsync(entity, job.OldVersion, ct);
+
+                    publishedEntity = entity;
+                }
+                else
+                {
+                    await dbContext.RemoveAsync<EFContentPublishedEntity>(job.Key, ct);
+                }
 
                 if (dedicatedTables)
                 {
-                    var contentContext = await CreateDbContextAsync(job.Value.AppId.Id, job.Value.AppId.Id, ct);
-                    await AddCoreAsync(contentContext, job, ct);
+                    var contentDbContext = await dynamicTables.CreateDbContextAsync(job.Value.AppId.Id, job.Value.AppId.Id, ct);
+
+                    await contentDbContext.UpsertAsync(completeEntity, job.OldVersion, ct);
+                    await contentDbContext.UpsertOrDeleteAsync(publishedEntity, job.Key, job.OldVersion, ct);
                 }
 
                 await dbTransaction.CommitAsync(ct);
@@ -225,27 +282,6 @@ public sealed partial class EFContentRepository<TContext, TContentContext> : ISn
                 await dbTransaction.RollbackAsync(ct);
                 throw;
             }
-        }
-
-        async Task AddCoreAsync(DbContext dbContext, SnapshotWriteJob<WriteContent> job, CancellationToken ct)
-        {
-            await dbContext.Set<EFReferenceCompleteEntity>().Where(x => x.FromKey == job.Key)
-                .ExecuteDeleteAsync(ct);
-
-            await dbContext.Set<EFReferencePublishedEntity>().Where(x => x.FromKey == job.Key)
-                .ExecuteDeleteAsync(ct);
-
-            if (job.Value.ShouldWritePublished())
-            {
-                await UpsertVersionedPublishedAsync(dbContext, job, ct);
-            }
-            else
-            {
-                await dbContext.Set<EFContentPublishedEntity>().Where(x => x.DocumentId == job.Key)
-                    .ExecuteDeleteAsync(ct);
-            }
-
-            await UpsertVersionedCompleteAsync(dbContext, job, ct);
         }
     }
 
@@ -261,6 +297,15 @@ public sealed partial class EFContentRepository<TContext, TContentContext> : ISn
 
         using (Telemetry.Activities.StartActivity("EFContentRepository/WriteManyAsync"))
         {
+            if (dedicatedTables)
+            {
+                // Ensure that the tables are created outside of the transaction.
+                foreach (var (appId, schemaId) in validJobs.Select(x => (AppId: x.Value.AppId.Id, SchemaId: x.Value.SchemaId.Id)).Distinct())
+                {
+                    await dynamicTables.EnsureDbContextAsync(appId, schemaId);
+                }
+            }
+
             await using var dbContext = await CreateDbContextAsync(ct);
             await using var dbTransaction = await dbContext.Database.BeginTransactionAsync(ct);
 
@@ -297,13 +342,12 @@ public sealed partial class EFContentRepository<TContext, TContentContext> : ISn
 
                 if (dedicatedTables)
                 {
-                    foreach (var bySchema in writesToCompleteContents.GroupBy(x => (x.AppId.Id, x.SchemaId.Id)))
+                    foreach (var bySchema in writesToCompleteContents.GroupBy(x => (AppId: x.AppId.Id, SchemaId: x.SchemaId.Id)))
                     {
-                        var (appId, schemaId) = bySchema.Key;
-                        var contentDbContext = await CreateDbContextAsync(appId, schemaId, ct);
+                        var contentDbContext = await dynamicTables.CreateDbContextAsync(bySchema.Key.AppId, bySchema.Key.SchemaId, ct);
 
                         // Just fetch the published context, so that we can reuse the context.
-                        var publishedContents = writesToPublishedContents.Where(x => x.AppId.Id == appId && x.SchemaId.Id == schemaId);
+                        var publishedContents = writesToPublishedContents.Where(x => x.AppId.Id == bySchema.Key.AppId && x.SchemaId.Id == bySchema.Key.SchemaId);
 
                         await contentDbContext.BulkInsertAsync(bySchema, cancellationToken: ct);
                         await contentDbContext.BulkInsertAsync(publishedContents, cancellationToken: ct);
@@ -318,46 +362,6 @@ public sealed partial class EFContentRepository<TContext, TContentContext> : ISn
                 throw;
             }
         }
-    }
-
-    private async Task UpsertVersionedPublishedAsync(DbContext dbContext, SnapshotWriteJob<WriteContent> job,
-        CancellationToken ct)
-    {
-        var (entity, references) = await EFContentPublishedEntity.CreateAsync(job, appProvider, ct);
-
-        await dbContext.AddRangeAsync(references);
-        await dbContext.UpsertAsync(entity, job.OldVersion, BuildUpdate<EFContentPublishedEntity>, ct);
-    }
-
-    private async Task UpsertVersionedCompleteAsync(DbContext dbContext, SnapshotWriteJob<WriteContent> job,
-        CancellationToken ct)
-    {
-        var (entity, references) = await EFContentCompleteEntity.CreateAsync(job, appProvider, ct);
-
-        await dbContext.AddRangeAsync(references);
-        await dbContext.UpsertAsync(entity, job.OldVersion, BuildUpdate<EFContentCompleteEntity>, ct);
-    }
-
-    private static Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> BuildUpdate<T>(EFContentEntity entity) where T : EFContentEntity
-    {
-        return b => b
-            .SetProperty(x => x.AppId, entity.AppId)
-            .SetProperty(x => x.Created, entity.Created)
-            .SetProperty(x => x.CreatedBy, entity.CreatedBy)
-            .SetProperty(x => x.Data, entity.Data)
-            .SetProperty(x => x.IndexedAppId, entity.IndexedAppId)
-            .SetProperty(x => x.IndexedSchemaId, entity.IndexedSchemaId)
-            .SetProperty(x => x.IsDeleted, entity.IsDeleted)
-            .SetProperty(x => x.LastModified, entity.LastModified)
-            .SetProperty(x => x.LastModifiedBy, entity.LastModifiedBy)
-            .SetProperty(x => x.NewData, entity.NewData)
-            .SetProperty(x => x.NewStatus, entity.NewStatus)
-            .SetProperty(x => x.ScheduledAt, entity.ScheduledAt)
-            .SetProperty(x => x.ScheduleJob, entity.ScheduleJob)
-            .SetProperty(x => x.SchemaId, entity.SchemaId)
-            .SetProperty(x => x.Status, entity.Status)
-            .SetProperty(x => x.TranslationStatus, entity.TranslationStatus)
-            .SetProperty(x => x.Version, entity.Version);
     }
 
     private static bool IsValid(WriteContent state)

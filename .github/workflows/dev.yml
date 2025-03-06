@@ -66,49 +66,7 @@ jobs:
           volumes: ${{ github.workspace }}:/src
           run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
 
-      - name: Test - RUN on Postgres
-        uses: kohlerdominik/docker-run-action@v2.0.0
-        with:
-          image: mcr.microsoft.com/dotnet/sdk:8.0
-          environment: |
-            CONFIG__BACKUPURL=http://localhost:5000
-            CONFIG__WAIT=60
-            CONFIG__SERVER__URL=http://localhost:8083
-            WEBHOOKCATCHER__HOST__ENDPOINT=webhookcatcher
-          default_network: host
-          options: --name test2
-          volumes: ${{ github.workspace }}:/src
-          run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter "Category!=NotAutomated & Category!=MongoOnly"
-
-      - name: Test - RUN on MySql
-        uses: kohlerdominik/docker-run-action@v2.0.0
-        with:
-          image: mcr.microsoft.com/dotnet/sdk:8.0
-          environment: |
-            CONFIG__BACKUPURL=http://localhost:5000
-            CONFIG__WAIT=60
-            CONFIG__SERVER__URL=http://localhost:8084
-            WEBHOOKCATCHER__HOST__ENDPOINT=webhookcatcher
-          default_network: host
-          options: --name test3
-          volumes: ${{ github.workspace }}:/src
-          run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter "Category!=NotAutomated & Category!=MongoOnly"
-
-      - name: Test - RUN on SqlServer
-        uses: kohlerdominik/docker-run-action@v2.0.0
-        with:
-          image: mcr.microsoft.com/dotnet/sdk:8.0
-          environment: |
-            CONFIG__BACKUPURL=http://localhost:5000
-            CONFIG__WAIT=60
-            CONFIG__SERVER__URL=http://localhost:8085
-            WEBHOOKCATCHER__HOST__ENDPOINT=webhookcatcher
-          default_network: host
-          options: --name test4
-          volumes: ${{ github.workspace }}:/src
-          run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter "Category!=NotAutomated & Category!=MongoOnly"
-
-      - name: Test - RUN on Mongo with path
+      - name: Test - RUN on Mongo on path
         uses: kohlerdominik/docker-run-action@v2.0.0
         with:
           image: mcr.microsoft.com/dotnet/sdk:8.0
@@ -122,7 +80,7 @@ jobs:
           volumes: ${{ github.workspace }}:/src
           run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
 
-      - name: Test - RUN on Mongo with dedicated collections
+      - name: Test - RUN on Postgres
         uses: kohlerdominik/docker-run-action@v2.0.0
         with:
           image: mcr.microsoft.com/dotnet/sdk:8.0
@@ -132,9 +90,37 @@ jobs:
             CONFIG__SERVER__URL=http://localhost:8082
             WEBHOOKCATCHER__HOST__ENDPOINT=webhookcatcher
           default_network: host
-          options: --name test6
+          options: --name test2
           volumes: ${{ github.workspace }}:/src
-          run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
+          run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter "Category!=NotAutomated & Category!=MongoOnly"
+
+      - name: Test - RUN on MySql
+        uses: kohlerdominik/docker-run-action@v2.0.0
+        with:
+          image: mcr.microsoft.com/dotnet/sdk:8.0
+          environment: |
+            CONFIG__BACKUPURL=http://localhost:5000
+            CONFIG__WAIT=60
+            CONFIG__SERVER__URL=http://localhost:8083
+            WEBHOOKCATCHER__HOST__ENDPOINT=webhookcatcher
+          default_network: host
+          options: --name test3
+          volumes: ${{ github.workspace }}:/src
+          run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter "Category!=NotAutomated & Category!=MongoOnly"
+
+      - name: Test - RUN on SqlServer
+        uses: kohlerdominik/docker-run-action@v2.0.0
+        with:
+          image: mcr.microsoft.com/dotnet/sdk:8.0
+          environment: |
+            CONFIG__BACKUPURL=http://localhost:5000
+            CONFIG__WAIT=60
+            CONFIG__SERVER__URL=http://localhost:8084
+            WEBHOOKCATCHER__HOST__ENDPOINT=webhookcatcher
+          default_network: host
+          options: --name test4
+          volumes: ${{ github.workspace }}:/src
+          run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter "Category!=NotAutomated & Category!=MongoOnly"
 
       - name: Test - Install Playwright Dependencies
         run: npm ci

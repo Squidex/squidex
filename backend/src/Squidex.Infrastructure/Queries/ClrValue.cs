@@ -7,7 +7,6 @@
 
 using System.Collections;
 using System.Globalization;
-using Google.Protobuf.WellKnownTypes;
 using NodaTime;
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter

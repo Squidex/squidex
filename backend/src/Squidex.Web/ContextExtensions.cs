@@ -7,7 +7,6 @@
 
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using RequestContext = Squidex.Domain.Apps.Entities.Context;
 

@@ -24,9 +24,9 @@ public class PostgresDialect : SqlDialect
         return exception is PostgresException ex && ex.SqlState == "42P07";
     }
 
-    public override string SelectTables()
+    public override string? JsonColumnType()
     {
-        return "SELECT tablename AS \"TableName\" FROM pg_tables WHERE schemaname = current_schema();";
+        return "jsonb";
     }
 
     public override string GeoIndex(string name, string table, string field)

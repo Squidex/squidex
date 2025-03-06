@@ -12,8 +12,6 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
-using Squidex.Infrastructure.Queries;
-using Squidex.Providers.SqlServer;
 using Squidex.Providers.SqlServer.Content;
 using Testcontainers.MsSql;
 
@@ -36,12 +34,13 @@ public class SqlServerFixture(string? reuseId = null) : IAsyncLifetime, ISqlCont
     public IDbContextNamedFactory<SqlServerContentDbContext> DbContextNamedFactory
         => services.GetRequiredService<IDbContextNamedFactory<SqlServerContentDbContext>>();
 
-    public SqlDialect Dialect => SqlServerDialect.Instance;
+    static SqlServerFixture()
+    {
+        BulkHelper.Configure();
+    }
 
     public async Task InitializeAsync()
     {
-        BulkHelper.Configure();
-
         await sqlServer.StartAsync();
         await sqlServer.ExecScriptAsync($"create database squidex;");
 

@@ -17,6 +17,6 @@ public sealed class MySqlContentDbContextDesignTimeFactory : IDesignTimeDbContex
     {
         const string ConnectionString = "Server=localhost;Port=33060;Database=test;User=mysql;Password=mysql";
 
-        return new MySqlContentDbContext(string.Empty, ConnectionString, new SystemJsonSerializer(JsonSerializerOptions.Default));
+        return new MySqlContentDbContext(string.Empty, ConnectionString, null, new SystemJsonSerializer(JsonSerializerOptions.Default));
     }
 }

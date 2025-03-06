@@ -7,14 +7,12 @@
 
 using Microsoft.EntityFrameworkCore;
 using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Providers.Postgres.App;
 
 public class PostgresAppDbContext(DbContextOptions options, IJsonSerializer jsonSerializer)
     : AppDbContext(options, jsonSerializer)
 {
-    protected override string? JsonColumnType()
-    {
-        return "jsonb";
-    }
+    public override SqlDialect Dialect => PostgresDialect.Instance;
 }

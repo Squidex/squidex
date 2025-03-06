@@ -23,11 +23,6 @@ public sealed class SqlServerDialect : SqlDialect
         return exception is SqlException ex && ex.Number is 1913 or 7642 or 7652;
     }
 
-    public override string SelectTables()
-    {
-        return "SELECT name AS \"TableName\" FROM sys.tables;";
-    }
-
     public override string GeoIndex(string name, string table, string field)
     {
         return $"CREATE SPATIAL INDEX {name} ON {FormatTable(table)} ({FormatField(field, false)}) USING GEOGRAPHY_GRID;";

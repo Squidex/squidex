@@ -16,13 +16,25 @@ public static class EFContentBuilder
     public static void UseContent(this ModelBuilder builder, IJsonSerializer jsonSerializer, string? jsonColumn, string prefix)
     {
         builder.UseContentEntity<EFContentCompleteEntity>(jsonSerializer, jsonColumn, $"{prefix}ContentsAll");
-        builder.UseContentEntity<EFContentPublishedEntity>(jsonSerializer, jsonColumn, $"{prefix}ContentsPublished");
+        builder.UseContentEntity<EFContentPublishedEntity>(jsonSerializer, jsonColumn, $"{prefix}ContentsPublished");        
     }
 
     public static void UseContentReferences(this ModelBuilder builder, string prefix)
     {
         builder.UseContentReference<EFReferenceCompleteEntity>($"{prefix}ContentReferencesAll");
         builder.UseContentReference<EFReferencePublishedEntity>($"{prefix}ContentReferencesPublished");
+    }
+
+    public static void UseContentTables(this ModelBuilder builder)
+    {
+        builder.Entity<EFContentTableEntity>(b =>
+        {
+            b.ToTable("ContentTables");
+            b.HasIndex("AppId", "SchemaId").IsUnique();
+
+            b.Property(x => x.AppId).AsString();
+            b.Property(x => x.SchemaId).AsString();
+        });
     }
 
     private static void UseContentEntity<T>(this ModelBuilder builder, IJsonSerializer jsonSerializer, string? jsonColumn, string tableName)
@@ -52,7 +64,7 @@ public static class EFContentBuilder
     }
 
     private static void UseContentReference<T>(this ModelBuilder builder, string tableName)
-        where T : EFReferenceEntity
+        where T : EFContentReferenceEntity
     {
         builder.Entity<T>(b =>
         {

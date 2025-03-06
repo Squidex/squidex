@@ -16,18 +16,22 @@ using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
 using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Domain.Users;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing.Consume;
 using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.States;
 using YDotNet.Server.EntityFramework;
 
 namespace Squidex;
 
-public class AppDbContext(DbContextOptions options, IJsonSerializer jsonSerializer) : IdentityDbContext(options)
+public abstract class AppDbContext(DbContextOptions options, IJsonSerializer jsonSerializer) : IdentityDbContext(options), IDbContextWithDialect
 {
+    public abstract SqlDialect Dialect { get; }
+
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        var jsonColumnType = JsonColumnType();
+        var jsonColumnType = Dialect.JsonColumnType();
 
         builder.UseApps(jsonSerializer, jsonColumnType);
         builder.UseAssetKeyValueStore<TusMetadata>();
@@ -37,6 +41,7 @@ public class AppDbContext(DbContextOptions options, IJsonSerializer jsonSerializ
         builder.UseChatStore();
         builder.UseContent(jsonSerializer, jsonColumnType, string.Empty);
         builder.UseContentReferences(string.Empty);
+        builder.UseContentTables();
         builder.UseEvents(jsonSerializer, jsonColumnType);
         builder.UseEventStore();
         builder.UseHistory(jsonSerializer, jsonColumnType);
@@ -59,11 +64,6 @@ public class AppDbContext(DbContextOptions options, IJsonSerializer jsonSerializ
         builder.UseYDotNet();
 
         base.OnModelCreating(builder);
-    }
-
-    protected virtual string? JsonColumnType()
-    {
-        return null;
     }
 }
 

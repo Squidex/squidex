@@ -16,8 +16,9 @@ using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
-public sealed class EFTextIndexerState<TContext>(IDbContextFactory<TContext> dbContextFactory, SqlDialect dialect, IContentRepository contentRepository)
-    : ITextIndexerState, IDeleter where TContext : DbContext
+public sealed class EFTextIndexerState<TContext>(IDbContextFactory<TContext> dbContextFactory, IContentRepository contentRepository)
+    : ITextIndexerState, IDeleter
+    where TContext : DbContext, IDbContextWithDialect
 {
     int IDeleter.Order => -2000;
 
@@ -27,7 +28,7 @@ public sealed class EFTextIndexerState<TContext>(IDbContextFactory<TContext> dbC
         await using var dbContext = await CreateDbContextAsync(ct);
 
         var (query, parameters) =
-            new SqlQueryBuilder(dialect, "TextState")
+            dbContext.Query<TextContentState>()
                 .Where(ClrFilter.Gt(nameof(TextContentState.UniqueContentId), new UniqueContentId(app.Id, DomainId.Empty).ToParseableString()))
                 .OrderAsc(nameof(TextContentState.UniqueContentId))
                 .OrderAsc(nameof(TextContentState.State))

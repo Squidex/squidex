@@ -39,32 +39,26 @@ public sealed partial class EFContentRepository<TContext, TContentContext>
             var schemaIds = schemas.Select(x => x.Id).ToList();
 
             return scope == SearchScope.All ?
-                await QueryAsync<EFContentCompleteEntity>(
+                await QueryAsync<EFContentCompleteEntity, EFReferenceCompleteEntity>(
                     app.Id,
                     schemaIds,
                     isSingle,
                     q,
-                    "ContentsAll",
-                    "ContentReferencesAll",
                     ct) :
-                await QueryAsync<EFContentPublishedEntity>(
+                await QueryAsync<EFContentPublishedEntity, EFReferencePublishedEntity>(
                     app.Id,
                     schemaIds,
                     isSingle,
                     q,
-                    "ContentsPublished",
-                    "ContentReferencesPublished",
                     ct);
         }
     }
 
-    private async Task<IResultList<Content>> QueryAsync<T>(
+    private async Task<IResultList<Content>> QueryAsync<T, TReference>(
         DomainId appId,
         List<DomainId> schemaIds,
         bool isSingle,
         Q q,
-        string tableName,
-        string referenceTableName,
         CancellationToken ct = default) where T : EFContentEntity
     {
         if (q.Ids is { Count: > 0 } && schemaIds.Count > 0)
@@ -102,14 +96,14 @@ public sealed partial class EFContentRepository<TContext, TContentContext>
             await using var dbContext = await CreateDbContextAsync(ct);
 
             var queryBuilder =
-                new ContentQueryBuilder(dialect, tableName)
+                dbContext.ContentQuery<T>()
                     .Where(ClrFilter.In(nameof(EFContentEntity.IndexedAppId), appId))
                     .Where(ClrFilter.In(nameof(EFContentEntity.IndexedSchemaId), schemaIds))
-                    .WhereQuery(nameof(EFContentEntity.Id), CompareOperator.In, (p, d) =>
-                        new ContentQueryBuilder(d, referenceTableName, p)
-                            .Where(ClrFilter.Eq(nameof(EFReferenceEntity.AppId), appId))
-                            .Where(ClrFilter.Eq(nameof(EFReferenceEntity.FromKey), DomainId.Combine(appId, q.Referencing)))
-                            .Select(nameof(EFReferenceEntity.ToId))
+                    .WhereQuery(nameof(EFContentEntity.Id), CompareOperator.In, parameters =>
+                        dbContext.ContentQuery<TReference>(parameters)
+                            .Where(ClrFilter.Eq(nameof(EFContentReferenceEntity.AppId), appId))
+                            .Where(ClrFilter.Eq(nameof(EFContentReferenceEntity.FromKey), DomainId.Combine(appId, q.Referencing)))
+                            .Select(nameof(EFContentReferenceEntity.ToId))
                     )
                     .WhereNotDeleted(q.Query);
 
@@ -121,12 +115,12 @@ public sealed partial class EFContentRepository<TContext, TContentContext>
             await using var dbContext = await CreateDbContextAsync(ct);
 
             var queryBuilder =
-                new ContentQueryBuilder(dialect, tableName)
-                    .WhereQuery(nameof(EFContentEntity.DocumentId), CompareOperator.In, (p, d) =>
-                        new ContentQueryBuilder(d, referenceTableName, p)
-                            .Where(ClrFilter.Eq(nameof(EFReferenceEntity.AppId), appId))
-                            .Where(ClrFilter.Eq(nameof(EFReferenceEntity.ToId), q.Reference))
-                            .Select(nameof(EFReferenceEntity.FromKey))
+                dbContext.ContentQuery<T>()
+                    .WhereQuery(nameof(EFContentEntity.DocumentId), CompareOperator.In, parameters =>
+                        dbContext.ContentQuery<TReference>(parameters)
+                            .Where(ClrFilter.Eq(nameof(EFContentReferenceEntity.AppId), appId))
+                            .Where(ClrFilter.Eq(nameof(EFContentReferenceEntity.ToId), q.Reference))
+                            .Select(nameof(EFContentReferenceEntity.FromKey))
                     )
                     .Where(ClrFilter.In(nameof(EFContentEntity.IndexedSchemaId), schemaIds))
                     .WhereNotDeleted(q.Query);
@@ -145,13 +139,14 @@ public sealed partial class EFContentRepository<TContext, TContentContext>
 
             DbContext dbContext =
                 dedicatedTables ?
-                await CreateDbContextAsync(appId, schemaId, ct) :
+                // We are not using a transaction here, therefore we can get the table immediately.
+                await dynamicTables.CreateDbContextAsync(appId, schemaId, ct) :
                 await CreateDbContextAsync(ct);
 
             await using (dbContext)
             {
                 var queryBuilder =
-                    new ContentQueryBuilder(dialect, tableName)
+                    dbContext.ContentQuery<T>()
                         .Where(ClrFilter.Eq(nameof(EFContentEntity.IndexedAppId), appId))
                         .Where(ClrFilter.Eq(nameof(EFContentEntity.IndexedSchemaId), schemaId))
                         .WhereNotDeleted(q.Query);
@@ -182,19 +177,17 @@ public sealed partial class EFContentRepository<TContext, TContentContext>
         CancellationToken ct = default)
     {
         return scope == SearchScope.All ?
-            QueryIdsAsync<EFContentCompleteEntity>(app.Id, schema.Id, filterNode,
-                "ContentsAll", ct) :
-            QueryIdsAsync<EFContentPublishedEntity>(app.Id, schema.Id, filterNode,
-                "ContentsPublished", ct);
+            QueryIdsAsync<EFContentCompleteEntity>(app.Id, schema.Id, filterNode, ct) :
+            QueryIdsAsync<EFContentPublishedEntity>(app.Id, schema.Id, filterNode, ct);
     }
 
-    private async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync<T>(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode, string table,
+    private async Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync<T>(DomainId appId, DomainId schemaId, FilterNode<ClrValue> filterNode,
         CancellationToken ct = default) where T : EFContentEntity
     {
         await using var dbContext = await CreateDbContextAsync(ct);
 
         var (sql, parameters) =
-            new ContentQueryBuilder(dialect, table)
+            dbContext.ContentQuery<T>()
                 .Where(ClrFilter.Eq(nameof(EFContentEntity.IndexedAppId), appId))
                 .Where(ClrFilter.Eq(nameof(EFContentEntity.IndexedSchemaId), schemaId))
                 .WhereNotDeleted(filterNode)

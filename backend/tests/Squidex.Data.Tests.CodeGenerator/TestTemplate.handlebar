@@ -12,37 +12,37 @@ namespace {{classNamespace}};
 {{#if HasContentContext}}
 [Trait("Category", "TestContainer")]
 [Collection("Postgres{{CollectionSuffix}}")]
-public class Postgres{{className}}(PostgresFixture fixture) : {{baseName}}<TestDbContextPostgres, PostgresContentDbContext>(fixture)
+public class Postgres{{className}}(Postgres{{CollectionSuffix}}Fixture fixture) : {{baseName}}<TestDbContextPostgres, PostgresContentDbContext>(fixture)
 {
 }
 
 [Trait("Category", "TestContainer")]
 [Collection("MySql{{CollectionSuffix}}")]
-public class MySql{{className}}(MySqlFixture fixture) : {{baseName}}<TestDbContextMySql, MySqlContentDbContext>(fixture)
+public class MySql{{className}}(MySql{{CollectionSuffix}}Fixture fixture) : {{baseName}}<TestDbContextMySql, MySqlContentDbContext>(fixture)
 {
 }
 
 [Trait("Category", "TestContainer")]
 [Collection("SqlServer{{CollectionSuffix}}")]
-public class SqlServer{{className}}(SqlServerFixture fixture) : {{baseName}}<TestDbContextSqlServer, SqlServerContentDbContext>(fixture)
+public class SqlServer{{className}}(SqlServer{{CollectionSuffix}}Fixture fixture) : {{baseName}}<TestDbContextSqlServer, SqlServerContentDbContext>(fixture)
 {
 }
 {{else}}
 [Trait("Category", "TestContainer")]
 [Collection("Postgres{{CollectionSuffix}}")]
-public class Postgres{{className}}(PostgresFixture fixture) : {{baseName}}<TestDbContextPostgres>(fixture)
+public class Postgres{{className}}(Postgres{{CollectionSuffix}}Fixture fixture) : {{baseName}}<TestDbContextPostgres>(fixture)
 {
 }
 
 [Trait("Category", "TestContainer")]
 [Collection("MySql{{CollectionSuffix}}")]
-public class MySql{{className}}(MySqlFixture fixture) : {{baseName}}<TestDbContextMySql>(fixture)
+public class MySql{{className}}(MySql{{CollectionSuffix}}Fixture fixture) : {{baseName}}<TestDbContextMySql>(fixture)
 {
 }
 
 [Trait("Category", "TestContainer")]
 [Collection("SqlServer{{CollectionSuffix}}")]
-public class SqlServer{{className}}(SqlServerFixture fixture) : {{baseName}}<TestDbContextSqlServer>(fixture)
+public class SqlServer{{className}}(SqlServer{{CollectionSuffix}}Fixture fixture) : {{baseName}}<TestDbContextSqlServer>(fixture)
 {
 }
 {{/if}}

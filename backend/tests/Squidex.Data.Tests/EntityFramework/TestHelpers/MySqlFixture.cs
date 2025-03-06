@@ -11,8 +11,6 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
-using Squidex.Infrastructure.Queries;
-using Squidex.Providers.MySql;
 using Squidex.Providers.MySql.Content;
 using Testcontainers.MySql;
 
@@ -35,15 +33,16 @@ public class MySqlFixture(string? reuseId = null) : IAsyncLifetime, ISqlContentF
     public IDbContextNamedFactory<MySqlContentDbContext> DbContextNamedFactory
         => services.GetRequiredService<IDbContextNamedFactory<MySqlContentDbContext>>();
 
-    public SqlDialect Dialect => MySqlDialect.Instance;
+    static MySqlFixture()
+    {
+        BulkHelper.Configure();
+    }
 
     public async Task InitializeAsync()
     {
-        BulkHelper.Configure();
-
         await mysql.StartAsync();
 
-        var connectionString = $"{mysql.GetConnectionString()};AllowLoadLocalInfile=true";
+        var connectionString = $"{mysql.GetConnectionString()};AllowLoadLocalInfile=true;MaxPoolSize=1000";
 
         services =
             new ServiceCollection()
@@ -57,7 +56,7 @@ public class MySqlFixture(string? reuseId = null) : IAsyncLifetime, ISqlContentF
                 })
                 .AddNamedDbContext((jsonSerializer, name) =>
                 {
-                    return new MySqlContentDbContext(name, connectionString, jsonSerializer);
+                    return new MySqlContentDbContext(name, connectionString, null, jsonSerializer);
                 })
                 .AddSingletonAs<DatabaseCreator<TestDbContextMySql>>().Done()
                 .AddSingleton(TestUtils.DefaultSerializer)

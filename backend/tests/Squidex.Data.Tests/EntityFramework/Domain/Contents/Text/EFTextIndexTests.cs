@@ -8,16 +8,18 @@
 using Microsoft.EntityFrameworkCore;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.EntityFramework.TestHelpers;
+using Squidex.Infrastructure;
 
 namespace Squidex.EntityFramework.Domain.Contents.Text;
 
-public abstract class EFTextIndexTests<TContext>(ISqlFixture<TContext> fixture) : TextIndexerTests where TContext : DbContext
+public abstract class EFTextIndexTests<TContext>(ISqlFixture<TContext> fixture) : TextIndexerTests 
+    where TContext : DbContext, IDbContextWithDialect
 {
     public override bool SupportsQuerySyntax => false;
 
     public override async Task<ITextIndex> CreateSutAsync()
     {
-        var sut = new EFTextIndex<TContext>(fixture.DbContextFactory, fixture.Dialect);
+        var sut = new EFTextIndex<TContext>(fixture.DbContextFactory);
 
         await sut.InitializeAsync(default);
         return sut;

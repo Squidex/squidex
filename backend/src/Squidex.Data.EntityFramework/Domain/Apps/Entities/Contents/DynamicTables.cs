@@ -6,103 +6,153 @@
 // ==========================================================================
 
 using System.Runtime.CompilerServices;
-using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Queries;
 
 #pragma warning disable MA0048 // File name must match type name
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public readonly partial record struct DynamicContextName(DomainId AppId, DomainId SchemaId)
+public readonly record struct DynamicContextName(DomainId AppId, DomainId SchemaId);
+
+public sealed class DynamicTables<TContext, TContentContext>(
+    IDbContextFactory<TContext> dbContextFactory,
+    IDbContextNamedFactory<TContentContext> dbContextNamedFactory)
+    where TContext : DbContext where TContentContext : ContentDbContext
 {
-    public static bool TryParse(string tableName, out DynamicContextName result)
-    {
-        result = default;
-        if (string.IsNullOrEmpty(tableName))
-        {
-            return false;
-        }
-
-        var match = PrefixRegex().Match(tableName);
-        if (!match.Success)
-        {
-            return false;
-        }
-
-        result =
-            new DynamicContextName(
-                DomainId.Create(match.Groups["AppId"].Value),
-                DomainId.Create(match.Groups["SchemaId"].Value));
-
-        return true;
-    }
-
-    [GeneratedRegex("^BySchema_(?<AppId>[0-9a-f\\-]{36})_(?<SchemaId>[0-9a-f\\-]{36})__")]
-    private static partial Regex PrefixRegex();
-
-    public override readonly string ToString()
-    {
-        return $"BySchema_{AppId}_{SchemaId}__";
-    }
-}
-
-public sealed class DynamicTables<TContentContext>(IDbContextNamedFactory<TContentContext> dbContextFactory, SqlDialect dialect)
-    where TContentContext : ContentDbContext
-{
-    private readonly Dictionary<DynamicContextName, Task> dynamicMigrations = new Dictionary<DynamicContextName, Task>();
+    private readonly Dictionary<DynamicContextName, Task<string>> cachedMappings = [];
 
     public async IAsyncEnumerable<DynamicContextName> GetContextNames(
         [EnumeratorCancellation] CancellationToken ct)
     {
-        using var dbContext = await dbContextFactory.CreateDbContextAsync(string.Empty, default);
+        using var dbContext = await dbContextFactory.CreateDbContextAsync(ct);
 
-        var tableNames = await dbContext.Database.SqlQueryRaw<string>(dialect.SelectTables()).ToListAsync(ct);
-        var tableResults = new HashSet<DynamicContextName>();
+        var tableEntities = await dbContext.Set<EFContentTableEntity>().ToListAsync(ct);
 
-        foreach (var table in tableNames)
+        lock (cachedMappings)
         {
-            if (DynamicContextName.TryParse(table, out var name) && tableResults.Add(name))
+            foreach (var entity in tableEntities)
             {
-                yield return name;
+                var name = new DynamicContextName(entity.AppId, entity.SchemaId);
+                if (!cachedMappings.ContainsKey(name))
+                {
+                    cachedMappings[name] = Task.FromResult(Prefix(entity));
+                }
             }
+        }
+
+        foreach (var entity in tableEntities)
+        {
+            yield return new DynamicContextName(entity.AppId, entity.SchemaId);
         }
     }
 
-    public Task<TContentContext> CreateDbContextAsync(DomainId appId, DomainId schemaId,
+    public async Task<TContentContext> CreateDbContextAsync(DomainId appId, DomainId schemaId,
         CancellationToken ct)
     {
-        return CreateDbContextAsync(new DynamicContextName(appId, schemaId), ct);
+        var prefix = await EnsureDbContextAsync(appId, schemaId);
+
+        return await dbContextNamedFactory.CreateDbContextAsync(prefix, ct);
     }
 
     public async Task<TContentContext> CreateDbContextAsync(DynamicContextName name,
         CancellationToken ct)
     {
+        var prefix = await EnsureDbContextAsync(name);
+
+        return await dbContextNamedFactory.CreateDbContextAsync(prefix, ct);
+    }
+
+    public async Task<string> EnsureDbContextAsync(DomainId appId, DomainId schemaId)
+    {
+        return await EnsureDbContextAsync(new DynamicContextName(appId, schemaId));
+    }
+
+    public async Task<string> EnsureDbContextAsync(DynamicContextName name)
+    {
         Guard.NotDefault(name);
 
-        async Task MigrateAsync()
+        async Task<string> PrepareAsync()
         {
-            using var dbContext = await dbContextFactory.CreateDbContextAsync(name.ToString(), default);
+            var prefix = await GetPrefixAsync(name);
 
-            await dbContext.MigrateAsync(default);
+            using var dbContext = await dbContextNamedFactory.CreateDbContextAsync(prefix, default);
+
+            // Make the prefix available as async local variable because migrations cannot use it otherwise.
+            TableName.Prefix = prefix;
+            await dbContext.Database.MigrateAsync(default);
+
+            return prefix;
         }
 
-        Task migration;
-        lock (dynamicMigrations)
+        Task<string> preparation;
+        lock (cachedMappings)
         {
-            if (!dynamicMigrations.TryGetValue(name, out var temp))
+            if (!cachedMappings.TryGetValue(name, out var temp))
             {
-                temp = MigrateAsync();
-                dynamicMigrations[name] = temp;
+                temp = PrepareAsync();
+                cachedMappings[name] = temp;
             }
 
-            migration = temp;
+            preparation = temp;
         }
 
-        await migration;
+        try
+        {
+            return await preparation;
+        }
+        catch
+        {
+            // Do not cache errors forever, otherwise we would not be able to recover.
+            lock (cachedMappings)
+            {
+                if (cachedMappings.TryGetValue(name, out var temp) && ReferenceEquals(temp, preparation))
+                {
+                    cachedMappings.Remove(name);
+                }
+            }
 
-        return await dbContextFactory.CreateDbContextAsync(name.ToString(), ct);
+            throw;
+        }
+    }
+
+    private async Task<string> GetPrefixAsync(DynamicContextName name)
+    {
+        var prefix = string.Empty;
+
+        await using var dbContext = await dbContextFactory.CreateDbContextAsync(default);
+#pragma warning disable RECS0022 // A catch clause that catches System.Exception and has an empty body
+        try
+        {
+            var entity = new EFContentTableEntity { AppId = name.AppId, SchemaId = name.SchemaId };
+
+            await dbContext.Set<EFContentTableEntity>().AddAsync(entity, default);
+            await dbContext.SaveChangesAsync(default);
+
+            prefix = Prefix(entity);
+        }
+        catch
+        {
+            // Very likely a unique index exception.
+        }
+#pragma warning restore RECS0022 // A catch clause that catches System.Exception and has an empty body
+
+        if (string.IsNullOrWhiteSpace(prefix))
+        {
+            var existing =
+                await dbContext.Set<EFContentTableEntity>().Where(x => x.AppId == name.AppId && x.SchemaId == name.SchemaId)
+                    .FirstOrDefaultAsync(default)
+                    ?? throw new InvalidOperationException("Cannot resolve mapping table for schema.");
+
+            prefix = Prefix(existing);
+        }
+
+        return prefix;
+    }
+
+    private static string Prefix(EFContentTableEntity entity)
+    {
+        return $"__c{entity.Id}_";
     }
 }

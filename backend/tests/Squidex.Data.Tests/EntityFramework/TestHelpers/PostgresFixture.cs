@@ -11,8 +11,6 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
-using Squidex.Infrastructure.Queries;
-using Squidex.Providers.Postgres;
 using Squidex.Providers.Postgres.Content;
 using Testcontainers.PostgreSql;
 
@@ -35,12 +33,13 @@ public class PostgresFixture(string? reuseId) : IAsyncLifetime, ISqlContentFixtu
     public IDbContextNamedFactory<PostgresContentDbContext> DbContextNamedFactory
         => services.GetRequiredService<IDbContextNamedFactory<PostgresContentDbContext>>();
 
-    public SqlDialect Dialect => PostgresDialect.Instance;
+    static PostgresFixture()
+    {
+        BulkHelper.Configure();
+    }
 
     public async Task InitializeAsync()
     {
-        BulkHelper.Configure();
-
         await postgreSql.StartAsync();
 
         var connectionString = postgreSql.GetConnectionString();

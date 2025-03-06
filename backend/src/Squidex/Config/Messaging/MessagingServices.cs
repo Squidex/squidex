@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.IO;
 using System.Text.Json;
 using Squidex.AI;
 using Squidex.Domain.Apps.Core.Subscriptions;

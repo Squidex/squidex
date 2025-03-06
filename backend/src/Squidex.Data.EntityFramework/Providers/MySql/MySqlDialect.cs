@@ -23,9 +23,9 @@ public sealed class MySqlDialect : SqlDialect
         return exception is MySqlException ex && ex.Number == 1061;
     }
 
-    public override string SelectTables()
+    public override string? JsonColumnType()
     {
-        return "SELECT table_name AS \"TableName\" FROM information_schema.tables WHERE table_schema = DATABASE();";
+        return "json";
     }
 
     public override string GeoIndex(string name, string table, string field)

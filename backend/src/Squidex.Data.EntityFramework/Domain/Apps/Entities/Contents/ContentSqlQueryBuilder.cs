@@ -10,7 +10,7 @@ using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public class ContentQueryBuilder(SqlDialect dialect, string table, SqlParams? parameters = null) : SqlQueryBuilder(dialect, table, parameters)
+public class ContentSqlQueryBuilder(SqlDialect dialect, string table, SqlParams? parameters = null) : SqlQueryBuilder(dialect, table, parameters)
 {
     public override PropertyPath Visit(PropertyPath path)
     {

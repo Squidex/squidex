@@ -43,13 +43,10 @@ using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Messaging;
-using Squidex.Providers.MySql;
 using Squidex.Providers.MySql.App;
 using Squidex.Providers.MySql.Content;
-using Squidex.Providers.Postgres;
 using Squidex.Providers.Postgres.App;
 using Squidex.Providers.Postgres.Content;
-using Squidex.Providers.SqlServer;
 using Squidex.Providers.SqlServer.App;
 using Squidex.Providers.SqlServer.Content;
 using YDotNet.Server.EntityFramework;
@@ -66,10 +63,10 @@ public static class ServiceExtensions
         {
             ["MySql"] = () =>
             {
+                var versionString = config.GetOptionalValue<string>("store:sql:version");
+
                 services.AddDbContextFactory<MySqlAppDbContext>(builder =>
                 {
-                    var versionString = config.GetOptionalValue<string>("store:sql:version");
-
                     var version =
                         !string.IsNullOrWhiteSpace(versionString) ?
                         ServerVersion.Parse(versionString) :
@@ -85,11 +82,10 @@ public static class ServiceExtensions
 
                 services.AddNamedDbContext((jsonSerializer, name) =>
                 {
-                    return new MySqlContentDbContext(name, connectionString, jsonSerializer);
+                    return new MySqlContentDbContext(name, connectionString, versionString, jsonSerializer);
                 });
 
                 services.AddSingleton(typeof(ISnapshotStore<>), typeof(MySqlSnapshotStore<>));
-                services.AddSingleton(MySqlDialect.Instance);
                 services.AddSquidexEntityFramework<MySqlAppDbContext, MySqlContentDbContext>(config);
             },
             ["Postgres"] = () =>
@@ -109,7 +105,6 @@ public static class ServiceExtensions
                 });
 
                 services.AddSingleton(typeof(ISnapshotStore<>), typeof(PostgresSnapshotStore<>));
-                services.AddSingleton(PostgresDialect.Instance);
                 services.AddSquidexEntityFramework<PostgresAppDbContext, PostgresContentDbContext>(config);
             },
             ["SqlServer"] = () =>
@@ -129,7 +124,6 @@ public static class ServiceExtensions
                 });
 
                 services.AddSingleton(typeof(ISnapshotStore<>), typeof(SqlServerSnapshotStore<>));
-                services.AddSingleton(SqlServerDialect.Instance);
                 services.AddSquidexEntityFramework<SqlServerAppDbContext, SqlServerContentDbContext>(config);
             },
         });
