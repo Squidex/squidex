@@ -30,57 +30,78 @@ public static class CommandFactory
 
     private static void UpsertEntry(UpsertIndexEntry upsert, List<object> args, string indexName)
     {
-        var geoField = string.Empty;
-        var geoObject = (object?)null;
+        var hasAddedDeletion = false;
+
+        void AddArgs(object arg)
+        {
+            if (!hasAddedDeletion)
+            {
+                args.Add(new
+                {
+                    index = new
+                    {
+                        _id = upsert.ToDocId(),
+                        _index = indexName,
+                    },
+                });
+            }
+
+            args.Add(arg);
+            hasAddedDeletion = true;
+        }
 
         if (upsert.GeoObjects != null)
         {
             foreach (var (key, value) in upsert.GeoObjects)
             {
-                if (value is Point point)
+                if (value is not Point point)
                 {
-                    geoField = key;
-                    geoObject = new
-                    {
-                        lat = point.Coordinate.X,
-                        lon = point.Coordinate.Y,
-                    };
-                    break;
+                    continue;
                 }
+
+                var geoField = key;
+                var geoObject = new
+                {
+                    lat = point.Coordinate.X,
+                    lon = point.Coordinate.Y,
+                };
+
+                AddArgs(new
+                {
+                    appId = upsert.UniqueContentId.AppId.ToString(),
+                    appName = string.Empty,
+                    contentId = upsert.UniqueContentId.ContentId.ToString(),
+                    schemaId = upsert.SchemaId.Id.ToString(),
+                    schemaName = upsert.SchemaId.Name,
+                    serveAll = upsert.ServeAll,
+                    servePublished = upsert.ServePublished,
+                    geoField,
+                    geoObject,
+                });
             }
         }
 
-        if (upsert.Texts != null || geoObject != null)
+        if (upsert.Texts is { Count: > 0 })
         {
-            args.Add(new
-            {
-                index = new
-                {
-                    _id = upsert.ToDocId(),
-                    _index = indexName,
-                },
-            });
-
             var texts = new Dictionary<string, string>();
 
-            if (upsert.Texts != null)
+            foreach (var (key, value) in upsert.Texts)
             {
-                foreach (var (key, value) in upsert.Texts)
+                var textMerged = value;
+                var textLanguage = ElasticSearchIndexDefinition.GetFieldName(key);
+
+                if (texts.TryGetValue(textLanguage, out var existing))
                 {
-                    var text = value;
+                    textMerged = $"{existing} {value}";
+                }
 
-                    var languageCode = ElasticSearchIndexDefinition.GetFieldName(key);
-
-                    if (texts.TryGetValue(languageCode, out var existing))
-                    {
-                        text = $"{existing} {value}";
-                    }
-
-                    texts[languageCode] = text;
+                if (!string.IsNullOrWhiteSpace(textMerged))
+                {
+                    texts[textLanguage] = textMerged;
                 }
             }
 
-            args.Add(new
+            AddArgs(new
             {
                 appId = upsert.UniqueContentId.AppId.ToString(),
                 appName = string.Empty,
@@ -90,8 +111,6 @@ public static class CommandFactory
                 serveAll = upsert.ServeAll,
                 servePublished = upsert.ServePublished,
                 texts,
-                geoField,
-                geoObject,
             });
         }
     }

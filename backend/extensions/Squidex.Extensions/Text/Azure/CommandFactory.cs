@@ -32,58 +32,72 @@ public static class CommandFactory
 
     private static void UpsertTextEntry(UpsertIndexEntry upsert, IList<IndexDocumentsAction<SearchDocument>> batch)
     {
-        var geoField = string.Empty;
-        var geoObject = (object?)null;
-
         if (upsert.GeoObjects != null)
         {
             foreach (var (key, value) in upsert.GeoObjects)
             {
-                if (value is Point point)
+                if (value is not Point point)
                 {
-                    geoField = key;
-                    geoObject = new
-                    {
-                        type = "Point",
-                        coordinates = new[]
-                        {
-                            point.Coordinate.X,
-                            point.Coordinate.Y,
-                        },
-                    };
-                    break;
+                    continue;
                 }
+
+                var geoField = key;
+                var geoObject = new
+                {
+                    type = "Point",
+                    coordinates = new[]
+                    {
+                        point.Coordinate.X,
+                        point.Coordinate.Y,
+                    },
+                };
+
+                var geoDocument = new SearchDocument
+                {
+                    ["docId"] = upsert.ToDocId(),
+                    ["appId"] = upsert.UniqueContentId.AppId.ToString(),
+                    ["appName"] = string.Empty,
+                    ["contentId"] = upsert.UniqueContentId.ContentId.ToString(),
+                    ["schemaId"] = upsert.SchemaId.Id.ToString(),
+                    ["schemaName"] = upsert.SchemaId.Name,
+                    ["serveAll"] = upsert.ServeAll,
+                    ["servePublished"] = upsert.ServePublished,
+                    ["geoField"] = geoField,
+                    ["geoObject"] = geoObject,
+                };
+
+                batch.Add(IndexDocumentsAction.MergeOrUpload(geoDocument));
             }
         }
 
-        if (upsert.Texts != null && geoObject != null)
+        if (upsert.Texts is { Count: > 0 })
         {
             var document = new SearchDocument
             {
                 ["docId"] = upsert.ToDocId(),
                 ["appId"] = upsert.UniqueContentId.AppId.ToString(),
                 ["appName"] = string.Empty,
-                ["contentId"] = upsert.UniqueContentId.ToString(),
+                ["contentId"] = upsert.UniqueContentId.ContentId.ToString(),
                 ["schemaId"] = upsert.SchemaId.Id.ToString(),
                 ["schemaName"] = upsert.SchemaId.Name,
                 ["serveAll"] = upsert.ServeAll,
                 ["servePublished"] = upsert.ServePublished,
-                ["geoField"] = geoField,
-                ["geoObject"] = geoObject,
             };
 
             foreach (var (key, value) in upsert.Texts)
             {
-                var text = value;
+                var textMerged = value;
+                var textLanguage = AzureIndexDefinition.GetFieldName(key);
 
-                var languageCode = AzureIndexDefinition.GetFieldName(key);
-
-                if (document.TryGetValue(languageCode, out var existing))
+                if (document.TryGetValue(textLanguage, out var existing))
                 {
-                    text = $"{existing} {value}";
+                    textMerged = $"{existing} {value}";
                 }
 
-                document[languageCode] = text;
+                if (!string.IsNullOrWhiteSpace(textMerged))
+                {
+                    document[textLanguage] = textMerged;
+                }
             }
 
             batch.Add(IndexDocumentsAction.MergeOrUpload(document));
