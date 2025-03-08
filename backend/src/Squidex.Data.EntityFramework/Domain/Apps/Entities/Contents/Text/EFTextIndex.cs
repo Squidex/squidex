@@ -18,8 +18,9 @@ using Squidex.Providers.SqlServer;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
-public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextFactory, SqlDialect dialect)
-    : ITextIndex, IInitializable, IDeleter where TContext : DbContext
+public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextFactory)
+    : ITextIndex, IInitializable, IDeleter
+    where TContext : DbContext, IDbContextWithDialect
 {
     private record struct SearchOperation
     {
@@ -39,8 +40,8 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
     {
         await using var dbContext = await CreateDbContextAsync(ct);
 
-        await dbContext.Database.CreateTextIndexAsync(dialect, "IDX_Text", "Texts", "Texts", ct);
-        await dbContext.Database.CreateGeoIndexAsync(dialect, "IDX_Geo", "Geos", "GeoObject", ct);
+        await dbContext.CreateTextIndexAsync("IDX_Text", "Texts", "Texts", ct);
+        await dbContext.CreateGeoIndexAsync("IDX_Geo", "Geos", "GeoObject", ct);
     }
 
     async Task IDeleter.DeleteAppAsync(App app,
@@ -148,11 +149,11 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
         return search.Results.OrderByDescending(x => x.Score).Select(x => x.Id).Distinct().ToList();
     }
 
-    private Task SearchBySchemaAsync(TContext context, SearchOperation search, IEnumerable<DomainId> schemaIds, double factor,
+    private static Task SearchBySchemaAsync(TContext context, SearchOperation search, IEnumerable<DomainId> schemaIds, double factor,
         CancellationToken ct = default)
     {
         var queryBuilder =
-            new SqlQueryBuilder(dialect, "Texts")
+            context.Query<EFTextIndexTextEntity>()
                 .Where(ClrFilter.Eq("AppId", search.App.Id))
                 .Where(ClrFilter.In("SchemaId", schemaIds.ToList()))
                 .WhereMatch("Texts", search.SearchTerms)
@@ -161,11 +162,11 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
         return SearchAsync(context, search, queryBuilder, factor, ct);
     }
 
-    private Task SearchByAppAsync(TContext context, SearchOperation search, double factor,
+    private static Task SearchByAppAsync(TContext context, SearchOperation search, double factor,
         CancellationToken ct = default)
     {
         var queryBuilder =
-            new SqlQueryBuilder(dialect, "Texts")
+            context.Query<EFTextIndexTextEntity>()
                 .Where(ClrFilter.Eq("AppId", search.App.Id))
                 .WhereMatch("Texts", search.SearchTerms)
                 .WhereScope(search.SearchScope);
@@ -242,7 +243,7 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
                             };
 
                             // We can only check the validatity by inserting them one by one.
-                            if (dialect is SqlServerDialect)
+                            if (dbContext.Dialect is SqlServerDialect)
                             {
                                 try
                                 {

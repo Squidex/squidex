@@ -10,7 +10,9 @@
 	<EnforceExtendedAnalyzerRules>true</EnforceExtendedAnalyzerRules>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Template.handlebar" />
+    <Compile Remove="Providers\**" />
+    <EmbeddedResource Remove="Providers\**" />
+    <None Remove="Providers\**" />
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Handlebars.Net" Version="2.1.6" PrivateAssets="all" GeneratePathProperty="true" />
@@ -37,6 +39,7 @@
     <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Template.handlebar" />
+    <EmbeddedResource Include="FixtureTemplate.handlebar" />
+    <EmbeddedResource Include="TestTemplate.handlebar" />
   </ItemGroup>
 </Project>

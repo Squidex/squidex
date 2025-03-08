@@ -10,52 +10,58 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Hosting;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
-using Squidex.Infrastructure.Queries;
-using Squidex.Providers.SqlServer;
+using Squidex.Providers.SqlServer.Content;
 using Testcontainers.MsSql;
-
-#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.EntityFramework.TestHelpers;
 
-[CollectionDefinition("SqlServer")]
-public sealed class SqlServerFixtureCollection : ICollectionFixture<SqlServerFixture>
-{
-}
-
-public sealed class SqlServerFixture : IAsyncLifetime, ISqlFixture<TestDbContextSqlServer>
+public class SqlServerFixture(string? reuseId = null) : IAsyncLifetime, ISqlContentFixture<TestDbContextSqlServer, SqlServerContentDbContext>
 {
     private readonly MsSqlContainer sqlServer =
         new MsSqlBuilder()
             .WithImage("vibs2006/sql_server_fts")
             .WithReuse(true)
-            .WithLabel("reuse-id", "squidex-mssql")
+            .WithLabel("reuse-id", reuseId)
             .Build();
 
     private IServiceProvider services;
 
-    public IDbContextFactory<TestDbContextSqlServer> DbContextFactory => services.GetRequiredService<IDbContextFactory<TestDbContextSqlServer>>();
+    public IDbContextFactory<TestDbContextSqlServer> DbContextFactory
+        => services.GetRequiredService<IDbContextFactory<TestDbContextSqlServer>>();
 
-    public SqlDialect Dialect => SqlServerDialect.Instance;
+    public IDbContextNamedFactory<SqlServerContentDbContext> DbContextNamedFactory
+        => services.GetRequiredService<IDbContextNamedFactory<SqlServerContentDbContext>>();
+
+    static SqlServerFixture()
+    {
+        BulkHelper.Configure();
+    }
 
     public async Task InitializeAsync()
     {
         await sqlServer.StartAsync();
         await sqlServer.ExecScriptAsync($"create database squidex;");
 
+        var connectionString = GetConnectionString();
+
         services =
             new ServiceCollection()
-                 .AddDbContextFactory<TestDbContextSqlServer>(b =>
-                 {
-                     b.UseSqlServer(GetConnectionString(), options =>
-                     {
-                         options.UseNetTopologySuite();
-                     });
-                 })
-                 .AddSingletonAs<DatabaseCreator<TestDbContextSqlServer>>().Done()
-                 .AddSingleton(TestUtils.DefaultSerializer)
-                 .BuildServiceProvider();
+                .AddDbContextFactory<TestDbContextSqlServer>(b =>
+                {
+                    b.UseSqlServer(connectionString, options =>
+                    {
+                        options.UseNetTopologySuite();
+                    });
+                })
+                .AddNamedDbContext((jsonSerializer, name) =>
+                {
+                    return new SqlServerContentDbContext(name, connectionString, jsonSerializer);
+                })
+                .AddSingletonAs<DatabaseCreator<TestDbContextSqlServer>>().Done()
+                .AddSingleton(TestUtils.DefaultSerializer)
+                .BuildServiceProvider();
 
         foreach (var service in services.GetRequiredService<IEnumerable<IInitializable>>())
         {

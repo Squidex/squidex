@@ -10,15 +10,17 @@ using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.EntityFramework.TestHelpers;
+using Squidex.Infrastructure;
 using Squidex.Shared;
 
 namespace Squidex.EntityFramework.Domain.Contents.Text;
 
-public abstract class EFTextIndexerStateTests<TContext>(ISqlFixture<TContext> fixture) : TextIndexerStateTests where TContext : DbContext
+public abstract class EFTextIndexerStateTests<TContext>(ISqlFixture<TContext> fixture) : TextIndexerStateTests
+    where TContext : DbContext, IDbContextWithDialect
 {
     protected override Task<ITextIndexerState> CreateSutAsync(IContentRepository contentRepository)
     {
-        var sut = new EFTextIndexerState<TContext>(fixture.DbContextFactory, fixture.Dialect, contentRepository);
+        var sut = new EFTextIndexerState<TContext>(fixture.DbContextFactory, contentRepository);
 
         return Task.FromResult<ITextIndexerState>(sut);
     }

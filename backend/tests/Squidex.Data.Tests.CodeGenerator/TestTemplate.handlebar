@@ -1,0 +1,48 @@
+#pragma warning disable
+// Auto-generated code
+using Squidex.EntityFramework.TestHelpers;
+{{#if HasContentContext}}
+using Squidex.Providers.MySql.Content;
+using Squidex.Providers.Postgres.Content;
+using Squidex.Providers.SqlServer.Content;
+{{/if}}
+
+namespace {{classNamespace}};
+
+{{#if HasContentContext}}
+[Trait("Category", "TestContainer")]
+[Collection("Postgres{{CollectionSuffix}}")]
+public class Postgres{{className}}(Postgres{{CollectionSuffix}}Fixture fixture) : {{baseName}}<TestDbContextPostgres, PostgresContentDbContext>(fixture)
+{
+}
+
+[Trait("Category", "TestContainer")]
+[Collection("MySql{{CollectionSuffix}}")]
+public class MySql{{className}}(MySql{{CollectionSuffix}}Fixture fixture) : {{baseName}}<TestDbContextMySql, MySqlContentDbContext>(fixture)
+{
+}
+
+[Trait("Category", "TestContainer")]
+[Collection("SqlServer{{CollectionSuffix}}")]
+public class SqlServer{{className}}(SqlServer{{CollectionSuffix}}Fixture fixture) : {{baseName}}<TestDbContextSqlServer, SqlServerContentDbContext>(fixture)
+{
+}
+{{else}}
+[Trait("Category", "TestContainer")]
+[Collection("Postgres{{CollectionSuffix}}")]
+public class Postgres{{className}}(Postgres{{CollectionSuffix}}Fixture fixture) : {{baseName}}<TestDbContextPostgres>(fixture)
+{
+}
+
+[Trait("Category", "TestContainer")]
+[Collection("MySql{{CollectionSuffix}}")]
+public class MySql{{className}}(MySql{{CollectionSuffix}}Fixture fixture) : {{baseName}}<TestDbContextMySql>(fixture)
+{
+}
+
+[Trait("Category", "TestContainer")]
+[Collection("SqlServer{{CollectionSuffix}}")]
+public class SqlServer{{className}}(SqlServer{{CollectionSuffix}}Fixture fixture) : {{baseName}}<TestDbContextSqlServer>(fixture)
+{
+}
+{{/if}}

@@ -3,19 +3,19 @@ $ErrorActionPreference = 'Stop'
 
 $migrationName = $args[0]
 
-dotnet ef migrations add $migrationName --context MysqlDbContext -o Providers/MySql/Migrations
+dotnet ef migrations add $migrationName --context MysqlAppDbContext -o Providers/MySql/App/Migrations
 if (!$?) { 
     Write-Error "Creating migration failed for MySql"
     exit 1 
 }
 
-dotnet ef migrations add $migrationName --context PostgresDbContext -o Providers/Postgres/Migrations
+dotnet ef migrations add $migrationName --context PostgresAppDbContext -o Providers/Postgres/App/Migrations
 if (!$?) { 
     Write-Error "Creating migration failed for Postgres"
     exit 1 
 }
 
-dotnet ef migrations add $migrationName --context SqlServerDbContext -o Providers/SqlServer/Migrations
+dotnet ef migrations add $migrationName --context SqlServerAppDbContext -o Providers/SqlServer/App/Migrations
 if (!$?) { 
     Write-Error "Creating migration failed for SqlServer"
     exit 1 

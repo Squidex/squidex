@@ -9,52 +9,57 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Hosting;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
-using Squidex.Infrastructure.Queries;
-using Squidex.Providers.Postgres;
+using Squidex.Providers.Postgres.Content;
 using Testcontainers.PostgreSql;
-
-#pragma warning disable CA1822 // Mark members as static
-#pragma warning disable MA0048 // File name must match type name
 
 namespace Squidex.EntityFramework.TestHelpers;
 
-[CollectionDefinition("Postgres")]
-public sealed class PostgresFixtureCollection : ICollectionFixture<PostgresFixture>
-{
-}
-
-public sealed class PostgresFixture : IAsyncLifetime, ISqlFixture<TestDbContextPostgres>
+public class PostgresFixture(string? reuseId) : IAsyncLifetime, ISqlContentFixture<TestDbContextPostgres, PostgresContentDbContext>
 {
     private readonly PostgreSqlContainer postgreSql =
         new PostgreSqlBuilder()
             .WithImage("postgis/postgis")
             .WithReuse(true)
-            .WithLabel("reuse-id", "squidex-postgres")
+            .WithLabel("reuse-id", reuseId)
             .Build();
 
     private IServiceProvider services;
 
-    public IDbContextFactory<TestDbContextPostgres> DbContextFactory => services.GetRequiredService<IDbContextFactory<TestDbContextPostgres>>();
+    public IDbContextFactory<TestDbContextPostgres> DbContextFactory
+        => services.GetRequiredService<IDbContextFactory<TestDbContextPostgres>>();
 
-    public SqlDialect Dialect => PostgresDialect.Instance;
+    public IDbContextNamedFactory<PostgresContentDbContext> DbContextNamedFactory
+        => services.GetRequiredService<IDbContextNamedFactory<PostgresContentDbContext>>();
+
+    static PostgresFixture()
+    {
+        BulkHelper.Configure();
+    }
 
     public async Task InitializeAsync()
     {
         await postgreSql.StartAsync();
 
+        var connectionString = postgreSql.GetConnectionString();
+
         services =
             new ServiceCollection()
-                 .AddDbContextFactory<TestDbContextPostgres>(b =>
-                 {
-                     b.UseNpgsql(postgreSql.GetConnectionString(), options =>
-                     {
-                         options.UseNetTopologySuite();
-                     });
-                 })
-                 .AddSingletonAs<DatabaseCreator<TestDbContextPostgres>>().Done()
-                 .AddSingleton(TestUtils.DefaultSerializer)
-                 .BuildServiceProvider();
+                .AddDbContextFactory<TestDbContextPostgres>(b =>
+                {
+                    b.UseNpgsql(connectionString, options =>
+                    {
+                        options.UseNetTopologySuite();
+                    });
+                })
+                .AddNamedDbContext((jsonSerializer, name) =>
+                {
+                    return new PostgresContentDbContext(name, connectionString, jsonSerializer);
+                })
+                .AddSingletonAs<DatabaseCreator<TestDbContextPostgres>>().Done()
+                .AddSingleton(TestUtils.DefaultSerializer)
+                .BuildServiceProvider();
 
         foreach (var service in services.GetRequiredService<IEnumerable<IInitializable>>())
         {

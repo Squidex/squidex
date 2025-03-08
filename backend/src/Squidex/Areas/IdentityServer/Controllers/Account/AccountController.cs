@@ -17,7 +17,6 @@ using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Translations;
 using Squidex.Shared.Identity;
 using Squidex.Shared.Users;
-using Squidex.Web;
 
 namespace Squidex.Areas.IdentityServer.Controllers.Account;
 

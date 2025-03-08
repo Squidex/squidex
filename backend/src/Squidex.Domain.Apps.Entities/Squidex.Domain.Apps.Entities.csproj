@@ -12,8 +12,11 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Remove="Notifications\**" />
+    <Compile Remove="Providers\**" />
     <EmbeddedResource Remove="Notifications\**" />
+    <EmbeddedResource Remove="Providers\**" />
     <None Remove="Notifications\**" />
+    <None Remove="Providers\**" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Squidex.Domain.Apps.Core.Model\Squidex.Domain.Apps.Core.Model.csproj" />

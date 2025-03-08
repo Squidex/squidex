@@ -84,7 +84,9 @@ public abstract class SnapshotStoreTests<TEntity>
         var sourceKey = DomainId.NewGuid();
         var sourceValue = CreateEntity(sourceKey, 0);
 
-        await sut.WriteAsync(new SnapshotWriteJob<TEntity>(sourceKey, sourceValue, 2, 1));
+        var act = () => sut.WriteAsync(new SnapshotWriteJob<TEntity>(sourceKey, sourceValue, 2, 1));
+
+        await act.Should().NotThrowAsync();
     }
 
     [Fact]

@@ -6,22 +6,27 @@
 // ==========================================================================
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public sealed partial class EFContentRepository<TContext>(
-    IDbContextFactory<TContext> dbContextFactory, IAppProvider appProvider,
-    SqlDialect dialect)
-    : IContentRepository where TContext : DbContext
+public sealed partial class EFContentRepository<TContext, TContentContext>(
+    IDbContextFactory<TContext> dbContextFactory,
+    IDbContextNamedFactory<TContentContext> dbContentContextFactory,
+    IAppProvider appProvider,
+    IOptions<ContentsOptions> options)
+    : IContentRepository
+    where TContext : DbContext, IDbContextWithDialect where TContentContext : ContentDbContext
 {
+    private readonly DynamicTables<TContext, TContentContext> dynamicTables = new DynamicTables<TContext, TContentContext>(dbContextFactory, dbContentContextFactory);
+
     public async Task<Content?> FindContentAsync(App app, Schema schema, DomainId id, SearchScope scope,
         CancellationToken ct = default)
     {
@@ -85,7 +90,7 @@ public sealed partial class EFContentRepository<TContext>(
     }
 
     public async Task<bool> HasReferrersAsync<TReference>(DomainId appId, DomainId reference,
-        CancellationToken ct = default) where TReference : EFReferenceEntity
+        CancellationToken ct = default) where TReference : EFContentReferenceEntity
     {
         using (Telemetry.Activities.StartActivity("EFContentRepository/QueryIdsAsync"))
         {
@@ -140,8 +145,9 @@ public sealed partial class EFContentRepository<TContext>(
         return Task.CompletedTask;
     }
 
-    private Task<TContext> CreateDbContextAsync(CancellationToken ct)
+    private async Task<TContext> CreateDbContextAsync(
+        CancellationToken ct)
     {
-        return dbContextFactory.CreateDbContextAsync(ct);
+        return await dbContextFactory.CreateDbContextAsync(ct);
     }
 }

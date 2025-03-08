@@ -5,14 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using EFCore.BulkExtensions.SqlAdapters;
-using EFCore.BulkExtensions.SqlAdapters.MySql;
-using EFCore.BulkExtensions.SqlAdapters.PostgreSql;
-using EFCore.BulkExtensions.SqlAdapters.SqlServer;
 using Microsoft.EntityFrameworkCore;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.States;
+using Squidex.Providers.MySql;
+using Squidex.Providers.Postgres;
+using Squidex.Providers.SqlServer;
 using Squidex.Shared;
 
 #pragma warning disable CS9107 // Parameter is captured into the state of the enclosing type and its value is also passed to the base constructor. The value might be captured by the base class as well.
@@ -23,59 +23,31 @@ namespace Squidex.EntityFramework.TestHelpers;
 public class TestDbContextMySql(DbContextOptions options, IJsonSerializer jsonSerializer)
     : TestDbContext(options, jsonSerializer)
 {
-    public static readonly IDbServer Server = new MySqlDbServer();
-
-    protected override string? JsonColumnType()
-    {
-        return "json";
-    }
+    public override SqlDialect Dialect => MySqlDialect.Instance;
 }
 
 public class TestDbContextPostgres(DbContextOptions options, IJsonSerializer jsonSerializer)
     : TestDbContext(options, jsonSerializer)
 {
-    public static readonly IDbServer Server = new PostgreSqlDbServer();
-
-    protected override string? JsonColumnType()
-    {
-        return "jsonb";
-    }
+    public override SqlDialect Dialect => PostgresDialect.Instance;
 }
 
 public class TestDbContextSqlServer(DbContextOptions options, IJsonSerializer jsonSerializer)
     : TestDbContext(options, jsonSerializer)
 {
-    public static readonly IDbServer Server = new SqlServerDbServer();
+    public override SqlDialect Dialect => SqlServerDialect.Instance;
 }
 
-public class TestDbContext(DbContextOptions options, IJsonSerializer jsonSerializer)
+public abstract class TestDbContext(DbContextOptions options, IJsonSerializer jsonSerializer)
     : AppDbContext(options, jsonSerializer)
 {
-    static TestDbContext()
-    {
-        SqlAdaptersMapping.Provider = context =>
-        {
-            switch (context)
-            {
-                case TestDbContextMySql:
-                    return TestDbContextMySql.Server;
-                case TestDbContextPostgres:
-                    return TestDbContextPostgres.Server;
-                case TestDbContextSqlServer:
-                    return TestDbContextSqlServer.Server;
-            }
-
-            throw new ArgumentException("Not supported.", nameof(context));
-        };
-    }
-
     protected override void OnModelCreating(ModelBuilder builder)
     {
-        builder.UseSnapshot<SnapshotValue, EFState<SnapshotValue>>(jsonSerializer, JsonColumnType());
+        builder.UseSnapshot<SnapshotValue, EFState<SnapshotValue>>(jsonSerializer, Dialect.JsonColumnType());
 
         builder.Entity<TestEntity>(b =>
         {
-            b.Property(x => x.Json).AsJsonString(jsonSerializer, JsonColumnType());
+            b.Property(x => x.Json).AsJsonString(jsonSerializer, Dialect.JsonColumnType());
         });
 
         base.OnModelCreating(builder);

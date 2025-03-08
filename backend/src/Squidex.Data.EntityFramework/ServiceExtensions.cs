@@ -7,7 +7,6 @@
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -37,15 +36,19 @@ using Squidex.Domain.Apps.Entities.Schemas.Repositories;
 using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Domain.Apps.Entities.Teams.Repositories;
 using Squidex.Domain.Users;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
 using Squidex.Messaging;
-using Squidex.Providers.MySql;
-using Squidex.Providers.Postgres;
-using Squidex.Providers.SqlServer;
+using Squidex.Providers.MySql.App;
+using Squidex.Providers.MySql.Content;
+using Squidex.Providers.Postgres.App;
+using Squidex.Providers.Postgres.Content;
+using Squidex.Providers.SqlServer.App;
+using Squidex.Providers.SqlServer.Content;
 using YDotNet.Server.EntityFramework;
 
 namespace Squidex;
@@ -60,16 +63,16 @@ public static class ServiceExtensions
         {
             ["MySql"] = () =>
             {
-                services.AddDbContextFactory<MySqlDbContext>(builder =>
-                {
-                    var versionString = config.GetOptionalValue<string>("store:sql:version");
+                var versionString = config.GetOptionalValue<string>("store:sql:version");
 
+                services.AddDbContextFactory<MySqlAppDbContext>(builder =>
+                {
                     var version =
                         !string.IsNullOrWhiteSpace(versionString) ?
                         ServerVersion.Parse(versionString) :
                         ServerVersion.AutoDetect(connectionString);
 
-                    builder.ConfigureWarnings(w => w.Ignore(CoreEventId.CollectionWithoutComparer));
+                    builder.SetDefaultWarnings();
                     builder.UseMySql(connectionString, version, options =>
                     {
                         options.UseNetTopologySuite();
@@ -77,44 +80,58 @@ public static class ServiceExtensions
                     });
                 });
 
+                services.AddNamedDbContext((jsonSerializer, name) =>
+                {
+                    return new MySqlContentDbContext(name, connectionString, versionString, jsonSerializer);
+                });
+
                 services.AddSingleton(typeof(ISnapshotStore<>), typeof(MySqlSnapshotStore<>));
-                services.AddSingleton(MySqlDialect.Instance);
-                services.AddSquidexEntityFramework<MySqlDbContext>(config);
+                services.AddSquidexEntityFramework<MySqlAppDbContext, MySqlContentDbContext>(config);
             },
             ["Postgres"] = () =>
             {
-                services.AddDbContextFactory<PostgresDbContext>(builder =>
+                services.AddDbContextFactory<PostgresAppDbContext>(builder =>
                 {
-                    builder.ConfigureWarnings(w => w.Ignore(CoreEventId.CollectionWithoutComparer));
+                    builder.SetDefaultWarnings();
                     builder.UseNpgsql(connectionString, options =>
                     {
                         options.UseNetTopologySuite();
                     });
                 });
 
+                services.AddNamedDbContext((jsonSerializer, name) =>
+                {
+                    return new PostgresContentDbContext(name, connectionString, jsonSerializer);
+                });
+
                 services.AddSingleton(typeof(ISnapshotStore<>), typeof(PostgresSnapshotStore<>));
-                services.AddSingleton(PostgresDialect.Instance);
-                services.AddSquidexEntityFramework<PostgresDbContext>(config);
+                services.AddSquidexEntityFramework<PostgresAppDbContext, PostgresContentDbContext>(config);
             },
             ["SqlServer"] = () =>
             {
-                services.AddDbContextFactory<SqlServerDbContext>(builder =>
+                services.AddDbContextFactory<SqlServerAppDbContext>(builder =>
                 {
-                    builder.ConfigureWarnings(w => w.Ignore(CoreEventId.CollectionWithoutComparer));
+                    builder.SetDefaultWarnings();
                     builder.UseSqlServer(connectionString, options =>
                     {
                         options.UseNetTopologySuite();
                     });
                 });
 
+                services.AddNamedDbContext((jsonSerializer, name) =>
+                {
+                    return new SqlServerContentDbContext(name, connectionString, jsonSerializer);
+                });
+
                 services.AddSingleton(typeof(ISnapshotStore<>), typeof(SqlServerSnapshotStore<>));
-                services.AddSingleton(SqlServerDialect.Instance);
-                services.AddSquidexEntityFramework<SqlServerDbContext>(config);
+                services.AddSquidexEntityFramework<SqlServerAppDbContext, SqlServerContentDbContext>(config);
             },
         });
     }
 
-    private static void AddSquidexEntityFramework<TContext>(this IServiceCollection services, IConfiguration config) where TContext : AppDbContext
+    private static void AddSquidexEntityFramework<TContext, TContextContext>(this IServiceCollection services, IConfiguration config)
+        where TContext : AppDbContext
+        where TContextContext : ContentDbContext
     {
         if (config.GetValue<bool>("store:sql:runMigration"))
         {
@@ -158,7 +175,7 @@ public static class ServiceExtensions
         services.AddSingletonAs<EFAssetFolderRepository<TContext>>()
             .As<IAssetFolderRepository>().As<ISnapshotStore<AssetFolder>>().As<IDeleter>();
 
-        services.AddSingletonAs<EFContentRepository<TContext>>()
+        services.AddSingletonAs<EFContentRepository<TContext, TContextContext>>()
             .As<IContentRepository>().As<ISnapshotStore<WriteContent>>().As<IDeleter>();
 
         services.AddSingletonAs<EFHistoryEventRepository<TContext>>()
@@ -200,17 +217,17 @@ public static class ServiceExtensions
         {
             ["MySql"] = () =>
             {
-                services.AddEntityFrameworkEventStore<MySqlDbContext>(config)
+                services.AddEntityFrameworkEventStore<MySqlAppDbContext>(config)
                     .AddMysqlAdapter();
             },
             ["Postgres"] = () =>
             {
-                services.AddEntityFrameworkEventStore<PostgresDbContext>(config)
+                services.AddEntityFrameworkEventStore<PostgresAppDbContext>(config)
                     .AddPostgresAdapter();
             },
             ["SqlServer"] = () =>
             {
-                services.AddEntityFrameworkEventStore<SqlServerDbContext>(config)
+                services.AddEntityFrameworkEventStore<SqlServerAppDbContext>(config)
                     .AddSqlServerAdapter();
             },
         });
@@ -222,33 +239,33 @@ public static class ServiceExtensions
         {
             ["MySql"] = () =>
             {
-                messaging.AddEntityFrameworkTransport<MySqlDbContext>(config);
+                messaging.AddEntityFrameworkTransport<MySqlAppDbContext>(config);
             },
             ["Postgres"] = () =>
             {
-                messaging.AddEntityFrameworkTransport<PostgresDbContext>(config);
+                messaging.AddEntityFrameworkTransport<PostgresAppDbContext>(config);
             },
             ["SqlServer"] = () =>
             {
-                messaging.AddEntityFrameworkTransport<SqlServerDbContext>(config);
+                messaging.AddEntityFrameworkTransport<SqlServerAppDbContext>(config);
             },
         });
 
         return messaging;
     }
 
-    public class MySqlSnapshotStore<T>(IDbContextFactory<MySqlDbContext> dbContextFactory)
-        : EFSnapshotStore<MySqlDbContext, T, EFState<T>>(dbContextFactory)
+    public class MySqlSnapshotStore<T>(IDbContextFactory<MySqlAppDbContext> dbContextFactory)
+        : EFSnapshotStore<MySqlAppDbContext, T, EFState<T>>(dbContextFactory)
     {
     }
 
-    public class PostgresSnapshotStore<T>(IDbContextFactory<PostgresDbContext> dbContextFactory)
-        : EFSnapshotStore<PostgresDbContext, T, EFState<T>>(dbContextFactory)
+    public class PostgresSnapshotStore<T>(IDbContextFactory<PostgresAppDbContext> dbContextFactory)
+        : EFSnapshotStore<PostgresAppDbContext, T, EFState<T>>(dbContextFactory)
     {
     }
 
-    public class SqlServerSnapshotStore<T>(IDbContextFactory<SqlServerDbContext> dbContextFactory)
-        : EFSnapshotStore<SqlServerDbContext, T, EFState<T>>(dbContextFactory)
+    public class SqlServerSnapshotStore<T>(IDbContextFactory<SqlServerAppDbContext> dbContextFactory)
+        : EFSnapshotStore<SqlServerAppDbContext, T, EFState<T>>(dbContextFactory)
     {
     }
 

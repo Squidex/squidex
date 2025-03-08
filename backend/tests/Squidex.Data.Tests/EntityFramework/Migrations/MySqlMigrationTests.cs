@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure.Migrations;
-using Squidex.Providers.MySql;
+using Squidex.Providers.MySql.App;
 using Testcontainers.MySql;
 
 namespace Squidex.EntityFramework.Migrations;
@@ -34,7 +34,7 @@ public class MySqlMigrationTests : IAsyncLifetime
     {
         var services =
             new ServiceCollection()
-                 .AddDbContextFactory<MySqlDbContext>(b =>
+                 .AddDbContextFactory<MySqlAppDbContext>(b =>
                  {
                      var connectionString = mysql.GetConnectionString();
 
@@ -45,11 +45,11 @@ public class MySqlMigrationTests : IAsyncLifetime
                      });
                  })
                  .AddSingleton(TestUtils.DefaultSerializer)
-                 .AddSingleton<DatabaseMigrator<MySqlDbContext>>()
+                 .AddSingleton<DatabaseMigrator<MySqlAppDbContext>>()
                  .BuildServiceProvider();
 
-        var databaseMigrator = services.GetRequiredService<DatabaseMigrator<MySqlDbContext>>();
-        var databaseFactory = services.GetRequiredService<IDbContextFactory<MySqlDbContext>>();
+        var databaseMigrator = services.GetRequiredService<DatabaseMigrator<MySqlAppDbContext>>();
+        var databaseFactory = services.GetRequiredService<IDbContextFactory<MySqlAppDbContext>>();
 
         await databaseMigrator.InitializeAsync(default);
 

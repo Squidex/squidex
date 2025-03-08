@@ -305,7 +305,7 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
         }
     }
 
-    public async Task AddCollectionsAsync(MongoContentEntity entity, Action<IMongoCollection<MongoContentEntity>, MongoContentEntity> add,
+    public async Task AddToCollectionsAsync(MongoContentEntity entity, Action<IMongoCollection<MongoContentEntity>, MongoContentEntity> add,
         CancellationToken ct)
     {
         if (queryInDedicatedCollection != null)

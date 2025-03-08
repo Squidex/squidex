@@ -11,7 +11,8 @@ using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Entities.Assets;
 
-internal sealed class AssetSqlQueryBuilder(SqlDialect dialect) : SqlQueryBuilder(dialect, "Assets")
+internal sealed class AssetSqlQueryBuilder(SqlDialect dialect, string tableName, SqlParams? parameters = null)
+    : SqlQueryBuilder(dialect, tableName, parameters)
 {
     public override string Visit(CompareFilter<ClrValue> nodeIn, None args)
     {

@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Google.Protobuf.WellKnownTypes;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Contents;

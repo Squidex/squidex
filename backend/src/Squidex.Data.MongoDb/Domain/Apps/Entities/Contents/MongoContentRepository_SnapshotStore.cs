@@ -108,6 +108,13 @@ public partial class MongoContentRepository : ISnapshotStore<WriteContent>, IDel
     async Task ISnapshotStore<WriteContent>.WriteManyAsync(IEnumerable<SnapshotWriteJob<WriteContent>> jobs,
         CancellationToken ct)
     {
+        // Some data is corrupt and might throw an exception if we do not ignore it.
+        var validJobs = jobs.Where(x => IsValid(x.Value)).ToList();
+        if (validJobs.Count == 0)
+        {
+            return;
+        }
+
         using (Telemetry.Activities.StartActivity("MongoContentRepository/WriteManyAsync"))
         {
             var collectionUpdates = new Dictionary<IMongoCollection<MongoContentEntity>, List<MongoContentEntity>>();
@@ -121,11 +128,11 @@ public partial class MongoContentRepository : ISnapshotStore<WriteContent>, IDel
             {
                 if (job.Value.ShouldWritePublished())
                 {
-                    await collectionPublished.AddCollectionsAsync(
+                    await collectionPublished.AddToCollectionsAsync(
                         await MongoContentEntity.CreatePublishedAsync(job, appProvider, ct), add, ct);
                 }
 
-                await collectionComplete.AddCollectionsAsync(
+                await collectionComplete.AddToCollectionsAsync(
                     await MongoContentEntity.CreateCompleteAsync(job, appProvider, ct), add, ct);
             }
 

@@ -7,8 +7,11 @@
 
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
+using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Entities;
+using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.States;
 
@@ -16,6 +19,22 @@ namespace Squidex.Infrastructure;
 
 public static class Extensions
 {
+    public static IServiceCollection AddNamedDbContext<TContext>(this IServiceCollection services,
+        Func<IJsonSerializer, string, TContext> factory)
+         where TContext : DbContext
+    {
+        services.AddSingleton<IDbContextNamedFactory<TContext>>(c =>
+            ActivatorUtilities.CreateInstance<DelegatingDbNamedContextFactory<TContext>>(c, factory));
+
+        return services;
+    }
+
+    public static DbContextOptionsBuilder SetDefaultWarnings(this DbContextOptionsBuilder builder)
+    {
+        builder.ConfigureWarnings(w => w.Ignore(CoreEventId.CollectionWithoutComparer));
+        return builder;
+    }
+
     public static IQueryable<T> Pagination<T>(this IQueryable<T> source, ClrQuery query)
     {
         if (query.Skip > 0)
@@ -110,14 +129,15 @@ public static class Extensions
         Func<T, Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>>> update,
         CancellationToken ct) where T : class, IVersionedEntity<DomainId>
     {
+        var dbSet = dbContext.Set<T>();
         try
         {
-            await dbContext.Set<T>().AddAsync(entity, ct);
+            await dbSet.AddAsync(entity, ct);
             await dbContext.SaveChangesAsync(ct);
         }
         catch (DbUpdateException)
         {
-            var updateQuery = dbContext.Set<T>().Where(x => x.DocumentId == entity.DocumentId);
+            var updateQuery = dbSet.Where(x => x.DocumentId == entity.DocumentId);
             if (oldVersion > EtagVersion.Any)
             {
                 updateQuery = updateQuery.Where(x => x.Version == oldVersion);
@@ -130,7 +150,7 @@ public static class Extensions
             if (updateCount != 1)
             {
                 var currentVersions =
-                    await dbContext.Set<T>()
+                    await dbSet
                         .Where(x => x.DocumentId == entity.DocumentId).Select(x => x.Version)
                         .ToListAsync(ct);
 
@@ -138,6 +158,10 @@ public static class Extensions
 
                 throw new InconsistentStateException(current, oldVersion);
             }
+        }
+        finally
+        {
+            dbContext.Entry(entity).State = EntityState.Detached;
         }
     }
 }
