@@ -21,10 +21,8 @@ jobs:
         env:
           DOCKER_BUILD_RECORD_UPLOAD: false
         with:
-          load: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          tags: squidex-local
 
   test-containers:
     runs-on: ubuntu-latest
@@ -69,7 +67,7 @@ jobs:
         with:
           load: true
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to:
           tags: squidex-local
 
       - name: Start Compose
@@ -170,7 +168,7 @@ jobs:
         with:
           load: true
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to:
           tags: squidex-local
 
       - name: Start Compose
