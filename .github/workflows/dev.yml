@@ -41,6 +41,7 @@ jobs:
           tags: squidex-local
 
       - name: Build - TestContainers
+        if: github.event_name == 'pull_request'
         uses: kohlerdominik/docker-run-action@v2.0.0
         with:
           image: mcr.microsoft.com/dotnet/sdk:8.0
@@ -49,10 +50,12 @@ jobs:
           run: dotnet test /src/backend/Squidex.sln --filter Category==TestContainers
 
       - name: Test - Start Compose
+        if: github.event_name == 'pull_request'
         run: docker compose up -d
         working-directory: tools/TestSuite
 
       - name: Test - RUN on Mongo
+        if: github.event_name == 'pull_request'
         uses: kohlerdominik/docker-run-action@v2.0.0
         with:
           image: mcr.microsoft.com/dotnet/sdk:8.0
@@ -67,6 +70,7 @@ jobs:
           run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
 
       - name: Test - RUN on Mongo on path
+        if: github.event_name == 'pull_request'
         uses: kohlerdominik/docker-run-action@v2.0.0
         with:
           image: mcr.microsoft.com/dotnet/sdk:8.0
@@ -81,6 +85,7 @@ jobs:
           run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
 
       - name: Test - RUN on Postgres
+        if: github.event_name == 'pull_request'
         uses: kohlerdominik/docker-run-action@v2.0.0
         with:
           image: mcr.microsoft.com/dotnet/sdk:8.0
@@ -95,6 +100,7 @@ jobs:
           run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter "Category!=NotAutomated & Category!=MongoOnly"
 
       - name: Test - RUN on MySql
+        if: github.event_name == 'pull_request'
         uses: kohlerdominik/docker-run-action@v2.0.0
         with:
           image: mcr.microsoft.com/dotnet/sdk:8.0
@@ -109,6 +115,7 @@ jobs:
           run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter "Category!=NotAutomated & Category!=MongoOnly"
 
       - name: Test - RUN on SqlServer
+        if: github.event_name == 'pull_request'
         uses: kohlerdominik/docker-run-action@v2.0.0
         with:
           image: mcr.microsoft.com/dotnet/sdk:8.0
@@ -123,21 +130,24 @@ jobs:
           run: dotnet test /src/tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter "Category!=NotAutomated & Category!=MongoOnly"
 
       - name: Test - Install Playwright Dependencies
+        if: github.event_name == 'pull_request'
         run: npm ci
         working-directory: './tools/e2e'
 
       - name: Test - Install Playwright Browsers
+        if: github.event_name == 'pull_request'
         run: npx playwright install --with-deps
         working-directory: './tools/e2e'
 
       - name: Test - Run Playwright Tests
+        if: github.event_name == 'pull_request'
         run: npx playwright test --retries=3
         working-directory: './tools/e2e'
         env:
           BASE__URL: http://localhost:8080
 
       - name: Test - Upload Playwright Artifacts
-        if: always()
+        if: github.event_name == 'pull_request' && always()
         uses: actions/upload-artifact@v4.6.1
         with:
           name: playwright-report
@@ -145,20 +155,20 @@ jobs:
           retention-days: 30
        
       - name: Test - Dump docker logs on failure
-        if: failure()
+        if: github.event_name == 'pull_request' && failure()
         uses: jwalton/gh-docker-logs@v2.2.2
         with:
             dest: './docker-logs'
 
       - name: Test - Upload docker logs
-        if: failure()
+        if: github.event_name == 'pull_request' && failure()
         uses: actions/upload-artifact@v4.6.1
         with:
             name: docker-logs
             path: './docker-logs'
 
       - name: Test - Cleanup
-        if: always()
+        if: github.event_name == 'pull_request' && always()
         run: docker compose down
         working-directory: tools/TestSuite
 
