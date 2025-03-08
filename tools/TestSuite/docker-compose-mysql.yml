@@ -1,0 +1,54 @@
+services:
+  db_mysql:
+    image: mysql
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=squidex
+      - MYSQL_USER=admin
+      - MYSQL_PASSWORD=secret
+      - MYSQL_ROOT_PASSWORD=secret
+    command: --log-bin-trust-function-creators=1 --local-infile=1
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "admin", "--password=secret"]
+      interval: 10s
+      retries: 10
+
+  squidex_mysql:
+    extends:
+      file: docker-compose-base.yml
+      service: squidex_base
+    environment:
+      - EVENTSTORE__TYPE=Sql
+      - STORE__TYPE=Sql
+      - STORE__SQL__CONNECTIONSTRING=Server=db_mysql;Port=3306;Database=squidex;User=admin;Password=secret;AllowLoadLocalInfile=true;
+      - STORE__SQL__PROVIDER=MySql
+      - STORE__SQL__VERSION=9.2.0-mysql
+      - MESSAGING__TYPE=Sql
+      - URLS__BASEURL=http://localhost:8080
+    depends_on:
+      db_mysql:
+        condition: service_healthy
+
+  proxy_mysql:
+    image: squidex/caddy-proxy-path:2.6.2
+    ports:
+      - "8080:8080"
+    environment:
+      - SITE_ADDRESS=http://localhost:8080
+      - SITE_PATH=*
+      - SITE_SERVER="squidex_mysql:5000"
+    depends_on:
+      - squidex_mysql
+    restart: unless-stopped
+
+  webhookcatcher:
+    image: tarampampam/webhook-tester:2
+    command: serve --port 1026
+    ports:
+      - "1026:1026"
+
+volumes:
+  mysql_data:
