@@ -1,0 +1,66 @@
+services:
+  db_sqlserver:
+    image: squidex/mssql-dev:2
+    ports:
+      - "1433:1433"
+    environment:
+      - SA_PASSWORD=1q2w3e!R
+      - SA_USER=none
+      - ACCEPT_EULA=Y
+    networks:
+      - internal
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 1q2w3e!R -Q 'SELECT 1'"]
+      interval: 10s
+      retries: 10
+
+  db_sqlserver_init:
+    image: mcr.microsoft.com/mssql-tools
+    entrypoint: >
+      /opt/mssql-tools/bin/sqlcmd -S db_sqlserver -U sa -P 1q2w3e!R -d master -Q 'CREATE DATABASE ''squidex'''
+    networks:
+      - internal
+    depends_on:
+      db_sqlserver:
+        condition: service_healthy
+
+  squidex_sqlserver:
+    extends:
+      file: docker-compose-base.yml
+      service: squidex_base
+    environment:
+      - EVENTSTORE__TYPE=Sql
+      - STORE__TYPE=Sql
+      - STORE__SQL__CONNECTIONSTRING=Server=db_sqlserver;Database=squidex;User=sa;Password=1q2w3e!R;TrustServerCertificate=True;
+      - STORE__SQL__PROVIDER=SqlServer
+      - MESSAGING__TYPE=Sql
+      - URLS__BASEURL=http://localhost:8080
+    depends_on:
+      db_sqlserver:
+        condition: service_healthy
+
+  proxy_sqlserver:
+    image: squidex/caddy-proxy-path:2.6.2
+    ports:
+      - "8080:8080"
+    environment:
+      - SITE_ADDRESS=http://localhost:8080
+      - SITE_PATH=*
+      - SITE_SERVER="squidex_sqlserver:5000"
+    depends_on:
+      - squidex_sqlserver
+    networks:
+      - internal
+    restart: unless-stopped
+
+  webhookcatcher:
+    image: tarampampam/webhook-tester:2
+    command: serve --port 1026
+    ports:
+      - "1026:1026"
+    networks:
+      - internal
+    
+networks:
+  internal:
+    driver: bridge

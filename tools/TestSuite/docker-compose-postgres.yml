@@ -1,0 +1,46 @@
+services:
+  db_postgres:
+    image: "postgis/postgis"
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=squidex
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U admin"]
+      interval: 10s
+      retries: 10
+
+  squidex_postgres:
+    extends:
+      file: docker-compose-base.yml
+      service: squidex_base
+    environment:
+      - EVENTSTORE__TYPE=Sql
+      - STORE__TYPE=Sql
+      - STORE__SQL__CONNECTIONSTRING=Server=db_postgres;Port=5432;Database=squidex;Pooling=true;Username=admin;Password=secret;SSL Mode=Disable;
+      - STORE__SQL__PROVIDER=Postgres
+      - MESSAGING__TYPE=Sql
+      - URLS__BASEURL=http://localhost:8080
+    depends_on:
+      db_postgres:
+        condition: service_healthy
+
+  proxy_postgres:
+    image: squidex/caddy-proxy-path:2.6.2
+    ports:
+      - "8080:8080"
+    environment:
+      - SITE_ADDRESS=http://localhost:8080
+      - SITE_PATH=*
+      - SITE_SERVER="squidex_postgres:5000"
+    depends_on:
+      - squidex_postgres
+    restart: unless-stopped
+
+  webhookcatcher:
+    image: tarampampam/webhook-tester:2
+    command: serve --port 1026
+    ports:
+      - "1026:1026"

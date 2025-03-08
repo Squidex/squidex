@@ -20,5 +20,3 @@ services:
       - TEMPLATES__LOCALURL=http://localhost:5000
       - UI__HIDENEWS=true
       - UI__HIDEONBOARDING=true
-    networks:
-      - internal
