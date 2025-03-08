@@ -175,7 +175,7 @@ jobs:
         working-directory: tools/TestSuite
 
       - name: RUN on ${{ matrix.name }}
-        run: dotnet test tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
+        run: dotnet test tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter "Category!=NotAutomated & Category!=MongoOnly"
         env:
           CONFIG__BACKUPURL: http://localhost:5000
           CONFIG__WAIT: 60
