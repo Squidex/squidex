@@ -84,7 +84,7 @@ jobs:
           CONFIG__SERVER__URL: http://localhost:8080
           WEBHOOKCATCHER__HOST__ENDPOINT: webhookcatcher
 
-      - name: RUN on Mongo on path
+      - name: RUN on Mongo on path with worker
         run: dotnet test tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
         env:
           CONFIG__BACKUPURL: http://localhost:5000
@@ -172,7 +172,7 @@ jobs:
       - name: Prepare - Setup Docker Buildx
         uses: docker/setup-buildx-action@v3.10.0
 
-      - name: Remove unnecessary files
+      - name: Prepare - Remove unnecessary files
         run: |
           sudo rm -rf /usr/share/dotnet
           sudo rm -rf "$AGENT_TOOLSDIRECTORY"
