@@ -71,9 +71,9 @@ services:
       file: docker-compose-base.yml
       service: squidex_base
     environment:
-      - EVENTSTORE__MONGODB__DATABASE=squidex_mongo1
-      - STORE__MONGODB__CONTENTDATABASE=squidex_mongo1_content
-      - STORE__MONGODB__DATABASE=squidex_mongo1
+      - EVENTSTORE__MONGODB__DATABASE=squidex1
+      - STORE__MONGODB__CONTENTDATABASE=squidex1_content
+      - STORE__MONGODB__DATABASE=squidex1
       - URLS__BASEURL=http://localhost:8080
     depends_on:
       - db_mongo
@@ -85,9 +85,9 @@ services:
       service: squidex_base
     environment:
       - CLUSTERING__WORKER=false
-      - EVENTSTORE__MONGODB__DATABASE=squidex_mongo2
-      - STORE__MONGODB__CONTENTDATABASE=squidex_mongo2_content
-      - STORE__MONGODB__DATABASE=squidex_mongo2
+      - EVENTSTORE__MONGODB__DATABASE=squidex2
+      - STORE__MONGODB__CONTENTDATABASE=squidex2_content
+      - STORE__MONGODB__DATABASE=squidex2
       - STORE__MONGODB__TEXTHARDCOUNT=20
       - URLS__BASEPATH=squidex/
       - URLS__BASEURL=http://localhost:8081/squidex/
@@ -101,9 +101,9 @@ services:
       service: squidex_base
     environment:
       - CLUSTERING__WORKER=true
-      - EVENTSTORE__MONGODB__DATABASE=squidex_mongo2
-      - STORE__MONGODB__CONTENTDATABASE=squidex_mongo2_content
-      - STORE__MONGODB__DATABASE=squidex_mongo2
+      - EVENTSTORE__MONGODB__DATABASE=squidex2
+      - STORE__MONGODB__CONTENTDATABASE=squidex2_content
+      - STORE__MONGODB__DATABASE=squidex2
       - STORE__MONGODB__TEXTHARDCOUNT=20
       - URLS__BASEPATH=squidex/
       - URLS__BASEURL=http://localhost:8081/squidex/
@@ -178,7 +178,7 @@ services:
       - SITE_PATH=*
       - SITE_SERVER="squidex_mongo:5000"
     depends_on:
-      - squidex_mongo1
+      - squidex_mongo
     networks:
       - internal
     restart: unless-stopped
