@@ -66,6 +66,8 @@ jobs:
 
       - name: Build
         uses: docker/build-push-action@v6.15.0
+        env:
+          DOCKER_BUILD_SUMMARY: false
         with:
           load: true
           cache-from: type=gha
@@ -164,6 +166,8 @@ jobs:
 
       - name: Build
         uses: docker/build-push-action@v6.15.0
+        env:
+          DOCKER_BUILD_SUMMARY: false
         with:
           load: true
           cache-from: type=gha
