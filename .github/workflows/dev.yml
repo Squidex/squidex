@@ -23,6 +23,8 @@ jobs:
 
       - name: Build
         uses: docker/build-push-action@v6.15.0
+        env:
+          DOCKER_BUILD_RECORD_UPLOAD: false
         with:
           load: true
           cache-from: type=gha
@@ -67,6 +69,7 @@ jobs:
       - name: Build
         uses: docker/build-push-action@v6.15.0
         env:
+          DOCKER_BUILD_RECORD_UPLOAD: false
           DOCKER_BUILD_SUMMARY: false
         with:
           load: true
@@ -167,6 +170,7 @@ jobs:
       - name: Build
         uses: docker/build-push-action@v6.15.0
         env:
+          DOCKER_BUILD_RECORD_UPLOAD: false
           DOCKER_BUILD_SUMMARY: false
         with:
           load: true
@@ -242,6 +246,8 @@ jobs:
       - name: Build & Push for Multi-Platforms
         if: github.event_name != 'pull_request'
         uses: docker/build-push-action@v6.15.0
+        env:
+          DOCKER_BUILD_RECORD_UPLOAD: false
         with:
           push: true
           build-args: "SQUIDEX__RUNTIME__VERSION=7.0.0-dev-${{ env.BUILD_NUMBER }}"
