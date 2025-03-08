@@ -36,10 +36,8 @@ jobs:
       - name: Prepare - Checkout
         uses: actions/checkout@v4.2.2
 
-      - name: Prepare - Setup DotNet
+      - name: Prepare - Setup dotnet
         uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 8.0.x
 
       - name: Test - TestContainers
         run: dotnet test backend/Squidex.sln --filter Category==TestContainers
@@ -54,10 +52,8 @@ jobs:
       - name: Prepare - Setup Docker Buildx
         uses: docker/setup-buildx-action@v3.10.0
 
-      - name: Prepare - Setup DotNet
+      - name: Prepare - Setup dotnet
         uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 8.0.x
 
       - name: Prepare - Setup Node
         uses: actions/setup-node@v4.2.0
@@ -155,10 +151,8 @@ jobs:
       - name: Prepare - Setup Docker Buildx
         uses: docker/setup-buildx-action@v3.10.0
 
-      - name: Prepare - Setup DotNet
+      - name: Prepare - Setup dotnet
         uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: 8.0.x
 
       - name: Prepare - Setup Node
         uses: actions/setup-node@v4.2.0
