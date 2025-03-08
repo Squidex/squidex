@@ -886,7 +886,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
 
         var updated = await _.Contents.GetAsync(content.Id);
 
-        Assert.Equal(2, content.Data.Number);
+        Assert.Equal(2, updated.Data.Number);
     }
 
     [Fact]
@@ -924,7 +924,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
 
         var updated = await _.Contents.GetAsync(content.Id);
 
-        Assert.Equal(2, content.Data.Number);
+        Assert.Equal(2, updated.Data.Number);
     }
 
     [Theory]
