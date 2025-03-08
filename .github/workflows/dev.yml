@@ -66,6 +66,7 @@ jobs:
           DOCKER_BUILD_RECORD_UPLOAD: false
           DOCKER_BUILD_SUMMARY: false
         with:
+          load: true
           cache-from: type=gha
           cache-to:
           tags: squidex-local
@@ -164,6 +165,7 @@ jobs:
           DOCKER_BUILD_RECORD_UPLOAD: false
           DOCKER_BUILD_SUMMARY: false
         with:
+          load: true
           cache-from: type=gha
           cache-to:
           tags: squidex-local
