@@ -54,7 +54,7 @@ internal static class Extensions
         }
     }
 
-    private static Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> BuildUpdate<T>(T entity) where T : EFContentEntity
+    public static Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>> BuildUpdate<T>(T entity) where T : EFContentEntity
     {
         return b => b
             .SetProperty(x => x.AppId, entity.AppId)

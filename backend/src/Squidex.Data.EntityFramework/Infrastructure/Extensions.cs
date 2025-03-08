@@ -129,14 +129,15 @@ public static class Extensions
         Func<T, Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>>> update,
         CancellationToken ct) where T : class, IVersionedEntity<DomainId>
     {
+        var dbSet = dbContext.Set<T>();
         try
         {
-            await dbContext.Set<T>().AddAsync(entity, ct);
+            await dbSet.AddAsync(entity, ct);
             await dbContext.SaveChangesAsync(ct);
         }
         catch (DbUpdateException)
         {
-            var updateQuery = dbContext.Set<T>().Where(x => x.DocumentId == entity.DocumentId);
+            var updateQuery = dbSet.Where(x => x.DocumentId == entity.DocumentId);
             if (oldVersion > EtagVersion.Any)
             {
                 updateQuery = updateQuery.Where(x => x.Version == oldVersion);
@@ -149,7 +150,7 @@ public static class Extensions
             if (updateCount != 1)
             {
                 var currentVersions =
-                    await dbContext.Set<T>()
+                    await dbSet
                         .Where(x => x.DocumentId == entity.DocumentId).Select(x => x.Version)
                         .ToListAsync(ct);
 
@@ -157,6 +158,10 @@ public static class Extensions
 
                 throw new InconsistentStateException(current, oldVersion);
             }
+        }
+        finally
+        {
+            dbContext.Entry(entity).State = EntityState.Detached;
         }
     }
 }
