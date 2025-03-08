@@ -128,11 +128,11 @@ public partial class MongoContentRepository : ISnapshotStore<WriteContent>, IDel
             {
                 if (job.Value.ShouldWritePublished())
                 {
-                    await collectionPublished.AddCollectionsAsync(
+                    await collectionPublished.AddToCollectionsAsync(
                         await MongoContentEntity.CreatePublishedAsync(job, appProvider, ct), add, ct);
                 }
 
-                await collectionComplete.AddCollectionsAsync(
+                await collectionComplete.AddToCollectionsAsync(
                     await MongoContentEntity.CreateCompleteAsync(job, appProvider, ct), add, ct);
             }
 

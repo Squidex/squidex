@@ -32,7 +32,7 @@ internal static class Extensions
     public static async Task UpsertAsync<T>(this DbContext dbContext, T entity, long oldVersion,
         CancellationToken ct) where T : EFContentEntity
     {
-        await dbContext.UpsertAsync(entity, oldVersion, BuildUpdate<T>, ct);
+        await dbContext.UpsertAsync(entity, oldVersion, BuildUpdate, ct);
     }
 
     public static async Task RemoveAsync<T>(this DbContext dbContext, DomainId id,

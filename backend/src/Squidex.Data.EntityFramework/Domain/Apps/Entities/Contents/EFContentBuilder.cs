@@ -16,7 +16,7 @@ public static class EFContentBuilder
     public static void UseContent(this ModelBuilder builder, IJsonSerializer jsonSerializer, string? jsonColumn, string prefix)
     {
         builder.UseContentEntity<EFContentCompleteEntity>(jsonSerializer, jsonColumn, $"{prefix}ContentsAll");
-        builder.UseContentEntity<EFContentPublishedEntity>(jsonSerializer, jsonColumn, $"{prefix}ContentsPublished");        
+        builder.UseContentEntity<EFContentPublishedEntity>(jsonSerializer, jsonColumn, $"{prefix}ContentsPublished");
     }
 
     public static void UseContentReferences(this ModelBuilder builder, string prefix)
