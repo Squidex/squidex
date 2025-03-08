@@ -27,7 +27,7 @@ services:
       - STORE__SQL__PROVIDER=MySql
       - STORE__SQL__VERSION=9.2.0-mysql
       - MESSAGING__TYPE=Sql
-      - URLS__BASEURL=http://localhost:8083
+      - URLS__BASEURL=http://localhost:8080
     depends_on:
       db_mysql:
         condition: service_healthy

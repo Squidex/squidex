@@ -174,7 +174,7 @@ jobs:
         run: docker compose -f ${{ matrix.compose }} up -d 
         working-directory: tools/TestSuite
 
-      - name: RUN on Mongo
+      - name: RUN on ${{ matrix.name }}
         run: dotnet test tools/TestSuite/TestSuite.ApiTests/TestSuite.ApiTests.csproj --filter Category!=NotAutomated
         env:
           CONFIG__BACKUPURL: http://localhost:5000

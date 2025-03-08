@@ -7,8 +7,6 @@ services:
       - SA_PASSWORD=1q2w3e!R
       - SA_USER=none
       - ACCEPT_EULA=Y
-    networks:
-      - internal
     healthcheck:
       test: ["CMD-SHELL", "/opt/mssql-tools/bin/sqlcmd -S localhost -U sa -P 1q2w3e!R -Q 'SELECT 1'"]
       interval: 10s
@@ -18,8 +16,6 @@ services:
     image: mcr.microsoft.com/mssql-tools
     entrypoint: >
       /opt/mssql-tools/bin/sqlcmd -S db_sqlserver -U sa -P 1q2w3e!R -d master -Q 'CREATE DATABASE ''squidex'''
-    networks:
-      - internal
     depends_on:
       db_sqlserver:
         condition: service_healthy
@@ -49,8 +45,6 @@ services:
       - SITE_SERVER="squidex_sqlserver:5000"
     depends_on:
       - squidex_sqlserver
-    networks:
-      - internal
     restart: unless-stopped
 
   webhookcatcher:
@@ -58,9 +52,3 @@ services:
     command: serve --port 1026
     ports:
       - "1026:1026"
-    networks:
-      - internal
-    
-networks:
-  internal:
-    driver: bridge
