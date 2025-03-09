@@ -247,12 +247,11 @@ jobs:
         env:
           DOCKER_BUILD_RECORD_UPLOAD: false
         with:
+          push: true
           build-args: "SQUIDEX__BUILD__VERSION=${{ env.GITHUB_REF_SLUG }},SQUIDEX__RUNTIME__VERSION=${{ env.GITHUB_REF_SLUG }}"
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          load: true
           platforms: linux/amd64,linux/arm64
-          push: true
           tags: squidex/squidex:${{ env.GITHUB_REF_SLUG }},squidex/squidex:${{ steps.version.outputs._0 }}${{env.STABLE_VERSION == 'true' && ',squidex/squidex:latest'}}
 
       - name: Release - Make directories
