@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+#if INCLUDE_KAFKA
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
@@ -55,3 +56,4 @@ public sealed record KafkaAction : RuleAction
     [Editor(RuleFieldEditor.TextArea)]
     public string? Schema { get; set; }
 }
+#endif

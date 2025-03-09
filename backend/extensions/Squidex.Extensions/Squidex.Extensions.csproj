@@ -13,7 +13,6 @@
     <PackageReference Include="Algolia.Search" Version="6.17.0" />
     <PackageReference Include="Azure.Monitor.OpenTelemetry.Exporter" Version="1.3.0" />
     <PackageReference Include="Azure.Search.Documents" Version="11.6.0" />
-    <PackageReference Include="Confluent.SchemaRegistry.Serdes.Avro" Version="2.6.0" />
     <PackageReference Include="CoreTweet" Version="1.0.0.483" />
     <PackageReference Include="Elasticsearch.Net" Version="7.17.5" />
     <PackageReference Include="Google.Cloud.Diagnostics.Common" Version="5.2.0" />
@@ -40,6 +39,9 @@
     <PackageReference Include="System.ComponentModel.Annotations" Version="5.0.0" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="WindowsAzure.Storage" Version="9.3.3" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(IncludeKafka)' == 'true'">
+    <PackageReference Include="Confluent.SchemaRegistry.Serdes.Avro" Version="2.6.0" />
   </ItemGroup>
   <ItemGroup>
     <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />

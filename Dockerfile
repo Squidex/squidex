@@ -9,10 +9,12 @@ RUN apt-get update \
  && apt-get install -y ffmpeg
 
 ARG SQUIDEX__BUILD__VERSION=7.0.0
+ARG SQUIDEX__BUILD__ARGS=
 
 WORKDIR /src
 
 # Copy nuget project files.
+COPY backend/Directory.Build.props ./
 COPY backend/*.sln ./
 
 # Copy the main source project files
@@ -32,16 +34,14 @@ RUN dotnet restore
 COPY backend .
  
 # Test Backend
-RUN dotnet test --no-restore --filter "Category!=Dependencies & Category!=TestContainer"
+RUN dotnet test --no-restore --filter "Category!=Dependencies & Category!=TestContainer" --configuration Release
 
 # Publish
-RUN dotnet publish --no-restore src/Squidex/Squidex.csproj --output /build/ --configuration Release -p:version=$SQUIDEX__BUILD__VERSION
+RUN dotnet publish --no-restore src/Squidex/Squidex.csproj --output /build/ --configuration Release -p:version=$SQUIDEX__BUILD__VERSION $SQUIDEX__BUILD__ARGS
 
 # Install tools
-RUN dotnet tool install --tool-path /tools dotnet-counters \
- && dotnet tool install --tool-path /tools dotnet-dump \
- && dotnet tool install --tool-path /tools dotnet-gcdump \
- && dotnet tool install --tool-path /tools dotnet-trace
+RUN dotnet tool install --tool-path /tools dotnet-dump \
+ && dotnet tool install --tool-path /tools dotnet-gcdump
 
 
 #
@@ -75,9 +75,13 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0-bookworm-slim
 
 ARG SQUIDEX__RUNTIME__VERSION=7.0.0
 
+
 # Curl for debugging and libc-dev for protobuf
 RUN apt-get update \
- && apt-get install -y curl libc-dev ffmpeg
+ && apt-get install -y --no-install-recommends curl libc-dev
+
+# Use a static and small version of ffmpeg
+COPY --from=mwader/static-ffmpeg:7.1 /ffmpeg /usr/local/bin/
 
 # Default tool directory
 WORKDIR /tools
@@ -95,10 +99,8 @@ COPY --from=frontend /build/browser wwwroot/build/
 EXPOSE 80
 EXPOSE 443
 
-ENV DIAGNOSTICS__COUNTERSTOOL=/tools/dotnet-counters
 ENV DIAGNOSTICS__DUMPTOOL=/tools/dotnet-dump
 ENV DIAGNOSTICS__GCDUMPTOOL=/tools/dotnet-gcdump
-ENV DIAGNOSTICS__TRACETOOL=/tools/dotnet-trace
 ENV ASPNETCORE_HTTP_PORTS=80
 
 ENTRYPOINT ["dotnet", "Squidex.dll"]

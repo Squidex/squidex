@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+#if INCLUDE_KAFKA
 using Confluent.Kafka;
 using Confluent.SchemaRegistry;
 using Confluent.SchemaRegistry.Serdes;
@@ -27,3 +28,4 @@ public class KafkaProducerOptions : ProducerConfig
         return !string.IsNullOrWhiteSpace(SchemaRegistry?.Url);
     }
 }
+#endif

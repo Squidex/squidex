@@ -153,6 +153,13 @@ public static class MessagingServices
             return builder.AddSquidexEntityFrameworkTransport(config);
         }
 
+#if INCLUDE_KAFKA
+        if (string.Equals(type, "Kafka", StringComparison.OrdinalIgnoreCase))
+        {
+            return builder.AddKafkaTransport(config);
+        }
+#endif
+
         return builder.AddTransport(config);
     }
 }

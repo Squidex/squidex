@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+#if INCLUDE_KAFKA
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
@@ -27,3 +28,4 @@ public sealed class KafkaPlugin : IPlugin
         }
     }
 }
+#endif

@@ -35,13 +35,16 @@
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql.Json.Microsoft" Version="8.0.2" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql.NetTopologySuite" Version="8.0.2" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
-    <PackageReference Include="Squidex.AI.EntityFramework" Version="6.35.0" />
-    <PackageReference Include="Squidex.Assets.EntityFramework" Version="6.35.0" />
-    <PackageReference Include="Squidex.Assets.TusAdapter" Version="6.35.0" />
-    <PackageReference Include="Squidex.EFCore.BulkExtensions" Version="8.1.6" />
-    <PackageReference Include="Squidex.Events.EntityFramework" Version="6.35.0" />
-    <PackageReference Include="Squidex.Hosting" Version="6.35.0" />
-    <PackageReference Include="Squidex.Messaging.EntityFramework" Version="6.35.0" />
+    <PackageReference Include="Squidex.AI.EntityFramework" Version="6.36.0" />
+    <PackageReference Include="Squidex.Assets.EntityFramework" Version="6.36.0" />
+    <PackageReference Include="Squidex.Assets.TusAdapter" Version="6.36.0" />
+    <PackageReference Include="Squidex.EFCore.BulkExtensions.Core" Version="8.1.6" />
+    <PackageReference Include="Squidex.EFCore.BulkExtensions.MySql" Version="8.1.6" />
+    <PackageReference Include="Squidex.EFCore.BulkExtensions.PostgreSQL" Version="8.1.6" />
+    <PackageReference Include="Squidex.EFCore.BulkExtensions.SqlServer" Version="8.1.6" />
+    <PackageReference Include="Squidex.Events.EntityFramework" Version="6.36.0" />
+    <PackageReference Include="Squidex.Hosting" Version="6.36.0" />
+    <PackageReference Include="Squidex.Messaging.EntityFramework" Version="6.36.0" />
     <PackageReference Include="Squidex.OpenIdDict.EntityFramework" Version="5.8.4" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />

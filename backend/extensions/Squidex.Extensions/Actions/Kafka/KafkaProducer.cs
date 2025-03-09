@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+#if INCLUDE_KAFKA
 using System.Text;
 using Avro;
 using Avro.Generic;
@@ -278,3 +279,4 @@ public sealed class KafkaProducer
         return schema?.Tag == expected || (schema is UnionSchema union && union.Schemas.Any(x => x.Tag == expected));
     }
 }
+#endif

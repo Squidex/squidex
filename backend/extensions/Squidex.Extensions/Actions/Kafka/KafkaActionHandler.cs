@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+#if INCLUDE_KAFKA
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 
@@ -113,3 +114,4 @@ public sealed class KafkaJob
 
     public int PartitionCount { get; set; }
 }
+#endif
