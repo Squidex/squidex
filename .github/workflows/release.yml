@@ -33,9 +33,11 @@ jobs:
 
       - name: Prepare - Setup dotnet
         uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
 
       - name: Test - TestContainers
-        run: dotnet test backend/Squidex.sln --filter Category==TestContainers
+        run: dotnet test backend/Squidex.sln --filter Category=TestContainers
 
   test-mongo:
     runs-on: ubuntu-latest
@@ -49,6 +51,8 @@ jobs:
 
       - name: Prepare - Setup dotnet
         uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
 
       - name: Prepare - Setup Node
         uses: actions/setup-node@v4.2.0
@@ -148,6 +152,8 @@ jobs:
 
       - name: Prepare - Setup dotnet
         uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
 
       - name: Prepare - Setup Node
         uses: actions/setup-node@v4.2.0

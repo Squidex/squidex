@@ -34,10 +34,10 @@ RUN dotnet restore
 COPY backend .
  
 # Test Backend
-RUN dotnet test --no-restore --filter "Category!=Dependencies & Category!=TestContainer" --configuration Release
+RUN dotnet test --filter "Category!=Dependencies & Category!=TestContainer" --configuration Release
 
 # Publish
-RUN dotnet publish --no-restore src/Squidex/Squidex.csproj --output /build/ --configuration Release -p:version=$SQUIDEX__BUILD__VERSION $SQUIDEX__BUILD__ARGS
+RUN dotnet publish src/Squidex/Squidex.csproj --output /build/ --configuration Release -p:version=$SQUIDEX__BUILD__VERSION
 
 # Install tools
 RUN dotnet tool install --tool-path /tools dotnet-dump \
@@ -67,7 +67,6 @@ RUN npm run test:coverage \
 
 RUN cp -a build /build/
 
- 
 #
 # Stage 3, Build runtime
 #
@@ -75,13 +74,11 @@ FROM mcr.microsoft.com/dotnet/aspnet:8.0-bookworm-slim
 
 ARG SQUIDEX__RUNTIME__VERSION=7.0.0
 
-
 # Curl for debugging and libc-dev for protobuf
 RUN apt-get update \
  && apt-get install -y --no-install-recommends curl libc-dev
 
-# Use a static and small version of ffmpeg
-COPY --from=mwader/static-ffmpeg:7.1 /ffmpeg /usr/local/bin/
+COPY --from=mwader/static-ffmpeg:7.1.1 /ffprobe /usr/local/bin/
 
 # Default tool directory
 WORKDIR /tools
