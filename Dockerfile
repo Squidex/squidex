@@ -9,7 +9,9 @@ RUN apt-get update \
  && apt-get install -y ffmpeg
 
 ARG SQUIDEX__BUILD__VERSION=7.0.0
-ARG SQUIDEX__BUILD__ARGS=
+ARG SQUIDEX__BUILD__ARGS
+
+RUN echo "ARGS IS $SQUIDEX__BUILD__ARGS" 
 
 WORKDIR /src
 
@@ -19,15 +21,21 @@ COPY backend/*.sln ./
 
 # Copy the main source project files
 COPY backend/src/*/*.csproj ./
-RUN for file in $(ls *.csproj); do mkdir -p src/${file%.*}/ && mv $file src/${file%.*}/; done
+RUN for file in $(ls *.csproj); \
+    do mkdir -p src/${file%.*}/ && mv $file src/${file%.*}/; \
+    done
 
 # Copy the test project files
 COPY backend/tests/*/*.csproj ./
-RUN for file in $(ls *.csproj); do mkdir -p tests/${file%.*}/ && mv $file tests/${file%.*}/; done
+RUN for file in $(ls *.csproj); \
+    do mkdir -p tests/${file%.*}/ && mv $file tests/${file%.*}/; \
+    done
 
 # Copy the extension project files
 COPY backend/extensions/*/*.csproj ./
-RUN for file in $(ls *.csproj); do mkdir -p extensions/${file%.*}/ && mv $file extensions/${file%.*}/; done
+RUN for file in $(ls *.csproj); \
+    do mkdir -p extensions/${file%.*}/ && mv $file extensions/${file%.*}/; \
+    done
 
 RUN dotnet restore
 
@@ -37,7 +45,7 @@ COPY backend .
 RUN dotnet test --filter "Category!=Dependencies & Category!=TestContainer" --configuration Release
 
 # Publish
-RUN dotnet publish src/Squidex/Squidex.csproj --output /build/ --configuration Release -p:version=$SQUIDEX__BUILD__VERSION
+RUN dotnet publish src/Squidex/Squidex.csproj --output /build/ --configuration Release -p:version=$SQUIDEX__BUILD__VERSION ${SQUIDEX__BUILD__ARGS}
 
 # Install tools
 RUN dotnet tool install --tool-path /tools dotnet-dump \
