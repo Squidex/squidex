@@ -4,6 +4,33 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.18.0] - 2025-03-09
+
+This version adds support for SQL databases. A lot of tests have been implemented to ensure it is working properly, but this is still in an early version.
+
+### Added
+
+* **Storage**: Support for MySQL.
+* **Storage**: Support for Postgres.
+* **Storage**: Support for SQL Server.
+
+### Changed
+
+* **Build**: Improve build performance with parallel steps.v
+* **ImageMagick**: To reduce the container size, ImageMagick has been removed from the container. This is a native library to analyze and resize images. Fortunately it is not needed anymore, because the .NET library ImageSharp can handle all image formats properly. You can also use the dedicated image resize server. When you build your own container or binaries you can enable ImageMagick with the following commands:
+   * With docker: `docker build . --build-arg SQUIDEX__BUILD__ARGS="-p:DefineConstants=INCLUDE_MAGICK"`
+   * With dotnet: `dotnet build -p:DefineConstants=INCLUDE_MAGICK`
+* **Kafka**: To reduce the container size, Kafka support has been removed from the container. When you build your own container or binaries you can enable Kafka with the following commands:
+   * With docker: `docker build . --build-arg SQUIDEX__BUILD__ARGS="-p:DefineConstants=INCLUDE_KAFKA"`
+   * With dotnet: `dotnet build -p:DefineConstants=INCLUDE_KAFKA`
+
+### Fixed
+
+* **Events**: Ensure that events can be replayed when the end of the Mongo commit log has been reached.
+* **Identity**: Redirect the user to the specified URL after a successful logout.
+* **Text**: Fix full-text integration for Azure Search.
+* **Text**: Fix full-text integration for Elastic Search.
+
 ## [7.17.0] - 2025-01-27
 
 ### Fixed
