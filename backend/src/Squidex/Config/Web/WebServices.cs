@@ -98,7 +98,9 @@ public static class WebServices
             options.ModelMetadataDetailsProviders.Add(new SuppressChildValidationMetadataProvider(typeof(JsonValue)));
         })
         .AddDataAnnotationsLocalization()
+#if DEBUG
         .AddRazorRuntimeCompilation()
+#endif
         .AddSquidexPlugins(config)
         .AddSquidexSerializers();
     }

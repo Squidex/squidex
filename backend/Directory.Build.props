@@ -1,0 +1,13 @@
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Condition="'$(Configuration)' == 'Debug'">
+    <DefineConstants>$(DefineConstants);INCLUDE_MAGICK;INCLUDE_KAFKA</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(DefineConstants.Contains(INCLUDE_MAGICK))'">
+	<IncludeMagick>true</IncludeMagick>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(DefineConstants.Contains(INCLUDE_KAFKA))'">
+	<IncludeKafka>true</IncludeKafka>
+  </PropertyGroup>
+</Project>

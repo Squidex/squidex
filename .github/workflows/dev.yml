@@ -26,10 +26,8 @@ jobs:
         env:
           DOCKER_BUILD_RECORD_UPLOAD: false
         with:
-          load: true
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          tags: squidex-local
 
   test-containers:
     runs-on: ubuntu-latest
@@ -38,13 +36,13 @@ jobs:
       - name: Prepare - Checkout
         uses: actions/checkout@v4.2.2
 
-      - name: Prepare - Setup DotNet
+      - name: Prepare - Setup dotnet
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
 
       - name: Test - TestContainers
-        run: dotnet test backend/Squidex.sln --filter Category==TestContainers
+        run: dotnet test backend/Squidex.sln --filter Category=TestContainers
 
   test-mongo:
     runs-on: ubuntu-latest
@@ -56,7 +54,7 @@ jobs:
       - name: Prepare - Setup Docker Buildx
         uses: docker/setup-buildx-action@v3.10.0
 
-      - name: Prepare - Setup DotNet
+      - name: Prepare - Setup dotnet
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
@@ -74,7 +72,7 @@ jobs:
         with:
           load: true
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to:
           tags: squidex-local
 
       - name: Start Compose
@@ -157,7 +155,7 @@ jobs:
       - name: Prepare - Setup Docker Buildx
         uses: docker/setup-buildx-action@v3.10.0
 
-      - name: Prepare - Setup DotNet
+      - name: Prepare - Setup dotnet
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
@@ -175,7 +173,7 @@ jobs:
         with:
           load: true
           cache-from: type=gha
-          cache-to: type=gha,mode=max
+          cache-to:
           tags: squidex-local
 
       - name: Start Compose

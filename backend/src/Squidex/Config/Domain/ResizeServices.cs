@@ -6,7 +6,9 @@
 // ==========================================================================
 
 using Squidex.Assets;
+#if INCLUDE_MAGICK
 using Squidex.Assets.ImageMagick;
+#endif
 using Squidex.Assets.ImageSharp;
 using Squidex.Assets.Remote;
 
@@ -19,14 +21,18 @@ public static class ResizeServices
         services.AddSingletonAs<ImageSharpThumbnailGenerator>()
             .AsSelf();
 
+#if INCLUDE_MAGICK
         services.AddSingletonAs<ImageMagickThumbnailGenerator>()
             .AsSelf();
+#endif
 
         services.AddSingletonAs(c =>
             new CompositeThumbnailGenerator(
             [
                 c.GetRequiredService<ImageSharpThumbnailGenerator>(),
+#if INCLUDE_MAGICK
                 c.GetRequiredService<ImageMagickThumbnailGenerator>(),
+#endif
             ]))
             .AsSelf();
 
