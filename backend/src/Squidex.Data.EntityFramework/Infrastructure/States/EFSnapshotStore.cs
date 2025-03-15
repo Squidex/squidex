@@ -36,7 +36,7 @@ public class EFSnapshotStore<TContext, T, TState>(IDbContextFactory<TContext> db
         {
             await using var dbContext = await CreateDbContextAsync(ct);
 
-            await foreach (var entity in dbContext.Set<TState>().ToAsyncEnumerable().WithCancellation(ct))
+            await foreach (var entity in dbContext.Set<TState>().AsAsyncEnumerable().WithCancellation(ct))
             {
                 if (entity.Document is IOnRead onRead)
                 {

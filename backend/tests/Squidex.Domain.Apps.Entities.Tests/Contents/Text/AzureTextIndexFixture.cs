@@ -19,7 +19,8 @@ public sealed class AzureTextIndexFixture : IAsyncLifetime
         Index = new AzureTextIndex(
             TestConfig.Configuration["azureText:serviceEndpoint"]!,
             TestConfig.Configuration["azureText:apiKey"]!,
-            TestConfig.Configuration["azureText:indexName"]!);
+            TestConfig.Configuration["azureText:indexName"]!,
+            string.Empty);
     }
 
     public Task InitializeAsync()

@@ -76,7 +76,7 @@ public static class Extensions
             }
             else
             {
-                queryTotal = await queryable.CountAsync(ct);
+                queryTotal = await queryable.LongCountAsync(ct);
             }
         }
 

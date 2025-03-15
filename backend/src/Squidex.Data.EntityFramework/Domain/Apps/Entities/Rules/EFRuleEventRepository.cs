@@ -36,7 +36,7 @@ public sealed class EFRuleEventRepository<TContext>(IDbContextFactory<TContext> 
 
         var ruleEvents =
             dbContext.Set<EFRuleEventEntity>().Where(x => x.NextAttempt < now)
-                .ToAsyncEnumerable();
+                .AsAsyncEnumerable();
 
         await foreach (var ruleEvent in ruleEvents.WithCancellation(ct))
         {
@@ -59,7 +59,7 @@ public sealed class EFRuleEventRepository<TContext>(IDbContextFactory<TContext> 
 
         if (ruleEventTotal >= take || skip > 0)
         {
-            ruleEventTotal = await query.CountAsync(ct);
+            ruleEventTotal = await query.LongCountAsync(ct);
         }
 
         return ResultList.Create(ruleEventTotal, ruleEventEntities);

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Runtime.CompilerServices;
+using Microsoft.EntityFrameworkCore;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
@@ -40,7 +41,7 @@ public sealed partial class EFContentRepository<TContext, TContentContext>
                 .Where(x => x.IndexedAppId == appId)
                 .WhereIf(x => schemaIds!.Contains(x.IndexedSchemaId), schemaIds is { Count: > 0 })
                 .Select(x => x.Id)
-                .ToAsyncEnumerable();
+                .AsAsyncEnumerable();
 
         await foreach (var id in query.WithCancellation(ct))
         {
@@ -71,7 +72,7 @@ public sealed partial class EFContentRepository<TContext, TContentContext>
                 .Where(x => x.IndexedAppId == appId)
                 .WhereIf(x => schemaIds!.Contains(x.IndexedSchemaId), schemaIds is { Count: > 0 })
                 .Select(x => x)
-                .ToAsyncEnumerable();
+                .AsAsyncEnumerable();
 
         await foreach (var entity in query.WithCancellation(ct))
         {
@@ -100,7 +101,7 @@ public sealed partial class EFContentRepository<TContext, TContentContext>
                 .Where(x => x.T.IndexedAppId == appId)
                 .Select(x => x.T).Distinct()
                 .Take(take)
-                .ToAsyncEnumerable();
+                .AsAsyncEnumerable();
 
         await foreach (var entity in query.WithCancellation(ct))
         {
@@ -124,7 +125,7 @@ public sealed partial class EFContentRepository<TContext, TContentContext>
         var query =
             dbContext.Set<T>()
                 .Where(x => x.ScheduledAt != null && x.ScheduledAt < now)
-                .ToAsyncEnumerable();
+                .AsAsyncEnumerable();
 
         await foreach (var entity in query.WithCancellation(ct))
         {

@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Text;
+using Squidex.Infrastructure.ObjectPool;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
@@ -18,7 +18,6 @@ public sealed class QueryParser(Func<string, string> fieldProvider)
             return null;
         }
 
-        text = text.Trim();
         text = ConvertFieldNames(text);
 
         return new Query
@@ -30,43 +29,48 @@ public sealed class QueryParser(Func<string, string> fieldProvider)
     private string ConvertFieldNames(string query)
     {
         var indexOfColon = query.IndexOf(':', StringComparison.Ordinal);
-
         if (indexOfColon < 0)
         {
-            return query;
+            return query.Trim();
         }
 
-        var sb = new StringBuilder();
+        var span = query.AsSpan().Trim();
 
-        int position = 0, lastIndexOfColon = 0;
-
-        while (indexOfColon >= 0)
+        var sb = DefaultPools.StringBuilder.Get();
+        try
         {
-            lastIndexOfColon = indexOfColon;
-
-            int i;
-            for (i = indexOfColon - 1; i >= position; i--)
+            while (indexOfColon >= 0)
             {
-                var c = query[i];
-
-                if (!char.IsLetter(c) && c != '-' && c != '_')
+                int i;
+                for (i = indexOfColon - 1; i >= 0; i--)
                 {
-                    break;
+                    var c = span[i];
+                    if (!char.IsLetterOrDigit(c) && c != '-' && c != '_')
+                    {
+                        break;
+                    }
                 }
+
+                i++;
+
+                var fieldName = span[i..indexOfColon].ToString();
+
+                sb.Append(span[..i]);
+                sb.Append(fieldProvider(fieldName));
+                sb.Append(':');
+
+                span = span[(indexOfColon + 1)..];
+
+                indexOfColon = span.IndexOf(':');
             }
 
-            i++;
+            sb.Append(span);
 
-            sb.Append(query[position..i]);
-            sb.Append(fieldProvider(query[i..indexOfColon]));
-
-            position = indexOfColon + 1;
-
-            indexOfColon = query.IndexOf(':', position);
+            return sb.ToString();
         }
-
-        sb.Append(query[lastIndexOfColon..]);
-
-        return sb.ToString();
+        finally
+        {
+            DefaultPools.StringBuilder.Return(sb);
+        }
     }
 }

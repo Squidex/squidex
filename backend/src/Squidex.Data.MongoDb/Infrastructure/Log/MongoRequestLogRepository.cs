@@ -73,7 +73,7 @@ public sealed class MongoRequestLogRepository(IMongoDatabase database, IOptions<
                 x.Key == key &&
                 x.Timestamp >= fromTime &&
                 x.Timestamp <= toTime)
-            .ToAsyncEnumerable(ct);
+            .AsAsyncEnumerable(ct);
 
         return documents.Select(x => x.ToRequest());
     }

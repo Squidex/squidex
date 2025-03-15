@@ -86,7 +86,7 @@ public sealed class EFRequestLogRepository<TContext>(IDbContextFactory<TContext>
             dbContext.Set<EFRequestEntity>()
                 .Where(x => x.Key == key)
                 .Where(x => x.Timestamp >= fromTime && x.Timestamp <= toTime)
-                .ToAsyncEnumerable();
+                .AsAsyncEnumerable();
 
         await foreach (var entity in entities.WithCancellation(ct))
         {

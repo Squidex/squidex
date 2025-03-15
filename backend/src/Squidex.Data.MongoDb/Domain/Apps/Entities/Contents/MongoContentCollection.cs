@@ -258,7 +258,7 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
     public IAsyncEnumerable<MongoContentEntity> StreamAll(
         CancellationToken ct)
     {
-        return Collection.Find(FindAll).ToAsyncEnumerable(ct);
+        return Collection.Find(FindAll).AsAsyncEnumerable(ct);
     }
 
     public async Task UpsertAsync(SnapshotWriteJob<MongoContentEntity> job,

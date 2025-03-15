@@ -26,7 +26,7 @@ public sealed partial class EFAssetRepository<TContext>(IDbContextFactory<TConte
             dbContext.Set<EFAssetEntity>()
                 .Where(x => x.IndexedAppId == appId)
                 .Where(x => !x.IsDeleted)
-                .ToAsyncEnumerable();
+                .AsAsyncEnumerable();
 
         await foreach (var entity in entities.WithCancellation(ct))
         {

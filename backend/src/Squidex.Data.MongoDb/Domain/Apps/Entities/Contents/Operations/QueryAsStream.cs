@@ -30,7 +30,7 @@ public sealed class QueryAsStream : OperationBase
         }
 
         var filter = CreateFilter(appId, schemaIds);
-        var find = Collection.Find(filter).SelectFields(null).ToAsyncEnumerable(ct);
+        var find = Collection.Find(filter).SelectFields(null).AsAsyncEnumerable(ct);
 
         await foreach (var entity in find.WithCancellation(ct))
         {
@@ -52,7 +52,7 @@ public sealed class QueryAsStream : OperationBase
         var filter = CreateFilter(appId, schemaIds);
         var find = Collection.Find(filter).Project<IdOnly>(projection);
 
-        await foreach (var entity in find.ToAsyncEnumerable(ct).WithCancellation(ct))
+        await foreach (var entity in find.AsAsyncEnumerable(ct).WithCancellation(ct))
         {
             yield return entity.Id;
         }

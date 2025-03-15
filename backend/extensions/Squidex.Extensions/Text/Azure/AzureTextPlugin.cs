@@ -23,7 +23,6 @@ public sealed class AzureTextPlugin : IPlugin
         if (string.Equals(fullTextType, "Azure", StringComparison.OrdinalIgnoreCase))
         {
             var serviceEndpoint = config.GetValue<string>("fullText:azure:serviceEndpoint");
-
             if (string.IsNullOrWhiteSpace(serviceEndpoint))
             {
                 var error = new ConfigurationError("Value is required.", "fullText:azure:serviceEndpoint");
@@ -32,7 +31,6 @@ public sealed class AzureTextPlugin : IPlugin
             }
 
             var serviceApiKey = config.GetValue<string>("fullText:azure:apiKey");
-
             if (string.IsNullOrWhiteSpace(serviceApiKey))
             {
                 var error = new ConfigurationError("Value is required.", "fullText:azure:apiKey");
@@ -41,14 +39,15 @@ public sealed class AzureTextPlugin : IPlugin
             }
 
             var indexName = config.GetValue<string>("fullText:azure:indexName");
-
             if (string.IsNullOrWhiteSpace(indexName))
             {
                 indexName = "squidex-index";
             }
 
+            var searchFullPrefix = config.GetValue<string>("fullText:azure:fullPrefix") ?? string.Empty;
+
             services.AddSingleton(
-                c => new AzureTextIndex(serviceEndpoint, serviceApiKey, indexName));
+                c => new AzureTextIndex(serviceEndpoint, serviceApiKey, indexName, searchFullPrefix.Trim()));
 
             services.AddSingleton<ITextIndex>(
                 c => c.GetRequiredService<AzureTextIndex>());

@@ -37,7 +37,7 @@ public sealed class EFTextIndexerState<TContext>(IDbContextFactory<TContext> dbC
         var ids =
             dbContext.Set<TextContentState>()
                 .FromSqlRaw(query, parameters)
-                .ToAsyncEnumerable()
+                .AsAsyncEnumerable()
                 .TakeWhile(x => x.UniqueContentId.AppId == app.Id)
                 .Take(int.MaxValue)
                 .Select(x => x.UniqueContentId);

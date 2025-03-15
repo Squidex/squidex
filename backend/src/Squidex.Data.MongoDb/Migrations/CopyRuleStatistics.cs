@@ -41,7 +41,7 @@ public sealed class CopyRuleStatistics(IMongoDatabase database, IRuleUsageTracke
 
         var collection = database.GetCollection<Document>(collectionName);
 
-        await foreach (var document in collection.Find(new BsonDocument()).ToAsyncEnumerable(ct))
+        await foreach (var document in collection.Find(new BsonDocument()).AsAsyncEnumerable(ct))
         {
             await ruleUsageTracker.TrackAsync(
                 document.AppId,

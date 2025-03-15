@@ -29,7 +29,7 @@ public sealed partial class EFContentRepository<TContext, TContentContext> : ISn
     {
         await using var dbContext = await CreateDbContextAsync(ct);
 
-        var entities = dbContext.Set<EFContentCompleteEntity>().ToAsyncEnumerable();
+        var entities = dbContext.Set<EFContentCompleteEntity>().AsAsyncEnumerable();
 
         await foreach (var entity in entities.WithCancellation(ct))
         {

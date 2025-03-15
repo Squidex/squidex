@@ -56,7 +56,7 @@ public sealed partial class EFAssetRepository<TContext> : ISnapshotStore<Asset>,
     {
         await using var dbContext = await CreateDbContextAsync(ct);
 
-        var entities = dbContext.Set<EFAssetEntity>().ToAsyncEnumerable();
+        var entities = dbContext.Set<EFAssetEntity>().AsAsyncEnumerable();
 
         await foreach (var entity in entities.WithCancellation(ct))
         {

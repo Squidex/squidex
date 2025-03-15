@@ -94,7 +94,7 @@ public abstract class MongoSnapshotStoreBase<T, TState>(IMongoDatabase database)
         {
             var find = Collection.Find(FindAll, Batching.Options);
 
-            await foreach (var document in find.ToAsyncEnumerable(ct))
+            await foreach (var document in find.AsAsyncEnumerable(ct))
             {
                 if (document.Document is IOnRead onRead)
                 {

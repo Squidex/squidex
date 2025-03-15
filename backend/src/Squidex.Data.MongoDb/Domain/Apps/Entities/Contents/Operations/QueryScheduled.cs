@@ -43,7 +43,7 @@ internal sealed class QueryScheduled : OperationBase
     {
         var find = Collection.Find(x => x.ScheduledAt < now && x.IsDeleted != true).Not(x => x.Data, x => x.NewData);
 
-        return find.ToAsyncEnumerable(ct);
+        return find.AsAsyncEnumerable(ct);
     }
 
     private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId appId,

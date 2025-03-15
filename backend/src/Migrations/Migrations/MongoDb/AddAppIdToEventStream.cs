@@ -24,7 +24,7 @@ public sealed class AddAppIdToEventStream(IMongoDatabase database) : MongoBase<B
         var collectionV2 = database.GetCollection<BsonDocument>("Events2");
 
         // Run batch first, because it is cheaper as it has less items.
-        var batchedCommits = collectionV1.Find(FindAll).ToAsyncEnumerable(ct).Batch(500, ct).Buffered(2, ct);
+        var batchedCommits = collectionV1.Find(FindAll).AsAsyncEnumerable(ct).Batch(500, ct).Buffered(2, ct);
 
         var options = new ParallelOptions
         {

@@ -80,7 +80,7 @@ public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAsse
     {
         var find = Collection.Find(x => x.IndexedAppId == appId && !x.IsDeleted);
 
-        await foreach (var entity in find.ToAsyncEnumerable(ct).WithCancellation(ct))
+        await foreach (var entity in find.AsAsyncEnumerable(ct).WithCancellation(ct))
         {
             yield return entity;
         }

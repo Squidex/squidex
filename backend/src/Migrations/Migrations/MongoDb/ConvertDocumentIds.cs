@@ -79,7 +79,7 @@ public sealed class ConvertDocumentIds(IMongoDatabase databaseDefault, IMongoDat
         await collectionV2.DeleteManyAsync(FindAll, ct);
 
         // Run batch first, because it is cheaper as it has less items.
-        var batches = collectionV1.Find(FindAll).ToAsyncEnumerable(ct).Batch(500, ct).Buffered(2, ct);
+        var batches = collectionV1.Find(FindAll).AsAsyncEnumerable(ct).Batch(500, ct).Buffered(2, ct);
 
         await Parallel.ForEachAsync(batches, ct, async (batch, ct) =>
         {

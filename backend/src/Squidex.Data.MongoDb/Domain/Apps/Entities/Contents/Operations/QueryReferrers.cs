@@ -41,7 +41,7 @@ internal sealed class QueryReferrers : OperationBase
         var filter = BuildFilter(appId, reference);
         var find = Collection.Find(filter).Limit(take).SelectFields(null);
 
-        await foreach (var entity in find.ToAsyncEnumerable(ct).WithCancellation(ct))
+        await foreach (var entity in find.AsAsyncEnumerable(ct).WithCancellation(ct))
         {
             yield return entity;
         }

@@ -36,10 +36,18 @@ public class QueryParserTests
     }
 
     [Fact]
-    public void Should_prefix_field_query_within_complex_query()
+    public void Should_prefix_field_query_within_complex_query1()
     {
         var source = "Hallo OR (Hello en:World)";
 
         Assert.Equal("Hallo OR (Hello texts.en:World)", sut.Parse(source)?.Text);
+    }
+
+    [Fact]
+    public void Should_prefix_field_query_within_complex_query2()
+    {
+        var source = "Hallo OR (it:Hello en:World)";
+
+        Assert.Equal("Hallo OR (texts.it:Hello texts.en:World)", sut.Parse(source)?.Text);
     }
 }

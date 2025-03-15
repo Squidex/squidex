@@ -52,7 +52,7 @@ public sealed class MongoRuleEventRepository(IMongoDatabase database) : MongoRep
     public async IAsyncEnumerable<IRuleEventEntity> QueryPendingAsync(Instant now,
         [EnumeratorCancellation] CancellationToken ct = default)
     {
-        var ruleEvents = Collection.Find(x => x.NextAttempt < now).ToAsyncEnumerable(ct);
+        var ruleEvents = Collection.Find(x => x.NextAttempt < now).AsAsyncEnumerable(ct);
 
         await foreach (var ruleEvent in ruleEvents.WithCancellation(ct))
         {

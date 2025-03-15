@@ -22,15 +22,18 @@ public sealed class AzureTextIndex : IInitializable, ITextIndex
     private readonly SearchIndexClient indexClient;
     private readonly SearchClient searchClient;
     private readonly QueryParser queryParser = new QueryParser(AzureIndexDefinition.GetFieldName);
+    private readonly string searchFullPrefix;
 
     public AzureTextIndex(
         string serviceEndpoint,
         string serviceApiKey,
-        string indexName)
+        string indexName,
+        string searchFullPrefix)
     {
         indexClient = new SearchIndexClient(new Uri(serviceEndpoint), new AzureKeyCredential(serviceApiKey));
 
-        searchClient = indexClient.GetSearchClient(indexName);
+        this.searchClient = indexClient.GetSearchClient(indexName);
+        this.searchFullPrefix = searchFullPrefix;
     }
 
     public async Task InitializeAsync(
@@ -90,7 +93,6 @@ public sealed class AzureTextIndex : IInitializable, ITextIndex
         Guard.NotNull(query);
 
         var parsed = queryParser.Parse(query.Text);
-
         if (parsed == null)
         {
             return null;
@@ -149,7 +151,14 @@ public sealed class AzureTextIndex : IInitializable, ITextIndex
 
         searchOptions.Select.Add("contentId");
         searchOptions.Size = take;
-        searchOptions.QueryType = SearchQueryType.Full;
+
+        var isFullQuery = text.StartsWith(searchFullPrefix, StringComparison.OrdinalIgnoreCase);
+        if (isFullQuery)
+        {
+            searchOptions.QueryType = SearchQueryType.Full;
+
+            text = text[searchFullPrefix.Length..];
+        }
 
         var results = await searchClient.SearchAsync<SearchDocument>(text, searchOptions, ct);
 
