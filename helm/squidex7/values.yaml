@@ -9,10 +9,19 @@ service:
   ## @param service.port Kubernetes Service port
   ##
   port: 80
+  ## @param service.annotations Kubernetes Service annotations
+  ##
+  annotations: {}
 deployment:
   ## @param deployment.replicaCount Number of instances.
   ##
   replicaCount: 1
+  ## @param deployment.annotations Common annotations for all deployments
+  ##
+  annotations: {}
+  ## @param deployment.podAnnotations Common annotations for all pods
+  ##
+  podAnnotations: {}
 selectors:
   ## @skip selectors.component
   ##

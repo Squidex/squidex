@@ -5,6 +5,10 @@ metadata:
   labels:
     {{- include "squidex.labels" . | indent 4 }}  
     app.kubernetes.io/role: api
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   type: {{ .Values.service.type }}
   ports:

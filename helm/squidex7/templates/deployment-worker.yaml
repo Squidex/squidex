@@ -5,6 +5,10 @@ metadata:
   labels:
     {{- include "squidex.labels" . | indent 4 }}
     app.kubernetes.io/role: worker
+  {{- with .Values.deployment.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
 spec:
   replicas: 1
   selector:
@@ -16,6 +20,10 @@ spec:
       labels:
         {{- include "squidex.selectors" . | indent 8 }}
         app.kubernetes.io/role: worker
+      {{- with .Values.deployment.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
