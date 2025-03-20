@@ -24,6 +24,12 @@ public static class OidcServices
 
             authBuilder.AddOpenIdConnect(Constants.ExternalScheme, displayName, options =>
             {
+                if (identityOptions.OidcDisableProfileScope)
+                {
+                    options.Scope.Clear();
+                    options.Scope.Add(OpenIddict.Abstractions.OpenIddictConstants.Scopes.OpenId);
+                }
+
                 options.Events = new OidcHandler(identityOptions);
                 options.Authority = identityOptions.OidcAuthority;
                 options.Prompt = identityOptions.OidcPrompt;
