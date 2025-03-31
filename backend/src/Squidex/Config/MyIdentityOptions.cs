@@ -61,6 +61,13 @@ public sealed class MyIdentityOptions
 
     public string[] OidcScopes { get; set; }
 
+    /// <summary>
+    /// <see cref="Microsoft.AspNetCore.Authentication.OpenIdConnect.OpenIdConnectOptions"/>
+    /// by default contains scopes "openid" and "profile".
+    /// When <see cref="OidcDisableProfileScope"/> is set to true scope "profile" will be removed.
+    /// </summary>
+    public bool OidcDisableProfileScope { get; set; }
+
     public bool OidcGetClaimsFromUserInfoEndpoint { get; set; }
 
     public bool OidcOverridePermissionsWithCustomClaimsOnLogin { get; set; }
