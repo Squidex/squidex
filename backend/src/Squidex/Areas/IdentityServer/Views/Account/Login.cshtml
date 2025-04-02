@@ -47,7 +47,7 @@
 
                     <div class="form-group">
                         <div error-for="Password"></div>
-                        <input asp-for="Password" type="password" class="form-control" placeholder="@T.Get("users.login.passwordPlaceholder")" />
+                        <input asp-for="Password" type="password" class="form-control" placeholder="@T.Get("users.login.passwordPlaceholder")" autocomplete="off" />
                     </div>
 
                     <button type="submit" data-testid="login-button" class="btn btn-block btn-primary">@T.Get("common.login")</button>

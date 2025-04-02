@@ -162,14 +162,14 @@
                         <label asp-for="Password">@T.Get("common.password")</label>
 
                         <div error-for="Password"></div>
-                        <input asp-for="Password" type="password" class="form-control" />
+                        <input asp-for="Password" type="password" class="form-control" autocomplete="off" />
                     </div>
 
                     <div class="form-group">
                         <label asp-for="PasswordConfirm">@T.Get("setup.createUser.confirmPassword")</label>
 
                         <div error-for="PasswordConfirm"></div>
-                        <input asp-for="PasswordConfirm" type="password" class="form-control" />
+                        <input asp-for="PasswordConfirm" type="password" class="form-control" autocomplete="off" />
                     </div>
 
                     <div class="form-group mb-0">

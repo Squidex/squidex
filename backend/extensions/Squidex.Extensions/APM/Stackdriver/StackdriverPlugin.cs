@@ -54,6 +54,6 @@ public sealed class StackdriverPlugin : IPlugin
         var serviceName = config.GetValue<string>("logging:name") ?? "Squidex";
         var serviceVersion = Assembly.GetEntryAssembly()?.GetName().Version?.ToString();
 
-        services.AddSingleton(c => ContextExceptionLogger.Create(projectId, serviceVersion, serviceVersion, null));
+        services.AddSingleton(c => ContextExceptionLogger.Create(projectId, serviceName, serviceVersion, null));
     }
 }
