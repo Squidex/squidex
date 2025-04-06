@@ -60,6 +60,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Squidex.Data.EntityFramewor
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squidex.Data.Tests.CodeGenerator", "tests\Squidex.Data.Tests.CodeGenerator\Squidex.Data.Tests.CodeGenerator.csproj", "{2E4CC21D-3AB9-4B8C-A13E-348AA3E2F328}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Squidex.Flows", "..\..\squidex-tools\libs\flows\Squidex.Flows\Squidex.Flows.csproj", "{42EE9178-F8F6-4098-A2A3-F45BD78B1C43}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -290,6 +292,18 @@ Global
 		{2E4CC21D-3AB9-4B8C-A13E-348AA3E2F328}.Release|x64.Build.0 = Release|Any CPU
 		{2E4CC21D-3AB9-4B8C-A13E-348AA3E2F328}.Release|x86.ActiveCfg = Release|Any CPU
 		{2E4CC21D-3AB9-4B8C-A13E-348AA3E2F328}.Release|x86.Build.0 = Release|Any CPU
+		{42EE9178-F8F6-4098-A2A3-F45BD78B1C43}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{42EE9178-F8F6-4098-A2A3-F45BD78B1C43}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{42EE9178-F8F6-4098-A2A3-F45BD78B1C43}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{42EE9178-F8F6-4098-A2A3-F45BD78B1C43}.Debug|x64.Build.0 = Debug|Any CPU
+		{42EE9178-F8F6-4098-A2A3-F45BD78B1C43}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{42EE9178-F8F6-4098-A2A3-F45BD78B1C43}.Debug|x86.Build.0 = Debug|Any CPU
+		{42EE9178-F8F6-4098-A2A3-F45BD78B1C43}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{42EE9178-F8F6-4098-A2A3-F45BD78B1C43}.Release|Any CPU.Build.0 = Release|Any CPU
+		{42EE9178-F8F6-4098-A2A3-F45BD78B1C43}.Release|x64.ActiveCfg = Release|Any CPU
+		{42EE9178-F8F6-4098-A2A3-F45BD78B1C43}.Release|x64.Build.0 = Release|Any CPU
+		{42EE9178-F8F6-4098-A2A3-F45BD78B1C43}.Release|x86.ActiveCfg = Release|Any CPU
+		{42EE9178-F8F6-4098-A2A3-F45BD78B1C43}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Diagnostics.Contracts;
+using Squidex.Flows.Internal;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Rules;
@@ -19,6 +20,8 @@ public record Rule : AppEntity
     public RuleAction Action { get; init; }
 
     public bool IsEnabled { get; init; } = true;
+
+    public FlowDefinition Flow { get; init; }
 
     public override DomainId UniqueId
     {
