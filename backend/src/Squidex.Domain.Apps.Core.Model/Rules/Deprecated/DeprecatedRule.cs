@@ -5,17 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.HandleRules;
+namespace Squidex.Domain.Apps.Core.Rules.Deprecated;
 
-public enum RuleFieldEditor
+public class DeprecatedRule
 {
-    Checkbox,
-    Dropdown,
-    Email,
-    Javascript,
-    Number,
-    Password,
-    Text,
-    TextArea,
-    Url,
+    public string? Name { get; init; }
+
+    public RuleTrigger Trigger { get; init; }
+
+    public DeprecatedRuleAction Action { get; init; }
+
+    public bool IsEnabled { get; init; } = true;
 }

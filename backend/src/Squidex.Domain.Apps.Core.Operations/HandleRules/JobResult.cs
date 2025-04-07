@@ -7,6 +7,7 @@
 
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
+using Squidex.Flows.Internal.Execution;
 
 namespace Squidex.Domain.Apps.Core.HandleRules;
 
@@ -32,11 +33,6 @@ public sealed record JobResult
         SkipReason = SkipReason.FromRule,
     };
 
-    public static readonly JobResult NoAction = new JobResult
-    {
-        SkipReason = SkipReason.NoAction,
-    };
-
     public static readonly JobResult NoTrigger = new JobResult
     {
         SkipReason = SkipReason.NoTrigger,
@@ -54,7 +50,7 @@ public sealed record JobResult
 
     public Rule? Rule { get; init; }
 
-    public RuleJob? Job { get; init; }
+    public CreateFlowInstanceRequest<FlowEventContext>? Job { get; init; }
 
     public EnrichedEvent? EnrichedEvent { get; init; }
 
@@ -69,7 +65,7 @@ public sealed record JobResult
         return new JobResult { Rule = rule, SkipReason = reason };
     }
 
-    public static JobResult ConditionDoesNotMatch(EnrichedEvent? enrichedEvent = null, RuleJob? job = null)
+    public static JobResult ConditionDoesNotMatch(EnrichedEvent? enrichedEvent = null, CreateFlowInstanceRequest<FlowEventContext>? job = null)
     {
         return new JobResult
         {
@@ -80,7 +76,7 @@ public sealed record JobResult
         };
     }
 
-    public static JobResult Failed(Exception exception, EnrichedEvent? enrichedEvent = null, RuleJob? job = null)
+    public static JobResult Failed(Exception exception, EnrichedEvent? enrichedEvent = null, CreateFlowInstanceRequest<FlowEventContext>? job = null)
     {
         return new JobResult
         {

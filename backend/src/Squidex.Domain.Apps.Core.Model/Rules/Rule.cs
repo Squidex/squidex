@@ -17,11 +17,9 @@ public record Rule : AppEntity
 
     public RuleTrigger Trigger { get; init; }
 
-    public RuleAction Action { get; init; }
+    public FlowDefinition Flow { get; init; }
 
     public bool IsEnabled { get; init; } = true;
-
-    public FlowDefinition Flow { get; init; }
 
     public override DomainId UniqueId
     {
@@ -80,20 +78,15 @@ public record Rule : AppEntity
     }
 
     [Pure]
-    public Rule Update(RuleAction newAction)
+    public Rule Update(FlowDefinition newFlow)
     {
-        Guard.NotNull(newAction);
+        Guard.NotNull(newFlow);
 
-        if (newAction.GetType() != Action.GetType())
-        {
-            ThrowHelper.ArgumentException("New action has another type.", nameof(newAction));
-        }
-
-        if (Action.Equals(newAction))
+        if (Flow.Equals(newFlow))
         {
             return this;
         }
 
-        return this with { Action = newAction };
+        return this with { Flow = newFlow };
     }
 }

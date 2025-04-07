@@ -7,23 +7,22 @@
 
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards;
 
-public sealed class RuleTriggerValidator(Func<DomainId, Task<Schema?>> schemaProvider) : IRuleTriggerVisitor<Task<IEnumerable<ValidationError>>>
+public sealed class RuleTriggerValidator(DomainId appId, IAppProvider appProvider, CancellationToken ct)
+    : IRuleTriggerVisitor<Task<IEnumerable<ValidationError>>>
 {
-    public Func<DomainId, Task<Schema?>> SchemaProvider { get; } = schemaProvider;
-
-    public static Task<IEnumerable<ValidationError>> ValidateAsync(DomainId appId, RuleTrigger trigger, IAppProvider appProvider)
+    public static Task<IEnumerable<ValidationError>> ValidateAsync(DomainId appId, RuleTrigger trigger, IAppProvider appProvider,
+        CancellationToken ct)
     {
         Guard.NotNull(trigger);
         Guard.NotNull(appProvider);
 
-        var visitor = new RuleTriggerValidator(x => appProvider.GetSchemaAsync(appId, x));
+        var visitor = new RuleTriggerValidator(appId, appProvider, ct);
 
         return trigger.Accept(visitor);
     }
@@ -90,7 +89,7 @@ public sealed class RuleTriggerValidator(Func<DomainId, Task<Schema?>> schemaPro
 
     private async Task<ValidationError?> CheckSchemaAsync(SchemaCondition schema)
     {
-        if (await SchemaProvider(schema.SchemaId) == null)
+        if (await appProvider.GetSchemaAsync(appId, schema.SchemaId, true, ct) == null)
         {
             return new ValidationError(T.Get("schemas.notFoundId", new { id = schema.SchemaId }),
                 nameof(ContentChangedTriggerV2.Schemas));

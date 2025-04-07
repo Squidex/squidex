@@ -5,10 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
+using Squidex.Flows;
+
 namespace Squidex.Domain.Apps.Core.HandleRules;
 
-[AttributeUsage(AttributeTargets.Property)]
-public sealed class EditorAttribute(RuleFieldEditor editor) : Attribute
+public sealed class FlowEventContext : FlowContext
 {
-    public RuleFieldEditor Editor { get; } = editor;
+    public EnrichedEvent Event { get; init; }
 }

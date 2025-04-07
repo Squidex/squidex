@@ -5,8 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
+using Squidex.Flows;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
 
@@ -14,7 +16,8 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards;
 
 public static class GuardRule
 {
-    public static Task CanCreate(CreateRule command, IAppProvider appProvider)
+    public static Task CanCreate(CreateRule command, IAppProvider appProvider, IFlowManager<FlowEventContext> flowManager,
+        CancellationToken ct)
     {
         Guard.NotNull(command);
 
@@ -31,12 +34,15 @@ public static class GuardRule
                 errors.Foreach((x, _) => x.AddTo(e));
             }
 
-            if (command.Action == null)
+            if (command.Flow == null)
             {
-                e(Not.Defined(nameof(command.Action)), nameof(command.Action));
+                e(Not.Defined(nameof(command.Flow)), nameof(command.Flow));
             }
             else
             {
+                await flowManager.ValidateAsync(command.Flow, (path, type, message) =>
+                {
+                }, ct);
                 var errors = command.Action.Validate();
 
                 errors.Foreach((x, _) => x.AddTo(e));
@@ -44,7 +50,7 @@ public static class GuardRule
         });
     }
 
-    public static Task CanUpdate(UpdateRule command, Rule rule, IAppProvider appProvider)
+    public static Task CanUpdate(UpdateRule command, Rule rule, IAppProvider appProvider, IFlowManager<FlowEventContext> flowManager)
     {
         Guard.NotNull(command);
 
@@ -57,7 +63,7 @@ public static class GuardRule
                 errors.Foreach((x, _) => x.AddTo(e));
             }
 
-            if (command.Action != null)
+            if (command.Flow != null)
             {
                 var errors = command.Action.Validate();
 
@@ -65,4 +71,6 @@ public static class GuardRule
             }
         });
     }
+
+    private AddValidation 
 }

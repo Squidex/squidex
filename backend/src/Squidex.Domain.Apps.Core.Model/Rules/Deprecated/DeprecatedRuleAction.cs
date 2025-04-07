@@ -5,9 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Flows;
 
-[AttributeUsage(AttributeTargets.Property)]
-public sealed class FormattableAttribute : Attribute
+namespace Squidex.Domain.Apps.Core.Rules.Deprecated;
+
+public abstract record DeprecatedRuleAction
 {
+    public abstract FlowStep ToFlowStep();
 }

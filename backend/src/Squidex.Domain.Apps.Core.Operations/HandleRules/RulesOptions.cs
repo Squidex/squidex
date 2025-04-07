@@ -9,11 +9,11 @@ namespace Squidex.Domain.Apps.Core.HandleRules;
 
 public sealed class RulesOptions
 {
-    public int ExecutionTimeoutInSeconds { get; set; } = 3;
-
     public int MaxEnrichedEvents { get; set; } = 500;
 
     public TimeSpan JobQueryInterval { get; set; } = TimeSpan.FromSeconds(10);
 
     public TimeSpan RulesCacheDuration { get; set; } = TimeSpan.FromSeconds(10);
+
+    public TimeSpan StaleTime { get; set; } = TimeSpan.FromDays(2);
 }

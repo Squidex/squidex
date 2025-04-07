@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Flows.Internal;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Commands;
 
@@ -15,7 +16,7 @@ public abstract class RuleEditCommand : RuleCommand
 
     public RuleTrigger? Trigger { get; set; }
 
-    public RuleAction? Action { get; set; }
+    public FlowDefinition? Flow { get; set; }
 
     public bool? IsEnabled { get; set; }
 }

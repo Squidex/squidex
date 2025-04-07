@@ -11,8 +11,8 @@ using Microsoft.Extensions.Options;
 using Squidex.Caching;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Events;
+using Squidex.Flows;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.EventSourcing;
@@ -23,7 +23,7 @@ public sealed class RuleEnqueuer(
     IMemoryCache cache,
     ILocalCache localCache,
     IAppProvider appProvider,
-    IRuleEventRepository ruleEventRepository,
+    IFlowManager<FlowEventContext> flowManager,
     IRuleService ruleService,
     IRuleUsageTracker ruleUsageTracker,
     IOptions<RulesOptions> options,
@@ -65,11 +65,11 @@ public sealed class RuleEnqueuer(
         };
 
         // Write in batches of 100 items for better performance. Dispose completes the last write.
-        await using var batch = new RuleQueueWriter(ruleEventRepository, ruleUsageTracker, log);
+        await using var batch = new RuleQueueWriter(flowManager, ruleUsageTracker, log);
 
         await foreach (var result in ruleService.CreateJobsAsync(@event, context))
         {
-            await batch.WriteAsync(result);
+            await batch.WriteAsync(appEvent.AppId.Id, result);
         }
     }
 
@@ -78,7 +78,7 @@ public sealed class RuleEnqueuer(
         using (localCache.StartContext())
         {
             // Write in batches of 100 items for better performance. Dispose completes the last write.
-            await using var batch = new RuleQueueWriter(ruleEventRepository, ruleUsageTracker, log);
+            await using var batch = new RuleQueueWriter(flowManager, ruleUsageTracker, log);
 
             foreach (var @event in events)
             {
@@ -106,7 +106,7 @@ public sealed class RuleEnqueuer(
 
                 await foreach (var result in ruleService.CreateJobsAsync(@event, context))
                 {
-                    await batch.WriteAsync(result);
+                    await batch.WriteAsync(appEvent.AppId.Id, result);
                 }
             }
         }

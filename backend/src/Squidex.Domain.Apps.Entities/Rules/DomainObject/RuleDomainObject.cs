@@ -7,11 +7,13 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Rules;
+using Squidex.Flows;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
@@ -72,7 +74,7 @@ public partial class RuleDomainObject(
             case UpdateRule updateRule:
                 return ApplyReturnAsync(updateRule, async (c, ct) =>
                 {
-                    await GuardRule.CanUpdate(c, Snapshot, AppProvider());
+                    await GuardRule.CanUpdate(c, Snapshot, AppProvider(), FlowManager());
 
                     Update(c);
 
@@ -163,5 +165,10 @@ public partial class RuleDomainObject(
     private IAppProvider AppProvider()
     {
         return serviceProvider.GetRequiredService<IAppProvider>();
+    }
+
+    private IFlowManager<FlowEventContext> FlowManager()
+    {
+        return serviceProvider.GetRequiredService<IFlowManager<FlowEventContext>>();
     }
 }

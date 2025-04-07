@@ -12,46 +12,25 @@ using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
-using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Contents;
+using Squidex.Flows.Internal;
+using Squidex.Flows.Steps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Domain.Apps.Core.Operations.HandleRules;
 
 public class RuleServiceTests
 {
     private readonly IRuleTriggerHandler ruleTriggerHandler = A.Fake<IRuleTriggerHandler>();
-    private readonly IRuleActionHandler ruleActionHandler = A.Fake<IRuleActionHandler>();
     private readonly IEventEnricher eventEnricher = A.Fake<IEventEnricher>();
-    private readonly IClock clock = A.Fake<IClock>();
-    private readonly string actionData = "{\"value\":10}";
-    private readonly string actionDump = "MyDump";
-    private readonly string actionName = "ValidAction";
-    private readonly string actionDescription = "MyDescription";
     private readonly NamedId<DomainId> appId = NamedId.Of(DomainId.NewGuid(), "my-app");
-    private readonly TypeRegistry typeRegistry = new TypeRegistry();
+    private readonly Instant now = SystemClock.Instance.GetCurrentInstant().WithoutMs();
     private readonly RuleService sut;
 
     public sealed class InvalidEvent : IEvent
     {
-    }
-
-    [RuleAction]
-    public sealed record InvalidAction : RuleAction
-    {
-    }
-
-    [RuleAction]
-    public sealed record ValidAction : RuleAction
-    {
-    }
-
-    public sealed class ValidData
-    {
-        public int Value { get; set; }
     }
 
     public sealed record InvalidTrigger : RuleTrigger
@@ -64,27 +43,19 @@ public class RuleServiceTests
 
     public RuleServiceTests()
     {
-        typeRegistry.Add<RuleAction, ValidAction>(actionName);
+        var clock = A.Fake<IClock>();
 
         A.CallTo(() => clock.GetCurrentInstant())
-            .Returns(SystemClock.Instance.GetCurrentInstant().WithoutMs());
-
-        A.CallTo(() => ruleActionHandler.ActionType)
-            .Returns(typeof(ValidAction));
-
-        A.CallTo(() => ruleActionHandler.DataType)
-            .Returns(typeof(ValidData));
+            .ReturnsLazily(() => now);
 
         A.CallTo(() => ruleTriggerHandler.TriggerType)
             .Returns(typeof(ContentChangedTriggerV2));
 
-        var log = A.Fake<ILogger<RuleService>>();
-
         sut = new RuleService(
-            Options.Create(new RulesOptions()),
             [ruleTriggerHandler],
-            [ruleActionHandler],
-            eventEnricher, TestUtils.DefaultSerializer, log, typeRegistry)
+            eventEnricher,
+            Options.Create(new RulesOptions()),
+            A.Fake<ILogger<RuleService>>())
         {
             Clock = clock,
         };
@@ -226,22 +197,6 @@ public class RuleServiceTests
     }
 
     [Fact]
-    public async Task Should_not_create_job_from_snapshots_if_no_action_handler_registered()
-    {
-        var context = Rule(action: new InvalidAction());
-
-        A.CallTo(() => ruleTriggerHandler.CanCreateSnapshotEvents)
-            .Returns(true);
-
-        var jobs = await sut.CreateSnapshotJobsAsync(context).ToListAsync();
-
-        Assert.Empty(jobs);
-
-        A.CallTo(() => ruleTriggerHandler.CreateSnapshotEventsAsync(A<RuleContext>._, A<CancellationToken>._))
-            .MustNotHaveHappened();
-    }
-
-    [Fact]
     public async Task Should_create_jobs_from_snapshots_if_rule_disabled_and_included()
     {
         var context = Rule(disable: true, includeSkipped: true);
@@ -361,26 +316,6 @@ public class RuleServiceTests
             .MustNotHaveHappened();
     }
 
-    [Theory]
-    [InlineData(true)]
-    [InlineData(false)]
-    public async Task Should_create_debug_job_if_no_action_handler_registered(bool includeSkipped)
-    {
-        var context = Rule(includeSkipped: includeSkipped, action: new InvalidAction());
-
-        var eventEnvelope = CreateEnvelope(new ContentCreated());
-
-        A.CallTo(() => ruleTriggerHandler.Handles(eventEnvelope.Payload))
-            .Returns(true);
-
-        var actual = await sut.CreateJobsAsync(eventEnvelope, context.ToRulesContext()).SingleAsync();
-
-        Assert.Equal(SkipReason.NoAction, actual.SkipReason);
-
-        A.CallTo(() => ruleTriggerHandler.Trigger(A<Envelope<AppEvent>>._, A<RuleTrigger>._))
-            .MustNotHaveHappened();
-    }
-
     [Fact]
     public async Task Should_create_debug_job_if_rule_disabled()
     {
@@ -416,7 +351,7 @@ public class RuleServiceTests
 
         var eventEnvelope =
             Envelope.Create(new ContentCreated())
-                .SetTimestamp(clock.GetCurrentInstant().Minus(Duration.FromDays(3)));
+                .SetTimestamp(now.Minus(Duration.FromDays(3)));
 
         A.CallTo(() => ruleTriggerHandler.Handles(eventEnvelope.Payload))
             .Returns(true);
@@ -436,7 +371,7 @@ public class RuleServiceTests
 
         var eventEnvelope =
             Envelope.Create(new ContentCreated())
-                .SetTimestamp(clock.GetCurrentInstant().Minus(Duration.FromDays(3)));
+                .SetTimestamp(now.Minus(Duration.FromDays(3)));
         var eventEnriched = CreateDefaultFlow(context.Rule, eventEnvelope);
 
         var actual = await sut.CreateJobsAsync(eventEnvelope, context.ToRulesContext()).SingleAsync();
@@ -451,7 +386,7 @@ public class RuleServiceTests
 
         var eventEnvelope =
             Envelope.Create(new ContentCreated())
-                .SetTimestamp(clock.GetCurrentInstant().Minus(Duration.FromDays(3)));
+                .SetTimestamp(now.Minus(Duration.FromDays(3)));
         var eventEnriched = CreateDefaultFlow(context.Rule, eventEnvelope);
 
         var actual = await sut.CreateJobsAsync(eventEnvelope, context.ToRulesContext()).SingleAsync();
@@ -649,28 +584,6 @@ public class RuleServiceTests
     }
 
     [Fact]
-    public async Task Should_create_job_with_exception_if_trigger_failed()
-    {
-        var context = Rule();
-
-        var eventEnvelope = CreateEnvelope(new ContentCreated());
-        var eventEnriched = CreateDefaultFlow(context.Rule, eventEnvelope);
-
-        A.CallTo(() => ruleActionHandler.CreateJobAsync(eventEnriched, context.Rule.Action))
-            .Throws(new InvalidOperationException());
-
-        var actual = await sut.CreateJobsAsync(eventEnvelope, context.ToRulesContext()).SingleAsync();
-
-        Assert.NotNull(actual.EnrichmentError);
-        Assert.NotNull(actual.Job?.ActionData);
-        Assert.NotNull(actual.Job?.Description);
-        Assert.Equal(eventEnriched, actual.EnrichedEvent);
-
-        A.CallTo(() => eventEnricher.EnrichAsync(eventEnriched, MatchPayload(eventEnvelope)))
-            .MustHaveHappened();
-    }
-
-    [Fact]
     public async Task Should_create_multiple_jobs_if_triggered()
     {
         var context = Rule();
@@ -694,63 +607,6 @@ public class RuleServiceTests
             .MustHaveHappened();
     }
 
-    [Fact]
-    public async Task Should_return_success_job_with_full_dump_if_handler_returns_no_exception()
-    {
-        A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10), A<CancellationToken>._))
-            .Returns(Result.Success(actionDump));
-
-        var actual = await sut.InvokeAsync(actionName, actionData);
-
-        Assert.Equal(RuleResult.Success, actual.Result.Status);
-
-        Assert.True(actual.Elapsed >= TimeSpan.Zero);
-        Assert.True(actual.Result.Dump?.StartsWith(actionDump, StringComparison.OrdinalIgnoreCase));
-    }
-
-    [Fact]
-    public async Task Should_return_failed_job_with_full_dump_if_handler_returns_exception()
-    {
-        A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10), A<CancellationToken>._))
-            .Returns(Result.Failed(new InvalidOperationException(), actionDump));
-
-        var actual = await sut.InvokeAsync(actionName, actionData);
-
-        Assert.Equal(RuleResult.Failed, actual.Result.Status);
-
-        Assert.True(actual.Elapsed >= TimeSpan.Zero);
-        Assert.True(actual.Result.Dump?.StartsWith(actionDump, StringComparison.OrdinalIgnoreCase));
-    }
-
-    [Fact]
-    public async Task Should_return_timeout_job_with_full_dump_if_exception_from_handler_indicates_timeout()
-    {
-        A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10), A<CancellationToken>._))
-            .Returns(Result.Failed(new TimeoutException(), actionDump));
-
-        var actual = await sut.InvokeAsync(actionName, actionData);
-
-        Assert.Equal(RuleResult.Timeout, actual.Result.Status);
-
-        Assert.True(actual.Elapsed >= TimeSpan.Zero);
-        Assert.True(actual.Result.Dump?.StartsWith(actionDump, StringComparison.OrdinalIgnoreCase));
-
-        Assert.True(actual.Result.Dump?.IndexOf("Action timed out.", StringComparison.OrdinalIgnoreCase) >= 0);
-    }
-
-    [Fact]
-    public async Task Should_create_exception_details_if_job_to_execute_failed()
-    {
-        var ex = new InvalidOperationException();
-
-        A.CallTo(() => ruleActionHandler.ExecuteJobAsync(A<ValidData>.That.Matches(x => x.Value == 10), A<CancellationToken>._))
-            .Throws(ex);
-
-        var actual = await sut.InvokeAsync(actionName, actionData);
-
-        Assert.Equal(ex, actual.Result.Exception);
-    }
-
     private EnrichedContentEvent CreateDefaultFlow<T>(Rule rule, Envelope<T> eventEnvelope) where T : AppEvent
     {
         var eventEnriched = new EnrichedContentEvent { AppId = appId };
@@ -767,15 +623,25 @@ public class RuleServiceTests
         A.CallTo(() => ruleTriggerHandler.CreateEnrichedEventsAsync(MatchPayload(eventEnvelope), A<RulesContext>._, default))
             .Returns(new List<EnrichedEvent> { eventEnriched }.ToAsyncEnumerable());
 
-        A.CallTo(() => ruleActionHandler.CreateJobAsync(eventEnriched, rule.Action))
-            .Returns((actionDescription, new ValidData { Value = 10 }));
-
         return eventEnriched;
     }
 
-    private RuleContext Rule(bool disable = false, bool includeStale = false, bool includeSkipped = false, RuleAction? action = null, RuleTrigger? trigger = null)
+    private RuleContext Rule(bool disable = false, bool includeStale = false, bool includeSkipped = false, RuleTrigger? trigger = null)
     {
-        var rule = new Rule { Trigger = trigger ?? new ContentChangedTriggerV2(), Action = action ?? new ValidAction() };
+        var stepId = Guid.NewGuid();
+
+        var rule = new Rule
+        {
+            Flow = new FlowDefinition
+            {
+                Steps = new Dictionary<Guid, FlowStepDefinition>
+                {
+                    [stepId] = new FlowStepDefinition { Step = new DelayStep() },
+                },
+                InitialStep = stepId,
+            },
+            Trigger = trigger ?? new ContentChangedTriggerV2(),
+        };
 
         if (disable)
         {
@@ -793,7 +659,7 @@ public class RuleServiceTests
 
     private Envelope<T> CreateEnvelope<T>(T @event) where T : class, IEvent
     {
-        return Envelope.Create(@event).SetTimestamp(clock.GetCurrentInstant());
+        return Envelope.Create(@event).SetTimestamp(now);
     }
 
     private static Envelope<AppEvent> MatchPayload(Envelope<IEvent> eventEnvelope)
@@ -801,24 +667,9 @@ public class RuleServiceTests
         return A<Envelope<AppEvent>>.That.Matches(x => x.Payload == eventEnvelope.Payload);
     }
 
-    private void AssertJob(EnrichedContentEvent eventEnriched, JobResult actual, SkipReason skipped)
+    private static void AssertJob(EnrichedContentEvent eventEnriched, JobResult actual, SkipReason skipped)
     {
-        var now = clock.GetCurrentInstant();
-
-        var job = actual.Job!;
-
         Assert.Equal(skipped, actual.SkipReason);
-
         Assert.Equal(eventEnriched, actual.EnrichedEvent);
-        Assert.Equal(eventEnriched.AppId.Id, job.AppId);
-
-        Assert.Equal(actionData, job.ActionData);
-        Assert.Equal(actionName, job.ActionName);
-        Assert.Equal(actionDescription, job.Description);
-
-        Assert.Equal(now, job.Created);
-        Assert.Equal(now.Plus(Duration.FromDays(30)), job.Expires);
-
-        Assert.NotEqual(DomainId.Empty, job.Id);
     }
 }
