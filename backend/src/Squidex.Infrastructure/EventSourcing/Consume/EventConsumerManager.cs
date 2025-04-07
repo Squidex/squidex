@@ -23,7 +23,7 @@ public sealed class EventConsumerManager(
     {
         var snapshots = await persistence.Snapshots.ReadAllAsync(ct).ToListAsync(ct);
 
-        return snapshots.Where(x => activeNames.Contains(x.Key.ToString())).Select(x => x.Value.ToInfo(x.Key.ToString())).ToList();
+        return snapshots.Where(x => activeNames.Contains(x.Key.ToString())).Select(x => x.Value.ToInfo(x.Key.ToString())).OrderBy(x => x.Name).ToList();
     }
 
     public async Task<EventConsumerInfo> ResetAsync(string consumerName,

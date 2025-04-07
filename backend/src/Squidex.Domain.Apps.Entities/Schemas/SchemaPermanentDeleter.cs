@@ -61,7 +61,7 @@ public sealed class SchemaPermanentDeleter(
             return;
         }
 
-        using var activity = Infrastructure.Telemetry.Activities.StartActivity("RemoveAppFromSystem");
+        using var activity = Telemetry.Activities.StartActivity("RemoveAppFromSystem");
 
         var app = await appProvider.GetAppAsync(schemaDeleted.AppId.Id);
         if (app == null)
@@ -77,7 +77,7 @@ public sealed class SchemaPermanentDeleter(
 
         foreach (var deleter in deleters)
         {
-            using (Infrastructure.Telemetry.Activities.StartActivity(deleter.GetType().Name))
+            using (Telemetry.Activities.StartActivity(deleter.GetType().Name))
             {
                 await deleter.DeleteSchemaAsync(app, schema.Snapshot, default);
             }
