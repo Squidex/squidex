@@ -71,16 +71,18 @@ public sealed class Startup(IConfiguration config)
 
     public void Configure(IApplicationBuilder app)
     {
+
         app.UseWebSockets();
         app.UseCookiePolicy();
         app.UseDefaultPathBase();
         app.UseDefaultForwardRules();
-        app.UseSquidexHealthCheck();
-        app.UseSquidexRobotsTxt();
         app.UseSquidexLogging();
         app.UseSquidexLocalization();
         app.UseSquidexLocalCache();
         app.UseSquidexCors();
+        app.UseSquidexCompression();
+        app.UseSquidexHealthCheck();
+        app.UseSquidexRobotsTxt();
 
         app.UseOpenApi(options =>
         {
