@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Rules;
+using Squidex.Flows.Internal;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
@@ -28,12 +29,6 @@ public class RuleDomainObjectTests : HandlerTestBase<Rule>
     protected override DomainId Id
     {
         get => DomainId.Combine(AppId, ruleId);
-    }
-
-    [RuleAction]
-    public sealed record TestAction : RuleAction
-    {
-        public int Value { get; set; }
     }
 
     public RuleDomainObjectTests()
@@ -189,9 +184,9 @@ public class RuleDomainObjectTests : HandlerTestBase<Rule>
             {
                 HandleAll = false,
             },
-            Action = new TestAction
+            Flow = new FlowDefinition
             {
-                Value = 123,
+                InitialStep = Guid.NewGuid(),
             },
         };
     }
@@ -205,9 +200,9 @@ public class RuleDomainObjectTests : HandlerTestBase<Rule>
             {
                 HandleAll = true,
             },
-            Action = new TestAction
+            Flow = new FlowDefinition
             {
-                Value = 456,
+                InitialStep = Guid.NewGuid(),
             },
         };
     }

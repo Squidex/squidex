@@ -19,7 +19,7 @@ public class UsageTriggerValidationTests : GivenContext, IClassFixture<Translati
     {
         var trigger = new UsageTrigger { NumDays = 0 };
 
-        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider);
+        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider, CancellationToken);
 
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
@@ -33,7 +33,7 @@ public class UsageTriggerValidationTests : GivenContext, IClassFixture<Translati
     {
         var trigger = new UsageTrigger { NumDays = 32 };
 
-        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider);
+        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider, CancellationToken);
 
         errors.Should().BeEquivalentTo(
             new List<ValidationError>
@@ -47,7 +47,7 @@ public class UsageTriggerValidationTests : GivenContext, IClassFixture<Translati
     {
         var trigger = new UsageTrigger { NumDays = 20 };
 
-        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider);
+        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider, CancellationToken);
 
         Assert.Empty(errors);
     }
@@ -57,7 +57,7 @@ public class UsageTriggerValidationTests : GivenContext, IClassFixture<Translati
     {
         var trigger = new UsageTrigger();
 
-        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider);
+        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider, CancellationToken);
 
         Assert.Empty(errors);
     }

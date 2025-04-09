@@ -78,14 +78,12 @@ public sealed class DefaultRuleRunnerService(
 
                 simulatedEvents.Add(new SimulatedRuleEvent
                 {
-                    ActionData = job.Job?.ActionData,
-                    ActionName = job.Job?.ActionName,
                     EnrichedEvent = job.EnrichedEvent,
                     Error = job.EnrichmentError?.Message,
                     Event = @event.Payload,
                     EventId = eventId,
                     EventName = ruleService.GetName(appEvent),
-                    State = job.Job,
+                    State = state,
                     SkipReason = job.SkipReason,
                     UniqueId = $"{eventId}_{job.Offset}",
                 });

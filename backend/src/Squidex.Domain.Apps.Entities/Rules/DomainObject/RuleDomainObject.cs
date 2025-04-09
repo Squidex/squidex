@@ -64,7 +64,7 @@ public partial class RuleDomainObject(
             case CreateRule createRule:
                 return ApplyReturnAsync(createRule, async (c, ct) =>
                 {
-                    await GuardRule.CanCreate(c, AppProvider());
+                    await GuardRule.CanCreate(c, AppProvider(), FlowManager(), ct);
 
                     Create(c);
 
@@ -74,7 +74,7 @@ public partial class RuleDomainObject(
             case UpdateRule updateRule:
                 return ApplyReturnAsync(updateRule, async (c, ct) =>
                 {
-                    await GuardRule.CanUpdate(c, Snapshot, AppProvider(), FlowManager());
+                    await GuardRule.CanUpdate(c, Snapshot, AppProvider(), FlowManager(), ct);
 
                     Update(c);
 

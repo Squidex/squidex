@@ -11,38 +11,34 @@ using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
+using Squidex.Flows;
+using Squidex.Flows.Internal;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards;
 
 public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
 {
-    private readonly Uri validUrl = new Uri("https://squidex.io");
-
-    [RuleAction]
-    public sealed record TestAction : RuleAction
-    {
-        public Uri Url { get; set; }
-    }
+    private readonly IFlowManager<FlowEventContext> flowManager = A.Fake<IFlowManager<FlowEventContext>>();
 
     [Fact]
     public async Task CanCreate_should_throw_exception_if_trigger_null()
     {
         var command = CreateCommand(new CreateRule
         {
-            Action = new TestAction
+            Flow = new FlowDefinition
             {
-                Url = validUrl,
+                InitialStep = Guid.NewGuid(),
             },
             Trigger = null!,
         });
 
-        await ValidationAssert.ThrowsAsync(() => GuardRule.CanCreate(command, AppProvider),
+        await ValidationAssert.ThrowsAsync(() => GuardRule.CanCreate(command, AppProvider, flowManager, CancellationToken),
             new ValidationError("Trigger is required.", "Trigger"));
     }
 
     [Fact]
-    public async Task CanCreate_should_throw_exception_if_action_null()
+    public async Task CanCreate_should_throw_exception_if_flow_null()
     {
         var command = CreateCommand(new CreateRule
         {
@@ -50,11 +46,11 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
             {
                 Schemas = [],
             },
-            Action = null!,
+            Flow = null!,
         });
 
-        await ValidationAssert.ThrowsAsync(() => GuardRule.CanCreate(command, AppProvider),
-            new ValidationError("Action is required.", "Action"));
+        await ValidationAssert.ThrowsAsync(() => GuardRule.CanCreate(command, AppProvider, flowManager, CancellationToken),
+            new ValidationError("Flow is required.", "Flow"));
     }
 
     [Fact]
@@ -66,13 +62,13 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
             {
                 Schemas = [],
             },
-            Action = new TestAction
+            Flow = new FlowDefinition
             {
-                Url = validUrl,
+                InitialStep = Guid.NewGuid(),
             },
         });
 
-        await GuardRule.CanCreate(command, AppProvider);
+        await GuardRule.CanCreate(command, AppProvider, flowManager, CancellationToken);
     }
 
     [Fact]
@@ -80,7 +76,7 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = new UpdateRule();
 
-        await GuardRule.CanUpdate(command, CreateRule(), AppProvider);
+        await GuardRule.CanUpdate(command, CreateRule(), AppProvider, flowManager, CancellationToken);
     }
 
     [Fact]
@@ -88,11 +84,11 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = new UpdateRule { Name = "MyName" };
 
-        await GuardRule.CanUpdate(command, CreateRule(), AppProvider);
+        await GuardRule.CanUpdate(command, CreateRule(), AppProvider, flowManager, CancellationToken);
     }
 
     [Fact]
-    public async Task CanUpdate_should_not_throw_exception_if_trigger_action_and_name_are_valid()
+    public async Task CanUpdate_should_not_throw_exception_if_trigger_flow_and_name_are_valid()
     {
         var command = new UpdateRule
         {
@@ -100,14 +96,14 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
             {
                 Schemas = [],
             },
-            Action = new TestAction
+            Flow = new FlowDefinition
             {
-                Url = validUrl,
+                InitialStep = Guid.NewGuid(),
             },
             Name = "NewName",
         };
 
-        await GuardRule.CanUpdate(command, CreateRule(), AppProvider);
+        await GuardRule.CanUpdate(command, CreateRule(), AppProvider, flowManager, CancellationToken);
     }
 
     private CreateRule CreateCommand(CreateRule command)
