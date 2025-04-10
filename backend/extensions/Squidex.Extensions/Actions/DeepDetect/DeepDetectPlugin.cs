@@ -27,6 +27,6 @@ internal sealed class DeepDetectPlugin : IPlugin
             client.BaseAddress = uri;
         });
 
-        services.AddRuleAction<DeepDetectAction, DeepDetectActionHandler>();
+        services.AddFlowStep<DeepDetectFlowStep>();
     }
 }

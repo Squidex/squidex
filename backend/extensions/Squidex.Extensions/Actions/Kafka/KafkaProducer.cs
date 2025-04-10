@@ -104,7 +104,7 @@ public sealed class KafkaProducer
         log.LogWarning("Kafka error with {code} and {reason}.", error.Code, error.Reason);
     }
 
-    public async Task SendAsync(KafkaJob job,
+    public async Task SendAsync(KafkaMessageRequest job,
         CancellationToken ct)
     {
         if (!string.IsNullOrWhiteSpace(job.Schema))
@@ -123,7 +123,7 @@ public sealed class KafkaProducer
         }
     }
 
-    private static async Task ProduceAsync<T>(IProducer<string, T> producer, Message<string, T> message, KafkaJob job,
+    private static async Task ProduceAsync<T>(IProducer<string, T> producer, Message<string, T> message, KafkaMessageRequest job,
         CancellationToken ct)
     {
         message.Key = job.MessageKey!;

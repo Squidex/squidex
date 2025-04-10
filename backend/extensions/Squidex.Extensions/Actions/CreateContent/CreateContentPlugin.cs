@@ -15,6 +15,6 @@ public sealed class CreateContentPlugin : IPlugin
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        services.AddRuleAction<CreateContentAction, CreateContentActionHandler>();
+        services.AddFlowStep<CreateContentFlowStep>();
     }
 }

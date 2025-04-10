@@ -93,6 +93,10 @@ public sealed class RuleEnqueuer(
                 }
 
                 var rules = await GetRulesAsync(appEvent.AppId.Id);
+                if (rules.Count == 0)
+                {
+                    continue;
+                }
 
                 var context = new RulesContext
                 {

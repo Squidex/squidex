@@ -5,32 +5,23 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Rules.Deprecated;
-using Squidex.Flows;
-using Squidex.Infrastructure.Reflection;
-using Squidex.Infrastructure.Validation;
-
+#if INCLUDE_KAFKA
 namespace Squidex.Extensions.Actions.Kafka;
 
-public sealed record KafkaAction : DeprecatedRuleAction
+public sealed class KafkaMessageRequest
 {
-    [LocalizedRequired]
     public string TopicName { get; set; }
 
-    public string? Payload { get; set; }
+    public string? MessageKey { get; set; }
 
-    public string? Key { get; set; }
-
-    public string? Headers { get; set; }
+    public string? MessageValue { get; set; }
 
     public string? Schema { get; set; }
 
     public string? PartitionKey { get; set; }
 
-    public int PartitionCount { get; set; }
+    public Dictionary<string, string>? Headers { get; set; }
 
-    public override FlowStep ToFlowStep()
-    {
-        return SimpleMapper.Map(this, new KafkaFlowStep());
-    }
+    public int PartitionCount { get; set; }
 }
+#endif

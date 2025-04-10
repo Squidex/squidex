@@ -6,9 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.HandleRules;
-using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
-using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Flows;
 using Squidex.Flows.Internal;
@@ -28,31 +26,11 @@ public class RuleQueueWriterTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_not_enqueue_result_without_job()
+    public async Task Should_not_enqueue_result_without_rule()
     {
         var result = new JobResult
         {
             SkipReason = SkipReason.None,
-        };
-
-        var writes = await EnqueueAndFlushAsync(result);
-
-        Assert.Empty(writes);
-    }
-
-    [Theory]
-    [InlineData(SkipReason.ConditionDoesNotMatch)]
-    [InlineData(SkipReason.ConditionPrecheckDoesNotMatch)]
-    [InlineData(SkipReason.FromRule)]
-    [InlineData(SkipReason.NoTrigger)]
-    [InlineData(SkipReason.TooOld)]
-    [InlineData(SkipReason.WrongEvent)]
-    [InlineData(SkipReason.WrongEventForTrigger)]
-    public async Task Should_not_enqueue_skipped_events_without_error(SkipReason reason)
-    {
-        var result = new JobResult
-        {
-            SkipReason = reason,
             EnrichedEvent = new EnrichedManualEvent(),
             EnrichmentError = null,
             Job = new CreateFlowInstanceRequest<FlowEventContext>
@@ -72,53 +50,21 @@ public class RuleQueueWriterTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_enqueue_with_failed_reason()
+    public async Task Should_not_enqueue_result_without_job()
     {
         var result = new JobResult
         {
-            SkipReason = SkipReason.Failed,
+            SkipReason = SkipReason.None,
             EnrichedEvent = new EnrichedManualEvent(),
             EnrichmentError = null,
-            Job = new CreateFlowInstanceRequest<FlowEventContext>
-            {
-                Context = new FlowEventContext(),
-                Definition = new FlowDefinition(),
-                DefinitionId = Guid.NewGuid().ToString(),
-                OwnerId = Guid.NewGuid().ToString(),
-            },
+            Rule = CreateRule(),
         };
 
-        var writes = await EnqueueAndFlushAsync(result);
+        await sut.WriteAsync(AppId.Id, result);
+        await sut.FlushAsync();
 
-        Assert.Equal(new[]
-        {
-            new RuleEventWrite(result.Job, null, null),
-        }, writes);
-    }
-
-    [Fact]
-    public async Task Should_enqueue_with_error()
-    {
-        var result = new JobResult
-        {
-            SkipReason = SkipReason.Failed,
-            EnrichedEvent = new EnrichedManualEvent(),
-            EnrichmentError = new InvalidOperationException(),
-            Job = new CreateFlowInstanceRequest<FlowEventContext>
-            {
-                Context = new FlowEventContext(),
-                Definition = new FlowDefinition(),
-                DefinitionId = Guid.NewGuid().ToString(),
-                OwnerId = Guid.NewGuid().ToString(),
-            },
-        };
-
-        var writes = await EnqueueAndFlushAsync(result);
-
-        Assert.Equal(new[]
-        {
-            new RuleEventWrite(result.Job, null, result.EnrichmentError),
-        }, writes);
+        A.CallTo(() => flowManager.EnqueueAsync(A<CreateFlowInstanceRequest<FlowEventContext>[]>._, default))
+            .MustNotHaveHappened();
     }
 
     [Fact]
@@ -136,14 +82,12 @@ public class RuleQueueWriterTests : GivenContext
                 DefinitionId = Guid.NewGuid().ToString(),
                 OwnerId = Guid.NewGuid().ToString(),
             },
+            Rule = CreateRule(),
         };
 
         var writes = await EnqueueAndFlushAsync(result);
 
-        Assert.Equal(new[]
-        {
-            new RuleEventWrite(result.Job, result.Job.Created, null),
-        }, writes);
+        Assert.Equal(new[] { result.Job.Value }, writes);
     }
 
     [Fact]
@@ -161,14 +105,12 @@ public class RuleQueueWriterTests : GivenContext
                 DefinitionId = Guid.NewGuid().ToString(),
                 OwnerId = Guid.NewGuid().ToString(),
             },
+            Rule = CreateRule(),
         };
 
         var writes = await EnqueueAndFlushAsync(result);
 
-        Assert.Equal(new[]
-        {
-            new RuleEventWrite(result.Job, result.Job.Created, null),
-        }, writes);
+        Assert.Equal(new[] { result.Job.Value }, writes);
     }
 
     [Fact]
@@ -186,6 +128,7 @@ public class RuleQueueWriterTests : GivenContext
                 DefinitionId = Guid.NewGuid().ToString(),
                 OwnerId = Guid.NewGuid().ToString(),
             },
+            Rule = CreateRule(),
         };
 
         for (var i = 0; i < 250; i++)
@@ -193,7 +136,7 @@ public class RuleQueueWriterTests : GivenContext
             await sut.WriteAsync(AppId.Id, result);
         }
 
-        A.CallTo(() => flowManager.EnqueueAsync(A<List<RuleEventWrite>>._, default))
+        A.CallTo(() => flowManager.EnqueueAsync(A<CreateFlowInstanceRequest<FlowEventContext>[]>._, default))
             .MustHaveHappenedANumberOfTimesMatching(x => x == 2);
     }
 

@@ -16,5 +16,6 @@ public sealed class ElasticSearchPlugin : IPlugin
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
         services.AddRuleAction<ElasticSearchAction, ElasticSearchActionHandler>();
+        services.AddFlowStep<Elastic>
     }
 }

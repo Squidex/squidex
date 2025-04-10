@@ -15,6 +15,6 @@ public sealed class EmailPlugin : IPlugin
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        services.AddRuleAction<EmailAction, EmailActionHandler>();
+        services.AddFlowStep<EmailFlowStep>();
     }
 }

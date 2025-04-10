@@ -16,6 +16,7 @@ using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Extensions.Actions.Webhook;
+using Squidex.Flows.Internal;
 using Squidex.Infrastructure;
 using ContentFieldData = Squidex.Domain.Apps.Core.Contents.ContentFieldData;
 
@@ -169,6 +170,19 @@ public class GivenContext
         return result;
     }
 
+    public EnrichedRule CreateAndSetupRule()
+    {
+        var rule = CreateRule();
+
+        A.CallTo(() => AppProvider.GetRulesAsync(AppId.Id, A<CancellationToken>._))
+            .Returns([rule]);
+
+        A.CallTo(() => AppProvider.GetRuleAsync(AppId.Id, rule.Id, A<CancellationToken>._))
+            .Returns(rule);
+
+        return rule;
+    }
+
     public EnrichedAsset CreateAsset()
     {
         var id = DomainId.NewGuid();
@@ -221,9 +235,9 @@ public class GivenContext
         {
             Id = id,
             AppId = AppId,
-            Action = new WebhookAction(),
             Created = Timestamp(),
             CreatedBy = User,
+            Flow = new FlowDefinition(),
             Name = "My Rule",
             LastModified = Timestamp(),
             LastModifiedBy = User,

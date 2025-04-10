@@ -17,7 +17,7 @@ namespace Squidex.Extensions.Actions.DeepDetect;
     IconColor = "#526a75",
     Display = "Annotate image",
     Description = "Annotate an image using deep detect.")]
-public sealed record DeepDetectAction : RuleAction
+public sealed record DeepDetectAction : DeprecatedRuleAction
 {
     [Display(Name = "Min Probability", Description = "The minimum probability for objects to be recognized (0 - 100).")]
     [Editor(RuleFieldEditor.Number)]

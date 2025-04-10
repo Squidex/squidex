@@ -21,6 +21,6 @@ public sealed class FastlyPlugin : IPlugin
             options.Timeout = TimeSpan.FromSeconds(2);
         });
 
-        services.AddRuleAction<FastlyAction, FastlyActionHandler>();
+        services.AddFlowStep<FastlyFlowStep>();
     }
 }

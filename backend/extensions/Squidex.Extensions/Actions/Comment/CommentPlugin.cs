@@ -15,6 +15,6 @@ public sealed class CommentPlugin : IPlugin
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        services.AddRuleAction<CommentAction, CommentActionHandler>();
+        services.AddFlowStep<CommentFlowStep>();
     }
 }

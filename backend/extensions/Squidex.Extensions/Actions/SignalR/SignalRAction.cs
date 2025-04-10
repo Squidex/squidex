@@ -15,25 +15,25 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.SignalR;
 
-[RuleAction(
+[FlowStep(
     Title = "Azure SignalR",
     IconImage = "<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><path d='M.011 16L0 6.248l12-1.63V16zM14 4.328L29.996 2v14H14zM30 18l-.004 14L14 29.75V18zM12 29.495L.01 27.851.009 18H12z'/></svg>",
     IconColor = "#1566BF",
     Display = "Send to Azure SignalR",
     Description = "Send a message to Azure SignalR.",
     ReadMore = "https://azure.microsoft.com/fr-fr/services/signalr-service/")]
-public sealed record SignalRAction : RuleAction
+public sealed record SignalRAction : DeprecatedRuleAction
 {
     [LocalizedRequired]
     [Display(Name = "Connection", Description = "The connection string to the Azure SignalR.")]
-    [Editor(RuleFieldEditor.Text)]
-    [Formattable]
+    [Editor(FlowStepEditor.Text)]
+    [Expression]
     public string ConnectionString { get; set; }
 
     [LocalizedRequired]
     [Display(Name = "Hub Name", Description = "The name of the hub.")]
-    [Editor(RuleFieldEditor.Text)]
-    [Formattable]
+    [Editor(FlowStepEditor.Text)]
+    [Expression]
     public string HubName { get; set; }
 
     [LocalizedRequired]
@@ -41,17 +41,17 @@ public sealed record SignalRAction : RuleAction
     public ActionTypeEnum Action { get; set; }
 
     [Display(Name = "Methode Name", Description = "Set the Name of the hub method received by the customer.")]
-    [Editor(RuleFieldEditor.Text)]
+    [Editor(FlowStepEditor.Text)]
     public string? MethodName { get; set; }
 
     [Display(Name = "Target (Optional)", Description = "Define target users or groups by id or name. One item per line. Not needed for Broadcast action.")]
-    [Editor(RuleFieldEditor.TextArea)]
-    [Formattable]
+    [Editor(FlowStepEditor.TextArea)]
+    [Expression]
     public string? Target { get; set; }
 
     [Display(Name = "Payload (Optional)", Description = "Leave it empty to use the full event as body.")]
-    [Editor(RuleFieldEditor.TextArea)]
-    [Formattable]
+    [Editor(FlowStepEditor.TextArea)]
+    [Expression]
     public string? Payload { get; set; }
 
     protected override IEnumerable<ValidationError> CustomValidate()

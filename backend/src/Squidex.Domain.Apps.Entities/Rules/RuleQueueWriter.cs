@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Logging;
+using NodaTime;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Flows;
 using Squidex.Flows.Internal.Execution;
@@ -18,6 +19,8 @@ public sealed class RuleQueueWriter(IFlowManager<FlowEventContext> flowManager, 
 {
     private readonly List<CreateFlowInstanceRequest<FlowEventContext>> writes = [];
 
+    public IClock Clock { get; set; } = SystemClock.Instance;
+
     public async Task<bool> WriteAsync(DomainId appId, JobResult result)
     {
         Guard.NotNull(result);
@@ -28,28 +31,15 @@ public sealed class RuleQueueWriter(IFlowManager<FlowEventContext> flowManager, 
             return false;
         }
 
-        var job = result.Job.Value;
+        writes.Add(result.Job.Value);
 
-        writes.Add(job);
+        log?.LogInformation("Adding rule job for Rule(trigger={ruleTrigger})",
+            result.Rule.Trigger.GetType().Name);
 
-        if (result.Rule != null)
-        {
-            log?.LogInformation("Adding rule job for Rule(trigger={ruleTrigger})",
-                result.Rule.Trigger.GetType().Name);
-        }
-
-        var totalFailure = result.SkipReason == SkipReason.Failed ? 1 : 0;
-        var totalCreated = 1;
-        var totalSucceeded = 0;
+        var today = Clock.GetCurrentInstant().ToDateOnly();
 
         // Unfortunately we cannot write in batches here, because the result could be from multiple rules.
-        await ruleUsageTracker.TrackAsync(
-            appId,
-            result.Rule?.Id ?? default,
-            DateTime.UtcNow.ToDateOnly(),
-            totalCreated,
-            totalSucceeded,
-            totalFailure);
+        await ruleUsageTracker.TrackAsync(appId, result.Rule.Id, today, 1, 0, 0);
 
         if (writes.Count >= 100)
         {

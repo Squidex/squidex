@@ -15,6 +15,6 @@ public sealed class AlgoliaPlugin : IPlugin
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        services.AddRuleAction<AlgoliaAction, AlgoliaActionHandler>();
+        services.AddFlowStep<AlgoliaFlowStep>();
     }
 }
