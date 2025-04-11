@@ -11,6 +11,7 @@ using GraphQL.Server.Transports.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
+using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Localization;
 using Microsoft.Extensions.Options;
 using Squidex.Config.Domain;
@@ -31,6 +32,9 @@ public static class WebServices
 {
     public static void AddSquidexMvcWithPlugins(this IServiceCollection services, IConfiguration config)
     {
+        services.Configure<CompressionOptions>(config,
+            "compression");
+
         services.AddSingletonAs(c => new ExposedValues(c.GetRequiredService<IOptions<ExposedConfiguration>>().Value, config, typeof(WebServices).Assembly))
             .AsSelf();
 
@@ -78,6 +82,29 @@ public static class WebServices
         services.AddYDotNet()
             .AutoCleanup()
             .AddWebSockets();
+
+        services.Configure<ResponseCompressionOptions>((services, options) =>
+        {
+            var compressionOptions = services.GetRequiredService<IOptions<CompressionOptions>>().Value;
+
+            options.EnableForHttps = compressionOptions.EnableForHttps;
+        });
+
+        services.Configure<BrotliCompressionProviderOptions>((services, options) =>
+        {
+            var compressionOptions = services.GetRequiredService<IOptions<CompressionOptions>>().Value;
+
+            options.Level = compressionOptions.LevelBrotli;
+        });
+
+        services.Configure<GzipCompressionProviderOptions>((services, options) =>
+        {
+            var compressionOptions = services.GetRequiredService<IOptions<CompressionOptions>>().Value;
+
+            options.Level = compressionOptions.LevelGzip;
+        });
+
+        services.AddResponseCompression();
 
         services.AddMvc(options =>
         {

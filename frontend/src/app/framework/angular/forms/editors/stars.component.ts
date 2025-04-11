@@ -72,7 +72,7 @@ export class StarsComponent extends StatefulControlComponent<State, number | nul
         super({
             stars: -1,
             starsArray: [1, 2, 3, 4, 5],
-            value: 1,
+            value: null,
         });
     }
 
