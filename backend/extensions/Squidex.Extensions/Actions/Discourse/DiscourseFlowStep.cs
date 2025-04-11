@@ -7,8 +7,11 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using Squidex.Domain.Apps.Core.Rules.Deprecated;
+using Squidex.Extensions.Actions.Algolia;
 using Squidex.Flows;
 using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.Discourse;
@@ -20,7 +23,9 @@ namespace Squidex.Extensions.Actions.Discourse;
     Display = "Post to discourse",
     Description = "Create a post or topic at discourse.",
     ReadMore = "https://www.discourse.org/")]
-internal sealed record DiscourseFlowStep : FlowStep
+#pragma warning disable CS0618 // Type or member is obsolete
+public sealed record DiscourseFlowStep : FlowStep, IConvertibleToAction
+#pragma warning restore CS0618 // Type or member is obsolete
 {
     [AbsoluteUrl]
     [LocalizedRequired]
@@ -57,9 +62,15 @@ internal sealed record DiscourseFlowStep : FlowStep
     [Editor(FlowStepEditor.Text)]
     public int? Category { get; set; }
 
-    public override ValueTask<FlowStepResult> ExecuteAsync(FlowExecutionContext executionContext,
+    public override async ValueTask<FlowStepResult> ExecuteAsync(FlowExecutionContext executionContext,
         CancellationToken ct)
     {
+        if (executionContext.IsSimulation)
+        {
+            executionContext.LogSkipSimulation();
+            return Next();
+        }
+
         var url = $"{Url.ToString().TrimEnd('/')}/posts.json?api_key={ApiKey}&api_username={ApiUsername}";
 
         var body = new Dictionary<string, object?>
@@ -70,11 +81,6 @@ internal sealed record DiscourseFlowStep : FlowStep
         if (Topic != null)
         {
             body.Add("topic_id", Topic.Value);
-            executionContext.Log($"Creating discourse Post at Topic ${Topic}");
-        }
-        else
-        {
-            executionContext.Log($"Creating discourse Topic");
         }
 
         if (Category != null)
@@ -84,8 +90,7 @@ internal sealed record DiscourseFlowStep : FlowStep
 
         body["raw"] = Text;
 
-        var jsonSerializer = executionContext.Resolve<IJsonSerializer>();
-        var jsonRequest = jsonSerializer.Serialize(body);
+        var jsonRequest = executionContext.SerializeJson(body);
 
         var httpClient =
             executionContext.Resolve<IHttpClientFactory>()
@@ -99,6 +104,24 @@ internal sealed record DiscourseFlowStep : FlowStep
         request.Headers.TryAddWithoutValidation("Api-Key", ApiKey);
         request.Headers.TryAddWithoutValidation("Api-Username", ApiUsername);
 
-        return await httpClient.OneWayRequestAsync(request, job.RequestBody, ct);
+        var (_, dump) = await httpClient.SendAsync(executionContext, request, jsonRequest, ct);
+
+        if (Topic != null)
+        {
+            executionContext.Log("Created post in topic {Topic}", dump);
+        }
+        else
+        {
+            executionContext.Log("Created Topic", dump);
+        }
+
+        return Next();
     }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+    public RuleAction ToAction()
+    {
+        return SimpleMapper.Map(this, new AlgoliaAction());
+    }
+#pragma warning restore CS0618 // Type or member is obsolete
 }

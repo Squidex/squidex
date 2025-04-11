@@ -13,6 +13,7 @@ using Squidex.Flows;
 using Squidex.Flows.Internal;
 using Squidex.Infrastructure.Migrations;
 
+#pragma warning disable CS0618 // Type or member is obsolete
 #pragma warning disable SA1310 // Field names must not contain underscore
 
 namespace Squidex.Domain.Apps.Core.Model.Rules;
@@ -59,7 +60,7 @@ public class RuleTests
         }
     }
 
-    public sealed record TestAction1 : DeprecatedRuleAction
+    public sealed record TestAction1 : RuleAction
     {
         public string Property { get; set; }
 

@@ -15,6 +15,9 @@ public sealed class NotificationPlugin : IPlugin
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        services.AddRuleAction<NotificationAction, NotificationActionHandler>();
+        services.AddFlowStep<NotificationFlowStep>();
+#pragma warning disable CS0618 // Type or member is obsolete
+        services.AddRuleAction<NotificationAction>();
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

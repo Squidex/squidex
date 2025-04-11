@@ -12,7 +12,8 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.Comment;
 
-public sealed record CommentAction : DeprecatedRuleAction
+[Obsolete("Use Flows")]
+public sealed record CommentAction : RuleAction
 {
     [LocalizedRequired]
     public string Text { get; set; }

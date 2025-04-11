@@ -15,6 +15,9 @@ public sealed class ScriptPlugin : IPlugin
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        services.AddRuleAction<ScriptAction, ScriptActionHandler>();
+        services.AddFlowStep<ScriptFlowStep>();
+#pragma warning disable CS0618 // Type or member is obsolete
+        services.AddRuleAction<ScriptAction>();
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

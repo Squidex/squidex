@@ -15,7 +15,6 @@ using Squidex.Domain.Apps.Core.Teams;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Rules;
-using Squidex.Extensions.Actions.Webhook;
 using Squidex.Flows.Internal;
 using Squidex.Infrastructure;
 using ContentFieldData = Squidex.Domain.Apps.Core.Contents.ContentFieldData;

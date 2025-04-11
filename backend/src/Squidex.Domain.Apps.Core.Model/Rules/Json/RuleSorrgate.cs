@@ -20,11 +20,11 @@ public sealed record RuleSorrgate : Rule, ISurrogate<Rule>
     private DeprecatedRule? ruleDef;
 
     [Obsolete("Old rule system.")]
-    private DeprecatedRuleAction? oldAction;
+    private RuleAction? oldAction;
 
     [JsonPropertyName("action")]
     [Obsolete("Old rule system.")]
-    public DeprecatedRuleAction Action
+    public RuleAction Action
     {
         // Because this property is old we old want to read it and never to write it.
         set => oldAction = value;
@@ -62,7 +62,7 @@ public sealed record RuleSorrgate : Rule, ISurrogate<Rule>
 
             var stepId = Guid.NewGuid();
 
-            if (actualAction is IMigrated<DeprecatedRuleAction> migratedAction)
+            if (actualAction is IMigrated<RuleAction> migratedAction)
             {
                 actualAction = migratedAction.Migrate();
             }

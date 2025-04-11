@@ -22,5 +22,8 @@ public sealed class FastlyPlugin : IPlugin
         });
 
         services.AddFlowStep<FastlyFlowStep>();
+#pragma warning disable CS0618 // Type or member is obsolete
+        services.AddRuleAction<FastlyAction>();
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

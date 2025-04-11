@@ -5,11 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Flows;
+namespace Squidex.Extensions.Actions.SignalR;
 
-namespace Squidex.Domain.Apps.Core.Rules.Deprecated;
-
-public abstract record DeprecatedRuleAction
+public enum SignalRActionType
 {
-    public abstract FlowStep ToFlowStep();
+    Broadcast,
+    User,
+    Group,
 }

@@ -12,7 +12,8 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.Fastly;
 
-public sealed record FastlyAction : DeprecatedRuleAction
+[Obsolete("Use Flows")]
+public sealed record FastlyAction : RuleAction
 {
     [LocalizedRequired]
     public string ApiKey { get; set; }

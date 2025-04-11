@@ -12,7 +12,8 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.Algolia;
 
-public sealed record AlgoliaAction : DeprecatedRuleAction
+[Obsolete("Use Flows")]
+public sealed record AlgoliaAction : RuleAction
 {
     [LocalizedRequired]
     public string AppId { get; set; }

@@ -8,7 +8,6 @@
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
-using NodaTime;
 using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.HandleRules;
@@ -16,8 +15,8 @@ using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
-using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Entities.Rules.Runner;
+using Squidex.Flows;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
@@ -33,29 +32,29 @@ namespace Squidex.Areas.Api.Controllers.Rules;
 public sealed class RulesController(
     ICommandBus commandBus,
     IAppProvider appProvider,
-    IRuleEventRepository ruleEventsRepository,
+    IFlowStepRegistry flowStepRegistry,
+    IFlowManager<FlowEventContext> flowManager,
     IRuleQueryService ruleQuery,
     IRuleRunnerService ruleRunnerService,
-    RuleTypeProvider ruleRegistry,
     EventJsonSchemaGenerator eventJsonSchemaGenerator)
     : ApiController(commandBus)
 {
     /// <summary>
-    /// Get supported rule actions.
+    /// Get supported rule steps.
     /// </summary>
     /// <response code="200">Rule actions returned.</response>
     [HttpGet]
-    [Route("rules/actions/")]
+    [Route("rules/steps/")]
     [ProducesResponseType(typeof(Dictionary<string, RuleElementDto>), StatusCodes.Status200OK)]
     [ApiPermission]
     [ApiCosts(0)]
-    public IActionResult GetActions()
+    public IActionResult GetSteps()
     {
-        var etag = string.Concat(ruleRegistry.Actions.Select(x => x.Key)).ToSha256Base64();
+        var etag = string.Concat(flowStepRegistry.Steps.Select(x => x.Key)).ToSha256Base64();
 
         var response = Deferred.Response(() =>
         {
-            return ruleRegistry.Actions.ToDictionary(x => x.Key, x => RuleElementDto.FromDomain(x.Value));
+            return flowStepRegistry.Steps.ToDictionary(x => x.Key, x => RuleElementDto.FromDomain(x.Value));
         });
 
         Response.Headers[HeaderNames.ETag] = etag;
@@ -243,7 +242,7 @@ public sealed class RulesController(
     [ApiCosts(1)]
     public async Task<IActionResult> DeleteRuleEvents(string app, DomainId id)
     {
-        await ruleEventsRepository.CancelByRuleAsync(id, HttpContext.RequestAborted);
+        await flowManager.CancelByDefinitionIdAsync(id.ToString(), HttpContext.RequestAborted);
 
         return NoContent();
     }
@@ -336,9 +335,9 @@ public sealed class RulesController(
     [ApiCosts(0)]
     public async Task<IActionResult> GetEvents(string app, [FromQuery] DomainId? ruleId = null, [FromQuery] int skip = 0, [FromQuery] int take = 20)
     {
-        var ruleEvents = await ruleEventsRepository.QueryByAppAsync(AppId, ruleId, skip, take, HttpContext.RequestAborted);
+        var (states, total) = await flowManager.QueryInstancesByOwnerAsync(AppId.ToString(), ruleId?.ToString(), skip, take, HttpContext.RequestAborted);
 
-        var response = RuleEventsDto.FromDomain(ruleEvents, Resources, ruleId);
+        var response = RuleEventsDto.FromDomain(ResultList.Create(total, states), Resources, ruleId);
 
         return Ok(response);
     }
@@ -355,16 +354,12 @@ public sealed class RulesController(
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ApiPermissionOrAnonymous(PermissionIds.AppRulesEventsUpdate)]
     [ApiCosts(0)]
-    public async Task<IActionResult> PutEvent(string app, DomainId id)
+    public async Task<IActionResult> PutEvent(string app, Guid id)
     {
-        var ruleEvent = await ruleEventsRepository.FindAsync(id, HttpContext.RequestAborted);
-
-        if (ruleEvent == null)
+        if (!await flowManager.ForceAsync(id, HttpContext.RequestAborted))
         {
             return NotFound();
         }
-
-        await ruleEventsRepository.EnqueueAsync(id, SystemClock.Instance.GetCurrentInstant(), HttpContext.RequestAborted);
 
         return NoContent();
     }
@@ -381,16 +376,12 @@ public sealed class RulesController(
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ApiPermissionOrAnonymous(PermissionIds.AppRulesEventsDelete)]
     [ApiCosts(0)]
-    public async Task<IActionResult> DeleteEvent(string app, DomainId id)
+    public async Task<IActionResult> DeleteEvent(string app, Guid id)
     {
-        var ruleEvent = await ruleEventsRepository.FindAsync(id, HttpContext.RequestAborted);
-
-        if (ruleEvent == null)
+        if (!await flowManager.CancelByInstanceIdAsync(id, HttpContext.RequestAborted))
         {
             return NotFound();
         }
-
-        await ruleEventsRepository.CancelByEventAsync(id, HttpContext.RequestAborted);
 
         return NoContent();
     }
@@ -407,8 +398,7 @@ public sealed class RulesController(
     [ApiCosts(1)]
     public async Task<IActionResult> DeleteEvents(string app)
     {
-        await ruleEventsRepository.CancelByAppAsync(App.Id, HttpContext.RequestAborted);
-
+        await flowManager.CancelByOwnerIdAsync(App.Id.ToString(), HttpContext.RequestAborted);
         return NoContent();
     }
 

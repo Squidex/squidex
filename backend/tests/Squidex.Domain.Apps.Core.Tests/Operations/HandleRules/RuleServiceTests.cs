@@ -636,7 +636,7 @@ public class RuleServiceTests
             {
                 Steps = new Dictionary<Guid, FlowStepDefinition>
                 {
-                    [stepId] = new FlowStepDefinition { Step = new DelayStep() },
+                    [stepId] = new FlowStepDefinition { Step = new DelayFlowStep() },
                 },
                 InitialStep = stepId,
             },

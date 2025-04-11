@@ -5,10 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Flows;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Http;
 
 namespace Squidex.Extensions.Actions;
@@ -51,37 +51,10 @@ public static class RuleHelper
         return @event is EnrichedAssetEvent { Type: EnrichedAssetEventType.Deleted };
     }
 
-    public static async Task<Result> OneWayRequestAsync(this HttpClient client, HttpRequestMessage request, string? requestBody = null,
-        CancellationToken ct = default)
-    {
-        HttpResponseMessage? response = null;
-        try
-        {
-            response = await client.SendAsync(request, ct);
-
-            var responseString = await response.Content.ReadAsStringAsync(ct);
-            var requestDump = DumpFormatter.BuildDump(request, response, requestBody, responseString);
-
-            if (!response.IsSuccessStatusCode)
-            {
-                var ex = new HttpRequestException($"Response code does not indicate success: {(int)response.StatusCode} ({response.StatusCode}).");
-
-                return Result.Failed(ex, requestDump);
-            }
-            else
-            {
-                return Result.Success(requestDump);
-            }
-        }
-        catch (Exception ex)
-        {
-            var requestDump = DumpFormatter.BuildDump(request, response, requestBody, ex.ToString());
-
-            return Result.Failed(ex, requestDump);
-        }
-    }
-
-    public static async Task<(string Response, string Dump)> SendAsync(this HttpClient client, FlowExecutionContext executionContext, HttpRequestMessage request, string? requestBody = null,
+    public static async Task<(string Response, string Dump)> SendAsync(this HttpClient client,
+        FlowExecutionContext executionContext,
+        HttpRequestMessage request,
+        string? requestBody = null,
         CancellationToken ct = default)
     {
         HttpResponseMessage? response = null;
@@ -106,6 +79,18 @@ public static class RuleHelper
 
             executionContext.Log("Http request failed", requestDump);
             throw;
+        }
+    }
+
+    public static (string Id, bool IsGenerated) GetOrCreateId(this EnrichedEvent @event)
+    {
+        if (@event is IEnrichedEntityEvent enrichedEntityEvent)
+        {
+            return (enrichedEntityEvent.Id.ToString(), false);
+        }
+        else
+        {
+            return (DomainId.NewGuid().ToString(), true);
         }
     }
 }

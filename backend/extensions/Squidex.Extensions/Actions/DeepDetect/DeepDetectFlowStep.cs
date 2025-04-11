@@ -12,12 +12,14 @@ using Google.Apis.Json;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Flows;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Text;
 
 namespace Squidex.Extensions.Actions.DeepDetect;
@@ -28,7 +30,9 @@ namespace Squidex.Extensions.Actions.DeepDetect;
     IconColor = "#526a75",
     Display = "Annotate image",
     Description = "Annotate an image using deep detect.")]
-internal sealed partial record DeepDetectFlowStep : FlowStep
+#pragma warning disable CS0618 // Type or member is obsolete
+public sealed partial record DeepDetectFlowStep : FlowStep, IConvertibleToAction
+#pragma warning restore CS0618 // Type or member is obsolete
 {
     [Display(Name = "Min Propability", Description = "The minimum probability for objects to be recognized (0 - 100).")]
     [Editor(FlowStepEditor.Number)]
@@ -44,13 +48,19 @@ internal sealed partial record DeepDetectFlowStep : FlowStep
         var @event = ((FlowEventContext)executionContext.Context).Event;
         if (@event is not EnrichedAssetEvent assetEvent)
         {
-            executionContext.Log("Ignored: Invalid event.");
+            executionContext.LogSkipped("Invalid event.");
             return Next();
         }
 
         if (assetEvent.AssetType != AssetType.Image)
         {
-            executionContext.Log("Ignored: Invalid event (not an image).");
+            executionContext.LogSkipped("Invalid event (not an image).");
+            return Next();
+        }
+
+        if (executionContext.IsSimulation)
+        {
+            executionContext.LogSkipSimulation();
             return Next();
         }
 
@@ -83,8 +93,7 @@ internal sealed partial record DeepDetectFlowStep : FlowStep
             response.EnsureSuccessStatusCode();
         }
 
-        var jsonSerializer = executionContext.Resolve<IJsonSerializer>();
-        var jsonResponse = jsonSerializer.Deserialize<DetectResponse>(responseBody);
+        var jsonResponse = executionContext.DeserializeJson<DetectResponse>(responseBody);
 
         var tags = jsonResponse!.Body.Predictions.SelectMany(x => x.Classes);
         if (!tags.Any())
@@ -99,7 +108,7 @@ internal sealed partial record DeepDetectFlowStep : FlowStep
 
         if (app == null)
         {
-            executionContext.Log("Ignored: App not found.");
+            executionContext.LogSkipped("App not found.");
             return Next();
         }
 
@@ -111,7 +120,7 @@ internal sealed partial record DeepDetectFlowStep : FlowStep
 
         if (asset == null)
         {
-            executionContext.Log("Ignored: Asset not found.");
+            executionContext.LogSkipped("Asset not found.");
             return Next();
         }
 
@@ -144,6 +153,13 @@ internal sealed partial record DeepDetectFlowStep : FlowStep
         executionContext.Log("Tags Added.", responseBody);
         return Next();
     }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+    public RuleAction ToAction()
+    {
+        return SimpleMapper.Map(this, new DeepDetectAction());
+    }
+#pragma warning restore CS0618 // Type or member is obsolete
 
     private sealed class DetectResponse
     {

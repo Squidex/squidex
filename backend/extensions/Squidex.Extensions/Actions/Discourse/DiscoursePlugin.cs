@@ -16,6 +16,10 @@ public sealed class DiscoursePlugin : IPlugin
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
         services.AddHttpClient("DiscourseAction");
+
         services.AddFlowStep<DiscourseFlowStep>();
+#pragma warning disable CS0618 // Type or member is obsolete
+        services.AddRuleAction<DiscourseAction>();
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

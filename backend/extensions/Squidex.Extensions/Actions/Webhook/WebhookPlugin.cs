@@ -15,12 +15,9 @@ public sealed class WebhookPlugin : IPlugin
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        services.AddHttpClient("WebhookPlugin", options =>
-        {
-            options.DefaultRequestHeaders.Add("User-Agent", "Squidex Webhook");
-            options.DefaultRequestHeaders.Add("X-Application", "Squidex Webhook");
-        });
-
-        services.AddRuleAction<WebhookAction, WebhookActionHandler>();
+        services.AddFlowStep<WebhookFlowStep>();
+#pragma warning disable CS0618 // Type or member is obsolete
+        services.AddRuleAction<WebhookAction>();
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

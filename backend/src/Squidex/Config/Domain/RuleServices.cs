@@ -20,6 +20,7 @@ using Squidex.Domain.Apps.Entities.Rules.Queries;
 using Squidex.Domain.Apps.Entities.Rules.Runner;
 using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
 using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Flows.Internal.Execution;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 
@@ -99,6 +100,11 @@ public static class RuleServices
             .As<IRuleService>();
 
         services.AddSingletonAs<RuleEventFormatter>()
-            .AsSelf();
+            .As<IFlowExpressionEngine>();
+
+        services.AddSingletonAs<RuleFlowTrackingCallback>()
+            .As<IFlowExecutionCallback<FlowEventContext>>();
+
+        services.AddFlows<FlowEventContext>(config);
     }
 }

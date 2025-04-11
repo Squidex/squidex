@@ -7,10 +7,12 @@
 
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Entities.Collaboration;
 using Squidex.Flows;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.Comment;
@@ -21,7 +23,9 @@ namespace Squidex.Extensions.Actions.Comment;
     IconColor = "#3389ff",
     Display = "Create comment",
     Description = "Create a comment for a content event.")]
-internal sealed record CommentFlowStep : FlowStep
+#pragma warning disable CS0618 // Type or member is obsolete
+public sealed record CommentFlowStep : FlowStep, IConvertibleToAction
+#pragma warning restore CS0618 // Type or member is obsolete
 {
     [LocalizedRequired]
     [Display(Name = "Text", Description = "The comment text.")]
@@ -39,13 +43,13 @@ internal sealed record CommentFlowStep : FlowStep
         var @event = ((FlowEventContext)executionContext.Context).Event;
         if (@event is not EnrichedContentEvent contentEvent)
         {
-            executionContext.Log("Ignored: Invalid event.");
+            executionContext.LogSkipped("Invalid event.");
             return Next();
         }
 
         if (string.IsNullOrWhiteSpace(Text))
         {
-            executionContext.Log("Ignored: No text.");
+            executionContext.LogSkipped("No text.");
             return Next();
         }
 
@@ -73,4 +77,11 @@ internal sealed record CommentFlowStep : FlowStep
         executionContext.Log("Commented", Text);
         return Next();
     }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+    public RuleAction ToAction()
+    {
+        return SimpleMapper.Map(this, new CommentAction());
+    }
+#pragma warning restore CS0618 // Type or member is obsolete
 }

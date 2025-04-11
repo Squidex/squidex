@@ -7,8 +7,10 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.Text;
+using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Flows;
 using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.Medium;
@@ -20,7 +22,9 @@ namespace Squidex.Extensions.Actions.Medium;
     Display = "Post to Medium",
     Description = "Create a new story or post at medium.",
     ReadMore = "https://medium.com/")]
-internal sealed record MediumFlowStep : FlowStep
+#pragma warning disable CS0618 // Type or member is obsolete
+public sealed record MediumFlowStep : FlowStep, IConvertibleToAction
+#pragma warning restore CS0618 // Type or member is obsolete
 {
     [LocalizedRequired]
     [Display(Name = "Access Token", Description = "The self issued access token.")]
@@ -60,7 +64,11 @@ internal sealed record MediumFlowStep : FlowStep
     public override async ValueTask<FlowStepResult> ExecuteAsync(FlowExecutionContext executionContext,
         CancellationToken ct)
     {
-        var jsonSerializer = executionContext.Resolve<IJsonSerializer>();
+        if (executionContext.IsSimulation)
+        {
+            executionContext.LogSkipSimulation();
+            return Next();
+        }
 
         var httpClient =
             executionContext.Resolve<IHttpClientFactory>()
@@ -76,7 +84,7 @@ internal sealed record MediumFlowStep : FlowStep
             var meRequest = BuildGetRequest("/v1/me");
 
             var (responseString, _) = await httpClient.SendAsync(executionContext, meRequest, null, ct);
-            var responseJson = jsonSerializer.Deserialize<UserResponse>(responseString);
+            var responseJson = executionContext.DeserializeJson<UserResponse>(responseString);
 
             var id = responseJson.Data?.Id;
 
@@ -89,10 +97,10 @@ internal sealed record MediumFlowStep : FlowStep
             contentFormat = IsHtml ? "html" : "markdown",
             content = Content,
             canonicalUrl = CanonicalUrl,
-            tags = ParseTags(jsonSerializer),
+            tags = ParseTags(executionContext),
         };
 
-        var requestJson = jsonSerializer.Serialize(requestBody);
+        var requestJson = executionContext.SerializeJson(requestBody);
 
         var (_, dump) = await httpClient.SendAsync(executionContext, BuildPostRequest(path, requestJson), requestJson, ct);
 
@@ -121,7 +129,7 @@ internal sealed record MediumFlowStep : FlowStep
         return request;
     }
 
-    private string[]? ParseTags(IJsonSerializer jsonSerializer)
+    private string[]? ParseTags(FlowExecutionContext executionContext)
     {
         if (string.IsNullOrWhiteSpace(Tags))
         {
@@ -130,13 +138,20 @@ internal sealed record MediumFlowStep : FlowStep
 
         try
         {
-            return jsonSerializer.Deserialize<string[]>(Tags);
+            return executionContext.DeserializeJson<string[]>(Tags);
         }
         catch
         {
             return Tags.Split(',');
         }
     }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+    public RuleAction ToAction()
+    {
+        return SimpleMapper.Map(this, new MediumAction());
+    }
+#pragma warning restore CS0618 // Type or member is obsolete
 
     private sealed class UserResponse
     {

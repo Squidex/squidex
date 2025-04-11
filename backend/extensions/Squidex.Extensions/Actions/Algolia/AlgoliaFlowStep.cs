@@ -10,9 +10,10 @@ using System.Text.Json.Serialization;
 using Algolia.Search.Clients;
 using Newtonsoft.Json.Linq;
 using Squidex.Domain.Apps.Core.HandleRules;
-using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
+using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Flows;
 using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.Algolia;
@@ -24,7 +25,9 @@ namespace Squidex.Extensions.Actions.Algolia;
     Display = "Populate Algolia index",
     Description = "Populate a full text search index in Algolia.",
     ReadMore = "https://www.algolia.com/")]
-public record AlgoliaFlowStep : FlowStep
+#pragma warning disable CS0618 // Type or member is obsolete
+public record AlgoliaFlowStep : FlowStep, IConvertibleToAction
+#pragma warning restore CS0618 // Type or member is obsolete
 {
     private static readonly ClientPool<(string AppId, string ApiKey, string IndexName), ISearchIndex> Clients = new ClientPool<(string AppId, string ApiKey, string IndexName), ISearchIndex>(key =>
     {
@@ -65,73 +68,70 @@ public record AlgoliaFlowStep : FlowStep
     {
         var @event = ((FlowEventContext)executionContext.Context).Event;
 
-        if (@event.ShouldDelete(executionContext, Delete))
-        {
-            var serializer = executionContext.Resolve<IJsonSerializer>();
-
-            AlgoliaContent content;
-            try
-            {
-                content = serializer.Deserialize<AlgoliaContent>(Document!);
-            }
-            catch (Exception ex)
-            {
-                content = new AlgoliaContent
-                {
-                    More = new Dictionary<string, object>
-                    {
-                        ["error"] = $"Invalid JSON: {ex.Message}",
-                    },
-                };
-            }
-
-            Document = serializer.Serialize(content);
-        }
-        else
+        if (!@event.ShouldDelete(executionContext, Delete))
         {
             Document = null;
+            return default;
         }
 
-        return base.PrepareAsync(executionContext, ct);
+        AlgoliaContent content;
+        try
+        {
+            content = executionContext.DeserializeJson<AlgoliaContent>(Document!);
+            content.ObjectID = @event.GetOrCreateId().Id;
+        }
+        catch (Exception ex)
+        {
+            content = new AlgoliaContent
+            {
+                More = new Dictionary<string, object>
+                {
+                    ["error"] = $"Invalid JSON: {ex.Message}",
+                },
+                ObjectID = @event.GetOrCreateId().Id,
+            };
+        }
+
+        Document = executionContext.SerializeJson(content);
+        return default;
     }
 
     public override async ValueTask<FlowStepResult> ExecuteAsync(FlowExecutionContext executionContext,
         CancellationToken ct)
     {
         var @event = ((FlowEventContext)executionContext.Context).Event;
-        if (@event is not IEnrichedEntityEvent entityEvent)
+
+        var (id, isGenerated) = @event.GetOrCreateId();
+        if (isGenerated && Document == null)
         {
-            executionContext.Log("Ignored: Invalid event.");
+            executionContext.LogSkipped("Can only delete content for static identities.");
             return Next();
         }
 
-        if (string.IsNullOrWhiteSpace(AppId))
+        if (executionContext.IsSimulation)
         {
-            executionContext.Log("Ignored: App ID not defined.");
+            executionContext.LogSkipSimulation();
             return Next();
         }
 
-        var serializer = executionContext.Resolve<IJsonSerializer>();
-
-        var index = await Clients.GetClientAsync((AppId, ApiKey, IndexName));
         try
         {
-            object? response;
+            var serializer = executionContext.Resolve<IJsonSerializer>();
+
+            var index = await Clients.GetClientAsync((AppId, ApiKey, IndexName));
             if (Document != null)
             {
-                var raw = new[]
-                {
-                    new JRaw(Document),
-                };
+                var response = await index.SaveObjectsAsync([new JRaw(Document)], null, ct, true);
 
-                response = await index.SaveObjectsAsync(raw, null, ct, true);
+                executionContext.Log($"Document with ID '{id}' upserted", serializer.Serialize(response, true));
             }
             else
             {
-                response = await index.DeleteObjectAsync(entityEvent.Id.ToString(), null, ct);
+                var response = await index.DeleteObjectAsync(id, null, ct);
+
+                executionContext.Log($"Document with ID '{id}' deleted", serializer.Serialize(response, true));
             }
 
-            executionContext.Log($"Success", serializer.Serialize(response, true));
             return Next();
         }
         catch (Exception ex)
@@ -140,6 +140,13 @@ public record AlgoliaFlowStep : FlowStep
             throw;
         }
     }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+    public RuleAction ToAction()
+    {
+        return SimpleMapper.Map(this, new AlgoliaAction());
+    }
+#pragma warning restore CS0618 // Type or member is obsolete
 
     private sealed class AlgoliaContent
     {

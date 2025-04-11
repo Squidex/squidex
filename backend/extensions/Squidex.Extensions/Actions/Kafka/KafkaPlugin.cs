@@ -22,6 +22,9 @@ public sealed class KafkaPlugin : IPlugin
         if (options.IsProducerConfigured())
         {
             services.AddFlowStep<KafkaFlowStep>();
+#pragma warning disable CS0618 // Type or member is obsolete
+            services.AddRuleAction<KafkaAction>();
+#pragma warning restore CS0618 // Type or member is obsolete
 
             services.AddSingleton<KafkaProducer>();
             services.AddSingleton(Options.Create(options));

@@ -76,7 +76,7 @@ public class RuleEventFormatterCompareTests
             new FakeContentResolver(),
         };
 
-        sut = new RuleEventFormatter(TestUtils.DefaultSerializer, BuildTemplateEngine(), BuildScriptEngine(), new SimpleFormatter(formatters));
+        sut = new RuleEventFormatter(TestUtils.DefaultSerializer, BuildScriptEngine(), BuildTemplateEngine(), new SimpleFormatter(formatters));
     }
 
     private FluidTemplateEngine BuildTemplateEngine()

@@ -16,6 +16,10 @@ public sealed class TypesensePlugin : IPlugin
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
         services.AddHttpClient("TypesenseAction");
-        services.AddRuleAction<TypesenseAction, TypesenseActionHandler>();
+
+        services.AddFlowStep<TypesenseFlowStep>();
+#pragma warning disable CS0618 // Type or member is obsolete
+        services.AddRuleAction<TypesenseAction>();
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

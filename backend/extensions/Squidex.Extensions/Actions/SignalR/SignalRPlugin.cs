@@ -15,6 +15,9 @@ public sealed class SignalRPlugin : IPlugin
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        services.AddRuleAction<SignalRAction, SignalRActionHandler>();
+        services.AddFlowStep<SignalRFlowStep>();
+#pragma warning disable CS0618 // Type or member is obsolete
+        services.AddRuleAction<SignalRAction>();
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

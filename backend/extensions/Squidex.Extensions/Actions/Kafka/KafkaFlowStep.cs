@@ -8,8 +8,9 @@
 #if INCLUDE_KAFKA
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.HandleRules;
-using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
+using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Flows;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.Kafka;
@@ -21,7 +22,9 @@ namespace Squidex.Extensions.Actions.Kafka;
     Display = "Push to kafka",
     Description = "Connect to Kafka stream and push data to that stream.",
     ReadMore = "https://kafka.apache.org/quickstart")]
-internal sealed record KafkaFlowStep : FlowStep
+#pragma warning disable CS0618 // Type or member is obsolete
+public sealed record KafkaFlowStep : FlowStep, IConvertibleToAction
+#pragma warning restore CS0618 // Type or member is obsolete
 {
     [LocalizedRequired]
     [Display(Name = "Topic Name", Description = "The name of the topic.")]
@@ -60,6 +63,12 @@ internal sealed record KafkaFlowStep : FlowStep
     public override async ValueTask<FlowStepResult> ExecuteAsync(FlowExecutionContext executionContext,
         CancellationToken ct)
     {
+        if (executionContext.IsSimulation)
+        {
+            executionContext.LogSkipSimulation();
+            return Next();
+        }
+
         var @event = ((FlowEventContext)executionContext.Context).Event;
 
         var key = Key;
@@ -118,5 +127,12 @@ internal sealed record KafkaFlowStep : FlowStep
 
         return headersDictionary;
     }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+    public RuleAction ToAction()
+    {
+        return SimpleMapper.Map(this, new KafkaAction());
+    }
+#pragma warning restore CS0618 // Type or member is obsolete
 }
 #endif

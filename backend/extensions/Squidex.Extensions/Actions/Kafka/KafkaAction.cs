@@ -12,7 +12,8 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.Kafka;
 
-public sealed record KafkaAction : DeprecatedRuleAction
+[Obsolete("Use Flows")]
+public sealed record KafkaAction : RuleAction
 {
     [LocalizedRequired]
     public string TopicName { get; set; }

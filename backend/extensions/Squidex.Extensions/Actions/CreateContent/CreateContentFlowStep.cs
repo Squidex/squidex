@@ -8,6 +8,7 @@
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities;
@@ -15,6 +16,7 @@ using Squidex.Flows;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 using Command = Squidex.Domain.Apps.Entities.Contents.Commands.CreateContent;
 
@@ -26,7 +28,9 @@ namespace Squidex.Extensions.Actions.CreateContent;
     IconColor = "#3389ff",
     Display = "Create content",
     Description = "Create a a new content item for any schema.")]
-public record class CreateContentFlowStep : FlowStep
+#pragma warning disable CS0618 // Type or member is obsolete
+public sealed record CreateContentFlowStep : FlowStep, IConvertibleToAction
+#pragma warning restore CS0618 // Type or member is obsolete
 {
     [LocalizedRequired]
     [Display(Name = "Data", Description = "The content data.")]
@@ -63,16 +67,19 @@ public record class CreateContentFlowStep : FlowStep
 
         if (schema == null)
         {
-            executionContext.Log("Skipped: Invalid Schema.");
+            executionContext.LogSkipped("Invalid Schema.");
+            return Next();
+        }
+
+        if (executionContext.IsSimulation)
+        {
+            executionContext.LogSkipSimulation();
             return Next();
         }
 
         command.SchemaId = schema.NamedId();
         command.FromRule = true;
-
-        var jsonSerializer = executionContext.Resolve<IJsonSerializer>();
-
-        command.Data = jsonSerializer.Deserialize<ContentData>(Data);
+        command.Data = executionContext.DeserializeJson<ContentData>(Data);
 
         if (!string.IsNullOrEmpty(Client))
         {
@@ -94,4 +101,11 @@ public record class CreateContentFlowStep : FlowStep
         executionContext.Log($"Content created for schema '{schema.Name}', ID: {command.ContentId}");
         return Next();
     }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+    public RuleAction ToAction()
+    {
+        return SimpleMapper.Map(this, new CreateContentAction());
+    }
+#pragma warning restore CS0618 // Type or member is obsolete
 }

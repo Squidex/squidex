@@ -14,6 +14,7 @@
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\..\extensions\Squidex.Extensions\Squidex.Extensions.csproj" />
     <ProjectReference Include="..\Squidex.Data.MongoDb\Squidex.Data.MongoDb.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Apps.Core.Model\Squidex.Domain.Apps.Core.Model.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Apps.Entities\Squidex.Domain.Apps.Entities.csproj" />

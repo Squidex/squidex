@@ -9,7 +9,9 @@ using System.ComponentModel.DataAnnotations;
 using MailKit.Net.Smtp;
 using MimeKit;
 using MimeKit.Text;
+using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Flows;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.Email;
@@ -21,7 +23,9 @@ namespace Squidex.Extensions.Actions.Email;
     Display = "Send an email",
     Description = "Send an email with a custom SMTP server.",
     ReadMore = "https://en.wikipedia.org/wiki/Email")]
-internal sealed record EmailFlowStep : FlowStep
+#pragma warning disable CS0618 // Type or member is obsolete
+internal sealed record EmailFlowStep : FlowStep, IConvertibleToAction
+#pragma warning restore CS0618 // Type or member is obsolete
 {
     [LocalizedRequired]
     [Display(Name = "Server Host", Description = "The IP address or host to the SMTP server.")]
@@ -69,6 +73,12 @@ internal sealed record EmailFlowStep : FlowStep
     public override async ValueTask<FlowStepResult> ExecuteAsync(FlowExecutionContext executionContext,
         CancellationToken ct)
     {
+        if (executionContext.IsSimulation)
+        {
+            executionContext.LogSkipSimulation();
+            return Next();
+        }
+
         using var smtpClient = new SmtpClient();
 
         await smtpClient.ConnectAsync(ServerHost, ServerPort, cancellationToken: ct);
@@ -98,4 +108,11 @@ internal sealed record EmailFlowStep : FlowStep
         executionContext.Log($"Email sent to {MessageTo}");
         return Next();
     }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+    public RuleAction ToAction()
+    {
+        return SimpleMapper.Map(this, new EmailAction());
+    }
+#pragma warning restore CS0618 // Type or member is obsolete
 }

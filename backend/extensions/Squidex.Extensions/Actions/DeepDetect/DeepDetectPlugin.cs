@@ -28,5 +28,8 @@ internal sealed class DeepDetectPlugin : IPlugin
         });
 
         services.AddFlowStep<DeepDetectFlowStep>();
+#pragma warning disable CS0618 // Type or member is obsolete
+        services.AddRuleAction<DeepDetectAction>();
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

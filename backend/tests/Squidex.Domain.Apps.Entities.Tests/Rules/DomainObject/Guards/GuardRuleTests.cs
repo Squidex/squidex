@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.HandleRules;
-using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Rules.Commands;

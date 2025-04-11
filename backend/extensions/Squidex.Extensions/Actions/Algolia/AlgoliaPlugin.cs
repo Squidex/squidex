@@ -16,5 +16,8 @@ public sealed class AlgoliaPlugin : IPlugin
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
         services.AddFlowStep<AlgoliaFlowStep>();
+#pragma warning disable CS0618 // Type or member is obsolete
+        services.AddRuleAction<AlgoliaAction>();
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

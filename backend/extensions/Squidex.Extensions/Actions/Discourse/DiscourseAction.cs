@@ -12,7 +12,8 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.Discourse;
 
-public sealed record DiscourseAction : DeprecatedRuleAction
+[Obsolete("Use Flows")]
+public sealed record DiscourseAction : RuleAction
 {
     [AbsoluteUrl]
     [LocalizedRequired]

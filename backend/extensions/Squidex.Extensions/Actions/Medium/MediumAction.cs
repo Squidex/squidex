@@ -12,7 +12,8 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.Medium;
 
-public sealed record MediumAction : DeprecatedRuleAction
+[Obsolete("Use Flows")]
+public sealed record MediumAction : RuleAction
 {
     [LocalizedRequired]
     public string AccessToken { get; set; }

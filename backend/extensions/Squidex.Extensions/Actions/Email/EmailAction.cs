@@ -12,7 +12,8 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.Email;
 
-public sealed record EmailAction : DeprecatedRuleAction
+[Obsolete("Use Flows")]
+public sealed record EmailAction : RuleAction
 {
     [LocalizedRequired]
     public string ServerHost { get; set; }

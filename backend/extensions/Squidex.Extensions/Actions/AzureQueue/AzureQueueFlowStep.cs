@@ -9,7 +9,9 @@ using System.ComponentModel.DataAnnotations;
 using System.Text.RegularExpressions;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Queue;
+using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Flows;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.AzureQueue;
@@ -21,7 +23,9 @@ namespace Squidex.Extensions.Actions.AzureQueue;
     Display = "Send to Azure Queue",
     Description = "Send an event to azure queue storage.",
     ReadMore = "https://azure.microsoft.com/en-us/services/storage/queues/")]
-internal sealed partial record AzureQueueFlowStep : FlowStep
+#pragma warning disable CS0618 // Type or member is obsolete
+public sealed partial record AzureQueueFlowStep : FlowStep, IConvertibleToAction
+#pragma warning restore CS0618 // Type or member is obsolete
 {
     [LocalizedRequired]
     [Display(Name = "Connection", Description = "The connection string to the storage account.")]
@@ -64,11 +68,24 @@ internal sealed partial record AzureQueueFlowStep : FlowStep
     public async override ValueTask<FlowStepResult> ExecuteAsync(FlowExecutionContext executionContext,
         CancellationToken ct)
     {
+        if (executionContext.IsSimulation)
+        {
+            executionContext.LogSkipSimulation();
+            return Next();
+        }
+
         var queue = await Clients.GetClientAsync((ConnectionString, Queue));
 
         await queue.AddMessageAsync(new CloudQueueMessage(Payload), null, null, null, null, ct);
         return Next();
     }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+    public RuleAction ToAction()
+    {
+        return SimpleMapper.Map(this, new AzureQueueAction());
+    }
+#pragma warning restore CS0618 // Type or member is obsolete
 
     [GeneratedRegex("^[a-z][a-z0-9]{2,}(\\-[a-z0-9]+)*$")]
     private static partial Regex QueueNameRegex();

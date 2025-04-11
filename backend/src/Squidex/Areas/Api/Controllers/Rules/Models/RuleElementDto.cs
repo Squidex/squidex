@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Flows;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models;
@@ -47,11 +47,11 @@ public sealed class RuleElementDto
     /// </summary>
     public RuleElementPropertyDto[] Properties { get; set; }
 
-    public static RuleElementDto FromDomain(RuleActionDefinition definition)
+    public static RuleElementDto FromDomain(FlowStepDescriptor descriptor)
     {
-        var result = SimpleMapper.Map(definition, new RuleElementDto());
+        var result = SimpleMapper.Map(descriptor, new RuleElementDto());
 
-        result.Properties = definition.Properties.Select(x => SimpleMapper.Map(x, new RuleElementPropertyDto())).ToArray();
+        result.Properties = descriptor.Properties.Select(x => SimpleMapper.Map(x, new RuleElementPropertyDto())).ToArray();
 
         return result;
     }

@@ -1,17 +1,19 @@
-﻿using Elasticsearch.Net;
-using Squidex.ClientLibrary;
+﻿// ==========================================================================
+//  Squidex Headless CMS
+// ==========================================================================
+//  Copyright (c) Squidex UG (haftungsbeschraenkt)
+//  All rights reserved. Licensed under the MIT license.
+// ==========================================================================
+
+using System.ComponentModel.DataAnnotations;
+using System.Text.Json.Serialization;
+using Elasticsearch.Net;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Flows;
 using Squidex.Infrastructure.Json;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Text;
-using System.Text.Json.Serialization;
-using System.Threading.Tasks;
-using static Squidex.Extensions.Actions.Algolia.AlgoliaFlowStep;
 
 namespace Squidex.Extensions.Actions.ElasticSearch;
 
@@ -22,7 +24,9 @@ namespace Squidex.Extensions.Actions.ElasticSearch;
     Display = "Populate ElasticSearch index",
     Description = "Populate a full text search index in ElasticSearch.",
     ReadMore = "https://www.elastic.co/")]
-internal sealed record ElasticSearchFlowStep : FlowStep
+#pragma warning disable CS0618 // Type or member is obsolete
+public sealed record ElasticSearchFlowStep : FlowStep, IConvertibleToAction
+#pragma warning restore CS0618 // Type or member is obsolete
 {
     [AbsoluteUrl]
     [LocalizedRequired]
@@ -53,7 +57,7 @@ internal sealed record ElasticSearchFlowStep : FlowStep
     [Editor(FlowStepEditor.Text)]
     public string? Delete { get; set; }
 
-    private static readonly ClientPool<(Uri Host, string? Username, string? Password), ElasticLowLevelClient> Clients = new ClientPool<(Uri Host, string? Username, string? Password), ElasticLowLevelClient>(key =>
+    private static readonly ClientPool<(Uri Host, string? Username, string? Password), ElasticLowLevelClient> Clients = new (key =>
     {
         var config = new ConnectionConfiguration(key.Host);
 
@@ -70,43 +74,97 @@ internal sealed record ElasticSearchFlowStep : FlowStep
     {
         var @event = ((FlowEventContext)executionContext.Context).Event;
 
-        if (@event.ShouldDelete(executionContext, Delete))
-        {
-            var serializer = executionContext.Resolve<IJsonSerializer>();
-
-            ElasticSearchContent content;
-            try
-            {
-                content = serializer.Deserialize<ElasticSearchContent>(Document!);
-            }
-            catch (Exception ex)
-            {
-                content = new ElasticSearchContent
-                {
-                    More = new Dictionary<string, object>
-                    {
-                        ["error"] = $"Invalid JSON: {ex.Message}",
-                    },
-                };
-            }
-
-            Document = serializer.Serialize(content);
-        }
-        else
+        if (!@event.ShouldDelete(executionContext, Delete))
         {
             Document = null;
+            return default;
         }
 
-        return base.PrepareAsync(executionContext, ct);
+        ElasticSearchContent content;
+        try
+        {
+            content = executionContext.DeserializeJson<ElasticSearchContent>(Document!);
+            content.ContentId = @event.GetOrCreateId().Id;
+        }
+        catch (Exception ex)
+        {
+            content = new ElasticSearchContent
+            {
+                More = new Dictionary<string, object>
+                {
+                    ["error"] = $"Invalid JSON: {ex.Message}",
+                },
+                ContentId = @event.GetOrCreateId().Id,
+            };
+        }
+
+        Document = executionContext.SerializeJson(content);
+        return default;
     }
 
-    public override ValueTask<FlowStepResult> ExecuteAsync(FlowExecutionContext executionContext,
+    public override async ValueTask<FlowStepResult> ExecuteAsync(FlowExecutionContext executionContext,
         CancellationToken ct)
     {
-        throw new NotImplementedException();
+        var @event = ((FlowEventContext)executionContext.Context).Event;
+
+        var (id, isGenerated) = @event.GetOrCreateId();
+        if (isGenerated && Document == null)
+        {
+            executionContext.LogSkipped("Can only delete content for static identities.");
+            return Next();
+        }
+
+        if (executionContext.IsSimulation)
+        {
+            executionContext.LogSkipSimulation();
+            return Next();
+        }
+
+        try
+        {
+            void HandleResult(StringResponse response, string message)
+            {
+                if (response.OriginalException != null)
+                {
+                    executionContext.Log("Failed with error", response.OriginalException.Message);
+                    throw response.OriginalException;
+                }
+
+                var serializer = executionContext.Resolve<IJsonSerializer>();
+                executionContext.Log(message, serializer.Serialize(response, true));
+            }
+
+            var client = await Clients.GetClientAsync((Host, Username, Password));
+            if (Document != null)
+            {
+                var response = await client.IndexAsync<StringResponse>(IndexName, id, Document, ctx: ct);
+
+                HandleResult(response, $"Document with ID '{id}' upserted");
+            }
+            else
+            {
+                var response = await client.DeleteAsync<StringResponse>(IndexName, id, ctx: ct);
+
+                HandleResult(response, $"Document with ID '{id}' deleted");
+            }
+
+            return Next();
+        }
+        catch (ElasticsearchClientException ex)
+        {
+            executionContext.Log("Failed with error", ex.Message);
+            throw;
+        }
     }
 
-    public sealed class ElasticSearchContent
+#pragma warning disable CS0618 // Type or member is obsolete
+    public RuleAction ToAction()
+    {
+        return SimpleMapper.Map(this, new ElasticSearchAction());
+    }
+#pragma warning restore CS0618 // Type or member is obsolete
+
+    private sealed class ElasticSearchContent
     {
         public string ContentId { get; set; }
 

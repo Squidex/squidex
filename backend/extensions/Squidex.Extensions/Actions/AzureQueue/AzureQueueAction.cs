@@ -12,7 +12,8 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.AzureQueue;
 
-public sealed record AzureQueueAction : DeprecatedRuleAction
+[Obsolete("Use Flows")]
+public sealed record AzureQueueAction : RuleAction
 {
     [LocalizedRequired]
     public string ConnectionString { get; set; }

@@ -7,9 +7,11 @@
 
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Flows;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.Fastly;
@@ -21,7 +23,9 @@ namespace Squidex.Extensions.Actions.Fastly;
     Display = "Purge fastly cache",
     Description = "Remove entries from the fastly CDN cache.",
     ReadMore = "https://www.fastly.com/")]
-internal sealed record FastlyFlowStep : FlowStep
+#pragma warning disable CS0618 // Type or member is obsolete
+public sealed record FastlyFlowStep : FlowStep, IConvertibleToAction
+#pragma warning restore CS0618 // Type or member is obsolete
 {
     [LocalizedRequired]
     [Display(Name = "Api Key", Description = "The API key to grant access to Squidex.")]
@@ -36,6 +40,12 @@ internal sealed record FastlyFlowStep : FlowStep
     public override async ValueTask<FlowStepResult> ExecuteAsync(FlowExecutionContext executionContext,
         CancellationToken ct)
     {
+        if (executionContext.IsSimulation)
+        {
+            executionContext.LogSkipSimulation();
+            return Next();
+        }
+
         var @event = ((FlowEventContext)executionContext.Context).Event;
 
         var id = string.Empty;
@@ -58,4 +68,11 @@ internal sealed record FastlyFlowStep : FlowStep
         executionContext.Log("Cache invalidated", dump);
         return Next();
     }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+    public RuleAction ToAction()
+    {
+        return SimpleMapper.Map(this, new FastlyAction());
+    }
+#pragma warning restore CS0618 // Type or member is obsolete
 }

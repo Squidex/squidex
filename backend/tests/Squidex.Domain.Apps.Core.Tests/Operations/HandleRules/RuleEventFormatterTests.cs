@@ -70,7 +70,7 @@ public class RuleEventFormatterTests
             new FakeContentResolver(),
         };
 
-        sut = new RuleEventFormatter(TestUtils.DefaultSerializer, BuildTemplateEngine(), BuildScriptEngine(), new SimpleFormatter(formatters));
+        sut = new RuleEventFormatter(TestUtils.DefaultSerializer, BuildScriptEngine(), BuildTemplateEngine(), new SimpleFormatter(formatters));
     }
 
     private static FluidTemplateEngine BuildTemplateEngine()
@@ -106,7 +106,7 @@ public class RuleEventFormatterTests
     [Fact]
     public void Should_serialize_object_to_json()
     {
-        var actual = sut.Serialize(new { Value = 1 });
+        var actual = sut.SerializeJson(new { Value = 1 });
 
         Assert.NotNull(actual);
     }
@@ -116,7 +116,7 @@ public class RuleEventFormatterTests
     {
         var @event = new EnrichedContentEvent { AppId = appId };
 
-        var actual = sut.Serialize(@event);
+        var actual = sut.SerializeJson(@event);
 
         Assert.NotNull(actual);
     }

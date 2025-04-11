@@ -5,10 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
+using Squidex.Flows.Internal;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
+using Squidex.Infrastructure.Validation;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models;
@@ -27,9 +29,16 @@ public sealed class UpdateRuleDto
     public RuleTriggerDto? Trigger { get; set; }
 
     /// <summary>
-    /// The action properties.
+    /// The flow to describe the sequence of actions to perform.
     /// </summary>
+    [Obsolete("Use Flow property")]
     public RuleAction? Action { get; set; }
+
+    /// <summary>
+    /// The flow.
+    /// </summary>
+    [LocalizedRequired]
+    public FlowDefinitionDto Flow { get; set; }
 
     /// <summary>
     /// Enable or disable the rule.
@@ -38,10 +47,28 @@ public sealed class UpdateRuleDto
 
     public UpdateRule ToCommand(DomainId id)
     {
-        var command = SimpleMapper.Map(this, new UpdateRule { RuleId = id });
+        var command = SimpleMapper.Map(this, new UpdateRule { RuleId = id, Flow = GetFlow() });
 
         command.Trigger = Trigger?.ToTrigger();
 
         return command;
+    }
+
+    private FlowDefinition? GetFlow()
+    {
+        var flow = Flow?.ToDefinition();
+#pragma warning disable CS0618 // Type or member is obsolete
+        if (flow == null && Action != null)
+        {
+            flow = new FlowDefinition
+            {
+                Steps = new Dictionary<Guid, FlowStepDefinition>
+                {
+                    [Guid.Empty] = new FlowStepDefinition { Step = Action.ToFlowStep() },
+                },
+            };
+        }
+#pragma warning restore CS0618 // Type or member is obsolete
+        return flow;
     }
 }

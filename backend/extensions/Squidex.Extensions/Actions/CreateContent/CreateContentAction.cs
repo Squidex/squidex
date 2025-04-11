@@ -12,7 +12,8 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.CreateContent;
 
-public sealed record CreateContentAction : DeprecatedRuleAction
+[Obsolete("Use Flows")]
+public sealed record CreateContentAction : RuleAction
 {
     [LocalizedRequired]
     public string Data { get; set; }

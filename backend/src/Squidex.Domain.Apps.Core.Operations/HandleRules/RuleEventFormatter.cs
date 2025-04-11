@@ -18,7 +18,11 @@ using Squidex.Shared.Identity;
 
 namespace Squidex.Domain.Apps.Core.HandleRules;
 
-public sealed class RuleEventFormatter(IJsonSerializer serializer, ITemplateEngine templateEngine, IScriptEngine scriptEngine, SimpleFormatter simpleFormatter)
+public sealed class RuleEventFormatter(
+    IJsonSerializer serializer,
+    IScriptEngine scriptEngine,
+    ITemplateEngine templateEngine,
+    SimpleFormatter simpleFormatter)
     : IFlowExpressionEngine
 {
     private const string GlobalFallback = "null";
@@ -60,9 +64,14 @@ public sealed class RuleEventFormatter(IJsonSerializer serializer, ITemplateEngi
         }
     }
 
-    public string Serialize<T>(T value)
+    public string SerializeJson<T>(T value)
     {
         return serializer.Serialize(value, true);
+    }
+
+    public T DeserializeJson<T>(string json)
+    {
+        return serializer.Deserialize<T>(json);
     }
 
     public bool Evaluate<T>(string? expression, T value)
