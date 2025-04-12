@@ -6,7 +6,12 @@ metadata:
     {{- include "squidex.labels" . | indent 4 }}
     app.kubernetes.io/role: api
 spec:
+  {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.deployment.replicaCount }}
+  {{- end }}
+  revisionHistoryLimit: {{ .Values.deployment.revisionHistoryLimit }}
+  strategy:
+    {{- toYaml .Values.deployment.strategy | nindent 4 }}
   selector:
     matchLabels:
       {{- include "squidex.selectors" . | indent 6 }}
@@ -16,26 +21,35 @@ spec:
       labels:
         {{- include "squidex.selectors" . | indent 8 }}
         app.kubernetes.io/role: api
+      {{- if .Values.deployment.annotations }}
+      annotations:
+        {{- toYaml .Values.deployment.annotations | nindent 8 }}
+      {{- end }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
         {{- toYaml . | nindent 8 }}
       {{- end }}
-      {{- if .Values.runAsNonRoot }}
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
-      {{- end }}
+      restartPolicy: {{ .Values.deployment.restartPolicy }}
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ default .Chart.AppVersion .Values.image.tag }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          {{- if .Values.runAsNonRoot }}
           securityContext:
             {{- toYaml .Values.containerSecurityContext | nindent 12 }}
+          {{- if .Values.deployment.command }}
+          command:
+            {{- toYaml .Values.deployment.command | nindent 12 }}
+          {{- end }}
+          {{- if .Values.deployment.args }}
+          args:
+            {{- toYaml .Values.deployment.args | nindent 12 }}
           {{- end }}
           ports:
             - name: http
-              containerPort: 80
+              containerPort: 8080
               protocol: TCP
           livenessProbe:
             httpGet:
@@ -58,7 +72,6 @@ spec:
               value: {{ $val | quote }}
             {{- end }}
           {{- end }}
-
             - name: CLUSTERING__WORKER
               value: "false"
           
