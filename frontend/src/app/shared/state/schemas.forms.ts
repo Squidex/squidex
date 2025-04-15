@@ -10,8 +10,7 @@
 import { AbstractControl, UntypedFormControl, Validators } from '@angular/forms';
 import { map } from 'rxjs/operators';
 import { ExtendedFormGroup, Form, TemplatedFormArray, ValidatorsEx, value$ } from '@app/framework';
-import { AddFieldDto, CreateSchemaDto, FieldRule, SchemaDto, SchemaPropertiesDto, SynchronizeSchemaDto, UpdateSchemaDto } from '../services/schemas.service';
-import { createProperties, FieldPropertiesDto, FieldPropertiesVisitor } from '../services/schemas.types';
+import { createProperties, FieldPropertiesDto, FieldPropertiesVisitor, IAddFieldDto, ICreateSchemaDto, IFieldPropertiesDto, IFieldRuleDto, ISynchronizeSchemaDto, IUpdateSchemaDto, SchemaDto, SchemaPropertiesDto } from '../model';
 
 type CreateCategoryFormType = { name: string };
 
@@ -25,7 +24,7 @@ export class CreateCategoryForm extends Form<ExtendedFormGroup, CreateCategoryFo
     }
 }
 
-export class CreateSchemaForm extends Form<ExtendedFormGroup, CreateSchemaDto> {
+export class CreateSchemaForm extends Form<ExtendedFormGroup, ICreateSchemaDto> {
     constructor() {
         super(new ExtendedFormGroup({
             name: new UntypedFormControl('', [
@@ -45,20 +44,20 @@ export class CreateSchemaForm extends Form<ExtendedFormGroup, CreateSchemaDto> {
         }));
     }
 
-    public transformLoad(value: CreateSchemaDto) {
+    public transformLoad(value: ICreateSchemaDto) {
         const { name, type, category, ...importing } = value;
 
         return { name, type, importing, initialCategory: category };
     }
 
-    public transformSubmit(value: any): CreateSchemaDto {
+    public transformSubmit(value: any): ICreateSchemaDto {
         const { name, type, importing, initialCategory } = value;
 
         return { name, type, category: initialCategory, ...importing };
     }
 }
 
-export class SynchronizeSchemaForm extends Form<ExtendedFormGroup, SynchronizeSchemaDto> {
+export class SynchronizeSchemaForm extends Form<ExtendedFormGroup, ISynchronizeSchemaDto> {
     constructor() {
         super(new ExtendedFormGroup({
             json: new UntypedFormControl({},
@@ -86,7 +85,7 @@ export class SynchronizeSchemaForm extends Form<ExtendedFormGroup, SynchronizeSc
     }
 }
 
-export class ConfigureFieldRulesForm extends Form<TemplatedFormArray, ReadonlyArray<FieldRule>, SchemaDto> {
+export class ConfigureFieldRulesForm extends Form<TemplatedFormArray, ReadonlyArray<IFieldRuleDto>, SchemaDto> {
     public get rulesControls(): ReadonlyArray<ExtendedFormGroup> {
         return this.form.controls as any;
     }
@@ -200,7 +199,7 @@ export class EditSchemaScriptsForm extends Form<ExtendedFormGroup, {}, object> {
     }
 }
 
-export class EditFieldForm extends Form<ExtendedFormGroup, {}, FieldPropertiesDto> {
+export class EditFieldForm extends Form<ExtendedFormGroup, {}, IFieldPropertiesDto> {
     constructor(properties: FieldPropertiesDto) {
         super(EditFieldForm.buildForm(properties));
     }
@@ -383,7 +382,7 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
     }
 }
 
-export class EditSchemaForm extends Form<ExtendedFormGroup, UpdateSchemaDto, SchemaPropertiesDto> {
+export class EditSchemaForm extends Form<ExtendedFormGroup, IUpdateSchemaDto, SchemaPropertiesDto> {
     constructor() {
         super(new ExtendedFormGroup({
             label: new UntypedFormControl('',
@@ -414,7 +413,7 @@ export class EditSchemaForm extends Form<ExtendedFormGroup, UpdateSchemaDto, Sch
     }
 }
 
-export class AddFieldForm extends Form<ExtendedFormGroup, AddFieldDto> {
+export class AddFieldForm extends Form<ExtendedFormGroup, IAddFieldDto> {
     public isContentField = value$(this.form.controls['type']).pipe(map(x => x !== 'UI'));
 
     constructor() {
@@ -433,7 +432,7 @@ export class AddFieldForm extends Form<ExtendedFormGroup, AddFieldDto> {
         }));
     }
 
-    public transformLoad(value: Partial<AddFieldDto>) {
+    public transformLoad(value: Partial<IAddFieldDto>) {
         const { name, properties, partitioning } = value;
 
         const isLocalizable = partitioning === 'language';

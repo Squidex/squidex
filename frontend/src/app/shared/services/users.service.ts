@@ -10,19 +10,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlConfig, pretifyError, Resource, StringHelper } from '@app/framework';
-
-export class UserDto {
-    constructor(
-        public readonly id: string,
-        public readonly displayName: string,
-    ) {
-    }
-}
-
-export type UpdateProfileDto = Readonly<{
-    // The given answers.
-    answers: { [question: string]: string };
- }>;
+import { IUpdateProfileDto, UpdateProfileDto, UserDto } from './../model';
 
 @Injectable({
     providedIn: 'root',
@@ -34,10 +22,10 @@ export class UsersService {
     ) {
     }
 
-    public postUser(dto: UpdateProfileDto): Observable<any> {
+    public postUser(dto: IUpdateProfileDto): Observable<any> {
         const url = this.apiUrl.buildUrl('api/user');
 
-        return this.http.post<any[]>(url, dto);
+        return this.http.post<any[]>(url, new UpdateProfileDto(dto));
     }
 
     public getUsers(query?: string): Observable<ReadonlyArray<UserDto>> {
@@ -45,7 +33,7 @@ export class UsersService {
 
         return this.http.get<any[]>(url).pipe(
             map(body => {
-                return parseUsers(body);
+                return body.map(UserDto.fromJSON);
             }),
             pretifyError('i18n:users.loadFailed'));
     }
@@ -55,7 +43,7 @@ export class UsersService {
 
         return this.http.get<any>(url).pipe(
             map(body => {
-                return parseUser(body);
+                return UserDto.fromJSON(body);
             }),
             pretifyError('i18n:users.loadUserFailed'));
     }
@@ -67,14 +55,3 @@ export class UsersService {
             pretifyError('i18n:users.loadUserFailed'));
     }
 }
-
-function parseUsers(response: any[]) {
-    return response.map(parseUser);
-}
-
-function parseUser(response: any) {
-    return new UserDto(
-        response.id,
-        response.displayName);
-}
-

@@ -7,7 +7,7 @@
 
 import { map, take } from 'rxjs/operators';
 import { State, Types } from '@app/framework';
-import { META_FIELDS, SchemaDto, TableField } from '../services/schemas.service';
+import { META_FIELDS, SchemaDto, TableField } from '../model';
 import { UIState } from './ui.state';
 
 const META_FIELD_NAMES = Object.values(META_FIELDS).filter(x => x !== META_FIELDS.empty);

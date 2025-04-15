@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, numberAttribute, Output, QueryList, ViewChildren } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FormHintComponent, IfOnceDirective, invalid$, ObjectFormBase, RootFieldDto, TooltipDirective, TranslatePipe, TypedSimpleChanges, Types, valueProjection$ } from '@app/shared';
+import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatter, FormHintComponent, IfOnceDirective, invalid$, NestedFieldDto, ObjectFormBase, TooltipDirective, TranslatePipe, TypedSimpleChanges, Types, valueProjection$ } from '@app/shared';
 import { ComponentSectionComponent } from './component-section.component';
 
 @Component({
@@ -152,7 +152,7 @@ function getTitle(formModel: ObjectFormBase) {
 
     let valueLength = 0;
 
-    function addFields(fields: ReadonlyArray<FieldDto>) {
+    function addFields(fields: ReadonlyArray<FieldDto | NestedFieldDto>) {
         for (const field of fields) {
             const fieldValue = value[field.name];
 
@@ -178,7 +178,7 @@ function getTitle(formModel: ObjectFormBase) {
         valueLength += formatted.length;
 
         addFields(formModel.schema.fields);
-    } else if (Types.is(formModel.field, RootFieldDto)) {
+    } else if (Types.is(formModel.field, FieldDto) && formModel.field.nested) {
        addFields(formModel.field.nested);
     }
 

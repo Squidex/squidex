@@ -8,10 +8,11 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, Resource, ResourceLinks, RoleDto, RolesDto, RolesPayload, RolesService, Version } from '@app/shared/internal';
+import { ApiUrlConfig, Resource, RoleDto, RolesDto, RolesService, Versioned, VersionTag } from '@app/shared/internal';
+import { ResourceLinkDto } from './../model';
 
 describe('RolesService', () => {
-    const version = new Version('1');
+    const version = new VersionTag('1');
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -32,7 +33,6 @@ describe('RolesService', () => {
     it('should make get request to get all permissions',
         inject([RolesService, HttpTestingController], (roleService: RolesService, httpMock: HttpTestingController) => {
             let permissions: ReadonlyArray<string>;
-
             roleService.getPermissions('my-app').subscribe(result => {
                 permissions = result;
             });
@@ -49,8 +49,7 @@ describe('RolesService', () => {
 
     it('should make get request to get roles',
         inject([RolesService, HttpTestingController], (roleService: RolesService, httpMock: HttpTestingController) => {
-            let roles: RolesDto;
-
+            let roles: Versioned<RolesDto>;
             roleService.getRoles('my-app').subscribe(result => {
                 roles = result;
             });
@@ -66,15 +65,14 @@ describe('RolesService', () => {
                 },
             });
 
-            expect(roles!).toEqual({ payload: createRoles(2, 4), version: new Version('2') });
+            expect(roles!).toEqual({ payload: createRoles(2, 4), version: new VersionTag('2') });
         }));
 
     it('should make post request to add role',
         inject([RolesService, HttpTestingController], (roleService: RolesService, httpMock: HttpTestingController) => {
             const dto = { name: 'Role3' };
 
-            let roles: RolesDto;
-
+            let roles: Versioned<RolesDto>;
             roleService.postRole('my-app', dto, version).subscribe(result => {
                 roles = result;
             });
@@ -90,7 +88,7 @@ describe('RolesService', () => {
                 },
             });
 
-            expect(roles!).toEqual({ payload: createRoles(2, 4), version: new Version('2') });
+            expect(roles!).toEqual({ payload: createRoles(2, 4), version: new VersionTag('2') });
         }));
 
     it('should make put request to update role',
@@ -103,8 +101,7 @@ describe('RolesService', () => {
                 },
             };
 
-            let roles: RolesDto;
-
+            let roles: Versioned<RolesDto>;
             roleService.putRole('my-app', resource, dto, version).subscribe(result => {
                 roles = result;
             });
@@ -120,7 +117,7 @@ describe('RolesService', () => {
                 },
             });
 
-            expect(roles!).toEqual({ payload: createRoles(2, 4), version: new Version('2') });
+            expect(roles!).toEqual({ payload: createRoles(2, 4), version: new VersionTag('2') });
         }));
 
     it('should make delete request to remove role',
@@ -131,8 +128,7 @@ describe('RolesService', () => {
                 },
             };
 
-            let roles: RolesDto;
-
+            let roles: Versioned<RolesDto>;
             roleService.deleteRole('my-app', resource, version).subscribe(result => {
                 roles = result;
             });
@@ -148,7 +144,7 @@ describe('RolesService', () => {
                 },
             });
 
-            expect(roles!).toEqual({ payload: createRoles(2, 4), version: new Version('2') });
+            expect(roles!).toEqual({ payload: createRoles(2, 4), version: new VersionTag('2') });
         }));
 
     function rolesResponse(...ids: number[]) {
@@ -171,36 +167,37 @@ describe('RolesService', () => {
     }
 });
 
-export function createRoles(...ids: ReadonlyArray<number>): RolesPayload {
-    return {
+export function createRoles(...ids: ReadonlyArray<number>) {
+    return new RolesDto({
         items: ids.map(createRole),
-        canCreate: true,
-    };
+        _links: {
+            create: new ResourceLinkDto({ method: 'POST', href: '/roles' }),
+        },
+    });
 }
 
 export function createRole(id: number) {
-    const links: ResourceLinks = {
-        update: { method: 'PUT', href: `/roles/id${id}` },
-    };
-
-    return new RoleDto(links, `name${id}`, id * 2, id * 3,
-        createPermissions(id),
-        createProperties(id),
-        id % 2 === 0);
+    return new RoleDto({
+        name: `name${id}`,
+        numClients: id * 2,
+        numContributors: id * 3,
+        permissions: createPermissions(id),
+        properties: createProperties(id),
+        isDefaultRole: id % 2 === 0,
+        _links: {
+            update: new ResourceLinkDto({ method: 'PUT', href: `/roles/id${id}` }),
+        },
+    });
 }
 
 function createPermissions(id: number) {
     const result: string[] = [];
-
     result.push(`permission${id}`);
-
     return result;
 }
 
 function createProperties(id: number) {
     const result = {} as Record<string, any>;
-
     result[`property${id}`] = true;
-
     return result;
 }

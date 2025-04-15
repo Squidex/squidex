@@ -8,7 +8,7 @@
 
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { FieldDto, FormHintComponent, REFERENCES_FIELD_EDITORS, ReferencesFieldPropertiesDto, TranslatePipe } from '@app/shared';
+import { FieldDto, FormHintComponent, ReferencesFieldEditorValues, ReferencesFieldPropertiesDto, TranslatePipe } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -23,7 +23,7 @@ import { FieldDto, FormHintComponent, REFERENCES_FIELD_EDITORS, ReferencesFieldP
     ],
 })
 export class ReferencesUIComponent {
-    public readonly editors = REFERENCES_FIELD_EDITORS;
+    public readonly editors = ReferencesFieldEditorValues;
 
     @Input({ required: true })
     public fieldForm!: UntypedFormGroup;

@@ -11,16 +11,15 @@
 import { AbstractControl, ValidatorFn } from '@angular/forms';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { isValidValue, Language } from '../internal';
-import { AppLanguageDto } from '../services/app-languages.service';
-import { FieldDto, RootFieldDto, SchemaDto } from '../services/schemas.service';
-import { fieldInvariant } from '../services/schemas.types';
+import { AppLanguageDto, FieldDto, fieldInvariant, isValidValue, Language, NestedFieldDto, SchemaDto } from '../internal';
 import { CompiledRules, RuleContext, RulesProvider } from './contents.form-rules';
 
-export type TranslationStatus = { [language: string]: number };
+export type TranslationStatuses = { [language: string]: number };
+
+export type AnyFieldDto = FieldDto | NestedFieldDto;
 
 export function contentsTranslationStatus(datas: any[], schema: SchemaDto, languages: ReadonlyArray<Language>) {
-    const result: TranslationStatus = {};
+    const result: TranslationStatuses = {};
 
     for (const data of datas) {
         const status = contentTranslationStatus(data, schema, languages);
@@ -42,7 +41,7 @@ export function contentsTranslationStatus(datas: any[], schema: SchemaDto, langu
 }
 
 export function contentTranslationStatus(data: any, schema: SchemaDto, languages: ReadonlyArray<Language>) {
-    const result: TranslationStatus = {};
+    const result: TranslationStatuses = {};
 
     const localizedFields = schema.fields.filter(x => x.isLocalizable);
 
@@ -101,7 +100,7 @@ export abstract class Hidden {
 
 export type FieldGroup<T = FieldDto> = { separator?: T; fields: T[]; id: string };
 
-export function groupFields<T extends FieldDto>(fields: ReadonlyArray<T>, keepEmpty = false): FieldGroup<T>[] {
+export function groupFields<T extends FieldDto | NestedFieldDto>(fields: ReadonlyArray<T>, keepEmpty = false): FieldGroup<T>[] {
     const result: FieldGroup<T>[] = [];
 
     let currentSeparator: T | undefined;
@@ -166,7 +165,7 @@ export class PartitionConfig {
         return { key: language.iso2Code, isOptional: language.isOptional };
     }
 
-    public getAll(field: RootFieldDto) {
+    public getAll(field: FieldDto) {
         return field.isLocalizable ? this.languages : this.invariant;
     }
 }
@@ -184,7 +183,7 @@ export interface FormGlobals {
     remoteValidator?: ValidatorFn;
 }
 
-export abstract class AbstractContentForm<T extends FieldDto, TForm extends AbstractControl> extends Hidden {
+export abstract class AbstractContentForm<T extends FieldDto | NestedFieldDto, TForm extends AbstractControl> extends Hidden {
     private readonly collapsed$ = new BehaviorSubject<boolean | null>(null);
     private readonly ruleSet: CompiledRules;
 

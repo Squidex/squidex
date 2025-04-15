@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { EMPTY, Observable, throwError } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
-import { AssignContributorDto, ContributorDto, ContributorsPayload, debug, DialogService, ErrorDto, getPagingInfo, ListState, shareMapSubscribed, shareSubscribed, State, TeamsState, Types, Version } from '@app/shared';
+import { ContributorDto, ContributorsDto, debug, DialogService, ErrorDto, getPagingInfo, IAssignContributorDto, ListState, shareMapSubscribed, shareSubscribed, State, TeamsState, Types, VersionTag } from '@app/shared';
 import { TeamContributorsService } from '../internal';
 
 interface Snapshot extends ListState<string> {
@@ -19,7 +19,7 @@ interface Snapshot extends ListState<string> {
     maxContributors: number;
 
     // The team version.
-    version: Version;
+    version: VersionTag;
 
     // Indicates if the user can add a contributor.
     canCreate?: boolean;
@@ -71,7 +71,7 @@ export class TeamContributorsState extends State<Snapshot> {
             page: 0,
             pageSize: 10,
             total: 0,
-            version: Version.EMPTY,
+            version: VersionTag.EMPTY,
         });
 
         debug(this, 'teamContributors');
@@ -126,7 +126,7 @@ export class TeamContributorsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public assign(request: AssignContributorDto, options?: { silent: boolean }): Observable<boolean | undefined> {
+    public assign(request: IAssignContributorDto, options?: { silent: boolean }): Observable<boolean | undefined> {
         return this.contributorsService.postContributor(this.teamId, request, this.version).pipe(
             catchError(error => {
                 if (Types.is(error, ErrorDto) && error.statusCode === 404) {
@@ -141,7 +141,9 @@ export class TeamContributorsState extends State<Snapshot> {
             shareMapSubscribed(this.dialogs, x => x.payload.isInvited, options));
     }
 
-    private replaceContributors(version: Version, { canCreate, items, maxContributors }: ContributorsPayload) {
+    private replaceContributors(version: VersionTag, payload: ContributorsDto) {
+        const { canCreate, items, maxContributors } = payload;
+
         this.next({
             canCreate,
             contributors: items,

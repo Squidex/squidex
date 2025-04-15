@@ -8,7 +8,7 @@
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, numberAttribute, Output } from '@angular/core';
 import { TranslatePipe } from '@app/framework';
-import { FilterLogical, FilterNode, isLogicalAnd, isLogicalOr, LanguageDto, QueryModel } from '@app/shared/internal';
+import { AppLanguageDto, FilterLogical, FilterNode, isLogicalAnd, isLogicalOr, QueryModel } from '@app/shared/internal';
 import { FilterNodeComponent } from './filter-node.component';
 
 @Component({
@@ -30,10 +30,10 @@ export class FilterLogicalComponent {
     public remove = new EventEmitter();
 
     @Input({ required: true })
-    public language!: LanguageDto;
+    public language!: AppLanguageDto;
 
     @Input({ required: true })
-    public languages!: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input({ transform: numberAttribute })
     public level = 0;

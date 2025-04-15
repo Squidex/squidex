@@ -9,9 +9,9 @@
 
 import { UntypedFormControl, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form, hasNoValue$, ValidatorsEx } from '@app/framework';
-import { ClientDto, CreateClientDto, UpdateClientDto } from '../services/clients.service';
+import { ClientDto, ICreateClientDto, IUpdateClientDto } from '../model';
 
-export class RenameClientForm extends Form<ExtendedFormGroup, UpdateClientDto, ClientDto> {
+export class RenameClientForm extends Form<ExtendedFormGroup, IUpdateClientDto, ClientDto> {
     constructor() {
         super(new ExtendedFormGroup({
             name: new UntypedFormControl('',
@@ -21,7 +21,7 @@ export class RenameClientForm extends Form<ExtendedFormGroup, UpdateClientDto, C
     }
 }
 
-export class AddClientForm extends Form<ExtendedFormGroup, CreateClientDto> {
+export class AddClientForm extends Form<ExtendedFormGroup, ICreateClientDto> {
     public get id() {
         return this.form.controls['id'];
     }

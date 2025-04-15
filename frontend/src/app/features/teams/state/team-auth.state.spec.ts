@@ -8,7 +8,7 @@
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { TestValues } from 'src/app/shared/state/_test-helpers';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { AuthSchemeDto, DialogService, TeamsService, versioned } from '@app/shared';
+import { AuthSchemeDto, AuthSchemeResponseDto, DialogService, TeamsService, versioned } from '@app/shared';
 import { TeamAuthState } from '../internal';
 
 describe('TeamAuthState', () => {
@@ -19,13 +19,13 @@ describe('TeamAuthState', () => {
         version,
     } = TestValues;
 
-    const scheme: AuthSchemeDto = {
+    const scheme = new AuthSchemeDto({
         domain: 'squidex.io',
         clientId: 'ID',
         clientSecret: 'secret',
         authority: 'Authority',
         displayName: 'Squidex',
-    };
+    });
 
     let dialogs: IMock<DialogService>;
     let authService: IMock<TeamsService>;
@@ -45,7 +45,7 @@ describe('TeamAuthState', () => {
     describe('Loading', () => {
         it('should load auth', () => {
             authService.setup(x => x.getTeamAuth(team))
-                .returns(() => of(versioned(version, { scheme, canUpdate: true }))).verifiable();
+                .returns(() => of(versioned(version, new AuthSchemeResponseDto({ scheme, _links: {} })))).verifiable();
 
             authState.load().subscribe();
 
@@ -68,7 +68,7 @@ describe('TeamAuthState', () => {
 
         it('should show notification on load if reload is true', () => {
             authService.setup(x => x.getTeamAuth(team))
-                .returns(() => of(versioned(version, { scheme, canUpdate: true }))).verifiable();
+                .returns(() => of(versioned(version, new AuthSchemeResponseDto({ scheme, _links: {} })))).verifiable();
 
             authState.load(true).subscribe();
 
@@ -81,16 +81,16 @@ describe('TeamAuthState', () => {
     describe('Updates', () => {
         beforeEach(() => {
             authService.setup(x => x.getTeamAuth(team))
-                .returns(() => of(versioned(version, { scheme, canUpdate: true }))).verifiable();
+                .returns(() => of(versioned(version, new AuthSchemeResponseDto({ scheme, _links: {} })))).verifiable();
 
             authState.load().subscribe();
         });
 
         it('should update scheme with new scheme', () => {
-            const newScheme = { ...scheme, authority: 'NEW AUTHORIY' };
+            const newScheme = new AuthSchemeDto({ ...scheme, authority: 'NEW AUTHORIY' });
 
             authService.setup(x => x.putTeamAuth(team, It.isAny(), version))
-                .returns(() => of(versioned(newVersion, { scheme: newScheme, canUpdate: true })));
+                .returns(() => of(versioned(newVersion, new AuthSchemeResponseDto({ scheme: newScheme, _links: {} })))).verifiable();
 
             authState.update(newScheme);
 
@@ -100,10 +100,10 @@ describe('TeamAuthState', () => {
         });
 
         it('should update scheme with deleted scheme', () => {
-            const newScheme = null;
+            const newScheme = undefined;
 
             authService.setup(x => x.putTeamAuth(team, It.isAny(), version))
-                .returns(() => of(versioned(newVersion, { scheme: newScheme, canUpdate: true })));
+                .returns(() => of(versioned(newVersion, new AuthSchemeResponseDto({ scheme: newScheme, _links: {} })))).verifiable();
 
             authState.update(newScheme);
 

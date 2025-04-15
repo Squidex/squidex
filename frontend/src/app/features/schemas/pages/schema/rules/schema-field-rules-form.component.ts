@@ -56,7 +56,7 @@ export class SchemaFieldRulesFormComponent implements  OnInit {
             if (field.properties.isContentField) {
                 fieldNames.push(field.name);
 
-                for (const nestedField of field.nested) {
+                for (const nestedField of field.nested || []) {
                     if (nestedField.properties.isContentField) {
                         fieldNames.push(`${field.name}.${nestedField.name}`);
                     }

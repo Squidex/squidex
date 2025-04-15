@@ -8,7 +8,7 @@
 import { booleanAttribute, Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Observable, of, Subject } from 'rxjs';
-import { DateTimeEditorComponent, DialogModel, FocusOnInitDirective, ModalDialogComponent, ModalDirective, TooltipDirective, TranslatePipe } from '@app/shared';
+import { DateTime, DateTimeEditorComponent, DialogModel, FocusOnInitDirective, ModalDialogComponent, ModalDirective, TooltipDirective, TranslatePipe } from '@app/shared';
 
 const OPTION_IMMEDIATELY = 'Immediately';
 
@@ -28,7 +28,7 @@ const OPTION_IMMEDIATELY = 'Immediately';
     ],
 })
 export class DueTimeSelectorComponent {
-    private dueTimeResult?: Subject<string | null>;
+    private dueTimeResult?: Subject<DateTime | undefined>;
 
     @Input({ transform: booleanAttribute })
     public disabled?: boolean | null;
@@ -38,13 +38,13 @@ export class DueTimeSelectorComponent {
     public dueTimeAction: string | null = '';
     public dueTimeMode = OPTION_IMMEDIATELY;
 
-    public selectDueTime(action: string): Observable<string | null> {
+    public selectDueTime(action: string): Observable<DateTime | undefined> {
         if (this.disabled) {
-            return of(null);
+            return of(undefined);
         }
 
         this.dueTimeAction = action;
-        this.dueTimeResult = new Subject<string | null>();
+        this.dueTimeResult = new Subject<DateTime | undefined>();
         this.dueTimeDialog.show();
 
         return this.dueTimeResult;
@@ -53,7 +53,7 @@ export class DueTimeSelectorComponent {
     public confirmStatusChange() {
         const result = this.dueTimeMode === OPTION_IMMEDIATELY ? null : this.dueTime;
 
-        this.dueTimeResult?.next(result);
+        this.dueTimeResult?.next(result ? DateTime.parseISO(result) : undefined);
         this.dueTimeResult?.complete();
 
         this.cancelStatusChange();

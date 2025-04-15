@@ -9,10 +9,11 @@ import { Injectable } from '@angular/core';
 import { EMPTY, forkJoin, Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
-import { AddFieldDto, CreateSchemaDto, FieldDto, FieldRule, NestedFieldDto, RootFieldDto, SchemaDto, SchemasService, UpdateFieldDto, UpdateSchemaDto, UpdateUIFields } from '../services/schemas.service';
+import { FieldDto, IAddFieldDto, IConfigureUIFieldsDto, ICreateSchemaDto, IFieldRuleDto, IUpdateFieldDto, IUpdateSchemaDto, NestedFieldDto, SchemaDto } from '../model';
+import { SchemasService } from '../services/schemas.service';
 import { AppsState } from './apps.state';
 
-type AnyFieldDto = NestedFieldDto | RootFieldDto;
+type AnyFieldDto = FieldDto | NestedFieldDto;
 
 interface Snapshot extends LoadingState {
     // The schema categories.
@@ -145,7 +146,7 @@ export class SchemasState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public create(request: CreateSchemaDto): Observable<SchemaDto> {
+    public create(request: ICreateSchemaDto): Observable<SchemaDto> {
         return this.schemasService.postSchema(this.appName, request).pipe(
             tap(created => {
                 this.next(s => {
@@ -247,8 +248,8 @@ export class SchemasState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public configureFieldRules(schema: SchemaDto, request: ReadonlyArray<FieldRule>): Observable<SchemaDto> {
-        return this.schemasService.putFieldRules(this.appName, schema, request, schema.version).pipe(
+    public configureFieldRules(schema: SchemaDto, request: ReadonlyArray<IFieldRuleDto>): Observable<SchemaDto> {
+        return this.schemasService.putFieldRules(this.appName, schema, { fieldRules: request } as any, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated, schema.version, 'i18n:schemas.saved');
             }),
@@ -271,7 +272,7 @@ export class SchemasState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public update(schema: SchemaDto, request: UpdateSchemaDto): Observable<SchemaDto> {
+    public update(schema: SchemaDto, request: IUpdateSchemaDto): Observable<SchemaDto> {
         return this.schemasService.putSchema(this.appName, schema, request, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated, schema.version);
@@ -279,7 +280,7 @@ export class SchemasState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public addField(schema: SchemaDto, request: AddFieldDto, parent?: RootFieldDto | null): Observable<FieldDto> {
+    public addField(schema: SchemaDto, request: IAddFieldDto, parent?: FieldDto | null): Observable<AnyFieldDto> {
         return this.schemasService.postField(this.appName, parent || schema, request, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated);
@@ -287,7 +288,7 @@ export class SchemasState extends State<Snapshot> {
             shareMapSubscribed(this.dialogs, x => getField(x, request, parent), { silent: true }));
     }
 
-    public configureUIFields(schema: SchemaDto, request: UpdateUIFields): Observable<SchemaDto> {
+    public configureUIFields(schema: SchemaDto, request: IConfigureUIFieldsDto): Observable<SchemaDto> {
         return this.schemasService.putUIFields(this.appName, schema, request, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated, schema.version);
@@ -295,7 +296,7 @@ export class SchemasState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public orderFields(schema: SchemaDto, fields: ReadonlyArray<FieldDto>, parent?: RootFieldDto): Observable<SchemaDto> {
+    public orderFields(schema: SchemaDto, fields: ReadonlyArray<FieldDto>, parent?: FieldDto): Observable<SchemaDto> {
         return this.schemasService.putFieldOrdering(this.appName, parent || schema, fields.map(t => t.fieldId), schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated, schema.version);
@@ -343,7 +344,7 @@ export class SchemasState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public updateField<T extends FieldDto>(schema: SchemaDto, field: T, request: UpdateFieldDto): Observable<SchemaDto> {
+    public updateField<T extends FieldDto>(schema: SchemaDto, field: T, request: IUpdateFieldDto): Observable<SchemaDto> {
         return this.schemasService.putField(this.appName, field, request, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated, schema.version);
@@ -360,7 +361,7 @@ export class SchemasState extends State<Snapshot> {
     }
 
     private replaceSchema(schema: SchemaDto, oldVersion?: Version, updateText?: string) {
-        if (!oldVersion || !oldVersion.eq(schema.version)) {
+        if (!oldVersion || oldVersion !== schema.version) {
             if (updateText) {
                 this.dialogs.notifyInfo(updateText);
             }
@@ -383,9 +384,9 @@ export class SchemasState extends State<Snapshot> {
     }
 }
 
-function getField(x: SchemaDto, request: AddFieldDto, parent?: RootFieldDto | null): FieldDto {
+function getField(x: SchemaDto, request: IAddFieldDto, parent?: FieldDto | null): AnyFieldDto {
     if (parent) {
-        return x.fields.find(f => f.fieldId === parent.fieldId)!.nested.find(f => f.name === request.name)!;
+        return x.fields.find(f => f.fieldId === parent.fieldId)!.nested?.find(f => f.name === request.name)!;
     } else {
         return x.fields.find(f => f.name === request.name)!;
     }
@@ -394,7 +395,7 @@ function getField(x: SchemaDto, request: AddFieldDto, parent?: RootFieldDto | nu
 function buildCategoryNames(categories: Set<string>, allSchemas: ReadonlyArray<SchemaDto>): ReadonlyArray<string> {
     const uniqueCategories: { [name: string]: boolean } = {};
 
-    function addCategory(name: string) {
+    function addCategory(name?: string) {
         if (name) {
             uniqueCategories[name] = true;
         }
@@ -447,7 +448,7 @@ export function getCategoryTree(allSchemas: ReadonlyArray<SchemaDto>, categories
         schemasFiltered: [],
         countSchemasInSubtree: 0,
         countSchemasInSubtreeFiltered: 0,
-        categories: []
+        categories: [],
     };
 
     const components: SchemaCategory = {
@@ -456,7 +457,7 @@ export function getCategoryTree(allSchemas: ReadonlyArray<SchemaDto>, categories
         schemasFiltered: [],
         countSchemasInSubtree: 0,
         countSchemasInSubtreeFiltered: 0,
-        categories: []
+        categories: [],
     };
 
     const categoryCache: { [name: string]: SchemaCategory } = {};

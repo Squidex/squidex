@@ -7,7 +7,7 @@
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, inject, Input } from '@angular/core';
 import { FormControl, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
-import { AppsState, ContentDto, ContentsService, LanguageDto, LocalizerService, RadioGroupComponent, StatefulControlComponent, Subscriptions, TypedSimpleChanges, UIOptions } from '@app/shared';
+import { AppLanguageDto, AppsState, ContentDto, ContentsService, LocalizerService, RadioGroupComponent, StatefulControlComponent, Subscriptions, TypedSimpleChanges, UIOptions } from '@app/shared';
 import { ReferencesTagsConverter } from './references-tag-converter';
 
 export const SQX_REFERENCES_RADIO_BUTTONS_CONTROL_VALUE_ACCESSOR: any = {
@@ -45,7 +45,7 @@ export class ReferencesRadioButtonsComponent extends StatefulControlComponent<St
     public schemaId: string | undefined | null;
 
     @Input({ required: true })
-    public language!: LanguageDto;
+    public language!: AppLanguageDto;
 
     @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {

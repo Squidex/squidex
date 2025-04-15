@@ -51,10 +51,15 @@ describe('LanguageService', () => {
                 },
             ]);
 
-            expect(languages!).toEqual(
-                [
-                    new LanguageDto('de', 'German'),
-                    new LanguageDto('en', 'English'),
-                ]);
+            expect(languages!).toEqual([
+                new LanguageDto({
+                    iso2Code: 'de',
+                    englishName: 'German',
+                }),
+                new LanguageDto({
+                    iso2Code: 'en',
+                    englishName: 'English',
+                }),
+            ]);
         }));
 });

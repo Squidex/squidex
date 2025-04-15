@@ -8,9 +8,9 @@
 import { UntypedFormControl, Validators } from '@angular/forms';
 import slugify from 'slugify';
 import { ExtendedFormGroup, Form, Mutable, TemplatedFormArray, Types } from '@app/framework';
-import { AnnotateAssetDto, AssetDto, AssetFolderDto, MoveAssetItemDto, RenameAssetFolderDto, RenameAssetTagDto } from '../services/assets.service';
+import { AssetDto, AssetFolderDto, IAnnotateAssetDto, IMoveAssetDto, IRenameAssetFolderDto, IRenameTagDto } from '../model';
 
-export class AnnotateAssetForm extends Form<ExtendedFormGroup, AnnotateAssetDto, AssetDto> {
+export class AnnotateAssetForm extends Form<ExtendedFormGroup, IAnnotateAssetDto, AssetDto> {
     public get metadata() {
         return this.form.controls['metadata'] as TemplatedFormArray;
     }
@@ -66,7 +66,7 @@ export class AnnotateAssetForm extends Form<ExtendedFormGroup, AnnotateAssetDto,
     }
 
     public submit(asset?: AssetDto) {
-        const result: Mutable<AnnotateAssetDto> | null = super.submit();
+        const result: Mutable<IAnnotateAssetDto> | null = super.submit();
 
         if (asset && result) {
             const index = asset.fileName.lastIndexOf('.');
@@ -200,7 +200,7 @@ export class EditAssetScriptsForm extends Form<ExtendedFormGroup, {}, object> {
     }
 }
 
-export class RenameAssetFolderForm extends Form<ExtendedFormGroup, RenameAssetFolderDto, AssetFolderDto> {
+export class RenameAssetFolderForm extends Form<ExtendedFormGroup, IRenameAssetFolderDto, AssetFolderDto> {
     constructor() {
         super(new ExtendedFormGroup({
             folderName: new UntypedFormControl('',
@@ -210,7 +210,7 @@ export class RenameAssetFolderForm extends Form<ExtendedFormGroup, RenameAssetFo
     }
 }
 
-export class RenameAssetTagForm extends Form<ExtendedFormGroup, RenameAssetTagDto, RenameAssetTagDto> {
+export class RenameAssetTagForm extends Form<ExtendedFormGroup, IRenameTagDto, IRenameTagDto> {
     constructor() {
         super(new ExtendedFormGroup({
             tagName: new UntypedFormControl('',
@@ -220,7 +220,7 @@ export class RenameAssetTagForm extends Form<ExtendedFormGroup, RenameAssetTagDt
     }
 }
 
-export class MoveAssetForm extends Form<ExtendedFormGroup, AssetDto, MoveAssetItemDto> {
+export class MoveAssetForm extends Form<ExtendedFormGroup, AssetDto, IMoveAssetDto> {
     constructor() {
         super(new ExtendedFormGroup({
             parentId: new UntypedFormControl('',

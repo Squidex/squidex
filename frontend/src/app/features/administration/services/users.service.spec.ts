@@ -8,8 +8,9 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, Resource, ResourceLinks } from '@app/shared';
-import { UserDto, UsersDto, UsersService } from './users.service';
+import { ApiUrlConfig, UserDto, UsersDto } from '@app/shared';
+import { IResourceDto, ResourceLinkDto } from '@app/shared/model';
+import { UsersService } from './users.service';
 
 describe('UsersService', () => {
     beforeEach(() => {
@@ -31,7 +32,6 @@ describe('UsersService', () => {
     it('should make get request to get many users',
         inject([UsersService, HttpTestingController], (userManagementService: UsersService, httpMock: HttpTestingController) => {
             let users: UsersDto;
-
             userManagementService.getUsers(20, 30).subscribe(result => {
                 users = result;
             });
@@ -47,22 +47,23 @@ describe('UsersService', () => {
                     userResponse(12),
                     userResponse(13),
                 ],
+                _links: {},
             });
 
-            expect(users!).toEqual({
-                total: 100,
-                items: [
-                    createUser(12),
-                    createUser(13),
-                ],
-                canCreate: false,
-            });
+            expect(users!).toEqual(
+                new UsersDto({
+                    total: 100,
+                    items: [
+                        createUser(12),
+                        createUser(13),
+                    ],
+                    _links: {},
+                }));
         }));
 
     it('should make get request with query to get many users',
         inject([UsersService, HttpTestingController], (userManagementService: UsersService, httpMock: HttpTestingController) => {
             let users: UsersDto;
-
             userManagementService.getUsers(20, 30, 'my-query').subscribe(result => {
                 users = result;
             });
@@ -78,22 +79,23 @@ describe('UsersService', () => {
                     userResponse(12),
                     userResponse(13),
                 ],
+                _links: {},
             });
 
-            expect(users!).toEqual({
-                total: 100,
-                items: [
-                    createUser(12),
-                    createUser(13),
-                ],
-                canCreate: false,
-            });
+            expect(users!).toEqual(
+                new UsersDto({
+                    total: 100,
+                    items: [
+                        createUser(12),
+                        createUser(13),
+                    ],
+                    _links: {},
+                }));
         }));
 
     it('should make get request to get single user',
         inject([UsersService, HttpTestingController], (userManagementService: UsersService, httpMock: HttpTestingController) => {
             let user: UserDto;
-
             userManagementService.getUser('123').subscribe(result => {
                 user = result;
             });
@@ -113,7 +115,6 @@ describe('UsersService', () => {
             const dto = { email: 'mail@squidex.io', displayName: 'Squidex User', permissions: ['Permission1'], password: 'password' };
 
             let user: UserDto;
-
             userManagementService.postUser(dto).subscribe(result => {
                 user = result;
             });
@@ -132,14 +133,13 @@ describe('UsersService', () => {
         inject([UsersService, HttpTestingController], (userManagementService: UsersService, httpMock: HttpTestingController) => {
             const dto = { email: 'mail@squidex.io', displayName: 'Squidex User', permissions: ['Permission1'], password: 'password' };
 
-            const resource: Resource = {
+            const resource: IResourceDto = {
                 _links: {
-                    update: { method: 'PUT', href: 'api/user-management/123' },
+                    update: new ResourceLinkDto({ method: 'PUT', href: 'api/user-management/123' }),
                 },
             };
 
             let user: UserDto;
-
             userManagementService.putUser(resource, dto).subscribe(result => {
                 user = result;
             });
@@ -156,14 +156,13 @@ describe('UsersService', () => {
 
     it('should make put request to lock user',
         inject([UsersService, HttpTestingController], (userManagementService: UsersService, httpMock: HttpTestingController) => {
-            const resource: Resource = {
+            const resource: IResourceDto = {
                 _links: {
-                    lock: { method: 'PUT', href: 'api/user-management/123/lock' },
+                    lock: new ResourceLinkDto({ method: 'PUT', href: 'api/user-management/123/lock' }),
                 },
             };
 
             let user: UserDto;
-
             userManagementService.lockUser(resource).subscribe(result => {
                 user = result;
             });
@@ -180,14 +179,13 @@ describe('UsersService', () => {
 
     it('should make put request to unlock user',
         inject([UsersService, HttpTestingController], (userManagementService: UsersService, httpMock: HttpTestingController) => {
-            const resource: Resource = {
+            const resource: IResourceDto = {
                 _links: {
-                    unlock: { method: 'PUT', href: 'api/user-management/123/unlock' },
+                    unlock: new ResourceLinkDto({ method: 'PUT', href: 'api/user-management/123/unlock' }),
                 },
             };
 
             let user: UserDto;
-
             userManagementService.unlockUser(resource).subscribe(result => {
                 user = result;
             });
@@ -204,9 +202,9 @@ describe('UsersService', () => {
 
     it('should make delete request to delete user',
         inject([UsersService, HttpTestingController], (userManagementService: UsersService, httpMock: HttpTestingController) => {
-            const resource: Resource = {
+            const resource: IResourceDto = {
                 _links: {
-                    delete: { method: 'DELETE', href: 'api/user-management/123' },
+                    delete: new ResourceLinkDto({ method: 'DELETE', href: 'api/user-management/123' }),
                 },
             };
 
@@ -241,18 +239,18 @@ describe('UsersService', () => {
 });
 
 export function createUser(id: number, suffix = '') {
-    const links: ResourceLinks = {
-        update: { method: 'PUT', href: `/users/${id}` },
-    };
-
     const key = `${id}${suffix}`;
 
-    return new UserDto(links,
-        `${id}`,
-        `user${key}@domain.com`,
-        `user${key}`,
-        [
+    return new UserDto({
+        id: `${id}`,
+        email: `user${key}@domain.com`,
+        displayName: `user${key}`,
+        permissions: [
             `Permission${key}`,
         ],
-        true);
+        isLocked: true,
+        _links: {
+            update: new ResourceLinkDto({ method: 'PUT', href: `/users/${id}` }),
+        },
+    });
 }

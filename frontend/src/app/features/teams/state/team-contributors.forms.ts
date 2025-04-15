@@ -7,9 +7,9 @@
 
 import { UntypedFormControl, Validators } from '@angular/forms';
 import { debounceTime, map, shareReplay } from 'rxjs/operators';
-import { AssignContributorDto, ExtendedFormGroup, Form, hasNoValue$, Types, UserDto, value$ } from '@app/shared';
+import { ExtendedFormGroup, Form, hasNoValue$, IAssignContributorDto, Types, UserDto, value$ } from '@app/shared';
 
-export class AssignTeamContributorForm extends Form<ExtendedFormGroup, AssignContributorDto> {
+export class AssignTeamContributorForm extends Form<ExtendedFormGroup, IAssignContributorDto> {
     public get user() {
         return this.form.controls['user'];
     }
@@ -35,9 +35,7 @@ export class AssignTeamContributorForm extends Form<ExtendedFormGroup, AssignCon
     }
 }
 
-type ImportContributorsFormType = ReadonlyArray<AssignContributorDto>;
-
-export class ImportContributorsForm extends Form<ExtendedFormGroup, ImportContributorsFormType> {
+export class ImportContributorsForm extends Form<ExtendedFormGroup, ReadonlyArray<IAssignContributorDto>> {
     public get import() {
         return this.form.controls['import'];
     }
@@ -60,7 +58,7 @@ export class ImportContributorsForm extends Form<ExtendedFormGroup, ImportContri
 }
 
 function extractEmails(value: string) {
-    const result: AssignContributorDto[] = [];
+    const result: IAssignContributorDto[] = [];
 
     if (value) {
         const added: { [email: string]: boolean } = {};

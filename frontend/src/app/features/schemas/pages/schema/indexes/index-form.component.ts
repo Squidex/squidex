@@ -86,7 +86,7 @@ export class IndexFormComponent {
         const fields = this.createForm.submit();
 
         if (fields) {
-            this.indexesState.create({ fields })
+            this.indexesState.create({ fields } as any)
                 .subscribe({
                     next: () => {
                         this.emitCreate();

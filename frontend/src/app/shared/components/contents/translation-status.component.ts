@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { contentTranslationStatus, LanguageDto, SchemaDto } from '@app/shared/internal';
+import { AppLanguageDto, contentTranslationStatus, SchemaDto } from '@app/shared/internal';
 
 @Component({
     standalone: true,
@@ -20,10 +20,10 @@ export class TranslationStatusComponent {
     public data!: any;
 
     @Input()
-    public language?: LanguageDto | null;
+    public language?: AppLanguageDto | null;
 
     @Input({ required: true })
-    public languages!: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input({ required: true })
     public schema?: SchemaDto;

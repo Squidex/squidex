@@ -7,7 +7,7 @@
 
 import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form, TemplatedFormArray, ValidatorsEx } from '@app/framework';
-import { RuleElementDto, TriggerType } from '../services/rules.service';
+import { RuleElementDto } from '../model';
 
 export class ActionForm extends Form<any, UntypedFormGroup> {
     constructor(public readonly definition: RuleElementDto,
@@ -46,7 +46,7 @@ export class ActionForm extends Form<any, UntypedFormGroup> {
 
 export class TriggerForm extends Form<any, UntypedFormGroup> {
     constructor(
-        public readonly triggerType: TriggerType,
+        public readonly triggerType: string,
     ) {
         super(TriggerForm.builForm(triggerType));
     }

@@ -6,7 +6,7 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { LanguageDto, META_FIELDS, Query, SortMode, TableField } from '@app/shared/internal';
+import { AppLanguageDto, META_FIELDS, Query, SortMode, TableField } from '@app/shared/internal';
 import { TableHeaderComponent } from '../table-header.component';
 
 @Component({
@@ -32,7 +32,7 @@ export class ContentListHeaderComponent {
     public query: Query | undefined;
 
     @Input({ required: true })
-    public language!: LanguageDto;
+    public language!: AppLanguageDto;
 
     public sortPath?: string;
     public sortDefault?: SortMode;

@@ -10,14 +10,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlConfig, pretifyError } from '@app/framework';
-
-export class LanguageDto {
-    constructor(
-        public readonly iso2Code: string,
-        public readonly englishName: string,
-    ) {
-    }
-}
+import { LanguageDto } from './../model';
 
 @Injectable({
     providedIn: 'root',
@@ -34,18 +27,8 @@ export class LanguagesService {
 
         return this.http.get<any[]>(url).pipe(
             map(body => {
-                return parseLanguages(body);
+                return body.map(LanguageDto.fromJSON);
             }),
             pretifyError('i18n:languages.loadFailed'));
     }
-}
-
-function parseLanguages(response: any[]) {
-    return response.map(parseLanguage);
-}
-
-function parseLanguage(response: any) {
-    return new LanguageDto(
-        response.iso2Code,
-        response.englishName);
 }

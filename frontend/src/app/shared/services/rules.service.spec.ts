@@ -8,11 +8,10 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, DateTime, Resource, ResourceLinks, RuleDto, RuleElementDto, RuleElementPropertyDto, RuleEventDto, RuleEventsDto, RulesDto, RulesService, ScriptCompletions, Version } from '@app/shared/internal';
-import { SimulatedRuleEventDto, SimulatedRuleEventsDto } from './rules.service';
+import { ApiUrlConfig, DateTime, ICreateRuleDto, IUpdateRuleDto, Resource, ResourceLinkDto, RuleDto, RuleElementDto, RuleElementPropertyDto, RuleEventDto, RuleEventsDto, RulesDto, RulesService, ScriptCompletions, SimulatedRuleEventDto, SimulatedRuleEventsDto, VersionTag } from '@app/shared/internal';
 
 describe('RulesService', () => {
-    const version = new Version('1');
+    const version = new VersionTag('1');
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -33,7 +32,6 @@ describe('RulesService', () => {
     it('should make get request to get actions',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
             let actions: { [ name: string ]: RuleElementDto };
-
             rulesService.getActions().subscribe(result => {
                 actions = result;
             });
@@ -51,25 +49,28 @@ describe('RulesService', () => {
                     iconColor: '#222',
                     iconImage: '<svg path="2" />',
                     readMore: 'link2',
-                    properties: [{
-                        name: 'property1',
-                        editor: 'Editor1',
-                        display: 'Display1',
-                        description: 'Description1',
-                        isRequired: true,
-                        isFormattable: false,
-                    }, {
-                        name: 'property2',
-                        editor: 'Editor2',
-                        display: 'Display2',
-                        description: 'Description2',
-                        isRequired: false,
-                        isFormattable: true,
-                        options: [
-                            'Yes',
-                            'No',
-                        ],
-                    }],
+                    properties: [
+                        {
+                            name: 'property1',
+                            editor: 'Editor1',
+                            display: 'Display1',
+                            description: 'Description1',
+                            isRequired: true,
+                            isFormattable: false,
+                        },
+                        {
+                            name: 'property2',
+                            editor: 'Editor2',
+                            display: 'Display2',
+                            description: 'Description2',
+                            isRequired: false,
+                            isFormattable: true,
+                            options: [
+                                'Yes',
+                                'No',
+                            ],
+                        },
+                    ],
                 },
                 action1: {
                     title: 'title1',
@@ -82,23 +83,52 @@ describe('RulesService', () => {
                 },
             });
 
-            const action1 = new RuleElementDto('title1', 'display1', 'description1', '#111', '<svg path="1" />', null, 'link1', []);
-
-            const action2 = new RuleElementDto('title2', 'display2', 'description2', '#222', '<svg path="2" />', null, 'link2', [
-                new RuleElementPropertyDto('property1', 'Editor1', 'Display1', 'Description1', false, true),
-                new RuleElementPropertyDto('property2', 'Editor2', 'Display2', 'Description2', true, false, ['Yes', 'No']),
-            ]);
-
             expect(actions!).toEqual({
-                action1,
-                action2,
+                action2: new RuleElementDto({
+                    title: 'title2',
+                    display: 'display2',
+                    description: 'description2',
+                    iconColor: '#222',
+                    iconImage: '<svg path="2" />',
+                    readMore: 'link2',
+                    properties: [
+                        new RuleElementPropertyDto({
+                            name: 'property1',
+                            editor: 'Editor1' as any,
+                            display: 'Display1',
+                            description: 'Description1',
+                            isRequired: true,
+                            isFormattable: false,
+                        }),
+                        new RuleElementPropertyDto({
+                            name: 'property2',
+                            editor: 'Editor2' as any,
+                            display: 'Display2',
+                            description: 'Description2',
+                            isRequired: false,
+                            isFormattable: true,
+                            options: [
+                                'Yes',
+                                'No',
+                            ],
+                        }),
+                    ],
+                }),
+                action1: new RuleElementDto({
+                    title: 'title1',
+                    display: 'display1',
+                    description: 'description1',
+                    iconColor: '#111',
+                    iconImage: '<svg path="1" />',
+                    readMore: 'link1',
+                    properties: [],
+                }),
             });
         }));
 
     it('should make get request to get app rules',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
             let rules: RulesDto;
-
             rulesService.getRules('my-app').subscribe(result => {
                 rules = result;
             });
@@ -114,23 +144,22 @@ describe('RulesService', () => {
                     ruleResponse(13),
                 ],
                 runningRuleId: '12',
+                _links: {},
             });
 
-            expect(rules!).toEqual({
+            expect(rules!).toEqual(new RulesDto({
                 items: [
                     createRule(12),
                     createRule(13),
                 ],
                 runningRuleId: '12',
-                canCancelRun: false,
-                canCreate: false,
-                canReadEvents: false,
-            });
+                _links: {},
+            }));
         }));
 
     it('should make post request to create rule',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
-            const dto = {
+            const dto: ICreateRuleDto = {
                 trigger: {
                     param1: 1,
                     param2: 2,
@@ -141,10 +170,9 @@ describe('RulesService', () => {
                     param4: 4,
                     actionType: 'Webhook',
                 },
-            };
+            } as any;
 
             let rule: RuleDto;
-
             rulesService.postRule('my-app', dto).subscribe(result => {
                 rule = result;
             });
@@ -161,14 +189,18 @@ describe('RulesService', () => {
 
     it('should make put request to update rule',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
-            const dto: any = {
+            const dto: IUpdateRuleDto = {
                 trigger: {
                     param1: 1,
+                    param2: 2,
+                    triggerType: 'ContentChanged',
                 },
                 action: {
-                    param3: 2,
+                    param3: 3,
+                    param4: 4,
+                    actionType: 'Webhook',
                 },
-            };
+            } as any;
 
             const resource: Resource = {
                 _links: {
@@ -177,7 +209,6 @@ describe('RulesService', () => {
             };
 
             let rule: RuleDto;
-
             rulesService.putRule('my-app', resource, dto, version).subscribe(result => {
                 rule = result;
             });
@@ -279,7 +310,6 @@ describe('RulesService', () => {
     it('should make get request to get rule events',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
             let rules: RuleEventsDto;
-
             rulesService.getEvents('my-app', 10, 20, '12').subscribe(result => {
                 rules = result;
             });
@@ -299,23 +329,21 @@ describe('RulesService', () => {
                 },
             });
 
-            expect(rules!).toEqual({
+            expect(rules!).toEqual(new RuleEventsDto({
+                total: 20,
                 items: [
                     createRuleEvent(1),
                     createRuleEvent(2),
                 ],
                 _links: {
-                    cancel: { method: 'DELETE', href: '/rules/events' },
+                    cancel: new ResourceLinkDto({ method: 'DELETE', href: '/rules/events' }),
                 },
-                total: 20,
-                canCancelAll: false,
-            });
+            }));
         }));
 
     it('should make get request to get simulated rule events',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
             let rules: SimulatedRuleEventsDto;
-
             rulesService.getSimulatedEvents('my-app', '12').subscribe(result => {
                 rules = result;
             });
@@ -330,21 +358,22 @@ describe('RulesService', () => {
                     simulatedRuleEventResponse(1),
                     simulatedRuleEventResponse(2),
                 ],
+                _links: {},
             });
 
-            expect(rules!).toEqual({
+            expect(rules!).toEqual(new SimulatedRuleEventsDto({
+                total: 20,
                 items: [
                     createSimulatedRuleEvent(1),
                     createSimulatedRuleEvent(2),
                 ],
-                total: 20,
-            });
+                _links: {},
+            }));
         }));
 
     it('should make post request to get simulated rule events with action and trigger',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
             let rules: SimulatedRuleEventsDto;
-
             rulesService.postSimulatedEvents('my-app', {}, {}).subscribe(result => {
                 rules = result;
             });
@@ -359,15 +388,17 @@ describe('RulesService', () => {
                     simulatedRuleEventResponse(1),
                     simulatedRuleEventResponse(2),
                 ],
+                _links: {},
             });
 
-            expect(rules!).toEqual({
+            expect(rules!).toEqual(new SimulatedRuleEventsDto({
+                total: 20,
                 items: [
                     createSimulatedRuleEvent(1),
                     createSimulatedRuleEvent(2),
                 ],
-                total: 20,
-            });
+                _links: {},
+            }));
         }));
 
     it('should make put request to enqueue rule event',
@@ -409,7 +440,6 @@ describe('RulesService', () => {
     it('should make get request to get completions',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
             let completions: ScriptCompletions;
-
             rulesService.getCompletions('my-app', 'TriggerType').subscribe(result => {
                 completions = result;
             });
@@ -431,12 +461,12 @@ describe('RulesService', () => {
             id: `id${id}`,
             created: buildDate(id, 10),
             createdBy: `creator${id}`,
+            isEnabled: id % 2 === 0,
             lastModified: buildDate(id, 20),
             lastModifiedBy: `modifier${id}`,
             name: `rule-name${key}`,
-            numSucceeded: id * 3,
             numFailed: id * 4,
-            isEnabled: id % 2 === 0,
+            numSucceeded: id * 3,
             trigger: {
                 param1: 1,
                 param2: 2,
@@ -486,74 +516,73 @@ describe('RulesService', () => {
             actionData: `action-data${key}`,
             skipReasons: [`reason${key}`],
             uniqueId: `unique-id${key}`,
-            _links: {},
         };
     }
 });
 
 export function createRule(id: number, suffix = '') {
-    const links: ResourceLinks = {
-        update: { method: 'PUT', href: `/rules/${id}` },
-    };
-
     const key = `${id}${suffix}`;
 
-    return new RuleDto(links,
-        `id${id}`,
-        DateTime.parseISO(buildDate(id, 10)), `creator${id}`,
-        DateTime.parseISO(buildDate(id, 20)), `modifier${id}`,
-        new Version(key),
-        id % 2 === 0,
-        {
+    return new RuleDto({
+        id: `id${id}`,
+        created: DateTime.parseISO(buildDate(id, 10)),
+        createdBy: `creator${id}`,
+        isEnabled: id % 2 === 0,
+        lastModified: DateTime.parseISO(buildDate(id, 20)),
+        lastModifiedBy: `modifier${id}`,
+        name: `rule-name${key}`,
+        numFailed: id * 4,
+        numSucceeded: id * 3,
+        trigger: {
             param1: 1,
             param2: 2,
             triggerType: `rule-trigger${key}`,
-        },
-        `rule-trigger${key}` as any,
-        {
+        } as any,
+        action: {
             param3: 3,
             param4: 4,
             actionType: `rule-action${key}`,
+        } as any,
+        version: id,
+        _links: {
+            update: new ResourceLinkDto({ method: 'PUT', href: `/rules/${id}` }),
         },
-        `rule-action${key}`,
-        `rule-name${key}`,
-        id * 3,
-        id * 4);
+    });
 }
 
 export function createRuleEvent(id: number, suffix = '') {
-    const links: ResourceLinks = {
-        update: { method: 'PUT', href: `/rules/events/${id}` },
-    };
-
     const key = `${id}${suffix}`;
 
-    return new RuleEventDto(links, `id${id}`,
-        DateTime.parseISO(buildDate(id, 10)),
-        DateTime.parseISO(buildDate(id, 20)),
-        `event-name${key}`,
-        `event-url${key}`,
-        `event-dump${key}`,
-        `Failed${key}`,
-        `Failed${key}`,
-        id);
+    return new RuleEventDto({
+        id: `id${id}`,
+        created: DateTime.parseISO(buildDate(id, 10)),
+        description: `event-url${key}`,
+        eventName: `event-name${key}`,
+        jobResult: `Failed${key}` as any,
+        lastDump: `event-dump${key}`,
+        nextAttempt: DateTime.parseISO(buildDate(id, 20)),
+        numCalls: id,
+        result: `Failed${key}` as any,
+        _links: {
+            update: new ResourceLinkDto({ method: 'PUT', href: `/rules/events/${id}` }),
+        },
+    });
 }
 
 export function createSimulatedRuleEvent(id: number, suffix = '') {
     const key = `${id}${suffix}`;
 
-    return new SimulatedRuleEventDto({},
-        `id${key}`,
-        `name${key}`,
-        { value: 'simple' },
-        { value: 'enriched' },
-        `action-name${key}`,
-        `action-data${key}`,
-        `error${key}`,
-        [
-            `reason${key}`,
-        ],
-        `unique-id${key}`);
+    return new SimulatedRuleEventDto({
+        eventId: `id${key}`,
+        eventName: `name${key}`,
+        event: { value: 'simple' },
+        enrichedEvent: { value: 'enriched' },
+        error: `error${key}`,
+        actionName: `action-name${key}`,
+        actionData: `action-data${key}`,
+        skipReasons: [`reason${key}` as any],
+        uniqueId: `unique-id${key}`,
+    });
 }
 
 function buildDate(id: number, add = 0) {

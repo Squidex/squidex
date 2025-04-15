@@ -7,7 +7,7 @@
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, RulesService } from '@app/shared/internal';
+import { DialogService, RulesService, SimulatedRuleEventsDto } from '@app/shared/internal';
 import { createSimulatedRuleEvent } from '../services/rules.service.spec';
 import { TestValues } from './_test-helpers';
 import { RuleSimulatorState } from './rule-simulator.state';
@@ -18,10 +18,14 @@ describe('RuleSimulatorState', () => {
         appsState,
     } = TestValues;
 
-    const oldSimulatedRuleEvents = [
-        createSimulatedRuleEvent(1),
-        createSimulatedRuleEvent(2),
-    ];
+    const oldSimulatedRuleEvents = new SimulatedRuleEventsDto({
+        total: 200,
+        items: [
+            createSimulatedRuleEvent(1),
+            createSimulatedRuleEvent(2),
+        ],
+        _links: {},
+    });
 
     let dialogs: IMock<DialogService>;
     let rulesService: IMock<RulesService>;
@@ -37,12 +41,12 @@ describe('RuleSimulatorState', () => {
 
     it('should load simulated rule events', () => {
         rulesService.setup(x => x.getSimulatedEvents(app, '12'))
-            .returns(() => of({ items: oldSimulatedRuleEvents, total: 200 }));
+            .returns(() => of(oldSimulatedRuleEvents));
 
         ruleSimulatorState.selectRule('12');
         ruleSimulatorState.load().subscribe();
 
-        expect(ruleSimulatorState.snapshot.simulatedRuleEvents).toEqual(oldSimulatedRuleEvents);
+        expect(ruleSimulatorState.snapshot.simulatedRuleEvents).toEqual(oldSimulatedRuleEvents.items);
         expect(ruleSimulatorState.snapshot.isLoaded).toBeTruthy();
         expect(ruleSimulatorState.snapshot.isLoading).toBeFalsy();
         expect(ruleSimulatorState.snapshot.total).toEqual(200);
@@ -52,12 +56,12 @@ describe('RuleSimulatorState', () => {
 
     it('should load simulated rule events by action and trigger', () => {
         rulesService.setup(x => x.postSimulatedEvents(app, It.isAny(), It.isAny()))
-            .returns(() => of({ items: oldSimulatedRuleEvents, total: 200 }));
+            .returns(() => of(oldSimulatedRuleEvents));
 
         ruleSimulatorState.setRule({}, {});
         ruleSimulatorState.load().subscribe();
 
-        expect(ruleSimulatorState.snapshot.simulatedRuleEvents).toEqual(oldSimulatedRuleEvents);
+        expect(ruleSimulatorState.snapshot.simulatedRuleEvents).toEqual(oldSimulatedRuleEvents.items);
         expect(ruleSimulatorState.snapshot.isLoaded).toBeTruthy();
         expect(ruleSimulatorState.snapshot.isLoading).toBeFalsy();
         expect(ruleSimulatorState.snapshot.total).toEqual(200);

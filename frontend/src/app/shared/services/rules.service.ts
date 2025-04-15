@@ -9,7 +9,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiUrlConfig, DateTime, hasAnyLink, HTTP, Model, pretifyError, Resource, ResourceLinks, ScriptCompletions, StringHelper, Version } from '@app/framework';
+import { ApiUrlConfig, HTTP, pretifyError, Resource, ScriptCompletions, StringHelper, VersionOrTag } from '@app/framework';
+import { CreateRuleDto, ICreateRuleDto, IUpdateRuleDto, RuleDto, RuleElementDto, RuleEventsDto, RulesDto, SimulatedRuleEventsDto, UpdateRuleDto } from './../model';
 
 export type RuleElementMetadataDto = Readonly<{
     description: string;
@@ -21,15 +22,8 @@ export type RuleElementMetadataDto = Readonly<{
     readMore?: string;
 }>;
 
-export type TriggerType =
-    'AssetChanged' |
-    'Comment' |
-    'ContentChanged' |
-    'Manual' |
-    'SchemaChanged' |
-    'Usage';
 
-export type TriggersDto = Record<TriggerType, RuleElementMetadataDto>;
+export type TriggersDto = Record<string, RuleElementMetadataDto>;
 
 export const ALL_TRIGGERS: TriggersDto = {
     AssetChanged: {
@@ -76,188 +70,7 @@ export const ALL_TRIGGERS: TriggersDto = {
     },
 };
 
-export class RuleElementDto {
-    constructor(
-        public readonly title: string,
-        public readonly display: string,
-        public readonly description: string,
-        public readonly iconColor: string,
-        public readonly iconImage: string,
-        public readonly iconCode: string | null,
-        public readonly readMore: string,
-        public readonly properties: ReadonlyArray<RuleElementPropertyDto>,
-    ) {
-    }
-}
-
-export class RuleElementPropertyDto {
-    constructor(
-        public readonly name: string,
-        public readonly editor: string,
-        public readonly display: string,
-        public readonly description: string,
-        public readonly isFormattable: boolean,
-        public readonly isRequired: boolean,
-        public readonly options?: ReadonlyArray<string>,
-    ) {
-    }
-}
-
-export class RuleDto {
-    public readonly _links: ResourceLinks;
-
-    public readonly canDelete: boolean;
-    public readonly canDisable: boolean;
-    public readonly canEnable: boolean;
-    public readonly canReadLogs: boolean;
-    public readonly canRun: boolean;
-    public readonly canRunFromSnapshots: boolean;
-    public readonly canTrigger: boolean;
-    public readonly canUpdate: boolean;
-
-    constructor(links: ResourceLinks,
-        public readonly id: string,
-        public readonly created: DateTime,
-        public readonly createdBy: string,
-        public readonly lastModified: DateTime,
-        public readonly lastModifiedBy: string,
-        public readonly version: Version,
-        public readonly isEnabled: boolean,
-        public readonly trigger: any,
-        public readonly triggerType: TriggerType,
-        public readonly action: any,
-        public readonly actionType: string,
-        public readonly name: string,
-        public readonly numSucceeded: number,
-        public readonly numFailed: number,
-    ) {
-        this._links = links;
-
-        this.canDelete = hasAnyLink(links, 'delete');
-        this.canDisable = hasAnyLink(links, 'disable');
-        this.canEnable = hasAnyLink(links, 'enable');
-        this.canReadLogs = hasAnyLink(links, 'logs');
-        this.canRun = hasAnyLink(links, 'run');
-        this.canRunFromSnapshots = hasAnyLink(links, 'run/snapshots');
-        this.canTrigger = hasAnyLink(links, 'trigger');
-        this.canUpdate = hasAnyLink(links, 'update');
-    }
-}
-
-export class RuleEventDto extends Model<RuleEventDto> {
-    public readonly _links: ResourceLinks;
-
-    public readonly canDelete: boolean;
-    public readonly canUpdate: boolean;
-
-    constructor(links: ResourceLinks,
-        public readonly id: string,
-        public readonly created: DateTime,
-        public readonly nextAttempt: DateTime | null,
-        public readonly eventName: string,
-        public readonly description: string,
-        public readonly lastDump: string,
-        public readonly result: string,
-        public readonly jobResult: string,
-        public readonly numCalls: number,
-    ) {
-        super();
-
-        this._links = links;
-
-        this.canDelete = hasAnyLink(links, 'cancel');
-        this.canUpdate = hasAnyLink(links, 'update');
-    }
-}
-
-export class SimulatedRuleEventDto {
-    public readonly _links: ResourceLinks;
-
-    constructor(links: ResourceLinks,
-        public readonly eventId: string,
-        public readonly eventName: string,
-        public readonly event: any,
-        public readonly enrichedEvent: any | undefined,
-        public readonly actionName: string | undefined,
-        public readonly actionData: string | undefined,
-        public readonly error: string | undefined,
-        public readonly skipReasons: ReadonlyArray<string>,
-        public readonly uniqueId: string,
-    ) {
-        this._links = links;
-    }
-}
-
-export type RulesDto = Readonly<{
-    // The list of rules.
-    items: ReadonlyArray<RuleDto>;
-
-    // The id of the rule that is currently running.
-    runningRuleId?: string;
-
-    // True, if the user has permission to create a rule.
-    canCreate?: boolean;
-
-    // True, if the user has permission to read events.
-    canReadEvents?: boolean;
-
-    // True, if the user has permission to cancel an event.
-    canCancelRun?: boolean;
-}>;
-
-export type RuleEventsDto = Readonly<{
-    // The list of rule events.
-    items: ReadonlyArray<RuleEventDto>;
-
-    // The total number of rule events.
-    total: number;
-
-    // True, if the user has permissions to cancel all rule events.
-    canCancelAll?: boolean;
-}> & Resource;
-
-export type SimulatedRuleEventsDto = Readonly<{
-    // The list of simulated rule events.
-    items: ReadonlyArray<SimulatedRuleEventDto>;
-
-    // The total number of simulated rule events.
-    total: number;
-}>;
-
-export type ActionsDto = Readonly<{
-    // The rule elements by name.
-    [name: string]: RuleElementDto;
-}>;
-
-export type UpsertRuleDto = Readonly<{
-    // The optional trigger to update.
-    trigger?: RuleTrigger;
-
-    // The optional action to update.
-    action?: RuleAction;
-
-    // The optional rule name.
-    name?: string;
-
-    // True, if the rule is enabled.
-    isEnabled?: boolean;
-}>;
-
-export type RuleAction = Readonly<{
-    // The type of the action.
-    actionType: string;
-
-    // The additional properties.
-    [key: string]: any;
- }>;
-
-export type RuleTrigger = Readonly<{
-    // The type of the trigger.
-    triggerType: string;
-
-    // The additional properties.
-    [key: string]: any;
-}>;
+export type ActionsDto = Readonly<{ [name: string]: RuleElementDto }>;
 
 @Injectable({
     providedIn: 'root',
@@ -269,12 +82,17 @@ export class RulesService {
     ) {
     }
 
-    public getActions(): Observable<{ [name: string]: RuleElementDto }> {
+    public getActions(): Observable<ActionsDto> {
         const url = this.apiUrl.buildUrl('api/rules/actions');
 
-        return this.http.get<any>(url).pipe(
+        return this.http.get<Record<string, any>>(url).pipe(
             map(body => {
-                return parseActions(body);
+                const result: { [name: string]: RuleElementDto } = {};
+                for (const [key, value] of Object.entries(body)) {
+                    result[key] = RuleElementDto.fromJSON(value);
+                }
+
+                return result;
             }),
             pretifyError('i18n:rules.loadFailed'));
     }
@@ -284,34 +102,34 @@ export class RulesService {
 
         return this.http.get<any>(url).pipe(
             map(body => {
-                return parseRules(body);
+                return RulesDto.fromJSON(body);
             }),
             pretifyError('i18n:rules.loadFailed'));
     }
 
-    public postRule(appName: string, dto: UpsertRuleDto): Observable<RuleDto> {
+    public postRule(appName: string, dto: ICreateRuleDto): Observable<RuleDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules`);
 
-        return HTTP.postVersioned(this.http, url, dto).pipe(
+        return HTTP.postVersioned(this.http, url, new CreateRuleDto(dto).toJSON()).pipe(
             map(({ payload }) => {
-                return parseRule(payload.body);
+                return RuleDto.fromJSON(payload.body);
             }),
             pretifyError('i18n:rules.createFailed'));
     }
 
-    public putRule(appName: string, resource: Resource, dto: Partial<UpsertRuleDto>, version: Version): Observable<RuleDto> {
+    public putRule(appName: string, resource: Resource, dto: IUpdateRuleDto, version: VersionOrTag): Observable<RuleDto> {
         const link = resource._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, new UpdateRuleDto(dto).toJSON()).pipe(
             map(({ payload }) => {
-                return parseRule(payload.body);
+                return RuleDto.fromJSON(payload.body);
             }),
             pretifyError('i18n:rules.updateFailed'));
     }
 
-    public deleteRule(appName: string, resource: Resource, version: Version): Observable<any> {
+    public deleteRule(appName: string, resource: Resource, version: VersionOrTag): Observable<any> {
         const link = resource._links['delete'];
 
         const url = this.apiUrl.buildUrl(link.href);
@@ -359,7 +177,7 @@ export class RulesService {
 
         return this.http.get<any>(url).pipe(
             map(body => {
-                return parseEvents(body);
+                return RuleEventsDto.fromJSON(body);
             }),
             pretifyError('i18n:rules.ruleEvents.loadFailed'));
     }
@@ -369,7 +187,7 @@ export class RulesService {
 
         return this.http.get<any>(url).pipe(
             map(body => {
-                return parseSimulatedEvents(body);
+                return SimulatedRuleEventsDto.fromJSON(body);
             }),
             pretifyError('i18n:rules.ruleEvents.loadFailed'));
     }
@@ -379,7 +197,7 @@ export class RulesService {
 
         return this.http.post<any>(url, { trigger, action }).pipe(
             map(body => {
-                return parseSimulatedEvents(body);
+                return SimulatedRuleEventsDto.fromJSON(body);
             }),
             pretifyError('i18n:rules.ruleEvents.loadFailed'));
     }
@@ -407,103 +225,4 @@ export class RulesService {
 
         return this.http.get<ScriptCompletions>(url);
     }
-}
-
-function parseSimulatedEvents(response: { items: any[]; total: number } & Resource): SimulatedRuleEventsDto {
-    const { items: list, total } = response;
-    const items = list.map(parseSimulatedRuleEvent);
-
-    return { items, total };
-}
-
-function parseEvents(response: { items: any[]; total: number } & Resource): RuleEventsDto {
-    const { items: list, total, _links } = response;
-    const items = list.map(parseRuleEvent);
-
-    const canCancelAll = hasAnyLink(_links, 'create');
-
-    return { items, total, canCancelAll, _links };
-}
-
-function parseRules(response: { items: any[]; runningRuleId?: string } & Resource): RulesDto {
-    const { items: list, runningRuleId, _links } = response;
-    const items = list.map(parseRule);
-
-    const canCreate = hasAnyLink(_links, 'create');
-    const canReadEvents = hasAnyLink(_links, 'events');
-    const canCancelRun = hasAnyLink(_links, 'run/cancel');
-
-    return { items, runningRuleId, canCreate, canCancelRun, canReadEvents };
-}
-
-function parseActions(response: any) {
-    const actions: { [name: string]: RuleElementDto } = {};
-
-    for (const key of Object.keys(response).sort()) {
-        const value = response[key];
-
-        const properties = value.properties.map((property: any) =>
-            new RuleElementPropertyDto(
-                property.name,
-                property.editor,
-                property.display,
-                property.description,
-                property.isFormattable,
-                property.isRequired,
-                property.options,
-            ));
-
-        actions[key] = new RuleElementDto(
-            value.title,
-            value.display,
-            value.description,
-            value.iconColor,
-            value.iconImage, null,
-            value.readMore,
-            properties);
-    }
-
-    return actions;
-}
-
-function parseRule(response: any) {
-    return new RuleDto(response._links,
-        response.id,
-        DateTime.parseISO(response.created), response.createdBy,
-        DateTime.parseISO(response.lastModified), response.lastModifiedBy,
-        new Version(response.version.toString()),
-        response.isEnabled,
-        response.trigger,
-        response.trigger.triggerType,
-        response.action,
-        response.action.actionType,
-        response.name,
-        response.numSucceeded,
-        response.numFailed);
-}
-
-function parseRuleEvent(response: any) {
-    return new RuleEventDto(response._links,
-        response.id,
-        DateTime.parseISO(response.created),
-        response.nextAttempt ? DateTime.parseISO(response.nextAttempt) : null,
-        response.eventName,
-        response.description,
-        response.lastDump,
-        response.result,
-        response.jobResult,
-        response.numCalls);
-}
-
-function parseSimulatedRuleEvent(response: any) {
-    return new SimulatedRuleEventDto(response._links,
-        response.eventId,
-        response.eventName,
-        response.event,
-        response.enrichedEvent,
-        response.actionName,
-        response.actionData,
-        response.error,
-        response.skipReasons,
-        response.uniqueId);
 }

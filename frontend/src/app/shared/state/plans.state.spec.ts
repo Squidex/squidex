@@ -7,7 +7,7 @@
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, PlanDto, PlanLockedReason, PlansService, PlansState, versioned } from '@app/shared/internal';
+import { DialogService, PlanChangedDto, PlanDto, PlansDto, PlansService, PlansState, versioned } from '@app/shared/internal';
 import { TestValues } from './_test-helpers';
 
 describe('PlansState', () => {
@@ -19,15 +19,39 @@ describe('PlansState', () => {
         version,
     } = TestValues;
 
-    const oldPlans = {
-        currentPlanId: 'id1',
+    const oldPlans = new PlansDto({
+        currentPlanId: 'free',
         planOwner: creator,
         plans: [
-            new PlanDto('id1', 'name1', '100€', undefined, 'id1_yearly', '200€', undefined, 1, 1, 1, 1),
-            new PlanDto('id2', 'name2', '400€', undefined, 'id2_yearly', '800€', undefined, 2, 2, 2, 2),
+            new PlanDto({
+                id: 'free',
+                name: 'Free',
+                costs: '14 €',
+                confirmText: 'Change for 14 € per month?',
+                yearlyId: 'free_yearly',
+                yearlyCosts: '120 €',
+                yearlyConfirmText: 'Change for 120 € per year?',
+                maxApiBytes: 128,
+                maxApiCalls: 1000,
+                maxAssetSize: 1500,
+                maxContributors: 2500,
+            }),
+            new PlanDto({
+                id: 'professional',
+                name: 'Professional',
+                costs: '18 €',
+                confirmText: 'Change for 18 € per month?',
+                yearlyId: 'professional_yearly',
+                yearlyCosts: '160 €',
+                yearlyConfirmText: 'Change for 160 € per year?',
+                maxApiBytes: 512,
+                maxApiCalls: 4000,
+                maxAssetSize: 5500,
+                maxContributors: 6500,
+            }),
         ],
-        locked: 'None' as PlanLockedReason,
-    };
+        locked: 'None',
+    });
 
     let dialogs: IMock<DialogService>;
     let plansService: IMock<PlansService>;
@@ -65,7 +89,7 @@ describe('PlansState', () => {
             plansService.setup(x => x.getPlans(app))
                 .returns(() => of(versioned(version, oldPlans))).verifiable();
 
-            plansState.load(false, 'id2_yearly').subscribe();
+            plansState.load(false, 'professional_yearly').subscribe();
 
             expect(plansState.snapshot.plans).toEqual([
                 { isSelected: false, isYearlySelected: false, plan: oldPlans.plans[0] },
@@ -115,7 +139,7 @@ describe('PlansState', () => {
             const result = { redirectUri: 'http://url' };
 
             plansService.setup(x => x.putPlan(app, It.isAny(), version))
-                .returns(() => of(versioned(newVersion, result)));
+                .returns(() => of(versioned(newVersion, new PlanChangedDto(result))));
 
             plansState.change('free').pipe(onErrorResumeNextWith()).subscribe();
 
@@ -127,11 +151,11 @@ describe('PlansState', () => {
             expect(plansState.snapshot.version).toEqual(version);
         });
 
-        it('should update plans if no returning url', () => {
+        it('should update plans if not returning url', () => {
             plansService.setup(x => x.putPlan(app, It.isAny(), version))
-                .returns(() => of(versioned(newVersion, { redirectUri: '' })));
+                .returns(() => of(versioned(newVersion, new PlanChangedDto())));
 
-            plansState.change('id2_yearly').pipe(onErrorResumeNextWith()).subscribe();
+            plansState.change('professional_yearly').pipe(onErrorResumeNextWith()).subscribe();
 
             expect(plansState.snapshot.plans).toEqual([
                 { isSelected: false, isYearlySelected: false, plan: oldPlans.plans[0] },

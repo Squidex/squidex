@@ -7,7 +7,7 @@
 
 
 import { ChangeDetectionStrategy, Component, EventEmitter, forwardRef, Input, numberAttribute, Output } from '@angular/core';
-import { FilterComparison, FilterLogical, FilterNegation, FilterNode, isLogical, LanguageDto, QueryModel } from '@app/shared/internal';
+import { AppLanguageDto, FilterComparison, FilterLogical, FilterNegation, FilterNode, isLogical, QueryModel } from '@app/shared/internal';
 import { FilterComparisonComponent } from './filter-comparison.component';
 import { FilterLogicalComponent } from './filter-logical.component';
 
@@ -30,10 +30,10 @@ export class FilterNodeComponent {
     public remove = new EventEmitter();
 
     @Input({ required: true })
-    public language!: LanguageDto;
+    public language!: AppLanguageDto;
 
     @Input({ required: true })
-    public languages!: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input({ transform: numberAttribute })
     public level = 0;

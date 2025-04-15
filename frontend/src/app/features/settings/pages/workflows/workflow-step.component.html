@@ -3,10 +3,10 @@
         <div class="col-auto">
             <button
                 class="btn btn-text-secondary btn-initial me-1"
-                [class.active]="step.name === workflow.initial"
-                [class.enabled]="step.name !== workflow.initial && !step.isLocked"
+                [class.active]="step.name === workflow.dto.initial"
+                [class.enabled]="step.name !== workflow.dto.initial && !step.isLocked"
                 (click)="makeInitial.emit()"
-                [disabled]="step.name === workflow.initial || step.isLocked || disabled">
+                [disabled]="step.name === workflow.dto.initial || step.isLocked || disabled">
                 @if (!step.isLocked) {
                     <i class="icon-arrow-right text-decent"></i>
                 }
@@ -16,7 +16,7 @@
             <sqx-color-picker
                 [disabled]="$any(disabled)"
                 mode="Circle"
-                [ngModel]="step.color"
+                [ngModel]="step.values.color"
                 (ngModelChange)="changeColor($event)"
                 [ngModelOptions]="onBlur"></sqx-color-picker>
         </div>
@@ -81,7 +81,7 @@
                         class="form-check-input step-prevent-updates-checkbox"
                         id="preventUpdates_{{ step.name }}"
                         [disabled]="!!disabled"
-                        [ngModel]="step.noUpdate"
+                        [ngModel]="step.values.noUpdate"
                         (ngModelChange)="changeNoUpdate($event)"
                         type="checkbox" />
 
@@ -90,16 +90,16 @@
                     </label>
                 </div>
             </div>
-            @if (step.noUpdate) {
+            @if (step.values.noUpdate) {
                 <div class="col-auto col-label">
                     <span class="text-decent">{{ "workflows.syntax.when" | sqxTranslate }}</span>
                 </div>
                 <div class="col col-step-expression">
                     <input
                         class="form-control"
-                        [class.dashed]="!step.noUpdateExpression"
+                        [class.dashed]="!step.values.noUpdateExpression"
                         [disabled]="!!disabled"
-                        [ngModel]="step.noUpdateExpression"
+                        [ngModel]="step.values.noUpdateExpression"
                         (ngModelChange)="changeNoUpdateExpression($event)"
                         [ngModelOptions]="onBlur"
                         placeholder="{{ 'workflows.syntax.expression' | sqxTranslate }}"
@@ -113,7 +113,7 @@
                         allowDuplicates="false"
                         [disabled]="!!disabled"
                         [itemsSource]="roles"
-                        [ngModel]="step.noUpdateRoles"
+                        [ngModel]="step.values.noUpdateRoles"
                         (ngModelChange)="changeNoUpdateRoles($event)"
                         [ngModelOptions]="onBlur"
                         placeholder="{{ 'common.role' | sqxTranslate }}"
@@ -132,7 +132,7 @@
                         class="form-check-input step-validate-checkbox"
                         id="validate_{{ step.name }}"
                         [disabled]="!!disabled"
-                        [ngModel]="step.validate"
+                        [ngModel]="step.values.validate"
                         (ngModelChange)="changeValidate($event)"
                         type="checkbox" />
 

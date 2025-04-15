@@ -8,7 +8,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ApiUrlConfig, ChangePlanDto, HTTP, mapVersioned, parsePlans, PlanChangedDto, PlansDto, pretifyError, Version, Versioned } from '@app/shared';
+import { ApiUrlConfig, ChangePlanDto, HTTP, IChangePlanDto, mapVersioned, PlanChangedDto, PlansDto, pretifyError, Versioned, VersionOrTag } from '@app/shared';
 
 @Injectable({
     providedIn: 'any',
@@ -20,22 +20,22 @@ export class TeamPlansService {
     ) {
     }
 
-    public getPlans(teamId: string): Observable<PlansDto> {
+    public getPlans(teamId: string): Observable<Versioned<PlansDto>> {
         const url = this.apiUrl.buildUrl(`api/teams/${teamId}/plans`);
 
         return HTTP.getVersioned(this.http, url).pipe(
             mapVersioned(({ body }) => {
-                return parsePlans(body);
+                return PlansDto.fromJSON(body);
             }),
             pretifyError('i18n:plans.loadFailed'));
     }
 
-    public putPlan(teamId: string, dto: ChangePlanDto, version: Version): Observable<Versioned<PlanChangedDto>> {
+    public putPlan(teamId: string, dto: IChangePlanDto, version: VersionOrTag): Observable<Versioned<PlanChangedDto>> {
         const url = this.apiUrl.buildUrl(`api/teams/${teamId}/plan`);
 
-        return HTTP.putVersioned(this.http, url, dto, version).pipe(
+        return HTTP.putVersioned(this.http, url, new ChangePlanDto(dto).toJSON(), version).pipe(
             mapVersioned(({ body }) => {
-                return <PlanChangedDto>body;
+                return PlanChangedDto.fromJSON(body);
             }),
             pretifyError('i18n:plans.changeFailed'));
     }

@@ -9,153 +9,8 @@ import { HttpClient, HttpErrorResponse, HttpEventType, HttpResponse } from '@ang
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError, filter, map } from 'rxjs/operators';
-import { ApiUrlConfig, DateTime, ErrorDto, getLinkUrl, hasAnyLink, HTTP, mapVersioned, pretifyError, Resource, ResourceLinks, StringHelper, Types, Version, Versioned } from '@app/framework';
-
-export class AppDto {
-    public readonly _links: ResourceLinks;
-
-    public readonly canCreateSchema: boolean;
-    public readonly canDelete: boolean;
-    public readonly canLeave: boolean;
-    public readonly canReadAssets: boolean;
-    public readonly canReadAssetsScripts: boolean;
-    public readonly canReadClients: boolean;
-    public readonly canReadContributors: boolean;
-    public readonly canReadJobs: boolean;
-    public readonly canReadLanguages: boolean;
-    public readonly canReadPatterns: boolean;
-    public readonly canReadPlans: boolean;
-    public readonly canReadRoles: boolean;
-    public readonly canReadRules: boolean;
-    public readonly canReadSchemas: boolean;
-    public readonly canReadWorkflows: boolean;
-    public readonly canUpdateTeam: boolean;
-    public readonly canUpdateGeneral: boolean;
-    public readonly canUpdateImage: boolean;
-    public readonly canUploadAssets: boolean;
-
-    public readonly image: string;
-
-    public readonly displayName: string;
-
-    constructor(links: ResourceLinks,
-        public readonly id: string,
-        public readonly created: DateTime,
-        public readonly createdBy: string,
-        public readonly lastModified: DateTime,
-        public readonly lastModifiedBy: string,
-        public readonly version: Version,
-        public readonly name: string,
-        public readonly label: string | undefined,
-        public readonly description: string | undefined,
-        public readonly permissions: ReadonlyArray<string>,
-        public readonly canAccessApi: boolean,
-        public readonly canAccessContent: boolean,
-        public readonly roleName: string | undefined,
-        public readonly roleProperties: { [key: string]: any },
-        public readonly teamId: string | null,
-    ) {
-        this._links = links;
-
-        this.displayName = StringHelper.firstNonEmpty(this.label, this.name);
-
-        this.canCreateSchema = hasAnyLink(links, 'schemas/create');
-        this.canDelete = hasAnyLink(links, 'delete');
-        this.canLeave = hasAnyLink(links, 'leave');
-        this.canReadAssets = hasAnyLink(links, 'assets');
-        this.canReadAssetsScripts = hasAnyLink(links, 'assets/scripts');
-        this.canReadClients = hasAnyLink(links, 'clients');
-        this.canReadContributors = hasAnyLink(links, 'contributors');
-        this.canReadJobs = hasAnyLink(links, 'jobs');
-        this.canReadLanguages = hasAnyLink(links, 'languages');
-        this.canReadPatterns = hasAnyLink(links, 'patterns');
-        this.canReadPlans = hasAnyLink(links, 'plans');
-        this.canReadRoles = hasAnyLink(links, 'roles');
-        this.canReadRules = hasAnyLink(links, 'rules');
-        this.canReadSchemas = hasAnyLink(links, 'schemas');
-        this.canReadWorkflows = hasAnyLink(links, 'workflows');
-        this.canUpdateGeneral = hasAnyLink(links, 'update');
-        this.canUpdateImage = hasAnyLink(links, 'image/upload');
-        this.canUpdateTeam = hasAnyLink(links, 'transfer');
-        this.canUploadAssets = hasAnyLink(links, 'assets/create');
-        this.image = getLinkUrl(links, 'image') as string;
-    }
-}
-
-export class AppSettingsDto {
-    public readonly _links: ResourceLinks;
-
-    public readonly canUpdate: boolean;
-
-    constructor(links: ResourceLinks,
-        public readonly hideScheduler: boolean,
-        public readonly patterns: ReadonlyArray<PatternDto>,
-        public readonly editors: ReadonlyArray<EditorDto>,
-        public readonly version: Version,
-    ) {
-        this._links = links;
-
-        this.canUpdate = hasAnyLink(links, 'update');
-    }
-}
-
-export class PatternDto {
-    constructor(
-        public readonly name: string,
-        public readonly regex: string,
-        public readonly message?: string,
-    ) {
-    }
-}
-
-export class EditorDto {
-    constructor(
-        public readonly name: string,
-        public readonly url: string,
-    ) {
-    }
-}
-
-export type AssetScripts = Readonly<{ [name: string]: string | null }>;
-
-export type AssetScriptsDto = Versioned<AssetScriptsPayload>;
-
-export type AssetScriptsPayload = Readonly<{
-    // The actual asset scripts.
-    scripts: AssetScripts;
-
-    // True, if the user has permissions to update the scripts.
-    canUpdate?: boolean;
-}> & Resource;
-
-export type UpdateAppSettingsDto = Readonly<{
-    // The regex patterns for scehams.
-    patterns: ReadonlyArray<PatternDto>;
-
-    // The registered editors for schemas.
-    editors: ReadonlyArray<EditorDto>;
-
-    // True if the scheduler should be hidden.
-    hideScheduler?: boolean;
-}>;
-
-export type CreateAppDto = Readonly<{
-    // The new name of the app. Must be unique.
-    name: string;
-}>;
-
-export type TransferToTeamDto = Readonly<{
-    // The target team ID.
-    teamId: string | null;
-}>;
-
-export type UpdateAppDto = Readonly<{
-    // The label, which is like a display name.
-    label?: string;
-
-    // The description of the app.
-    description?: string;
-}>;
+import { ApiUrlConfig, ErrorDto, HTTP, mapVersioned, pretifyError, Resource, Types, Versioned, VersionOrTag } from '@app/framework';
+import { AppDto, AppSettingsDto, AssetScriptsDto, CreateAppDto, ICreateAppDto, ITransferToTeamDto, IUpdateAppDto, IUpdateAppSettingsDto, IUpdateAssetScriptsDto, TransferToTeamDto, UpdateAppDto, UpdateAppSettingsDto, UpdateAssetScriptsDto } from './../model';
 
 @Injectable({
     providedIn: 'root',
@@ -172,7 +27,7 @@ export class AppsService {
 
         return this.http.get<any[]>(url).pipe(
             map(body => {
-                const apps = body.map(parseApp);
+                const apps = body.map(AppDto.fromJSON);
 
                 return apps;
             }),
@@ -184,7 +39,7 @@ export class AppsService {
 
         return this.http.get<any[]>(url).pipe(
             map(body => {
-                const apps = body.map(parseApp);
+                const apps = body.map(AppDto.fromJSON);
 
                 return apps;
             }),
@@ -196,43 +51,43 @@ export class AppsService {
 
         return this.http.get<any>(url).pipe(
             map(body => {
-                const app = parseApp(body);
+                const app = AppDto.fromJSON(body);
 
                 return app;
             }),
             pretifyError('i18n:apps.appLoadFailed'));
     }
 
-    public postApp(dto: CreateAppDto): Observable<AppDto> {
+    public postApp(dto: ICreateAppDto): Observable<AppDto> {
         const url = this.apiUrl.buildUrl('api/apps');
 
-        return this.http.post(url, dto).pipe(
+        return this.http.post(url, new CreateAppDto(dto).toJSON()).pipe(
             map(body => {
-                return parseApp(body);
+                return AppDto.fromJSON(body);
             }),
             pretifyError('i18n:apps.createFailed'));
     }
 
-    public putApp(appName: string, resource: Resource, dto: UpdateAppDto, version: Version): Observable<AppDto> {
+    public putApp(appName: string, resource: Resource, dto: IUpdateAppDto, version: VersionOrTag): Observable<AppDto> {
         const link = resource._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, new UpdateAppDto(dto).toJSON()).pipe(
             map(({ payload }) => {
-                return parseApp(payload.body);
+                return AppDto.fromJSON(payload.body);
             }),
             pretifyError('i18n:apps.updateFailed'));
     }
 
-    public transferApp(appName: string, resource: Resource, dto: TransferToTeamDto, version: Version): Observable<AppDto> {
+    public transferApp(appName: string, resource: Resource, dto: ITransferToTeamDto, version: VersionOrTag): Observable<AppDto> {
         const link = resource._links['transfer'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, new TransferToTeamDto(dto).toJSON()).pipe(
             map(({ payload }) => {
-                return parseApp(payload.body);
+                return AppDto.fromJSON(payload.body);
             }),
             pretifyError('i18n:apps.transferFailed'));
     }
@@ -242,46 +97,46 @@ export class AppsService {
 
         return this.http.get<any>(url).pipe(
             map(body => {
-                return parseAppSettings(body);
+                return AppSettingsDto.fromJSON(body);
             }),
             pretifyError('i18n:apps.loadSettingsFailed'));
     }
 
-    public putSettings(appName: string, resource: Resource, dto: UpdateAppSettingsDto, version: Version): Observable<AppSettingsDto> {
+    public putSettings(appName: string, resource: Resource, dto: IUpdateAppSettingsDto, version: VersionOrTag): Observable<AppSettingsDto> {
         const link = resource._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, new UpdateAppSettingsDto(dto).toJSON()).pipe(
             map(({ payload }) => {
-                return parseAppSettings(payload.body);
+                return AppSettingsDto.fromJSON(payload.body);
             }),
             pretifyError('i18n:apps.updateSettingsFailed'));
     }
 
-    public getAssetScripts(appName: string): Observable<AssetScriptsDto> {
+    public getAssetScripts(appName: string): Observable<Versioned<AssetScriptsDto>> {
         const url = this.apiUrl.buildUrl(`/api/apps/${appName}/assets/scripts`);
 
         return HTTP.getVersioned(this.http, url).pipe(
             mapVersioned(({ body }) => {
-                return parseAssetScripts(body);
+                return AssetScriptsDto.fromJSON(body);
             }),
             pretifyError('i18n:apps.loadAssetScriptsFailed'));
     }
 
-    public putAssetScripts(appName: string, resource: Resource, dto: AssetScripts, version: Version): Observable<AssetScriptsDto> {
+    public putAssetScripts(appName: string, resource: Resource, dto: IUpdateAssetScriptsDto, version: VersionOrTag): Observable<Versioned<AssetScriptsDto>> {
         const link = resource._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, new UpdateAssetScriptsDto(dto).toJSON()).pipe(
             mapVersioned(({ body }) => {
-                return parseAssetScripts(body);
+                return AssetScriptsDto.fromJSON(body);
             }),
             pretifyError('i18n:apps.updateAssetScriptsFailed'));
     }
 
-    public postAppImage(appName: string, resource: Resource, file: HTTP.UploadFile, version: Version): Observable<number | AppDto> {
+    public postAppImage(appName: string, resource: Resource, file: HTTP.UploadFile, version: VersionOrTag): Observable<number | AppDto> {
         const link = resource._links['image/upload'];
 
         const url = this.apiUrl.buildUrl(link.href);
@@ -296,7 +151,7 @@ export class AppsService {
 
                     return percentDone;
                 } else if (Types.is(event, HttpResponse)) {
-                    return parseApp(event.body);
+                    return AppDto.fromJSON(event.body);
                 } else {
                     throw new Error('Invalid');
                 }
@@ -311,14 +166,14 @@ export class AppsService {
             pretifyError('i18n:apps.uploadImageFailed'));
     }
 
-    public deleteAppImage(appName: string, resource: Resource, version: Version): Observable<any> {
+    public deleteAppImage(appName: string, resource: Resource, version: VersionOrTag): Observable<AppDto> {
         const link = resource._links['image/delete'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
         return HTTP.requestVersioned(this.http, link.method, url, version).pipe(
             map(({ payload }) => {
-                return parseApp(payload.body);
+                return AppDto.fromJSON(payload.body);
             }),
             pretifyError('i18n:apps.removeImageFailed'));
     }
@@ -340,41 +195,4 @@ export class AppsService {
         return this.http.request(link.method, url).pipe(
             pretifyError('i18n:apps.archiveFailed'));
     }
-}
-
-function parseApp(response: any & Resource) {
-    return new AppDto(response._links,
-        response.id,
-        DateTime.parseISO(response.created), response.createdBy,
-        DateTime.parseISO(response.lastModified), response.lastModifiedBy,
-        new Version(response.version.toString()),
-        response.name,
-        response.label,
-        response.description,
-        response.permissions,
-        response.canAccessApi,
-        response.canAccessContent,
-        response.roleName,
-        response.roleProperties,
-        response.teamId);
-}
-
-function parseAppSettings(response: any & Resource) {
-    return new AppSettingsDto(response._links,
-        response.hideScheduler,
-        response.patterns.map((x: any) => {
-            return new PatternDto(x.name, x.regex, x.message);
-        }),
-        response.editors.map((x: any) => {
-            return new EditorDto(x.name, x.url);
-        }),
-        new Version(response.version.toString()));
-}
-
-function parseAssetScripts(response: any): AssetScriptsPayload {
-    const { _links, ...scripts } = response;
-
-    const canUpdate = hasAnyLink(_links, 'update');
-
-    return { scripts, canUpdate, _links };
 }

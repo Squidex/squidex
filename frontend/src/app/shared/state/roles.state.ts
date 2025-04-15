@@ -8,8 +8,9 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { debug, DialogService, LoadingState, shareSubscribed, State, Version } from '@app/framework';
-import { CreateRoleDto, RoleDto, RolesPayload, RolesService, UpdateRoleDto } from '../services/roles.service';
+import { debug, DialogService, LoadingState, shareSubscribed, State, VersionTag } from '@app/framework';
+import { IAddRoleDto, IUpdateRoleDto, RoleDto, RolesDto } from '../model';
+import { RolesService } from '../services/roles.service';
 import { AppsState } from './apps.state';
 
 interface Snapshot extends LoadingState {
@@ -17,7 +18,7 @@ interface Snapshot extends LoadingState {
     roles: ReadonlyArray<RoleDto>;
 
     // The app version.
-    version: Version;
+    version: VersionTag;
 
     // Indicates if the user can add a role.
     canCreate?: boolean;
@@ -58,7 +59,7 @@ export class RolesState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly rolesService: RolesService,
     ) {
-        super({ roles: [], version: Version.EMPTY });
+        super({ roles: [], version: VersionTag.EMPTY });
 
         debug(this, 'roles');
     }
@@ -88,7 +89,7 @@ export class RolesState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public add(request: CreateRoleDto): Observable<any> {
+    public add(request: IAddRoleDto): Observable<any> {
         return this.rolesService.postRole(this.appName, request, this.version).pipe(
             tap(({ version, payload }) => {
                 this.replaceRoles(payload, version);
@@ -96,7 +97,7 @@ export class RolesState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public update(role: RoleDto, request: UpdateRoleDto): Observable<any> {
+    public update(role: RoleDto, request: IUpdateRoleDto): Observable<any> {
         return this.rolesService.putRole(this.appName, role, request, this.version).pipe(
             tap(({ version, payload }) => {
                 this.replaceRoles(payload, version);
@@ -112,7 +113,7 @@ export class RolesState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    private replaceRoles(payload: RolesPayload, version: Version) {
+    private replaceRoles(payload: RolesDto, version: VersionTag) {
         const { canCreate, items: roles } = payload;
 
         this.next({

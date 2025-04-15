@@ -11,7 +11,7 @@
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { StopClickDirective } from '@app/framework';
-import { ContentDto, LanguageDto, META_FIELDS, SchemaDto } from '@app/shared/internal';
+import { AppLanguageDto, ContentDto, META_FIELDS, SchemaDto } from '@app/shared/internal';
 import { ContentListCellDirective } from '../contents/content-list-cell.directive';
 import { ContentListFieldComponent } from '../contents/content-list-field.component';
 
@@ -41,10 +41,10 @@ export class ContentSelectorItemComponent {
     public selectable?: boolean | null = true;
 
     @Input()
-    public language!: LanguageDto;
+    public language!: AppLanguageDto;
 
     @Input()
-    public languages!: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input()
     public schema!: SchemaDto;

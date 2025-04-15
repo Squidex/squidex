@@ -7,10 +7,8 @@
 
 import { ValidatorFn, Validators } from '@angular/forms';
 import { DateTime, Types, ValidatorsEx } from '@app/framework';
-import { ContentDto, ContentReferences, ContentReferencesValue } from '../services/contents.service';
-import { LanguageDto } from '../services/languages.service';
-import { FieldDto, RootFieldDto } from '../services/schemas.service';
-import { ArrayFieldPropertiesDto, AssetsFieldPropertiesDto, BooleanFieldPropertiesDto, ComponentFieldPropertiesDto, ComponentsFieldPropertiesDto, DateTimeFieldPropertiesDto, fieldInvariant, FieldPropertiesVisitor, GeolocationFieldPropertiesDto, JsonFieldPropertiesDto, NumberFieldPropertiesDto, ReferencesFieldPropertiesDto, RichTextFieldPropertiesDto, StringFieldPropertiesDto, TagsFieldPropertiesDto, UIFieldPropertiesDto } from '../services/schemas.types';
+import { AppLanguageDto, ContentDto, FieldDto, NestedFieldDto } from '../model';
+import { ArrayFieldPropertiesDto, AssetsFieldPropertiesDto, BooleanFieldPropertiesDto, ComponentFieldPropertiesDto, ComponentsFieldPropertiesDto, DateTimeFieldPropertiesDto, fieldInvariant, FieldPropertiesVisitor, GeolocationFieldPropertiesDto, JsonFieldPropertiesDto, NumberFieldPropertiesDto, ReferencesFieldPropertiesDto, RichTextFieldPropertiesDto, StringFieldPropertiesDto, TagsFieldPropertiesDto, UIFieldPropertiesDto } from '../model';
 
 export class HtmlValue {
     constructor(
@@ -20,10 +18,25 @@ export class HtmlValue {
     }
 }
 
+export type ContentReferences = Readonly<{
+    // The reference values by field name.
+    [fieldName: string ]: ContentFieldData<ContentReferencesValue>;
+}>;
+
+export type ContentFieldData<T = any> = Readonly<{
+    // The data by partition.
+    [partition: string]: T;
+}>;
+
+export type ContentReferencesValue = Readonly<{
+    // The references by partition.
+    [partition: string]: any;
+}> | string;
+
 export type FieldValue = string | HtmlValue;
 
-export function getContentValue(content: ContentDto, language: LanguageDto, field: RootFieldDto, allowHtml = true): { value: any; formatted: FieldValue } {
-    function getValue(source: ContentReferences | undefined, language: LanguageDto, field: RootFieldDto, secondLevel = false) {
+export function getContentValue(content: ContentDto, language: AppLanguageDto, field: FieldDto, allowHtml = true): { value: any; formatted: FieldValue } {
+    function getValue(source: ContentReferences | undefined, language: AppLanguageDto, field: FieldDto, secondLevel = false) {
         const fieldValue = source?.[field.name];
 
         if (!fieldValue) {
@@ -64,7 +77,7 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
     ) {
     }
 
-    public static format(field: FieldDto, value: any, referenceValue?: any, allowHtml = true) {
+    public static format(field: FieldDto | NestedFieldDto, value: any, referenceValue?: any, allowHtml = true) {
         if ((value === null || value === undefined) && !referenceValue) {
             return '';
         }
@@ -296,7 +309,7 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
     ) {
     }
 
-    public static create(field: FieldDto, isOptional: boolean) {
+    public static create(field: FieldDto | NestedFieldDto, isOptional: boolean) {
         const validators = [...field.properties.accept(new FieldsValidators(isOptional))];
 
         if (field.properties.isRequired && !isOptional) {
@@ -444,7 +457,7 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
     ) {
     }
 
-    public static get(field: FieldDto, partitionKey: string, now?: DateTime) {
+    public static get(field: FieldDto | NestedFieldDto, partitionKey: string, now?: DateTime) {
         return field.properties.accept(new FieldDefaultValue(partitionKey, now));
     }
 

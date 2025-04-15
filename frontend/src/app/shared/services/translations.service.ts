@@ -10,26 +10,8 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlConfig, pretifyError, StringHelper } from '@app/framework';
+import { ITranslateDto, TranslateDto, TranslationDto } from './../model';
 import { AuthService } from './auth.service';
-
-export class TranslationDto {
-    constructor(
-        public readonly result: string,
-        public readonly text: string,
-    ) {
-    }
-}
-
-export type TranslateDto = Readonly<{
-    // The text to translate.
-    text: string;
-
-    // The source language.
-    sourceLanguage: string;
-
-    // The target language.
-    targetLanguage: string;
- }>;
 
 export type AskDto = Readonly<{
     // Optional conversation ID.
@@ -77,20 +59,20 @@ export class TranslationsService {
     ) {
     }
 
-    public translate(appName: string, request: TranslateDto): Observable<TranslationDto> {
+    public translate(appName: string, dto: ITranslateDto): Observable<TranslationDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/translations`);
 
-        return this.http.post<any>(url, request).pipe(
+        return this.http.post<any>(url, new TranslateDto(dto).toJSON()).pipe(
             map(body => {
-                return parseTranslation(body);
+                return TranslationDto.fromJSON(body);
             }),
             pretifyError('i18n:translate.translateFailed'));
     }
 
-    public ask(appName: string, request: AskDto): Observable<ChatEventDto> {
+    public ask(appName: string, dto: AskDto): Observable<ChatEventDto> {
         const token = this.authService.user!.accessToken;
 
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/ask${StringHelper.buildQuery({ ...request, access_token: token })}`);
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/ask${StringHelper.buildQuery({ ...dto, access_token: token })}`);
 
         return new Observable<ChatEventDto>((subscriber) => {
             const source = new EventSource(url);
@@ -128,8 +110,3 @@ export class TranslationsService {
         });
     }
 }
-
-function parseTranslation(body: any): TranslationDto {
-    return new TranslationDto(body.result, body.text);
-}
-

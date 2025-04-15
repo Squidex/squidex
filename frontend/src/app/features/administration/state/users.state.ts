@@ -11,8 +11,8 @@ import { Injectable } from '@angular/core';
 import '@app/framework/utils/rxjs-extensions';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
-import { debug, DialogService, getPagingInfo, ListState, shareSubscribed, State } from '@app/shared';
-import { UpsertUserDto, UserDto, UsersService } from '../services/users.service';
+import { debug, DialogService, getPagingInfo, ICreateUserDto, IUpdateUserDto, ListState, shareSubscribed, State, UserDto } from '@app/shared';
+import { UsersService } from '../services/users.service';
 
 interface Snapshot extends ListState<string> {
     // The current users.
@@ -104,7 +104,7 @@ export class UsersState extends State<Snapshot> {
                 pageSize,
                 pageSize * page,
                 query).pipe(
-            tap(({ total, items: users, canCreate }) => {
+            tap(({ canCreate, items: users, total }) => {
                 if (isReload) {
                     this.dialogs.notifyInfo('i18n:users.reloaded');
                 }
@@ -132,7 +132,7 @@ export class UsersState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public create(request: UpsertUserDto): Observable<UserDto> {
+    public create(request: ICreateUserDto): Observable<UserDto> {
         return this.usersService.postUser(request).pipe(
             tap(created => {
                 this.next(s => {
@@ -144,7 +144,7 @@ export class UsersState extends State<Snapshot> {
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
-    public update(user: UserDto, request: Partial<UpsertUserDto>): Observable<UserDto> {
+    public update(user: UserDto, request: IUpdateUserDto): Observable<UserDto> {
         return this.usersService.putUser(user, request).pipe(
             tap(updated => {
                 this.replaceUser(updated);

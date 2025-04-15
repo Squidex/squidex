@@ -43,9 +43,15 @@ describe('TranslationsService', () => {
             expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({
-                text: 'Hallo', result: 'Translated',
+                result: 'Translated',
+                status: 'Translated',
+                text: 'Hallo',
             });
 
-            expect(translation!).toEqual(new TranslationDto('Translated', 'Hallo'));
+            expect(translation!).toEqual(new TranslationDto({
+                result: 'Translated',
+                status: 'Translated',
+                text: 'Hallo',
+            }));
         }));
 });

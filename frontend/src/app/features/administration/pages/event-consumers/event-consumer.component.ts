@@ -9,8 +9,8 @@
 
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { TooltipDirective } from '@app/shared';
-import { EventConsumerDto, EventConsumersState } from '../../internal';
+import { EventConsumerDto, TooltipDirective } from '@app/shared';
+import { EventConsumersState } from '../../internal';
 
 @Component({
     standalone: true,

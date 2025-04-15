@@ -7,7 +7,7 @@
 
 import { of } from 'rxjs';
 import { Mock } from 'typemoq';
-import { AppsState, AuthService, DateTime, FieldPropertiesDto, FieldRule, NestedFieldDto, RootFieldDto, SchemaDto, SchemaPropertiesDto, TeamsState, Version } from '../';
+import { AppsState, AuthService, DateTime, FieldDto, FieldPropertiesDto, FieldRuleDto, NestedFieldDto, SchemaDto, SchemaPropertiesDto, SchemaScriptsDto, TeamsState, VersionTag } from '../';
 
 const app = 'my-app';
 const creation = DateTime.today().addDays(-2);
@@ -15,8 +15,8 @@ const creator = 'me';
 const modified = DateTime.now().addDays(-1);
 const modifier = 'now-me';
 const team = 'my-team';
-const version = new Version('1');
-const newVersion = new Version('2');
+const version = new VersionTag('1');
+const newVersion = new VersionTag('2');
 
 const appsState = Mock.ofType<AppsState>();
 
@@ -41,32 +41,39 @@ authService.setup(x => x.user)
 
 type SchemaValues = {
     id?: number;
-    fields?: ReadonlyArray<RootFieldDto>;
-    fieldsInLists?: ReadonlyArray<string>;
-    fieldsInReferences?: ReadonlyArray<string>;
-    fieldRules?: ReadonlyArray<FieldRule>;
+    name?: string;
+    fields?: FieldDto[];
+    fieldsInLists?: string[];
+    fieldsInReferences?: string[];
+    fieldRules?: FieldRuleDto[];
     properties?: SchemaPropertiesDto;
 };
 
-function createSchema({ properties, id, fields, fieldsInLists, fieldsInReferences, fieldRules }: SchemaValues = {}) {
+function createSchema({ name, properties, id, fields, fieldsInLists, fieldsInReferences, fieldRules }: SchemaValues = {}) {
     id = id || 1;
 
-    return new SchemaDto({},
-        `schema${id}`,
-        creation,
-        creator,
-        modified,
-        modifier,
-        new Version('1'),
-        `schema-name${id}`,
-        `schema-category${id}`,
-        'Default',
-        true,
-        properties || new SchemaPropertiesDto(),
-        fields,
-        fieldsInLists || [],
-        fieldsInReferences || [],
-        fieldRules || []);
+
+    return new SchemaDto({
+        id: `${id}`,
+        category: `schema-category${id}`,
+        created: DateTime.now(),
+        createdBy: 'me',
+        fieldRules: fieldRules || [],
+        fieldsInLists: fieldsInLists || [],
+        fieldsInReferences: fieldsInReferences || [],
+        isPublished: true,
+        isSingleton: false,
+        lastModified: DateTime.now(),
+        lastModifiedBy: 'me',
+        name: name || `schema-name${id}`,
+        previewUrls: {},
+        properties: properties || new SchemaPropertiesDto(),
+        scripts: new SchemaScriptsDto(),
+        type: 'Default',
+        version: 1,
+        fields: fields || [],
+        _links: {},
+    });
 }
 
 type FieldValues = {
@@ -75,19 +82,37 @@ type FieldValues = {
     isDisabled?: boolean;
     isHidden?: boolean;
     partitioning?: string;
-    nested?: ReadonlyArray<NestedFieldDto>;
+    nested?: NestedFieldDto[];
 };
 
 function createField({ properties, id, partitioning, isDisabled, nested }: FieldValues) {
     id = id || 1;
 
-    return new RootFieldDto({}, id, `field${id}`, properties, partitioning || 'language', false, false, isDisabled, nested);
+    return new FieldDto({
+        fieldId: id,
+        isDisabled: isDisabled || false,
+        isHidden: false,
+        isLocked: false,
+        name: `field${id}`,
+        partitioning: partitioning || 'language',
+        properties,
+        nested,
+        _links: {},
+    });
 }
 
 function createNestedField({ properties, id, isDisabled }: FieldValues) {
     id = id || 1;
 
-    return new NestedFieldDto({}, id, `nested${id}`, properties, 0, false, false, isDisabled);
+    return new NestedFieldDto({
+        fieldId: id,
+        isDisabled: isDisabled || false,
+        isHidden: false,
+        isLocked: false,
+        name: `field${id}`,
+        properties,
+        _links: {},
+    });
 }
 
 export const TestValues = {
