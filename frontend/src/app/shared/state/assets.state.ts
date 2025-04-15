@@ -9,7 +9,8 @@ import { Injectable } from '@angular/core';
 import { EMPTY, forkJoin, Observable, of, throwError } from 'rxjs';
 import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { compareStrings, debug, DialogService, ErrorDto, getPagingInfo, ListState, MathHelper, shareSubscribed, State, Types } from '@app/framework';
-import { AnnotateAssetDto, AssetDto, AssetFolderDto, AssetFoldersDto, AssetsService, RenameAssetFolderDto } from '../services/assets.service';
+import { AssetDto, AssetFolderDto, AssetFoldersDto, IAnnotateAssetDto, IRenameAssetFolderDto } from '../model';
+import { AssetsService } from '../services/assets.service';
 import { Query } from '../services/query';
 import { AppsState } from './apps.state';
 
@@ -275,7 +276,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public updateAsset(asset: AssetDto, request: AnnotateAssetDto) {
+    public updateAsset(asset: AssetDto, request: IAnnotateAssetDto) {
         return this.assetsService.putAsset(this.appName, asset, request, asset.version).pipe(
             tap(updated => {
                 this.next(s => {
@@ -289,7 +290,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
-    public updateAssetFolder(folder: AssetFolderDto, request: RenameAssetFolderDto) {
+    public updateAssetFolder(folder: AssetFolderDto, request: IRenameAssetFolderDto) {
         return this.assetsService.putAssetFolder(this.appName, folder, request, folder.version).pipe(
             tap(updated => {
                 this.next(s => {
@@ -511,7 +512,7 @@ function updateTags(snapshot: Snapshot, newAsset?: AssetDto, oldAsset?: AssetDto
     const tagsAvailable = { ...snapshot.tagsAvailable };
     const tagsSelected = { ...snapshot.tagsSelected };
 
-    if (oldAsset) {
+    if (oldAsset?.tags) {
         for (const tag of oldAsset.tags) {
             if (tagsAvailable[tag] === 1) {
                 delete tagsAvailable[tag];
@@ -522,7 +523,7 @@ function updateTags(snapshot: Snapshot, newAsset?: AssetDto, oldAsset?: AssetDto
         }
     }
 
-    if (newAsset) {
+    if (newAsset?.tags) {
         for (const tag of newAsset.tags) {
             if (tagsAvailable[tag]) {
                 tagsAvailable[tag]++;

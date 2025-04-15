@@ -21,7 +21,7 @@ describe('UsersProviderService', () => {
     });
 
     it('should return users service if user not cached', () => {
-        const user = new UserDto('123', 'User1');
+        const user = new UserDto({ id: '123', displayName: 'User1' } as any);
 
         usersService.setup(x => x.getUser('123'))
             .returns(() => of(user)).verifiable(Times.once());
@@ -38,7 +38,7 @@ describe('UsersProviderService', () => {
     });
 
     it('should return provide user from cache', () => {
-        const user = new UserDto('123', 'User1');
+        const user = new UserDto({ id: '123', displayName: 'User1' } as any);
 
         usersService.setup(x => x.getUser('123'))
             .returns(() => of(user)).verifiable(Times.once());
@@ -57,7 +57,7 @@ describe('UsersProviderService', () => {
     });
 
     it('should return me if user is current user', () => {
-        const user = new UserDto('123', 'User1');
+        const user = new UserDto({ id: '123', displayName: 'User1' } as any);
 
         authService.setup(x => x.user)
             .returns(() => new Profile(<any>{ profile: { sub: '123' } }));
@@ -71,7 +71,7 @@ describe('UsersProviderService', () => {
             resultingUser = result;
         }).unsubscribe();
 
-        expect(resultingUser!).toEqual(new UserDto('123', 'Me'));
+        expect(resultingUser!).toEqual(new UserDto({ id: '123', displayName: 'Me' } as any));
 
         usersService.verifyAll();
     });
@@ -89,7 +89,7 @@ describe('UsersProviderService', () => {
             resultingUser = result;
         }).unsubscribe();
 
-        expect(resultingUser!).toEqual(new UserDto('Unknown', 'Unknown'));
+        expect(resultingUser!).toEqual(new UserDto({ id: 'Unknown', displayName: 'Unknown' } as any));
 
         usersService.verifyAll();
     });

@@ -67,7 +67,7 @@ export class LanguageComponent {
     }
 
     public sort(event: CdkDragDrop<ReadonlyArray<AppLanguageDto>>) {
-        this.fallbackLanguages = sorted(event);
+        this.fallbackLanguages = sorted(event) as any;
     }
 
     public save() {

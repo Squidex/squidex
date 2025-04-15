@@ -7,7 +7,7 @@
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, inject, Input } from '@angular/core';
 import { FormControl, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
-import { AppsState, CheckboxGroupComponent, ContentDto, ContentsService, LanguageDto, LocalizerService, StatefulControlComponent, Subscriptions, TypedSimpleChanges, UIOptions } from '@app/shared';
+import { AppLanguageDto, AppsState, CheckboxGroupComponent, ContentDto, ContentsService, LocalizerService, StatefulControlComponent, Subscriptions, TypedSimpleChanges, UIOptions } from '@app/shared';
 import { ReferencesTagsConverter } from './references-tag-converter';
 
 export const SQX_REFERENCES_CHECKBOXES_CONTROL_VALUE_ACCESSOR: any = {
@@ -45,7 +45,7 @@ export class ReferencesCheckboxesComponent extends StatefulControlComponent<Stat
     public schemaId: string | undefined | null;
 
     @Input({ required: true })
-    public language!: LanguageDto;
+    public language!: AppLanguageDto;
 
     @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {

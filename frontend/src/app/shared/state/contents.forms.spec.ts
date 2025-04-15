@@ -9,7 +9,7 @@
 
 import { AbstractControl, UntypedFormArray } from '@angular/forms';
 import { MathHelper } from '@app/framework';
-import { AppLanguageDto, createProperties, EditContentForm, getContentValue, HtmlValue, LanguageDto, RootFieldDto } from '@app/shared/internal';
+import { AppLanguageDto, createProperties, EditContentForm, getContentValue, HtmlValue, LanguageDto, FieldDto } from '@app/shared/internal';
 import { FieldRule, SchemaDto } from '../services/schemas.service';
 import { TestValues } from './_test-helpers';
 import { ComponentForm, FieldArrayForm } from './contents.forms';
@@ -1250,7 +1250,7 @@ describe('ContentForm', () => {
         });
     });
 
-    function createForm(fields: RootFieldDto[], fieldRules: FieldRule[] = [], schemas: { [id: string]: SchemaDto } = {}) {
+    function createForm(fields: FieldDto[], fieldRules: FieldRule[] = [], schemas: { [id: string]: SchemaDto } = {}) {
         return new EditContentForm(languages,
             createSchema({ fields, fieldRules }), schemas, {}, 0);
     }

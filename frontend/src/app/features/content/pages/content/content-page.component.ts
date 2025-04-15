@@ -365,10 +365,10 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
         this.loadVersion(null, false);
     }
 
-    public loadVersion(version: Version | null, compare: boolean) {
+    public loadVersion(version: number | null, compare: boolean) {
         const content = this.content;
 
-        if (!content || version === null || version.eq(content.version)) {
+        if (!content || version === null || version != content.version) {
             this.contentFormCompare = null;
             this.contentVersion = null;
             this.loadContent(content?.data || {}, true);

@@ -30,7 +30,6 @@ describe('UsagesService', () => {
     it('should make get request to get calls usages',
         inject([UsagesService, HttpTestingController], (usagesService: UsagesService, httpMock: HttpTestingController) => {
             let usages: CallsUsageDto;
-
             usagesService.getCallsUsages('my-app', '2017-10-12', '2017-10-13').subscribe(result => {
                 usages = result;
             });
@@ -48,7 +47,6 @@ describe('UsagesService', () => {
     it('should make get request to get calls usages for team',
         inject([UsagesService, HttpTestingController], (usagesService: UsagesService, httpMock: HttpTestingController) => {
             let usages: CallsUsageDto;
-
             usagesService.getCallsUsagesForTeam('my-team', '2017-10-12', '2017-10-13').subscribe(result => {
                 usages = result;
             });
@@ -66,7 +64,6 @@ describe('UsagesService', () => {
     it('should make get request to get storage usages',
         inject([UsagesService, HttpTestingController], (usagesService: UsagesService, httpMock: HttpTestingController) => {
             let usages: ReadonlyArray<StorageUsagePerDateDto>;
-
             usagesService.getStorageUsages('my-app', '2017-10-12', '2017-10-13').subscribe(result => {
                 usages = result;
             });
@@ -84,7 +81,6 @@ describe('UsagesService', () => {
     it('should make get request to get storage usages for team',
         inject([UsagesService, HttpTestingController], (usagesService: UsagesService, httpMock: HttpTestingController) => {
             let usages: ReadonlyArray<StorageUsagePerDateDto>;
-
             usagesService.getStorageUsagesForTeam('my-team', '2017-10-12', '2017-10-13').subscribe(result => {
                 usages = result;
             });
@@ -102,7 +98,6 @@ describe('UsagesService', () => {
     it('should make get request to get today storage',
         inject([UsagesService, HttpTestingController], (usagesService: UsagesService, httpMock: HttpTestingController) => {
             let usages: CurrentStorageDto;
-
             usagesService.getTodayStorage('my-app').subscribe(result => {
                 usages = result;
             });
@@ -114,7 +109,7 @@ describe('UsagesService', () => {
 
             req.flush({ size: 130, maxAllowed: 150 });
 
-            expect(usages!).toEqual(new CurrentStorageDto(130, 150));
+            expect(usages!).toEqual(new CurrentStorageDto({ size: 130, maxAllowed: 150 }));
         }));
 
     it('should make get request to get today storage for team',
@@ -132,7 +127,7 @@ describe('UsagesService', () => {
 
             req.flush({ size: 130, maxAllowed: 150 });
 
-            expect(usages!).toEqual(new CurrentStorageDto(130, 150));
+            expect(usages!).toEqual(new CurrentStorageDto({ size: 130, maxAllowed: 150 }));
         }));
 
     it('should make get request to get log',
@@ -152,64 +147,92 @@ describe('UsagesService', () => {
 
             expect(url!).toEqual('download/url');
         }));
-});
 
-function callsUsageResponse() {
-    return {
-        allowedBytes: 512,
-        allowedCalls: 100,
-        blockingCalls: 200,
-        totalBytes: 1024,
-        totalCalls: 40,
-        monthCalls: 5120,
-        monthBytes: 256,
-        averageElapsedMs: 12.4,
-        details: {
-            category1: [
+        function callsUsageResponse() {
+            return {
+                allowedBytes: 512,
+                allowedCalls: 100,
+                averageElapsedMs: 12.4,
+                blockingApiCalls: 200,
+                monthBytes: 256,
+                monthCalls: 5120,
+                totalBytes: 1024,
+                totalCalls: 40,
+                details: {
+                    category1: [
+                        {
+                            date: '2017-10-12',
+                            totalBytes: 10,
+                            totalCalls: 130,
+                            averageElapsedMs: 12.3,
+                        },
+                        {
+                            date: '2017-10-13',
+                            totalBytes: 13,
+                            totalCalls: 170,
+                            averageElapsedMs: 33.3,
+                        },
+                    ],
+                },
+            };
+        }
+
+        function storageUsageResponse() {
+            return [
                 {
                     date: '2017-10-12',
-                    totalBytes: 10,
-                    totalCalls: 130,
-                    averageElapsedMs: 12.3,
+                    totalCount: 10,
+                    totalSize: 130,
                 },
                 {
                     date: '2017-10-13',
+                    totalCount: 13,
+                    totalSize: 170,
+                },
+            ];
+        }
+});
+
+export function callsUsageResult() {
+    return new CallsUsageDto({
+        allowedBytes: 512,
+        allowedCalls: 100,
+        averageElapsedMs: 12.4,
+        blockingApiCalls: 200,
+        monthBytes: 256,
+        monthCalls: 5120,
+        totalBytes: 1024,
+        totalCalls: 40,
+        details: {
+            category1: [
+                new CallsUsagePerDateDto({
+                    date: DateTime.parseISO('2017-10-12'),
+                    totalBytes: 10,
+                    totalCalls: 130,
+                    averageElapsedMs: 12.3,
+                }),
+                new CallsUsagePerDateDto({
+                    date: DateTime.parseISO('2017-10-13'),
                     totalBytes: 13,
                     totalCalls: 170,
                     averageElapsedMs: 33.3,
-                },
+                }),
             ],
         },
-    };
-}
-
-function callsUsageResult() {
-    return new CallsUsageDto(512, 100, 200, 1024, 40, 256, 5120, 12.4, {
-        category1: [
-            new CallsUsagePerDateDto(DateTime.parseISO('2017-10-12'), 10, 130, 12.3),
-            new CallsUsagePerDateDto(DateTime.parseISO('2017-10-13'), 13, 170, 33.3),
-        ],
     });
 }
 
-function storageUsageResponse() {
+function storageUsageResult() {
     return [
-        {
-            date: '2017-10-12',
+        new StorageUsagePerDateDto({
+            date: DateTime.parseISO('2017-10-12'),
             totalCount: 10,
             totalSize: 130,
-        },
-        {
-            date: '2017-10-13',
+        }),
+        new StorageUsagePerDateDto({
+            date: DateTime.parseISO('2017-10-13'),
             totalCount: 13,
             totalSize: 170,
-        },
-    ];
-}
-
-function storageUsageResult() {
-    return  [
-        new StorageUsagePerDateDto(DateTime.parseISO('2017-10-12'), 10, 130),
-        new StorageUsagePerDateDto(DateTime.parseISO('2017-10-13'), 13, 170),
+        }),
     ];
 }

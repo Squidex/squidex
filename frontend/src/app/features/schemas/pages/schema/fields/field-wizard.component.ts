@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AddFieldForm, AppSettingsDto, ControlErrorsComponent, createProperties, DropdownMenuComponent, EditFieldForm, FieldDto, fieldTypes, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, LanguagesState, ModalDialogComponent, ModalDirective, ModalModel, ModalPlacementDirective, RootFieldDto, SchemaDto, SchemasState, TooltipDirective, TranslatePipe, Types } from '@app/shared';
+import { AddFieldForm, AppSettingsDto, ControlErrorsComponent, createProperties, DropdownMenuComponent, EditFieldForm, FieldDto, fieldTypes, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, LanguagesState, ModalDialogComponent, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, SchemasState, TooltipDirective, TranslatePipe, Types } from '@app/shared';
 import { FieldFormComponent } from './forms/field-form.component';
 
 
@@ -48,21 +48,21 @@ export class FieldWizardComponent implements OnInit {
     public settings!: AppSettingsDto;
 
     @Input()
-    public parent: RootFieldDto | null | undefined;
+    public parent: FieldDto | null | undefined;
 
     @Output()
     public dialogClose = new EventEmitter();
 
     public fieldTypes = fieldTypes;
-    public field!: FieldDto;
 
     public addFieldForm = new AddFieldForm();
     public addFieldModal = new ModalModel();
 
+    public editField!: FieldDto;
     public editForm?: EditFieldForm;
 
     public get isLocalizable() {
-        return (this.parent && this.parent.isLocalizable) || (this.field as any)['isLocalizable'];
+        return (this.parent && this.parent.isLocalizable) || (this.editField as any)['isLocalizable'];
     }
 
     constructor(
@@ -102,10 +102,9 @@ export class FieldWizardComponent implements OnInit {
                             break;
 
                         case 'Edit':
-                            this.field = dto;
-
-                            this.editForm = new EditFieldForm(this.field.properties);
-                            this.editForm.load(this.field.properties);
+                            this.editField = dto as any;
+                            this.editForm = new EditFieldForm(this.editField.properties);
+                            this.editForm.load(this.editField.properties);
                             break;
 
                         case 'Close':
@@ -129,9 +128,9 @@ export class FieldWizardComponent implements OnInit {
             return;
         }
 
-        const properties = createProperties(this.field.properties.fieldType, value);
+        const properties = createProperties(this.editField.properties.fieldType as any, value);
 
-        this.schemasState.updateField(this.schema, this.field as RootFieldDto, { properties })
+        this.schemasState.updateField(this.schema, this.editField as FieldDto, { properties })
             .subscribe({
                 next: () => {
                     switch (navigationMode) {

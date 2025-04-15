@@ -13,7 +13,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Observable } from 'rxjs';
 import { distinctUntilChanged, map, shareReplay, switchMap, take, tap } from 'rxjs/operators';
-import { AppLanguageDto, AppsState, ConfirmClickDirective, ContentDto, ContentListCellDirective, ContentListCellResizeDirective, ContentListHeaderComponent, ContentListWidthDirective, ContentsService, ContentsState, ContentStatusComponent, contentsTranslationStatus, ContributorsState, defined, DropdownMenuComponent, getTableConfig, KeysPipe, LanguageSelectorComponent, LanguagesState, LayoutComponent, ListViewComponent, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, NotifoComponent, PagerComponent, Queries, Query, QuerySynchronizer, Router2State, SchemaDto, SchemasService, SchemasState, SearchFormComponent, Settings, ShortcutDirective, SidebarMenuDirective, Subscriptions, switchSafe, SyncWidthDirective, TableSettings, TempService, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, TranslationStatus, UIState } from '@app/shared';
+import { AppLanguageDto, AppsState, ConfirmClickDirective, ContentDto, ContentListCellDirective, ContentListCellResizeDirective, ContentListHeaderComponent, ContentListWidthDirective, ContentsService, ContentsState, ContentStatusComponent, contentsTranslationStatus, ContributorsState, defined, DropdownMenuComponent, getTableConfig, KeysPipe, LanguageSelectorComponent, LanguagesState, LayoutComponent, ListViewComponent, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, NotifoComponent, PagerComponent, Queries, Query, QuerySynchronizer, Router2State, SchemaDto, SchemasService, SchemasState, SearchFormComponent, Settings, ShortcutDirective, SidebarMenuDirective, Subscriptions, switchSafe, SyncWidthDirective, TableSettings, TempService, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, TranslationStatuses, UIState } from '@app/shared';
 import { DueTimeSelectorComponent } from '../../shared/due-time-selector.component';
 import { ContentComponent } from '../../shared/list/content.component';
 import { CustomViewEditorComponent } from './custom-view-editor.component';
@@ -82,7 +82,7 @@ export class ContentsPageComponent implements OnInit {
     public language!: AppLanguageDto;
     public languages!: ReadonlyArray<AppLanguageDto>;
 
-    public translationStatus?: TranslationStatus;
+    public translationStatus?: TranslationStatuses;
 
     public get disableScheduler() {
         return this.appsState.snapshot.selectedSettings?.hideScheduler === true;

@@ -9,9 +9,9 @@
 
 import { UntypedFormControl, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form, hasNoValue$, ValidatorsEx } from '@app/framework';
-import { StartRestoreDto } from '../services/jobs.service';
+import { IRestoreRequestDto } from '../model';
 
-export class RestoreForm extends Form<ExtendedFormGroup, StartRestoreDto> {
+export class RestoreForm extends Form<ExtendedFormGroup, IRestoreRequestDto> {
     public get url() {
         return this.form.controls['url'];
     }

@@ -8,7 +8,7 @@
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ModalDirective, StopClickDirective } from '@app/framework';
-import { AppsState, ContentDto, ContentsService, DialogModel, getContentValue, LanguageDto, LocalizerService, StatefulControlComponent, TypedSimpleChanges, Types } from '@app/shared/internal';
+import { AppLanguageDto, AppsState, ContentDto, ContentsService, DialogModel, getContentValue, LocalizerService, StatefulControlComponent, TypedSimpleChanges, Types } from '@app/shared/internal';
 import { ContentSelectorComponent } from './content-selector.component';
 
 export const SQX_REFERENCE_INPUT_CONTROL_VALUE_ACCESSOR: any = {
@@ -47,10 +47,10 @@ export class ReferenceInputComponent extends StatefulControlComponent<State, Rea
     public query?: string;
 
     @Input({ required: true })
-    public language!: LanguageDto;
+    public language!: AppLanguageDto;
 
     @Input({ required: true })
-    public languages!: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input({ required: true })
     public mode: 'Array' | 'Single' = 'Single';

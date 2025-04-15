@@ -15,7 +15,7 @@ namespace Squidex.Areas.Api.Controllers.Contents.Models;
 public class EnrichContentDefaultsDto
 {
     /// <summary>
-    ///  True, to also enrich required fields. Default: false.
+    /// True, to also enrich required fields. Default: false.
     /// </summary>
     [FromQuery(Name = "enrichRequiredFields")]
     public bool EnrichRequiredFields { get; set; }

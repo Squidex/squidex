@@ -7,9 +7,9 @@
 
 import { UntypedFormControl, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form, hasNoValue$ } from '@app/framework';
-import { CreateWorkflowDto } from '../services/workflows.service';
+import { IAddWorkflowDto } from '../model';
 
-export class AddWorkflowForm extends Form<ExtendedFormGroup, CreateWorkflowDto> {
+export class AddWorkflowForm extends Form<ExtendedFormGroup, IAddWorkflowDto> {
     public get name() {
         return this.form.controls['name'];
     }

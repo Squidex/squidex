@@ -7,7 +7,7 @@
 
 import { firstValueFrom, of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, SchemaDto, SchemasService, UpdateSchemaCategoryDto, versioned } from '@app/shared/internal';
+import { DialogService, SchemaDto, SchemasDto, SchemasService, versioned } from '@app/shared/internal';
 import { createSchema } from '../services/schemas.service.spec';
 import { TestValues } from './_test-helpers';
 import { getCategoryTree, SchemasState } from './schemas.state';
@@ -23,14 +23,13 @@ describe('SchemasState', () => {
     const schema1 = createSchema(1);
     const schema2 = createSchema(2);
 
-    const oldSchemas = {
-        canCreate: true,
+    const oldSchemas = new SchemasDto({
         items: [
             schema1,
             schema2,
         ],
         _links: {},
-    };
+    });
 
     let dialogs: IMock<DialogService>;
     let schemasService: IMock<SchemasService>;
@@ -194,7 +193,7 @@ describe('SchemasState', () => {
 
             const updated = createSchema(1, '_new');
 
-            schemasService.setup(x => x.putCategory(app, schema1, It.is<UpdateSchemaCategoryDto>(i => i.name === category), version))
+            schemasService.setup(x => x.putCategory(app, schema1, { name: category }, version))
                 .returns(() => of(updated)).verifiable();
 
             schemasState.changeCategory(schema1, category).subscribe();
@@ -227,7 +226,7 @@ describe('SchemasState', () => {
 
                 const updated = createSchema(1, '_new');
 
-                schemasService.setup(x => x.putCategory(app, schema1, It.is<UpdateSchemaCategoryDto>(i => i.name === category), version))
+                schemasService.setup(x => x.putCategory(app, schema1, { name: category }, version))
                     .returns(() => of(updated)).verifiable();
 
                 schemasState.changeCategory(schema1, category).subscribe();
@@ -332,7 +331,7 @@ describe('SchemasState', () => {
             });
 
             it('should update schema and selected schema if nested field added', async () => {
-                const request = { ...schema1.fields[0].nested[0] };
+                const request = { ...schema1.fields[0].nested![0] };
 
                 const updated = createSchema(1, '_new');
 

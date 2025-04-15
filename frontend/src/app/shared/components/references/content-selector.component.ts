@@ -11,7 +11,7 @@ import { FormsModule } from '@angular/forms';
 import { BehaviorSubject, of } from 'rxjs';
 import { distinctUntilChanged, map, switchMap } from 'rxjs/operators';
 import { LanguageSelectorComponent, ListViewComponent, ModalDialogComponent, PagerComponent, SyncWidthDirective, TooltipDirective, TranslatePipe } from '@app/framework';
-import { ApiUrlConfig, AppsState, ComponentContentsState, ContentDto, LanguageDto, META_FIELDS, Query, SchemaDto, SchemasService, SchemasState, Subscriptions } from '@app/shared/internal';
+import { ApiUrlConfig, AppLanguageDto, AppsState, ComponentContentsState, ContentDto, META_FIELDS, Query, SchemaDto, SchemasService, SchemasState, Subscriptions } from '@app/shared/internal';
 import { ContentListCellDirective, ContentListWidthDirective } from '../contents/content-list-cell.directive';
 import { ContentListHeaderComponent } from '../contents/content-list-header.component';
 import { SearchFormComponent } from '../search/search-form.component';
@@ -64,10 +64,10 @@ export class ContentSelectorComponent implements OnInit {
     public query?: string;
 
     @Input({ required: true })
-    public language!: LanguageDto;
+    public language!: AppLanguageDto;
 
     @Input({ required: true })
-    public languages!: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input({ transform: booleanAttribute })
     public allowDuplicates?: boolean | null;

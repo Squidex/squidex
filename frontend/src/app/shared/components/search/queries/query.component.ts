@@ -8,7 +8,7 @@
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { TranslatePipe } from '@app/framework';
-import { FilterLogical, LanguageDto, Query, QueryModel, QuerySorting } from '@app/shared/internal';
+import { AppLanguageDto, FilterLogical, Query, QueryModel, QuerySorting } from '@app/shared/internal';
 import { FilterLogicalComponent } from './filter-logical.component';
 import { SortingComponent } from './sorting.component';
 
@@ -29,10 +29,10 @@ export class QueryComponent {
     public queryChange = new EventEmitter<Query>();
 
     @Input({ required: true })
-    public language!: LanguageDto;
+    public language!: AppLanguageDto;
 
     @Input({ required: true })
-    public languages!: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input({ required: true })
     public model!: QueryModel;

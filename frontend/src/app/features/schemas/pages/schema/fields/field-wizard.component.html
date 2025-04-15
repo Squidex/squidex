@@ -11,7 +11,7 @@
         @if (editForm) {
             <form class="edit-form" [formGroup]="editForm.form" (ngSubmit)="save('Close')">
                 <sqx-field-form
-                    [field]="field"
+                    [field]="editField"
                     [fieldForm]="editForm.form"
                     isEditable="true"
                     [isLocalizable]="isLocalizable"

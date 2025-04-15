@@ -8,13 +8,12 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ErrorDto } from '@app/framework';
-import { ApiUrlConfig, ContentDto, ContentsDto, ContentsService, DateTime, Resource, ResourceLinks, ScheduleDto, Version, Versioned } from '@app/shared/internal';
-import { BulkResultDto, BulkUpdateDto } from './contents.service';
+import { ApiUrlConfig, ContentDto, ContentsDto, ContentsService, DateTime, Resource, ScheduleJobDto, Versioned, VersionTag } from '@app/shared/internal';
+import { BulkResultDto, IBulkUpdateContentsDto, ResourceLinkDto, ServerErrorDto, StatusInfoDto } from './../model';
 import { sanitize } from './query';
 
 describe('ContentsService', () => {
-    const version = new Version('1');
+    const version = new VersionTag('1');
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -63,7 +62,6 @@ describe('ContentsService', () => {
         it(`should make post request to get contents using ${x.name}`,
             inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
                 let contents: ContentsDto;
-
                 contentsService.getContents('my-app', 'my-schema', x.query).subscribe(result => {
                     contents = result;
                 });
@@ -85,20 +83,20 @@ describe('ContentsService', () => {
                     statuses: [{
                         status: 'Draft', color: 'Gray',
                     }],
+                    _links: {},
                 });
 
-                expect(contents!).toEqual({
+                expect(contents!).toEqual(new ContentsDto({
                     items: [
                         createContent(12),
                         createContent(13),
                     ],
                     total: 10,
                     statuses: [
-                        { status: 'Draft', color: 'Gray' },
+                        new StatusInfoDto({ status: 'Draft', color: 'Gray' }),
                     ],
-                    canCreate: false,
-                    canCreateAndPublish: false,
-                });
+                    _links: {},
+                }));
             }));
     });
 
@@ -156,7 +154,6 @@ describe('ContentsService', () => {
     it('should make get request to get content',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
             let content: ContentDto;
-
             contentsService.getContent('my-app', 'my-schema', '1').subscribe(result => {
                 content = result;
             });
@@ -174,7 +171,6 @@ describe('ContentsService', () => {
     it('should make get request to get raw content',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
             let content: any;
-
             contentsService.getRawContent('my-app', 'my-schema', '1').subscribe(result => {
                 content = result;
             });
@@ -194,7 +190,6 @@ describe('ContentsService', () => {
     it('should make get request to get raw content with language',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
             let content: any;
-
             contentsService.getRawContent('my-app', 'my-schema', '1', 'en').subscribe(result => {
                 content = result;
             });
@@ -216,7 +211,6 @@ describe('ContentsService', () => {
             const dto = {};
 
             let content: ContentDto;
-
             contentsService.postContent('my-app', 'my-schema', dto, true, 'my-id').subscribe(result => {
                 content = result;
             });
@@ -236,12 +230,11 @@ describe('ContentsService', () => {
             const response = {};
 
             let data: Versioned<any>;
-
-            contentsService.getVersionData('my-app', 'my-schema', 'content1', version).subscribe(result => {
+            contentsService.getVersionData('my-app', 'my-schema', 'content1', 42).subscribe(result => {
                 data = result;
             });
 
-            const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1/1');
+            const req = httpMock.expectOne('http://service/p/api/content/my-app/my-schema/content1/42');
 
             expect(req.request.method).toEqual('GET');
             expect(req.request.headers.get('If-Match')).toBeNull();
@@ -262,7 +255,6 @@ describe('ContentsService', () => {
             };
 
             let content: ContentDto;
-
             contentsService.putContent('my-app', resource, dto, version).subscribe(result => {
                 content = result;
             });
@@ -288,7 +280,6 @@ describe('ContentsService', () => {
             };
 
             let content: ContentDto;
-
             contentsService.patchContent('my-app', resource, dto, version).subscribe(result => {
                 content = result;
             });
@@ -312,7 +303,6 @@ describe('ContentsService', () => {
             };
 
             let content: ContentDto;
-
             contentsService.createVersion('my-app', resource, version).subscribe(result => {
                 content = result;
             });
@@ -336,7 +326,6 @@ describe('ContentsService', () => {
             };
 
             let content: ContentDto;
-
             contentsService.deleteVersion('my-app', resource, version).subscribe(result => {
                 content = result;
             });
@@ -360,7 +349,6 @@ describe('ContentsService', () => {
             };
 
             let content: ContentDto;
-
             contentsService.cancelStatus('my-app', resource, version).subscribe(result => {
                 content = result;
             });
@@ -377,7 +365,7 @@ describe('ContentsService', () => {
 
     it('should make post request to for bulk update',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
-            const dto: BulkUpdateDto = {
+            const dto: IBulkUpdateContentsDto = {
                 jobs: [{
                     id: '123',
                     type: 'Delete',
@@ -385,10 +373,9 @@ describe('ContentsService', () => {
                     id: '456',
                     type: 'Delete',
                 }],
-            };
+            } as any;
 
             let results: ReadonlyArray<BulkResultDto>;
-
             contentsService.bulkUpdate('my-app', 'my-schema', dto).subscribe(result => {
                 results = result;
             });
@@ -399,8 +386,10 @@ describe('ContentsService', () => {
             expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush([{
+                jobIndex: 0,
                 contentId: '123',
             }, {
+                jobIndex: 1,
                 contentId: '456',
                 error: {
                     statusCode: 400,
@@ -409,8 +398,8 @@ describe('ContentsService', () => {
             }]);
 
             expect(results!).toEqual([
-                new BulkResultDto('123'),
-                new BulkResultDto('456', new ErrorDto(400, 'Invalid')),
+                new BulkResultDto({ jobIndex: 0, id: '123' }),
+                new BulkResultDto({ jobIndex: 0, id: '456', error: new ServerErrorDto({ statusCode: 400, message: 'Invalid' }) }),
             ]);
         }));
 
@@ -419,27 +408,29 @@ describe('ContentsService', () => {
 
         return {
             id: `id${id}`,
-            status: `Status${id}`,
-            statusColor: 'black',
-            newStatus: `StatusNew${id}`,
-            newStatusColor: 'black',
             created: buildDate(id, 10),
             createdBy: `creator${id}`,
+            data: {},
+            isDeleted: false,
             lastModified: buildDate(id, 20),
             lastModifiedBy: `modifier${id}`,
+            newStatus: `StatusNew${id}`,
+            newStatusColor: 'black',
+            referenceData: {},
+            referenceFields: [],
             scheduleJob: {
+                id: '42',
                 status: 'Draft',
                 scheduledBy: `Scheduler${id}`,
                 color: 'red',
                 dueTime: buildDate(id, 30),
             },
-            isDeleted: false,
-            data: {},
-            schemaName: 'my-schema',
+            schemaId: key,
             schemaDisplayName: 'MySchema',
-            referenceData: {},
-            referenceFields: [],
-            version: key,
+            schemaName: 'my-schema',
+            status: `Status${id}`,
+            statusColor: 'black',
+            version: id,
             _links: {
                 update: { method: 'PUT', href: `/contents/id${id}` },
             },
@@ -448,28 +439,37 @@ describe('ContentsService', () => {
 });
 
 export function createContent(id: number, suffix = '') {
-    const links: ResourceLinks = {
-        update: { method: 'PUT', href: `/contents/id${id}` },
-    };
-
     const key = `${id}${suffix}`;
 
-    return new ContentDto(links,
-        `id${id}`,
-        DateTime.parseISO(buildDate(id, 10)), `creator${id}`,
-        DateTime.parseISO(buildDate(id, 20)), `modifier${id}`,
-        new Version(key),
-        `Status${key}`,
-        'black',
-        `StatusNew${key}`,
-        'black',
-        new ScheduleDto('Draft', `Scheduler${id}`, 'red', DateTime.parseISO(buildDate(id, 30))),
-        false,
-        {},
-        'my-schema',
-        'MySchema',
-        {},
-        []);
+    return new ContentDto({
+        id: `id${id}`,
+        created: DateTime.parseISO(buildDate(id, 10)),
+        createdBy: `creator${id}`,
+        data: {},
+        isDeleted: false,
+        lastModified: DateTime.parseISO(buildDate(id, 20)),
+        lastModifiedBy: `modifier${id}`,
+        newStatus: `StatusNew${id}`,
+        newStatusColor: 'black',
+        referenceData: {},
+        referenceFields: [],
+        scheduleJob: new ScheduleJobDto({
+            id: '42',
+            status: 'Draft',
+            scheduledBy: `Scheduler${id}`,
+            color: 'red',
+            dueTime: DateTime.parseISO(buildDate(id, 30)),
+        }),
+        schemaId: key,
+        schemaDisplayName: 'MySchema',
+        schemaName: 'my-schema',
+        status: `Status${id}`,
+        statusColor: 'black',
+        version: id,
+        _links: {
+            update: new ResourceLinkDto({ method: 'PUT', href: `/contents/id${id}` }),
+        },
+    });
 }
 
 function buildDate(id: number, add = 0) {

@@ -7,7 +7,7 @@
 
 import { of } from 'rxjs';
 import { IMock, Mock } from 'typemoq';
-import { ResourceLinks, UIService, UIState, UsersService } from '@app/shared/internal';
+import { ResourceLinkDtos, UIService, UIState, UsersService } from '@app/shared/internal';
 import { TestValues } from './_test-helpers';
 
 describe('UIState', () => {
@@ -41,7 +41,7 @@ describe('UIState', () => {
         canCustomize: true,
     };
 
-    const resources: ResourceLinks = {
+    const resources: ResourceLinkDtos = {
         'admin/events': { method: 'GET', href: '/api/events' },
         'admin/restore': { method: 'GET', href: '/api/restore' },
         'admin/users': { method: 'GET', href: '/api/users' },

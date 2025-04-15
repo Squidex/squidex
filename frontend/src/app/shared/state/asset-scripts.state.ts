@@ -8,16 +8,17 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { debug, DialogService, LoadingState, Resource, shareSubscribed, State, Version } from '@app/framework';
-import { AppsService, AssetScripts, AssetScriptsPayload } from '../services/apps.service';
+import { debug, DialogService, LoadingState, Resource, shareSubscribed, State, VersionTag } from '@app/framework';
+import { AssetScriptsDto, IAssetScriptsDto, IUpdateAssetScriptsDto } from '../model';
+import { AppsService } from '../services/apps.service';
 import { AppsState } from './apps.state';
 
 interface Snapshot extends LoadingState {
     // The current scripts.
-    scripts: AssetScripts;
+    scripts: Omit<IAssetScriptsDto, 'version' | '_links'>;
 
     // The app version.
-    version: Version;
+    version: VersionTag;
 
     // Indicates if the user can update the scripts.
     canUpdate?: boolean;
@@ -55,7 +56,7 @@ export class AssetScriptsState extends State<Snapshot> {
         private readonly appsService: AppsService,
         private readonly dialogs: DialogService,
     ) {
-        super({ scripts: {}, resource: { _links: {} }, version: Version.EMPTY });
+        super({ scripts: {}, resource: { _links: {} }, version: VersionTag.EMPTY });
 
         debug(this, 'assetScripts');
     }
@@ -85,7 +86,7 @@ export class AssetScriptsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public update(request: AssetScripts): Observable<any> {
+    public update(request: IUpdateAssetScriptsDto): Observable<any> {
         return this.appsService.putAssetScripts(this.appName, this.snapshot.resource, request, this.version).pipe(
             tap(({ version, payload }) => {
                 this.replaceAssetScripts(payload, version);
@@ -93,8 +94,8 @@ export class AssetScriptsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    private replaceAssetScripts(payload: AssetScriptsPayload, version: Version) {
-        const { canUpdate, scripts } = payload;
+    private replaceAssetScripts(payload: AssetScriptsDto, version: VersionTag) {
+        const { canUpdate, _links: _, version: __, ...scripts } = payload;
 
         this.next({
             canUpdate,

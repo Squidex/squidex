@@ -7,9 +7,9 @@
 
 import { UntypedFormControl, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form, hasNoValue$, TemplatedFormArray } from '@app/framework';
-import { CreateRoleDto, RoleDto, UpdateRoleDto } from '../services/roles.service';
+import { IAddRoleDto, IUpdateRoleDto, RoleDto } from '../model';
 
-export class EditRoleForm extends Form<TemplatedFormArray, UpdateRoleDto, RoleDto> {
+export class EditRoleForm extends Form<TemplatedFormArray, IUpdateRoleDto, RoleDto> {
     public get controls() {
         return this.form.controls as UntypedFormControl[];
     }
@@ -22,7 +22,7 @@ export class EditRoleForm extends Form<TemplatedFormArray, UpdateRoleDto, RoleDt
         return { permissions: value, properties: {} };
     }
 
-    public transformLoad(value: Partial<UpdateRoleDto>) {
+    public transformLoad(value: Partial<IUpdateRoleDto>) {
         return value.permissions || [];
     }
 }
@@ -35,7 +35,7 @@ class PermissionTemplate {
     }
 }
 
-export class AddRoleForm extends Form<ExtendedFormGroup, CreateRoleDto> {
+export class AddRoleForm extends Form<ExtendedFormGroup, IAddRoleDto> {
     public get name() {
         return this.form.controls['name'];
     }

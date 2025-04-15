@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { DateTimeEditorComponent, DropdownComponent, HighlightPipe, TranslatePipe } from '@app/framework';
-import { ContributorsState, FilterableField, FilterComparison, FilterFieldUI, FilterNegation, getFilterUI, isNegation, LanguageDto, QueryModel } from '@app/shared/internal';
+import { AppLanguageDto, ContributorsState, FilterableField, FilterComparison, FilterFieldUI, FilterNegation, getFilterUI, isNegation, QueryModel } from '@app/shared/internal';
 import { UserDtoPicture } from '../../pipes';
 import { ReferenceInputComponent } from '../../references/reference-input.component';
 import { QueryPathComponent } from './query-path.component';
@@ -42,10 +42,10 @@ export class FilterComparisonComponent {
     public remove = new EventEmitter();
 
     @Input({ required: true })
-    public language!: LanguageDto;
+    public language!: AppLanguageDto;
 
     @Input({ required: true })
-    public languages!: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input({ required: true })
     public model!: QueryModel;

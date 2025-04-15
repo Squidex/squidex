@@ -8,9 +8,9 @@
 
 import { UntypedFormControl, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form, TemplatedFormArray } from '@app/framework';
-import { IndexDto, IndexField } from '@app/shared/internal';
+import { IIndexFieldDto, IndexDto } from '@app/shared/internal';
 
-export class CreateIndexForm extends Form<TemplatedFormArray, IndexField[], IndexDto> {
+export class CreateIndexForm extends Form<TemplatedFormArray, IIndexFieldDto[], IndexDto> {
     public get controls(): ReadonlyArray<ExtendedFormGroup> {
         return this.form.controls as any;
     }

@@ -7,7 +7,7 @@
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, versioned, WorkflowsPayload, WorkflowsService, WorkflowsState } from '@app/shared/internal';
+import { DialogService, versioned, WorkflowsDto, WorkflowsService, WorkflowsState } from '@app/shared/internal';
 import { createWorkflows } from '../services/workflows.service.spec';
 import { TestValues } from './_test-helpers';
 
@@ -94,12 +94,12 @@ describe('WorkflowsState', () => {
         it('should update workflows if workflow updated', () => {
             const updated = createWorkflows('1', '2', '3');
 
-            const request = oldWorkflows.items[0].serialize();
+            const request = { initial: '1' } as any;
 
             workflowsService.setup(x => x.putWorkflow(app, oldWorkflows.items[0], request, version))
                 .returns(() => of(versioned(newVersion, updated))).verifiable();
 
-            workflowsState.update(oldWorkflows.items[0]).subscribe();
+            workflowsState.update(oldWorkflows.items[0], request).subscribe();
 
             expectNewWorkflows(updated);
 
@@ -117,7 +117,7 @@ describe('WorkflowsState', () => {
             expectNewWorkflows(updated);
         });
 
-        function expectNewWorkflows(updated: WorkflowsPayload) {
+        function expectNewWorkflows(updated: WorkflowsDto) {
             expect(workflowsState.snapshot.workflows).toEqual(updated.items);
             expect(workflowsState.snapshot.version).toEqual(newVersion);
         }

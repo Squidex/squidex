@@ -31,7 +31,7 @@ export class EditableTitleComponent {
     public inputTitleChange = new EventEmitter<string>();
 
     @Input({ required: true })
-    public inputTitle!: string;
+    public inputTitle?: string;
 
     @Input({ transform: numberAttribute })
     public inputTitleLength = 20;

@@ -9,49 +9,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiUrlConfig, DateTime, pretifyError } from '@app/framework';
-
-export class CallsUsageDto {
-    constructor(
-        public readonly allowedBytes: number,
-        public readonly allowedCalls: number,
-        public readonly blockingCalls: number,
-        public readonly totalBytes: number,
-        public readonly totalCalls: number,
-        public readonly monthBytes: number,
-        public readonly monthCalls: number,
-        public readonly averageElapsedMs: number,
-        public readonly details: { [category: string]: ReadonlyArray<CallsUsagePerDateDto> },
-    ) {
-    }
-}
-
-export class CallsUsagePerDateDto {
-    constructor(
-        public readonly date: DateTime,
-        public readonly totalBytes: number,
-        public readonly totalCalls: number,
-        public readonly averageElapsedMs: number,
-    ) {
-    }
-}
-
-export class StorageUsagePerDateDto {
-    constructor(
-        public readonly date: DateTime,
-        public readonly totalCount: number,
-        public readonly totalSize: number,
-    ) {
-    }
-}
-
-export class CurrentStorageDto {
-    constructor(
-        public readonly size: number,
-        public readonly maxAllowed: number,
-    ) {
-    }
-}
+import { ApiUrlConfig, pretifyError } from '@app/framework';
+import { CallsUsageDto, CurrentStorageDto, StorageUsagePerDateDto } from '../model';
 
 @Injectable({
     providedIn: 'root',
@@ -78,7 +37,7 @@ export class UsagesService {
 
         return this.http.get<any>(url).pipe(
             map(body => {
-                return parseCurrentStorage(body);
+                return CurrentStorageDto.fromJSON(body);
             }),
             pretifyError('i18n:usages.loadTodayStorageFailed'));
     }
@@ -88,7 +47,7 @@ export class UsagesService {
 
         return this.http.get<any>(url).pipe(
             map(body => {
-                return parseCurrentStorage(body);
+                return CurrentStorageDto.fromJSON(body);
             }),
             pretifyError('i18n:usages.loadTodayStorageFailed'));
     }
@@ -98,7 +57,7 @@ export class UsagesService {
 
         return this.http.get<any>(url).pipe(
             map(body => {
-                return parseCallsUsage(body);
+                return CallsUsageDto.fromJSON(body);
             }),
             pretifyError('i18n:usages.loadCallsFailed'));
     }
@@ -108,7 +67,7 @@ export class UsagesService {
 
         return this.http.get<any>(url).pipe(
             map(body => {
-                return parseCallsUsage(body);
+                return CallsUsageDto.fromJSON(body);
             }),
             pretifyError('i18n:usages.loadCallsFailed'));
     }
@@ -118,7 +77,7 @@ export class UsagesService {
 
         return this.http.get<any[]>(url).pipe(
             map(body => {
-                return parseStorageUser(body);
+                return body.map(StorageUsagePerDateDto.fromJSON);
             }),
             pretifyError('i18n:usages.loadStorageFailed'));
     }
@@ -128,46 +87,8 @@ export class UsagesService {
 
         return this.http.get<any[]>(url).pipe(
             map(body => {
-                return parseStorageUser(body);
+                return body.map(StorageUsagePerDateDto.fromJSON);
             }),
             pretifyError('i18n:usages.loadStorageFailed'));
     }
-}
-
-function parseCurrentStorage(response: any): CurrentStorageDto {
-    return new CurrentStorageDto(response.size, response.maxAllowed);
-}
-
-function parseCallsUsage(response: any) {
-    const details: { [category: string]: CallsUsagePerDateDto[] } = {};
-
-    for (const [category, value] of Object.entries(response.details)) {
-        details[category] = (value as any).map((item: any) => new CallsUsagePerDateDto(
-            DateTime.parseISO(item.date),
-            item.totalBytes,
-            item.totalCalls,
-            item.averageElapsedMs));
-    }
-
-    const usages = new CallsUsageDto(
-        response.allowedBytes,
-        response.allowedCalls,
-        response.blockingCalls,
-        response.totalBytes,
-        response.totalCalls,
-        response.monthBytes,
-        response.monthCalls,
-        response.averageElapsedMs,
-        details);
-
-    return usages;
-}
-
-function parseStorageUser(response: any[]) {
-    const usages = response.map(item => new StorageUsagePerDateDto(
-        DateTime.parseISO(item.date),
-        item.totalCount,
-        item.totalSize));
-
-    return usages;
 }

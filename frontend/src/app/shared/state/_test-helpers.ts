@@ -7,7 +7,7 @@
 
 import { of } from 'rxjs';
 import { Mock } from 'typemoq';
-import { AppsState, AuthService, DateTime, FieldPropertiesDto, FieldRule, NestedFieldDto, RootFieldDto, SchemaDto, SchemaPropertiesDto, TeamsState, Version } from '../';
+import { AppsState, AuthService, DateTime, FieldPropertiesDto, FieldRule, FieldDto, FieldDto, SchemaDto, SchemaPropertiesDto, TeamsState, Version } from '../';
 
 const app = 'my-app';
 const creation = DateTime.today().addDays(-2);
@@ -15,8 +15,8 @@ const creator = 'me';
 const modified = DateTime.now().addDays(-1);
 const modifier = 'now-me';
 const team = 'my-team';
-const version = new Version('1');
-const newVersion = new Version('2');
+const version = new VersionTag('1');
+const newVersion = new VersionTag('2');
 
 const appsState = Mock.ofType<AppsState>();
 
@@ -41,7 +41,7 @@ authService.setup(x => x.user)
 
 type SchemaValues = {
     id?: number;
-    fields?: ReadonlyArray<RootFieldDto>;
+    fields?: ReadonlyArray<FieldDto>;
     fieldsInLists?: ReadonlyArray<string>;
     fieldsInReferences?: ReadonlyArray<string>;
     fieldRules?: ReadonlyArray<FieldRule>;
@@ -57,7 +57,7 @@ function createSchema({ properties, id, fields, fieldsInLists, fieldsInReference
         creator,
         modified,
         modifier,
-        new Version('1'),
+        new VersionTag('1'),
         `schema-name${id}`,
         `schema-category${id}`,
         'Default',
@@ -75,19 +75,19 @@ type FieldValues = {
     isDisabled?: boolean;
     isHidden?: boolean;
     partitioning?: string;
-    nested?: ReadonlyArray<NestedFieldDto>;
+    nested?: ReadonlyArray<FieldDto>;
 };
 
 function createField({ properties, id, partitioning, isDisabled, nested }: FieldValues) {
     id = id || 1;
 
-    return new RootFieldDto({}, id, `field${id}`, properties, partitioning || 'language', false, false, isDisabled, nested);
+    return new FieldDto({}, id, `field${id}`, properties, partitioning || 'language', false, false, isDisabled, nested);
 }
 
 function createNestedField({ properties, id, isDisabled }: FieldValues) {
     id = id || 1;
 
-    return new NestedFieldDto({}, id, `nested${id}`, properties, 0, false, false, isDisabled);
+    return new FieldDto({}, id, `nested${id}`, properties, 0, false, false, isDisabled);
 }
 
 export const TestValues = {

@@ -8,7 +8,7 @@
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { ContentDto, ContentsDto, DropdownComponent, getContentValue, HighlightPipe, LanguageDto, LocalizerService, ResolveContents, SafeHtmlPipe, StatefulControlComponent, Subscriptions, TypedSimpleChanges, Types, value$ } from '@app/shared';
+import { AppLanguageDto, ContentDto, ContentsDto, DropdownComponent, getContentValue, HighlightPipe, LocalizerService, ResolveContents, SafeHtmlPipe, StatefulControlComponent, Subscriptions, TypedSimpleChanges, Types, value$ } from '@app/shared';
 
 export const SQX_REFERENCE_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferenceDropdownComponent), multi: true,
@@ -53,10 +53,10 @@ export class ReferenceDropdownComponent extends StatefulControlComponent<State, 
     private isLoadingFailed = false;
 
     @Input({ required: true })
-    public language!: LanguageDto;
+    public language!: AppLanguageDto;
 
     @Input({ required: true })
-    public languages!: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input({ required: true })
     public schemaId!: string;

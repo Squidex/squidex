@@ -7,27 +7,45 @@
 
 import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DateTime, Version } from '@app/framework';
-import { createProperties, FieldSizes, META_FIELDS, RootFieldDto, SchemaDto, TableSettings, UIState } from '@app/shared/internal';
+import { DateTime } from '@app/framework';
+import { createProperties, FieldDto, FieldSizes, META_FIELDS, SchemaDto, SchemaPropertiesDto, SchemaScriptsDto, TableSettings, UIState } from '@app/shared/internal';
 import { FieldWrappings } from '..';
 
 describe('TableSettings', () => {
     let uiState: IMock<UIState>;
 
     const schema =
-        new SchemaDto({},
-            '1',
-            DateTime.now(), 'me',
-            DateTime.now(), 'me',
-            new Version('1'),
-            'my-schema',
-            'my-category',
-            'Default',
-            false,
-            {},
-            [
-                new RootFieldDto({}, 1, 'string', createProperties('String'), 'invariant'),
-            ]);
+        new SchemaDto({
+            id: '1',
+            created: DateTime.now(),
+            createdBy: 'me',
+            fieldRules: [],
+            fieldsInLists: [],
+            fieldsInReferences: [],
+            isPublished: true,
+            isSingleton: false,
+            lastModified: DateTime.now(),
+            lastModifiedBy: 'me',
+            name: 'my-schema',
+            previewUrls: {},
+            properties: new SchemaPropertiesDto(),
+            scripts: new SchemaScriptsDto(),
+            type: 'Default',
+            version: 1,
+            fields: [
+                new FieldDto({
+                    fieldId: 1,
+                    isDisabled: false,
+                    isHidden: false,
+                    isLocked: false,
+                    name: 'string',
+                    partitioning: 'invariant',
+                    properties: createProperties('String'),
+                    _links: {},
+                }),
+            ],
+            _links: {},
+        });
 
     beforeEach(() => {
         uiState = Mock.ofType<UIState>();

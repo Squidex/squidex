@@ -8,10 +8,10 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, PlanChangedDto, PlanDto, PlansDto, PlansService, Version } from '@app/shared/internal';
+import { ApiUrlConfig, PlanChangedDto, PlanDto, PlansDto, PlansService, Versioned, VersionTag } from '@app/shared/internal';
 
 describe('PlansService', () => {
-    const version = new Version('1');
+    const version = new VersionTag('1');
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -31,8 +31,7 @@ describe('PlansService', () => {
 
     it('should make get request to get app plans',
         inject([PlansService, HttpTestingController], (plansService: PlansService, httpMock: HttpTestingController) => {
-            let plans: PlansDto;
-
+            let plans: Versioned<PlansDto>;
             plansService.getPlans('my-app').subscribe(result => {
                 plans = result;
             });
@@ -85,36 +84,44 @@ describe('PlansService', () => {
             });
 
             expect(plans!).toEqual({
-                payload: {
+                payload: new PlansDto({
                     currentPlanId: '123',
                     portalLink: 'link/to/portal',
                     planOwner: '456',
                     plans: [
-                        new PlanDto(
-                            'free',
-                            'Free',
-                            '14 €',
-                            'Change for 14 € per month?',
-                            'free_yearly',
-                            '120 €',
-                            'Change for 120 € per year?',
-                            128, 1000, 1500, 2500),
-                        new PlanDto(
-                            'professional',
-                            'Professional',
-                            '18 €',
-                            'Change for 18 € per month?',
-                            'professional_yearly',
-                            '160 €',
-                            'Change for 160 € per year?',
-                            512, 4000, 5500, 6500),
+                        new PlanDto({
+                            id: 'free',
+                            name: 'Free',
+                            costs: '14 €',
+                            confirmText: 'Change for 14 € per month?',
+                            yearlyId: 'free_yearly',
+                            yearlyCosts: '120 €',
+                            yearlyConfirmText: 'Change for 120 € per year?',
+                            maxApiBytes: 128,
+                            maxApiCalls: 1000,
+                            maxAssetSize: 1500,
+                            maxContributors: 2500,
+                        }),
+                        new PlanDto({
+                            id: 'professional',
+                            name: 'Professional',
+                            costs: '18 €',
+                            confirmText: 'Change for 18 € per month?',
+                            yearlyId: 'professional_yearly',
+                            yearlyCosts: '160 €',
+                            yearlyConfirmText: 'Change for 160 € per year?',
+                            maxApiBytes: 512,
+                            maxApiCalls: 4000,
+                            maxAssetSize: 5500,
+                            maxContributors: 6500,
+                        }),
                     ],
                     referral: {
                         code: 'CODE',
                     } as any,
                     locked: 'ManagedByTeam',
-                },
-                version: new Version('2'),
+                }),
+                version: new VersionTag('2'),
             });
         }));
 
@@ -135,6 +142,6 @@ describe('PlansService', () => {
             expect(req.request.method).toEqual('PUT');
             expect(req.request.headers.get('If-Match')).toBe(version.value);
 
-            expect(planChanged!).toEqual({ redirectUri: 'http://url' });
+            expect(planChanged!).toEqual(new PlanChangedDto({ redirectUri: 'http://url' }));
         }));
 });

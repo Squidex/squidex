@@ -8,8 +8,8 @@
 import { inject, Injectable } from '@angular/core';
 import { from, Observable, of, shareReplay } from 'rxjs';
 import { UIOptions } from '@app/framework';
-import { AssetDto, AssetsDto, AssetsService } from '../services/assets.service';
-import { ContentDto, ContentsDto, ContentsService } from '../services/contents.service';
+import { AssetsService, ContentsService } from '../internal';
+import { AssetDto, AssetsDto, ContentDto, ContentsDto } from '../model';
 import { AppsState } from './apps.state';
 
 abstract class ResolverBase<T extends { id: string }, TResult extends { items: ReadonlyArray<T> }> {

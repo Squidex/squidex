@@ -7,24 +7,9 @@
 
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { map, Observable } from 'rxjs';
 import { ApiUrlConfig, pretifyError, StringHelper } from '@app/framework';
-
-export type FeatureDto = Readonly<{
-    // The name of the feature.
-    name: string;
-
-    // The feature description.
-    text: string;
-}>;
-
-export type FeaturesDto = Readonly<{
-    // The list of features.
-    features: ReadonlyArray<FeatureDto>;
-
-    // The latest version.
-    version: number;
-}>;
+import { FeaturesDto } from '../model';
 
 @Injectable({
     providedIn: 'root',
@@ -39,7 +24,10 @@ export class NewsService {
     public getFeatures(version: number): Observable<FeaturesDto> {
         const url = this.apiUrl.buildUrl(`api/news/features${StringHelper.buildQuery({ version })}`);
 
-        return this.http.get<FeaturesDto>(url).pipe(
+        return this.http.get(url).pipe(
+            map(body => {
+                return FeaturesDto.fromJSON(body);
+            }),
             pretifyError('i18n:features.loadFailed'));
     }
 }

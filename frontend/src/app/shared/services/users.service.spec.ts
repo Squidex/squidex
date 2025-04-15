@@ -40,7 +40,6 @@ describe('UsersService', () => {
     it('should make get request to get many users',
         inject([UsersService, HttpTestingController], (usersService: UsersService, httpMock: HttpTestingController) => {
             let users: ReadonlyArray<UserDto>;
-
             usersService.getUsers().subscribe(result => {
                 users = result;
             });
@@ -63,15 +62,14 @@ describe('UsersService', () => {
 
             expect(users!).toEqual(
                 [
-                    new UserDto('123', 'User1'),
-                    new UserDto('456', 'User2'),
+                    new UserDto({ id: '123', displayName: 'User1' } as any),
+                    new UserDto({ id: '456', displayName: 'User2' } as any),
                 ]);
         }));
 
     it('should make get request with query to get many users',
         inject([UsersService, HttpTestingController], (usersService: UsersService, httpMock: HttpTestingController) => {
             let users: ReadonlyArray<UserDto>;
-
             usersService.getUsers('my-query').subscribe(result => {
                 users = result;
             });
@@ -94,15 +92,14 @@ describe('UsersService', () => {
 
             expect(users!).toEqual(
                 [
-                    new UserDto('123', 'User1'),
-                    new UserDto('456', 'User2'),
+                    new UserDto({ id: '123', displayName: 'User1' } as any),
+                    new UserDto({ id: '456', displayName: 'User2' } as any),
                 ]);
         }));
 
     it('should make get request to get single user',
         inject([UsersService, HttpTestingController], (usersService: UsersService, httpMock: HttpTestingController) => {
             let user: UserDto;
-
             usersService.getUser('123').subscribe(result => {
                 user = result;
             });
@@ -114,13 +111,12 @@ describe('UsersService', () => {
 
             req.flush({ id: '123', displayName: 'User1' });
 
-            expect(user!).toEqual(new UserDto('123', 'User1'));
+            expect(user!).toEqual(new UserDto({ id: '123', displayName: 'User1' } as any));
         }));
 
     it('should make get request to get resources',
         inject([UsersService, HttpTestingController], (usersService: UsersService, httpMock: HttpTestingController) => {
             let resources: Resource;
-
             usersService.getResources().subscribe(result => {
                 resources = result;
             });

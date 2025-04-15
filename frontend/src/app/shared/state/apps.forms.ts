@@ -9,9 +9,9 @@
 
 import { UntypedFormControl, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form, TemplatedFormArray, ValidatorsEx } from '@app/framework';
-import { AppDto, AppSettingsDto, CreateAppDto, TransferToTeamDto, UpdateAppDto, UpdateAppSettingsDto } from '../services/apps.service';
+import { AppDto, AppSettingsDto,  ICreateAppDto, ITransferToTeamDto, IUpdateAppDto, IUpdateAppSettingsDto } from '../model';
 
-export class CreateAppForm extends Form<ExtendedFormGroup, CreateAppDto> {
+export class CreateAppForm extends Form<ExtendedFormGroup, ICreateAppDto> {
     constructor() {
         super(new ExtendedFormGroup({
             name: new UntypedFormControl('', [
@@ -23,7 +23,7 @@ export class CreateAppForm extends Form<ExtendedFormGroup, CreateAppDto> {
     }
 }
 
-export class TransferAppForm extends Form<ExtendedFormGroup, TransferToTeamDto, AppDto> {
+export class TransferAppForm extends Form<ExtendedFormGroup, ITransferToTeamDto, AppDto> {
     constructor() {
         super(new ExtendedFormGroup({
             teamId: new UntypedFormControl(''),
@@ -31,7 +31,7 @@ export class TransferAppForm extends Form<ExtendedFormGroup, TransferToTeamDto, 
     }
 }
 
-export class UpdateAppForm extends Form<ExtendedFormGroup, UpdateAppDto, AppDto> {
+export class UpdateAppForm extends Form<ExtendedFormGroup, IUpdateAppDto, AppDto> {
     constructor() {
         super(new ExtendedFormGroup({
             label: new UntypedFormControl('',
@@ -44,7 +44,7 @@ export class UpdateAppForm extends Form<ExtendedFormGroup, UpdateAppDto, AppDto>
     }
 }
 
-export class EditAppSettingsForm extends Form<ExtendedFormGroup, UpdateAppSettingsDto, AppSettingsDto> {
+export class EditAppSettingsForm extends Form<ExtendedFormGroup, IUpdateAppSettingsDto, AppSettingsDto> {
     public get patterns() {
         return this.form.controls['patterns'] as TemplatedFormArray;
     }

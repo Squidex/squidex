@@ -6,7 +6,7 @@
  */
 
 import { IMock, It, Mock, Times } from 'typemoq';
-import { AutoSaveService, LocalStoreService, Version } from '@app/shared/internal';
+import { AutoSaveService, LocalStoreService } from '@app/shared/internal';
 
 describe('AutoSaveService', () => {
     let localStore: IMock<LocalStoreService>;
@@ -20,7 +20,7 @@ describe('AutoSaveService', () => {
     });
 
     it('should remove unsaved created content', () => {
-        autoSaveService.remove({ schemaId: '1', schemaVersion: new Version('2') });
+        autoSaveService.remove({ schemaId: '1', schemaVersion: 2 });
 
         expect().nothing();
 
@@ -28,7 +28,7 @@ describe('AutoSaveService', () => {
     });
 
     it('should remove unsaved edited content', () => {
-        autoSaveService.remove({ schemaId: '1', schemaVersion: new Version('2'), contentId: '3' });
+        autoSaveService.remove({ schemaId: '1', schemaVersion: 2, contentId: '3' });
 
         expect().nothing();
 
@@ -44,7 +44,7 @@ describe('AutoSaveService', () => {
     });
 
     it('should save unsaved created content', () => {
-        autoSaveService.set({ schemaId: '1', schemaVersion: new Version('2') }, { text: 'Hello' });
+        autoSaveService.set({ schemaId: '1', schemaVersion: 2 }, { text: 'Hello' });
 
         expect().nothing();
 
@@ -52,7 +52,7 @@ describe('AutoSaveService', () => {
     });
 
     it('should save unsaved edited content', () => {
-        autoSaveService.set({ schemaId: '1', schemaVersion: new Version('2'), contentId: '3' }, { text: 'Hello' });
+        autoSaveService.set({ schemaId: '1', schemaVersion: 2, contentId: '3' }, { text: 'Hello' });
 
         expect().nothing();
 
@@ -68,7 +68,7 @@ describe('AutoSaveService', () => {
     });
 
     it('should not save content if content is not defined', () => {
-        autoSaveService.set({ schemaId: '1', schemaVersion: new Version('2') }, null!);
+        autoSaveService.set({ schemaId: '1', schemaVersion: 2 }, null!);
 
         expect().nothing();
 
@@ -79,7 +79,7 @@ describe('AutoSaveService', () => {
         localStore.setup(x => x.get('autosave.1-2'))
             .returns(() => '{"text":"Hello"}');
 
-        const key = { schemaId: '1', schemaVersion: new Version('2') };
+        const key = { schemaId: '1', schemaVersion: 2 };
 
         const content = autoSaveService.fetch(key);
 
@@ -92,7 +92,7 @@ describe('AutoSaveService', () => {
         localStore.setup(x => x.get('autosave.1-2.3'))
             .returns(() => '{"text":"Hello"}');
 
-        const key = { schemaId: '1', schemaVersion: new Version('2'), contentId: '3' };
+        const key = { schemaId: '1', schemaVersion: 2, contentId: '3' };
 
         const content = autoSaveService.fetch(key);
 

@@ -8,10 +8,11 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, DateTime, Resource, ResourceLinks, TeamAuthSchemeDto, TeamDto, TeamsService, Version } from '@app/shared/internal';
+import { ApiUrlConfig, AuthSchemeResponseDto, DateTime, Resource, TeamDto, TeamsService, Versioned, VersionTag } from '@app/shared/internal';
+import { ResourceLinkDto } from '../model';
 
 describe('TeamsService', () => {
-    const version = new Version('1');
+    const version = new VersionTag('1');
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -32,7 +33,6 @@ describe('TeamsService', () => {
     it('should make get request to get teams',
         inject([TeamsService, HttpTestingController], (teamsService: TeamsService, httpMock: HttpTestingController) => {
             let teams: ReadonlyArray<TeamDto>;
-
             teamsService.getTeams().subscribe(result => {
                 teams = result;
             });
@@ -53,7 +53,6 @@ describe('TeamsService', () => {
     it('should make get request to get team',
         inject([TeamsService, HttpTestingController], (teamsService: TeamsService, httpMock: HttpTestingController) => {
             let team: TeamDto;
-
             teamsService.getTeam('my-team').subscribe(result => {
                 team = result;
             });
@@ -73,7 +72,6 @@ describe('TeamsService', () => {
             const dto = { name: 'new-team' };
 
             let team: TeamDto;
-
             teamsService.postTeam(dto).subscribe(result => {
                 team = result;
             });
@@ -97,8 +95,7 @@ describe('TeamsService', () => {
             };
 
             let team: TeamDto;
-
-            teamsService.putTeam('my-team', resource, { }, version).subscribe(result => {
+            teamsService.putTeam('my-team', resource, { name: 'NewName' }, version).subscribe(result => {
                 team = result;
             });
 
@@ -114,8 +111,7 @@ describe('TeamsService', () => {
 
     it('should make get request to get auth',
         inject([TeamsService, HttpTestingController], (teamsService: TeamsService, httpMock: HttpTestingController) => {
-            let auth: TeamAuthSchemeDto;
-
+            let auth: Versioned<AuthSchemeResponseDto>;
             teamsService.getTeamAuth('my-team').subscribe(result => {
                 auth = result;
             });
@@ -131,14 +127,18 @@ describe('TeamsService', () => {
                 },
             });
 
-            expect(auth!).toEqual({ payload: { scheme: null, canUpdate: true }, version: new Version('2') });
+            expect(auth!).toEqual({
+                payload: new AuthSchemeResponseDto({
+                    _links: {},
+                }),
+                version: new VersionTag('2'),
+            });
         }));
 
     it('should make put request to update auth',
         inject([TeamsService, HttpTestingController], (teamsService: TeamsService, httpMock: HttpTestingController) => {
-            let auth: TeamAuthSchemeDto;
-
-            teamsService.putTeamAuth('my-team', { scheme: null }, version).subscribe(result => {
+            let auth: Versioned<AuthSchemeResponseDto>;
+            teamsService.putTeamAuth('my-team', { scheme: null } as any, version).subscribe(result => {
                 auth = result;
             });
 
@@ -153,7 +153,12 @@ describe('TeamsService', () => {
                 },
             });
 
-            expect(auth!).toEqual({ payload: { scheme: null, canUpdate: true }, version: new Version('2') });
+            expect(auth!).toEqual({
+                payload: new AuthSchemeResponseDto({
+                    _links: {},
+                }),
+                version: new VersionTag('2'),
+            });
         }));
 
     it('should make delete request to leave team',
@@ -201,10 +206,9 @@ describe('TeamsService', () => {
             createdBy: `creator${id}`,
             lastModified: buildDate(id, 20),
             lastModifiedBy: `modifier${id}`,
-            version: key,
             name: `team-name${key}`,
             roleName: `Role${id}`,
-            roleProperties: createProperties(id),
+            version: key,
             _links: {
                 update: { method: 'PUT', href: `teams/${id}` },
             },
@@ -212,7 +216,6 @@ describe('TeamsService', () => {
     }
 
     function teamAuthResponse(id: number) {
-
         return {
             scheme: null,
             _links: {
@@ -223,28 +226,21 @@ describe('TeamsService', () => {
 });
 
 export function createTeam(id: number, suffix = '') {
-    const links: ResourceLinks = {
-        update: { method: 'PUT', href: `teams/${id}` },
-    };
-
     const key = `${id}${suffix}`;
 
-    return new TeamDto(links,
-        `id${id}`,
-        DateTime.parseISO(buildDate(id, 10)), `creator${id}`,
-        DateTime.parseISO(buildDate(id, 20)), `modifier${id}`,
-        new Version(key),
-        `team-name${key}`,
-        `Role${id}`,
-        createProperties(id));
-}
-
-function createProperties(id: number) {
-    const result = {} as Record<string, any>;
-
-    result[`property${id}`] = true;
-
-    return result;
+    return new TeamDto({
+        id: `id${id}`,
+        created: DateTime.parseISO(buildDate(id, 10)),
+        createdBy: `creator${id}`,
+        lastModified: DateTime.parseISO(buildDate(id, 20)),
+        lastModifiedBy: `modifier${id}`,
+        name: `team-name${key}`,
+        roleName: `Role${id}`,
+        version: id,
+        _links: {
+            update: new ResourceLinkDto({ method: 'PUT', href: `teams/${id}` }),
+        },
+    });
 }
 
 function buildDate(id: number, add = 0) {
