@@ -19,26 +19,26 @@ describe('SchemaDto', () => {
     const field3 = createField({ properties: createProperties('Array', { label: 'My Field 3' }), id: 3 });
 
     it('should return label as display name', () => {
-        const schema = createSchema({ properties: new SchemaPropertiesDto('Label') });
+        const schema = createSchema({ properties: new SchemaPropertiesDto({ label: 'Label', validateOnPublish: true }) });
 
         expect(schema.displayName).toBe('Label');
     });
 
     it('should return name as display name if label is undefined', () => {
-        const schema = createSchema({ properties: new SchemaPropertiesDto(undefined) });
+        const schema = createSchema({ properties: new SchemaPropertiesDto({ label: undefined, validateOnPublish: true }) });
 
         expect(schema.displayName).toBe('schema-name1');
     });
 
     it('should return name as display name label is empty', () => {
-        const schema = createSchema({ properties: new SchemaPropertiesDto('') });
+        const schema = createSchema({ properties: new SchemaPropertiesDto({ label: '', validateOnPublish: true }) });
 
         expect(schema.displayName).toBe('schema-name1');
     });
 
     it('should return configured fields as list fields if fields are declared', () => {
         const schema = createSchema({
-            properties: new SchemaPropertiesDto(''),
+            properties: new SchemaPropertiesDto({ validateOnPublish: true }),
             fieldsInLists: [
                 'data.field1',
                 'data.field3',
@@ -56,7 +56,7 @@ describe('SchemaDto', () => {
 
     it('should return configured fields as references fields if fields are declared', () => {
         const schema = createSchema({
-            properties: new SchemaPropertiesDto(''),
+            properties: new SchemaPropertiesDto(),
             fieldsInReferences: [
                 'data.field1',
                 'data.field3',
@@ -73,7 +73,7 @@ describe('SchemaDto', () => {
     });
 
     it('should return first fields as list fields if no field is declared', () => {
-        const schema = createSchema({ properties: new SchemaPropertiesDto(''), fields: [field1, field2, field3] });
+        const schema = createSchema({ properties: new SchemaPropertiesDto(), fields: [field1, field2, field3] });
 
         expect(schema.defaultListFields).toEqual([
             META_FIELDS.lastModifiedByAvatar,
@@ -95,7 +95,7 @@ describe('SchemaDto', () => {
     });
 
     it('should return first field as reference fields if no field is declared', () => {
-        const schema = createSchema({ properties: new SchemaPropertiesDto(''), fields: [field1, field2, field3] });
+        const schema = createSchema({ properties: new SchemaPropertiesDto(), fields: [field1, field2, field3] });
 
         expect(schema.defaultReferenceFields).toEqual([
             { name: 'data.field1', rootField: field1, label: field1.displayName },

@@ -8,7 +8,7 @@
 
 import { booleanAttribute, Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { AssetsFieldPropertiesDto, FieldDto, FormHintComponent, LanguageDto, LocalizedInputComponent, TagEditorComponent, TranslatePipe } from '@app/shared';
+import { AppLanguageDto, AssetsFieldPropertiesDto, FieldDto, FormHintComponent, LocalizedInputComponent, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -35,7 +35,7 @@ export class AssetsValidationComponent {
     public properties!: AssetsFieldPropertiesDto;
 
     @Input({ required: true })
-    public languages!: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input({ transform: booleanAttribute })
     public isLocalizable?: boolean | null;

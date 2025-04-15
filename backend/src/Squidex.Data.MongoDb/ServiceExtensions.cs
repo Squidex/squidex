@@ -185,7 +185,7 @@ public static class ServiceExtensions
         services.AddSingletonAs<MongoUserStore>()
             .As<IUserStore<IdentityUser>>().As<IUserFactory>();
 
-        services.AddFlows<FlowEventContext>(config)
+        services.AddFlowsCore()
             .AddMongoFlowStore<FlowEventContext>();
 
         services.AddSingletonAs(c =>

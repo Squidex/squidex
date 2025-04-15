@@ -8,7 +8,8 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, ResourceLinks, SearchResultDto, SearchService } from '@app/shared/internal';
+import { ApiUrlConfig, SearchResultDto, SearchService } from '@app/shared/internal';
+import { ResourceLinkDto } from './../model';
 
 describe('SearchService', () => {
     beforeEach(() => {
@@ -64,12 +65,12 @@ describe('SearchService', () => {
 });
 
 export function createSearchResult(id: number) {
-    const links: ResourceLinks = {
-        url: { method: 'GET', href: `/url${id}` },
-    };
-
-    return new SearchResultDto(links,
-        `Search Result ${id}`,
-        `Search Type ${id}`,
-        `Label ${id}`);
+    return new SearchResultDto({
+        name: `Search Result ${id}`,
+        type: `Search Type ${id}` as any,
+        label: `Label ${id}`,
+        _links: {
+            url: new ResourceLinkDto({ method: 'GET', href: `/url${id}` }),
+        },
+    });
 }

@@ -8,7 +8,8 @@
 import { Injectable } from '@angular/core';
 import { Observable, shareReplay, Subject, takeUntil } from 'rxjs';
 import { debug, DialogService, HTTP, MathHelper, State, Types } from '@app/framework';
-import { AssetDto, AssetsService } from '../services/assets.service';
+import { AssetDto } from '../model';
+import { AssetsService } from '../services/assets.service';
 import { AppsState } from './apps.state';
 
 export interface Upload {

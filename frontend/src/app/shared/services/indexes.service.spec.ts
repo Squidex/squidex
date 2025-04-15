@@ -8,7 +8,8 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, IndexDto, IndexesDto, IndexesService, Resource, ResourceLinks } from '@app/shared/internal';
+import { ApiUrlConfig, IndexDto, IndexesDto, IndexesService, IndexFieldDto, Resource } from '@app/shared/internal';
+import { ResourceLinkDto } from '../model';
 
 describe('IndexesService', () => {
     beforeEach(() => {
@@ -30,7 +31,6 @@ describe('IndexesService', () => {
     it('should make get request to get indexes',
         inject([IndexesService, HttpTestingController], (indexesService: IndexesService, httpMock: HttpTestingController) => {
             let indexes: IndexesDto;
-
             indexesService.getIndexes('my-app', 'my-schema').subscribe(result => {
                 indexes = result;
             });
@@ -45,15 +45,16 @@ describe('IndexesService', () => {
                     indexResponse(12),
                     indexResponse(13),
                 ],
+                _links: {},
             });
 
-            expect(indexes!).toEqual({
+            expect(indexes!).toEqual(new IndexesDto({
                 items: [
                     createIndex(12),
                     createIndex(13),
                 ],
-                canCreate: false,
-            });
+                _links: {},
+            }));
         }));
 
     it('should make post request to create index',
@@ -103,14 +104,14 @@ describe('IndexesService', () => {
 });
 
 export function createIndex(id: number) {
-    const links: ResourceLinks = {
-        download: { method: 'GET', href: '/api/indexes/1' },
-    };
-
-    return new IndexDto(links,
-        `index${id}`,
-        [
-            { name: `field${id}_asc`, order: 'Ascending' },
-            { name: `field${id}_desc`, order: 'Descending' },
-        ]);
+    return new IndexDto({
+        name: `index${id}`,
+        fields: [
+            new IndexFieldDto({ name: `field${id}_asc`, order: 'Ascending' }),
+            new IndexFieldDto({ name: `field${id}_desc`, order: 'Descending' }),
+        ],
+        _links: {
+            download: new ResourceLinkDto({ method: 'GET', href: '/api/indexes/1' }),
+        },
+    });
 }

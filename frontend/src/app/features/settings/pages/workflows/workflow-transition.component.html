@@ -4,7 +4,7 @@
     </div>
     <div class="col col-step">
         <div class="transition-to">
-            <i class="icon-circle" [style.color]="transition.step.color"></i>
+            <i class="icon-circle" [style.color]="transition.step.values.color"></i>
             {{ transition.to }}
         </div>
     </div>
@@ -14,9 +14,9 @@
     <div class="col">
         <input
             class="form-control"
-            [class.dashed]="!transition.expression"
+            [class.dashed]="!transition.values.expression"
             [disabled]="!!disabled"
-            [ngModel]="transition.expression"
+            [ngModel]="transition.values.expression"
             (ngModelChange)="changeExpression($event)"
             [ngModelOptions]="onBlur"
             placeholder="{{ 'workflows.syntax.expression' | sqxTranslate }}"
@@ -30,7 +30,7 @@
             allowDuplicates="false"
             [disabled]="!!disabled"
             [itemsSource]="roles"
-            [ngModel]="transition.roles"
+            [ngModel]="transition.values.roles"
             (ngModelChange)="changeRole($event)"
             [ngModelOptions]="onBlur"
             placeholder="{{ 'common.role' | sqxTranslate }}"

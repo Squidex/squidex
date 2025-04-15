@@ -29,8 +29,8 @@ export class SchemaUIFormComponent {
 
     public isEditable = false;
 
-    public fieldsInLists: ReadonlyArray<string> = [];
-    public fieldsInReferences: ReadonlyArray<string> = [];
+    public fieldsInLists: string[] = [];
+    public fieldsInReferences: string[] = [];
 
     constructor(
         private readonly schemasState: SchemasState,
@@ -44,11 +44,11 @@ export class SchemaUIFormComponent {
         this.fieldsInReferences = this.schema.fieldsInReferences;
     }
 
-    public setFieldsInLists(names: ReadonlyArray<string>) {
+    public setFieldsInLists(names: string[]) {
         this.fieldsInLists = names;
     }
 
-    public setFieldsInReferences(names: ReadonlyArray<string>) {
+    public setFieldsInReferences(names: string[]) {
         this.fieldsInReferences = names;
     }
 

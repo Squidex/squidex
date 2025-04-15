@@ -38,6 +38,6 @@ export class PlanComponent {
     }
 
     public changeYearly() {
-        this.plansState.change(this.planInfo.plan.yearlyId);
+        this.plansState.change(this.planInfo.plan.yearlyId!);
     }
 }

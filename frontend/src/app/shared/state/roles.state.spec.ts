@@ -7,7 +7,7 @@
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, RolesPayload, RolesService, RolesState, versioned } from '@app/shared/internal';
+import { DialogService, RolesDto, RolesService, RolesState, versioned } from '@app/shared/internal';
 import { createRoles } from '../services/roles.service.spec';
 import { TestValues } from './_test-helpers';
 
@@ -113,7 +113,7 @@ describe('RolesState', () => {
             expectNewRoles(updated);
         });
 
-        function expectNewRoles(updated: RolesPayload) {
+        function expectNewRoles(updated: RolesDto) {
             expect(rolesState.snapshot.roles).toEqual(updated.items);
             expect(rolesState.snapshot.version).toEqual(newVersion);
         }

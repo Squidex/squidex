@@ -8,8 +8,9 @@
 import { Injectable } from '@angular/core';
 import { EMPTY, Observable, throwError } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
-import { debug, DialogService, ErrorDto, getPagingInfo, ListState, shareMapSubscribed, shareSubscribed, State, Types, Version } from '@app/framework';
-import { AssignContributorDto, ContributorDto, ContributorsPayload, ContributorsService } from '../services/contributors.service';
+import { debug, DialogService, ErrorDto, getPagingInfo, ListState, shareMapSubscribed, shareSubscribed, State, Types, VersionTag } from '@app/framework';
+import { ContributorDto, ContributorsDto, IAssignContributorDto } from '../model';
+import { ContributorsService } from '../services/contributors.service';
 import { AppsState } from './apps.state';
 
 interface Snapshot extends ListState<string> {
@@ -20,7 +21,7 @@ interface Snapshot extends ListState<string> {
     maxContributors: number;
 
     // The app version.
-    version: Version;
+    version: VersionTag;
 
     // Indicates if the user can add a contributor.
     canCreate?: boolean;
@@ -76,7 +77,7 @@ export class ContributorsState extends State<Snapshot> {
             page: 0,
             pageSize: 10,
             total: 0,
-            version: Version.EMPTY,
+            version: VersionTag.EMPTY,
         });
 
         debug(this, 'contributors');
@@ -131,7 +132,7 @@ export class ContributorsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public assign(request: AssignContributorDto, options?: { silent: boolean }): Observable<boolean | undefined> {
+    public assign(request: IAssignContributorDto, options?: { silent: boolean }): Observable<boolean | undefined> {
         return this.contributorsService.postContributor(this.appName, request, this.version).pipe(
             catchError(error => {
                 if (Types.is(error, ErrorDto) && error.statusCode === 404) {
@@ -146,7 +147,7 @@ export class ContributorsState extends State<Snapshot> {
             shareMapSubscribed(this.dialogs, x => x.payload.isInvited, options));
     }
 
-    private replaceContributors(version: Version, { canCreate, items, maxContributors }: ContributorsPayload) {
+    private replaceContributors(version: VersionTag, { canCreate, items, maxContributors }: ContributorsDto) {
         this.next({
             canCreate,
             contributors: items,

@@ -7,7 +7,7 @@
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService } from '@app/shared';
+import { DialogService, EventConsumersDto } from '@app/shared';
 import { EventConsumersService } from '../internal';
 import { createEventConsumer } from '../services/event-consumers.service.spec';
 import { EventConsumersState } from './event-consumers.state';
@@ -34,7 +34,7 @@ describe('EventConsumersState', () => {
     describe('Loading', () => {
         it('should load event consumers', () => {
             eventConsumersService.setup(x => x.getEventConsumers())
-                .returns(() => of({ items: [eventConsumer1, eventConsumer2] })).verifiable();
+                .returns(() => of(new EventConsumersDto({ items: [eventConsumer1, eventConsumer2], _links: {} }))).verifiable();
 
             eventConsumersState.load().subscribe();
 
@@ -56,7 +56,7 @@ describe('EventConsumersState', () => {
 
         it('should show notification on load if reload is true', () => {
             eventConsumersService.setup(x => x.getEventConsumers())
-            .returns(() => of({ items: [eventConsumer1, eventConsumer2] })).verifiable();
+                .returns(() => of(new EventConsumersDto({ items: [eventConsumer1, eventConsumer2], _links: {} }))).verifiable();
 
             eventConsumersState.load(true).subscribe();
 
@@ -80,7 +80,7 @@ describe('EventConsumersState', () => {
     describe('Updates', () => {
         beforeEach(() => {
             eventConsumersService.setup(x => x.getEventConsumers())
-            .returns(() => of({ items: [eventConsumer1, eventConsumer2] })).verifiable();
+                .returns(() => of(new EventConsumersDto({ items: [eventConsumer1, eventConsumer2], _links: {} }))).verifiable();
 
             eventConsumersState.load().subscribe();
         });

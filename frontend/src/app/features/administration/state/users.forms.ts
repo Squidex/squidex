@@ -6,10 +6,9 @@
  */
 
 import { UntypedFormControl, Validators } from '@angular/forms';
-import { ExtendedFormGroup, Form, ValidatorsEx } from '@app/shared';
-import { UpsertUserDto, UserDto } from '../services/users.service';
+import { ExtendedFormGroup, Form, IUpdateUserDto, IUserDto, ValidatorsEx } from '@app/shared';
 
-export class UserForm extends Form<ExtendedFormGroup, UpsertUserDto, UserDto> {
+export class UserForm extends Form<ExtendedFormGroup, IUpdateUserDto, IUserDto> {
     constructor() {
         super(new ExtendedFormGroup({
             email: new UntypedFormControl('', [
@@ -33,7 +32,7 @@ export class UserForm extends Form<ExtendedFormGroup, UpsertUserDto, UserDto> {
         }));
     }
 
-    public load(value: Partial<UserDto>) {
+    public load(value: Partial<IUpdateUserDto>) {
         if (value) {
             this.form.controls['password'].setValidators(Validators.nullValidator);
         } else {
@@ -43,7 +42,7 @@ export class UserForm extends Form<ExtendedFormGroup, UpsertUserDto, UserDto> {
         super.load(value);
     }
 
-    protected transformLoad(user: Partial<UserDto>) {
+    protected transformLoad(user: Partial<IUserDto>) {
         const permissions = user.permissions?.join('\n') || '';
 
         return { ...user, permissions };

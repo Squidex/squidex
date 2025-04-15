@@ -8,7 +8,7 @@
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
 import { FocusedImage, FocusPicker } from 'image-focus';
 import { TranslatePipe, Types } from '@app/framework';
-import { AnnotateAssetDto, AssetDto } from '@app/shared/internal';
+import { AssetDto, IAnnotateAssetDto } from '@app/shared/internal';
 
 @Component({
     standalone: true,
@@ -79,7 +79,7 @@ export class ImageFocusPointComponent implements AfterViewInit, OnDestroy {
         });
     }
 
-    public submit(asset: AssetDto): AnnotateAssetDto | null {
+    public submit(asset: AssetDto): IAnnotateAssetDto | null {
         const previous = getFocusPoint(asset.metadata);
 
         if (previous.x === this.x && previous.y === this.y) {
@@ -87,7 +87,6 @@ export class ImageFocusPointComponent implements AfterViewInit, OnDestroy {
         }
 
         const metadata = { ...asset.metadata, focusX: this.x, focusY: this.y };
-
         return { metadata };
     }
 }

@@ -10,7 +10,7 @@ import { catchError } from 'rxjs/operators';
 import { createContributors } from 'src/app/shared/services/contributors.service.spec';
 import { TestValues } from 'src/app/shared/state/_test-helpers';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { ContributorDto, ContributorsPayload, DialogService, ErrorDto, versioned } from '@app/shared';
+import { ContributorDto, ContributorsDto, DialogService, ErrorDto, versioned } from '@app/shared';
 import { TeamContributorsService, TeamContributorsState } from '../internal';
 
 describe('TeamContributorsState', () => {
@@ -197,7 +197,7 @@ describe('TeamContributorsState', () => {
             expectNewContributors(updated);
         });
 
-        function expectNewContributors(updated: ContributorsPayload) {
+        function expectNewContributors(updated: ContributorsDto) {
             expect(contributorsState.snapshot.contributors).toEqual(updated.items);
             expect(contributorsState.snapshot.maxContributors).toBe(updated.maxContributors);
             expect(contributorsState.snapshot.version).toEqual(newVersion);

@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { FieldDto, FloatConverter, FormHintComponent, NUMBER_FIELD_EDITORS, NumberFieldPropertiesDto, Subscriptions, TagEditorComponent, TranslatePipe, TypedSimpleChanges, valueProjection$ } from '@app/shared';
+import { FieldDto, FloatConverter, FormHintComponent, NumberFieldEditorValues, NumberFieldPropertiesDto, Subscriptions, TagEditorComponent, TranslatePipe, TypedSimpleChanges, valueProjection$ } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -29,7 +29,7 @@ export class NumberUIComponent  {
     private readonly subscriptions = new Subscriptions();
 
     public readonly converter = FloatConverter.INSTANCE;
-    public readonly editors = NUMBER_FIELD_EDITORS;
+    public readonly editors = NumberFieldEditorValues;
 
     @Input({ required: true })
     public fieldForm!: UntypedFormGroup;

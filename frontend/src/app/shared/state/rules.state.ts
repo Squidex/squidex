@@ -9,7 +9,8 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { finalize, map, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, shareSubscribed, State } from '@app/framework';
-import { RuleDto, RulesService, UpsertRuleDto } from '../services/rules.service';
+import { ICreateRuleDto, IUpdateRuleDto, RuleDto } from '../model';
+import { RulesService } from '../services/rules.service';
 import { AppsState } from './apps.state';
 
 interface Snapshot extends LoadingState {
@@ -141,7 +142,7 @@ export class RulesState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public create(request: UpsertRuleDto): Observable<RuleDto> {
+    public create(request: ICreateRuleDto): Observable<RuleDto> {
         return this.rulesService.postRule(this.appName, request).pipe(
             tap(created => {
                 this.next(s => {
@@ -170,7 +171,7 @@ export class RulesState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public update(rule: RuleDto, dto: Partial<UpsertRuleDto>): Observable<RuleDto> {
+    public update(rule: RuleDto, dto: Partial<IUpdateRuleDto>): Observable<RuleDto> {
         return this.rulesService.putRule(this.appName, rule, dto, rule.version).pipe(
             tap(updated => {
                 this.replaceRule(updated);

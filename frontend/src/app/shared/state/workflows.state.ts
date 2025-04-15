@@ -8,8 +8,9 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { debug, DialogService, LoadingState, shareSubscribed, State, Version } from '@app/framework';
-import { WorkflowDto, WorkflowsPayload, WorkflowsService } from '../services/workflows.service';
+import { debug, DialogService, LoadingState, shareSubscribed, State, VersionTag } from '@app/framework';
+import { WorkflowsService } from '../services/workflows.service';
+import { IUpdateWorkflowDto, IWorkflowStepDto, IWorkflowTransitionDto, WorkflowDto, WorkflowsDto } from './../model';
 import { AppsState } from './apps.state';
 
 interface Snapshot extends LoadingState {
@@ -17,7 +18,7 @@ interface Snapshot extends LoadingState {
     workflows: ReadonlyArray<WorkflowDto>;
 
     // The app version.
-    version: Version;
+    version: VersionTag;
 
     // The errors.
     errors: ReadonlyArray<string>;
@@ -58,7 +59,7 @@ export class WorkflowsState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly workflowsService: WorkflowsService,
     ) {
-        super({ errors: [], workflows: [], version: Version.EMPTY });
+        super({ errors: [], workflows: [], version: VersionTag.EMPTY });
 
         debug(this, 'workflows');
     }
@@ -96,8 +97,8 @@ export class WorkflowsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public update(workflow: WorkflowDto): Observable<any> {
-        return this.workflowsService.putWorkflow(this.appName, workflow, workflow.serialize(), this.version).pipe(
+    public update(workflow: WorkflowDto, update: IUpdateWorkflowDto): Observable<any> {
+        return this.workflowsService.putWorkflow(this.appName, workflow, update, this.version).pipe(
             tap(({ version, payload }) => {
                 this.dialogs.notifyInfo('i18n:workflows.saved');
 
@@ -114,7 +115,7 @@ export class WorkflowsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    private replaceWorkflows(payload: WorkflowsPayload, version: Version) {
+    private replaceWorkflows(payload: WorkflowsDto, version: VersionTag) {
         const { canCreate, errors, items: workflows } = payload;
 
         this.next({
@@ -129,5 +130,185 @@ export class WorkflowsState extends State<Snapshot> {
 
     private get version() {
         return this.snapshot.version;
+    }
+}
+
+export interface WorkflowStepView {
+    // The name of the workflow.
+    name: string;
+
+    // The actual step.
+    values: WorkflowStepValues;
+
+     // True, if the step cannot be removed.
+     isLocked?: boolean;
+}
+
+export type WorkflowStepValues = Omit<IWorkflowStepDto, 'transitions'>;
+
+export interface WorkflowTransitionView {
+    // The source step name.
+    from: string;
+
+    // The target step name.
+    to: string;
+
+    // The actual transition.
+    values: WorkflowTransitionValues;
+
+    // The actual workflow step.
+    step: WorkflowStepView;
+}
+
+export type WorkflowTransitionValues = IWorkflowTransitionDto;
+
+export class WorkflowView {
+    public steps: ReadonlyArray<WorkflowStepView> = [];
+
+    public transitions: ReadonlyArray<WorkflowTransitionView> = [];
+
+    constructor(
+        public readonly dto: WorkflowDto,
+    ) {
+        const resultSteps: WorkflowStepView[] = [];
+        const resultTransitions: WorkflowTransitionView[] = [];
+
+        for (const [stepName, stepValue] of Object.entries(dto.steps)) {
+            const { transitions, ...step } = stepValue as any;
+
+            resultSteps.push({ name: stepName, isLocked: stepName === 'Published', values: step });
+
+            for (const [to, transition] of Object.entries(transitions)) {
+                resultTransitions.push({ from: stepName, to, ...transition as any });
+            }
+        }
+
+        this.steps =
+            resultSteps.sortedByString(x => x.name);
+
+        this.transitions =
+            resultTransitions.sortedByString(x => x.to);
+    }
+
+    public getOpenSteps(step: WorkflowStepView) {
+        return this.steps.filter(x => x.name !== step.name && !this.transitions.find(y => y.from === step.name && y.to === x.name));
+    }
+
+    public getTransitions(step: WorkflowStepView): WorkflowTransitionView[] {
+        return this.transitions.filter(x => x.from === step.name);
+    }
+
+    public getStep(name: string): WorkflowStepView {
+        return this.steps.find(x => x.name === name)!;
+    }
+
+    public setStep(name: string, values: Partial<WorkflowStepValues> = {}) {
+        const step = this.dto.steps[name];
+        if (!step) {
+            return this;
+        }
+
+        const clone = this.dto.toJSON();
+        Object.assign(values, clone.steps[name]);
+        return new WorkflowView(WorkflowDto.fromJSON(clone));
+    }
+
+    public changeSchemaIds(schemaIds: string[]) {
+        if (this.dto.schemaIds === schemaIds) {
+            return this;
+        }
+
+        const clone = this.dto.toJSON();
+        clone.schemaIds = schemaIds;
+        return new WorkflowView(WorkflowDto.fromJSON(clone));
+    }
+
+    public changeName(name: string) {
+        if (this.dto.name === name) {
+            return this;
+        }
+
+        const clone = this.dto.toJSON();
+        clone.name = name;
+        return new WorkflowView(WorkflowDto.fromJSON(clone));
+    }
+
+    public setInitial(initial: string) {
+        if (this.dto.initial === initial) {
+            return this;
+        }
+
+        const clone = this.dto.toJSON();
+        clone.initial = initial;
+        return new WorkflowView(WorkflowDto.fromJSON(clone));
+    }
+
+    public removeStep(name: string) {
+        const step = this.dto.steps[name];
+        if (!step) {
+            return this;
+        }
+
+        const clone = this.dto.toJSON();
+
+        delete clone.steps[name];
+        if (clone.initial === name) {
+            clone.initial = name;
+        }
+
+        return new WorkflowView(WorkflowDto.fromJSON(clone));
+    }
+
+    public removeTransition(from: string, to: string) {
+        const step = this.dto.steps[from];
+        if (!step) {
+            return this;
+        }
+
+        const transition = step.transitions![to];
+        if (!transition) {
+            return this;
+        }
+
+        const clone = this.dto.toJSON();
+        delete clone.steps[from].transitions[to];
+        return new WorkflowView(WorkflowDto.fromJSON(clone));
+    }
+
+    public setTransition(from: string, to: string, values: Partial<WorkflowTransitionValues> = {}) {
+        const step = this.dto.steps[from];
+        if (!step) {
+            return this;
+        }
+
+        const transition = step.transitions![to];
+        if (!transition) {
+            return this;
+        }
+
+        const clone = this.dto.toJSON();
+        Object.assign(values, clone.steps[from].transitions[to]);
+        return new WorkflowView(WorkflowDto.fromJSON(clone));
+    }
+
+    public renameStep(name: string, newName: string) {
+        const step = this.dto.steps[name];
+        if (!step) {
+            return this;
+        }
+
+        const clone = this.dto.toJSON();
+
+        clone.steps[newName] = clone.steps[name];
+        delete clone.steps[name];
+
+        for (const step of Object.values(clone.step) as any[]) {
+            if (step.transitions[name]) {
+                step.transitions[newName] = step.transitions[name];
+                delete step.transitions[name];
+            }
+        }
+
+        return new WorkflowView(WorkflowDto.fromJSON(clone));
     }
 }

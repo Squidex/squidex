@@ -7,22 +7,31 @@
 
 /* eslint-disable no-template-curly-in-string */
 
-import { Version } from '@app/framework';
-import { AppSettingsDto } from '../services/apps.service';
+import { AppSettingsDto, EditorDto } from '../model';
 import { computeEditorUrl } from './editor-utils';
 
 describe('EditorUtils', () => {
-    const settings = new AppSettingsDto({}, false, [], [{
-        name: 'editor1',
-        url: 'url/to/editor1',
-    }, {
-        name: 'duplicate',
-        url: 'url/to/duplicate1',
-    }, {
-        name: 'duplicate',
-        url: 'url/to/duplicate2',
-    }],
-    new Version('1'));
+    const settings = new AppSettingsDto({
+        patterns: [],
+        hideDateTimeModeButton: false,
+        hideScheduler: false,
+        editors: [
+            new EditorDto({
+                name: 'editor1',
+                url: 'url/to/editor1',
+            }),
+            new EditorDto({
+                name: 'duplicate',
+                url: 'url/to/duplicate1',
+            }),
+            new EditorDto({
+                name: 'duplicate',
+                url: 'url/to/duplicate2',
+            }),
+        ],
+        version: 1,
+        _links: {},
+    });
 
     it('should interpolate editor url', () => {
         const result = computeEditorUrl('http://${editor1}?query=value', settings);

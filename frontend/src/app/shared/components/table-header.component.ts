@@ -8,7 +8,7 @@
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { TranslatePipe } from '@app/framework';
-import { LanguageDto, Query, SortMode, Types } from '@app/shared/internal';
+import { AppLanguageDto, Query, SortMode, Types } from '@app/shared/internal';
 
 @Component({
     standalone: true,
@@ -31,7 +31,7 @@ export class TableHeaderComponent {
     public text = '';
 
     @Input()
-    public language!: LanguageDto;
+    public language!: AppLanguageDto;
 
     @Input()
     public sortPath?: string | undefined | null;

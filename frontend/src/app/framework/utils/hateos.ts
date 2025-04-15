@@ -8,11 +8,11 @@
 export interface Resource {
     _links: ResourceLinks;
 
-    _meta?: Metadata;
+    _meta?: Metadata | any;
 }
 
 export type ResourceLinks = { [rel: string]: ResourceLink };
-export type ResourceLink = { href: string; method: ResourceMethod; metadata?: string };
+export type ResourceLink = { href: string; method: ResourceMethod | string; metadata?: string };
 
 export type Metadata = { [rel: string]: string };
 

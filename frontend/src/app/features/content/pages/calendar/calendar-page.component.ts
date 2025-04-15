@@ -9,7 +9,7 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { AppsState, ConfirmClickDirective, ContentDto, ContentsService, ContentStatusComponent, CopyDirective, DateTime, DialogModel, FullDateTimePipe, getContentValue, LanguageDto, LanguagesState, LayoutComponent, LocalizerService, ModalDialogComponent, ModalDirective, ResourceLoaderService, TitleComponent, TooltipDirective, TranslatePipe, UserNameRefPipe, UserPictureRefPipe } from '@app/shared';
+import { AppLanguageDto, AppsState, ConfirmClickDirective, ContentDto, ContentsService, ContentStatusComponent, CopyDirective, DateTime, DialogModel, FullDateTimePipe, getContentValue, LanguagesState, LayoutComponent, LocalizerService, ModalDialogComponent, ModalDirective, ResourceLoaderService, TitleComponent, TooltipDirective, TranslatePipe, UserNameRefPipe, UserPictureRefPipe } from '@app/shared';
 
 declare const tui: any;
 
@@ -39,7 +39,7 @@ type ViewMode = 'day' | 'week' | 'month';
 })
 export class CalendarPageComponent implements AfterViewInit, OnDestroy, OnInit {
     private calendar: any;
-    private language!: LanguageDto;
+    private language!: AppLanguageDto;
 
     @ViewChild('calendarContainer', { static: false })
     public calendarContainer!: ElementRef;

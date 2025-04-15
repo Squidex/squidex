@@ -10,7 +10,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ControlErrorsComponent, FormErrorComponent, LayoutComponent, ShortcutDirective, Subscriptions, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
-import { UpsertUserDto, UserDto, UserForm, UsersState } from '../../internal';
+import { UserDto, UserForm, UsersState } from '../../internal';
 
 @Component({
     standalone: true,
@@ -79,7 +79,7 @@ export class UserPageComponent implements OnInit {
                         },
                     });
             } else {
-                this.usersState.create(<UpsertUserDto>value)
+                this.usersState.create(value as any)
                     .subscribe({
                         next: () => {
                             this.back();

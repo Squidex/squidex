@@ -7,7 +7,7 @@
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { ClientsPayload, ClientsService, ClientsState, DialogService, versioned } from '@app/shared/internal';
+import { ClientsDto, ClientsService, ClientsState, DialogService, versioned } from '@app/shared/internal';
 import { createClients } from '../services/clients.service.spec';
 import { TestValues } from './_test-helpers';
 
@@ -130,7 +130,7 @@ describe('ClientsState', () => {
             expectNewClients(updated);
         });
 
-        function expectNewClients(updated: ClientsPayload) {
+        function expectNewClients(updated: ClientsDto) {
             expect(clientsState.snapshot.clients).toEqual(updated.items);
             expect(clientsState.snapshot.version).toEqual(newVersion);
         }

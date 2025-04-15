@@ -206,7 +206,7 @@ public static class ServiceExtensions
         services.AddSingletonAs<EFUserFactory>()
             .As<IUserFactory>();
 
-        services.AddFlows<FlowEventContext>(config)
+        services.AddFlowsCore()
             .AddEntityFrameworkStore<TContext, FlowEventContext>();
 
         services.AddEntityFrameworkAssetKeyValueStore<TContext, TusMetadata>();

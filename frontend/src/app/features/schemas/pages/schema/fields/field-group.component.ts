@@ -8,7 +8,7 @@
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
 
 import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
-import { AppSettingsDto, FieldDto, FieldGroup, LanguageDto, LocalStoreService, RootFieldDto, SchemaDto, Settings, StatefulComponent } from '@app/shared';
+import { AppLanguageDto, AppSettingsDto, FieldDto, FieldGroup, LocalStoreService, SchemaDto, Settings, StatefulComponent } from '@app/shared';
 import { FieldComponent } from './field.component';
 
 interface State {
@@ -33,10 +33,10 @@ export class FieldGroupComponent extends StatefulComponent<State> {
     public sorted = new EventEmitter<CdkDragDrop<FieldDto[]>>();
 
     @Input({ required: true })
-    public languages!: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input()
-    public parent?: RootFieldDto;
+    public parent?: FieldDto;
 
     @Input({ required: true })
     public settings!: AppSettingsDto;
@@ -56,7 +56,7 @@ export class FieldGroupComponent extends StatefulComponent<State> {
     public trackByFieldFn: (_index: number, field: FieldDto) => any;
 
     public get hasAnyFields() {
-        return this.parent ? this.parent.nested.length > 0 : this.schema.fields.length > 0;
+        return this.parent ? this.parent.nested && this.parent.nested.length > 0 : this.schema.fields.length > 0;
     }
 
     constructor(

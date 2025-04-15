@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { AssetFolderDropdownComponent, FieldDto, FormHintComponent, SchemaTagSource, STRING_FIELD_EDITORS, StringFieldPropertiesDto, Subscriptions, TagEditorComponent, TranslatePipe, TypedSimpleChanges, valueProjection$ } from '@app/shared';
+import { AssetFolderDropdownComponent, FieldDto, FormHintComponent, SchemaTagSource, StringFieldEditorValues, StringFieldPropertiesDto, Subscriptions, TagEditorComponent, TranslatePipe, TypedSimpleChanges, valueProjection$ } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -29,7 +29,7 @@ import { AssetFolderDropdownComponent, FieldDto, FormHintComponent, SchemaTagSou
 export class StringUIComponent  {
     private readonly subscriptions = new Subscriptions();
 
-    public readonly editors = STRING_FIELD_EDITORS;
+    public readonly editors = StringFieldEditorValues;
 
     @Input({ required: true })
     public fieldForm!: UntypedFormGroup;

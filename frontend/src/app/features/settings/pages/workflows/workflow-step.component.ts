@@ -8,7 +8,7 @@
 
 import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ColorPickerComponent, DropdownComponent, EditableTitleComponent, TagEditorComponent, TranslatePipe, TypedSimpleChanges, WorkflowDto, WorkflowStep, WorkflowStepValues, WorkflowTransition, WorkflowTransitionValues, WorkflowTransitionView } from '@app/shared';
+import { ColorPickerComponent, DropdownComponent, EditableTitleComponent, TagEditorComponent, TranslatePipe, TypedSimpleChanges, WorkflowStepValues, WorkflowStepView, WorkflowTransitionValues, WorkflowTransitionView, WorkflowView } from '@app/shared';
 import { WorkflowTransitionComponent } from './workflow-transition.component';
 
 @Component({
@@ -33,13 +33,13 @@ export class WorkflowStepComponent {
     public makeInitial = new EventEmitter();
 
     @Output()
-    public transitionAdd = new EventEmitter<WorkflowStep>();
+    public transitionAdd = new EventEmitter<WorkflowStepView>();
 
     @Output()
-    public transitionRemove = new EventEmitter<WorkflowTransition>();
+    public transitionRemove = new EventEmitter<WorkflowTransitionView>();
 
     @Output()
-    public transitionUpdate = new EventEmitter<{ transition: WorkflowTransition; values: WorkflowTransitionValues }>();
+    public transitionUpdate = new EventEmitter<{ transition: WorkflowTransitionView; values: WorkflowTransitionValues }>();
 
     @Output()
     public update = new EventEmitter<WorkflowStepValues>();
@@ -51,10 +51,10 @@ export class WorkflowStepComponent {
     public remove = new EventEmitter();
 
     @Input({ required: true })
-    public workflow!: WorkflowDto;
+    public workflow!: WorkflowView;
 
     @Input({ required: true })
-    public step!: WorkflowStep;
+    public step!: WorkflowStepView;
 
     @Input({ required: true })
     public roles!: ReadonlyArray<string>;
@@ -62,8 +62,8 @@ export class WorkflowStepComponent {
     @Input({ transform: booleanAttribute })
     public disabled?: boolean | null;
 
-    public openSteps!: ReadonlyArray<WorkflowStep>;
-    public openStep!: WorkflowStep;
+    public openSteps!: ReadonlyArray<WorkflowStepView>;
+    public openStep!: WorkflowStepView;
 
     public transitions!: ReadonlyArray<WorkflowTransitionView>;
 
@@ -76,7 +76,7 @@ export class WorkflowStepComponent {
         }
     }
 
-    public changeTransition(transition: WorkflowTransition, values: WorkflowTransitionValues) {
+    public changeTransition(transition: WorkflowTransitionView, values: WorkflowTransitionValues) {
         this.transitionUpdate.emit({ transition, values });
     }
 
@@ -100,7 +100,7 @@ export class WorkflowStepComponent {
         this.update.emit({ noUpdateExpression });
     }
 
-    public changeNoUpdateRoles(noUpdateRoles?: ReadonlyArray<string>) {
+    public changeNoUpdateRoles(noUpdateRoles?: string[]) {
         this.update.emit({ noUpdateRoles });
     }
 }

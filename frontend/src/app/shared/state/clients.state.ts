@@ -8,8 +8,8 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { debug, DialogService, LoadingState, shareSubscribed, State, Version } from '@app/framework';
-import { ClientDto, ClientsPayload, ClientsService, CreateClientDto, UpdateClientDto } from '../services/clients.service';
+import { debug, DialogService, LoadingState, shareSubscribed, State, VersionTag } from '@app/framework';
+import { ClientDto, ClientsDto, ClientsService, ICreateClientDto, IUpdateClientDto } from '../internal';
 import { AppsState } from './apps.state';
 
 interface Snapshot extends LoadingState {
@@ -17,7 +17,7 @@ interface Snapshot extends LoadingState {
     clients: ReadonlyArray<ClientDto>;
 
     // The app version.
-    version: Version;
+    version: VersionTag;
 
     // Indicates if the user can create new clients.
     canCreate?: boolean;
@@ -52,7 +52,7 @@ export class ClientsState extends State<Snapshot> {
         private readonly clientsService: ClientsService,
         private readonly dialogs: DialogService,
     ) {
-        super({ clients: [], version: Version.EMPTY });
+        super({ clients: [], version: VersionTag.EMPTY });
 
         debug(this, 'clients');
     }
@@ -82,7 +82,7 @@ export class ClientsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public attach(request: CreateClientDto): Observable<any> {
+    public attach(request: ICreateClientDto): Observable<any> {
         return this.clientsService.postClient(this.appName, request, this.version).pipe(
             tap(({ version, payload }) => {
                 this.replaceClients(payload, version);
@@ -98,7 +98,7 @@ export class ClientsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public update(client: ClientDto, request: UpdateClientDto): Observable<any> {
+    public update(client: ClientDto, request: IUpdateClientDto): Observable<any> {
         return this.clientsService.putClient(this.appName, client, request, this.version).pipe(
             tap(({ version, payload }) => {
                 this.replaceClients(payload, version);
@@ -106,7 +106,7 @@ export class ClientsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    private replaceClients(payload: ClientsPayload, version: Version) {
+    private replaceClients(payload: ClientsDto, version: VersionTag) {
         const { canCreate, items: clients } = payload;
 
         this.next({

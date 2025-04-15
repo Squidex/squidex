@@ -14,7 +14,7 @@ import { markdownRender } from '@app/framework/internal';
 })
 export class MarkdownDirective {
     @Input('sqxMarkdown')
-    public markdown!: string;
+    public markdown!: string | undefined;
 
     @Input({ transform: booleanAttribute })
     public trusted = false;
@@ -35,19 +35,20 @@ export class MarkdownDirective {
         let html = '';
 
         let markdown = this.markdown;
+        if (markdown) {
+            const hasExclamation = markdown.indexOf('!') === 0;
 
-        const hasExclamation = markdown.indexOf('!') === 0;
+            if (hasExclamation && this.optional) {
+                markdown = markdown.substring(1);
+            }
 
-        if (hasExclamation && this.optional) {
-            markdown = markdown.substring(1);
-        }
-
-        if (!markdown) {
-            html = markdown;
-        } else if (this.optional && !hasExclamation) {
-            html = markdown;
-        } else if (this.markdown) {
-            html = markdownRender(markdown, this.inline, this.trusted);
+            if (!markdown) {
+                html = markdown;
+            } else if (this.optional && !hasExclamation) {
+                html = markdown;
+            } else if (this.markdown) {
+                html = markdownRender(markdown, this.inline, this.trusted);
+            }
         }
 
         const hasHtml = html.indexOf('<') >= 0 || html.indexOf('&') >= 0;
