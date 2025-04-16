@@ -67,9 +67,6 @@ public static class MessagingServices
 
             services.AddSingletonAs<UsageTrackerWorker>()
                 .AsSelf().As<IMessageHandler>();
-
-            services.AddFlowsCore()
-                .AddWorker<FlowEventContext>();
         }
 
         if (isRandomName)

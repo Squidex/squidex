@@ -95,9 +95,6 @@ public static class RuleServices
         services.AddSingletonAs<PredefinedPatternsFormatter>()
             .As<IRuleEventFormatter>();
 
-        services.AddSingletonAs<SimpleFormatter>()
-            .AsSelf();
-
         services.AddSingletonAs<RuleService>()
             .As<IRuleService>();
 

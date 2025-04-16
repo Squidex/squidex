@@ -18,10 +18,9 @@ public sealed class ScopesProcessor : IOperationProcessor
 {
     public bool Process(OperationProcessorContext context)
     {
-        context.OperationDescription.Operation.Security ??= new List<OpenApiSecurityRequirement>();
+        context.OperationDescription.Operation.Security ??= [];
 
         var permissionAttribute = context.MethodInfo.GetCustomAttribute<ApiPermissionAttribute>();
-
         if (permissionAttribute != null)
         {
             context.OperationDescription.Operation.Security.Add(new OpenApiSecurityRequirement
