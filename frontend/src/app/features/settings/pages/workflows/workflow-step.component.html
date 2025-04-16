@@ -60,7 +60,7 @@
                 <div class="col col-step">
                     <sqx-dropdown canSearch="false" [items]="openSteps" [(ngModel)]="openStep">
                         <ng-template let-target="$implicit">
-                            <i class="icon-circle" [style.color]="target.color"></i>
+                            <i class="icon-circle" [style.color]="target.values.color"></i>
                             {{ target.name }}
                         </ng-template>
                     </sqx-dropdown>

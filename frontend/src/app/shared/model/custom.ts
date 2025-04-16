@@ -205,6 +205,12 @@ export class AssetScriptsDto extends generated.AssetScriptsDto {
     }
 }
 
+export class AuthSchemeResponseDto extends generated.AuthSchemeResponseDto {
+    get canUpdate() {
+        return this.compute('canUpdate', () => hasAnyLink(this._links, 'update'));
+    }
+}
+
 export class ClientDto extends generated.ClientDto {
     get canRevoke() {
         return this.compute('canRevoke', () => hasAnyLink(this._links, 'delete'));

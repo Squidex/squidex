@@ -51,6 +51,7 @@ describe('TeamAuthState', () => {
 
             expect(authState.snapshot.scheme).toEqual(scheme);
             expect(authState.snapshot.isLoaded).toBeTruthy();
+            expect(authState.snapshot.canUpdate).toBeTruthy();
             expect(authState.snapshot.version).toEqual(version);
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());

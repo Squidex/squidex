@@ -173,19 +173,20 @@ export class WorkflowView {
         const resultSteps: WorkflowStepView[] = [];
         const resultTransitions: WorkflowTransitionView[] = [];
 
-        for (const [stepName, step] of Object.entries(dto.steps)) {
+        for (const [name, step] of Object.entries(dto.steps)) {
             const { transitions: _, ...values } = step.toJSON();
-            const stepView = { name: stepName, isLocked: stepName === 'Published', values };
+            
+            resultSteps.push({ name, isLocked: isLocked(name), values });
+        }
 
+        for (const [from, step] of Object.entries(dto.steps)) {
             if (step.transitions) {
                 for (const [to, transition] of Object.entries(step.transitions)) {
-                    const asJson = transition.toJSON();
+                    const step = resultSteps.find(x => x.name === to)!;
 
-                    resultTransitions.push({ from: stepName, to, step: stepView, values: asJson });
+                    resultTransitions.push({ from, to, step, values: transition.toJSON() });
                 }
             }
-
-            resultSteps.push(stepView);
         }
 
         this.steps =
@@ -212,14 +213,13 @@ export class WorkflowView {
     }
 
     public setStep(name: string, values: Partial<WorkflowStepValues> = {}) {
-        const clone = this.dto.toJSON();
+        return this.update(clone => {
+            clone.steps[name] = { transitions: {}, ...clone.steps[name] ?? {}, ...values };
 
-        clone.steps[name] = { transitions: {}, ...clone.steps[name] ?? {}, ...values };
-        if (!clone.initial) {
-            clone.initial = name;
-        }
-
-        return new WorkflowView(WorkflowDto.fromJSON(clone));
+            if (!clone.initial && !isLocked(name)) {
+                clone.initial = name;
+            }
+        });
     }
 
     public removeStep(name: string) {
@@ -227,19 +227,18 @@ export class WorkflowView {
         if (!step || step.isLocked) {
             return this;
         }
+        
+        return this.update(clone => {
+            delete clone.steps[name];
 
-        const clone = this.dto.toJSON();
+            if (clone.initial === name) {
+                clone.initial = this.steps.filter(x => x.name !== name && !x.isLocked)[0]?.name ?? null;
+            }
 
-        delete clone.steps[name];
-        if (clone.initial === name) {
-            clone.initial = this.steps.filter(x => x.name !== name && !x.isLocked)[0]?.name ?? null;
-        }
-
-        for (const step of Object.values(clone.steps) as any[]) {
-            delete step.transitions[name];
-        }
-
-        return new WorkflowView(WorkflowDto.fromJSON(clone));
+            for (const step of Object.values(clone.steps) as any[]) {
+                delete step.transitions[name];
+            }
+        });
     }
 
     public changeSchemaIds(schemaIds: string[]) {
@@ -247,9 +246,9 @@ export class WorkflowView {
             return this;
         }
 
-        const clone = this.dto.toJSON();
-        clone.schemaIds = schemaIds;
-        return new WorkflowView(WorkflowDto.fromJSON(clone));
+        return this.update(clone => {
+            clone.schemaIds = schemaIds;
+        });
     }
 
     public changeName(name: string) {
@@ -257,71 +256,72 @@ export class WorkflowView {
             return this;
         }
 
-        const clone = this.dto.toJSON();
-        clone.name = name;
-        return new WorkflowView(WorkflowDto.fromJSON(clone));
+        return this.update(clone => {
+            clone.name = name;
+        });
     }
 
     public setInitial(initial: string) {
-        const step = this.dto.steps[initial];
-        if (!step) {
+        const step = this.steps.find(x => x.name === initial);
+        if (!step || step.isLocked || this.dto.initial === initial) {
             return this;
         }
 
-        if (this.dto.initial === initial) {
-            return this;
-        }
-
-        const clone = this.dto.toJSON();
-        clone.initial = initial;
-        return new WorkflowView(WorkflowDto.fromJSON(clone));
+        return this.update(clone => {
+            clone.initial = initial;
+        });
     }
 
     public setTransition(from: string, to: string, values: Partial<WorkflowTransitionValues> = {}) {
-        const step = this.dto.steps[from];
-        if (!step) {
+        if (!this.dto.steps[from] || !this.dto.steps[to]) {
             return this;
         }
 
-        const clone = this.dto.toJSON();
-        clone.steps[from].transitions[to] = { transitions: {}, ...clone.steps[from].transitions[to] ?? {}, ...values };
-        return new WorkflowView(WorkflowDto.fromJSON(clone));
+        return this.update(clone => {
+            clone.steps[from].transitions[to] = { transitions: {}, ...clone.steps[from].transitions[to] ?? {}, ...values };
+        });
     }
 
     public removeTransition(from: string, to: string) {
         const step = this.dto.steps[from];
-        if (!step) {
+        if (!step || !step.transitions?.[to]) {
             return this;
         }
 
-        const transition = step.transitions![to];
-        if (!transition) {
-            return this;
-        }
-
-        const clone = this.dto.toJSON();
-        delete clone.steps[from].transitions[to];
-        return new WorkflowView(WorkflowDto.fromJSON(clone));
+        return this.update(clone => {
+            delete clone.steps[from].transitions[to];
+        });
     }
 
     public renameStep(name: string, newName: string) {
-        const step = this.dto.steps[name];
-        if (!step) {
+        if (!this.dto.steps[name] || name === newName) {
             return this;
         }
 
-        const clone = this.dto.toJSON();
-
-        clone.steps[newName] = clone.steps[name];
-        delete clone.steps[name];
-
-        for (const step of Object.values(clone.steps) as any[]) {
-            if (step.transitions[name]) {
-                step.transitions[newName] = step.transitions[name];
-                delete step.transitions[name];
+        return this.update(clone => {
+            renameInObj(clone.steps, name, newName);
+    
+            for (const step of Object.values(clone.steps) as any[]) {
+                renameInObj(step.transitions, name, newName);
             }
-        }
+        });
+    }
 
+    private update(action: (clone: any) => void) {
+        const clone = this.dto.toJSON();
+        action(clone);
         return new WorkflowView(WorkflowDto.fromJSON(clone));
     }
+}
+
+function renameInObj(target: any, name: string, newName: string) {
+    const existing = target[name];
+    if (existing) {
+        target[newName] = existing;
+        delete target[name];
+    }
+}
+
+function isLocked(name: string) {
+    return name === 'Published';
 }

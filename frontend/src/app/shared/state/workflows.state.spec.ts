@@ -376,7 +376,7 @@ describe('Workflow', () => {
         expect(updated).toBe(workflow);
     });
 
-    it('should return same workflow if transition to update not found by to step', () => {
+    it('should return same workflow if transition has invalid steps', () => {
         const workflow =
             new WorkflowView(dto)
                 .setStep('1')

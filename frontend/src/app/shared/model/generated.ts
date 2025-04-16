@@ -1571,6 +1571,10 @@ export class AuthSchemeResponseDto extends ResourceDto implements IAuthSchemeRes
     /** The auth scheme if configured. */
     readonly scheme?: AuthSchemeDto | undefined;
 
+    get canUpdate() {
+        return this.compute('canUpdate', () => hasAnyLink(this._links, 'update'));
+    }
+
     constructor(data?: IAuthSchemeResponseDto) {
         super(data);
     }
