@@ -10,7 +10,7 @@ import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { debounceTime, Subscription } from 'rxjs';
-import { ActionForm, ALL_TRIGGERS, ConfirmClickDirective, FormAlertComponent, KeysPipe, LayoutComponent, ListViewComponent, MessageBus, RuleDto, RuleElementDto, RulesService, RulesState, SchemasState, SidebarMenuDirective, Subscriptions, TitleComponent, ToggleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe, TriggerForm, value$ } from '@app/shared';
+import { ActionForm, ALL_TRIGGERS, ConfirmClickDirective, FormAlertComponent, KeysPipe, LayoutComponent, ListViewComponent, MessageBus, DynamicRuleDto, RuleElementDto, RulesService, RulesState, SchemasState, SidebarMenuDirective, Subscriptions, TitleComponent, ToggleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe, TriggerForm, value$ } from '@app/shared';
 import { GenericActionComponent } from '../../shared/actions/generic-action.component';
 import { RuleElementComponent } from '../../shared/rule-element.component';
 import { AssetChangedTriggerComponent } from '../../shared/triggers/asset-changed-trigger.component';
@@ -60,7 +60,7 @@ export class RulePageComponent implements OnInit {
     public supportedTriggers = ALL_TRIGGERS;
     public supportedActions: { [name: string]: RuleElementDto } = {};
 
-    public rule?: RuleDto | null;
+    public rule?: DynamicRuleDto | null;
 
     public currentTrigger?: TriggerForm;
     public currentAction?: ActionForm;

@@ -199,7 +199,7 @@ describe('AssetsState', () => {
                 .returns(() => of(new AssetsDto({ items: [asset1, asset2], total: 200, _links: {} }))).verifiable();
 
             assetsService.setup(x => x.getAssets(app, { take: 2, skip: 0, parentId: MathHelper.EMPTY_GUID, noSlowTotal: true }))
-                .returns(() => of(new AssetsDto({ items: [asset1, asset2], total: 200, _links: {} }))).verifiable();
+                .returns(() => of(new AssetsDto({ items: [asset1, asset2], total: 200, _links: {} })));
 
             assetsState.load(true).subscribe();
         });

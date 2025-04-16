@@ -8,8 +8,8 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, AssetDto, AssetFolderDto, AssetFoldersDto, AssetMeta, AssetsDto, AssetsService, DateTime, ErrorDto, MathHelper, Resource, sanitize, ScriptCompletions, VersionTag } from '@app/shared/internal';
-import { ResourceLinkDto } from './../model';
+import { ApiUrlConfig, AssetDto, AssetFolderDto, AssetFoldersDto, AssetsDto, AssetsService, DateTime, ErrorDto, MathHelper, Resource, sanitize, ScriptCompletions, VersionTag } from '@app/shared/internal';
+import { AssetMetaDto, ResourceLinkDto } from './../model';
 
 describe('AssetsService', () => {
     const version = new VersionTag('1');
@@ -537,7 +537,7 @@ describe('AssetsService', () => {
     }
 });
 
-export function createAsset(id: number, tags?: ReadonlyArray<string>, suffix = '', parentId?: string) {
+export function createAsset(id: number, tags?: string[], suffix = '', parentId?: string) {
     parentId = parentId || MathHelper.EMPTY_GUID;
 
     const key = `${id}${suffix}`;
@@ -563,7 +563,7 @@ export function createAsset(id: number, tags?: ReadonlyArray<string>, suffix = '
         },
         parentId,
         slug: `my-name${key}.png`,
-        tags: [
+        tags: tags || [
             'tag1',
             'tag2',
         ],
@@ -572,7 +572,7 @@ export function createAsset(id: number, tags?: ReadonlyArray<string>, suffix = '
         _links: {
             update: new ResourceLinkDto({ method: 'PUT', href: `/assets/${id}` }),
         },
-        _meta: new AssetMeta({
+        _meta: new AssetMetaDto({
             isDuplicate: 'true',
         }),
     });

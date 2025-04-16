@@ -84,9 +84,8 @@ export class AuthPageComponent implements OnInit {
         }
 
         this.isEditing = isEditing;
-
         if (!isEditing) {
-            this.authState.update(null);
+            this.authState.update(undefined);
         }
     }
 

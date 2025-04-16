@@ -630,7 +630,7 @@ export class SchemaDto extends generated.SchemaDto {
     }
 }
 
-export class RuleDto extends generated.RuleDto {
+export class DynamicRuleDto extends generated.DynamicRuleDto {
     get canDelete() {
         return this.compute('canDelete', () => hasAnyLink(this._links, 'delete'));
     }
@@ -664,7 +664,7 @@ export class RuleDto extends generated.RuleDto {
     }
 }
 
-export class RulesDto extends generated.RulesDto {
+export class DynamicRulesDto extends generated.DynamicRulesDto {
     get canCreate() {
         return this.compute('canCreate', () => hasAnyLink(this._links, 'create'));
     }

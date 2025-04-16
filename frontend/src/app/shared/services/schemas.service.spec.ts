@@ -886,7 +886,7 @@ export function createSchema(id: number, suffix = '') {
         },
         properties: createSchemaProperties(id, suffix),
         type: id % 2 === 0 ? 'Default' : 'Singleton',
-        version: id,
+        version: id + suffix.length,
         fields: [
             new FieldDto({
                 fieldId: 11,

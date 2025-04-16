@@ -118,13 +118,13 @@ export interface IServerErrorDto {
     readonly statusCode: number;
 }
 
-export class UserProperty implements IUserProperty {
+export class UserPropertyDto implements IUserPropertyDto {
     /** Uses the cache values because the actual object is frozen. */
     protected readonly cachedValues: { [key: string]: any } = {};
     readonly name!: string;
     readonly value!: string;
 
-    constructor(data?: IUserProperty) {
+    constructor(data?: IUserPropertyDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -140,8 +140,8 @@ export class UserProperty implements IUserProperty {
         return this;
     }
 
-    static fromJSON(data: any): UserProperty {
-        const result = new UserProperty().init(data);
+    static fromJSON(data: any): UserPropertyDto {
+        const result = new UserPropertyDto().init(data);
         result.cleanup();
         return result;
     }
@@ -176,7 +176,7 @@ export class UserProperty implements IUserProperty {
     }
 }
 
-export interface IUserProperty {
+export interface IUserPropertyDto {
     readonly name: string;
     readonly value: string;
 }
@@ -240,333 +240,6 @@ export class UpdateSettingDto implements IUpdateSettingDto {
 export interface IUpdateSettingDto {
     /** The value for the setting. */
     readonly value: any;
-}
-
-export class MarkerRequestDto implements IMarkerRequestDto {
-    /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
-    readonly issue!: MarkerIssueDto;
-    readonly website!: MarkerWebsiteDto;
-    readonly context!: MarkerContextDto;
-
-    constructor(data?: IMarkerRequestDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data: any) {
-        (<any>this).issue = _data["issue"] ? MarkerIssueDto.fromJSON(_data["issue"]) : new MarkerIssueDto();
-        (<any>this).website = _data["website"] ? MarkerWebsiteDto.fromJSON(_data["website"]) : new MarkerWebsiteDto();
-        (<any>this).context = _data["context"] ? MarkerContextDto.fromJSON(_data["context"]) : new MarkerContextDto();
-        this.cleanup();
-        return this;
-    }
-
-    static fromJSON(data: any): MarkerRequestDto {
-        const result = new MarkerRequestDto().init(data);
-        result.cleanup();
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {}; 
-        data["issue"] = this.issue ? this.issue.toJSON() : <any>undefined;
-        data["website"] = this.website ? this.website.toJSON() : <any>undefined;
-        data["context"] = this.context ? this.context.toJSON() : <any>undefined;
-        return data;
-    }
-
-    protected cleanup() {
-        const target = <any>this;
-        for (var property in target) {
-            if (target.hasOwnProperty(property)) {
-                const value = target[property];
-                if (value === undefined) {
-                    delete target[property];
-                }
-            }
-        }
-    }
-
-    protected compute<T>(key: string, action: () => T): T {
-        if (!this.cachedValues.hasOwnProperty(key)) {
-            const value = action();
-            this.cachedValues[key] = value;
-            return value;
-        } else {
-            return this.cachedValues[key] as any;
-        }
-    }
-}
-
-export interface IMarkerRequestDto {
-    readonly issue: MarkerIssueDto;
-    readonly website: MarkerWebsiteDto;
-    readonly context: MarkerContextDto;
-}
-
-export class MarkerIssueDto implements IMarkerIssueDto {
-    /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
-    readonly title!: string;
-    readonly description!: string;
-    readonly type!: string;
-    readonly screenshotUrl!: string;
-    readonly console!: MarkerConsoleDto;
-
-    constructor(data?: IMarkerIssueDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data: any) {
-        (<any>this).title = _data["title"];
-        (<any>this).description = _data["description"];
-        (<any>this).type = _data["type"];
-        (<any>this).screenshotUrl = _data["screenshotUrl"];
-        (<any>this).console = _data["console"] ? MarkerConsoleDto.fromJSON(_data["console"]) : new MarkerConsoleDto();
-        this.cleanup();
-        return this;
-    }
-
-    static fromJSON(data: any): MarkerIssueDto {
-        const result = new MarkerIssueDto().init(data);
-        result.cleanup();
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {}; 
-        data["title"] = this.title;
-        data["description"] = this.description;
-        data["type"] = this.type;
-        data["screenshotUrl"] = this.screenshotUrl;
-        data["console"] = this.console ? this.console.toJSON() : <any>undefined;
-        return data;
-    }
-
-    protected cleanup() {
-        const target = <any>this;
-        for (var property in target) {
-            if (target.hasOwnProperty(property)) {
-                const value = target[property];
-                if (value === undefined) {
-                    delete target[property];
-                }
-            }
-        }
-    }
-
-    protected compute<T>(key: string, action: () => T): T {
-        if (!this.cachedValues.hasOwnProperty(key)) {
-            const value = action();
-            this.cachedValues[key] = value;
-            return value;
-        } else {
-            return this.cachedValues[key] as any;
-        }
-    }
-}
-
-export interface IMarkerIssueDto {
-    readonly title: string;
-    readonly description: string;
-    readonly type: string;
-    readonly screenshotUrl: string;
-    readonly console: MarkerConsoleDto;
-}
-
-export class MarkerConsoleDto implements IMarkerConsoleDto {
-    /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
-    readonly summary!: string;
-    readonly url!: string;
-
-    constructor(data?: IMarkerConsoleDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data: any) {
-        (<any>this).summary = _data["summary"];
-        (<any>this).url = _data["url"];
-        this.cleanup();
-        return this;
-    }
-
-    static fromJSON(data: any): MarkerConsoleDto {
-        const result = new MarkerConsoleDto().init(data);
-        result.cleanup();
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {}; 
-        data["summary"] = this.summary;
-        data["url"] = this.url;
-        return data;
-    }
-
-    protected cleanup() {
-        const target = <any>this;
-        for (var property in target) {
-            if (target.hasOwnProperty(property)) {
-                const value = target[property];
-                if (value === undefined) {
-                    delete target[property];
-                }
-            }
-        }
-    }
-
-    protected compute<T>(key: string, action: () => T): T {
-        if (!this.cachedValues.hasOwnProperty(key)) {
-            const value = action();
-            this.cachedValues[key] = value;
-            return value;
-        } else {
-            return this.cachedValues[key] as any;
-        }
-    }
-}
-
-export interface IMarkerConsoleDto {
-    readonly summary: string;
-    readonly url: string;
-}
-
-export class MarkerWebsiteDto implements IMarkerWebsiteDto {
-    /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
-    readonly url!: string;
-    readonly pageTitle!: string;
-
-    constructor(data?: IMarkerWebsiteDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data: any) {
-        (<any>this).url = _data["url"];
-        (<any>this).pageTitle = _data["pageTitle"];
-        this.cleanup();
-        return this;
-    }
-
-    static fromJSON(data: any): MarkerWebsiteDto {
-        const result = new MarkerWebsiteDto().init(data);
-        result.cleanup();
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {}; 
-        data["url"] = this.url;
-        data["pageTitle"] = this.pageTitle;
-        return data;
-    }
-
-    protected cleanup() {
-        const target = <any>this;
-        for (var property in target) {
-            if (target.hasOwnProperty(property)) {
-                const value = target[property];
-                if (value === undefined) {
-                    delete target[property];
-                }
-            }
-        }
-    }
-
-    protected compute<T>(key: string, action: () => T): T {
-        if (!this.cachedValues.hasOwnProperty(key)) {
-            const value = action();
-            this.cachedValues[key] = value;
-            return value;
-        } else {
-            return this.cachedValues[key] as any;
-        }
-    }
-}
-
-export interface IMarkerWebsiteDto {
-    readonly url: string;
-    readonly pageTitle: string;
-}
-
-export class MarkerContextDto implements IMarkerContextDto {
-    /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
-    readonly contextString!: string;
-
-    constructor(data?: IMarkerContextDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data: any) {
-        (<any>this).contextString = _data["contextString"];
-        this.cleanup();
-        return this;
-    }
-
-    static fromJSON(data: any): MarkerContextDto {
-        const result = new MarkerContextDto().init(data);
-        result.cleanup();
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {}; 
-        data["contextString"] = this.contextString;
-        return data;
-    }
-
-    protected cleanup() {
-        const target = <any>this;
-        for (var property in target) {
-            if (target.hasOwnProperty(property)) {
-                const value = target[property];
-                if (value === undefined) {
-                    delete target[property];
-                }
-            }
-        }
-    }
-
-    protected compute<T>(key: string, action: () => T): T {
-        if (!this.cachedValues.hasOwnProperty(key)) {
-            const value = action();
-            this.cachedValues[key] = value;
-            return value;
-        } else {
-            return this.cachedValues[key] as any;
-        }
-    }
-}
-
-export interface IMarkerContextDto {
-    readonly contextString: string;
 }
 
 export abstract class ResourceDto implements IResourceDto {
@@ -1413,7 +1086,7 @@ export class ContributorsDto extends ResourceDto implements IContributorsDto {
     /** The maximum number of allowed contributors. */
     readonly maxContributors!: number;
     /** The metadata to provide information about this request. */
-    readonly _meta?: ContributorsMetadata | undefined;
+    readonly _meta?: ContributorsMetadataDto | undefined;
 
     get canCreate() {
         return this.compute('canCreate', () => hasAnyLink(this._links, 'create'));
@@ -1435,7 +1108,7 @@ export class ContributorsDto extends ResourceDto implements IContributorsDto {
                 (<any>this).items!.push(ContributorDto.fromJSON(item));
         }
         (<any>this).maxContributors = _data["maxContributors"];
-        (<any>this)._meta = _data["_meta"] ? ContributorsMetadata.fromJSON(_data["_meta"]) : <any>undefined;
+        (<any>this)._meta = _data["_meta"] ? ContributorsMetadataDto.fromJSON(_data["_meta"]) : <any>undefined;
         this.cleanup();
         return this;
     }
@@ -1466,7 +1139,7 @@ export interface IContributorsDto extends IResourceDto {
     /** The maximum number of allowed contributors. */
     readonly maxContributors: number;
     /** The metadata to provide information about this request. */
-    readonly _meta?: ContributorsMetadata | undefined;
+    readonly _meta?: ContributorsMetadataDto | undefined;
 }
 
 export class ContributorDto extends ResourceDto implements IContributorDto {
@@ -1533,13 +1206,13 @@ export interface IContributorDto extends IResourceDto {
     readonly role?: string | undefined;
 }
 
-export class ContributorsMetadata implements IContributorsMetadata {
+export class ContributorsMetadataDto implements IContributorsMetadataDto {
     /** Uses the cache values because the actual object is frozen. */
     protected readonly cachedValues: { [key: string]: any } = {};
     /** Indicates whether the user has been invited. */
     readonly isInvited!: string;
 
-    constructor(data?: IContributorsMetadata) {
+    constructor(data?: IContributorsMetadataDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -1554,8 +1227,8 @@ export class ContributorsMetadata implements IContributorsMetadata {
         return this;
     }
 
-    static fromJSON(data: any): ContributorsMetadata {
-        const result = new ContributorsMetadata().init(data);
+    static fromJSON(data: any): ContributorsMetadataDto {
+        const result = new ContributorsMetadataDto().init(data);
         result.cleanup();
         return result;
     }
@@ -1589,7 +1262,7 @@ export class ContributorsMetadata implements IContributorsMetadata {
     }
 }
 
-export interface IContributorsMetadata {
+export interface IContributorsMetadataDto {
     /** Indicates whether the user has been invited. */
     readonly isInvited: string;
 }
@@ -6502,18 +6175,6 @@ export class RulesDto extends ResourceDto implements IRulesDto {
     /** The ID of the rule that is currently rerunning. */
     readonly runningRuleId?: string | undefined;
 
-    get canCreate() {
-        return this.compute('canCreate', () => hasAnyLink(this._links, 'create'));
-    }
-
-    get canReadEvents() {
-        return this.compute('canReadEvents', () => hasAnyLink(this._links, 'events'));
-    }
-
-    get canCancelRun() {
-        return this.compute('canCancelRun', () => hasAnyLink(this._links, 'run/cancel'));
-    }
-
     constructor(data?: IRulesDto) {
         super(data);
     }
@@ -6583,38 +6244,6 @@ export class RuleDto extends ResourceDto implements IRuleDto {
     readonly numFailed!: number;
     /** The date and time when the rule was executed the last time. */
     readonly lastExecuted?: DateTime | undefined;
-
-    get canDelete() {
-        return this.compute('canDelete', () => hasAnyLink(this._links, 'delete'));
-    }
-
-    get canDisable() {
-        return this.compute('canDisable', () => hasAnyLink(this._links, 'disable'));
-    }
-
-    get canEnable() {
-        return this.compute('canEnable', () => hasAnyLink(this._links, 'enable'));
-    }
-
-    get canReadLogs() {
-        return this.compute('canReadLogs', () => hasAnyLink(this._links, 'logs'));
-    }
-
-    get canRun() {
-        return this.compute('canRun', () => hasAnyLink(this._links, 'run'));
-    }
-
-    get canRunFromSnapshots() {
-        return this.compute('canRunFromSnapshots', () => hasAnyLink(this._links, 'run/snapshots'));
-    }
-
-    get canTrigger() {
-        return this.compute('canTrigger', () => hasAnyLink(this._links, 'trigger'));
-    }
-
-    get canUpdate() {
-        return this.compute('canUpdate', () => hasAnyLink(this._links, 'update'));
-    }
 
     constructor(data?: IRuleDto) {
         super(data);
@@ -6841,9 +6470,9 @@ export interface ICommentRuleTriggerDto extends IRuleTriggerDto {
 
 export class ContentChangedRuleTriggerDto extends RuleTriggerDto implements IContentChangedRuleTriggerDto {
     /** The schema settings. */
-    readonly schemas?: SchemaCondition[] | undefined;
+    readonly schemas?: SchemaConditionDto[] | undefined;
     /** The schema references. */
-    readonly referencedSchemas?: SchemaCondition[] | undefined;
+    readonly referencedSchemas?: SchemaConditionDto[] | undefined;
     /** Determines whether the trigger should handle all content changes events. */
     readonly handleAll!: boolean;
 
@@ -6857,12 +6486,12 @@ export class ContentChangedRuleTriggerDto extends RuleTriggerDto implements ICon
         if (Array.isArray(_data["schemas"])) {
             (<any>this).schemas = [] as any;
             for (let item of _data["schemas"])
-                (<any>this).schemas!.push(SchemaCondition.fromJSON(item));
+                (<any>this).schemas!.push(SchemaConditionDto.fromJSON(item));
         }
         if (Array.isArray(_data["referencedSchemas"])) {
             (<any>this).referencedSchemas = [] as any;
             for (let item of _data["referencedSchemas"])
-                (<any>this).referencedSchemas!.push(SchemaCondition.fromJSON(item));
+                (<any>this).referencedSchemas!.push(SchemaConditionDto.fromJSON(item));
         }
         (<any>this).handleAll = _data["handleAll"];
         this.cleanup();
@@ -6895,20 +6524,20 @@ export class ContentChangedRuleTriggerDto extends RuleTriggerDto implements ICon
 
 export interface IContentChangedRuleTriggerDto extends IRuleTriggerDto {
     /** The schema settings. */
-    readonly schemas?: SchemaCondition[] | undefined;
+    readonly schemas?: SchemaConditionDto[] | undefined;
     /** The schema references. */
-    readonly referencedSchemas?: SchemaCondition[] | undefined;
+    readonly referencedSchemas?: SchemaConditionDto[] | undefined;
     /** Determines whether the trigger should handle all content changes events. */
     readonly handleAll: boolean;
 }
 
-export class SchemaCondition implements ISchemaCondition {
+export class SchemaConditionDto implements ISchemaConditionDto {
     /** Uses the cache values because the actual object is frozen. */
     protected readonly cachedValues: { [key: string]: any } = {};
     readonly schemaId!: string;
     readonly condition?: string | undefined;
 
-    constructor(data?: ISchemaCondition) {
+    constructor(data?: ISchemaConditionDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -6924,8 +6553,8 @@ export class SchemaCondition implements ISchemaCondition {
         return this;
     }
 
-    static fromJSON(data: any): SchemaCondition {
-        const result = new SchemaCondition().init(data);
+    static fromJSON(data: any): SchemaConditionDto {
+        const result = new SchemaConditionDto().init(data);
         result.cleanup();
         return result;
     }
@@ -6960,7 +6589,7 @@ export class SchemaCondition implements ISchemaCondition {
     }
 }
 
-export interface ISchemaCondition {
+export interface ISchemaConditionDto {
     readonly schemaId: string;
     readonly condition?: string | undefined;
 }
@@ -7136,9 +6765,6 @@ export abstract class RuleActionDto implements IRuleActionDto {
         }
         if (data["actionType"] === "Slack") {
             return new SlackRuleActionDto().init(data);
-        }
-        if (data["actionType"] === "SquidexEmail") {
-            return new SquidexEmailRuleActionDto().init(data);
         }
         if (data["actionType"] === "Tweet") {
             return new TweetRuleActionDto().init(data);
@@ -8021,53 +7647,6 @@ export interface ISlackRuleActionDto extends IRuleActionDto {
     readonly text: string;
 }
 
-export class SquidexEmailRuleActionDto extends RuleActionDto implements ISquidexEmailRuleActionDto {
-    /** The email message will be sent to. */
-    readonly messageTo!: string;
-    /** The subject line for this email message. */
-    readonly messageSubject!: string;
-    /** The message body. */
-    readonly messageBody!: string;
-
-    constructor(data?: ISquidexEmailRuleActionDto) {
-        super(data);
-        (<any>this).actionType = "SquidexEmail";
-    }
-
-    init(_data: any) {
-        super.init(_data);
-        (<any>this).messageTo = _data["messageTo"];
-        (<any>this).messageSubject = _data["messageSubject"];
-        (<any>this).messageBody = _data["messageBody"];
-        this.cleanup();
-        return this;
-    }
-
-    static fromJSON(data: any): SquidexEmailRuleActionDto {
-        const result = new SquidexEmailRuleActionDto().init(data);
-        result.cleanup();
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {}; 
-        data["messageTo"] = this.messageTo;
-        data["messageSubject"] = this.messageSubject;
-        data["messageBody"] = this.messageBody;
-        super.toJSON(data);
-        return data;
-    }
-}
-
-export interface ISquidexEmailRuleActionDto extends IRuleActionDto {
-    /** The email message will be sent to. */
-    readonly messageTo: string;
-    /** The subject line for this email message. */
-    readonly messageSubject: string;
-    /** The message body. */
-    readonly messageBody: string;
-}
-
 export class TweetRuleActionDto extends RuleActionDto implements ITweetRuleActionDto {
     /** The generated access token. */
     readonly accessToken!: string;
@@ -8749,7 +8328,7 @@ export class PlansDto implements IPlansDto {
     /** The link to the management portal. */
     readonly portalLink?: string | undefined;
     /** The referral management. */
-    readonly referral?: ReferralInfo | undefined;
+    readonly referral?: ReferralInfoDto | undefined;
     /** The reason why the plan cannot be changed. */
     readonly locked!: PlansLockedReason;
 
@@ -8771,7 +8350,7 @@ export class PlansDto implements IPlansDto {
         (<any>this).currentPlanId = _data["currentPlanId"];
         (<any>this).planOwner = _data["planOwner"];
         (<any>this).portalLink = _data["portalLink"];
-        (<any>this).referral = _data["referral"] ? ReferralInfo.fromJSON(_data["referral"]) : <any>undefined;
+        (<any>this).referral = _data["referral"] ? ReferralInfoDto.fromJSON(_data["referral"]) : <any>undefined;
         (<any>this).locked = _data["locked"];
         this.cleanup();
         return this;
@@ -8831,7 +8410,7 @@ export interface IPlansDto {
     /** The link to the management portal. */
     readonly portalLink?: string | undefined;
     /** The referral management. */
-    readonly referral?: ReferralInfo | undefined;
+    readonly referral?: ReferralInfoDto | undefined;
     /** The reason why the plan cannot be changed. */
     readonly locked: PlansLockedReason;
 }
@@ -8957,14 +8536,14 @@ export interface IPlanDto {
     readonly maxContributors: number;
 }
 
-export class ReferralInfo implements IReferralInfo {
+export class ReferralInfoDto implements IReferralInfoDto {
     /** Uses the cache values because the actual object is frozen. */
     protected readonly cachedValues: { [key: string]: any } = {};
     readonly code!: string;
     readonly earned!: string;
     readonly condition!: string;
 
-    constructor(data?: IReferralInfo) {
+    constructor(data?: IReferralInfoDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -8981,8 +8560,8 @@ export class ReferralInfo implements IReferralInfo {
         return this;
     }
 
-    static fromJSON(data: any): ReferralInfo {
-        const result = new ReferralInfo().init(data);
+    static fromJSON(data: any): ReferralInfoDto {
+        const result = new ReferralInfoDto().init(data);
         result.cleanup();
         return result;
     }
@@ -9018,7 +8597,7 @@ export class ReferralInfo implements IReferralInfo {
     }
 }
 
-export interface IReferralInfo {
+export interface IReferralInfoDto {
     readonly code: string;
     readonly earned: string;
     readonly condition: string;
@@ -10748,7 +10327,7 @@ export class QueryJsonDto implements IQueryJsonDto {
     readonly take!: number;
     readonly random!: number;
     readonly top!: number;
-    readonly sort?: SortNode[] | undefined;
+    readonly sort?: SortNodeDto[] | undefined;
 
     constructor(data?: IQueryJsonDto) {
         if (data) {
@@ -10770,7 +10349,7 @@ export class QueryJsonDto implements IQueryJsonDto {
         if (Array.isArray(_data["sort"])) {
             (<any>this).sort = [] as any;
             for (let item of _data["sort"])
-                (<any>this).sort!.push(SortNode.fromJSON(item));
+                (<any>this).sort!.push(SortNodeDto.fromJSON(item));
         }
         this.cleanup();
         return this;
@@ -10830,16 +10409,16 @@ export interface IQueryJsonDto {
     readonly take: number;
     readonly random: number;
     readonly top: number;
-    readonly sort?: SortNode[] | undefined;
+    readonly sort?: SortNodeDto[] | undefined;
 }
 
-export class SortNode implements ISortNode {
+export class SortNodeDto implements ISortNodeDto {
     /** Uses the cache values because the actual object is frozen. */
     protected readonly cachedValues: { [key: string]: any } = {};
     readonly path!: string;
     readonly order!: SortOrder;
 
-    constructor(data?: ISortNode) {
+    constructor(data?: ISortNodeDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -10855,8 +10434,8 @@ export class SortNode implements ISortNode {
         return this;
     }
 
-    static fromJSON(data: any): SortNode {
-        const result = new SortNode().init(data);
+    static fromJSON(data: any): SortNodeDto {
+        const result = new SortNodeDto().init(data);
         result.cleanup();
         return result;
     }
@@ -10891,7 +10470,7 @@ export class SortNode implements ISortNode {
     }
 }
 
-export interface ISortNode {
+export interface ISortNodeDto {
     readonly path: string;
     readonly order: SortOrder;
 }
@@ -11874,7 +11453,7 @@ export class AssetDto extends ResourceDto implements IAssetDto {
     /** The version of the asset. */
     readonly version!: number;
     /** The metadata. */
-    readonly _meta?: AssetMeta | undefined;
+    readonly _meta?: AssetMetaDto | undefined;
     /** Determines of the created file is an image. */
     readonly isImage!: boolean;
     /** The width of the image in pixels if the asset is an image. */
@@ -11973,7 +11552,7 @@ export class AssetDto extends ResourceDto implements IAssetDto {
         (<any>this).created = _data["created"] ? DateTime.parseISO(_data["created"].toString()) : <any>undefined;
         (<any>this).lastModified = _data["lastModified"] ? DateTime.parseISO(_data["lastModified"].toString()) : <any>undefined;
         (<any>this).version = _data["version"];
-        (<any>this)._meta = _data["_meta"] ? AssetMeta.fromJSON(_data["_meta"]) : <any>undefined;
+        (<any>this)._meta = _data["_meta"] ? AssetMetaDto.fromJSON(_data["_meta"]) : <any>undefined;
         (<any>this).isImage = _data["isImage"];
         (<any>this).pixelWidth = _data["pixelWidth"];
         (<any>this).pixelHeight = _data["pixelHeight"];
@@ -12070,7 +11649,7 @@ export interface IAssetDto extends IResourceDto {
     /** The version of the asset. */
     readonly version: number;
     /** The metadata. */
-    readonly _meta?: AssetMeta | undefined;
+    readonly _meta?: AssetMetaDto | undefined;
     /** Determines of the created file is an image. */
     readonly isImage: boolean;
     /** The width of the image in pixels if the asset is an image. */
@@ -12079,13 +11658,13 @@ export interface IAssetDto extends IResourceDto {
     readonly pixelHeight?: number | undefined;
 }
 
-export class AssetMeta implements IAssetMeta {
+export class AssetMetaDto implements IAssetMetaDto {
     /** Uses the cache values because the actual object is frozen. */
     protected readonly cachedValues: { [key: string]: any } = {};
     /** Indicates whether the asset is a duplicate. */
     readonly isDuplicate!: string;
 
-    constructor(data?: IAssetMeta) {
+    constructor(data?: IAssetMetaDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -12100,8 +11679,8 @@ export class AssetMeta implements IAssetMeta {
         return this;
     }
 
-    static fromJSON(data: any): AssetMeta {
-        const result = new AssetMeta().init(data);
+    static fromJSON(data: any): AssetMetaDto {
+        const result = new AssetMetaDto().init(data);
         result.cleanup();
         return result;
     }
@@ -12135,7 +11714,7 @@ export class AssetMeta implements IAssetMeta {
     }
 }
 
-export interface IAssetMeta {
+export interface IAssetMetaDto {
     /** Indicates whether the asset is a duplicate. */
     readonly isDuplicate: string;
 }
@@ -14755,6 +14334,386 @@ export interface IUpdateWorkflowDto {
     readonly schemaIds?: string[] | undefined;
     /** The initial step. */
     readonly initial: string;
+}
+
+export class DynamicCreateRuleDto implements IDynamicCreateRuleDto {
+    /** Uses the cache values because the actual object is frozen. */
+    protected readonly cachedValues: { [key: string]: any } = {};
+    /** The trigger properties. */
+    readonly trigger!: RuleTriggerDto;
+    /** The action properties. */
+    readonly action!: { [key: string]: any; };
+
+    constructor(data?: IDynamicCreateRuleDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data: any) {
+        (<any>this).trigger = _data["trigger"] ? RuleTriggerDto.fromJSON(_data["trigger"]) : <any>undefined;
+        if (_data["action"]) {
+            (<any>this).action = {} as any;
+            for (let key in _data["action"]) {
+                if (_data["action"].hasOwnProperty(key))
+                    (<any>(<any>this).action)![key] = _data["action"][key];
+            }
+        }
+        this.cleanup();
+        return this;
+    }
+
+    static fromJSON(data: any): DynamicCreateRuleDto {
+        const result = new DynamicCreateRuleDto().init(data);
+        result.cleanup();
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["trigger"] = this.trigger ? this.trigger.toJSON() : <any>undefined;
+        if (this.action) {
+            data["action"] = {};
+            for (let key in this.action) {
+                if (this.action.hasOwnProperty(key))
+                    (<any>data["action"])[key] = (<any>this.action)[key];
+            }
+        }
+        return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
+    }
+
+    protected compute<T>(key: string, action: () => T): T {
+        if (!this.cachedValues.hasOwnProperty(key)) {
+            const value = action();
+            this.cachedValues[key] = value;
+            return value;
+        } else {
+            return this.cachedValues[key] as any;
+        }
+    }
+}
+
+export interface IDynamicCreateRuleDto {
+    /** The trigger properties. */
+    readonly trigger: RuleTriggerDto;
+    /** The action properties. */
+    readonly action: { [key: string]: any; };
+}
+
+export class DynamicRulesDto extends ResourceDto implements IDynamicRulesDto {
+    /** The rules. */
+    readonly items!: DynamicRuleDto[];
+    /** The ID of the rule that is currently rerunning. */
+    readonly runningRuleId?: string | undefined;
+
+    get canCreate() {
+        return this.compute('canCreate', () => hasAnyLink(this._links, 'create'));
+    }
+
+    get canReadEvents() {
+        return this.compute('canReadEvents', () => hasAnyLink(this._links, 'events'));
+    }
+
+    get canCancelRun() {
+        return this.compute('canCancelRun', () => hasAnyLink(this._links, 'run/cancel'));
+    }
+
+    constructor(data?: IDynamicRulesDto) {
+        super(data);
+    }
+
+    init(_data: any) {
+        super.init(_data);
+        if (Array.isArray(_data["items"])) {
+            (<any>this).items = [] as any;
+            for (let item of _data["items"])
+                (<any>this).items!.push(DynamicRuleDto.fromJSON(item));
+        }
+        (<any>this).runningRuleId = _data["runningRuleId"];
+        this.cleanup();
+        return this;
+    }
+
+    static fromJSON(data: any): DynamicRulesDto {
+        const result = new DynamicRulesDto().init(data);
+        result.cleanup();
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["runningRuleId"] = this.runningRuleId;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+export interface IDynamicRulesDto extends IResourceDto {
+    /** The rules. */
+    readonly items: DynamicRuleDto[];
+    /** The ID of the rule that is currently rerunning. */
+    readonly runningRuleId?: string | undefined;
+}
+
+export class DynamicRuleDto extends ResourceDto implements IDynamicRuleDto {
+    /** The ID of the rule. */
+    readonly id!: string;
+    /** The user that has created the rule. */
+    readonly createdBy!: string;
+    /** The user that has updated the rule. */
+    readonly lastModifiedBy!: string;
+    /** The date and time when the rule has been created. */
+    readonly created!: DateTime;
+    /** The date and time when the rule has been modified last. */
+    readonly lastModified!: DateTime;
+    /** The version of the rule. */
+    readonly version!: number;
+    /** Determines if the rule is enabled. */
+    readonly isEnabled!: boolean;
+    /** Optional rule name. */
+    readonly name?: string | undefined;
+    /** The trigger properties. */
+    readonly trigger!: RuleTriggerDto;
+    /** The action properties. */
+    readonly action!: { [key: string]: any; };
+    /** The number of completed executions. */
+    readonly numSucceeded!: number;
+    /** The number of failed executions. */
+    readonly numFailed!: number;
+    /** The date and time when the rule was executed the last time. */
+    readonly lastExecuted?: DateTime | undefined;
+
+    get canDelete() {
+        return this.compute('canDelete', () => hasAnyLink(this._links, 'delete'));
+    }
+
+    get canDisable() {
+        return this.compute('canDisable', () => hasAnyLink(this._links, 'disable'));
+    }
+
+    get canEnable() {
+        return this.compute('canEnable', () => hasAnyLink(this._links, 'enable'));
+    }
+
+    get canReadLogs() {
+        return this.compute('canReadLogs', () => hasAnyLink(this._links, 'logs'));
+    }
+
+    get canRun() {
+        return this.compute('canRun', () => hasAnyLink(this._links, 'run'));
+    }
+
+    get canRunFromSnapshots() {
+        return this.compute('canRunFromSnapshots', () => hasAnyLink(this._links, 'run/snapshots'));
+    }
+
+    get canTrigger() {
+        return this.compute('canTrigger', () => hasAnyLink(this._links, 'trigger'));
+    }
+
+    get canUpdate() {
+        return this.compute('canUpdate', () => hasAnyLink(this._links, 'update'));
+    }
+
+    constructor(data?: IDynamicRuleDto) {
+        super(data);
+    }
+
+    init(_data: any) {
+        super.init(_data);
+        (<any>this).id = _data["id"];
+        (<any>this).createdBy = _data["createdBy"];
+        (<any>this).lastModifiedBy = _data["lastModifiedBy"];
+        (<any>this).created = _data["created"] ? DateTime.parseISO(_data["created"].toString()) : <any>undefined;
+        (<any>this).lastModified = _data["lastModified"] ? DateTime.parseISO(_data["lastModified"].toString()) : <any>undefined;
+        (<any>this).version = _data["version"];
+        (<any>this).isEnabled = _data["isEnabled"];
+        (<any>this).name = _data["name"];
+        (<any>this).trigger = _data["trigger"] ? RuleTriggerDto.fromJSON(_data["trigger"]) : <any>undefined;
+        if (_data["action"]) {
+            (<any>this).action = {} as any;
+            for (let key in _data["action"]) {
+                if (_data["action"].hasOwnProperty(key))
+                    (<any>(<any>this).action)![key] = _data["action"][key];
+            }
+        }
+        (<any>this).numSucceeded = _data["numSucceeded"];
+        (<any>this).numFailed = _data["numFailed"];
+        (<any>this).lastExecuted = _data["lastExecuted"] ? DateTime.parseISO(_data["lastExecuted"].toString()) : <any>undefined;
+        this.cleanup();
+        return this;
+    }
+
+    static fromJSON(data: any): DynamicRuleDto {
+        const result = new DynamicRuleDto().init(data);
+        result.cleanup();
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["id"] = this.id;
+        data["createdBy"] = this.createdBy;
+        data["lastModifiedBy"] = this.lastModifiedBy;
+        data["created"] = this.created ? this.created.toISOString() : <any>undefined;
+        data["lastModified"] = this.lastModified ? this.lastModified.toISOString() : <any>undefined;
+        data["version"] = this.version;
+        data["isEnabled"] = this.isEnabled;
+        data["name"] = this.name;
+        data["trigger"] = this.trigger ? this.trigger.toJSON() : <any>undefined;
+        if (this.action) {
+            data["action"] = {};
+            for (let key in this.action) {
+                if (this.action.hasOwnProperty(key))
+                    (<any>data["action"])[key] = (<any>this.action)[key];
+            }
+        }
+        data["numSucceeded"] = this.numSucceeded;
+        data["numFailed"] = this.numFailed;
+        data["lastExecuted"] = this.lastExecuted ? this.lastExecuted.toISOString() : <any>undefined;
+        super.toJSON(data);
+        return data;
+    }
+}
+
+export interface IDynamicRuleDto extends IResourceDto {
+    /** The ID of the rule. */
+    readonly id: string;
+    /** The user that has created the rule. */
+    readonly createdBy: string;
+    /** The user that has updated the rule. */
+    readonly lastModifiedBy: string;
+    /** The date and time when the rule has been created. */
+    readonly created: DateTime;
+    /** The date and time when the rule has been modified last. */
+    readonly lastModified: DateTime;
+    /** The version of the rule. */
+    readonly version: number;
+    /** Determines if the rule is enabled. */
+    readonly isEnabled: boolean;
+    /** Optional rule name. */
+    readonly name?: string | undefined;
+    /** The trigger properties. */
+    readonly trigger: RuleTriggerDto;
+    /** The action properties. */
+    readonly action: { [key: string]: any; };
+    /** The number of completed executions. */
+    readonly numSucceeded: number;
+    /** The number of failed executions. */
+    readonly numFailed: number;
+    /** The date and time when the rule was executed the last time. */
+    readonly lastExecuted?: DateTime | undefined;
+}
+
+export class DynamicUpdateRuleDto implements IDynamicUpdateRuleDto {
+    /** Uses the cache values because the actual object is frozen. */
+    protected readonly cachedValues: { [key: string]: any } = {};
+    /** Optional rule name. */
+    readonly name?: string | undefined;
+    /** The trigger properties. */
+    readonly trigger?: RuleTriggerDto | undefined;
+    /** The action properties. */
+    readonly action?: { [key: string]: any; } | undefined;
+    /** Enable or disable the rule. */
+    readonly isEnabled?: boolean | undefined;
+
+    constructor(data?: IDynamicUpdateRuleDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data: any) {
+        (<any>this).name = _data["name"];
+        (<any>this).trigger = _data["trigger"] ? RuleTriggerDto.fromJSON(_data["trigger"]) : <any>undefined;
+        if (_data["action"]) {
+            (<any>this).action = {} as any;
+            for (let key in _data["action"]) {
+                if (_data["action"].hasOwnProperty(key))
+                    (<any>(<any>this).action)![key] = _data["action"][key];
+            }
+        }
+        (<any>this).isEnabled = _data["isEnabled"];
+        this.cleanup();
+        return this;
+    }
+
+    static fromJSON(data: any): DynamicUpdateRuleDto {
+        const result = new DynamicUpdateRuleDto().init(data);
+        result.cleanup();
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["name"] = this.name;
+        data["trigger"] = this.trigger ? this.trigger.toJSON() : <any>undefined;
+        if (this.action) {
+            data["action"] = {};
+            for (let key in this.action) {
+                if (this.action.hasOwnProperty(key))
+                    (<any>data["action"])[key] = (<any>this.action)[key];
+            }
+        }
+        data["isEnabled"] = this.isEnabled;
+        return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
+    }
+
+    protected compute<T>(key: string, action: () => T): T {
+        if (!this.cachedValues.hasOwnProperty(key)) {
+            const value = action();
+            this.cachedValues[key] = value;
+            return value;
+        } else {
+            return this.cachedValues[key] as any;
+        }
+    }
+}
+
+export interface IDynamicUpdateRuleDto {
+    /** Optional rule name. */
+    readonly name?: string | undefined;
+    /** The trigger properties. */
+    readonly trigger?: RuleTriggerDto | undefined;
+    /** The action properties. */
+    readonly action?: { [key: string]: any; } | undefined;
+    /** Enable or disable the rule. */
+    readonly isEnabled?: boolean | undefined;
 }
 
 export interface FileParameter {

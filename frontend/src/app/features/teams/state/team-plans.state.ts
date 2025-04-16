@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { debug, DialogService, LoadingState, PlanDto, PlansLockedReason, ReferralInfo, shareSubscribed, State, TeamsState, VersionTag } from '@app/shared';
+import { debug, DialogService, LoadingState, PlanDto, PlansLockedReason, ReferralInfoDto, shareSubscribed, State, TeamsState, VersionTag } from '@app/shared';
 import { TeamPlansService } from '../internal';
 
 export interface PlanInfo {
@@ -33,7 +33,7 @@ interface Snapshot extends LoadingState {
     portalLink?: string;
 
     // The referral info.
-    referral?: ReferralInfo;
+    referral?: ReferralInfoDto;
 
     // The reason why the plan cannot be changed.
     locked?: PlansLockedReason;

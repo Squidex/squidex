@@ -8,7 +8,7 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, DateTime, ICreateRuleDto, IUpdateRuleDto, Resource, ResourceLinkDto, RuleDto, RuleElementDto, RuleElementPropertyDto, RuleEventDto, RuleEventsDto, RulesDto, RulesService, ScriptCompletions, SimulatedRuleEventDto, SimulatedRuleEventsDto, VersionTag } from '@app/shared/internal';
+import { ApiUrlConfig, ContentChangedRuleTriggerDto, DateTime, DynamicRuleDto, DynamicRulesDto, IDynamicCreateRuleDto, IDynamicUpdateRuleDto, ManualRuleTriggerDto, Resource, ResourceLinkDto, RuleElementDto, RuleElementPropertyDto, RuleEventDto, RuleEventsDto, RulesService, ScriptCompletions, SimulatedRuleEventDto, SimulatedRuleEventsDto, VersionTag } from '@app/shared/internal';
 
 describe('RulesService', () => {
     const version = new VersionTag('1');
@@ -128,7 +128,7 @@ describe('RulesService', () => {
 
     it('should make get request to get app rules',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
-            let rules: RulesDto;
+            let rules: DynamicRulesDto;
             rulesService.getRules('my-app').subscribe(result => {
                 rules = result;
             });
@@ -147,7 +147,7 @@ describe('RulesService', () => {
                 _links: {},
             });
 
-            expect(rules!).toEqual(new RulesDto({
+            expect(rules!).toEqual(new DynamicRulesDto({
                 items: [
                     createRule(12),
                     createRule(13),
@@ -159,20 +159,16 @@ describe('RulesService', () => {
 
     it('should make post request to create rule',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
-            const dto: ICreateRuleDto = {
-                trigger: {
-                    param1: 1,
-                    param2: 2,
-                    triggerType: 'ContentChanged',
-                },
+            const dto: IDynamicCreateRuleDto = {
+                trigger: new ManualRuleTriggerDto(),
                 action: {
                     param3: 3,
                     param4: 4,
                     actionType: 'Webhook',
                 },
-            } as any;
+            };
 
-            let rule: RuleDto;
+            let rule: DynamicRuleDto;
             rulesService.postRule('my-app', dto).subscribe(result => {
                 rule = result;
             });
@@ -189,18 +185,14 @@ describe('RulesService', () => {
 
     it('should make put request to update rule',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
-            const dto: IUpdateRuleDto = {
-                trigger: {
-                    param1: 1,
-                    param2: 2,
-                    triggerType: 'ContentChanged',
-                },
+            const dto: IDynamicUpdateRuleDto = {
+                trigger: new ManualRuleTriggerDto(),
                 action: {
                     param3: 3,
                     param4: 4,
                     actionType: 'Webhook',
                 },
-            } as any;
+            };
 
             const resource: Resource = {
                 _links: {
@@ -208,7 +200,7 @@ describe('RulesService', () => {
                 },
             };
 
-            let rule: RuleDto;
+            let rule: DynamicRuleDto;
             rulesService.putRule('my-app', resource, dto, version).subscribe(result => {
                 rule = result;
             });
@@ -468,9 +460,7 @@ describe('RulesService', () => {
             numFailed: id * 4,
             numSucceeded: id * 3,
             trigger: {
-                param1: 1,
-                param2: 2,
-                triggerType: `rule-trigger${key}`,
+                triggerType: 'ContentChanged',
             },
             action: {
                 param3: 3,
@@ -523,7 +513,7 @@ describe('RulesService', () => {
 export function createRule(id: number, suffix = '') {
     const key = `${id}${suffix}`;
 
-    return new RuleDto({
+    return new DynamicRuleDto({
         id: `id${id}`,
         created: DateTime.parseISO(buildDate(id, 10)),
         createdBy: `creator${id}`,
@@ -533,11 +523,7 @@ export function createRule(id: number, suffix = '') {
         name: `rule-name${key}`,
         numFailed: id * 4,
         numSucceeded: id * 3,
-        trigger: {
-            param1: 1,
-            param2: 2,
-            triggerType: `rule-trigger${key}`,
-        } as any,
+        trigger: new ContentChangedRuleTriggerDto(),
         action: {
             param3: 3,
             param4: 4,

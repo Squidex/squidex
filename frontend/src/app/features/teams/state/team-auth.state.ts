@@ -14,9 +14,6 @@ interface Snapshot extends LoadingState {
     // The current scheme.
     scheme?: AuthSchemeDto | null;
 
-    // Indicates if the user can update the auth settings.
-    canUpdate?: boolean;
-
     // The team version.
     version: VersionTag;
 }

@@ -9,7 +9,7 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { ActionsDto, ConfirmClickDirective, DropdownMenuComponent, EditableTitleComponent, ModalDirective, ModalModel, ModalPlacementDirective, RuleDto, RulesState, ToggleComponent, TranslatePipe, TriggersDto } from '@app/shared';
+import { ActionsDto, ConfirmClickDirective, DropdownMenuComponent, DynamicRuleDto, EditableTitleComponent, ModalDirective, ModalModel, ModalPlacementDirective, RulesState, ToggleComponent, TranslatePipe, TriggersDto } from '@app/shared';
 import { RuleElementComponent } from '../../shared/rule-element.component';
 
 @Component({
@@ -39,7 +39,7 @@ export class RuleComponent {
     public ruleActions!: ActionsDto;
 
     @Input({ required: true })
-    public rule!: RuleDto;
+    public rule!: DynamicRuleDto;
 
     public dropdown = new ModalModel();
 

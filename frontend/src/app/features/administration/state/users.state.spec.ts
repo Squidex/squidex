@@ -219,7 +219,7 @@ describe('UsersState', () => {
             ];
 
             usersService.setup(x => x.getUsers(10, 0, undefined))
-                .returns(() => of(new UsersDto({ items: newUsers, total: 200, _links: {} }))).verifiable();
+                .returns(() => of(new UsersDto({ items: newUsers, total: 200, _links: {} })));
 
             usersState.load().subscribe();
 

@@ -13,18 +13,19 @@ export const customMatchers: jasmine.CustomMatcherFactories = {
 
                 const omit = (obj: any) =>
                     Object.fromEntries(
-                        Object.entries(obj).filter(([key]) => !propsToIgnore.includes(key)),
+                        Object.entries(obj).filter(([key, value]) => value !== undefined && !propsToIgnore.includes(key)),
                     );
 
+                const diffBuilder = new (jasmine as any)['DiffBuilder']({ prettyPrinter: util.pp });
+
                 const result = {} as jasmine.CustomMatcherResult;
-                result.pass = util.equals(
+                result.pass = (util as any)['equals'](
                     omit(actual),
                     omit(expected),
+                    diffBuilder,
                 );
 
-                result.message = result.pass
-                    ? 'Expected objects not to be equal (ignoring props), but they are.'
-                    : 'Expected objects to be equal (ignoring props), but they are not.';
+                result.message = diffBuilder.getMessage();
 
                 return result;
             },

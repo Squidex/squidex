@@ -9,7 +9,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { ApiUrlConfig, ContributorDto, ContributorsDto, Resource, Versioned, VersionTag } from '@app/shared/internal';
-import { ContributorsMetadata, ResourceLinkDto } from '@app/shared/model';
+import { ContributorsMetadataDto, ResourceLinkDto } from '@app/shared/model';
 import { TeamContributorsService } from '../internal';
 
 describe('TeamContributorsService', () => {
@@ -131,7 +131,7 @@ export function createContributors(...ids: ReadonlyArray<number>) {
         _links: {
             create: new ResourceLinkDto({ method: 'POST', href: '/contributors' }),
         },
-        _meta: new ContributorsMetadata({
+        _meta: new ContributorsMetadataDto({
             isInvited: 'true',
         }),
     });

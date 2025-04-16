@@ -12,6 +12,7 @@ import { AppsService } from '../services/apps.service';
 import { createAssetScripts } from '../services/apps.service.spec';
 import { TestValues } from './_test-helpers';
 import { AssetScriptsState } from './asset-scripts.state';
+import { customMatchers } from 'src/spec/matchers';
 
 describe('AssetScriptsState', () => {
     const {
@@ -26,6 +27,10 @@ describe('AssetScriptsState', () => {
     let dialogs: IMock<DialogService>;
     let appsService: IMock<AppsService>;
     let assetScriptsState: AssetScriptsState;
+
+    beforeAll(function () {
+        jasmine.addMatchers(customMatchers);
+    });
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
@@ -45,7 +50,7 @@ describe('AssetScriptsState', () => {
 
             assetScriptsState.load().subscribe();
 
-            expect(assetScriptsState.snapshot.scripts).toEqual({ query: oldScripts.query, queryPre: oldScripts.queryPre });
+            expect(assetScriptsState.snapshot.scripts).toEqualIgnoringProps({ query: oldScripts.query, queryPre: oldScripts.queryPre });
             expect(assetScriptsState.snapshot.isLoaded).toBeTruthy();
             expect(assetScriptsState.snapshot.isLoading).toBeFalsy();
             expect(assetScriptsState.snapshot.version).toEqual(version);
@@ -92,7 +97,7 @@ describe('AssetScriptsState', () => {
 
             assetScriptsState.update(request).subscribe();
 
-            expect(assetScriptsState.snapshot.scripts).toEqual({ query: updated.query });
+            expect(assetScriptsState.snapshot.scripts).toEqualIgnoringProps({ query: updated.query, queryPre: updated.queryPre });
             expect(assetScriptsState.snapshot.version).toEqual(newVersion);
         });
     });

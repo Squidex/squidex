@@ -7,7 +7,7 @@
 
 import { firstValueFrom, of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, RuleDto, RulesDto, RulesService, versioned } from '@app/shared/internal';
+import { DialogService, DynamicRuleDto, DynamicRulesDto, RulesService, versioned } from '@app/shared/internal';
 import { createRule } from '../services/rules.service.spec';
 import { TestValues } from './_test-helpers';
 import { RulesState } from './rules.state';
@@ -42,7 +42,7 @@ describe('RulesState', () => {
     describe('Loading', () => {
         it('should load rules', () => {
             rulesService.setup(x => x.getRules(app))
-                .returns(() => of(new RulesDto(({ items: [rule1, rule2], runningRuleId: rule1.id, _links: {} })))).verifiable();
+                .returns(() => of(new DynamicRulesDto(({ items: [rule1, rule2], runningRuleId: rule1.id, _links: {} })))).verifiable();
 
             rulesState.load().subscribe();
 
@@ -50,7 +50,7 @@ describe('RulesState', () => {
             expect(rulesState.snapshot.isLoading).toBeFalsy();
             expect(rulesState.snapshot.rules).toEqual([rule1, rule2]);
 
-            let ruleRunning: RuleDto | undefined;
+            let ruleRunning: DynamicRuleDto | undefined;
             rulesState.runningRule.subscribe(result => {
                 ruleRunning = result;
             });
@@ -72,7 +72,7 @@ describe('RulesState', () => {
 
         it('should show notification on load if reload is true', () => {
             rulesService.setup(x => x.getRules(app))
-                .returns(() => of(new RulesDto(({ items: [rule1, rule2], _links: {} })))).verifiable();
+                .returns(() => of(new DynamicRulesDto(({ items: [rule1, rule2], _links: {} })))).verifiable();
 
             rulesState.load(true).subscribe();
 
@@ -85,7 +85,7 @@ describe('RulesState', () => {
     describe('Updates', () => {
         beforeEach(() => {
             rulesService.setup(x => x.getRules(app))
-                .returns(() => of(new RulesDto(({ items: [rule1, rule2], _links: {} })))).verifiable();
+                .returns(() => of(new DynamicRulesDto(({ items: [rule1, rule2], _links: {} })))).verifiable();
 
             rulesState.load().subscribe();
         });
@@ -177,7 +177,7 @@ describe('RulesState', () => {
     describe('Selection', () => {
         beforeEach(() => {
             rulesService.setup(x => x.getRules(app))
-                .returns(() => of(new RulesDto(({ items: [rule1, rule2], _links: {} })))).verifiable(Times.atLeastOnce());
+                .returns(() => of(new DynamicRulesDto(({ items: [rule1, rule2], _links: {} })))).verifiable(Times.atLeastOnce());
 
             rulesState.load().subscribe();
             rulesState.select(rule2.id).subscribe();
@@ -190,7 +190,7 @@ describe('RulesState', () => {
             ];
 
             rulesService.setup(x => x.getRules(app))
-                .returns(() => of(new RulesDto(({ items: newRules, _links: {} })))).verifiable();
+                .returns(() => of(new DynamicRulesDto(({ items: newRules, _links: {} })))).verifiable(Times.exactly(2));
 
             rulesState.load().subscribe();
 

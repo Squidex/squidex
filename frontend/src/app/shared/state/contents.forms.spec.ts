@@ -470,7 +470,7 @@ describe('ContentForm', () => {
             iso2Code: 'de',
             englishName: 'Getman',
             isMaster: false,
-            isOptional: false,
+            isOptional: true,
             fallback: [],
             _links: {},
         }),

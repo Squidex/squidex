@@ -95,7 +95,7 @@ export class AssetScriptsState extends State<Snapshot> {
     }
 
     private replaceAssetScripts(payload: AssetScriptsDto, version: VersionTag) {
-        const { canUpdate, _links: _, version: __, ...scripts } = payload;
+        const { canUpdate, _links: _, version: __, ...scripts } = payload.toJSON();
 
         this.next({
             canUpdate,

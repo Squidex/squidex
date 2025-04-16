@@ -8,7 +8,7 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, PlanChangedDto, PlanDto, PlansDto, PlansService, ReferralInfo, Versioned, VersionTag } from '@app/shared/internal';
+import { ApiUrlConfig, PlanChangedDto, PlanDto, PlansDto, PlansService, ReferralInfoDto, Versioned, VersionTag } from '@app/shared/internal';
 
 describe('PlansService', () => {
     const version = new VersionTag('1');
@@ -114,7 +114,7 @@ describe('PlansService', () => {
                             maxContributors: 6500,
                         }),
                     ],
-                    referral: new ReferralInfo({ code: 'CODE', earned: '0', condition: 'None' }),
+                    referral: new ReferralInfoDto({ code: 'CODE', earned: '0', condition: 'None' }),
                     locked: 'ManagedByTeam',
                 }),
                 version: new VersionTag('2'),

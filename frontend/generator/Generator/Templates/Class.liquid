@@ -1,0 +1,205 @@
+{% if HasDescription -%}
+/** {{ Description }} */
+{% endif -%}
+{% if ExportTypes %}export {% endif %}{% if IsAbstract %}abstract {% endif %}class {{ ClassName }}{{ Inheritance }} {
+{% if HasDiscriminator -%}
+    /** The discriminator. */
+    public readonly {{ BaseDiscriminator }}!: string;
+{% endif -%}
+{% unless HasInheritance -%}
+    /** Uses the cache values because the actual object is frozen. */
+    protected readonly cachedValues: { [key: string]: any } = {};
+{% endunless -%}
+{% for property in Properties -%}
+{%   if property.HasDescription -%}
+    /** {{ property.Description | strip }} */
+{%   endif -%}
+    {% if property.IsReadOnly %}readonly {% endif %}{{ property.PropertyName }}{% if property.IsOptional %}?{% elsif RequiresStrictPropertyInitialization %}!{% endif %}: {{ property.Type }}{{ property.TypePostfix }};
+{% endfor -%}
+{% if HasIndexerProperty -%}
+
+    [key: string]: {{ IndexerPropertyValueType }};
+{% endif -%}
+
+{% assign condition_temp = HasInheritance == false or ConvertConstructorInterfaceData -%}
+{% if GenerateConstructorInterface or HasBaseDiscriminator -%}
+    constructor({% if GenerateConstructorInterface %}data?: I{{ ClassName }}{% endif %}) {
+{%     if HasInheritance -%}
+        super({% if GenerateConstructorInterface %}data{% endif %});
+{%     endif -%}
+{%     if GenerateConstructorInterface and condition_temp -%}
+        if (data) {
+{%         if HasInheritance == false -%}
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+{%         endif -%}
+{%         if ConvertConstructorInterfaceData -%}
+{%             for property in Properties -%}
+{%                 if property.SupportsConstructorConversion -%}
+{%                     if property.IsArray -%}
+            if (data.{{ property.PropertyName }}) {
+                this.{{ property.PropertyName }} = [];
+                for (let i = 0; i < data.{{ property.PropertyName }}.length; i++) {
+                    let item = data.{{ property.PropertyName }}[i];
+                    this.{{ property.PropertyName }}[i] = item && !(<any>item).toJSON ? new {{ property.ArrayItemType }}(item) : <{{ property.ArrayItemType }}>item;
+                }
+            }
+{%                     elsif property.IsDictionary -%}
+            if (data.{{ property.PropertyName }}) {
+                this.{{ property.PropertyName }} = {};
+                for (let key in data.{{ property.PropertyName }}) {
+                    if (data.{{ property.PropertyName }}.hasOwnProperty(key)) {
+                        let item = data.{{ property.PropertyName }}[key];
+                        this.{{ property.PropertyName }}[key] = item && !(<any>item).toJSON ? new {{ property.DictionaryItemType }}(item) : <{{ property.DictionaryItemType }}>item;
+                    }
+                }
+            }
+{%                     else -%}
+            this.{{ property.PropertyName }} = data.{{ property.PropertyName }} && !(<any>data.{{ property.PropertyName }}).toJSON ? new {{ property.Type }}(data.{{ property.PropertyName }}) : <{{ property.Type }}>this.{{ property.PropertyName }};
+{%                     endif -%}
+{%                 endif -%}
+{%             endfor -%}
+{%         endif -%}
+        }
+{%     endif -%}
+{%     if HasBaseDiscriminator -%}
+        (<any>this).{{ BaseDiscriminator }} = "{{ DiscriminatorName }}";
+{%     endif -%}
+    }
+{% endif -%}
+
+    {% if HasInheritance and SupportsOverrideKeyword %}override {% endif %}init(_data: any{% if HandleReferences %}, _mappings?: any{% endif %}) {
+{% if HasInheritance -%}
+        super.init(_data);
+{% endif -%}
+{% if HasIndexerProperty or HasProperties -%}
+{%     if HasIndexerProperty -%}
+        for (var property in _data) {
+            if (_data.hasOwnProperty(property))
+                this[property] = _data[property];
+        }
+{%     endif -%}
+{%     for property in Properties -%}
+        {{ property.ConvertToClassCode | strip | tab }}
+{%     endfor -%}
+{% endif -%}
+        this.cleanup();
+        return this;
+    }
+
+    static {% if HasInheritance and SupportsOverrideKeyword %}override {% endif %}fromJSON(data: any{% if HandleReferences %}, _mappings?: any{% endif %}): {{ ClassName }} {
+{% if HandleReferences -%}
+{%   if HasBaseDiscriminator -%}
+{%     for derivedClass in DerivedClasses -%}
+        if (data["{{ BaseDiscriminator }}"] === "{{ derivedClass.Discriminator }}")
+{%       if derivedClass.IsAbstract -%}
+            throw new Error("The abstract class '{{ derivedClass.ClassName }}' cannot be instantiated.");
+{%       else -%}
+            return createInstance<{{ derivedClass.ClassName }}>(data, _mappings, {{ derivedClass.ClassName }});
+{%       endif -%}
+{%     endfor -%}
+{%   endif -%}
+{%   if IsAbstract -%}
+        throw new Error("The abstract class '{{ ClassName }}' cannot be instantiated.");
+{%   else -%}
+        return createInstance<{{ ClassName }}>(data, _mappings, {{ ClassName }});
+{%   endif -%}
+{% else -%}
+{%   if HasBaseDiscriminator -%}
+{%     for derivedClass in DerivedClasses -%}
+        if (data["{{ BaseDiscriminator }}"] === "{{ derivedClass.Discriminator }}") {
+{%       if derivedClass.IsAbstract -%}
+            throw new Error("The abstract class '{{ derivedClass.ClassName }}' cannot be instantiated.");
+{%       else -%}
+            return new {{ derivedClass.ClassName }}().init(data);
+{%       endif -%}
+        }
+{%     endfor -%}
+{%   endif -%}
+{%     if IsAbstract -%}
+        throw new Error("The abstract class '{{ ClassName }}' cannot be instantiated.");
+{%     else -%}
+        const result = new {{ ClassName }}().init(data);
+        result.cleanup();
+        return result;
+{%     endif -%}
+{% endif -%}
+    }
+
+    {% if HasInheritance and SupportsOverrideKeyword %}override {% endif %}toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+{% if HasIndexerProperty -%}
+        for (var property in this) {
+            if (this.hasOwnProperty(property))
+                data[property] = this[property];
+        }
+{% endif -%}
+{% if HasDiscriminator -%}
+        data["{{ BaseDiscriminator }}"] = "{{ DiscriminatorName }}";
+{% endif -%}
+{% for property in Properties -%}
+        {{ property.ConvertToJavaScriptCode | tab }}
+{% endfor -%}
+{% if HasInheritance -%}
+        super.toJSON(data);
+{% endif -%}
+        return data;
+    }
+{% if GenerateCloneMethod -%}
+
+    clone(): {{ ClassName }} {
+{%   if IsAbstract -%}
+        throw new Error("The abstract class '{{ ClassName }}' cannot be instantiated.");
+{%   else -%}
+        const json = this.toJSON();
+        let result = new {{ ClassName }}();
+        result.init(json);
+        return result;
+{%   endif -%}
+    }
+{% endif -%}
+{% unless HasInheritance -%}
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
+    }
+
+    protected compute<T>(key: string, action: () => T): T {
+        if (!this.cachedValues.hasOwnProperty(key)) {
+            const value = action();
+            this.cachedValues[key] = value;
+            return value;
+        } else {
+            return this.cachedValues[key] as any;
+        }
+    }
+{% endunless -%}
+}
+{% if GenerateConstructorInterface -%}
+
+{%   if HasDescription -%}
+/** {{ Description }} */
+{%   endif -%}
+{% if ExportTypes %}export {% endif %}interface I{{ ClassName }}{{ InterfaceInheritance }} {
+{%   for property in Properties -%}
+{%       if property.HasDescription -%}
+    /** {{ property.Description | strip }} */
+{%       endif -%}
+    readonly {{ property.PropertyName }}{% if property.IsOptional %}?{% endif %}: {{ property.ConstructorInterfaceType }}{{ property.TypePostfix }};
+{%   endfor -%}
+{%   if HasIndexerProperty -%}
+
+    [key: string]: {{ IndexerPropertyValueType }};
+{%   endif -%}
+}
+{% endif -%}

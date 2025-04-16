@@ -387,10 +387,10 @@ describe('ContentsService', () => {
 
             req.flush([{
                 jobIndex: 0,
-                contentId: '123',
+                id: '123',
             }, {
                 jobIndex: 1,
-                contentId: '456',
+                id: '456',
                 error: {
                     statusCode: 400,
                     message: 'Invalid',
@@ -399,7 +399,7 @@ describe('ContentsService', () => {
 
             expect(results!).toEqual([
                 new BulkResultDto({ jobIndex: 0, id: '123' }),
-                new BulkResultDto({ jobIndex: 0, id: '456', error: new ServerErrorDto({ statusCode: 400, message: 'Invalid' }) }),
+                new BulkResultDto({ jobIndex: 1, id: '456', error: new ServerErrorDto({ statusCode: 400, message: 'Invalid' }) }),
             ]);
         }));
 

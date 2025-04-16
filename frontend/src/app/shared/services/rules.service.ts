@@ -10,7 +10,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlConfig, HTTP, pretifyError, Resource, ScriptCompletions, StringHelper, VersionOrTag } from '@app/framework';
-import { CreateRuleDto, ICreateRuleDto, IUpdateRuleDto, RuleDto, RuleElementDto, RuleEventsDto, RulesDto, SimulatedRuleEventsDto, UpdateRuleDto } from './../model';
+import { DynamicCreateRuleDto, DynamicRuleDto, DynamicRulesDto, DynamicUpdateRuleDto, IDynamicCreateRuleDto, IDynamicUpdateRuleDto, RuleElementDto, RuleEventsDto, SimulatedRuleEventsDto } from './../model';
 
 export type RuleElementMetadataDto = Readonly<{
     description: string;
@@ -97,34 +97,34 @@ export class RulesService {
             pretifyError('i18n:rules.loadFailed'));
     }
 
-    public getRules(appName: string): Observable<RulesDto> {
+    public getRules(appName: string): Observable<DynamicRulesDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules`);
 
         return this.http.get<any>(url).pipe(
             map(body => {
-                return RulesDto.fromJSON(body);
+                return DynamicRulesDto.fromJSON(body);
             }),
             pretifyError('i18n:rules.loadFailed'));
     }
 
-    public postRule(appName: string, dto: ICreateRuleDto): Observable<RuleDto> {
+    public postRule(appName: string, dto: IDynamicCreateRuleDto): Observable<DynamicRuleDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules`);
 
-        return HTTP.postVersioned(this.http, url, new CreateRuleDto(dto).toJSON()).pipe(
+        return HTTP.postVersioned(this.http, url, new DynamicCreateRuleDto(dto).toJSON()).pipe(
             map(({ payload }) => {
-                return RuleDto.fromJSON(payload.body);
+                return DynamicRuleDto.fromJSON(payload.body);
             }),
             pretifyError('i18n:rules.createFailed'));
     }
 
-    public putRule(appName: string, resource: Resource, dto: IUpdateRuleDto, version: VersionOrTag): Observable<RuleDto> {
+    public putRule(appName: string, resource: Resource, dto: IDynamicUpdateRuleDto, version: VersionOrTag): Observable<DynamicRuleDto> {
         const link = resource._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, new UpdateRuleDto(dto).toJSON()).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, new DynamicUpdateRuleDto(dto).toJSON()).pipe(
             map(({ payload }) => {
-                return RuleDto.fromJSON(payload.body);
+                return DynamicRuleDto.fromJSON(payload.body);
             }),
             pretifyError('i18n:rules.updateFailed'));
     }

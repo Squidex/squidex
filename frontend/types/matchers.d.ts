@@ -7,6 +7,6 @@
 
 declare namespace jasmine {
     interface Matchers<T> {
-        toEqualIgnoringProps(expected: T, propsToIgnore?: string[]): boolean;
+        toEqualIgnoringProps(expected: Expected<T>, propsToIgnore?: string[]): boolean;
     }
 }

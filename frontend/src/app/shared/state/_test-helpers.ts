@@ -109,7 +109,7 @@ function createNestedField({ properties, id, isDisabled }: FieldValues) {
         isDisabled: isDisabled || false,
         isHidden: false,
         isLocked: false,
-        name: `field${id}`,
+        name: `nested${id}`,
         properties,
         _links: {},
     });

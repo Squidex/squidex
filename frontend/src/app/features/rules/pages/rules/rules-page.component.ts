@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { ALL_TRIGGERS, LayoutComponent, ListViewComponent, RuleDto, RuleElementDto, RulesService, RulesState, SchemasState, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { ALL_TRIGGERS, DynamicRuleDto, LayoutComponent, ListViewComponent, RuleElementDto, RulesService, RulesState, SchemasState, ShortcutDirective, SidebarMenuDirective, TitleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { RuleComponent } from './rule.component';
 
 @Component({
@@ -63,11 +63,11 @@ export class RulesPageComponent implements OnInit {
         this.rulesState.runCancel();
     }
 
-    public delete(rule: RuleDto) {
+    public delete(rule: DynamicRuleDto) {
         this.rulesState.delete(rule);
     }
 
-    public toggle(rule: RuleDto) {
+    public toggle(rule: DynamicRuleDto) {
         this.rulesState.update(rule, { isEnabled: !rule.isEnabled });
     }
 }
