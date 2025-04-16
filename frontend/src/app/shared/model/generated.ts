@@ -55,13 +55,13 @@ export class ServerErrorDto implements IServerErrorDto {
                 (<any>this).details!.push(item);
         }
         (<any>this).statusCode = _data["statusCode"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): ServerErrorDto {
         const result = new ServerErrorDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -77,11 +77,11 @@ export class ServerErrorDto implements IServerErrorDto {
                 data["details"].push(item);
         }
         data["statusCode"] = this.statusCode;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -136,13 +136,13 @@ export class UserPropertyDto implements IUserPropertyDto {
     init(_data: any) {
         (<any>this).name = _data["name"];
         (<any>this).value = _data["value"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): UserPropertyDto {
         const result = new UserPropertyDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -150,11 +150,11 @@ export class UserPropertyDto implements IUserPropertyDto {
         data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         data["value"] = this.value;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -198,24 +198,24 @@ export class UpdateSettingDto implements IUpdateSettingDto {
 
     init(_data: any) {
         (<any>this).value = _data["value"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): UpdateSettingDto {
         const result = new UpdateSettingDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         data["value"] = this.value;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -265,7 +265,7 @@ export abstract class ResourceDto implements IResourceDto {
                     (<any>(<any>this)._links)![key] = _data["_links"][key] ? ResourceLinkDto.fromJSON(_data["_links"][key]) : new ResourceLinkDto();
             }
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
@@ -282,11 +282,11 @@ export abstract class ResourceDto implements IResourceDto {
                     (<any>data["_links"])[key] = this._links[key] ? this._links[key].toJSON() : <any>undefined;
             }
         }
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -335,13 +335,13 @@ export class UsersDto extends ResourceDto implements IUsersDto {
             for (let item of _data["items"])
                 (<any>this).items!.push(UserDto.fromJSON(item));
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): UsersDto {
         const result = new UsersDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -354,6 +354,7 @@ export class UsersDto extends ResourceDto implements IUsersDto {
                 data["items"].push(item.toJSON());
         }
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -408,13 +409,13 @@ export class UserDto extends ResourceDto implements IUserDto {
             for (let item of _data["permissions"])
                 (<any>this).permissions!.push(item);
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): UserDto {
         const result = new UserDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -430,6 +431,7 @@ export class UserDto extends ResourceDto implements IUserDto {
                 data["permissions"].push(item);
         }
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -470,13 +472,13 @@ export class ResourceLinkDto implements IResourceLinkDto {
         (<any>this).href = _data["href"];
         (<any>this).method = _data["method"];
         (<any>this).metadata = _data["metadata"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): ResourceLinkDto {
         const result = new ResourceLinkDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -485,11 +487,11 @@ export class ResourceLinkDto implements IResourceLinkDto {
         data["href"] = this.href;
         data["method"] = this.method;
         data["metadata"] = this.metadata;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -550,13 +552,13 @@ export class CreateUserDto implements ICreateUserDto {
             for (let item of _data["permissions"])
                 (<any>this).permissions!.push(item);
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): CreateUserDto {
         const result = new CreateUserDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -570,11 +572,11 @@ export class CreateUserDto implements ICreateUserDto {
             for (let item of this.permissions)
                 data["permissions"].push(item);
         }
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -637,13 +639,13 @@ export class UpdateUserDto implements IUpdateUserDto {
             for (let item of _data["permissions"])
                 (<any>this).permissions!.push(item);
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): UpdateUserDto {
         const result = new UpdateUserDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -657,11 +659,11 @@ export class UpdateUserDto implements IUpdateUserDto {
             for (let item of this.permissions)
                 data["permissions"].push(item);
         }
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -702,19 +704,20 @@ export class ResourcesDto extends ResourceDto implements IResourcesDto {
 
     init(_data: any) {
         super.init(_data);
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): ResourcesDto {
         const result = new ResourcesDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -745,13 +748,13 @@ export class UpdateProfileDto implements IUpdateProfileDto {
                     (<any>(<any>this).answers)![key] = _data["answers"][key];
             }
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): UpdateProfileDto {
         const result = new UpdateProfileDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -764,11 +767,11 @@ export class UpdateProfileDto implements IUpdateProfileDto {
                     (<any>data["answers"])[key] = (<any>this.answers)[key];
             }
         }
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -818,13 +821,13 @@ export class TranslationDto implements ITranslationDto {
         (<any>this).status = _data["status"];
         (<any>this).result = _data["result"];
         (<any>this).text = _data["text"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): TranslationDto {
         const result = new TranslationDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -833,11 +836,11 @@ export class TranslationDto implements ITranslationDto {
         data["status"] = this.status;
         data["result"] = this.result;
         data["text"] = this.text;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -902,13 +905,13 @@ export class TranslateDto implements ITranslateDto {
         (<any>this).text = _data["text"];
         (<any>this).targetLanguage = _data["targetLanguage"];
         (<any>this).sourceLanguage = _data["sourceLanguage"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): TranslateDto {
         const result = new TranslateDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -917,11 +920,11 @@ export class TranslateDto implements ITranslateDto {
         data["text"] = this.text;
         data["targetLanguage"] = this.targetLanguage;
         data["sourceLanguage"] = this.sourceLanguage;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -967,13 +970,13 @@ export class TemplatesDto extends ResourceDto implements ITemplatesDto {
             for (let item of _data["items"])
                 (<any>this).items!.push(TemplateDto.fromJSON(item));
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): TemplatesDto {
         const result = new TemplatesDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -985,6 +988,7 @@ export class TemplatesDto extends ResourceDto implements ITemplatesDto {
                 data["items"].push(item.toJSON());
         }
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -1014,13 +1018,13 @@ export class TemplateDto extends ResourceDto implements ITemplateDto {
         (<any>this).title = _data["title"];
         (<any>this).description = _data["description"];
         (<any>this).isStarter = _data["isStarter"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): TemplateDto {
         const result = new TemplateDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -1031,6 +1035,7 @@ export class TemplateDto extends ResourceDto implements ITemplateDto {
         data["description"] = this.description;
         data["isStarter"] = this.isStarter;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -1057,13 +1062,13 @@ export class TemplateDetailsDto extends ResourceDto implements ITemplateDetailsD
     init(_data: any) {
         super.init(_data);
         (<any>this).details = _data["details"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): TemplateDetailsDto {
         const result = new TemplateDetailsDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -1071,6 +1076,7 @@ export class TemplateDetailsDto extends ResourceDto implements ITemplateDetailsD
         data = typeof data === 'object' ? data : {}; 
         data["details"] = this.details;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -1109,13 +1115,13 @@ export class ContributorsDto extends ResourceDto implements IContributorsDto {
         }
         (<any>this).maxContributors = _data["maxContributors"];
         (<any>this)._meta = _data["_meta"] ? ContributorsMetadataDto.fromJSON(_data["_meta"]) : <any>undefined;
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): ContributorsDto {
         const result = new ContributorsDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -1129,6 +1135,7 @@ export class ContributorsDto extends ResourceDto implements IContributorsDto {
         data["maxContributors"] = this.maxContributors;
         data["_meta"] = this._meta ? this._meta.toJSON() : <any>undefined;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -1174,13 +1181,13 @@ export class ContributorDto extends ResourceDto implements IContributorDto {
         (<any>this).contributorName = _data["contributorName"];
         (<any>this).contributorEmail = _data["contributorEmail"];
         (<any>this).role = _data["role"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): ContributorDto {
         const result = new ContributorDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -1191,6 +1198,7 @@ export class ContributorDto extends ResourceDto implements IContributorDto {
         data["contributorEmail"] = this.contributorEmail;
         data["role"] = this.role;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -1223,24 +1231,24 @@ export class ContributorsMetadataDto implements IContributorsMetadataDto {
 
     init(_data: any) {
         (<any>this).isInvited = _data["isInvited"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): ContributorsMetadataDto {
         const result = new ContributorsMetadataDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         data["isInvited"] = this.isInvited;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -1290,13 +1298,13 @@ export class AssignContributorDto implements IAssignContributorDto {
         (<any>this).contributorId = _data["contributorId"];
         (<any>this).role = _data["role"];
         (<any>this).invite = _data["invite"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): AssignContributorDto {
         const result = new AssignContributorDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -1305,11 +1313,11 @@ export class AssignContributorDto implements IAssignContributorDto {
         data["contributorId"] = this.contributorId;
         data["role"] = this.role;
         data["invite"] = this.invite;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -1392,13 +1400,13 @@ export class TeamDto extends ResourceDto implements ITeamDto {
         (<any>this).created = _data["created"] ? DateTime.parseISO(_data["created"].toString()) : <any>undefined;
         (<any>this).lastModified = _data["lastModified"] ? DateTime.parseISO(_data["lastModified"].toString()) : <any>undefined;
         (<any>this).roleName = _data["roleName"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): TeamDto {
         const result = new TeamDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -1413,6 +1421,7 @@ export class TeamDto extends ResourceDto implements ITeamDto {
         data["lastModified"] = this.lastModified ? this.lastModified.toISOString() : <any>undefined;
         data["roleName"] = this.roleName;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -1453,24 +1462,24 @@ export class CreateTeamDto implements ICreateTeamDto {
 
     init(_data: any) {
         (<any>this).name = _data["name"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): CreateTeamDto {
         const result = new CreateTeamDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -1514,24 +1523,24 @@ export class UpdateTeamDto implements IUpdateTeamDto {
 
     init(_data: any) {
         (<any>this).name = _data["name"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): UpdateTeamDto {
         const result = new UpdateTeamDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -1569,13 +1578,13 @@ export class AuthSchemeResponseDto extends ResourceDto implements IAuthSchemeRes
     init(_data: any) {
         super.init(_data);
         (<any>this).scheme = _data["scheme"] ? AuthSchemeDto.fromJSON(_data["scheme"]) : <any>undefined;
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): AuthSchemeResponseDto {
         const result = new AuthSchemeResponseDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -1583,6 +1592,7 @@ export class AuthSchemeResponseDto extends ResourceDto implements IAuthSchemeRes
         data = typeof data === 'object' ? data : {}; 
         data["scheme"] = this.scheme ? this.scheme.toJSON() : <any>undefined;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -1624,13 +1634,13 @@ export class AuthSchemeDto implements IAuthSchemeDto {
         (<any>this).clientSecret = _data["clientSecret"];
         (<any>this).authority = _data["authority"];
         (<any>this).signoutRedirectUrl = _data["signoutRedirectUrl"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): AuthSchemeDto {
         const result = new AuthSchemeDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -1642,11 +1652,11 @@ export class AuthSchemeDto implements IAuthSchemeDto {
         data["clientSecret"] = this.clientSecret;
         data["authority"] = this.authority;
         data["signoutRedirectUrl"] = this.signoutRedirectUrl;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -1700,24 +1710,24 @@ export class AuthSchemeValueDto implements IAuthSchemeValueDto {
 
     init(_data: any) {
         (<any>this).scheme = _data["scheme"] ? AuthSchemeDto.fromJSON(_data["scheme"]) : <any>undefined;
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): AuthSchemeValueDto {
         const result = new AuthSchemeValueDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         data["scheme"] = this.scheme ? this.scheme.toJSON() : <any>undefined;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -1761,24 +1771,24 @@ export class LogDownloadDto implements ILogDownloadDto {
 
     init(_data: any) {
         (<any>this).downloadUrl = _data["downloadUrl"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): LogDownloadDto {
         const result = new LogDownloadDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         data["downloadUrl"] = this.downloadUrl;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -1852,13 +1862,13 @@ export class CallsUsageDto implements ICallsUsageDto {
                     (<any>(<any>this).details)![key] = _data["details"][key] ? _data["details"][key].map((i: any) => CallsUsagePerDateDto.fromJSON(i)) : [];
             }
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): CallsUsageDto {
         const result = new CallsUsageDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -1879,11 +1889,11 @@ export class CallsUsageDto implements ICallsUsageDto {
                     (<any>data["details"])[key] = (<any>this.details)[key];
             }
         }
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -1952,13 +1962,13 @@ export class CallsUsagePerDateDto implements ICallsUsagePerDateDto {
         (<any>this).totalCalls = _data["totalCalls"];
         (<any>this).totalBytes = _data["totalBytes"];
         (<any>this).averageElapsedMs = _data["averageElapsedMs"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): CallsUsagePerDateDto {
         const result = new CallsUsagePerDateDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -1968,11 +1978,11 @@ export class CallsUsagePerDateDto implements ICallsUsagePerDateDto {
         data["totalCalls"] = this.totalCalls;
         data["totalBytes"] = this.totalBytes;
         data["averageElapsedMs"] = this.averageElapsedMs;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -2025,13 +2035,13 @@ export class CurrentStorageDto implements ICurrentStorageDto {
     init(_data: any) {
         (<any>this).size = _data["size"];
         (<any>this).maxAllowed = _data["maxAllowed"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): CurrentStorageDto {
         const result = new CurrentStorageDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -2039,11 +2049,11 @@ export class CurrentStorageDto implements ICurrentStorageDto {
         data = typeof data === 'object' ? data : {}; 
         data["size"] = this.size;
         data["maxAllowed"] = this.maxAllowed;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -2095,13 +2105,13 @@ export class StorageUsagePerDateDto implements IStorageUsagePerDateDto {
         (<any>this).date = _data["date"] ? DateTime.parseISO(_data["date"].toString()) : <any>undefined;
         (<any>this).totalCount = _data["totalCount"];
         (<any>this).totalSize = _data["totalSize"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): StorageUsagePerDateDto {
         const result = new StorageUsagePerDateDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -2110,11 +2120,11 @@ export class StorageUsagePerDateDto implements IStorageUsagePerDateDto {
         data["date"] = this.date ? this.date.toISOString() : <any>undefined;
         data["totalCount"] = this.totalCount;
         data["totalSize"] = this.totalSize;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -2166,13 +2176,13 @@ export class SearchResultDto extends ResourceDto implements ISearchResultDto {
         (<any>this).name = _data["name"];
         (<any>this).type = _data["type"];
         (<any>this).label = _data["label"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): SearchResultDto {
         const result = new SearchResultDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -2182,6 +2192,7 @@ export class SearchResultDto extends ResourceDto implements ISearchResultDto {
         data["type"] = this.type;
         data["label"] = this.label;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -2455,13 +2466,13 @@ export class SchemaDto extends ResourceDto implements ISchemaDto {
             for (let item of _data["fields"])
                 (<any>this).fields!.push(FieldDto.fromJSON(item));
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): SchemaDto {
         const result = new SchemaDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -2508,6 +2519,7 @@ export class SchemaDto extends ResourceDto implements ISchemaDto {
                 data["fields"].push(item.toJSON());
         }
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -2604,13 +2616,13 @@ export class SchemaPropertiesDto implements ISchemaPropertiesDto {
             for (let item of _data["tags"])
                 (<any>this).tags!.push(item);
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): SchemaPropertiesDto {
         const result = new SchemaPropertiesDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -2629,11 +2641,11 @@ export class SchemaPropertiesDto implements ISchemaPropertiesDto {
             for (let item of this.tags)
                 data["tags"].push(item);
         }
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -2708,13 +2720,13 @@ export class SchemaScriptsDto implements ISchemaScriptsDto {
         (<any>this).update = _data["update"];
         (<any>this).delete = _data["delete"];
         (<any>this).change = _data["change"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): SchemaScriptsDto {
         const result = new SchemaScriptsDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -2726,11 +2738,11 @@ export class SchemaScriptsDto implements ISchemaScriptsDto {
         data["update"] = this.update;
         data["delete"] = this.delete;
         data["change"] = this.change;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -2790,13 +2802,13 @@ export class FieldRuleDto implements IFieldRuleDto {
         (<any>this).action = _data["action"];
         (<any>this).field = _data["field"];
         (<any>this).condition = _data["condition"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): FieldRuleDto {
         const result = new FieldRuleDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -2805,11 +2817,11 @@ export class FieldRuleDto implements IFieldRuleDto {
         data["action"] = this.action;
         data["field"] = this.field;
         data["condition"] = this.condition;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -2944,13 +2956,13 @@ export class FieldDto extends ResourceDto implements IFieldDto {
             for (let item of _data["nested"])
                 (<any>this).nested!.push(NestedFieldDto.fromJSON(item));
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): FieldDto {
         const result = new FieldDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -2969,6 +2981,7 @@ export class FieldDto extends ResourceDto implements IFieldDto {
                 data["nested"].push(item.toJSON());
         }
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -3053,7 +3066,7 @@ export abstract class FieldPropertiesDto implements IFieldPropertiesDto {
             for (let item of _data["tags"])
                 (<any>this).tags!.push(item);
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
@@ -3118,11 +3131,11 @@ export abstract class FieldPropertiesDto implements IFieldPropertiesDto {
             for (let item of this.tags)
                 data["tags"].push(item);
         }
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -3192,13 +3205,13 @@ export class ArrayFieldPropertiesDto extends FieldPropertiesDto implements IArra
             for (let item of _data["uniqueFields"])
                 (<any>this).uniqueFields!.push(item);
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): ArrayFieldPropertiesDto {
         const result = new ArrayFieldPropertiesDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -3213,6 +3226,7 @@ export class ArrayFieldPropertiesDto extends FieldPropertiesDto implements IArra
                 data["uniqueFields"].push(item);
         }
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -3329,13 +3343,13 @@ export class AssetsFieldPropertiesDto extends FieldPropertiesDto implements IAss
                 (<any>this).allowedExtensions!.push(item);
         }
         (<any>this).allowDuplicates = _data["allowDuplicates"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): AssetsFieldPropertiesDto {
         const result = new AssetsFieldPropertiesDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -3377,6 +3391,7 @@ export class AssetsFieldPropertiesDto extends FieldPropertiesDto implements IAss
         }
         data["allowDuplicates"] = this.allowDuplicates;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -3478,13 +3493,13 @@ export class BooleanFieldPropertiesDto extends FieldPropertiesDto implements IBo
         (<any>this).defaultValue = _data["defaultValue"];
         (<any>this).inlineEditable = _data["inlineEditable"];
         (<any>this).editor = _data["editor"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): BooleanFieldPropertiesDto {
         const result = new BooleanFieldPropertiesDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -3501,6 +3516,7 @@ export class BooleanFieldPropertiesDto extends FieldPropertiesDto implements IBo
         data["inlineEditable"] = this.inlineEditable;
         data["editor"] = this.editor;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -3547,13 +3563,13 @@ export class ComponentFieldPropertiesDto extends FieldPropertiesDto implements I
             for (let item of _data["schemaIds"])
                 (<any>this).schemaIds!.push(item);
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): ComponentFieldPropertiesDto {
         const result = new ComponentFieldPropertiesDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -3565,6 +3581,7 @@ export class ComponentFieldPropertiesDto extends FieldPropertiesDto implements I
                 data["schemaIds"].push(item);
         }
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -3614,13 +3631,13 @@ export class ComponentsFieldPropertiesDto extends FieldPropertiesDto implements 
             for (let item of _data["uniqueFields"])
                 (<any>this).uniqueFields!.push(item);
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): ComponentsFieldPropertiesDto {
         const result = new ComponentsFieldPropertiesDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -3640,6 +3657,7 @@ export class ComponentsFieldPropertiesDto extends FieldPropertiesDto implements 
                 data["uniqueFields"].push(item);
         }
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -3701,13 +3719,13 @@ export class DateTimeFieldPropertiesDto extends FieldPropertiesDto implements ID
         (<any>this).format = _data["format"];
         (<any>this).editor = _data["editor"];
         (<any>this).calculatedDefaultValue = _data["calculatedDefaultValue"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): DateTimeFieldPropertiesDto {
         const result = new DateTimeFieldPropertiesDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -3727,6 +3745,7 @@ export class DateTimeFieldPropertiesDto extends FieldPropertiesDto implements ID
         data["editor"] = this.editor;
         data["calculatedDefaultValue"] = this.calculatedDefaultValue;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -3782,13 +3801,13 @@ export class GeolocationFieldPropertiesDto extends FieldPropertiesDto implements
     init(_data: any) {
         super.init(_data);
         (<any>this).editor = _data["editor"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): GeolocationFieldPropertiesDto {
         const result = new GeolocationFieldPropertiesDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -3796,6 +3815,7 @@ export class GeolocationFieldPropertiesDto extends FieldPropertiesDto implements
         data = typeof data === 'object' ? data : {}; 
         data["editor"] = this.editor;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -3831,13 +3851,13 @@ export class JsonFieldPropertiesDto extends FieldPropertiesDto implements IJsonF
     init(_data: any) {
         super.init(_data);
         (<any>this).graphQLSchema = _data["graphQLSchema"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): JsonFieldPropertiesDto {
         const result = new JsonFieldPropertiesDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -3845,6 +3865,7 @@ export class JsonFieldPropertiesDto extends FieldPropertiesDto implements IJsonF
         data = typeof data === 'object' ? data : {}; 
         data["graphQLSchema"] = this.graphQLSchema;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -3905,13 +3926,13 @@ export class NumberFieldPropertiesDto extends FieldPropertiesDto implements INum
         (<any>this).isUnique = _data["isUnique"];
         (<any>this).inlineEditable = _data["inlineEditable"];
         (<any>this).editor = _data["editor"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): NumberFieldPropertiesDto {
         const result = new NumberFieldPropertiesDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -3936,6 +3957,7 @@ export class NumberFieldPropertiesDto extends FieldPropertiesDto implements INum
         data["inlineEditable"] = this.inlineEditable;
         data["editor"] = this.editor;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -4033,13 +4055,13 @@ export class ReferencesFieldPropertiesDto extends FieldPropertiesDto implements 
             for (let item of _data["schemaIds"])
                 (<any>this).schemaIds!.push(item);
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): ReferencesFieldPropertiesDto {
         const result = new ReferencesFieldPropertiesDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -4070,6 +4092,7 @@ export class ReferencesFieldPropertiesDto extends FieldPropertiesDto implements 
                 data["schemaIds"].push(item);
         }
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -4160,13 +4183,13 @@ export class RichTextFieldPropertiesDto extends FieldPropertiesDto implements IR
             for (let item of _data["schemaIds"])
                 (<any>this).schemaIds!.push(item);
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): RichTextFieldPropertiesDto {
         const result = new RichTextFieldPropertiesDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -4190,6 +4213,7 @@ export class RichTextFieldPropertiesDto extends FieldPropertiesDto implements IR
                 data["schemaIds"].push(item);
         }
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -4310,13 +4334,13 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto implements IStr
         (<any>this).createEnum = _data["createEnum"];
         (<any>this).contentType = _data["contentType"];
         (<any>this).editor = _data["editor"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): StringFieldPropertiesDto {
         const result = new StringFieldPropertiesDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -4361,6 +4385,7 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto implements IStr
         data["contentType"] = this.contentType;
         data["editor"] = this.editor;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -4487,13 +4512,13 @@ export class TagsFieldPropertiesDto extends FieldPropertiesDto implements ITagsF
         }
         (<any>this).createEnum = _data["createEnum"];
         (<any>this).editor = _data["editor"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): TagsFieldPropertiesDto {
         const result = new TagsFieldPropertiesDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -4521,6 +4546,7 @@ export class TagsFieldPropertiesDto extends FieldPropertiesDto implements ITagsF
         data["createEnum"] = this.createEnum;
         data["editor"] = this.editor;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -4578,13 +4604,13 @@ export class UIFieldPropertiesDto extends FieldPropertiesDto implements IUIField
     init(_data: any) {
         super.init(_data);
         (<any>this).editor = _data["editor"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): UIFieldPropertiesDto {
         const result = new UIFieldPropertiesDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -4592,6 +4618,7 @@ export class UIFieldPropertiesDto extends FieldPropertiesDto implements IUIField
         data = typeof data === 'object' ? data : {}; 
         data["editor"] = this.editor;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -4672,13 +4699,13 @@ export class NestedFieldDto extends ResourceDto implements INestedFieldDto {
         (<any>this).isLocked = _data["isLocked"];
         (<any>this).isDisabled = _data["isDisabled"];
         (<any>this).properties = _data["properties"] ? FieldPropertiesDto.fromJSON(_data["properties"]) : <any>undefined;
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): NestedFieldDto {
         const result = new NestedFieldDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -4691,6 +4718,7 @@ export class NestedFieldDto extends ResourceDto implements INestedFieldDto {
         data["isDisabled"] = this.isDisabled;
         data["properties"] = this.properties ? this.properties.toJSON() : <any>undefined;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -4733,13 +4761,13 @@ export class AddFieldDto implements IAddFieldDto {
         (<any>this).name = _data["name"];
         (<any>this).partitioning = _data["partitioning"];
         (<any>this).properties = _data["properties"] ? FieldPropertiesDto.fromJSON(_data["properties"]) : <any>undefined;
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): AddFieldDto {
         const result = new AddFieldDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -4748,11 +4776,11 @@ export class AddFieldDto implements IAddFieldDto {
         data["name"] = this.name;
         data["partitioning"] = this.partitioning;
         data["properties"] = this.properties ? this.properties.toJSON() : <any>undefined;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -4811,13 +4839,13 @@ export class ConfigureUIFieldsDto implements IConfigureUIFieldsDto {
             for (let item of _data["fieldsInReferences"])
                 (<any>this).fieldsInReferences!.push(item);
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): ConfigureUIFieldsDto {
         const result = new ConfigureUIFieldsDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -4833,11 +4861,11 @@ export class ConfigureUIFieldsDto implements IConfigureUIFieldsDto {
             for (let item of this.fieldsInReferences)
                 data["fieldsInReferences"].push(item);
         }
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -4887,13 +4915,13 @@ export class ReorderFieldsDto implements IReorderFieldsDto {
             for (let item of _data["fieldIds"])
                 (<any>this).fieldIds!.push(item);
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): ReorderFieldsDto {
         const result = new ReorderFieldsDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -4904,11 +4932,11 @@ export class ReorderFieldsDto implements IReorderFieldsDto {
             for (let item of this.fieldIds)
                 data["fieldIds"].push(item);
         }
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -4952,24 +4980,24 @@ export class UpdateFieldDto implements IUpdateFieldDto {
 
     init(_data: any) {
         (<any>this).properties = _data["properties"] ? FieldPropertiesDto.fromJSON(_data["properties"]) : <any>undefined;
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): UpdateFieldDto {
         const result = new UpdateFieldDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         data["properties"] = this.properties ? this.properties.toJSON() : <any>undefined;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -5015,13 +5043,13 @@ export class IndexesDto extends ResourceDto implements IIndexesDto {
             for (let item of _data["items"])
                 (<any>this).items!.push(IndexDto.fromJSON(item));
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): IndexesDto {
         const result = new IndexesDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -5033,6 +5061,7 @@ export class IndexesDto extends ResourceDto implements IIndexesDto {
                 data["items"].push(item.toJSON());
         }
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -5064,13 +5093,13 @@ export class IndexDto extends ResourceDto implements IIndexDto {
             for (let item of _data["fields"])
                 (<any>this).fields!.push(IndexFieldDto.fromJSON(item));
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): IndexDto {
         const result = new IndexDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -5083,6 +5112,7 @@ export class IndexDto extends ResourceDto implements IIndexDto {
                 data["fields"].push(item.toJSON());
         }
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -5114,13 +5144,13 @@ export class IndexFieldDto implements IIndexFieldDto {
     init(_data: any) {
         (<any>this).name = _data["name"];
         (<any>this).order = _data["order"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): IndexFieldDto {
         const result = new IndexFieldDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -5128,11 +5158,11 @@ export class IndexFieldDto implements IIndexFieldDto {
         data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         data["order"] = this.order;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -5189,13 +5219,13 @@ export class CreateIndexDto implements ICreateIndexDto {
             for (let item of _data["fields"])
                 (<any>this).fields!.push(IndexFieldDto.fromJSON(item));
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): CreateIndexDto {
         const result = new CreateIndexDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -5206,11 +5236,11 @@ export class CreateIndexDto implements ICreateIndexDto {
             for (let item of this.fields)
                 data["fields"].push(item.toJSON());
         }
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -5256,13 +5286,13 @@ export class SchemasDto extends ResourceDto implements ISchemasDto {
             for (let item of _data["items"])
                 (<any>this).items!.push(SchemaDto.fromJSON(item));
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): SchemasDto {
         const result = new SchemasDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -5274,6 +5304,7 @@ export class SchemasDto extends ResourceDto implements ISchemasDto {
                 data["items"].push(item.toJSON());
         }
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -5346,7 +5377,7 @@ export abstract class UpsertSchemaDto implements IUpsertSchemaDto {
         }
         (<any>this).category = _data["category"];
         (<any>this).isPublished = _data["isPublished"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
@@ -5387,11 +5418,11 @@ export abstract class UpsertSchemaDto implements IUpsertSchemaDto {
         }
         data["category"] = this.category;
         data["isPublished"] = this.isPublished;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -5451,13 +5482,13 @@ export class CreateSchemaDto extends UpsertSchemaDto implements ICreateSchemaDto
         (<any>this).name = _data["name"];
         (<any>this).type = _data["type"];
         (<any>this).isSingleton = _data["isSingleton"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): CreateSchemaDto {
         const result = new CreateSchemaDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -5467,6 +5498,7 @@ export class CreateSchemaDto extends UpsertSchemaDto implements ICreateSchemaDto
         data["type"] = this.type;
         data["isSingleton"] = this.isSingleton;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -5519,13 +5551,13 @@ export class UpsertSchemaFieldDto implements IUpsertSchemaFieldDto {
             for (let item of _data["nested"])
                 (<any>this).nested!.push(UpsertSchemaNestedFieldDto.fromJSON(item));
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): UpsertSchemaFieldDto {
         const result = new UpsertSchemaFieldDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -5542,11 +5574,11 @@ export class UpsertSchemaFieldDto implements IUpsertSchemaFieldDto {
             for (let item of this.nested)
                 data["nested"].push(item.toJSON());
         }
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -5614,13 +5646,13 @@ export class UpsertSchemaNestedFieldDto implements IUpsertSchemaNestedFieldDto {
         (<any>this).isLocked = _data["isLocked"];
         (<any>this).isDisabled = _data["isDisabled"];
         (<any>this).properties = _data["properties"] ? FieldPropertiesDto.fromJSON(_data["properties"]) : <any>undefined;
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): UpsertSchemaNestedFieldDto {
         const result = new UpsertSchemaNestedFieldDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -5631,11 +5663,11 @@ export class UpsertSchemaNestedFieldDto implements IUpsertSchemaNestedFieldDto {
         data["isLocked"] = this.isLocked;
         data["isDisabled"] = this.isDisabled;
         data["properties"] = this.properties ? this.properties.toJSON() : <any>undefined;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -5709,13 +5741,13 @@ export class UpdateSchemaDto implements IUpdateSchemaDto {
             for (let item of _data["tags"])
                 (<any>this).tags!.push(item);
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): UpdateSchemaDto {
         const result = new UpdateSchemaDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -5732,11 +5764,11 @@ export class UpdateSchemaDto implements IUpdateSchemaDto {
             for (let item of this.tags)
                 data["tags"].push(item);
         }
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -5789,13 +5821,13 @@ export class SynchronizeSchemaDto extends UpsertSchemaDto implements ISynchroniz
         super.init(_data);
         (<any>this).noFieldDeletion = _data["noFieldDeletion"];
         (<any>this).noFieldRecreation = _data["noFieldRecreation"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): SynchronizeSchemaDto {
         const result = new SynchronizeSchemaDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -5804,6 +5836,7 @@ export class SynchronizeSchemaDto extends UpsertSchemaDto implements ISynchroniz
         data["noFieldDeletion"] = this.noFieldDeletion;
         data["noFieldRecreation"] = this.noFieldRecreation;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -5832,24 +5865,24 @@ export class ChangeCategoryDto implements IChangeCategoryDto {
 
     init(_data: any) {
         (<any>this).name = _data["name"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): ChangeCategoryDto {
         const result = new ChangeCategoryDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -5897,13 +5930,13 @@ export class ConfigureFieldRulesDto implements IConfigureFieldRulesDto {
             for (let item of _data["fieldRules"])
                 (<any>this).fieldRules!.push(FieldRuleDto.fromJSON(item));
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): ConfigureFieldRulesDto {
         const result = new ConfigureFieldRulesDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -5914,11 +5947,11 @@ export class ConfigureFieldRulesDto implements IConfigureFieldRulesDto {
             for (let item of this.fieldRules)
                 data["fieldRules"].push(item.toJSON());
         }
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -5984,13 +6017,13 @@ export class RuleElementDto implements IRuleElementDto {
             for (let item of _data["properties"])
                 (<any>this).properties!.push(RuleElementPropertyDto.fromJSON(item));
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): RuleElementDto {
         const result = new RuleElementDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -6007,11 +6040,11 @@ export class RuleElementDto implements IRuleElementDto {
             for (let item of this.properties)
                 data["properties"].push(item.toJSON());
         }
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -6089,13 +6122,13 @@ export class RuleElementPropertyDto implements IRuleElementPropertyDto {
         (<any>this).description = _data["description"];
         (<any>this).isFormattable = _data["isFormattable"];
         (<any>this).isRequired = _data["isRequired"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): RuleElementPropertyDto {
         const result = new RuleElementPropertyDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -6112,11 +6145,11 @@ export class RuleElementPropertyDto implements IRuleElementPropertyDto {
         data["description"] = this.description;
         data["isFormattable"] = this.isFormattable;
         data["isRequired"] = this.isRequired;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -6187,13 +6220,13 @@ export class RulesDto extends ResourceDto implements IRulesDto {
                 (<any>this).items!.push(RuleDto.fromJSON(item));
         }
         (<any>this).runningRuleId = _data["runningRuleId"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): RulesDto {
         const result = new RulesDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -6206,6 +6239,7 @@ export class RulesDto extends ResourceDto implements IRulesDto {
         }
         data["runningRuleId"] = this.runningRuleId;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -6264,13 +6298,13 @@ export class RuleDto extends ResourceDto implements IRuleDto {
         (<any>this).numSucceeded = _data["numSucceeded"];
         (<any>this).numFailed = _data["numFailed"];
         (<any>this).lastExecuted = _data["lastExecuted"] ? DateTime.parseISO(_data["lastExecuted"].toString()) : <any>undefined;
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): RuleDto {
         const result = new RuleDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -6290,6 +6324,7 @@ export class RuleDto extends ResourceDto implements IRuleDto {
         data["numFailed"] = this.numFailed;
         data["lastExecuted"] = this.lastExecuted ? this.lastExecuted.toISOString() : <any>undefined;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -6340,7 +6375,7 @@ export abstract class RuleTriggerDto implements IRuleTriggerDto {
     }
 
     init(_data: any) {
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
@@ -6369,11 +6404,11 @@ export abstract class RuleTriggerDto implements IRuleTriggerDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         data["triggerType"] = "RuleTriggerDto";
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -6410,13 +6445,13 @@ export class AssetChangedRuleTriggerDto extends RuleTriggerDto implements IAsset
     init(_data: any) {
         super.init(_data);
         (<any>this).condition = _data["condition"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): AssetChangedRuleTriggerDto {
         const result = new AssetChangedRuleTriggerDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -6424,6 +6459,7 @@ export class AssetChangedRuleTriggerDto extends RuleTriggerDto implements IAsset
         data = typeof data === 'object' ? data : {}; 
         data["condition"] = this.condition;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -6445,13 +6481,13 @@ export class CommentRuleTriggerDto extends RuleTriggerDto implements ICommentRul
     init(_data: any) {
         super.init(_data);
         (<any>this).condition = _data["condition"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): CommentRuleTriggerDto {
         const result = new CommentRuleTriggerDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -6459,6 +6495,7 @@ export class CommentRuleTriggerDto extends RuleTriggerDto implements ICommentRul
         data = typeof data === 'object' ? data : {}; 
         data["condition"] = this.condition;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -6494,13 +6531,13 @@ export class ContentChangedRuleTriggerDto extends RuleTriggerDto implements ICon
                 (<any>this).referencedSchemas!.push(SchemaConditionDto.fromJSON(item));
         }
         (<any>this).handleAll = _data["handleAll"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): ContentChangedRuleTriggerDto {
         const result = new ContentChangedRuleTriggerDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -6518,6 +6555,7 @@ export class ContentChangedRuleTriggerDto extends RuleTriggerDto implements ICon
         }
         data["handleAll"] = this.handleAll;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -6549,13 +6587,13 @@ export class SchemaConditionDto implements ISchemaConditionDto {
     init(_data: any) {
         (<any>this).schemaId = _data["schemaId"];
         (<any>this).condition = _data["condition"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): SchemaConditionDto {
         const result = new SchemaConditionDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -6563,11 +6601,11 @@ export class SchemaConditionDto implements ISchemaConditionDto {
         data = typeof data === 'object' ? data : {}; 
         data["schemaId"] = this.schemaId;
         data["condition"] = this.condition;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -6603,19 +6641,20 @@ export class ManualRuleTriggerDto extends RuleTriggerDto implements IManualRuleT
 
     init(_data: any) {
         super.init(_data);
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): ManualRuleTriggerDto {
         const result = new ManualRuleTriggerDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -6635,13 +6674,13 @@ export class SchemaChangedRuleTriggerDto extends RuleTriggerDto implements ISche
     init(_data: any) {
         super.init(_data);
         (<any>this).condition = _data["condition"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): SchemaChangedRuleTriggerDto {
         const result = new SchemaChangedRuleTriggerDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -6649,6 +6688,7 @@ export class SchemaChangedRuleTriggerDto extends RuleTriggerDto implements ISche
         data = typeof data === 'object' ? data : {}; 
         data["condition"] = this.condition;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -6673,13 +6713,13 @@ export class UsageRuleTriggerDto extends RuleTriggerDto implements IUsageRuleTri
         super.init(_data);
         (<any>this).limit = _data["limit"];
         (<any>this).numDays = _data["numDays"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): UsageRuleTriggerDto {
         const result = new UsageRuleTriggerDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -6688,6 +6728,7 @@ export class UsageRuleTriggerDto extends RuleTriggerDto implements IUsageRuleTri
         data["limit"] = this.limit;
         data["numDays"] = this.numDays;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -6716,7 +6757,7 @@ export abstract class RuleActionDto implements IRuleActionDto {
     }
 
     init(_data: any) {
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
@@ -6781,11 +6822,11 @@ export abstract class RuleActionDto implements IRuleActionDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         data["actionType"] = "RuleActionDto";
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -6834,13 +6875,13 @@ export class AlgoliaRuleActionDto extends RuleActionDto implements IAlgoliaRuleA
         (<any>this).indexName = _data["indexName"];
         (<any>this).document = _data["document"];
         (<any>this).delete = _data["delete"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): AlgoliaRuleActionDto {
         const result = new AlgoliaRuleActionDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -6852,6 +6893,7 @@ export class AlgoliaRuleActionDto extends RuleActionDto implements IAlgoliaRuleA
         data["document"] = this.document;
         data["delete"] = this.delete;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -6887,13 +6929,13 @@ export class AzureQueueRuleActionDto extends RuleActionDto implements IAzureQueu
         (<any>this).connectionString = _data["connectionString"];
         (<any>this).queue = _data["queue"];
         (<any>this).payload = _data["payload"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): AzureQueueRuleActionDto {
         const result = new AzureQueueRuleActionDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -6903,6 +6945,7 @@ export class AzureQueueRuleActionDto extends RuleActionDto implements IAzureQueu
         data["queue"] = this.queue;
         data["payload"] = this.payload;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -6931,13 +6974,13 @@ export class CommentRuleActionDto extends RuleActionDto implements ICommentRuleA
         super.init(_data);
         (<any>this).text = _data["text"];
         (<any>this).client = _data["client"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): CommentRuleActionDto {
         const result = new CommentRuleActionDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -6946,6 +6989,7 @@ export class CommentRuleActionDto extends RuleActionDto implements ICommentRuleA
         data["text"] = this.text;
         data["client"] = this.client;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -6978,13 +7022,13 @@ export class CreateContentRuleActionDto extends RuleActionDto implements ICreate
         (<any>this).schema = _data["schema"];
         (<any>this).client = _data["client"];
         (<any>this).publish = _data["publish"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): CreateContentRuleActionDto {
         const result = new CreateContentRuleActionDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -6995,6 +7039,7 @@ export class CreateContentRuleActionDto extends RuleActionDto implements ICreate
         data["client"] = this.client;
         data["publish"] = this.publish;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -7040,13 +7085,13 @@ export class DiscourseRuleActionDto extends RuleActionDto implements IDiscourseR
         (<any>this).title = _data["title"];
         (<any>this).topic = _data["topic"];
         (<any>this).category = _data["category"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): DiscourseRuleActionDto {
         const result = new DiscourseRuleActionDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -7060,6 +7105,7 @@ export class DiscourseRuleActionDto extends RuleActionDto implements IDiscourseR
         data["topic"] = this.topic;
         data["category"] = this.category;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -7108,13 +7154,13 @@ export class ElasticSearchRuleActionDto extends RuleActionDto implements IElasti
         (<any>this).password = _data["password"];
         (<any>this).document = _data["document"];
         (<any>this).delete = _data["delete"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): ElasticSearchRuleActionDto {
         const result = new ElasticSearchRuleActionDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -7127,6 +7173,7 @@ export class ElasticSearchRuleActionDto extends RuleActionDto implements IElasti
         data["document"] = this.document;
         data["delete"] = this.delete;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -7179,13 +7226,13 @@ export class EmailRuleActionDto extends RuleActionDto implements IEmailRuleActio
         (<any>this).messageTo = _data["messageTo"];
         (<any>this).messageSubject = _data["messageSubject"];
         (<any>this).messageBody = _data["messageBody"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): EmailRuleActionDto {
         const result = new EmailRuleActionDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -7200,6 +7247,7 @@ export class EmailRuleActionDto extends RuleActionDto implements IEmailRuleActio
         data["messageSubject"] = this.messageSubject;
         data["messageBody"] = this.messageBody;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -7238,13 +7286,13 @@ export class FastlyRuleActionDto extends RuleActionDto implements IFastlyRuleAct
         super.init(_data);
         (<any>this).apiKey = _data["apiKey"];
         (<any>this).serviceId = _data["serviceId"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): FastlyRuleActionDto {
         const result = new FastlyRuleActionDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -7253,6 +7301,7 @@ export class FastlyRuleActionDto extends RuleActionDto implements IFastlyRuleAct
         data["apiKey"] = this.apiKey;
         data["serviceId"] = this.serviceId;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -7294,13 +7343,13 @@ export class MediumRuleActionDto extends RuleActionDto implements IMediumRuleAct
         (<any>this).tags = _data["tags"];
         (<any>this).publicationId = _data["publicationId"];
         (<any>this).isHtml = _data["isHtml"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): MediumRuleActionDto {
         const result = new MediumRuleActionDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -7314,6 +7363,7 @@ export class MediumRuleActionDto extends RuleActionDto implements IMediumRuleAct
         data["publicationId"] = this.publicationId;
         data["isHtml"] = this.isHtml;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -7356,13 +7406,13 @@ export class NotificationRuleActionDto extends RuleActionDto implements INotific
         (<any>this).text = _data["text"];
         (<any>this).url = _data["url"];
         (<any>this).client = _data["client"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): NotificationRuleActionDto {
         const result = new NotificationRuleActionDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -7373,6 +7423,7 @@ export class NotificationRuleActionDto extends RuleActionDto implements INotific
         data["url"] = this.url;
         data["client"] = this.client;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -7415,13 +7466,13 @@ export class OpenSearchRuleActionDto extends RuleActionDto implements IOpenSearc
         (<any>this).password = _data["password"];
         (<any>this).document = _data["document"];
         (<any>this).delete = _data["delete"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): OpenSearchRuleActionDto {
         const result = new OpenSearchRuleActionDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -7434,6 +7485,7 @@ export class OpenSearchRuleActionDto extends RuleActionDto implements IOpenSearc
         data["document"] = this.document;
         data["delete"] = this.delete;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -7468,13 +7520,13 @@ export class PrerenderRuleActionDto extends RuleActionDto implements IPrerenderR
         super.init(_data);
         (<any>this).token = _data["token"];
         (<any>this).url = _data["url"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): PrerenderRuleActionDto {
         const result = new PrerenderRuleActionDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -7483,6 +7535,7 @@ export class PrerenderRuleActionDto extends RuleActionDto implements IPrerenderR
         data["token"] = this.token;
         data["url"] = this.url;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -7506,13 +7559,13 @@ export class ScriptRuleActionDto extends RuleActionDto implements IScriptRuleAct
     init(_data: any) {
         super.init(_data);
         (<any>this).script = _data["script"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): ScriptRuleActionDto {
         const result = new ScriptRuleActionDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -7520,6 +7573,7 @@ export class ScriptRuleActionDto extends RuleActionDto implements IScriptRuleAct
         data = typeof data === 'object' ? data : {}; 
         data["script"] = this.script;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -7558,13 +7612,13 @@ export class SignalRRuleActionDto extends RuleActionDto implements ISignalRRuleA
         (<any>this).methodName = _data["methodName"];
         (<any>this).target = _data["target"];
         (<any>this).payload = _data["payload"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): SignalRRuleActionDto {
         const result = new SignalRRuleActionDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -7577,6 +7631,7 @@ export class SignalRRuleActionDto extends RuleActionDto implements ISignalRRuleA
         data["target"] = this.target;
         data["payload"] = this.payload;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -7621,13 +7676,13 @@ export class SlackRuleActionDto extends RuleActionDto implements ISlackRuleActio
         super.init(_data);
         (<any>this).webhookUrl = _data["webhookUrl"];
         (<any>this).text = _data["text"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): SlackRuleActionDto {
         const result = new SlackRuleActionDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -7636,6 +7691,7 @@ export class SlackRuleActionDto extends RuleActionDto implements ISlackRuleActio
         data["webhookUrl"] = this.webhookUrl;
         data["text"] = this.text;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -7665,13 +7721,13 @@ export class TweetRuleActionDto extends RuleActionDto implements ITweetRuleActio
         (<any>this).accessToken = _data["accessToken"];
         (<any>this).accessSecret = _data["accessSecret"];
         (<any>this).text = _data["text"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): TweetRuleActionDto {
         const result = new TweetRuleActionDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -7681,6 +7737,7 @@ export class TweetRuleActionDto extends RuleActionDto implements ITweetRuleActio
         data["accessSecret"] = this.accessSecret;
         data["text"] = this.text;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -7718,13 +7775,13 @@ export class TypesenseRuleActionDto extends RuleActionDto implements ITypesenseR
         (<any>this).apiKey = _data["apiKey"];
         (<any>this).document = _data["document"];
         (<any>this).delete = _data["delete"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): TypesenseRuleActionDto {
         const result = new TypesenseRuleActionDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -7736,6 +7793,7 @@ export class TypesenseRuleActionDto extends RuleActionDto implements ITypesenseR
         data["document"] = this.document;
         data["delete"] = this.delete;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -7780,13 +7838,13 @@ export class WebhookRuleActionDto extends RuleActionDto implements IWebhookRuleA
         (<any>this).payloadType = _data["payloadType"];
         (<any>this).headers = _data["headers"];
         (<any>this).sharedSecret = _data["sharedSecret"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): WebhookRuleActionDto {
         const result = new WebhookRuleActionDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -7799,6 +7857,7 @@ export class WebhookRuleActionDto extends RuleActionDto implements IWebhookRuleA
         data["headers"] = this.headers;
         data["sharedSecret"] = this.sharedSecret;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -7848,13 +7907,13 @@ export class CreateRuleDto implements ICreateRuleDto {
     init(_data: any) {
         (<any>this).trigger = _data["trigger"] ? RuleTriggerDto.fromJSON(_data["trigger"]) : <any>undefined;
         (<any>this).action = _data["action"] ? RuleActionDto.fromJSON(_data["action"]) : <any>undefined;
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): CreateRuleDto {
         const result = new CreateRuleDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -7862,11 +7921,11 @@ export class CreateRuleDto implements ICreateRuleDto {
         data = typeof data === 'object' ? data : {}; 
         data["trigger"] = this.trigger ? this.trigger.toJSON() : <any>undefined;
         data["action"] = this.action ? this.action.toJSON() : <any>undefined;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -7921,13 +7980,13 @@ export class UpdateRuleDto implements IUpdateRuleDto {
         (<any>this).trigger = _data["trigger"] ? RuleTriggerDto.fromJSON(_data["trigger"]) : <any>undefined;
         (<any>this).action = _data["action"] ? RuleActionDto.fromJSON(_data["action"]) : <any>undefined;
         (<any>this).isEnabled = _data["isEnabled"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): UpdateRuleDto {
         const result = new UpdateRuleDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -7937,11 +7996,11 @@ export class UpdateRuleDto implements IUpdateRuleDto {
         data["trigger"] = this.trigger ? this.trigger.toJSON() : <any>undefined;
         data["action"] = this.action ? this.action.toJSON() : <any>undefined;
         data["isEnabled"] = this.isEnabled;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -7992,13 +8051,13 @@ export class SimulatedRuleEventsDto extends ResourceDto implements ISimulatedRul
             for (let item of _data["items"])
                 (<any>this).items!.push(SimulatedRuleEventDto.fromJSON(item));
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): SimulatedRuleEventsDto {
         const result = new SimulatedRuleEventsDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -8011,6 +8070,7 @@ export class SimulatedRuleEventsDto extends ResourceDto implements ISimulatedRul
                 data["items"].push(item.toJSON());
         }
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -8067,13 +8127,13 @@ export class SimulatedRuleEventDto implements ISimulatedRuleEventDto {
             for (let item of _data["skipReasons"])
                 (<any>this).skipReasons!.push(item);
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): SimulatedRuleEventDto {
         const result = new SimulatedRuleEventDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -8092,11 +8152,11 @@ export class SimulatedRuleEventDto implements ISimulatedRuleEventDto {
             for (let item of this.skipReasons)
                 data["skipReasons"].push(item);
         }
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -8177,13 +8237,13 @@ export class RuleEventsDto extends ResourceDto implements IRuleEventsDto {
             for (let item of _data["items"])
                 (<any>this).items!.push(RuleEventDto.fromJSON(item));
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): RuleEventsDto {
         const result = new RuleEventsDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -8196,6 +8256,7 @@ export class RuleEventsDto extends ResourceDto implements IRuleEventsDto {
                 data["items"].push(item.toJSON());
         }
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -8250,13 +8311,13 @@ export class RuleEventDto extends ResourceDto implements IRuleEventDto {
         (<any>this).nextAttempt = _data["nextAttempt"] ? DateTime.parseISO(_data["nextAttempt"].toString()) : <any>undefined;
         (<any>this).result = _data["result"];
         (<any>this).jobResult = _data["jobResult"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): RuleEventDto {
         const result = new RuleEventDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -8272,6 +8333,7 @@ export class RuleEventDto extends ResourceDto implements IRuleEventDto {
         data["result"] = this.result;
         data["jobResult"] = this.jobResult;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -8352,13 +8414,13 @@ export class PlansDto implements IPlansDto {
         (<any>this).portalLink = _data["portalLink"];
         (<any>this).referral = _data["referral"] ? ReferralInfoDto.fromJSON(_data["referral"]) : <any>undefined;
         (<any>this).locked = _data["locked"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): PlansDto {
         const result = new PlansDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -8374,11 +8436,11 @@ export class PlansDto implements IPlansDto {
         data["portalLink"] = this.portalLink;
         data["referral"] = this.referral ? this.referral.toJSON() : <any>undefined;
         data["locked"] = this.locked;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -8462,13 +8524,13 @@ export class PlanDto implements IPlanDto {
         (<any>this).maxApiCalls = _data["maxApiCalls"];
         (<any>this).maxAssetSize = _data["maxAssetSize"];
         (<any>this).maxContributors = _data["maxContributors"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): PlanDto {
         const result = new PlanDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -8485,11 +8547,11 @@ export class PlanDto implements IPlanDto {
         data["maxApiCalls"] = this.maxApiCalls;
         data["maxAssetSize"] = this.maxAssetSize;
         data["maxContributors"] = this.maxContributors;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -8556,13 +8618,13 @@ export class ReferralInfoDto implements IReferralInfoDto {
         (<any>this).code = _data["code"];
         (<any>this).earned = _data["earned"];
         (<any>this).condition = _data["condition"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): ReferralInfoDto {
         const result = new ReferralInfoDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -8571,11 +8633,11 @@ export class ReferralInfoDto implements IReferralInfoDto {
         data["code"] = this.code;
         data["earned"] = this.earned;
         data["condition"] = this.condition;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -8629,24 +8691,24 @@ export class PlanChangedDto implements IPlanChangedDto {
 
     init(_data: any) {
         (<any>this).redirectUri = _data["redirectUri"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): PlanChangedDto {
         const result = new PlanChangedDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         data["redirectUri"] = this.redirectUri;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -8690,24 +8752,24 @@ export class ChangePlanDto implements IChangePlanDto {
 
     init(_data: any) {
         (<any>this).planId = _data["planId"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): ChangePlanDto {
         const result = new ChangePlanDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         data["planId"] = this.planId;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -8758,13 +8820,13 @@ export class FeaturesDto implements IFeaturesDto {
                 (<any>this).features!.push(FeatureDto.fromJSON(item));
         }
         (<any>this).version = _data["version"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): FeaturesDto {
         const result = new FeaturesDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -8776,11 +8838,11 @@ export class FeaturesDto implements IFeaturesDto {
                 data["features"].push(item.toJSON());
         }
         data["version"] = this.version;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -8829,13 +8891,13 @@ export class FeatureDto implements IFeatureDto {
     init(_data: any) {
         (<any>this).name = _data["name"];
         (<any>this).text = _data["text"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): FeatureDto {
         const result = new FeatureDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -8843,11 +8905,11 @@ export class FeatureDto implements IFeatureDto {
         data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         data["text"] = this.text;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -8896,13 +8958,13 @@ export class LanguageDto implements ILanguageDto {
     init(_data: any) {
         (<any>this).iso2Code = _data["iso2Code"];
         (<any>this).englishName = _data["englishName"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): LanguageDto {
         const result = new LanguageDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -8910,11 +8972,11 @@ export class LanguageDto implements ILanguageDto {
         data = typeof data === 'object' ? data : {}; 
         data["iso2Code"] = this.iso2Code;
         data["englishName"] = this.englishName;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -8962,13 +9024,13 @@ export class JobsDto extends ResourceDto implements IJobsDto {
             for (let item of _data["items"])
                 (<any>this).items!.push(JobDto.fromJSON(item));
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): JobsDto {
         const result = new JobsDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -8980,6 +9042,7 @@ export class JobsDto extends ResourceDto implements IJobsDto {
                 data["items"].push(item.toJSON());
         }
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -9050,13 +9113,13 @@ export class JobDto extends ResourceDto implements IJobDto {
                 (<any>this).log!.push(JobLogMessageDto.fromJSON(item));
         }
         (<any>this).canDownload = _data["canDownload"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): JobDto {
         const result = new JobDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -9082,6 +9145,7 @@ export class JobDto extends ResourceDto implements IJobDto {
         }
         data["canDownload"] = this.canDownload;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -9137,13 +9201,13 @@ export class JobLogMessageDto implements IJobLogMessageDto {
     init(_data: any) {
         (<any>this).timestamp = _data["timestamp"] ? DateTime.parseISO(_data["timestamp"].toString()) : <any>undefined;
         (<any>this).message = _data["message"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): JobLogMessageDto {
         const result = new JobLogMessageDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -9151,11 +9215,11 @@ export class JobLogMessageDto implements IJobLogMessageDto {
         data = typeof data === 'object' ? data : {}; 
         data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
         data["message"] = this.message;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -9216,13 +9280,13 @@ export class HistoryEventDto implements IHistoryEventDto {
         (<any>this).eventId = _data["eventId"];
         (<any>this).created = _data["created"] ? DateTime.parseISO(_data["created"].toString()) : <any>undefined;
         (<any>this).version = _data["version"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): HistoryEventDto {
         const result = new HistoryEventDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -9234,11 +9298,11 @@ export class HistoryEventDto implements IHistoryEventDto {
         data["eventId"] = this.eventId;
         data["created"] = this.created ? this.created.toISOString() : <any>undefined;
         data["version"] = this.version;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -9290,13 +9354,13 @@ export class EventConsumersDto extends ResourceDto implements IEventConsumersDto
             for (let item of _data["items"])
                 (<any>this).items!.push(EventConsumerDto.fromJSON(item));
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): EventConsumersDto {
         const result = new EventConsumersDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -9308,6 +9372,7 @@ export class EventConsumersDto extends ResourceDto implements IEventConsumersDto
                 data["items"].push(item.toJSON());
         }
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -9355,13 +9420,13 @@ export class EventConsumerDto extends ResourceDto implements IEventConsumerDto {
         (<any>this).name = _data["name"];
         (<any>this).error = _data["error"];
         (<any>this).position = _data["position"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): EventConsumerDto {
         const result = new EventConsumerDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -9374,6 +9439,7 @@ export class EventConsumerDto extends ResourceDto implements IEventConsumerDto {
         data["error"] = this.error;
         data["position"] = this.position;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -9426,13 +9492,13 @@ export class ContentsDto extends ResourceDto implements IContentsDto {
             for (let item of _data["statuses"])
                 (<any>this).statuses!.push(StatusInfoDto.fromJSON(item));
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): ContentsDto {
         const result = new ContentsDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -9450,6 +9516,7 @@ export class ContentsDto extends ResourceDto implements IContentsDto {
                 data["statuses"].push(item.toJSON());
         }
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -9575,13 +9642,13 @@ export class ContentDto extends ResourceDto implements IContentDto {
         }
         (<any>this).isDeleted = _data["isDeleted"];
         (<any>this).version = _data["version"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): ContentDto {
         const result = new ContentDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -9617,6 +9684,7 @@ export class ContentDto extends ResourceDto implements IContentDto {
         data["isDeleted"] = this.isDeleted;
         data["version"] = this.version;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -9691,13 +9759,13 @@ export class ScheduleJobDto implements IScheduleJobDto {
         (<any>this).dueTime = _data["dueTime"] ? DateTime.parseISO(_data["dueTime"].toString()) : <any>undefined;
         (<any>this).color = _data["color"];
         (<any>this).scheduledBy = _data["scheduledBy"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): ScheduleJobDto {
         const result = new ScheduleJobDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -9708,11 +9776,11 @@ export class ScheduleJobDto implements IScheduleJobDto {
         data["dueTime"] = this.dueTime ? this.dueTime.toISOString() : <any>undefined;
         data["color"] = this.color;
         data["scheduledBy"] = this.scheduledBy;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -9767,13 +9835,13 @@ export class StatusInfoDto implements IStatusInfoDto {
     init(_data: any) {
         (<any>this).status = _data["status"];
         (<any>this).color = _data["color"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): StatusInfoDto {
         const result = new StatusInfoDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -9781,11 +9849,11 @@ export class StatusInfoDto implements IStatusInfoDto {
         data = typeof data === 'object' ? data : {}; 
         data["status"] = this.status;
         data["color"] = this.color;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -9844,13 +9912,13 @@ export class QueryDto implements IQueryDto {
         (<any>this).oData = _data["oData"];
         (<any>this).q = _data["q"];
         (<any>this).parentId = _data["parentId"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): QueryDto {
         const result = new QueryDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -9864,11 +9932,11 @@ export class QueryDto implements IQueryDto {
         data["oData"] = this.oData;
         data["q"] = this.q;
         data["parentId"] = this.parentId;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -9927,13 +9995,13 @@ export class BulkResultDto implements IBulkResultDto {
         (<any>this).jobIndex = _data["jobIndex"];
         (<any>this).id = _data["id"];
         (<any>this).contentId = _data["contentId"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): BulkResultDto {
         const result = new BulkResultDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -9943,11 +10011,11 @@ export class BulkResultDto implements IBulkResultDto {
         data["jobIndex"] = this.jobIndex;
         data["id"] = this.id;
         data["contentId"] = this.contentId;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -10010,13 +10078,13 @@ export class ImportContentsDto implements IImportContentsDto {
         (<any>this).publish = _data["publish"];
         (<any>this).doNotScript = _data["doNotScript"];
         (<any>this).optimizeValidation = _data["optimizeValidation"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): ImportContentsDto {
         const result = new ImportContentsDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -10030,11 +10098,11 @@ export class ImportContentsDto implements IImportContentsDto {
         data["publish"] = this.publish;
         data["doNotScript"] = this.doNotScript;
         data["optimizeValidation"] = this.optimizeValidation;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -10109,13 +10177,13 @@ export class BulkUpdateContentsDto implements IBulkUpdateContentsDto {
         (<any>this).doNotValidateWorkflow = _data["doNotValidateWorkflow"];
         (<any>this).checkReferrers = _data["checkReferrers"];
         (<any>this).optimizeValidation = _data["optimizeValidation"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): BulkUpdateContentsDto {
         const result = new BulkUpdateContentsDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -10133,11 +10201,11 @@ export class BulkUpdateContentsDto implements IBulkUpdateContentsDto {
         data["doNotValidateWorkflow"] = this.doNotValidateWorkflow;
         data["checkReferrers"] = this.checkReferrers;
         data["optimizeValidation"] = this.optimizeValidation;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -10234,13 +10302,13 @@ export class BulkUpdateContentsJobDto implements IBulkUpdateContentsJobDto {
         (<any>this).enrichDefaults = _data["enrichDefaults"];
         (<any>this).expectedCount = _data["expectedCount"];
         (<any>this).expectedVersion = _data["expectedVersion"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): BulkUpdateContentsJobDto {
         const result = new BulkUpdateContentsJobDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -10264,11 +10332,11 @@ export class BulkUpdateContentsJobDto implements IBulkUpdateContentsJobDto {
         data["enrichDefaults"] = this.enrichDefaults;
         data["expectedCount"] = this.expectedCount;
         data["expectedVersion"] = this.expectedVersion;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -10351,13 +10419,13 @@ export class QueryJsonDto implements IQueryJsonDto {
             for (let item of _data["sort"])
                 (<any>this).sort!.push(SortNodeDto.fromJSON(item));
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): QueryJsonDto {
         const result = new QueryJsonDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -10375,11 +10443,11 @@ export class QueryJsonDto implements IQueryJsonDto {
             for (let item of this.sort)
                 data["sort"].push(item.toJSON());
         }
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -10430,13 +10498,13 @@ export class SortNodeDto implements ISortNodeDto {
     init(_data: any) {
         (<any>this).path = _data["path"];
         (<any>this).order = _data["order"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): SortNodeDto {
         const result = new SortNodeDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -10444,11 +10512,11 @@ export class SortNodeDto implements ISortNodeDto {
         data = typeof data === 'object' ? data : {}; 
         data["path"] = this.path;
         data["order"] = this.order;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -10511,13 +10579,13 @@ export class ChangeStatusDto implements IChangeStatusDto {
         (<any>this).status = _data["status"];
         (<any>this).dueTime = _data["dueTime"] ? DateTime.parseISO(_data["dueTime"].toString()) : <any>undefined;
         (<any>this).checkReferrers = _data["checkReferrers"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): ChangeStatusDto {
         const result = new ChangeStatusDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -10526,11 +10594,11 @@ export class ChangeStatusDto implements IChangeStatusDto {
         data["status"] = this.status;
         data["dueTime"] = this.dueTime ? this.dueTime.toISOString() : <any>undefined;
         data["checkReferrers"] = this.checkReferrers;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -10600,13 +10668,13 @@ export class AllContentsByPostDto implements IAllContentsByPostDto {
         (<any>this).references = _data["references"];
         (<any>this).oData = _data["oData"];
         (<any>this).q = _data["q"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): AllContentsByPostDto {
         const result = new AllContentsByPostDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -10623,11 +10691,11 @@ export class AllContentsByPostDto implements IAllContentsByPostDto {
         data["references"] = this.references;
         data["oData"] = this.oData;
         data["q"] = this.q;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -10681,13 +10749,13 @@ export class BackupJobsDto extends ResourceDto implements IBackupJobsDto {
             for (let item of _data["items"])
                 (<any>this).items!.push(BackupJobDto.fromJSON(item));
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): BackupJobsDto {
         const result = new BackupJobsDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -10699,6 +10767,7 @@ export class BackupJobsDto extends ResourceDto implements IBackupJobsDto {
                 data["items"].push(item.toJSON());
         }
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -10734,13 +10803,13 @@ export class BackupJobDto extends ResourceDto implements IBackupJobDto {
         (<any>this).handledEvents = _data["handledEvents"];
         (<any>this).handledAssets = _data["handledAssets"];
         (<any>this).status = _data["status"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): BackupJobDto {
         const result = new BackupJobDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -10753,6 +10822,7 @@ export class BackupJobDto extends ResourceDto implements IBackupJobDto {
         data["handledAssets"] = this.handledAssets;
         data["status"] = this.status;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -10805,13 +10875,13 @@ export class RestoreJobDto implements IRestoreJobDto {
         (<any>this).started = _data["started"] ? DateTime.parseISO(_data["started"].toString()) : <any>undefined;
         (<any>this).stopped = _data["stopped"] ? DateTime.parseISO(_data["stopped"].toString()) : <any>undefined;
         (<any>this).status = _data["status"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): RestoreJobDto {
         const result = new RestoreJobDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -10826,11 +10896,11 @@ export class RestoreJobDto implements IRestoreJobDto {
         data["started"] = this.started ? this.started.toISOString() : <any>undefined;
         data["stopped"] = this.stopped ? this.stopped.toISOString() : <any>undefined;
         data["status"] = this.status;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -10885,13 +10955,13 @@ export class RestoreRequestDto implements IRestoreRequestDto {
     init(_data: any) {
         (<any>this).name = _data["name"];
         (<any>this).url = _data["url"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): RestoreRequestDto {
         const result = new RestoreRequestDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -10899,11 +10969,11 @@ export class RestoreRequestDto implements IRestoreRequestDto {
         data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         data["url"] = this.url;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -10996,13 +11066,13 @@ export class AssetFoldersDto extends ResourceDto implements IAssetFoldersDto {
             for (let item of _data["path"])
                 (<any>this).path!.push(AssetFolderDto.fromJSON(item));
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): AssetFoldersDto {
         const result = new AssetFoldersDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -11020,6 +11090,7 @@ export class AssetFoldersDto extends ResourceDto implements IAssetFoldersDto {
                 data["path"].push(item.toJSON());
         }
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -11065,13 +11136,13 @@ export class AssetFolderDto extends ResourceDto implements IAssetFolderDto {
         (<any>this).parentId = _data["parentId"];
         (<any>this).folderName = _data["folderName"];
         (<any>this).version = _data["version"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): AssetFolderDto {
         const result = new AssetFolderDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -11082,6 +11153,7 @@ export class AssetFolderDto extends ResourceDto implements IAssetFolderDto {
         data["folderName"] = this.folderName;
         data["version"] = this.version;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -11125,13 +11197,13 @@ export class CreateAssetFolderDto implements ICreateAssetFolderDto {
     init(_data: any) {
         (<any>this).folderName = _data["folderName"];
         (<any>this).parentId = _data["parentId"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): CreateAssetFolderDto {
         const result = new CreateAssetFolderDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -11139,11 +11211,11 @@ export class CreateAssetFolderDto implements ICreateAssetFolderDto {
         data = typeof data === 'object' ? data : {}; 
         data["folderName"] = this.folderName;
         data["parentId"] = this.parentId;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -11189,24 +11261,24 @@ export class RenameAssetFolderDto implements IRenameAssetFolderDto {
 
     init(_data: any) {
         (<any>this).folderName = _data["folderName"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): RenameAssetFolderDto {
         const result = new RenameAssetFolderDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         data["folderName"] = this.folderName;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -11250,24 +11322,24 @@ export class MoveAssetFolderDto implements IMoveAssetFolderDto {
 
     init(_data: any) {
         (<any>this).parentId = _data["parentId"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): MoveAssetFolderDto {
         const result = new MoveAssetFolderDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         data["parentId"] = this.parentId;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -11311,24 +11383,24 @@ export class RenameTagDto implements IRenameTagDto {
 
     init(_data: any) {
         (<any>this).tagName = _data["tagName"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): RenameTagDto {
         const result = new RenameTagDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         data["tagName"] = this.tagName;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -11381,13 +11453,13 @@ export class AssetsDto extends ResourceDto implements IAssetsDto {
             for (let item of _data["items"])
                 (<any>this).items!.push(AssetDto.fromJSON(item));
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): AssetsDto {
         const result = new AssetsDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -11400,6 +11472,7 @@ export class AssetsDto extends ResourceDto implements IAssetsDto {
                 data["items"].push(item.toJSON());
         }
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -11556,13 +11629,13 @@ export class AssetDto extends ResourceDto implements IAssetDto {
         (<any>this).isImage = _data["isImage"];
         (<any>this).pixelWidth = _data["pixelWidth"];
         (<any>this).pixelHeight = _data["pixelHeight"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): AssetDto {
         const result = new AssetDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -11603,6 +11676,7 @@ export class AssetDto extends ResourceDto implements IAssetDto {
         data["pixelWidth"] = this.pixelWidth;
         data["pixelHeight"] = this.pixelHeight;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -11675,24 +11749,24 @@ export class AssetMetaDto implements IAssetMetaDto {
 
     init(_data: any) {
         (<any>this).isDuplicate = _data["isDuplicate"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): AssetMetaDto {
         const result = new AssetMetaDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         data["isDuplicate"] = this.isDuplicate;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -11749,13 +11823,13 @@ export class BulkUpdateAssetsDto implements IBulkUpdateAssetsDto {
         (<any>this).checkReferrers = _data["checkReferrers"];
         (<any>this).optimizeValidation = _data["optimizeValidation"];
         (<any>this).doNotScript = _data["doNotScript"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): BulkUpdateAssetsDto {
         const result = new BulkUpdateAssetsDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -11769,11 +11843,11 @@ export class BulkUpdateAssetsDto implements IBulkUpdateAssetsDto {
         data["checkReferrers"] = this.checkReferrers;
         data["optimizeValidation"] = this.optimizeValidation;
         data["doNotScript"] = this.doNotScript;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -11860,13 +11934,13 @@ export class BulkUpdateAssetsJobDto implements IBulkUpdateAssetsJobDto {
         }
         (<any>this).permanent = _data["permanent"];
         (<any>this).expectedVersion = _data["expectedVersion"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): BulkUpdateAssetsJobDto {
         const result = new BulkUpdateAssetsJobDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -11892,11 +11966,11 @@ export class BulkUpdateAssetsJobDto implements IBulkUpdateAssetsJobDto {
         }
         data["permanent"] = this.permanent;
         data["expectedVersion"] = this.expectedVersion;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -11988,13 +12062,13 @@ export class AnnotateAssetDto implements IAnnotateAssetDto {
                     (<any>(<any>this).metadata)![key] = _data["metadata"][key];
             }
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): AnnotateAssetDto {
         const result = new AnnotateAssetDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -12015,11 +12089,11 @@ export class AnnotateAssetDto implements IAnnotateAssetDto {
                     (<any>data["metadata"])[key] = (<any>this.metadata)[key];
             }
         }
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -12071,24 +12145,24 @@ export class MoveAssetDto implements IMoveAssetDto {
 
     init(_data: any) {
         (<any>this).parentId = _data["parentId"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): MoveAssetDto {
         const result = new MoveAssetDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         data["parentId"] = this.parentId;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -12151,13 +12225,13 @@ export class AssetScriptsDto extends ResourceDto implements IAssetScriptsDto {
         (<any>this).move = _data["move"];
         (<any>this).delete = _data["delete"];
         (<any>this).version = _data["version"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): AssetScriptsDto {
         const result = new AssetScriptsDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -12172,6 +12246,7 @@ export class AssetScriptsDto extends ResourceDto implements IAssetScriptsDto {
         data["delete"] = this.delete;
         data["version"] = this.version;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -12230,13 +12305,13 @@ export class UpdateAssetScriptsDto implements IUpdateAssetScriptsDto {
         (<any>this).annotate = _data["annotate"];
         (<any>this).move = _data["move"];
         (<any>this).delete = _data["delete"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): UpdateAssetScriptsDto {
         const result = new UpdateAssetScriptsDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -12249,11 +12324,11 @@ export class UpdateAssetScriptsDto implements IUpdateAssetScriptsDto {
         data["annotate"] = this.annotate;
         data["move"] = this.move;
         data["delete"] = this.delete;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -12311,13 +12386,13 @@ export class ClientsDto extends ResourceDto implements IClientsDto {
             for (let item of _data["items"])
                 (<any>this).items!.push(ClientDto.fromJSON(item));
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): ClientsDto {
         const result = new ClientsDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -12329,6 +12404,7 @@ export class ClientsDto extends ResourceDto implements IClientsDto {
                 data["items"].push(item.toJSON());
         }
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -12375,13 +12451,13 @@ export class ClientDto extends ResourceDto implements IClientDto {
         (<any>this).apiCallsLimit = _data["apiCallsLimit"];
         (<any>this).apiTrafficLimit = _data["apiTrafficLimit"];
         (<any>this).allowAnonymous = _data["allowAnonymous"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): ClientDto {
         const result = new ClientDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -12395,6 +12471,7 @@ export class ClientDto extends ResourceDto implements IClientDto {
         data["apiTrafficLimit"] = this.apiTrafficLimit;
         data["allowAnonymous"] = this.allowAnonymous;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -12433,24 +12510,24 @@ export class CreateClientDto implements ICreateClientDto {
 
     init(_data: any) {
         (<any>this).id = _data["id"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): CreateClientDto {
         const result = new CreateClientDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         data["id"] = this.id;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -12506,13 +12583,13 @@ export class UpdateClientDto implements IUpdateClientDto {
         (<any>this).allowAnonymous = _data["allowAnonymous"];
         (<any>this).apiCallsLimit = _data["apiCallsLimit"];
         (<any>this).apiTrafficLimit = _data["apiTrafficLimit"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): UpdateClientDto {
         const result = new UpdateClientDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -12523,11 +12600,11 @@ export class UpdateClientDto implements IUpdateClientDto {
         data["allowAnonymous"] = this.allowAnonymous;
         data["apiCallsLimit"] = this.apiCallsLimit;
         data["apiTrafficLimit"] = this.apiTrafficLimit;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -12581,13 +12658,13 @@ export class AppLanguagesDto extends ResourceDto implements IAppLanguagesDto {
             for (let item of _data["items"])
                 (<any>this).items!.push(AppLanguageDto.fromJSON(item));
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): AppLanguagesDto {
         const result = new AppLanguagesDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -12599,6 +12676,7 @@ export class AppLanguagesDto extends ResourceDto implements IAppLanguagesDto {
                 data["items"].push(item.toJSON());
         }
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -12643,13 +12721,13 @@ export class AppLanguageDto extends ResourceDto implements IAppLanguageDto {
         }
         (<any>this).isMaster = _data["isMaster"];
         (<any>this).isOptional = _data["isOptional"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): AppLanguageDto {
         const result = new AppLanguageDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -12665,6 +12743,7 @@ export class AppLanguageDto extends ResourceDto implements IAppLanguageDto {
         data["isMaster"] = this.isMaster;
         data["isOptional"] = this.isOptional;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -12699,24 +12778,24 @@ export class AddLanguageDto implements IAddLanguageDto {
 
     init(_data: any) {
         (<any>this).language = _data["language"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): AddLanguageDto {
         const result = new AddLanguageDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         data["language"] = this.language;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -12770,13 +12849,13 @@ export class UpdateLanguageDto implements IUpdateLanguageDto {
             for (let item of _data["fallback"])
                 (<any>this).fallback!.push(item);
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): UpdateLanguageDto {
         const result = new UpdateLanguageDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -12789,11 +12868,11 @@ export class UpdateLanguageDto implements IUpdateLanguageDto {
             for (let item of this.fallback)
                 data["fallback"].push(item);
         }
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -12843,13 +12922,13 @@ export class RolesDto extends ResourceDto implements IRolesDto {
             for (let item of _data["items"])
                 (<any>this).items!.push(RoleDto.fromJSON(item));
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): RolesDto {
         const result = new RolesDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -12861,6 +12940,7 @@ export class RolesDto extends ResourceDto implements IRolesDto {
                 data["items"].push(item.toJSON());
         }
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -12914,13 +12994,13 @@ export class RoleDto extends ResourceDto implements IRoleDto {
                     (<any>(<any>this).properties)![key] = _data["properties"][key];
             }
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): RoleDto {
         const result = new RoleDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -12943,6 +13023,7 @@ export class RoleDto extends ResourceDto implements IRoleDto {
             }
         }
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -12979,24 +13060,24 @@ export class AddRoleDto implements IAddRoleDto {
 
     init(_data: any) {
         (<any>this).name = _data["name"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): AddRoleDto {
         const result = new AddRoleDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -13053,13 +13134,13 @@ export class UpdateRoleDto implements IUpdateRoleDto {
                     (<any>(<any>this).properties)![key] = _data["properties"][key];
             }
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): UpdateRoleDto {
         const result = new UpdateRoleDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -13077,11 +13158,11 @@ export class UpdateRoleDto implements IUpdateRoleDto {
                     (<any>data["properties"])[key] = (<any>this.properties)[key];
             }
         }
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -13257,13 +13338,13 @@ export class AppDto extends ResourceDto implements IAppDto {
                     (<any>(<any>this).roleProperties)![key] = _data["roleProperties"][key];
             }
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): AppDto {
         const result = new AppDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -13295,6 +13376,7 @@ export class AppDto extends ResourceDto implements IAppDto {
             }
         }
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -13352,13 +13434,13 @@ export class CreateAppDto implements ICreateAppDto {
     init(_data: any) {
         (<any>this).name = _data["name"];
         (<any>this).template = _data["template"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): CreateAppDto {
         const result = new CreateAppDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -13366,11 +13448,11 @@ export class CreateAppDto implements ICreateAppDto {
         data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         data["template"] = this.template;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -13419,13 +13501,13 @@ export class UpdateAppDto implements IUpdateAppDto {
     init(_data: any) {
         (<any>this).label = _data["label"];
         (<any>this).description = _data["description"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): UpdateAppDto {
         const result = new UpdateAppDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -13433,11 +13515,11 @@ export class UpdateAppDto implements IUpdateAppDto {
         data = typeof data === 'object' ? data : {}; 
         data["label"] = this.label;
         data["description"] = this.description;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -13483,24 +13565,24 @@ export class TransferToTeamDto implements ITransferToTeamDto {
 
     init(_data: any) {
         (<any>this).teamId = _data["teamId"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): TransferToTeamDto {
         const result = new TransferToTeamDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         data["teamId"] = this.teamId;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -13562,13 +13644,13 @@ export class AppSettingsDto extends ResourceDto implements IAppSettingsDto {
         (<any>this).hideScheduler = _data["hideScheduler"];
         (<any>this).hideDateTimeModeButton = _data["hideDateTimeModeButton"];
         (<any>this).version = _data["version"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): AppSettingsDto {
         const result = new AppSettingsDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -13588,6 +13670,7 @@ export class AppSettingsDto extends ResourceDto implements IAppSettingsDto {
         data["hideDateTimeModeButton"] = this.hideDateTimeModeButton;
         data["version"] = this.version;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -13628,13 +13711,13 @@ export class PatternDto implements IPatternDto {
         (<any>this).name = _data["name"];
         (<any>this).regex = _data["regex"];
         (<any>this).message = _data["message"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): PatternDto {
         const result = new PatternDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -13643,11 +13726,11 @@ export class PatternDto implements IPatternDto {
         data["name"] = this.name;
         data["regex"] = this.regex;
         data["message"] = this.message;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -13698,13 +13781,13 @@ export class EditorDto implements IEditorDto {
     init(_data: any) {
         (<any>this).name = _data["name"];
         (<any>this).url = _data["url"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): EditorDto {
         const result = new EditorDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -13712,11 +13795,11 @@ export class EditorDto implements IEditorDto {
         data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         data["url"] = this.url;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -13779,13 +13862,13 @@ export class UpdateAppSettingsDto implements IUpdateAppSettingsDto {
         }
         (<any>this).hideScheduler = _data["hideScheduler"];
         (<any>this).hideDateTimeModeButton = _data["hideDateTimeModeButton"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): UpdateAppSettingsDto {
         const result = new UpdateAppSettingsDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -13803,11 +13886,11 @@ export class UpdateAppSettingsDto implements IUpdateAppSettingsDto {
         }
         data["hideScheduler"] = this.hideScheduler;
         data["hideDateTimeModeButton"] = this.hideDateTimeModeButton;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -13866,13 +13949,13 @@ export class WorkflowsDto extends ResourceDto implements IWorkflowsDto {
             for (let item of _data["errors"])
                 (<any>this).errors!.push(item);
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): WorkflowsDto {
         const result = new WorkflowsDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -13889,6 +13972,7 @@ export class WorkflowsDto extends ResourceDto implements IWorkflowsDto {
                 data["errors"].push(item);
         }
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -13945,13 +14029,13 @@ export class WorkflowDto extends ResourceDto implements IWorkflowDto {
                 (<any>this).schemaIds!.push(item);
         }
         (<any>this).initial = _data["initial"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): WorkflowDto {
         const result = new WorkflowDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -13973,6 +14057,7 @@ export class WorkflowDto extends ResourceDto implements IWorkflowDto {
         }
         data["initial"] = this.initial;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -14032,13 +14117,13 @@ export class WorkflowStepDto implements IWorkflowStepDto {
             for (let item of _data["noUpdateRoles"])
                 (<any>this).noUpdateRoles!.push(item);
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): WorkflowStepDto {
         const result = new WorkflowStepDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -14060,11 +14145,11 @@ export class WorkflowStepDto implements IWorkflowStepDto {
             for (let item of this.noUpdateRoles)
                 data["noUpdateRoles"].push(item);
         }
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -14125,13 +14210,13 @@ export class WorkflowTransitionDto implements IWorkflowTransitionDto {
             for (let item of _data["roles"])
                 (<any>this).roles!.push(item);
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): WorkflowTransitionDto {
         const result = new WorkflowTransitionDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -14143,11 +14228,11 @@ export class WorkflowTransitionDto implements IWorkflowTransitionDto {
             for (let item of this.roles)
                 data["roles"].push(item);
         }
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -14193,24 +14278,24 @@ export class AddWorkflowDto implements IAddWorkflowDto {
 
     init(_data: any) {
         (<any>this).name = _data["name"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): AddWorkflowDto {
         const result = new AddWorkflowDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -14273,13 +14358,13 @@ export class UpdateWorkflowDto implements IUpdateWorkflowDto {
                 (<any>this).schemaIds!.push(item);
         }
         (<any>this).initial = _data["initial"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): UpdateWorkflowDto {
         const result = new UpdateWorkflowDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -14299,11 +14384,11 @@ export class UpdateWorkflowDto implements IUpdateWorkflowDto {
                 data["schemaIds"].push(item);
         }
         data["initial"] = this.initial;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -14362,13 +14447,13 @@ export class DynamicCreateRuleDto implements IDynamicCreateRuleDto {
                     (<any>(<any>this).action)![key] = _data["action"][key];
             }
         }
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): DynamicCreateRuleDto {
         const result = new DynamicCreateRuleDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -14382,11 +14467,11 @@ export class DynamicCreateRuleDto implements IDynamicCreateRuleDto {
                     (<any>data["action"])[key] = (<any>this.action)[key];
             }
         }
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];
@@ -14445,13 +14530,13 @@ export class DynamicRulesDto extends ResourceDto implements IDynamicRulesDto {
                 (<any>this).items!.push(DynamicRuleDto.fromJSON(item));
         }
         (<any>this).runningRuleId = _data["runningRuleId"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): DynamicRulesDto {
         const result = new DynamicRulesDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -14464,6 +14549,7 @@ export class DynamicRulesDto extends ResourceDto implements IDynamicRulesDto {
         }
         data["runningRuleId"] = this.runningRuleId;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -14560,13 +14646,13 @@ export class DynamicRuleDto extends ResourceDto implements IDynamicRuleDto {
         (<any>this).numSucceeded = _data["numSucceeded"];
         (<any>this).numFailed = _data["numFailed"];
         (<any>this).lastExecuted = _data["lastExecuted"] ? DateTime.parseISO(_data["lastExecuted"].toString()) : <any>undefined;
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): DynamicRuleDto {
         const result = new DynamicRuleDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -14592,6 +14678,7 @@ export class DynamicRuleDto extends ResourceDto implements IDynamicRuleDto {
         data["numFailed"] = this.numFailed;
         data["lastExecuted"] = this.lastExecuted ? this.lastExecuted.toISOString() : <any>undefined;
         super.toJSON(data);
+        this.cleanup(data);
         return data;
     }
 }
@@ -14657,13 +14744,13 @@ export class DynamicUpdateRuleDto implements IDynamicUpdateRuleDto {
             }
         }
         (<any>this).isEnabled = _data["isEnabled"];
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
     static fromJSON(data: any): DynamicUpdateRuleDto {
         const result = new DynamicUpdateRuleDto().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
     }
 
@@ -14679,11 +14766,11 @@ export class DynamicUpdateRuleDto implements IDynamicUpdateRuleDto {
             }
         }
         data["isEnabled"] = this.isEnabled;
+        this.cleanup(data);
         return data;
     }
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];

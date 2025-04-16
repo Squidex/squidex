@@ -85,7 +85,7 @@
         {{ property.ConvertToClassCode | strip | tab }}
 {%     endfor -%}
 {% endif -%}
-        this.cleanup();
+        this.cleanup(this);
         return this;
     }
 
@@ -122,7 +122,7 @@
         throw new Error("The abstract class '{{ ClassName }}' cannot be instantiated.");
 {%     else -%}
         const result = new {{ ClassName }}().init(data);
-        result.cleanup();
+        result.cleanup(this);
         return result;
 {%     endif -%}
 {% endif -%}
@@ -145,6 +145,7 @@
 {% if HasInheritance -%}
         super.toJSON(data);
 {% endif -%}
+        this.cleanup(data);
         return data;
     }
 {% if GenerateCloneMethod -%}
@@ -162,8 +163,7 @@
 {% endif -%}
 {% unless HasInheritance -%}
 
-    protected cleanup() {
-        const target = <any>this;
+    protected cleanup(target: any) {
         for (var property in target) {
             if (target.hasOwnProperty(property)) {
                 const value = target[property];

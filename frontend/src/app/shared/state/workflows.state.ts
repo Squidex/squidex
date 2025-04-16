@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { debug, DialogService, LoadingState, shareSubscribed, State, VersionTag } from '@app/framework';
+import { compareStrings, debug, DialogService, LoadingState, shareSubscribed, State, VersionTag } from '@app/framework';
 import { WorkflowsService } from '../services/workflows.service';
 import { IUpdateWorkflowDto, IWorkflowStepDto, IWorkflowTransitionDto, WorkflowDto, WorkflowsDto } from './../model';
 import { AppsState } from './apps.state';
@@ -173,21 +173,30 @@ export class WorkflowView {
         const resultSteps: WorkflowStepView[] = [];
         const resultTransitions: WorkflowTransitionView[] = [];
 
-        for (const [stepName, stepValue] of Object.entries(dto.steps)) {
-            const { transitions, ...step } = stepValue as any;
+        for (const [stepName, step] of Object.entries(dto.steps)) {
+            const { transitions: _, ...values } = step.toJSON();
+            const stepView = { name: stepName, isLocked: stepName === 'Published', values };
 
-            resultSteps.push({ name: stepName, isLocked: stepName === 'Published', values: step });
+            if (step.transitions) {
+                for (const [to, transition] of Object.entries(step.transitions)) {
+                    const asJson = transition.toJSON();
 
-            for (const [to, transition] of Object.entries(transitions)) {
-                resultTransitions.push({ from: stepName, to, ...transition as any });
+                    resultTransitions.push({ from: stepName, to, step: stepView, values: asJson });
+                }
             }
+
+            resultSteps.push(stepView);
         }
 
         this.steps =
-            resultSteps.sortedByString(x => x.name);
+            resultSteps.sort((a, b) => {
+                return compareStrings(a.name, b.name);
+            });
 
         this.transitions =
-            resultTransitions.sortedByString(x => x.to);
+            resultTransitions.sort((a, b) => {
+                return compareStrings(a.to, b.to);
+            });
     }
 
     public getOpenSteps(step: WorkflowStepView) {
@@ -203,13 +212,33 @@ export class WorkflowView {
     }
 
     public setStep(name: string, values: Partial<WorkflowStepValues> = {}) {
-        const step = this.dto.steps[name];
-        if (!step) {
+        const clone = this.dto.toJSON();
+
+        clone.steps[name] = { transitions: {}, ...clone.steps[name] ?? {}, ...values };
+        if (!clone.initial) {
+            clone.initial = name;
+        }
+
+        return new WorkflowView(WorkflowDto.fromJSON(clone));
+    }
+
+    public removeStep(name: string) {
+        const step = this.steps.find(x => x.name === name);
+        if (!step || step.isLocked) {
             return this;
         }
 
         const clone = this.dto.toJSON();
-        Object.assign(values, clone.steps[name]);
+
+        delete clone.steps[name];
+        if (clone.initial === name) {
+            clone.initial = this.steps.filter(x => x.name !== name && !x.isLocked)[0]?.name ?? null;
+        }
+
+        for (const step of Object.values(clone.steps) as any[]) {
+            delete step.transitions[name];
+        }
+
         return new WorkflowView(WorkflowDto.fromJSON(clone));
     }
 
@@ -234,6 +263,11 @@ export class WorkflowView {
     }
 
     public setInitial(initial: string) {
+        const step = this.dto.steps[initial];
+        if (!step) {
+            return this;
+        }
+
         if (this.dto.initial === initial) {
             return this;
         }
@@ -243,19 +277,14 @@ export class WorkflowView {
         return new WorkflowView(WorkflowDto.fromJSON(clone));
     }
 
-    public removeStep(name: string) {
-        const step = this.dto.steps[name];
+    public setTransition(from: string, to: string, values: Partial<WorkflowTransitionValues> = {}) {
+        const step = this.dto.steps[from];
         if (!step) {
             return this;
         }
 
         const clone = this.dto.toJSON();
-
-        delete clone.steps[name];
-        if (clone.initial === name) {
-            clone.initial = name;
-        }
-
+        clone.steps[from].transitions[to] = { transitions: {}, ...clone.steps[from].transitions[to] ?? {}, ...values };
         return new WorkflowView(WorkflowDto.fromJSON(clone));
     }
 
@@ -275,22 +304,6 @@ export class WorkflowView {
         return new WorkflowView(WorkflowDto.fromJSON(clone));
     }
 
-    public setTransition(from: string, to: string, values: Partial<WorkflowTransitionValues> = {}) {
-        const step = this.dto.steps[from];
-        if (!step) {
-            return this;
-        }
-
-        const transition = step.transitions![to];
-        if (!transition) {
-            return this;
-        }
-
-        const clone = this.dto.toJSON();
-        Object.assign(values, clone.steps[from].transitions[to]);
-        return new WorkflowView(WorkflowDto.fromJSON(clone));
-    }
-
     public renameStep(name: string, newName: string) {
         const step = this.dto.steps[name];
         if (!step) {
@@ -302,7 +315,7 @@ export class WorkflowView {
         clone.steps[newName] = clone.steps[name];
         delete clone.steps[name];
 
-        for (const step of Object.values(clone.step) as any[]) {
+        for (const step of Object.values(clone.steps) as any[]) {
             if (step.transitions[name]) {
                 step.transitions[newName] = step.transitions[name];
                 delete step.transitions[name];
