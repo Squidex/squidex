@@ -12,26 +12,26 @@ namespace Squidex.Config.Startup;
 
 public sealed class LogConfigurationHost(IConfiguration configuration, ISemanticLog log) : IHostedService
 {
-    private static readonly Regex[] SensitivePatterns = new[]
-    {
+    private static readonly Regex[] SensitivePatterns =
+    [
         // Authentication and API keys
         new Regex(@"(?i)(secret|token|key|password|credential|auth|api[_-]?key)$"),
         new Regex(@"(?i)^(aws|azure|google|microsoft|github)[_-]"),
         new Regex(@"(?i)(jwt|bearer|oauth|saml)"),
         new Regex(@"(?i)(client|secret|password)$"),
-        
+
         // Connection strings and credentials
         new Regex(@"(?i)(connectionstring|connection)$"),
         new Regex(@"(?i)(username|password|credential)$"),
-        
+
         // Cloud provider specific
         new Regex(@"(?i)(accesskey|secretkey|privatekey|publickey)$"),
         new Regex(@"(?i)(projectid|tenantid)$"),
-        
+
         // Database specific
         new Regex(@"(?i)(mongodb|sqlserver|postgres|mysql)://.*"),
-        new Regex(@"(?i)(database|db|server|host|port|user|pass)=")
-    };
+        new Regex(@"(?i)(database|db|server|host|port|user|pass)="),
+    ];
 
     private static readonly string RedactedValue = "*****";
 
@@ -54,7 +54,7 @@ public sealed class LogConfigurationHost(IConfiguration configuration, ISemantic
                     {
                         var keyLower = key.ToLowerInvariant();
                         var value = IsSensitiveKey(keyLower) || IsSensitiveValue(val) ? RedactedValue : val;
-                        
+
                         c.WriteProperty(keyLower, value);
                     }
                 }
@@ -79,7 +79,7 @@ public sealed class LogConfigurationHost(IConfiguration configuration, ISemantic
         return value.Contains("://") && (
             value.Contains("@") || // Contains username/password in URL
             value.Contains(";") || // Contains connection string parameters
-            value.Contains("=")    // Contains key-value pairs
+            value.Contains("=") // Contains key-value pairs
         );
     }
 
