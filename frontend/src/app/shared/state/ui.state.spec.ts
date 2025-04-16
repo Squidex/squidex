@@ -7,7 +7,7 @@
 
 import { of } from 'rxjs';
 import { IMock, Mock } from 'typemoq';
-import { ResourceLinkDtos, UIService, UIState, UsersService } from '@app/shared/internal';
+import { IResourceDto, ResourceLinkDto, UIService, UIState, UsersService } from '@app/shared/internal';
 import { TestValues } from './_test-helpers';
 
 describe('UIState', () => {
@@ -41,10 +41,12 @@ describe('UIState', () => {
         canCustomize: true,
     };
 
-    const resources: ResourceLinkDtos = {
-        'admin/events': { method: 'GET', href: '/api/events' },
-        'admin/restore': { method: 'GET', href: '/api/restore' },
-        'admin/users': { method: 'GET', href: '/api/users' },
+    const resource: IResourceDto = {
+        _links: {
+            'admin/events': new ResourceLinkDto({ method: 'GET', href: '/api/events' }),
+            'admin/restore': new ResourceLinkDto({ method: 'GET', href: '/api/restore' }),
+            'admin/users': new ResourceLinkDto({ method: 'GET', href: '/api/users' }),
+        },
     };
 
     let usersService: IMock<UsersService>;
@@ -66,7 +68,7 @@ describe('UIState', () => {
         usersService = Mock.ofType<UsersService>();
 
         usersService.setup(x => x.getResources())
-            .returns(() => of({ _links: resources }));
+            .returns(() => of(resource));
 
         uiState = new UIState(uiService.object, usersService.object);
         uiState.load();

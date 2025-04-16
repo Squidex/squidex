@@ -371,7 +371,7 @@ describe('AppsService', () => {
             roleName: `Role${id}`,
             roleProperties: createProperties(id),
             teamId: `app-team${key}`,
-            version: key,
+            version: id,
             _links: {
                 update: { method: 'PUT', href: `apps/${id}` },
             },

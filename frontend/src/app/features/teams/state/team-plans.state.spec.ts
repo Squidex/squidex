@@ -21,7 +21,7 @@ describe('TeamPlansState', () => {
     } = TestValues;
 
     const oldPlans = new PlansDto({
-        currentPlanId: 'id1',
+        currentPlanId: 'free',
         planOwner: creator,
         plans: [
             new PlanDto({
@@ -90,7 +90,7 @@ describe('TeamPlansState', () => {
             plansService.setup(x => x.getPlans(team))
                 .returns(() => of(versioned(version, oldPlans))).verifiable();
 
-            plansState.load(false, 'id2_yearly').subscribe();
+            plansState.load(false, 'professional_yearly').subscribe();
 
             expect(plansState.snapshot.plans).toEqual([
                 { isSelected: false, isYearlySelected: false, plan: oldPlans.plans[0] },
@@ -152,11 +152,11 @@ describe('TeamPlansState', () => {
             expect(plansState.snapshot.version).toEqual(version);
         });
 
-        it('should update plans if no returning url', () => {
+        it('should update plans if not returning url', () => {
             plansService.setup(x => x.putPlan(team, It.isAny(), version))
                 .returns(() => of(versioned(newVersion, new PlanChangedDto())));
 
-            plansState.change('id2_yearly').pipe(onErrorResumeNextWith()).subscribe();
+            plansState.change('professional_yearly').pipe(onErrorResumeNextWith()).subscribe();
 
             expect(plansState.snapshot.plans).toEqual([
                 { isSelected: false, isYearlySelected: false, plan: oldPlans.plans[0] },

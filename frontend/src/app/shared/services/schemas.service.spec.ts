@@ -661,7 +661,7 @@ describe('SchemasService', () => {
             },
             properties: schemaPropertiesResponse(id, suffix),
             type: id % 2 === 0 ? 'Default' : 'Singleton',
-            version: key,
+            version: id,
             fields: [
                 {
                     fieldId: 11,

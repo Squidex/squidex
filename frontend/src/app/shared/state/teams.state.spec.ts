@@ -88,7 +88,7 @@ describe('TeamsState', () => {
     });
 
     it('should update team if updated', () => {
-        const request = {};
+        const request = { name: 'NewName' };
 
         const updated = createTeam(2, '_new');
 
@@ -138,7 +138,7 @@ describe('TeamsState', () => {
         });
 
         it('should update selected team if updated', () => {
-            const request = {};
+            const request = { name: 'NewName' };
 
             const updated = createTeam(1, '_new');
 

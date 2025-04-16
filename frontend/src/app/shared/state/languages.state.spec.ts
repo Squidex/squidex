@@ -7,7 +7,7 @@
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { AppLanguagesPayload, AppLanguagesService, DialogService, LanguageDto, LanguagesService, LanguagesState, versioned } from '@app/shared/internal';
+import { AppLanguagesDto, AppLanguagesService, DialogService, LanguageDto, LanguagesService, LanguagesState, versioned } from '@app/shared/internal';
 import { createLanguages } from '../services/app-languages.service.spec';
 import { TestValues } from './_test-helpers';
 
@@ -19,10 +19,10 @@ describe('LanguagesState', () => {
         version,
     } = TestValues;
 
-    const languageDE = new LanguageDto('de', 'German');
-    const languageEN = new LanguageDto('en', 'English');
-    const languageIT = new LanguageDto('it', 'Italian');
-    const languageES = new LanguageDto('es', 'Spanish');
+    const languageDE = new LanguageDto({ iso2Code: 'de', englishName: 'German' });
+    const languageEN = new LanguageDto({ iso2Code: 'en', englishName: 'English' });
+    const languageIT = new LanguageDto({ iso2Code: 'it', englishName: 'Italian' });
+    const languageES = new LanguageDto({ iso2Code: 'es', englishName: 'Spanish' });
 
     const oldLanguages = createLanguages('en', 'de');
 
@@ -132,7 +132,7 @@ describe('LanguagesState', () => {
             expectNewLanguages(updated);
         });
 
-        function expectNewLanguages(updated: AppLanguagesPayload) {
+        function expectNewLanguages(updated: AppLanguagesDto) {
             expect(languagesState.snapshot.languages).toEqual([
                 {
                     language: updated.items[0],

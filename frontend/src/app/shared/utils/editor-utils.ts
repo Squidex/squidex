@@ -14,7 +14,6 @@ export function computeEditorUrl(url?: string | null, settings?: AppSettingsDto 
     }
 
     const editors: { [key: string]: string } = {};
-
     if (settings?.editors) {
         for (const editor of settings.editors) {
             editors[editor.name] = editor.url;

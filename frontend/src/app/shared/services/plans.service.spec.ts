@@ -8,7 +8,7 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, PlanChangedDto, PlanDto, PlansDto, PlansService, Versioned, VersionTag } from '@app/shared/internal';
+import { ApiUrlConfig, PlanChangedDto, PlanDto, PlansDto, PlansService, ReferralInfo, Versioned, VersionTag } from '@app/shared/internal';
 
 describe('PlansService', () => {
     const version = new VersionTag('1');
@@ -42,7 +42,7 @@ describe('PlansService', () => {
             expect(req.request.headers.get('If-Match')).toBeNull();
 
             req.flush({
-                currentPlanId: '123',
+                currentPlanId: 'free',
                 portalLink: 'link/to/portal',
                 planOwner: '456',
                 plans: [
@@ -73,9 +73,7 @@ describe('PlansService', () => {
                         maxContributors: 6500,
                     },
                 ],
-                referral: {
-                    code: 'CODE',
-                },
+                referral: { code: 'CODE', earned: '0', condition: 'None' },
                 locked: 'ManagedByTeam',
             }, {
                 headers: {
@@ -85,7 +83,7 @@ describe('PlansService', () => {
 
             expect(plans!).toEqual({
                 payload: new PlansDto({
-                    currentPlanId: '123',
+                    currentPlanId: 'free',
                     portalLink: 'link/to/portal',
                     planOwner: '456',
                     plans: [
@@ -116,9 +114,7 @@ describe('PlansService', () => {
                             maxContributors: 6500,
                         }),
                     ],
-                    referral: {
-                        code: 'CODE',
-                    } as any,
+                    referral: new ReferralInfo({ code: 'CODE', earned: '0', condition: 'None' }),
                     locked: 'ManagedByTeam',
                 }),
                 version: new VersionTag('2'),

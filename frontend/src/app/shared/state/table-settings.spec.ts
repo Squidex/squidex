@@ -7,44 +7,24 @@
 
 import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DateTime } from '@app/framework';
-import { createProperties, FieldDto, FieldSizes, META_FIELDS, SchemaDto, SchemaPropertiesDto, SchemaScriptsDto, TableSettings, UIState } from '@app/shared/internal';
+import { createProperties, FieldSizes, META_FIELDS, TableSettings, UIState } from '@app/shared/internal';
 import { FieldWrappings } from '..';
+import { TestValues } from './_test-helpers';
 
 describe('TableSettings', () => {
     let uiState: IMock<UIState>;
 
+    const {
+        createSchema,
+        createField,
+    } = TestValues;
+
     const schema =
-        new SchemaDto({
-            id: '1',
-            created: DateTime.now(),
-            createdBy: 'me',
-            fieldRules: [],
-            fieldsInLists: [],
-            fieldsInReferences: [],
-            isPublished: true,
-            isSingleton: false,
-            lastModified: DateTime.now(),
-            lastModifiedBy: 'me',
+        createSchema({
             name: 'my-schema',
-            previewUrls: {},
-            properties: new SchemaPropertiesDto(),
-            scripts: new SchemaScriptsDto(),
-            type: 'Default',
-            version: 1,
             fields: [
-                new FieldDto({
-                    fieldId: 1,
-                    isDisabled: false,
-                    isHidden: false,
-                    isLocked: false,
-                    name: 'string',
-                    partitioning: 'invariant',
-                    properties: createProperties('String'),
-                    _links: {},
-                }),
+                createField({ id: 1, properties: createProperties('String') }),
             ],
-            _links: {},
         });
 
     beforeEach(() => {

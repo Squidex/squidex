@@ -53,17 +53,19 @@ describe('UsersService', () => {
                 {
                     id: '123',
                     displayName: 'User1',
+                    _links: {},
                 },
                 {
                     id: '456',
                     displayName: 'User2',
+                    _links: {},
                 },
             ]);
 
             expect(users!).toEqual(
                 [
-                    new UserDto({ id: '123', displayName: 'User1' } as any),
-                    new UserDto({ id: '456', displayName: 'User2' } as any),
+                    new UserDto({ id: '123', displayName: 'User1', _links: {} } as any),
+                    new UserDto({ id: '456', displayName: 'User2', _links: {} } as any),
                 ]);
         }));
 
@@ -83,17 +85,19 @@ describe('UsersService', () => {
                 {
                     id: '123',
                     displayName: 'User1',
+                    _links: {},
                 },
                 {
                     id: '456',
                     displayName: 'User2',
+                    _links: {},
                 },
             ]);
 
             expect(users!).toEqual(
                 [
-                    new UserDto({ id: '123', displayName: 'User1' } as any),
-                    new UserDto({ id: '456', displayName: 'User2' } as any),
+                    new UserDto({ id: '123', displayName: 'User1', _links: {} } as any),
+                    new UserDto({ id: '456', displayName: 'User2', _links: {} } as any),
                 ]);
         }));
 

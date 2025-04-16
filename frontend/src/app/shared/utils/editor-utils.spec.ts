@@ -21,12 +21,12 @@ describe('EditorUtils', () => {
                 url: 'url/to/editor1',
             }),
             new EditorDto({
-                name: 'editor2',
-                url: 'url/to/editor2',
+                name: 'duplicate',
+                url: 'url/to/duplicate1',
             }),
             new EditorDto({
-                name: 'editor3',
-                url: 'url/to/editor3',
+                name: 'duplicate',
+                url: 'url/to/duplicate2',
             }),
         ],
         version: 1,

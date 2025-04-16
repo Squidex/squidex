@@ -55,15 +55,18 @@ export class ServerErrorDto implements IServerErrorDto {
                 (<any>this).details!.push(item);
         }
         (<any>this).statusCode = _data["statusCode"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): ServerErrorDto {
-        return new ServerErrorDto().init(data);
+        const result = new ServerErrorDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["message"] = this.message;
         data["errorCode"] = this.errorCode;
         data["traceId"] = this.traceId;
@@ -75,6 +78,18 @@ export class ServerErrorDto implements IServerErrorDto {
         }
         data["statusCode"] = this.statusCode;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -121,18 +136,33 @@ export class UserProperty implements IUserProperty {
     init(_data: any) {
         (<any>this).name = _data["name"];
         (<any>this).value = _data["value"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): UserProperty {
-        return new UserProperty().init(data);
+        const result = new UserProperty().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         data["value"] = this.value;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -168,17 +198,32 @@ export class UpdateSettingDto implements IUpdateSettingDto {
 
     init(_data: any) {
         (<any>this).value = _data["value"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): UpdateSettingDto {
-        return new UpdateSettingDto().init(data);
+        const result = new UpdateSettingDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["value"] = this.value;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -211,30 +256,40 @@ export class MarkerRequestDto implements IMarkerRequestDto {
                     (<any>this)[property] = (<any>data)[property];
             }
         }
-        if (!data) {
-            this.issue = new MarkerIssueDto();
-            this.website = new MarkerWebsiteDto();
-            this.context = new MarkerContextDto();
-        }
     }
 
     init(_data: any) {
         (<any>this).issue = _data["issue"] ? MarkerIssueDto.fromJSON(_data["issue"]) : new MarkerIssueDto();
         (<any>this).website = _data["website"] ? MarkerWebsiteDto.fromJSON(_data["website"]) : new MarkerWebsiteDto();
         (<any>this).context = _data["context"] ? MarkerContextDto.fromJSON(_data["context"]) : new MarkerContextDto();
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): MarkerRequestDto {
-        return new MarkerRequestDto().init(data);
+        const result = new MarkerRequestDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["issue"] = this.issue ? this.issue.toJSON() : <any>undefined;
         data["website"] = this.website ? this.website.toJSON() : <any>undefined;
         data["context"] = this.context ? this.context.toJSON() : <any>undefined;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -270,9 +325,6 @@ export class MarkerIssueDto implements IMarkerIssueDto {
                     (<any>this)[property] = (<any>data)[property];
             }
         }
-        if (!data) {
-            this.console = new MarkerConsoleDto();
-        }
     }
 
     init(_data: any) {
@@ -281,21 +333,36 @@ export class MarkerIssueDto implements IMarkerIssueDto {
         (<any>this).type = _data["type"];
         (<any>this).screenshotUrl = _data["screenshotUrl"];
         (<any>this).console = _data["console"] ? MarkerConsoleDto.fromJSON(_data["console"]) : new MarkerConsoleDto();
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): MarkerIssueDto {
-        return new MarkerIssueDto().init(data);
+        const result = new MarkerIssueDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["title"] = this.title;
         data["description"] = this.description;
         data["type"] = this.type;
         data["screenshotUrl"] = this.screenshotUrl;
         data["console"] = this.console ? this.console.toJSON() : <any>undefined;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -335,18 +402,33 @@ export class MarkerConsoleDto implements IMarkerConsoleDto {
     init(_data: any) {
         (<any>this).summary = _data["summary"];
         (<any>this).url = _data["url"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): MarkerConsoleDto {
-        return new MarkerConsoleDto().init(data);
+        const result = new MarkerConsoleDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["summary"] = this.summary;
         data["url"] = this.url;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -383,18 +465,33 @@ export class MarkerWebsiteDto implements IMarkerWebsiteDto {
     init(_data: any) {
         (<any>this).url = _data["url"];
         (<any>this).pageTitle = _data["pageTitle"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): MarkerWebsiteDto {
-        return new MarkerWebsiteDto().init(data);
+        const result = new MarkerWebsiteDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["url"] = this.url;
         data["pageTitle"] = this.pageTitle;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -429,17 +526,32 @@ export class MarkerContextDto implements IMarkerContextDto {
 
     init(_data: any) {
         (<any>this).contextString = _data["contextString"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): MarkerContextDto {
-        return new MarkerContextDto().init(data);
+        const result = new MarkerContextDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["contextString"] = this.contextString;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -470,9 +582,6 @@ export abstract class ResourceDto implements IResourceDto {
                     (<any>this)[property] = (<any>data)[property];
             }
         }
-        if (!data) {
-            this._links = {};
-        }
     }
 
     init(_data: any) {
@@ -480,10 +589,10 @@ export abstract class ResourceDto implements IResourceDto {
             (<any>this)._links = {} as any;
             for (let key in _data["_links"]) {
                 if (_data["_links"].hasOwnProperty(key))
-                    (<any>(<any>this)._links)![key] = _data["_links"][key] !== undefined ? _data["_links"][key] : new ResourceLinkDto();
+                    (<any>(<any>this)._links)![key] = _data["_links"][key] ? ResourceLinkDto.fromJSON(_data["_links"][key]) : new ResourceLinkDto();
             }
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
@@ -492,6 +601,7 @@ export abstract class ResourceDto implements IResourceDto {
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (this._links) {
             data["_links"] = {};
             for (let key in this._links) {
@@ -500,6 +610,18 @@ export abstract class ResourceDto implements IResourceDto {
             }
         }
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -530,9 +652,6 @@ export class UsersDto extends ResourceDto implements IUsersDto {
 
     constructor(data?: IUsersDto) {
         super(data);
-        if (!data) {
-            this.items = [];
-        }
     }
 
     init(_data: any) {
@@ -543,15 +662,18 @@ export class UsersDto extends ResourceDto implements IUsersDto {
             for (let item of _data["items"])
                 (<any>this).items!.push(UserDto.fromJSON(item));
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): UsersDto {
-        return new UsersDto().init(data);
+        const result = new UsersDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["total"] = this.total;
         if (Array.isArray(this.items)) {
             data["items"] = [];
@@ -600,9 +722,6 @@ export class UserDto extends ResourceDto implements IUserDto {
 
     constructor(data?: IUserDto) {
         super(data);
-        if (!data) {
-            this.permissions = [];
-        }
     }
 
     init(_data: any) {
@@ -616,15 +735,18 @@ export class UserDto extends ResourceDto implements IUserDto {
             for (let item of _data["permissions"])
                 (<any>this).permissions!.push(item);
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): UserDto {
-        return new UserDto().init(data);
+        const result = new UserDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["id"] = this.id;
         data["email"] = this.email;
         data["displayName"] = this.displayName;
@@ -675,19 +797,34 @@ export class ResourceLinkDto implements IResourceLinkDto {
         (<any>this).href = _data["href"];
         (<any>this).method = _data["method"];
         (<any>this).metadata = _data["metadata"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): ResourceLinkDto {
-        return new ResourceLinkDto().init(data);
+        const result = new ResourceLinkDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["href"] = this.href;
         data["method"] = this.method;
         data["metadata"] = this.metadata;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -729,9 +866,6 @@ export class CreateUserDto implements ICreateUserDto {
                     (<any>this)[property] = (<any>data)[property];
             }
         }
-        if (!data) {
-            this.permissions = [];
-        }
     }
 
     init(_data: any) {
@@ -743,15 +877,18 @@ export class CreateUserDto implements ICreateUserDto {
             for (let item of _data["permissions"])
                 (<any>this).permissions!.push(item);
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): CreateUserDto {
-        return new CreateUserDto().init(data);
+        const result = new CreateUserDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["email"] = this.email;
         data["displayName"] = this.displayName;
         data["password"] = this.password;
@@ -761,6 +898,18 @@ export class CreateUserDto implements ICreateUserDto {
                 data["permissions"].push(item);
         }
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -804,9 +953,6 @@ export class UpdateUserDto implements IUpdateUserDto {
                     (<any>this)[property] = (<any>data)[property];
             }
         }
-        if (!data) {
-            this.permissions = [];
-        }
     }
 
     init(_data: any) {
@@ -818,15 +964,18 @@ export class UpdateUserDto implements IUpdateUserDto {
             for (let item of _data["permissions"])
                 (<any>this).permissions!.push(item);
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): UpdateUserDto {
-        return new UpdateUserDto().init(data);
+        const result = new UpdateUserDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["email"] = this.email;
         data["displayName"] = this.displayName;
         data["password"] = this.password;
@@ -836,6 +985,18 @@ export class UpdateUserDto implements IUpdateUserDto {
                 data["permissions"].push(item);
         }
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -868,15 +1029,18 @@ export class ResourcesDto extends ResourceDto implements IResourcesDto {
 
     init(_data: any) {
         super.init(_data);
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): ResourcesDto {
-        return new ResourcesDto().init(data);
+        const result = new ResourcesDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         super.toJSON(data);
         return data;
     }
@@ -905,18 +1069,21 @@ export class UpdateProfileDto implements IUpdateProfileDto {
             (<any>this).answers = {} as any;
             for (let key in _data["answers"]) {
                 if (_data["answers"].hasOwnProperty(key))
-                    (<any>(<any>this).answers)![key] = _data["answers"][key] !== undefined ? _data["answers"][key] : <any>undefined;
+                    (<any>(<any>this).answers)![key] = _data["answers"][key];
             }
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): UpdateProfileDto {
-        return new UpdateProfileDto().init(data);
+        const result = new UpdateProfileDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (this.answers) {
             data["answers"] = {};
             for (let key in this.answers) {
@@ -925,6 +1092,18 @@ export class UpdateProfileDto implements IUpdateProfileDto {
             }
         }
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -966,19 +1145,34 @@ export class TranslationDto implements ITranslationDto {
         (<any>this).status = _data["status"];
         (<any>this).result = _data["result"];
         (<any>this).text = _data["text"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): TranslationDto {
-        return new TranslationDto().init(data);
+        const result = new TranslationDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["status"] = this.status;
         data["result"] = this.result;
         data["text"] = this.text;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -1035,19 +1229,34 @@ export class TranslateDto implements ITranslateDto {
         (<any>this).text = _data["text"];
         (<any>this).targetLanguage = _data["targetLanguage"];
         (<any>this).sourceLanguage = _data["sourceLanguage"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): TranslateDto {
-        return new TranslateDto().init(data);
+        const result = new TranslateDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["text"] = this.text;
         data["targetLanguage"] = this.targetLanguage;
         data["sourceLanguage"] = this.sourceLanguage;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -1076,9 +1285,6 @@ export class TemplatesDto extends ResourceDto implements ITemplatesDto {
 
     constructor(data?: ITemplatesDto) {
         super(data);
-        if (!data) {
-            this.items = [];
-        }
     }
 
     init(_data: any) {
@@ -1088,15 +1294,18 @@ export class TemplatesDto extends ResourceDto implements ITemplatesDto {
             for (let item of _data["items"])
                 (<any>this).items!.push(TemplateDto.fromJSON(item));
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): TemplatesDto {
-        return new TemplatesDto().init(data);
+        const result = new TemplatesDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (Array.isArray(this.items)) {
             data["items"] = [];
             for (let item of this.items)
@@ -1132,15 +1341,18 @@ export class TemplateDto extends ResourceDto implements ITemplateDto {
         (<any>this).title = _data["title"];
         (<any>this).description = _data["description"];
         (<any>this).isStarter = _data["isStarter"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): TemplateDto {
-        return new TemplateDto().init(data);
+        const result = new TemplateDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         data["title"] = this.title;
         data["description"] = this.description;
@@ -1172,15 +1384,18 @@ export class TemplateDetailsDto extends ResourceDto implements ITemplateDetailsD
     init(_data: any) {
         super.init(_data);
         (<any>this).details = _data["details"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): TemplateDetailsDto {
-        return new TemplateDetailsDto().init(data);
+        const result = new TemplateDetailsDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["details"] = this.details;
         super.toJSON(data);
         return data;
@@ -1210,9 +1425,6 @@ export class ContributorsDto extends ResourceDto implements IContributorsDto {
 
     constructor(data?: IContributorsDto) {
         super(data);
-        if (!data) {
-            this.items = [];
-        }
     }
 
     init(_data: any) {
@@ -1224,15 +1436,18 @@ export class ContributorsDto extends ResourceDto implements IContributorsDto {
         }
         (<any>this).maxContributors = _data["maxContributors"];
         (<any>this)._meta = _data["_meta"] ? ContributorsMetadata.fromJSON(_data["_meta"]) : <any>undefined;
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): ContributorsDto {
-        return new ContributorsDto().init(data);
+        const result = new ContributorsDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (Array.isArray(this.items)) {
             data["items"] = [];
             for (let item of this.items)
@@ -1286,15 +1501,18 @@ export class ContributorDto extends ResourceDto implements IContributorDto {
         (<any>this).contributorName = _data["contributorName"];
         (<any>this).contributorEmail = _data["contributorEmail"];
         (<any>this).role = _data["role"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): ContributorDto {
-        return new ContributorDto().init(data);
+        const result = new ContributorDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["contributorId"] = this.contributorId;
         data["contributorName"] = this.contributorName;
         data["contributorEmail"] = this.contributorEmail;
@@ -1332,17 +1550,32 @@ export class ContributorsMetadata implements IContributorsMetadata {
 
     init(_data: any) {
         (<any>this).isInvited = _data["isInvited"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): ContributorsMetadata {
-        return new ContributorsMetadata().init(data);
+        const result = new ContributorsMetadata().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["isInvited"] = this.isInvited;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -1384,19 +1617,34 @@ export class AssignContributorDto implements IAssignContributorDto {
         (<any>this).contributorId = _data["contributorId"];
         (<any>this).role = _data["role"];
         (<any>this).invite = _data["invite"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): AssignContributorDto {
-        return new AssignContributorDto().init(data);
+        const result = new AssignContributorDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["contributorId"] = this.contributorId;
         data["role"] = this.role;
         data["invite"] = this.invite;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -1471,15 +1719,18 @@ export class TeamDto extends ResourceDto implements ITeamDto {
         (<any>this).created = _data["created"] ? DateTime.parseISO(_data["created"].toString()) : <any>undefined;
         (<any>this).lastModified = _data["lastModified"] ? DateTime.parseISO(_data["lastModified"].toString()) : <any>undefined;
         (<any>this).roleName = _data["roleName"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): TeamDto {
-        return new TeamDto().init(data);
+        const result = new TeamDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["createdBy"] = this.createdBy;
         data["lastModifiedBy"] = this.lastModifiedBy;
         data["id"] = this.id;
@@ -1529,17 +1780,32 @@ export class CreateTeamDto implements ICreateTeamDto {
 
     init(_data: any) {
         (<any>this).name = _data["name"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): CreateTeamDto {
-        return new CreateTeamDto().init(data);
+        const result = new CreateTeamDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -1575,17 +1841,32 @@ export class UpdateTeamDto implements IUpdateTeamDto {
 
     init(_data: any) {
         (<any>this).name = _data["name"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): UpdateTeamDto {
-        return new UpdateTeamDto().init(data);
+        const result = new UpdateTeamDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -1615,15 +1896,18 @@ export class AuthSchemeResponseDto extends ResourceDto implements IAuthSchemeRes
     init(_data: any) {
         super.init(_data);
         (<any>this).scheme = _data["scheme"] ? AuthSchemeDto.fromJSON(_data["scheme"]) : <any>undefined;
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): AuthSchemeResponseDto {
-        return new AuthSchemeResponseDto().init(data);
+        const result = new AuthSchemeResponseDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["scheme"] = this.scheme ? this.scheme.toJSON() : <any>undefined;
         super.toJSON(data);
         return data;
@@ -1667,15 +1951,18 @@ export class AuthSchemeDto implements IAuthSchemeDto {
         (<any>this).clientSecret = _data["clientSecret"];
         (<any>this).authority = _data["authority"];
         (<any>this).signoutRedirectUrl = _data["signoutRedirectUrl"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): AuthSchemeDto {
-        return new AuthSchemeDto().init(data);
+        const result = new AuthSchemeDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["domain"] = this.domain;
         data["displayName"] = this.displayName;
         data["clientId"] = this.clientId;
@@ -1683,6 +1970,18 @@ export class AuthSchemeDto implements IAuthSchemeDto {
         data["authority"] = this.authority;
         data["signoutRedirectUrl"] = this.signoutRedirectUrl;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -1728,17 +2027,32 @@ export class AuthSchemeValueDto implements IAuthSchemeValueDto {
 
     init(_data: any) {
         (<any>this).scheme = _data["scheme"] ? AuthSchemeDto.fromJSON(_data["scheme"]) : <any>undefined;
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): AuthSchemeValueDto {
-        return new AuthSchemeValueDto().init(data);
+        const result = new AuthSchemeValueDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["scheme"] = this.scheme ? this.scheme.toJSON() : <any>undefined;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -1774,17 +2088,32 @@ export class LogDownloadDto implements ILogDownloadDto {
 
     init(_data: any) {
         (<any>this).downloadUrl = _data["downloadUrl"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): LogDownloadDto {
-        return new LogDownloadDto().init(data);
+        const result = new LogDownloadDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["downloadUrl"] = this.downloadUrl;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -1832,9 +2161,6 @@ export class CallsUsageDto implements ICallsUsageDto {
                     (<any>this)[property] = (<any>data)[property];
             }
         }
-        if (!data) {
-            this.details = {};
-        }
     }
 
     init(_data: any) {
@@ -1853,15 +2179,18 @@ export class CallsUsageDto implements ICallsUsageDto {
                     (<any>(<any>this).details)![key] = _data["details"][key] ? _data["details"][key].map((i: any) => CallsUsagePerDateDto.fromJSON(i)) : [];
             }
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): CallsUsageDto {
-        return new CallsUsageDto().init(data);
+        const result = new CallsUsageDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["totalCalls"] = this.totalCalls;
         data["totalBytes"] = this.totalBytes;
         data["monthCalls"] = this.monthCalls;
@@ -1878,6 +2207,18 @@ export class CallsUsageDto implements ICallsUsageDto {
             }
         }
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -1938,20 +2279,35 @@ export class CallsUsagePerDateDto implements ICallsUsagePerDateDto {
         (<any>this).totalCalls = _data["totalCalls"];
         (<any>this).totalBytes = _data["totalBytes"];
         (<any>this).averageElapsedMs = _data["averageElapsedMs"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): CallsUsagePerDateDto {
-        return new CallsUsagePerDateDto().init(data);
+        const result = new CallsUsagePerDateDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["date"] = this.date ? this.date.toISOString() : <any>undefined;
         data["totalCalls"] = this.totalCalls;
         data["totalBytes"] = this.totalBytes;
         data["averageElapsedMs"] = this.averageElapsedMs;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -1996,18 +2352,33 @@ export class CurrentStorageDto implements ICurrentStorageDto {
     init(_data: any) {
         (<any>this).size = _data["size"];
         (<any>this).maxAllowed = _data["maxAllowed"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): CurrentStorageDto {
-        return new CurrentStorageDto().init(data);
+        const result = new CurrentStorageDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["size"] = this.size;
         data["maxAllowed"] = this.maxAllowed;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -2051,19 +2422,34 @@ export class StorageUsagePerDateDto implements IStorageUsagePerDateDto {
         (<any>this).date = _data["date"] ? DateTime.parseISO(_data["date"].toString()) : <any>undefined;
         (<any>this).totalCount = _data["totalCount"];
         (<any>this).totalSize = _data["totalSize"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): StorageUsagePerDateDto {
-        return new StorageUsagePerDateDto().init(data);
+        const result = new StorageUsagePerDateDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["date"] = this.date ? this.date.toISOString() : <any>undefined;
         data["totalCount"] = this.totalCount;
         data["totalSize"] = this.totalSize;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -2107,15 +2493,18 @@ export class SearchResultDto extends ResourceDto implements ISearchResultDto {
         (<any>this).name = _data["name"];
         (<any>this).type = _data["type"];
         (<any>this).label = _data["label"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): SearchResultDto {
-        return new SearchResultDto().init(data);
+        const result = new SearchResultDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         data["type"] = this.type;
         data["label"] = this.label;
@@ -2349,15 +2738,6 @@ export class SchemaDto extends ResourceDto implements ISchemaDto {
 
     constructor(data?: ISchemaDto) {
         super(data);
-        if (!data) {
-            this.properties = new SchemaPropertiesDto();
-            this.scripts = new SchemaScriptsDto();
-            this.previewUrls = {};
-            this.fieldsInLists = [];
-            this.fieldsInReferences = [];
-            this.fieldRules = [];
-            this.fields = [];
-        }
     }
 
     init(_data: any) {
@@ -2379,7 +2759,7 @@ export class SchemaDto extends ResourceDto implements ISchemaDto {
             (<any>this).previewUrls = {} as any;
             for (let key in _data["previewUrls"]) {
                 if (_data["previewUrls"].hasOwnProperty(key))
-                    (<any>(<any>this).previewUrls)![key] = _data["previewUrls"][key] !== undefined ? _data["previewUrls"][key] : <any>undefined;
+                    (<any>(<any>this).previewUrls)![key] = _data["previewUrls"][key];
             }
         }
         if (Array.isArray(_data["fieldsInLists"])) {
@@ -2402,15 +2782,18 @@ export class SchemaDto extends ResourceDto implements ISchemaDto {
             for (let item of _data["fields"])
                 (<any>this).fields!.push(FieldDto.fromJSON(item));
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): SchemaDto {
-        return new SchemaDto().init(data);
+        const result = new SchemaDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["id"] = this.id;
         data["createdBy"] = this.createdBy;
         data["lastModifiedBy"] = this.lastModifiedBy;
@@ -2548,15 +2931,18 @@ export class SchemaPropertiesDto implements ISchemaPropertiesDto {
             for (let item of _data["tags"])
                 (<any>this).tags!.push(item);
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): SchemaPropertiesDto {
-        return new SchemaPropertiesDto().init(data);
+        const result = new SchemaPropertiesDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["label"] = this.label;
         data["hints"] = this.hints;
         data["contentsSidebarUrl"] = this.contentsSidebarUrl;
@@ -2571,6 +2957,18 @@ export class SchemaPropertiesDto implements ISchemaPropertiesDto {
                 data["tags"].push(item);
         }
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -2637,15 +3035,18 @@ export class SchemaScriptsDto implements ISchemaScriptsDto {
         (<any>this).update = _data["update"];
         (<any>this).delete = _data["delete"];
         (<any>this).change = _data["change"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): SchemaScriptsDto {
-        return new SchemaScriptsDto().init(data);
+        const result = new SchemaScriptsDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["query"] = this.query;
         data["queryPre"] = this.queryPre;
         data["create"] = this.create;
@@ -2653,6 +3054,18 @@ export class SchemaScriptsDto implements ISchemaScriptsDto {
         data["delete"] = this.delete;
         data["change"] = this.change;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -2704,19 +3117,34 @@ export class FieldRuleDto implements IFieldRuleDto {
         (<any>this).action = _data["action"];
         (<any>this).field = _data["field"];
         (<any>this).condition = _data["condition"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): FieldRuleDto {
-        return new FieldRuleDto().init(data);
+        const result = new FieldRuleDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["action"] = this.action;
         data["field"] = this.field;
         data["condition"] = this.condition;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -2843,15 +3271,18 @@ export class FieldDto extends ResourceDto implements IFieldDto {
             for (let item of _data["nested"])
                 (<any>this).nested!.push(NestedFieldDto.fromJSON(item));
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): FieldDto {
-        return new FieldDto().init(data);
+        const result = new FieldDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["fieldId"] = this.fieldId;
         data["name"] = this.name;
         data["isHidden"] = this.isHidden;
@@ -2949,7 +3380,7 @@ export abstract class FieldPropertiesDto implements IFieldPropertiesDto {
             for (let item of _data["tags"])
                 (<any>this).tags!.push(item);
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
@@ -3000,6 +3431,7 @@ export abstract class FieldPropertiesDto implements IFieldPropertiesDto {
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["fieldType"] = "FieldPropertiesDto";
         data["label"] = this.label;
         data["hints"] = this.hints;
@@ -3014,6 +3446,18 @@ export abstract class FieldPropertiesDto implements IFieldPropertiesDto {
                 data["tags"].push(item);
         }
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -3075,15 +3519,18 @@ export class ArrayFieldPropertiesDto extends FieldPropertiesDto implements IArra
             for (let item of _data["uniqueFields"])
                 (<any>this).uniqueFields!.push(item);
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): ArrayFieldPropertiesDto {
-        return new ArrayFieldPropertiesDto().init(data);
+        const result = new ArrayFieldPropertiesDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["minItems"] = this.minItems;
         data["maxItems"] = this.maxItems;
         data["calculatedDefaultValue"] = this.calculatedDefaultValue;
@@ -3209,15 +3656,18 @@ export class AssetsFieldPropertiesDto extends FieldPropertiesDto implements IAss
                 (<any>this).allowedExtensions!.push(item);
         }
         (<any>this).allowDuplicates = _data["allowDuplicates"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): AssetsFieldPropertiesDto {
-        return new AssetsFieldPropertiesDto().init(data);
+        const result = new AssetsFieldPropertiesDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["previewMode"] = this.previewMode;
         if (this.defaultValues) {
             data["defaultValues"] = {};
@@ -3349,21 +3799,24 @@ export class BooleanFieldPropertiesDto extends FieldPropertiesDto implements IBo
             (<any>this).defaultValues = {} as any;
             for (let key in _data["defaultValues"]) {
                 if (_data["defaultValues"].hasOwnProperty(key))
-                    (<any>(<any>this).defaultValues)![key] = _data["defaultValues"][key] !== undefined ? _data["defaultValues"][key] : <any>undefined;
+                    (<any>(<any>this).defaultValues)![key] = _data["defaultValues"][key];
             }
         }
         (<any>this).defaultValue = _data["defaultValue"];
         (<any>this).inlineEditable = _data["inlineEditable"];
         (<any>this).editor = _data["editor"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): BooleanFieldPropertiesDto {
-        return new BooleanFieldPropertiesDto().init(data);
+        const result = new BooleanFieldPropertiesDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (this.defaultValues) {
             data["defaultValues"] = {};
             for (let key in this.defaultValues) {
@@ -3421,15 +3874,18 @@ export class ComponentFieldPropertiesDto extends FieldPropertiesDto implements I
             for (let item of _data["schemaIds"])
                 (<any>this).schemaIds!.push(item);
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): ComponentFieldPropertiesDto {
-        return new ComponentFieldPropertiesDto().init(data);
+        const result = new ComponentFieldPropertiesDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (Array.isArray(this.schemaIds)) {
             data["schemaIds"] = [];
             for (let item of this.schemaIds)
@@ -3485,15 +3941,18 @@ export class ComponentsFieldPropertiesDto extends FieldPropertiesDto implements 
             for (let item of _data["uniqueFields"])
                 (<any>this).uniqueFields!.push(item);
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): ComponentsFieldPropertiesDto {
-        return new ComponentsFieldPropertiesDto().init(data);
+        const result = new ComponentsFieldPropertiesDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["minItems"] = this.minItems;
         data["maxItems"] = this.maxItems;
         data["calculatedDefaultValue"] = this.calculatedDefaultValue;
@@ -3569,15 +4028,18 @@ export class DateTimeFieldPropertiesDto extends FieldPropertiesDto implements ID
         (<any>this).format = _data["format"];
         (<any>this).editor = _data["editor"];
         (<any>this).calculatedDefaultValue = _data["calculatedDefaultValue"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): DateTimeFieldPropertiesDto {
-        return new DateTimeFieldPropertiesDto().init(data);
+        const result = new DateTimeFieldPropertiesDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (this.defaultValues) {
             data["defaultValues"] = {};
             for (let key in this.defaultValues) {
@@ -3647,15 +4109,18 @@ export class GeolocationFieldPropertiesDto extends FieldPropertiesDto implements
     init(_data: any) {
         super.init(_data);
         (<any>this).editor = _data["editor"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): GeolocationFieldPropertiesDto {
-        return new GeolocationFieldPropertiesDto().init(data);
+        const result = new GeolocationFieldPropertiesDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["editor"] = this.editor;
         super.toJSON(data);
         return data;
@@ -3693,15 +4158,18 @@ export class JsonFieldPropertiesDto extends FieldPropertiesDto implements IJsonF
     init(_data: any) {
         super.init(_data);
         (<any>this).graphQLSchema = _data["graphQLSchema"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): JsonFieldPropertiesDto {
-        return new JsonFieldPropertiesDto().init(data);
+        const result = new JsonFieldPropertiesDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["graphQLSchema"] = this.graphQLSchema;
         super.toJSON(data);
         return data;
@@ -3750,7 +4218,7 @@ export class NumberFieldPropertiesDto extends FieldPropertiesDto implements INum
             (<any>this).defaultValues = {} as any;
             for (let key in _data["defaultValues"]) {
                 if (_data["defaultValues"].hasOwnProperty(key))
-                    (<any>(<any>this).defaultValues)![key] = _data["defaultValues"][key] !== undefined ? _data["defaultValues"][key] : <any>undefined;
+                    (<any>(<any>this).defaultValues)![key] = _data["defaultValues"][key];
             }
         }
         (<any>this).defaultValue = _data["defaultValue"];
@@ -3764,15 +4232,18 @@ export class NumberFieldPropertiesDto extends FieldPropertiesDto implements INum
         (<any>this).isUnique = _data["isUnique"];
         (<any>this).inlineEditable = _data["inlineEditable"];
         (<any>this).editor = _data["editor"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): NumberFieldPropertiesDto {
-        return new NumberFieldPropertiesDto().init(data);
+        const result = new NumberFieldPropertiesDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (this.defaultValues) {
             data["defaultValues"] = {};
             for (let key in this.defaultValues) {
@@ -3889,15 +4360,18 @@ export class ReferencesFieldPropertiesDto extends FieldPropertiesDto implements 
             for (let item of _data["schemaIds"])
                 (<any>this).schemaIds!.push(item);
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): ReferencesFieldPropertiesDto {
-        return new ReferencesFieldPropertiesDto().init(data);
+        const result = new ReferencesFieldPropertiesDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (this.defaultValues) {
             data["defaultValues"] = {};
             for (let key in this.defaultValues) {
@@ -4013,15 +4487,18 @@ export class RichTextFieldPropertiesDto extends FieldPropertiesDto implements IR
             for (let item of _data["schemaIds"])
                 (<any>this).schemaIds!.push(item);
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): RichTextFieldPropertiesDto {
-        return new RichTextFieldPropertiesDto().init(data);
+        const result = new RichTextFieldPropertiesDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["folderId"] = this.folderId;
         data["minLength"] = this.minLength;
         data["maxLength"] = this.maxLength;
@@ -4126,7 +4603,7 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto implements IStr
             (<any>this).defaultValues = {} as any;
             for (let key in _data["defaultValues"]) {
                 if (_data["defaultValues"].hasOwnProperty(key))
-                    (<any>(<any>this).defaultValues)![key] = _data["defaultValues"][key] !== undefined ? _data["defaultValues"][key] : <any>undefined;
+                    (<any>(<any>this).defaultValues)![key] = _data["defaultValues"][key];
             }
         }
         (<any>this).defaultValue = _data["defaultValue"];
@@ -4160,15 +4637,18 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto implements IStr
         (<any>this).createEnum = _data["createEnum"];
         (<any>this).contentType = _data["contentType"];
         (<any>this).editor = _data["editor"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): StringFieldPropertiesDto {
-        return new StringFieldPropertiesDto().init(data);
+        const result = new StringFieldPropertiesDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (this.defaultValues) {
             data["defaultValues"] = {};
             for (let key in this.defaultValues) {
@@ -4334,15 +4814,18 @@ export class TagsFieldPropertiesDto extends FieldPropertiesDto implements ITagsF
         }
         (<any>this).createEnum = _data["createEnum"];
         (<any>this).editor = _data["editor"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): TagsFieldPropertiesDto {
-        return new TagsFieldPropertiesDto().init(data);
+        const result = new TagsFieldPropertiesDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (this.defaultValues) {
             data["defaultValues"] = {};
             for (let key in this.defaultValues) {
@@ -4422,15 +4905,18 @@ export class UIFieldPropertiesDto extends FieldPropertiesDto implements IUIField
     init(_data: any) {
         super.init(_data);
         (<any>this).editor = _data["editor"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): UIFieldPropertiesDto {
-        return new UIFieldPropertiesDto().init(data);
+        const result = new UIFieldPropertiesDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["editor"] = this.editor;
         super.toJSON(data);
         return data;
@@ -4513,15 +4999,18 @@ export class NestedFieldDto extends ResourceDto implements INestedFieldDto {
         (<any>this).isLocked = _data["isLocked"];
         (<any>this).isDisabled = _data["isDisabled"];
         (<any>this).properties = _data["properties"] ? FieldPropertiesDto.fromJSON(_data["properties"]) : <any>undefined;
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): NestedFieldDto {
-        return new NestedFieldDto().init(data);
+        const result = new NestedFieldDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["fieldId"] = this.fieldId;
         data["name"] = this.name;
         data["isHidden"] = this.isHidden;
@@ -4571,19 +5060,34 @@ export class AddFieldDto implements IAddFieldDto {
         (<any>this).name = _data["name"];
         (<any>this).partitioning = _data["partitioning"];
         (<any>this).properties = _data["properties"] ? FieldPropertiesDto.fromJSON(_data["properties"]) : <any>undefined;
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): AddFieldDto {
-        return new AddFieldDto().init(data);
+        const result = new AddFieldDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         data["partitioning"] = this.partitioning;
         data["properties"] = this.properties ? this.properties.toJSON() : <any>undefined;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -4634,15 +5138,18 @@ export class ConfigureUIFieldsDto implements IConfigureUIFieldsDto {
             for (let item of _data["fieldsInReferences"])
                 (<any>this).fieldsInReferences!.push(item);
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): ConfigureUIFieldsDto {
-        return new ConfigureUIFieldsDto().init(data);
+        const result = new ConfigureUIFieldsDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (Array.isArray(this.fieldsInLists)) {
             data["fieldsInLists"] = [];
             for (let item of this.fieldsInLists)
@@ -4654,6 +5161,18 @@ export class ConfigureUIFieldsDto implements IConfigureUIFieldsDto {
                 data["fieldsInReferences"].push(item);
         }
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -4687,9 +5206,6 @@ export class ReorderFieldsDto implements IReorderFieldsDto {
                     (<any>this)[property] = (<any>data)[property];
             }
         }
-        if (!data) {
-            this.fieldIds = [];
-        }
     }
 
     init(_data: any) {
@@ -4698,21 +5214,36 @@ export class ReorderFieldsDto implements IReorderFieldsDto {
             for (let item of _data["fieldIds"])
                 (<any>this).fieldIds!.push(item);
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): ReorderFieldsDto {
-        return new ReorderFieldsDto().init(data);
+        const result = new ReorderFieldsDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (Array.isArray(this.fieldIds)) {
             data["fieldIds"] = [];
             for (let item of this.fieldIds)
                 data["fieldIds"].push(item);
         }
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -4748,17 +5279,32 @@ export class UpdateFieldDto implements IUpdateFieldDto {
 
     init(_data: any) {
         (<any>this).properties = _data["properties"] ? FieldPropertiesDto.fromJSON(_data["properties"]) : <any>undefined;
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): UpdateFieldDto {
-        return new UpdateFieldDto().init(data);
+        const result = new UpdateFieldDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["properties"] = this.properties ? this.properties.toJSON() : <any>undefined;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -4787,9 +5333,6 @@ export class IndexesDto extends ResourceDto implements IIndexesDto {
 
     constructor(data?: IIndexesDto) {
         super(data);
-        if (!data) {
-            this.items = [];
-        }
     }
 
     init(_data: any) {
@@ -4799,15 +5342,18 @@ export class IndexesDto extends ResourceDto implements IIndexesDto {
             for (let item of _data["items"])
                 (<any>this).items!.push(IndexDto.fromJSON(item));
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): IndexesDto {
-        return new IndexesDto().init(data);
+        const result = new IndexesDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (Array.isArray(this.items)) {
             data["items"] = [];
             for (let item of this.items)
@@ -4835,9 +5381,6 @@ export class IndexDto extends ResourceDto implements IIndexDto {
 
     constructor(data?: IIndexDto) {
         super(data);
-        if (!data) {
-            this.fields = [];
-        }
     }
 
     init(_data: any) {
@@ -4848,15 +5391,18 @@ export class IndexDto extends ResourceDto implements IIndexDto {
             for (let item of _data["fields"])
                 (<any>this).fields!.push(IndexFieldDto.fromJSON(item));
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): IndexDto {
-        return new IndexDto().init(data);
+        const result = new IndexDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         if (Array.isArray(this.fields)) {
             data["fields"] = [];
@@ -4895,18 +5441,33 @@ export class IndexFieldDto implements IIndexFieldDto {
     init(_data: any) {
         (<any>this).name = _data["name"];
         (<any>this).order = _data["order"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): IndexFieldDto {
-        return new IndexFieldDto().init(data);
+        const result = new IndexFieldDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         data["order"] = this.order;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -4947,9 +5508,6 @@ export class CreateIndexDto implements ICreateIndexDto {
                     (<any>this)[property] = (<any>data)[property];
             }
         }
-        if (!data) {
-            this.fields = [];
-        }
     }
 
     init(_data: any) {
@@ -4958,21 +5516,36 @@ export class CreateIndexDto implements ICreateIndexDto {
             for (let item of _data["fields"])
                 (<any>this).fields!.push(IndexFieldDto.fromJSON(item));
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): CreateIndexDto {
-        return new CreateIndexDto().init(data);
+        const result = new CreateIndexDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (Array.isArray(this.fields)) {
             data["fields"] = [];
             for (let item of this.fields)
                 data["fields"].push(item.toJSON());
         }
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -5001,9 +5574,6 @@ export class SchemasDto extends ResourceDto implements ISchemasDto {
 
     constructor(data?: ISchemasDto) {
         super(data);
-        if (!data) {
-            this.items = [];
-        }
     }
 
     init(_data: any) {
@@ -5013,15 +5583,18 @@ export class SchemasDto extends ResourceDto implements ISchemasDto {
             for (let item of _data["items"])
                 (<any>this).items!.push(SchemaDto.fromJSON(item));
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): SchemasDto {
-        return new SchemasDto().init(data);
+        const result = new SchemasDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (Array.isArray(this.items)) {
             data["items"] = [];
             for (let item of this.items)
@@ -5090,7 +5663,7 @@ export abstract class UpsertSchemaDto implements IUpsertSchemaDto {
             (<any>this).previewUrls = {} as any;
             for (let key in _data["previewUrls"]) {
                 if (_data["previewUrls"].hasOwnProperty(key))
-                    (<any>(<any>this).previewUrls)![key] = _data["previewUrls"][key] !== undefined ? _data["previewUrls"][key] : <any>undefined;
+                    (<any>(<any>this).previewUrls)![key] = _data["previewUrls"][key];
             }
         }
         if (Array.isArray(_data["fieldRules"])) {
@@ -5100,7 +5673,7 @@ export abstract class UpsertSchemaDto implements IUpsertSchemaDto {
         }
         (<any>this).category = _data["category"];
         (<any>this).isPublished = _data["isPublished"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
@@ -5109,6 +5682,7 @@ export abstract class UpsertSchemaDto implements IUpsertSchemaDto {
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["properties"] = this.properties ? this.properties.toJSON() : <any>undefined;
         data["scripts"] = this.scripts ? this.scripts.toJSON() : <any>undefined;
         if (Array.isArray(this.fieldsInReferences)) {
@@ -5141,6 +5715,18 @@ export abstract class UpsertSchemaDto implements IUpsertSchemaDto {
         data["category"] = this.category;
         data["isPublished"] = this.isPublished;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -5192,15 +5778,18 @@ export class CreateSchemaDto extends UpsertSchemaDto implements ICreateSchemaDto
         (<any>this).name = _data["name"];
         (<any>this).type = _data["type"];
         (<any>this).isSingleton = _data["isSingleton"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): CreateSchemaDto {
-        return new CreateSchemaDto().init(data);
+        const result = new CreateSchemaDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         data["type"] = this.type;
         data["isSingleton"] = this.isSingleton;
@@ -5257,15 +5846,18 @@ export class UpsertSchemaFieldDto implements IUpsertSchemaFieldDto {
             for (let item of _data["nested"])
                 (<any>this).nested!.push(UpsertSchemaNestedFieldDto.fromJSON(item));
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): UpsertSchemaFieldDto {
-        return new UpsertSchemaFieldDto().init(data);
+        const result = new UpsertSchemaFieldDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         data["isHidden"] = this.isHidden;
         data["isLocked"] = this.isLocked;
@@ -5278,6 +5870,18 @@ export class UpsertSchemaFieldDto implements IUpsertSchemaFieldDto {
                 data["nested"].push(item.toJSON());
         }
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -5337,21 +5941,36 @@ export class UpsertSchemaNestedFieldDto implements IUpsertSchemaNestedFieldDto {
         (<any>this).isLocked = _data["isLocked"];
         (<any>this).isDisabled = _data["isDisabled"];
         (<any>this).properties = _data["properties"] ? FieldPropertiesDto.fromJSON(_data["properties"]) : <any>undefined;
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): UpsertSchemaNestedFieldDto {
-        return new UpsertSchemaNestedFieldDto().init(data);
+        const result = new UpsertSchemaNestedFieldDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         data["isHidden"] = this.isHidden;
         data["isLocked"] = this.isLocked;
         data["isDisabled"] = this.isDisabled;
         data["properties"] = this.properties ? this.properties.toJSON() : <any>undefined;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -5417,15 +6036,18 @@ export class UpdateSchemaDto implements IUpdateSchemaDto {
             for (let item of _data["tags"])
                 (<any>this).tags!.push(item);
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): UpdateSchemaDto {
-        return new UpdateSchemaDto().init(data);
+        const result = new UpdateSchemaDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["label"] = this.label;
         data["hints"] = this.hints;
         data["contentsSidebarUrl"] = this.contentsSidebarUrl;
@@ -5438,6 +6060,18 @@ export class UpdateSchemaDto implements IUpdateSchemaDto {
                 data["tags"].push(item);
         }
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -5482,15 +6116,18 @@ export class SynchronizeSchemaDto extends UpsertSchemaDto implements ISynchroniz
         super.init(_data);
         (<any>this).noFieldDeletion = _data["noFieldDeletion"];
         (<any>this).noFieldRecreation = _data["noFieldRecreation"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): SynchronizeSchemaDto {
-        return new SynchronizeSchemaDto().init(data);
+        const result = new SynchronizeSchemaDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["noFieldDeletion"] = this.noFieldDeletion;
         data["noFieldRecreation"] = this.noFieldRecreation;
         super.toJSON(data);
@@ -5522,17 +6159,32 @@ export class ChangeCategoryDto implements IChangeCategoryDto {
 
     init(_data: any) {
         (<any>this).name = _data["name"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): ChangeCategoryDto {
-        return new ChangeCategoryDto().init(data);
+        const result = new ChangeCategoryDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -5572,21 +6224,36 @@ export class ConfigureFieldRulesDto implements IConfigureFieldRulesDto {
             for (let item of _data["fieldRules"])
                 (<any>this).fieldRules!.push(FieldRuleDto.fromJSON(item));
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): ConfigureFieldRulesDto {
-        return new ConfigureFieldRulesDto().init(data);
+        const result = new ConfigureFieldRulesDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (Array.isArray(this.fieldRules)) {
             data["fieldRules"] = [];
             for (let item of this.fieldRules)
                 data["fieldRules"].push(item.toJSON());
         }
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -5630,9 +6297,6 @@ export class RuleElementDto implements IRuleElementDto {
                     (<any>this)[property] = (<any>data)[property];
             }
         }
-        if (!data) {
-            this.properties = [];
-        }
     }
 
     init(_data: any) {
@@ -5647,15 +6311,18 @@ export class RuleElementDto implements IRuleElementDto {
             for (let item of _data["properties"])
                 (<any>this).properties!.push(RuleElementPropertyDto.fromJSON(item));
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): RuleElementDto {
-        return new RuleElementDto().init(data);
+        const result = new RuleElementDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["description"] = this.description;
         data["display"] = this.display;
         data["title"] = this.title;
@@ -5668,6 +6335,18 @@ export class RuleElementDto implements IRuleElementDto {
                 data["properties"].push(item.toJSON());
         }
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -5737,15 +6416,18 @@ export class RuleElementPropertyDto implements IRuleElementPropertyDto {
         (<any>this).description = _data["description"];
         (<any>this).isFormattable = _data["isFormattable"];
         (<any>this).isRequired = _data["isRequired"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): RuleElementPropertyDto {
-        return new RuleElementPropertyDto().init(data);
+        const result = new RuleElementPropertyDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["editor"] = this.editor;
         data["name"] = this.name;
         data["display"] = this.display;
@@ -5758,6 +6440,18 @@ export class RuleElementPropertyDto implements IRuleElementPropertyDto {
         data["isFormattable"] = this.isFormattable;
         data["isRequired"] = this.isRequired;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -5822,9 +6516,6 @@ export class RulesDto extends ResourceDto implements IRulesDto {
 
     constructor(data?: IRulesDto) {
         super(data);
-        if (!data) {
-            this.items = [];
-        }
     }
 
     init(_data: any) {
@@ -5835,15 +6526,18 @@ export class RulesDto extends ResourceDto implements IRulesDto {
                 (<any>this).items!.push(RuleDto.fromJSON(item));
         }
         (<any>this).runningRuleId = _data["runningRuleId"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): RulesDto {
-        return new RulesDto().init(data);
+        const result = new RulesDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (Array.isArray(this.items)) {
             data["items"] = [];
             for (let item of this.items)
@@ -5941,15 +6635,18 @@ export class RuleDto extends ResourceDto implements IRuleDto {
         (<any>this).numSucceeded = _data["numSucceeded"];
         (<any>this).numFailed = _data["numFailed"];
         (<any>this).lastExecuted = _data["lastExecuted"] ? DateTime.parseISO(_data["lastExecuted"].toString()) : <any>undefined;
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): RuleDto {
-        return new RuleDto().init(data);
+        const result = new RuleDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["id"] = this.id;
         data["createdBy"] = this.createdBy;
         data["lastModifiedBy"] = this.lastModifiedBy;
@@ -6014,7 +6711,7 @@ export abstract class RuleTriggerDto implements IRuleTriggerDto {
     }
 
     init(_data: any) {
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
@@ -6041,8 +6738,21 @@ export abstract class RuleTriggerDto implements IRuleTriggerDto {
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["triggerType"] = "RuleTriggerDto";
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -6071,15 +6781,18 @@ export class AssetChangedRuleTriggerDto extends RuleTriggerDto implements IAsset
     init(_data: any) {
         super.init(_data);
         (<any>this).condition = _data["condition"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): AssetChangedRuleTriggerDto {
-        return new AssetChangedRuleTriggerDto().init(data);
+        const result = new AssetChangedRuleTriggerDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["condition"] = this.condition;
         super.toJSON(data);
         return data;
@@ -6103,15 +6816,18 @@ export class CommentRuleTriggerDto extends RuleTriggerDto implements ICommentRul
     init(_data: any) {
         super.init(_data);
         (<any>this).condition = _data["condition"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): CommentRuleTriggerDto {
-        return new CommentRuleTriggerDto().init(data);
+        const result = new CommentRuleTriggerDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["condition"] = this.condition;
         super.toJSON(data);
         return data;
@@ -6149,15 +6865,18 @@ export class ContentChangedRuleTriggerDto extends RuleTriggerDto implements ICon
                 (<any>this).referencedSchemas!.push(SchemaCondition.fromJSON(item));
         }
         (<any>this).handleAll = _data["handleAll"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): ContentChangedRuleTriggerDto {
-        return new ContentChangedRuleTriggerDto().init(data);
+        const result = new ContentChangedRuleTriggerDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (Array.isArray(this.schemas)) {
             data["schemas"] = [];
             for (let item of this.schemas)
@@ -6201,18 +6920,33 @@ export class SchemaCondition implements ISchemaCondition {
     init(_data: any) {
         (<any>this).schemaId = _data["schemaId"];
         (<any>this).condition = _data["condition"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): SchemaCondition {
-        return new SchemaCondition().init(data);
+        const result = new SchemaCondition().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["schemaId"] = this.schemaId;
         data["condition"] = this.condition;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -6240,15 +6974,18 @@ export class ManualRuleTriggerDto extends RuleTriggerDto implements IManualRuleT
 
     init(_data: any) {
         super.init(_data);
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): ManualRuleTriggerDto {
-        return new ManualRuleTriggerDto().init(data);
+        const result = new ManualRuleTriggerDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         super.toJSON(data);
         return data;
     }
@@ -6269,15 +7006,18 @@ export class SchemaChangedRuleTriggerDto extends RuleTriggerDto implements ISche
     init(_data: any) {
         super.init(_data);
         (<any>this).condition = _data["condition"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): SchemaChangedRuleTriggerDto {
-        return new SchemaChangedRuleTriggerDto().init(data);
+        const result = new SchemaChangedRuleTriggerDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["condition"] = this.condition;
         super.toJSON(data);
         return data;
@@ -6304,15 +7044,18 @@ export class UsageRuleTriggerDto extends RuleTriggerDto implements IUsageRuleTri
         super.init(_data);
         (<any>this).limit = _data["limit"];
         (<any>this).numDays = _data["numDays"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): UsageRuleTriggerDto {
-        return new UsageRuleTriggerDto().init(data);
+        const result = new UsageRuleTriggerDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["limit"] = this.limit;
         data["numDays"] = this.numDays;
         super.toJSON(data);
@@ -6344,7 +7087,7 @@ export abstract class RuleActionDto implements IRuleActionDto {
     }
 
     init(_data: any) {
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
@@ -6410,8 +7153,21 @@ export abstract class RuleActionDto implements IRuleActionDto {
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["actionType"] = "RuleActionDto";
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -6452,15 +7208,18 @@ export class AlgoliaRuleActionDto extends RuleActionDto implements IAlgoliaRuleA
         (<any>this).indexName = _data["indexName"];
         (<any>this).document = _data["document"];
         (<any>this).delete = _data["delete"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): AlgoliaRuleActionDto {
-        return new AlgoliaRuleActionDto().init(data);
+        const result = new AlgoliaRuleActionDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["appId"] = this.appId;
         data["apiKey"] = this.apiKey;
         data["indexName"] = this.indexName;
@@ -6502,15 +7261,18 @@ export class AzureQueueRuleActionDto extends RuleActionDto implements IAzureQueu
         (<any>this).connectionString = _data["connectionString"];
         (<any>this).queue = _data["queue"];
         (<any>this).payload = _data["payload"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): AzureQueueRuleActionDto {
-        return new AzureQueueRuleActionDto().init(data);
+        const result = new AzureQueueRuleActionDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["connectionString"] = this.connectionString;
         data["queue"] = this.queue;
         data["payload"] = this.payload;
@@ -6543,15 +7305,18 @@ export class CommentRuleActionDto extends RuleActionDto implements ICommentRuleA
         super.init(_data);
         (<any>this).text = _data["text"];
         (<any>this).client = _data["client"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): CommentRuleActionDto {
-        return new CommentRuleActionDto().init(data);
+        const result = new CommentRuleActionDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["text"] = this.text;
         data["client"] = this.client;
         super.toJSON(data);
@@ -6587,15 +7352,18 @@ export class CreateContentRuleActionDto extends RuleActionDto implements ICreate
         (<any>this).schema = _data["schema"];
         (<any>this).client = _data["client"];
         (<any>this).publish = _data["publish"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): CreateContentRuleActionDto {
-        return new CreateContentRuleActionDto().init(data);
+        const result = new CreateContentRuleActionDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["data"] = this.data;
         data["schema"] = this.schema;
         data["client"] = this.client;
@@ -6646,15 +7414,18 @@ export class DiscourseRuleActionDto extends RuleActionDto implements IDiscourseR
         (<any>this).title = _data["title"];
         (<any>this).topic = _data["topic"];
         (<any>this).category = _data["category"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): DiscourseRuleActionDto {
-        return new DiscourseRuleActionDto().init(data);
+        const result = new DiscourseRuleActionDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["url"] = this.url;
         data["apiKey"] = this.apiKey;
         data["apiUsername"] = this.apiUsername;
@@ -6711,15 +7482,18 @@ export class ElasticSearchRuleActionDto extends RuleActionDto implements IElasti
         (<any>this).password = _data["password"];
         (<any>this).document = _data["document"];
         (<any>this).delete = _data["delete"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): ElasticSearchRuleActionDto {
-        return new ElasticSearchRuleActionDto().init(data);
+        const result = new ElasticSearchRuleActionDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["host"] = this.host;
         data["indexName"] = this.indexName;
         data["username"] = this.username;
@@ -6779,15 +7553,18 @@ export class EmailRuleActionDto extends RuleActionDto implements IEmailRuleActio
         (<any>this).messageTo = _data["messageTo"];
         (<any>this).messageSubject = _data["messageSubject"];
         (<any>this).messageBody = _data["messageBody"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): EmailRuleActionDto {
-        return new EmailRuleActionDto().init(data);
+        const result = new EmailRuleActionDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["serverHost"] = this.serverHost;
         data["serverPort"] = this.serverPort;
         data["serverUsername"] = this.serverUsername;
@@ -6835,15 +7612,18 @@ export class FastlyRuleActionDto extends RuleActionDto implements IFastlyRuleAct
         super.init(_data);
         (<any>this).apiKey = _data["apiKey"];
         (<any>this).serviceId = _data["serviceId"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): FastlyRuleActionDto {
-        return new FastlyRuleActionDto().init(data);
+        const result = new FastlyRuleActionDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["apiKey"] = this.apiKey;
         data["serviceId"] = this.serviceId;
         super.toJSON(data);
@@ -6888,15 +7668,18 @@ export class MediumRuleActionDto extends RuleActionDto implements IMediumRuleAct
         (<any>this).tags = _data["tags"];
         (<any>this).publicationId = _data["publicationId"];
         (<any>this).isHtml = _data["isHtml"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): MediumRuleActionDto {
-        return new MediumRuleActionDto().init(data);
+        const result = new MediumRuleActionDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["accessToken"] = this.accessToken;
         data["title"] = this.title;
         data["content"] = this.content;
@@ -6947,15 +7730,18 @@ export class NotificationRuleActionDto extends RuleActionDto implements INotific
         (<any>this).text = _data["text"];
         (<any>this).url = _data["url"];
         (<any>this).client = _data["client"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): NotificationRuleActionDto {
-        return new NotificationRuleActionDto().init(data);
+        const result = new NotificationRuleActionDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["user"] = this.user;
         data["text"] = this.text;
         data["url"] = this.url;
@@ -7003,15 +7789,18 @@ export class OpenSearchRuleActionDto extends RuleActionDto implements IOpenSearc
         (<any>this).password = _data["password"];
         (<any>this).document = _data["document"];
         (<any>this).delete = _data["delete"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): OpenSearchRuleActionDto {
-        return new OpenSearchRuleActionDto().init(data);
+        const result = new OpenSearchRuleActionDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["host"] = this.host;
         data["indexName"] = this.indexName;
         data["username"] = this.username;
@@ -7053,15 +7842,18 @@ export class PrerenderRuleActionDto extends RuleActionDto implements IPrerenderR
         super.init(_data);
         (<any>this).token = _data["token"];
         (<any>this).url = _data["url"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): PrerenderRuleActionDto {
-        return new PrerenderRuleActionDto().init(data);
+        const result = new PrerenderRuleActionDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["token"] = this.token;
         data["url"] = this.url;
         super.toJSON(data);
@@ -7088,15 +7880,18 @@ export class ScriptRuleActionDto extends RuleActionDto implements IScriptRuleAct
     init(_data: any) {
         super.init(_data);
         (<any>this).script = _data["script"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): ScriptRuleActionDto {
-        return new ScriptRuleActionDto().init(data);
+        const result = new ScriptRuleActionDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["script"] = this.script;
         super.toJSON(data);
         return data;
@@ -7137,15 +7932,18 @@ export class SignalRRuleActionDto extends RuleActionDto implements ISignalRRuleA
         (<any>this).methodName = _data["methodName"];
         (<any>this).target = _data["target"];
         (<any>this).payload = _data["payload"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): SignalRRuleActionDto {
-        return new SignalRRuleActionDto().init(data);
+        const result = new SignalRRuleActionDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["connectionString"] = this.connectionString;
         data["hubName"] = this.hubName;
         data["action"] = this.action;
@@ -7197,15 +7995,18 @@ export class SlackRuleActionDto extends RuleActionDto implements ISlackRuleActio
         super.init(_data);
         (<any>this).webhookUrl = _data["webhookUrl"];
         (<any>this).text = _data["text"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): SlackRuleActionDto {
-        return new SlackRuleActionDto().init(data);
+        const result = new SlackRuleActionDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["webhookUrl"] = this.webhookUrl;
         data["text"] = this.text;
         super.toJSON(data);
@@ -7238,15 +8039,18 @@ export class SquidexEmailRuleActionDto extends RuleActionDto implements ISquidex
         (<any>this).messageTo = _data["messageTo"];
         (<any>this).messageSubject = _data["messageSubject"];
         (<any>this).messageBody = _data["messageBody"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): SquidexEmailRuleActionDto {
-        return new SquidexEmailRuleActionDto().init(data);
+        const result = new SquidexEmailRuleActionDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["messageTo"] = this.messageTo;
         data["messageSubject"] = this.messageSubject;
         data["messageBody"] = this.messageBody;
@@ -7282,15 +8086,18 @@ export class TweetRuleActionDto extends RuleActionDto implements ITweetRuleActio
         (<any>this).accessToken = _data["accessToken"];
         (<any>this).accessSecret = _data["accessSecret"];
         (<any>this).text = _data["text"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): TweetRuleActionDto {
-        return new TweetRuleActionDto().init(data);
+        const result = new TweetRuleActionDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["accessToken"] = this.accessToken;
         data["accessSecret"] = this.accessSecret;
         data["text"] = this.text;
@@ -7332,15 +8139,18 @@ export class TypesenseRuleActionDto extends RuleActionDto implements ITypesenseR
         (<any>this).apiKey = _data["apiKey"];
         (<any>this).document = _data["document"];
         (<any>this).delete = _data["delete"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): TypesenseRuleActionDto {
-        return new TypesenseRuleActionDto().init(data);
+        const result = new TypesenseRuleActionDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["host"] = this.host;
         data["indexName"] = this.indexName;
         data["apiKey"] = this.apiKey;
@@ -7391,15 +8201,18 @@ export class WebhookRuleActionDto extends RuleActionDto implements IWebhookRuleA
         (<any>this).payloadType = _data["payloadType"];
         (<any>this).headers = _data["headers"];
         (<any>this).sharedSecret = _data["sharedSecret"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): WebhookRuleActionDto {
-        return new WebhookRuleActionDto().init(data);
+        const result = new WebhookRuleActionDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["url"] = this.url;
         data["method"] = this.method;
         data["payload"] = this.payload;
@@ -7456,18 +8269,33 @@ export class CreateRuleDto implements ICreateRuleDto {
     init(_data: any) {
         (<any>this).trigger = _data["trigger"] ? RuleTriggerDto.fromJSON(_data["trigger"]) : <any>undefined;
         (<any>this).action = _data["action"] ? RuleActionDto.fromJSON(_data["action"]) : <any>undefined;
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): CreateRuleDto {
-        return new CreateRuleDto().init(data);
+        const result = new CreateRuleDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["trigger"] = this.trigger ? this.trigger.toJSON() : <any>undefined;
         data["action"] = this.action ? this.action.toJSON() : <any>undefined;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -7514,20 +8342,35 @@ export class UpdateRuleDto implements IUpdateRuleDto {
         (<any>this).trigger = _data["trigger"] ? RuleTriggerDto.fromJSON(_data["trigger"]) : <any>undefined;
         (<any>this).action = _data["action"] ? RuleActionDto.fromJSON(_data["action"]) : <any>undefined;
         (<any>this).isEnabled = _data["isEnabled"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): UpdateRuleDto {
-        return new UpdateRuleDto().init(data);
+        const result = new UpdateRuleDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         data["trigger"] = this.trigger ? this.trigger.toJSON() : <any>undefined;
         data["action"] = this.action ? this.action.toJSON() : <any>undefined;
         data["isEnabled"] = this.isEnabled;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -7560,9 +8403,6 @@ export class SimulatedRuleEventsDto extends ResourceDto implements ISimulatedRul
 
     constructor(data?: ISimulatedRuleEventsDto) {
         super(data);
-        if (!data) {
-            this.items = [];
-        }
     }
 
     init(_data: any) {
@@ -7573,15 +8413,18 @@ export class SimulatedRuleEventsDto extends ResourceDto implements ISimulatedRul
             for (let item of _data["items"])
                 (<any>this).items!.push(SimulatedRuleEventDto.fromJSON(item));
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): SimulatedRuleEventsDto {
-        return new SimulatedRuleEventsDto().init(data);
+        const result = new SimulatedRuleEventsDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["total"] = this.total;
         if (Array.isArray(this.items)) {
             data["items"] = [];
@@ -7629,9 +8472,6 @@ export class SimulatedRuleEventDto implements ISimulatedRuleEventDto {
                     (<any>this)[property] = (<any>data)[property];
             }
         }
-        if (!data) {
-            this.skipReasons = [];
-        }
     }
 
     init(_data: any) {
@@ -7648,15 +8488,18 @@ export class SimulatedRuleEventDto implements ISimulatedRuleEventDto {
             for (let item of _data["skipReasons"])
                 (<any>this).skipReasons!.push(item);
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): SimulatedRuleEventDto {
-        return new SimulatedRuleEventDto().init(data);
+        const result = new SimulatedRuleEventDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["eventId"] = this.eventId;
         data["uniqueId"] = this.uniqueId;
         data["eventName"] = this.eventName;
@@ -7671,6 +8514,18 @@ export class SimulatedRuleEventDto implements ISimulatedRuleEventDto {
                 data["skipReasons"].push(item);
         }
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -7733,9 +8588,6 @@ export class RuleEventsDto extends ResourceDto implements IRuleEventsDto {
 
     constructor(data?: IRuleEventsDto) {
         super(data);
-        if (!data) {
-            this.items = [];
-        }
     }
 
     init(_data: any) {
@@ -7746,15 +8598,18 @@ export class RuleEventsDto extends ResourceDto implements IRuleEventsDto {
             for (let item of _data["items"])
                 (<any>this).items!.push(RuleEventDto.fromJSON(item));
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): RuleEventsDto {
-        return new RuleEventsDto().init(data);
+        const result = new RuleEventsDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["total"] = this.total;
         if (Array.isArray(this.items)) {
             data["items"] = [];
@@ -7816,15 +8671,18 @@ export class RuleEventDto extends ResourceDto implements IRuleEventDto {
         (<any>this).nextAttempt = _data["nextAttempt"] ? DateTime.parseISO(_data["nextAttempt"].toString()) : <any>undefined;
         (<any>this).result = _data["result"];
         (<any>this).jobResult = _data["jobResult"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): RuleEventDto {
-        return new RuleEventDto().init(data);
+        const result = new RuleEventDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["id"] = this.id;
         data["created"] = this.created ? this.created.toISOString() : <any>undefined;
         data["description"] = this.description;
@@ -7902,9 +8760,6 @@ export class PlansDto implements IPlansDto {
                     (<any>this)[property] = (<any>data)[property];
             }
         }
-        if (!data) {
-            this.plans = [];
-        }
     }
 
     init(_data: any) {
@@ -7918,15 +8773,18 @@ export class PlansDto implements IPlansDto {
         (<any>this).portalLink = _data["portalLink"];
         (<any>this).referral = _data["referral"] ? ReferralInfo.fromJSON(_data["referral"]) : <any>undefined;
         (<any>this).locked = _data["locked"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): PlansDto {
-        return new PlansDto().init(data);
+        const result = new PlansDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (Array.isArray(this.plans)) {
             data["plans"] = [];
             for (let item of this.plans)
@@ -7938,6 +8796,18 @@ export class PlansDto implements IPlansDto {
         data["referral"] = this.referral ? this.referral.toJSON() : <any>undefined;
         data["locked"] = this.locked;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -8013,15 +8883,18 @@ export class PlanDto implements IPlanDto {
         (<any>this).maxApiCalls = _data["maxApiCalls"];
         (<any>this).maxAssetSize = _data["maxAssetSize"];
         (<any>this).maxContributors = _data["maxContributors"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): PlanDto {
-        return new PlanDto().init(data);
+        const result = new PlanDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["id"] = this.id;
         data["name"] = this.name;
         data["costs"] = this.costs;
@@ -8034,6 +8907,18 @@ export class PlanDto implements IPlanDto {
         data["maxAssetSize"] = this.maxAssetSize;
         data["maxContributors"] = this.maxContributors;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -8092,19 +8977,34 @@ export class ReferralInfo implements IReferralInfo {
         (<any>this).code = _data["code"];
         (<any>this).earned = _data["earned"];
         (<any>this).condition = _data["condition"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): ReferralInfo {
-        return new ReferralInfo().init(data);
+        const result = new ReferralInfo().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["code"] = this.code;
         data["earned"] = this.earned;
         data["condition"] = this.condition;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -8150,17 +9050,32 @@ export class PlanChangedDto implements IPlanChangedDto {
 
     init(_data: any) {
         (<any>this).redirectUri = _data["redirectUri"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): PlanChangedDto {
-        return new PlanChangedDto().init(data);
+        const result = new PlanChangedDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["redirectUri"] = this.redirectUri;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -8196,17 +9111,32 @@ export class ChangePlanDto implements IChangePlanDto {
 
     init(_data: any) {
         (<any>this).planId = _data["planId"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): ChangePlanDto {
-        return new ChangePlanDto().init(data);
+        const result = new ChangePlanDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["planId"] = this.planId;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -8240,9 +9170,6 @@ export class FeaturesDto implements IFeaturesDto {
                     (<any>this)[property] = (<any>data)[property];
             }
         }
-        if (!data) {
-            this.features = [];
-        }
     }
 
     init(_data: any) {
@@ -8252,15 +9179,18 @@ export class FeaturesDto implements IFeaturesDto {
                 (<any>this).features!.push(FeatureDto.fromJSON(item));
         }
         (<any>this).version = _data["version"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): FeaturesDto {
-        return new FeaturesDto().init(data);
+        const result = new FeaturesDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (Array.isArray(this.features)) {
             data["features"] = [];
             for (let item of this.features)
@@ -8268,6 +9198,18 @@ export class FeaturesDto implements IFeaturesDto {
         }
         data["version"] = this.version;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -8308,18 +9250,33 @@ export class FeatureDto implements IFeatureDto {
     init(_data: any) {
         (<any>this).name = _data["name"];
         (<any>this).text = _data["text"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): FeatureDto {
-        return new FeatureDto().init(data);
+        const result = new FeatureDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         data["text"] = this.text;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -8360,18 +9317,33 @@ export class LanguageDto implements ILanguageDto {
     init(_data: any) {
         (<any>this).iso2Code = _data["iso2Code"];
         (<any>this).englishName = _data["englishName"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): LanguageDto {
-        return new LanguageDto().init(data);
+        const result = new LanguageDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["iso2Code"] = this.iso2Code;
         data["englishName"] = this.englishName;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -8402,9 +9374,6 @@ export class JobsDto extends ResourceDto implements IJobsDto {
 
     constructor(data?: IJobsDto) {
         super(data);
-        if (!data) {
-            this.items = [];
-        }
     }
 
     init(_data: any) {
@@ -8414,15 +9383,18 @@ export class JobsDto extends ResourceDto implements IJobsDto {
             for (let item of _data["items"])
                 (<any>this).items!.push(JobDto.fromJSON(item));
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): JobsDto {
-        return new JobsDto().init(data);
+        const result = new JobsDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (Array.isArray(this.items)) {
             data["items"] = [];
             for (let item of this.items)
@@ -8476,10 +9448,6 @@ export class JobDto extends ResourceDto implements IJobDto {
 
     constructor(data?: IJobDto) {
         super(data);
-        if (!data) {
-            this.taskArguments = {};
-            this.log = [];
-        }
     }
 
     init(_data: any) {
@@ -8494,7 +9462,7 @@ export class JobDto extends ResourceDto implements IJobDto {
             (<any>this).taskArguments = {} as any;
             for (let key in _data["taskArguments"]) {
                 if (_data["taskArguments"].hasOwnProperty(key))
-                    (<any>(<any>this).taskArguments)![key] = _data["taskArguments"][key] !== undefined ? _data["taskArguments"][key] : <any>undefined;
+                    (<any>(<any>this).taskArguments)![key] = _data["taskArguments"][key];
             }
         }
         if (Array.isArray(_data["log"])) {
@@ -8503,15 +9471,18 @@ export class JobDto extends ResourceDto implements IJobDto {
                 (<any>this).log!.push(JobLogMessageDto.fromJSON(item));
         }
         (<any>this).canDownload = _data["canDownload"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): JobDto {
-        return new JobDto().init(data);
+        const result = new JobDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["id"] = this.id;
         data["started"] = this.started ? this.started.toISOString() : <any>undefined;
         data["stopped"] = this.stopped ? this.stopped.toISOString() : <any>undefined;
@@ -8587,18 +9558,33 @@ export class JobLogMessageDto implements IJobLogMessageDto {
     init(_data: any) {
         (<any>this).timestamp = _data["timestamp"] ? DateTime.parseISO(_data["timestamp"].toString()) : <any>undefined;
         (<any>this).message = _data["message"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): JobLogMessageDto {
-        return new JobLogMessageDto().init(data);
+        const result = new JobLogMessageDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
         data["message"] = this.message;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -8651,15 +9637,18 @@ export class HistoryEventDto implements IHistoryEventDto {
         (<any>this).eventId = _data["eventId"];
         (<any>this).created = _data["created"] ? DateTime.parseISO(_data["created"].toString()) : <any>undefined;
         (<any>this).version = _data["version"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): HistoryEventDto {
-        return new HistoryEventDto().init(data);
+        const result = new HistoryEventDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["message"] = this.message;
         data["eventType"] = this.eventType;
         data["actor"] = this.actor;
@@ -8667,6 +9656,18 @@ export class HistoryEventDto implements IHistoryEventDto {
         data["created"] = this.created ? this.created.toISOString() : <any>undefined;
         data["version"] = this.version;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -8701,9 +9702,6 @@ export class EventConsumersDto extends ResourceDto implements IEventConsumersDto
 
     constructor(data?: IEventConsumersDto) {
         super(data);
-        if (!data) {
-            this.items = [];
-        }
     }
 
     init(_data: any) {
@@ -8713,15 +9711,18 @@ export class EventConsumersDto extends ResourceDto implements IEventConsumersDto
             for (let item of _data["items"])
                 (<any>this).items!.push(EventConsumerDto.fromJSON(item));
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): EventConsumersDto {
-        return new EventConsumersDto().init(data);
+        const result = new EventConsumersDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (Array.isArray(this.items)) {
             data["items"] = [];
             for (let item of this.items)
@@ -8775,15 +9776,18 @@ export class EventConsumerDto extends ResourceDto implements IEventConsumerDto {
         (<any>this).name = _data["name"];
         (<any>this).error = _data["error"];
         (<any>this).position = _data["position"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): EventConsumerDto {
-        return new EventConsumerDto().init(data);
+        const result = new EventConsumerDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["isStopped"] = this.isStopped;
         data["isResetting"] = this.isResetting;
         data["count"] = this.count;
@@ -8828,10 +9832,6 @@ export class ContentsDto extends ResourceDto implements IContentsDto {
 
     constructor(data?: IContentsDto) {
         super(data);
-        if (!data) {
-            this.items = [];
-            this.statuses = [];
-        }
     }
 
     init(_data: any) {
@@ -8847,15 +9847,18 @@ export class ContentsDto extends ResourceDto implements IContentsDto {
             for (let item of _data["statuses"])
                 (<any>this).statuses!.push(StatusInfoDto.fromJSON(item));
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): ContentsDto {
-        return new ContentsDto().init(data);
+        const result = new ContentsDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["total"] = this.total;
         if (Array.isArray(this.items)) {
             data["items"] = [];
@@ -8960,9 +9963,6 @@ export class ContentDto extends ResourceDto implements IContentDto {
 
     constructor(data?: IContentDto) {
         super(data);
-        if (!data) {
-            this.referenceFields = [];
-        }
     }
 
     init(_data: any) {
@@ -8975,7 +9975,7 @@ export class ContentDto extends ResourceDto implements IContentDto {
             (<any>this).referenceData = {} as any;
             for (let key in _data["referenceData"]) {
                 if (_data["referenceData"].hasOwnProperty(key))
-                    (<any>(<any>this).referenceData)![key] = _data["referenceData"][key] !== undefined ? _data["referenceData"][key] : <any>undefined;
+                    (<any>(<any>this).referenceData)![key] = _data["referenceData"][key];
             }
         }
         (<any>this).created = _data["created"] ? DateTime.parseISO(_data["created"].toString()) : <any>undefined;
@@ -8996,15 +9996,18 @@ export class ContentDto extends ResourceDto implements IContentDto {
         }
         (<any>this).isDeleted = _data["isDeleted"];
         (<any>this).version = _data["version"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): ContentDto {
-        return new ContentDto().init(data);
+        const result = new ContentDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["id"] = this.id;
         data["createdBy"] = this.createdBy;
         data["lastModifiedBy"] = this.lastModifiedBy;
@@ -9109,21 +10112,36 @@ export class ScheduleJobDto implements IScheduleJobDto {
         (<any>this).dueTime = _data["dueTime"] ? DateTime.parseISO(_data["dueTime"].toString()) : <any>undefined;
         (<any>this).color = _data["color"];
         (<any>this).scheduledBy = _data["scheduledBy"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): ScheduleJobDto {
-        return new ScheduleJobDto().init(data);
+        const result = new ScheduleJobDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["id"] = this.id;
         data["status"] = this.status;
         data["dueTime"] = this.dueTime ? this.dueTime.toISOString() : <any>undefined;
         data["color"] = this.color;
         data["scheduledBy"] = this.scheduledBy;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -9170,18 +10188,33 @@ export class StatusInfoDto implements IStatusInfoDto {
     init(_data: any) {
         (<any>this).status = _data["status"];
         (<any>this).color = _data["color"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): StatusInfoDto {
-        return new StatusInfoDto().init(data);
+        const result = new StatusInfoDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["status"] = this.status;
         data["color"] = this.color;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -9232,15 +10265,18 @@ export class QueryDto implements IQueryDto {
         (<any>this).oData = _data["oData"];
         (<any>this).q = _data["q"];
         (<any>this).parentId = _data["parentId"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): QueryDto {
-        return new QueryDto().init(data);
+        const result = new QueryDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (Array.isArray(this.ids)) {
             data["ids"] = [];
             for (let item of this.ids)
@@ -9250,6 +10286,18 @@ export class QueryDto implements IQueryDto {
         data["q"] = this.q;
         data["parentId"] = this.parentId;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -9300,20 +10348,35 @@ export class BulkResultDto implements IBulkResultDto {
         (<any>this).jobIndex = _data["jobIndex"];
         (<any>this).id = _data["id"];
         (<any>this).contentId = _data["contentId"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): BulkResultDto {
-        return new BulkResultDto().init(data);
+        const result = new BulkResultDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["error"] = this.error ? this.error.toJSON() : <any>undefined;
         data["jobIndex"] = this.jobIndex;
         data["id"] = this.id;
         data["contentId"] = this.contentId;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -9357,9 +10420,6 @@ export class ImportContentsDto implements IImportContentsDto {
                     (<any>this)[property] = (<any>data)[property];
             }
         }
-        if (!data) {
-            this.datas = [];
-        }
     }
 
     init(_data: any) {
@@ -9371,15 +10431,18 @@ export class ImportContentsDto implements IImportContentsDto {
         (<any>this).publish = _data["publish"];
         (<any>this).doNotScript = _data["doNotScript"];
         (<any>this).optimizeValidation = _data["optimizeValidation"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): ImportContentsDto {
-        return new ImportContentsDto().init(data);
+        const result = new ImportContentsDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (Array.isArray(this.datas)) {
             data["datas"] = [];
             for (let item of this.datas)
@@ -9389,6 +10452,18 @@ export class ImportContentsDto implements IImportContentsDto {
         data["doNotScript"] = this.doNotScript;
         data["optimizeValidation"] = this.optimizeValidation;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -9440,9 +10515,6 @@ export class BulkUpdateContentsDto implements IBulkUpdateContentsDto {
                     (<any>this)[property] = (<any>data)[property];
             }
         }
-        if (!data) {
-            this.jobs = [];
-        }
     }
 
     init(_data: any) {
@@ -9458,15 +10530,18 @@ export class BulkUpdateContentsDto implements IBulkUpdateContentsDto {
         (<any>this).doNotValidateWorkflow = _data["doNotValidateWorkflow"];
         (<any>this).checkReferrers = _data["checkReferrers"];
         (<any>this).optimizeValidation = _data["optimizeValidation"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): BulkUpdateContentsDto {
-        return new BulkUpdateContentsDto().init(data);
+        const result = new BulkUpdateContentsDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (Array.isArray(this.jobs)) {
             data["jobs"] = [];
             for (let item of this.jobs)
@@ -9480,6 +10555,18 @@ export class BulkUpdateContentsDto implements IBulkUpdateContentsDto {
         data["checkReferrers"] = this.checkReferrers;
         data["optimizeValidation"] = this.optimizeValidation;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -9556,7 +10643,7 @@ export class BulkUpdateContentsJobDto implements IBulkUpdateContentsJobDto {
             (<any>this).data = {} as any;
             for (let key in _data["data"]) {
                 if (_data["data"].hasOwnProperty(key))
-                    (<any>(<any>this).data)![key] = _data["data"][key] !== undefined ? _data["data"][key] : <any>undefined;
+                    (<any>(<any>this).data)![key] = _data["data"][key];
             }
         }
         (<any>this).status = _data["status"];
@@ -9568,15 +10655,18 @@ export class BulkUpdateContentsJobDto implements IBulkUpdateContentsJobDto {
         (<any>this).enrichDefaults = _data["enrichDefaults"];
         (<any>this).expectedCount = _data["expectedCount"];
         (<any>this).expectedVersion = _data["expectedVersion"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): BulkUpdateContentsJobDto {
-        return new BulkUpdateContentsJobDto().init(data);
+        const result = new BulkUpdateContentsJobDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["query"] = this.query ? this.query.toJSON() : <any>undefined;
         data["id"] = this.id;
         if (this.data) {
@@ -9596,6 +10686,18 @@ export class BulkUpdateContentsJobDto implements IBulkUpdateContentsJobDto {
         data["expectedCount"] = this.expectedCount;
         data["expectedVersion"] = this.expectedVersion;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -9670,15 +10772,18 @@ export class QueryJsonDto implements IQueryJsonDto {
             for (let item of _data["sort"])
                 (<any>this).sort!.push(SortNode.fromJSON(item));
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): QueryJsonDto {
-        return new QueryJsonDto().init(data);
+        const result = new QueryJsonDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["filter"] = this.filter;
         data["fullText"] = this.fullText;
         data["collation"] = this.collation;
@@ -9692,6 +10797,18 @@ export class QueryJsonDto implements IQueryJsonDto {
                 data["sort"].push(item.toJSON());
         }
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -9734,18 +10851,33 @@ export class SortNode implements ISortNode {
     init(_data: any) {
         (<any>this).path = _data["path"];
         (<any>this).order = _data["order"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): SortNode {
-        return new SortNode().init(data);
+        const result = new SortNode().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["path"] = this.path;
         data["order"] = this.order;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -9800,19 +10932,34 @@ export class ChangeStatusDto implements IChangeStatusDto {
         (<any>this).status = _data["status"];
         (<any>this).dueTime = _data["dueTime"] ? DateTime.parseISO(_data["dueTime"].toString()) : <any>undefined;
         (<any>this).checkReferrers = _data["checkReferrers"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): ChangeStatusDto {
-        return new ChangeStatusDto().init(data);
+        const result = new ChangeStatusDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["status"] = this.status;
         data["dueTime"] = this.dueTime ? this.dueTime.toISOString() : <any>undefined;
         data["checkReferrers"] = this.checkReferrers;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -9874,15 +11021,18 @@ export class AllContentsByPostDto implements IAllContentsByPostDto {
         (<any>this).references = _data["references"];
         (<any>this).oData = _data["oData"];
         (<any>this).q = _data["q"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): AllContentsByPostDto {
-        return new AllContentsByPostDto().init(data);
+        const result = new AllContentsByPostDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (Array.isArray(this.ids)) {
             data["ids"] = [];
             for (let item of this.ids)
@@ -9895,6 +11045,18 @@ export class AllContentsByPostDto implements IAllContentsByPostDto {
         data["oData"] = this.oData;
         data["q"] = this.q;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -9931,9 +11093,6 @@ export class BackupJobsDto extends ResourceDto implements IBackupJobsDto {
 
     constructor(data?: IBackupJobsDto) {
         super(data);
-        if (!data) {
-            this.items = [];
-        }
     }
 
     init(_data: any) {
@@ -9943,15 +11102,18 @@ export class BackupJobsDto extends ResourceDto implements IBackupJobsDto {
             for (let item of _data["items"])
                 (<any>this).items!.push(BackupJobDto.fromJSON(item));
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): BackupJobsDto {
-        return new BackupJobsDto().init(data);
+        const result = new BackupJobsDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (Array.isArray(this.items)) {
             data["items"] = [];
             for (let item of this.items)
@@ -9993,15 +11155,18 @@ export class BackupJobDto extends ResourceDto implements IBackupJobDto {
         (<any>this).handledEvents = _data["handledEvents"];
         (<any>this).handledAssets = _data["handledAssets"];
         (<any>this).status = _data["status"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): BackupJobDto {
-        return new BackupJobDto().init(data);
+        const result = new BackupJobDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["id"] = this.id;
         data["started"] = this.started ? this.started.toISOString() : <any>undefined;
         data["stopped"] = this.stopped ? this.stopped.toISOString() : <any>undefined;
@@ -10049,9 +11214,6 @@ export class RestoreJobDto implements IRestoreJobDto {
                     (<any>this)[property] = (<any>data)[property];
             }
         }
-        if (!data) {
-            this.log = [];
-        }
     }
 
     init(_data: any) {
@@ -10064,15 +11226,18 @@ export class RestoreJobDto implements IRestoreJobDto {
         (<any>this).started = _data["started"] ? DateTime.parseISO(_data["started"].toString()) : <any>undefined;
         (<any>this).stopped = _data["stopped"] ? DateTime.parseISO(_data["stopped"].toString()) : <any>undefined;
         (<any>this).status = _data["status"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): RestoreJobDto {
-        return new RestoreJobDto().init(data);
+        const result = new RestoreJobDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["url"] = this.url;
         if (Array.isArray(this.log)) {
             data["log"] = [];
@@ -10083,6 +11248,18 @@ export class RestoreJobDto implements IRestoreJobDto {
         data["stopped"] = this.stopped ? this.stopped.toISOString() : <any>undefined;
         data["status"] = this.status;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -10129,18 +11306,33 @@ export class RestoreRequestDto implements IRestoreRequestDto {
     init(_data: any) {
         (<any>this).name = _data["name"];
         (<any>this).url = _data["url"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): RestoreRequestDto {
-        return new RestoreRequestDto().init(data);
+        const result = new RestoreRequestDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         data["url"] = this.url;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -10210,10 +11402,6 @@ export class AssetFoldersDto extends ResourceDto implements IAssetFoldersDto {
 
     constructor(data?: IAssetFoldersDto) {
         super(data);
-        if (!data) {
-            this.items = [];
-            this.path = [];
-        }
     }
 
     init(_data: any) {
@@ -10229,15 +11417,18 @@ export class AssetFoldersDto extends ResourceDto implements IAssetFoldersDto {
             for (let item of _data["path"])
                 (<any>this).path!.push(AssetFolderDto.fromJSON(item));
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): AssetFoldersDto {
-        return new AssetFoldersDto().init(data);
+        const result = new AssetFoldersDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["total"] = this.total;
         if (Array.isArray(this.items)) {
             data["items"] = [];
@@ -10295,15 +11486,18 @@ export class AssetFolderDto extends ResourceDto implements IAssetFolderDto {
         (<any>this).parentId = _data["parentId"];
         (<any>this).folderName = _data["folderName"];
         (<any>this).version = _data["version"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): AssetFolderDto {
-        return new AssetFolderDto().init(data);
+        const result = new AssetFolderDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["id"] = this.id;
         data["parentId"] = this.parentId;
         data["folderName"] = this.folderName;
@@ -10352,18 +11546,33 @@ export class CreateAssetFolderDto implements ICreateAssetFolderDto {
     init(_data: any) {
         (<any>this).folderName = _data["folderName"];
         (<any>this).parentId = _data["parentId"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): CreateAssetFolderDto {
-        return new CreateAssetFolderDto().init(data);
+        const result = new CreateAssetFolderDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["folderName"] = this.folderName;
         data["parentId"] = this.parentId;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -10401,17 +11610,32 @@ export class RenameAssetFolderDto implements IRenameAssetFolderDto {
 
     init(_data: any) {
         (<any>this).folderName = _data["folderName"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): RenameAssetFolderDto {
-        return new RenameAssetFolderDto().init(data);
+        const result = new RenameAssetFolderDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["folderName"] = this.folderName;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -10447,17 +11671,32 @@ export class MoveAssetFolderDto implements IMoveAssetFolderDto {
 
     init(_data: any) {
         (<any>this).parentId = _data["parentId"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): MoveAssetFolderDto {
-        return new MoveAssetFolderDto().init(data);
+        const result = new MoveAssetFolderDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["parentId"] = this.parentId;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -10493,17 +11732,32 @@ export class RenameTagDto implements IRenameTagDto {
 
     init(_data: any) {
         (<any>this).tagName = _data["tagName"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): RenameTagDto {
-        return new RenameTagDto().init(data);
+        const result = new RenameTagDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["tagName"] = this.tagName;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -10538,9 +11792,6 @@ export class AssetsDto extends ResourceDto implements IAssetsDto {
 
     constructor(data?: IAssetsDto) {
         super(data);
-        if (!data) {
-            this.items = [];
-        }
     }
 
     init(_data: any) {
@@ -10551,15 +11802,18 @@ export class AssetsDto extends ResourceDto implements IAssetsDto {
             for (let item of _data["items"])
                 (<any>this).items!.push(AssetDto.fromJSON(item));
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): AssetsDto {
-        return new AssetsDto().init(data);
+        const result = new AssetsDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["total"] = this.total;
         if (Array.isArray(this.items)) {
             data["items"] = [];
@@ -10685,10 +11939,6 @@ export class AssetDto extends ResourceDto implements IAssetDto {
 
     constructor(data?: IAssetDto) {
         super(data);
-        if (!data) {
-            this.metadata = {};
-            this.tags = [];
-        }
     }
 
     init(_data: any) {
@@ -10707,7 +11957,7 @@ export class AssetDto extends ResourceDto implements IAssetDto {
             (<any>this).metadata = {} as any;
             for (let key in _data["metadata"]) {
                 if (_data["metadata"].hasOwnProperty(key))
-                    (<any>(<any>this).metadata)![key] = _data["metadata"][key] !== undefined ? _data["metadata"][key] : <any>undefined;
+                    (<any>(<any>this).metadata)![key] = _data["metadata"][key];
             }
         }
         if (Array.isArray(_data["tags"])) {
@@ -10727,15 +11977,18 @@ export class AssetDto extends ResourceDto implements IAssetDto {
         (<any>this).isImage = _data["isImage"];
         (<any>this).pixelWidth = _data["pixelWidth"];
         (<any>this).pixelHeight = _data["pixelHeight"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): AssetDto {
-        return new AssetDto().init(data);
+        const result = new AssetDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["id"] = this.id;
         data["parentId"] = this.parentId;
         data["fileName"] = this.fileName;
@@ -10843,17 +12096,32 @@ export class AssetMeta implements IAssetMeta {
 
     init(_data: any) {
         (<any>this).isDuplicate = _data["isDuplicate"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): AssetMeta {
-        return new AssetMeta().init(data);
+        const result = new AssetMeta().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["isDuplicate"] = this.isDuplicate;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -10902,15 +12170,18 @@ export class BulkUpdateAssetsDto implements IBulkUpdateAssetsDto {
         (<any>this).checkReferrers = _data["checkReferrers"];
         (<any>this).optimizeValidation = _data["optimizeValidation"];
         (<any>this).doNotScript = _data["doNotScript"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): BulkUpdateAssetsDto {
-        return new BulkUpdateAssetsDto().init(data);
+        const result = new BulkUpdateAssetsDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (Array.isArray(this.jobs)) {
             data["jobs"] = [];
             for (let item of this.jobs)
@@ -10920,6 +12191,18 @@ export class BulkUpdateAssetsDto implements IBulkUpdateAssetsDto {
         data["optimizeValidation"] = this.optimizeValidation;
         data["doNotScript"] = this.doNotScript;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -10993,20 +12276,23 @@ export class BulkUpdateAssetsJobDto implements IBulkUpdateAssetsJobDto {
             (<any>this).metadata = {} as any;
             for (let key in _data["metadata"]) {
                 if (_data["metadata"].hasOwnProperty(key))
-                    (<any>(<any>this).metadata)![key] = _data["metadata"][key] !== undefined ? _data["metadata"][key] : <any>undefined;
+                    (<any>(<any>this).metadata)![key] = _data["metadata"][key];
             }
         }
         (<any>this).permanent = _data["permanent"];
         (<any>this).expectedVersion = _data["expectedVersion"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): BulkUpdateAssetsJobDto {
-        return new BulkUpdateAssetsJobDto().init(data);
+        const result = new BulkUpdateAssetsJobDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["id"] = this.id;
         data["type"] = this.type;
         data["parentId"] = this.parentId;
@@ -11028,6 +12314,18 @@ export class BulkUpdateAssetsJobDto implements IBulkUpdateAssetsJobDto {
         data["permanent"] = this.permanent;
         data["expectedVersion"] = this.expectedVersion;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -11108,18 +12406,21 @@ export class AnnotateAssetDto implements IAnnotateAssetDto {
             (<any>this).metadata = {} as any;
             for (let key in _data["metadata"]) {
                 if (_data["metadata"].hasOwnProperty(key))
-                    (<any>(<any>this).metadata)![key] = _data["metadata"][key] !== undefined ? _data["metadata"][key] : <any>undefined;
+                    (<any>(<any>this).metadata)![key] = _data["metadata"][key];
             }
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): AnnotateAssetDto {
-        return new AnnotateAssetDto().init(data);
+        const result = new AnnotateAssetDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["fileName"] = this.fileName;
         data["slug"] = this.slug;
         data["isProtected"] = this.isProtected;
@@ -11136,6 +12437,18 @@ export class AnnotateAssetDto implements IAnnotateAssetDto {
             }
         }
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -11179,17 +12492,32 @@ export class MoveAssetDto implements IMoveAssetDto {
 
     init(_data: any) {
         (<any>this).parentId = _data["parentId"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): MoveAssetDto {
-        return new MoveAssetDto().init(data);
+        const result = new MoveAssetDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["parentId"] = this.parentId;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -11244,15 +12572,18 @@ export class AssetScriptsDto extends ResourceDto implements IAssetScriptsDto {
         (<any>this).move = _data["move"];
         (<any>this).delete = _data["delete"];
         (<any>this).version = _data["version"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): AssetScriptsDto {
-        return new AssetScriptsDto().init(data);
+        const result = new AssetScriptsDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["query"] = this.query;
         data["queryPre"] = this.queryPre;
         data["create"] = this.create;
@@ -11320,15 +12651,18 @@ export class UpdateAssetScriptsDto implements IUpdateAssetScriptsDto {
         (<any>this).annotate = _data["annotate"];
         (<any>this).move = _data["move"];
         (<any>this).delete = _data["delete"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): UpdateAssetScriptsDto {
-        return new UpdateAssetScriptsDto().init(data);
+        const result = new UpdateAssetScriptsDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["query"] = this.query;
         data["queryPre"] = this.queryPre;
         data["create"] = this.create;
@@ -11337,6 +12671,18 @@ export class UpdateAssetScriptsDto implements IUpdateAssetScriptsDto {
         data["move"] = this.move;
         data["delete"] = this.delete;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -11377,9 +12723,6 @@ export class ClientsDto extends ResourceDto implements IClientsDto {
 
     constructor(data?: IClientsDto) {
         super(data);
-        if (!data) {
-            this.items = [];
-        }
     }
 
     init(_data: any) {
@@ -11389,15 +12732,18 @@ export class ClientsDto extends ResourceDto implements IClientsDto {
             for (let item of _data["items"])
                 (<any>this).items!.push(ClientDto.fromJSON(item));
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): ClientsDto {
-        return new ClientsDto().init(data);
+        const result = new ClientsDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (Array.isArray(this.items)) {
             data["items"] = [];
             for (let item of this.items)
@@ -11450,15 +12796,18 @@ export class ClientDto extends ResourceDto implements IClientDto {
         (<any>this).apiCallsLimit = _data["apiCallsLimit"];
         (<any>this).apiTrafficLimit = _data["apiTrafficLimit"];
         (<any>this).allowAnonymous = _data["allowAnonymous"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): ClientDto {
-        return new ClientDto().init(data);
+        const result = new ClientDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["id"] = this.id;
         data["secret"] = this.secret;
         data["name"] = this.name;
@@ -11505,17 +12854,32 @@ export class CreateClientDto implements ICreateClientDto {
 
     init(_data: any) {
         (<any>this).id = _data["id"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): CreateClientDto {
-        return new CreateClientDto().init(data);
+        const result = new CreateClientDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["id"] = this.id;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -11563,21 +12927,36 @@ export class UpdateClientDto implements IUpdateClientDto {
         (<any>this).allowAnonymous = _data["allowAnonymous"];
         (<any>this).apiCallsLimit = _data["apiCallsLimit"];
         (<any>this).apiTrafficLimit = _data["apiTrafficLimit"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): UpdateClientDto {
-        return new UpdateClientDto().init(data);
+        const result = new UpdateClientDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         data["role"] = this.role;
         data["allowAnonymous"] = this.allowAnonymous;
         data["apiCallsLimit"] = this.apiCallsLimit;
         data["apiTrafficLimit"] = this.apiTrafficLimit;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -11614,9 +12993,6 @@ export class AppLanguagesDto extends ResourceDto implements IAppLanguagesDto {
 
     constructor(data?: IAppLanguagesDto) {
         super(data);
-        if (!data) {
-            this.items = [];
-        }
     }
 
     init(_data: any) {
@@ -11626,15 +13002,18 @@ export class AppLanguagesDto extends ResourceDto implements IAppLanguagesDto {
             for (let item of _data["items"])
                 (<any>this).items!.push(AppLanguageDto.fromJSON(item));
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): AppLanguagesDto {
-        return new AppLanguagesDto().init(data);
+        const result = new AppLanguagesDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (Array.isArray(this.items)) {
             data["items"] = [];
             for (let item of this.items)
@@ -11672,9 +13051,6 @@ export class AppLanguageDto extends ResourceDto implements IAppLanguageDto {
 
     constructor(data?: IAppLanguageDto) {
         super(data);
-        if (!data) {
-            this.fallback = [];
-        }
     }
 
     init(_data: any) {
@@ -11688,15 +13064,18 @@ export class AppLanguageDto extends ResourceDto implements IAppLanguageDto {
         }
         (<any>this).isMaster = _data["isMaster"];
         (<any>this).isOptional = _data["isOptional"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): AppLanguageDto {
-        return new AppLanguageDto().init(data);
+        const result = new AppLanguageDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["iso2Code"] = this.iso2Code;
         data["englishName"] = this.englishName;
         if (Array.isArray(this.fallback)) {
@@ -11741,17 +13120,32 @@ export class AddLanguageDto implements IAddLanguageDto {
 
     init(_data: any) {
         (<any>this).language = _data["language"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): AddLanguageDto {
-        return new AddLanguageDto().init(data);
+        const result = new AddLanguageDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["language"] = this.language;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -11797,15 +13191,18 @@ export class UpdateLanguageDto implements IUpdateLanguageDto {
             for (let item of _data["fallback"])
                 (<any>this).fallback!.push(item);
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): UpdateLanguageDto {
-        return new UpdateLanguageDto().init(data);
+        const result = new UpdateLanguageDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["isMaster"] = this.isMaster;
         data["isOptional"] = this.isOptional;
         if (Array.isArray(this.fallback)) {
@@ -11814,6 +13211,18 @@ export class UpdateLanguageDto implements IUpdateLanguageDto {
                 data["fallback"].push(item);
         }
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -11846,9 +13255,6 @@ export class RolesDto extends ResourceDto implements IRolesDto {
 
     constructor(data?: IRolesDto) {
         super(data);
-        if (!data) {
-            this.items = [];
-        }
     }
 
     init(_data: any) {
@@ -11858,15 +13264,18 @@ export class RolesDto extends ResourceDto implements IRolesDto {
             for (let item of _data["items"])
                 (<any>this).items!.push(RoleDto.fromJSON(item));
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): RolesDto {
-        return new RolesDto().init(data);
+        const result = new RolesDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (Array.isArray(this.items)) {
             data["items"] = [];
             for (let item of this.items)
@@ -11906,10 +13315,6 @@ export class RoleDto extends ResourceDto implements IRoleDto {
 
     constructor(data?: IRoleDto) {
         super(data);
-        if (!data) {
-            this.permissions = [];
-            this.properties = {};
-        }
     }
 
     init(_data: any) {
@@ -11927,18 +13332,21 @@ export class RoleDto extends ResourceDto implements IRoleDto {
             (<any>this).properties = {} as any;
             for (let key in _data["properties"]) {
                 if (_data["properties"].hasOwnProperty(key))
-                    (<any>(<any>this).properties)![key] = _data["properties"][key] !== undefined ? _data["properties"][key] : <any>undefined;
+                    (<any>(<any>this).properties)![key] = _data["properties"][key];
             }
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): RoleDto {
-        return new RoleDto().init(data);
+        const result = new RoleDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         data["numClients"] = this.numClients;
         data["numContributors"] = this.numContributors;
@@ -11992,17 +13400,32 @@ export class AddRoleDto implements IAddRoleDto {
 
     init(_data: any) {
         (<any>this).name = _data["name"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): AddRoleDto {
-        return new AddRoleDto().init(data);
+        const result = new AddRoleDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -12036,9 +13459,6 @@ export class UpdateRoleDto implements IUpdateRoleDto {
                     (<any>this)[property] = (<any>data)[property];
             }
         }
-        if (!data) {
-            this.permissions = [];
-        }
     }
 
     init(_data: any) {
@@ -12051,18 +13471,21 @@ export class UpdateRoleDto implements IUpdateRoleDto {
             (<any>this).properties = {} as any;
             for (let key in _data["properties"]) {
                 if (_data["properties"].hasOwnProperty(key))
-                    (<any>(<any>this).properties)![key] = _data["properties"][key] !== undefined ? _data["properties"][key] : <any>undefined;
+                    (<any>(<any>this).properties)![key] = _data["properties"][key];
             }
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): UpdateRoleDto {
-        return new UpdateRoleDto().init(data);
+        const result = new UpdateRoleDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (Array.isArray(this.permissions)) {
             data["permissions"] = [];
             for (let item of this.permissions)
@@ -12076,6 +13499,18 @@ export class UpdateRoleDto implements IUpdateRoleDto {
             }
         }
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -12214,10 +13649,6 @@ export class AppDto extends ResourceDto implements IAppDto {
 
     constructor(data?: IAppDto) {
         super(data);
-        if (!data) {
-            this.permissions = [];
-            this.roleProperties = {};
-        }
     }
 
     init(_data: any) {
@@ -12244,18 +13675,21 @@ export class AppDto extends ResourceDto implements IAppDto {
             (<any>this).roleProperties = {} as any;
             for (let key in _data["roleProperties"]) {
                 if (_data["roleProperties"].hasOwnProperty(key))
-                    (<any>(<any>this).roleProperties)![key] = _data["roleProperties"][key] !== undefined ? _data["roleProperties"][key] : <any>undefined;
+                    (<any>(<any>this).roleProperties)![key] = _data["roleProperties"][key];
             }
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): AppDto {
-        return new AppDto().init(data);
+        const result = new AppDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["createdBy"] = this.createdBy;
         data["lastModifiedBy"] = this.lastModifiedBy;
         data["id"] = this.id;
@@ -12339,18 +13773,33 @@ export class CreateAppDto implements ICreateAppDto {
     init(_data: any) {
         (<any>this).name = _data["name"];
         (<any>this).template = _data["template"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): CreateAppDto {
-        return new CreateAppDto().init(data);
+        const result = new CreateAppDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         data["template"] = this.template;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -12391,18 +13840,33 @@ export class UpdateAppDto implements IUpdateAppDto {
     init(_data: any) {
         (<any>this).label = _data["label"];
         (<any>this).description = _data["description"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): UpdateAppDto {
-        return new UpdateAppDto().init(data);
+        const result = new UpdateAppDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["label"] = this.label;
         data["description"] = this.description;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -12440,17 +13904,32 @@ export class TransferToTeamDto implements ITransferToTeamDto {
 
     init(_data: any) {
         (<any>this).teamId = _data["teamId"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): TransferToTeamDto {
-        return new TransferToTeamDto().init(data);
+        const result = new TransferToTeamDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["teamId"] = this.teamId;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -12487,10 +13966,6 @@ export class AppSettingsDto extends ResourceDto implements IAppSettingsDto {
 
     constructor(data?: IAppSettingsDto) {
         super(data);
-        if (!data) {
-            this.patterns = [];
-            this.editors = [];
-        }
     }
 
     init(_data: any) {
@@ -12508,15 +13983,18 @@ export class AppSettingsDto extends ResourceDto implements IAppSettingsDto {
         (<any>this).hideScheduler = _data["hideScheduler"];
         (<any>this).hideDateTimeModeButton = _data["hideDateTimeModeButton"];
         (<any>this).version = _data["version"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): AppSettingsDto {
-        return new AppSettingsDto().init(data);
+        const result = new AppSettingsDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (Array.isArray(this.patterns)) {
             data["patterns"] = [];
             for (let item of this.patterns)
@@ -12571,19 +14049,34 @@ export class PatternDto implements IPatternDto {
         (<any>this).name = _data["name"];
         (<any>this).regex = _data["regex"];
         (<any>this).message = _data["message"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): PatternDto {
-        return new PatternDto().init(data);
+        const result = new PatternDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         data["regex"] = this.regex;
         data["message"] = this.message;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -12626,18 +14119,33 @@ export class EditorDto implements IEditorDto {
     init(_data: any) {
         (<any>this).name = _data["name"];
         (<any>this).url = _data["url"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): EditorDto {
-        return new EditorDto().init(data);
+        const result = new EditorDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         data["url"] = this.url;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -12677,10 +14185,6 @@ export class UpdateAppSettingsDto implements IUpdateAppSettingsDto {
                     (<any>this)[property] = (<any>data)[property];
             }
         }
-        if (!data) {
-            this.patterns = [];
-            this.editors = [];
-        }
     }
 
     init(_data: any) {
@@ -12696,15 +14200,18 @@ export class UpdateAppSettingsDto implements IUpdateAppSettingsDto {
         }
         (<any>this).hideScheduler = _data["hideScheduler"];
         (<any>this).hideDateTimeModeButton = _data["hideDateTimeModeButton"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): UpdateAppSettingsDto {
-        return new UpdateAppSettingsDto().init(data);
+        const result = new UpdateAppSettingsDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (Array.isArray(this.patterns)) {
             data["patterns"] = [];
             for (let item of this.patterns)
@@ -12718,6 +14225,18 @@ export class UpdateAppSettingsDto implements IUpdateAppSettingsDto {
         data["hideScheduler"] = this.hideScheduler;
         data["hideDateTimeModeButton"] = this.hideDateTimeModeButton;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -12754,10 +14273,6 @@ export class WorkflowsDto extends ResourceDto implements IWorkflowsDto {
 
     constructor(data?: IWorkflowsDto) {
         super(data);
-        if (!data) {
-            this.items = [];
-            this.errors = [];
-        }
     }
 
     init(_data: any) {
@@ -12772,15 +14287,18 @@ export class WorkflowsDto extends ResourceDto implements IWorkflowsDto {
             for (let item of _data["errors"])
                 (<any>this).errors!.push(item);
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): WorkflowsDto {
-        return new WorkflowsDto().init(data);
+        const result = new WorkflowsDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (Array.isArray(this.items)) {
             data["items"] = [];
             for (let item of this.items)
@@ -12829,9 +14347,6 @@ export class WorkflowDto extends ResourceDto implements IWorkflowDto {
 
     constructor(data?: IWorkflowDto) {
         super(data);
-        if (!data) {
-            this.steps = {};
-        }
     }
 
     init(_data: any) {
@@ -12842,7 +14357,7 @@ export class WorkflowDto extends ResourceDto implements IWorkflowDto {
             (<any>this).steps = {} as any;
             for (let key in _data["steps"]) {
                 if (_data["steps"].hasOwnProperty(key))
-                    (<any>(<any>this).steps)![key] = _data["steps"][key] !== undefined ? _data["steps"][key] : new WorkflowStepDto();
+                    (<any>(<any>this).steps)![key] = _data["steps"][key] ? WorkflowStepDto.fromJSON(_data["steps"][key]) : new WorkflowStepDto();
             }
         }
         if (Array.isArray(_data["schemaIds"])) {
@@ -12851,15 +14366,18 @@ export class WorkflowDto extends ResourceDto implements IWorkflowDto {
                 (<any>this).schemaIds!.push(item);
         }
         (<any>this).initial = _data["initial"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): WorkflowDto {
-        return new WorkflowDto().init(data);
+        const result = new WorkflowDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["id"] = this.id;
         data["name"] = this.name;
         if (this.steps) {
@@ -12923,7 +14441,7 @@ export class WorkflowStepDto implements IWorkflowStepDto {
             (<any>this).transitions = {} as any;
             for (let key in _data["transitions"]) {
                 if (_data["transitions"].hasOwnProperty(key))
-                    (<any>(<any>this).transitions)![key] = _data["transitions"][key] !== undefined ? _data["transitions"][key] : new WorkflowTransitionDto();
+                    (<any>(<any>this).transitions)![key] = _data["transitions"][key] ? WorkflowTransitionDto.fromJSON(_data["transitions"][key]) : new WorkflowTransitionDto();
             }
         }
         (<any>this).color = _data["color"];
@@ -12935,15 +14453,18 @@ export class WorkflowStepDto implements IWorkflowStepDto {
             for (let item of _data["noUpdateRoles"])
                 (<any>this).noUpdateRoles!.push(item);
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): WorkflowStepDto {
-        return new WorkflowStepDto().init(data);
+        const result = new WorkflowStepDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         if (this.transitions) {
             data["transitions"] = {};
             for (let key in this.transitions) {
@@ -12961,6 +14482,18 @@ export class WorkflowStepDto implements IWorkflowStepDto {
                 data["noUpdateRoles"].push(item);
         }
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -13013,15 +14546,18 @@ export class WorkflowTransitionDto implements IWorkflowTransitionDto {
             for (let item of _data["roles"])
                 (<any>this).roles!.push(item);
         }
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): WorkflowTransitionDto {
-        return new WorkflowTransitionDto().init(data);
+        const result = new WorkflowTransitionDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["expression"] = this.expression;
         if (Array.isArray(this.roles)) {
             data["roles"] = [];
@@ -13029,6 +14565,18 @@ export class WorkflowTransitionDto implements IWorkflowTransitionDto {
                 data["roles"].push(item);
         }
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -13066,17 +14614,32 @@ export class AddWorkflowDto implements IAddWorkflowDto {
 
     init(_data: any) {
         (<any>this).name = _data["name"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): AddWorkflowDto {
-        return new AddWorkflowDto().init(data);
+        const result = new AddWorkflowDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {
@@ -13114,9 +14677,6 @@ export class UpdateWorkflowDto implements IUpdateWorkflowDto {
                     (<any>this)[property] = (<any>data)[property];
             }
         }
-        if (!data) {
-            this.steps = {};
-        }
     }
 
     init(_data: any) {
@@ -13125,7 +14685,7 @@ export class UpdateWorkflowDto implements IUpdateWorkflowDto {
             (<any>this).steps = {} as any;
             for (let key in _data["steps"]) {
                 if (_data["steps"].hasOwnProperty(key))
-                    (<any>(<any>this).steps)![key] = _data["steps"][key] !== undefined ? _data["steps"][key] : new WorkflowStepDto();
+                    (<any>(<any>this).steps)![key] = _data["steps"][key] ? WorkflowStepDto.fromJSON(_data["steps"][key]) : new WorkflowStepDto();
             }
         }
         if (Array.isArray(_data["schemaIds"])) {
@@ -13134,15 +14694,18 @@ export class UpdateWorkflowDto implements IUpdateWorkflowDto {
                 (<any>this).schemaIds!.push(item);
         }
         (<any>this).initial = _data["initial"];
-        Object.freeze(this);
+        this.cleanup();
         return this;
     }
 
     static fromJSON(data: any): UpdateWorkflowDto {
-        return new UpdateWorkflowDto().init(data);
+        const result = new UpdateWorkflowDto().init(data);
+        result.cleanup();
+        return result;
     }
 
     toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
         data["name"] = this.name;
         if (this.steps) {
             data["steps"] = {};
@@ -13158,6 +14721,18 @@ export class UpdateWorkflowDto implements IUpdateWorkflowDto {
         }
         data["initial"] = this.initial;
         return data;
+    }
+
+    protected cleanup() {
+        const target = <any>this;
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
     }
 
     protected compute<T>(key: string, action: () => T): T {

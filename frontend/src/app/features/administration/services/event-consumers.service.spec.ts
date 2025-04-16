@@ -46,6 +46,7 @@ describe('EventConsumersService', () => {
                     eventConsumerResponse(12),
                     eventConsumerResponse(13),
                 ],
+                _links: {},
             });
 
             expect(eventConsumers!).toEqual(

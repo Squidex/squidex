@@ -50,7 +50,7 @@ describe('NewsService', () => {
                         text: 'Feature Text2',
                     },
                 ],
-                version: '13',
+                version: 13,
             });
 
             expect(features!).toEqual(new FeaturesDto({

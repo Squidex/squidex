@@ -134,7 +134,7 @@ describe('ClientsService', () => {
         inject([ClientsService, HttpTestingController], (clientsService: ClientsService, httpMock: HttpTestingController) => {
             let accessTokenDto: AccessTokenDto;
 
-            clientsService.createToken('my-app', createClient(3)).subscribe(result => {
+            clientsService.createToken('my-app', createClient(13)).subscribe(result => {
                 accessTokenDto = result;
             });
 

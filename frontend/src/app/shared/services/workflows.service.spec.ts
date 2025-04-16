@@ -10,7 +10,7 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, Resource, Version, Versioned, WorkflowDto, WorkflowsDto, WorkflowsService } from '@app/shared/internal';
+import { ApiUrlConfig, Resource, Versioned, VersionTag, WorkflowDto, WorkflowsDto, WorkflowsService } from '@app/shared/internal';
 import { ResourceLinkDto, WorkflowStepDto, WorkflowTransitionDto } from '../model';
 
 describe('WorkflowsService', () => {
