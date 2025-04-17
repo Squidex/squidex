@@ -65,10 +65,13 @@ export class TeamAuthState extends State<Snapshot> {
                     this.dialogs.notifyInfo('i18n:teams.auth.reloaded');
                 }
 
+                const { scheme, canUpdate } = payload;
+
                 this.next({
-                    ...payload,
+                    canUpdate,
                     isLoaded: true,
                     isLoading: false,
+                    scheme,
                     version,
                 }, 'Loading Success');
             }),

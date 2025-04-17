@@ -8,9 +8,9 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { compareStrings, debug, DialogService, LoadingState, shareSubscribed, State, VersionTag } from '@app/framework';
+import { compareStrings, debug, DialogService, LoadingState, Mutable, shareSubscribed, State, VersionTag } from '@app/framework';
 import { WorkflowsService } from '../services/workflows.service';
-import { IUpdateWorkflowDto, IWorkflowStepDto, IWorkflowTransitionDto, WorkflowDto, WorkflowsDto } from './../model';
+import { IUpdateWorkflowDto, IWorkflowStepDto, IWorkflowTransitionDto, WorkflowDto, WorkflowsDto, WorkflowStepDto, WorkflowTransitionDto } from './../model';
 import { AppsState } from './apps.state';
 
 interface Snapshot extends LoadingState {
@@ -214,7 +214,7 @@ export class WorkflowView {
 
     public setStep(name: string, values: Partial<WorkflowStepValues> = {}) {
         return this.update(clone => {
-            clone.steps[name] = { transitions: {}, ...clone.steps[name] ?? {}, ...values };
+            clone.steps[name] = new WorkflowStepDto({ transitions: {}, ...clone.steps[name] ?? {}, ...values });
 
             if (!clone.initial && !isLocked(name)) {
                 clone.initial = name;
@@ -278,7 +278,9 @@ export class WorkflowView {
         }
 
         return this.update(clone => {
-            clone.steps[from].transitions[to] = { transitions: {}, ...clone.steps[from].transitions[to] ?? {}, ...values };
+            const step = clone.steps[from] as Mutable<WorkflowStepDto>;
+            step.transitions ??= {};
+            step.transitions[to] = new WorkflowTransitionDto({ ...step.transitions[to] ?? {}, ...values });
         });
     }
 
@@ -289,7 +291,7 @@ export class WorkflowView {
         }
 
         return this.update(clone => {
-            delete clone.steps[from].transitions[to];
+            delete clone.steps[from].transitions![to];
         });
     }
 
@@ -307,8 +309,8 @@ export class WorkflowView {
         });
     }
 
-    private update(action: (clone: any) => void) {
-        const clone = this.dto.toJSON();
+    private update(action: (clone: Mutable<WorkflowDto>) => void) {
+        const clone = WorkflowDto.fromJSON(this.dto.toJSON());
         action(clone);
         return new WorkflowView(WorkflowDto.fromJSON(clone));
     }
