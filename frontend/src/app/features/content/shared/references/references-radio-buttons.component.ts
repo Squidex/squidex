@@ -68,7 +68,7 @@ export class ReferencesRadioButtonsComponent extends StatefulControlComponent<St
         this.subscriptions.add(
             this.control.valueChanges
                 .subscribe(value => {
-                     {
+                    if (value) {
                         this.callTouched();
                         this.callChange([value]);
                     } else {
