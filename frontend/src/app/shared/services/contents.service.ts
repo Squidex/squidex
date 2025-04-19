@@ -10,7 +10,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlConfig, HTTP, mapVersioned, pretifyError, Resource, StringHelper, Version, Versioned, VersionOrTag } from '@app/framework';
-import { BulkResultDto, ContentDto, ContentsDto, IBulkUpdateContentsDto } from './../model';
+import { BulkResultDto, BulkUpdateContentsDto, ContentDto, ContentsDto } from './../model';
 import { Query, sanitize } from './query';
 
 export type StatusInfo = Readonly<{ status: string; color: string }>;
@@ -227,7 +227,7 @@ export class ContentsService {
             pretifyError('i18n:contents.deleteVersionFailed'));
     }
 
-    public bulkUpdate(appName: string, schemaName: string, dto: IBulkUpdateContentsDto): Observable<ReadonlyArray<BulkResultDto>> {
+    public bulkUpdate(appName: string, schemaName: string, dto: BulkUpdateContentsDto): Observable<ReadonlyArray<BulkResultDto>> {
         const url = this.apiUrl.buildUrl(`/api/content/${appName}/${schemaName}/bulk`);
 
         return this.http.post<any[]>(url, dto).pipe(

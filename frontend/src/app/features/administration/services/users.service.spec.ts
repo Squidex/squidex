@@ -9,7 +9,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { ApiUrlConfig, UserDto, UsersDto } from '@app/shared';
-import { IResourceDto, ResourceLinkDto } from '@app/shared/model';
+import { CreateUserDto, IResourceDto, ResourceLinkDto, UpdateUserDto } from '@app/shared/model';
 import { UsersService } from './users.service';
 
 describe('UsersService', () => {
@@ -112,7 +112,12 @@ describe('UsersService', () => {
 
     it('should make post request to create user',
         inject([UsersService, HttpTestingController], (userManagementService: UsersService, httpMock: HttpTestingController) => {
-            const dto = { email: 'mail@squidex.io', displayName: 'Squidex User', permissions: ['Permission1'], password: 'password' };
+            const dto = new CreateUserDto({
+                email: 'mail@squidex.io',
+                displayName: 'Squidex User',
+                permissions: ['Permission1'],
+                password: 'password',
+            });
 
             let user: UserDto;
             userManagementService.postUser(dto).subscribe(result => {
@@ -131,7 +136,12 @@ describe('UsersService', () => {
 
     it('should make put request to update user',
         inject([UsersService, HttpTestingController], (userManagementService: UsersService, httpMock: HttpTestingController) => {
-            const dto = { email: 'mail@squidex.io', displayName: 'Squidex User', permissions: ['Permission1'], password: 'password' };
+            const dto = new UpdateUserDto({
+                email: 'mail@squidex.io',
+                displayName: 'Squidex User',
+                permissions: ['Permission1'],
+                password: 'password',
+            });
 
             const resource: IResourceDto = {
                 _links: {

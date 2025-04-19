@@ -10,7 +10,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlConfig, HTTP, pretifyError, Resource, ScriptCompletions, StringHelper, VersionOrTag } from '@app/framework';
-import { DynamicCreateRuleDto, DynamicRuleDto, DynamicRulesDto, DynamicUpdateRuleDto, IDynamicCreateRuleDto, IDynamicUpdateRuleDto, RuleElementDto, RuleEventsDto, SimulatedRuleEventsDto } from './../model';
+import { DynamicCreateRuleDto, DynamicRuleDto, DynamicRulesDto, DynamicUpdateRuleDto, RuleElementDto, RuleEventsDto, SimulatedRuleEventsDto } from './../model';
 
 export type RuleElementMetadataDto = Readonly<{
     description: string;
@@ -107,22 +107,22 @@ export class RulesService {
             pretifyError('i18n:rules.loadFailed'));
     }
 
-    public postRule(appName: string, dto: IDynamicCreateRuleDto): Observable<DynamicRuleDto> {
+    public postRule(appName: string, dto: DynamicCreateRuleDto): Observable<DynamicRuleDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules`);
 
-        return HTTP.postVersioned(this.http, url, new DynamicCreateRuleDto(dto).toJSON()).pipe(
+        return HTTP.postVersioned(this.http, url, dto.toJSON()).pipe(
             map(({ payload }) => {
                 return DynamicRuleDto.fromJSON(payload.body);
             }),
             pretifyError('i18n:rules.createFailed'));
     }
 
-    public putRule(appName: string, resource: Resource, dto: IDynamicUpdateRuleDto, version: VersionOrTag): Observable<DynamicRuleDto> {
+    public putRule(appName: string, resource: Resource, dto: DynamicUpdateRuleDto, version: VersionOrTag): Observable<DynamicRuleDto> {
         const link = resource._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, new DynamicUpdateRuleDto(dto).toJSON()).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto.toJSON()).pipe(
             map(({ payload }) => {
                 return DynamicRuleDto.fromJSON(payload.body);
             }),

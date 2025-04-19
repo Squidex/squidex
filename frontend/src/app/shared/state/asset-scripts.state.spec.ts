@@ -6,13 +6,13 @@
  */
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
+import { customMatchers } from 'src/spec/matchers';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, versioned } from '@app/shared/internal';
+import { DialogService, UpdateAssetScriptsDto, versioned } from '@app/shared/internal';
 import { AppsService } from '../services/apps.service';
 import { createAssetScripts } from '../services/apps.service.spec';
 import { TestValues } from './_test-helpers';
 import { AssetScriptsState } from './asset-scripts.state';
-import { customMatchers } from 'src/spec/matchers';
 
 describe('AssetScriptsState', () => {
     const {
@@ -90,7 +90,7 @@ describe('AssetScriptsState', () => {
         it('should update scripts if scripts updated', () => {
             const updated = createAssetScripts(1, '_new');
 
-            const request = { query: 'id3' };
+            const request = new UpdateAssetScriptsDto({ query: 'id3' });
 
             appsService.setup(x => x.putAssetScripts(app, oldScripts, request, version))
                 .returns(() => of(versioned(newVersion, updated))).verifiable();

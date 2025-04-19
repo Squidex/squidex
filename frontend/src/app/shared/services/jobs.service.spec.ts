@@ -9,7 +9,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { ApiUrlConfig, DateTime, JobDto, JobLogMessageDto, JobsDto, JobsService, Resource } from '@app/shared/internal';
-import { ResourceLinkDto, RestoreJobDto } from '../model';
+import { ResourceLinkDto, RestoreJobDto, RestoreRequestDto } from '../model';
 
 describe('JobsService', () => {
     beforeEach(() => {
@@ -143,7 +143,7 @@ describe('JobsService', () => {
 
     it('should make post request to start restore',
         inject([JobsService, HttpTestingController], (jobsService: JobsService, httpMock: HttpTestingController) => {
-            const dto = { url: 'http://url' };
+            const dto = new RestoreRequestDto({ url: 'http://url' });
 
             jobsService.postRestore(dto).subscribe();
 

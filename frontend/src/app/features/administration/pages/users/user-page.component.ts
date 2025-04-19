@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ControlErrorsComponent, FormErrorComponent, LayoutComponent, ShortcutDirective, Subscriptions, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
+import { ControlErrorsComponent, FormErrorComponent, LayoutComponent, ShortcutDirective, Subscriptions, TitleComponent, TooltipDirective, TranslatePipe, UpdateUserDto } from '@app/shared';
 import { UserDto, UserForm, UsersState } from '../../internal';
 
 @Component({
@@ -66,29 +66,32 @@ export class UserPageComponent implements OnInit {
         }
 
         const value = this.userForm.submit();
+        if (!value) {
+            return;
+        }
 
-        if (value) {
-            if (this.user) {
-                this.usersState.update(this.user, value)
-                    .subscribe({
-                        next: user => {
-                            this.userForm.submitCompleted({ newValue: user });
-                        },
-                        error: error => {
-                            this.userForm.submitFailed(error);
-                        },
-                    });
-            } else {
-                this.usersState.create(value as any)
-                    .subscribe({
-                        next: () => {
-                            this.back();
-                        },
-                        error: error => {
-                            this.userForm.submitFailed(error);
-                        },
-                    });
-            }
+        if (this.user) {
+            const request = new UpdateUserDto({ ...value });
+
+            this.usersState.update(this.user, request)
+                .subscribe({
+                    next: user => {
+                        this.userForm.submitCompleted({ newValue: user });
+                    },
+                    error: error => {
+                        this.userForm.submitFailed(error);
+                    },
+                });
+        } else {
+            this.usersState.create(value)
+                .subscribe({
+                    next: () => {
+                        this.back();
+                    },
+                    error: error => {
+                        this.userForm.submitFailed(error);
+                    },
+                });
         }
     }
 

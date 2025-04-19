@@ -95,17 +95,18 @@ export class AuthPageComponent implements OnInit {
         }
 
         const value = this.updateForm.submit();
-
-        if (value) {
-            this.authState.update(value)
-                .subscribe({
-                    next: scheme => {
-                        this.updateForm.submitCompleted({ newValue: scheme || {} as any });
-                    },
-                    error: error => {
-                        this.updateForm.submitFailed(error);
-                    },
-                });
+        if (!value) {
+            return;
         }
+
+        this.authState.update(value)
+            .subscribe({
+                next: scheme => {
+                    this.updateForm.submitCompleted({ newValue: scheme || {} });
+                },
+                error: error => {
+                    this.updateForm.submitFailed(error);
+                },
+            });
     }
 }

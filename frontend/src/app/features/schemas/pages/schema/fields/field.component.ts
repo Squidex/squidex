@@ -8,7 +8,7 @@
 
 import { booleanAttribute, Component, forwardRef, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AppLanguageDto, AppSettingsDto, ConfirmClickDirective, createProperties, DialogModel, DropdownMenuComponent, EditFieldForm, FieldDto, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, SchemasState, TooltipDirective, TourStepDirective, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { AppLanguageDto, AppSettingsDto, ConfirmClickDirective, createProperties, DialogModel, DropdownMenuComponent, EditFieldForm, FieldDto, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, SchemasState, TooltipDirective, TourStepDirective, TranslatePipe, TypedSimpleChanges, UpdateFieldDto } from '@app/shared';
 import { FieldWizardComponent } from './field-wizard.component';
 import { FieldFormComponent } from './forms/field-form.component';
 import { SortableFieldListComponent } from './sortable-field-list.component';
@@ -118,19 +118,20 @@ export class FieldComponent {
         }
 
         const value = this.editForm.submit();
-
-        if (value) {
-            const properties = createProperties(this.field.properties.fieldType as any, value);
-
-            this.schemasState.updateField(this.schema, this.field, { properties })
-                .subscribe({
-                    next: () => {
-                        this.editForm.submitCompleted({ noReset: true });
-                    },
-                    error: error => {
-                        this.editForm.submitFailed(error);
-                    },
-                });
+        if (!value) {
+            return;
         }
+
+        const properties = createProperties(this.field.properties.fieldType as any, value);
+
+        this.schemasState.updateField(this.schema, this.field, new UpdateFieldDto({ properties }))
+            .subscribe({
+                next: () => {
+                    this.editForm.submitCompleted({ noReset: true });
+                },
+                error: error => {
+                    this.editForm.submitFailed(error);
+                },
+            });
     }
 }

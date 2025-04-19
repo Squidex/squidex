@@ -10,7 +10,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
 import { ApiUrlConfig, pretifyError, Resource, Types } from '@app/framework';
-import { IRestoreRequestDto, JobsDto, RestoreJobDto, RestoreRequestDto } from './../model';
+import { JobsDto, RestoreJobDto, RestoreRequestDto } from './../model';
 
 
 @Injectable({
@@ -57,10 +57,10 @@ export class JobsService {
             pretifyError('i18n:jobs.backupFailed'));
     }
 
-    public postRestore(dto: IRestoreRequestDto): Observable<any> {
+    public postRestore(dto: RestoreRequestDto): Observable<any> {
         const url = this.apiUrl.buildUrl('api/apps/restore');
 
-        return this.http.post(url, new RestoreRequestDto(dto).toJSON()).pipe(
+        return this.http.post(url, dto.toJSON()).pipe(
             pretifyError('i18n:jobs.restoreFailed'));
     }
 

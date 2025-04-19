@@ -8,7 +8,7 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, ArrayFieldPropertiesDto, AssetsFieldPropertiesDto, BooleanFieldPropertiesDto, ComponentFieldPropertiesDto, ComponentsFieldPropertiesDto, createProperties, DateTime, DateTimeFieldPropertiesDto, FieldDto, FieldRuleDto, GeolocationFieldPropertiesDto, IConfigureFieldRulesDto, JsonFieldPropertiesDto, NestedFieldDto, NumberFieldPropertiesDto, ReferencesFieldPropertiesDto, Resource, ResourceLinkDto, SchemaDto, SchemaPropertiesDto, SchemaScriptsDto, SchemasDto, SchemasService, ScriptCompletions, StringFieldPropertiesDto, TagsFieldPropertiesDto, VersionTag } from '@app/shared/internal';
+import { AddFieldDto, ApiUrlConfig, ArrayFieldPropertiesDto, AssetsFieldPropertiesDto, BooleanFieldPropertiesDto, ChangeCategoryDto, ComponentFieldPropertiesDto, ComponentsFieldPropertiesDto, ConfigureFieldRulesDto, ConfigureUIFieldsDto, createProperties, CreateSchemaDto, DateTime, DateTimeFieldPropertiesDto, FieldDto, FieldRuleDto, GeolocationFieldPropertiesDto, JsonFieldPropertiesDto, NestedFieldDto, NumberFieldPropertiesDto, ReferencesFieldPropertiesDto, Resource, ResourceLinkDto, SchemaDto, SchemaPropertiesDto, SchemaScriptsDto, SchemasDto, SchemasService, ScriptCompletions, StringFieldPropertiesDto, SynchronizeSchemaDto, TagsFieldPropertiesDto, UpdateFieldDto, UpdateSchemaDto, VersionTag } from '@app/shared/internal';
 
 describe('SchemasService', () => {
     const version = new VersionTag('1');
@@ -87,7 +87,7 @@ describe('SchemasService', () => {
 
     it('should make post request to create schema',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-            const dto = { name: 'name' };
+            const dto = new CreateSchemaDto({ name: 'name' });
 
             let schema: SchemaDto;
             schemasService.postSchema('my-app', dto).subscribe(result => {
@@ -106,7 +106,7 @@ describe('SchemasService', () => {
 
     it('should make put request to update schema',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-            const dto = { label: 'label1' };
+            const dto = new UpdateSchemaDto({ label: 'label1' });
 
             const resource: Resource = {
                 _links: {
@@ -156,7 +156,7 @@ describe('SchemasService', () => {
 
     it('should make put request to update field rules',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-            const dto: IConfigureFieldRulesDto = {} as any;
+            const dto = new ConfigureFieldRulesDto({});
 
             const resource: Resource = {
                 _links: {
@@ -181,7 +181,7 @@ describe('SchemasService', () => {
 
     it('should make put request to synchronize schema',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-            const dto = {};
+            const dto = new SynchronizeSchemaDto({});
 
             const resource: Resource = {
                 _links: {
@@ -206,7 +206,7 @@ describe('SchemasService', () => {
 
     it('should make put request to update category',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-            const dto = {};
+            const dto = new ChangeCategoryDto({});
 
             const resource: Resource = {
                 _links: {
@@ -256,7 +256,11 @@ describe('SchemasService', () => {
 
     it('should make post request to add field',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-            const dto = { name: 'name', partitioning: 'invariant', properties: createProperties('Number') };
+            const dto = new AddFieldDto({
+                name: 'name',
+                partitioning: 'invariant',
+                properties: createProperties('Number'),
+            });
 
             const resource: Resource = {
                 _links: {
@@ -327,7 +331,7 @@ describe('SchemasService', () => {
 
     it('should make put request to update field',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-            const dto = { properties: createProperties('Number') };
+            const dto = new UpdateFieldDto({ properties: createProperties('Number') });
 
             const resource: Resource = {
                 _links: {
@@ -352,7 +356,7 @@ describe('SchemasService', () => {
 
     it('should make put request to update ui fields',
         inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
-            const dto = { fieldsInReferences: ['field1'] };
+            const dto = new ConfigureUIFieldsDto({ fieldsInReferences: ['field1'] });
 
             const resource: Resource = {
                 _links: {

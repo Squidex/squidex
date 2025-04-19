@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, shareSubscribed, State } from '@app/framework';
-import { ICreateIndexDto, IndexDto } from '../model';
+import { CreateIndexDto, IndexDto } from '../model';
 import { IndexesService } from '../services/indexes.service';
 import { AppsState } from './apps.state';
 import { SchemasState } from './schemas.state';
@@ -97,7 +97,7 @@ export class IndexesState extends State<Snapshot> {
             shareSubscribed(this.dialogs, { silent }));
     }
 
-    public create(request: ICreateIndexDto): Observable<any> {
+    public create(request: CreateIndexDto): Observable<any> {
         return this.indexesService.postIndex(this.appName, this.schemaName, request).pipe(
             tap(() => {
                 this.dialogs.notifyInfo('i18n:schemas.indexes.created');

@@ -9,7 +9,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { ApiUrlConfig, ContributorDto, ContributorsDto, ContributorsService, Resource, Versioned, VersionTag } from '@app/shared/internal';
-import { ContributorsMetadataDto, ResourceLinkDto } from '../model';
+import { AssignContributorDto, ContributorsMetadataDto, ResourceLinkDto } from '../model';
 
 describe('ContributorsService', () => {
     const version = new VersionTag('1');
@@ -53,7 +53,7 @@ describe('ContributorsService', () => {
 
     it('should make post request to assign contributor',
         inject([ContributorsService, HttpTestingController], (contributorsService: ContributorsService, httpMock: HttpTestingController) => {
-            const dto = { contributorId: '123', role: 'Owner' };
+            const dto = new AssignContributorDto({ contributorId: '123', role: 'Owner' });
 
             let contributors: Versioned<ContributorsDto>;
             contributorsService.postContributor('my-app', dto, version).subscribe(result => {

@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { EMPTY, Observable, throwError } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, ErrorDto, getPagingInfo, ListState, shareMapSubscribed, shareSubscribed, State, Types, VersionTag } from '@app/framework';
-import { ContributorDto, ContributorsDto, IAssignContributorDto } from '../model';
+import { ContributorDto, ContributorsDto, AssignContributorDto } from '../model';
 import { ContributorsService } from '../services/contributors.service';
 import { AppsState } from './apps.state';
 
@@ -132,7 +132,7 @@ export class ContributorsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public assign(request: IAssignContributorDto, options?: { silent: boolean }): Observable<boolean | undefined> {
+    public assign(request: AssignContributorDto, options?: { silent: boolean }): Observable<boolean | undefined> {
         return this.contributorsService.postContributor(this.appName, request, this.version).pipe(
             catchError(error => {
                 if (Types.is(error, ErrorDto) && error.statusCode === 404) {

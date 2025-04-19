@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { debug, DialogService, shareSubscribed, State } from '@app/framework';
-import { ICreateTeamDto, IUpdateTeamDto, TeamDto, TeamsService } from '@app/shared/internal';
+import { CreateTeamDto, TeamDto, TeamsService, UpdateTeamDto } from '@app/shared/internal';
 
 interface Snapshot {
     // All teams, loaded once.
@@ -90,7 +90,7 @@ export class TeamsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public create(request: ICreateTeamDto): Observable<TeamDto> {
+    public create(request: CreateTeamDto): Observable<TeamDto> {
         return this.teamsService.postTeam(request).pipe(
             tap(created => {
                 this.next(s => {
@@ -102,7 +102,7 @@ export class TeamsState extends State<Snapshot> {
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
-    public update(team: TeamDto, request: IUpdateTeamDto): Observable<TeamDto> {
+    public update(team: TeamDto, request: UpdateTeamDto): Observable<TeamDto> {
         return this.teamsService.putTeam(team.name, team, request, team.version).pipe(
             tap(updated => {
                 this.replaceTeam(updated);

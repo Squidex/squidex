@@ -9,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiUrlConfig, HTTP, mapVersioned, pretifyError, Resource, Versioned, VersionOrTag } from '@app/framework';
-import { AddLanguageDto, AppLanguagesDto, IAddLanguageDto, IUpdateLanguageDto, UpdateLanguageDto } from '../model';
+import { AddLanguageDto, AppLanguagesDto, UpdateLanguageDto } from '../model';
 
 @Injectable({
     providedIn: 'root',
@@ -31,22 +31,22 @@ export class AppLanguagesService {
             pretifyError('i18n:languages.loadFailed'));
     }
 
-    public postLanguage(appName: string, dto: IAddLanguageDto, version: VersionOrTag): Observable<Versioned<AppLanguagesDto>> {
+    public postLanguage(appName: string, dto: AddLanguageDto, version: VersionOrTag): Observable<Versioned<AppLanguagesDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/languages`);
 
-        return HTTP.postVersioned(this.http, url, new AddLanguageDto(dto).toJSON(), version).pipe(
+        return HTTP.postVersioned(this.http, url, dto.toJSON(), version).pipe(
             mapVersioned(({ body }) => {
                 return AppLanguagesDto.fromJSON(body);
             }),
             pretifyError('i18n:languages.addFailed'));
     }
 
-    public putLanguage(appName: string, resource: Resource, dto: IUpdateLanguageDto, version: VersionOrTag): Observable<Versioned<AppLanguagesDto>> {
+    public putLanguage(appName: string, resource: Resource, dto: UpdateLanguageDto, version: VersionOrTag): Observable<Versioned<AppLanguagesDto>> {
         const link = resource._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, new UpdateLanguageDto(dto).toJSON()).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto.toJSON()).pipe(
             mapVersioned(({ body }) => {
                 return AppLanguagesDto.fromJSON(body);
             }),

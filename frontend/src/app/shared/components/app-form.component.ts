@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ApiUrlConfig, ControlErrorsComponent, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, ModalDialogComponent, TooltipDirective, TransformInputDirective, TranslatePipe } from '@app/framework';
-import { AppsState, CreateAppForm, TemplateDto } from '@app/shared/internal';
+import { AppsState, CreateAppDto, CreateAppForm, TemplateDto } from '@app/shared/internal';
 
 @Component({
     standalone: true,
@@ -53,19 +53,20 @@ export class AppFormComponent {
 
     public createApp() {
         const value = this.createForm.submit();
-
-        if (value) {
-            const request = { ...value, template: this.template?.name };
-
-            this.appsStore.create(request)
-                .subscribe({
-                    next: () => {
-                        this.emitClose();
-                    },
-                    error: error => {
-                        this.createForm.submitFailed(error);
-                    },
-                });
+        if (!value) {
+            return;
         }
+
+        const request = new CreateAppDto({ ...value, template: this.template?.name });
+
+        this.appsStore.create(request)
+            .subscribe({
+                next: () => {
+                    this.emitClose();
+                },
+                error: error => {
+                    this.createForm.submitFailed(error);
+                },
+            });
     }
 }

@@ -7,10 +7,10 @@
 
 import { UntypedFormControl, Validators } from '@angular/forms';
 import slugify from 'slugify';
-import { ExtendedFormGroup, Form, Mutable, TemplatedFormArray, Types } from '@app/framework';
-import { AssetDto, AssetFolderDto, IAnnotateAssetDto, IMoveAssetDto, IRenameAssetFolderDto, IRenameTagDto } from '../model';
+import { ExtendedFormGroup, Form, TemplatedFormArray, Types } from '@app/framework';
+import { AssetDto, AssetFolderDto, AnnotateAssetDto, MoveAssetDto, RenameAssetFolderDto, RenameTagDto, UpdateAssetScriptsDto } from '../model';
 
-export class AnnotateAssetForm extends Form<ExtendedFormGroup, IAnnotateAssetDto, AssetDto> {
+export class AnnotateAssetForm extends Form<ExtendedFormGroup, AnnotateAssetDto, AssetDto> {
     public get metadata() {
         return this.form.controls['metadata'] as TemplatedFormArray;
     }
@@ -66,42 +66,44 @@ export class AnnotateAssetForm extends Form<ExtendedFormGroup, IAnnotateAssetDto
     }
 
     public submit(asset?: AssetDto) {
-        const result: Mutable<IAnnotateAssetDto> | null = super.submit();
+        const result: ({ metadata?: object } & Record<string, any>) | null = super.submit() as any;
 
-        if (asset && result) {
-            const index = asset.fileName.lastIndexOf('.');
-
-            if (index > 0) {
-                result.fileName += asset.fileName.substring(index);
-            }
-
-            if (result.fileName === asset.fileName) {
-                delete result.fileName;
-            }
-
-            if (result.slug === asset.slug) {
-                delete result.slug;
-            }
-
-            if (result.isProtected === asset.isProtected) {
-                delete result.isProtected;
-            }
-
-            if (Types.equals(result.metadata, asset.metadata)) {
-                delete result.metadata;
-            }
-
-            if (Types.equals(result.tags, asset.tags)) {
-                delete result.tags;
-            }
-
-            if (Object.keys(result).length === 0) {
-                this.enable();
-                return null;
-            }
+        if (!asset || !result) {
+            return null;
         }
 
-        return result;
+        const index = asset.fileName.lastIndexOf('.');
+
+        if (index > 0) {
+            result.fileName += asset.fileName.substring(index);
+        }
+
+        if (result.fileName === asset.fileName) {
+            delete result.fileName;
+        }
+
+        if (result.slug === asset.slug) {
+            delete result.slug;
+        }
+
+        if (result.isProtected === asset.isProtected) {
+            delete result.isProtected;
+        }
+
+        if (Types.equals(result.metadata, asset.metadata)) {
+            delete result.metadata;
+        }
+
+        if (Types.equals(result.tags, asset.tags)) {
+            delete result.tags;
+        }
+
+        if (Object.keys(result).length === 0) {
+            this.enable();
+            return null;
+        }
+
+        return new AnnotateAssetDto(result);
     }
 
     public transformLoad(value: Partial<AssetDto>) {
@@ -172,7 +174,7 @@ class MetadataTemplate {
     }
 }
 
-export class EditAssetScriptsForm extends Form<ExtendedFormGroup, {}, object> {
+export class EditAssetScriptsForm extends Form<ExtendedFormGroup, UpdateAssetScriptsDto, object> {
     constructor() {
         super(new ExtendedFormGroup({
             query: new UntypedFormControl('',
@@ -198,9 +200,13 @@ export class EditAssetScriptsForm extends Form<ExtendedFormGroup, {}, object> {
             ),
         }));
     }
+
+    public transformSubmit(value: any) {
+        return new UpdateAssetScriptsDto(value);
+    }
 }
 
-export class RenameAssetFolderForm extends Form<ExtendedFormGroup, IRenameAssetFolderDto, AssetFolderDto> {
+export class RenameAssetFolderForm extends Form<ExtendedFormGroup, RenameAssetFolderDto, AssetFolderDto> {
     constructor() {
         super(new ExtendedFormGroup({
             folderName: new UntypedFormControl('',
@@ -210,7 +216,7 @@ export class RenameAssetFolderForm extends Form<ExtendedFormGroup, IRenameAssetF
     }
 }
 
-export class RenameAssetTagForm extends Form<ExtendedFormGroup, IRenameTagDto, IRenameTagDto> {
+export class RenameAssetTagForm extends Form<ExtendedFormGroup, RenameTagDto, RenameTagDto> {
     constructor() {
         super(new ExtendedFormGroup({
             tagName: new UntypedFormControl('',
@@ -218,14 +224,22 @@ export class RenameAssetTagForm extends Form<ExtendedFormGroup, IRenameTagDto, I
             ),
         }));
     }
+    
+    protected transformSubmit(value: any) {
+        return new RenameTagDto(value);
+    }
 }
 
-export class MoveAssetForm extends Form<ExtendedFormGroup, AssetDto, IMoveAssetDto> {
+export class MoveAssetForm extends Form<ExtendedFormGroup, MoveAssetDto, AssetDto> {
     constructor() {
         super(new ExtendedFormGroup({
             parentId: new UntypedFormControl('',
                 Validators.required,
             ),
         }));
+    }
+    
+    protected transformSubmit(value: any) {
+        return new MoveAssetDto(value);
     }
 }

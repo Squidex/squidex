@@ -10,7 +10,7 @@ import { Observable, of } from 'rxjs';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { debug, DialogService, shareSubscribed, State, Types } from '@app/framework';
 import { AppsService } from '../internal';
-import { AppDto, AppSettingsDto, ICreateAppDto, IUpdateAppDto, IUpdateAppSettingsDto } from '../model';
+import { AppDto, AppSettingsDto, CreateAppDto, TransferToTeamDto, UpdateAppDto, UpdateAppSettingsDto } from '../model';
 
 interface Snapshot {
     // All apps, loaded once.
@@ -122,7 +122,7 @@ export class AppsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public create(request: ICreateAppDto): Observable<AppDto> {
+    public create(request: CreateAppDto): Observable<AppDto> {
         return this.appsService.postApp(request).pipe(
             tap(created => {
                 this.next(s => {
@@ -134,7 +134,7 @@ export class AppsState extends State<Snapshot> {
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
-    public update(app: AppDto, request: IUpdateAppDto): Observable<AppDto> {
+    public update(app: AppDto, request: UpdateAppDto): Observable<AppDto> {
         return this.appsService.putApp(app.name, app, request, app.version).pipe(
             tap(updated => {
                 this.replaceApp(updated);
@@ -142,15 +142,15 @@ export class AppsState extends State<Snapshot> {
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
-    public transfer(app: AppDto, teamId: string | undefined): Observable<AppDto> {
-        return this.appsService.transferApp(app.name, app, { teamId }, app.version).pipe(
+    public transfer(app: AppDto, request: TransferToTeamDto): Observable<AppDto> {
+        return this.appsService.transferApp(app.name, app, request, app.version).pipe(
             tap(updated => {
                 this.replaceApp(updated);
             }),
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
-    public updateSettings(settings: AppSettingsDto, request: IUpdateAppSettingsDto): Observable<AppSettingsDto> {
+    public updateSettings(settings: AppSettingsDto, request: UpdateAppSettingsDto): Observable<AppSettingsDto> {
         return this.appsService.putSettings(this.appName, settings, request, settings.version).pipe(
             tap(updated => {
                 this.replaceAppSettings(updated);

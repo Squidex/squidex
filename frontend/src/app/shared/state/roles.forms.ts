@@ -7,9 +7,9 @@
 
 import { UntypedFormControl, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form, hasNoValue$, TemplatedFormArray } from '@app/framework';
-import { IAddRoleDto, IUpdateRoleDto, RoleDto } from '../model';
+import { AddRoleDto, RoleDto, UpdateRoleDto } from '../model';
 
-export class EditRoleForm extends Form<TemplatedFormArray, IUpdateRoleDto, RoleDto> {
+export class EditRoleForm extends Form<TemplatedFormArray, UpdateRoleDto, RoleDto> {
     public get controls() {
         return this.form.controls as UntypedFormControl[];
     }
@@ -18,12 +18,12 @@ export class EditRoleForm extends Form<TemplatedFormArray, IUpdateRoleDto, RoleD
         super(new TemplatedFormArray(PermissionTemplate.INSTANCE));
     }
 
-    public transformSubmit(value: any) {
-        return { permissions: value, properties: {} };
+    public transformLoad(value: Partial<RoleDto>) {
+        return value.permissions || [];
     }
 
-    public transformLoad(value: Partial<IUpdateRoleDto>) {
-        return value.permissions || [];
+    public transformSubmit(value: any) {
+        return new UpdateRoleDto({ permissions: value, properties: {} });
     }
 }
 
@@ -35,7 +35,7 @@ class PermissionTemplate {
     }
 }
 
-export class AddRoleForm extends Form<ExtendedFormGroup, IAddRoleDto> {
+export class AddRoleForm extends Form<ExtendedFormGroup, AddRoleDto> {
     public get name() {
         return this.form.controls['name'];
     }
@@ -48,5 +48,9 @@ export class AddRoleForm extends Form<ExtendedFormGroup, IAddRoleDto> {
                 Validators.required,
             ),
         }));
+    }
+
+    public transformSubmit(value: any) {
+        return new AddRoleDto(value);
     }
 }

@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { forkJoin, Observable } from 'rxjs';
 import { finalize, map, shareReplay, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, shareMapSubscribed, shareSubscribed, State, VersionTag } from '@app/framework';
-import { AppLanguageDto, AppLanguagesDto, IUpdateLanguageDto, LanguageDto } from '../model';
+import { AddLanguageDto, AppLanguageDto, AppLanguagesDto, LanguageDto, UpdateLanguageDto } from '../model';
 import { AppLanguagesService } from '../services/app-languages.service';
 import { LanguagesService } from '../services/languages.service';
 import { AppsState } from './apps.state';
@@ -126,7 +126,7 @@ export class LanguagesState extends State<Snapshot> {
     }
 
     public add(language: string): Observable<any> {
-        return this.appLanguagesService.postLanguage(this.appName, { language }, this.version).pipe(
+        return this.appLanguagesService.postLanguage(this.appName, new AddLanguageDto({ language }), this.version).pipe(
             tap(({ version, payload }) => {
                 this.replaceLanguages(payload, version);
             }),
@@ -141,7 +141,7 @@ export class LanguagesState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public update(language: AppLanguageDto, request: IUpdateLanguageDto): Observable<any> {
+    public update(language: AppLanguageDto, request: UpdateLanguageDto): Observable<any> {
         return this.appLanguagesService.putLanguage(this.appName, language, request, this.version).pipe(
             tap(({ version, payload }) => {
                 this.replaceLanguages(payload, version);

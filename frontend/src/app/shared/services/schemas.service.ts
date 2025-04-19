@@ -10,7 +10,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlConfig, HTTP, pretifyError, Resource, ScriptCompletions, Versioned, VersionOrTag } from '@app/framework';
-import { AddFieldDto, ChangeCategoryDto, ConfigureFieldRulesDto, ConfigureUIFieldsDto, CreateSchemaDto, IAddFieldDto, IChangeCategoryDto, IConfigureFieldRulesDto, IConfigureUIFieldsDto, ICreateSchemaDto, ISynchronizeSchemaDto, IUpdateFieldDto, IUpdateSchemaDto, SchemaDto, SchemasDto, SynchronizeSchemaDto, UpdateFieldDto, UpdateSchemaDto } from './../model';
+import { AddFieldDto, ChangeCategoryDto, ConfigureFieldRulesDto, ConfigureUIFieldsDto, CreateSchemaDto, SchemaDto, SchemasDto, SynchronizeSchemaDto, UpdateFieldDto, UpdateSchemaDto } from './../model';
 import { QueryModel } from './query';
 
 @Injectable({
@@ -43,17 +43,17 @@ export class SchemasService {
             pretifyError('i18n:schemas.loadSchemaFailed'));
     }
 
-    public postSchema(appName: string, dto: ICreateSchemaDto): Observable<SchemaDto> {
+    public postSchema(appName: string, dto: CreateSchemaDto): Observable<SchemaDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas`);
 
-        return HTTP.postVersioned(this.http, url, new CreateSchemaDto(dto).toJSON()).pipe(
+        return HTTP.postVersioned(this.http, url, dto.toJSON()).pipe(
             map(({ payload }) => {
                 return SchemaDto.fromJSON(payload.body);
             }),
             pretifyError('i18n:schemas.createFailed'));
     }
 
-    public putScripts(appName: string, resource: Resource, dto: {}, version: VersionOrTag): Observable<SchemaDto> {
+    public putScripts(appName: string, resource: Resource, dto: Record<string, string>, version: VersionOrTag): Observable<SchemaDto> {
         const link = resource._links['update/scripts'];
 
         const url = this.apiUrl.buildUrl(link.href);
@@ -65,31 +65,31 @@ export class SchemasService {
             pretifyError('i18n:schemas.updateScriptsFailed'));
     }
 
-    public putFieldRules(appName: string, resource: Resource, dto: IConfigureFieldRulesDto, version: VersionOrTag): Observable<SchemaDto> {
+    public putFieldRules(appName: string, resource: Resource, dto: ConfigureFieldRulesDto, version: VersionOrTag): Observable<SchemaDto> {
         const link = resource._links['update/rules'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, new ConfigureFieldRulesDto(dto).toJSON()).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto.toJSON()).pipe(
             map(({ payload }) => {
                 return SchemaDto.fromJSON(payload.body);
             }),
             pretifyError('i18n:schemas.updateRulesFailed'));
     }
 
-    public putSchemaSync(appName: string, resource: Resource, dto: ISynchronizeSchemaDto, version: VersionOrTag): Observable<SchemaDto> {
+    public putSchemaSync(appName: string, resource: Resource, dto: SynchronizeSchemaDto, version: VersionOrTag): Observable<SchemaDto> {
         const link = resource._links['update/sync'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, new SynchronizeSchemaDto(dto).toJSON()).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto.toJSON()).pipe(
             map(({ payload }) => {
                 return SchemaDto.fromJSON(payload.body);
             }),
             pretifyError('i18n:schemas.synchronizeFailed'));
     }
 
-    public putSchema(appName: string, resource: Resource, dto: IUpdateSchemaDto, version: VersionOrTag): Observable<SchemaDto> {
+    public putSchema(appName: string, resource: Resource, dto: UpdateSchemaDto, version: VersionOrTag): Observable<SchemaDto> {
         const link = resource._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
@@ -101,19 +101,19 @@ export class SchemasService {
             pretifyError('i18n:schemas.updateFailed'));
     }
 
-    public putCategory(appName: string, resource: Resource, dto: IChangeCategoryDto, version: VersionOrTag): Observable<SchemaDto> {
+    public putCategory(appName: string, resource: Resource, dto: ChangeCategoryDto, version: VersionOrTag): Observable<SchemaDto> {
         const link = resource._links['update/category'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, new ChangeCategoryDto(dto).toJSON()).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto.toJSON()).pipe(
             map(({ payload }) => {
                 return SchemaDto.fromJSON(payload.body);
             }),
             pretifyError('i18n:schemas.changeCategoryFailed'));
     }
 
-    public putPreviewUrls(appName: string, resource: Resource, dto: {}, version: VersionOrTag): Observable<SchemaDto> {
+    public putPreviewUrls(appName: string, resource: Resource, dto: Record<string, string>, version: VersionOrTag): Observable<SchemaDto> {
         const link = resource._links['update/urls'];
 
         const url = this.apiUrl.buildUrl(link.href);
@@ -149,24 +149,24 @@ export class SchemasService {
             pretifyError('i18n:schemas.unpublishFailed'));
     }
 
-    public postField(appName: string, resource: Resource, dto: IAddFieldDto, version: VersionOrTag): Observable<SchemaDto> {
+    public postField(appName: string, resource: Resource, dto: AddFieldDto, version: VersionOrTag): Observable<SchemaDto> {
         const link = resource._links['fields/add'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, new AddFieldDto(dto).toJSON()).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto.toJSON()).pipe(
             map(({ payload }) => {
                 return SchemaDto.fromJSON(payload.body);
             }),
             pretifyError('i18n:schemas.addFieldFailed'));
     }
 
-    public putUIFields(appName: string, resource: Resource, dto: IConfigureUIFieldsDto, version: VersionOrTag): Observable<SchemaDto> {
+    public putUIFields(appName: string, resource: Resource, dto: ConfigureUIFieldsDto, version: VersionOrTag): Observable<SchemaDto> {
         const link = resource._links['fields/ui'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, new ConfigureUIFieldsDto(dto).toJSON()).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto.toJSON()).pipe(
             map(({ payload }) => {
                 return SchemaDto.fromJSON(payload.body);
             }),
@@ -185,12 +185,12 @@ export class SchemasService {
             pretifyError('i18n:schemas.reorderFieldsFailed'));
     }
 
-    public putField(appName: string, resource: Resource, dto: IUpdateFieldDto, version: VersionOrTag): Observable<SchemaDto> {
+    public putField(appName: string, resource: Resource, dto: UpdateFieldDto, version: VersionOrTag): Observable<SchemaDto> {
         const link = resource._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, new UpdateFieldDto(dto).toJSON()).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto.toJSON()).pipe(
             map(({ payload }) => {
                 return SchemaDto.fromJSON(payload.body);
             }),

@@ -74,7 +74,7 @@ export class WorkflowComponent {
             return;
         }
 
-        this.workflowsState.update(this.workflowView.dto, this.workflowView.dto)
+        this.workflowsState.update(this.workflowView.dto, this.workflowView.toUpdate())
             .subscribe({
                 next: () => {
                     this.error = null;

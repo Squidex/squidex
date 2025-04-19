@@ -9,7 +9,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { ApiUrlConfig, AppDto, AppSettingsDto, AppsService, AssetScriptsDto, DateTime, EditorDto, ErrorDto, PatternDto, Resource, Versioned, VersionTag } from '@app/shared/internal';
-import { ResourceLinkDto } from '../model';
+import { CreateAppDto, ResourceLinkDto, TransferToTeamDto, UpdateAppDto, UpdateAppSettingsDto, UpdateAssetScriptsDto } from '../model';
 
 describe('AppsService', () => {
     const version = new VersionTag('1');
@@ -107,6 +107,8 @@ describe('AppsService', () => {
 
     it('should make put request to update app settings',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+            const dto = new UpdateAppSettingsDto({ editors: [], patterns: [] });
+
             const resource: Resource = {
                 _links: {
                     update: { method: 'PUT', href: '/api/apps/my-app/settings' },
@@ -114,7 +116,7 @@ describe('AppsService', () => {
             };
 
             let settings: AppSettingsDto;
-            appsService.putSettings('my-app', resource, {} as any, version).subscribe(result => {
+            appsService.putSettings('my-app', resource, dto, version).subscribe(result => {
                 settings = result;
             });
 
@@ -151,6 +153,8 @@ describe('AppsService', () => {
 
     it('should make put request to update asset scripts',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+            const dto = new UpdateAssetScriptsDto({});
+
             const resource: Resource = {
                 _links: {
                     update: { method: 'PUT', href: '/api/apps/my-app/assets/scripts' },
@@ -158,7 +162,7 @@ describe('AppsService', () => {
             };
 
             let scripts: Versioned<AssetScriptsDto>;
-            appsService.putAssetScripts('my-app', resource, {} as any, version).subscribe(result => {
+            appsService.putAssetScripts('my-app', resource, dto, version).subscribe(result => {
                 scripts = result;
             });
 
@@ -178,10 +182,9 @@ describe('AppsService', () => {
 
     it('should make post request to create app',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
-            const dto = { name: 'new-app' };
+            const dto = new CreateAppDto({ name: 'new-app' });
 
             let app: AppDto;
-
             appsService.postApp(dto).subscribe(result => {
                 app = result;
             });
@@ -198,6 +201,8 @@ describe('AppsService', () => {
 
     it('should make put request to update app',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+            const dto = new UpdateAppDto({});
+
             const resource: Resource = {
                 _links: {
                     update: { method: 'PUT', href: '/api/apps/my-app' },
@@ -205,8 +210,7 @@ describe('AppsService', () => {
             };
 
             let app: AppDto;
-
-            appsService.putApp('my-app', resource, { }, version).subscribe(result => {
+            appsService.putApp('my-app', resource, dto, version).subscribe(result => {
                 app = result;
             });
 
@@ -222,6 +226,8 @@ describe('AppsService', () => {
 
     it('should make put request to transfer app',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+            const dto = new TransferToTeamDto({ teamId: 'my-team' });
+
             const resource: Resource = {
                 _links: {
                     transfer: { method: 'PUT', href: '/api/apps/my-app/team' },
@@ -229,8 +235,7 @@ describe('AppsService', () => {
             };
 
             let app: AppDto;
-
-            appsService.transferApp('my-app', resource, { teamId: 'my-team' }, version).subscribe(result => {
+            appsService.transferApp('my-app', resource, dto, version).subscribe(result => {
                 app = result;
             });
 
@@ -253,7 +258,6 @@ describe('AppsService', () => {
             };
 
             let app: AppDto;
-
             appsService.postAppImage('my-app', resource, null!, version).subscribe(result => {
                 app = <AppDto>result;
             });
@@ -277,7 +281,6 @@ describe('AppsService', () => {
             };
 
             let error: ErrorDto;
-
             appsService.postAppImage('my-app', resource, null!, version).subscribe({
                 error: e => {
                     error = e;

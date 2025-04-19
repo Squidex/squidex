@@ -9,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiUrlConfig, IResourceDto, IUpdateUserDto, pretifyError, StringHelper, UpdateUserDto, UserDto, UsersDto } from '@app/shared';
+import { ApiUrlConfig, CreateUserDto, IResourceDto, pretifyError, StringHelper, UpdateUserDto, UserDto, UsersDto } from '@app/shared';
 export { UserDto, UsersDto };
 
 @Injectable()
@@ -40,22 +40,22 @@ export class UsersService {
             pretifyError('i18n:users.loadUserFailed'));
     }
 
-    public postUser(dto: IUpdateUserDto): Observable<UserDto> {
+    public postUser(dto: CreateUserDto): Observable<UserDto> {
         const url = this.apiUrl.buildUrl('api/user-management');
 
-        return this.http.post(url, new UpdateUserDto(dto as any).toJSON()).pipe(
+        return this.http.post(url, dto.toJSON()).pipe(
             map(body => {
                 return UserDto.fromJSON(body);
             }),
             pretifyError('i18n:users.createFailed'));
     }
 
-    public putUser(user: IResourceDto, dto: Partial<IUpdateUserDto>): Observable<UserDto> {
+    public putUser(user: IResourceDto, dto: UpdateUserDto): Observable<UserDto> {
         const link = user._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return this.http.request(link.method, url, { body: new UpdateUserDto(dto as any).toJSON() }).pipe(
+        return this.http.request(link.method, url, { body: dto.toJSON() }).pipe(
             map(body => {
                 return UserDto.fromJSON(body);
             }),

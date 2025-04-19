@@ -9,7 +9,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { ApiUrlConfig, ContentDto, ContentsDto, ContentsService, DateTime, Resource, ScheduleJobDto, Versioned, VersionTag } from '@app/shared/internal';
-import { BulkResultDto, IBulkUpdateContentsDto, ResourceLinkDto, ServerErrorDto, StatusInfoDto } from './../model';
+import { BulkResultDto, BulkUpdateContentsDto, BulkUpdateContentsJobDto, ResourceLinkDto, ServerErrorDto, StatusInfoDto } from './../model';
 import { sanitize } from './query';
 
 describe('ContentsService', () => {
@@ -365,15 +365,18 @@ describe('ContentsService', () => {
 
     it('should make post request to for bulk update',
         inject([ContentsService, HttpTestingController], (contentsService: ContentsService, httpMock: HttpTestingController) => {
-            const dto: IBulkUpdateContentsDto = {
-                jobs: [{
-                    id: '123',
-                    type: 'Delete',
-                }, {
-                    id: '456',
-                    type: 'Delete',
-                }],
-            } as any;
+            const dto = new BulkUpdateContentsDto({
+                jobs: [
+                    new BulkUpdateContentsJobDto({
+                        id: '123',
+                        type: 'Delete',
+                    }),
+                    new BulkUpdateContentsJobDto({
+                        id: '456',
+                        type: 'Delete',
+                    }),
+                ],
+            });
 
             let results: ReadonlyArray<BulkResultDto>;
             contentsService.bulkUpdate('my-app', 'my-schema', dto).subscribe(result => {

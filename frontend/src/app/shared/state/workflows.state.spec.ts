@@ -7,7 +7,7 @@
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, versioned, WorkflowDto, WorkflowsDto, WorkflowsService, WorkflowsState, WorkflowView } from '@app/shared/internal';
+import { AddWorkflowDto, DialogService, versioned, WorkflowDto, WorkflowsDto, WorkflowsService, WorkflowsState, WorkflowView } from '@app/shared/internal';
 import { createWorkflows } from '../services/workflows.service.spec';
 import { TestValues } from './_test-helpers';
 
@@ -83,10 +83,12 @@ describe('WorkflowsState', () => {
         it('should update workflows if workflow added', () => {
             const updated = createWorkflows('1', '2', '3');
 
-            workflowsService.setup(x => x.postWorkflow(app, { name: 'my-workflow' }, version))
+            const request = new AddWorkflowDto({ name: 'my-workflow' });
+
+            workflowsService.setup(x => x.postWorkflow(app, request, version))
                 .returns(() => of(versioned(newVersion, updated))).verifiable();
 
-            workflowsState.add('my-workflow').subscribe();
+            workflowsState.add(request).subscribe();
 
             expectNewWorkflows(updated);
         });

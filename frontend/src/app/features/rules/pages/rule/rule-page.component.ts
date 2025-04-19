@@ -10,7 +10,7 @@ import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { debounceTime, Subscription } from 'rxjs';
-import { ActionForm, ALL_TRIGGERS, ConfirmClickDirective, FormAlertComponent, KeysPipe, LayoutComponent, ListViewComponent, MessageBus, DynamicRuleDto, RuleElementDto, RulesService, RulesState, SchemasState, SidebarMenuDirective, Subscriptions, TitleComponent, ToggleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe, TriggerForm, value$ } from '@app/shared';
+import { ActionForm, ALL_TRIGGERS, ConfirmClickDirective, DynamicCreateRuleDto, DynamicRuleDto, DynamicUpdateRuleDto, FormAlertComponent, KeysPipe, LayoutComponent, ListViewComponent, MessageBus, RuleElementDto, RulesService, RulesState, SchemasState, SidebarMenuDirective, Subscriptions, TitleComponent, ToggleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe, TriggerForm, value$ } from '@app/shared';
 import { GenericActionComponent } from '../../shared/actions/generic-action.component';
 import { RuleElementComponent } from '../../shared/rule-element.component';
 import { AssetChangedTriggerComponent } from '../../shared/triggers/asset-changed-trigger.component';
@@ -175,20 +175,18 @@ export class RulePageComponent implements OnInit {
         }
 
         const action = this.currentAction.submit();
-
         if (!action) {
             return;
         }
 
         const trigger = this.currentTrigger.submit();
-
         if (!trigger || !action) {
             return;
         }
 
-        const request: any = { trigger, action, isEnabled: this.isEnabled };
-
         if (this.rule) {
+            const request = new DynamicUpdateRuleDto({ trigger, action, isEnabled: this.isEnabled });
+
             this.rulesState.update(this.rule, request)
                 .subscribe({
                     next: () => {
@@ -199,6 +197,8 @@ export class RulePageComponent implements OnInit {
                     },
                 });
         } else {
+            const request = new DynamicCreateRuleDto({ trigger, action });
+
             this.rulesState.create(request)
                 .subscribe({
                     next: rule => {

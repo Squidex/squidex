@@ -6,9 +6,9 @@
  */
 
 import { UntypedFormControl, Validators } from '@angular/forms';
-import { ExtendedFormGroup, Form, IUpdateUserDto, IUserDto, ValidatorsEx } from '@app/shared';
+import { CreateUserDto, ExtendedFormGroup, Form, UserDto, ValidatorsEx } from '@app/shared';
 
-export class UserForm extends Form<ExtendedFormGroup, IUpdateUserDto, IUserDto> {
+export class UserForm extends Form<ExtendedFormGroup, CreateUserDto, UserDto> {
     constructor() {
         super(new ExtendedFormGroup({
             email: new UntypedFormControl('', [
@@ -32,7 +32,7 @@ export class UserForm extends Form<ExtendedFormGroup, IUpdateUserDto, IUserDto> 
         }));
     }
 
-    public load(value: Partial<IUpdateUserDto>) {
+    public load(value: Partial<UserDto>) {
         if (value) {
             this.form.controls['password'].setValidators(Validators.nullValidator);
         } else {
@@ -42,7 +42,7 @@ export class UserForm extends Form<ExtendedFormGroup, IUpdateUserDto, IUserDto> 
         super.load(value);
     }
 
-    protected transformLoad(user: Partial<IUserDto>) {
+    protected transformLoad(user: Partial<UserDto>) {
         const permissions = user.permissions?.join('\n') || '';
 
         return { ...user, permissions };
@@ -51,6 +51,6 @@ export class UserForm extends Form<ExtendedFormGroup, IUpdateUserDto, IUserDto> 
     protected transformSubmit(value: any) {
         const permissions = value['permissions'].split('\n').defined();
 
-        return { ...value, permissions };
+        return new CreateUserDto({ ...value, permissions });
     }
 }

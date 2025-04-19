@@ -7,7 +7,7 @@
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, ICreateIndexDto, IndexesService, IndexesState, IndexFieldDto, SchemasState } from '@app/shared/internal';
+import { CreateIndexDto, DialogService, IndexesService, IndexesState, IndexFieldDto, SchemasState } from '@app/shared/internal';
 import { createIndex } from '../services/indexes.service.spec';
 import { TestValues } from './_test-helpers';
 
@@ -106,7 +106,7 @@ describe('IndexesState', () => {
         });
 
         it('should not add index to snapshot', () => {
-            const request: ICreateIndexDto = { fields: [new IndexFieldDto({ name: 'field1', order: 'Ascending' })] };
+            const request = new CreateIndexDto({ fields: [new IndexFieldDto({ name: 'field1', order: 'Ascending' })] });
 
             indexesService.setup(x => x.postIndex(app, schema, request))
                 .returns(() => of({})).verifiable();

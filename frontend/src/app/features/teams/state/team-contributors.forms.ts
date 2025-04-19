@@ -7,9 +7,9 @@
 
 import { UntypedFormControl, Validators } from '@angular/forms';
 import { debounceTime, map, shareReplay } from 'rxjs/operators';
-import { ExtendedFormGroup, Form, hasNoValue$, IAssignContributorDto, Types, UserDto, value$ } from '@app/shared';
+import { AssignContributorDto, ExtendedFormGroup, Form, hasNoValue$, Types, UserDto, value$ } from '@app/shared';
 
-export class AssignTeamContributorForm extends Form<ExtendedFormGroup, IAssignContributorDto> {
+export class AssignTeamContributorForm extends Form<ExtendedFormGroup, AssignContributorDto, { user: string }> {
     public get user() {
         return this.form.controls['user'];
     }
@@ -31,11 +31,11 @@ export class AssignTeamContributorForm extends Form<ExtendedFormGroup, IAssignCo
             contributorId = contributorId.id;
         }
 
-        return { contributorId, role: 'Owner', invite: true };
+        return new AssignContributorDto({ contributorId, role: 'Owner', invite: true });
     }
 }
 
-export class ImportContributorsForm extends Form<ExtendedFormGroup, ReadonlyArray<IAssignContributorDto>> {
+export class ImportContributorsForm extends Form<ExtendedFormGroup, ReadonlyArray<AssignContributorDto>> {
     public get import() {
         return this.form.controls['import'];
     }
@@ -58,18 +58,16 @@ export class ImportContributorsForm extends Form<ExtendedFormGroup, ReadonlyArra
 }
 
 function extractEmails(value: string) {
-    const result: IAssignContributorDto[] = [];
+    const result: AssignContributorDto[] = [];
 
     if (value) {
         const added: { [email: string]: boolean } = {};
 
         const emails = value.match(EMAIL_REGEX);
-
         if (emails) {
             for (const match of emails) {
                 if (!added[match]) {
-                    result.push({ contributorId: match, role: 'Owner', invite: true });
-
+                    result.push(new AssignContributorDto({ contributorId: match, role: 'Owner', invite: true }));
                     added[match] = true;
                 }
             }

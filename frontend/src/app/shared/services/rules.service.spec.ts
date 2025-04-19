@@ -8,7 +8,7 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, ContentChangedRuleTriggerDto, DateTime, DynamicRuleDto, DynamicRulesDto, IDynamicCreateRuleDto, IDynamicUpdateRuleDto, ManualRuleTriggerDto, Resource, ResourceLinkDto, RuleElementDto, RuleElementPropertyDto, RuleEventDto, RuleEventsDto, RulesService, ScriptCompletions, SimulatedRuleEventDto, SimulatedRuleEventsDto, VersionTag } from '@app/shared/internal';
+import { ApiUrlConfig, ContentChangedRuleTriggerDto, DateTime, DynamicCreateRuleDto, DynamicRuleDto, DynamicRulesDto, DynamicUpdateRuleDto, ManualRuleTriggerDto, Resource, ResourceLinkDto, RuleElementDto, RuleElementPropertyDto, RuleEventDto, RuleEventsDto, RulesService, ScriptCompletions, SimulatedRuleEventDto, SimulatedRuleEventsDto, VersionTag } from '@app/shared/internal';
 
 describe('RulesService', () => {
     const version = new VersionTag('1');
@@ -159,14 +159,14 @@ describe('RulesService', () => {
 
     it('should make post request to create rule',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
-            const dto: IDynamicCreateRuleDto = {
+            const dto = new DynamicCreateRuleDto({
                 trigger: new ManualRuleTriggerDto(),
                 action: {
                     param3: 3,
                     param4: 4,
                     actionType: 'Webhook',
                 },
-            };
+            });
 
             let rule: DynamicRuleDto;
             rulesService.postRule('my-app', dto).subscribe(result => {
@@ -185,14 +185,14 @@ describe('RulesService', () => {
 
     it('should make put request to update rule',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
-            const dto: IDynamicUpdateRuleDto = {
+            const dto = new DynamicUpdateRuleDto({
                 trigger: new ManualRuleTriggerDto(),
                 action: {
                     param3: 3,
                     param4: 4,
                     actionType: 'Webhook',
                 },
-            };
+            });
 
             const resource: Resource = {
                 _links: {

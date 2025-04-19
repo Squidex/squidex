@@ -7,7 +7,7 @@
 
 import { firstValueFrom, of, throwError } from 'rxjs';
 import { IMock, Mock, Times } from 'typemoq';
-import { DialogService, TeamsService, TeamsState } from '@app/shared/internal';
+import { CreateTeamDto, DialogService, TeamsService, TeamsState, UpdateTeamDto } from '@app/shared/internal';
 import { createTeam } from '../services/teams.service.spec';
 
 describe('TeamsState', () => {
@@ -77,7 +77,7 @@ describe('TeamsState', () => {
     it('should add team to snapshot if created', () => {
         const updated = createTeam(3, '_new');
 
-        const request = { ...updated };
+        const request = new CreateTeamDto({ ...updated });
 
         teamsService.setup(x => x.postTeam(request))
             .returns(() => of(updated)).verifiable();
@@ -88,9 +88,9 @@ describe('TeamsState', () => {
     });
 
     it('should update team if updated', () => {
-        const request = { name: 'NewName' };
-
         const updated = createTeam(2, '_new');
+
+        const request = new UpdateTeamDto({ name: 'NewName' });
 
         teamsService.setup(x => x.putTeam(team2.name, team2, request, team2.version))
             .returns(() => of(updated)).verifiable();
@@ -138,9 +138,9 @@ describe('TeamsState', () => {
         });
 
         it('should update selected team if updated', () => {
-            const request = { name: 'NewName' };
-
             const updated = createTeam(1, '_new');
+
+            const request = new UpdateTeamDto({ name: 'NewName' });
 
             teamsService.setup(x => x.putTeam(team1.name, team1, request, team1.version))
                 .returns(() => of(updated)).verifiable();

@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { finalize, map, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, shareSubscribed, State } from '@app/framework';
-import { DynamicRuleDto, IDynamicCreateRuleDto, IDynamicUpdateRuleDto } from '../model';
+import { DynamicRuleDto, DynamicCreateRuleDto, DynamicUpdateRuleDto } from '../model';
 import { RulesService } from '../services/rules.service';
 import { AppsState } from './apps.state';
 
@@ -142,7 +142,7 @@ export class RulesState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public create(request: IDynamicCreateRuleDto): Observable<DynamicRuleDto> {
+    public create(request: DynamicCreateRuleDto): Observable<DynamicRuleDto> {
         return this.rulesService.postRule(this.appName, request).pipe(
             tap(created => {
                 this.next(s => {
@@ -171,8 +171,8 @@ export class RulesState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public update(rule: DynamicRuleDto, dto: Partial<IDynamicUpdateRuleDto>): Observable<DynamicRuleDto> {
-        return this.rulesService.putRule(this.appName, rule, dto, rule.version).pipe(
+    public update(rule: DynamicRuleDto, request: DynamicUpdateRuleDto): Observable<DynamicRuleDto> {
+        return this.rulesService.putRule(this.appName, rule, request, rule.version).pipe(
             tap(updated => {
                 this.replaceRule(updated);
             }),

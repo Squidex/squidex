@@ -8,7 +8,7 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, PlanChangedDto, PlanDto, PlansDto, PlansService, ReferralInfoDto, Versioned, VersionTag } from '@app/shared/internal';
+import { ApiUrlConfig, ChangePlanDto, PlanChangedDto, PlanDto, PlansDto, PlansService, ReferralInfoDto, Versioned, VersionTag } from '@app/shared/internal';
 
 describe('PlansService', () => {
     const version = new VersionTag('1');
@@ -123,10 +123,9 @@ describe('PlansService', () => {
 
     it('should make put request to change plan',
         inject([PlansService, HttpTestingController], (plansService: PlansService, httpMock: HttpTestingController) => {
-            const dto = { planId: 'enterprise' };
+            const dto = new ChangePlanDto({ planId: 'enterprise' });
 
             let planChanged: PlanChangedDto;
-
             plansService.putPlan('my-app', dto, version).subscribe(result => {
                 planChanged = result.payload;
             });

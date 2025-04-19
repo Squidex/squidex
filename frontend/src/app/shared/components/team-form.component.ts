@@ -50,17 +50,18 @@ export class TeamFormComponent {
 
     public createTeam() {
         const value = this.createForm.submit();
-
-        if (value) {
-            this.teamsStore.create(value)
-                .subscribe({
-                    next: () => {
-                        this.emitClose();
-                    },
-                    error: error => {
-                        this.createForm.submitFailed(error);
-                    },
-                });
+        if (!value) {
+            return;
         }
+
+        this.teamsStore.create(value)
+            .subscribe({
+                next: () => {
+                    this.emitClose();
+                },
+                error: error => {
+                    this.createForm.submitFailed(error);
+                },
+            });
     }
 }

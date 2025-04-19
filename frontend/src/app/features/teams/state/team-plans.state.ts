@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { debug, DialogService, LoadingState, PlanDto, PlansLockedReason, ReferralInfoDto, shareSubscribed, State, TeamsState, VersionTag } from '@app/shared';
+import { ChangePlanDto, debug, DialogService, LoadingState, PlanDto, PlansLockedReason, ReferralInfoDto, shareSubscribed, State, TeamsState, VersionTag } from '@app/shared';
 import { TeamPlansService } from '../internal';
 
 export interface PlanInfo {
@@ -121,7 +121,7 @@ export class TeamPlansState extends State<Snapshot> {
     }
 
     public change(planId: string): Observable<any> {
-        return this.plansService.putPlan(this.teamId, { planId }, this.version).pipe(
+        return this.plansService.putPlan(this.teamId, new ChangePlanDto({ planId }), this.version).pipe(
             tap(({ version, payload }) => {
                 if (payload.redirectUri && payload.redirectUri.length > 0) {
                     this.window.location.href = payload.redirectUri;

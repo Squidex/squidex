@@ -10,7 +10,7 @@ import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError, filter, map } from 'rxjs/operators';
 import { ApiUrlConfig, ErrorDto, HTTP, mapVersioned, pretifyError, Resource, Types, Versioned, VersionOrTag } from '@app/framework';
-import { AppDto, AppSettingsDto, AssetScriptsDto, CreateAppDto, ICreateAppDto, ITransferToTeamDto, IUpdateAppDto, IUpdateAppSettingsDto, IUpdateAssetScriptsDto, TransferToTeamDto, UpdateAppDto, UpdateAppSettingsDto, UpdateAssetScriptsDto } from './../model';
+import { AppDto, AppSettingsDto, AssetScriptsDto, CreateAppDto, TransferToTeamDto, UpdateAppDto, UpdateAppSettingsDto, UpdateAssetScriptsDto } from './../model';
 
 @Injectable({
     providedIn: 'root',
@@ -58,34 +58,34 @@ export class AppsService {
             pretifyError('i18n:apps.appLoadFailed'));
     }
 
-    public postApp(dto: ICreateAppDto): Observable<AppDto> {
+    public postApp(dto: CreateAppDto): Observable<AppDto> {
         const url = this.apiUrl.buildUrl('api/apps');
 
-        return this.http.post(url, new CreateAppDto(dto).toJSON()).pipe(
+        return this.http.post(url, dto.toJSON()).pipe(
             map(body => {
                 return AppDto.fromJSON(body);
             }),
             pretifyError('i18n:apps.createFailed'));
     }
 
-    public putApp(appName: string, resource: Resource, dto: IUpdateAppDto, version: VersionOrTag): Observable<AppDto> {
+    public putApp(appName: string, resource: Resource, dto: UpdateAppDto, version: VersionOrTag): Observable<AppDto> {
         const link = resource._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, new UpdateAppDto(dto).toJSON()).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto.toJSON()).pipe(
             map(({ payload }) => {
                 return AppDto.fromJSON(payload.body);
             }),
             pretifyError('i18n:apps.updateFailed'));
     }
 
-    public transferApp(appName: string, resource: Resource, dto: ITransferToTeamDto, version: VersionOrTag): Observable<AppDto> {
+    public transferApp(appName: string, resource: Resource, dto: TransferToTeamDto, version: VersionOrTag): Observable<AppDto> {
         const link = resource._links['transfer'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, new TransferToTeamDto(dto).toJSON()).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto.toJSON()).pipe(
             map(({ payload }) => {
                 return AppDto.fromJSON(payload.body);
             }),
@@ -102,12 +102,12 @@ export class AppsService {
             pretifyError('i18n:apps.loadSettingsFailed'));
     }
 
-    public putSettings(appName: string, resource: Resource, dto: IUpdateAppSettingsDto, version: VersionOrTag): Observable<AppSettingsDto> {
+    public putSettings(appName: string, resource: Resource, dto: UpdateAppSettingsDto, version: VersionOrTag): Observable<AppSettingsDto> {
         const link = resource._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, new UpdateAppSettingsDto(dto).toJSON()).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto.toJSON()).pipe(
             map(({ payload }) => {
                 return AppSettingsDto.fromJSON(payload.body);
             }),
@@ -124,12 +124,12 @@ export class AppsService {
             pretifyError('i18n:apps.loadAssetScriptsFailed'));
     }
 
-    public putAssetScripts(appName: string, resource: Resource, dto: IUpdateAssetScriptsDto, version: VersionOrTag): Observable<Versioned<AssetScriptsDto>> {
+    public putAssetScripts(appName: string, resource: Resource, dto: UpdateAssetScriptsDto, version: VersionOrTag): Observable<Versioned<AssetScriptsDto>> {
         const link = resource._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, new UpdateAssetScriptsDto(dto).toJSON()).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto.toJSON()).pipe(
             mapVersioned(({ body }) => {
                 return AssetScriptsDto.fromJSON(body);
             }),

@@ -10,7 +10,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlConfig, HTTP, mapVersioned, pretifyError, Resource, Versioned, VersionOrTag } from '@app/framework';
-import { ClientDto, ClientsDto, CreateClientDto, ICreateClientDto, IUpdateClientDto, UpdateClientDto } from './../model';
+import { ClientDto, ClientsDto, CreateClientDto, UpdateClientDto } from './../model';
 
 export class AccessTokenDto {
     constructor(
@@ -40,22 +40,22 @@ export class ClientsService {
             pretifyError('i18n:clients.loadFailed'));
     }
 
-    public postClient(appName: string, dto: ICreateClientDto, version: VersionOrTag): Observable<Versioned<ClientsDto>> {
+    public postClient(appName: string, dto: CreateClientDto, version: VersionOrTag): Observable<Versioned<ClientsDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/clients`);
 
-        return HTTP.postVersioned(this.http, url, new CreateClientDto(dto).toJSON(), version).pipe(
+        return HTTP.postVersioned(this.http, url, dto.toJSON(), version).pipe(
             mapVersioned(({ body }) => {
                 return ClientsDto.fromJSON(body);
             }),
             pretifyError('i18n:clients.addFailed'));
     }
 
-    public putClient(appName: string, resource: Resource, dto: IUpdateClientDto, version: VersionOrTag): Observable<Versioned<ClientsDto>> {
+    public putClient(appName: string, resource: Resource, dto: UpdateClientDto, version: VersionOrTag): Observable<Versioned<ClientsDto>> {
         const link = resource._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, new UpdateClientDto(dto).toJSON()).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto.toJSON()).pipe(
             mapVersioned(({ body }) => {
                 return ClientsDto.fromJSON(body);
             }),

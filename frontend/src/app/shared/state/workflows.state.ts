@@ -10,7 +10,7 @@ import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { compareStrings, debug, DialogService, LoadingState, Mutable, shareSubscribed, State, VersionTag } from '@app/framework';
 import { WorkflowsService } from '../services/workflows.service';
-import { IUpdateWorkflowDto, IWorkflowStepDto, IWorkflowTransitionDto, WorkflowDto, WorkflowsDto, WorkflowStepDto, WorkflowTransitionDto } from './../model';
+import { AddWorkflowDto, IWorkflowStepDto, IWorkflowTransitionDto, UpdateWorkflowDto, WorkflowDto, WorkflowsDto, WorkflowStepDto, WorkflowTransitionDto } from './../model';
 import { AppsState } from './apps.state';
 
 interface Snapshot extends LoadingState {
@@ -89,16 +89,16 @@ export class WorkflowsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public add(name: string): Observable<any> {
-        return this.workflowsService.postWorkflow(this.appName, { name }, this.version).pipe(
+    public add(request: AddWorkflowDto): Observable<any> {
+        return this.workflowsService.postWorkflow(this.appName, request, this.version).pipe(
             tap(({ version, payload }) => {
                 this.replaceWorkflows(payload, version);
             }),
             shareSubscribed(this.dialogs));
     }
 
-    public update(workflow: WorkflowDto, update: IUpdateWorkflowDto): Observable<any> {
-        return this.workflowsService.putWorkflow(this.appName, workflow, update, this.version).pipe(
+    public update(workflow: WorkflowDto, request: UpdateWorkflowDto): Observable<any> {
+        return this.workflowsService.putWorkflow(this.appName, workflow, request, this.version).pipe(
             tap(({ version, payload }) => {
                 this.dialogs.notifyInfo('i18n:workflows.saved');
 
@@ -313,6 +313,10 @@ export class WorkflowView {
         const clone = WorkflowDto.fromJSON(this.dto.toJSON());
         action(clone);
         return new WorkflowView(WorkflowDto.fromJSON(clone));
+    }
+
+    public toUpdate(): UpdateWorkflowDto {
+        return UpdateWorkflowDto.fromJSON(this.dto.toJSON());
     }
 }
 

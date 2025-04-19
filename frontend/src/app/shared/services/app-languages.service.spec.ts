@@ -9,7 +9,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { ApiUrlConfig, AppLanguageDto, AppLanguagesDto, AppLanguagesService, Resource, Versioned, VersionTag } from '@app/shared/internal';
-import { ResourceLinkDto } from '../model';
+import { AddLanguageDto, ResourceLinkDto, UpdateLanguageDto } from '../model';
 
 describe('AppLanguagesService', () => {
     const version = new VersionTag('1');
@@ -53,7 +53,7 @@ describe('AppLanguagesService', () => {
 
     it('should make post request to add language',
         inject([AppLanguagesService, HttpTestingController], (appLanguagesService: AppLanguagesService, httpMock: HttpTestingController) => {
-            const dto = { language: 'de' };
+            const dto = new AddLanguageDto({ language: 'de' });
 
             let languages: Versioned<AppLanguagesDto>;
             appLanguagesService.postLanguage('my-app', dto, version).subscribe(result => {
@@ -76,7 +76,7 @@ describe('AppLanguagesService', () => {
 
     it('should make put request to make master language',
         inject([AppLanguagesService, HttpTestingController], (appLanguagesService: AppLanguagesService, httpMock: HttpTestingController) => {
-            const dto = { isMaster: true };
+            const dto = new UpdateLanguageDto({ isMaster: true });
 
             const resource: Resource = {
                 _links: {

@@ -13,7 +13,7 @@ import { FieldPropertiesVisitor, META_FIELDS, tableField, tableFields } from './
 
 export class ServerErrorDto implements IServerErrorDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** Error message. */
     readonly message!: string;
     /** The error code. */
@@ -120,7 +120,7 @@ export interface IServerErrorDto {
 
 export class UserPropertyDto implements IUserPropertyDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     readonly name!: string;
     readonly value!: string;
 
@@ -183,7 +183,7 @@ export interface IUserPropertyDto {
 
 export class UpdateSettingDto implements IUpdateSettingDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The value for the setting. */
     readonly value!: any;
 
@@ -244,7 +244,7 @@ export interface IUpdateSettingDto {
 
 export abstract class ResourceDto implements IResourceDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The links. */
     readonly _links!: { [key: string]: ResourceLinkDto; };
 
@@ -451,7 +451,7 @@ export interface IUserDto extends IResourceDto {
 
 export class ResourceLinkDto implements IResourceLinkDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The link url. */
     readonly href!: string;
     /** The link method. */
@@ -524,7 +524,7 @@ export interface IResourceLinkDto {
 
 export class CreateUserDto implements ICreateUserDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The email of the user. Unique value. */
     readonly email!: string;
     /** The display name (usually first name and last name) of the user. */
@@ -611,7 +611,7 @@ export interface ICreateUserDto {
 
 export class UpdateUserDto implements IUpdateUserDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The email of the user. Unique value. */
     readonly email!: string;
     /** The display name (usually first name and last name) of the user. */
@@ -727,7 +727,7 @@ export interface IResourcesDto extends IResourceDto {
 
 export class UpdateProfileDto implements IUpdateProfileDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The answers from a questionaire. */
     readonly answers?: { [key: string]: string; } | undefined;
 
@@ -800,7 +800,7 @@ export interface IUpdateProfileDto {
 
 export class TranslationDto implements ITranslationDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The result of the translation. */
     readonly status!: TranslationStatus;
     /** The result of the translation. */
@@ -884,7 +884,7 @@ export const TranslationStatusValues: ReadonlyArray<TranslationStatus> = [
 
 export class TranslateDto implements ITranslateDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The text to translate. */
     readonly text!: string;
     /** The target language. */
@@ -1216,7 +1216,7 @@ export interface IContributorDto extends IResourceDto {
 
 export class ContributorsMetadataDto implements IContributorsMetadataDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** Indicates whether the user has been invited. */
     readonly isInvited!: string;
 
@@ -1277,7 +1277,7 @@ export interface IContributorsMetadataDto {
 
 export class AssignContributorDto implements IAssignContributorDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The id or email of the user to add to the app. */
     readonly contributorId!: string;
     /** The role of the contributor. */
@@ -1447,7 +1447,7 @@ export interface ITeamDto extends IResourceDto {
 
 export class CreateTeamDto implements ICreateTeamDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The name of the team. */
     readonly name!: string;
 
@@ -1508,7 +1508,7 @@ export interface ICreateTeamDto {
 
 export class UpdateTeamDto implements IUpdateTeamDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The name of the team. */
     readonly name!: string;
 
@@ -1608,7 +1608,7 @@ export interface IAuthSchemeResponseDto extends IResourceDto {
 
 export class AuthSchemeDto implements IAuthSchemeDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The domain name of your user accounts. */
     readonly domain!: string;
     /** The display name for buttons. */
@@ -1699,7 +1699,7 @@ export interface IAuthSchemeDto {
 
 export class AuthSchemeValueDto implements IAuthSchemeValueDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The auth scheme if configured. */
     readonly scheme?: AuthSchemeDto | undefined;
 
@@ -1760,7 +1760,7 @@ export interface IAuthSchemeValueDto {
 
 export class LogDownloadDto implements ILogDownloadDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The url to download the log. */
     readonly downloadUrl?: string | undefined;
 
@@ -1821,7 +1821,7 @@ export interface ILogDownloadDto {
 
 export class CallsUsageDto implements ICallsUsageDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The total number of API calls. */
     readonly totalCalls!: number;
     /** The total number of bytes transferred. */
@@ -1942,7 +1942,7 @@ export interface ICallsUsageDto {
 
 export class CallsUsagePerDateDto implements ICallsUsagePerDateDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The date when the usage was tracked. */
     readonly date!: DateTime;
     /** The total number of API calls. */
@@ -2021,7 +2021,7 @@ export interface ICallsUsagePerDateDto {
 
 export class CurrentStorageDto implements ICurrentStorageDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The size in bytes. */
     readonly size!: number;
     /** The maximum allowed asset size. */
@@ -2088,7 +2088,7 @@ export interface ICurrentStorageDto {
 
 export class StorageUsagePerDateDto implements IStorageUsagePerDateDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The date when the usage was tracked. */
     readonly date!: DateTime;
     /** The number of assets. */
@@ -2577,7 +2577,7 @@ export const SchemaTypeValues: ReadonlyArray<SchemaType> = [
 
 export class SchemaPropertiesDto implements ISchemaPropertiesDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** Optional label for the editor. */
     readonly label?: string | undefined;
     /** Hints to describe the schema. */
@@ -2694,7 +2694,7 @@ export interface ISchemaPropertiesDto {
 
 export class SchemaScriptsDto implements ISchemaScriptsDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The script that is executed for each content when querying contents. */
     readonly query?: string | undefined;
     /** The script that is executed for all contents when querying contents. */
@@ -2785,7 +2785,7 @@ export interface ISchemaScriptsDto {
 
 export class FieldRuleDto implements IFieldRuleDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The action to perform when the condition is met. */
     readonly action!: FieldRuleAction;
     /** The field to update. */
@@ -3013,7 +3013,7 @@ export abstract class FieldPropertiesDto implements IFieldPropertiesDto {
     /** The discriminator. */
     public readonly fieldType!: string;
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** Optional label for the editor. */
     readonly label?: string | undefined;
     /** Hints to describe the field. */
@@ -3122,7 +3122,7 @@ export abstract class FieldPropertiesDto implements IFieldPropertiesDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
-        data["fieldType"] = "FieldPropertiesDto";
+        data["fieldType"] = this.fieldType;
         data["label"] = this.label;
         data["hints"] = this.hints;
         data["placeholder"] = this.placeholder;
@@ -4744,7 +4744,7 @@ export interface INestedFieldDto extends IResourceDto {
 
 export class AddFieldDto implements IAddFieldDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The name of the field. Must be unique within the schema. */
     readonly name!: string;
     /** Determines the optional partitioning of the field. */
@@ -4817,7 +4817,7 @@ export interface IAddFieldDto {
 
 export class ConfigureUIFieldsDto implements IConfigureUIFieldsDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The name of fields that are used in content lists. */
     readonly fieldsInLists?: string[] | undefined;
     /** The name of fields that are used in content references. */
@@ -4900,7 +4900,7 @@ export interface IConfigureUIFieldsDto {
 
 export class ReorderFieldsDto implements IReorderFieldsDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The field ids in the target order. */
     readonly fieldIds!: number[];
 
@@ -4969,7 +4969,7 @@ export interface IReorderFieldsDto {
 
 export class UpdateFieldDto implements IUpdateFieldDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The field properties. */
     readonly properties!: FieldPropertiesDto;
 
@@ -5130,7 +5130,7 @@ export interface IIndexDto extends IResourceDto {
 
 export class IndexFieldDto implements IIndexFieldDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The name of the field. */
     readonly name!: string;
     /** The sort order of the field. */
@@ -5204,7 +5204,7 @@ export const SortOrderValues: ReadonlyArray<SortOrder> = [
 
 export class CreateIndexDto implements ICreateIndexDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The index fields. */
     readonly fields!: IndexFieldDto[];
 
@@ -5320,7 +5320,7 @@ export interface ISchemasDto extends IResourceDto {
 
 export abstract class UpsertSchemaDto implements IUpsertSchemaDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The optional properties. */
     readonly properties?: SchemaPropertiesDto | undefined;
     /** The optional scripts. */
@@ -5518,7 +5518,7 @@ export interface ICreateSchemaDto extends IUpsertSchemaDto {
 
 export class UpsertSchemaFieldDto implements IUpsertSchemaFieldDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The name of the field. Must be unique within the schema. */
     readonly name!: string;
     /** Defines if the field is hidden. */
@@ -5623,7 +5623,7 @@ export interface IUpsertSchemaFieldDto {
 
 export class UpsertSchemaNestedFieldDto implements IUpsertSchemaNestedFieldDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The name of the field. Must be unique within the schema. */
     readonly name!: string;
     /** Defines if the field is hidden. */
@@ -5708,7 +5708,7 @@ export interface IUpsertSchemaNestedFieldDto {
 
 export class UpdateSchemaDto implements IUpdateSchemaDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** Optional label for the editor. */
     readonly label?: string | undefined;
     /** Hints to describe the schema. */
@@ -5854,7 +5854,7 @@ export interface ISynchronizeSchemaDto extends IUpsertSchemaDto {
 
 export class ChangeCategoryDto implements IChangeCategoryDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The name of the category. */
     readonly name?: string | undefined;
 
@@ -5915,7 +5915,7 @@ export interface IChangeCategoryDto {
 
 export class ConfigureFieldRulesDto implements IConfigureFieldRulesDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The field rules to configure. */
     readonly fieldRules?: FieldRuleDto[] | undefined;
 
@@ -5984,7 +5984,7 @@ export interface IConfigureFieldRulesDto {
 
 export class RuleElementDto implements IRuleElementDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** Describes the action or trigger type. */
     readonly description!: string;
     /** The label for the action or trigger type. */
@@ -6089,7 +6089,7 @@ export interface IRuleElementDto {
 
 export class RuleElementPropertyDto implements IRuleElementPropertyDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The html editor. */
     readonly editor!: RuleFieldEditor;
     /** The name of the editor. */
@@ -6366,7 +6366,7 @@ export abstract class RuleTriggerDto implements IRuleTriggerDto {
     /** The discriminator. */
     public readonly triggerType!: string;
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
 
     constructor(data?: IRuleTriggerDto) {
         if (data) {
@@ -6407,7 +6407,7 @@ export abstract class RuleTriggerDto implements IRuleTriggerDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
-        data["triggerType"] = "RuleTriggerDto";
+        data["triggerType"] = this.triggerType;
         this.cleanup(data);
         return data;
     }
@@ -6575,7 +6575,7 @@ export interface IContentChangedRuleTriggerDto extends IRuleTriggerDto {
 
 export class SchemaConditionDto implements ISchemaConditionDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     readonly schemaId!: string;
     readonly condition?: string | undefined;
 
@@ -6748,7 +6748,7 @@ export abstract class RuleActionDto implements IRuleActionDto {
     /** The discriminator. */
     public readonly actionType!: string;
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
 
     constructor(data?: IRuleActionDto) {
         if (data) {
@@ -6825,7 +6825,7 @@ export abstract class RuleActionDto implements IRuleActionDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
-        data["actionType"] = "RuleActionDto";
+        data["actionType"] = this.actionType;
         this.cleanup(data);
         return data;
     }
@@ -7893,7 +7893,7 @@ export const WebhookMethodValues: ReadonlyArray<WebhookMethod> = [
 
 export class CreateRuleDto implements ICreateRuleDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The trigger properties. */
     readonly trigger!: RuleTriggerDto;
     /** The action properties. */
@@ -7960,7 +7960,7 @@ export interface ICreateRuleDto {
 
 export class UpdateRuleDto implements IUpdateRuleDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** Optional rule name. */
     readonly name?: string | undefined;
     /** The trigger properties. */
@@ -8088,7 +8088,7 @@ export interface ISimulatedRuleEventsDto extends IResourceDto {
 
 export class SimulatedRuleEventDto implements ISimulatedRuleEventDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The unique event id. */
     readonly eventId!: string;
     /** The the unique id of the simulated event. */
@@ -8384,7 +8384,7 @@ export const RuleJobResultValues: ReadonlyArray<RuleJobResult> = [
 
 export class PlansDto implements IPlansDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The available plans. */
     readonly plans!: PlanDto[];
     /** The current plan id. */
@@ -8483,7 +8483,7 @@ export interface IPlansDto {
 
 export class PlanDto implements IPlanDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The ID of the plan. */
     readonly id!: string;
     /** The name of the plan. */
@@ -8604,7 +8604,7 @@ export interface IPlanDto {
 
 export class ReferralInfoDto implements IReferralInfoDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     readonly code!: string;
     readonly earned!: string;
     readonly condition!: string;
@@ -8680,7 +8680,7 @@ export const PlansLockedReasonValues: ReadonlyArray<PlansLockedReason> = [
 
 export class PlanChangedDto implements IPlanChangedDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** Optional redirect uri. */
     readonly redirectUri?: string | undefined;
 
@@ -8741,7 +8741,7 @@ export interface IPlanChangedDto {
 
 export class ChangePlanDto implements IChangePlanDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The new plan id. */
     readonly planId!: string;
 
@@ -8802,7 +8802,7 @@ export interface IChangePlanDto {
 
 export class FeaturesDto implements IFeaturesDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The latest features. */
     readonly features!: FeatureDto[];
     /** The recent version. */
@@ -8877,7 +8877,7 @@ export interface IFeaturesDto {
 
 export class FeatureDto implements IFeatureDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The name of the feature. */
     readonly name!: string;
     /** The description text. */
@@ -8944,7 +8944,7 @@ export interface IFeatureDto {
 
 export class LanguageDto implements ILanguageDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The iso code of the language. */
     readonly iso2Code!: string;
     /** The english name of the language. */
@@ -9187,7 +9187,7 @@ export const JobStatusValues: ReadonlyArray<JobStatus> = [
 
 export class JobLogMessageDto implements IJobLogMessageDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The timestamp. */
     readonly timestamp!: DateTime;
     /** The log message. */
@@ -9254,7 +9254,7 @@ export interface IJobLogMessageDto {
 
 export class HistoryEventDto implements IHistoryEventDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The message for the event. */
     readonly message!: string;
     /** The type of the original event. */
@@ -9736,7 +9736,7 @@ export interface IContentDto extends IResourceDto {
 
 export class ScheduleJobDto implements IScheduleJobDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The ID of the schedule job. */
     readonly id!: string;
     /** The new status. */
@@ -9821,7 +9821,7 @@ export interface IScheduleJobDto {
 
 export class StatusInfoDto implements IStatusInfoDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The name of the status. */
     readonly status!: string;
     /** The color of the status. */
@@ -9888,7 +9888,7 @@ export interface IStatusInfoDto {
 
 export class QueryDto implements IQueryDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The optional list of ids to query. */
     readonly ids?: string[] | undefined;
     /** The optional odata query. */
@@ -9975,7 +9975,7 @@ export interface IQueryDto {
 
 export class BulkResultDto implements IBulkResultDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The error when the bulk job failed. */
     readonly error?: ServerErrorDto | undefined;
     /** The index of the bulk job where the result belongs to. The order can change. */
@@ -10054,7 +10054,7 @@ export interface IBulkResultDto {
 
 export class ImportContentsDto implements IImportContentsDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The data to import. */
     readonly datas!: { [key: string]: { [key: string]: any; }; }[];
     /** True to automatically publish the content. */
@@ -10141,7 +10141,7 @@ export interface IImportContentsDto {
 
 export class BulkUpdateContentsDto implements IBulkUpdateContentsDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The contents to update or insert. */
     readonly jobs!: BulkUpdateContentsJobDto[];
     /** True to automatically publish the content. */
@@ -10252,7 +10252,7 @@ export interface IBulkUpdateContentsDto {
 
 export class BulkUpdateContentsJobDto implements IBulkUpdateContentsJobDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** An optional query to identify the content to update. */
     readonly query?: QueryJsonDto | undefined;
     /** An optional ID of the content to update. */
@@ -10391,7 +10391,7 @@ export interface IBulkUpdateContentsJobDto {
 
 export class QueryJsonDto implements IQueryJsonDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     readonly filter?: any | undefined;
     readonly fullText?: string | undefined;
     readonly collation?: string | undefined;
@@ -10486,7 +10486,7 @@ export interface IQueryJsonDto {
 
 export class SortNodeDto implements ISortNodeDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     readonly path!: string;
     readonly order!: SortOrder;
 
@@ -10562,7 +10562,7 @@ export const BulkUpdateContentTypeValues: ReadonlyArray<BulkUpdateContentType> =
 
 export class ChangeStatusDto implements IChangeStatusDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The new status. */
     readonly status!: string;
     /** The due time. */
@@ -10635,7 +10635,7 @@ export interface IChangeStatusDto {
 
 export class AllContentsByPostDto implements IAllContentsByPostDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The list of ids to query. */
     readonly ids?: string[] | undefined;
     /** The start of the schedule. */
@@ -10848,7 +10848,7 @@ export interface IBackupJobDto extends IResourceDto {
 
 export class RestoreJobDto implements IRestoreJobDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The uri to load from. */
     readonly url!: string;
     /** The status log. */
@@ -10941,7 +10941,7 @@ export interface IRestoreJobDto {
 
 export class RestoreRequestDto implements IRestoreRequestDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The name of the app. */
     readonly name?: string | undefined;
     /** The url to the restore file. */
@@ -11183,7 +11183,7 @@ export const AssetFolderScopeValues: ReadonlyArray<AssetFolderScope> = [
 
 export class CreateAssetFolderDto implements ICreateAssetFolderDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The name of the folder. */
     readonly folderName!: string;
     /** The ID of the parent folder. */
@@ -11250,7 +11250,7 @@ export interface ICreateAssetFolderDto {
 
 export class RenameAssetFolderDto implements IRenameAssetFolderDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The name of the folder. */
     readonly folderName!: string;
 
@@ -11311,7 +11311,7 @@ export interface IRenameAssetFolderDto {
 
 export class MoveAssetFolderDto implements IMoveAssetFolderDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The parent folder id. */
     readonly parentId?: string | undefined;
 
@@ -11372,7 +11372,7 @@ export interface IMoveAssetFolderDto {
 
 export class RenameTagDto implements IRenameTagDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The new name for the tag. */
     readonly tagName!: string;
 
@@ -11738,7 +11738,7 @@ export interface IAssetDto extends IResourceDto {
 
 export class AssetMetaDto implements IAssetMetaDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** Indicates whether the asset is a duplicate. */
     readonly isDuplicate!: string;
 
@@ -11799,7 +11799,7 @@ export interface IAssetMetaDto {
 
 export class BulkUpdateAssetsDto implements IBulkUpdateAssetsDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The contents to update or insert. */
     readonly jobs?: BulkUpdateAssetsJobDto[] | undefined;
     /** True to check referrers of deleted assets. */
@@ -11886,7 +11886,7 @@ export interface IBulkUpdateAssetsDto {
 
 export class BulkUpdateAssetsJobDto implements IBulkUpdateAssetsJobDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** An optional ID of the asset to update. */
     readonly id?: string | undefined;
     /** The update type. */
@@ -12029,7 +12029,7 @@ export const BulkUpdateAssetTypeValues: ReadonlyArray<BulkUpdateAssetType> = [
 
 export class AnnotateAssetDto implements IAnnotateAssetDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The new name of the asset. */
     readonly fileName?: string | undefined;
     /** The new slug of the asset. */
@@ -12134,7 +12134,7 @@ export interface IAnnotateAssetDto {
 
 export class MoveAssetDto implements IMoveAssetDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The parent folder id. */
     readonly parentId?: string | undefined;
 
@@ -12276,7 +12276,7 @@ export interface IAssetScriptsDto extends IResourceDto {
 
 export class UpdateAssetScriptsDto implements IUpdateAssetScriptsDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The script that is executed for each asset when querying assets. */
     readonly query?: string | undefined;
     /** The script that is executed for all assets when querying assets. */
@@ -12499,7 +12499,7 @@ export interface IClientDto extends IResourceDto {
 
 export class CreateClientDto implements ICreateClientDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The ID of the client. */
     readonly id!: string;
 
@@ -12560,7 +12560,7 @@ export interface ICreateClientDto {
 
 export class UpdateClientDto implements IUpdateClientDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The new display name of the client. */
     readonly name?: string | undefined;
     /** The role of the client. */
@@ -12767,7 +12767,7 @@ export interface IAppLanguageDto extends IResourceDto {
 
 export class AddLanguageDto implements IAddLanguageDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The language to add. */
     readonly language!: string;
 
@@ -12828,7 +12828,7 @@ export interface IAddLanguageDto {
 
 export class UpdateLanguageDto implements IUpdateLanguageDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** Set the value to true to make the language the master. */
     readonly isMaster?: boolean | undefined;
     /** Set the value to true to make the language optional. */
@@ -13049,7 +13049,7 @@ export interface IRoleDto extends IResourceDto {
 
 export class AddRoleDto implements IAddRoleDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The role name. */
     readonly name!: string;
 
@@ -13110,7 +13110,7 @@ export interface IAddRoleDto {
 
 export class UpdateRoleDto implements IUpdateRoleDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** Associated list of permissions. */
     readonly permissions!: string[];
     /** Associated list of UI properties. */
@@ -13420,7 +13420,7 @@ export interface IAppDto extends IResourceDto {
 
 export class CreateAppDto implements ICreateAppDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The name of the app. */
     readonly name!: string;
     /** Initialize the app with the inbuilt template. */
@@ -13487,7 +13487,7 @@ export interface ICreateAppDto {
 
 export class UpdateAppDto implements IUpdateAppDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The optional label of your app. */
     readonly label?: string | undefined;
     /** The optional description of your app. */
@@ -13554,7 +13554,7 @@ export interface IUpdateAppDto {
 
 export class TransferToTeamDto implements ITransferToTeamDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The ID of the team. */
     readonly teamId?: string | undefined;
 
@@ -13694,7 +13694,7 @@ export interface IAppSettingsDto extends IResourceDto {
 
 export class PatternDto implements IPatternDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The name of the suggestion. */
     readonly name!: string;
     /** The regex pattern. */
@@ -13767,7 +13767,7 @@ export interface IPatternDto {
 
 export class EditorDto implements IEditorDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The name of the editor. */
     readonly name!: string;
     /** The url to the editor. */
@@ -13834,7 +13834,7 @@ export interface IEditorDto {
 
 export class UpdateAppSettingsDto implements IUpdateAppSettingsDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The configured app patterns. */
     readonly patterns!: PatternDto[];
     /** The configured UI editors. */
@@ -14081,7 +14081,7 @@ export interface IWorkflowDto extends IResourceDto {
 
 export class WorkflowStepDto implements IWorkflowStepDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The transitions. */
     readonly transitions?: { [key: string]: WorkflowTransitionDto; };
     /** The optional color. */
@@ -14192,7 +14192,7 @@ export interface IWorkflowStepDto {
 
 export class WorkflowTransitionDto implements IWorkflowTransitionDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The optional expression. */
     readonly expression?: string | undefined;
     /** The optional restricted role. */
@@ -14267,7 +14267,7 @@ export interface IWorkflowTransitionDto {
 
 export class AddWorkflowDto implements IAddWorkflowDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The name of the workflow. */
     readonly name!: string;
 
@@ -14328,7 +14328,7 @@ export interface IAddWorkflowDto {
 
 export class UpdateWorkflowDto implements IUpdateWorkflowDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The name of the workflow. */
     readonly name?: string | undefined;
     /** The workflow steps. */
@@ -14427,7 +14427,7 @@ export interface IUpdateWorkflowDto {
 
 export class DynamicCreateRuleDto implements IDynamicCreateRuleDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** The trigger properties. */
     readonly trigger!: RuleTriggerDto;
     /** The action properties. */
@@ -14718,7 +14718,7 @@ export interface IDynamicRuleDto extends IResourceDto {
 
 export class DynamicUpdateRuleDto implements IDynamicUpdateRuleDto {
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
     /** Optional rule name. */
     readonly name?: string | undefined;
     /** The trigger properties. */

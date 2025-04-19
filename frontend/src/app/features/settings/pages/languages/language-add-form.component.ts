@@ -69,17 +69,18 @@ export class LanguageAddFormComponent {
 
     public addLanguage() {
         const value = this.addLanguageForm.submit();
-
-        if (value) {
-            this.languagesState.add(value.language)
-                .subscribe({
-                    next: () => {
-                        this.addLanguageForm.submitCompleted();
-                    },
-                    error: error => {
-                        this.addLanguageForm.submitFailed(error);
-                    },
-                });
+        if (!value) {
+            return;
         }
+
+        this.languagesState.add(value.language)
+            .subscribe({
+                next: () => {
+                    this.addLanguageForm.submitCompleted();
+                },
+                error: error => {
+                    this.addLanguageForm.submitFailed(error);
+                },
+            });
     }
 }

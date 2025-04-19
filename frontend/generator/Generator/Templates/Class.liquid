@@ -8,7 +8,7 @@
 {% endif -%}
 {% unless HasInheritance -%}
     /** Uses the cache values because the actual object is frozen. */
-    protected readonly cachedValues: { [key: string]: any } = {};
+    private readonly cachedValues: { [key: string]: any } = {};
 {% endunless -%}
 {% for property in Properties -%}
 {%   if property.HasDescription -%}
@@ -137,7 +137,7 @@
         }
 {% endif -%}
 {% if HasDiscriminator -%}
-        data["{{ BaseDiscriminator }}"] = "{{ DiscriminatorName }}";
+        data["{{ BaseDiscriminator }}"] = this.{{ BaseDiscriminator }};
 {% endif -%}
 {% for property in Properties -%}
         {{ property.ConvertToJavaScriptCode | tab }}

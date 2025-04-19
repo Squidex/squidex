@@ -10,7 +10,7 @@ import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError, filter, map } from 'rxjs/operators';
 import { ApiUrlConfig, ErrorDto, HTTP, pretifyError, Resource, ScriptCompletions, StringHelper, Types, Versioned, VersionOrTag } from '@app/framework';
-import { AnnotateAssetDto, AssetDto, AssetFolderDto, AssetFoldersDto, AssetsDto, CreateAssetFolderDto, IAnnotateAssetDto, ICreateAssetFolderDto, IMoveAssetDto, IMoveAssetFolderDto, IRenameAssetFolderDto, IRenameTagDto, MoveAssetDto, MoveAssetFolderDto, RenameAssetFolderDto, RenameTagDto } from './../model';
+import { AnnotateAssetDto, AssetDto, AssetFolderDto, AssetFoldersDto, AssetsDto, CreateAssetFolderDto, MoveAssetDto, MoveAssetFolderDto, RenameAssetFolderDto, RenameTagDto } from './../model';
 import { Query, sanitize } from './query';
 
 type AssetFolderScope = 'PathAndItems' | 'Path' | 'Items';
@@ -60,10 +60,10 @@ export class AssetsService {
     ) {
     }
 
-    public putTag(appName: string, name: string, dto: IRenameTagDto): Observable<{ [name: string]: number }> {
+    public putTag(appName: string, name: string, dto: RenameTagDto): Observable<{ [name: string]: number }> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/tags/${encodeURIComponent(name)}`);
 
-        return this.http.put<{ [name: string]: number }>(url, new RenameTagDto(dto).toJSON()).pipe(
+        return this.http.put<{ [name: string]: number }>(url, dto.toJSON()).pipe(
             pretifyError('i18n:assets.renameTagFailed'));
     }
 
@@ -164,58 +164,58 @@ export class AssetsService {
             pretifyError('i18n:assets.replaceFailed'));
     }
 
-    public postAssetFolder(appName: string, dto: ICreateAssetFolderDto): Observable<AssetFolderDto> {
+    public postAssetFolder(appName: string, dto: CreateAssetFolderDto): Observable<AssetFolderDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/folders`);
 
-        return HTTP.postVersioned(this.http, url, new CreateAssetFolderDto(dto).toJSON()).pipe(
+        return HTTP.postVersioned(this.http, url, dto.toJSON()).pipe(
             map(({ payload }) => {
                 return AssetFolderDto.fromJSON(payload.body);
             }),
             pretifyError('i18n:assets.createFolderFailed'));
     }
 
-    public putAsset(appName: string, resource: Resource, dto: IAnnotateAssetDto, version: VersionOrTag): Observable<AssetDto> {
+    public putAsset(appName: string, resource: Resource, dto: AnnotateAssetDto, version: VersionOrTag): Observable<AssetDto> {
         const link = resource._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, new AnnotateAssetDto(dto).toJSON()).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto.toJSON()).pipe(
             map(({ payload }) => {
                 return AssetDto.fromJSON(payload.body);
             }),
             pretifyError('i18n:assets.updateFailed'));
     }
 
-    public putAssetFolder(appName: string, resource: Resource, dto: IRenameAssetFolderDto, version: VersionOrTag): Observable<AssetFolderDto> {
+    public putAssetFolder(appName: string, resource: Resource, dto: RenameAssetFolderDto, version: VersionOrTag): Observable<AssetFolderDto> {
         const link = resource._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, new RenameAssetFolderDto(dto).toJSON()).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto.toJSON()).pipe(
             map(({ payload }) => {
                 return AssetFolderDto.fromJSON(payload.body);
             }),
             pretifyError('i18n:assets.updateFolderFailed'));
     }
 
-    public putAssetParent(appName: string, resource: Resource, dto: IMoveAssetDto, version: VersionOrTag): Observable<AssetDto> {
+    public putAssetParent(appName: string, resource: Resource, dto: MoveAssetDto, version: VersionOrTag): Observable<AssetDto> {
         const link = resource._links['move'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, new MoveAssetDto(dto).toJSON()).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto.toJSON()).pipe(
             map(({ payload }) => {
                 return AssetDto.fromJSON(payload.body);
             }),
             pretifyError('i18n:assets.moveFailed'));
     }
 
-    public putAssetFolderParent(appName: string, resource: Resource, dto: IMoveAssetFolderDto, version: VersionOrTag): Observable<AssetFolderDto> {
+    public putAssetFolderParent(appName: string, resource: Resource, dto: MoveAssetFolderDto, version: VersionOrTag): Observable<AssetFolderDto> {
         const link = resource._links['move'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, new MoveAssetFolderDto(dto).toJSON()).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto.toJSON()).pipe(
             map(({ payload }) => {
                 return AssetFolderDto.fromJSON(payload.body);
             }),

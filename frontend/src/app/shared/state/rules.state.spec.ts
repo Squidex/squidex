@@ -7,7 +7,7 @@
 
 import { firstValueFrom, of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, DynamicRuleDto, DynamicRulesDto, RulesService, versioned } from '@app/shared/internal';
+import { DialogService, DynamicCreateRuleDto, DynamicRuleDto, DynamicRulesDto, DynamicUpdateRuleDto, ManualRuleTriggerDto, RulesService, versioned } from '@app/shared/internal';
 import { createRule } from '../services/rules.service.spec';
 import { TestValues } from './_test-helpers';
 import { RulesState } from './rules.state';
@@ -105,7 +105,12 @@ describe('RulesState', () => {
         });
 
         it('should add rule to snapshot if created', () => {
-            const request = { trigger: { triggerType: 'trigger3', value: 3 }, action: { actionType: 'action3', value: 1 } } as any;
+            const request = new DynamicCreateRuleDto({
+                trigger: new ManualRuleTriggerDto(),
+                action: {
+                    actionType: 'action3',
+                },
+            });
 
             rulesService.setup(x => x.postRule(app, request))
                 .returns(() => of(newRule));
@@ -116,7 +121,12 @@ describe('RulesState', () => {
         });
 
         it('should update rule if updated', () => {
-            const request = {};
+            const request = new DynamicUpdateRuleDto({
+                trigger: new ManualRuleTriggerDto(),
+                action: {
+                    actionType: 'action3',
+                },
+            });
 
             const updated = createRule(1, '_new');
 
@@ -198,7 +208,12 @@ describe('RulesState', () => {
         });
 
         it('should update selected rule if updated', () => {
-            const request = {};
+            const request = new DynamicUpdateRuleDto({
+                trigger: new ManualRuleTriggerDto(),
+                action: {
+                    actionType: 'action3',
+                },
+            });
 
             const updated = createRule(2, '_new');
 

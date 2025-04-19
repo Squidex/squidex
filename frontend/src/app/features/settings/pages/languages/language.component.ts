@@ -9,7 +9,7 @@ import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/d
 
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AppLanguageDto, ConfirmClickDirective, EditLanguageForm, FormHintComponent, LanguageDto, LanguagesState, sorted, TranslatePipe } from '@app/shared';
+import { AppLanguageDto, ConfirmClickDirective, EditLanguageForm, FormHintComponent, LanguageDto, LanguagesState, sorted, TranslatePipe, UpdateLanguageDto } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -76,20 +76,21 @@ export class LanguageComponent {
         }
 
         const value = this.editForm.submit();
-
-        if (value) {
-            const request = { ...value, fallback: this.fallbackLanguages.map(x => x.iso2Code) };
-
-            this.languagesState.update(this.language, request)
-                .subscribe({
-                    next: () => {
-                        this.editForm.submitCompleted({ noReset: true });
-                    },
-                    error: error => {
-                        this.editForm.submitFailed(error);
-                    },
-                });
+        if (!value) {
+            return;
         }
+
+        const request = new UpdateLanguageDto({ ...value, fallback: this.fallbackLanguages.map(x => x.iso2Code) });
+
+        this.languagesState.update(this.language, request)
+            .subscribe({
+                next: () => {
+                    this.editForm.submitCompleted({ noReset: true });
+                },
+                error: error => {
+                    this.editForm.submitFailed(error);
+                },
+            });
     }
 
     public removeFallbackLanguage(language: LanguageDto) {
