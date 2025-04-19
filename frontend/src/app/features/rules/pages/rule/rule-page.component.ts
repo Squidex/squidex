@@ -94,7 +94,6 @@ export class RulePageComponent implements OnInit {
         this.rulesService.getActions()
             .subscribe(actions => {
                 this.supportedActions = actions;
-
                 this.initFromRule();
             });
 
@@ -102,7 +101,6 @@ export class RulePageComponent implements OnInit {
             this.rulesState.selectedRule
                 .subscribe(rule => {
                     this.rule = rule;
-
                     this.initFromRule();
                 }));
 

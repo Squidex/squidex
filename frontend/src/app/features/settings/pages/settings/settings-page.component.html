@@ -28,7 +28,7 @@
             <div class="card card-body mb-4" data-testid="patterns">
                 <div class="content">
                     @if (!isEditable && editForm.patternsControls.length === 0) {
-                        <div class="mt-4">
+                        <div>
                             {{ "appSettings.patterns.empty" | sqxTranslate }}
                         </div>
                     }
@@ -109,7 +109,7 @@
             <div class="card card-body mb-4">
                 <div class="content" data-testid="pattern">
                     @if (!isEditable && editForm.editorsControls.length === 0) {
-                        <div class="mt-4">
+                        <div>
                             {{ "appSettings.editors.empty" | sqxTranslate }}
                         </div>
                     }

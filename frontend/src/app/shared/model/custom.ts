@@ -108,7 +108,7 @@ export class AppLanguagesDto extends generated.AppLanguagesDto {
 
 export class AppSettingsDto extends generated.AppSettingsDto {
     get canUpdate() {
-        return this.compute('canUpdate', () => hasAnyLink(this._links, 'delete'));
+        return this.compute('canUpdate', () => hasAnyLink(this._links, 'update'));
     }
 }
 

@@ -13626,7 +13626,7 @@ export class AppSettingsDto extends ResourceDto implements IAppSettingsDto {
     readonly version!: number;
 
     get canUpdate() {
-        return this.compute('canUpdate', () => hasAnyLink(this._links, 'delete'));
+        return this.compute('canUpdate', () => hasAnyLink(this._links, 'update'));
     }
 
     constructor(data?: IAppSettingsDto) {

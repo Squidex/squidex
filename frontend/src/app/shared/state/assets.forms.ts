@@ -8,7 +8,7 @@
 import { UntypedFormControl, Validators } from '@angular/forms';
 import slugify from 'slugify';
 import { ExtendedFormGroup, Form, TemplatedFormArray, Types } from '@app/framework';
-import { AssetDto, AssetFolderDto, AnnotateAssetDto, MoveAssetDto, RenameAssetFolderDto, RenameTagDto, UpdateAssetScriptsDto } from '../model';
+import { AnnotateAssetDto, AssetDto, AssetFolderDto, MoveAssetDto, RenameAssetFolderDto, RenameTagDto, UpdateAssetScriptsDto } from '../model';
 
 export class AnnotateAssetForm extends Form<ExtendedFormGroup, AnnotateAssetDto, AssetDto> {
     public get metadata() {
@@ -214,6 +214,10 @@ export class RenameAssetFolderForm extends Form<ExtendedFormGroup, RenameAssetFo
             ),
         }));
     }
+
+    protected transformSubmit(value: any) {
+        return new RenameAssetFolderDto(value);
+    }
 }
 
 export class RenameAssetTagForm extends Form<ExtendedFormGroup, RenameTagDto, RenameTagDto> {
@@ -224,7 +228,7 @@ export class RenameAssetTagForm extends Form<ExtendedFormGroup, RenameTagDto, Re
             ),
         }));
     }
-    
+
     protected transformSubmit(value: any) {
         return new RenameTagDto(value);
     }
@@ -238,7 +242,7 @@ export class MoveAssetForm extends Form<ExtendedFormGroup, MoveAssetDto, AssetDt
             ),
         }));
     }
-    
+
     protected transformSubmit(value: any) {
         return new MoveAssetDto(value);
     }

@@ -86,10 +86,10 @@ export class TriggerForm extends Form<UntypedFormGroup, RuleTriggerDto> {
         }
     }
 
-    protected transformSubmit(value: any): any {
+    protected transformSubmit(value: any) {
         value.triggerType = this.triggerType;
 
-        return value;
+        return RuleTriggerDto.fromJSON(value);
     }
 }
 
