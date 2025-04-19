@@ -8,7 +8,7 @@
 
 import { AfterViewInit, booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
-import { AppSettingsDto, FieldDto, LanguageDto, SchemaDto, TranslatePipe } from '@app/shared';
+import { AppLanguageDto, AppSettingsDto, FieldDto, SchemaDto, TranslatePipe } from '@app/shared';
 import { JsonMoreComponent } from '../types/json-more.component';
 import { FieldFormCommonComponent } from './field-form-common.component';
 import { FieldFormUIComponent } from './field-form-ui.component';
@@ -47,7 +47,7 @@ export class FieldFormComponent implements AfterViewInit {
     public settings!: AppSettingsDto;
 
     @Input({ required: true })
-    public languages!: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input({ transform: booleanAttribute })
     public isLocalizable?: boolean | null;

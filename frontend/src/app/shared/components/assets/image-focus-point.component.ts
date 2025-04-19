@@ -86,9 +86,13 @@ export class ImageFocusPointComponent implements AfterViewInit, OnDestroy {
             return null;
         }
 
-        const metadata = { ...asset.metadata, focusX: this.x, focusY: this.y };
-
-        return { metadata };
+        return new AnnotateAssetDto({ 
+            metadata: {
+                ...asset.metadata,
+                focusX: this.x,
+                focusY: this.y,
+            },
+        });
     }
 }
 

@@ -6,7 +6,7 @@
  */
 
 import { interpolate } from '@app/framework';
-import { AppSettingsDto } from '../services/apps.service';
+import { AppSettingsDto } from '../model';
 
 export function computeEditorUrl(url?: string | null, settings?: AppSettingsDto | null) {
     if (!url) {
@@ -14,7 +14,6 @@ export function computeEditorUrl(url?: string | null, settings?: AppSettingsDto 
     }
 
     const editors: { [key: string]: string } = {};
-
     if (settings?.editors) {
         for (const editor of settings.editors) {
             editors[editor.name] = editor.url;

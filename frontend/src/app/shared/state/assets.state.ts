@@ -9,7 +9,8 @@ import { Injectable } from '@angular/core';
 import { EMPTY, forkJoin, Observable, of, throwError } from 'rxjs';
 import { catchError, finalize, switchMap, tap } from 'rxjs/operators';
 import { compareStrings, debug, DialogService, ErrorDto, getPagingInfo, ListState, MathHelper, shareSubscribed, State, Types } from '@app/framework';
-import { AnnotateAssetDto, AssetDto, AssetFolderDto, AssetFoldersDto, AssetsService, RenameAssetFolderDto } from '../services/assets.service';
+import { AnnotateAssetDto, AssetDto, AssetFolderDto, AssetFoldersDto, CreateAssetFolderDto, MoveAssetDto, MoveAssetFolderDto, RenameAssetFolderDto, RenameTagDto } from '../model';
+import { AssetsService } from '../services/assets.service';
 import { Query } from '../services/query';
 import { AppsState } from './apps.state';
 
@@ -260,7 +261,9 @@ export abstract class AssetsStateBase extends State<Snapshot> {
     }
 
     public createAssetFolder(folderName: string) {
-        return this.assetsService.postAssetFolder(this.appName, { folderName, parentId: this.snapshot.parentId }).pipe(
+        const request = new CreateAssetFolderDto({ folderName, parentId: this.snapshot.parentId });
+
+        return this.assetsService.postAssetFolder(this.appName, request).pipe(
             tap(folder => {
                 if (folder.parentId !== this.snapshot.parentId) {
                     return;
@@ -325,8 +328,9 @@ export abstract class AssetsStateBase extends State<Snapshot> {
         }
 
         moveOutOrIn(this, asset, moveIn, 'Asset Moving');
+        const request = new MoveAssetDto({ parentId });
 
-        return this.assetsService.putAssetParent(this.appName, asset, { parentId }, asset.version).pipe(
+        return this.assetsService.putAssetParent(this.appName, asset, request, asset.version).pipe(
             catchError(error => {
                 moveOutOrIn(this, asset, !moveIn, 'Asset Moving reverted.');
 
@@ -359,8 +363,9 @@ export abstract class AssetsStateBase extends State<Snapshot> {
         }
 
         moveOutOrIn(this, folder, moveIn, 'Asset Folder Moving');
+        const request = new MoveAssetFolderDto({ parentId });
 
-        return this.assetsService.putAssetFolderParent(this.appName, folder, { parentId }, folder.version).pipe(
+        return this.assetsService.putAssetFolderParent(this.appName, folder, request, folder.version).pipe(
             catchError(error => {
                 moveOutOrIn(this, folder, !moveIn, 'Asset Folder Moving reverted.');
 
@@ -415,7 +420,7 @@ export abstract class AssetsStateBase extends State<Snapshot> {
     }
 
     public renameTag(name: string, tagName: string): Observable<any> {
-        return this.assetsService.putTag(this.appName, name, { tagName }).pipe(
+        return this.assetsService.putTag(this.appName, name, new RenameTagDto({ tagName })).pipe(
             tap(tags => {
                 this.next(s => {
                     const tagsAvailable = tags;
@@ -511,7 +516,7 @@ function updateTags(snapshot: Snapshot, newAsset?: AssetDto, oldAsset?: AssetDto
     const tagsAvailable = { ...snapshot.tagsAvailable };
     const tagsSelected = { ...snapshot.tagsSelected };
 
-    if (oldAsset) {
+    if (oldAsset?.tags) {
         for (const tag of oldAsset.tags) {
             if (tagsAvailable[tag] === 1) {
                 delete tagsAvailable[tag];
@@ -522,7 +527,7 @@ function updateTags(snapshot: Snapshot, newAsset?: AssetDto, oldAsset?: AssetDto
         }
     }
 
-    if (newAsset) {
+    if (newAsset?.tags) {
         for (const tag of newAsset.tags) {
             if (tagsAvailable[tag]) {
                 tagsAvailable[tag]++;

@@ -51,17 +51,18 @@ export class SchemaEditFormComponent {
         }
 
         const value = this.fieldForm.submit();
-
-        if (value) {
-            this.schemasState.update(this.schema, value)
-                .subscribe({
-                    next: () => {
-                        this.fieldForm.submitCompleted({ noReset: true });
-                    },
-                    error: error => {
-                        this.fieldForm.submitFailed(error);
-                    },
-                });
+        if (!value) {
+            return;
         }
+
+        this.schemasState.update(this.schema, value)
+            .subscribe({
+                next: () => {
+                    this.fieldForm.submitCompleted({ noReset: true });
+                },
+                error: error => {
+                    this.fieldForm.submitFailed(error);
+                },
+            });
     }
 }

@@ -9,7 +9,7 @@ import { TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
 import { firstValueFrom, of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { RuleDto, RulesState } from '@app/shared/internal';
+import { DynamicRuleDto, RulesState } from '@app/shared/internal';
 import { ruleMustExistGuard } from './rule-must-exist.guard';
 
 describe('RuleMustExistGuard', () => {
@@ -36,7 +36,7 @@ describe('RuleMustExistGuard', () => {
 
     bit('should load rule and return true if found', async () => {
         rulesState.setup(x => x.select('123'))
-            .returns(() => of(<RuleDto>{}));
+            .returns(() => of(<DynamicRuleDto>{}));
 
         const route: any = {
             params: {

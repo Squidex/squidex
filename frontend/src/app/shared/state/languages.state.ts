@@ -8,9 +8,10 @@
 import { Injectable } from '@angular/core';
 import { forkJoin, Observable } from 'rxjs';
 import { finalize, map, shareReplay, tap } from 'rxjs/operators';
-import { debug, DialogService, LoadingState, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
-import { AppLanguageDto, AppLanguagesPayload, AppLanguagesService, UpdateAppLanguageDto } from '../services/app-languages.service';
-import { LanguageDto, LanguagesService } from '../services/languages.service';
+import { debug, DialogService, LoadingState, shareMapSubscribed, shareSubscribed, State, VersionTag } from '@app/framework';
+import { AddLanguageDto, AppLanguageDto, AppLanguagesDto, LanguageDto, UpdateLanguageDto } from '../model';
+import { AppLanguagesService } from '../services/app-languages.service';
+import { LanguagesService } from '../services/languages.service';
 import { AppsState } from './apps.state';
 
 export interface SnapshotLanguage {
@@ -35,7 +36,7 @@ interface Snapshot extends LoadingState {
     languages: ReadonlyArray<SnapshotLanguage>;
 
     // The app version.
-    version: Version;
+    version: VersionTag;
 
     // Indicates if the user can add a language.
     canCreate?: boolean;
@@ -86,7 +87,7 @@ export class LanguagesState extends State<Snapshot> {
             allLanguages: [],
             allLanguagesNew: [],
             languages: [],
-            version: Version.EMPTY,
+            version: VersionTag.EMPTY,
         });
 
         debug(this, 'languages');
@@ -125,7 +126,7 @@ export class LanguagesState extends State<Snapshot> {
     }
 
     public add(language: string): Observable<any> {
-        return this.appLanguagesService.postLanguage(this.appName, { language }, this.version).pipe(
+        return this.appLanguagesService.postLanguage(this.appName, new AddLanguageDto({ language }), this.version).pipe(
             tap(({ version, payload }) => {
                 this.replaceLanguages(payload, version);
             }),
@@ -140,7 +141,7 @@ export class LanguagesState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public update(language: AppLanguageDto, request: UpdateAppLanguageDto): Observable<any> {
+    public update(language: AppLanguageDto, request: UpdateLanguageDto): Observable<any> {
         return this.appLanguagesService.putLanguage(this.appName, language, request, this.version).pipe(
             tap(({ version, payload }) => {
                 this.replaceLanguages(payload, version);
@@ -148,12 +149,11 @@ export class LanguagesState extends State<Snapshot> {
             shareMapSubscribed(this.dialogs, x => x.payload));
     }
 
-    private replaceLanguages(payload: AppLanguagesPayload, version: Version, allLanguages?: ReadonlyArray<LanguageDto>) {
+    private replaceLanguages(payload: AppLanguagesDto, version: VersionTag, allLanguages?: ReadonlyArray<LanguageDto>) {
         this.next(s => {
             allLanguages = allLanguages || s.allLanguages;
 
             const { canCreate, items: languages } = payload;
-
             return {
                 ...s,
                 allLanguages,
@@ -161,7 +161,7 @@ export class LanguagesState extends State<Snapshot> {
                 canCreate,
                 isLoaded: true,
                 isLoading: false,
-                languages: languages.map(x => this.createLanguage(x, languages)),
+                languages: languages.map(x => this.createLanguage(x, languages as any)),
                 version,
             };
         }, 'Loading Success / Updated');

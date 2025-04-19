@@ -7,7 +7,7 @@
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { ClientsPayload, ClientsService, ClientsState, DialogService, versioned } from '@app/shared/internal';
+import { ClientsDto, ClientsService, ClientsState, CreateClientDto, DialogService, UpdateClientDto, versioned } from '@app/shared/internal';
 import { createClients } from '../services/clients.service.spec';
 import { TestValues } from './_test-helpers';
 
@@ -83,7 +83,7 @@ describe('ClientsState', () => {
         it('should update clients if client added', () => {
             const updated = createClients(1, 2, 3);
 
-            const request = { id: 'id3' };
+            const request = new CreateClientDto({ id: 'id3' });
 
             clientsService.setup(x => x.postClient(app, request, version))
                 .returns(() => of(versioned(newVersion, updated))).verifiable();
@@ -96,7 +96,7 @@ describe('ClientsState', () => {
         it('should update clients if role updated', () => {
             const updated = createClients(1, 2, 3);
 
-            const request = { role: 'Owner' };
+            const request = new UpdateClientDto({ role: 'Owner' });
 
             clientsService.setup(x => x.putClient(app, oldClients.items[0], request, version))
                 .returns(() => of(versioned(newVersion, updated))).verifiable();
@@ -109,7 +109,7 @@ describe('ClientsState', () => {
         it('should update clients if name updated', () => {
             const updated = createClients(1, 2, 3);
 
-            const request = { name: 'NewName' };
+            const request = new UpdateClientDto({ name: 'NewName' });
 
             clientsService.setup(x => x.putClient(app, oldClients.items[0], request, version))
                 .returns(() => of(versioned(newVersion, updated))).verifiable();
@@ -130,7 +130,7 @@ describe('ClientsState', () => {
             expectNewClients(updated);
         });
 
-        function expectNewClients(updated: ClientsPayload) {
+        function expectNewClients(updated: ClientsDto) {
             expect(clientsState.snapshot.clients).toEqual(updated.items);
             expect(clientsState.snapshot.version).toEqual(newVersion);
         }

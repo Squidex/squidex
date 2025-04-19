@@ -8,7 +8,7 @@
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList, CdkDropListGroup, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 
 import { booleanAttribute, Component, EventEmitter, forwardRef, Input, Output } from '@angular/core';
-import { AppSettingsDto, FieldDto, FieldGroup, groupFields, LanguageDto, RootFieldDto, SchemaDto } from '@app/shared';
+import { AppLanguageDto, AppSettingsDto, FieldDto, FieldGroup, groupFields, SchemaDto } from '@app/shared';
 import { FieldGroupComponent } from './field-group.component';
 
 @Component({
@@ -29,10 +29,10 @@ export class SortableFieldListComponent {
     public sorted = new EventEmitter<ReadonlyArray<FieldDto>>();
 
     @Input({ required: true })
-    public languages!: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input()
-    public parent?: RootFieldDto;
+    public parent?: FieldDto;
 
     @Input({ required: true })
     public settings!: AppSettingsDto;

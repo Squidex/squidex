@@ -65,5 +65,5 @@ function getKey(key: AutoSaveKey) {
         contentId = `.${contentId}`;
     }
 
-    return `autosave.${schemaId}-${schemaVersion.value}${contentId}`;
+    return `autosave.${schemaId}-${schemaVersion}${contentId}`;
 }

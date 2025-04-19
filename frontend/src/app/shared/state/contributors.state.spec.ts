@@ -8,7 +8,7 @@
 import { catchError, EMPTY, of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { ErrorDto } from '@app/framework';
-import { ContributorDto, ContributorsPayload, ContributorsService, ContributorsState, DialogService, versioned } from '@app/shared/internal';
+import { AssignContributorDto, ContributorDto, ContributorsDto, ContributorsService, ContributorsState, DialogService, versioned } from '@app/shared/internal';
 import { createContributors } from '../services/contributors.service.spec';
 import { TestValues } from './_test-helpers';
 
@@ -137,7 +137,7 @@ describe('ContributorsState', () => {
         it('should update contributors if user assigned', () => {
             const updated = createContributors(5, 6);
 
-            const request = { contributorId: 'mail2stehle@gmail.com', role: 'Developer' };
+            const request = new AssignContributorDto({ contributorId: 'mail2stehle@gmail.com', role: 'Developer' });
 
             contributorsService.setup(x => x.postContributor(app, request, version))
                 .returns(() => of(versioned(newVersion, updated))).verifiable();
@@ -148,7 +148,7 @@ describe('ContributorsState', () => {
         });
 
         it('should return proper error if user to add does not exist', () => {
-            const request = { contributorId: 'mail2stehle@gmail.com', role: 'Developer' };
+            const request = new AssignContributorDto({ contributorId: 'mail2stehle@gmail.com', role: 'Developer' });
 
             contributorsService.setup(x => x.postContributor(app, request, version))
                 .returns(() => throwError(() => new ErrorDto(404, '404')));
@@ -167,7 +167,7 @@ describe('ContributorsState', () => {
         });
 
         it('should return original error if not a 404', () => {
-            const request = { contributorId: 'mail2stehle@gmail.com', role: 'Developer' };
+            const request = new AssignContributorDto({ contributorId: 'mail2stehle@gmail.com', role: 'Developer' });
 
             contributorsService.setup(x => x.postContributor(app, request, version))
                 .returns(() => throwError(() => new ErrorDto(500, '500')));
@@ -196,7 +196,7 @@ describe('ContributorsState', () => {
             expectNewContributors(updated);
         });
 
-        function expectNewContributors(updated: ContributorsPayload) {
+        function expectNewContributors(updated: ContributorsDto) {
             expect(contributorsState.snapshot.contributors).toEqual(updated.items);
             expect(contributorsState.snapshot.maxContributors).toBe(updated.maxContributors);
             expect(contributorsState.snapshot.version).toEqual(newVersion);

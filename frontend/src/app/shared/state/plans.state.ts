@@ -8,8 +8,9 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { debug, DialogService, LoadingState, shareSubscribed, State, Version } from '@app/framework';
-import { PlanDto, PlanLockedReason, PlansService, ReferralDto } from '../services/plans.service';
+import { debug, DialogService, LoadingState, shareSubscribed, State, VersionTag } from '@app/framework';
+import { ChangePlanDto, PlanDto, PlansLockedReason, ReferralInfoDto } from '../model';
+import { PlansService } from '../services/plans.service';
 import { AppsState } from './apps.state';
 
 export interface PlanInfo {
@@ -34,13 +35,13 @@ interface Snapshot extends LoadingState {
     portalLink?: string;
 
     // The referral info.
-    referral?: ReferralDto;
+    referral?: ReferralInfoDto;
 
     // The reason why the plan cannot be changed.
-    locked?: PlanLockedReason;
+    locked?: PlansLockedReason;
 
     // The app version.
-    version: Version;
+    version: VersionTag;
 }
 
 @Injectable({
@@ -83,7 +84,7 @@ export class PlansState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly plansService: PlansService,
     ) {
-        super({ plans: [], version: Version.EMPTY });
+        super({ plans: [], version: VersionTag.EMPTY });
 
         debug(this, 'plans');
     }
@@ -126,8 +127,8 @@ export class PlansState extends State<Snapshot> {
     }
 
     public change(planId: string): Observable<any> {
-        return this.plansService.putPlan(this.appName, { planId }, this.version).pipe(
-            tap(({ payload, version }) => {
+        return this.plansService.putPlan(this.appName, new ChangePlanDto({ planId }), this.version).pipe(
+            tap(({ version, payload }) => {
                 if (payload.redirectUri && payload.redirectUri.length > 0) {
                     this.window.location.href = payload.redirectUri;
                 } else {
@@ -146,7 +147,7 @@ export class PlansState extends State<Snapshot> {
     }
 }
 
-function createPlan(plan: PlanDto, id: string) {
+function createPlan(plan: PlanDto, id?: string) {
     return {
         plan,
         isSelected: plan.id === id,

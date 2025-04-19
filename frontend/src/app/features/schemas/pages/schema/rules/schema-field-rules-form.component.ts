@@ -56,7 +56,7 @@ export class SchemaFieldRulesFormComponent implements  OnInit {
             if (field.properties.isContentField) {
                 fieldNames.push(field.name);
 
-                for (const nestedField of field.nested) {
+                for (const nestedField of field.nested || []) {
                     if (nestedField.properties.isContentField) {
                         fieldNames.push(`${field.name}.${nestedField.name}`);
                     }
@@ -82,17 +82,18 @@ export class SchemaFieldRulesFormComponent implements  OnInit {
         }
 
         const value = this.editForm.submit();
-
-        if (value) {
-            this.schemasState.configureFieldRules(this.schema, value)
-                .subscribe({
-                    next: () => {
-                        this.editForm.submitCompleted({ noReset: true });
-                    },
-                    error: error => {
-                        this.editForm.submitFailed(error);
-                    },
-                });
+        if (!value) {
+            return;
         }
+
+        this.schemasState.configureFieldRules(this.schema, value)
+            .subscribe({
+                next: () => {
+                    this.editForm.submitCompleted({ noReset: true });
+                },
+                error: error => {
+                    this.editForm.submitFailed(error);
+                },
+            });
     }
 }

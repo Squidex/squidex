@@ -8,7 +8,7 @@
 
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { BOOLEAN_FIELD_EDITORS, BooleanFieldPropertiesDto, FieldDto, FormHintComponent, TranslatePipe } from '@app/shared';
+import { BooleanFieldEditorValues, BooleanFieldPropertiesDto, FieldDto, FormHintComponent, TranslatePipe } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -23,7 +23,7 @@ import { BOOLEAN_FIELD_EDITORS, BooleanFieldPropertiesDto, FieldDto, FormHintCom
     ],
 })
 export class BooleanUIComponent {
-    public readonly editors = BOOLEAN_FIELD_EDITORS;
+    public readonly editors = BooleanFieldEditorValues;
 
     @Input({ required: true })
     public fieldForm!: UntypedFormGroup;

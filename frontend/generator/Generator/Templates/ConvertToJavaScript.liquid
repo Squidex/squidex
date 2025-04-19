@@ -1,0 +1,45 @@
+{%- if IsNewableObject -%}
+{{ Variable }} = {{ Value }} ? {{ Value }}.toJSON() : <any>{{ NullValue }};
+{%- elsif IsArray -%}
+if (Array.isArray({{ Value }})) {
+    {{ Variable }} = [];
+    for (let item of {{ Value }})
+{%-     if IsArrayItemNewableObject -%}
+        {{ Variable }}.push(item.toJSON());
+{%-     elsif IsArrayItemDate -%}
+        {{ Variable }}.push({% if UseJsDate %}formatDate(item){% else %}item.toISOString(){% endif %});
+{%-     elsif IsArrayItemDateTime -%}
+        {{ Variable }}.push(item.toISOString());
+{%-     else -%}
+        {{ Variable }}.push(item);
+{%-     endif -%}
+}
+{%- elsif IsDictionary -%}
+if ({{ Value }}) {
+    {{ Variable }} = {};
+    for (let key in {{ Value }}) {
+        if ({{ Value }}.hasOwnProperty(key))
+{%-     if IsDictionaryValueNewableObject -%}
+            (<any>{{ Variable }})[key] = {{ Value }}[key] ? {{ Value }}[key].toJSON() : <any>{{ NullValue }};
+{%-     elsif IsDictionaryValueDate -%}
+            (<any>{{ Variable }})[key] = {{ Value }}[key] ? {{ Value }}[key].toISOString() : <any>{{ NullValue }};
+{%-     elsif IsDictionaryValueDateTime -%}
+            (<any>{{ Variable }})[key] = {{ Value }}[key] ? {{ Value }}[key].toISOString() : <any>{{ NullValue }};
+{%-     else -%}
+{%-         if NullValue != "undefined" -%}
+            (<any>{{ Variable }})[key] = {{ Value }}[key] !== undefined ? {{ Value }}[key] : <any>{{ NullValue }};
+{%-         else -%}
+            (<any>{{ Variable }})[key] = (<any>{{ Value }})[key];
+{%-         endif -%}
+{%-     endif -%}
+    }
+}
+{%- elsif IsDate -%}
+{{ Variable }} = {{ Value }} ? {{ Value }}.toISOString() : {% if HasDefaultValue %}{{ DefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
+{%- elsif IsDateTime -%}
+{{ Variable }} = {{ Value }} ? {{ Value }}.toISOString() : {% if HasDefaultValue %}{{ DefaultValue }}{% else %}<any>{{ NullValue }}{% endif %};
+{%- elsif NullValue != "undefined" -%}
+{{ Variable }} = {{ Value }} !== undefined ? {{ Value }} : <any>{{ NullValue }};
+{%- else -%}
+{{ Variable }} = {{ Value }};
+{%- endif %}

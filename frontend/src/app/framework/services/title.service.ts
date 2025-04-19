@@ -48,29 +48,28 @@ export class TitleService {
 
     public push(value: string, index?: number, route?: any) {
         let result: number | undefined;
-
-        if (value) {
-            const clone = [...this.path$.value];
-
-            const lastIndex = clone.length - 1;
-            const localized = this.localizer.getOrKey(value);
-
-            const title = { localized, value, route };
-
-            if (Types.isNumber(index) && index >= 0 && index <= lastIndex) {
-                clone[index] = title;
-
-                result = index;
-            } else {
-                clone.push(title);
-
-                result = lastIndex + 1;
-            }
-
-            this.path$.next(clone);
+        if (!value) {
+            return result;
         }
 
-        return result;
+        const clone = [...this.path$.value];
+
+        const lastIndex = clone.length - 1;
+        const localized = this.localizer.getOrKey(value);
+
+        const title = { localized, value, route };
+
+        if (Types.isNumber(index) && index >= 0 && index <= lastIndex) {
+            clone[index] = title;
+
+            result = index;
+        } else {
+            clone.push(title);
+
+            result = lastIndex + 1;
+        }
+
+        this.path$.next(clone);
     }
 
     public pop() {

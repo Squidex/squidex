@@ -9,8 +9,7 @@
 
 import { AbstractControl, UntypedFormArray } from '@angular/forms';
 import { MathHelper } from '@app/framework';
-import { AppLanguageDto, createProperties, EditContentForm, getContentValue, HtmlValue, LanguageDto, RootFieldDto } from '@app/shared/internal';
-import { FieldRule, SchemaDto } from '../services/schemas.service';
+import { AppLanguageDto, createProperties, EditContentForm, FieldDto, FieldRuleDto, getContentValue, HtmlValue, SchemaDto } from '@app/shared/internal';
 import { TestValues } from './_test-helpers';
 import { ComponentForm, FieldArrayForm } from './contents.forms';
 import { contentsTranslationStatus, contentTranslationStatus, fieldTranslationStatus, PartitionConfig } from './contents.forms-helpers';
@@ -175,7 +174,15 @@ describe('TranslationStatus', () => {
 });
 
 describe('GetContentValue', () => {
-    const language = new LanguageDto('en', 'English');
+    const language = new AppLanguageDto({
+        iso2Code: 'en',
+        englishName: 'English',
+        isMaster: false,
+        isOptional: false,
+        fallback: [],
+        _links: {},
+    });
+
     const fieldInvariant = createField({ properties: createProperties('Number'), partitioning: 'invariant' });
     const fieldLocalized = createField({ properties: createProperties('Number') });
     const fieldAssets = createField({ properties: createProperties('Assets') });
@@ -451,8 +458,22 @@ describe('GetContentValue', () => {
 
 describe('ContentForm', () => {
     const languages = [
-        new AppLanguageDto({}, 'en', 'English', true, false, []),
-        new AppLanguageDto({}, 'de', 'English', false, true, []),
+        new AppLanguageDto({
+            iso2Code: 'en',
+            englishName: 'English',
+            isMaster: true,
+            isOptional: false,
+            fallback: [],
+            _links: {},
+        }),
+        new AppLanguageDto({
+            iso2Code: 'de',
+            englishName: 'Getman',
+            isMaster: false,
+            isOptional: true,
+            fallback: [],
+            _links: {},
+        }),
     ];
 
     const complexSchema = createSchema({ fields: [
@@ -565,9 +586,9 @@ describe('ContentForm', () => {
             const contentForm = createForm([
                 createField({ id: 1, properties: createProperties('Number'), partitioning: 'invariant' }),
                 createField({ id: 2, properties: createProperties('Number'), partitioning: 'invariant' }),
-            ], [{
-                field: 'field1', action: 'Require', condition: 'ctx.value < 100',
-            }]);
+            ], [
+                new FieldRuleDto({ field: 'field1', action: 'Require', condition: 'ctx.value < 100' }),
+            ]);
 
             contentForm.setContext({ value: 50 });
 
@@ -584,9 +605,9 @@ describe('ContentForm', () => {
             const contentForm = createForm([
                 createField({ id: 1, properties: createProperties('Number'), partitioning: 'invariant' }),
                 createField({ id: 2, properties: createProperties('Number'), partitioning: 'invariant' }),
-            ], [{
-                field: 'field1', action: 'Require', condition: 'data.field2.iv < 100',
-            }]);
+            ], [
+                new FieldRuleDto({ field: 'field1', action: 'Require', condition: 'data.field2.iv < 100' }),
+            ]);
 
             const field1 = contentForm.get('field1')!.get('iv');
             const field2 = contentForm.get('field2');
@@ -610,9 +631,9 @@ describe('ContentForm', () => {
             const contentForm = createForm([
                 createField({ id: 1, properties: createProperties('Number'), partitioning: 'invariant' }),
                 createField({ id: 2, properties: createProperties('Number'), partitioning: 'invariant' }),
-            ], [{
-                field: 'field1', action: 'Disable', condition: 'data.field2.iv > 100',
-            }]);
+            ], [
+                new FieldRuleDto({ field: 'field1', action: 'Disable', condition: 'data.field2.iv > 100' }),
+            ]);
 
             const field1 = contentForm.get('field1');
             const field1_iv = contentForm.get('field1')!.get('iv');
@@ -643,9 +664,9 @@ describe('ContentForm', () => {
             const contentForm = createForm([
                 createField({ id: 1, properties: createProperties('Number'), partitioning: 'invariant' }),
                 createField({ id: 2, properties: createProperties('Number'), partitioning: 'invariant' }),
-            ], [{
-                field: 'field1', action: 'Hide', condition: 'data.field2.iv > 100',
-            }]);
+            ], [
+                new FieldRuleDto({ field: 'field1', action: 'Hide', condition: 'data.field2.iv > 100' }),
+            ]);
 
             const field1 = contentForm.get('field1');
             const field1_iv = contentForm.get('field1')!.get('iv');
@@ -683,9 +704,9 @@ describe('ContentForm', () => {
                     ],
                     partitioning: 'invariant',
                 }),
-            ], [{
-                field: 'field4.nested42', action: 'Disable', condition: 'itemData.nested41 > 100',
-            }]);
+            ], [
+                new FieldRuleDto({ field: 'field4.nested42', action: 'Disable', condition: 'itemData.nested41 > 100' }),
+            ]);
 
             const array = contentForm.get(complexSchema.fields[3])!.get(languages[0]) as FieldArrayForm;
 
@@ -716,9 +737,9 @@ describe('ContentForm', () => {
                     ],
                     partitioning: 'invariant',
                 }),
-            ], [{
-                field: 'field4.nested42', action: 'Hide', condition: 'itemData.nested41 > 100',
-            }]);
+            ], [
+                new FieldRuleDto({ field: 'field4.nested42', action: 'Hide', condition: 'itemData.nested41 > 100' }),
+            ]);
 
             const array = contentForm.get(complexSchema.fields[3])!.get(languages[0]) as FieldArrayForm;
 
@@ -749,9 +770,9 @@ describe('ContentForm', () => {
                     ],
                     partitioning: 'language',
                 }),
-            ], [{
-                field: 'field4.nested42', action: 'Hide', condition: 'itemData.nested41 > 100',
-            }]);
+            ], [
+                new FieldRuleDto({ field: 'field4.nested42', action: 'Hide', condition: 'itemData.nested41 > 100' }),
+            ]);
 
             const array = contentForm.get(complexSchema.fields[3])!.get(languages[0]) as FieldArrayForm;
 
@@ -778,9 +799,9 @@ describe('ContentForm', () => {
                 fields: [
                     createField({ id: 1, properties: createProperties('String'), partitioning: 'invariant' }),
                 ],
-                fieldRules: [{
-                    field: 'field1', action: 'Hide', condition: 'data.field1 > 100',
-                }],
+                fieldRules: [
+                    new FieldRuleDto({ field: 'field1', action: 'Hide', condition: 'data.field1 > 100' }),
+                ],
             });
 
             const contentForm = createForm([
@@ -1250,7 +1271,7 @@ describe('ContentForm', () => {
         });
     });
 
-    function createForm(fields: RootFieldDto[], fieldRules: FieldRule[] = [], schemas: { [id: string]: SchemaDto } = {}) {
+    function createForm(fields: FieldDto[], fieldRules: FieldRuleDto[] = [], schemas: { [id: string]: SchemaDto } = {}) {
         return new EditContentForm(languages,
             createSchema({ fields, fieldRules }), schemas, {}, 0);
     }

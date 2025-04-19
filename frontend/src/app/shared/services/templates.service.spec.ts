@@ -8,7 +8,8 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, Resource, ResourceLinks, TemplateDetailsDto, TemplateDto, TemplatesDto, TemplatesService } from '@app/shared/internal';
+import { ApiUrlConfig, Resource, TemplateDetailsDto, TemplateDto, TemplatesDto, TemplatesService } from '@app/shared/internal';
+import { ResourceLinkDto } from '../model';
 
 describe('TemplatesService', () => {
     beforeEach(() => {
@@ -45,14 +46,16 @@ describe('TemplatesService', () => {
                     templateResponse(1),
                     templateResponse(2),
                 ],
+                _links: {},
             });
 
-            expect(templates!).toEqual({
+            expect(templates!).toEqual(new TemplatesDto({
                 items: [
                     createTemplate(1),
                     createTemplate(2),
                 ],
-            });
+                _links: {},
+            }));
         }));
 
     it('should make get request to get template',
@@ -88,9 +91,7 @@ describe('TemplatesService', () => {
                 description: `Description ${key}`,
                 isStarter: id % 2 === 0,
                 _links: {
-                    self: {
-                        method: 'GET', href: `/templates/name${key}`,
-                    },
+                    self: { method: 'GET', href: `/templates/name${key}` },
                 },
             };
         }
@@ -101,31 +102,34 @@ describe('TemplatesService', () => {
             return {
                 details: `Details ${key}`,
                 _links: {
-                    self: {
-                        method: 'GET', href: `/templates/name${id}`,
-                    },
+                    self: { method: 'GET', href: `/templates/name${id}` },
                 },
             };
         }
 });
 
 export function createTemplate(id: number, suffix = '') {
-    const links: ResourceLinks = {
-        self: { method: 'GET', href: `/templates/name${id}` },
-    };
-
     const key = `${id}${suffix}`;
 
-    return new TemplateDto(links, `name${key}`, `Title ${key}`, `Description ${key}`, id % 2 === 0);
+    return new TemplateDto({
+        name: `name${key}`,
+        title: `Title ${key}`,
+        description: `Description ${key}`,
+        isStarter: id % 2 === 0,
+        _links: {
+            self: new ResourceLinkDto({ method: 'GET', href: `/templates/name${key}` }),
+        },
+    });
 }
 
 
 export function createTemplateDetails(id: number, suffix = '') {
-    const links: ResourceLinks = {
-        self: { method: 'GET', href: `/templates/name${id}` },
-    };
-
     const key = `${id}${suffix}`;
 
-    return new TemplateDetailsDto(links, `Details ${key}`);
+    return new TemplateDetailsDto({
+        details: `Details ${key}`,
+        _links: {
+            self: new ResourceLinkDto({ method: 'GET', href: `/templates/name${id}` }),
+        },
+    });
 }

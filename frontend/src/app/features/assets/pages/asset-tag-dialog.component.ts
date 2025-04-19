@@ -52,7 +52,6 @@ export class AssetTagDialogComponent implements OnInit {
 
     public renameAssetTag() {
         const value = this.editForm.submit();
-
         if (!value) {
             return;
         }

@@ -83,18 +83,19 @@ export class IndexFormComponent {
     }
 
     public createSchema() {
-        const fields = this.createForm.submit();
-
-        if (fields) {
-            this.indexesState.create({ fields })
-                .subscribe({
-                    next: () => {
-                        this.emitCreate();
-                    },
-                    error: error => {
-                        this.createForm.submitFailed(error);
-                    },
-                });
+        const value = this.createForm.submit();
+        if (!value) {
+            return;
         }
+
+        this.indexesState.create(value)
+            .subscribe({
+                next: () => {
+                    this.emitCreate();
+                },
+                error: error => {
+                    this.createForm.submitFailed(error);
+                },
+            });
     }
 }

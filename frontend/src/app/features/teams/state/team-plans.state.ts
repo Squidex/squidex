@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { debug, DialogService, LoadingState, PlanDto, PlanLockedReason, ReferralDto, shareSubscribed, State, TeamsState, Version } from '@app/shared';
+import { ChangePlanDto, debug, DialogService, LoadingState, PlanDto, PlansLockedReason, ReferralInfoDto, shareSubscribed, State, TeamsState, VersionTag } from '@app/shared';
 import { TeamPlansService } from '../internal';
 
 export interface PlanInfo {
@@ -33,13 +33,13 @@ interface Snapshot extends LoadingState {
     portalLink?: string;
 
     // The referral info.
-    referral?: ReferralDto;
+    referral?: ReferralInfoDto;
 
     // The reason why the plan cannot be changed.
-    locked?: PlanLockedReason;
+    locked?: PlansLockedReason;
 
     // The team version.
-    version: Version;
+    version: VersionTag;
 }
 
 @Injectable({
@@ -78,7 +78,7 @@ export class TeamPlansState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly plansService: TeamPlansService,
     ) {
-        super({ plans: [], version: Version.EMPTY });
+        super({ plans: [], version: VersionTag.EMPTY });
 
         debug(this, 'teamPlans');
     }
@@ -100,7 +100,7 @@ export class TeamPlansState extends State<Snapshot> {
                     this.dialogs.notifyInfo('i18n:plans.reloaded');
                 }
 
-                const planId = overridePlanId || payload.currentPlanId;
+                const planId = overridePlanId || payload.currentPlanId!;
                 const plans = payload.plans.map(x => createPlan(x, planId));
 
                 this.next({
@@ -121,8 +121,8 @@ export class TeamPlansState extends State<Snapshot> {
     }
 
     public change(planId: string): Observable<any> {
-        return this.plansService.putPlan(this.teamId, { planId }, this.version).pipe(
-            tap(({ payload, version }) => {
+        return this.plansService.putPlan(this.teamId, new ChangePlanDto({ planId }), this.version).pipe(
+            tap(({ version, payload }) => {
                 if (payload.redirectUri && payload.redirectUri.length > 0) {
                     this.window.location.href = payload.redirectUri;
                 } else {

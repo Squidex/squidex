@@ -8,7 +8,7 @@
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FullDateTimePipe, LocalizerService, TooltipDirective, TranslatePipe, TypedSimpleChanges } from '@app/framework';
-import { ScheduleDto } from '@app/shared/internal';
+import { ScheduleJobDto } from '@app/shared/internal';
 
 @Component({
     standalone: true,
@@ -30,7 +30,7 @@ export class ContentStatusComponent {
     public statusColor!: string;
 
     @Input()
-    public scheduled?: ScheduleDto | null;
+    public scheduled?: ScheduleJobDto | null;
 
     @Input()
     public layout: 'icon' | 'text' | 'multiline' = 'icon';

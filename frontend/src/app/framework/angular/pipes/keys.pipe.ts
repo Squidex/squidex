@@ -14,6 +14,6 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class KeysPipe implements PipeTransform {
     public transform(value: any): any {
-        return Object.keys(value);
+        return Object.keys(value).sorted();
     }
 }

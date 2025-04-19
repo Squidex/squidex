@@ -22,25 +22,28 @@ public sealed class TagXmlProcessor : IDocumentProcessor
             foreach (var controllerType in context.ControllerTypes)
             {
                 var attribute = controllerType.GetCustomAttribute<ApiExplorerSettingsAttribute>();
-
-                if (attribute != null)
+                if (attribute == null)
                 {
-                    var tag = context.Document.Tags.FirstOrDefault(x => x.Name == attribute.GroupName);
+                    continue;
+                }
 
-                    if (tag != null)
-                    {
-                        var description = controllerType.GetXmlDocsSummary();
+                var tag = context.Document.Tags.FirstOrDefault(x => x.Name == attribute.GroupName);
+                if (tag == null)
+                {
+                    continue;
+                }
 
-                        if (description != null)
-                        {
-                            tag.Description ??= string.Empty;
+                var description = controllerType.GetXmlDocsSummary();
+                if (description == null)
+                {
+                    continue;
+                }
 
-                            if (!tag.Description.Contains(description, StringComparison.Ordinal))
-                            {
-                                tag.Description += "\n\n" + description;
-                            }
-                        }
-                    }
+                tag.Description ??= string.Empty;
+
+                if (!tag.Description.Contains(description, StringComparison.Ordinal))
+                {
+                    tag.Description += "\n\n" + description;
                 }
             }
         }

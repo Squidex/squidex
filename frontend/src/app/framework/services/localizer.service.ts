@@ -29,7 +29,6 @@ export class LocalizerService {
         }
 
         let text = (this.translations as any)[key];
-
         if (!text) {
             return null;
         }

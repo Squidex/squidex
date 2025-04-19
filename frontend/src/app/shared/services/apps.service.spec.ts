@@ -8,10 +8,11 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, AppDto, AppSettingsDto, AppsService, AssetScriptsDto, AssetScriptsPayload, DateTime, EditorDto, ErrorDto, PatternDto, Resource, ResourceLinks, Version } from '@app/shared/internal';
+import { ApiUrlConfig, AppDto, AppSettingsDto, AppsService, AssetScriptsDto, DateTime, EditorDto, ErrorDto, PatternDto, Resource, Versioned, VersionTag } from '@app/shared/internal';
+import { CreateAppDto, ResourceLinkDto, TransferToTeamDto, UpdateAppDto, UpdateAppSettingsDto, UpdateAssetScriptsDto } from '../model';
 
 describe('AppsService', () => {
-    const version = new Version('1');
+    const version = new VersionTag('1');
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -32,7 +33,6 @@ describe('AppsService', () => {
     it('should make get request to get apps',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
             let apps: ReadonlyArray<AppDto>;
-
             appsService.getApps().subscribe(result => {
                 apps = result;
             });
@@ -54,7 +54,6 @@ describe('AppsService', () => {
     it('should make get request to get team apps',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
             let apps: ReadonlyArray<AppDto>;
-
             appsService.getTeamApps('my-team').subscribe(result => {
                 apps = result;
             });
@@ -75,7 +74,6 @@ describe('AppsService', () => {
     it('should make get request to get app',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
             let app: AppDto;
-
             appsService.getApp('my-app').subscribe(result => {
                 app = result;
             });
@@ -93,7 +91,6 @@ describe('AppsService', () => {
     it('should make get request to get app settings',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
             let settings: AppSettingsDto;
-
             appsService.getSettings('my-app').subscribe(result => {
                 settings = result;
             });
@@ -110,6 +107,8 @@ describe('AppsService', () => {
 
     it('should make put request to update app settings',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+            const dto = new UpdateAppSettingsDto({ editors: [], patterns: [] });
+
             const resource: Resource = {
                 _links: {
                     update: { method: 'PUT', href: '/api/apps/my-app/settings' },
@@ -117,8 +116,7 @@ describe('AppsService', () => {
             };
 
             let settings: AppSettingsDto;
-
-            appsService.putSettings('my-app', resource, {} as any, version).subscribe(result => {
+            appsService.putSettings('my-app', resource, dto, version).subscribe(result => {
                 settings = result;
             });
 
@@ -134,10 +132,9 @@ describe('AppsService', () => {
 
     it('should make get request to get asset scripts',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
-            let settings: AssetScriptsDto;
-
+            let scripts: Versioned<AssetScriptsDto>;
             appsService.getAssetScripts('my-app').subscribe(result => {
-                settings = result;
+                scripts = result;
             });
 
             const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/scripts');
@@ -151,20 +148,21 @@ describe('AppsService', () => {
                 },
             });
 
-            expect(settings!).toEqual({ payload: createAssetScripts(12), version: new Version('2') });
+            expect(scripts!).toEqual({ payload: createAssetScripts(12), version: new VersionTag('2') });
         }));
 
     it('should make put request to update asset scripts',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+            const dto = new UpdateAssetScriptsDto({});
+
             const resource: Resource = {
                 _links: {
                     update: { method: 'PUT', href: '/api/apps/my-app/assets/scripts' },
                 },
             };
 
-            let scripts: AssetScriptsDto;
-
-            appsService.putAssetScripts('my-app', resource, {} as any, version).subscribe(result => {
+            let scripts: Versioned<AssetScriptsDto>;
+            appsService.putAssetScripts('my-app', resource, dto, version).subscribe(result => {
                 scripts = result;
             });
 
@@ -179,15 +177,14 @@ describe('AppsService', () => {
                 },
             });
 
-            expect(scripts!).toEqual({ payload: createAssetScripts(12), version: new Version('2') });
+            expect(scripts!).toEqual({ payload: createAssetScripts(12), version: new VersionTag('2') });
         }));
 
     it('should make post request to create app',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
-            const dto = { name: 'new-app' };
+            const dto = new CreateAppDto({ name: 'new-app' });
 
             let app: AppDto;
-
             appsService.postApp(dto).subscribe(result => {
                 app = result;
             });
@@ -204,6 +201,8 @@ describe('AppsService', () => {
 
     it('should make put request to update app',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+            const dto = new UpdateAppDto({});
+
             const resource: Resource = {
                 _links: {
                     update: { method: 'PUT', href: '/api/apps/my-app' },
@@ -211,8 +210,7 @@ describe('AppsService', () => {
             };
 
             let app: AppDto;
-
-            appsService.putApp('my-app', resource, { }, version).subscribe(result => {
+            appsService.putApp('my-app', resource, dto, version).subscribe(result => {
                 app = result;
             });
 
@@ -228,6 +226,8 @@ describe('AppsService', () => {
 
     it('should make put request to transfer app',
         inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+            const dto = new TransferToTeamDto({ teamId: 'my-team' });
+
             const resource: Resource = {
                 _links: {
                     transfer: { method: 'PUT', href: '/api/apps/my-app/team' },
@@ -235,8 +235,7 @@ describe('AppsService', () => {
             };
 
             let app: AppDto;
-
-            appsService.transferApp('my-app', resource, { teamId: 'my-team' }, version).subscribe(result => {
+            appsService.transferApp('my-app', resource, dto, version).subscribe(result => {
                 app = result;
             });
 
@@ -259,7 +258,6 @@ describe('AppsService', () => {
             };
 
             let app: AppDto;
-
             appsService.postAppImage('my-app', resource, null!, version).subscribe(result => {
                 app = <AppDto>result;
             });
@@ -283,7 +281,6 @@ describe('AppsService', () => {
             };
 
             let error: ErrorDto;
-
             appsService.postAppImage('my-app', resource, null!, version).subscribe({
                 error: e => {
                     error = e;
@@ -309,7 +306,6 @@ describe('AppsService', () => {
             };
 
             let app: AppDto;
-
             appsService.deleteAppImage('my-app', resource, version).subscribe(result => {
                 app = result;
             });
@@ -365,20 +361,20 @@ describe('AppsService', () => {
 
         return {
             id: `id${id}`,
-            created: buildDate(id, 10),
-            createdBy: `creator${id}`,
-            lastModified: buildDate(id, 20),
-            lastModifiedBy: `modifier${id}`,
-            version: key,
-            name: `app-name${key}`,
             canAccessApi: id % 2 === 0,
             canAccessContent: id % 2 === 0,
+            created: buildDate(id, 10),
+            createdBy: `creator${id}`,
             description: `app-description${key}`,
             label: `app-label${key}`,
+            lastModified: buildDate(id, 20),
+            lastModifiedBy: `modifier${id}`,
+            name: `app-name${key}`,
             permissions: ['Owner'],
             roleName: `Role${id}`,
             roleProperties: createProperties(id),
             teamId: `app-team${key}`,
+            version: id,
             _links: {
                 update: { method: 'PUT', href: `apps/${id}` },
             },
@@ -389,18 +385,19 @@ describe('AppsService', () => {
         const key = `${id}${suffix}`;
 
         return {
-            hideScheduler: false,
-            patterns: [1, 2, 3].map(i => {
-                const name = `pattern${i}${key}`;
-
-                return { name, regex: `${name}_regex`, message: `${name}_message` };
-            }),
             editors: [1, 2, 3].map(i => {
                 const name = `editor${i}${key}`;
 
                 return { name, url: `${name}_url` };
             }),
-            version: key,
+            hideDateTimeModeButton: true,
+            hideScheduler: true,
+            patterns: [1, 2, 3].map(i => {
+                const name = `pattern${i}${key}`;
+
+                return { name, regex: `${name}_regex`, message: `${name}_message` };
+            }),
+            version: id,
             _links: {
                 update: { method: 'PUT', href: `apps/${id}/settings` },
             },
@@ -411,7 +408,9 @@ describe('AppsService', () => {
         const key = `${id}${suffix}`;
 
         return {
-            update: key,
+            query: key,
+            queryPre: key,
+            version: id,
             _links: {
                 update: { method: 'PUT', href: `apps/${id}/assets/scripts` },
             },
@@ -420,58 +419,64 @@ describe('AppsService', () => {
 });
 
 export function createApp(id: number, suffix = '') {
-    const links: ResourceLinks = {
-        update: { method: 'PUT', href: `apps/${id}` },
-    };
-
     const key = `${id}${suffix}`;
 
-    return new AppDto(links,
-        `id${id}`,
-        DateTime.parseISO(buildDate(id, 10)), `creator${id}`,
-        DateTime.parseISO(buildDate(id, 20)), `modifier${id}`,
-        new Version(key),
-        `app-name${key}`,
-        `app-label${key}`,
-        `app-description${key}`,
-        ['Owner'],
-        id % 2 === 0,
-        id % 2 === 0,
-        `Role${id}`,
-        createProperties(id),
-        `app-team${key}`);
+    return new AppDto({
+        id: `id${id}`,
+        canAccessApi: id % 2 === 0,
+        canAccessContent: id % 2 === 0,
+        created: DateTime.parseISO(buildDate(id, 10)),
+        createdBy: `creator${id}`,
+        description: `app-description${key}`,
+        label: `app-label${key}`,
+        lastModified: DateTime.parseISO(buildDate(id, 20)),
+        lastModifiedBy: `modifier${id}`,
+        name: `app-name${key}`,
+        permissions: ['Owner'],
+        roleName: `Role${id}`,
+        roleProperties: createProperties(id),
+        teamId: `app-team${key}`,
+        version: id,
+        _links: {
+            update: new ResourceLinkDto({ method: 'PUT', href: `apps/${id}` }),
+        },
+    });
 }
 
 export function createAppSettings(id: number, suffix = '') {
-    const links: ResourceLinks = {
-        update: { method: 'PUT', href: `apps/${id}/settings` },
-    };
-
     const key = `${id}${suffix}`;
 
-    return new AppSettingsDto(links,
-        false,
-        [1, 2, 3].map(i => {
-            const name = `pattern${i}${key}`;
-
-            return new PatternDto(name, `${name}_regex`, `${name}_message`);
-        }),
-        [1, 2, 3].map(i => {
+    return new AppSettingsDto({
+        editors: [1, 2, 3].map(i => {
             const name = `editor${i}${key}`;
 
-            return new EditorDto(name, `${name}_url`);
+            return new EditorDto({ name, url: `${name}_url` });
         }),
-        new Version(key));
+        hideDateTimeModeButton: true,
+        hideScheduler: true,
+        patterns: [1, 2, 3].map(i => {
+            const name = `pattern${i}${key}`;
+
+            return new PatternDto({ name, regex: `${name}_regex`, message: `${name}_message` });
+        }),
+        version: id,
+        _links: {
+            update: new ResourceLinkDto({ method: 'PUT', href: `apps/${id}/settings` }),
+        },
+    });
 }
 
-export function createAssetScripts(id: number, suffix = ''): AssetScriptsPayload {
-    return {
-        scripts: { update: `${id}${suffix}` },
+export function createAssetScripts(id: number, suffix = ''): AssetScriptsDto {
+    const key = `${id}${suffix}`;
+
+    return new AssetScriptsDto({
+        query: key,
+        queryPre: key,
+        version: id,
         _links: {
-            update: { method: 'PUT', href: `apps/${id}/assets/scripts` },
+            update: new ResourceLinkDto({ method: 'PUT', href: `apps/${id}/assets/scripts` }),
         },
-        canUpdate: true,
-    };
+    });
 }
 
 function createProperties(id: number) {

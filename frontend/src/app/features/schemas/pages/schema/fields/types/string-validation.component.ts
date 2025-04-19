@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { AppSettingsDto, DropdownMenuComponent, FieldDto, FormHintComponent, hasNoValue$, hasValue$, LanguageDto, LocalizedInputComponent, ModalDirective, ModalModel, ModalPlacementDirective, PatternDto, RootFieldDto, SchemaDto, STRING_CONTENT_TYPES, StringFieldPropertiesDto, Subscriptions, TranslatePipe, TypedSimpleChanges, Types, value$ } from '@app/shared';
+import { AppLanguageDto, AppSettingsDto, DropdownMenuComponent, FieldDto, FormHintComponent, hasNoValue$, hasValue$, LocalizedInputComponent, ModalDirective, ModalModel, ModalPlacementDirective, PatternDto, SchemaDto, StringContentTypeValues, StringFieldPropertiesDto, Subscriptions, TranslatePipe, TypedSimpleChanges, Types, value$ } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -31,7 +31,7 @@ import { AppSettingsDto, DropdownMenuComponent, FieldDto, FormHintComponent, has
 export class StringValidationComponent  {
     private readonly subscriptions = new Subscriptions();
 
-    public readonly contentTypes = STRING_CONTENT_TYPES;
+    public readonly contentTypes = StringContentTypeValues;
 
     @Input({ required: true })
     public fieldForm!: UntypedFormGroup;
@@ -49,7 +49,7 @@ export class StringValidationComponent  {
     public settings!: AppSettingsDto;
 
     @Input({ required: true })
-    public languages!: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input({ transform: booleanAttribute })
     public isLocalizable?: boolean | null;
@@ -61,7 +61,7 @@ export class StringValidationComponent  {
     public patternsModal = new ModalModel();
 
     public get showUnique() {
-        return Types.is(this.field, RootFieldDto) && !this.field.isLocalizable && this.schema.type !== 'Component';
+        return Types.is(this.field, FieldDto) && !this.field.isLocalizable && this.schema.type !== 'Component';
     }
 
     public ngOnChanges(changes: TypedSimpleChanges<this>) {

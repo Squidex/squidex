@@ -7,8 +7,7 @@
 
 import { firstValueFrom, of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, RulesService, versioned } from '@app/shared/internal';
-import { RuleDto } from '../services/rules.service';
+import { DialogService, DynamicCreateRuleDto, DynamicRuleDto, DynamicRulesDto, DynamicUpdateRuleDto, ManualRuleTriggerDto, RulesService, versioned } from '@app/shared/internal';
 import { createRule } from '../services/rules.service.spec';
 import { TestValues } from './_test-helpers';
 import { RulesState } from './rules.state';
@@ -43,7 +42,7 @@ describe('RulesState', () => {
     describe('Loading', () => {
         it('should load rules', () => {
             rulesService.setup(x => x.getRules(app))
-                .returns(() => of({ items: [rule1, rule2], runningRuleId: rule1.id })).verifiable();
+                .returns(() => of(new DynamicRulesDto(({ items: [rule1, rule2], runningRuleId: rule1.id, _links: {} })))).verifiable();
 
             rulesState.load().subscribe();
 
@@ -51,8 +50,7 @@ describe('RulesState', () => {
             expect(rulesState.snapshot.isLoading).toBeFalsy();
             expect(rulesState.snapshot.rules).toEqual([rule1, rule2]);
 
-            let ruleRunning: RuleDto | undefined;
-
+            let ruleRunning: DynamicRuleDto | undefined;
             rulesState.runningRule.subscribe(result => {
                 ruleRunning = result;
             });
@@ -74,7 +72,7 @@ describe('RulesState', () => {
 
         it('should show notification on load if reload is true', () => {
             rulesService.setup(x => x.getRules(app))
-                .returns(() => of({ items: [rule1, rule2] })).verifiable();
+                .returns(() => of(new DynamicRulesDto(({ items: [rule1, rule2], _links: {} })))).verifiable();
 
             rulesState.load(true).subscribe();
 
@@ -87,7 +85,7 @@ describe('RulesState', () => {
     describe('Updates', () => {
         beforeEach(() => {
             rulesService.setup(x => x.getRules(app))
-                .returns(() => of({ items: [rule1, rule2] })).verifiable();
+                .returns(() => of(new DynamicRulesDto(({ items: [rule1, rule2], _links: {} })))).verifiable();
 
             rulesState.load().subscribe();
         });
@@ -107,7 +105,12 @@ describe('RulesState', () => {
         });
 
         it('should add rule to snapshot if created', () => {
-            const request = { trigger: { triggerType: 'trigger3', value: 3 }, action: { actionType: 'action3', value: 1 } };
+            const request = new DynamicCreateRuleDto({
+                trigger: new ManualRuleTriggerDto(),
+                action: {
+                    actionType: 'action3',
+                },
+            });
 
             rulesService.setup(x => x.postRule(app, request))
                 .returns(() => of(newRule));
@@ -118,7 +121,12 @@ describe('RulesState', () => {
         });
 
         it('should update rule if updated', () => {
-            const request = {};
+            const request = new DynamicUpdateRuleDto({
+                trigger: new ManualRuleTriggerDto(),
+                action: {
+                    actionType: 'action3',
+                },
+            });
 
             const updated = createRule(1, '_new');
 
@@ -179,7 +187,7 @@ describe('RulesState', () => {
     describe('Selection', () => {
         beforeEach(() => {
             rulesService.setup(x => x.getRules(app))
-                .returns(() => of({ items: [rule1, rule2] })).verifiable(Times.atLeastOnce());
+                .returns(() => of(new DynamicRulesDto(({ items: [rule1, rule2], _links: {} })))).verifiable(Times.atLeastOnce());
 
             rulesState.load().subscribe();
             rulesState.select(rule2.id).subscribe();
@@ -192,7 +200,7 @@ describe('RulesState', () => {
             ];
 
             rulesService.setup(x => x.getRules(app))
-                .returns(() => of({ items: newRules }));
+                .returns(() => of(new DynamicRulesDto(({ items: newRules, _links: {} })))).verifiable(Times.exactly(2));
 
             rulesState.load().subscribe();
 
@@ -200,7 +208,12 @@ describe('RulesState', () => {
         });
 
         it('should update selected rule if updated', () => {
-            const request = {};
+            const request = new DynamicUpdateRuleDto({
+                trigger: new ManualRuleTriggerDto(),
+                action: {
+                    actionType: 'action3',
+                },
+            });
 
             const updated = createRule(2, '_new');
 

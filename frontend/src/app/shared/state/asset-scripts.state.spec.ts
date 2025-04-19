@@ -6,9 +6,10 @@
  */
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
+import { customMatchers } from 'src/spec/matchers';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, versioned } from '@app/shared/internal';
-import { AppsService, AssetScriptsPayload } from '../services/apps.service';
+import { DialogService, UpdateAssetScriptsDto, versioned } from '@app/shared/internal';
+import { AppsService } from '../services/apps.service';
 import { createAssetScripts } from '../services/apps.service.spec';
 import { TestValues } from './_test-helpers';
 import { AssetScriptsState } from './asset-scripts.state';
@@ -26,6 +27,10 @@ describe('AssetScriptsState', () => {
     let dialogs: IMock<DialogService>;
     let appsService: IMock<AppsService>;
     let assetScriptsState: AssetScriptsState;
+
+    beforeAll(function () {
+        jasmine.addMatchers(customMatchers);
+    });
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
@@ -45,7 +50,7 @@ describe('AssetScriptsState', () => {
 
             assetScriptsState.load().subscribe();
 
-            expect(assetScriptsState.snapshot.scripts).toEqual(oldScripts.scripts);
+            expect(assetScriptsState.snapshot.scripts).toEqualIgnoringProps({ query: oldScripts.query, queryPre: oldScripts.queryPre });
             expect(assetScriptsState.snapshot.isLoaded).toBeTruthy();
             expect(assetScriptsState.snapshot.isLoading).toBeFalsy();
             expect(assetScriptsState.snapshot.version).toEqual(version);
@@ -85,19 +90,15 @@ describe('AssetScriptsState', () => {
         it('should update scripts if scripts updated', () => {
             const updated = createAssetScripts(1, '_new');
 
-            const request = { id: 'id3' };
+            const request = new UpdateAssetScriptsDto({ query: 'id3' });
 
             appsService.setup(x => x.putAssetScripts(app, oldScripts, request, version))
                 .returns(() => of(versioned(newVersion, updated))).verifiable();
 
             assetScriptsState.update(request).subscribe();
 
-            expectNewScripts(updated);
-        });
-
-        function expectNewScripts(updated: AssetScriptsPayload) {
-            expect(assetScriptsState.snapshot.scripts).toEqual(updated.scripts);
+            expect(assetScriptsState.snapshot.scripts).toEqualIgnoringProps({ query: updated.query, queryPre: updated.queryPre });
             expect(assetScriptsState.snapshot.version).toEqual(newVersion);
-        }
+        });
     });
 });

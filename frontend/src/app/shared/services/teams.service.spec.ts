@@ -8,10 +8,11 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, DateTime, Resource, ResourceLinks, TeamAuthSchemeDto, TeamDto, TeamsService, Version } from '@app/shared/internal';
+import { ApiUrlConfig, AuthSchemeResponseDto, DateTime, Resource, TeamDto, TeamsService, Versioned, VersionTag } from '@app/shared/internal';
+import { AuthSchemeDto, AuthSchemeValueDto, CreateTeamDto, ResourceLinkDto, UpdateTeamDto } from '../model';
 
 describe('TeamsService', () => {
-    const version = new Version('1');
+    const version = new VersionTag('1');
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -32,7 +33,6 @@ describe('TeamsService', () => {
     it('should make get request to get teams',
         inject([TeamsService, HttpTestingController], (teamsService: TeamsService, httpMock: HttpTestingController) => {
             let teams: ReadonlyArray<TeamDto>;
-
             teamsService.getTeams().subscribe(result => {
                 teams = result;
             });
@@ -53,7 +53,6 @@ describe('TeamsService', () => {
     it('should make get request to get team',
         inject([TeamsService, HttpTestingController], (teamsService: TeamsService, httpMock: HttpTestingController) => {
             let team: TeamDto;
-
             teamsService.getTeam('my-team').subscribe(result => {
                 team = result;
             });
@@ -70,10 +69,9 @@ describe('TeamsService', () => {
 
     it('should make post request to create team',
         inject([TeamsService, HttpTestingController], (teamsService: TeamsService, httpMock: HttpTestingController) => {
-            const dto = { name: 'new-team' };
+            const dto = new CreateTeamDto({ name: 'new-team' });
 
             let team: TeamDto;
-
             teamsService.postTeam(dto).subscribe(result => {
                 team = result;
             });
@@ -90,6 +88,8 @@ describe('TeamsService', () => {
 
     it('should make put request to update team',
         inject([TeamsService, HttpTestingController], (teamsService: TeamsService, httpMock: HttpTestingController) => {
+            const dto = new UpdateTeamDto({ name: 'NewName' });
+
             const resource: Resource = {
                 _links: {
                     update: { method: 'PUT', href: '/api/teams/my-team' },
@@ -97,8 +97,7 @@ describe('TeamsService', () => {
             };
 
             let team: TeamDto;
-
-            teamsService.putTeam('my-team', resource, { }, version).subscribe(result => {
+            teamsService.putTeam('my-team', resource, dto, version).subscribe(result => {
                 team = result;
             });
 
@@ -114,8 +113,7 @@ describe('TeamsService', () => {
 
     it('should make get request to get auth',
         inject([TeamsService, HttpTestingController], (teamsService: TeamsService, httpMock: HttpTestingController) => {
-            let auth: TeamAuthSchemeDto;
-
+            let auth: Versioned<AuthSchemeResponseDto>;
             teamsService.getTeamAuth('my-team').subscribe(result => {
                 auth = result;
             });
@@ -131,14 +129,15 @@ describe('TeamsService', () => {
                 },
             });
 
-            expect(auth!).toEqual({ payload: { scheme: null, canUpdate: true }, version: new Version('2') });
+            expect(auth!).toEqual({ payload: createTeamAuth(12), version: new VersionTag('2') });
         }));
 
     it('should make put request to update auth',
         inject([TeamsService, HttpTestingController], (teamsService: TeamsService, httpMock: HttpTestingController) => {
-            let auth: TeamAuthSchemeDto;
+            const dto = new AuthSchemeValueDto({});
 
-            teamsService.putTeamAuth('my-team', { scheme: null }, version).subscribe(result => {
+            let auth: Versioned<AuthSchemeResponseDto>;
+            teamsService.putTeamAuth('my-team', dto, version).subscribe(result => {
                 auth = result;
             });
 
@@ -153,7 +152,7 @@ describe('TeamsService', () => {
                 },
             });
 
-            expect(auth!).toEqual({ payload: { scheme: null, canUpdate: true }, version: new Version('2') });
+            expect(auth!).toEqual({ payload: createTeamAuth(12), version: new VersionTag('2') });
         }));
 
     it('should make delete request to leave team',
@@ -197,14 +196,13 @@ describe('TeamsService', () => {
 
         return {
             id: `id${id}`,
+            name: `team-name${key}`,
             created: buildDate(id, 10),
             createdBy: `creator${id}`,
             lastModified: buildDate(id, 20),
             lastModifiedBy: `modifier${id}`,
-            version: key,
-            name: `team-name${key}`,
             roleName: `Role${id}`,
-            roleProperties: createProperties(id),
+            version: id,
             _links: {
                 update: { method: 'PUT', href: `teams/${id}` },
             },
@@ -212,9 +210,14 @@ describe('TeamsService', () => {
     }
 
     function teamAuthResponse(id: number) {
-
         return {
-            scheme: null,
+            scheme: {
+                displayName: 'Auth',
+                domain: 'squidex.io',
+                clientId: 'client-id',
+                clientSecret: 'client-secret',
+                authority: 'squidex.io/authority',
+            },
             _links: {
                 update: { method: 'PUT', href: `teams/${id}/auth` },
             },
@@ -223,28 +226,36 @@ describe('TeamsService', () => {
 });
 
 export function createTeam(id: number, suffix = '') {
-    const links: ResourceLinks = {
-        update: { method: 'PUT', href: `teams/${id}` },
-    };
-
     const key = `${id}${suffix}`;
 
-    return new TeamDto(links,
-        `id${id}`,
-        DateTime.parseISO(buildDate(id, 10)), `creator${id}`,
-        DateTime.parseISO(buildDate(id, 20)), `modifier${id}`,
-        new Version(key),
-        `team-name${key}`,
-        `Role${id}`,
-        createProperties(id));
+    return new TeamDto({
+        id: `id${id}`,
+        name: `team-name${key}`,
+        created: DateTime.parseISO(buildDate(id, 10)),
+        createdBy: `creator${id}`,
+        lastModified: DateTime.parseISO(buildDate(id, 20)),
+        lastModifiedBy: `modifier${id}`,
+        roleName: `Role${id}`,
+        version: id,
+        _links: {
+            update: new ResourceLinkDto({ method: 'PUT', href: `teams/${id}` }),
+        },
+    });
 }
 
-function createProperties(id: number) {
-    const result = {} as Record<string, any>;
-
-    result[`property${id}`] = true;
-
-    return result;
+export function createTeamAuth(id: number) {
+    return new AuthSchemeResponseDto({
+        scheme: new AuthSchemeDto({
+            displayName: 'Auth',
+            domain: 'squidex.io',
+            clientId: 'client-id',
+            clientSecret: 'client-secret',
+            authority: 'squidex.io/authority',
+        }),
+        _links: {
+            update: new ResourceLinkDto({ method: 'PUT', href: `teams/${id}/auth` }),
+        },
+    });
 }
 
 function buildDate(id: number, add = 0) {

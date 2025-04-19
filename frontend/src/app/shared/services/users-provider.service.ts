@@ -7,8 +7,9 @@
 
 import { Injectable } from '@angular/core';
 import { catchError, map, Observable, of, share, shareReplay } from 'rxjs';
+import { UserDto } from '../model';
 import { AuthService } from './auth.service';
-import { UserDto, UsersService } from './users.service';
+import { UsersService } from './users.service';
 
 @Injectable({
     providedIn: 'root',
@@ -29,7 +30,7 @@ export class UsersProviderService {
             result =
                 this.usersService.getUser(id).pipe(
                     catchError(() => {
-                        return of(new UserDto('Unknown', 'Unknown'));
+                        return of(new UserDto({ id: 'Unknown', displayName: 'Unknown' } as any));
                     }),
                     shareReplay(1));
 
@@ -39,7 +40,7 @@ export class UsersProviderService {
         return result.pipe(
             map(dto => {
                 if (me && this.authService.user && dto.id === this.authService.user.id) {
-                    dto = new UserDto(dto.id, me);
+                    dto = new UserDto({ id: dto.id, displayName: me } as any);
                 }
                 return dto;
             }),

@@ -8,8 +8,9 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { debug, DialogService, LoadingState, shareSubscribed, State, Version } from '@app/framework';
-import { WorkflowDto, WorkflowsPayload, WorkflowsService } from '../services/workflows.service';
+import { compareStrings, debug, DialogService, LoadingState, Mutable, shareSubscribed, State, VersionTag } from '@app/framework';
+import { WorkflowsService } from '../services/workflows.service';
+import { AddWorkflowDto, IWorkflowStepDto, IWorkflowTransitionDto, UpdateWorkflowDto, WorkflowDto, WorkflowsDto, WorkflowStepDto, WorkflowTransitionDto } from './../model';
 import { AppsState } from './apps.state';
 
 interface Snapshot extends LoadingState {
@@ -17,7 +18,7 @@ interface Snapshot extends LoadingState {
     workflows: ReadonlyArray<WorkflowDto>;
 
     // The app version.
-    version: Version;
+    version: VersionTag;
 
     // The errors.
     errors: ReadonlyArray<string>;
@@ -58,7 +59,7 @@ export class WorkflowsState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly workflowsService: WorkflowsService,
     ) {
-        super({ errors: [], workflows: [], version: Version.EMPTY });
+        super({ errors: [], workflows: [], version: VersionTag.EMPTY });
 
         debug(this, 'workflows');
     }
@@ -88,16 +89,16 @@ export class WorkflowsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public add(name: string): Observable<any> {
-        return this.workflowsService.postWorkflow(this.appName, { name }, this.version).pipe(
+    public add(request: AddWorkflowDto): Observable<any> {
+        return this.workflowsService.postWorkflow(this.appName, request, this.version).pipe(
             tap(({ version, payload }) => {
                 this.replaceWorkflows(payload, version);
             }),
             shareSubscribed(this.dialogs));
     }
 
-    public update(workflow: WorkflowDto): Observable<any> {
-        return this.workflowsService.putWorkflow(this.appName, workflow, workflow.serialize(), this.version).pipe(
+    public update(workflow: WorkflowDto, request: UpdateWorkflowDto): Observable<any> {
+        return this.workflowsService.putWorkflow(this.appName, workflow, request, this.version).pipe(
             tap(({ version, payload }) => {
                 this.dialogs.notifyInfo('i18n:workflows.saved');
 
@@ -114,7 +115,7 @@ export class WorkflowsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    private replaceWorkflows(payload: WorkflowsPayload, version: Version) {
+    private replaceWorkflows(payload: WorkflowsDto, version: VersionTag) {
         const { canCreate, errors, items: workflows } = payload;
 
         this.next({
@@ -130,4 +131,203 @@ export class WorkflowsState extends State<Snapshot> {
     private get version() {
         return this.snapshot.version;
     }
+}
+
+export interface WorkflowStepView {
+    // The name of the workflow.
+    name: string;
+
+    // The actual step.
+    values: WorkflowStepValues;
+
+     // True, if the step cannot be removed.
+     isLocked?: boolean;
+}
+
+export type WorkflowStepValues = Omit<IWorkflowStepDto, 'transitions'>;
+
+export interface WorkflowTransitionView {
+    // The source step name.
+    from: string;
+
+    // The target step name.
+    to: string;
+
+    // The actual transition.
+    values: WorkflowTransitionValues;
+
+    // The actual workflow step.
+    step: WorkflowStepView;
+}
+
+export type WorkflowTransitionValues = IWorkflowTransitionDto;
+
+export class WorkflowView {
+    public steps: ReadonlyArray<WorkflowStepView> = [];
+
+    public transitions: ReadonlyArray<WorkflowTransitionView> = [];
+
+    constructor(
+        public readonly dto: WorkflowDto,
+    ) {
+        const resultSteps: WorkflowStepView[] = [];
+        const resultTransitions: WorkflowTransitionView[] = [];
+
+        for (const [name, step] of Object.entries(dto.steps)) {
+            const { transitions: _, ...values } = step.toJSON();
+            
+            resultSteps.push({ name, isLocked: isLocked(name), values });
+        }
+
+        for (const [from, step] of Object.entries(dto.steps)) {
+            if (step.transitions) {
+                for (const [to, transition] of Object.entries(step.transitions)) {
+                    const step = resultSteps.find(x => x.name === to)!;
+
+                    resultTransitions.push({ from, to, step, values: transition.toJSON() });
+                }
+            }
+        }
+
+        this.steps =
+            resultSteps.sort((a, b) => {
+                return compareStrings(a.name, b.name);
+            });
+
+        this.transitions =
+            resultTransitions.sort((a, b) => {
+                return compareStrings(a.to, b.to);
+            });
+    }
+
+    public getOpenSteps(step: WorkflowStepView) {
+        return this.steps.filter(x => x.name !== step.name && !this.transitions.find(y => y.from === step.name && y.to === x.name));
+    }
+
+    public getTransitions(step: WorkflowStepView): WorkflowTransitionView[] {
+        return this.transitions.filter(x => x.from === step.name);
+    }
+
+    public getStep(name: string): WorkflowStepView {
+        return this.steps.find(x => x.name === name)!;
+    }
+
+    public setStep(name: string, values: Partial<WorkflowStepValues> = {}) {
+        return this.update(clone => {
+            clone.steps[name] = new WorkflowStepDto({ transitions: {}, ...clone.steps[name] ?? {}, ...values });
+
+            if (!clone.initial && !isLocked(name)) {
+                clone.initial = name;
+            }
+        });
+    }
+
+    public removeStep(name: string) {
+        const step = this.steps.find(x => x.name === name);
+        if (!step || step.isLocked) {
+            return this;
+        }
+        
+        return this.update(clone => {
+            delete clone.steps[name];
+
+            if (clone.initial === name) {
+                clone.initial = this.steps.filter(x => x.name !== name && !x.isLocked)[0]?.name ?? null;
+            }
+
+            for (const step of Object.values(clone.steps) as any[]) {
+                delete step.transitions[name];
+            }
+        });
+    }
+
+    public changeSchemaIds(schemaIds: string[]) {
+        if (this.dto.schemaIds === schemaIds) {
+            return this;
+        }
+
+        return this.update(clone => {
+            clone.schemaIds = schemaIds;
+        });
+    }
+
+    public changeName(name: string) {
+        if (this.dto.name === name) {
+            return this;
+        }
+
+        return this.update(clone => {
+            clone.name = name;
+        });
+    }
+
+    public setInitial(initial: string) {
+        const step = this.steps.find(x => x.name === initial);
+        if (!step || step.isLocked || this.dto.initial === initial) {
+            return this;
+        }
+
+        return this.update(clone => {
+            clone.initial = initial;
+        });
+    }
+
+    public setTransition(from: string, to: string, values: Partial<WorkflowTransitionValues> = {}) {
+        if (!this.dto.steps[from] || !this.dto.steps[to]) {
+            return this;
+        }
+
+        return this.update(clone => {
+            const step = clone.steps[from] as Mutable<WorkflowStepDto>;
+            step.transitions ??= {};
+            step.transitions[to] = new WorkflowTransitionDto({ ...step.transitions[to] ?? {}, ...values });
+        });
+    }
+
+    public removeTransition(from: string, to: string) {
+        const step = this.dto.steps[from];
+        if (!step || !step.transitions?.[to]) {
+            return this;
+        }
+
+        return this.update(clone => {
+            delete clone.steps[from].transitions![to];
+        });
+    }
+
+    public renameStep(name: string, newName: string) {
+        if (!this.dto.steps[name] || name === newName) {
+            return this;
+        }
+
+        return this.update(clone => {
+            renameInObj(clone.steps, name, newName);
+    
+            for (const step of Object.values(clone.steps) as any[]) {
+                renameInObj(step.transitions, name, newName);
+            }
+        });
+    }
+
+    private update(action: (clone: Mutable<WorkflowDto>) => void) {
+        const clone = WorkflowDto.fromJSON(this.dto.toJSON());
+        action(clone);
+        return new WorkflowView(WorkflowDto.fromJSON(clone));
+    }
+
+    public toUpdate(): UpdateWorkflowDto {
+        return UpdateWorkflowDto.fromJSON(this.dto.toJSON());
+    }
+}
+
+function renameInObj(target: any, name: string, newName: string) {
+    const existing = target[name];
+    if (existing) {
+        target[newName] = existing;
+        delete target[name];
+    }
+}
+
+function isLocked(name: string) {
+    return name === 'Published';
 }

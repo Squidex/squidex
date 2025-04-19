@@ -5,12 +5,12 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ContentDto, getContentValue, LanguageDto, LocalizerService, TagConverter, TagValue } from '@app/shared/internal';
+import { AppLanguageDto, ContentDto, getContentValue, LocalizerService, TagConverter, TagValue } from '@app/shared/internal';
 
 export class ReferencesTagsConverter implements TagConverter {
     public tags: ReadonlyArray<TagValue> = [];
 
-    constructor(language: LanguageDto, contents: ReadonlyArray<ContentDto>,
+    constructor(language: AppLanguageDto, contents: ReadonlyArray<ContentDto>,
         private readonly localizer: LocalizerService,
     ) {
         this.tags = this.createTags(language, contents);
@@ -28,7 +28,7 @@ export class ReferencesTagsConverter implements TagConverter {
         return result || null;
     }
 
-    private createTags(language: LanguageDto, contents: ReadonlyArray<ContentDto>): ReadonlyArray<TagValue> {
+    private createTags(language: AppLanguageDto, contents: ReadonlyArray<ContentDto>): ReadonlyArray<TagValue> {
         if (contents.length === 0) {
             return [];
         }

@@ -10,7 +10,7 @@ using Squidex.Infrastructure.UsageTracking;
 
 namespace Squidex.Areas.Api.Controllers.Statistics.Models;
 
-public sealed class CallsUsageDtoDto
+public sealed class CallsUsageDto
 {
     /// <summary>
     /// The total number of API calls.
@@ -57,9 +57,9 @@ public sealed class CallsUsageDtoDto
     /// </summary>
     public Dictionary<string, CallsUsagePerDateDto[]> Details { get; set; }
 
-    public static CallsUsageDtoDto FromDomain(Plan plan, ApiStatsSummary summary, Dictionary<string, List<ApiStats>> details)
+    public static CallsUsageDto FromDomain(Plan plan, ApiStatsSummary summary, Dictionary<string, List<ApiStats>> details)
     {
-        return new CallsUsageDtoDto
+        return new CallsUsageDto
         {
             AverageElapsedMs = summary.AverageElapsedMs,
             BlockingApiCalls = plan.BlockingApiCalls,

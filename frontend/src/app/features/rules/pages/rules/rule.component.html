@@ -89,7 +89,7 @@
                 <h3>{{ "rules.ruleSyntax.if" | sqxTranslate }}</h3>
             </div>
             <div class="col">
-                <sqx-rule-element disabled="true" [element]="ruleTriggers[rule.triggerType]" [type]="rule.triggerType"></sqx-rule-element>
+                <sqx-rule-element disabled="true" [element]="ruleTriggers[rule.trigger.triggerType]" [type]="rule.trigger.triggerType"></sqx-rule-element>
             </div>
             <div class="col-auto">
                 <h3>{{ "rules.ruleSyntax.then" | sqxTranslate }}</h3>
@@ -97,8 +97,8 @@
             <div class="col">
                 <sqx-rule-element
                     disabled="true"
-                    [element]="$any(ruleActions[rule.actionType])"
-                    [type]="rule.actionType"></sqx-rule-element>
+                    [element]="$any(ruleActions[rule.action.actionType])"
+                    [type]="rule.action.actionType"></sqx-rule-element>
             </div>
             <div class="col col-last text-end">
                 @if (isManual) {

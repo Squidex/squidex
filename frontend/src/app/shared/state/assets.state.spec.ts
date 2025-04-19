@@ -8,7 +8,7 @@
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { ErrorDto } from '@app/framework';
-import { AssetsService, AssetsState, DialogService, MathHelper, versioned } from '@app/shared/internal';
+import { AnnotateAssetDto, AssetFoldersDto, AssetsDto, AssetsService, AssetsState, CreateAssetFolderDto, DialogService, MathHelper, MoveAssetDto, MoveAssetFolderDto, RenameAssetFolderDto, RenameTagDto, versioned } from '@app/shared/internal';
 import { createAsset, createAssetFolder } from '../services/assets.service.spec';
 import { TestValues } from './_test-helpers';
 
@@ -48,12 +48,12 @@ describe('AssetsState', () => {
     describe('Loading', () => {
         beforeEach(() => {
             assetsService.setup(x => x.getAssetFolders(app, MathHelper.EMPTY_GUID, 'PathAndItems'))
-                .returns(() => of({ items: [assetFolder1, assetFolder2], path: [] })).verifiable(Times.atLeastOnce());
+                .returns(() => of(new AssetFoldersDto({ items: [assetFolder1, assetFolder2], total: 2, path: [], _links: {} }))).verifiable(Times.atLeastOnce());
         });
 
         it('should load assets', () => {
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: MathHelper.EMPTY_GUID, noSlowTotal: true }))
-                .returns(() => of({ items: [asset1, asset2], total: 200 })).verifiable();
+                .returns(() => of(new AssetsDto({ items: [asset1, asset2], total: 200, _links: {} }))).verifiable();
 
             assetsState.load().subscribe();
 
@@ -67,7 +67,7 @@ describe('AssetsState', () => {
 
         it('should show notification on load if reload is true', () => {
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: MathHelper.EMPTY_GUID, noSlowTotal: true }))
-                .returns(() => of({ items: [asset1, asset2], total: 200 })).verifiable();
+                .returns(() => of(new AssetsDto({ items: [asset1, asset2], total: 200, _links: {} }))).verifiable();
 
             assetsState.load(true).subscribe();
 
@@ -78,7 +78,7 @@ describe('AssetsState', () => {
 
         it('should load with total', () => {
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: MathHelper.EMPTY_GUID, noSlowTotal: false }))
-                .returns(() => of({ items: [asset1, asset2], total: 200 })).verifiable();
+                .returns(() => of(new AssetsDto({ items: [asset1, asset2], total: 200, _links: {} }))).verifiable();
 
             assetsState.load(true, false).subscribe();
 
@@ -89,10 +89,10 @@ describe('AssetsState', () => {
 
         it('should load without tags if tag untoggled', () => {
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, tags: ['tag1'], noSlowTotal: true }))
-                .returns(() => of({ items: [], total: 0 })).verifiable();
+            .returns(() => of(new AssetsDto({ items: [], total: 0, _links: {} }))).verifiable();
 
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: MathHelper.EMPTY_GUID, noSlowTotal: true }))
-                .returns(() => of({ items: [], total: 0 })).verifiable();
+                .returns(() => of(new AssetsDto({ items: [], total: 0, _links: {} }))).verifiable();
 
             assetsState.toggleTag('tag1').subscribe();
             assetsState.toggleTag('tag1').subscribe();
@@ -102,7 +102,7 @@ describe('AssetsState', () => {
 
         it('should load without tags if tags reset', () => {
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: MathHelper.EMPTY_GUID, noSlowTotal: true }))
-                .returns(() => of({ items: [], total: 0 })).verifiable();
+                .returns(() => of(new AssetsDto({ items: [], total: 0, _links: {} }))).verifiable();
 
             assetsState.resetTags().subscribe();
 
@@ -111,7 +111,7 @@ describe('AssetsState', () => {
 
         it('should load with new pagination if paging', () => {
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 30, parentId: MathHelper.EMPTY_GUID, noSlowTotal: true }))
-                .returns(() => of({ items: [], total: 200 })).verifiable();
+            .returns(() => of(new AssetsDto({ items: [], total: 200, _links: {} }))).verifiable();
 
             assetsState.page({ page: 1, pageSize: 30 }).subscribe();
 
@@ -120,10 +120,10 @@ describe('AssetsState', () => {
 
         it('should skip page size if loaded before', () => {
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: MathHelper.EMPTY_GUID, noSlowTotal: true }))
-                .returns(() => of({ items: [asset1, asset2], total: 200 })).verifiable();
+            .returns(() => of(new AssetsDto({ items: [asset1, asset2], total: 200, _links: {} }))).verifiable();
 
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 30, parentId: MathHelper.EMPTY_GUID, noSlowTotal: true, noTotal: true }))
-                .returns(() => of({ items: [], total: 200 })).verifiable();
+                .returns(() => of(new AssetsDto({ items: [], total: 200, _links: {} }))).verifiable();
 
             assetsState.load().subscribe();
             assetsState.page({ page: 1, pageSize: 30 }).subscribe();
@@ -135,10 +135,10 @@ describe('AssetsState', () => {
     describe('Navigating', () => {
         it('should load with parent id', () => {
             assetsService.setup(x => x.getAssetFolders(app, '123', 'PathAndItems'))
-                .returns(() => of({ items: [assetFolder1, assetFolder2], path: [] })).verifiable();
+                .returns(() => of(new AssetFoldersDto({ items: [assetFolder1, assetFolder2], total: 2, path: [], _links: {} }))).verifiable();
 
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: '123', noSlowTotal: true }))
-                .returns(() => of({ items: [], total: 200 })).verifiable();
+                .returns(() => of(new AssetsDto({ items: [], total: 200, _links: {} }))).verifiable();
 
             assetsState.navigate('123').subscribe();
 
@@ -149,7 +149,7 @@ describe('AssetsState', () => {
     describe('Searching', () => {
         it('should load with tags if tag toggled', () => {
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, tags: ['tag1'], noSlowTotal: true }))
-                .returns(() => of({ items: [], total: 0 })).verifiable();
+                .returns(() => of(new AssetsDto({ items: [], total: 0, _links: {} }))).verifiable();
 
             assetsState.toggleTag('tag1').subscribe();
 
@@ -158,7 +158,7 @@ describe('AssetsState', () => {
 
         it('should load with tags if tags selected', () => {
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, tags: ['tag1', 'tag2'], noSlowTotal: true }))
-                .returns(() => of({ items: [], total: 0 })).verifiable();
+                .returns(() => of(new AssetsDto({ items: [], total: 0, _links: {} }))).verifiable();
 
             assetsState.selectTags(['tag1', 'tag2']).subscribe();
 
@@ -169,7 +169,7 @@ describe('AssetsState', () => {
             const query = { fullText: 'my-query' };
 
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, query, noSlowTotal: true }))
-                .returns(() => of({ items: [], total: 0 })).verifiable();
+                .returns(() => of(new AssetsDto({ items: [], total: 0, _links: {} }))).verifiable();
 
             assetsState.search(query).subscribe();
 
@@ -180,7 +180,7 @@ describe('AssetsState', () => {
             const query = { fullText: 'my-query' };
 
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, query, noSlowTotal: true }))
-                .returns(() => of({ items: [], total: 0 })).verifiable();
+                .returns(() => of(new AssetsDto({ items: [], total: 0, _links: {} }))).verifiable();
 
             assetsState.next({ ref: '1' });
             assetsState.search(query).subscribe();
@@ -193,13 +193,13 @@ describe('AssetsState', () => {
     describe('Updates', () => {
         beforeEach(() => {
             assetsService.setup(x => x.getAssetFolders(app, MathHelper.EMPTY_GUID, 'PathAndItems'))
-                .returns(() => of({ items: [assetFolder1, assetFolder2], path: [] }));
+                .returns(() => of(new AssetFoldersDto({ items: [assetFolder1, assetFolder2], total: 2, path: [], _links: {} })));
 
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: MathHelper.EMPTY_GUID, noSlowTotal: true }))
-                .returns(() => of({ items: [asset1, asset2], total: 200 })).verifiable();
+                .returns(() => of(new AssetsDto({ items: [asset1, asset2], total: 200, _links: {} }))).verifiable();
 
             assetsService.setup(x => x.getAssets(app, { take: 2, skip: 0, parentId: MathHelper.EMPTY_GUID, noSlowTotal: true }))
-                .returns(() => of({ items: [asset1, asset2], total: 200 }));
+                .returns(() => of(new AssetsDto({ items: [asset1, asset2], total: 200, _links: {} })));
 
             assetsState.load(true).subscribe();
         });
@@ -267,9 +267,9 @@ describe('AssetsState', () => {
         });
 
         it('should add asset folder if created', () => {
-            const request = { folderName: 'New Folder', parentId: MathHelper.EMPTY_GUID };
+            const request = new CreateAssetFolderDto({ folderName: 'New Folder', parentId: MathHelper.EMPTY_GUID });
 
-            assetsService.setup(x => x.postAssetFolder(app, It.isValue(request)))
+            assetsService.setup(x => x.postAssetFolder(app, request))
                 .returns(() => of(newAssetFolder));
 
             assetsState.createAssetFolder(request.folderName);
@@ -280,9 +280,9 @@ describe('AssetsState', () => {
         it('should add asset folder if path has changed', () => {
             const otherPath = createAssetFolder(3, '_new', 'otherParent');
 
-            const request = { folderName: 'New Folder', parentId: MathHelper.EMPTY_GUID };
+            const request = new CreateAssetFolderDto({ folderName: 'New Folder', parentId: MathHelper.EMPTY_GUID });
 
-            assetsService.setup(x => x.postAssetFolder(app, It.isValue(request)))
+            assetsService.setup(x => x.postAssetFolder(app, request))
                 .returns(() => of(otherPath));
 
             assetsState.createAssetFolder(request.folderName);
@@ -293,7 +293,7 @@ describe('AssetsState', () => {
         it('should update asset if updated', () => {
             const updated = createAsset(1, ['new'], '_new');
 
-            const request = { fileName: 'New Name' };
+            const request = new AnnotateAssetDto({ fileName: 'New Name' });
 
             assetsService.setup(x => x.putAsset(app, asset1, request, asset1.version))
                 .returns(() => of(updated));
@@ -307,7 +307,7 @@ describe('AssetsState', () => {
         it('should update asset folder if updated', () => {
             const updated = createAssetFolder(1, '_new');
 
-            const request = { folderName: 'New Name' };
+            const request = new RenameAssetFolderDto({ folderName: 'New Name' });
 
             assetsService.setup(x => x.putAssetFolder(app, assetFolder1, request, assetFolder1.version))
                 .returns(() => of(updated));
@@ -320,7 +320,7 @@ describe('AssetsState', () => {
         it('should remove asset from snapshot if moved to other folder', () => {
             const updated = createAsset(1, ['new'], '_new');
 
-            const request = { parentId: 'newParent' };
+            const request = new MoveAssetDto({ parentId: 'newParent' });
 
             assetsService.setup(x => x.putAssetParent(app, asset1, It.isValue(request), asset1.version))
                 .returns(() => of(updated));
@@ -334,7 +334,7 @@ describe('AssetsState', () => {
         it('should add asset to snapshot if moved to current folder', () => {
             const asset3 = createAsset(3, undefined, undefined, 'oldParent');
 
-            const request = { parentId: assetsState.snapshot.parentId };
+            const request = new MoveAssetDto({ parentId: assetsState.snapshot.parentId });
 
             assetsService.setup(x => x.putAssetParent(app, asset3, It.isValue(request), asset3.version))
                 .returns(() => of(asset3));
@@ -355,7 +355,7 @@ describe('AssetsState', () => {
         });
 
         it('should move asset back to snapshot if moving via api failed', () => {
-            const request = { parentId: 'newParent' };
+            const request = new MoveAssetDto({ parentId: 'newParent' });
 
             assetsService.setup(x => x.putAssetParent(app, asset1, It.isValue(request), asset1.version))
                 .returns(() => throwError(() => 'Service Error'));
@@ -369,7 +369,7 @@ describe('AssetsState', () => {
         it('should remove asset folder from snapshot if moved to other folder', () => {
             const updated = createAssetFolder(1, '_new');
 
-            const request = { parentId: 'newParent' };
+            const request = new MoveAssetFolderDto({ parentId: 'newParent' });
 
             assetsService.setup(x => x.putAssetFolderParent(app, assetFolder1, It.isValue(request), assetFolder1.version))
                 .returns(() => of(updated));
@@ -382,7 +382,7 @@ describe('AssetsState', () => {
         it('should add asset folder to snapshot if moved to current folder', () => {
             const assetFolder3 = createAssetFolder(3, undefined, 'oldParent');
 
-            const request = { parentId: assetsState.snapshot.parentId };
+            const request = new MoveAssetFolderDto({ parentId: assetsState.snapshot.parentId });
 
             assetsService.setup(x => x.putAssetFolderParent(app, assetFolder3, It.isValue(request), assetFolder3.version))
                 .returns(() => of(assetFolder3));
@@ -393,7 +393,7 @@ describe('AssetsState', () => {
         });
 
         it('should not do anything if moving asset folder to itself', () => {
-            const request = { parentId: assetFolder1.id };
+            const request = new MoveAssetFolderDto({ parentId: assetFolder1.id });
 
             assetsState.moveAssetFolder(assetFolder1, request.parentId).pipe(onErrorResumeNextWith()).subscribe();
 
@@ -401,7 +401,7 @@ describe('AssetsState', () => {
         });
 
         it('should not do anything if moving asset folder to current parent', () => {
-            const request = { parentId: MathHelper.EMPTY_GUID };
+            const request = new MoveAssetFolderDto({ parentId: MathHelper.EMPTY_GUID });
 
             assetsState.moveAssetFolder(assetFolder1, request.parentId).pipe(onErrorResumeNextWith()).subscribe();
 
@@ -409,7 +409,7 @@ describe('AssetsState', () => {
         });
 
         it('should move asset folder back to snapshot if moving via api failed', () => {
-            const request = { parentId: 'newParent' };
+            const request = new MoveAssetFolderDto({ parentId: 'newParent' });
 
             assetsService.setup(x => x.putAssetFolderParent(app, assetFolder1, It.isValue(request), assetFolder1.version))
                 .returns(() => throwError(() => 'Service Error'));
@@ -469,14 +469,14 @@ describe('AssetsState', () => {
         });
 
         it('should replace tags if renamed', () => {
-            const newTags = {};
+            const request = new RenameTagDto({ tagName: 'new-name' });
 
-            assetsService.setup(x => x.putTag(app, 'old-name', { tagName: 'new-name' }))
-                .returns(() => of(newTags));
+            assetsService.setup(x => x.putTag(app, 'old-name', It.isValue(request)))
+                .returns(() => of({ 'new-name': 1 }));
 
             assetsState.renameTag('old-name', 'new-name').subscribe();
 
-            expect(assetsState.snapshot.tagsAvailable).toBe(newTags);
+            expect(assetsState.snapshot.tagsAvailable).toEqual({ 'new-name': 1 });
         });
     });
 });

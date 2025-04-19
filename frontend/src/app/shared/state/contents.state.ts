@@ -8,8 +8,9 @@
 import { Injectable } from '@angular/core';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, finalize, map, switchMap, tap } from 'rxjs/operators';
-import { debug, DialogService, ErrorDto, getPagingInfo, ListState, shareSubscribed, State, Types, Version, Versioned } from '@app/framework';
-import { BulkResultDto, BulkUpdateJobDto, ContentDto, ContentsDto, ContentsService, StatusInfo } from '../services/contents.service';
+import { DateTime, debug, DialogService, getPagingInfo, ListState, shareSubscribed, State, Types, Version, Versioned } from '@app/framework';
+import { BulkResultDto, ContentDto, ContentsDto, BulkUpdateContentsJobDto, ServerErrorDto, IBulkUpdateContentsJobDto, BulkUpdateContentsDto } from '../model';
+import { ContentsService, StatusInfo } from '../services/contents.service';
 import { Query } from '../services/query';
 import { AppsState } from './apps.state';
 import { SavedQuery } from './queries';
@@ -194,8 +195,6 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 }
 
                 return this.next(s => {
-                    statuses = s.statuses || statuses;
-
                     let selectedContent = s.selectedContent;
 
                     if (selectedContent) {
@@ -210,7 +209,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                         isLoading: false,
                         contents,
                         selectedContent,
-                        statuses,
+                        statuses: s.statuses || statuses,
                         total: total >= 0 ? total : s.total,
                     };
                 }, 'Loading Success');
@@ -240,7 +239,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     public validate(contents: ReadonlyArray<ContentDto>): Observable<any> {
-        const job: Partial<BulkUpdateJobDto> = { type: 'Validate' };
+        const job: Partial<BulkUpdateContentsJobDto> = { type: 'Validate' };
 
         return this.bulkMany(contents, false, job).pipe(
             tap(results => {
@@ -248,7 +247,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                     const validationResults = { ...s.validationResults || {} };
 
                     for (const result of results) {
-                        validationResults[result.contentId] = !result.error;
+                        validationResults[result.contentId!] = !result.error;
                     }
 
                     return { ...s, validationResults };
@@ -257,8 +256,8 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
-    public changeManyStatus(contents: ReadonlyArray<ContentDto>, status: string, dueTime?: string | null): Observable<any> {
-        const job: Partial<BulkUpdateJobDto> = { type: 'ChangeStatus', status, dueTime };
+    public changeManyStatus(contents: ReadonlyArray<ContentDto>, status: string, dueTime?: DateTime | undefined): Observable<any> {
+        const job: Partial<IBulkUpdateContentsJobDto> = { type: 'ChangeStatus', status, dueTime };
 
         return this.bulkWithRetry(contents, job,
                 'i18n:contents.unpublishReferrerConfirmTitle',
@@ -268,7 +267,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     public deleteMany(contents: ReadonlyArray<ContentDto>) {
-        const job: Partial<BulkUpdateJobDto> = { type: 'Delete' };
+        const job: Partial<IBulkUpdateContentsJobDto> = { type: 'Delete' };
 
         return this.bulkWithRetry(contents, job,
                 'i18n:contents.deleteReferrerConfirmTitle',
@@ -358,8 +357,8 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             }));
     }
 
-    private replaceContent(content: ContentDto, oldVersion?: Version, updateText?: string) {
-        if (!oldVersion || !oldVersion.eq(content.version)) {
+    private replaceContent(content: ContentDto, oldVersion?: number, updateText?: string) {
+        if (!oldVersion || oldVersion != content.version) {
             if (updateText) {
                 this.dialogs.notifyInfo(updateText);
             }
@@ -379,7 +378,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
         return false;
     }
 
-    private bulkWithRetry(contents: ReadonlyArray<ContentDto>, job: Partial<BulkUpdateJobDto>, confirmTitle: string, confirmText: string, confirmKey: string): Observable<ReadonlyArray<BulkResultDto>> {
+    private bulkWithRetry(contents: ReadonlyArray<ContentDto>, job: Partial<IBulkUpdateContentsJobDto>, confirmTitle: string, confirmText: string, confirmKey: string): Observable<ReadonlyArray<BulkResultDto>> {
         return this.bulkMany(contents, true, job).pipe(
             switchMap(results => {
                 const referrerFailures = results.filter(x => isReferrerError(x.error));
@@ -414,27 +413,27 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                     if (errors.length >= contents.length) {
                         throw error;
                     } else {
-                        this.dialogs.notifyError(error);
+                        this.dialogs.notifyError(error.toError());
                     }
                 }
             }));
     }
 
-    private bulkMany(contents: ReadonlyArray<ContentDto>, checkReferrers: boolean, job: Partial<BulkUpdateJobDto>): Observable<ReadonlyArray<BulkResultDto>> {
-        const update = {
+    private bulkMany(contents: ReadonlyArray<ContentDto>, checkReferrers: boolean, job: Partial<IBulkUpdateContentsJobDto>): Observable<ReadonlyArray<BulkResultDto>> {
+        const update = new BulkUpdateContentsDto({
             // This is set to true by default, so we turn it off here.
             optimizeValidation: false,
-            dotNotValidate: false,
+            doNotValidate: false,
             doNotScript: false,
-            jobs: contents.map(x => ({
+            jobs: contents.map(x => new BulkUpdateContentsJobDto(({
                 id: x.id,
                 schema: x.schemaName,
                 status: undefined,
-                expectedVersion: parseInt(x.version.value, 10),
+                expectedVersion: x.version,
                 ...job,
-            })),
+            }))),
             checkReferrers,
-        };
+        });
 
         return this.contentsService.bulkUpdate(this.appName, this.schemaName, update as any);
     }
@@ -442,7 +441,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     public abstract get schemaName(): string;
 }
 
-function isReferrerError(error?: ErrorDto) {
+function isReferrerError(error?: ServerErrorDto) {
     return error?.errorCode === 'OBJECT_REFERENCED';
 }
 

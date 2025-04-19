@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { DateTimeEditorComponent, DateTimeFieldPropertiesDto, FieldDto, FormHintComponent, hasNoValue$, LanguageDto, LocalizedInputComponent, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { AppLanguageDto, DateTimeEditorComponent, DateTimeFieldPropertiesDto, FieldDto, FormHintComponent, hasNoValue$, LocalizedInputComponent, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 
 const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['Now', 'Today'];
 
@@ -39,7 +39,7 @@ export class DateTimeValidationComponent {
     public properties!: DateTimeFieldPropertiesDto;
 
     @Input({ required: true })
-    public languages!: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input({ transform: booleanAttribute })
     public isLocalizable?: boolean | null;

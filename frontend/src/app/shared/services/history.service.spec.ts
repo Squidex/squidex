@@ -10,7 +10,7 @@ import { HttpTestingController, provideHttpClientTesting } from '@angular/common
 import { inject, TestBed } from '@angular/core/testing';
 import { firstValueFrom, of } from 'rxjs';
 import { IMock, Mock } from 'typemoq';
-import { ApiUrlConfig, DateTime, formatHistoryMessage, HistoryEventDto, HistoryService, UsersProviderService, Version } from '@app/shared/internal';
+import { ApiUrlConfig, DateTime, formatHistoryMessage, HistoryEventDto, HistoryService, UserDto, UsersProviderService } from '@app/shared/internal';
 
 describe('formatHistoryMessage', () => {
     let userProvider: IMock<UsersProviderService>;
@@ -57,7 +57,7 @@ describe('formatHistoryMessage', () => {
 
     it('should embed user ref with subject', async () => {
         userProvider.setup(x => x.getUser('1', null))
-            .returns(() => of({ id: '1', displayName: 'User1' }));
+            .returns(() => of(new UserDto({ id: '1', displayName: 'User1' } as any)));
 
         const message = await firstValueFrom(formatHistoryMessage('{user:subject:1}', userProvider.object));
 
@@ -66,7 +66,7 @@ describe('formatHistoryMessage', () => {
 
     it('should embed user ref with id', async () => {
         userProvider.setup(x => x.getUser('1', null))
-            .returns(() => of({ id: '1', displayName: 'User1' }));
+            .returns(() => of(new UserDto({ id: '1', displayName: 'User1' } as any)));
 
         const message = await firstValueFrom(formatHistoryMessage('{user:1}', userProvider.object));
 
@@ -126,32 +126,46 @@ describe('HistoryService', () => {
 
             expect(events!).toEqual(createHistory());
         }));
+
+        function historyResponse() {
+            return [
+                {
+                    actor: 'User1',
+                    created: '2016-12-12T10:10',
+                    eventId: '1',
+                    eventType: 'Type 1',
+                    message: 'Message 1',
+                    version: 2,
+                },
+                {
+                    actor: 'User2',
+                    created: '2016-12-13T10:10',
+                    eventId: '2',
+                    eventType: 'Type 2',
+                    message: 'Message 2',
+                    version: 3,
+                },
+            ];
+        }
 });
 
 export function createHistory() {
     return [
-        new HistoryEventDto('1', 'User1', 'Type 1', 'Message 1', DateTime.parseISO('2016-12-12T10:10Z'), new Version('2')),
-        new HistoryEventDto('2', 'User2', 'Type 2', 'Message 2', DateTime.parseISO('2016-12-13T10:10Z'), new Version('3')),
-    ];
-}
-
-function historyResponse() {
-    return [
-        {
+        new HistoryEventDto({
             actor: 'User1',
+            created: DateTime.parseISO('2016-12-12T10:10'),
             eventId: '1',
             eventType: 'Type 1',
             message: 'Message 1',
             version: 2,
-            created: '2016-12-12T10:10',
-        },
-        {
+        }),
+        new HistoryEventDto({
             actor: 'User2',
+            created: DateTime.parseISO('2016-12-13T10:10'),
             eventId: '2',
             eventType: 'Type 2',
             message: 'Message 2',
             version: 3,
-            created: '2016-12-13T10:10',
-        },
+        }),
     ];
 }

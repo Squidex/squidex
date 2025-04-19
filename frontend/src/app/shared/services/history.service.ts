@@ -9,20 +9,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { firstValueFrom, from, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiUrlConfig, DateTime, escapeHTML, pretifyError, StringHelper, Version } from '@app/framework';
+import { ApiUrlConfig, escapeHTML, pretifyError, StringHelper } from '@app/framework';
+import { HistoryEventDto } from './../model';
 import { UsersProviderService } from './users-provider.service';
-
-export class HistoryEventDto {
-    constructor(
-        public readonly eventId: string,
-        public readonly actor: string,
-        public readonly eventType: string,
-        public readonly message: string,
-        public readonly created: DateTime,
-        public readonly version: Version,
-    ) {
-    }
-}
 
 export function formatHistoryMessage(message: string, users: UsersProviderService): Observable<string> {
     async function getUserName(id: string): Promise<string> {
@@ -91,7 +80,7 @@ export class HistoryService {
 
         return this.http.get<any[]>(url, options).pipe(
             map(body => {
-                return parseHistoryEvents(body);
+                return body.map(HistoryEventDto.fromJSON);
             }),
             pretifyError('i18n:history.loadFailed'));
     }
@@ -107,22 +96,8 @@ export class HistoryService {
 
         return this.http.get<any[]>(url, options).pipe(
             map(body => {
-                return parseHistoryEvents(body);
+                return body.map(HistoryEventDto.fromJSON);
             }),
             pretifyError('i18n:history.loadFailed'));
     }
-}
-
-function parseHistoryEvents(response: any[]) {
-    return response.map(parseHistoryEvent);
-}
-
-function parseHistoryEvent(response: any) {
-    return new HistoryEventDto(
-        response.eventId,
-        response.actor,
-        response.eventType,
-        response.message,
-        DateTime.parseISO(response.created),
-        new Version(response.version.toString()));
 }

@@ -21,7 +21,6 @@ public sealed class TagByGroupNameProcessor : IOperationProcessor
         if (!string.IsNullOrWhiteSpace(groupName))
         {
             context.OperationDescription.Operation.Tags = [groupName];
-
             return true;
         }
         else

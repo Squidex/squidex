@@ -92,20 +92,21 @@ export class MorePageComponent implements OnInit {
         }
 
         const value = this.updateForm.submit();
-
-        if (value) {
-            this.appsState.update(this.app, value)
-                .subscribe({
-                    next: app => {
-                        this.updateForm.submitCompleted({ newValue: app });
-                    },
-                    error: error => {
-                        this.dialogs.notifyError(error);
-
-                        this.updateForm.submitFailed(error);
-                    },
-                });
+        if (!value) {
+            return;
         }
+
+        this.appsState.update(this.app, value)
+            .subscribe({
+                next: app => {
+                    this.updateForm.submitCompleted({ newValue: app });
+                },
+                error: error => {
+                    this.dialogs.notifyError(error);
+
+                    this.updateForm.submitFailed(error);
+                },
+            });
     }
 
     public transfer() {
@@ -114,20 +115,21 @@ export class MorePageComponent implements OnInit {
         }
 
         const value = this.transferForm.submit();
-
-        if (value) {
-            this.appsState.transfer(this.app, value.teamId)
-                .subscribe({
-                    next: app => {
-                        this.transferForm.submitCompleted({ newValue: app });
-                    },
-                    error: error => {
-                        this.dialogs.notifyError(error);
-
-                        this.transferForm.submitFailed(error);
-                    },
-                });
+        if (!value) {
+            return;
         }
+
+        this.appsState.transfer(this.app, value)
+            .subscribe({
+                next: app => {
+                    this.transferForm.submitCompleted({ newValue: app });
+                },
+                error: error => {
+                    this.dialogs.notifyError(error);
+
+                    this.transferForm.submitFailed(error);
+                },
+            });
     }
 
     public uploadImage(file: ReadonlyArray<File>) {

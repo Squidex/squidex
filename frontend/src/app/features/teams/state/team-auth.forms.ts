@@ -12,7 +12,7 @@ import { map, shareReplay } from 'rxjs/operators';
 import { ExtendedFormGroup, Form, value$ } from '@app/framework';
 import { AuthSchemeDto } from '@app/shared';
 
-export class UpdateTeamAuthForm extends Form<ExtendedFormGroup, AuthSchemeDto, AuthSchemeDto> {
+export class UpdateTeamAuthForm extends Form<ExtendedFormGroup, AuthSchemeDto, Partial<AuthSchemeDto>> {
     public get domain() {
         return this.form.controls['domain'];
     }

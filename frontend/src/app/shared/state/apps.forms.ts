@@ -9,7 +9,7 @@
 
 import { UntypedFormControl, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form, TemplatedFormArray, ValidatorsEx } from '@app/framework';
-import { AppDto, AppSettingsDto, CreateAppDto, TransferToTeamDto, UpdateAppDto, UpdateAppSettingsDto } from '../services/apps.service';
+import { AppDto, AppSettingsDto, CreateAppDto, EditorDto, PatternDto, TransferToTeamDto, UpdateAppDto, UpdateAppSettingsDto } from '../model';
 
 export class CreateAppForm extends Form<ExtendedFormGroup, CreateAppDto> {
     constructor() {
@@ -21,6 +21,10 @@ export class CreateAppForm extends Form<ExtendedFormGroup, CreateAppDto> {
             ]),
         }));
     }
+
+    protected transformSubmit(value: any) {
+        return new CreateAppDto(value);
+    }
 }
 
 export class TransferAppForm extends Form<ExtendedFormGroup, TransferToTeamDto, AppDto> {
@@ -28,6 +32,10 @@ export class TransferAppForm extends Form<ExtendedFormGroup, TransferToTeamDto, 
         super(new ExtendedFormGroup({
             teamId: new UntypedFormControl(''),
         }));
+    }
+
+    protected transformSubmit(value: any) {
+        return new TransferToTeamDto(value);
     }
 }
 
@@ -41,6 +49,10 @@ export class UpdateAppForm extends Form<ExtendedFormGroup, UpdateAppDto, AppDto>
                 Validators.nullValidator,
             ),
         }));
+    }
+
+    protected transformSubmit(value: any) {
+        return new UpdateAppDto(value);
     }
 }
 
@@ -76,6 +88,18 @@ export class EditAppSettingsForm extends Form<ExtendedFormGroup, UpdateAppSettin
                 EditorTemplate.INSTANCE,
             ),
         }));
+    }
+
+    protected transformSubmit(value: Record<string, any> & { editors: any[]; patterns: any[] }) {
+        const { editors, patterns, ...other } = value;
+
+        return new UpdateAppSettingsDto({
+            ...other,
+            editors: editors.map(x =>
+                new EditorDto(x)),
+            patterns: patterns.map(x =>
+                new PatternDto(x)),
+        });
     }
 }
 

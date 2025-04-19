@@ -138,13 +138,13 @@ internal sealed class OperationBuilder(OperationsBuilder operations, OpenApiOper
     {
         var fullId = PermissionIds.ForApp(permissionId, operations.Parent.AppName, operations.SchemaName).Id;
 
-        operation.Security = new List<OpenApiSecurityRequirement>
-        {
+        operation.Security =
+        [
             new OpenApiSecurityRequirement
             {
                 [Constants.SecurityDefinition] = [fullId],
             },
-        };
+        ];
 
         return this;
     }
