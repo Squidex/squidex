@@ -9,7 +9,7 @@
 
 import { UntypedFormControl, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form, hasNoValue$, ValidatorsEx } from '@app/framework';
-import { ClientDto, CreateClientDto, UpdateClientDto } from '../services/clients.service';
+import { ClientDto, CreateClientDto, UpdateClientDto } from '../model';
 
 export class RenameClientForm extends Form<ExtendedFormGroup, UpdateClientDto, ClientDto> {
     constructor() {
@@ -18,6 +18,10 @@ export class RenameClientForm extends Form<ExtendedFormGroup, UpdateClientDto, C
                 Validators.required,
             ),
         }));
+    }
+
+    protected transformSubmit(value: any) {
+        return new UpdateClientDto(value);
     }
 }
 
@@ -35,5 +39,9 @@ export class AddClientForm extends Form<ExtendedFormGroup, CreateClientDto> {
                 ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'i18n:clients.clientIdValidationMessage'),
             ]),
         }));
+    }
+
+    protected transformSubmit(value: any) {
+        return new CreateClientDto(value);
     }
 }

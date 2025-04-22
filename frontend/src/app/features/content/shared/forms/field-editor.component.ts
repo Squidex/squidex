@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, Component, ElementRef, EventEmitter, Input, numberAttribute, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { AbstractContentForm, AnnotationCreate, AnnotationsSelect, AppLanguageDto, ChatDialogComponent, CheckboxGroupComponent, CodeEditorComponent, ColorPickerComponent, CommentsState, ConfirmClickDirective, ControlErrorsComponent, DateTimeEditorComponent, DialogModel, disabled$, EditContentForm, FieldDto, FormHintComponent, GeolocationEditorComponent, hasNoValue$, HTTP, IndeterminateValueDirective, MarkdownDirective, MathHelper, MessageBus, ModalDirective, RadioGroupComponent, ReferenceInputComponent, RichEditorComponent, StarsComponent, TagEditorComponent, ToggleComponent, TooltipDirective, TransformInputDirective, TypedSimpleChanges, Types } from '@app/shared';
+import { AbstractContentForm, AnnotationCreate, AnnotationsSelect, AnyFieldDto, AppLanguageDto, ChatDialogComponent, CheckboxGroupComponent, CodeEditorComponent, ColorPickerComponent, CommentsState, ConfirmClickDirective, ControlErrorsComponent, DateTimeEditorComponent, DialogModel, disabled$, EditContentForm, FormHintComponent, GeolocationEditorComponent, hasNoValue$, HTTP, IndeterminateValueDirective, MarkdownDirective, MathHelper, MessageBus, ModalDirective, RadioGroupComponent, ReferenceInputComponent, RichEditorComponent, StarsComponent, TagEditorComponent, ToggleComponent, TooltipDirective, TransformInputDirective, TypedSimpleChanges, Types } from '@app/shared';
 import { ReferenceDropdownComponent } from '../references/reference-dropdown.component';
 import { ReferencesCheckboxesComponent } from '../references/references-checkboxes.component';
 import { ReferencesEditorComponent } from '../references/references-editor.component';
@@ -84,7 +84,7 @@ export class FieldEditorComponent {
     public formLevel!: number;
 
     @Input({ required: true })
-    public formModel!: AbstractContentForm<FieldDto, AbstractControl>;
+    public formModel!: AbstractContentForm<AnyFieldDto, AbstractControl>;
 
     @Input({ required: true })
     public language!: AppLanguageDto;
@@ -142,17 +142,18 @@ export class FieldEditorComponent {
 
     public reset() {
         const editor = this.editor as any;
+        if (!editor) {
+            return;
+        }
 
-        if (editor) {
-            const nativeElement = this.editor.nativeElement;
+        const nativeElement = this.editor.nativeElement;
 
-            if (nativeElement && Types.isFunction(nativeElement['reset'])) {
-                nativeElement['reset']();
-            }
+        if (nativeElement && Types.isFunction(nativeElement['reset'])) {
+            nativeElement['reset']();
+        }
 
-            if (this.editor && Types.isFunction(editor['reset'])) {
-                editor['reset']();
-            }
+        if (this.editor && Types.isFunction(editor['reset'])) {
+            editor['reset']();
         }
     }
 

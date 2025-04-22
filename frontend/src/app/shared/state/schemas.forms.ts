@@ -10,8 +10,7 @@
 import { AbstractControl, UntypedFormControl, Validators } from '@angular/forms';
 import { map } from 'rxjs/operators';
 import { ExtendedFormGroup, Form, TemplatedFormArray, ValidatorsEx, value$ } from '@app/framework';
-import { AddFieldDto, CreateSchemaDto, FieldRule, SchemaDto, SchemaPropertiesDto, SynchronizeSchemaDto, UpdateSchemaDto } from '../services/schemas.service';
-import { createProperties, FieldPropertiesDto, FieldPropertiesVisitor } from '../services/schemas.types';
+import { AddFieldDto, ConfigureFieldRulesDto, createProperties, CreateSchemaDto, FieldPropertiesDto, FieldPropertiesVisitor, FieldRuleDto, SchemaDto, SchemaPropertiesDto, SynchronizeSchemaDto, UpdateSchemaDto } from '../model';
 
 type CreateCategoryFormType = { name: string };
 
@@ -51,10 +50,10 @@ export class CreateSchemaForm extends Form<ExtendedFormGroup, CreateSchemaDto> {
         return { name, type, importing, initialCategory: category };
     }
 
-    public transformSubmit(value: any): CreateSchemaDto {
+    public transformSubmit(value: any) {
         const { name, type, importing, initialCategory } = value;
 
-        return { name, type, category: initialCategory, ...importing };
+        return new CreateSchemaDto({ name, type, category: initialCategory, ...importing });
     }
 }
 
@@ -78,15 +77,15 @@ export class SynchronizeSchemaForm extends Form<ExtendedFormGroup, SynchronizeSc
     }
 
     public transformSubmit(value: any) {
-        return {
+        return SynchronizeSchemaDto.fromJSON({
             ...value.json,
             noFieldDeletion: !value.fieldsDelete,
             noFieldRecreation: !value.fieldsRecreate,
-        };
+        });
     }
 }
 
-export class ConfigureFieldRulesForm extends Form<TemplatedFormArray, ReadonlyArray<FieldRule>, SchemaDto> {
+export class ConfigureFieldRulesForm extends Form<TemplatedFormArray, ConfigureFieldRulesDto, SchemaDto> {
     public get rulesControls(): ReadonlyArray<ExtendedFormGroup> {
         return this.form.controls as any;
     }
@@ -105,6 +104,10 @@ export class ConfigureFieldRulesForm extends Form<TemplatedFormArray, ReadonlyAr
 
     public transformLoad(value: Partial<SchemaDto>) {
         return value.fieldRules || [];
+    }
+
+    public transformSubmit(value: any[]) {
+        return new ConfigureFieldRulesDto({ fieldRules: value.map(x => new FieldRuleDto(x)) });
     }
 }
 
@@ -126,9 +129,7 @@ class FieldRuleTemplate {
     }
 }
 
-type ConfigurePreviewUrlsFormType = { [name: string]: string };
-
-export class ConfigurePreviewUrlsForm extends Form<TemplatedFormArray, ConfigurePreviewUrlsFormType, SchemaDto> {
+export class ConfigurePreviewUrlsForm extends Form<TemplatedFormArray, Record<string, string>, SchemaDto> {
     public get previewControls(): ReadonlyArray<ExtendedFormGroup> {
         return this.form.controls as any;
     }
@@ -412,9 +413,13 @@ export class EditSchemaForm extends Form<ExtendedFormGroup, UpdateSchemaDto, Sch
             ),
         }));
     }
+
+    public transformSubmit(value: any) {
+        return new UpdateSchemaDto(value);
+    }
 }
 
-export class AddFieldForm extends Form<ExtendedFormGroup, AddFieldDto> {
+export class AddFieldForm extends Form<ExtendedFormGroup, AddFieldDto, Partial<AddFieldDto>> {
     public isContentField = value$(this.form.controls['type']).pipe(map(x => x !== 'UI'));
 
     constructor() {
@@ -452,6 +457,6 @@ export class AddFieldForm extends Form<ExtendedFormGroup, AddFieldDto> {
         const properties = createProperties(type);
         const partitioning = isLocalizable ? 'language' : 'invariant';
 
-        return { name, partitioning, properties };
+        return new AddFieldDto({ name, partitioning, properties });
     }
 }

@@ -7,7 +7,7 @@
 
 import { firstValueFrom, of, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { AppsService, AppsState, DialogService } from '@app/shared/internal';
+import { AppsService, AppsState, CreateAppDto, DialogService, UpdateAppDto } from '@app/shared/internal';
 import { createApp, createAppSettings } from '../services/apps.service.spec';
 
 describe('AppsState', () => {
@@ -104,7 +104,7 @@ describe('AppsState', () => {
     it('should add app to snapshot if created', () => {
         const updated = createApp(3, '_new');
 
-        const request = { ...updated };
+        const request = new CreateAppDto({ ...updated });
 
         appsService.setup(x => x.postApp(request))
             .returns(() => of(updated)).verifiable();
@@ -115,7 +115,7 @@ describe('AppsState', () => {
     });
 
     it('should update app if updated', () => {
-        const request = {};
+        const request = new UpdateAppDto({});
 
         const updated = createApp(2, '_new');
 
@@ -200,7 +200,7 @@ describe('AppsState', () => {
         });
 
         it('should update selected app if updated', () => {
-            const request = {};
+            const request = new UpdateAppDto({});
 
             const updated = createApp(1, '_new');
 

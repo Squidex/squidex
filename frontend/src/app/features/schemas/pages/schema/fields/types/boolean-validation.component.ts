@@ -9,7 +9,7 @@
 import { booleanAttribute, Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { BooleanFieldPropertiesDto, FieldDto, FormHintComponent, hasNoValue$, IndeterminateValueDirective, LanguageDto, LocalizedInputComponent, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { AppLanguageDto, BooleanFieldPropertiesDto, FieldDto, FormHintComponent, hasNoValue$, IndeterminateValueDirective, LocalizedInputComponent, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -36,7 +36,7 @@ export class BooleanValidationComponent {
     public properties!: BooleanFieldPropertiesDto;
 
     @Input({ required: true })
-    public languages!: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input({ transform: booleanAttribute })
     public isLocalizable?: boolean | null;

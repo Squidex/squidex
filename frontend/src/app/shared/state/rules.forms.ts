@@ -7,9 +7,9 @@
 
 import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form, TemplatedFormArray, ValidatorsEx } from '@app/framework';
-import { RuleElementDto, TriggerType } from '../services/rules.service';
+import { RuleElementDto, RuleTriggerDto } from '../model';
 
-export class ActionForm extends Form<any, UntypedFormGroup> {
+export class ActionForm extends Form<UntypedFormGroup, Record<string, any>> {
     constructor(public readonly definition: RuleElementDto,
         public readonly actionType: string,
     ) {
@@ -44,9 +44,9 @@ export class ActionForm extends Form<any, UntypedFormGroup> {
     }
 }
 
-export class TriggerForm extends Form<any, UntypedFormGroup> {
+export class TriggerForm extends Form<UntypedFormGroup, RuleTriggerDto> {
     constructor(
-        public readonly triggerType: TriggerType,
+        public readonly triggerType: string,
     ) {
         super(TriggerForm.builForm(triggerType));
     }
@@ -86,10 +86,10 @@ export class TriggerForm extends Form<any, UntypedFormGroup> {
         }
     }
 
-    protected transformSubmit(value: any): any {
+    protected transformSubmit(value: any) {
         value.triggerType = this.triggerType;
 
-        return value;
+        return RuleTriggerDto.fromJSON(value);
     }
 }
 

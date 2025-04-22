@@ -75,17 +75,18 @@ export class SettingsPageComponent implements OnInit {
         }
 
         const value = this.editForm.submit();
-
-        if (value) {
-            this.appsState.updateSettings(this.editingSettings, value)
-                .subscribe({
-                    next: () => {
-                        this.editForm.submitCompleted({ noReset: true });
-                    },
-                    error: error => {
-                        this.editForm.submitFailed(error);
-                    },
-                });
+        if (!value) {
+            return;
         }
+
+        this.appsState.updateSettings(this.editingSettings, value)
+            .subscribe({
+                next: () => {
+                    this.editForm.submitCompleted({ noReset: true });
+                },
+                error: error => {
+                    this.editForm.submitFailed(error);
+                },
+            });
     }
 }

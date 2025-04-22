@@ -6,7 +6,7 @@
  */
 
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
-import { ListViewComponent, ResourceLoaderService, WorkflowDto } from '@app/shared';
+import { ListViewComponent, ResourceLoaderService, WorkflowView } from '@app/shared';
 
 declare const vis: any;
 
@@ -26,7 +26,7 @@ export class WorkflowDiagramComponent implements AfterViewInit, OnDestroy {
     public chartContainer!: ElementRef;
 
     @Input({ required: true })
-    public workflow!: WorkflowDto;
+    public workflow!: WorkflowView;
 
     public isLoaded = false;
 
@@ -65,21 +65,21 @@ export class WorkflowDiagramComponent implements AfterViewInit, OnDestroy {
     }
 }
 
-function buildGraph(workflow: WorkflowDto) {
+function buildGraph(workflow: WorkflowView) {
     const nodes = new vis.DataSet();
 
     for (const step of workflow.steps) {
         let label = `<b>${step.name}</b>`;
 
-        if (step.noUpdate) {
+        if (step.values.noUpdate) {
             label += '\nPrevent updates';
 
-            if (step.noUpdateExpression) {
-                label += `\nwhen (${step.noUpdateExpression})`;
+            if (step.values.noUpdateExpression) {
+                label += `\nwhen (${step.values.noUpdateExpression})`;
             }
 
-            if (step.noUpdateRoles && step.noUpdateRoles.length > 0) {
-                label += `\nfor ${step.noUpdateRoles.join(', ')}`;
+            if (step.values.noUpdateRoles && step.values.noUpdateRoles.length > 0) {
+                label += `\nfor ${step.values.noUpdateRoles.join(', ')}`;
             }
         }
 
@@ -87,12 +87,12 @@ function buildGraph(workflow: WorkflowDto) {
             label += '\nAvailable in the API';
         }
 
-        const node: any = { id: step.name, label, color: step.color };
+        const node: any = { id: step.name, label, color: step.values.color };
 
         nodes.add(node);
     }
 
-    if (workflow.initial) {
+    if (workflow.dto.initial) {
         nodes.add({ id: 0, color: '#000', label: 'Start', shape: 'dot', size: 3 });
     }
 
@@ -101,12 +101,12 @@ function buildGraph(workflow: WorkflowDto) {
     for (const transition of workflow.transitions) {
         let label = '';
 
-        if (transition.expression) {
-            label += `\nwhen (${transition.expression})`;
+        if (transition.values.expression) {
+            label += `\nwhen (${transition.values.expression})`;
         }
 
-        if (transition.roles && transition.roles.length > 0) {
-            label += `\nfor ${transition.roles.join(', ')}`;
+        if (transition.values.roles && transition.values.roles.length > 0) {
+            label += `\nfor ${transition.values.roles.join(', ')}`;
         }
 
         const edge: any = { ...transition, label };
@@ -114,8 +114,8 @@ function buildGraph(workflow: WorkflowDto) {
         edges.add(edge);
     }
 
-    if (workflow.initial) {
-        edges.add({ from: 0, to: workflow.initial });
+    if (workflow.dto.initial) {
+        edges.add({ from: 0, to: workflow.dto.initial });
     }
 
     return { edges, nodes };

@@ -9,7 +9,7 @@
 /* eslint-disable no-useless-return */
 
 import { Types } from '@app/framework';
-import { FieldRule, SchemaDto } from '../services/schemas.service';
+import { FieldRuleDto, SchemaDto } from './../model';
 
 export type RuleContext = { data: any; user?: any };
 export type RuleForm = { fieldPath: string };
@@ -36,7 +36,7 @@ export class CompiledRule {
     }
 
     constructor(
-        private readonly rule: FieldRule,
+        private readonly rule: FieldRuleDto,
         private readonly useItemData: boolean,
     ) {
         try {

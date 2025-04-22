@@ -10,7 +10,7 @@ import { Component, OnInit } from '@angular/core';
 import { AbstractControl, FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { debounceTime, Subscription } from 'rxjs';
-import { ActionForm, ALL_TRIGGERS, ConfirmClickDirective, FormAlertComponent, KeysPipe, LayoutComponent, ListViewComponent, MessageBus, RuleDto, RuleElementDto, RulesService, RulesState, SchemasState, SidebarMenuDirective, Subscriptions, TitleComponent, ToggleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe, TriggerForm, TriggerType, value$ } from '@app/shared';
+import { ActionForm, ALL_TRIGGERS, ConfirmClickDirective, DynamicCreateRuleDto, DynamicRuleDto, DynamicUpdateRuleDto, FormAlertComponent, KeysPipe, LayoutComponent, ListViewComponent, MessageBus, RuleElementDto, RulesService, RulesState, SchemasState, SidebarMenuDirective, Subscriptions, TitleComponent, ToggleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe, TriggerForm, value$ } from '@app/shared';
 import { GenericActionComponent } from '../../shared/actions/generic-action.component';
 import { RuleElementComponent } from '../../shared/rule-element.component';
 import { AssetChangedTriggerComponent } from '../../shared/triggers/asset-changed-trigger.component';
@@ -60,7 +60,7 @@ export class RulePageComponent implements OnInit {
     public supportedTriggers = ALL_TRIGGERS;
     public supportedActions: { [name: string]: RuleElementDto } = {};
 
-    public rule?: RuleDto | null;
+    public rule?: DynamicRuleDto | null;
 
     public currentTrigger?: TriggerForm;
     public currentAction?: ActionForm;
@@ -69,7 +69,7 @@ export class RulePageComponent implements OnInit {
     public isEditable = false;
 
     public get isManual() {
-        return this.rule?.triggerType === 'Manual';
+        return this.rule?.trigger.triggerType === 'Manual';
     }
 
     public get actionElement() {
@@ -77,7 +77,7 @@ export class RulePageComponent implements OnInit {
     }
 
     public get triggerElement() {
-        return this.supportedTriggers[(this.currentTrigger?.triggerType || '') as TriggerType];
+        return this.supportedTriggers[this.currentTrigger!.triggerType];
     }
 
     constructor(
@@ -94,7 +94,6 @@ export class RulePageComponent implements OnInit {
         this.rulesService.getActions()
             .subscribe(actions => {
                 this.supportedActions = actions;
-
                 this.initFromRule();
             });
 
@@ -102,7 +101,6 @@ export class RulePageComponent implements OnInit {
             this.rulesState.selectedRule
                 .subscribe(rule => {
                     this.rule = rule;
-
                     this.initFromRule();
                 }));
 
@@ -114,8 +112,8 @@ export class RulePageComponent implements OnInit {
             this.isEditable = this.rule.canUpdate;
             this.isEnabled = this.rule.isEnabled;
 
-            this.selectAction(this.rule.actionType, this.rule.action);
-            this.selectTrigger(this.rule.triggerType, this.rule.trigger);
+            this.selectAction(this.rule.action.actionType, this.rule.action);
+            this.selectTrigger(this.rule.trigger.triggerType, this.rule.trigger);
         } else {
             this.isEditable = true;
             this.isEnabled = false;
@@ -140,7 +138,7 @@ export class RulePageComponent implements OnInit {
         }
     }
 
-    public selectTrigger(type: TriggerType, values?: any) {
+    public selectTrigger(type: string, values?: any) {
         if (this.currentTrigger?.triggerType !== type) {
             this.currentTrigger = new TriggerForm(type);
             this.currentTrigger.setEnabled(this.isEditable);
@@ -175,20 +173,18 @@ export class RulePageComponent implements OnInit {
         }
 
         const action = this.currentAction.submit();
-
         if (!action) {
             return;
         }
 
         const trigger = this.currentTrigger.submit();
-
         if (!trigger || !action) {
             return;
         }
 
-        const request: any = { trigger, action, isEnabled: this.isEnabled };
-
         if (this.rule) {
+            const request = new DynamicUpdateRuleDto({ trigger, action, isEnabled: this.isEnabled });
+
             this.rulesState.update(this.rule, request)
                 .subscribe({
                     next: () => {
@@ -199,6 +195,8 @@ export class RulePageComponent implements OnInit {
                     },
                 });
         } else {
+            const request = new DynamicCreateRuleDto({ trigger, action });
+
             this.rulesState.create(request)
                 .subscribe({
                     next: rule => {

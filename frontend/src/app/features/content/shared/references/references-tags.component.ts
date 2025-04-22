@@ -8,7 +8,7 @@
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { ContentDto, ContentsDto, LanguageDto, LocalizerService, ResolveContents, StatefulControlComponent, Subscriptions, TagEditorComponent, TranslatePipe, TypedSimpleChanges, Types } from '@app/shared';
+import { AppLanguageDto, ContentDto, ContentsDto, LocalizerService, ResolveContents, StatefulControlComponent, Subscriptions, TagEditorComponent, TranslatePipe, TypedSimpleChanges, Types } from '@app/shared';
 import { ReferencesTagsConverter } from './references-tag-converter';
 
 export const SQX_REFERENCES_TAGS_CONTROL_VALUE_ACCESSOR: any = {
@@ -51,10 +51,10 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
     public schemaId!: string;
 
     @Input({ required: true })
-    public language!: LanguageDto;
+    public language!: AppLanguageDto;
 
     @Input({ required: true })
-    public languages!: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {

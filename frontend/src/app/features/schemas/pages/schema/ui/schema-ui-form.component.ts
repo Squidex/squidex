@@ -7,7 +7,7 @@
 
 import { Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { SchemaDto, SchemasState, TranslatePipe } from '@app/shared';
+import { ConfigureUIFieldsDto, SchemaDto, SchemasState, TranslatePipe } from '@app/shared';
 import { FieldListComponent } from './field-list.component';
 
 @Component({
@@ -29,8 +29,8 @@ export class SchemaUIFormComponent {
 
     public isEditable = false;
 
-    public fieldsInLists: ReadonlyArray<string> = [];
-    public fieldsInReferences: ReadonlyArray<string> = [];
+    public fieldsInLists: string[] = [];
+    public fieldsInReferences: string[] = [];
 
     constructor(
         private readonly schemasState: SchemasState,
@@ -44,11 +44,11 @@ export class SchemaUIFormComponent {
         this.fieldsInReferences = this.schema.fieldsInReferences;
     }
 
-    public setFieldsInLists(names: ReadonlyArray<string>) {
+    public setFieldsInLists(names: string[]) {
         this.fieldsInLists = names;
     }
 
-    public setFieldsInReferences(names: ReadonlyArray<string>) {
+    public setFieldsInReferences(names: string[]) {
         this.fieldsInReferences = names;
     }
 
@@ -61,9 +61,11 @@ export class SchemaUIFormComponent {
             return;
         }
 
-        this.schemasState.configureUIFields(this.schema, {
+        const request = new ConfigureUIFieldsDto({
             fieldsInLists: this.fieldsInLists,
             fieldsInReferences: this.fieldsInReferences,
         });
+
+        this.schemasState.configureUIFields(this.schema, request);
     }
 }

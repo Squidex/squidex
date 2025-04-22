@@ -111,22 +111,23 @@ export class ContentComponent {
         }
 
         const value = this.patchForm.submit();
-
-        if (value) {
-            this.contentsState.patch(this.content, value)
-                .subscribe({
-                    next: () => {
-                        this.patchForm!.submitCompleted({ noReset: true });
-
-                        this.changeDetector.detectChanges();
-                    },
-                    error: error => {
-                        this.patchForm!.submitFailed(error);
-
-                        this.changeDetector.detectChanges();
-                    },
-                });
+        if (!value) {
+            return;
         }
+
+        this.contentsState.patch(this.content, value)
+            .subscribe({
+                next: () => {
+                    this.patchForm!.submitCompleted({ noReset: true });
+
+                    this.changeDetector.detectChanges();
+                },
+                error: error => {
+                    this.patchForm!.submitFailed(error);
+
+                    this.changeDetector.detectChanges();
+                },
+            });
     }
 
     public shouldStop(field: TableField) {

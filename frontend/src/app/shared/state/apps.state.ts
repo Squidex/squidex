@@ -9,7 +9,8 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { catchError, map, switchMap, tap } from 'rxjs/operators';
 import { debug, DialogService, shareSubscribed, State, Types } from '@app/framework';
-import { AppDto, AppSettingsDto, AppsService, CreateAppDto, UpdateAppDto, UpdateAppSettingsDto } from '../services/apps.service';
+import { AppsService } from '../internal';
+import { AppDto, AppSettingsDto, CreateAppDto, TransferToTeamDto, UpdateAppDto, UpdateAppSettingsDto } from '../model';
 
 interface Snapshot {
     // All apps, loaded once.
@@ -141,8 +142,8 @@ export class AppsState extends State<Snapshot> {
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
-    public transfer(app: AppDto, teamId: string | null): Observable<AppDto> {
-        return this.appsService.transferApp(app.name, app, { teamId }, app.version).pipe(
+    public transfer(app: AppDto, request: TransferToTeamDto): Observable<AppDto> {
+        return this.appsService.transferApp(app.name, app, request, app.version).pipe(
             tap(updated => {
                 this.replaceApp(updated);
             }),

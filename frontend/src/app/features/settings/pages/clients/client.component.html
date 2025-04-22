@@ -124,7 +124,7 @@
                         </div>
                         @if (client.canUpdate) {
                             <div class="col-auto">
-                                <button class="btn btn-outline-secondary" (click)="updateApiCallsLimit()">
+                                <button class="btn btn-outline-secondary" (click)="updateApiCallsLimit(apiCallsLimit)">
                                     {{ "common.save" | sqxTranslate }}
                                 </button>
                             </div>

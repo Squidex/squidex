@@ -47,17 +47,18 @@ export class SchemaExportFormComponent {
         }
 
         const value = this.synchronizeForm.submit();
-
-        if (value) {
-            this.schemasState.synchronize(this.schema, value)
-                .subscribe({
-                    next: () => {
-                        this.synchronizeForm.submitCompleted({ noReset: true });
-                    },
-                    error: error => {
-                        this.synchronizeForm.submitFailed(error);
-                    },
-                });
+        if (!value) {
+            return;
         }
+
+        this.schemasState.synchronize(this.schema, value)
+            .subscribe({
+                next: () => {
+                    this.synchronizeForm.submitCompleted({ noReset: true });
+                },
+                error: error => {
+                    this.synchronizeForm.submitFailed(error);
+                },
+            });
     }
 }

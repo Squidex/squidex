@@ -10,12 +10,9 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { debounceTimeSafe, ExtendedFormGroup, Form, FormArrayTemplate, TemplatedFormArray, Types, value$ } from '@app/framework';
 import { FormGroupTemplate, TemplatedFormGroup } from '@app/framework/angular/forms/templated-form-group';
-import { AppLanguageDto } from '../services/app-languages.service';
-import { LanguageDto } from '../services/languages.service';
-import { FieldDto, RootFieldDto, SchemaDto, TableField } from '../services/schemas.service';
-import { ComponentFieldPropertiesDto, fieldInvariant } from '../services/schemas.types';
+import { AppLanguageDto, ComponentFieldPropertiesDto, FieldDto, fieldInvariant, LanguageDto, NestedFieldDto, SchemaDto, TableField } from '../model';
 import { ComponentRulesProvider, RootRulesProvider, RulesProvider } from './contents.form-rules';
-import { AbstractContentForm, AbstractContentFormState, contentTranslationStatus, FieldSection, fieldTranslationStatus, FormGlobals, groupFields, PartitionConfig } from './contents.forms-helpers';
+import { AbstractContentForm, AbstractContentFormState, AnyFieldDto, contentTranslationStatus, FieldSection, fieldTranslationStatus, FormGlobals, groupFields, PartitionConfig } from './contents.forms-helpers';
 import { FieldDefaultValue, FieldsValidators } from './contents.forms.visitors';
 
 type SaveQueryFormType = { name: string; user: boolean };
@@ -34,7 +31,7 @@ export class SaveQueryForm extends Form<ExtendedFormGroup, SaveQueryFormType> {
 }
 
 export class PatchContentForm extends Form<ExtendedFormGroup, any> {
-    private readonly editableFields: ReadonlyArray<RootFieldDto>;
+    private readonly editableFields: ReadonlyArray<FieldDto>;
 
     constructor(
         private readonly listFields: ReadonlyArray<TableField>,
@@ -79,7 +76,7 @@ export class EditContentForm extends Form<ExtendedFormGroup, any> {
     private readonly valueChange$ = new BehaviorSubject<any>(this.form.value);
     private initialData: any;
 
-    public readonly sections: ReadonlyArray<FieldSection<RootFieldDto, FieldForm>>;
+    public readonly sections: ReadonlyArray<FieldSection<FieldDto, FieldForm>>;
 
     public get valueChanges(): Observable<any> {
         return this.valueChange$;
@@ -127,7 +124,7 @@ export class EditContentForm extends Form<ExtendedFormGroup, any> {
                 this.fields[field.name] = childForm;
             }
 
-            return new FieldSection<RootFieldDto, FieldForm>(separator, forms);
+            return new FieldSection<FieldDto, FieldForm>(separator, forms);
         });
 
         value$(this.form).pipe(debounceTimeSafe(debounce), distinctUntilChanged(Types.equals)).subscribe(value => {
@@ -137,8 +134,8 @@ export class EditContentForm extends Form<ExtendedFormGroup, any> {
         this.updateInitialData();
     }
 
-    public get(field: string | RootFieldDto): FieldForm | undefined {
-        if (Types.is(field, RootFieldDto)) {
+    public get(field: string | FieldDto): FieldForm | undefined {
+        if (Types.is(field, FieldDto)) {
             return this.fields[field.name];
         } else {
             return this.fields[field];
@@ -208,14 +205,14 @@ export class EditContentForm extends Form<ExtendedFormGroup, any> {
     }
 }
 
-export class FieldForm extends AbstractContentForm<RootFieldDto, UntypedFormGroup> {
+export class FieldForm extends AbstractContentForm<FieldDto, UntypedFormGroup> {
     private readonly partitions: { [partition: string]: FieldItemForm } = {};
     private isRequired: boolean;
 
     public readonly translationStatus =
         value$(this.form).pipe(map(x => fieldTranslationStatus(x)));
 
-    constructor(globals: FormGlobals, field: RootFieldDto, fieldPath: string, rules: RulesProvider) {
+    constructor(globals: FormGlobals, field: FieldDto, fieldPath: string, rules: RulesProvider) {
         super(globals, field, fieldPath, FieldForm.buildForm(), false, rules);
 
         for (const { key, isOptional } of globals.partitions.getAll(field)) {
@@ -233,10 +230,10 @@ export class FieldForm extends AbstractContentForm<RootFieldDto, UntypedFormGrou
             this.form.setControl(key, childForm.form);
         }
 
-        this.isRequired = field.properties.isRequired;
+        this.isRequired = !!field.properties.isRequired;
     }
 
-    public get(language: string | LanguageDto) {
+    public get(language: string | LanguageDto | AppLanguageDto) {
         if (this.field.isLocalizable) {
             return this.partitions[(language as any)['iso2Code'] || language];
         } else {
@@ -280,15 +277,15 @@ export class FieldForm extends AbstractContentForm<RootFieldDto, UntypedFormGrou
     }
 }
 
-export class FieldValueForm extends AbstractContentForm<FieldDto, UntypedFormControl> {
+export class FieldValueForm extends AbstractContentForm<FieldDto | NestedFieldDto, UntypedFormControl> {
     private isRequired = false;
 
-    constructor(globals: FormGlobals, field: FieldDto, fieldPath: string, isOptional: boolean, rules: RulesProvider, partition: string) {
+    constructor(globals: FormGlobals, field: FieldDto | NestedFieldDto, fieldPath: string, isOptional: boolean, rules: RulesProvider, partition: string) {
         super(globals, field, fieldPath,
             FieldValueForm.buildControl(field, isOptional, partition, globals),
             isOptional, rules);
 
-        this.isRequired = field.properties.isRequired && !isOptional;
+        this.isRequired = !!field.properties.isRequired && !isOptional;
     }
 
     protected updateCustomState(_context: any, _itemData: any, state: AbstractContentFormState) {
@@ -310,7 +307,7 @@ export class FieldValueForm extends AbstractContentForm<FieldDto, UntypedFormCon
         }
     }
 
-    private static buildControl(field: FieldDto, isOptional: boolean, partition: string, globals: FormGlobals) {
+    private static buildControl(field: FieldDto | NestedFieldDto, isOptional: boolean, partition: string, globals: FormGlobals) {
         const value = FieldDefaultValue.get(field, partition);
 
         const validators = FieldsValidators.create(field, isOptional);
@@ -323,7 +320,7 @@ export class FieldValueForm extends AbstractContentForm<FieldDto, UntypedFormCon
     }
 }
 
-export class FieldArrayForm extends AbstractContentForm<FieldDto, TemplatedFormArray> {
+export class FieldArrayForm extends AbstractContentForm<FieldDto | NestedFieldDto, TemplatedFormArray> {
     private readonly item$ = new BehaviorSubject<ReadonlyArray<ObjectFormBase>>([]);
 
     public get itemChanges(): Observable<ReadonlyArray<ObjectFormBase>> {
@@ -338,7 +335,7 @@ export class FieldArrayForm extends AbstractContentForm<FieldDto, TemplatedFormA
         this.item$.next(value);
     }
 
-    constructor(globals: FormGlobals, field: FieldDto, fieldPath: string, isOptional: boolean, rules: RulesProvider,
+    constructor(globals: FormGlobals, field: FieldDto | NestedFieldDto, fieldPath: string, isOptional: boolean, rules: RulesProvider,
         public readonly partition: string,
         public readonly isComponents: boolean,
     ) {
@@ -432,7 +429,7 @@ class ArrayTemplate implements FormArrayTemplate {
     private createItem(model: FieldArrayForm) {
         return new ArrayItemForm(
             model.globals,
-            model.field as RootFieldDto,
+            model.field as FieldDto,
             model.fieldPath,
             model.isOptional,
             model.rules,
@@ -442,7 +439,7 @@ class ArrayTemplate implements FormArrayTemplate {
     private createComponent(model: FieldArrayForm) {
         return new ComponentForm(
             model.globals,
-            model.field as RootFieldDto,
+            model.field as FieldDto,
             model.fieldPath,
             model.isOptional,
             model.rules,
@@ -454,11 +451,11 @@ export type FieldItemForm = ComponentForm | FieldValueForm | FieldArrayForm;
 
 type FieldMap = { [name: string]: FieldItemForm };
 
-export class ObjectFormBase<TField extends FieldDto = FieldDto> extends AbstractContentForm<TField, TemplatedFormGroup> {
-    private readonly sections$ = new BehaviorSubject<ReadonlyArray<FieldSection<FieldDto, FieldItemForm>>>([]);
+export class ObjectFormBase extends AbstractContentForm<AnyFieldDto, TemplatedFormGroup> {
+    private readonly sections$ = new BehaviorSubject<ReadonlyArray<FieldSection<AnyFieldDto, FieldItemForm>>>([]);
     private readonly fields$ = new BehaviorSubject<FieldMap>({});
 
-    public get sectionsChanges(): Observable<ReadonlyArray<FieldSection<FieldDto, FieldItemForm>>> {
+    public get sectionsChanges(): Observable<ReadonlyArray<FieldSection<AnyFieldDto, FieldItemForm>>> {
         return this.sections$;
     }
 
@@ -466,7 +463,7 @@ export class ObjectFormBase<TField extends FieldDto = FieldDto> extends Abstract
         return this.sections$.value;
     }
 
-    public set internalFieldSections(value: ReadonlyArray<FieldSection<FieldDto, FieldItemForm>>) {
+    public set internalFieldSections(value: ReadonlyArray<FieldSection<AnyFieldDto, FieldItemForm>>) {
         this.sections$.next(value);
     }
 
@@ -482,7 +479,7 @@ export class ObjectFormBase<TField extends FieldDto = FieldDto> extends Abstract
         this.fields$.next(value);
     }
 
-    constructor(globals: FormGlobals, field: TField, fieldPath: string, isOptional: boolean, rules: RulesProvider, template: ObjectTemplate,
+    constructor(globals: FormGlobals, field: AnyFieldDto, fieldPath: string, isOptional: boolean, rules: RulesProvider, template: ObjectTemplate,
         public readonly partition: string,
     ) {
         super(globals, field, fieldPath,
@@ -510,7 +507,7 @@ export class ObjectFormBase<TField extends FieldDto = FieldDto> extends Abstract
 }
 
 abstract class ObjectTemplate<T extends ObjectFormBase = ObjectFormBase> implements FormGroupTemplate {
-    private currentSchema: ReadonlyArray<FieldDto> | undefined;
+    private currentSchema: ReadonlyArray<FieldDto | NestedFieldDto> | undefined;
 
     protected get model() {
         return this.modelProvider();
@@ -521,7 +518,7 @@ abstract class ObjectTemplate<T extends ObjectFormBase = ObjectFormBase> impleme
     ) {
     }
 
-    protected abstract getSchema(value: any, model: T): ReadonlyArray<FieldDto> | undefined;
+    protected abstract getSchema(value: any, model: T): ReadonlyArray<AnyFieldDto> | undefined;
 
     public setControls(form: UntypedFormGroup, value: any) {
         const schema = this.getSchema(value, this.model);
@@ -547,9 +544,9 @@ abstract class ObjectTemplate<T extends ObjectFormBase = ObjectFormBase> impleme
         }
     }
 
-    protected setControlsCore(schema: ReadonlyArray<FieldDto>, _: any, model: T, form: UntypedFormGroup) {
+    protected setControlsCore(schema: ReadonlyArray<AnyFieldDto>, _: any, model: T, form: UntypedFormGroup) {
         const fieldByName: FieldMap = {};
-        const fieldSections: FieldSection<FieldDto, FieldItemForm>[] = [];
+        const fieldSections: FieldSection<AnyFieldDto, FieldItemForm>[] = [];
 
         for (const { separator, fields } of groupFields(schema)) {
             const forms: FieldItemForm[] = [];
@@ -570,7 +567,7 @@ abstract class ObjectTemplate<T extends ObjectFormBase = ObjectFormBase> impleme
                 fieldByName[field.name] = childForm;
             }
 
-            fieldSections.push(new FieldSection<FieldDto, FieldItemForm>(separator, forms));
+            fieldSections.push(new FieldSection<AnyFieldDto, FieldItemForm>(separator, forms));
         }
 
         model.internalFieldByName = fieldByName;
@@ -587,8 +584,8 @@ abstract class ObjectTemplate<T extends ObjectFormBase = ObjectFormBase> impleme
     }
 }
 
-export class ArrayItemForm extends ObjectFormBase<RootFieldDto> {
-    constructor(globals: FormGlobals, field: RootFieldDto, fieldPath: string, isOptional: boolean, rules: RulesProvider, partition: string) {
+export class ArrayItemForm extends ObjectFormBase {
+    constructor(globals: FormGlobals, field: FieldDto, fieldPath: string, isOptional: boolean, rules: RulesProvider, partition: string) {
         super(globals, field, fieldPath, isOptional, rules,
             new ArrayItemTemplate(() => this), partition);
 
@@ -598,7 +595,11 @@ export class ArrayItemForm extends ObjectFormBase<RootFieldDto> {
 
 class ArrayItemTemplate extends ObjectTemplate<ArrayItemForm> {
     public getSchema() {
-        return this.model.field.nested;
+        if (Types.is(this.model.field, FieldDto)) {
+            return this.model.field.nested || [];
+        } else {
+            return [];
+        }
     }
 }
 
@@ -621,7 +622,7 @@ export class ComponentForm extends ObjectFormBase {
         return this.field.properties as ComponentFieldPropertiesDto;
     }
 
-    constructor(globals: FormGlobals, field: FieldDto, fieldPath: string, isOptional: boolean, rules: RulesProvider, partition: string) {
+    constructor(globals: FormGlobals, field: AnyFieldDto, fieldPath: string, isOptional: boolean, rules: RulesProvider, partition: string) {
         super(globals, field, fieldPath, isOptional,
             new ComponentRulesProvider(fieldPath, rules, () => this.schema),
             new ComponentTemplate(() => this),
@@ -655,7 +656,7 @@ class ComponentTemplate extends ObjectTemplate<ComponentForm> {
     }
 }
 
-function buildForm(globals: FormGlobals, field: FieldDto, fieldPath: string, isOptional: boolean, rules: RulesProvider, partition: string) {
+function buildForm(globals: FormGlobals, field: FieldDto | NestedFieldDto, fieldPath: string, isOptional: boolean, rules: RulesProvider, partition: string) {
     switch (field.properties.fieldType) {
         case 'Array':
             return new FieldArrayForm(globals, field, fieldPath, isOptional, rules, partition, false);

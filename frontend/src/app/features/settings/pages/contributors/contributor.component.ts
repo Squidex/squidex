@@ -10,7 +10,7 @@
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ConfirmClickDirective, ContributorDto, ContributorsState, HighlightPipe, RoleDto, TooltipDirective, UserPicturePipe } from '@app/shared';
+import { AssignContributorDto, ConfirmClickDirective, ContributorDto, ContributorsState, HighlightPipe, RoleDto, TooltipDirective, UserPicturePipe } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -46,6 +46,8 @@ export class ContributorComponent {
     }
 
     public changeRole(role: string) {
-        this.contributorsState.assign({ contributorId: this.contributor.contributorId, role });
+        const request = new AssignContributorDto({ contributorId: this.contributor.contributorId, role });
+
+        this.contributorsState.assign(request);
     }
 }

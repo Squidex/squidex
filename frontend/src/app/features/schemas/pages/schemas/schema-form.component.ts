@@ -74,17 +74,18 @@ export class SchemaFormComponent implements OnInit {
 
     public createSchema() {
         const value = this.createForm.submit();
-
-        if (value) {
-            this.schemasState.create(value)
-                .subscribe({
-                    next: dto => {
-                        this.emitCreate(dto);
-                    },
-                    error: error => {
-                        this.createForm.submitFailed(error);
-                    },
-                });
+        if (!value) {
+            return;
         }
+
+        this.schemasState.create(value)
+            .subscribe({
+                next: dto => {
+                    this.emitCreate(dto);
+                },
+                error: error => {
+                    this.createForm.submitFailed(error);
+                },
+            });
     }
 }

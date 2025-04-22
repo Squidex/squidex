@@ -221,18 +221,18 @@ public sealed class SchemasOpenApiGenerator(
 
         var document = new OpenApiDocument
         {
-            Schemes = new List<OpenApiSchema>
-            {
+            Schemes =
+            [
                 scheme,
-            },
-            Consumes = new List<string>
-            {
+            ],
+            Consumes =
+            [
                 "application/json",
-            },
-            Produces = new List<string>
-            {
+            ],
+            Produces =
+            [
                 "application/json",
-            },
+            ],
             Info = new OpenApiInfo
             {
                 Title = $"Squidex Content API for '{appName}' App",

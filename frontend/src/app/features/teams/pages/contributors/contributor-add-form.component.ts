@@ -78,23 +78,24 @@ export class ContributorAddFormComponent {
 
     public assignContributor() {
         const value = this.assignContributorForm.submit();
-
-        if (value) {
-            this.contributorsState.assign(value)
-                .subscribe({
-                    next: isCreated => {
-                        this.assignContributorForm.submitCompleted({ newValue: { user: '' } as any });
-
-                        if (isCreated) {
-                            this.dialogs.notifyInfo('i18n:contributors.contributorAssigned');
-                        } else {
-                            this.dialogs.notifyInfo('i18n:contributors.contributorAssignedOld');
-                        }
-                    },
-                    error: error => {
-                        this.assignContributorForm.submitFailed(error);
-                    },
-                });
+        if (!value) {
+            return;
         }
+
+        this.contributorsState.assign(value)
+            .subscribe({
+                next: isCreated => {
+                    this.assignContributorForm.submitCompleted({ newValue: { user: '' } });
+
+                    if (isCreated) {
+                        this.dialogs.notifyInfo('i18n:contributors.contributorAssigned');
+                    } else {
+                        this.dialogs.notifyInfo('i18n:contributors.contributorAssignedOld');
+                    }
+                },
+                error: error => {
+                    this.assignContributorForm.submitFailed(error);
+                },
+            });
     }
 }

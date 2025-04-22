@@ -89,13 +89,14 @@ export class SchemasPageComponent implements OnInit {
 
     public addCategory() {
         const value = this.addCategoryForm.submit();
+        if (!value) {
+            return;
+        }
 
-        if (value) {
-            try {
-                this.schemasState.addCategory(value.name);
-            } finally {
-                this.addCategoryForm.submitCompleted();
-            }
+        try {
+            this.schemasState.addCategory(value.name);
+        } finally {
+            this.addCategoryForm.submitCompleted();
         }
     }
 

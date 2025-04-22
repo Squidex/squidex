@@ -101,7 +101,7 @@
                                             [triggerForm]="currentTrigger"></sqx-content-changed-trigger>
                                     }
                                     @case ("SchemaChanged") {
-                                        <sqx-schema-changed-trigger [triggerForm]="currentTrigger.form"></sqx-schema-changed-trigger>
+                                        <sqx-schema-changed-trigger [triggerForm]="currentTrigger"></sqx-schema-changed-trigger>
                                     }
                                     @case ("Usage") {
                                         <sqx-usage-trigger [triggerForm]="currentTrigger"></sqx-usage-trigger>
@@ -162,7 +162,7 @@
                                 <sqx-generic-action
                                     [actionForm]="currentAction"
                                     [appName]="rulesState.appName"
-                                    [trigger]="currentTrigger?.form.value"
+                                    [trigger]="currentTrigger?.form?.value || {}"
                                     [triggerType]="currentTrigger?.triggerType"></sqx-generic-action>
                             } @else {
                                 <div class="row g-0">

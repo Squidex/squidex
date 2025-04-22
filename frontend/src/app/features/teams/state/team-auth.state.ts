@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, map, tap } from 'rxjs/operators';
-import { AuthSchemeDto, debug, DialogService, LoadingState, shareSubscribed, State, TeamsService, TeamsState, Version } from '@app/shared';
+import { AuthSchemeDto, AuthSchemeValueDto, debug, DialogService, LoadingState, shareSubscribed, State, TeamsService, TeamsState, VersionTag } from '@app/shared';
 
 interface Snapshot extends LoadingState {
     // The current scheme.
@@ -18,7 +18,7 @@ interface Snapshot extends LoadingState {
     canUpdate?: boolean;
 
     // The team version.
-    version: Version;
+    version: VersionTag;
 }
 
 @Injectable({
@@ -43,7 +43,7 @@ export class TeamAuthState extends State<Snapshot> {
         private readonly dialogs: DialogService,
         private readonly teamService: TeamsService,
     ) {
-        super({ version: Version.EMPTY });
+        super({ version: VersionTag.EMPTY });
 
         debug(this, 'teamAuth');
     }
@@ -65,10 +65,12 @@ export class TeamAuthState extends State<Snapshot> {
                     this.dialogs.notifyInfo('i18n:teams.auth.reloaded');
                 }
 
+                const { scheme, canUpdate } = payload;
                 this.next({
-                    ...payload,
+                    canUpdate,
                     isLoaded: true,
                     isLoading: false,
+                    scheme,
                     version,
                 }, 'Loading Success');
             }),
@@ -78,9 +80,9 @@ export class TeamAuthState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public update(scheme: AuthSchemeDto | null): Observable<AuthSchemeDto | undefined | null> {
-        return this.teamService.putTeamAuth(this.teamId, { scheme }, this.version).pipe(
-            tap(({ payload, version }) => {
+    public update(scheme: AuthSchemeDto | undefined): Observable<AuthSchemeDto | undefined | null> {
+        return this.teamService.putTeamAuth(this.teamId, new AuthSchemeValueDto({ scheme }), this.version).pipe(
+            tap(({ version, payload }) => {
                 this.next({
                     ...payload,
                     version,

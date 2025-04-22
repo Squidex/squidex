@@ -8,7 +8,7 @@
 
 import { booleanAttribute, Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { AppSettingsDto, FieldDto, LanguageDto, SchemaDto, TranslatePipe } from '@app/shared';
+import { AppLanguageDto, AppSettingsDto, FieldDto, SchemaDto, TranslatePipe } from '@app/shared';
 import { ArrayValidationComponent } from '../types/array-validation.component';
 import { AssetsValidationComponent } from '../types/assets-validation.component';
 import { BooleanValidationComponent } from '../types/boolean-validation.component';
@@ -61,7 +61,7 @@ export class FieldFormValidationComponent {
     public settings!: AppSettingsDto;
 
     @Input({ required: true })
-    public languages!: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input({ transform: booleanAttribute })
     public isLocalizable?: boolean | null;

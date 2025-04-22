@@ -8,6 +8,7 @@
 export * from '@app/framework';
 export * from './components/cards/shared';
 export * from './interceptors/auth.interceptor';
+export * from './model';
 export * from './services/app-languages.service';
 export * from './services/apps.service';
 export * from './services/assets.service';
@@ -28,9 +29,7 @@ export * from './services/query';
 export * from './services/roles.service';
 export * from './services/rules.service';
 export * from './services/schemas.service';
-export * from './services/schemas.types';
 export * from './services/search.service';
-export * from './services/shared';
 export * from './services/stock-photo.service';
 export * from './services/teams.service';
 export * from './services/templates.service';

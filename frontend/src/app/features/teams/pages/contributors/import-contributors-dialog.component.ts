@@ -10,7 +10,7 @@ import { Component, EventEmitter, Output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EMPTY, of } from 'rxjs';
 import { catchError, mergeMap, tap } from 'rxjs/operators';
-import { ErrorDto, FormHintComponent, ImportContributorsForm, ModalDialogComponent, StatusIconComponent, TooltipDirective, TranslatePipe } from '@app/shared';
+import { AssignContributorDto, ErrorDto, FormHintComponent, ImportContributorsForm, ModalDialogComponent, StatusIconComponent, TooltipDirective, TranslatePipe } from '@app/shared';
 import { TeamContributorsState } from '../../internal';
 
 type ImportStatus = {
@@ -94,7 +94,7 @@ export class ImportContributorsDialogComponent {
 }
 
 function createRequest(status: ImportStatus) {
-    return { contributorId: status.email, role: status.role, invite: true };
+    return new AssignContributorDto({ contributorId: status.email, role: status.role, invite: true });
 }
 
 function getError(error: ErrorDto): string {

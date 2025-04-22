@@ -7,27 +7,25 @@
 
 import { of } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DateTime, Version } from '@app/framework';
-import { createProperties, FieldSizes, META_FIELDS, RootFieldDto, SchemaDto, TableSettings, UIState } from '@app/shared/internal';
+import { createProperties, FieldSizes, META_FIELDS, TableSettings, UIState } from '@app/shared/internal';
 import { FieldWrappings } from '..';
+import { TestValues } from './_test-helpers';
 
 describe('TableSettings', () => {
     let uiState: IMock<UIState>;
 
+    const {
+        createSchema,
+        createField,
+    } = TestValues;
+
     const schema =
-        new SchemaDto({},
-            '1',
-            DateTime.now(), 'me',
-            DateTime.now(), 'me',
-            new Version('1'),
-            'my-schema',
-            'my-category',
-            'Default',
-            false,
-            {},
-            [
-                new RootFieldDto({}, 1, 'string', createProperties('String'), 'invariant'),
-            ]);
+        createSchema({
+            name: 'my-schema',
+            fields: [
+                createField({ id: 1, properties: createProperties('String') }),
+            ],
+        });
 
     beforeEach(() => {
         uiState = Mock.ofType<UIState>();

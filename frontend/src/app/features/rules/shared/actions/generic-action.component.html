@@ -31,7 +31,7 @@
                             <textarea class="form-control" id="{{ property.name }}" [formControlName]="property.name"></textarea>
                         }
                     }
-                    @case ("JavaScript") {
+                    @case ("Javascript") {
                         <sqx-code-editor
                             [completion]="ruleCompletions | async"
                             [formControlName]="property.name"

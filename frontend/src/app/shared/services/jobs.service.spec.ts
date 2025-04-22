@@ -8,7 +8,8 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, DateTime, JobDto, JobLogMessageDto, JobsDto, JobsService, Resource, ResourceLinks, RestoreDto } from '@app/shared/internal';
+import { ApiUrlConfig, DateTime, JobDto, JobLogMessageDto, JobsDto, JobsService, Resource } from '@app/shared/internal';
+import { ResourceLinkDto, RestoreJobDto, RestoreRequestDto } from '../model';
 
 describe('JobsService', () => {
     beforeEach(() => {
@@ -30,7 +31,6 @@ describe('JobsService', () => {
     it('should make get request to get jobs',
         inject([JobsService, HttpTestingController], (jobsService: JobsService, httpMock: HttpTestingController) => {
             let jobs: JobsDto;
-
             jobsService.getJobs('my-app').subscribe(result => {
                 jobs = result;
             });
@@ -45,21 +45,21 @@ describe('JobsService', () => {
                     jobResponse(12),
                     jobResponse(13),
                 ],
+                _links: {},
             });
 
-            expect(jobs!).toEqual({
+            expect(jobs!).toEqual(new JobsDto({
                 items: [
                     createJob(12),
                     createJob(13),
                 ],
-                canCreateBackup: false,
-            });
+                _links: {},
+            }));
         }));
 
     it('should make get request to get restore',
         inject([JobsService, HttpTestingController], (jobsService: JobsService, httpMock: HttpTestingController) => {
-            let restore: RestoreDto;
-
+            let restore: RestoreJobDto;
             jobsService.getRestore().subscribe(result => {
                 restore = result!;
             });
@@ -80,21 +80,21 @@ describe('JobsService', () => {
                 ],
             });
 
-            expect(restore!).toEqual(
-                new RestoreDto('http://url',
-                    DateTime.parseISO('2017-02-03'),
-                    DateTime.parseISO('2017-02-04'),
-                    'Failed',
-                    [
-                        'log1',
-                        'log2',
-                    ]));
+            expect(restore!).toEqual(new RestoreJobDto({
+                url: 'http://url',
+                started: DateTime.parseISO('2017-02-03'),
+                stopped: DateTime.parseISO('2017-02-04'),
+                status: 'Failed',
+                log: [
+                    'log1',
+                    'log2',
+                ],
+            }));
         }));
 
     it('should return null if get restore returns 404',
         inject([JobsService, HttpTestingController], (jobsService: JobsService, httpMock: HttpTestingController) => {
-            let restore: RestoreDto | null;
-
+            let restore: RestoreJobDto | null;
             jobsService.getRestore().subscribe(result => {
                 restore = result;
             });
@@ -143,7 +143,7 @@ describe('JobsService', () => {
 
     it('should make post request to start restore',
         inject([JobsService, HttpTestingController], (jobsService: JobsService, httpMock: HttpTestingController) => {
-            const dto = { url: 'http://url' };
+            const dto = new RestoreRequestDto({ url: 'http://url' });
 
             jobsService.postRestore(dto).subscribe();
 
@@ -176,21 +176,25 @@ describe('JobsService', () => {
     function jobResponse(id: number) {
         return {
             id: `id${id}`,
+            canDownload: false,
+            description: `description${id}`,
+            log: [
+                {
+                    timestamp: buildDate(id, 30),
+                    message:  `log1_${id}`,
+                },
+                {
+                    timestamp: buildDate(id, 40),
+                    message:  `log2_${id}`,
+                },
+            ],
+            status: id % 2 === 0 ? 'Success' : 'Failed',
             started: buildDate(id, 10),
             stopped: buildDate(id, 20),
             taskName: `task${id}`,
             taskArguments: {
                 [`arg${id}`]: '42',
             },
-            description: `description${id}`,
-            log: [{
-                timestamp: buildDate(id, 30),
-                message:  `log1_${id}`,
-            }, {
-                timestamp: buildDate(id, 40),
-                message:  `log2_${id}`,
-            }],
-            status: id % 2 === 0 ? 'Success' : 'Failed',
             _links: {
                 download: { method: 'GET', href: '/api/jobs/1' },
             },
@@ -199,24 +203,31 @@ describe('JobsService', () => {
 });
 
 export function createJob(id: number) {
-    const links: ResourceLinks = {
-        download: { method: 'GET', href: '/api/jobs/1' },
-    };
-
-    return new JobDto(links,
-        `id${id}`,
-        DateTime.parseISO(buildDate(id, 10)),
-        DateTime.parseISO(buildDate(id, 20)),
-        `task${id}`,
-        {
+    return new JobDto({
+        id: `id${id}`,
+        canDownload: false,
+        description: `description${id}`,
+        log: [
+            new JobLogMessageDto({
+                timestamp: DateTime.parseISO(buildDate(id, 30)),
+                message:  `log1_${id}`,
+            }),
+            new JobLogMessageDto({
+                timestamp: DateTime.parseISO(buildDate(id, 40)),
+                message:  `log2_${id}`,
+            }),
+        ],
+        started: DateTime.parseISO(buildDate(id, 10)),
+        status: id % 2 === 0 ? 'Success' : 'Failed' as any,
+        stopped: DateTime.parseISO(buildDate(id, 20)),
+        taskName: `task${id}`,
+        taskArguments: {
             [`arg${id}`]: '42',
         },
-        `description${id}`,
-        [
-            new JobLogMessageDto(DateTime.parseISO(buildDate(id, 30)), `log1_${id}`),
-            new JobLogMessageDto(DateTime.parseISO(buildDate(id, 40)), `log2_${id}`),
-        ],
-        id % 2 === 0 ? 'Success' : 'Failed');
+        _links: {
+            download: new ResourceLinkDto({ method: 'GET', href: '/api/jobs/1' }),
+        },
+    });
 }
 
 function buildDate(id: number, add = 0) {

@@ -71,7 +71,6 @@ public sealed class Startup(IConfiguration config)
 
     public void Configure(IApplicationBuilder app)
     {
-
         app.UseWebSockets();
         app.UseCookiePolicy();
         app.UseDefaultPathBase();

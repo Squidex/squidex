@@ -8,11 +8,12 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, ContributorDto, ContributorsDto, ContributorsPayload, Resource, ResourceLinks, Version } from '@app/shared/internal';
+import { ApiUrlConfig, ContributorDto, ContributorsDto, Resource, Versioned, VersionTag } from '@app/shared/internal';
+import { AssignContributorDto, ContributorsMetadataDto, ResourceLinkDto } from '@app/shared/model';
 import { TeamContributorsService } from '../internal';
 
 describe('TeamContributorsService', () => {
-    const version = new Version('1');
+    const version = new VersionTag('1');
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -32,8 +33,7 @@ describe('TeamContributorsService', () => {
 
     it('should make get request to get team contributors',
         inject([TeamContributorsService, HttpTestingController], (contributorsService: TeamContributorsService, httpMock: HttpTestingController) => {
-            let contributors: ContributorsDto;
-
+            let contributors: Versioned<ContributorsDto>;
             contributorsService.getContributors('my-team').subscribe(result => {
                 contributors = result;
             });
@@ -49,15 +49,14 @@ describe('TeamContributorsService', () => {
                 },
             });
 
-            expect(contributors!).toEqual({ payload: createContributors(1, 2, 3), version: new Version('2') });
+            expect(contributors!).toEqual({ payload: createContributors(1, 2, 3), version: new VersionTag('2') });
         }));
 
     it('should make post request to assign contributor',
         inject([TeamContributorsService, HttpTestingController], (contributorsService: TeamContributorsService, httpMock: HttpTestingController) => {
-            const dto = { contributorId: '123', role: 'Owner' };
+            const dto = new AssignContributorDto({ contributorId: '123', role: 'Owner' });
 
-            let contributors: ContributorsDto;
-
+            let contributors: Versioned<ContributorsDto>;
             contributorsService.postContributor('my-team', dto, version).subscribe(result => {
                 contributors = result;
             });
@@ -73,7 +72,7 @@ describe('TeamContributorsService', () => {
                 },
             });
 
-            expect(contributors!).toEqual({ payload: createContributors(1, 2, 3), version: new Version('2') });
+            expect(contributors!).toEqual({ payload: createContributors(1, 2, 3), version: new VersionTag('2') });
         }));
 
     it('should make delete request to remove contributor',
@@ -84,8 +83,7 @@ describe('TeamContributorsService', () => {
                 },
             };
 
-            let contributors: ContributorsDto;
-
+            let contributors: Versioned<ContributorsDto>;
             contributorsService.deleteContributor('my-team', resource, version).subscribe(result => {
                 contributors = result;
             });
@@ -101,7 +99,7 @@ describe('TeamContributorsService', () => {
                 },
             });
 
-            expect(contributors!).toEqual({ payload: createContributors(1, 2, 3), version: new Version('2') });
+            expect(contributors!).toEqual({ payload: createContributors(1, 2, 3), version: new VersionTag('2') });
         }));
 
     function contributorsResponse(...ids: number[]) {
@@ -126,19 +124,27 @@ describe('TeamContributorsService', () => {
     }
 });
 
-export function createContributors(...ids: ReadonlyArray<number>): ContributorsPayload {
-    return {
-        maxContributors: ids.length * 13,
+export function createContributors(...ids: ReadonlyArray<number>) {
+    return new ContributorsDto({
         items: ids.map(createContributor),
-        isInvited: false,
-        canCreate: true,
-    };
+        maxContributors: ids.length * 13,
+        _links: {
+            create: new ResourceLinkDto({ method: 'POST', href: '/contributors' }),
+        },
+        _meta: new ContributorsMetadataDto({
+            isInvited: 'true',
+        }),
+    });
 }
 
 export function createContributor(id: number) {
-    const links: ResourceLinks = {
-        update: { method: 'PUT', href: `/contributors/id${id}` },
-    };
-
-    return new ContributorDto(links, `id${id}`, `name${id}`, `mail${id}@squidex.io`, id % 2 === 0 ? 'Owner' : 'Developer');
+    return new ContributorDto({
+        contributorId: `id${id}`,
+        contributorName: `name${id}`,
+        contributorEmail: `mail${id}@squidex.io`,
+        role: id % 2 === 0 ? 'Owner' : 'Developer',
+        _links: {
+            update: new ResourceLinkDto({ method: 'PUT', href: `/contributors/id${id}` }),
+        },
+    });
 }

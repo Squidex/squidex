@@ -9,15 +9,16 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { finalize, map, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, shareSubscribed, State } from '@app/framework';
-import { RuleDto, RulesService, UpsertRuleDto } from '../services/rules.service';
+import { DynamicRuleDto, DynamicCreateRuleDto, DynamicUpdateRuleDto } from '../model';
+import { RulesService } from '../services/rules.service';
 import { AppsState } from './apps.state';
 
 interface Snapshot extends LoadingState {
     // The current rules.
-    rules: ReadonlyArray<RuleDto>;
+    rules: ReadonlyArray<DynamicRuleDto>;
 
     // The selected rule.
-    selectedRule?: RuleDto | null;
+    selectedRule?: DynamicRuleDto | null;
 
     // The id of the rule that is currently running.
     runningRuleId?: string;
@@ -81,7 +82,7 @@ export class RulesState extends State<Snapshot> {
         debug(this, 'rules');
     }
 
-    public select(id: string | null): Observable<RuleDto | null> {
+    public select(id: string | null): Observable<DynamicRuleDto | null> {
         return this.loadIfNotLoaded().pipe(
             map(() => this.snapshot.rules.find(x => x.id === id) || null),
             tap(selectedRule => {
@@ -141,7 +142,7 @@ export class RulesState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public create(request: UpsertRuleDto): Observable<RuleDto> {
+    public create(request: DynamicCreateRuleDto): Observable<DynamicRuleDto> {
         return this.rulesService.postRule(this.appName, request).pipe(
             tap(created => {
                 this.next(s => {
@@ -153,7 +154,7 @@ export class RulesState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public delete(rule: RuleDto): Observable<any> {
+    public delete(rule: DynamicRuleDto): Observable<any> {
         return this.rulesService.deleteRule(this.appName, rule, rule.version).pipe(
             tap(() => {
                 this.next(s => {
@@ -170,15 +171,15 @@ export class RulesState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public update(rule: RuleDto, dto: Partial<UpsertRuleDto>): Observable<RuleDto> {
-        return this.rulesService.putRule(this.appName, rule, dto, rule.version).pipe(
+    public update(rule: DynamicRuleDto, request: DynamicUpdateRuleDto): Observable<DynamicRuleDto> {
+        return this.rulesService.putRule(this.appName, rule, request, rule.version).pipe(
             tap(updated => {
                 this.replaceRule(updated);
             }),
             shareSubscribed(this.dialogs));
     }
 
-    public run(rule: RuleDto): Observable<any> {
+    public run(rule: DynamicRuleDto): Observable<any> {
         return this.rulesService.runRule(this.appName, rule).pipe(
             tap(() => {
                 this.dialogs.notifyInfo('i18n:rules.restarted');
@@ -186,7 +187,7 @@ export class RulesState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public runFromSnapshots(rule: RuleDto): Observable<any> {
+    public runFromSnapshots(rule: DynamicRuleDto): Observable<any> {
         return this.rulesService.runRuleFromSnapshots(this.appName, rule).pipe(
             tap(() => {
                 this.dialogs.notifyInfo('i18n:rules.restarted');
@@ -194,7 +195,7 @@ export class RulesState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public trigger(rule: RuleDto): Observable<any> {
+    public trigger(rule: DynamicRuleDto): Observable<any> {
         return this.rulesService.triggerRule(this.appName, rule).pipe(
             tap(() => {
                 this.dialogs.notifyInfo('i18n:rules.enqueued');
@@ -210,7 +211,7 @@ export class RulesState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    private replaceRule(rule: RuleDto) {
+    private replaceRule(rule: DynamicRuleDto) {
         this.next(s => {
             const rules = s.rules.replacedBy('id', rule);
 

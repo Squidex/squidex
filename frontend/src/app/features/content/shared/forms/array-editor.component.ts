@@ -89,7 +89,7 @@ export class ArrayEditorComponent {
 
     public ngOnChanges(changes: TypedSimpleChanges<this>) {
         if (changes.formModel) {
-            const maxItems = (this.formModel.field.properties as any)['maxItems'] || Number.MAX_VALUE;
+            const maxItems = this.formModel.field.rawProperties['maxItems'] || Number.MAX_VALUE;
 
             if (Types.is(this.formModel.field.properties, ComponentsFieldPropertiesDto)) {
                 this.schemasList = this.formModel.field.properties.schemaIds?.map(x => this.formModel.globals.schemas[x]).defined().sortedByString(x => x.displayName) || [];

@@ -8,7 +8,7 @@
 
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { FieldDto, FormHintComponent, TagEditorComponent, TAGS_FIELD_EDITORS, TagsFieldPropertiesDto, TranslatePipe } from '@app/shared';
+import { FieldDto, FormHintComponent, TagEditorComponent, TagsFieldEditorValues, TagsFieldPropertiesDto, TranslatePipe } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -24,7 +24,7 @@ import { FieldDto, FormHintComponent, TagEditorComponent, TAGS_FIELD_EDITORS, Ta
     ],
 })
 export class TagsUIComponent {
-    public readonly editors = TAGS_FIELD_EDITORS;
+    public readonly editors = TagsFieldEditorValues;
 
     @Input({ required: true })
     public fieldForm!: UntypedFormGroup;

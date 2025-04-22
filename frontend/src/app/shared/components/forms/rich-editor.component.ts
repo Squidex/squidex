@@ -10,7 +10,7 @@ import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, El
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { BehaviorSubject, catchError, of, switchMap } from 'rxjs';
 import { HTTP, ModalDirective, TypedSimpleChanges } from '@app/framework';
-import { ApiUrlConfig, AppsState, AssetDto, AssetsService, AssetUploaderState, ContentDto, DialogModel, getContentValue, LanguageDto, ResourceLoaderService, StatefulControlComponent, Types } from '@app/shared/internal';
+import { ApiUrlConfig, AppLanguageDto, AppsState, AssetDto, AssetsService, AssetUploaderState, ContentDto, DialogModel, getContentValue, ResourceLoaderService, StatefulControlComponent, Types } from '@app/shared/internal';
 import { AssetDialogComponent } from '../assets/asset-dialog.component';
 import { AssetSelectorComponent } from '../assets/asset-selector.component';
 import { ChatDialogComponent } from '../chat-dialog.component';
@@ -71,10 +71,10 @@ export class RichEditorComponent extends StatefulControlComponent<{}, EditorValu
     public schemaIds?: ReadonlyArray<string>;
 
     @Input()
-    public language!: LanguageDto;
+    public language!: AppLanguageDto;
 
     @Input()
-    public languages!: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input()
     public folderId = '';
@@ -295,7 +295,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, EditorValu
     }
 }
 
-function buildContentTitle(content: ContentDto, language: LanguageDto) {
+function buildContentTitle(content: ContentDto, language: AppLanguageDto) {
     const name =
         content.referenceFields
             .map(f => getContentValue(content, language, f, false))

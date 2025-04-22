@@ -10,7 +10,7 @@
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, numberAttribute, Output } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ConfirmClickDirective, ContentDto, ContentListCellDirective, ContentListFieldComponent, ContentValueComponent, getContentValue, LanguageDto, META_FIELDS, TooltipDirective, TranslatePipe } from '@app/shared';
+import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirective, ContentListFieldComponent, ContentValueComponent, getContentValue, META_FIELDS, TooltipDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -38,10 +38,10 @@ export class ReferenceItemComponent {
     public clone = new EventEmitter();
 
     @Input()
-    public language!: LanguageDto;
+    public language!: AppLanguageDto;
 
     @Input()
-    public languages!: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     @Input({ transform: booleanAttribute })
     public canRemove?: boolean | null = true;

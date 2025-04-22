@@ -1,0 +1,10 @@
+{%- if HasDescription -%}
+/** {{ Description }} */
+{%- endif -%}
+{%- if ExportTypes %}export {% endif %}type {{ Name }} = {% for enumeration in Enums %}{%- if Enums.first.Value != enumeration.Value %} | {% endif %}{{ enumeration.Value }}{% endfor %};
+
+export const {{ Name | uppercamelcase }}Values: ReadonlyArray<{{ Name }}> = [
+{%  for enumeration in Enums -%}
+	{{ enumeration.Value }}{% unless forloop.last %},{% endunless %}
+{%  endfor -%}
+];

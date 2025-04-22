@@ -6,10 +6,9 @@
  */
 
 import { UntypedFormControl, Validators } from '@angular/forms';
-import { ExtendedFormGroup, Form, ValidatorsEx } from '@app/shared';
-import { UpsertUserDto, UserDto } from '../services/users.service';
+import { CreateUserDto, ExtendedFormGroup, Form, UserDto, ValidatorsEx } from '@app/shared';
 
-export class UserForm extends Form<ExtendedFormGroup, UpsertUserDto, UserDto> {
+export class UserForm extends Form<ExtendedFormGroup, CreateUserDto, UserDto> {
     constructor() {
         super(new ExtendedFormGroup({
             email: new UntypedFormControl('', [
@@ -52,6 +51,6 @@ export class UserForm extends Form<ExtendedFormGroup, UpsertUserDto, UserDto> {
     protected transformSubmit(value: any) {
         const permissions = value['permissions'].split('\n').defined();
 
-        return { ...value, permissions };
+        return new CreateUserDto({ ...value, permissions });
     }
 }

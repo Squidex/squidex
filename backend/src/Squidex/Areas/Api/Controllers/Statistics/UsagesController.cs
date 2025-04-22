@@ -93,7 +93,7 @@ public sealed class UsagesController(
     /// <response code="404">App not found.</response>
     [HttpGet]
     [Route("apps/{app}/usages/calls/{fromDate}/{toDate}/")]
-    [ProducesResponseType(typeof(CallsUsageDtoDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CallsUsageDto), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous(PermissionIds.AppUsage)]
     [ApiCosts(0)]
     public async Task<IActionResult> GetUsages(string app, DateOnly fromDate, DateOnly toDate)
@@ -103,7 +103,7 @@ public sealed class UsagesController(
         // Use the current app plan to show the limits to the user.
         var (plan, _, _) = await usageGate.GetPlanForAppAsync(App, false, HttpContext.RequestAborted);
 
-        var response = CallsUsageDtoDto.FromDomain(plan, summary, details);
+        var response = CallsUsageDto.FromDomain(plan, summary, details);
 
         return Ok(response);
     }
@@ -118,7 +118,7 @@ public sealed class UsagesController(
     /// <response code="404">Team not found.</response>
     [HttpGet]
     [Route("teams/{team}/usages/calls/{fromDate}/{toDate}/")]
-    [ProducesResponseType(typeof(CallsUsageDtoDto), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(CallsUsageDto), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous(PermissionIds.TeamUsage)]
     [ApiCosts(0)]
     public async Task<IActionResult> GetUsagesForTeam(string team, DateOnly fromDate, DateOnly toDate)
@@ -128,7 +128,7 @@ public sealed class UsagesController(
         // Use the current team plan to show the limits to the user.
         var (plan, _) = await usageGate.GetPlanForTeamAsync(Team, HttpContext.RequestAborted);
 
-        var response = CallsUsageDtoDto.FromDomain(plan, summary, details);
+        var response = CallsUsageDto.FromDomain(plan, summary, details);
 
         return Ok(response);
     }

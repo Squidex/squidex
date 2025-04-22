@@ -6,7 +6,7 @@
  */
 
 import { Pipe, PipeTransform } from '@angular/core';
-import { Version } from '@app/framework';
+import { VersionOrTag, VersionTag } from '@app/framework';
 import { ApiUrlConfig, AssetDto, AuthService, MathHelper, StringHelper, Types } from '@app/shared/internal';
 
 @Pipe({
@@ -20,7 +20,7 @@ export class AssetUrlPipe implements PipeTransform {
     ) {
     }
 
-    public transform(asset: AssetDto, version?: number | Version, withQuery = false): string {
+    public transform(asset: AssetDto, version?: VersionOrTag, withQuery = false): string {
         const url = asset.fullUrl(this.apiUrl);
 
         const query: Record<string, any> = {};
@@ -30,7 +30,7 @@ export class AssetUrlPipe implements PipeTransform {
 
         if (Types.isNumber(version)) {
             query['version'] = version;
-        } else if (Types.is(version, Version)) {
+        } else if (Types.is(version, VersionTag)) {
             query['version'] = version.value;
         }
 

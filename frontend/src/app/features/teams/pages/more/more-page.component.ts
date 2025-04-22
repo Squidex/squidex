@@ -73,18 +73,19 @@ export class MorePageComponent implements OnInit {
         }
 
         const value = this.updateForm.submit();
-
-        if (value) {
-            this.teamsState.update(this.team, value)
-                .subscribe({
-                    next: team => {
-                        this.updateForm.submitCompleted({ newValue: team });
-                    },
-                    error: error => {
-                        this.updateForm.submitFailed(error);
-                    },
-                });
+        if (!value) {
+            return;
         }
+
+        this.teamsState.update(this.team, value)
+            .subscribe({
+                next: team => {
+                    this.updateForm.submitCompleted({ newValue: team });
+                },
+                error: error => {
+                    this.updateForm.submitFailed(error);
+                },
+            });
     }
 
     public deleteTeam() {

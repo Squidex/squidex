@@ -9,7 +9,7 @@
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { UntypedFormGroup } from '@angular/forms';
 import { FromNowPipe, ShortDatePipe, TooltipDirective, TranslatePipe } from '@app/framework';
-import { ContentDto, FieldValue, getContentValue, LanguageDto, META_FIELDS, SchemaDto, StatefulComponent, TableField, TableSettings } from '@app/shared/internal';
+import { AppLanguageDto, ContentDto, FieldValue, getContentValue, META_FIELDS, SchemaDto, StatefulComponent, TableField, TableSettings } from '@app/shared/internal';
 import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
 import { ContentStatusComponent } from './content-status.component';
 import { ContentValueEditorComponent } from './content-value-editor.component';
@@ -62,10 +62,10 @@ export class ContentListFieldComponent extends StatefulComponent<State> {
     public schema?: SchemaDto;
 
     @Input({ required: true })
-    public language!: LanguageDto;
+    public language!: AppLanguageDto;
 
     @Input({ required: true })
-    public languages!: ReadonlyArray<LanguageDto>;
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     public get isInlineEditable() {
         return this.field.rootField?.isInlineEditable === true;

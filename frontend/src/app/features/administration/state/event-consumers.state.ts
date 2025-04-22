@@ -8,8 +8,8 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { debug, DialogService, LoadingState, shareSubscribed, State } from '@app/shared';
-import { EventConsumerDto, EventConsumersService } from '../services/event-consumers.service';
+import { debug, DialogService, EventConsumerDto, LoadingState, shareSubscribed, State } from '@app/shared';
+import { EventConsumersService } from '../services/event-consumers.service';
 
 interface Snapshot extends LoadingState {
     // The list of event consumers.

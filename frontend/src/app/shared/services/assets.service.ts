@@ -9,167 +9,11 @@ import { HttpClient, HttpErrorResponse, HttpEventType, HttpResponse } from '@ang
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError, filter, map } from 'rxjs/operators';
-import { ApiUrlConfig, DateTime, ErrorDto, getLinkUrl, hasAnyLink, HTTP, Metadata, pretifyError, Resource, ResourceLinks, ScriptCompletions, StringHelper, Types, Version, Versioned } from '@app/framework';
+import { ApiUrlConfig, ErrorDto, HTTP, pretifyError, Resource, ScriptCompletions, StringHelper, Types, Versioned, VersionOrTag } from '@app/framework';
+import { AnnotateAssetDto, AssetDto, AssetFolderDto, AssetFoldersDto, AssetsDto, CreateAssetFolderDto, MoveAssetDto, MoveAssetFolderDto, RenameAssetFolderDto, RenameTagDto } from './../model';
 import { Query, sanitize } from './query';
 
-const SVG_PREVIEW_LIMIT = 10 * 1024;
-
-const MIME_TIFF = 'image/tiff';
-const MIME_SVG = 'image/svg+xml';
-
 type AssetFolderScope = 'PathAndItems' | 'Path' | 'Items';
-
-export class AssetDto {
-    public readonly _meta: Metadata = {};
-
-    public readonly _links: ResourceLinks;
-
-    public readonly canDelete: boolean;
-    public readonly canPreview: boolean;
-    public readonly canUpdate: boolean;
-    public readonly canUpload: boolean;
-    public readonly canMove: boolean;
-
-    public get isDuplicate() {
-        return this._meta && this._meta['isDuplicate'] === 'true';
-    }
-
-    public get contentUrl() {
-        return getLinkUrl(this, 'content') as string;
-    }
-
-    public get fileNameWithoutExtension() {
-        const index = this.fileName.lastIndexOf('.');
-
-        if (index > 0) {
-            return this.fileName.substring(0, index);
-        } else {
-            return this.fileName;
-        }
-    }
-
-    constructor(links: ResourceLinks, meta: Metadata,
-        public readonly id: string,
-        public readonly created: DateTime,
-        public readonly createdBy: string,
-        public readonly lastModified: DateTime,
-        public readonly lastModifiedBy: string,
-        public readonly version: Version,
-        public readonly fileName: string,
-        public readonly fileHash: string,
-        public readonly fileType: string,
-        public readonly fileSize: number,
-        public readonly fileVersion: number,
-        public readonly isProtected: boolean,
-        public readonly parentId: string,
-        public readonly mimeType: string,
-        public readonly type: string,
-        public readonly metadataText: string,
-        public readonly metadata: any,
-        public readonly slug: string,
-        public readonly tags: ReadonlyArray<string>,
-    ) {
-        this.canPreview =
-            (this.mimeType !== MIME_TIFF && this.type === 'Image') ||
-            (this.mimeType === MIME_SVG && this.fileSize < SVG_PREVIEW_LIMIT);
-
-        this._links = links;
-
-        this.canDelete = hasAnyLink(links, 'delete');
-        this.canUpdate = hasAnyLink(links, 'update');
-        this.canUpload = hasAnyLink(links, 'upload');
-        this.canMove = hasAnyLink(links, 'move');
-
-        this._meta = meta;
-    }
-
-    public fullUrl(apiUrl: ApiUrlConfig) {
-        return apiUrl.buildUrl(this.contentUrl);
-    }
-}
-
-export class AssetFolderDto {
-    public readonly _links: ResourceLinks;
-
-    public readonly canDelete: boolean;
-    public readonly canUpdate: boolean;
-    public readonly canMove: boolean;
-
-    constructor(links: ResourceLinks,
-        public readonly id: string,
-        public readonly folderName: string,
-        public readonly parentId: string,
-        public readonly version: Version,
-    ) {
-        this._links = links;
-
-        this.canDelete = hasAnyLink(links, 'delete');
-        this.canUpdate = hasAnyLink(links, 'update');
-        this.canMove = hasAnyLink(links, 'move');
-    }
-}
-
-export type AssetsDto = Readonly<{
-    // The list of assets.
-    items: ReadonlyArray<AssetDto>;
-
-    // The total number of assets.
-    total: number;
-
-    // True, if the user has permissions to create an asset.
-    canCreate?: boolean;
-
-    // True, if the user has permissions to rename a tag.
-    canRenameTag?: boolean;
-}>;
-
-export type AssetFoldersDto = Readonly<{
-    // The list of asset folders.
-    items: ReadonlyArray<AssetFolderDto>;
-
-    // The path to the asset folders.
-    path: ReadonlyArray<AssetFolderDto>;
-
-    // True, if the user has permissions to create an asset folder.
-    canCreate?: boolean;
-}>;
-
-export type AnnotateAssetDto = Readonly<{
-    // The optional file name.
-    fileName?: string;
-
-    // The optional flag, if an asset is protected.
-    isProtected?: boolean;
-
-    // The optiona slug.
-    slug?: string;
-
-    // The optional tags.
-    tags?: ReadonlyArray<string>;
-
-    // The optional metadata.
-    metadata?: { [key: string]: any };
-}>;
-
-export type CreateAssetFolderDto = Readonly<{
-    // The name of the folder.
-    folderName: string;
-} & MoveAssetItemDto>;
-
-export type RenameAssetFolderDto = Readonly<{
-    // The name of the folder.
-    folderName: string;
-}>;
-
-export type RenameAssetTagDto = Readonly<{
-    // The name of the tag.
-    tagName: string;
-}>;
-
-export type MoveAssetItemDto = Readonly<{
-    // The new ID to the asset folder.
-    parentId?: string;
-}>;
 
 export type AssetsQuery = Readonly<{
     // True, to not return the total number of items.
@@ -216,10 +60,10 @@ export class AssetsService {
     ) {
     }
 
-    public putTag(appName: string, name: string, dto: RenameAssetTagDto): Observable<{ [name: string]: number }> {
+    public putTag(appName: string, name: string, dto: RenameTagDto): Observable<{ [name: string]: number }> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/tags/${encodeURIComponent(name)}`);
 
-        return this.http.put<{ [name: string]: number }>(url, dto).pipe(
+        return this.http.put<{ [name: string]: number }>(url, dto.toJSON()).pipe(
             pretifyError('i18n:assets.renameTagFailed'));
     }
 
@@ -237,7 +81,7 @@ export class AssetsService {
 
         return this.http.post<any>(url, body, buildHeaders(q, (q as any)?.ref)).pipe(
             map(body => {
-                return parseAssets(body);
+                return AssetsDto.fromJSON(body);
             }),
             pretifyError('i18n:assets.loadFailed'));
     }
@@ -247,7 +91,7 @@ export class AssetsService {
 
         return this.http.get<any>(url).pipe(
             map(body => {
-                return parseAssetFolders(body);
+                return AssetFoldersDto.fromJSON(body);
             }),
             pretifyError('i18n:assets.loadFoldersFailed'));
     }
@@ -257,7 +101,7 @@ export class AssetsService {
 
         return HTTP.getVersioned(this.http, url).pipe(
             map(({ payload }) => {
-                return parseAsset(payload.body);
+                return AssetDto.fromJSON(payload.body);
             }),
             pretifyError('i18n:assets.loadFailed'));
     }
@@ -275,7 +119,7 @@ export class AssetsService {
 
                     return percentDone;
                 } else if (Types.is(event, HttpResponse)) {
-                    return parseAsset(event.body);
+                    return AssetDto.fromJSON(event.body);
                 } else {
                     throw new Error('Invalid');
                 }
@@ -290,7 +134,7 @@ export class AssetsService {
             pretifyError('i18n:assets.uploadFailed'));
     }
 
-    public putAssetFile(appName: string, resource: Resource, file: HTTP.UploadFile, version: Version): Observable<number | AssetDto> {
+    public putAssetFile(appName: string, resource: Resource, file: HTTP.UploadFile, version: VersionOrTag): Observable<number | AssetDto> {
         const link = resource._links['upload'];
 
         const url = this.apiUrl.buildUrl(link.href);
@@ -305,7 +149,7 @@ export class AssetsService {
 
                     return percentDone;
                 } else if (Types.is(event, HttpResponse)) {
-                    return parseAsset(event.body);
+                    return AssetDto.fromJSON(event.body);
                 } else {
                     throw new Error('Invalid');
                 }
@@ -323,62 +167,62 @@ export class AssetsService {
     public postAssetFolder(appName: string, dto: CreateAssetFolderDto): Observable<AssetFolderDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets/folders`);
 
-        return HTTP.postVersioned(this.http, url, dto).pipe(
+        return HTTP.postVersioned(this.http, url, dto.toJSON()).pipe(
             map(({ payload }) => {
-                return parseAssetFolder(payload.body);
+                return AssetFolderDto.fromJSON(payload.body);
             }),
             pretifyError('i18n:assets.createFolderFailed'));
     }
 
-    public putAsset(appName: string, resource: Resource, dto: AnnotateAssetDto, version: Version): Observable<AssetDto> {
+    public putAsset(appName: string, resource: Resource, dto: AnnotateAssetDto, version: VersionOrTag): Observable<AssetDto> {
         const link = resource._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto.toJSON()).pipe(
             map(({ payload }) => {
-                return parseAsset(payload.body);
+                return AssetDto.fromJSON(payload.body);
             }),
             pretifyError('i18n:assets.updateFailed'));
     }
 
-    public putAssetFolder(appName: string, resource: Resource, dto: RenameAssetFolderDto, version: Version): Observable<AssetFolderDto> {
+    public putAssetFolder(appName: string, resource: Resource, dto: RenameAssetFolderDto, version: VersionOrTag): Observable<AssetFolderDto> {
         const link = resource._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto.toJSON()).pipe(
             map(({ payload }) => {
-                return parseAssetFolder(payload.body);
+                return AssetFolderDto.fromJSON(payload.body);
             }),
             pretifyError('i18n:assets.updateFolderFailed'));
     }
 
-    public putAssetParent(appName: string, resource: Resource, dto: MoveAssetItemDto, version: Version): Observable<AssetDto> {
+    public putAssetParent(appName: string, resource: Resource, dto: MoveAssetDto, version: VersionOrTag): Observable<AssetDto> {
         const link = resource._links['move'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto.toJSON()).pipe(
             map(({ payload }) => {
-                return parseAsset(payload.body);
+                return AssetDto.fromJSON(payload.body);
             }),
             pretifyError('i18n:assets.moveFailed'));
     }
 
-    public putAssetFolderParent(appName: string, resource: Resource, dto: MoveAssetItemDto, version: Version): Observable<AssetFolderDto> {
+    public putAssetFolderParent(appName: string, resource: Resource, dto: MoveAssetFolderDto, version: VersionOrTag): Observable<AssetFolderDto> {
         const link = resource._links['move'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, dto).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto.toJSON()).pipe(
             map(({ payload }) => {
-                return parseAssetFolder(payload.body);
+                return AssetFolderDto.fromJSON(payload.body);
             }),
             pretifyError('i18n:assets.moveFailed'));
     }
 
-    public deleteAssetItem(appName: string, asset: Resource, checkReferrers: boolean, version: Version): Observable<Versioned<any>> {
+    public deleteAssetItem(appName: string, asset: Resource, checkReferrers: boolean, version: VersionOrTag): Observable<Versioned<any>> {
         const link = asset._links['delete'];
 
         const url = `${this.apiUrl.buildUrl(link.href)}${StringHelper.buildQuery({ checkReferrers })}`;
@@ -462,52 +306,4 @@ function buildQuery(q?: AssetsQuery & AssetsByQuery & AssetsByIds & AssetsByRef)
 
         return { q: sanitize(queryObj), parentId };
     }
-}
-
-function parseAssets(response: { items: any[]; total: number } & Resource): AssetsDto {
-    const { items: list, total, _links } = response;
-    const items = list.map(parseAsset);
-
-    const canCreate = hasAnyLink(_links, 'create');
-    const canRenameTag = hasAnyLink(_links, 'tags/rename');
-
-    return { items, total, canCreate, canRenameTag };
-}
-
-function parseAsset(response: any) {
-    return new AssetDto(response._links, response._meta,
-        response.id,
-        DateTime.parseISO(response.created), response.createdBy,
-        DateTime.parseISO(response.lastModified), response.lastModifiedBy,
-        new Version(response.version.toString()),
-        response.fileName,
-        response.fileHash,
-        response.fileType,
-        response.fileSize,
-        response.fileVersion,
-        response.isProtected,
-        response.parentId,
-        response.mimeType,
-        response.type,
-        response.metadataText,
-        response.metadata,
-        response.slug,
-        response.tags || []);
-}
-
-function parseAssetFolders(response: { items: any[]; path: any[]; total: number } & Resource): AssetFoldersDto {
-    const { items: list, _links } = response;
-    const items = list.map(parseAssetFolder);
-
-    const canCreate = hasAnyLink(_links, 'create');
-
-    return { items, canCreate, path: response.path.map(parseAssetFolder) };
-}
-
-function parseAssetFolder(response: any) {
-    return new AssetFolderDto(response._links,
-        response.id,
-        response.folderName,
-        response.parentId,
-        new Version(response.version.toString()));
 }

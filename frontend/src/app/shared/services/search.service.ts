@@ -9,23 +9,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiUrlConfig, pretifyError, ResourceLinks, StringHelper } from '@app/framework';
-
-export class SearchResultDto {
-    public readonly _links: ResourceLinks;
-
-    public readonly url: string;
-
-    constructor(links: ResourceLinks,
-        public readonly name: string,
-        public readonly type: string,
-        public readonly label?: string,
-    ) {
-        this._links = links;
-
-        this.url = this._links['url'].href;
-    }
-}
+import { ApiUrlConfig, pretifyError, StringHelper } from '@app/framework';
+import { SearchResultDto } from './../model';
 
 @Injectable({
     providedIn: 'root',
@@ -42,21 +27,8 @@ export class SearchService {
 
         return this.http.get<any[]>(url).pipe(
             map(body => {
-                return parseResults(body);
+                return body.map(SearchResultDto.fromJSON);
             }),
             pretifyError('i18n:search.searchFailed'));
     }
 }
-
-function parseResults(response: any[]) {
-    return response.map(parseResult);
-}
-
-function parseResult(response: any) {
-    return new SearchResultDto(
-        response._links,
-        response.name,
-        response.type,
-        response.label);
-}
-

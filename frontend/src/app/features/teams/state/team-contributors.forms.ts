@@ -9,7 +9,7 @@ import { UntypedFormControl, Validators } from '@angular/forms';
 import { debounceTime, map, shareReplay } from 'rxjs/operators';
 import { AssignContributorDto, ExtendedFormGroup, Form, hasNoValue$, Types, UserDto, value$ } from '@app/shared';
 
-export class AssignTeamContributorForm extends Form<ExtendedFormGroup, AssignContributorDto> {
+export class AssignTeamContributorForm extends Form<ExtendedFormGroup, AssignContributorDto, { user: string }> {
     public get user() {
         return this.form.controls['user'];
     }
@@ -31,13 +31,11 @@ export class AssignTeamContributorForm extends Form<ExtendedFormGroup, AssignCon
             contributorId = contributorId.id;
         }
 
-        return { contributorId, role: 'Owner', invite: true };
+        return new AssignContributorDto({ contributorId, role: 'Owner', invite: true });
     }
 }
 
-type ImportContributorsFormType = ReadonlyArray<AssignContributorDto>;
-
-export class ImportContributorsForm extends Form<ExtendedFormGroup, ImportContributorsFormType> {
+export class ImportContributorsForm extends Form<ExtendedFormGroup, ReadonlyArray<AssignContributorDto>> {
     public get import() {
         return this.form.controls['import'];
     }
@@ -66,12 +64,10 @@ function extractEmails(value: string) {
         const added: { [email: string]: boolean } = {};
 
         const emails = value.match(EMAIL_REGEX);
-
         if (emails) {
             for (const match of emails) {
                 if (!added[match]) {
-                    result.push({ contributorId: match, role: 'Owner', invite: true });
-
+                    result.push(new AssignContributorDto({ contributorId: match, role: 'Owner', invite: true }));
                     added[match] = true;
                 }
             }

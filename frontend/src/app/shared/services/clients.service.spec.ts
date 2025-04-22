@@ -8,10 +8,11 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { AccessTokenDto, ApiUrlConfig, ClientDto, ClientsDto, ClientsPayload, ClientsService, Resource, ResourceLinks, Version } from '@app/shared/internal';
+import { AccessTokenDto, ApiUrlConfig, ClientDto, ClientsDto, ClientsService, Resource, Versioned, VersionTag } from '@app/shared/internal';
+import { CreateClientDto, ResourceLinkDto, UpdateClientDto } from '../model';
 
 describe('ClientsService', () => {
-    const version = new Version('1');
+    const version = new VersionTag('1');
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -31,8 +32,7 @@ describe('ClientsService', () => {
 
     it('should make get request to get app clients',
         inject([ClientsService, HttpTestingController], (clientsService: ClientsService, httpMock: HttpTestingController) => {
-            let clients: ClientsDto;
-
+            let clients: Versioned<ClientsDto>;
             clientsService.getClients('my-app').subscribe(result => {
                 clients = result;
             });
@@ -48,15 +48,14 @@ describe('ClientsService', () => {
                 },
             });
 
-            expect(clients!).toEqual({ payload: createClients(1, 2), version: new Version('2') });
+            expect(clients!).toEqual({ payload: createClients(1, 2), version: new VersionTag('2') });
         }));
 
     it('should make post request to create client',
         inject([ClientsService, HttpTestingController], (clientsService: ClientsService, httpMock: HttpTestingController) => {
-            const dto = { id: 'client1' };
+            const dto = new CreateClientDto({ id: 'client1' });
 
-            let clients: ClientsDto;
-
+            let clients: Versioned<ClientsDto>;
             clientsService.postClient('my-app', dto, version).subscribe(result => {
                 clients = result;
             });
@@ -72,12 +71,12 @@ describe('ClientsService', () => {
                 },
             });
 
-            expect(clients!).toEqual({ payload: createClients(1, 2), version: new Version('2') });
+            expect(clients!).toEqual({ payload: createClients(1, 2), version: new VersionTag('2') });
         }));
 
     it('should make put request to rename client',
         inject([ClientsService, HttpTestingController], (clientsService: ClientsService, httpMock: HttpTestingController) => {
-            const dto = { name: 'New Name' };
+            const dto = new UpdateClientDto({ name: 'New Name' });
 
             const resource: Resource = {
                 _links: {
@@ -85,8 +84,7 @@ describe('ClientsService', () => {
                 },
             };
 
-            let clients: ClientsDto;
-
+            let clients: Versioned<ClientsDto>;
             clientsService.putClient('my-app', resource, dto, version).subscribe(result => {
                 clients = result;
             });
@@ -102,7 +100,7 @@ describe('ClientsService', () => {
                 },
             });
 
-            expect(clients!).toEqual({ payload: createClients(1, 2), version: new Version('2') });
+            expect(clients!).toEqual({ payload: createClients(1, 2), version: new VersionTag('2') });
         }));
 
     it('should make delete request to remove client',
@@ -113,8 +111,7 @@ describe('ClientsService', () => {
                 },
             };
 
-            let clients: ClientsDto;
-
+            let clients: Versioned<ClientsDto>;
             clientsService.deleteClient('my-app', resource, version).subscribe(result => {
                 clients = result;
             });
@@ -130,7 +127,7 @@ describe('ClientsService', () => {
                 },
             });
 
-            expect(clients!).toEqual({ payload: createClients(1, 2), version: new Version('2') });
+            expect(clients!).toEqual({ payload: createClients(1, 2), version: new VersionTag('2') });
         }));
 
     it('should make form request to create token',
@@ -174,17 +171,26 @@ describe('ClientsService', () => {
     }
 });
 
-export function createClients(...ids: ReadonlyArray<number>): ClientsPayload {
-    return {
+export function createClients(...ids: ReadonlyArray<number>) {
+    return new ClientsDto({
         items: ids.map(createClient),
-        canCreate: true,
-    };
+        _links: {
+            create: new ResourceLinkDto({ method: 'POST', href: '/clients' }),
+        },
+    });
 }
 
 export function createClient(id: number) {
-    const links: ResourceLinks = {
-        update: { method: 'PUT', href: `/clients/id${id}` },
-    };
-
-    return new ClientDto(links, `id${id}`, `Client ${id}`, `secret${id}`, `Role${id}`, id * 512, id * 5120, true);
+    return new ClientDto({
+        id: `id${id}`,
+        name: `Client ${id}`,
+        role: `Role${id}`,
+        secret: `secret${id}`,
+        apiCallsLimit: id * 512,
+        apiTrafficLimit: id * 5120,
+        allowAnonymous: true,
+        _links: {
+            update: new ResourceLinkDto({ method: 'PUT', href: `/clients/id${id}` }),
+        },
+    });
 }

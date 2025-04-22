@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ConfirmClickDirective, ErrorDto, FormErrorComponent, FormHintComponent, MathHelper, SchemaTagSource, TagEditorComponent, TranslatePipe, WorkflowDto, WorkflowsState, WorkflowStep, WorkflowStepValues, WorkflowTransition, WorkflowTransitionValues } from '@app/shared';
+import { ConfirmClickDirective, ErrorDto, FormErrorComponent, FormHintComponent, IWorkflowStepDto, IWorkflowTransitionDto, MathHelper, SchemaTagSource, TagEditorComponent, TranslatePipe, WorkflowDto, WorkflowsState, WorkflowStepView, WorkflowTransitionView, WorkflowView } from '@app/shared';
 import { WorkflowDiagramComponent } from './workflow-diagram.component';
 import { WorkflowStepComponent } from './workflow-step.component';
 
@@ -33,7 +33,9 @@ export class WorkflowComponent {
     public readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };
 
     @Input({ required: true })
-    public workflow!: WorkflowDto;
+    public set workflow(value: WorkflowDto) {
+        this.workflowView = new WorkflowView(value);
+    };
 
     @Input({ required: true })
     public roles!: ReadonlyArray<string>;
@@ -46,6 +48,8 @@ export class WorkflowComponent {
     public isEditing = false;
     public isEditable = false;
 
+    public workflowView!: WorkflowView;
+
     public selectedTab = 0;
 
     constructor(
@@ -54,7 +58,7 @@ export class WorkflowComponent {
     }
 
     public ngOnChanges() {
-        this.isEditable = this.workflow.canUpdate;
+        this.isEditable = this.workflowView.dto.canUpdate;
     }
 
     public toggleEditing() {
@@ -62,7 +66,7 @@ export class WorkflowComponent {
     }
 
     public remove() {
-        this.workflowsState.delete(this.workflow);
+        this.workflowsState.delete(this.workflowView.dto);
     }
 
     public save() {
@@ -70,7 +74,7 @@ export class WorkflowComponent {
             return;
         }
 
-        this.workflowsState.update(this.workflow)
+        this.workflowsState.update(this.workflowView.dto, this.workflowView.toUpdate())
             .subscribe({
                 next: () => {
                     this.error = null;
@@ -82,52 +86,52 @@ export class WorkflowComponent {
     }
 
     public addStep() {
-        const index = this.workflow.steps.length;
+        const index = this.workflowView.steps.length;
 
         for (let i = index; i < index + 100; i++) {
             const name = `Step${i}`;
 
-            if (!this.workflow.getStep(name)) {
-                this.workflow = this.workflow.setStep(name, { color: MathHelper.randomColor() });
+            if (!this.workflowView.getStep(name)) {
+                this.workflowView = this.workflowView.setStep(name, { color: MathHelper.randomColor() });
                 return;
             }
         }
     }
 
     public rename(name: string) {
-        this.workflow = this.workflow.changeName(name);
+        this.workflowView = this.workflowView.changeName(name);
     }
 
     public changeSchemaIds(schemaIds: string[]) {
-        this.workflow = this.workflow.changeSchemaIds(schemaIds);
+        this.workflowView = this.workflowView.changeSchemaIds(schemaIds);
     }
 
-    public setInitial(step: WorkflowStep) {
-        this.workflow = this.workflow.setInitial(step.name);
+    public setInitial(step: WorkflowStepView) {
+        this.workflowView = this.workflowView.setInitial(step.name);
     }
 
-    public addTransiton(from: WorkflowStep, to: WorkflowStep) {
-        this.workflow = this.workflow.setTransition(from.name, to.name, {});
+    public addTransiton(from: WorkflowStepView, to: WorkflowStepView) {
+        this.workflowView = this.workflowView.setTransition(from.name, to.name, {});
     }
 
-    public removeTransition(from: WorkflowStep, transition: WorkflowTransition) {
-        this.workflow = this.workflow.removeTransition(from.name, transition.to);
+    public removeTransition(from: WorkflowStepView, transition: WorkflowTransitionView) {
+        this.workflowView = this.workflowView.removeTransition(from.name, transition.to);
     }
 
-    public updateTransition(update: { transition: WorkflowTransition; values: WorkflowTransitionValues }) {
-        this.workflow = this.workflow.setTransition(update.transition.from, update.transition.to, update.values);
+    public updateTransition(update: { transition: WorkflowTransitionView; values: IWorkflowTransitionDto }) {
+        this.workflowView = this.workflowView.setTransition(update.transition.from, update.transition.to, update.values);
     }
 
-    public updateStep(step: WorkflowStep, values: WorkflowStepValues) {
-        this.workflow = this.workflow.setStep(step.name, values);
+    public updateStep(step: WorkflowStepView, values: Partial<IWorkflowStepDto>) {
+        this.workflowView = this.workflowView.setStep(step.name, values);
     }
 
-    public renameStep(step: WorkflowStep, newName: string) {
-        this.workflow = this.workflow.renameStep(step.name, newName);
+    public renameStep(step: WorkflowStepView, newName: string) {
+        this.workflowView = this.workflowView.renameStep(step.name, newName);
     }
 
-    public removeStep(step: WorkflowStep) {
-        this.workflow = this.workflow.removeStep(step.name);
+    public removeStep(step: WorkflowStepView) {
+        this.workflowView = this.workflowView.removeStep(step.name);
     }
 
     public selectTab(tab: number) {

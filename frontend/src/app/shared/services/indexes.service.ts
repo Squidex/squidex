@@ -8,37 +8,8 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
-import { ApiUrlConfig, hasAnyLink, pretifyError, Resource, ResourceLinks } from '@app/framework';
-
-export type IndexField = { name: string; order: 'Ascending' | 'Descending' };
-
-export class IndexDto {
-    public readonly _links: ResourceLinks;
-
-    public readonly canDelete: boolean;
-
-    constructor(links: ResourceLinks,
-        public readonly name: string,
-        public readonly fields: ReadonlyArray<IndexField>,
-    ) {
-        this._links = links;
-
-        this.canDelete = hasAnyLink(links, 'delete');
-    }
-}
-
-export type IndexesDto = Readonly<{
-    // The indexes.
-    items: ReadonlyArray<IndexDto>;
-
-    // The if the user can create a new index.
-    canCreate?: boolean;
-}>;
-
-export type CreateIndexDto = Readonly<{
-    // The index fields.
-    fields: IndexField[];
-}>;
+import { ApiUrlConfig, pretifyError, Resource } from '@app/framework';
+import { CreateIndexDto, IndexesDto } from './../model';
 
 @Injectable({
     providedIn: 'root',
@@ -55,7 +26,7 @@ export class IndexesService {
 
         return this.http.get(url).pipe(
             map(body => {
-                return parseIndexes(body as any);
+                return IndexesDto.fromJSON(body as any);
             }),
             pretifyError('i18n:schemas.indexes.loadFailed'));
     }
@@ -63,7 +34,7 @@ export class IndexesService {
     public postIndex(appName: string, schemaName: string, dto: CreateIndexDto): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/indexes`);
 
-        return this.http.post(url, dto).pipe(
+        return this.http.post(url, dto.toJSON()).pipe(
             pretifyError('i18n:schemas.indexes.createFailed'));
     }
 
@@ -77,17 +48,4 @@ export class IndexesService {
     }
 }
 
-function parseIndexes(response: { items: any[] } & Resource): IndexesDto {
-    const { items: list, _links } = response;
-    const items = list.map(parseIndex);
-
-    const canCreate = hasAnyLink(_links, 'create');
-
-    return { items, canCreate };
-}
-
-function parseIndex(response: any) {
-    return new IndexDto(response._links,
-        response.name,
-        response.fields);
-}
+export { CreateIndexDto };

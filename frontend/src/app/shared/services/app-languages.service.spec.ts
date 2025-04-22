@@ -8,10 +8,11 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, AppLanguageDto, AppLanguagesDto, AppLanguagesPayload, AppLanguagesService, Resource, ResourceLinks, Version } from '@app/shared/internal';
+import { ApiUrlConfig, AppLanguageDto, AppLanguagesDto, AppLanguagesService, Resource, Versioned, VersionTag } from '@app/shared/internal';
+import { AddLanguageDto, ResourceLinkDto, UpdateLanguageDto } from '../model';
 
 describe('AppLanguagesService', () => {
-    const version = new Version('1');
+    const version = new VersionTag('1');
 
     beforeEach(() => {
         TestBed.configureTestingModule({
@@ -31,8 +32,7 @@ describe('AppLanguagesService', () => {
 
     it('should make get request to get app languages',
         inject([AppLanguagesService, HttpTestingController], (appLanguagesService: AppLanguagesService, httpMock: HttpTestingController) => {
-            let languages: AppLanguagesDto;
-
+            let languages: Versioned<AppLanguagesDto>;
             appLanguagesService.getLanguages('my-app').subscribe(result => {
                 languages = result;
             });
@@ -48,15 +48,14 @@ describe('AppLanguagesService', () => {
                 },
             });
 
-            expect(languages!).toEqual({ payload: createLanguages('en', 'de', 'it'), version: new Version('2') });
+            expect(languages!).toEqual({ payload: createLanguages('en', 'de', 'it'), version: new VersionTag('2') });
         }));
 
     it('should make post request to add language',
         inject([AppLanguagesService, HttpTestingController], (appLanguagesService: AppLanguagesService, httpMock: HttpTestingController) => {
-            const dto = { language: 'de' };
+            const dto = new AddLanguageDto({ language: 'de' });
 
-            let languages: AppLanguagesDto;
-
+            let languages: Versioned<AppLanguagesDto>;
             appLanguagesService.postLanguage('my-app', dto, version).subscribe(result => {
                 languages = result;
             });
@@ -72,12 +71,12 @@ describe('AppLanguagesService', () => {
                 },
             });
 
-            expect(languages!).toEqual({ payload: createLanguages('en', 'de', 'it'), version: new Version('2') });
+            expect(languages!).toEqual({ payload: createLanguages('en', 'de', 'it'), version: new VersionTag('2') });
         }));
 
     it('should make put request to make master language',
         inject([AppLanguagesService, HttpTestingController], (appLanguagesService: AppLanguagesService, httpMock: HttpTestingController) => {
-            const dto = { isMaster: true };
+            const dto = new UpdateLanguageDto({ isMaster: true });
 
             const resource: Resource = {
                 _links: {
@@ -85,8 +84,7 @@ describe('AppLanguagesService', () => {
                 },
             };
 
-            let languages: AppLanguagesDto;
-
+            let languages: Versioned<AppLanguagesDto>;
             appLanguagesService.putLanguage('my-app', resource, dto, version).subscribe(result => {
                 languages = result;
             });
@@ -102,7 +100,7 @@ describe('AppLanguagesService', () => {
                 },
             });
 
-            expect(languages!).toEqual({ payload: createLanguages('en', 'de', 'it'), version: new Version('2') });
+            expect(languages!).toEqual({ payload: createLanguages('en', 'de', 'it'), version: new VersionTag('2') });
         }));
 
     it('should make delete request to remove language',
@@ -113,8 +111,7 @@ describe('AppLanguagesService', () => {
                 },
             };
 
-            let languages: AppLanguagesDto;
-
+            let languages: Versioned<AppLanguagesDto>;
             appLanguagesService.deleteLanguage('my-app', resource, version).subscribe(result => {
                 languages = result;
             });
@@ -130,7 +127,7 @@ describe('AppLanguagesService', () => {
                 },
             });
 
-            expect(languages!).toEqual({ payload: createLanguages('en', 'de', 'it'), version: new Version('2') });
+            expect(languages!).toEqual({ payload: createLanguages('en', 'de', 'it'), version: new VersionTag('2') });
         }));
 
     function languagesResponse(...codes: string[]) {
@@ -152,16 +149,20 @@ describe('AppLanguagesService', () => {
     }
 });
 
-export function createLanguages(...codes: ReadonlyArray<string>): AppLanguagesPayload {
-    return {
-        items: codes.map((code, i) => createLanguage(code, codes, i)),
-        canCreate: true,
-    };
-}
-function createLanguage(code: string, codes: ReadonlyArray<string>, i: number) {
-    const links: ResourceLinks = {
-        update: { method: 'PUT', href: `/languages/${code}` },
-    };
-
-    return new AppLanguageDto(links, code, code, i === 0, i % 2 === 1, codes.removed(code));
+export function createLanguages(...codes: Array<string>): AppLanguagesDto {
+    return new AppLanguagesDto({
+        items: codes.map((code, i) => new AppLanguageDto({
+            iso2Code: code,
+            englishName: code,
+            isMaster: i === 0,
+            isOptional: i % 2 === 1,
+            fallback: codes.removed(code),
+            _links: {
+                update: new ResourceLinkDto({ method: 'PUT', href: `/languages/${code}` }),
+            },
+        })),
+        _links: {
+            create: new ResourceLinkDto({ method: 'POST', href: '/languages' }),
+        },
+    });
 }

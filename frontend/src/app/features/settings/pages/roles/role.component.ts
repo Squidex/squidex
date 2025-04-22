@@ -8,7 +8,7 @@
 import { SlicePipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, Input, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AutocompleteComponent, AutocompleteSource, ConfirmClickDirective, ControlErrorsComponent, EditRoleForm, FormAlertComponent, FormHintComponent, RoleDto, RolesState, SchemaDto, Settings, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { AutocompleteComponent, AutocompleteSource, ConfirmClickDirective, ControlErrorsComponent, EditRoleForm, FormAlertComponent, FormHintComponent, RoleDto, RolesState, SchemaDto, Settings, TranslatePipe, TypedSimpleChanges, UpdateRoleDto } from '@app/shared';
 
 const DESCRIPTIONS = {
     Developer: 'i18n:roles.defaults.developer',
@@ -117,17 +117,20 @@ export class RoleComponent {
 
     public save() {
         const value = this.editForm.submit();
-
-        if (value) {
-            this.rolesState.update(this.role, { ...value, properties: this.properties })
-                .subscribe({
-                    next: () => {
-                        this.editForm.submitCompleted({ noReset: true });
-                    },
-                    error: error => {
-                        this.editForm.submitFailed(error);
-                    },
-                });
+        if (!value) {
+            return;
         }
+
+        const request = new UpdateRoleDto({ ...value, properties: this.properties });
+
+        this.rolesState.update(this.role, request)
+            .subscribe({
+                next: () => {
+                    this.editForm.submitCompleted({ noReset: true });
+                },
+                error: error => {
+                    this.editForm.submitFailed(error);
+                },
+            });
     }
 }

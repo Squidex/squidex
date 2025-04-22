@@ -8,7 +8,7 @@
 
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { DATETIME_FIELD_EDITORS, DateTimeFieldPropertiesDto, FieldDto, FloatConverter, FormHintComponent, MarkdownDirective, TranslatePipe } from '@app/shared';
+import { DateTimeFieldEditorValues, DateTimeFieldPropertiesDto, FieldDto, FloatConverter, FormHintComponent, MarkdownDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -25,7 +25,7 @@ import { DATETIME_FIELD_EDITORS, DateTimeFieldPropertiesDto, FieldDto, FloatConv
 })
 export class DateTimeUIComponent {
     public readonly converter = FloatConverter.INSTANCE;
-    public readonly editors = DATETIME_FIELD_EDITORS;
+    public readonly editors = DateTimeFieldEditorValues;
 
     @Input({ required: true })
     public fieldForm!: UntypedFormGroup;

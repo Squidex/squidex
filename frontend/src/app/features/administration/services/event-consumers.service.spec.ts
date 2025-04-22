@@ -8,8 +8,9 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, Resource, ResourceLinks } from '@app/shared';
-import { EventConsumerDto, EventConsumersDto, EventConsumersService } from './event-consumers.service';
+import { ApiUrlConfig, EventConsumerDto, EventConsumersDto } from '@app/shared';
+import { IResourceDto, ResourceLinkDto } from '@app/shared/model';
+import { EventConsumersService } from './event-consumers.service';
 
 describe('EventConsumersService', () => {
     beforeEach(() => {
@@ -31,7 +32,6 @@ describe('EventConsumersService', () => {
     it('should make get request to get event consumers',
         inject([EventConsumersService, HttpTestingController], (eventConsumersService: EventConsumersService, httpMock: HttpTestingController) => {
             let eventConsumers: EventConsumersDto;
-
             eventConsumersService.getEventConsumers().subscribe(result => {
                 eventConsumers = result;
             });
@@ -46,26 +46,28 @@ describe('EventConsumersService', () => {
                     eventConsumerResponse(12),
                     eventConsumerResponse(13),
                 ],
+                _links: {},
             });
 
-            expect(eventConsumers!).toEqual({
-                items: [
-                    createEventConsumer(12),
-                    createEventConsumer(13),
-                ],
-            });
+            expect(eventConsumers!).toEqual(
+                new EventConsumersDto({
+                    items: [
+                        createEventConsumer(12),
+                        createEventConsumer(13),
+                    ],
+                    _links: {},
+                }));
         }));
 
     it('should make put request to start event consumer',
         inject([EventConsumersService, HttpTestingController], (eventConsumersService: EventConsumersService, httpMock: HttpTestingController) => {
-            const resource: Resource = {
+            const resource: IResourceDto = {
                 _links: {
-                    start: { method: 'PUT', href: 'api/event-consumers/event-consumer123/start' },
+                    start: new ResourceLinkDto({ method: 'PUT', href: 'api/event-consumers/event-consumer123/start' }),
                 },
             };
 
             let eventConsumer: EventConsumerDto;
-
             eventConsumersService.putStart(resource).subscribe(response => {
                 eventConsumer = response;
             });
@@ -82,14 +84,13 @@ describe('EventConsumersService', () => {
 
     it('should make put request to stop event consumer',
         inject([EventConsumersService, HttpTestingController], (eventConsumersService: EventConsumersService, httpMock: HttpTestingController) => {
-            const resource: Resource = {
+            const resource: IResourceDto = {
                 _links: {
-                    stop: { method: 'PUT', href: 'api/event-consumers/event-consumer123/stop' },
+                    stop: new ResourceLinkDto({ method: 'PUT', href: 'api/event-consumers/event-consumer123/stop' }),
                 },
             };
 
             let eventConsumer: EventConsumerDto;
-
             eventConsumersService.putStop(resource).subscribe(response => {
                 eventConsumer = response;
             });
@@ -106,14 +107,13 @@ describe('EventConsumersService', () => {
 
     it('should make put request to reset event consumer',
         inject([EventConsumersService, HttpTestingController], (eventConsumersService: EventConsumersService, httpMock: HttpTestingController) => {
-            const resource: Resource = {
+            const resource: IResourceDto = {
                 _links: {
-                    reset: { method: 'PUT', href: 'api/event-consumers/event-consumer123/reset' },
+                    reset: new ResourceLinkDto({ method: 'PUT', href: 'api/event-consumers/event-consumer123/reset' }),
                 },
             };
 
             let eventConsumer: EventConsumerDto;
-
             eventConsumersService.putReset(resource).subscribe(response => {
                 eventConsumer = response;
             });
@@ -146,17 +146,17 @@ describe('EventConsumersService', () => {
 });
 
 export function createEventConsumer(id: number, suffix = '') {
-    const links: ResourceLinks = {
-        reset: { method: 'PUT', href: `/event-consumers/${id}/reset` },
-    };
-
     const key = `${id}${suffix}`;
 
-    return new EventConsumerDto(links,
-        `event-consumer${id}`,
-        id,
-        true,
-        true,
-        `failure${key}`,
-        `position${key}`);
+    return new EventConsumerDto({
+        name: `event-consumer${id}`,
+        position: `position${key}`,
+        count: id,
+        isStopped: true,
+        isResetting: true,
+        error: `failure${key}`,
+        _links: {
+            reset: new ResourceLinkDto({ method: 'PUT', href: `/event-consumers/${id}/reset` }),
+        },
+    });
 }

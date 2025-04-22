@@ -9,9 +9,9 @@
 
 import { UntypedFormControl, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form, hasNoValue$, ValidatorsEx } from '@app/framework';
-import { StartRestoreDto } from '../services/jobs.service';
+import { RestoreRequestDto } from '../model';
 
-export class RestoreForm extends Form<ExtendedFormGroup, StartRestoreDto> {
+export class RestoreForm extends Form<ExtendedFormGroup, RestoreRequestDto> {
     public get url() {
         return this.form.controls['url'];
     }
@@ -30,5 +30,9 @@ export class RestoreForm extends Form<ExtendedFormGroup, StartRestoreDto> {
                 ),
             }),
         );
+    }
+
+    protected transformSubmit(value: any) {
+        return new RestoreRequestDto(value);
     }
 }

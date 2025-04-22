@@ -9,35 +9,8 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ApiUrlConfig, pretifyError, Resource, ResourceLinks } from '@app/framework';
-
-export class TemplateDto {
-    public readonly _links: ResourceLinks;
-
-    constructor(links: ResourceLinks,
-        public readonly name: string,
-        public readonly title: string,
-        public readonly description: string,
-        public readonly isStarter: boolean,
-    ) {
-        this._links = links;
-    }
-}
-
-export class TemplateDetailsDto {
-    public readonly _links: ResourceLinks;
-
-    constructor(links: ResourceLinks,
-        public readonly details: string,
-    ) {
-        this._links = links;
-    }
-}
-
-export type TemplatesDto = Readonly<{
-    // The list of templates.
-    items: ReadonlyArray<TemplateDto>;
-}>;
+import { ApiUrlConfig, pretifyError, Resource } from '@app/framework';
+import { TemplateDetailsDto, TemplatesDto } from './../model';
 
 @Injectable({
     providedIn: 'root',
@@ -54,7 +27,7 @@ export class TemplatesService {
 
         return this.http.get<any>(url).pipe(
             map(body => {
-                return parseTemplates(body);
+                return TemplatesDto.fromJSON(body);
             }),
             pretifyError('i18n:templates.loadFailed'));
     }
@@ -66,28 +39,8 @@ export class TemplatesService {
 
         return this.http.get<any>(url).pipe(
             map(body => {
-                return parseTemplateDetails(body);
+                return TemplateDetailsDto.fromJSON(body);
             }),
             pretifyError('i18n:templates.loadFailed'));
     }
-}
-
-function parseTemplates(response: { items: any[] } & Resource): TemplatesDto {
-    const { items: list } = response;
-    const items = list.map(parseTemplate);
-
-    return { items };
-}
-
-function parseTemplate(response: any & Resource) {
-    return new TemplateDto(response._links,
-        response.name,
-        response.title,
-        response.description,
-        response.isStarter);
-}
-
-function parseTemplateDetails(response: any & Resource) {
-    return new TemplateDetailsDto(response._links,
-        response.details);
 }

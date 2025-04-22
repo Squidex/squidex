@@ -7,7 +7,7 @@
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, HostBinding, Input } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { AppLanguageDto, ContentDto, ContentsColumnsPipe, ContentSelectorComponent, DialogModel, ModalDirective, ResizedDirective, ResolveContents, sorted, StatefulControlComponent, TranslatePipe, Types } from '@app/shared';
 import { ContentCreatorComponent } from './content-creator.component';
@@ -48,6 +48,10 @@ interface State {
     ],
 })
 export class ReferencesEditorComponent extends StatefulControlComponent<State, ReadonlyArray<string>> {
+    @Input({ transform: booleanAttribute })
+    @HostBinding('class.expanded')
+    public isExpanded = false;
+
     @Input({ required: true })
     public schemaIds!: ReadonlyArray<string>;
 
@@ -62,9 +66,6 @@ export class ReferencesEditorComponent extends StatefulControlComponent<State, R
 
     @Input({ required: true })
     public formContext!: any;
-
-    @Input({ transform: booleanAttribute })
-    public isExpanded = false;
 
     @Input({ transform: booleanAttribute })
     public allowDuplicates?: boolean | null = true;

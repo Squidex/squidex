@@ -7,7 +7,7 @@
 
 import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, forwardRef, Input, numberAttribute, Output } from '@angular/core';
-import { AppLanguageDto, EditContentForm, FieldForm, FieldSection, FormHintComponent, LocalStoreService, MarkdownDirective, RootFieldDto, SchemaDto, Settings, StatefulComponent, TypedSimpleChanges } from '@app/shared';
+import { AppLanguageDto, EditContentForm, FieldForm, FieldSection, FormHintComponent, LocalStoreService, MarkdownDirective, FieldDto, SchemaDto, Settings, StatefulComponent, TypedSimpleChanges } from '@app/shared';
 import { ContentFieldComponent } from './content-field.component';
 
 interface State {
@@ -48,7 +48,7 @@ export class ContentSectionComponent extends StatefulComponent<State> {
     public formContext!: any;
 
     @Input({ required: true })
-    public formSection!: FieldSection<RootFieldDto, FieldForm>;
+    public formSection!: FieldSection<FieldDto, FieldForm>;
 
     @Input({ required: true })
     public schema!: SchemaDto;

@@ -10,7 +10,7 @@ import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Inp
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { ControlErrorsComponent, FocusOnInitDirective, MarkdownDirective, ModalDialogComponent, ModalDirective, ShortcutComponent, ShortcutDirective, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/framework';
-import { DialogModel, equalsQuery, hasFilter, LanguageDto, Queries, Query, QueryModel, SaveQueryForm, TypedSimpleChanges } from '@app/shared/internal';
+import { AppLanguageDto, DialogModel, equalsQuery, hasFilter, Queries, Query, QueryModel, SaveQueryForm, TypedSimpleChanges } from '@app/shared/internal';
 import { TourHintDirective } from '../tour-hint.directive';
 import { QueryComponent } from './queries/query.component';
 import { SavedQueriesComponent } from './shared-queries.component';
@@ -50,10 +50,10 @@ export class SearchFormComponent {
     public placeholder = '';
 
     @Input()
-    public language!: LanguageDto;
+    public language!: AppLanguageDto;
 
     @Input()
-    public languages: ReadonlyArray<LanguageDto> = [];
+    public languages: ReadonlyArray<AppLanguageDto> = [];
 
     @Input()
     public queryModel?: QueryModel | null;
@@ -116,19 +116,20 @@ export class SearchFormComponent {
 
     public saveQueryComplete() {
         const value = this.saveQueryForm.submit();
-
-        if (value) {
-            if (this.queries && this.query) {
-                if (value.user) {
-                    this.queries.addUser(value.name, this.query);
-                } else {
-                    this.queries.addShared(value.name, this.query);
-                }
-            }
-
-            this.saveQueryForm.submitCompleted();
-            this.saveQueryDialog.hide();
+        if (!value) {
+            return;
         }
+
+        if (this.queries && this.query) {
+            if (value.user) {
+                this.queries.addUser(value.name, this.query);
+            } else {
+                this.queries.addShared(value.name, this.query);
+            }
+        }
+
+        this.saveQueryForm.submitCompleted();
+        this.saveQueryDialog.hide();
     }
 
     public changeQueryFullText(fullText: string) {

@@ -39,7 +39,7 @@ export class FieldListComponent {
     public withMetaFields = false;
 
     @Output()
-    public fieldNamesChange = new EventEmitter<ReadonlyArray<string>>();
+    public fieldNamesChange = new EventEmitter<string[]>();
 
     public fieldsAdded!: TableField[];
     public fieldsNotAdded!: TableField[];

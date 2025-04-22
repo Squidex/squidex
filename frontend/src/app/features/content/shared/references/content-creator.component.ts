@@ -106,26 +106,26 @@ export class ContentCreatorComponent implements OnInit {
 
     private saveContent(publish: boolean) {
         const value = this.contentForm.submit();
-
-        if (value) {
-            if (!this.canCreate(publish)) {
-                return;
-            }
-
-            this.contentsState.create(value, publish)
-                .subscribe({
-                    next: content => {
-                        this.contentForm.submitCompleted({ noReset: true });
-
-                        this.emitSelect(content);
-                    },
-                    error: error => {
-                        this.contentForm.submitFailed(error);
-                    },
-                });
-        } else {
+        if (!value) {
             this.contentForm.submitFailed('i18n:contents.contentNotValid');
+            return;
         }
+
+        if (!this.canCreate(publish)) {
+            return;
+        }
+
+        this.contentsState.create(value, publish)
+            .subscribe({
+                next: content => {
+                    this.contentForm.submitCompleted({ noReset: true });
+
+                    this.emitSelect(content);
+                },
+                error: error => {
+                    this.contentForm.submitFailed(error);
+                },
+            });
     }
 
     private canCreate(publish: boolean) {
