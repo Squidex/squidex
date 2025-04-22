@@ -13,8 +13,8 @@
     padding-bottom: 0;
 
     &.expanded {
-        @include absolute(3rem, 1.25rem, .75rem, 1.25rem);
-        max-height: none;
+        @include absolute(5.5rem, 1.25rem, .75rem, 1.25rem);
+        height: auto;
     }
 }
 
