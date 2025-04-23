@@ -27,9 +27,6 @@ image:
   ## @param image.repository Squidex image registry
   ##
   repository: squidex/squidex
-  ## @param image.tag Override Squidex image tag; use chart's AppVersion otherwise
-  ##
-  # tag: "7.0.2"
   ## @param image.pullPolicy Squidex image pull policy
   ##
   pullPolicy: IfNotPresent
@@ -50,7 +47,7 @@ clusterSuffix: cluster.local
 ## Set to true to run Squidex as nonroot. Defaults to false for backwards compatibility.
 runAsNonRoot: false
 
-## @param podSecurityContext - object - optional
+## @skip podSecurityContext - object - optional
 ## You can modify the security context used to run PODS in the cluster
 ## For information regarding which settings are required per policy see: https://kubernetes.io/docs/concepts/security/pod-security-standards/
 ## An example that follows the Restricted profile is described below:
@@ -63,7 +60,7 @@ podSecurityContext:
   runAsGroup: 10000
   fsGroup: 10000
 
-## @param containerSecurityContext - object - optional
+## @skip containerSecurityContext - object - optional
 ## You can modify the security context used to run CONTAINERS in the cluster
 ## For information regarding which settings are required per policy see: https://kubernetes.io/docs/concepts/security/pod-security-standards/
 ## An example that follows the Restricted profile is described below:
@@ -85,6 +82,7 @@ ingress:
   ## If true, Squidex Ingress will be created.
   ##
   enabled: true
+  ## @param ingress.ingressClassName The ingress class.
   ingressClassName: nginx
   ## Squidex Ingress annotations
   # annotations:
@@ -240,56 +238,62 @@ env:
   ASSETSTORE__TYPE: MongoDb
 
   ## @param env.URLS__BASEURL Set the base url of your application, to generate correct urls in background process.
+  ##
   URLS__BASEURL: https://squidex.local/ # 
 
   ## @param env.URLS__ENFORCEHTTPS Set it to true to redirect the user from http to https permanently
+  ##
   URLS__ENFORCEHTTPS: false
 
-  ## @param env.ASPNETCORE_URLS: an override to ensure that kestrel starts on a non-privileged port
+  ## @param env.ASPNETCORE_URLS An override to ensure that kestrel starts on a non-privileged port
+  ##
   ASPNETCORE_URLS: http://+:80
 
 ## @section MongoDB parameters
-mongodb-replicaset:
-  ## @param mongodb-replicaset.enabled Uses the custom mongoDB instance.
+mongodb:
+  ## @param mongodb.architecture MongoDB(®) architecture (standalone or replicaset
+  ##
+  architecture: replicaset
+  ## @param mongodb.enabled Uses the custom mongoDB instance.
   ##
   enabled: true
-  ## @param mongodb-replicaset.replicas The number of replicas.
+  ## @param mongodb.replicaCount The number of replicas.
   ##
-  replicas: 3
+  replicaCount: 3
   
-  ## @skip mongodb-replicaset.auth
   auth:
+    ## @param mongodb.auth.enabled Enable authentication for MongoDB.
+    ##
     enabled: false
-    existingKeySecret: ""
-    existingAdminSecret: ""
-    existingMetricsSecret: ""
-    # adminUser: username
-    # adminPassword: password
-    # metricsUser: metrics
-    # metricsPassword: password
-    # key: keycontent
+    ## @param mongodb.auth.rootUsername The MongoDB root user name.
+    ##
+    rootUsername: ""
+    ## @param mongodb.auth.rootPassword The MongoDB root password.
+    ##
+    rootPassword: ""
+    ## @param mongodb.auth.existingSecret The name of the existing secret to use for authentication.
+    ##
+    existingSecret: ""
   
-  persistentVolume:
-    ## @param mongodb-replicaset.persistentVolume.enabled If true, persistent volume claims are created.
+  persistence:
+    ## @param mongodb.persistence.enabled If true, persistent volume claims are created.
     ##
     enabled: true
-    ## @param mongodb-replicaset.persistentVolume.storageClass Persistent volume storage class.
-    ## mongodb-replicaset data Persistent Volume Storage Class
-    ## If defined, storageClassName: <storageClass>
-    ## If set to "-", storageClassName: "", which disables dynamic provisioning
-    ## If undefined (the default) or set to null, no storageClassName spec is
-    ##   set, choosing the default provisioner.  (gp2 on AWS, standard on
-    ##   GKE, AWS & OpenStack)
-    ##
+    ## @param mongodb.persistence.storageClass The storage class for the persistent volume claim.
     ##
     storageClass: ""
-    ## @param mongodb-replicaset.persistentVolume.accessModes Persistent volume access modes.
+    ## @param mongodb.persistence.accessModes Persistent volume access modes.
     ##
     accessModes:
       - ReadWriteOnce
-    ## @param mongodb-replicaset.persistentVolume.size Persistent volume size.
+    ## @param mongodb.persistence.size Persistent volume size.
     ##
     size: 10Gi
+
+  ## @skip mongodb.arbiter
+  arbiter:
+    ## @skip mongodb.arbiter.enabled
+    enabled: false
   
-  ## @skip mongodb-replicaset.nodeSelector
+  ## @skip mongodb.nodeSelector
   nodeSelector: {}

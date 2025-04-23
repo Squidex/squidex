@@ -26,8 +26,8 @@ app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- define "squidex.mongoDefaultHostname" }}
   {{- $release := .Release}}
   {{- $clusterSuffix := .Values.clusterSuffix}}
-  {{- range $index, $i := until (int (index .Values "mongodb-replicaset").replicas) }}
-    {{- $replica := printf "%s-mongodb-replicaset-%d.%s-mongodb-replicaset.%s.svc.%s" $release.Name $i $release.Name $release.Namespace $clusterSuffix }}
+  {{- range $index, $i := until (int (index .Values "mongodb").replicaCount) }}
+    {{- $replica := printf "%s-mongodb-%d.%s-mongodb-headless.%s.svc.%s" $release.Name $i $release.Name $release.Namespace $clusterSuffix }}
     {{- if eq $i 0}}
       {{- $replica }}
     {{- else -}}

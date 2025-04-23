@@ -46,17 +46,17 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ### Global parameters
 
-| Name                      | Description                    | Value                          |
-| ------------------------- | ------------------------------ | ------------------------------ |
-| `service.type`            | Kubernetes Service type        | `ClusterIP`                    |
-| `service.port`            | Kubernetes Service port        | `80`                           |
-| `deployment.replicaCount` | Number of instances.           | `1`                            |
-| `image.repository`        | Squidex image registry         | `squidex/squidex`              |
-| `image.tag`               | Squidex image tag              | null: Uses chart's App Version |
-| `image.pullPolicy`        | Squidex image pull policy      | `IfNotPresent`                 |
-| `ingress.enabled`         | True to deploy an ingress      | `true`                         |
-| `ingress.hostName`        | The host name for the ingress. | `squidex.local`                |
-
+| Name                       | Description                    | Value             |
+| -------------------------- | ------------------------------ | ----------------- |
+| `service.type`             | Kubernetes Service type        | `ClusterIP`       |
+| `service.port`             | Kubernetes Service port        | `80`              |
+| `deployment.replicaCount`  | Number of instances.           | `1`               |
+| `image.repository`         | Squidex image registry         | `squidex/squidex` |
+| `image.pullPolicy`         | Squidex image pull policy      | `IfNotPresent`    |
+| `runAsNonRoot`             |                                | `false`           |
+| `ingress.enabled`          | True to deploy an ingress      | `true`            |
+| `ingress.ingressClassName` | The ingress class.             | `nginx`           |
+| `ingress.hostName`         | The host name for the ingress. | `squidex.local`   |
 
 ### Squidex parameters
 
@@ -86,7 +86,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | `env.IDENTITY__OIDCRESPONSETYPE`                     | The type of the response. id_token or code.                                                                      | `nil`                        |
 | `env.IDENTITY__OIDCSCOPES`                           | The scopes.                                                                                                      | `[]`                         |
 | `env.IDENTITY__OIDCSINGOUTREDIRECTURL`               | The redirect URL for the sign out.                                                                               | `nil`                        |
-| `env.LOGGING__APPLICATIONINSIGHTS__ENABLED`          | Enable monitoring via application insights.                                                                      | `falsen`                     |
+| `env.LOGGING__APPLICATIONINSIGHTS__ENABLED`          | Enable monitoring via application insights.                                                                      | `false`                      |
 | `env.LOGGING__APPLICATIONINSIGHTS__CONNECTIONSTRING` | The connection string to application insights.                                                                   | `nil`                        |
 | `env.LOGGING__COLORS`                                | Use colors in the console output.                                                                                | `false`                      |
 | `env.LOGGING__HUMAN`                                 | Setting the flag to true, enables well formatteds json logs.                                                     | `false`                      |
@@ -101,18 +101,23 @@ The command removes all the Kubernetes components associated with the chart and 
 | `env.STORE__MONGODB__CONTENTDATABASE`                | The name of the database for content items.                                                                      | `SquidexContent`             |
 | `env.URLS__BASEURL`                                  | Set the base url of your application, to generate correct urls in background process.                            | `https://squidex.local/`     |
 | `env.URLS__ENFORCEHTTPS`                             | Set it to true to redirect the user from http to https permanently                                               | `false`                      |
-
+| `env.ASPNETCORE_URLS`                                | An override to ensure that kestrel starts on a non-privileged port                                               | `http://+:80`                |
 
 ### MongoDB parameters
 
-| Name                                               | Description                                    | Value               |
-| -------------------------------------------------- | ---------------------------------------------- | ------------------- |
-| `mongodb-replicaset.enabled`                       | Uses the custom mongoDB instance.              | `true`              |
-| `mongodb-replicaset.replicas`                      | The number of replicas.                        | `3`                 |
-| `mongodb-replicaset.persistentVolume.enabled`      | If true, persistent volume claims are created. | `true`              |
-| `mongodb-replicaset.persistentVolume.storageClass` | Persistent volume storage class.               | `""`                |
-| `mongodb-replicaset.persistentVolume.accessModes`  | Persistent volume access modes.                | `["ReadWriteOnce"]` |
-| `mongodb-replicaset.persistentVolume.size`         | Persistent volume size.                        | `10Gi`              |
+| Name                               | Description                                                | Value               |
+| ---------------------------------- | ---------------------------------------------------------- | ------------------- |
+| `mongodb.architecture`             | MongoDB(®) architecture (standalone or replicaset          | `replicaset`        |
+| `mongodb.enabled`                  | Uses the custom mongoDB instance.                          | `true`              |
+| `mongodb.replicaCount`             | The number of replicas.                                    | `3`                 |
+| `mongodb.auth.enabled`             | Enable authentication for MongoDB.                         | `false`             |
+| `mongodb.auth.rootUsername`        | The MongoDB root user name.                                | `""`                |
+| `mongodb.auth.rootPassword`        | The MongoDB root password.                                 | `""`                |
+| `mongodb.auth.existingSecret`      | The name of the existing secret to use for authentication. | `""`                |
+| `mongodb.persistence.enabled`      | If true, persistent volume claims are created.             | `true`              |
+| `mongodb.persistence.storageClass` | The storage class for the persistent volume claim.         | `""`                |
+| `mongodb.persistence.accessModes`  | Persistent volume access modes.                            | `["ReadWriteOnce"]` |
+| `mongodb.persistence.size`         | Persistent volume size.                                    | `10Gi`              |
 
 
 Parameters are generated with: https://github.com/bitnami-labs/readme-generator-for-helm#configuration-file

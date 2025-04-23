@@ -5,8 +5,8 @@ name: squidex7
 icon: https://raw.githubusercontent.com/Squidex/squidex/master/media/logo-squared.png
 description: Squidex CMS v7.0 and newer
 
-version: 1.0.3
-appVersion: "7.15.0"
+version: 2.0.0
+appVersion: "7.18.0"
 
 home: https://squidex.io/
 
@@ -22,7 +22,7 @@ sources:
   - https://github.com/Squidex/squidex
 
 dependencies:
-  - name: mongodb-replicaset
-    version: 3.9.6
-    repository: https://kubernetes-charts.storage.googleapis.com/
-    condition: mongodb-replicaset.enabled
+  - name: mongodb
+    version: 16.5.1
+    repository: https://charts.bitnami.com/bitnami
+    condition: mongodb.enabled
