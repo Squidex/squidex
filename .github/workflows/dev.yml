@@ -60,7 +60,7 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Prepare - Setup Node
-        uses: actions/setup-node@v4.3.0
+        uses: actions/setup-node@v4.4.0
         with:
           node-version: 18
 
@@ -161,7 +161,7 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Prepare - Setup Node
-        uses: actions/setup-node@v4.3.0
+        uses: actions/setup-node@v4.4.0
         with:
           node-version: 18
 
