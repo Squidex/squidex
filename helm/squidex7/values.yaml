@@ -24,7 +24,7 @@ deployment:
   ## @param deployment.revisionHistoryLimit [default: 2] Number of revision history
   revisionHistoryLimit: 2
   ## @param deployment.serviceAccountName Name of the service account to use
-  serviceAccountName: "squidex-sa"
+  serviceAccountName: ""
   ## @param deployment.strategy.type Deployment strategy type
   strategy:
     type: RollingUpdate

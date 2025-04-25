@@ -54,7 +54,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | `deployment.replicaCount`                          | Number of replicas                                                  | `1`               |
 | `deployment.worker.replicaCount`                   | Number of worker instances                                          | `1`               |
 | `deployment.revisionHistoryLimit`                  | Number of revision history                                          | `2`               |
-| `deployment.serviceAccountName`                    | Name of the service account to use                                  | `squidex-sa`      |
+| `deployment.serviceAccountName`                    | Name of the service account to use                                  | `""`              |
 | `deployment.strategy.type`                         | Deployment strategy type                                            | `RollingUpdate`   |
 | `deployment.strategy.rollingUpdate.maxSurge`       | Maximum number of pods that can be created above the desired amount | `1`               |
 | `deployment.strategy.rollingUpdate.maxUnavailable` | Maximum number of unavailable pods during update                    | `0`               |
