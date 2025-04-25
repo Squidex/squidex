@@ -49,6 +49,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | Name                                               | Description                                                         | Value             |
 | -------------------------------------------------- | ------------------------------------------------------------------- | ----------------- |
 | `nameOverride`                                     | Override the name of the application.                               | `squidex`         |
+| `labels`                                           | Labels to add to the deployment                                     | `{}`              |
 | `service.type`                                     | Kubernetes Service type                                             | `ClusterIP`       |
 | `service.port`                                     | Kubernetes Service port                                             | `8080`            |
 | `deployment.replicaCount`                          | Number of replicas                                                  | `1`               |
@@ -65,10 +66,13 @@ The command removes all the Kubernetes components associated with the chart and 
 | `networkPolicy.enabled`                            | Enable network policies                                             | `true`            |
 | `image.repository`                                 | Squidex image registry                                              | `squidex/squidex` |
 | `image.pullPolicy`                                 | Squidex image pull policy                                           | `IfNotPresent`    |
+| `resources`                                        | Resource requests and limits                                        | `{}`              |
+| `topologySpreadConstraints`                        | Topology spread constraints for pod scheduling                      | `[]`              |
+| `priorityClassName`                                | Priority class name for the pod                                     | `nil`             |
 | `runAsNonRoot`                                     | Run container as non-root user.                                     | `true`            |
 | `ingress.enabled`                                  | True to deploy an ingress                                           | `true`            |
 | `ingress.ingressClassName`                         | The ingress class.                                                  | `nginx`           |
-| `ingress.annotations`                              | Ingress annotations                                                 | `undefined`       |
+| `ingress.annotations`                              | Ingress annotations                                                 | `{}`              |
 | `ingress.hostName`                                 | The host name for the ingress.                                      | `squidex.local`   |
 
 ### Squidex parameters

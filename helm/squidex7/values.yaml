@@ -3,7 +3,7 @@
 ## @param nameOverride Override the name of the application.
 nameOverride: "squidex"
 
-## @skip labels
+## @param labels [object] Labels to add to the deployment
 labels:
   # custom: "custom"
 
@@ -98,7 +98,7 @@ image:
   ##
   pullPolicy: IfNotPresent
 
-## @skip resources
+## @param resources [object] Resource requests and limits
 resources:
   limits:
     memory: "1Gi"
@@ -130,7 +130,7 @@ affinity:
           - amd64
           - arm64
 
-## @skip topologySpreadConstraints
+## @param topologySpreadConstraints [array] Topology spread constraints for pod scheduling
 topologySpreadConstraints:
   # - maxSkew: 1
   #   topologyKey: kubernetes.io/hostname
@@ -140,7 +140,7 @@ topologySpreadConstraints:
   #       app.kubernetes.io/instance: squidex
   #       app.kubernetes.io/component: squidex
 
-## @skip priorityClassName
+## @param priorityClassName [nullable] Priority class name for the pod
 priorityClassName:
 
 ## @skip clusterSuffix
@@ -187,8 +187,7 @@ ingress:
   enabled: true
   ## @param ingress.ingressClassName The ingress class.
   ingressClassName: nginx
-  ## @param ingress.annotations Ingress annotations
-  ## @skip ingress.annotations [nullable]
+  ## @param ingress.annotations [object] Ingress annotations
   annotations:
     #   kubernetes.io/ingress.class: nginx
     #   kubernetes.io/tls-acme: "true"
