@@ -16,34 +16,44 @@ service:
   port: 8080
 
 deployment:
-  ## @param deployment.replicaCount Number of instances.
-  ## if autoscaling is enabled, this value is ignored
+  ## @param deployment.replicaCount [nullable] Number of replicas
   replicaCount: 1
   worker:
-    replicaCount: 1 # only one worker supported
+    ## @param deployment.worker.replicaCount Number of worker instances
+    replicaCount: 1 # only one worker supported# only one worker supported
+  ## @param deployment.revisionHistoryLimit [default: 2] Number of revision history
   revisionHistoryLimit: 2
+  ## @param deployment.serviceAccountName Name of the service account to use
   serviceAccountName: "squidex-sa"
+  ## @param deployment.strategy.type Deployment strategy type
   strategy:
     type: RollingUpdate
+    ## @param deployment.strategy.rollingUpdate.maxSurge Maximum number of pods that can be created above the desired amount
     rollingUpdate:
       maxSurge: 1
+      ## @param deployment.strategy.rollingUpdate.maxUnavailable Maximum number of unavailable pods during update
       maxUnavailable: 0
+  ## @param deployment.restartPolicy Pod restart policy
   restartPolicy: Always
+  ## @param deployment.annotations Annotations to add to the deployment
   annotations:
     # vault.hashicorp.com/agent-pre-populate-only: "true"
     # vault.hashicorp.com/agent-limits-cpu: 50m
     # vault.hashicorp.com/agent-limits-mem: 64Mi
     # vault.hashicorp.com/agent-requests-cpu: 10m
     # vault.hashicorp.com/agent-requests-mem: 16Mi
+  ## @param deployment.command Command to run in the container
   command:
     # - sh
     # - -c
+  ## @param deployment.args Arguments to pass to the container
   args:
     # - 'dotnet Squidex.dll'
 
-## Network policies
+## @param networkPolicy.enabled Enable network policies
 networkPolicy:
   enabled: true
+  ## @skip networkPolicy.ingressRules
   ingressRules:
     - from:
         - namespaceSelector:
@@ -55,6 +65,7 @@ networkPolicy:
       ports:
         - port: 8080
           protocol: TCP
+  ## @skip networkPolicy.egressRules
   egressRules:
     - to:
       - namespaceSelector:
@@ -135,8 +146,7 @@ priorityClassName:
 ## @skip clusterSuffix
 clusterSuffix: cluster.local
 
-## @param runAsNonRoot
-## Set to true to run Squidex as nonroot.
+## @param runAsNonRoot Run container as non-root user.
 runAsNonRoot: true
 
 ## @skip podSecurityContext - object - optional
@@ -177,7 +187,8 @@ ingress:
   enabled: true
   ## @param ingress.ingressClassName The ingress class.
   ingressClassName: nginx
-  ## Squidex Ingress annotations
+  ## @param ingress.annotations Ingress annotations
+  ## @skip ingress.annotations [nullable]
   annotations:
     #   kubernetes.io/ingress.class: nginx
     #   kubernetes.io/tls-acme: "true"
@@ -343,19 +354,24 @@ env:
   ##
   URLS__ENFORCEHTTPS: false
 
-  ## @param env.ASPNETCORE_URLS: an override to ensure that kestrel starts on a non-privileged port
+  ## @param env.ASPNETCORE_URLS An override to ensure that kestrel starts on a non-privileged port
+  ##
   ASPNETCORE_URLS: http://+:8080
 
-## @section Autoscaling parameters
+## @param autoscaling.enabled Enable autoscaling for the deployment
 autoscaling:
   enabled: true
+  ## @param autoscaling.maxReplicas Maximum number of replicas
   maxReplicas: 6
+  ## @param autoscaling.minReplicas Minimum number of replicas
   minReplicas: 3
+  ## @param autoscaling.targetCPUUtilizationPercentage Target CPU utilization percentage
   targetCPUUtilizationPercentage: 85
 
-## @section Pod Disruption Budget parameters
+## @param podDisruptionBudget.minAvailable Minimum number of available pods
 podDisruptionBudget:
   minAvailable: 1
+  ## @param podDisruptionBudget.unhealthyPodEvictionPolicy Policy for evicting unhealthy pods
   unhealthyPodEvictionPolicy: AlwaysAllow
 
 ## @section MongoDB parameters
