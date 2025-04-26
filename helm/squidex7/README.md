@@ -52,7 +52,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | `labels`                                           | Labels to add to the deployment                                     | `{}`              |
 | `service.type`                                     | Kubernetes Service type                                             | `ClusterIP`       |
 | `service.port`                                     | Kubernetes Service port                                             | `8080`            |
-| `deployment.replicaCount`                          | Number of replicas                                                  | `1`               |
+| `deployment.replicaCount`                          | Number of replicas (ignored if autoscaling enabled)                 | `3`               |
 | `deployment.worker.replicaCount`                   | Number of worker instances                                          | `1`               |
 | `deployment.revisionHistoryLimit`                  | Number of revision history                                          | `2`               |
 | `deployment.serviceAccountName`                    | Name of the service account to use                                  | `""`              |

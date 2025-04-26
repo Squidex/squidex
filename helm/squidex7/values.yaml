@@ -16,11 +16,11 @@ service:
   port: 8080
 
 deployment:
-  ## @param deployment.replicaCount [nullable] Number of replicas
-  replicaCount: 1
+  ## @param deployment.replicaCount Number of replicas (ignored if autoscaling enabled)
+  replicaCount: 3
   worker:
     ## @param deployment.worker.replicaCount Number of worker instances
-    replicaCount: 1 # only one worker supported# only one worker supported
+    replicaCount: 1 # only one worker supported
   ## @param deployment.revisionHistoryLimit [default: 2] Number of revision history
   revisionHistoryLimit: 2
   ## @param deployment.serviceAccountName Name of the service account to use
