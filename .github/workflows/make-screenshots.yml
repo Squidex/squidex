@@ -23,7 +23,7 @@ jobs:
           node-version: 18
 
       - name: Build - BUILD
-        uses: docker/build-push-action@v6.15.0
+        uses: docker/build-push-action@v6.16.0
         with:
           load: true
           cache-from: type=gha
