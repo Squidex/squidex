@@ -1,18 +1,85 @@
 ## @section Global parameters
 
-## @skip labels
+## @param nameOverride Override the name of the application.
+nameOverride: "squidex"
+
+## @param labels [object] Labels to add to the deployment
 labels:
+  # custom: "custom"
+
 service:
   ## @param service.type Kubernetes Service type
   ##
   type: ClusterIP
   ## @param service.port Kubernetes Service port
   ##
-  port: 80
+  port: 8080
+
 deployment:
-  ## @param deployment.replicaCount Number of instances.
-  ##
-  replicaCount: 1
+  ## @param deployment.replicaCount Number of replicas (ignored if autoscaling enabled)
+  replicaCount: 3
+  worker:
+    ## @param deployment.worker.replicaCount Number of worker instances
+    replicaCount: 1 # only one worker supported
+  ## @param deployment.revisionHistoryLimit [default: 2] Number of revision history
+  revisionHistoryLimit: 2
+  ## @param deployment.serviceAccountName Name of the service account to use
+  serviceAccountName: ""
+  ## @param deployment.strategy.type Deployment strategy type
+  strategy:
+    type: RollingUpdate
+    ## @param deployment.strategy.rollingUpdate.maxSurge Maximum number of pods that can be created above the desired amount
+    rollingUpdate:
+      maxSurge: 1
+      ## @param deployment.strategy.rollingUpdate.maxUnavailable Maximum number of unavailable pods during update
+      maxUnavailable: 0
+  ## @param deployment.restartPolicy Pod restart policy
+  restartPolicy: Always
+  ## @param deployment.annotations Annotations to add to the deployment
+  annotations:
+    # vault.hashicorp.com/agent-pre-populate-only: "true"
+    # vault.hashicorp.com/agent-limits-cpu: 50m
+    # vault.hashicorp.com/agent-limits-mem: 64Mi
+    # vault.hashicorp.com/agent-requests-cpu: 10m
+    # vault.hashicorp.com/agent-requests-mem: 16Mi
+  ## @param deployment.command Command to run in the container
+  command:
+    # - sh
+    # - -c
+  ## @param deployment.args Arguments to pass to the container
+  args:
+    # - 'dotnet Squidex.dll'
+
+## @param networkPolicy.enabled Enable network policies
+networkPolicy:
+  enabled: true
+  ## @skip networkPolicy.ingressRules
+  ingressRules:
+    - from:
+        - namespaceSelector:
+            matchLabels:
+              kubernetes.io/metadata.name: ingress-nginx
+        - podSelector:
+            matchLabels:
+              app.kubernetes.io/instance: ingress-nginx
+      ports:
+        - port: 8080
+          protocol: TCP
+  ## @skip networkPolicy.egressRules
+  egressRules:
+    - to:
+      - namespaceSelector:
+          matchLabels:
+            kubernetes.io/metadata.name: kube-system
+        podSelector:
+          matchLabels:
+            k8s-app: kube-dns
+      ports:
+        - port: 53
+          protocol: UDP
+        - port: 53
+          protocol: TCP
+
 selectors:
   ## @skip selectors.component
   ##
@@ -31,21 +98,56 @@ image:
   ##
   pullPolicy: IfNotPresent
 
-## @skip resources
-resources: { }
+## @param resources [object] Resource requests and limits
+resources:
+  limits:
+    memory: "1Gi"
+  requests:
+    cpu: "200m"
+    memory: "512Mi"
 ## @skip nodeSelector
 nodeSelector: { }
 ## @skip tolerations
 tolerations: [ ]
 ## @skip affinity
-affinity: { }
+affinity:
+  podAntiAffinity:
+    preferredDuringSchedulingIgnoredDuringExecution:
+    - weight: 100
+      podAffinityTerm:
+        labelSelector:
+          matchLabels:
+            app.kubernetes.io/instance: squidex
+            app.kubernetes.io/component: squidex
+        topologyKey: kubernetes.io/hostname
+  nodeAffinity:
+    requiredDuringSchedulingIgnoredDuringExecution:
+      nodeSelectorTerms:
+      - matchExpressions:
+        - key: kubernetes.io/arch
+          operator: In
+          values:
+          - amd64
+          - arm64
+
+## @param topologySpreadConstraints [array] Topology spread constraints for pod scheduling
+topologySpreadConstraints:
+  # - maxSkew: 1
+  #   topologyKey: kubernetes.io/hostname
+  #   whenUnsatisfiable: DoNotSchedule
+  #   labelSelector:
+  #     matchLabels:
+  #       app.kubernetes.io/instance: squidex
+  #       app.kubernetes.io/component: squidex
+
+## @param priorityClassName [nullable] Priority class name for the pod
+priorityClassName:
 
 ## @skip clusterSuffix
 clusterSuffix: cluster.local
 
-## @param runAsNonRoot
-## Set to true to run Squidex as nonroot. Defaults to false for backwards compatibility.
-runAsNonRoot: false
+## @param runAsNonRoot Run container as non-root user.
+runAsNonRoot: true
 
 ## @skip podSecurityContext - object - optional
 ## You can modify the security context used to run PODS in the cluster
@@ -63,6 +165,7 @@ podSecurityContext:
 ## @skip containerSecurityContext - object - optional
 ## You can modify the security context used to run CONTAINERS in the cluster
 ## For information regarding which settings are required per policy see: https://kubernetes.io/docs/concepts/security/pod-security-standards/
+## readOnlyRootFilesystem: true not supported becasue of backup and restore process
 ## An example that follows the Restricted profile is described below:
 #
 containerSecurityContext:
@@ -84,10 +187,15 @@ ingress:
   enabled: true
   ## @param ingress.ingressClassName The ingress class.
   ingressClassName: nginx
-  ## Squidex Ingress annotations
-  # annotations:
-  #   kubernetes.io/ingress.class: nginx
-  #   kubernetes.io/tls-acme: "true"
+  ## @param ingress.annotations [object] Ingress annotations
+  annotations:
+    #   kubernetes.io/ingress.class: nginx
+    #   kubernetes.io/tls-acme: "true"
+    nginx.ingress.kubernetes.io/proxy-body-size: 50m
+    nginx.ingress.kubernetes.io/proxy-buffer-size: 128k
+    nginx.ingress.kubernetes.io/proxy-buffers: 4 256k
+    nginx.ingress.kubernetes.io/proxy-busy-buffers-size: 256k
+    nginx.ingress.kubernetes.io/ssl-redirect: 'true'
   ## @param ingress.hostName The host name for the ingress.
   ## 
   hostName: squidex.local
@@ -119,7 +227,7 @@ env:
   IDENTITY__ADMINPASSWORD: ""
   ## @param env.IDENTITY__ADMINRECREATE Recreate the admin if it does not exist or the password does not match
   ##
-  IDENTITY__ADMINRECREATE: false # 
+  IDENTITY__ADMINRECREATE: false
   ## @param env.IDENTITY__ALLOWPASSWORDAUTH Enable password auth. Set this to false if you want to disable local login, leaving only 3rd party login options
   ## 
   IDENTITY__ALLOWPASSWORDAUTH: "true"
@@ -205,7 +313,7 @@ env:
   LOGGING__HUMAN: false
   ## @param env.LOGGING__LEVEL Trace, Debug, Information, Warning, Error, Fatal
   ##
-  LOGGING__LEVEL: INFORMATION 
+  LOGGING__LEVEL: Warning
   ## @param env.LOGGING__LOGREQUESTS Set to false to disable logging of http requests.
   ##
   LOGGING__LOGREQUESTS: true
@@ -247,7 +355,23 @@ env:
 
   ## @param env.ASPNETCORE_URLS An override to ensure that kestrel starts on a non-privileged port
   ##
-  ASPNETCORE_URLS: http://+:80
+  ASPNETCORE_URLS: http://+:8080
+
+## @param autoscaling.enabled Enable autoscaling for the deployment
+autoscaling:
+  enabled: true
+  ## @param autoscaling.maxReplicas Maximum number of replicas
+  maxReplicas: 6
+  ## @param autoscaling.minReplicas Minimum number of replicas
+  minReplicas: 3
+  ## @param autoscaling.targetCPUUtilizationPercentage Target CPU utilization percentage
+  targetCPUUtilizationPercentage: 85
+
+## @param podDisruptionBudget.minAvailable Minimum number of available pods
+podDisruptionBudget:
+  minAvailable: 1
+  ## @param podDisruptionBudget.unhealthyPodEvictionPolicy Policy for evicting unhealthy pods
+  unhealthyPodEvictionPolicy: AlwaysAllow
 
 ## @section MongoDB parameters
 mongodb:

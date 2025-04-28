@@ -46,17 +46,34 @@ The command removes all the Kubernetes components associated with the chart and 
 
 ### Global parameters
 
-| Name                       | Description                    | Value             |
-| -------------------------- | ------------------------------ | ----------------- |
-| `service.type`             | Kubernetes Service type        | `ClusterIP`       |
-| `service.port`             | Kubernetes Service port        | `80`              |
-| `deployment.replicaCount`  | Number of instances.           | `1`               |
-| `image.repository`         | Squidex image registry         | `squidex/squidex` |
-| `image.pullPolicy`         | Squidex image pull policy      | `IfNotPresent`    |
-| `runAsNonRoot`             |                                | `false`           |
-| `ingress.enabled`          | True to deploy an ingress      | `true`            |
-| `ingress.ingressClassName` | The ingress class.             | `nginx`           |
-| `ingress.hostName`         | The host name for the ingress. | `squidex.local`   |
+| Name                                               | Description                                                         | Value             |
+| -------------------------------------------------- | ------------------------------------------------------------------- | ----------------- |
+| `nameOverride`                                     | Override the name of the application.                               | `squidex`         |
+| `labels`                                           | Labels to add to the deployment                                     | `{}`              |
+| `service.type`                                     | Kubernetes Service type                                             | `ClusterIP`       |
+| `service.port`                                     | Kubernetes Service port                                             | `8080`            |
+| `deployment.replicaCount`                          | Number of replicas (ignored if autoscaling enabled)                 | `3`               |
+| `deployment.worker.replicaCount`                   | Number of worker instances                                          | `1`               |
+| `deployment.revisionHistoryLimit`                  | Number of revision history                                          | `2`               |
+| `deployment.serviceAccountName`                    | Name of the service account to use                                  | `""`              |
+| `deployment.strategy.type`                         | Deployment strategy type                                            | `RollingUpdate`   |
+| `deployment.strategy.rollingUpdate.maxSurge`       | Maximum number of pods that can be created above the desired amount | `1`               |
+| `deployment.strategy.rollingUpdate.maxUnavailable` | Maximum number of unavailable pods during update                    | `0`               |
+| `deployment.restartPolicy`                         | Pod restart policy                                                  | `Always`          |
+| `deployment.annotations`                           | Annotations to add to the deployment                                | `nil`             |
+| `deployment.command`                               | Command to run in the container                                     | `nil`             |
+| `deployment.args`                                  | Arguments to pass to the container                                  | `nil`             |
+| `networkPolicy.enabled`                            | Enable network policies                                             | `true`            |
+| `image.repository`                                 | Squidex image registry                                              | `squidex/squidex` |
+| `image.pullPolicy`                                 | Squidex image pull policy                                           | `IfNotPresent`    |
+| `resources`                                        | Resource requests and limits                                        | `{}`              |
+| `topologySpreadConstraints`                        | Topology spread constraints for pod scheduling                      | `[]`              |
+| `priorityClassName`                                | Priority class name for the pod                                     | `nil`             |
+| `runAsNonRoot`                                     | Run container as non-root user.                                     | `true`            |
+| `ingress.enabled`                                  | True to deploy an ingress                                           | `true`            |
+| `ingress.ingressClassName`                         | The ingress class.                                                  | `nginx`           |
+| `ingress.annotations`                              | Ingress annotations                                                 | `{}`              |
+| `ingress.hostName`                                 | The host name for the ingress.                                      | `squidex.local`   |
 
 ### Squidex parameters
 
@@ -90,7 +107,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | `env.LOGGING__APPLICATIONINSIGHTS__CONNECTIONSTRING` | The connection string to application insights.                                                                   | `nil`                        |
 | `env.LOGGING__COLORS`                                | Use colors in the console output.                                                                                | `false`                      |
 | `env.LOGGING__HUMAN`                                 | Setting the flag to true, enables well formatteds json logs.                                                     | `false`                      |
-| `env.LOGGING__LEVEL`                                 | Trace, Debug, Information, Warning, Error, Fatal                                                                 | `INFORMATION`                |
+| `env.LOGGING__LEVEL`                                 | Trace, Debug, Information, Warning, Error, Fatal                                                                 | `Warning`                    |
 | `env.LOGGING__LOGREQUESTS`                           | Set to false to disable logging of http requests.                                                                | `true`                       |
 | `env.LOGGING__OTLP__ENABLED`                         | True, to enable OpenTelemetry Protocol integration                                                               | `false`                      |
 | `env.LOGGING__OLTP__ENDPOINT`                        | The endpoint to the agent                                                                                        | `nil`                        |
@@ -101,7 +118,13 @@ The command removes all the Kubernetes components associated with the chart and 
 | `env.STORE__MONGODB__CONTENTDATABASE`                | The name of the database for content items.                                                                      | `SquidexContent`             |
 | `env.URLS__BASEURL`                                  | Set the base url of your application, to generate correct urls in background process.                            | `https://squidex.local/`     |
 | `env.URLS__ENFORCEHTTPS`                             | Set it to true to redirect the user from http to https permanently                                               | `false`                      |
-| `env.ASPNETCORE_URLS`                                | An override to ensure that kestrel starts on a non-privileged port                                               | `http://+:80`                |
+| `env.ASPNETCORE_URLS`                                | An override to ensure that kestrel starts on a non-privileged port                                               | `http://+:8080`              |
+| `autoscaling.enabled`                                | Enable autoscaling for the deployment                                                                            | `true`                       |
+| `autoscaling.maxReplicas`                            | Maximum number of replicas                                                                                       | `6`                          |
+| `autoscaling.minReplicas`                            | Minimum number of replicas                                                                                       | `3`                          |
+| `autoscaling.targetCPUUtilizationPercentage`         | Target CPU utilization percentage                                                                                | `85`                         |
+| `podDisruptionBudget.minAvailable`                   | Minimum number of available pods                                                                                 | `1`                          |
+| `podDisruptionBudget.unhealthyPodEvictionPolicy`     | Policy for evicting unhealthy pods                                                                               | `AlwaysAllow`                |
 
 ### MongoDB parameters
 

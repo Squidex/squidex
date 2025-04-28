@@ -19,7 +19,8 @@ app.kubernetes.io/version: {{ .Values.selectors.version | quote }}
 helm.sh/chart: {{ include "squidex.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- if .Values.labels }}
-{{- toYaml .Values.labels | nindent 4 }}
+{{- "\n" -}}
+{{- toYaml .Values.labels }}
 {{- end -}}
 {{- end -}}
 
