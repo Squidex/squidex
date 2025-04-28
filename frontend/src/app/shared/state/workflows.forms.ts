@@ -25,6 +25,6 @@ export class AddWorkflowForm extends Form<ExtendedFormGroup, AddWorkflowDto> {
     }
 
     public transformSubmit(value: any) {
-        return new AddWorkflowDto(value);    
+        return new AddWorkflowDto(value);
     }
 }

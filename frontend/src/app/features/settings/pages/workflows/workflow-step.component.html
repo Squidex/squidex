@@ -5,7 +5,7 @@
                 class="btn btn-text-secondary btn-initial me-1"
                 [class.active]="step.name === workflow.dto.initial"
                 [class.enabled]="step.name !== workflow.dto.initial && !step.isLocked"
-                (click)="makeInitial.emit()"
+                (click)="makeInitial()"
                 [disabled]="step.name === workflow.dto.initial || step.isLocked || disabled">
                 @if (!step.isLocked) {
                     <i class="icon-arrow-right text-decent"></i>
@@ -35,7 +35,7 @@
         }
         <div class="col-auto">
             @if (!step.isLocked && workflow.steps.length > 2) {
-                <button class="btn btn-text-danger" (click)="remove.emit()" [disabled]="disabled" type="button">
+                <button class="btn btn-text-danger" (click)="remove()" [disabled]="disabled" type="button">
                     <i class="icon-bin2"></i>
                 </button>
             }
@@ -46,10 +46,11 @@
         @for (transition of transitions; track transition.to) {
             <sqx-workflow-transition
                 [disabled]="disabled"
-                (remove)="transitionRemove.emit(transition)"
+                (remove)="removeTransition(transition.to)"
                 [roles]="roles"
                 [transition]="transition"
-                (update)="changeTransition(transition, $event)"></sqx-workflow-transition>
+                (update)="update.emit($event)"
+                [workflow]="workflow"></sqx-workflow-transition>
         }
 
         @if (openSteps.length > 0 && !disabled) {
@@ -66,7 +67,7 @@
                     </sqx-dropdown>
                 </div>
                 <div class="col ps-2">
-                    <button class="btn btn-outline-secondary" (click)="transitionAdd.emit(openStep)">
+                    <button class="btn btn-outline-secondary" (click)="addTransition(openStep.name)">
                         <i class="icon-plus"></i>
                     </button>
                 </div>

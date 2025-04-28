@@ -91,6 +91,7 @@ public static class OpenApiServices
         {
             ConfigureSchemaSettings(settings.SchemaSettings, services.GetRequiredService<TypeRegistry>(), false);
             settings.DocumentProcessors.Add(new AddAdditionalTypeProcessor<DynamicCreateRuleDto>());
+            settings.DocumentProcessors.Add(new AddAdditionalTypeProcessor<DynamicFlowExecutionStateDto>());
             settings.DocumentProcessors.Add(new AddAdditionalTypeProcessor<DynamicRulesDto>());
             settings.DocumentProcessors.Add(new AddAdditionalTypeProcessor<DynamicUpdateRuleDto>());
         });

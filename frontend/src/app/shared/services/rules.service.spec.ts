@@ -8,7 +8,7 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, ContentChangedRuleTriggerDto, DateTime, DynamicCreateRuleDto, DynamicRuleDto, DynamicRulesDto, DynamicUpdateRuleDto, ManualRuleTriggerDto, Resource, ResourceLinkDto, RuleElementDto, RuleElementPropertyDto, RuleEventDto, RuleEventsDto, RulesService, ScriptCompletions, SimulatedRuleEventDto, SimulatedRuleEventsDto, VersionTag } from '@app/shared/internal';
+import { ApiUrlConfig, ContentChangedRuleTriggerDto, DateTime, DynamicCreateRuleDto, DynamicFlowDefinitionDto, DynamicRuleDto, DynamicRulesDto, DynamicUpdateRuleDto, FlowDefinitionDto, FlowExecutionStateDto, ManualRuleTriggerDto, Resource, ResourceLinkDto, RuleElementDto, RuleElementPropertyDto, RuleEventDto, RuleEventsDto, RulesService, ScriptCompletions, SimulatedRuleEventDto, SimulatedRuleEventsDto, VersionTag } from '@app/shared/internal';
 
 describe('RulesService', () => {
     const version = new VersionTag('1');
@@ -479,14 +479,18 @@ describe('RulesService', () => {
 
         return {
             id: `id${id}`,
-            created: buildDate(id, 10),
-            description: `event-url${key}`,
-            eventName: `event-name${key}`,
-            jobResult: `Failed${key}`,
-            lastDump: `event-dump${key}`,
-            nextAttempt: buildDate(id, 20),
-            numCalls: id,
-            result: `Failed${key}`,
+            flowState: {
+                completed: buildDate(id, 20),
+                context: {},
+                created:buildDate(id, 10),
+                definition: {
+                    steps: {},
+                    initialStep: '0',
+                },
+                nextStepId: '1',
+                status: `Failed${key}` as any,
+                steps: {},
+            },
             _links: {
                 update: { method: 'PUT', href: `/rules/events/${id}` },
             },
@@ -500,11 +504,19 @@ describe('RulesService', () => {
             eventId: `id${key}`,
             eventName: `name${key}`,
             event: { value: 'simple' },
-            enrichedEvent: { value: 'enriched' },
-            error: `error${key}`,
-            actionName: `action-name${key}`,
-            actionData: `action-data${key}`,
-            skipReasons: [`reason${key}`],
+            flowState: {
+                completed: buildDate(id, 20),
+                context: {},
+                created: buildDate(id, 10),
+                definition: {
+                    steps: {},
+                    initialStep: '0',
+                },
+                nextStepId: '1',
+                status: `Failed${key}` as any,
+                steps: {},
+            },
+            skipReasons: [`reason${key}` as any],
             uniqueId: `unique-id${key}`,
         };
     }
@@ -517,6 +529,7 @@ export function createRule(id: number, suffix = '') {
         id: `id${id}`,
         created: DateTime.parseISO(buildDate(id, 10)),
         createdBy: `creator${id}`,
+        flow: new DynamicFlowDefinitionDto(),
         isEnabled: id % 2 === 0,
         lastModified: DateTime.parseISO(buildDate(id, 20)),
         lastModifiedBy: `modifier${id}`,
@@ -541,14 +554,18 @@ export function createRuleEvent(id: number, suffix = '') {
 
     return new RuleEventDto({
         id: `id${id}`,
-        created: DateTime.parseISO(buildDate(id, 10)),
-        description: `event-url${key}`,
-        eventName: `event-name${key}`,
-        jobResult: `Failed${key}` as any,
-        lastDump: `event-dump${key}`,
-        nextAttempt: DateTime.parseISO(buildDate(id, 20)),
-        numCalls: id,
-        result: `Failed${key}` as any,
+        flowState: new FlowExecutionStateDto({
+            completed: DateTime.parseISO(buildDate(id, 20)),
+            context: {},
+            created: DateTime.parseISO(buildDate(id, 10)),
+            definition: new FlowDefinitionDto({
+                steps: {},
+                initialStep: '0',
+            }),
+            nextStepId: '1',
+            status: `Failed${key}` as any,
+            steps: {},
+        }),
         _links: {
             update: new ResourceLinkDto({ method: 'PUT', href: `/rules/events/${id}` }),
         },
@@ -562,10 +579,18 @@ export function createSimulatedRuleEvent(id: number, suffix = '') {
         eventId: `id${key}`,
         eventName: `name${key}`,
         event: { value: 'simple' },
-        enrichedEvent: { value: 'enriched' },
-        error: `error${key}`,
-        actionName: `action-name${key}`,
-        actionData: `action-data${key}`,
+        flowState: new FlowExecutionStateDto({
+            completed: DateTime.parseISO(buildDate(id, 20)),
+            context: {},
+            created: DateTime.parseISO(buildDate(id, 10)),
+            definition: new FlowDefinitionDto({
+                steps: {},
+                initialStep: '0',
+            }),
+            nextStepId: '1',
+            status: `Failed${key}` as any,
+            steps: {},
+        }),
         skipReasons: [`reason${key}` as any],
         uniqueId: `unique-id${key}`,
     });

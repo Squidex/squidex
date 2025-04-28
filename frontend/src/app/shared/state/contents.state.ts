@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, finalize, map, switchMap, tap } from 'rxjs/operators';
 import { DateTime, debug, DialogService, getPagingInfo, ListState, shareSubscribed, State, Types, Version, Versioned } from '@app/framework';
-import { BulkResultDto, ContentDto, ContentsDto, BulkUpdateContentsJobDto, ServerErrorDto, IBulkUpdateContentsJobDto, BulkUpdateContentsDto } from '../model';
+import { BulkResultDto, BulkUpdateContentsDto, BulkUpdateContentsJobDto, ContentDto, ContentsDto, IBulkUpdateContentsJobDto, ServerErrorDto } from '../model';
 import { ContentsService, StatusInfo } from '../services/contents.service';
 import { Query } from '../services/query';
 import { AppsState } from './apps.state';

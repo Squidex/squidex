@@ -6091,7 +6091,7 @@ export class RuleElementPropertyDto implements IRuleElementPropertyDto {
     /** Uses the cache values because the actual object is frozen. */
     private readonly cachedValues: { [key: string]: any } = {};
     /** The html editor. */
-    readonly editor!: RuleFieldEditor;
+    readonly editor!: string;
     /** The name of the editor. */
     readonly name!: string;
     /** The label to use. */
@@ -6177,7 +6177,7 @@ export class RuleElementPropertyDto implements IRuleElementPropertyDto {
 
 export interface IRuleElementPropertyDto {
     /** The html editor. */
-    readonly editor: RuleFieldEditor;
+    readonly editor: string;
     /** The name of the editor. */
     readonly name: string;
     /** The label to use. */
@@ -6191,20 +6191,6 @@ export interface IRuleElementPropertyDto {
     /** Indicates if the property is required. */
     readonly isRequired: boolean;
 }
-
-export type RuleFieldEditor = "Checkbox" | "Dropdown" | "Email" | "Javascript" | "Number" | "Password" | "Text" | "TextArea" | "Url";
-
-export const RuleFieldEditorValues: ReadonlyArray<RuleFieldEditor> = [
-	"Checkbox",
-	"Dropdown",
-	"Email",
-	"Javascript",
-	"Number",
-	"Password",
-	"Text",
-	"TextArea",
-	"Url"
-];
 
 export class RulesDto extends ResourceDto implements IRulesDto {
     /** The rules. */
@@ -6274,6 +6260,8 @@ export class RuleDto extends ResourceDto implements IRuleDto {
     readonly name?: string | undefined;
     /** The trigger properties. */
     readonly trigger!: RuleTriggerDto;
+    /** The flow to describe the sequence of actions to perform. */
+    readonly flow!: FlowDefinitionDto;
     /** The action properties. */
     readonly action!: RuleActionDto;
     /** The number of completed executions. */
@@ -6298,6 +6286,7 @@ export class RuleDto extends ResourceDto implements IRuleDto {
         (<any>this).isEnabled = _data["isEnabled"];
         (<any>this).name = _data["name"];
         (<any>this).trigger = _data["trigger"] ? RuleTriggerDto.fromJSON(_data["trigger"]) : <any>undefined;
+        (<any>this).flow = _data["flow"] ? FlowDefinitionDto.fromJSON(_data["flow"]) : new FlowDefinitionDto();
         (<any>this).action = _data["action"] ? RuleActionDto.fromJSON(_data["action"]) : <any>undefined;
         (<any>this).numSucceeded = _data["numSucceeded"];
         (<any>this).numFailed = _data["numFailed"];
@@ -6323,6 +6312,7 @@ export class RuleDto extends ResourceDto implements IRuleDto {
         data["isEnabled"] = this.isEnabled;
         data["name"] = this.name;
         data["trigger"] = this.trigger ? this.trigger.toJSON() : <any>undefined;
+        data["flow"] = this.flow ? this.flow.toJSON() : <any>undefined;
         data["action"] = this.action ? this.action.toJSON() : <any>undefined;
         data["numSucceeded"] = this.numSucceeded;
         data["numFailed"] = this.numFailed;
@@ -6352,6 +6342,8 @@ export interface IRuleDto extends IResourceDto {
     readonly name?: string | undefined;
     /** The trigger properties. */
     readonly trigger: RuleTriggerDto;
+    /** The flow to describe the sequence of actions to perform. */
+    readonly flow: FlowDefinitionDto;
     /** The action properties. */
     readonly action: RuleActionDto;
     /** The number of completed executions. */
@@ -6744,6 +6736,211 @@ export interface IUsageRuleTriggerDto extends IRuleTriggerDto {
     readonly numDays?: number | undefined;
 }
 
+export class FlowDefinitionDto implements IFlowDefinitionDto {
+    /** Uses the cache values because the actual object is frozen. */
+    private readonly cachedValues: { [key: string]: any } = {};
+    /** The ID of the initial step. */
+    readonly initialStep!: string;
+    /** The steps. */
+    readonly steps!: { [key: string]: FlowStepDefinitionDto; };
+
+    constructor(data?: IFlowDefinitionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data: any) {
+        (<any>this).initialStep = _data["initialStep"];
+        if (_data["steps"]) {
+            (<any>this).steps = {} as any;
+            for (let key in _data["steps"]) {
+                if (_data["steps"].hasOwnProperty(key))
+                    (<any>(<any>this).steps)![key] = _data["steps"][key] ? FlowStepDefinitionDto.fromJSON(_data["steps"][key]) : new FlowStepDefinitionDto();
+            }
+        }
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): FlowDefinitionDto {
+        const result = new FlowDefinitionDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["initialStep"] = this.initialStep;
+        if (this.steps) {
+            data["steps"] = {};
+            for (let key in this.steps) {
+                if (this.steps.hasOwnProperty(key))
+                    (<any>data["steps"])[key] = this.steps[key] ? this.steps[key].toJSON() : <any>undefined;
+            }
+        }
+        this.cleanup(data);
+        return data;
+    }
+
+    protected cleanup(target: any) {
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
+    }
+
+    protected compute<T>(key: string, action: () => T): T {
+        if (!this.cachedValues.hasOwnProperty(key)) {
+            const value = action();
+            this.cachedValues[key] = value;
+            return value;
+        } else {
+            return this.cachedValues[key] as any;
+        }
+    }
+}
+
+export interface IFlowDefinitionDto {
+    /** The ID of the initial step. */
+    readonly initialStep: string;
+    /** The steps. */
+    readonly steps: { [key: string]: FlowStepDefinitionDto; };
+}
+
+export class FlowStepDefinitionDto implements IFlowStepDefinitionDto {
+    /** Uses the cache values because the actual object is frozen. */
+    private readonly cachedValues: { [key: string]: any } = {};
+    /** The actual step. */
+    readonly step!: FlowStepDto;
+    /** The next step. */
+    readonly nextStepId?: string | undefined;
+    /** Indicates if errors should be ignored. */
+    readonly ignoreError?: boolean;
+
+    constructor(data?: IFlowStepDefinitionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data: any) {
+        (<any>this).step = _data["step"] ? FlowStepDto.fromJSON(_data["step"]) : <any>undefined;
+        (<any>this).nextStepId = _data["nextStepId"];
+        (<any>this).ignoreError = _data["ignoreError"];
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): FlowStepDefinitionDto {
+        const result = new FlowStepDefinitionDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["step"] = this.step ? this.step.toJSON() : <any>undefined;
+        data["nextStepId"] = this.nextStepId;
+        data["ignoreError"] = this.ignoreError;
+        this.cleanup(data);
+        return data;
+    }
+
+    protected cleanup(target: any) {
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
+    }
+
+    protected compute<T>(key: string, action: () => T): T {
+        if (!this.cachedValues.hasOwnProperty(key)) {
+            const value = action();
+            this.cachedValues[key] = value;
+            return value;
+        } else {
+            return this.cachedValues[key] as any;
+        }
+    }
+}
+
+export interface IFlowStepDefinitionDto {
+    /** The actual step. */
+    readonly step: FlowStepDto;
+    /** The next step. */
+    readonly nextStepId?: string | undefined;
+    /** Indicates if errors should be ignored. */
+    readonly ignoreError?: boolean;
+}
+
+export abstract class FlowStepDto implements IFlowStepDto {
+    /** Uses the cache values because the actual object is frozen. */
+    private readonly cachedValues: { [key: string]: any } = {};
+
+    constructor(data?: IFlowStepDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data: any) {
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): FlowStepDto {
+        throw new Error("The abstract class 'FlowStepDto' cannot be instantiated.");
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        this.cleanup(data);
+        return data;
+    }
+
+    protected cleanup(target: any) {
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
+    }
+
+    protected compute<T>(key: string, action: () => T): T {
+        if (!this.cachedValues.hasOwnProperty(key)) {
+            const value = action();
+            this.cachedValues[key] = value;
+            return value;
+        } else {
+            return this.cachedValues[key] as any;
+        }
+    }
+}
+
+export interface IFlowStepDto {
+}
+
 export abstract class RuleActionDto implements IRuleActionDto {
     /** The discriminator. */
     public readonly actionType!: string;
@@ -6856,15 +7053,10 @@ export interface IRuleActionDto {
 }
 
 export class AlgoliaRuleActionDto extends RuleActionDto implements IAlgoliaRuleActionDto {
-    /** The application ID. */
     readonly appId!: string;
-    /** The API key to grant access to Squidex. */
     readonly apiKey!: string;
-    /** The name of the index. */
     readonly indexName!: string;
-    /** The optional custom document. */
     readonly document?: string | undefined;
-    /** The condition when to delete the entry. */
     readonly delete?: string | undefined;
 
     constructor(data?: IAlgoliaRuleActionDto) {
@@ -6903,24 +7095,16 @@ export class AlgoliaRuleActionDto extends RuleActionDto implements IAlgoliaRuleA
 }
 
 export interface IAlgoliaRuleActionDto extends IRuleActionDto {
-    /** The application ID. */
     readonly appId: string;
-    /** The API key to grant access to Squidex. */
     readonly apiKey: string;
-    /** The name of the index. */
     readonly indexName: string;
-    /** The optional custom document. */
     readonly document?: string | undefined;
-    /** The condition when to delete the entry. */
     readonly delete?: string | undefined;
 }
 
 export class AzureQueueRuleActionDto extends RuleActionDto implements IAzureQueueRuleActionDto {
-    /** The connection string to the storage account. */
     readonly connectionString!: string;
-    /** The name of the queue. */
     readonly queue!: string;
-    /** Leave it empty to use the full event as body. */
     readonly payload?: string | undefined;
 
     constructor(data?: IAzureQueueRuleActionDto) {
@@ -6955,18 +7139,13 @@ export class AzureQueueRuleActionDto extends RuleActionDto implements IAzureQueu
 }
 
 export interface IAzureQueueRuleActionDto extends IRuleActionDto {
-    /** The connection string to the storage account. */
     readonly connectionString: string;
-    /** The name of the queue. */
     readonly queue: string;
-    /** Leave it empty to use the full event as body. */
     readonly payload?: string | undefined;
 }
 
 export class CommentRuleActionDto extends RuleActionDto implements ICommentRuleActionDto {
-    /** The comment text. */
     readonly text!: string;
-    /** An optional client name. */
     readonly client?: string | undefined;
 
     constructor(data?: ICommentRuleActionDto) {
@@ -6999,20 +7178,14 @@ export class CommentRuleActionDto extends RuleActionDto implements ICommentRuleA
 }
 
 export interface ICommentRuleActionDto extends IRuleActionDto {
-    /** The comment text. */
     readonly text: string;
-    /** An optional client name. */
     readonly client?: string | undefined;
 }
 
 export class CreateContentRuleActionDto extends RuleActionDto implements ICreateContentRuleActionDto {
-    /** The content data. */
     readonly data!: string;
-    /** The name of the schema. */
     readonly schema!: string;
-    /** An optional client name. */
-    readonly client!: string;
-    /** Publish the content. */
+    readonly client?: string | undefined;
     readonly publish!: boolean;
 
     constructor(data?: ICreateContentRuleActionDto) {
@@ -7049,30 +7222,19 @@ export class CreateContentRuleActionDto extends RuleActionDto implements ICreate
 }
 
 export interface ICreateContentRuleActionDto extends IRuleActionDto {
-    /** The content data. */
     readonly data: string;
-    /** The name of the schema. */
     readonly schema: string;
-    /** An optional client name. */
-    readonly client: string;
-    /** Publish the content. */
+    readonly client?: string | undefined;
     readonly publish: boolean;
 }
 
 export class DiscourseRuleActionDto extends RuleActionDto implements IDiscourseRuleActionDto {
-    /** The url to the discourse server. */
     readonly url!: string;
-    /** The api key to authenticate to your discourse server. */
     readonly apiKey!: string;
-    /** The api username to authenticate to your discourse server. */
     readonly apiUsername!: string;
-    /** The text as markdown. */
     readonly text!: string;
-    /** The optional title when creating new topics. */
     readonly title?: string | undefined;
-    /** The optional topic id. */
     readonly topic?: number | undefined;
-    /** The optional category id. */
     readonly category?: number | undefined;
 
     constructor(data?: IDiscourseRuleActionDto) {
@@ -7115,34 +7277,21 @@ export class DiscourseRuleActionDto extends RuleActionDto implements IDiscourseR
 }
 
 export interface IDiscourseRuleActionDto extends IRuleActionDto {
-    /** The url to the discourse server. */
     readonly url: string;
-    /** The api key to authenticate to your discourse server. */
     readonly apiKey: string;
-    /** The api username to authenticate to your discourse server. */
     readonly apiUsername: string;
-    /** The text as markdown. */
     readonly text: string;
-    /** The optional title when creating new topics. */
     readonly title?: string | undefined;
-    /** The optional topic id. */
     readonly topic?: number | undefined;
-    /** The optional category id. */
     readonly category?: number | undefined;
 }
 
 export class ElasticSearchRuleActionDto extends RuleActionDto implements IElasticSearchRuleActionDto {
-    /** The url to the instance or cluster. */
     readonly host!: string;
-    /** The name of the index. */
     readonly indexName!: string;
-    /** The optional username. */
     readonly username?: string | undefined;
-    /** The optional password. */
     readonly password?: string | undefined;
-    /** The optional custom document. */
     readonly document?: string | undefined;
-    /** The condition when to delete the document. */
     readonly delete?: string | undefined;
 
     constructor(data?: IElasticSearchRuleActionDto) {
@@ -7183,37 +7332,23 @@ export class ElasticSearchRuleActionDto extends RuleActionDto implements IElasti
 }
 
 export interface IElasticSearchRuleActionDto extends IRuleActionDto {
-    /** The url to the instance or cluster. */
     readonly host: string;
-    /** The name of the index. */
     readonly indexName: string;
-    /** The optional username. */
     readonly username?: string | undefined;
-    /** The optional password. */
     readonly password?: string | undefined;
-    /** The optional custom document. */
     readonly document?: string | undefined;
-    /** The condition when to delete the document. */
     readonly delete?: string | undefined;
 }
 
 export class EmailRuleActionDto extends RuleActionDto implements IEmailRuleActionDto {
-    /** The IP address or host to the SMTP server. */
     readonly serverHost!: string;
-    /** The port to the SMTP server. */
     readonly serverPort!: number;
-    /** The username for the SMTP server. */
-    readonly serverUsername!: string;
-    /** The password for the SMTP server. */
-    readonly serverPassword!: string;
-    /** The email sending address. */
     readonly messageFrom!: string;
-    /** The email message will be sent to. */
     readonly messageTo!: string;
-    /** The subject line for this email message. */
     readonly messageSubject!: string;
-    /** The message body. */
     readonly messageBody!: string;
+    readonly serverUsername!: string;
+    readonly serverPassword!: string;
 
     constructor(data?: IEmailRuleActionDto) {
         super(data);
@@ -7224,12 +7359,12 @@ export class EmailRuleActionDto extends RuleActionDto implements IEmailRuleActio
         super.init(_data);
         (<any>this).serverHost = _data["serverHost"];
         (<any>this).serverPort = _data["serverPort"];
-        (<any>this).serverUsername = _data["serverUsername"];
-        (<any>this).serverPassword = _data["serverPassword"];
         (<any>this).messageFrom = _data["messageFrom"];
         (<any>this).messageTo = _data["messageTo"];
         (<any>this).messageSubject = _data["messageSubject"];
         (<any>this).messageBody = _data["messageBody"];
+        (<any>this).serverUsername = _data["serverUsername"];
+        (<any>this).serverPassword = _data["serverPassword"];
         this.cleanup(this);
         return this;
     }
@@ -7244,12 +7379,12 @@ export class EmailRuleActionDto extends RuleActionDto implements IEmailRuleActio
         data = typeof data === 'object' ? data : {}; 
         data["serverHost"] = this.serverHost;
         data["serverPort"] = this.serverPort;
-        data["serverUsername"] = this.serverUsername;
-        data["serverPassword"] = this.serverPassword;
         data["messageFrom"] = this.messageFrom;
         data["messageTo"] = this.messageTo;
         data["messageSubject"] = this.messageSubject;
         data["messageBody"] = this.messageBody;
+        data["serverUsername"] = this.serverUsername;
+        data["serverPassword"] = this.serverPassword;
         super.toJSON(data);
         this.cleanup(data);
         return data;
@@ -7257,28 +7392,18 @@ export class EmailRuleActionDto extends RuleActionDto implements IEmailRuleActio
 }
 
 export interface IEmailRuleActionDto extends IRuleActionDto {
-    /** The IP address or host to the SMTP server. */
     readonly serverHost: string;
-    /** The port to the SMTP server. */
     readonly serverPort: number;
-    /** The username for the SMTP server. */
-    readonly serverUsername: string;
-    /** The password for the SMTP server. */
-    readonly serverPassword: string;
-    /** The email sending address. */
     readonly messageFrom: string;
-    /** The email message will be sent to. */
     readonly messageTo: string;
-    /** The subject line for this email message. */
     readonly messageSubject: string;
-    /** The message body. */
     readonly messageBody: string;
+    readonly serverUsername: string;
+    readonly serverPassword: string;
 }
 
 export class FastlyRuleActionDto extends RuleActionDto implements IFastlyRuleActionDto {
-    /** The API key to grant access to Squidex. */
     readonly apiKey!: string;
-    /** The ID of the fastly service. */
     readonly serviceId!: string;
 
     constructor(data?: IFastlyRuleActionDto) {
@@ -7311,26 +7436,17 @@ export class FastlyRuleActionDto extends RuleActionDto implements IFastlyRuleAct
 }
 
 export interface IFastlyRuleActionDto extends IRuleActionDto {
-    /** The API key to grant access to Squidex. */
     readonly apiKey: string;
-    /** The ID of the fastly service. */
     readonly serviceId: string;
 }
 
 export class MediumRuleActionDto extends RuleActionDto implements IMediumRuleActionDto {
-    /** The self issued access token. */
     readonly accessToken!: string;
-    /** The title, used for the url. */
     readonly title!: string;
-    /** The content, either html or markdown. */
     readonly content!: string;
-    /** The original home of this content, if it was originally published elsewhere. */
     readonly canonicalUrl?: string | undefined;
-    /** The optional comma separated list of tags. */
     readonly tags?: string | undefined;
-    /** Optional publication id. */
     readonly publicationId?: string | undefined;
-    /** Indicates whether the content is markdown or html. */
     readonly isHtml!: boolean;
 
     constructor(data?: IMediumRuleActionDto) {
@@ -7373,30 +7489,19 @@ export class MediumRuleActionDto extends RuleActionDto implements IMediumRuleAct
 }
 
 export interface IMediumRuleActionDto extends IRuleActionDto {
-    /** The self issued access token. */
     readonly accessToken: string;
-    /** The title, used for the url. */
     readonly title: string;
-    /** The content, either html or markdown. */
     readonly content: string;
-    /** The original home of this content, if it was originally published elsewhere. */
     readonly canonicalUrl?: string | undefined;
-    /** The optional comma separated list of tags. */
     readonly tags?: string | undefined;
-    /** Optional publication id. */
     readonly publicationId?: string | undefined;
-    /** Indicates whether the content is markdown or html. */
     readonly isHtml: boolean;
 }
 
 export class NotificationRuleActionDto extends RuleActionDto implements INotificationRuleActionDto {
-    /** The user id or email. */
     readonly user!: string;
-    /** The text to send. */
     readonly text!: string;
-    /** The optional url to attach to the notification. */
     readonly url?: string | undefined;
-    /** An optional client name. */
     readonly client?: string | undefined;
 
     constructor(data?: INotificationRuleActionDto) {
@@ -7433,28 +7538,18 @@ export class NotificationRuleActionDto extends RuleActionDto implements INotific
 }
 
 export interface INotificationRuleActionDto extends IRuleActionDto {
-    /** The user id or email. */
     readonly user: string;
-    /** The text to send. */
     readonly text: string;
-    /** The optional url to attach to the notification. */
     readonly url?: string | undefined;
-    /** An optional client name. */
     readonly client?: string | undefined;
 }
 
 export class OpenSearchRuleActionDto extends RuleActionDto implements IOpenSearchRuleActionDto {
-    /** The url to the instance or cluster. */
     readonly host!: string;
-    /** The name of the index. */
     readonly indexName!: string;
-    /** The optional username. */
     readonly username?: string | undefined;
-    /** The optional password. */
     readonly password?: string | undefined;
-    /** The optional custom document. */
     readonly document?: string | undefined;
-    /** The condition when to delete the document. */
     readonly delete?: string | undefined;
 
     constructor(data?: IOpenSearchRuleActionDto) {
@@ -7495,24 +7590,16 @@ export class OpenSearchRuleActionDto extends RuleActionDto implements IOpenSearc
 }
 
 export interface IOpenSearchRuleActionDto extends IRuleActionDto {
-    /** The url to the instance or cluster. */
     readonly host: string;
-    /** The name of the index. */
     readonly indexName: string;
-    /** The optional username. */
     readonly username?: string | undefined;
-    /** The optional password. */
     readonly password?: string | undefined;
-    /** The optional custom document. */
     readonly document?: string | undefined;
-    /** The condition when to delete the document. */
     readonly delete?: string | undefined;
 }
 
 export class PrerenderRuleActionDto extends RuleActionDto implements IPrerenderRuleActionDto {
-    /** The prerender token from your account. */
     readonly token!: string;
-    /** The url to recache. */
     readonly url!: string;
 
     constructor(data?: IPrerenderRuleActionDto) {
@@ -7545,14 +7632,11 @@ export class PrerenderRuleActionDto extends RuleActionDto implements IPrerenderR
 }
 
 export interface IPrerenderRuleActionDto extends IRuleActionDto {
-    /** The prerender token from your account. */
     readonly token: string;
-    /** The url to recache. */
     readonly url: string;
 }
 
 export class ScriptRuleActionDto extends RuleActionDto implements IScriptRuleActionDto {
-    /** The script to render. */
     readonly script!: string;
 
     constructor(data?: IScriptRuleActionDto) {
@@ -7583,24 +7667,15 @@ export class ScriptRuleActionDto extends RuleActionDto implements IScriptRuleAct
 }
 
 export interface IScriptRuleActionDto extends IRuleActionDto {
-    /** The script to render. */
     readonly script: string;
 }
 
 export class SignalRRuleActionDto extends RuleActionDto implements ISignalRRuleActionDto {
-    /** The connection string to the Azure SignalR. */
     readonly connectionString!: string;
-    /** The name of the hub. */
     readonly hubName!: string;
-    /** * Broadcast = send to all users.
- * User = send to all target users(s).
- * Group = send to all target group(s). */
-    readonly action!: ActionTypeEnum;
-    /** Set the Name of the hub method received by the customer. */
+    readonly action!: SignalRActionType;
     readonly methodName?: string | undefined;
-    /** Define target users or groups by id or name. One item per line. Not needed for Broadcast action. */
     readonly target?: string | undefined;
-    /** Leave it empty to use the full event as body. */
     readonly payload?: string | undefined;
 
     constructor(data?: ISignalRRuleActionDto) {
@@ -7641,34 +7716,24 @@ export class SignalRRuleActionDto extends RuleActionDto implements ISignalRRuleA
 }
 
 export interface ISignalRRuleActionDto extends IRuleActionDto {
-    /** The connection string to the Azure SignalR. */
     readonly connectionString: string;
-    /** The name of the hub. */
     readonly hubName: string;
-    /** * Broadcast = send to all users.
- * User = send to all target users(s).
- * Group = send to all target group(s). */
-    readonly action: ActionTypeEnum;
-    /** Set the Name of the hub method received by the customer. */
+    readonly action: SignalRActionType;
     readonly methodName?: string | undefined;
-    /** Define target users or groups by id or name. One item per line. Not needed for Broadcast action. */
     readonly target?: string | undefined;
-    /** Leave it empty to use the full event as body. */
     readonly payload?: string | undefined;
 }
 
-export type ActionTypeEnum = "Broadcast" | "User" | "Group";
+export type SignalRActionType = "Broadcast" | "User" | "Group";
 
-export const ActionTypeEnumValues: ReadonlyArray<ActionTypeEnum> = [
+export const SignalRActionTypeValues: ReadonlyArray<SignalRActionType> = [
 	"Broadcast",
 	"User",
 	"Group"
 ];
 
 export class SlackRuleActionDto extends RuleActionDto implements ISlackRuleActionDto {
-    /** The slack webhook url. */
     readonly webhookUrl!: string;
-    /** The text that is sent as message to slack. */
     readonly text!: string;
 
     constructor(data?: ISlackRuleActionDto) {
@@ -7701,18 +7766,13 @@ export class SlackRuleActionDto extends RuleActionDto implements ISlackRuleActio
 }
 
 export interface ISlackRuleActionDto extends IRuleActionDto {
-    /** The slack webhook url. */
     readonly webhookUrl: string;
-    /** The text that is sent as message to slack. */
     readonly text: string;
 }
 
 export class TweetRuleActionDto extends RuleActionDto implements ITweetRuleActionDto {
-    /** The generated access token. */
     readonly accessToken!: string;
-    /** The generated access secret. */
     readonly accessSecret!: string;
-    /** The text that is sent as tweet to twitter. */
     readonly text!: string;
 
     constructor(data?: ITweetRuleActionDto) {
@@ -7747,24 +7807,16 @@ export class TweetRuleActionDto extends RuleActionDto implements ITweetRuleActio
 }
 
 export interface ITweetRuleActionDto extends IRuleActionDto {
-    /** The generated access token. */
     readonly accessToken: string;
-    /** The generated access secret. */
     readonly accessSecret: string;
-    /** The text that is sent as tweet to twitter. */
     readonly text: string;
 }
 
 export class TypesenseRuleActionDto extends RuleActionDto implements ITypesenseRuleActionDto {
-    /** The url to the instance or cluster. */
     readonly host!: string;
-    /** The name of the index. */
     readonly indexName!: string;
-    /** The api key. */
     readonly apiKey!: string;
-    /** The optional custom document. */
     readonly document?: string | undefined;
-    /** The condition when to delete the document. */
     readonly delete?: string | undefined;
 
     constructor(data?: ITypesenseRuleActionDto) {
@@ -7803,30 +7855,19 @@ export class TypesenseRuleActionDto extends RuleActionDto implements ITypesenseR
 }
 
 export interface ITypesenseRuleActionDto extends IRuleActionDto {
-    /** The url to the instance or cluster. */
     readonly host: string;
-    /** The name of the index. */
     readonly indexName: string;
-    /** The api key. */
     readonly apiKey: string;
-    /** The optional custom document. */
     readonly document?: string | undefined;
-    /** The condition when to delete the document. */
     readonly delete?: string | undefined;
 }
 
 export class WebhookRuleActionDto extends RuleActionDto implements IWebhookRuleActionDto {
-    /** The url to the webhook. */
     readonly url!: string;
-    /** The type of the request. */
     readonly method!: WebhookMethod;
-    /** Leave it empty to use the full event as body. */
     readonly payload?: string | undefined;
-    /** The mime type of the payload. */
     readonly payloadType?: string | undefined;
-    /** The message headers in the format '[Key]=[Value]', one entry per line. */
     readonly headers?: string | undefined;
-    /** The shared secret that is used to calculate the payload signature. */
     readonly sharedSecret?: string | undefined;
 
     constructor(data?: IWebhookRuleActionDto) {
@@ -7867,17 +7908,11 @@ export class WebhookRuleActionDto extends RuleActionDto implements IWebhookRuleA
 }
 
 export interface IWebhookRuleActionDto extends IRuleActionDto {
-    /** The url to the webhook. */
     readonly url: string;
-    /** The type of the request. */
     readonly method: WebhookMethod;
-    /** Leave it empty to use the full event as body. */
     readonly payload?: string | undefined;
-    /** The mime type of the payload. */
     readonly payloadType?: string | undefined;
-    /** The message headers in the format '[Key]=[Value]', one entry per line. */
     readonly headers?: string | undefined;
-    /** The shared secret that is used to calculate the payload signature. */
     readonly sharedSecret?: string | undefined;
 }
 
@@ -7897,7 +7932,9 @@ export class CreateRuleDto implements ICreateRuleDto {
     /** The trigger properties. */
     readonly trigger!: RuleTriggerDto;
     /** The action properties. */
-    readonly action!: RuleActionDto;
+    readonly action?: RuleActionDto | undefined;
+    /** The flow to describe the sequence of actions to perform. */
+    readonly flow!: FlowDefinitionDto;
 
     constructor(data?: ICreateRuleDto) {
         if (data) {
@@ -7911,6 +7948,7 @@ export class CreateRuleDto implements ICreateRuleDto {
     init(_data: any) {
         (<any>this).trigger = _data["trigger"] ? RuleTriggerDto.fromJSON(_data["trigger"]) : <any>undefined;
         (<any>this).action = _data["action"] ? RuleActionDto.fromJSON(_data["action"]) : <any>undefined;
+        (<any>this).flow = _data["flow"] ? FlowDefinitionDto.fromJSON(_data["flow"]) : new FlowDefinitionDto();
         this.cleanup(this);
         return this;
     }
@@ -7925,6 +7963,7 @@ export class CreateRuleDto implements ICreateRuleDto {
         data = typeof data === 'object' ? data : {}; 
         data["trigger"] = this.trigger ? this.trigger.toJSON() : <any>undefined;
         data["action"] = this.action ? this.action.toJSON() : <any>undefined;
+        data["flow"] = this.flow ? this.flow.toJSON() : <any>undefined;
         this.cleanup(data);
         return data;
     }
@@ -7955,7 +7994,9 @@ export interface ICreateRuleDto {
     /** The trigger properties. */
     readonly trigger: RuleTriggerDto;
     /** The action properties. */
-    readonly action: RuleActionDto;
+    readonly action?: RuleActionDto | undefined;
+    /** The flow to describe the sequence of actions to perform. */
+    readonly flow: FlowDefinitionDto;
 }
 
 export class UpdateRuleDto implements IUpdateRuleDto {
@@ -7965,8 +8006,10 @@ export class UpdateRuleDto implements IUpdateRuleDto {
     readonly name?: string | undefined;
     /** The trigger properties. */
     readonly trigger?: RuleTriggerDto | undefined;
-    /** The action properties. */
+    /** The flow to describe the sequence of actions to perform. */
     readonly action?: RuleActionDto | undefined;
+    /** The flow. */
+    readonly flow!: FlowDefinitionDto;
     /** Enable or disable the rule. */
     readonly isEnabled?: boolean | undefined;
 
@@ -7983,6 +8026,7 @@ export class UpdateRuleDto implements IUpdateRuleDto {
         (<any>this).name = _data["name"];
         (<any>this).trigger = _data["trigger"] ? RuleTriggerDto.fromJSON(_data["trigger"]) : <any>undefined;
         (<any>this).action = _data["action"] ? RuleActionDto.fromJSON(_data["action"]) : <any>undefined;
+        (<any>this).flow = _data["flow"] ? FlowDefinitionDto.fromJSON(_data["flow"]) : new FlowDefinitionDto();
         (<any>this).isEnabled = _data["isEnabled"];
         this.cleanup(this);
         return this;
@@ -7999,6 +8043,7 @@ export class UpdateRuleDto implements IUpdateRuleDto {
         data["name"] = this.name;
         data["trigger"] = this.trigger ? this.trigger.toJSON() : <any>undefined;
         data["action"] = this.action ? this.action.toJSON() : <any>undefined;
+        data["flow"] = this.flow ? this.flow.toJSON() : <any>undefined;
         data["isEnabled"] = this.isEnabled;
         this.cleanup(data);
         return data;
@@ -8031,8 +8076,10 @@ export interface IUpdateRuleDto {
     readonly name?: string | undefined;
     /** The trigger properties. */
     readonly trigger?: RuleTriggerDto | undefined;
-    /** The action properties. */
+    /** The flow to describe the sequence of actions to perform. */
     readonly action?: RuleActionDto | undefined;
+    /** The flow. */
+    readonly flow: FlowDefinitionDto;
     /** Enable or disable the rule. */
     readonly isEnabled?: boolean | undefined;
 }
@@ -8097,14 +8144,8 @@ export class SimulatedRuleEventDto implements ISimulatedRuleEventDto {
     readonly eventName!: string;
     /** The source event. */
     readonly event!: any;
-    /** The enriched event. */
-    readonly enrichedEvent?: any | undefined;
-    /** The data for the action. */
-    readonly actionName?: string | undefined;
-    /** The name of the action. */
-    readonly actionData?: string | undefined;
-    /** The name of the event. */
-    readonly error?: string | undefined;
+    /** The flow state. */
+    readonly flowState?: FlowExecutionStateDto | undefined;
     /** The reason why the event has been skipped. */
     readonly skipReasons!: SkipReason[];
 
@@ -8122,10 +8163,7 @@ export class SimulatedRuleEventDto implements ISimulatedRuleEventDto {
         (<any>this).uniqueId = _data["uniqueId"];
         (<any>this).eventName = _data["eventName"];
         (<any>this).event = _data["event"];
-        (<any>this).enrichedEvent = _data["enrichedEvent"];
-        (<any>this).actionName = _data["actionName"];
-        (<any>this).actionData = _data["actionData"];
-        (<any>this).error = _data["error"];
+        (<any>this).flowState = _data["flowState"] ? FlowExecutionStateDto.fromJSON(_data["flowState"]) : <any>undefined;
         if (Array.isArray(_data["skipReasons"])) {
             (<any>this).skipReasons = [] as any;
             for (let item of _data["skipReasons"])
@@ -8147,10 +8185,7 @@ export class SimulatedRuleEventDto implements ISimulatedRuleEventDto {
         data["uniqueId"] = this.uniqueId;
         data["eventName"] = this.eventName;
         data["event"] = this.event;
-        data["enrichedEvent"] = this.enrichedEvent;
-        data["actionName"] = this.actionName;
-        data["actionData"] = this.actionData;
-        data["error"] = this.error;
+        data["flowState"] = this.flowState ? this.flowState.toJSON() : <any>undefined;
         if (Array.isArray(this.skipReasons)) {
             data["skipReasons"] = [];
             for (let item of this.skipReasons)
@@ -8191,19 +8226,379 @@ export interface ISimulatedRuleEventDto {
     readonly eventName: string;
     /** The source event. */
     readonly event: any;
-    /** The enriched event. */
-    readonly enrichedEvent?: any | undefined;
-    /** The data for the action. */
-    readonly actionName?: string | undefined;
-    /** The name of the action. */
-    readonly actionData?: string | undefined;
-    /** The name of the event. */
-    readonly error?: string | undefined;
+    /** The flow state. */
+    readonly flowState?: FlowExecutionStateDto | undefined;
     /** The reason why the event has been skipped. */
     readonly skipReasons: SkipReason[];
 }
 
-export type SkipReason = "None" | "ConditionDoesNotMatch" | "ConditionPrecheckDoesNotMatch" | "Disabled" | "Failed" | "FromRule" | "NoAction" | "NoTrigger" | "TooOld" | "WrongEvent" | "WrongEventForTrigger";
+export class FlowExecutionStateDto implements IFlowExecutionStateDto {
+    /** Uses the cache values because the actual object is frozen. */
+    private readonly cachedValues: { [key: string]: any } = {};
+    /** The actual definition of the the steps to be executed. */
+    readonly definition!: FlowDefinitionDto;
+    /** The context. */
+    readonly context!: any;
+    /** The state of each step. */
+    readonly steps!: { [key: string]: FlowExecutionStepStateDto; };
+    /** The next step to be executed. */
+    readonly nextStepId!: string;
+    /** THe time when the next step will be executed. */
+    readonly nextRun?: DateTime | undefined;
+    /** The creation time. */
+    readonly created!: DateTime;
+    /** The completion time. */
+    readonly completed!: DateTime;
+    /** The overall status. */
+    readonly status!: FlowExecutionStatus;
+
+    constructor(data?: IFlowExecutionStateDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data: any) {
+        (<any>this).definition = _data["definition"] ? FlowDefinitionDto.fromJSON(_data["definition"]) : new FlowDefinitionDto();
+        (<any>this).context = _data["context"];
+        if (_data["steps"]) {
+            (<any>this).steps = {} as any;
+            for (let key in _data["steps"]) {
+                if (_data["steps"].hasOwnProperty(key))
+                    (<any>(<any>this).steps)![key] = _data["steps"][key] ? FlowExecutionStepStateDto.fromJSON(_data["steps"][key]) : new FlowExecutionStepStateDto();
+            }
+        }
+        (<any>this).nextStepId = _data["nextStepId"];
+        (<any>this).nextRun = _data["nextRun"] ? DateTime.parseISO(_data["nextRun"].toString()) : <any>undefined;
+        (<any>this).created = _data["created"] ? DateTime.parseISO(_data["created"].toString()) : <any>undefined;
+        (<any>this).completed = _data["completed"] ? DateTime.parseISO(_data["completed"].toString()) : <any>undefined;
+        (<any>this).status = _data["status"];
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): FlowExecutionStateDto {
+        const result = new FlowExecutionStateDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["definition"] = this.definition ? this.definition.toJSON() : <any>undefined;
+        data["context"] = this.context;
+        if (this.steps) {
+            data["steps"] = {};
+            for (let key in this.steps) {
+                if (this.steps.hasOwnProperty(key))
+                    (<any>data["steps"])[key] = this.steps[key] ? this.steps[key].toJSON() : <any>undefined;
+            }
+        }
+        data["nextStepId"] = this.nextStepId;
+        data["nextRun"] = this.nextRun ? this.nextRun.toISOString() : <any>undefined;
+        data["created"] = this.created ? this.created.toISOString() : <any>undefined;
+        data["completed"] = this.completed ? this.completed.toISOString() : <any>undefined;
+        data["status"] = this.status;
+        this.cleanup(data);
+        return data;
+    }
+
+    protected cleanup(target: any) {
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
+    }
+
+    protected compute<T>(key: string, action: () => T): T {
+        if (!this.cachedValues.hasOwnProperty(key)) {
+            const value = action();
+            this.cachedValues[key] = value;
+            return value;
+        } else {
+            return this.cachedValues[key] as any;
+        }
+    }
+}
+
+export interface IFlowExecutionStateDto {
+    /** The actual definition of the the steps to be executed. */
+    readonly definition: FlowDefinitionDto;
+    /** The context. */
+    readonly context: any;
+    /** The state of each step. */
+    readonly steps: { [key: string]: FlowExecutionStepStateDto; };
+    /** The next step to be executed. */
+    readonly nextStepId: string;
+    /** THe time when the next step will be executed. */
+    readonly nextRun?: DateTime | undefined;
+    /** The creation time. */
+    readonly created: DateTime;
+    /** The completion time. */
+    readonly completed: DateTime;
+    /** The overall status. */
+    readonly status: FlowExecutionStatus;
+}
+
+export class FlowExecutionStepStateDto implements IFlowExecutionStepStateDto {
+    /** Uses the cache values because the actual object is frozen. */
+    private readonly cachedValues: { [key: string]: any } = {};
+    /** The status of this step. */
+    readonly status!: FlowExecutionStatus;
+    /** Indicates if the step has already been prepared (happens once for all attempts). */
+    readonly isPrepared!: boolean;
+    /** The different attempts. */
+    readonly attempts!: FlowExecutionStepAttemptDto[];
+
+    constructor(data?: IFlowExecutionStepStateDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data: any) {
+        (<any>this).status = _data["status"];
+        (<any>this).isPrepared = _data["isPrepared"];
+        if (Array.isArray(_data["attempts"])) {
+            (<any>this).attempts = [] as any;
+            for (let item of _data["attempts"])
+                (<any>this).attempts!.push(FlowExecutionStepAttemptDto.fromJSON(item));
+        }
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): FlowExecutionStepStateDto {
+        const result = new FlowExecutionStepStateDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["status"] = this.status;
+        data["isPrepared"] = this.isPrepared;
+        if (Array.isArray(this.attempts)) {
+            data["attempts"] = [];
+            for (let item of this.attempts)
+                data["attempts"].push(item.toJSON());
+        }
+        this.cleanup(data);
+        return data;
+    }
+
+    protected cleanup(target: any) {
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
+    }
+
+    protected compute<T>(key: string, action: () => T): T {
+        if (!this.cachedValues.hasOwnProperty(key)) {
+            const value = action();
+            this.cachedValues[key] = value;
+            return value;
+        } else {
+            return this.cachedValues[key] as any;
+        }
+    }
+}
+
+export interface IFlowExecutionStepStateDto {
+    /** The status of this step. */
+    readonly status: FlowExecutionStatus;
+    /** Indicates if the step has already been prepared (happens once for all attempts). */
+    readonly isPrepared: boolean;
+    /** The different attempts. */
+    readonly attempts: FlowExecutionStepAttemptDto[];
+}
+
+export type FlowExecutionStatus = "Pending" | "Scheduled" | "Completed" | "Failed" | "Running";
+
+export const FlowExecutionStatusValues: ReadonlyArray<FlowExecutionStatus> = [
+	"Pending",
+	"Scheduled",
+	"Completed",
+	"Failed",
+	"Running"
+];
+
+export class FlowExecutionStepAttemptDto implements IFlowExecutionStepAttemptDto {
+    /** Uses the cache values because the actual object is frozen. */
+    private readonly cachedValues: { [key: string]: any } = {};
+    /** The log messages. */
+    readonly log!: FlowExecutionStepLogEntryDto[];
+    /** The time when the attempt has been started. */
+    readonly started!: DateTime;
+    /** The time when the attempt has been completed. */
+    readonly completed!: DateTime;
+    /** The error, if there is any. */
+    readonly error?: string | undefined;
+
+    constructor(data?: IFlowExecutionStepAttemptDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data: any) {
+        if (Array.isArray(_data["log"])) {
+            (<any>this).log = [] as any;
+            for (let item of _data["log"])
+                (<any>this).log!.push(FlowExecutionStepLogEntryDto.fromJSON(item));
+        }
+        (<any>this).started = _data["started"] ? DateTime.parseISO(_data["started"].toString()) : <any>undefined;
+        (<any>this).completed = _data["completed"] ? DateTime.parseISO(_data["completed"].toString()) : <any>undefined;
+        (<any>this).error = _data["error"];
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): FlowExecutionStepAttemptDto {
+        const result = new FlowExecutionStepAttemptDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        if (Array.isArray(this.log)) {
+            data["log"] = [];
+            for (let item of this.log)
+                data["log"].push(item.toJSON());
+        }
+        data["started"] = this.started ? this.started.toISOString() : <any>undefined;
+        data["completed"] = this.completed ? this.completed.toISOString() : <any>undefined;
+        data["error"] = this.error;
+        this.cleanup(data);
+        return data;
+    }
+
+    protected cleanup(target: any) {
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
+    }
+
+    protected compute<T>(key: string, action: () => T): T {
+        if (!this.cachedValues.hasOwnProperty(key)) {
+            const value = action();
+            this.cachedValues[key] = value;
+            return value;
+        } else {
+            return this.cachedValues[key] as any;
+        }
+    }
+}
+
+export interface IFlowExecutionStepAttemptDto {
+    /** The log messages. */
+    readonly log: FlowExecutionStepLogEntryDto[];
+    /** The time when the attempt has been started. */
+    readonly started: DateTime;
+    /** The time when the attempt has been completed. */
+    readonly completed: DateTime;
+    /** The error, if there is any. */
+    readonly error?: string | undefined;
+}
+
+export class FlowExecutionStepLogEntryDto implements IFlowExecutionStepLogEntryDto {
+    /** Uses the cache values because the actual object is frozen. */
+    private readonly cachedValues: { [key: string]: any } = {};
+    /** The timestamp. */
+    readonly timeStamp!: DateTime;
+    /** The log message. */
+    readonly message!: string;
+    /** A detailed dump. */
+    readonly dump?: string | undefined;
+
+    constructor(data?: IFlowExecutionStepLogEntryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data: any) {
+        (<any>this).timeStamp = _data["timeStamp"] ? DateTime.parseISO(_data["timeStamp"].toString()) : <any>undefined;
+        (<any>this).message = _data["message"];
+        (<any>this).dump = _data["dump"];
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): FlowExecutionStepLogEntryDto {
+        const result = new FlowExecutionStepLogEntryDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
+        data["message"] = this.message;
+        data["dump"] = this.dump;
+        this.cleanup(data);
+        return data;
+    }
+
+    protected cleanup(target: any) {
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
+    }
+
+    protected compute<T>(key: string, action: () => T): T {
+        if (!this.cachedValues.hasOwnProperty(key)) {
+            const value = action();
+            this.cachedValues[key] = value;
+            return value;
+        } else {
+            return this.cachedValues[key] as any;
+        }
+    }
+}
+
+export interface IFlowExecutionStepLogEntryDto {
+    /** The timestamp. */
+    readonly timeStamp: DateTime;
+    /** The log message. */
+    readonly message: string;
+    /** A detailed dump. */
+    readonly dump?: string | undefined;
+}
+
+export type SkipReason = "None" | "ConditionDoesNotMatch" | "ConditionPrecheckDoesNotMatch" | "Disabled" | "Failed" | "FromRule" | "NoTrigger" | "TooOld" | "WrongEvent" | "WrongEventForTrigger";
 
 export const SkipReasonValues: ReadonlyArray<SkipReason> = [
 	"None",
@@ -8212,7 +8607,6 @@ export const SkipReasonValues: ReadonlyArray<SkipReason> = [
 	"Disabled",
 	"Failed",
 	"FromRule",
-	"NoAction",
 	"NoTrigger",
 	"TooOld",
 	"WrongEvent",
@@ -8275,22 +8669,8 @@ export interface IRuleEventsDto extends IResourceDto {
 export class RuleEventDto extends ResourceDto implements IRuleEventDto {
     /** The ID of the event. */
     readonly id!: string;
-    /** The time when the event has been created. */
-    readonly created!: DateTime;
-    /** The description. */
-    readonly description!: string;
-    /** The name of the event. */
-    readonly eventName!: string;
-    /** The last dump. */
-    readonly lastDump?: string | undefined;
-    /** The number of calls. */
-    readonly numCalls!: number;
-    /** The next attempt. */
-    readonly nextAttempt?: DateTime | undefined;
-    /** The result of the event. */
-    readonly result!: RuleResult;
-    /** The result of the job. */
-    readonly jobResult!: RuleJobResult;
+    /** The flow state. */
+    readonly flowState!: FlowExecutionStateDto;
 
     get canDelete() {
         return this.compute('canDelete', () => hasAnyLink(this._links, 'cancel'));
@@ -8307,14 +8687,7 @@ export class RuleEventDto extends ResourceDto implements IRuleEventDto {
     init(_data: any) {
         super.init(_data);
         (<any>this).id = _data["id"];
-        (<any>this).created = _data["created"] ? DateTime.parseISO(_data["created"].toString()) : <any>undefined;
-        (<any>this).description = _data["description"];
-        (<any>this).eventName = _data["eventName"];
-        (<any>this).lastDump = _data["lastDump"];
-        (<any>this).numCalls = _data["numCalls"];
-        (<any>this).nextAttempt = _data["nextAttempt"] ? DateTime.parseISO(_data["nextAttempt"].toString()) : <any>undefined;
-        (<any>this).result = _data["result"];
-        (<any>this).jobResult = _data["jobResult"];
+        (<any>this).flowState = _data["flowState"] ? FlowExecutionStateDto.fromJSON(_data["flowState"]) : new FlowExecutionStateDto();
         this.cleanup(this);
         return this;
     }
@@ -8328,14 +8701,7 @@ export class RuleEventDto extends ResourceDto implements IRuleEventDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         data["id"] = this.id;
-        data["created"] = this.created ? this.created.toISOString() : <any>undefined;
-        data["description"] = this.description;
-        data["eventName"] = this.eventName;
-        data["lastDump"] = this.lastDump;
-        data["numCalls"] = this.numCalls;
-        data["nextAttempt"] = this.nextAttempt ? this.nextAttempt.toISOString() : <any>undefined;
-        data["result"] = this.result;
-        data["jobResult"] = this.jobResult;
+        data["flowState"] = this.flowState ? this.flowState.toJSON() : <any>undefined;
         super.toJSON(data);
         this.cleanup(data);
         return data;
@@ -8345,42 +8711,9 @@ export class RuleEventDto extends ResourceDto implements IRuleEventDto {
 export interface IRuleEventDto extends IResourceDto {
     /** The ID of the event. */
     readonly id: string;
-    /** The time when the event has been created. */
-    readonly created: DateTime;
-    /** The description. */
-    readonly description: string;
-    /** The name of the event. */
-    readonly eventName: string;
-    /** The last dump. */
-    readonly lastDump?: string | undefined;
-    /** The number of calls. */
-    readonly numCalls: number;
-    /** The next attempt. */
-    readonly nextAttempt?: DateTime | undefined;
-    /** The result of the event. */
-    readonly result: RuleResult;
-    /** The result of the job. */
-    readonly jobResult: RuleJobResult;
+    /** The flow state. */
+    readonly flowState: FlowExecutionStateDto;
 }
-
-export type RuleResult = "Pending" | "Success" | "Failed" | "Timeout";
-
-export const RuleResultValues: ReadonlyArray<RuleResult> = [
-	"Pending",
-	"Success",
-	"Failed",
-	"Timeout"
-];
-
-export type RuleJobResult = "Pending" | "Success" | "Retry" | "Failed" | "Cancelled";
-
-export const RuleJobResultValues: ReadonlyArray<RuleJobResult> = [
-	"Pending",
-	"Success",
-	"Retry",
-	"Failed",
-	"Cancelled"
-];
 
 export class PlansDto implements IPlansDto {
     /** Uses the cache values because the actual object is frozen. */
@@ -14584,6 +14917,8 @@ export class DynamicRuleDto extends ResourceDto implements IDynamicRuleDto {
     readonly name?: string | undefined;
     /** The trigger properties. */
     readonly trigger!: RuleTriggerDto;
+    /** The flow to describe the sequence of actions to perform. */
+    readonly flow!: DynamicFlowDefinitionDto;
     /** The action properties. */
     readonly action!: { [key: string]: any; };
     /** The number of completed executions. */
@@ -14640,6 +14975,7 @@ export class DynamicRuleDto extends ResourceDto implements IDynamicRuleDto {
         (<any>this).isEnabled = _data["isEnabled"];
         (<any>this).name = _data["name"];
         (<any>this).trigger = _data["trigger"] ? RuleTriggerDto.fromJSON(_data["trigger"]) : <any>undefined;
+        (<any>this).flow = _data["flow"] ? DynamicFlowDefinitionDto.fromJSON(_data["flow"]) : new DynamicFlowDefinitionDto();
         if (_data["action"]) {
             (<any>this).action = {} as any;
             for (let key in _data["action"]) {
@@ -14671,6 +15007,7 @@ export class DynamicRuleDto extends ResourceDto implements IDynamicRuleDto {
         data["isEnabled"] = this.isEnabled;
         data["name"] = this.name;
         data["trigger"] = this.trigger ? this.trigger.toJSON() : <any>undefined;
+        data["flow"] = this.flow ? this.flow.toJSON() : <any>undefined;
         if (this.action) {
             data["action"] = {};
             for (let key in this.action) {
@@ -14706,6 +15043,8 @@ export interface IDynamicRuleDto extends IResourceDto {
     readonly name?: string | undefined;
     /** The trigger properties. */
     readonly trigger: RuleTriggerDto;
+    /** The flow to describe the sequence of actions to perform. */
+    readonly flow: DynamicFlowDefinitionDto;
     /** The action properties. */
     readonly action: { [key: string]: any; };
     /** The number of completed executions. */
@@ -14714,6 +15053,170 @@ export interface IDynamicRuleDto extends IResourceDto {
     readonly numFailed: number;
     /** The date and time when the rule was executed the last time. */
     readonly lastExecuted?: DateTime | undefined;
+}
+
+export class DynamicFlowDefinitionDto implements IDynamicFlowDefinitionDto {
+    /** Uses the cache values because the actual object is frozen. */
+    private readonly cachedValues: { [key: string]: any } = {};
+    /** The ID of the initial step. */
+    readonly initialStep!: string;
+    /** The steps. */
+    readonly steps!: { [key: string]: DynamicFlowStepDefinitionDto; };
+
+    constructor(data?: IDynamicFlowDefinitionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data: any) {
+        (<any>this).initialStep = _data["initialStep"];
+        if (_data["steps"]) {
+            (<any>this).steps = {} as any;
+            for (let key in _data["steps"]) {
+                if (_data["steps"].hasOwnProperty(key))
+                    (<any>(<any>this).steps)![key] = _data["steps"][key] ? DynamicFlowStepDefinitionDto.fromJSON(_data["steps"][key]) : new DynamicFlowStepDefinitionDto();
+            }
+        }
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): DynamicFlowDefinitionDto {
+        const result = new DynamicFlowDefinitionDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["initialStep"] = this.initialStep;
+        if (this.steps) {
+            data["steps"] = {};
+            for (let key in this.steps) {
+                if (this.steps.hasOwnProperty(key))
+                    (<any>data["steps"])[key] = this.steps[key] ? this.steps[key].toJSON() : <any>undefined;
+            }
+        }
+        this.cleanup(data);
+        return data;
+    }
+
+    protected cleanup(target: any) {
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
+    }
+
+    protected compute<T>(key: string, action: () => T): T {
+        if (!this.cachedValues.hasOwnProperty(key)) {
+            const value = action();
+            this.cachedValues[key] = value;
+            return value;
+        } else {
+            return this.cachedValues[key] as any;
+        }
+    }
+}
+
+export interface IDynamicFlowDefinitionDto {
+    /** The ID of the initial step. */
+    readonly initialStep: string;
+    /** The steps. */
+    readonly steps: { [key: string]: DynamicFlowStepDefinitionDto; };
+}
+
+export class DynamicFlowStepDefinitionDto implements IDynamicFlowStepDefinitionDto {
+    /** Uses the cache values because the actual object is frozen. */
+    private readonly cachedValues: { [key: string]: any } = {};
+    /** The actual step. */
+    readonly step!: { [key: string]: any; };
+    /** The next step. */
+    readonly nextStepId?: string | undefined;
+    /** Indicates if errors should be ignored. */
+    readonly ignoreError?: boolean;
+
+    constructor(data?: IDynamicFlowStepDefinitionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data: any) {
+        if (_data["step"]) {
+            (<any>this).step = {} as any;
+            for (let key in _data["step"]) {
+                if (_data["step"].hasOwnProperty(key))
+                    (<any>(<any>this).step)![key] = _data["step"][key];
+            }
+        }
+        (<any>this).nextStepId = _data["nextStepId"];
+        (<any>this).ignoreError = _data["ignoreError"];
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): DynamicFlowStepDefinitionDto {
+        const result = new DynamicFlowStepDefinitionDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        if (this.step) {
+            data["step"] = {};
+            for (let key in this.step) {
+                if (this.step.hasOwnProperty(key))
+                    (<any>data["step"])[key] = (<any>this.step)[key];
+            }
+        }
+        data["nextStepId"] = this.nextStepId;
+        data["ignoreError"] = this.ignoreError;
+        this.cleanup(data);
+        return data;
+    }
+
+    protected cleanup(target: any) {
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
+    }
+
+    protected compute<T>(key: string, action: () => T): T {
+        if (!this.cachedValues.hasOwnProperty(key)) {
+            const value = action();
+            this.cachedValues[key] = value;
+            return value;
+        } else {
+            return this.cachedValues[key] as any;
+        }
+    }
+}
+
+export interface IDynamicFlowStepDefinitionDto {
+    /** The actual step. */
+    readonly step: { [key: string]: any; };
+    /** The next step. */
+    readonly nextStepId?: string | undefined;
+    /** Indicates if errors should be ignored. */
+    readonly ignoreError?: boolean;
 }
 
 export class DynamicUpdateRuleDto implements IDynamicUpdateRuleDto {

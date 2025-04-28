@@ -175,7 +175,7 @@ export class WorkflowView {
 
         for (const [name, step] of Object.entries(dto.steps)) {
             const { transitions: _, ...values } = step.toJSON();
-            
+
             resultSteps.push({ name, isLocked: isLocked(name), values });
         }
 
@@ -219,6 +219,8 @@ export class WorkflowView {
             if (!clone.initial && !isLocked(name)) {
                 clone.initial = name;
             }
+
+            return true;
         });
     }
 
@@ -227,7 +229,7 @@ export class WorkflowView {
         if (!step || step.isLocked) {
             return this;
         }
-        
+
         return this.update(clone => {
             delete clone.steps[name];
 
@@ -238,6 +240,8 @@ export class WorkflowView {
             for (const step of Object.values(clone.steps) as any[]) {
                 delete step.transitions[name];
             }
+
+            return true;
         });
     }
 
@@ -248,6 +252,7 @@ export class WorkflowView {
 
         return this.update(clone => {
             clone.schemaIds = schemaIds;
+            return true;
         });
     }
 
@@ -258,6 +263,7 @@ export class WorkflowView {
 
         return this.update(clone => {
             clone.name = name;
+            return true;
         });
     }
 
@@ -269,29 +275,32 @@ export class WorkflowView {
 
         return this.update(clone => {
             clone.initial = initial;
+            return true;
         });
     }
 
     public setTransition(from: string, to: string, values: Partial<WorkflowTransitionValues> = {}) {
-        if (!this.dto.steps[from] || !this.dto.steps[to]) {
-            return this;
-        }
-
         return this.update(clone => {
-            const step = clone.steps[from] as Mutable<WorkflowStepDto>;
-            step.transitions ??= {};
-            step.transitions[to] = new WorkflowTransitionDto({ ...step.transitions[to] ?? {}, ...values });
+            const fromStep = clone.steps[from] as Mutable<WorkflowStepDto>;
+            if (!fromStep || !clone.steps[to]) {
+                return false;
+            }
+
+            fromStep.transitions ??= {};
+            fromStep.transitions[to] = new WorkflowTransitionDto({ ...fromStep.transitions[to] ?? {}, ...values });
+            return true;
         });
     }
 
     public removeTransition(from: string, to: string) {
-        const step = this.dto.steps[from];
-        if (!step || !step.transitions?.[to]) {
-            return this;
-        }
-
         return this.update(clone => {
+            const fromStep = clone.steps[from] as Mutable<WorkflowStepDto>;
+            if (!fromStep?.transitions?.[to]) {
+                return false;
+            }
+
             delete clone.steps[from].transitions![to];
+            return true;
         });
     }
 
@@ -302,17 +311,21 @@ export class WorkflowView {
 
         return this.update(clone => {
             renameInObj(clone.steps, name, newName);
-    
+
             for (const step of Object.values(clone.steps) as any[]) {
                 renameInObj(step.transitions, name, newName);
             }
+
+            return true;
         });
     }
 
-    private update(action: (clone: Mutable<WorkflowDto>) => void) {
+    private update(action: (clone: Mutable<WorkflowDto>) => boolean) {
         const clone = WorkflowDto.fromJSON(this.dto.toJSON());
-        action(clone);
-        return new WorkflowView(WorkflowDto.fromJSON(clone));
+        if (!action(clone)) {
+            return this;
+        }
+        return new WorkflowView(clone);
     }
 
     public toUpdate(): UpdateWorkflowDto {

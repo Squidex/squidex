@@ -1,0 +1,35 @@
+@for (form of branchesControls; track form; let i = $index) {
+    <div class="form-group row gx-2" attr.data-testid="pattern_{{ form.get('name')?.value }}" [formGroup]="form">
+        <div class="col">
+            <sqx-control-errors for="condition"></sqx-control-errors>
+            <input
+                class="form-control"
+                formControlName="condition"
+                maxlength="1000"
+                placeholder="{{ 'common.condition' | sqxTranslate }}" />
+        </div>
+        <div class="col-auto">
+            <button
+                class="btn btn-text-danger"
+                attr.aria-label="{{ 'common.delete' | sqxTranslate }}"
+                (click)="control.removeAt(i)"
+                [disabled]="!isEditable"
+                type="button">
+                <i class="icon-bin2"></i>
+            </button>
+        </div>
+    </div>
+}
+
+@if (isEditable) {
+    <div class="form-group row gx-2">
+        <div class="col">
+            <div class="form-control preview">{{ "common.condition" | sqxTranslate }}</div>
+        </div>
+        <div class="col-auto">
+            <button class="btn btn-success" attr.aria-label="{{ 'common.add' | sqxTranslate }}" (click)="control.add()" type="button">
+                <i class="icon-add"></i>
+            </button>
+        </div>
+    </div>
+}

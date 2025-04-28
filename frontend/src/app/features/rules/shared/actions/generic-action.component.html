@@ -56,6 +56,9 @@
                             }
                         </select>
                     }
+                    @case ("Branches") {
+                        <sqx-branches-input [control]="actionForm.branch(property.name)" [isEditable]="isEditable"></sqx-branches-input>
+                    }
                     @default {
                         <input
                             class="form-control"

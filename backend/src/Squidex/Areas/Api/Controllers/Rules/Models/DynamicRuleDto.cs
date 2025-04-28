@@ -59,8 +59,14 @@ public sealed class DynamicRuleDto : Resource
     public RuleTriggerDto Trigger { get; set; }
 
     /// <summary>
+    /// The flow to describe the sequence of actions to perform.
+    /// </summary>
+    public DynamicFlowDefinitionDto Flow { get; set; }
+
+    /// <summary>
     /// The action properties.
     /// </summary>
+    [Obsolete("Use Flow property. Can be null if the flow cannot be converted.")]
     public Dictionary<string, object> Action { get; set; }
 
     /// <summary>

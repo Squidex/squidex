@@ -31,16 +31,38 @@ export class ActionForm extends Form<UntypedFormGroup, Record<string, any>> {
                 defaultValue = property.options[0];
             }
 
-            controls[property.name] = new UntypedFormControl(defaultValue, validator);
+            if (property.editor === 'Branches') {
+                controls[property.name] = new TemplatedFormArray(BranchTemplate.INSTANCE, validator);
+            } else {
+                controls[property.name] = new UntypedFormControl(defaultValue, validator);
+            }
         }
 
         return new ExtendedFormGroup(controls);
     }
 
+    public branch(name: string) {
+        return this.form.controls[name] as TemplatedFormArray;
+    }
+
     protected transformSubmit(value: any): any {
         value.actionType = this.actionType;
-
         return value;
+    }
+}
+
+class BranchTemplate {
+    public static readonly INSTANCE = new BranchTemplate();
+
+    public createControl() {
+        return new ExtendedFormGroup({
+            condition: new UntypedFormControl('',
+                Validators.nullValidator,
+            ),
+            step: new UntypedFormControl('',
+                Validators.nullValidator,
+            ),
+        });
     }
 }
 
