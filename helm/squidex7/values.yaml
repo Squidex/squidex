@@ -3,51 +3,51 @@
 ## @param nameOverride Override the name of the application.
 nameOverride: "squidex"
 
-## @param labels [object] Labels to add to the deployment
+## @param labels [object] Labels to add to the deployment.
 labels:
   # custom: "custom"
 
 service:
-  ## @param service.type Kubernetes Service type
+  ## @param service.type Kubernetes Service type.
   ##
   type: ClusterIP
-  ## @param service.port Kubernetes Service port
+  ## @param service.port Kubernetes Service port.
   ##
   port: 8080
 
 deployment:
-  ## @param deployment.replicaCount Number of replicas (ignored if autoscaling enabled)
+  ## @param deployment.replicaCount Number of replicas (ignored if autoscaling enabled).
   replicaCount: 1
-  ## @param deployment.revisionHistoryLimit [default: 2] Number of revision history
+  ## @param deployment.revisionHistoryLimit [default: 2] Number of revision history.
   revisionHistoryLimit: 2
-  ## @param deployment.serviceAccountName Name of the service account to use
+  ## @param deployment.serviceAccountName Name of the service account to use.
   serviceAccountName: ""
-  ## @param deployment.strategy.type Deployment strategy type
+  ## @param deployment.strategy.type Deployment strategy type.
   strategy:
     type: RollingUpdate
-    ## @param deployment.strategy.rollingUpdate.maxSurge Maximum number of pods that can be created above the desired amount
+    ## @param deployment.strategy.rollingUpdate.maxSurge Maximum number of pods that can be created above the desired amount.
     rollingUpdate:
       maxSurge: 1
-      ## @param deployment.strategy.rollingUpdate.maxUnavailable Maximum number of unavailable pods during update
+      ## @param deployment.strategy.rollingUpdate.maxUnavailable Maximum number of unavailable pods during update.
       maxUnavailable: 0
-  ## @param deployment.restartPolicy Pod restart policy
+  ## @param deployment.restartPolicy Pod restart policy.
   restartPolicy: Always
-  ## @param deployment.annotations Annotations to add to the deployment
+  ## @param deployment.annotations Annotations to add to the deployment.
   annotations:
     # vault.hashicorp.com/agent-pre-populate-only: "true"
     # vault.hashicorp.com/agent-limits-cpu: 50m
     # vault.hashicorp.com/agent-limits-mem: 64Mi
     # vault.hashicorp.com/agent-requests-cpu: 10m
     # vault.hashicorp.com/agent-requests-mem: 16Mi
-  ## @param deployment.command Command to run in the container
+  ## @param deployment.command Command to run in the container.
   command:
     # - sh
     # - -c
-  ## @param deployment.args Arguments to pass to the container
+  ## @param deployment.args Arguments to pass to the container.
   args:
     # - 'dotnet Squidex.dll'
 
-## @param networkPolicy.enabled Enable network policies
+## @param networkPolicy.enabled Enable network policies.
 networkPolicy:
   enabled: true
   ## @skip networkPolicy.ingressRules
@@ -88,14 +88,14 @@ selectors:
   ##
   version: ""
 image:
-  ## @param image.repository Squidex image registry
+  ## @param image.repository Squidex image registry.
   ##
   repository: squidex/squidex
-  ## @param image.pullPolicy Squidex image pull policy
+  ## @param image.pullPolicy Squidex image pull policy.
   ##
   pullPolicy: IfNotPresent
 
-## @param resources [object] Resource requests and limits
+## @param resources [object] Resource requests and limits.
 resources:
   limits:
     memory: "1Gi"
@@ -127,7 +127,7 @@ affinity:
           - amd64
           - arm64
 
-## @param topologySpreadConstraints [array] Topology spread constraints for pod scheduling
+## @param topologySpreadConstraints [array] Topology spread constraints for pod scheduling.
 topologySpreadConstraints:
   # - maxSkew: 1
   #   topologyKey: kubernetes.io/hostname
@@ -137,7 +137,7 @@ topologySpreadConstraints:
   #       app.kubernetes.io/instance: squidex
   #       app.kubernetes.io/component: squidex
 
-## @param priorityClassName [nullable] Priority class name for the pod
+## @param priorityClassName [nullable] Priority class name for the pod.
 priorityClassName:
 
 ## @skip clusterSuffix
@@ -146,7 +146,7 @@ clusterSuffix: cluster.local
 ## @param runAsNonRoot Run container as non-root user.
 runAsNonRoot: true
 
-## @skip podSecurityContext - object - optional
+## @skip podSecurityContext [object]
 ## You can modify the security context userepd to run PODS in the cluster
 ## For information regarding which settings are required per policy see: https://kubernetes.io/docs/concepts/security/pod-security-standards/
 ## An example that follows the Restricted profile is described below:
@@ -159,7 +159,7 @@ podSecurityContext:
   runAsGroup: 10000
   fsGroup: 10000
 
-## @skip containerSecurityContext - object - optional
+## @skip containerSecurityContext [object]
 ## You can modify the security context used to run CONTAINERS in the cluster
 ## For information regarding which settings are required per policy see: https://kubernetes.io/docs/concepts/security/pod-security-standards/
 ## readOnlyRootFilesystem: true not supported becasue of backup and restore process
@@ -178,13 +178,13 @@ auth:
   ## 
 
 ingress:
-  ## @param ingress.enabled True to deploy an ingress
+  ## @param ingress.enabled True to deploy an ingress.
   ## If true, Squidex Ingress will be created.
   ##
   enabled: true
   ## @param ingress.ingressClassName The ingress class.
   ingressClassName: nginx
-  ## @param ingress.annotations [object] Ingress annotations
+  ## @param ingress.annotations [object] Ingress annotations.
   annotations:
     #   kubernetes.io/ingress.class: nginx
     #   kubernetes.io/tls-acme: "true"
@@ -207,7 +207,7 @@ ingress:
 
 env:
   # Define the type of the event store
-  ## @param env.EVENTSTORE__MONGODB__DATABASE The name of the database for events
+  ## @param env.EVENTSTORE__MONGODB__DATABASE The name of the database for events.
   EVENTSTORE__MONGODB__DATABASE: "Squidex"
 
   ## @skip env.EVENTSTORE__TYPE
@@ -222,10 +222,10 @@ env:
   ## @param env.IDENTITY__ADMINPASSWORD The initial admin email address.
   ##
   IDENTITY__ADMINPASSWORD: ""
-  ## @param env.IDENTITY__ADMINRECREATE Recreate the admin if it does not exist or the password does not match
+  ## @param env.IDENTITY__ADMINRECREATE Recreate the admin if it does not exist or the password does not match.
   ##
   IDENTITY__ADMINRECREATE: false
-  ## @param env.IDENTITY__ALLOWPASSWORDAUTH Enable password auth. Set this to false if you want to disable local login, leaving only 3rd party login options
+  ## @param env.IDENTITY__ALLOWPASSWORDAUTH Enable password auth. Set this to false if you want to disable local login, leaving only 3rd party login options.
   ## 
   IDENTITY__ALLOWPASSWORDAUTH: "true"
   ## @param env.IDENTITY__LOCKAUTOMATICALLY Lock new users automatically, the administrator must unlock them.
@@ -234,7 +234,7 @@ env:
   ## @param env.IDENTITY__PRIVACYURL The url to you privacy statements.
   ##
   IDENTITY__PRIVACYURL: "https://squidex.io/privacy"
-  ## @param env.IDENTITY__SHOWPII Set to true to show PII (Personally Identifiable Information) in the logs
+  ## @param env.IDENTITY__SHOWPII Set to true to show PII (Personally Identifiable Information) in the logs.
   ## 
   IDENTITY__SHOWPII: true # 
 
@@ -278,7 +278,7 @@ env:
   ## @param env.IDENTITY__OIDCMETADATAADDRESS A custom address for OIDC metadata.
   ##
   IDENTITY__OIDCMETADATAADDRESS: null
-  ## @param env.IDENTITY__OIDCNAME The name of the OIDC integration or server. Used in the UI
+  ## @param env.IDENTITY__OIDCNAME The name of the OIDC integration or server. Used in the UI.
   ##
   IDENTITY__OIDCNAME: null
   ## @param env.IDENTITY__OIDCRESPONSETYPE The type of the response. id_token or code.
@@ -308,16 +308,16 @@ env:
   ## @param env.LOGGING__HUMAN Setting the flag to true, enables well formatteds json logs.
   ##
   LOGGING__HUMAN: false
-  ## @param env.LOGGING__LEVEL Trace, Debug, Information, Warning, Error, Fatal
+  ## @param env.LOGGING__LEVEL Trace, Debug, Information, Warning, Error, Fatal.
   ##
   LOGGING__LEVEL: Warning
   ## @param env.LOGGING__LOGREQUESTS Set to false to disable logging of http requests.
   ##
   LOGGING__LOGREQUESTS: true
-  ## @param env.LOGGING__OTLP__ENABLED True, to enable OpenTelemetry Protocol integration
+  ## @param env.LOGGING__OTLP__ENABLED True, to enable OpenTelemetry Protocol integration.
   ##
   LOGGING__OTLP__ENABLED: false
-  ## @param env.LOGGING__OLTP__ENDPOINT The endpoint to the agent
+  ## @param env.LOGGING__OLTP__ENDPOINT The endpoint to the agent.
   ##
   LOGGING__OLTP__ENDPOINT: null
   ## @param env.LOGGING__STACKDRIVER__ENABLED True, to enable stackdriver integration.
@@ -326,7 +326,7 @@ env:
   ## @param env.LOGGING__STOREENABLED False to disable the log store for HTTP requests.
   ##
   LOGGING__STOREENABLED: true
-  ## @param env.LOGGING__STORERETENTIONINDAYS The number of days request log items will be stored
+  ## @param env.LOGGING__STORERETENTIONINDAYS The number of days request log items will be stored.
   ##
   LOGGING__STORERETENTIONINDAYS: 90
 
@@ -346,33 +346,33 @@ env:
   ##
   URLS__BASEURL: https://squidex.local/ # 
 
-  ## @param env.URLS__ENFORCEHTTPS Set it to true to redirect the user from http to https permanently
+  ## @param env.URLS__ENFORCEHTTPS Set it to true to redirect the user from http to https permanently.
   ##
   URLS__ENFORCEHTTPS: false
 
-  ## @param env.ASPNETCORE_URLS An override to ensure that kestrel starts on a non-privileged port
+  ## @param env.ASPNETCORE_URLS An override to ensure that kestrel starts on a non-privileged port.
   ##
   ASPNETCORE_URLS: http://+:8080
 
-## @param autoscaling.enabled Enable autoscaling for the deployment
+## @param autoscaling.enabled Enable autoscaling for the deployment.
 autoscaling:
   enabled: true
-  ## @param autoscaling.maxReplicas Maximum number of replicas
+  ## @param autoscaling.maxReplicas Maximum number of replicas.
   maxReplicas: 6
-  ## @param autoscaling.minReplicas Minimum number of replicas
+  ## @param autoscaling.minReplicas Minimum number of replicas.
   minReplicas: 3
-  ## @param autoscaling.targetCPUUtilizationPercentage Target CPU utilization percentage
+  ## @param autoscaling.targetCPUUtilizationPercentage Target CPU utilization percentage.
   targetCPUUtilizationPercentage: 85
 
-## @param podDisruptionBudget.minAvailable Minimum number of available pods
+## @param podDisruptionBudget.minAvailable Minimum number of available pods.
 podDisruptionBudget:
   minAvailable: 1
-  ## @param podDisruptionBudget.unhealthyPodEvictionPolicy Policy for evicting unhealthy pods
+  ## @param podDisruptionBudget.unhealthyPodEvictionPolicy Policy for evicting unhealthy pods.
   unhealthyPodEvictionPolicy: AlwaysAllow
 
 ## @section MongoDB parameters
 mongodb:
-  ## @param mongodb.architecture MongoDB(®) architecture (standalone or replicaset
+  ## @param mongodb.architecture MongoDB(®) architecture (standalone or replicaset).
   ##
   architecture: replicaset
   ## @param mongodb.enabled Uses the custom mongoDB instance.
