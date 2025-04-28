@@ -17,10 +17,7 @@ service:
 
 deployment:
   ## @param deployment.replicaCount Number of replicas (ignored if autoscaling enabled)
-  replicaCount: 3
-  worker:
-    ## @param deployment.worker.replicaCount Number of worker instances
-    replicaCount: 1 # only one worker supported
+  replicaCount: 1
   ## @param deployment.revisionHistoryLimit [default: 2] Number of revision history
   revisionHistoryLimit: 2
   ## @param deployment.serviceAccountName Name of the service account to use
@@ -150,7 +147,7 @@ clusterSuffix: cluster.local
 runAsNonRoot: true
 
 ## @skip podSecurityContext - object - optional
-## You can modify the security context used to run PODS in the cluster
+## You can modify the security context userepd to run PODS in the cluster
 ## For information regarding which settings are required per policy see: https://kubernetes.io/docs/concepts/security/pod-security-standards/
 ## An example that follows the Restricted profile is described below:
 #

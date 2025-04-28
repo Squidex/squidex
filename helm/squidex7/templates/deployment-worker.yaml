@@ -6,7 +6,7 @@ metadata:
     {{- include "squidex.labels" . | indent 4 }}
     app.kubernetes.io/role: worker
 spec:
-  replicas: {{ .Values.deployment.worker.replicaCount }}
+  replicas: 1
   revisionHistoryLimit: {{ .Values.deployment.revisionHistoryLimit }}
   strategy:
     {{- toYaml .Values.deployment.strategy | nindent 4 }}
