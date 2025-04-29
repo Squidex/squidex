@@ -9,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiUrlConfig, HTTP, mapVersioned, pretifyError, Resource, Versioned, VersionOrTag } from '@app/framework';
-import { AddWorkflowDto, IAddWorkflowDto, IUpdateWorkflowDto, UpdateWorkflowDto, WorkflowsDto } from '../model';
+import { AddWorkflowDto, UpdateWorkflowDto, WorkflowsDto } from '../model';
 
 @Injectable({
     providedIn: 'root',
@@ -31,22 +31,22 @@ export class WorkflowsService {
             pretifyError('i18n:workflows.loadFailed'));
     }
 
-    public postWorkflow(appName: string, dto: IAddWorkflowDto, version: VersionOrTag): Observable<Versioned<WorkflowsDto>> {
+    public postWorkflow(appName: string, dto: AddWorkflowDto, version: VersionOrTag): Observable<Versioned<WorkflowsDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/workflows`);
 
-        return HTTP.postVersioned(this.http, url, new AddWorkflowDto(dto).toJSON(), version).pipe(
+        return HTTP.postVersioned(this.http, url, dto.toJSON(), version).pipe(
             mapVersioned(({ body }) => {
                 return WorkflowsDto.fromJSON(body);
             }),
             pretifyError('i18n:workflows.createFailed'));
     }
 
-    public putWorkflow(appName: string, resource: Resource, dto: IUpdateWorkflowDto, version: VersionOrTag): Observable<Versioned<WorkflowsDto>> {
+    public putWorkflow(appName: string, resource: Resource, dto: UpdateWorkflowDto, version: VersionOrTag): Observable<Versioned<WorkflowsDto>> {
         const link = resource._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, new UpdateWorkflowDto(dto).toJSON()).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto.toJSON()).pipe(
             mapVersioned(({ body }) => {
                 return WorkflowsDto.fromJSON(body);
             }),

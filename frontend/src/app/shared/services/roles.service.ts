@@ -9,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { ApiUrlConfig, HTTP, mapVersioned, pretifyError, Resource, Versioned, VersionOrTag } from '@app/framework';
-import { AddRoleDto, IAddRoleDto, IUpdateRoleDto, RolesDto, UpdateRoleDto } from '../model';
+import { AddRoleDto, RolesDto, UpdateRoleDto } from '../model';
 
 @Injectable({
     providedIn: 'root',
@@ -31,22 +31,22 @@ export class RolesService {
             pretifyError('i18n:roles.loadFailed'));
     }
 
-    public postRole(appName: string, dto: IAddRoleDto, version: VersionOrTag): Observable<Versioned<RolesDto>> {
+    public postRole(appName: string, dto: AddRoleDto, version: VersionOrTag): Observable<Versioned<RolesDto>> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/roles`);
 
-        return HTTP.postVersioned(this.http, url, new AddRoleDto(dto).toJSON(), version).pipe(
+        return HTTP.postVersioned(this.http, url, dto.toJSON(), version).pipe(
             mapVersioned(({ body }) => {
                 return RolesDto.fromJSON(body);
             }),
             pretifyError('i18n:roles.addFailed'));
     }
 
-    public putRole(appName: string, resource: Resource, dto: IUpdateRoleDto, version: VersionOrTag): Observable<Versioned<RolesDto>> {
+    public putRole(appName: string, resource: Resource, dto: UpdateRoleDto, version: VersionOrTag): Observable<Versioned<RolesDto>> {
         const link = resource._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, new UpdateRoleDto(dto).toJSON()).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto.toJSON()).pipe(
             mapVersioned(({ body }) => {
                 return RolesDto.fromJSON(body);
             }),

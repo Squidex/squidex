@@ -9,7 +9,7 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 import { ApiUrlConfig, pretifyError, Resource } from '@app/framework';
-import { CreateIndexDto, ICreateIndexDto, IndexesDto } from './../model';
+import { CreateIndexDto, IndexesDto } from './../model';
 
 @Injectable({
     providedIn: 'root',
@@ -31,10 +31,10 @@ export class IndexesService {
             pretifyError('i18n:schemas.indexes.loadFailed'));
     }
 
-    public postIndex(appName: string, schemaName: string, dto: ICreateIndexDto): Observable<any> {
+    public postIndex(appName: string, schemaName: string, dto: CreateIndexDto): Observable<any> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/${schemaName}/indexes`);
 
-        return this.http.post(url, new CreateIndexDto(dto).toJSON()).pipe(
+        return this.http.post(url, dto.toJSON()).pipe(
             pretifyError('i18n:schemas.indexes.createFailed'));
     }
 

@@ -21,4 +21,16 @@ describe('KeysPipe', () => {
 
         expect(actual).toEqual(expected);
     });
+
+    it('should return sorted keys', () => {
+        const value = {
+            key2: 2,
+            key1: 1,
+        };
+
+        const actual = pipe.transform(value);
+        const expected = ['key1', 'key2'];
+
+        expect(actual).toEqual(expected);
+    });
 });

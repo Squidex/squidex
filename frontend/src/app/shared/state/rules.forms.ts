@@ -7,9 +7,13 @@
 
 import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form, TemplatedFormArray, ValidatorsEx } from '@app/framework';
-import { RuleElementDto } from '../model';
+import { RuleElementDto, RuleTriggerDto } from '../model';
 
-export class ActionForm extends Form<any, UntypedFormGroup> {
+export class ActionForm extends Form<UntypedFormGroup, Record<string, any>> {
+    public get editableProperties() {
+        return this.definition.properties.filter(x => x.editor !== 'None');
+    }
+
     constructor(public readonly definition: RuleElementDto,
         public readonly actionType: string,
     ) {
@@ -31,20 +35,42 @@ export class ActionForm extends Form<any, UntypedFormGroup> {
                 defaultValue = property.options[0];
             }
 
-            controls[property.name] = new UntypedFormControl(defaultValue, validator);
+            if (property.editor === 'Branches') {
+                controls[property.name] = new TemplatedFormArray(BranchTemplate.INSTANCE, validator);
+            } else {
+                controls[property.name] = new UntypedFormControl(defaultValue, validator);
+            }
         }
 
         return new ExtendedFormGroup(controls);
     }
 
+    public branch(name: string) {
+        return this.form.controls[name] as TemplatedFormArray;
+    }
+
     protected transformSubmit(value: any): any {
         value.actionType = this.actionType;
-
         return value;
     }
 }
 
-export class TriggerForm extends Form<any, UntypedFormGroup> {
+class BranchTemplate {
+    public static readonly INSTANCE = new BranchTemplate();
+
+    public createControl() {
+        return new ExtendedFormGroup({
+            condition: new UntypedFormControl('',
+                Validators.nullValidator,
+            ),
+            step: new UntypedFormControl('',
+                Validators.nullValidator,
+            ),
+        });
+    }
+}
+
+export class TriggerForm extends Form<UntypedFormGroup, RuleTriggerDto> {
     constructor(
         public readonly triggerType: string,
     ) {
@@ -86,10 +112,10 @@ export class TriggerForm extends Form<any, UntypedFormGroup> {
         }
     }
 
-    protected transformSubmit(value: any): any {
+    protected transformSubmit(value: any) {
         value.triggerType = this.triggerType;
 
-        return value;
+        return RuleTriggerDto.fromJSON(value);
     }
 }
 

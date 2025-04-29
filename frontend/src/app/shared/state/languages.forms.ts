@@ -7,9 +7,9 @@
 
 import { UntypedFormControl, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form, value$ } from '@app/framework';
-import { AppLanguageDto, IUpdateLanguageDto } from '../model';
+import { AddLanguageDto, AppLanguageDto, UpdateLanguageDto } from '../model';
 
-export class EditLanguageForm extends Form<ExtendedFormGroup, IUpdateLanguageDto, AppLanguageDto> {
+export class EditLanguageForm extends Form<ExtendedFormGroup, UpdateLanguageDto, AppLanguageDto> {
     public get isMaster() {
         return this.form.controls['isMaster'];
     }
@@ -42,16 +42,22 @@ export class EditLanguageForm extends Form<ExtendedFormGroup, IUpdateLanguageDto
                 }
             });
     }
+
+    protected transformSubmit(value: any) {
+        return new UpdateLanguageDto(value);
+    }
 }
 
-type AddLanguageFormType = { language: string };
-
-export class AddLanguageForm extends Form<ExtendedFormGroup, AddLanguageFormType> {
+export class AddLanguageForm extends Form<ExtendedFormGroup, AddLanguageDto> {
     constructor() {
         super(new ExtendedFormGroup({
             language: new UntypedFormControl(null,
                 Validators.required,
             ),
         }));
+    }
+
+    protected transformSubmit(value: any) {
+        return new AddLanguageDto(value);
     }
 }

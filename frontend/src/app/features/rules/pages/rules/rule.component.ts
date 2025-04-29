@@ -9,7 +9,7 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { ActionsDto, ConfirmClickDirective, DropdownMenuComponent, EditableTitleComponent, ModalDirective, ModalModel, ModalPlacementDirective, RuleDto, RulesState, ToggleComponent, TranslatePipe, TriggersDto } from '@app/shared';
+import { ActionsDto, ConfirmClickDirective, DropdownMenuComponent, DynamicRuleDto, DynamicUpdateRuleDto, EditableTitleComponent, ModalDirective, ModalModel, ModalPlacementDirective, RulesState, ToggleComponent, TranslatePipe, TriggersDto } from '@app/shared';
 import { RuleElementComponent } from '../../shared/rule-element.component';
 
 @Component({
@@ -39,7 +39,7 @@ export class RuleComponent {
     public ruleActions!: ActionsDto;
 
     @Input({ required: true })
-    public rule!: RuleDto;
+    public rule!: DynamicRuleDto;
 
     public dropdown = new ModalModel();
 
@@ -65,19 +65,19 @@ export class RuleComponent {
     }
 
     public rename(name: string) {
-        this.rulesState.update(this.rule, { name });
+        this.rulesState.update(this.rule, new DynamicUpdateRuleDto({ name }));
     }
 
     public disable() {
-        this.rulesState.update(this.rule, { isEnabled: false });
+        this.rulesState.update(this.rule, new DynamicUpdateRuleDto({ isEnabled: false }));
     }
 
     public enable() {
-        this.rulesState.update(this.rule, { isEnabled: true });
+        this.rulesState.update(this.rule, new DynamicUpdateRuleDto({ isEnabled: true }));
     }
 
     public toggle() {
-        this.rulesState.update(this.rule, { isEnabled: !this.rule.isEnabled });
+        this.rulesState.update(this.rule, new DynamicUpdateRuleDto({ isEnabled: !this.rule.isEnabled }));
     }
 
     public trigger() {

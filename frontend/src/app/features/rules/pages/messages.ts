@@ -8,7 +8,7 @@
 export class RuleConfigured {
     constructor(
         public readonly trigger: any,
-        public readonly action: any,
+        public readonly flow: any,
     ) {
     }
 }

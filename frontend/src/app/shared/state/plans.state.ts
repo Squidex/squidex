@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, shareSubscribed, State, VersionTag } from '@app/framework';
-import { PlanDto, PlansLockedReason, ReferralInfo } from '../model';
+import { ChangePlanDto, PlanDto, PlansLockedReason, ReferralInfoDto } from '../model';
 import { PlansService } from '../services/plans.service';
 import { AppsState } from './apps.state';
 
@@ -35,7 +35,7 @@ interface Snapshot extends LoadingState {
     portalLink?: string;
 
     // The referral info.
-    referral?: ReferralInfo;
+    referral?: ReferralInfoDto;
 
     // The reason why the plan cannot be changed.
     locked?: PlansLockedReason;
@@ -127,7 +127,7 @@ export class PlansState extends State<Snapshot> {
     }
 
     public change(planId: string): Observable<any> {
-        return this.plansService.putPlan(this.appName, { planId }, this.version).pipe(
+        return this.plansService.putPlan(this.appName, new ChangePlanDto({ planId }), this.version).pipe(
             tap(({ version, payload }) => {
                 if (payload.redirectUri && payload.redirectUri.length > 0) {
                     this.window.location.href = payload.redirectUri;

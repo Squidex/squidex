@@ -8,8 +8,8 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, AssetDto, AssetFolderDto, AssetFoldersDto, AssetMeta, AssetsDto, AssetsService, DateTime, ErrorDto, MathHelper, Resource, sanitize, ScriptCompletions, VersionTag } from '@app/shared/internal';
-import { ResourceLinkDto } from './../model';
+import { ApiUrlConfig, AssetDto, AssetFolderDto, AssetFoldersDto, AssetsDto, AssetsService, DateTime, ErrorDto, MathHelper, Resource, sanitize, ScriptCompletions, VersionTag } from '@app/shared/internal';
+import { AnnotateAssetDto, AssetMetaDto, CreateAssetFolderDto, MoveAssetDto, MoveAssetFolderDto, RenameAssetFolderDto, RenameTagDto, ResourceLinkDto } from './../model';
 
 describe('AssetsService', () => {
     const version = new VersionTag('1');
@@ -108,17 +108,15 @@ describe('AssetsService', () => {
 
     it('should make put request to rename asset tag',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
-            const dto = { tagName: 'new-name' };
+            const dto = new RenameTagDto({ tagName: 'new-name' });
 
             let tags: any;
-
             assetsService.putTag('my-app', 'old-name', dto).subscribe(result => {
                 tags = result;
             });
 
             const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets/tags/old-name');
 
-            expect(req.request.body).toEqual(dto);
             expect(req.request.method).toEqual('PUT');
             expect(req.request.headers.get('If-Match')).toBeNull();
 
@@ -326,7 +324,7 @@ describe('AssetsService', () => {
 
     it('should make put request to annotate asset',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
-            const dto = { fileName: 'New-Name.png' };
+            const dto = new AnnotateAssetDto({ fileName: 'New-Name.png' });
 
             const resource: Resource = {
                 _links: {
@@ -351,6 +349,8 @@ describe('AssetsService', () => {
 
     it('should make put request to move asset',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
+            const dto = new MoveAssetDto({ parentId: 'parent1' });
+
             const resource: Resource = {
                 _links: {
                     move: { method: 'PUT', href: 'api/apps/my-app/assets/123/parent' },
@@ -358,8 +358,7 @@ describe('AssetsService', () => {
             };
 
             let asset: AssetDto;
-
-            assetsService.putAssetParent('my-app', resource, { parentId: 'parent1' }, version).subscribe(result => {
+            assetsService.putAssetParent('my-app', resource, dto, version).subscribe(result => {
                 asset = result;
             });
 
@@ -375,6 +374,8 @@ describe('AssetsService', () => {
 
     it('should make put request to move asset folder',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
+            const dto = new MoveAssetFolderDto({ parentId: 'parent1' });
+
             const resource: Resource = {
                 _links: {
                     move: { method: 'PUT', href: 'api/apps/my-app/assets/folders/123/parent' },
@@ -382,8 +383,7 @@ describe('AssetsService', () => {
             };
 
             let assetFolder: AssetFolderDto;
-
-            assetsService.putAssetFolderParent('my-app', resource, { parentId: 'parent1' }, version).subscribe(result => {
+            assetsService.putAssetFolderParent('my-app', resource, dto, version).subscribe(result => {
                 assetFolder = result;
             });
 
@@ -417,10 +417,9 @@ describe('AssetsService', () => {
 
     it('should make post request to create asset folder',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
-            const dto = { folderName: 'My Folder' };
+            const dto = new CreateAssetFolderDto({ folderName: 'My Folder' });
 
             let assetFolder: AssetFolderDto;
-
             assetsService.postAssetFolder('my-app', dto).subscribe(result => {
                 assetFolder = result;
             });
@@ -437,7 +436,7 @@ describe('AssetsService', () => {
 
     it('should make put request to update asset folder',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
-            const dto = { folderName: 'My Folder' };
+            const dto = new RenameAssetFolderDto({ folderName: 'My Folder' });
 
             const resource: Resource = {
                 _links: {
@@ -446,7 +445,6 @@ describe('AssetsService', () => {
             };
 
             let assetFolder: AssetFolderDto;
-
             assetsService.putAssetFolder('my-app', resource, dto, version).subscribe(result => {
                 assetFolder = result;
             });
@@ -464,7 +462,6 @@ describe('AssetsService', () => {
     it('should make get request to get completions',
         inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
             let completions: ScriptCompletions;
-
             assetsService.getCompletions('my-app').subscribe(result => {
                 completions = result;
             });
@@ -537,7 +534,7 @@ describe('AssetsService', () => {
     }
 });
 
-export function createAsset(id: number, tags?: ReadonlyArray<string>, suffix = '', parentId?: string) {
+export function createAsset(id: number, tags?: string[], suffix = '', parentId?: string) {
     parentId = parentId || MathHelper.EMPTY_GUID;
 
     const key = `${id}${suffix}`;
@@ -563,7 +560,7 @@ export function createAsset(id: number, tags?: ReadonlyArray<string>, suffix = '
         },
         parentId,
         slug: `my-name${key}.png`,
-        tags: [
+        tags: tags || [
             'tag1',
             'tag2',
         ],
@@ -572,7 +569,7 @@ export function createAsset(id: number, tags?: ReadonlyArray<string>, suffix = '
         _links: {
             update: new ResourceLinkDto({ method: 'PUT', href: `/assets/${id}` }),
         },
-        _meta: new AssetMeta({
+        _meta: new AssetMetaDto({
             isDuplicate: 'true',
         }),
     });

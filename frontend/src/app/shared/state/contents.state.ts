@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, finalize, map, switchMap, tap } from 'rxjs/operators';
 import { DateTime, debug, DialogService, getPagingInfo, ListState, shareSubscribed, State, Types, Version, Versioned } from '@app/framework';
-import { BulkResultDto, ContentDto, ContentsDto, IBulkUpdateContentsJobDto, ServerErrorDto } from '../model';
+import { BulkResultDto, BulkUpdateContentsDto, BulkUpdateContentsJobDto, ContentDto, ContentsDto, IBulkUpdateContentsJobDto, ServerErrorDto } from '../model';
 import { ContentsService, StatusInfo } from '../services/contents.service';
 import { Query } from '../services/query';
 import { AppsState } from './apps.state';
@@ -239,7 +239,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     public validate(contents: ReadonlyArray<ContentDto>): Observable<any> {
-        const job: Partial<IBulkUpdateContentsJobDto> = { type: 'Validate' };
+        const job: Partial<BulkUpdateContentsJobDto> = { type: 'Validate' };
 
         return this.bulkMany(contents, false, job).pipe(
             tap(results => {
@@ -420,20 +420,20 @@ export abstract class ContentsStateBase extends State<Snapshot> {
     }
 
     private bulkMany(contents: ReadonlyArray<ContentDto>, checkReferrers: boolean, job: Partial<IBulkUpdateContentsJobDto>): Observable<ReadonlyArray<BulkResultDto>> {
-        const update = {
+        const update = new BulkUpdateContentsDto({
             // This is set to true by default, so we turn it off here.
             optimizeValidation: false,
-            dotNotValidate: false,
+            doNotValidate: false,
             doNotScript: false,
-            jobs: contents.map(x => ({
+            jobs: contents.map(x => new BulkUpdateContentsJobDto(({
                 id: x.id,
                 schema: x.schemaName,
                 status: undefined,
                 expectedVersion: x.version,
                 ...job,
-            })),
+            }))),
             checkReferrers,
-        };
+        });
 
         return this.contentsService.bulkUpdate(this.appName, this.schemaName, update as any);
     }

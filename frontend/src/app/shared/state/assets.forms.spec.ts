@@ -76,7 +76,7 @@ describe('AnnotateAssetForm', () => {
 
         const request = form.submit({ fileName: 'Old File.png' } as any)!;
 
-        expect(request).toEqual(asset);
+        expect(request.toJSON()).toEqual(asset);
         expect(form.form.enabled).toBeFalsy();
     });
 

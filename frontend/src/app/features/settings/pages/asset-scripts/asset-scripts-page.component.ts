@@ -83,17 +83,18 @@ export class AssetScriptsPageComponent implements OnInit {
         }
 
         const value = this.editForm.submit();
-
-        if (value) {
-            this.assetScriptsState.update(value)
-                .subscribe({
-                    next: () => {
-                        this.editForm.submitCompleted({ noReset: true });
-                    },
-                    error: error => {
-                        this.editForm.submitFailed(error);
-                    },
-                });
+        if (!value) {
+            return;
         }
+
+        this.assetScriptsState.update(value)
+            .subscribe({
+                next: () => {
+                    this.editForm.submitCompleted({ noReset: true });
+                },
+                error: error => {
+                    this.editForm.submitFailed(error);
+                },
+            });
     }
 }

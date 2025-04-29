@@ -36,18 +36,19 @@ export class ClientAddFormComponent {
 
     public addClient() {
         const value = this.addClientForm.submit();
-
-        if (value) {
-            this.clientsState.attach(value)
-                .subscribe({
-                    next: () => {
-                        this.addClientForm.submitCompleted();
-                    },
-                    error: error => {
-                        this.addClientForm.submitFailed(error);
-                    },
-                });
+        if (!value) {
+            return;
         }
+
+        this.clientsState.attach(value)
+            .subscribe({
+                next: () => {
+                    this.addClientForm.submitCompleted();
+                },
+                error: error => {
+                    this.addClientForm.submitFailed(error);
+                },
+            });
     }
 
     public cancel() {

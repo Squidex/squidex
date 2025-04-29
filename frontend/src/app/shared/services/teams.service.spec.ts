@@ -9,7 +9,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { ApiUrlConfig, AuthSchemeResponseDto, DateTime, Resource, TeamDto, TeamsService, Versioned, VersionTag } from '@app/shared/internal';
-import { AuthSchemeDto, ResourceLinkDto } from '../model';
+import { AuthSchemeDto, AuthSchemeValueDto, CreateTeamDto, ResourceLinkDto, UpdateTeamDto } from '../model';
 
 describe('TeamsService', () => {
     const version = new VersionTag('1');
@@ -69,7 +69,7 @@ describe('TeamsService', () => {
 
     it('should make post request to create team',
         inject([TeamsService, HttpTestingController], (teamsService: TeamsService, httpMock: HttpTestingController) => {
-            const dto = { name: 'new-team' };
+            const dto = new CreateTeamDto({ name: 'new-team' });
 
             let team: TeamDto;
             teamsService.postTeam(dto).subscribe(result => {
@@ -88,6 +88,8 @@ describe('TeamsService', () => {
 
     it('should make put request to update team',
         inject([TeamsService, HttpTestingController], (teamsService: TeamsService, httpMock: HttpTestingController) => {
+            const dto = new UpdateTeamDto({ name: 'NewName' });
+
             const resource: Resource = {
                 _links: {
                     update: { method: 'PUT', href: '/api/teams/my-team' },
@@ -95,7 +97,7 @@ describe('TeamsService', () => {
             };
 
             let team: TeamDto;
-            teamsService.putTeam('my-team', resource, { name: 'NewName' }, version).subscribe(result => {
+            teamsService.putTeam('my-team', resource, dto, version).subscribe(result => {
                 team = result;
             });
 
@@ -132,8 +134,10 @@ describe('TeamsService', () => {
 
     it('should make put request to update auth',
         inject([TeamsService, HttpTestingController], (teamsService: TeamsService, httpMock: HttpTestingController) => {
+            const dto = new AuthSchemeValueDto({});
+
             let auth: Versioned<AuthSchemeResponseDto>;
-            teamsService.putTeamAuth('my-team', { scheme: null } as any, version).subscribe(result => {
+            teamsService.putTeamAuth('my-team', dto, version).subscribe(result => {
                 auth = result;
             });
 

@@ -252,7 +252,6 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
 
     private saveContent(publish: boolean, navigationMode: SaveNavigationMode) {
         const value = this.contentForm.submit();
-
         if (!value) {
             this.contentForm.submitFailed('i18n:contents.contentNotValid', false);
             return;

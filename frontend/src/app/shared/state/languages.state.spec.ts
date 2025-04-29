@@ -7,7 +7,7 @@
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { AppLanguagesDto, AppLanguagesService, DialogService, LanguageDto, LanguagesService, LanguagesState, versioned } from '@app/shared/internal';
+import { AppLanguagesDto, AppLanguagesService, DialogService, LanguageDto, LanguagesService, LanguagesState, UpdateLanguageDto, versioned } from '@app/shared/internal';
 import { createLanguages } from '../services/app-languages.service.spec';
 import { TestValues } from './_test-helpers';
 
@@ -111,7 +111,7 @@ describe('LanguagesState', () => {
         it('should update languages if language updated', () => {
             const updated = createLanguages('de');
 
-            const request = { isMaster: true, isOptional: false, fallback: [] };
+            const request = new UpdateLanguageDto({ isMaster: true, isOptional: false, fallback: [] });
 
             languagesService.setup(x => x.putLanguage(app, oldLanguages.items[1], request, version))
                 .returns(() => of(versioned(newVersion, updated))).verifiable();

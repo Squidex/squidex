@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, shareSubscribed, State, VersionTag } from '@app/framework';
-import { IAddRoleDto, IUpdateRoleDto, RoleDto, RolesDto } from '../model';
+import { AddRoleDto, RoleDto, RolesDto, UpdateRoleDto } from '../model';
 import { RolesService } from '../services/roles.service';
 import { AppsState } from './apps.state';
 
@@ -89,7 +89,7 @@ export class RolesState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public add(request: IAddRoleDto): Observable<any> {
+    public add(request: AddRoleDto): Observable<any> {
         return this.rolesService.postRole(this.appName, request, this.version).pipe(
             tap(({ version, payload }) => {
                 this.replaceRoles(payload, version);
@@ -97,7 +97,7 @@ export class RolesState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public update(role: RoleDto, request: IUpdateRoleDto): Observable<any> {
+    public update(role: RoleDto, request: UpdateRoleDto): Observable<any> {
         return this.rolesService.putRole(this.appName, role, request, this.version).pipe(
             tap(({ version, payload }) => {
                 this.replaceRoles(payload, version);

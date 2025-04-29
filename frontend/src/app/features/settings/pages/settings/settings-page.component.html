@@ -28,7 +28,7 @@
             <div class="card card-body mb-4" data-testid="patterns">
                 <div class="content">
                     @if (!isEditable && editForm.patternsControls.length === 0) {
-                        <div class="mt-4">
+                        <div>
                             {{ "appSettings.patterns.empty" | sqxTranslate }}
                         </div>
                     }
@@ -77,7 +77,7 @@
 
                     @if (isEditable) {
                         <div class="form-group row gx-2">
-                            <div class="col-3 col-action">
+                            <div class="col-3">
                                 <div class="form-control preview">{{ "common.name" | sqxTranslate }}</div>
                             </div>
                             <div class="col">
@@ -109,7 +109,7 @@
             <div class="card card-body mb-4">
                 <div class="content" data-testid="pattern">
                     @if (!isEditable && editForm.editorsControls.length === 0) {
-                        <div class="mt-4">
+                        <div>
                             {{ "appSettings.editors.empty" | sqxTranslate }}
                         </div>
                     }

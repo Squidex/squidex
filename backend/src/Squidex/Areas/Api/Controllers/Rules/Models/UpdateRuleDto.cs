@@ -31,7 +31,7 @@ public sealed class UpdateRuleDto
     /// <summary>
     /// The flow to describe the sequence of actions to perform.
     /// </summary>
-    [Obsolete("Use Flow property")]
+    [Obsolete("Use the new 'Flow' property to define actions")]
     public RuleAction? Action { get; set; }
 
     /// <summary>
@@ -50,7 +50,6 @@ public sealed class UpdateRuleDto
         var command = SimpleMapper.Map(this, new UpdateRule { RuleId = id, Flow = GetFlow() });
 
         command.Trigger = Trigger?.ToTrigger();
-
         return command;
     }
 

@@ -7,7 +7,7 @@
 
 import { firstValueFrom, of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, ICreateUserDto, IUpdateUserDto, UsersDto } from '@app/shared';
+import { CreateUserDto, DialogService, UpdateUserDto, UsersDto } from '@app/shared';
 import { UsersService } from '../internal';
 import { createUser } from '../services/users.service.spec';
 import { UsersState } from './users.state';
@@ -130,7 +130,7 @@ describe('UsersState', () => {
         });
 
         it('should add user to snapshot if created', () => {
-            const request: ICreateUserDto = { ...newUser, password: 'password' } as any;
+            const request = new CreateUserDto({ ...newUser, password: 'password' });
 
             usersService.setup(x => x.postUser(request))
                 .returns(() => of(newUser)).verifiable();
@@ -142,9 +142,8 @@ describe('UsersState', () => {
         });
 
         it('should update user if updated', () => {
-            const request: IUpdateUserDto = {} as any;
-
             const updated = createUser(2, '_new');
+            const request = new UpdateUserDto({ ...updated });
 
             usersService.setup(x => x.putUser(user2, request))
                 .returns(() => of(updated)).verifiable();
@@ -187,7 +186,7 @@ describe('UsersState', () => {
         });
 
         it('should truncate users if page size reached', () => {
-            const request: ICreateUserDto = { ...newUser, password: 'password' } as any;
+            const request = new CreateUserDto({ ...newUser, password: 'password' });
 
             usersService.setup(x => x.getUsers(2, 0, undefined))
                 .returns(() => of(new UsersDto({ items: [user1, user2], total: 200, _links: {} }))).verifiable();
@@ -219,7 +218,7 @@ describe('UsersState', () => {
             ];
 
             usersService.setup(x => x.getUsers(10, 0, undefined))
-                .returns(() => of(new UsersDto({ items: newUsers, total: 200, _links: {} }))).verifiable();
+                .returns(() => of(new UsersDto({ items: newUsers, total: 200, _links: {} })));
 
             usersState.load().subscribe();
 
@@ -227,9 +226,8 @@ describe('UsersState', () => {
         });
 
         it('should update selected user if updated', () => {
-            const request: IUpdateUserDto = {} as any;
-
             const updated = createUser(2, '_new');
+            const request = new UpdateUserDto({ ...updated });
 
             usersService.setup(x => x.putUser(user2, request))
                 .returns(() => of(updated)).verifiable();

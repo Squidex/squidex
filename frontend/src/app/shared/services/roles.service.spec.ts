@@ -9,7 +9,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { ApiUrlConfig, Resource, RoleDto, RolesDto, RolesService, Versioned, VersionTag } from '@app/shared/internal';
-import { ResourceLinkDto } from './../model';
+import { AddRoleDto, ResourceLinkDto, UpdateRoleDto } from './../model';
 
 describe('RolesService', () => {
     const version = new VersionTag('1');
@@ -70,7 +70,7 @@ describe('RolesService', () => {
 
     it('should make post request to add role',
         inject([RolesService, HttpTestingController], (roleService: RolesService, httpMock: HttpTestingController) => {
-            const dto = { name: 'Role3' };
+            const dto = new AddRoleDto({ name: 'Role3' });
 
             let roles: Versioned<RolesDto>;
             roleService.postRole('my-app', dto, version).subscribe(result => {
@@ -93,7 +93,7 @@ describe('RolesService', () => {
 
     it('should make put request to update role',
         inject([RolesService, HttpTestingController], (roleService: RolesService, httpMock: HttpTestingController) => {
-            const dto = { permissions: ['P4', 'P5'], properties: createProperties(1) };
+            const dto = new UpdateRoleDto({ permissions: [], properties: createProperties(1) });
 
             const resource: Resource = {
                 _links: {

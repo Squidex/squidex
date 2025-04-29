@@ -11,7 +11,7 @@ import { Injectable } from '@angular/core';
 import '@app/framework/utils/rxjs-extensions';
 import { EMPTY, Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
-import { debug, DialogService, getPagingInfo, ICreateUserDto, IUpdateUserDto, ListState, shareSubscribed, State, UserDto } from '@app/shared';
+import { CreateUserDto, debug, DialogService, getPagingInfo, ListState, shareSubscribed, State, UpdateUserDto, UserDto } from '@app/shared';
 import { UsersService } from '../services/users.service';
 
 interface Snapshot extends ListState<string> {
@@ -132,7 +132,7 @@ export class UsersState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public create(request: ICreateUserDto): Observable<UserDto> {
+    public create(request: CreateUserDto): Observable<UserDto> {
         return this.usersService.postUser(request).pipe(
             tap(created => {
                 this.next(s => {
@@ -144,7 +144,7 @@ export class UsersState extends State<Snapshot> {
             shareSubscribed(this.dialogs, { silent: true }));
     }
 
-    public update(user: UserDto, request: IUpdateUserDto): Observable<UserDto> {
+    public update(user: UserDto, request: UpdateUserDto): Observable<UserDto> {
         return this.usersService.putUser(user, request).pipe(
             tap(updated => {
                 this.replaceUser(updated);

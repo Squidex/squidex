@@ -8,7 +8,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ApiUrlConfig, ChangePlanDto, HTTP, IChangePlanDto, mapVersioned, PlanChangedDto, PlansDto, pretifyError, Versioned, VersionOrTag } from '@app/shared';
+import { ApiUrlConfig, ChangePlanDto, HTTP, mapVersioned, PlanChangedDto, PlansDto, pretifyError, Versioned, VersionOrTag } from '@app/shared';
 
 @Injectable({
     providedIn: 'any',
@@ -30,10 +30,10 @@ export class TeamPlansService {
             pretifyError('i18n:plans.loadFailed'));
     }
 
-    public putPlan(teamId: string, dto: IChangePlanDto, version: VersionOrTag): Observable<Versioned<PlanChangedDto>> {
+    public putPlan(teamId: string, dto: ChangePlanDto, version: VersionOrTag): Observable<Versioned<PlanChangedDto>> {
         const url = this.apiUrl.buildUrl(`api/teams/${teamId}/plan`);
 
-        return HTTP.putVersioned(this.http, url, new ChangePlanDto(dto).toJSON(), version).pipe(
+        return HTTP.putVersioned(this.http, url, dto.toJSON(), version).pipe(
             mapVersioned(({ body }) => {
                 return PlanChangedDto.fromJSON(body);
             }),

@@ -7,7 +7,7 @@
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, RolesDto, RolesService, RolesState, versioned } from '@app/shared/internal';
+import { AddRoleDto, DialogService, RolesDto, RolesService, RolesState, UpdateRoleDto, versioned } from '@app/shared/internal';
 import { createRoles } from '../services/roles.service.spec';
 import { TestValues } from './_test-helpers';
 
@@ -79,7 +79,7 @@ describe('RolesState', () => {
         it('should update roles if role added', () => {
             const updated = createRoles(4, 5);
 
-            const request = { name: 'newRole' };
+            const request = new AddRoleDto({ name: 'newRole' });
 
             rolesService.setup(x => x.postRole(app, request, version))
                 .returns(() => of(versioned(newVersion, updated)));
@@ -92,7 +92,7 @@ describe('RolesState', () => {
         it('should update roles if role updated', () => {
             const updated = createRoles(4, 5);
 
-            const request = { permissions: ['P4', 'P5'], properties: {} };
+            const request = new UpdateRoleDto({ permissions: ['P4', 'P5'], properties: {} });
 
             rolesService.setup(x => x.putRole(app, oldRoles.items[1], request, version))
                 .returns(() => of(versioned(newVersion, updated)));

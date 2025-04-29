@@ -8,7 +8,7 @@
 import { firstValueFrom, of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { customMatchers } from 'src/spec/matchers';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, SchemaDto, SchemasDto, SchemasService, versioned } from '@app/shared/internal';
+import { AddFieldDto, ChangeCategoryDto, ConfigureUIFieldsDto, CreateSchemaDto, DialogService, SchemaDto, SchemasDto, SchemasService, SynchronizeSchemaDto, UpdateFieldDto, UpdateSchemaDto, versioned } from '@app/shared/internal';
 import { createSchema } from '../services/schemas.service.spec';
 import { TestValues } from './_test-helpers';
 import { getCategoryTree, SchemasState } from './schemas.state';
@@ -193,14 +193,14 @@ describe('SchemasState', () => {
         });
 
         it('should update schema if schema category changed', () => {
-            const category = 'my-new-category';
-
             const updated = createSchema(1, '_new');
 
-            schemasService.setup(x => x.putCategory(app, schema1, { name: category }, schema1.version))
+            const request = new ChangeCategoryDto({  name: 'my-new-category' });
+
+            schemasService.setup(x => x.putCategory(app, schema1, It.isValue(request), schema1.version))
                 .returns(() => of(updated)).verifiable();
 
-            schemasState.changeCategory(schema1, category).subscribe();
+            schemasState.changeCategory(schema1, request.name!).subscribe();
 
             expect(schemasState.snapshot.schemas).toEqualIgnoringProps([updated, schema2]);
         });
@@ -226,21 +226,21 @@ describe('SchemasState', () => {
             });
 
             it('should update schema and selected schema if schema category changed', () => {
-                const category = 'my-new-category';
-
                 const updated = createSchema(1, '_new');
 
-                schemasService.setup(x => x.putCategory(app, schema1, { name: category }, schema1.version))
+                const request = new ChangeCategoryDto({  name: 'my-new-category' });
+
+                schemasService.setup(x => x.putCategory(app, schema1, It.isValue(request), schema1.version))
                     .returns(() => of(updated)).verifiable();
 
-                schemasState.changeCategory(schema1, category).subscribe();
+                schemasState.changeCategory(schema1, request.name!).subscribe();
 
                 expect(schemasState.snapshot.schemas).toEqualIgnoringProps([updated, schema2]);
                 expect(schemasState.snapshot.selectedSchema).toEqualIgnoringProps(updated);
             });
 
             it('should update schema and selected schema if schema updated', () => {
-                const request = { label: 'name2_label', hints: 'name2_hints' };
+                const request = new UpdateSchemaDto({ label: 'name2_label', hints: 'name2_hints' });
 
                 const updated = createSchema(1, '_new');
 
@@ -254,7 +254,7 @@ describe('SchemasState', () => {
             });
 
             it('should update schema and selected schema if schema synced', () => {
-                const request = {};
+                const request = new SynchronizeSchemaDto({});
 
                 const updated = createSchema(1, '_new');
 
@@ -296,7 +296,7 @@ describe('SchemasState', () => {
             });
 
             it('should add schema to snapshot if created', () => {
-                const request = { name: 'newName' };
+                const request = new CreateSchemaDto({ name: 'newName' });
 
                 const updated = createSchema(3, '_new');
 
@@ -320,11 +320,11 @@ describe('SchemasState', () => {
             });
 
             it('should update schema and selected schema if field added', async () => {
-                const request = { ...schema1.fields[0] };
+                const request = new AddFieldDto({ ...schema1.fields[0] });
 
                 const updated = createSchema(1, '_new');
 
-                schemasService.setup(x => x.postField(app, schema1, It.isAny(), schema1.version))
+                schemasService.setup(x => x.postField(app, schema1, request, schema1.version))
                     .returns(() => of(updated)).verifiable();
 
                 const schemaField = await firstValueFrom(schemasState.addField(schema1, request));
@@ -335,11 +335,11 @@ describe('SchemasState', () => {
             });
 
             it('should update schema and selected schema if nested field added', async () => {
-                const request = { ...schema1.fields[0].nested![0] };
+                const request = new AddFieldDto({ ...schema1.fields[0].nested![0] });
 
                 const updated = createSchema(1, '_new');
 
-                schemasService.setup(x => x.postField(app, schema1.fields[0], It.isAny(), schema1.version))
+                schemasService.setup(x => x.postField(app, schema1.fields[0], request, schema1.version))
                     .returns(() => of(updated)).verifiable();
 
                 const schemaField = await firstValueFrom(schemasState.addField(schema1, request, schema1.fields[0]));
@@ -362,7 +362,7 @@ describe('SchemasState', () => {
             });
 
             it('should update schema and selected schema if ui fields configured', () => {
-                const request = { fieldsInLists: [schema1.fields[1].name] };
+                const request = new ConfigureUIFieldsDto({ fieldsInLists: [schema1.fields[1].name] });
 
                 const updated = createSchema(1, '_new');
 
@@ -406,7 +406,7 @@ describe('SchemasState', () => {
             it('should update schema and selected schema if field updated', () => {
                 const updated = createSchema(1, '_new');
 
-                const request = { ...schema1.fields[0] };
+                const request = new UpdateFieldDto({ ...schema1.fields[0] });
 
                 schemasService.setup(x => x.putField(app, schema1.fields[0], request, schema1.version))
                     .returns(() => of(updated)).verifiable();
@@ -480,10 +480,12 @@ describe('SchemasState', () => {
             it('should update schema with matching category', () => {
                 const updated = createSchema(1, '_new');
 
-                schemasService.setup(x => x.putCategory(app, schema1, { name: 'new-name' }, schema1.version))
+                const request = new ChangeCategoryDto({ name: 'new-name' });
+
+                schemasService.setup(x => x.putCategory(app, schema1, It.isValue(request), schema1.version))
                     .returns(() => of(updated)).verifiable();
 
-                schemasState.renameCategory('schema-category1', 'new-name').subscribe();
+                schemasState.renameCategory('schema-category1', request.name!).subscribe();
 
                 expect(schemasState.snapshot.schemas).toEqualIgnoringProps([updated, schema2]);
                 expect(schemasState.snapshot.selectedSchema).toEqualIgnoringProps(updated);

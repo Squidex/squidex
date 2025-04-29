@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { EMPTY, Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, getPagingInfo, ListState, Resource, shareSubscribed, State } from '@app/framework';
-import { RuleEventDto } from '../model';
+import { FlowExecutionStateDto, RuleEventDto } from '../model';
 import { RulesService } from '../services/rules.service';
 import { AppsState } from './apps.state';
 
@@ -165,14 +165,10 @@ export class RuleEventsState extends State<Snapshot> {
 
 const setCancelled = (event: RuleEventDto) =>
     new RuleEventDto({
-        id: event.id,
-        created:  event.created,
-        description: event.description,
-        eventName: event.eventName,
-        jobResult: 'Cancelled',
-        lastDump: event.lastDump,
-        nextAttempt: undefined,
-        numCalls: event.numCalls,
-        result: event.result,
-        _links: event._links,
+        ...event,
+        flowState: new FlowExecutionStateDto({
+            ...event.flowState,
+            nextRun: undefined,
+            nextStepId: undefined as any,
+        }),
     });

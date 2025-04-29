@@ -10,7 +10,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlConfig, pretifyError, StringHelper } from '@app/framework';
-import { ITranslateDto, TranslateDto, TranslationDto } from './../model';
+import { TranslateDto, TranslationDto } from './../model';
 import { AuthService } from './auth.service';
 
 export type AskDto = Readonly<{
@@ -59,10 +59,10 @@ export class TranslationsService {
     ) {
     }
 
-    public translate(appName: string, dto: ITranslateDto): Observable<TranslationDto> {
+    public translate(appName: string, dto: TranslateDto): Observable<TranslationDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/translations`);
 
-        return this.http.post<any>(url, new TranslateDto(dto).toJSON()).pipe(
+        return this.http.post<any>(url, dto.toJSON()).pipe(
             map(body => {
                 return TranslationDto.fromJSON(body);
             }),

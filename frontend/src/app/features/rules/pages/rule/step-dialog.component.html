@@ -1,0 +1,149 @@
+<form [formGroup]="currentAction?.form!" (ngSubmit)="save()">
+    <sqx-modal-dialog (dialogClose)="dialogClose.emit()" size="xl">
+        <ng-container title>
+            {{ "rules.step.edit" | sqxTranslate }}
+        </ng-container>
+
+        <ng-container content>
+            @if (currentAction) {
+                <div class="form-horizontal" [formGroup]="currentAction.form">
+                    <div class="form-group row">
+                        <div class="form-check">
+                            <input
+                                class="form-check-input"
+                                id="ignoreError"
+                                [(ngModel)]="ignoreError"
+                                [ngModelOptions]="{ standalone: true }"
+                                type="checkbox" />
+                            <label class="form-check-label" for="ignoreError">
+                                {{ "rules.ignoreError" | sqxTranslate }}
+                            </label>
+                        </div>
+                        <sqx-form-hint>
+                            {{ "rules.ignoreErrorHint" | sqxTranslate }}
+                        </sqx-form-hint>
+                    </div>
+
+                    <hr />
+
+                    @for (property of currentAction.editableProperties; track property.name) {
+                        <div class="form-group row">
+                            <label class="col-3 col-form-label" [for]="property.name">
+                                @if (property.editor !== "Checkbox") {
+                                    {{ property.display }}
+                                }
+                                @if (property.isRequired) {
+                                    <small class="hint">&nbsp;*</small>
+                                }
+                            </label>
+
+                            <div class="col-9">
+                                <sqx-control-errors [for]="property.name"></sqx-control-errors>
+
+                                @switch (property.editor) {
+                                    @case ("Text") {
+                                        @if (property.isFormattable) {
+                                            <sqx-formattable-input [formControlName]="property.name" type="Text"></sqx-formattable-input>
+                                        } @else {
+                                            <input class="form-control" id="{{ property.name }}" [formControlName]="property.name" />
+                                        }
+                                    }
+                                    @case ("TextArea") {
+                                        @if (property.isFormattable) {
+                                            <sqx-formattable-input
+                                                [completion]="scriptCompletions"
+                                                [formControlName]="property.name"
+                                                type="Code"></sqx-formattable-input>
+                                        } @else {
+                                            <textarea
+                                                class="form-control"
+                                                id="{{ property.name }}"
+                                                [formControlName]="property.name"></textarea>
+                                        }
+                                    }
+                                    @case ("Javascript") {
+                                        <sqx-code-editor
+                                            [completion]="scriptCompletions"
+                                            [formControlName]="property.name"
+                                            [height]="350"></sqx-code-editor>
+                                    }
+                                    @case ("Checkbox") {
+                                        <div class="form-check">
+                                            <input
+                                                class="form-check-input"
+                                                id="{{ property.name }}"
+                                                [formControlName]="property.name"
+                                                type="checkbox" />
+                                            <label class="form-check-label" for="{{ property.name }}">
+                                                {{ property.display }}
+                                            </label>
+                                        </div>
+                                    }
+                                    @case ("Dropdown") {
+                                        <select class="form-select" [formControlName]="property.name">
+                                            @if (!property.isRequired) {
+                                                <option></option>
+                                            }
+
+                                            @for (option of property.options; track option) {
+                                                <option [ngValue]="option">{{ option }}</option>
+                                            }
+                                        </select>
+                                    }
+                                    @case ("Branches") {
+                                        <sqx-branches-input
+                                            [control]="currentAction.branch(property.name)"
+                                            [isEditable]="isEditable"></sqx-branches-input>
+                                    }
+                                    @default {
+                                        <input
+                                            class="form-control"
+                                            id="{{ property.name }}"
+                                            [formControlName]="property.name"
+                                            type="{{ property.editor | lowercase }}" />
+                                    }
+                                }
+
+                                <sqx-form-hint>
+                                    <span inline="true" [sqxMarkdown]="property.description"></span>
+
+                                    @if (property.isFormattable) {
+                                        <div>
+                                            {{ "rules.advancedFormattingHint" | sqxTranslate }}:
+                                            <a href="https://docs.squidex.io/concepts/rules#3-formatting" sqxExternalLink tabindex="-1">
+                                                {{ "common.documentation" | sqxTranslate }}
+                                            </a>
+                                        </div>
+                                    }
+                                </sqx-form-hint>
+                            </div>
+                        </div>
+                    }
+                </div>
+            } @else {
+                <div class="row g-0">
+                    @for (stepType of supportedSteps | sqxKeys; track stepType) {
+                        <div class="col-12 col-md-6">
+                            <div class="rule-element" (click)="selectStep(stepType)">
+                                <sqx-rule-element
+                                    [element]="$any(supportedSteps)[stepType]"
+                                    isSmall="false"
+                                    [type]="stepType"></sqx-rule-element>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </ng-container>
+
+        <ng-container footer>
+            <button class="btn btn-text-secondary" (click)="dialogClose.emit()" type="button">
+                {{ "common.cancel" | sqxTranslate }}
+            </button>
+
+            <button class="btn btn-success" type="submit">
+                {{ "common.complete" | sqxTranslate }}
+            </button>
+        </ng-container>
+    </sqx-modal-dialog>
+</form>

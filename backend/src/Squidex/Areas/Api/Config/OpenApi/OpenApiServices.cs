@@ -12,6 +12,8 @@ using NJsonSchema.Generation.TypeMappers;
 using NodaTime;
 using NSwag.Generation;
 using NSwag.Generation.Processors;
+using NSwag.Generation.Processors.Contexts;
+using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -88,6 +90,10 @@ public static class OpenApiServices
         services.AddOpenApiDocument((settings, services) =>
         {
             ConfigureSchemaSettings(settings.SchemaSettings, services.GetRequiredService<TypeRegistry>(), false);
+            settings.DocumentProcessors.Add(new AddAdditionalTypeProcessor<DynamicCreateRuleDto>());
+            settings.DocumentProcessors.Add(new AddAdditionalTypeProcessor<DynamicFlowExecutionStateDto>());
+            settings.DocumentProcessors.Add(new AddAdditionalTypeProcessor<DynamicRulesDto>());
+            settings.DocumentProcessors.Add(new AddAdditionalTypeProcessor<DynamicUpdateRuleDto>());
         });
     }
 
@@ -103,8 +109,8 @@ public static class OpenApiServices
         settings.SchemaProcessors.Add(new RequiredSchemaProcessor());
         settings.SchemaType = NJsonSchema.SchemaType.OpenApi3;
 
-        settings.TypeMappers = new List<ITypeMapper>
-        {
+        settings.TypeMappers =
+        [
             CreateAnyMap<FilterNode<JsonValue>>(),
             CreateAnyMap<JsonDocument>(),
             CreateAnyMap<JsonValue>(),
@@ -123,15 +129,14 @@ public static class OpenApiServices
             CreateStringMap<PropertyPath>(),
             CreateStringMap<RefToken>(),
             CreateStringMap<Status>(),
-        };
+        ];
     }
 
-    private static ITypeMapper CreateObjectMap<T>()
+    private static PrimitiveTypeMapper CreateObjectMap<T>()
     {
         return new PrimitiveTypeMapper(typeof(T), schema =>
         {
             schema.Type = JsonObjectType.Object;
-
             schema.AdditionalPropertiesSchema = new JsonSchema
             {
                 Description = "Any",
@@ -139,12 +144,11 @@ public static class OpenApiServices
         });
     }
 
-    private static ITypeMapper CreateArrayMap<T>(JsonObjectType itemType)
+    private static PrimitiveTypeMapper CreateArrayMap<T>(JsonObjectType itemType)
     {
         return new PrimitiveTypeMapper(typeof(T), schema =>
         {
             schema.Type = JsonObjectType.Array;
-
             schema.Item = new JsonSchema
             {
                 Type = itemType,
@@ -152,21 +156,28 @@ public static class OpenApiServices
         });
     }
 
-    private static ITypeMapper CreateStringMap<T>(string? format = null)
+    private static PrimitiveTypeMapper CreateStringMap<T>(string? format = null)
     {
         return new PrimitiveTypeMapper(typeof(T), schema =>
         {
             schema.Type = JsonObjectType.String;
-
             schema.Format = format;
         });
     }
 
-    private static ITypeMapper CreateAnyMap<T>()
+    private static PrimitiveTypeMapper CreateAnyMap<T>()
     {
         return new PrimitiveTypeMapper(typeof(T), schema =>
         {
             schema.Type = JsonObjectType.None;
         });
+    }
+
+    public sealed class AddAdditionalTypeProcessor<T> : IDocumentProcessor where T : class
+    {
+        public void Process(DocumentProcessorContext context)
+        {
+            context.SchemaResolver.AppendSchema(context.SchemaGenerator.Generate(typeof(T), context.SchemaResolver), null);
+        }
     }
 }

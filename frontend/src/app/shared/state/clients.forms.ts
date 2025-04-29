@@ -9,9 +9,9 @@
 
 import { UntypedFormControl, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form, hasNoValue$, ValidatorsEx } from '@app/framework';
-import { ClientDto, ICreateClientDto, IUpdateClientDto } from '../model';
+import { ClientDto, CreateClientDto, UpdateClientDto } from '../model';
 
-export class RenameClientForm extends Form<ExtendedFormGroup, IUpdateClientDto, ClientDto> {
+export class RenameClientForm extends Form<ExtendedFormGroup, UpdateClientDto, ClientDto> {
     constructor() {
         super(new ExtendedFormGroup({
             name: new UntypedFormControl('',
@@ -19,9 +19,13 @@ export class RenameClientForm extends Form<ExtendedFormGroup, IUpdateClientDto, 
             ),
         }));
     }
+
+    protected transformSubmit(value: any) {
+        return new UpdateClientDto(value);
+    }
 }
 
-export class AddClientForm extends Form<ExtendedFormGroup, ICreateClientDto> {
+export class AddClientForm extends Form<ExtendedFormGroup, CreateClientDto> {
     public get id() {
         return this.form.controls['id'];
     }
@@ -35,5 +39,9 @@ export class AddClientForm extends Form<ExtendedFormGroup, ICreateClientDto> {
                 ValidatorsEx.pattern('[a-z0-9]+(\-[a-z0-9]+)*', 'i18n:clients.clientIdValidationMessage'),
             ]),
         }));
+    }
+
+    protected transformSubmit(value: any) {
+        return new CreateClientDto(value);
     }
 }

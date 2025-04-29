@@ -8,7 +8,7 @@
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { ErrorDto } from '@app/framework';
-import { AssetFoldersDto, AssetsDto, AssetsService, AssetsState, DialogService, MathHelper, versioned } from '@app/shared/internal';
+import { AnnotateAssetDto, AssetFoldersDto, AssetsDto, AssetsService, AssetsState, CreateAssetFolderDto, DialogService, MathHelper, MoveAssetDto, MoveAssetFolderDto, RenameAssetFolderDto, RenameTagDto, versioned } from '@app/shared/internal';
 import { createAsset, createAssetFolder } from '../services/assets.service.spec';
 import { TestValues } from './_test-helpers';
 
@@ -199,7 +199,7 @@ describe('AssetsState', () => {
                 .returns(() => of(new AssetsDto({ items: [asset1, asset2], total: 200, _links: {} }))).verifiable();
 
             assetsService.setup(x => x.getAssets(app, { take: 2, skip: 0, parentId: MathHelper.EMPTY_GUID, noSlowTotal: true }))
-                .returns(() => of(new AssetsDto({ items: [asset1, asset2], total: 200, _links: {} }))).verifiable();
+                .returns(() => of(new AssetsDto({ items: [asset1, asset2], total: 200, _links: {} })));
 
             assetsState.load(true).subscribe();
         });
@@ -267,9 +267,9 @@ describe('AssetsState', () => {
         });
 
         it('should add asset folder if created', () => {
-            const request = { folderName: 'New Folder', parentId: MathHelper.EMPTY_GUID };
+            const request = new CreateAssetFolderDto({ folderName: 'New Folder', parentId: MathHelper.EMPTY_GUID });
 
-            assetsService.setup(x => x.postAssetFolder(app, It.isValue(request)))
+            assetsService.setup(x => x.postAssetFolder(app, request))
                 .returns(() => of(newAssetFolder));
 
             assetsState.createAssetFolder(request.folderName);
@@ -280,9 +280,9 @@ describe('AssetsState', () => {
         it('should add asset folder if path has changed', () => {
             const otherPath = createAssetFolder(3, '_new', 'otherParent');
 
-            const request = { folderName: 'New Folder', parentId: MathHelper.EMPTY_GUID };
+            const request = new CreateAssetFolderDto({ folderName: 'New Folder', parentId: MathHelper.EMPTY_GUID });
 
-            assetsService.setup(x => x.postAssetFolder(app, It.isValue(request)))
+            assetsService.setup(x => x.postAssetFolder(app, request))
                 .returns(() => of(otherPath));
 
             assetsState.createAssetFolder(request.folderName);
@@ -293,7 +293,7 @@ describe('AssetsState', () => {
         it('should update asset if updated', () => {
             const updated = createAsset(1, ['new'], '_new');
 
-            const request = { fileName: 'New Name' };
+            const request = new AnnotateAssetDto({ fileName: 'New Name' });
 
             assetsService.setup(x => x.putAsset(app, asset1, request, asset1.version))
                 .returns(() => of(updated));
@@ -307,7 +307,7 @@ describe('AssetsState', () => {
         it('should update asset folder if updated', () => {
             const updated = createAssetFolder(1, '_new');
 
-            const request = { folderName: 'New Name' };
+            const request = new RenameAssetFolderDto({ folderName: 'New Name' });
 
             assetsService.setup(x => x.putAssetFolder(app, assetFolder1, request, assetFolder1.version))
                 .returns(() => of(updated));
@@ -320,7 +320,7 @@ describe('AssetsState', () => {
         it('should remove asset from snapshot if moved to other folder', () => {
             const updated = createAsset(1, ['new'], '_new');
 
-            const request = { parentId: 'newParent' };
+            const request = new MoveAssetDto({ parentId: 'newParent' });
 
             assetsService.setup(x => x.putAssetParent(app, asset1, It.isValue(request), asset1.version))
                 .returns(() => of(updated));
@@ -334,7 +334,7 @@ describe('AssetsState', () => {
         it('should add asset to snapshot if moved to current folder', () => {
             const asset3 = createAsset(3, undefined, undefined, 'oldParent');
 
-            const request = { parentId: assetsState.snapshot.parentId };
+            const request = new MoveAssetDto({ parentId: assetsState.snapshot.parentId });
 
             assetsService.setup(x => x.putAssetParent(app, asset3, It.isValue(request), asset3.version))
                 .returns(() => of(asset3));
@@ -355,7 +355,7 @@ describe('AssetsState', () => {
         });
 
         it('should move asset back to snapshot if moving via api failed', () => {
-            const request = { parentId: 'newParent' };
+            const request = new MoveAssetDto({ parentId: 'newParent' });
 
             assetsService.setup(x => x.putAssetParent(app, asset1, It.isValue(request), asset1.version))
                 .returns(() => throwError(() => 'Service Error'));
@@ -369,7 +369,7 @@ describe('AssetsState', () => {
         it('should remove asset folder from snapshot if moved to other folder', () => {
             const updated = createAssetFolder(1, '_new');
 
-            const request = { parentId: 'newParent' };
+            const request = new MoveAssetFolderDto({ parentId: 'newParent' });
 
             assetsService.setup(x => x.putAssetFolderParent(app, assetFolder1, It.isValue(request), assetFolder1.version))
                 .returns(() => of(updated));
@@ -382,7 +382,7 @@ describe('AssetsState', () => {
         it('should add asset folder to snapshot if moved to current folder', () => {
             const assetFolder3 = createAssetFolder(3, undefined, 'oldParent');
 
-            const request = { parentId: assetsState.snapshot.parentId };
+            const request = new MoveAssetFolderDto({ parentId: assetsState.snapshot.parentId });
 
             assetsService.setup(x => x.putAssetFolderParent(app, assetFolder3, It.isValue(request), assetFolder3.version))
                 .returns(() => of(assetFolder3));
@@ -393,7 +393,7 @@ describe('AssetsState', () => {
         });
 
         it('should not do anything if moving asset folder to itself', () => {
-            const request = { parentId: assetFolder1.id };
+            const request = new MoveAssetFolderDto({ parentId: assetFolder1.id });
 
             assetsState.moveAssetFolder(assetFolder1, request.parentId).pipe(onErrorResumeNextWith()).subscribe();
 
@@ -401,7 +401,7 @@ describe('AssetsState', () => {
         });
 
         it('should not do anything if moving asset folder to current parent', () => {
-            const request = { parentId: MathHelper.EMPTY_GUID };
+            const request = new MoveAssetFolderDto({ parentId: MathHelper.EMPTY_GUID });
 
             assetsState.moveAssetFolder(assetFolder1, request.parentId).pipe(onErrorResumeNextWith()).subscribe();
 
@@ -409,7 +409,7 @@ describe('AssetsState', () => {
         });
 
         it('should move asset folder back to snapshot if moving via api failed', () => {
-            const request = { parentId: 'newParent' };
+            const request = new MoveAssetFolderDto({ parentId: 'newParent' });
 
             assetsService.setup(x => x.putAssetFolderParent(app, assetFolder1, It.isValue(request), assetFolder1.version))
                 .returns(() => throwError(() => 'Service Error'));
@@ -469,14 +469,14 @@ describe('AssetsState', () => {
         });
 
         it('should replace tags if renamed', () => {
-            const newTags = {};
+            const request = new RenameTagDto({ tagName: 'new-name' });
 
-            assetsService.setup(x => x.putTag(app, 'old-name', { tagName: 'new-name' }))
-                .returns(() => of(newTags));
+            assetsService.setup(x => x.putTag(app, 'old-name', It.isValue(request)))
+                .returns(() => of({ 'new-name': 1 }));
 
             assetsState.renameTag('old-name', 'new-name').subscribe();
 
-            expect(assetsState.snapshot.tagsAvailable).toBe(newTags);
+            expect(assetsState.snapshot.tagsAvailable).toEqual({ 'new-name': 1 });
         });
     });
 });

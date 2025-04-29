@@ -63,17 +63,18 @@ export class SchemaScriptsFormComponent {
         }
 
         const value = this.editForm.submit();
-
-        if (value) {
-            this.schemasState.configureScripts(this.schema, value)
-                .subscribe({
-                    next: () => {
-                        this.editForm.submitCompleted({ noReset: true });
-                    },
-                    error: error => {
-                        this.editForm.submitFailed(error);
-                    },
-                });
+        if (!value) {
+            return;
         }
+
+        this.schemasState.configureScripts(this.schema, value)
+            .subscribe({
+                next: () => {
+                    this.editForm.submitCompleted({ noReset: true });
+                },
+                error: error => {
+                    this.editForm.submitFailed(error);
+                },
+            });
     }
 }

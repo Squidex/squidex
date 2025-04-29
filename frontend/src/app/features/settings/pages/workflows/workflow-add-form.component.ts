@@ -35,18 +35,19 @@ export class WorkflowAddFormComponent {
 
     public addWorkflow() {
         const value = this.addWorkflowForm.submit();
-
-        if (value) {
-            this.workflowsState.add(value.name)
-                .subscribe({
-                    next: () => {
-                        this.addWorkflowForm.submitCompleted();
-                    },
-                    error: error => {
-                        this.addWorkflowForm.submitFailed(error);
-                    },
-                });
+        if (!value) {
+            return;
         }
+
+        this.workflowsState.add(value)
+            .subscribe({
+                next: () => {
+                    this.addWorkflowForm.submitCompleted();
+                },
+                error: error => {
+                    this.addWorkflowForm.submitFailed(error);
+                },
+            });
     }
 
     public cancel() {

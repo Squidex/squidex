@@ -35,18 +35,19 @@ export class RoleAddFormComponent {
 
     public addRole() {
         const value = this.addRoleForm.submit();
-
-        if (value) {
-            this.rolesState.add(value)
-                .subscribe({
-                    next: () => {
-                        this.addRoleForm.submitCompleted();
-                    },
-                    error: error => {
-                        this.addRoleForm.submitFailed(error);
-                    },
-                });
+        if (!value) {
+            return;
         }
+
+        this.rolesState.add(value)
+            .subscribe({
+                next: () => {
+                    this.addRoleForm.submitCompleted();
+                },
+                error: error => {
+                    this.addRoleForm.submitFailed(error);
+                },
+            });
     }
 
     public cancel() {

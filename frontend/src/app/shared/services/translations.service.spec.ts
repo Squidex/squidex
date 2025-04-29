@@ -8,7 +8,7 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, TranslationDto, TranslationsService } from '@app/shared/internal';
+import { ApiUrlConfig, TranslateDto, TranslationDto, TranslationsService } from '@app/shared/internal';
 
 describe('TranslationsService', () => {
     beforeEach(() => {
@@ -29,10 +29,9 @@ describe('TranslationsService', () => {
 
     it('should make post request to translate text',
         inject([TranslationsService, HttpTestingController], (translationsService: TranslationsService, httpMock: HttpTestingController) => {
-            const dto = { text: 'Hello', sourceLanguage: 'en', targetLanguage: 'de' };
+            const dto = new TranslateDto({ text: 'Hello', sourceLanguage: 'en', targetLanguage: 'de' });
 
             let translation: TranslationDto;
-
             translationsService.translate('my-app', dto).subscribe(result => {
                 translation = result;
             });

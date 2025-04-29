@@ -45,16 +45,16 @@ type Story = StoryObj<LongHoverDirective>;
 
 export const Default: Story = {
     args: {
-        hover: action('Hover') as any,
+        hover: action('Hover'),
         selector: '',
-        cancelled: action('Cancelled') as any,
+        cancelled: action('Cancelled'),
     },
 };
 
 export const Selector: Story = {
     args: {
-        hover: action('Hover') as any,
+        hover: action('Hover'),
         selector: 'button',
-        cancelled: action('Cancelled') as any,
+        cancelled: action('Cancelled'),
     },
 };

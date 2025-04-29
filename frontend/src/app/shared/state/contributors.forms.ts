@@ -8,9 +8,9 @@
 import { UntypedFormControl, Validators } from '@angular/forms';
 import { debounceTime, map, shareReplay } from 'rxjs/operators';
 import { ExtendedFormGroup, Form, hasNoValue$, Types, value$ } from '@app/framework';
-import { IAssignContributorDto, UserDto } from '../model';
+import { AssignContributorDto, UserDto } from '../model';
 
-export class AssignContributorForm extends Form<ExtendedFormGroup, IAssignContributorDto> {
+export class AssignContributorForm extends Form<ExtendedFormGroup, AssignContributorDto> {
     public get user() {
         return this.form.controls['user'];
     }
@@ -35,11 +35,11 @@ export class AssignContributorForm extends Form<ExtendedFormGroup, IAssignContri
             contributorId = contributorId.id;
         }
 
-        return { contributorId, role: value.role, invite: true };
+        return new AssignContributorDto({ contributorId, role: value.role, invite: true });
     }
 }
 
-export class ImportContributorsForm extends Form<ExtendedFormGroup, ReadonlyArray<IAssignContributorDto>> {
+export class ImportContributorsForm extends Form<ExtendedFormGroup, ReadonlyArray<AssignContributorDto>> {
     public get import() {
         return this.form.controls['import'];
     }
@@ -62,17 +62,16 @@ export class ImportContributorsForm extends Form<ExtendedFormGroup, ReadonlyArra
 }
 
 function extractEmails(value: string) {
-    const result: IAssignContributorDto[] = [];
+    const result: AssignContributorDto[] = [];
 
     if (value) {
         const added: { [email: string]: boolean } = {};
 
         const emails = value.match(EMAIL_REGEX);
-
         if (emails) {
             for (const match of emails) {
                 if (!added[match]) {
-                    result.push({ contributorId: match, role: 'Editor', invite: true });
+                    result.push(new AssignContributorDto({ contributorId: match, role: 'Editor', invite: true }));
 
                     added[match] = true;
                 }

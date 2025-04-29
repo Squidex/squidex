@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, map, tap } from 'rxjs/operators';
-import { AuthSchemeDto, debug, DialogService, LoadingState, shareSubscribed, State, TeamsService, TeamsState, VersionTag } from '@app/shared';
+import { AuthSchemeDto, AuthSchemeValueDto, debug, DialogService, LoadingState, shareSubscribed, State, TeamsService, TeamsState, VersionTag } from '@app/shared';
 
 interface Snapshot extends LoadingState {
     // The current scheme.
@@ -65,10 +65,12 @@ export class TeamAuthState extends State<Snapshot> {
                     this.dialogs.notifyInfo('i18n:teams.auth.reloaded');
                 }
 
+                const { scheme, canUpdate } = payload;
                 this.next({
-                    ...payload,
+                    canUpdate,
                     isLoaded: true,
                     isLoading: false,
+                    scheme,
                     version,
                 }, 'Loading Success');
             }),
@@ -79,7 +81,7 @@ export class TeamAuthState extends State<Snapshot> {
     }
 
     public update(scheme: AuthSchemeDto | undefined): Observable<AuthSchemeDto | undefined | null> {
-        return this.teamService.putTeamAuth(this.teamId, { scheme: scheme || undefined }, this.version).pipe(
+        return this.teamService.putTeamAuth(this.teamId, new AuthSchemeValueDto({ scheme }), this.version).pipe(
             tap(({ version, payload }) => {
                 this.next({
                     ...payload,

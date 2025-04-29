@@ -116,19 +116,20 @@ export class SearchFormComponent {
 
     public saveQueryComplete() {
         const value = this.saveQueryForm.submit();
-
-        if (value) {
-            if (this.queries && this.query) {
-                if (value.user) {
-                    this.queries.addUser(value.name, this.query);
-                } else {
-                    this.queries.addShared(value.name, this.query);
-                }
-            }
-
-            this.saveQueryForm.submitCompleted();
-            this.saveQueryDialog.hide();
+        if (!value) {
+            return;
         }
+
+        if (this.queries && this.query) {
+            if (value.user) {
+                this.queries.addUser(value.name, this.query);
+            } else {
+                this.queries.addShared(value.name, this.query);
+            }
+        }
+
+        this.saveQueryForm.submitCompleted();
+        this.saveQueryDialog.hide();
     }
 
     public changeQueryFullText(fullText: string) {

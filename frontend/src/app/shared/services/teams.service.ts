@@ -10,7 +10,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlConfig, HTTP, mapVersioned, pretifyError, Resource, Versioned, VersionOrTag } from '@app/framework';
-import { AuthSchemeResponseDto, AuthSchemeValueDto, CreateTeamDto, IAuthSchemeValueDto, ICreateTeamDto, IUpdateTeamDto, TeamDto, UpdateTeamDto } from '../model';
+import { AuthSchemeResponseDto, AuthSchemeValueDto, CreateTeamDto, TeamDto, UpdateTeamDto } from '../model';
 
 @Injectable({
     providedIn: 'root',
@@ -42,22 +42,22 @@ export class TeamsService {
             pretifyError('i18n:teams.teamLoadFailed'));
     }
 
-    public postTeam(dto: ICreateTeamDto): Observable<TeamDto> {
+    public postTeam(dto: CreateTeamDto): Observable<TeamDto> {
         const url = this.apiUrl.buildUrl('api/teams');
 
-        return this.http.post(url, new CreateTeamDto(dto).toJSON()).pipe(
+        return this.http.post(url, dto.toJSON()).pipe(
             map(body => {
                 return TeamDto.fromJSON(body);
             }),
             pretifyError('i18n:teams.createFailed'));
     }
 
-    public putTeam(teamId: string, resource: Resource, dto: IUpdateTeamDto, version: VersionOrTag): Observable<TeamDto> {
+    public putTeam(teamId: string, resource: Resource, dto: UpdateTeamDto, version: VersionOrTag): Observable<TeamDto> {
         const link = resource._links['update'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return HTTP.requestVersioned(this.http, link.method, url, version, new UpdateTeamDto(dto).toJSON()).pipe(
+        return HTTP.requestVersioned(this.http, link.method, url, version, dto.toJSON()).pipe(
             map(({ payload }) => {
                 return TeamDto.fromJSON(payload.body);
             }),
@@ -74,10 +74,10 @@ export class TeamsService {
             pretifyError('i18n:teams.teamLoadFailed'));
     }
 
-    public putTeamAuth(teamId: string, dto: IAuthSchemeValueDto, version: VersionOrTag): Observable<Versioned<AuthSchemeResponseDto>> {
+    public putTeamAuth(teamId: string, dto: AuthSchemeValueDto, version: VersionOrTag): Observable<Versioned<AuthSchemeResponseDto>> {
         const url = this.apiUrl.buildUrl(`api/teams/${teamId}/auth`);
 
-        return HTTP.putVersioned(this.http, url, new AuthSchemeValueDto(dto).toJSON(), version).pipe(
+        return HTTP.putVersioned(this.http, url, dto.toJSON(), version).pipe(
             mapVersioned((payload) => {
                 return AuthSchemeResponseDto.fromJSON(payload.body);
             }),

@@ -8,7 +8,7 @@
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AppsState, ClientDto, ClientsState, ConfirmClickDirective, CopyDirective, DialogModel, EditableTitleComponent, FormHintComponent, ModalDirective, RoleDto, TooltipDirective, TourStepDirective, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { AppsState, ClientDto, ClientsState, ConfirmClickDirective, CopyDirective, DialogModel, EditableTitleComponent, FormHintComponent, ModalDirective, RoleDto, TooltipDirective, TourStepDirective, TranslatePipe, TypedSimpleChanges, UpdateClientDto } from '@app/shared';
 import { ClientConnectFormComponent } from './client-connect-form.component';
 
 @Component({
@@ -58,18 +58,26 @@ export class ClientComponent {
     }
 
     public updateRole(role: string) {
-        this.clientsState.update(this.client, { role });
+        const request = new UpdateClientDto({ role });
+
+        this.clientsState.update(this.client, request);
     }
 
     public updateAllowAnonymous(allowAnonymous: boolean) {
-        this.clientsState.update(this.client, { allowAnonymous });
+        const request = new UpdateClientDto({ allowAnonymous });
+
+        this.clientsState.update(this.client, request);
     }
 
-    public updateApiCallsLimit() {
-        this.clientsState.update(this.client, { apiCallsLimit: this.apiCallsLimit });
+    public updateApiCallsLimit(apiCallsLimit: number) {
+        const request = new UpdateClientDto({ apiCallsLimit });
+
+        this.clientsState.update(this.client, request);
     }
 
     public rename(name: string) {
-        this.clientsState.update(this.client, { name });
+        const request = new UpdateClientDto({ name });
+
+        this.clientsState.update(this.client, request);
     }
 }

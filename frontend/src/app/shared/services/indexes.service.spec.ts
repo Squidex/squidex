@@ -9,7 +9,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { ApiUrlConfig, IndexDto, IndexesDto, IndexesService, IndexFieldDto, Resource } from '@app/shared/internal';
-import { ResourceLinkDto } from '../model';
+import { CreateIndexDto, ResourceLinkDto } from '../model';
 
 describe('IndexesService', () => {
     beforeEach(() => {
@@ -59,7 +59,7 @@ describe('IndexesService', () => {
 
     it('should make post request to create index',
         inject([IndexesService, HttpTestingController], (indexesService: IndexesService, httpMock: HttpTestingController) => {
-            const request = { fields: [] };
+            const request = new CreateIndexDto({ fields: [] });
 
             indexesService.postIndex('my-app', 'my-schema', request).subscribe();
 

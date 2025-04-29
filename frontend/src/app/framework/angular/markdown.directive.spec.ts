@@ -11,14 +11,14 @@ import { MarkdownDirective } from './markdown.directive';
 
 describe('MarkdownDirective', () => {
     let renderer: IMock<Renderer2>;
-    let markdownElement = {};
+    let markdownElement: any = {};
     let markdownDirective: MarkdownDirective;
 
     beforeEach(() => {
         renderer = Mock.ofType<Renderer2>();
 
         markdownElement = {};
-        markdownDirective = new MarkdownDirective(markdownElement as any, renderer.object);
+        markdownDirective = new MarkdownDirective(markdownElement, renderer.object);
     });
 
     it('should render empty text as text', () => {

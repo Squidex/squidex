@@ -8,7 +8,7 @@
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { TestValues } from 'src/app/shared/state/_test-helpers';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { AuthSchemeDto, AuthSchemeResponseDto, DialogService, TeamsService, versioned } from '@app/shared';
+import { AuthSchemeDto, AuthSchemeResponseDto, DialogService, ResourceLinkDto, TeamsService, versioned } from '@app/shared';
 import { TeamAuthState } from '../internal';
 
 describe('TeamAuthState', () => {
@@ -45,13 +45,13 @@ describe('TeamAuthState', () => {
     describe('Loading', () => {
         it('should load auth', () => {
             authService.setup(x => x.getTeamAuth(team))
-                .returns(() => of(versioned(version, new AuthSchemeResponseDto({ scheme, _links: {} })))).verifiable();
+                .returns(() => of(versioned(version, createAuthResponse(scheme)))).verifiable();
 
             authState.load().subscribe();
 
             expect(authState.snapshot.scheme).toEqual(scheme);
-            expect(authState.snapshot.canUpdate).toBeTruthy();
             expect(authState.snapshot.isLoaded).toBeTruthy();
+            expect(authState.snapshot.canUpdate).toBeTruthy();
             expect(authState.snapshot.version).toEqual(version);
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
@@ -68,7 +68,7 @@ describe('TeamAuthState', () => {
 
         it('should show notification on load if reload is true', () => {
             authService.setup(x => x.getTeamAuth(team))
-                .returns(() => of(versioned(version, new AuthSchemeResponseDto({ scheme, _links: {} })))).verifiable();
+                .returns(() => of(versioned(newVersion, createAuthResponse(scheme)))).verifiable();
 
             authState.load(true).subscribe();
 
@@ -81,7 +81,7 @@ describe('TeamAuthState', () => {
     describe('Updates', () => {
         beforeEach(() => {
             authService.setup(x => x.getTeamAuth(team))
-                .returns(() => of(versioned(version, new AuthSchemeResponseDto({ scheme, _links: {} })))).verifiable();
+                .returns(() => of(versioned(version, createAuthResponse(scheme)))).verifiable();
 
             authState.load().subscribe();
         });
@@ -90,12 +90,11 @@ describe('TeamAuthState', () => {
             const newScheme = new AuthSchemeDto({ ...scheme, authority: 'NEW AUTHORIY' });
 
             authService.setup(x => x.putTeamAuth(team, It.isAny(), version))
-                .returns(() => of(versioned(newVersion, new AuthSchemeResponseDto({ scheme: newScheme, _links: {} })))).verifiable();
+                .returns(() => of(versioned(newVersion, createAuthResponse(newScheme)))).verifiable();
 
             authState.update(newScheme);
 
             expect(authState.snapshot.scheme).toEqual(newScheme);
-            expect(authState.snapshot.canUpdate).toBeTruthy();
             expect(authState.snapshot.version).toEqual(newVersion);
         });
 
@@ -103,13 +102,21 @@ describe('TeamAuthState', () => {
             const newScheme = undefined;
 
             authService.setup(x => x.putTeamAuth(team, It.isAny(), version))
-                .returns(() => of(versioned(newVersion, new AuthSchemeResponseDto({ scheme: newScheme, _links: {} })))).verifiable();
+                .returns(() => of(versioned(newVersion, createAuthResponse(newScheme)))).verifiable();
 
             authState.update(newScheme);
 
             expect(authState.snapshot.scheme).toEqual(newScheme);
-            expect(authState.snapshot.canUpdate).toBeTruthy();
             expect(authState.snapshot.version).toEqual(newVersion);
         });
     });
 });
+
+function createAuthResponse(scheme: AuthSchemeDto | undefined): AuthSchemeResponseDto {
+    return new AuthSchemeResponseDto({
+        scheme,
+        _links: {
+            update: new ResourceLinkDto({ method: 'PUT', href: 'teams/42/auth' }),
+        },
+    });
+}

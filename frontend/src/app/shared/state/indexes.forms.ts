@@ -8,15 +8,19 @@
 
 import { UntypedFormControl, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form, TemplatedFormArray } from '@app/framework';
-import { IIndexFieldDto, IndexDto } from '@app/shared/internal';
+import { CreateIndexDto, IndexFieldDto } from '@app/shared/internal';
 
-export class CreateIndexForm extends Form<TemplatedFormArray, IIndexFieldDto[], IndexDto> {
+export class CreateIndexForm extends Form<TemplatedFormArray, CreateIndexDto> {
     public get controls(): ReadonlyArray<ExtendedFormGroup> {
         return this.form.controls as any;
     }
 
     constructor() {
         super(new TemplatedFormArray(FieldTemplate.INSTANCE));
+    }
+
+    protected transformSubmit(value: any[]) {
+        return new CreateIndexDto({ fields: value.map(x => new IndexFieldDto(x)) });
     }
 }
 

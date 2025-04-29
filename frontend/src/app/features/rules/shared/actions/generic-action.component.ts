@@ -6,10 +6,11 @@
  */
 
 import { AsyncPipe, LowerCasePipe } from '@angular/common';
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EMPTY, Observable, shareReplay } from 'rxjs';
 import { ActionForm, CodeEditorComponent, ControlErrorsComponent, ExternalLinkDirective, FormHintComponent, MarkdownDirective, RulesService, ScriptCompletions, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { BranchesInputComponent } from './branches-input.component';
 import { FormattableInputComponent } from './formattable-input.component';
 
 @Component({
@@ -20,11 +21,12 @@ import { FormattableInputComponent } from './formattable-input.component';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AsyncPipe,
+        BranchesInputComponent,
         CodeEditorComponent,
         ControlErrorsComponent,
         ExternalLinkDirective,
-        FormHintComponent,
         FormattableInputComponent,
+        FormHintComponent,
         FormsModule,
         LowerCasePipe,
         MarkdownDirective,
@@ -44,6 +46,9 @@ export class GenericActionComponent {
 
     @Input({ required: true })
     public triggerType: string | undefined | null;
+
+    @Input({ required: true, transform: booleanAttribute })
+    public isEditable = true;
 
     public ruleCompletions: Observable<ScriptCompletions> = EMPTY;
 

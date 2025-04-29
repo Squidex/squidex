@@ -8,9 +8,9 @@
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { debug, DialogService, LoadingState, shareSubscribed, State, VersionTag } from '@app/framework';
+import { compareStrings, debug, DialogService, LoadingState, Mutable, shareSubscribed, State, VersionTag } from '@app/framework';
 import { WorkflowsService } from '../services/workflows.service';
-import { IUpdateWorkflowDto, IWorkflowStepDto, IWorkflowTransitionDto, WorkflowDto, WorkflowsDto } from './../model';
+import { AddWorkflowDto, IWorkflowStepDto, IWorkflowTransitionDto, UpdateWorkflowDto, WorkflowDto, WorkflowsDto, WorkflowStepDto, WorkflowTransitionDto } from './../model';
 import { AppsState } from './apps.state';
 
 interface Snapshot extends LoadingState {
@@ -89,16 +89,16 @@ export class WorkflowsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public add(name: string): Observable<any> {
-        return this.workflowsService.postWorkflow(this.appName, { name }, this.version).pipe(
+    public add(request: AddWorkflowDto): Observable<any> {
+        return this.workflowsService.postWorkflow(this.appName, request, this.version).pipe(
             tap(({ version, payload }) => {
                 this.replaceWorkflows(payload, version);
             }),
             shareSubscribed(this.dialogs));
     }
 
-    public update(workflow: WorkflowDto, update: IUpdateWorkflowDto): Observable<any> {
-        return this.workflowsService.putWorkflow(this.appName, workflow, update, this.version).pipe(
+    public update(workflow: WorkflowDto, request: UpdateWorkflowDto): Observable<any> {
+        return this.workflowsService.putWorkflow(this.appName, workflow, request, this.version).pipe(
             tap(({ version, payload }) => {
                 this.dialogs.notifyInfo('i18n:workflows.saved');
 
@@ -173,21 +173,31 @@ export class WorkflowView {
         const resultSteps: WorkflowStepView[] = [];
         const resultTransitions: WorkflowTransitionView[] = [];
 
-        for (const [stepName, stepValue] of Object.entries(dto.steps)) {
-            const { transitions, ...step } = stepValue as any;
+        for (const [name, step] of Object.entries(dto.steps)) {
+            const { transitions: _, ...values } = step.toJSON();
 
-            resultSteps.push({ name: stepName, isLocked: stepName === 'Published', values: step });
+            resultSteps.push({ name, isLocked: isLocked(name), values });
+        }
 
-            for (const [to, transition] of Object.entries(transitions)) {
-                resultTransitions.push({ from: stepName, to, ...transition as any });
+        for (const [from, step] of Object.entries(dto.steps)) {
+            if (step.transitions) {
+                for (const [to, transition] of Object.entries(step.transitions)) {
+                    const step = resultSteps.find(x => x.name === to)!;
+
+                    resultTransitions.push({ from, to, step, values: transition.toJSON() });
+                }
             }
         }
 
         this.steps =
-            resultSteps.sortedByString(x => x.name);
+            resultSteps.sort((a, b) => {
+                return compareStrings(a.name, b.name);
+            });
 
         this.transitions =
-            resultTransitions.sortedByString(x => x.to);
+            resultTransitions.sort((a, b) => {
+                return compareStrings(a.to, b.to);
+            });
     }
 
     public getOpenSteps(step: WorkflowStepView) {
@@ -203,14 +213,36 @@ export class WorkflowView {
     }
 
     public setStep(name: string, values: Partial<WorkflowStepValues> = {}) {
-        const step = this.dto.steps[name];
-        if (!step) {
+        return this.update(clone => {
+            clone.steps[name] = new WorkflowStepDto({ transitions: {}, ...clone.steps[name] ?? {}, ...values });
+
+            if (!clone.initial && !isLocked(name)) {
+                clone.initial = name;
+            }
+
+            return true;
+        });
+    }
+
+    public removeStep(name: string) {
+        const step = this.steps.find(x => x.name === name);
+        if (!step || step.isLocked) {
             return this;
         }
 
-        const clone = this.dto.toJSON();
-        Object.assign(values, clone.steps[name]);
-        return new WorkflowView(WorkflowDto.fromJSON(clone));
+        return this.update(clone => {
+            delete clone.steps[name];
+
+            if (clone.initial === name) {
+                clone.initial = this.steps.filter(x => x.name !== name && !x.isLocked)[0]?.name ?? null;
+            }
+
+            for (const step of Object.values(clone.steps) as any[]) {
+                delete step.transitions[name];
+            }
+
+            return true;
+        });
     }
 
     public changeSchemaIds(schemaIds: string[]) {
@@ -218,9 +250,10 @@ export class WorkflowView {
             return this;
         }
 
-        const clone = this.dto.toJSON();
-        clone.schemaIds = schemaIds;
-        return new WorkflowView(WorkflowDto.fromJSON(clone));
+        return this.update(clone => {
+            clone.schemaIds = schemaIds;
+            return true;
+        });
     }
 
     public changeName(name: string) {
@@ -228,87 +261,86 @@ export class WorkflowView {
             return this;
         }
 
-        const clone = this.dto.toJSON();
-        clone.name = name;
-        return new WorkflowView(WorkflowDto.fromJSON(clone));
+        return this.update(clone => {
+            clone.name = name;
+            return true;
+        });
     }
 
     public setInitial(initial: string) {
-        if (this.dto.initial === initial) {
+        const step = this.steps.find(x => x.name === initial);
+        if (!step || step.isLocked || this.dto.initial === initial) {
             return this;
         }
 
-        const clone = this.dto.toJSON();
-        clone.initial = initial;
-        return new WorkflowView(WorkflowDto.fromJSON(clone));
-    }
-
-    public removeStep(name: string) {
-        const step = this.dto.steps[name];
-        if (!step) {
-            return this;
-        }
-
-        const clone = this.dto.toJSON();
-
-        delete clone.steps[name];
-        if (clone.initial === name) {
-            clone.initial = name;
-        }
-
-        return new WorkflowView(WorkflowDto.fromJSON(clone));
-    }
-
-    public removeTransition(from: string, to: string) {
-        const step = this.dto.steps[from];
-        if (!step) {
-            return this;
-        }
-
-        const transition = step.transitions![to];
-        if (!transition) {
-            return this;
-        }
-
-        const clone = this.dto.toJSON();
-        delete clone.steps[from].transitions[to];
-        return new WorkflowView(WorkflowDto.fromJSON(clone));
+        return this.update(clone => {
+            clone.initial = initial;
+            return true;
+        });
     }
 
     public setTransition(from: string, to: string, values: Partial<WorkflowTransitionValues> = {}) {
-        const step = this.dto.steps[from];
-        if (!step) {
-            return this;
-        }
+        return this.update(clone => {
+            const fromStep = clone.steps[from] as Mutable<WorkflowStepDto>;
+            if (!fromStep || !clone.steps[to]) {
+                return false;
+            }
 
-        const transition = step.transitions![to];
-        if (!transition) {
-            return this;
-        }
+            fromStep.transitions ??= {};
+            fromStep.transitions[to] = new WorkflowTransitionDto({ ...fromStep.transitions[to] ?? {}, ...values });
+            return true;
+        });
+    }
 
-        const clone = this.dto.toJSON();
-        Object.assign(values, clone.steps[from].transitions[to]);
-        return new WorkflowView(WorkflowDto.fromJSON(clone));
+    public removeTransition(from: string, to: string) {
+        return this.update(clone => {
+            const fromStep = clone.steps[from] as Mutable<WorkflowStepDto>;
+            if (!fromStep?.transitions?.[to]) {
+                return false;
+            }
+
+            delete clone.steps[from].transitions![to];
+            return true;
+        });
     }
 
     public renameStep(name: string, newName: string) {
-        const step = this.dto.steps[name];
-        if (!step) {
+        if (!this.dto.steps[name] || name === newName) {
             return this;
         }
 
-        const clone = this.dto.toJSON();
+        return this.update(clone => {
+            renameInObj(clone.steps, name, newName);
 
-        clone.steps[newName] = clone.steps[name];
-        delete clone.steps[name];
-
-        for (const step of Object.values(clone.step) as any[]) {
-            if (step.transitions[name]) {
-                step.transitions[newName] = step.transitions[name];
-                delete step.transitions[name];
+            for (const step of Object.values(clone.steps) as any[]) {
+                renameInObj(step.transitions, name, newName);
             }
-        }
 
-        return new WorkflowView(WorkflowDto.fromJSON(clone));
+            return true;
+        });
     }
+
+    private update(action: (clone: Mutable<WorkflowDto>) => boolean) {
+        const clone = WorkflowDto.fromJSON(this.dto.toJSON());
+        if (!action(clone)) {
+            return this;
+        }
+        return new WorkflowView(clone);
+    }
+
+    public toUpdate(): UpdateWorkflowDto {
+        return UpdateWorkflowDto.fromJSON(this.dto.toJSON());
+    }
+}
+
+function renameInObj(target: any, name: string, newName: string) {
+    const existing = target[name];
+    if (existing) {
+        target[newName] = existing;
+        delete target[name];
+    }
+}
+
+function isLocked(name: string) {
+    return name === 'Published';
 }

@@ -9,7 +9,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { AccessTokenDto, ApiUrlConfig, ClientDto, ClientsDto, ClientsService, Resource, Versioned, VersionTag } from '@app/shared/internal';
-import { ResourceLinkDto } from '../model';
+import { CreateClientDto, ResourceLinkDto, UpdateClientDto } from '../model';
 
 describe('ClientsService', () => {
     const version = new VersionTag('1');
@@ -53,7 +53,7 @@ describe('ClientsService', () => {
 
     it('should make post request to create client',
         inject([ClientsService, HttpTestingController], (clientsService: ClientsService, httpMock: HttpTestingController) => {
-            const dto = { id: 'client1' };
+            const dto = new CreateClientDto({ id: 'client1' });
 
             let clients: Versioned<ClientsDto>;
             clientsService.postClient('my-app', dto, version).subscribe(result => {
@@ -76,7 +76,7 @@ describe('ClientsService', () => {
 
     it('should make put request to rename client',
         inject([ClientsService, HttpTestingController], (clientsService: ClientsService, httpMock: HttpTestingController) => {
-            const dto = { name: 'New Name' };
+            const dto = new UpdateClientDto({ name: 'New Name' });
 
             const resource: Resource = {
                 _links: {

@@ -11,7 +11,7 @@ import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http'
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
 import { ApiUrlConfig, Resource, Versioned, VersionTag, WorkflowDto, WorkflowsDto, WorkflowsService } from '@app/shared/internal';
-import { ResourceLinkDto, WorkflowStepDto, WorkflowTransitionDto } from '../model';
+import { AddWorkflowDto, ResourceLinkDto, UpdateWorkflowDto, WorkflowStepDto, WorkflowTransitionDto } from '../model';
 
 describe('WorkflowsService', () => {
     const version = new VersionTag('1');
@@ -56,8 +56,10 @@ describe('WorkflowsService', () => {
 
     it('should make a post request to create a workflow',
         inject([WorkflowsService, HttpTestingController], (workflowsService: WorkflowsService, httpMock: HttpTestingController) => {
+            const dto = new AddWorkflowDto({ name: 'New' });
+
             let workflows: Versioned<WorkflowsDto>;
-            workflowsService.postWorkflow('my-app', { name: 'New' }, version).subscribe(result => {
+            workflowsService.postWorkflow('my-app', dto, version).subscribe(result => {
                 workflows = result;
             });
 
@@ -77,6 +79,8 @@ describe('WorkflowsService', () => {
 
     it('should make a put request to update a workflow',
         inject([WorkflowsService, HttpTestingController], (workflowsService: WorkflowsService, httpMock: HttpTestingController) => {
+            const dto = new UpdateWorkflowDto({ initial: 'A', steps: {} });
+
             const resource: Resource = {
                 _links: {
                     update: { method: 'PUT', href: '/api/apps/my-app/workflows/123' },
@@ -84,7 +88,7 @@ describe('WorkflowsService', () => {
             };
 
             let workflows: Versioned<WorkflowsDto>;
-            workflowsService.putWorkflow('my-app', resource, {} as any, version).subscribe(result => {
+            workflowsService.putWorkflow('my-app', resource, dto, version).subscribe(result => {
                 workflows = result;
             });
 

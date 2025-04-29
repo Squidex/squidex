@@ -8,7 +8,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
-import { ApiUrlConfig, AssignContributorDto, ContributorsDto, HTTP, IAssignContributorDto, mapVersioned, pretifyError, Resource, Versioned, VersionOrTag } from '@app/shared';
+import { ApiUrlConfig, AssignContributorDto, ContributorsDto, HTTP, mapVersioned, pretifyError, Resource, Versioned, VersionOrTag } from '@app/shared';
 
 @Injectable({
     providedIn: 'any',
@@ -30,10 +30,10 @@ export class TeamContributorsService {
             pretifyError('i18n:contributors.loadFailed'));
     }
 
-    public postContributor(teamId: string, dto: IAssignContributorDto, version: VersionOrTag): Observable<Versioned<ContributorsDto>> {
+    public postContributor(teamId: string, dto: AssignContributorDto, version: VersionOrTag): Observable<Versioned<ContributorsDto>> {
         const url = this.apiUrl.buildUrl(`api/teams/${teamId}/contributors`);
 
-        return HTTP.postVersioned(this.http, url, new AssignContributorDto(dto).toJSON(), version).pipe(
+        return HTTP.postVersioned(this.http, url, dto.toJSON(), version).pipe(
             mapVersioned(({ body }) => {
                 return ContributorsDto.fromJSON(body);
             }),

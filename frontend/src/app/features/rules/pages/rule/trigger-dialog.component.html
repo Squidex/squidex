@@ -1,0 +1,55 @@
+<form [formGroup]="currentTrigger?.form!" (ngSubmit)="save()">
+    <sqx-modal-dialog (dialogClose)="dialogClose.emit()" size="xl">
+        <ng-container title>
+            {{ "rules.trigger.edit" | sqxTranslate }}
+        </ng-container>
+
+        <ng-container content>
+            @if (currentTrigger) {
+                @switch (currentTrigger.triggerType) {
+                    @case ("AssetChanged") {
+                        <sqx-asset-changed-trigger [triggerForm]="currentTrigger"></sqx-asset-changed-trigger>
+                    }
+                    @case ("Comment") {
+                        <sqx-comment-trigger [triggerForm]="currentTrigger"></sqx-comment-trigger>
+                    }
+                    @case ("ContentChanged") {
+                        <sqx-content-changed-trigger
+                            [schemas]="schemasState.schemas | async"
+                            [trigger]="currentTrigger.form.value"
+                            [triggerForm]="currentTrigger"></sqx-content-changed-trigger>
+                    }
+                    @case ("SchemaChanged") {
+                        <sqx-schema-changed-trigger [triggerForm]="currentTrigger"></sqx-schema-changed-trigger>
+                    }
+                    @case ("Usage") {
+                        <sqx-usage-trigger [triggerForm]="currentTrigger"></sqx-usage-trigger>
+                    }
+                }
+            } @else {
+                <div class="row g-0">
+                    @for (triggerType of supportedTriggers | sqxKeys; track triggerType) {
+                        <div class="col-12 col-md-6">
+                            <div class="rule-element" (click)="selectTrigger(triggerType)">
+                                <sqx-rule-element
+                                    [element]="$any(supportedTriggers)[triggerType]"
+                                    isSmall="false"
+                                    [type]="triggerType"></sqx-rule-element>
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </ng-container>
+
+        <ng-container footer>
+            <button class="btn btn-text-secondary" (click)="dialogClose.emit()" type="button">
+                {{ "common.cancel" | sqxTranslate }}
+            </button>
+
+            <button class="btn btn-success" type="submit">
+                {{ "common.complete" | sqxTranslate }}
+            </button>
+        </ng-container>
+    </sqx-modal-dialog>
+</form>

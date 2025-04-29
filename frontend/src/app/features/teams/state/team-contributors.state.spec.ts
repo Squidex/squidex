@@ -10,7 +10,7 @@ import { catchError } from 'rxjs/operators';
 import { createContributors } from 'src/app/shared/services/contributors.service.spec';
 import { TestValues } from 'src/app/shared/state/_test-helpers';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { ContributorDto, ContributorsDto, DialogService, ErrorDto, versioned } from '@app/shared';
+import { AssignContributorDto, ContributorDto, ContributorsDto, DialogService, ErrorDto, versioned } from '@app/shared';
 import { TeamContributorsService, TeamContributorsState } from '../internal';
 
 describe('TeamContributorsState', () => {
@@ -138,7 +138,7 @@ describe('TeamContributorsState', () => {
         it('should update contributors if user assigned', () => {
             const updated = createContributors(5, 6);
 
-            const request = { contributorId: 'mail2stehle@gmail.com', role: 'Developer' };
+            const request = new AssignContributorDto({ contributorId: 'mail2stehle@gmail.com', role: 'Developer' });
 
             contributorsService.setup(x => x.postContributor(team, request, version))
                 .returns(() => of(versioned(newVersion, updated))).verifiable();
@@ -149,7 +149,7 @@ describe('TeamContributorsState', () => {
         });
 
         it('should return proper error if user to add does not exist', () => {
-            const request = { contributorId: 'mail2stehle@gmail.com', role: 'Developer' };
+            const request = new AssignContributorDto({ contributorId: 'mail2stehle@gmail.com', role: 'Developer' });
 
             contributorsService.setup(x => x.postContributor(team, request, version))
                 .returns(() => throwError(() => new ErrorDto(404, '404')));
@@ -168,7 +168,7 @@ describe('TeamContributorsState', () => {
         });
 
         it('should return original error if not a 404', () => {
-            const request = { contributorId: 'mail2stehle@gmail.com', role: 'Developer' };
+            const request = new AssignContributorDto({ contributorId: 'mail2stehle@gmail.com', role: 'Developer' });
 
             contributorsService.setup(x => x.postContributor(team, request, version))
                 .returns(() => throwError(() => new ErrorDto(500, '500')));

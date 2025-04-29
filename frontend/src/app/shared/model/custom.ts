@@ -108,7 +108,7 @@ export class AppLanguagesDto extends generated.AppLanguagesDto {
 
 export class AppSettingsDto extends generated.AppSettingsDto {
     get canUpdate() {
-        return this.compute('canUpdate', () => hasAnyLink(this._links, 'delete'));
+        return this.compute('canUpdate', () => hasAnyLink(this._links, 'update'));
     }
 }
 
@@ -200,6 +200,12 @@ export class AssetFoldersDto extends generated.AssetsDto {
 }
 
 export class AssetScriptsDto extends generated.AssetScriptsDto {
+    get canUpdate() {
+        return this.compute('canUpdate', () => hasAnyLink(this._links, 'update'));
+    }
+}
+
+export class AuthSchemeResponseDto extends generated.AuthSchemeResponseDto {
     get canUpdate() {
         return this.compute('canUpdate', () => hasAnyLink(this._links, 'update'));
     }
@@ -630,7 +636,7 @@ export class SchemaDto extends generated.SchemaDto {
     }
 }
 
-export class RuleDto extends generated.RuleDto {
+export class DynamicRuleDto extends generated.DynamicRuleDto {
     get canDelete() {
         return this.compute('canDelete', () => hasAnyLink(this._links, 'delete'));
     }
@@ -664,7 +670,7 @@ export class RuleDto extends generated.RuleDto {
     }
 }
 
-export class RulesDto extends generated.RulesDto {
+export class DynamicRulesDto extends generated.DynamicRulesDto {
     get canCreate() {
         return this.compute('canCreate', () => hasAnyLink(this._links, 'create'));
     }

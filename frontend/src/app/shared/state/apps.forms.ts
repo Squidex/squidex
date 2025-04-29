@@ -9,9 +9,9 @@
 
 import { UntypedFormControl, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form, TemplatedFormArray, ValidatorsEx } from '@app/framework';
-import { AppDto, AppSettingsDto,  ICreateAppDto, ITransferToTeamDto, IUpdateAppDto, IUpdateAppSettingsDto } from '../model';
+import { AppDto, AppSettingsDto, CreateAppDto, EditorDto, PatternDto, TransferToTeamDto, UpdateAppDto, UpdateAppSettingsDto } from '../model';
 
-export class CreateAppForm extends Form<ExtendedFormGroup, ICreateAppDto> {
+export class CreateAppForm extends Form<ExtendedFormGroup, CreateAppDto> {
     constructor() {
         super(new ExtendedFormGroup({
             name: new UntypedFormControl('', [
@@ -21,17 +21,25 @@ export class CreateAppForm extends Form<ExtendedFormGroup, ICreateAppDto> {
             ]),
         }));
     }
+
+    protected transformSubmit(value: any) {
+        return new CreateAppDto(value);
+    }
 }
 
-export class TransferAppForm extends Form<ExtendedFormGroup, ITransferToTeamDto, AppDto> {
+export class TransferAppForm extends Form<ExtendedFormGroup, TransferToTeamDto, AppDto> {
     constructor() {
         super(new ExtendedFormGroup({
             teamId: new UntypedFormControl(''),
         }));
     }
+
+    protected transformSubmit(value: any) {
+        return new TransferToTeamDto(value);
+    }
 }
 
-export class UpdateAppForm extends Form<ExtendedFormGroup, IUpdateAppDto, AppDto> {
+export class UpdateAppForm extends Form<ExtendedFormGroup, UpdateAppDto, AppDto> {
     constructor() {
         super(new ExtendedFormGroup({
             label: new UntypedFormControl('',
@@ -42,9 +50,13 @@ export class UpdateAppForm extends Form<ExtendedFormGroup, IUpdateAppDto, AppDto
             ),
         }));
     }
+
+    protected transformSubmit(value: any) {
+        return new UpdateAppDto(value);
+    }
 }
 
-export class EditAppSettingsForm extends Form<ExtendedFormGroup, IUpdateAppSettingsDto, AppSettingsDto> {
+export class EditAppSettingsForm extends Form<ExtendedFormGroup, UpdateAppSettingsDto, AppSettingsDto> {
     public get patterns() {
         return this.form.controls['patterns'] as TemplatedFormArray;
     }
@@ -76,6 +88,18 @@ export class EditAppSettingsForm extends Form<ExtendedFormGroup, IUpdateAppSetti
                 EditorTemplate.INSTANCE,
             ),
         }));
+    }
+
+    protected transformSubmit(value: Record<string, any> & { editors: any[]; patterns: any[] }) {
+        const { editors, patterns, ...other } = value;
+
+        return new UpdateAppSettingsDto({
+            ...other,
+            editors: editors.map(x =>
+                new EditorDto(x)),
+            patterns: patterns.map(x =>
+                new PatternDto(x)),
+        });
     }
 }
 

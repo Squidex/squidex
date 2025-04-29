@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AddFieldForm, AppSettingsDto, ControlErrorsComponent, createProperties, DropdownMenuComponent, EditFieldForm, FieldDto, fieldTypes, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, LanguagesState, ModalDialogComponent, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, SchemasState, TooltipDirective, TranslatePipe, Types } from '@app/shared';
+import { AddFieldForm, AppSettingsDto, ControlErrorsComponent, createProperties, DropdownMenuComponent, EditFieldForm, FieldDto, fieldTypes, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, LanguagesState, ModalDialogComponent, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, SchemasState, TooltipDirective, TranslatePipe, Types, UpdateFieldDto } from '@app/shared';
 import { FieldFormComponent } from './forms/field-form.component';
 
 
@@ -83,7 +83,6 @@ export class FieldWizardComponent implements OnInit {
 
     public addField(navigationMode: SaveNavigationMode) {
         const value = this.addFieldForm.submit();
-
         if (!value) {
             return;
         }
@@ -123,14 +122,13 @@ export class FieldWizardComponent implements OnInit {
         }
 
         const value = this.editForm.submit();
-
         if (!value) {
             return;
         }
 
         const properties = createProperties(this.editField.properties.fieldType as any, value);
 
-        this.schemasState.updateField(this.schema, this.editField as FieldDto, { properties })
+        this.schemasState.updateField(this.schema, this.editField, new UpdateFieldDto({ properties }))
             .subscribe({
                 next: () => {
                     switch (navigationMode) {

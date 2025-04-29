@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, shareSubscribed, State, VersionTag } from '@app/framework';
-import { ClientDto, ClientsDto, ClientsService, ICreateClientDto, IUpdateClientDto } from '../internal';
+import { ClientDto, ClientsDto, ClientsService, CreateClientDto, UpdateClientDto } from '../internal';
 import { AppsState } from './apps.state';
 
 interface Snapshot extends LoadingState {
@@ -82,7 +82,7 @@ export class ClientsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public attach(request: ICreateClientDto): Observable<any> {
+    public attach(request: CreateClientDto): Observable<any> {
         return this.clientsService.postClient(this.appName, request, this.version).pipe(
             tap(({ version, payload }) => {
                 this.replaceClients(payload, version);
@@ -98,7 +98,7 @@ export class ClientsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public update(client: ClientDto, request: IUpdateClientDto): Observable<any> {
+    public update(client: ClientDto, request: UpdateClientDto): Observable<any> {
         return this.clientsService.putClient(this.appName, client, request, this.version).pipe(
             tap(({ version, payload }) => {
                 this.replaceClients(payload, version);

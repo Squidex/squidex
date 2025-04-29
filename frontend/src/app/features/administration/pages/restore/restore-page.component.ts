@@ -50,19 +50,20 @@ export class RestorePageComponent {
 
     public restore() {
         const value = this.restoreForm.submit();
-
-        if (value) {
-            this.restoreForm.submitCompleted();
-
-            this.jobsService.postRestore(value)
-                .subscribe({
-                    next: () => {
-                        this.dialogs.notifyInfo('i18n:jobs.restoreStarted');
-                    },
-                    error: error => {
-                        this.dialogs.notifyError(error);
-                    },
-                });
+        if (!value) {
+            return;
         }
+
+        this.restoreForm.submitCompleted();
+
+        this.jobsService.postRestore(value)
+            .subscribe({
+                next: () => {
+                    this.dialogs.notifyInfo('i18n:jobs.restoreStarted');
+                },
+                error: error => {
+                    this.dialogs.notifyError(error);
+                },
+            });
     }
 }
