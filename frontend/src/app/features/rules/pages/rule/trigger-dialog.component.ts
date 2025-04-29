@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { ALL_TRIGGERS, KeysPipe, ModalDialogComponent, RuleTriggerDto, SchemasState, TranslatePipe, TriggerForm } from '@app/shared';
+import { KeysPipe, ModalDialogComponent, RuleTriggerDto, SchemasState, TranslatePipe, TriggerForm, TriggersDto } from '@app/shared';
 import { RuleElementComponent } from '../../shared/rule-element.component';
 import { AssetChangedTriggerComponent } from '../../shared/triggers/asset-changed-trigger.component';
 import { CommentTriggerComponent } from '../../shared/triggers/comment-trigger.component';
@@ -36,20 +36,20 @@ import { UsageTriggerComponent } from '../../shared/triggers/usage-trigger.compo
     ],
 })
 export class TriggerDialogComponent implements OnInit {
-
     @Input({ required: true })
-    public trigger?: RuleTriggerDto;
+    public trigger?: RuleTriggerDto | null;
 
     @Input({ required: true, transform: booleanAttribute })
     public isEditable = true;
+
+    @Input({ required: true })
+    public supportedTriggers!: TriggersDto;
 
     @Output()
     public dialogClose = new EventEmitter();
 
     @Output()
     public dialogSaved = new EventEmitter<RuleTriggerDto>();
-    
-    public supportedTriggers = ALL_TRIGGERS;
 
     public currentTrigger?: TriggerForm;
 

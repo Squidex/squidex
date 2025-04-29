@@ -7,7 +7,7 @@
 
 import { LowerCasePipe } from '@angular/common';
 import { booleanAttribute, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
-import { ReactiveFormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActionForm, CodeEditorComponent, ControlErrorsComponent, DynamicFlowStepDefinitionDto, FormHintComponent, KeysPipe, MarkdownDirective, ModalDialogComponent, RuleElementDto, ScriptCompletions, TranslatePipe } from '@app/shared';
 import { BranchesInputComponent } from '../../shared/actions/branches-input.component';
 import { FormattableInputComponent } from '../../shared/actions/formattable-input.component';
@@ -24,6 +24,7 @@ import { RuleElementComponent } from '../../shared/rule-element.component';
         ControlErrorsComponent,
         FormattableInputComponent,
         FormHintComponent,
+        FormsModule,
         KeysPipe,
         LowerCasePipe,
         MarkdownDirective,
@@ -33,7 +34,7 @@ import { RuleElementComponent } from '../../shared/rule-element.component';
         TranslatePipe,
     ],
 })
-export class TriggerDialogComponent implements OnInit {
+export class StepDialogComponent implements OnInit {
     @Input({ required: true })
     public stepDefinition?: DynamicFlowStepDefinitionDto;
 
@@ -44,7 +45,7 @@ export class TriggerDialogComponent implements OnInit {
     public supportedSteps: { [name: string]: RuleElementDto } = {};
 
     @Input({ required: true })
-    public ruleCompletions: ScriptCompletions = [];
+    public scriptCompletions: ScriptCompletions | null = [];
 
     @Output()
     public dialogClose = new EventEmitter();

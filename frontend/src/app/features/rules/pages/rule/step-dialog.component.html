@@ -51,7 +51,7 @@
                                     @case ("TextArea") {
                                         @if (property.isFormattable) {
                                             <sqx-formattable-input
-                                                [completion]="ruleCompletions"
+                                                [completion]="scriptCompletions"
                                                 [formControlName]="property.name"
                                                 type="Code"></sqx-formattable-input>
                                         } @else {
@@ -63,7 +63,7 @@
                                     }
                                     @case ("Javascript") {
                                         <sqx-code-editor
-                                            [completion]="ruleCompletions"
+                                            [completion]="scriptCompletions"
                                             [formControlName]="property.name"
                                             [height]="350"></sqx-code-editor>
                                     }
