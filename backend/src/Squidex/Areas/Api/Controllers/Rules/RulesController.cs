@@ -261,9 +261,8 @@ public sealed class RulesController(
     [ApiCosts(5)]
     public async Task<IActionResult> Simulate(string app, [FromBody] CreateRuleDto request)
     {
-        var rule = request.ToRule();
-
-        var simulation = await ruleRunnerService.SimulateAsync(App.NamedId(), DomainId.Empty, rule, HttpContext.RequestAborted);
+        var simulated = request.ToRule();
+        var simulation = await ruleRunnerService.SimulateAsync(App.NamedId(), DomainId.Empty, simulated, HttpContext.RequestAborted);
 
         var response = SimulatedRuleEventsDto.FromDomain(simulation);
 

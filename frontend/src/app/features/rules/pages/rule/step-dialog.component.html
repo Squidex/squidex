@@ -26,7 +26,7 @@
 
                     <hr />
 
-                    @for (property of currentAction.definition.properties; track property.name) {
+                    @for (property of currentAction.editableProperties; track property.name) {
                         <div class="form-group row">
                             <label class="col-3 col-form-label" [for]="property.name">
                                 @if (property.editor !== "Checkbox") {

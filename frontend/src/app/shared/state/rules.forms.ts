@@ -10,6 +10,10 @@ import { ExtendedFormGroup, Form, TemplatedFormArray, ValidatorsEx } from '@app/
 import { RuleElementDto, RuleTriggerDto } from '../model';
 
 export class ActionForm extends Form<UntypedFormGroup, Record<string, any>> {
+    public get editableProperties() {
+        return this.definition.properties.filter(x => x.editor !== 'None');
+    }
+
     constructor(public readonly definition: RuleElementDto,
         public readonly actionType: string,
     ) {

@@ -10,11 +10,11 @@ import { Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { BehaviorSubject, debounceTime, distinctUntilChanged, filter, map, switchMap } from 'rxjs';
-import { ALL_TRIGGERS, ConfirmClickDirective, DynamicCreateRuleDto, DynamicFlowDefinitionDto, DynamicRuleDto, DynamicUpdateRuleDto, ErrorDto, FlowStepDefinitionDto, FlowView, IDynamicFlowStepDefinitionDto, LayoutComponent, MessageBus, ModalDirective, Mutable, RuleElementDto, RulesService, RulesState, RuleTriggerDto, SchemasState, SidebarMenuDirective, Subscriptions, TitleComponent, ToggleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe, Types } from '@app/shared';
+import { ALL_TRIGGERS, ConfirmClickDirective, DynamicCreateRuleDto, DynamicFlowDefinitionDto, DynamicFlowStepDefinitionDto, DynamicRuleDto, DynamicUpdateRuleDto, ErrorDto, FlowView, IDynamicFlowStepDefinitionDto, LayoutComponent, MessageBus, ModalDirective, Mutable, RuleElementDto, RulesService, RulesState, RuleTriggerDto, SchemasState, SidebarMenuDirective, Subscriptions, TitleComponent, ToggleComponent, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe, Types } from '@app/shared';
 import { RuleConfigured } from '../messages';
+import { StepDialogComponent } from './step-dialog.component';
 import { TriggerDialogComponent } from './trigger-dialog.component';
 import { FlowStepAdd, FlowStepRemove } from './types';
-import { StepDialogComponent } from "./step-dialog.component";
 
 type Snapshot = {
     flow: FlowView;
@@ -46,7 +46,7 @@ type Snapshot = {
     TourStepDirective,
     TranslatePipe,
     TriggerDialogComponent,
-    StepDialogComponent
+    StepDialogComponent,
 ],
 })
 export class RulePageComponent implements OnInit {
@@ -58,7 +58,7 @@ export class RulePageComponent implements OnInit {
     public error?: ErrorDto;
 
     public targetTrigger?: RuleTriggerDto;
-    public targetStep?: { step: FlowStepDefinitionDto; target: string | FlowStepAdd };
+    public targetStep?: { step: DynamicFlowStepDefinitionDto; target: string | FlowStepAdd };
 
     public rule?: DynamicRuleDto | null;
 
@@ -125,15 +125,13 @@ export class RulePageComponent implements OnInit {
     }
 
     public save() {
-        const editableRule = this.editableRule.value;
-        if (!editableRule?.isEditable || !editableRule.trigger) {
+        const value = this.editableRule.value;
+        if (!value?.isEditable || !value.trigger || !value.flow) {
             return;
         }
 
-        const { flow, isEnabled, trigger } = this.editableRule.value;
-
         if (this.rule) {
-            const request = new DynamicUpdateRuleDto({ flow, isEnabled: this.isEnabled });
+            const request = new DynamicUpdateRuleDto(value as any);
 
             this.rulesState.update(this.rule, request)
                 .subscribe({
@@ -142,7 +140,7 @@ export class RulePageComponent implements OnInit {
                     },
                 });
         } else {
-            const request = new DynamicCreateRuleDto({ trigger, flow });
+            const request = new DynamicCreateRuleDto(value as any);
 
             this.rulesState.create(request)
                 .subscribe({

@@ -7929,12 +7929,16 @@ export const WebhookMethodValues: ReadonlyArray<WebhookMethod> = [
 export class CreateRuleDto implements ICreateRuleDto {
     /** Uses the cache values because the actual object is frozen. */
     private readonly cachedValues: { [key: string]: any } = {};
+    /** Optional rule name. */
+    readonly name?: string | undefined;
     /** The trigger properties. */
     readonly trigger!: RuleTriggerDto;
     /** The action properties. */
     readonly action?: RuleActionDto | undefined;
     /** The flow to describe the sequence of actions to perform. */
     readonly flow!: FlowDefinitionDto;
+    /** Enable or disable the rule. */
+    readonly isEnabled?: boolean | undefined;
 
     constructor(data?: ICreateRuleDto) {
         if (data) {
@@ -7946,9 +7950,11 @@ export class CreateRuleDto implements ICreateRuleDto {
     }
 
     init(_data: any) {
+        (<any>this).name = _data["name"];
         (<any>this).trigger = _data["trigger"] ? RuleTriggerDto.fromJSON(_data["trigger"]) : <any>undefined;
         (<any>this).action = _data["action"] ? RuleActionDto.fromJSON(_data["action"]) : <any>undefined;
         (<any>this).flow = _data["flow"] ? FlowDefinitionDto.fromJSON(_data["flow"]) : new FlowDefinitionDto();
+        (<any>this).isEnabled = _data["isEnabled"];
         this.cleanup(this);
         return this;
     }
@@ -7961,9 +7967,11 @@ export class CreateRuleDto implements ICreateRuleDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
+        data["name"] = this.name;
         data["trigger"] = this.trigger ? this.trigger.toJSON() : <any>undefined;
         data["action"] = this.action ? this.action.toJSON() : <any>undefined;
         data["flow"] = this.flow ? this.flow.toJSON() : <any>undefined;
+        data["isEnabled"] = this.isEnabled;
         this.cleanup(data);
         return data;
     }
@@ -7991,12 +7999,16 @@ export class CreateRuleDto implements ICreateRuleDto {
 }
 
 export interface ICreateRuleDto {
+    /** Optional rule name. */
+    readonly name?: string | undefined;
     /** The trigger properties. */
     readonly trigger: RuleTriggerDto;
     /** The action properties. */
     readonly action?: RuleActionDto | undefined;
     /** The flow to describe the sequence of actions to perform. */
     readonly flow: FlowDefinitionDto;
+    /** Enable or disable the rule. */
+    readonly isEnabled?: boolean | undefined;
 }
 
 export class UpdateRuleDto implements IUpdateRuleDto {
@@ -14764,7 +14776,11 @@ export class DynamicCreateRuleDto implements IDynamicCreateRuleDto {
     /** The trigger properties. */
     readonly trigger!: RuleTriggerDto;
     /** The action properties. */
-    readonly action!: { [key: string]: any; };
+    readonly action?: { [key: string]: any; } | undefined;
+    /** The flow to describe the sequence of actions to perform. */
+    readonly flow!: DynamicFlowDefinitionDto;
+    /** Enable or disable the rule. */
+    readonly isEnabled?: boolean | undefined;
 
     constructor(data?: IDynamicCreateRuleDto) {
         if (data) {
@@ -14784,6 +14800,8 @@ export class DynamicCreateRuleDto implements IDynamicCreateRuleDto {
                     (<any>(<any>this).action)![key] = _data["action"][key];
             }
         }
+        (<any>this).flow = _data["flow"] ? DynamicFlowDefinitionDto.fromJSON(_data["flow"]) : new DynamicFlowDefinitionDto();
+        (<any>this).isEnabled = _data["isEnabled"];
         this.cleanup(this);
         return this;
     }
@@ -14804,6 +14822,8 @@ export class DynamicCreateRuleDto implements IDynamicCreateRuleDto {
                     (<any>data["action"])[key] = (<any>this.action)[key];
             }
         }
+        data["flow"] = this.flow ? this.flow.toJSON() : <any>undefined;
+        data["isEnabled"] = this.isEnabled;
         this.cleanup(data);
         return data;
     }
@@ -14834,7 +14854,290 @@ export interface IDynamicCreateRuleDto {
     /** The trigger properties. */
     readonly trigger: RuleTriggerDto;
     /** The action properties. */
-    readonly action: { [key: string]: any; };
+    readonly action?: { [key: string]: any; } | undefined;
+    /** The flow to describe the sequence of actions to perform. */
+    readonly flow: DynamicFlowDefinitionDto;
+    /** Enable or disable the rule. */
+    readonly isEnabled?: boolean | undefined;
+}
+
+export class DynamicFlowDefinitionDto implements IDynamicFlowDefinitionDto {
+    /** Uses the cache values because the actual object is frozen. */
+    private readonly cachedValues: { [key: string]: any } = {};
+    /** The ID of the initial step. */
+    readonly initialStep!: string;
+    /** The steps. */
+    readonly steps!: { [key: string]: DynamicFlowStepDefinitionDto; };
+
+    constructor(data?: IDynamicFlowDefinitionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data: any) {
+        (<any>this).initialStep = _data["initialStep"];
+        if (_data["steps"]) {
+            (<any>this).steps = {} as any;
+            for (let key in _data["steps"]) {
+                if (_data["steps"].hasOwnProperty(key))
+                    (<any>(<any>this).steps)![key] = _data["steps"][key] ? DynamicFlowStepDefinitionDto.fromJSON(_data["steps"][key]) : new DynamicFlowStepDefinitionDto();
+            }
+        }
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): DynamicFlowDefinitionDto {
+        const result = new DynamicFlowDefinitionDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["initialStep"] = this.initialStep;
+        if (this.steps) {
+            data["steps"] = {};
+            for (let key in this.steps) {
+                if (this.steps.hasOwnProperty(key))
+                    (<any>data["steps"])[key] = this.steps[key] ? this.steps[key].toJSON() : <any>undefined;
+            }
+        }
+        this.cleanup(data);
+        return data;
+    }
+
+    protected cleanup(target: any) {
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
+    }
+
+    protected compute<T>(key: string, action: () => T): T {
+        if (!this.cachedValues.hasOwnProperty(key)) {
+            const value = action();
+            this.cachedValues[key] = value;
+            return value;
+        } else {
+            return this.cachedValues[key] as any;
+        }
+    }
+}
+
+export interface IDynamicFlowDefinitionDto {
+    /** The ID of the initial step. */
+    readonly initialStep: string;
+    /** The steps. */
+    readonly steps: { [key: string]: DynamicFlowStepDefinitionDto; };
+}
+
+export class DynamicFlowStepDefinitionDto implements IDynamicFlowStepDefinitionDto {
+    /** Uses the cache values because the actual object is frozen. */
+    private readonly cachedValues: { [key: string]: any } = {};
+    /** The actual step. */
+    readonly step!: { [key: string]: any; };
+    /** The next step. */
+    readonly nextStepId?: string | undefined;
+    /** Indicates if errors should be ignored. */
+    readonly ignoreError?: boolean;
+
+    constructor(data?: IDynamicFlowStepDefinitionDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data: any) {
+        if (_data["step"]) {
+            (<any>this).step = {} as any;
+            for (let key in _data["step"]) {
+                if (_data["step"].hasOwnProperty(key))
+                    (<any>(<any>this).step)![key] = _data["step"][key];
+            }
+        }
+        (<any>this).nextStepId = _data["nextStepId"];
+        (<any>this).ignoreError = _data["ignoreError"];
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): DynamicFlowStepDefinitionDto {
+        const result = new DynamicFlowStepDefinitionDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        if (this.step) {
+            data["step"] = {};
+            for (let key in this.step) {
+                if (this.step.hasOwnProperty(key))
+                    (<any>data["step"])[key] = (<any>this.step)[key];
+            }
+        }
+        data["nextStepId"] = this.nextStepId;
+        data["ignoreError"] = this.ignoreError;
+        this.cleanup(data);
+        return data;
+    }
+
+    protected cleanup(target: any) {
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
+    }
+
+    protected compute<T>(key: string, action: () => T): T {
+        if (!this.cachedValues.hasOwnProperty(key)) {
+            const value = action();
+            this.cachedValues[key] = value;
+            return value;
+        } else {
+            return this.cachedValues[key] as any;
+        }
+    }
+}
+
+export interface IDynamicFlowStepDefinitionDto {
+    /** The actual step. */
+    readonly step: { [key: string]: any; };
+    /** The next step. */
+    readonly nextStepId?: string | undefined;
+    /** Indicates if errors should be ignored. */
+    readonly ignoreError?: boolean;
+}
+
+export class DynamicFlowExecutionStateDto implements IDynamicFlowExecutionStateDto {
+    /** Uses the cache values because the actual object is frozen. */
+    private readonly cachedValues: { [key: string]: any } = {};
+    /** The actual definition of the the steps to be executed. */
+    readonly definition!: DynamicFlowDefinitionDto;
+    /** The context. */
+    readonly context!: any;
+    /** The state of each step. */
+    readonly steps!: { [key: string]: FlowExecutionStepStateDto; };
+    /** The next step to be executed. */
+    readonly nextStepId!: string;
+    /** THe time when the next step will be executed. */
+    readonly nextRun?: DateTime | undefined;
+    /** The creation time. */
+    readonly created!: DateTime;
+    /** The completion time. */
+    readonly completed!: DateTime;
+    /** The overall status. */
+    readonly status!: FlowExecutionStatus;
+
+    constructor(data?: IDynamicFlowExecutionStateDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data: any) {
+        (<any>this).definition = _data["definition"] ? DynamicFlowDefinitionDto.fromJSON(_data["definition"]) : new DynamicFlowDefinitionDto();
+        (<any>this).context = _data["context"];
+        if (_data["steps"]) {
+            (<any>this).steps = {} as any;
+            for (let key in _data["steps"]) {
+                if (_data["steps"].hasOwnProperty(key))
+                    (<any>(<any>this).steps)![key] = _data["steps"][key] ? FlowExecutionStepStateDto.fromJSON(_data["steps"][key]) : new FlowExecutionStepStateDto();
+            }
+        }
+        (<any>this).nextStepId = _data["nextStepId"];
+        (<any>this).nextRun = _data["nextRun"] ? DateTime.parseISO(_data["nextRun"].toString()) : <any>undefined;
+        (<any>this).created = _data["created"] ? DateTime.parseISO(_data["created"].toString()) : <any>undefined;
+        (<any>this).completed = _data["completed"] ? DateTime.parseISO(_data["completed"].toString()) : <any>undefined;
+        (<any>this).status = _data["status"];
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): DynamicFlowExecutionStateDto {
+        const result = new DynamicFlowExecutionStateDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["definition"] = this.definition ? this.definition.toJSON() : <any>undefined;
+        data["context"] = this.context;
+        if (this.steps) {
+            data["steps"] = {};
+            for (let key in this.steps) {
+                if (this.steps.hasOwnProperty(key))
+                    (<any>data["steps"])[key] = this.steps[key] ? this.steps[key].toJSON() : <any>undefined;
+            }
+        }
+        data["nextStepId"] = this.nextStepId;
+        data["nextRun"] = this.nextRun ? this.nextRun.toISOString() : <any>undefined;
+        data["created"] = this.created ? this.created.toISOString() : <any>undefined;
+        data["completed"] = this.completed ? this.completed.toISOString() : <any>undefined;
+        data["status"] = this.status;
+        this.cleanup(data);
+        return data;
+    }
+
+    protected cleanup(target: any) {
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
+    }
+
+    protected compute<T>(key: string, action: () => T): T {
+        if (!this.cachedValues.hasOwnProperty(key)) {
+            const value = action();
+            this.cachedValues[key] = value;
+            return value;
+        } else {
+            return this.cachedValues[key] as any;
+        }
+    }
+}
+
+export interface IDynamicFlowExecutionStateDto {
+    /** The actual definition of the the steps to be executed. */
+    readonly definition: DynamicFlowDefinitionDto;
+    /** The context. */
+    readonly context: any;
+    /** The state of each step. */
+    readonly steps: { [key: string]: FlowExecutionStepStateDto; };
+    /** The next step to be executed. */
+    readonly nextStepId: string;
+    /** THe time when the next step will be executed. */
+    readonly nextRun?: DateTime | undefined;
+    /** The creation time. */
+    readonly created: DateTime;
+    /** The completion time. */
+    readonly completed: DateTime;
+    /** The overall status. */
+    readonly status: FlowExecutionStatus;
 }
 
 export class DynamicRulesDto extends ResourceDto implements IDynamicRulesDto {
@@ -15055,170 +15358,6 @@ export interface IDynamicRuleDto extends IResourceDto {
     readonly lastExecuted?: DateTime | undefined;
 }
 
-export class DynamicFlowDefinitionDto implements IDynamicFlowDefinitionDto {
-    /** Uses the cache values because the actual object is frozen. */
-    private readonly cachedValues: { [key: string]: any } = {};
-    /** The ID of the initial step. */
-    readonly initialStep!: string;
-    /** The steps. */
-    readonly steps!: { [key: string]: DynamicFlowStepDefinitionDto; };
-
-    constructor(data?: IDynamicFlowDefinitionDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data: any) {
-        (<any>this).initialStep = _data["initialStep"];
-        if (_data["steps"]) {
-            (<any>this).steps = {} as any;
-            for (let key in _data["steps"]) {
-                if (_data["steps"].hasOwnProperty(key))
-                    (<any>(<any>this).steps)![key] = _data["steps"][key] ? DynamicFlowStepDefinitionDto.fromJSON(_data["steps"][key]) : new DynamicFlowStepDefinitionDto();
-            }
-        }
-        this.cleanup(this);
-        return this;
-    }
-
-    static fromJSON(data: any): DynamicFlowDefinitionDto {
-        const result = new DynamicFlowDefinitionDto().init(data);
-        result.cleanup(this);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {}; 
-        data["initialStep"] = this.initialStep;
-        if (this.steps) {
-            data["steps"] = {};
-            for (let key in this.steps) {
-                if (this.steps.hasOwnProperty(key))
-                    (<any>data["steps"])[key] = this.steps[key] ? this.steps[key].toJSON() : <any>undefined;
-            }
-        }
-        this.cleanup(data);
-        return data;
-    }
-
-    protected cleanup(target: any) {
-        for (var property in target) {
-            if (target.hasOwnProperty(property)) {
-                const value = target[property];
-                if (value === undefined) {
-                    delete target[property];
-                }
-            }
-        }
-    }
-
-    protected compute<T>(key: string, action: () => T): T {
-        if (!this.cachedValues.hasOwnProperty(key)) {
-            const value = action();
-            this.cachedValues[key] = value;
-            return value;
-        } else {
-            return this.cachedValues[key] as any;
-        }
-    }
-}
-
-export interface IDynamicFlowDefinitionDto {
-    /** The ID of the initial step. */
-    readonly initialStep: string;
-    /** The steps. */
-    readonly steps: { [key: string]: DynamicFlowStepDefinitionDto; };
-}
-
-export class DynamicFlowStepDefinitionDto implements IDynamicFlowStepDefinitionDto {
-    /** Uses the cache values because the actual object is frozen. */
-    private readonly cachedValues: { [key: string]: any } = {};
-    /** The actual step. */
-    readonly step!: { [key: string]: any; };
-    /** The next step. */
-    readonly nextStepId?: string | undefined;
-    /** Indicates if errors should be ignored. */
-    readonly ignoreError?: boolean;
-
-    constructor(data?: IDynamicFlowStepDefinitionDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data: any) {
-        if (_data["step"]) {
-            (<any>this).step = {} as any;
-            for (let key in _data["step"]) {
-                if (_data["step"].hasOwnProperty(key))
-                    (<any>(<any>this).step)![key] = _data["step"][key];
-            }
-        }
-        (<any>this).nextStepId = _data["nextStepId"];
-        (<any>this).ignoreError = _data["ignoreError"];
-        this.cleanup(this);
-        return this;
-    }
-
-    static fromJSON(data: any): DynamicFlowStepDefinitionDto {
-        const result = new DynamicFlowStepDefinitionDto().init(data);
-        result.cleanup(this);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {}; 
-        if (this.step) {
-            data["step"] = {};
-            for (let key in this.step) {
-                if (this.step.hasOwnProperty(key))
-                    (<any>data["step"])[key] = (<any>this.step)[key];
-            }
-        }
-        data["nextStepId"] = this.nextStepId;
-        data["ignoreError"] = this.ignoreError;
-        this.cleanup(data);
-        return data;
-    }
-
-    protected cleanup(target: any) {
-        for (var property in target) {
-            if (target.hasOwnProperty(property)) {
-                const value = target[property];
-                if (value === undefined) {
-                    delete target[property];
-                }
-            }
-        }
-    }
-
-    protected compute<T>(key: string, action: () => T): T {
-        if (!this.cachedValues.hasOwnProperty(key)) {
-            const value = action();
-            this.cachedValues[key] = value;
-            return value;
-        } else {
-            return this.cachedValues[key] as any;
-        }
-    }
-}
-
-export interface IDynamicFlowStepDefinitionDto {
-    /** The actual step. */
-    readonly step: { [key: string]: any; };
-    /** The next step. */
-    readonly nextStepId?: string | undefined;
-    /** Indicates if errors should be ignored. */
-    readonly ignoreError?: boolean;
-}
-
 export class DynamicUpdateRuleDto implements IDynamicUpdateRuleDto {
     /** Uses the cache values because the actual object is frozen. */
     private readonly cachedValues: { [key: string]: any } = {};
@@ -15228,6 +15367,8 @@ export class DynamicUpdateRuleDto implements IDynamicUpdateRuleDto {
     readonly trigger?: RuleTriggerDto | undefined;
     /** The action properties. */
     readonly action?: { [key: string]: any; } | undefined;
+    /** The flow to describe the sequence of actions to perform. */
+    readonly flow!: DynamicFlowDefinitionDto;
     /** Enable or disable the rule. */
     readonly isEnabled?: boolean | undefined;
 
@@ -15250,6 +15391,7 @@ export class DynamicUpdateRuleDto implements IDynamicUpdateRuleDto {
                     (<any>(<any>this).action)![key] = _data["action"][key];
             }
         }
+        (<any>this).flow = _data["flow"] ? DynamicFlowDefinitionDto.fromJSON(_data["flow"]) : new DynamicFlowDefinitionDto();
         (<any>this).isEnabled = _data["isEnabled"];
         this.cleanup(this);
         return this;
@@ -15272,6 +15414,7 @@ export class DynamicUpdateRuleDto implements IDynamicUpdateRuleDto {
                     (<any>data["action"])[key] = (<any>this.action)[key];
             }
         }
+        data["flow"] = this.flow ? this.flow.toJSON() : <any>undefined;
         data["isEnabled"] = this.isEnabled;
         this.cleanup(data);
         return data;
@@ -15306,6 +15449,8 @@ export interface IDynamicUpdateRuleDto {
     readonly trigger?: RuleTriggerDto | undefined;
     /** The action properties. */
     readonly action?: { [key: string]: any; } | undefined;
+    /** The flow to describe the sequence of actions to perform. */
+    readonly flow: DynamicFlowDefinitionDto;
     /** Enable or disable the rule. */
     readonly isEnabled?: boolean | undefined;
 }

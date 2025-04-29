@@ -71,7 +71,7 @@ public sealed class RuleDto : Resource
     /// <summary>
     /// The action properties.
     /// </summary>
-    [Obsolete("Use Flow property. Can be null if the flow cannot be converted.")]
+    [Obsolete("Use the new 'Flow' property to define actions. Can be null if the flow cannot be converted.")]
     public RuleAction Action { get; set; }
 
     /// <summary>
