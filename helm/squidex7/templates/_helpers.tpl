@@ -19,15 +19,16 @@ app.kubernetes.io/version: {{ .Values.selectors.version | quote }}
 helm.sh/chart: {{ include "squidex.chart" . }}
 app.kubernetes.io/managed-by: {{ .Release.Service }}
 {{- if .Values.labels }}
-{{- toYaml .Values.labels | nindent 4 }}
+{{- "\n" -}}
+{{- toYaml .Values.labels }}
 {{- end -}}
 {{- end -}}
 
 {{- define "squidex.mongoDefaultHostname" }}
   {{- $release := .Release}}
   {{- $clusterSuffix := .Values.clusterSuffix}}
-  {{- range $index, $i := until (int (index .Values "mongodb-replicaset").replicas) }}
-    {{- $replica := printf "%s-mongodb-replicaset-%d.%s-mongodb-replicaset.%s.svc.%s" $release.Name $i $release.Name $release.Namespace $clusterSuffix }}
+  {{- range $index, $i := until (int (index .Values "mongodb").replicaCount) }}
+    {{- $replica := printf "%s-mongodb-%d.%s-mongodb-headless.%s.svc.%s" $release.Name $i $release.Name $release.Namespace $clusterSuffix }}
     {{- if eq $i 0}}
       {{- $replica }}
     {{- else -}}

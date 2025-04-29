@@ -3,13 +3,13 @@
 ## @skip labels
 labels:
 service:
-  ## @param service.type Kubernetes Service type
+  ## @param service.type Kubernetes Service type.
   ##
   type: ClusterIP
-  ## @param service.port Kubernetes Service port
+  ## @param service.port Kubernetes Service port.
   ##
   port: 80
-  ## @param service.port Kubernetes Service port
+  ## @param service.port Kubernetes Service port.
   ##
   nodePort: null
 deployment:
@@ -27,13 +27,13 @@ selectors:
   ##
   version: ""
 image:
-  ## @param image.repository Squidex image registry
+  ## @param image.repository Squidex image registry.
   ##
   repository: squidex/squidex
-  ## @param image.tag Squidex image tag
+  ## @param image.tag Squidex image tag.
   ##
   tag: ""
-  ## @param image.pullPolicy Squidex image pull policy
+  ## @param image.pullPolicy Squidex image pull policy.
   ##
   pullPolicy: IfNotPresent
 
@@ -49,11 +49,11 @@ affinity: { }
 ## @skip clusterSuffix
 clusterSuffix: cluster.local
 
-## @param runAsNonRoot
+## @param runAsNonRoot.
 ## Set to true to run Squidex as nonroot. Defaults to false for backwards compatibility.
 runAsNonRoot: false
 
-## @param podSecurityContext - object - optional
+## @param podSecurityContext  [object]
 ## You can modify the security context used to run PODS in the cluster
 ## For information regarding which settings are required per policy see: https://kubernetes.io/docs/concepts/security/pod-security-standards/
 ## An example that follows the Restricted profile is described below:
@@ -66,7 +66,7 @@ podSecurityContext:
   runAsGroup: 10000
   fsGroup: 10000
 
-## @param containerSecurityContext - object - optional
+## @param containerSecurityContext  [object]
 ## You can modify the security context used to run CONTAINERS in the cluster
 ## For information regarding which settings are required per policy see: https://kubernetes.io/docs/concepts/security/pod-security-standards/
 ## An example that follows the Restricted profile is described below:
@@ -84,7 +84,7 @@ auth:
   ## 
 
 ingress:
-  ## @param ingress.enabled True to deploy an ingress
+  ## @param ingress.enabled True to deploy an ingress.
   ## If true, Squidex Ingress will be created.
   ##
   enabled: true
@@ -107,7 +107,7 @@ ingress:
 
 env:
   # Define the type of the event store
-  ## @param env.EVENTSTORE__MONGODB__DATABASE The name of the database for events
+  ## @param env.EVENTSTORE__MONGODB__DATABASE The name of the database for events.
   EVENTSTORE__MONGODB__DATABASE: "Squidex"
 
   ## @skip env.EVENTSTORE__TYPE
@@ -122,10 +122,10 @@ env:
   ## @param env.IDENTITY__ADMINPASSWORD The initial admin email address.
   ##
   IDENTITY__ADMINPASSWORD: ""
-  ## @param env.IDENTITY__ADMINRECREATE Recreate the admin if it does not exist or the password does not match
+  ## @param env.IDENTITY__ADMINRECREATE Recreate the admin if it does not exist or the password does not match.
   ##
   IDENTITY__ADMINRECREATE: false # 
-  ## @param env.IDENTITY__ALLOWPASSWORDAUTH Enable password auth. Set this to false if you want to disable local login, leaving only 3rd party login options
+  ## @param env.IDENTITY__ALLOWPASSWORDAUTH Enable password auth. Set this to false if you want to disable local login, leaving only 3rd party login options.
   ## 
   IDENTITY__ALLOWPASSWORDAUTH: "true"
   ## @param env.IDENTITY__LOCKAUTOMATICALLY Lock new users automatically, the administrator must unlock them.
@@ -134,7 +134,7 @@ env:
   ## @param env.IDENTITY__PRIVACYURL The url to you privacy statements.
   ##
   IDENTITY__PRIVACYURL: "https://squidex.io/privacy"
-  ## @param env.IDENTITY__SHOWPII Set to true to show PII (Personally Identifiable Information) in the logs
+  ## @param env.IDENTITY__SHOWPII Set to true to show PII (Personally Identifiable Information) in the logs.
   ## 
   IDENTITY__SHOWPII: true # 
 
@@ -178,7 +178,7 @@ env:
   ## @param env.IDENTITY__OIDCMETADATAADDRESS A custom address for OIDC metadata.
   ##
   IDENTITY__OIDCMETADATAADDRESS: null
-  ## @param env.IDENTITY__OIDCNAME The name of the OIDC integration or server. Used in the UI
+  ## @param env.IDENTITY__OIDCNAME The name of the OIDC integration or server. Used in the UI.
   ##
   IDENTITY__OIDCNAME: null
   ## @param env.IDENTITY__OIDCRESPONSETYPE The type of the response. id_token or code.
@@ -208,16 +208,16 @@ env:
   ## @param env.LOGGING__HUMAN Setting the flag to true, enables well formatteds json logs.
   ##
   LOGGING__HUMAN: false
-  ## @param env.LOGGING__LEVEL Trace, Debug, Information, Warning, Error, Fatal
+  ## @param env.LOGGING__LEVEL Trace, Debug, Information, Warning, Error, Fatal.
   ##
   LOGGING__LEVEL: INFORMATION 
   ## @param env.LOGGING__LOGREQUESTS Set to false to disable logging of http requests.
   ##
   LOGGING__LOGREQUESTS: true
-  ## @param env.LOGGING__OTLP__ENABLED True, to enable OpenTelemetry Protocol integration
+  ## @param env.LOGGING__OTLP__ENABLED True, to enable OpenTelemetry Protocol integration.
   ##
   LOGGING__OTLP__ENABLED: false
-  ## @param env.LOGGING__OLTP__ENDPOINT The endpoint to the agent
+  ## @param env.LOGGING__OLTP__ENDPOINT The endpoint to the agent.
   ##
   LOGGING__OLTP__ENDPOINT: null
   ## @param env.LOGGING__STACKDRIVER__ENABLED True, to enable stackdriver integration.
@@ -226,7 +226,7 @@ env:
   ## @param env.LOGGING__STOREENABLED False to disable the log store for HTTP requests.
   ##
   LOGGING__STOREENABLED: true
-  ## @param env.LOGGING__STORERETENTIONINDAYS The number of days request log items will be stored
+  ## @param env.LOGGING__STORERETENTIONINDAYS The number of days request log items will be stored.
   ##
   LOGGING__STORERETENTIONINDAYS: 90
 
@@ -251,7 +251,7 @@ env:
   ## @param env.URLS__BASEURL Set the base url of your application, to generate correct urls in background process.
   URLS__BASEURL: https://squidex.local/ # 
 
-  ## @param env.URLS__ENFORCEHTTPS Set it to true to redirect the user from http to https permanently
+  ## @param env.URLS__ENFORCEHTTPS Set it to true to redirect the user from http to https permanently.
   URLS__ENFORCEHTTPS: false 
 
 ## @section MongoDB parameters
