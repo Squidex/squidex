@@ -7,6 +7,7 @@
 
 using NJsonSchema.Generation;
 using Squidex.Domain.Apps.Core.Rules.Deprecated;
+using Squidex.Flows;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Config.OpenApi;
@@ -15,6 +16,16 @@ public sealed class SchemaNameGenerator : DefaultSchemaNameGenerator
 {
     public override string Generate(Type type)
     {
+        if (type.BaseType == typeof(FlowStep))
+        {
+            return $"{type.TypeName(false, "Action")}FlowStepDto";
+        }
+
+        if (type == typeof(FlowStep))
+        {
+            return $"FlowStepDto";
+        }
+
 #pragma warning disable CS0618 // Type or member is obsolete
         if (type.BaseType == typeof(RuleAction))
         {

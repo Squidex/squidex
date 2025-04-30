@@ -9,7 +9,7 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { ActionsDto, ConfirmClickDirective, DropdownMenuComponent, DynamicRuleDto, DynamicUpdateRuleDto, EditableTitleComponent, ModalDirective, ModalModel, ModalPlacementDirective, RulesState, ToggleComponent, TranslatePipe, TriggersDto } from '@app/shared';
+import { BranchItem, ConfirmClickDirective, DropdownMenuComponent, DynamicRuleDto, DynamicUpdateRuleDto, EditableTitleComponent, FlowView, ModalDirective, ModalModel, ModalPlacementDirective, RuleElementDto, RulesState, RuleTriggerMetadataDto, ToggleComponent, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 import { RuleElementComponent } from '../../shared/rule-element.component';
 
 @Component({
@@ -33,13 +33,15 @@ import { RuleElementComponent } from '../../shared/rule-element.component';
 })
 export class RuleComponent {
     @Input({ required: true })
-    public ruleTriggers!: TriggersDto;
+    public availableTriggers: Record<string, RuleTriggerMetadataDto> = {};
 
     @Input({ required: true })
-    public ruleActions!: ActionsDto;
+    public availableSteps: Record<string, RuleElementDto> = {};
 
     @Input({ required: true })
     public rule!: DynamicRuleDto;
+
+    public flow: BranchItem[] = [];
 
     public dropdown = new ModalModel();
 
@@ -50,6 +52,12 @@ export class RuleComponent {
     constructor(
         private readonly rulesState: RulesState,
     ) {
+    }
+
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.rule) {
+            this.flow = new FlowView(this.rule.flow).getAllItems();
+        }
     }
 
     public delete() {

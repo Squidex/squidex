@@ -6,9 +6,9 @@
  */
 
 import { LowerCasePipe } from '@angular/common';
-import { booleanAttribute, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ActionForm, CodeEditorComponent, ControlErrorsComponent, DynamicFlowStepDefinitionDto, FormHintComponent, KeysPipe, MarkdownDirective, ModalDialogComponent, RuleElementDto, ScriptCompletions, TranslatePipe } from '@app/shared';
+import { CodeEditorComponent, ControlErrorsComponent, DynamicFlowStepDefinitionDto, FormHintComponent, KeysPipe, MarkdownDirective, ModalDialogComponent, RuleElementDto, ScriptCompletions, StepForm, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 import { BranchesInputComponent } from '../../shared/actions/branches-input.component';
 import { FormattableInputComponent } from '../../shared/actions/formattable-input.component';
 import { RuleElementComponent } from '../../shared/rule-element.component';
@@ -34,7 +34,7 @@ import { RuleElementComponent } from '../../shared/rule-element.component';
         TranslatePipe,
     ],
 })
-export class StepDialogComponent implements OnInit {
+export class StepDialogComponent {
     @Input({ required: true })
     public stepDefinition?: DynamicFlowStepDefinitionDto;
 
@@ -42,52 +42,58 @@ export class StepDialogComponent implements OnInit {
     public isEditable = true;
 
     @Input({ required: true })
-    public supportedSteps: { [name: string]: RuleElementDto } = {};
+    public availableSteps: { [name: string]: RuleElementDto } = {};
 
     @Input({ required: true })
     public scriptCompletions: ScriptCompletions | null = [];
 
     @Output()
+    public remove = new EventEmitter();
+
+    @Output()
     public dialogClose = new EventEmitter();
 
     @Output()
-    public dialogSaved = new EventEmitter<DynamicFlowStepDefinitionDto>();
+    public dialogSave = new EventEmitter<DynamicFlowStepDefinitionDto>();
 
-    public currentAction?: ActionForm;
+    public currentStep?: StepForm;
 
-    public ignoreError = false;
+    public stepName?: string;
 
-    public ngOnInit() {
-        if (this.stepDefinition) {
+    public stepIgnore = false;
+
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.stepDefinition && this.stepDefinition) {
             this.selectStep(this.stepDefinition.step.stepType, this.stepDefinition.step);
 
-            this.ignoreError = this.stepDefinition.ignoreError || false;
+            this.stepIgnore = this.stepDefinition.ignoreError || false;
+            this.stepName = this.stepDefinition?.name;
         }
     }
 
     public selectStep(type: string, values?: any) {
-        if (this.currentAction?.actionType !== type) {
-            const element = this.supportedSteps[type];
+        if (this.currentStep?.stepType !== type) {
+            const element = this.availableSteps[type];
 
-            this.currentAction = new ActionForm(element, type);
-            this.currentAction.setEnabled(this.isEditable);
+            this.currentStep = new StepForm(element, type);
+            this.currentStep.setEnabled(this.isEditable);
         }
 
         if (values) {
-            this.currentAction?.load(values || {});
+            this.currentStep?.load(values || {});
         }
     }
 
     public save() {
-        if (!this.isEditable || !this.currentAction) {
+        if (!this.isEditable || !this.currentStep) {
             return;
         }
 
-        const values = this.currentAction.submit();
-        if (!values) {
+        const step = this.currentStep.submit();
+        if (!step) {
             return;
         }
 
-        this.dialogSaved.emit(new DynamicFlowStepDefinitionDto({ ignoreError: this.ignoreError, step: values }));
+        this.dialogSave.emit(new DynamicFlowStepDefinitionDto({ name: this.stepName, ignoreError: this.stepIgnore, step }));
     }
 }

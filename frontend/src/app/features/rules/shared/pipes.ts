@@ -34,7 +34,7 @@ export class RuleClassPipe implements PipeTransform {
 })
 export class SimulatedRuleEventStatusPipe implements PipeTransform {
     public transform(value: SimulatedRuleEventDto) {
-        if (value.error) {
+        if ((value as any)['error']) {
             return 'Failed';
         } else if (value.skipReasons.length > 0) {
             return 'Skipped';

@@ -1,24 +1,37 @@
-<form [formGroup]="currentAction?.form!" (ngSubmit)="save()">
+<form [formGroup]="currentStep?.form!" (ngSubmit)="save()">
     <sqx-modal-dialog (dialogClose)="dialogClose.emit()" size="xl">
         <ng-container title>
             {{ "rules.step.edit" | sqxTranslate }}
         </ng-container>
 
         <ng-container content>
-            @if (currentAction) {
-                <div class="form-horizontal" [formGroup]="currentAction.form">
+            @if (currentStep) {
+                <div class="form-horizontal" [formGroup]="currentStep.form">
                     <div class="form-group row">
+                        <label class="col-3 col-form-label" for="stepName">{{ "common.name" | sqxTranslate }}</label>
+
+                        <div class="col-9">
+                            <input class="form-control" id="stepName" [(ngModel)]="stepName" [ngModelOptions]="{ standalone: true }" maxlength="40" />
+
+                            <sqx-form-hint>
+                                {{ "rules.stepNameHint" | sqxTranslate }}
+                            </sqx-form-hint>
+                        </div>
+                    </div>
+
+                    <div class="col-9 offset-3">
                         <div class="form-check">
                             <input
                                 class="form-check-input"
-                                id="ignoreError"
-                                [(ngModel)]="ignoreError"
+                                id="stepIgnore"
+                                [(ngModel)]="stepIgnore"
                                 [ngModelOptions]="{ standalone: true }"
                                 type="checkbox" />
-                            <label class="form-check-label" for="ignoreError">
-                                {{ "rules.ignoreError" | sqxTranslate }}
+                            <label class="form-check-label" for="stepIgnore">
+                                {{ "rules.stepIgnoreErrorHint" | sqxTranslate }}
                             </label>
                         </div>
+
                         <sqx-form-hint>
                             {{ "rules.ignoreErrorHint" | sqxTranslate }}
                         </sqx-form-hint>
@@ -26,7 +39,7 @@
 
                     <hr />
 
-                    @for (property of currentAction.editableProperties; track property.name) {
+                    @for (property of currentStep.editableProperties; track property.name) {
                         <div class="form-group row">
                             <label class="col-3 col-form-label" [for]="property.name">
                                 @if (property.editor !== "Checkbox") {
@@ -92,7 +105,7 @@
                                     }
                                     @case ("Branches") {
                                         <sqx-branches-input
-                                            [control]="currentAction.branch(property.name)"
+                                            [control]="currentStep.branch(property.name)"
                                             [isEditable]="isEditable"></sqx-branches-input>
                                     }
                                     @default {
@@ -122,13 +135,14 @@
                 </div>
             } @else {
                 <div class="row g-0">
-                    @for (stepType of supportedSteps | sqxKeys; track stepType) {
+                    @for (stepType of availableSteps | sqxKeys; track stepType) {
                         <div class="col-12 col-md-6">
                             <div class="rule-element" (click)="selectStep(stepType)">
                                 <sqx-rule-element
-                                    [element]="$any(supportedSteps)[stepType]"
-                                    isSmall="false"
-                                    [type]="stepType"></sqx-rule-element>
+                                    [elementInfo]="$any(availableSteps)[stepType]"
+                                    [elementType]="stepType"
+                                    showDescription="true"
+                                    showName="true"></sqx-rule-element>
                             </div>
                         </div>
                     }
@@ -140,9 +154,8 @@
             <button class="btn btn-text-secondary" (click)="dialogClose.emit()" type="button">
                 {{ "common.cancel" | sqxTranslate }}
             </button>
-
-            <button class="btn btn-success" type="submit">
-                {{ "common.complete" | sqxTranslate }}
+            <button class="btn btn-success" [disabled]="!currentStep" type="submit">
+                {{ "common.edit" | sqxTranslate }}
             </button>
         </ng-container>
     </sqx-modal-dialog>

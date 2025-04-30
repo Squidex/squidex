@@ -1,0 +1,80 @@
+<div class="branch">
+    @if (branchTitle) {
+        <div class="centered">
+            <h3 class="d-block white-label">{{ branchTitle }}</h3>
+        </div>
+
+    }
+
+    @if (branchLabel) {
+        <div class="centered">
+            <label class="d-block white-label">{{ branchLabel }}</label>
+        </div>
+    }
+
+    @if (branchItems.length > 0) {
+        @for (item of branchItems; track item.id; let last = $last; let i = $index) {
+            <div class="centered">
+                <button class="btn btn-outline-secondary btn-circle-sm" (click)="add(i - 1)">
+                    <i class="icon-plus"></i>
+                </button>
+            </div>
+
+            <div class="rule-element" [class.if]="item.step.step.stepType === 'If'">
+                <div class="centered">
+                    <sqx-rule-element
+                        [elementInfo]="availableSteps[item.step.step.stepType]"
+                        [elementType]="item.step.step.stepType"
+                        (iconClick)="edit(item)"
+                        [label]="item.step.name"
+                        (remove)="remove(item)"
+                        [showDescription]="false"
+                        [showName]="false"
+                        [showRemove]="isEditable"></sqx-rule-element>
+
+                    @if (!parentId) {
+                        <div class="step-title white-label">
+                            {{ item.step.name || availableSteps[item.step.step.stepType].title }}
+                        </div>
+                    } @else {
+                        <div class="hover-step-title white-label">
+                            {{ item.step.name || availableSteps[item.step.step.stepType].title }}
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="branches">
+                @for (branch of flow.getBranches(item.id); let parentIndex = $index; track parentIndex) {
+                    <div class="subbranch">
+                        <sqx-branch
+                            [availableSteps]="availableSteps"
+                            [branchItems]="branch.items"
+                            [branchLabel]="branch.label"
+                            [flow]="flow"
+                            [isEditable]="isEditable"
+                            [parentBranch]="parentIndex"
+                            [parentId]="item.id"
+                            (stepAdd)="stepAdd.emit($event)"
+                            (stepRemove)="stepRemove.emit($event)"
+                            (stepUpdate)="stepUpdate.emit($event)"></sqx-branch>
+                    </div>
+                }
+            </div>
+
+            @if (last && item.step.step.stepType !== "If") {
+                <div class="centered">
+                    <button class="btn btn-outline-secondary btn-circle-sm" (click)="add(i)">
+                        <i class="icon-plus"></i>
+                    </button>
+                </div>
+            }
+        }
+    } @else {
+        <div class="centered">
+            <button class="btn btn-outline-secondary btn-circle" (click)="add()">
+                <i class="icon-plus"></i>
+            </button>
+        </div>
+    }
+</div>

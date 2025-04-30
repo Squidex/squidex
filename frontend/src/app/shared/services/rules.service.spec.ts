@@ -32,7 +32,7 @@ describe('RulesService', () => {
     it('should make get request to get actions',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
             let actions: { [ name: string ]: RuleElementDto };
-            rulesService.getActions().subscribe(result => {
+            rulesService.getSteps().subscribe(result => {
                 actions = result;
             });
 
@@ -161,11 +161,10 @@ describe('RulesService', () => {
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
             const dto = new DynamicCreateRuleDto({
                 trigger: new ManualRuleTriggerDto(),
-                action: {
-                    param3: 3,
-                    param4: 4,
-                    actionType: 'Webhook',
-                },
+                flow: new DynamicFlowDefinitionDto({
+                    steps: {},
+                    initialStep: 'NONE',
+                }),
             });
 
             let rule: DynamicRuleDto;

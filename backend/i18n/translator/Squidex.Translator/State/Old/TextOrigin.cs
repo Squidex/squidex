@@ -11,5 +11,5 @@ public enum TextOrigin
 {
     Frontend,
     BackendInfrastructure,
-    BackendShared
+    BackendShared,
 }

@@ -10,7 +10,7 @@
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CodeEditorComponent, ConfirmClickDirective, FromNowPipe, RuleEventDto, TranslatePipe } from '@app/shared';
+import { CodeEditorComponent, ConfirmClickDirective, FromNowPipe, TranslatePipe } from '@app/shared';
 import { RuleClassPipe } from '../../shared/pipes';
 
 @Component({
@@ -30,7 +30,7 @@ import { RuleClassPipe } from '../../shared/pipes';
 })
 export class RuleEventComponent {
     @Input('sqxRuleEvent')
-    public event!: RuleEventDto;
+    public event!: any;
 
     @Input({ transform: booleanAttribute })
     public expanded = false;

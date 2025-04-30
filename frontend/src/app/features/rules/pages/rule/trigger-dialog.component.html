@@ -16,7 +16,7 @@
                     @case ("ContentChanged") {
                         <sqx-content-changed-trigger
                             [schemas]="schemasState.schemas | async"
-                            [trigger]="currentTrigger.form.value"
+                            [triggerDto]="currentTrigger.form.value"
                             [triggerForm]="currentTrigger"></sqx-content-changed-trigger>
                     }
                     @case ("SchemaChanged") {
@@ -28,13 +28,14 @@
                 }
             } @else {
                 <div class="row g-0">
-                    @for (triggerType of supportedTriggers | sqxKeys; track triggerType) {
+                    @for (triggerType of availableTriggers | sqxKeys; track triggerType) {
                         <div class="col-12 col-md-6">
                             <div class="rule-element" (click)="selectTrigger(triggerType)">
                                 <sqx-rule-element
-                                    [element]="$any(supportedTriggers)[triggerType]"
-                                    isSmall="false"
-                                    [type]="triggerType"></sqx-rule-element>
+                                    [elementInfo]="$any(availableTriggers)[triggerType]"
+                                    [elementType]="triggerType"
+                                    showDescription="true"
+                                    showName="true"></sqx-rule-element>
                             </div>
                         </div>
                     }
@@ -47,8 +48,8 @@
                 {{ "common.cancel" | sqxTranslate }}
             </button>
 
-            <button class="btn btn-success" type="submit">
-                {{ "common.complete" | sqxTranslate }}
+            <button class="btn btn-success" [disabled]="!currentTrigger" type="submit">
+                {{ "common.edit" | sqxTranslate }}
             </button>
         </ng-container>
     </sqx-modal-dialog>

@@ -34,8 +34,8 @@ import { RuleComponent } from './rule.component';
     ],
 })
 export class RulesPageComponent implements OnInit {
-    public supportedActions?: { [name: string]: RuleElementDto };
-    public supportedTriggers = ALL_TRIGGERS;
+    public availableTriggers = ALL_TRIGGERS;
+    public availableSteps?: { [name: string]: RuleElementDto };
 
     constructor(
         public readonly rulesState: RulesState,
@@ -47,9 +47,9 @@ export class RulesPageComponent implements OnInit {
     public ngOnInit() {
         this.rulesState.load();
 
-        this.rulesService.getActions()
-            .subscribe(actions => {
-                this.supportedActions = actions;
+        this.rulesService.getSteps()
+            .subscribe(steps => {
+                this.availableSteps = steps;
             });
 
         this.schemasState.loadIfNotLoaded();

@@ -88,17 +88,31 @@
             <div class="col-auto">
                 <h3>{{ "rules.ruleSyntax.if" | sqxTranslate }}</h3>
             </div>
-            <div class="col">
-                <sqx-rule-element disabled="true" [element]="ruleTriggers[rule.trigger.triggerType]" [type]="rule.trigger.triggerType"></sqx-rule-element>
+            <div class="col-auto">
+                <sqx-rule-element
+                    disabled="true"
+                    [elementInfo]="availableTriggers[rule.trigger.triggerType]"
+                    [elementType]="rule.trigger.triggerType"
+                    showDescription="false"
+                    showName="false" />
             </div>
             <div class="col-auto">
                 <h3>{{ "rules.ruleSyntax.then" | sqxTranslate }}</h3>
             </div>
-            <div class="col">
-                <sqx-rule-element
-                    disabled="true"
-                    [element]="$any(ruleActions[rule.action.actionType])"
-                    [type]="rule.action.actionType"></sqx-rule-element>
+            <div class="col col-flow">
+                <div class="d-flex flex-row align-items-center">
+                    @for (item of flow; track item.id) {
+                        <sqx-rule-element
+                            disabled="true"
+                            [elementInfo]="$any(availableSteps[item.step.step.stepType])"
+                            [elementType]="item.step.step.stepType"
+                            [label]="item.step.name"
+                            showDescription="false"
+                            showName="false" />
+
+                        <i class="icon-caret-right ms-2 me-2"></i>
+                    }
+                </div>
             </div>
             <div class="col col-last text-end">
                 @if (isManual) {

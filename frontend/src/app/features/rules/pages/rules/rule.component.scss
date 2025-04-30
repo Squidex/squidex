@@ -17,6 +17,16 @@ a {
     text-decoration: none;
 }
 
+.col-flow {
+    overflow: hidden;
+}
+
 .col-last {
     @include force-width(80px);
+}
+
+.icon-caret-right {
+    &:last-child {
+        display: none;
+    }
 }

@@ -1,56 +1,41 @@
-@if (isSmall) {
-    <div
-        class="small root"
-        [class.disabled]="disabled"
-        [sqxHoverBackground]="element.iconColor | sqxDarken: 5"
-        [style.background]="element.iconColor">
-        <div class="small-icon" [style.background]="element.iconColor | sqxDarken: 5">
-            <sqx-rule-icon [element]="element" size="md"></sqx-rule-icon>
-        </div>
-        <div class="small-text">
-            {{ element.display }}
-        </div>
-    </div>
-} @else {
-    <div class="row g-0 large root" [class.disabled]="disabled">
-        <div class="col-auto">
-            <div class="large-icon" [style.background]="element.iconColor | sqxDarken: 5">
-                <sqx-rule-icon [element]="element" size="lg"></sqx-rule-icon>
-            </div>
-        </div>
-        <div class="col pe-2">
-            <div class="large-title">{{ element.title || type }}</div>
-            <div class="large-text text-muted">
-                {{ element.description }}
-            </div>
-            @if (element.readMore) {
-                <div class="large-link">
-                    <a [href]="element.readMore" sqxExternalLink sqxStopClick>{{ "rules.readMore" | sqxTranslate }}</a>
-                </div>
+<div class="row gx-3 large root" [class.align-items-center]="!showDescription" [class.disabled]="disabled">
+    <div class="col-auto">
+        <div
+            class="large-icon relative d-flex align-items-center justify-content-center"
+            (click)="iconClick.emit()"
+            [style.background]="elementInfo.iconColor! | sqxDarken: 5"
+            [style.border]="'none'"
+            [title]="label || elementInfo.title">
+            <sqx-rule-icon [element]="elementInfo" size="lg"></sqx-rule-icon>
+
+            @if (showRemove) {
+                <a
+                    class="btn btn-sm rounded-full btn-outline-danger"
+                    confirmText="i18n:rules.removeElementText"
+                    confirmTitle="i18n:rules.removeElementTitle"
+                    (sqxConfirmClick)="remove.emit()"
+                    sqxStopClick=""
+                    type="button">
+                    <i class="icon-bin2"></i>
+                </a>
             }
         </div>
     </div>
-}
+    @if (showName) {
+        <div class="col">
+            <div class="large-title">{{ elementInfo.title || elementType }}</div>
 
-<ng-template #large>
-    <div class="row g-0 large root" [class.disabled]="disabled">
-        <div class="col-auto">
-            <div class="large-icon" [style.background]="element.iconColor | sqxDarken: 5">
-                <sqx-rule-icon [element]="element" size="lg"></sqx-rule-icon>
-            </div>
-        </div>
-        <div class="col pe-2">
-            <div class="large-title">{{ element.title || type }}</div>
-
-            <div class="large-text text-muted">
-                {{ element.description }}
-            </div>
-
-            @if (element.readMore) {
-                <div class="large-link">
-                    <a [href]="element.readMore" sqxExternalLink sqxStopClick>{{ "rules.readMore" | sqxTranslate }}</a>
+            @if (showDescription) {
+                <div class="large-text text-muted">
+                    {{ elementInfo.description }}
                 </div>
+
+                @if (elementInfo.readMore) {
+                    <div class="large-link">
+                        <a [href]="elementInfo.readMore" sqxExternalLink sqxStopClick>{{ "rules.readMore" | sqxTranslate }}</a>
+                    </div>
+                }
             }
         </div>
-    </div>
-</ng-template>
+    }
+</div>

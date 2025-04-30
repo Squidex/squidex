@@ -12,20 +12,17 @@ import { map } from 'rxjs/operators';
 import { ApiUrlConfig, HTTP, pretifyError, Resource, ScriptCompletions, StringHelper, VersionOrTag } from '@app/framework';
 import { DynamicCreateRuleDto, DynamicRuleDto, DynamicRulesDto, DynamicUpdateRuleDto, RuleElementDto, RuleEventsDto, SimulatedRuleEventsDto } from './../model';
 
-export type RuleElementMetadataDto = Readonly<{
+export type RuleTriggerMetadataDto = Readonly<{
     description: string;
     display: string;
-    iconColor: string;
+    iconColor?: string;
     iconCode?: string | null;
     iconImage?: string;
     title?: string;
     readMore?: string;
 }>;
 
-
-export type TriggersDto = Record<string, RuleElementMetadataDto>;
-
-export const ALL_TRIGGERS: TriggersDto = {
+export const ALL_TRIGGERS: Record<string, RuleTriggerMetadataDto> = {
     AssetChanged: {
         description: 'For asset changes like uploaded, updated (reuploaded), renamed, deleted...',
         display: 'Asset changed',
@@ -70,7 +67,7 @@ export const ALL_TRIGGERS: TriggersDto = {
     },
 };
 
-export type ActionsDto = Readonly<{ [name: string]: RuleElementDto }>;
+export type StepsDto = Readonly<{ [name: string]: RuleElementDto }>;
 
 @Injectable({
     providedIn: 'root',
@@ -82,8 +79,8 @@ export class RulesService {
     ) {
     }
 
-    public getActions(): Observable<ActionsDto> {
-        const url = this.apiUrl.buildUrl('api/rules/actions');
+    public getSteps(): Observable<StepsDto> {
+        const url = this.apiUrl.buildUrl('api/rules/steps');
 
         return this.http.get<Record<string, any>>(url).pipe(
             map(body => {

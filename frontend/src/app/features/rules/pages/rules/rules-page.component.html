@@ -24,13 +24,13 @@
                 </div>
             }
 
-            @if (supportedActions && supportedTriggers && (rulesState.isLoaded | async) && (rulesState.rules | async); as rules) {
+            @if (availableSteps && availableTriggers && (rulesState.isLoaded | async) && (rulesState.rules | async); as rules) {
                 @for (rule of rules; track rule.id) {
                     <sqx-rule
+                        [availableSteps]="availableSteps"
+                        [availableTriggers]="availableTriggers"
                         (delete)="delete(rule)"
                         [rule]="rule"
-                        [ruleActions]="supportedActions"
-                        [ruleTriggers]="supportedTriggers"
                         (toggle)="toggle(rule)"></sqx-rule>
                 } @empty {
                     <div class="table-items-row table-items-row-summary table-items-row-empty">

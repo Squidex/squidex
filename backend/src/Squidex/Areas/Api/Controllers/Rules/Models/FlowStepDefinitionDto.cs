@@ -23,9 +23,14 @@ public class FlowStepDefinitionDto
     public FlowStep Step { get; set; }
 
     /// <summary>
+    /// The optional descriptive name.
+    /// </summary>
+    public string? Name { get; set; }
+
+    /// <summary>
     /// The next step.
     /// </summary>
-    public Guid NextStepId { get; set; }
+    public Guid? NextStepId { get; set; }
 
     /// <summary>
     /// Indicates if errors should be ignored.

@@ -9,7 +9,7 @@ import { AsyncPipe, LowerCasePipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EMPTY, Observable, shareReplay } from 'rxjs';
-import { ActionForm, CodeEditorComponent, ControlErrorsComponent, ExternalLinkDirective, FormHintComponent, MarkdownDirective, RulesService, ScriptCompletions, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { CodeEditorComponent, ControlErrorsComponent, ExternalLinkDirective, FormHintComponent, MarkdownDirective, RulesService, ScriptCompletions, StepForm, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 import { BranchesInputComponent } from './branches-input.component';
 import { FormattableInputComponent } from './formattable-input.component';
 
@@ -36,7 +36,7 @@ import { FormattableInputComponent } from './formattable-input.component';
 })
 export class GenericActionComponent {
     @Input({ required: true })
-    public actionForm!: ActionForm;
+    public actionForm!: StepForm;
 
     @Input({ required: true })
     public appName!: string;

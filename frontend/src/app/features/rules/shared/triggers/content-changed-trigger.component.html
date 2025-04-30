@@ -10,10 +10,7 @@
             <div>
                 @for (form of schemasForm.controls; track form; let i = $index) {
                     <div class="mb-2">
-                        <sqx-content-changed-schema
-                            [form]="$any(form)"
-                            (remove)="removeSchema(i)"
-                            [schemas]="schemas"></sqx-content-changed-schema>
+                        <sqx-content-changed-schema [form]="$any(form)" (remove)="remove(i)" [schemas]="schemas" />
                     </div>
                 }
                 <div class="form-group row gx-2 align-items-center">
@@ -54,10 +51,7 @@
 
         @for (form of referencedSchemasForm.controls; track form; let i = $index) {
             <div class="mb-2">
-                <sqx-content-changed-schema
-                    [form]="$any(form)"
-                    (remove)="removeReferencedSchema(i)"
-                    [schemas]="schemas"></sqx-content-changed-schema>
+                <sqx-content-changed-schema [form]="$any(form)" (remove)="removeReferencedSchema(i)" [schemas]="schemas" />
             </div>
         }
 

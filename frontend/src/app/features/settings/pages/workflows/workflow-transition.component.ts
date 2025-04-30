@@ -46,6 +46,11 @@ export class WorkflowTransitionComponent {
         this.change({ roles });
     }
 
+    public remove() {
+        const { from, to } = this.transition;
+        this.update.emit(this.workflow.removeTransition(from, to));
+    }
+
     private change(changes: Partial<WorkflowTransitionValues>) {
         const { from, to } = this.transition;
         this.update.emit(this.workflow.setTransition(from, to, changes));

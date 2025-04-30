@@ -92,13 +92,16 @@ public sealed class RuleDto : Resource
 
     public static RuleDto FromDomain(EnrichedRule rule, bool canRun, IRuleRunnerService ruleRunnerService, Resources resources)
     {
-        var result = new RuleDto();
-
-        SimpleMapper.Map(rule, result);
+        var result = SimpleMapper.Map(rule, new RuleDto());
 
         if (rule.Trigger != null)
         {
             result.Trigger = RuleTriggerDtoFactory.Create(rule.Trigger);
+        }
+
+        if (rule.Flow != null)
+        {
+            result.Flow = FlowDefinitionDto.FromDomain(rule.Flow);
         }
 
         if (rule.Flow != null && rule.Flow.Steps.Count == 1)

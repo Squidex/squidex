@@ -43,7 +43,7 @@ export class RuleSimulatorPageComponent implements OnInit {
         this.subscriptions.add(
             this.messageBus.of(RuleConfigured)
                 .subscribe(message => {
-                    this.ruleSimulatorState.setRule(message.trigger, message.action);
+                    this.ruleSimulatorState.setRule(message.trigger, message.flow);
                 }));
 
         this.subscriptions.add(

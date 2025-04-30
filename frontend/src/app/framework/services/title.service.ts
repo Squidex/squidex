@@ -70,6 +70,7 @@ export class TitleService {
         }
 
         this.path$.next(clone);
+        return result;
     }
 
     public pop() {

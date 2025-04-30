@@ -10,7 +10,7 @@
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CodeEditorComponent, JoinPipe, SimulatedRuleEventDto, TranslatePipe } from '@app/shared';
+import { CodeEditorComponent, JoinPipe, TranslatePipe } from '@app/shared';
 import { RuleClassPipe, SimulatedRuleEventStatusPipe } from '../../shared/pipes';
 import { RuleTransitionComponent } from './rule-transition.component';
 
@@ -51,7 +51,7 @@ const ERRORS_FAILED = [
 })
 export class SimulatedRuleEventComponent {
     @Input('sqxSimulatedRuleEvent')
-    public event!: SimulatedRuleEventDto;
+    public event!: any;
 
     @Input({ transform: booleanAttribute })
     public expanded = false;

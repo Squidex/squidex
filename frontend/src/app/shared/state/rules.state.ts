@@ -233,10 +233,10 @@ export interface SubBranch {
     label: string;
 
     // The actual branch.
-    steps: BranchList;
+    items: BranchList;
 
     // The root step ID.
-    rootId?: string;
+    rootId?: string | null;
 
     // The function to set the root.
     setRoot: (id?: string) => void;
@@ -256,6 +256,37 @@ export class FlowView {
         return getBranches(this.dto, this.dto.steps[parentId!]);
     }
 
+    public getAllItems() {
+        const result: BranchItem[] = [];
+
+        const add = (stepId: string | undefined | null) => {
+            if (!stepId || stepId === MathHelper.EMPTY_GUID) {
+                return;
+            }
+
+            const definition = this.dto.steps[stepId];
+            if (!definition) {
+                return;
+            }
+
+            result.push({ id: stepId, step: definition });
+            if (isIf(definition)) {
+                if (Types.isArrayOfObject(definition.step.branches)) {
+                    for (const branch of definition.step.branches) {
+                        add(branch.nextStepId);
+                    }
+                }
+
+                add(definition.step.elseStepId);
+            } else {
+                add(definition.nextStepId);
+            }
+        };
+
+        add(this.dto.initialStep);
+        return result;
+    }
+
     public update(id: string, values: Mutable<IDynamicFlowStepDefinitionDto>) {
         return this.clone(clone => {
             const step = clone.steps[id];
@@ -268,7 +299,7 @@ export class FlowView {
         });
     }
 
-    public add(values: Mutable<IDynamicFlowStepDefinitionDto>, afterId?: string, parentId?: string, branchIndex: number = 0): FlowView {
+    public add(values: Mutable<IDynamicFlowStepDefinitionDto>, afterId?: string | null, parentId?: string | null, branchIndex: number = 0): FlowView {
         if ((parentId && !isIf(this.dto.steps[parentId])) ) {
             return this;
         }
@@ -283,7 +314,7 @@ export class FlowView {
 
             let afterItem: BranchItem | undefined = undefined;
             if (afterId) {
-                afterItem = branch.steps.find(x => x.id === afterId);
+                afterItem = branch.items.find(x => x.id === afterId);
                 if (!afterItem) {
                     return false;
                 }
@@ -291,13 +322,15 @@ export class FlowView {
 
             const id = this.idGenerator();
             if (!afterItem) {
-                values.nextStepId = branch.rootId;
+                if (!isIf(values)) {
+                    values.nextStepId = branch.rootId!;
+                }
                 branch.setRoot(id);
             } else {
-                const afterStep = afterItem.step as Mutable<DynamicFlowStepDefinitionDto>;
-
-                values.nextStepId = afterItem.step.nextStepId;
-                afterStep.nextStepId = id;
+                if (!isIf(values)) {
+                    values.nextStepId = afterItem.step.nextStepId;
+                }
+                (afterItem.step as Mutable<DynamicFlowStepDefinitionDto>).nextStepId = id;
             }
 
             clone.steps[id] = new DynamicFlowStepDefinitionDto(values);
@@ -305,7 +338,7 @@ export class FlowView {
         });
     }
 
-    public remove(id: string, parentId?: string, branchIndex: number = 0): FlowView {
+    public remove(id: string, parentId?: string | null, branchIndex: number = 0): FlowView {
         const step = this.dto.steps[id];
         if (!step || (parentId && !isIf(this.dto.steps[parentId])) ) {
             return this;
@@ -319,7 +352,7 @@ export class FlowView {
                 return false;
             }
 
-            const index = branch.steps.findIndex(x => x.id === id);
+            const index = branch.items.findIndex(x => x.id === id);
             if (index < 0) {
                 return false;
             }
@@ -328,7 +361,7 @@ export class FlowView {
             if (branch.rootId === id) {
                 branch.setRoot(nextId);
             } else if (index > 0) {
-                const step = branch.steps[index - 1].step as Mutable<DynamicFlowStepDefinitionDto>;
+                const step = branch.items[index - 1].step as Mutable<DynamicFlowStepDefinitionDto>;
                 step.nextStepId = nextId;
             }
 
@@ -346,19 +379,19 @@ export class FlowView {
     }
 }
 
-type IfValues = { branches: { condition: string; step?: string }[]; else: string };
+type IfValues = { branches: { condition: string; nextStepId?: string }[]; elseStepId: string | null };
 
-function isIf(definition?: DynamicFlowStepDefinitionDto) {
+function isIf(definition?: IDynamicFlowStepDefinitionDto): definition is { step: IfValues }  {
     return definition?.step['stepType'] === 'If';
 }
 
 function getBranches(flow: Mutable<DynamicFlowDefinitionDto>, parent?: DynamicFlowStepDefinitionDto): ReadonlyArray<SubBranch> {
     const result: SubBranch[] = [];
 
-    if (!parent || !isIf(parent)) {
+    if (!parent) {
         result.push({
             label: 'root',
-            steps: getBranch(flow, flow.initialStep),
+            items: getBranch(flow, flow.initialStep),
             setRoot: (id) => {
                 flow.initialStep = id!;
             },
@@ -368,37 +401,41 @@ function getBranches(flow: Mutable<DynamicFlowDefinitionDto>, parent?: DynamicFl
         return result;
     }
 
-    const { else: elseIf, branches } = parent.step as IfValues;
+    if (!isIf(parent)) {
+        return result;
+    }
+
+    const { elseStepId, branches } = parent.step;
 
     if (Types.isArrayOfObject(branches)) {
         for (const branch of branches) {
             result.push({
-                label: `if: ${branch.condition}`,
-                steps: getBranch(flow, branch.step),
+                label: branch.condition ? `if: ${branch.condition}` : 'if',
+                items: getBranch(flow, branch.nextStepId),
                 setRoot: (id) => {
-                    branch.step = id;
+                    branch.nextStepId = id;
                 },
-                rootId: branch.step,
+                rootId: branch.nextStepId,
             });
         }
     }
 
     result.push({
         label: 'else',
-        steps: getBranch(flow, elseIf),
+        items: getBranch(flow, elseStepId),
         setRoot: (id) => {
             parent.step.else = id;
         },
-        rootId: elseIf,
+        rootId: elseStepId,
     });
 
     return result;
 }
 
-function getBranch(flow: Mutable<DynamicFlowDefinitionDto>, initialStep?: string): BranchList {
+function getBranch(flow: Mutable<DynamicFlowDefinitionDto>, initialStep?: string | null): BranchList {
     const result: BranchItem[] = [];
 
-    let stepId: string | undefined = initialStep;
+    let stepId: string | undefined | null = initialStep;
     while (stepId && stepId !== MathHelper.EMPTY_GUID) {
         const step = flow.steps[stepId];
         if (!step) {
@@ -419,14 +456,14 @@ function cleanup(dto: DynamicFlowDefinitionDto) {
         ids.add(item.nextStepId);
 
         if (isIf(item)) {
-            const { else: elseIf, branches } = item.step as IfValues;
+            const { elseStepId, branches } = item.step as IfValues;
             if (Types.isArrayOfObject(branches)) {
                 for (const branch of branches) {
-                    ids.add(branch.step);
+                    ids.add(branch.nextStepId);
                 }
             }
 
-            ids.add(elseIf);
+            ids.add(elseStepId);
         }
     }
 

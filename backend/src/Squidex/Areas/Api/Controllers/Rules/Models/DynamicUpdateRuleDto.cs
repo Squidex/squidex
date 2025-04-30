@@ -32,8 +32,7 @@ public sealed class DynamicUpdateRuleDto
     /// <summary>
     /// The flow to describe the sequence of actions to perform.
     /// </summary>
-    [LocalizedRequired]
-    public DynamicFlowDefinitionDto Flow { get; set; }
+    public DynamicFlowDefinitionDto? Flow { get; set; }
 
     /// <summary>
     /// Enable or disable the rule.

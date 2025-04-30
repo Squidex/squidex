@@ -110,6 +110,7 @@ describe('RulesState', () => {
                 action: {
                     actionType: 'action3',
                 },
+                flow: new DynamicFlowDefinitionDto(),
             });
 
             rulesService.setup(x => x.postRule(app, request))
@@ -307,7 +308,7 @@ describe('FlowView', () => {
         expect(flow.dto.toJSON()).toEqual({
             initialStep: '1',
             steps: {
-                '1': { step: { stepType: 'If', branches: [], else: '2' }, nextStepId: null },
+                '1': { step: { stepType: 'If', branches: [], elseStepId: '2' }, nextStepId: null },
                 '2': { step: { stepType: 'Action' } },
             },
         });
@@ -455,7 +456,7 @@ describe('FlowView', () => {
         expect(flow.dto.toJSON()).toEqual({
             initialStep: '1',
             steps: {
-                '1': { step:  { stepType: 'If', branches: [{}], else: null }, nextStepId: null },
+                '1': { step:  { stepType: 'If', branches: [{}], elseStepId: null }, nextStepId: null },
             },
         });
     });
@@ -470,7 +471,7 @@ describe('FlowView', () => {
         expect(flow.dto.toJSON()).toEqual({
             initialStep: '1',
             steps: {
-                '1': { step:  { stepType: 'If', branches: [{ step: null }] }, nextStepId: null },
+                '1': { step:  { stepType: 'If', branches: [{ nextStepId: null }] }, nextStepId: null },
             },
         });
     });
@@ -602,7 +603,7 @@ describe('FlowView', () => {
             {
                 label: 'root',
                 rootId: '1',
-                steps: [
+                items: [
                     {
                         id: '1',
                         step: new DynamicFlowStepDefinitionDto({
@@ -612,7 +613,7 @@ describe('FlowView', () => {
                                     { condition: 'Condition1', step: '3' },
                                     { condition: 'Condition2', step: '4' },
                                 ],
-                                else: '5',
+                                elseStepId: '5',
                             },
                             nextStepId: '2',
                         }),
@@ -634,7 +635,7 @@ describe('FlowView', () => {
             {
                 label: 'if: Condition1',
                 rootId: '3',
-                steps: [
+                items: [
                     {
                         id: '3',
                         step: new DynamicFlowStepDefinitionDto({
@@ -648,7 +649,7 @@ describe('FlowView', () => {
             {
                 label: 'if: Condition2',
                 rootId: '4',
-                steps: [
+                items: [
                     {
                         id: '4',
                         step: new DynamicFlowStepDefinitionDto({
@@ -662,7 +663,7 @@ describe('FlowView', () => {
             {
                 label: 'else',
                 rootId: '5',
-                steps: [
+                items: [
                     {
                         id: '5',
                         step: new DynamicFlowStepDefinitionDto({

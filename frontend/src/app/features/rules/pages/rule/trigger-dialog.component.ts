@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { KeysPipe, ModalDialogComponent, RuleTriggerDto, SchemasState, TranslatePipe, TriggerForm, TriggersDto } from '@app/shared';
+import { KeysPipe, ManualRuleTriggerDto, ModalDialogComponent, RuleTriggerDto, RuleTriggerMetadataDto, SchemasState, TranslatePipe, TriggerForm } from '@app/shared';
 import { RuleElementComponent } from '../../shared/rule-element.component';
 import { AssetChangedTriggerComponent } from '../../shared/triggers/asset-changed-trigger.component';
 import { CommentTriggerComponent } from '../../shared/triggers/comment-trigger.component';
@@ -43,13 +43,13 @@ export class TriggerDialogComponent implements OnInit {
     public isEditable = true;
 
     @Input({ required: true })
-    public supportedTriggers!: TriggersDto;
+    public availableTriggers: Record<string, RuleTriggerMetadataDto> = {};
 
     @Output()
     public dialogClose = new EventEmitter();
 
     @Output()
-    public dialogSaved = new EventEmitter<RuleTriggerDto>();
+    public dialogSave = new EventEmitter<RuleTriggerDto>();
 
     public currentTrigger?: TriggerForm;
 
@@ -65,6 +65,10 @@ export class TriggerDialogComponent implements OnInit {
     }
 
     public selectTrigger(type: string, values?: any) {
+        if (type === 'Manual') {
+            this.dialogSave.emit(new ManualRuleTriggerDto());
+        }
+
         if (this.currentTrigger?.triggerType !== type) {
             this.currentTrigger = new TriggerForm(type);
             this.currentTrigger.setEnabled(this.isEditable);
@@ -85,6 +89,6 @@ export class TriggerDialogComponent implements OnInit {
             return;
         }
 
-        this.dialogSaved.emit(values);
+        this.dialogSave.emit(values);
     }
 }
