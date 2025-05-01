@@ -23,8 +23,8 @@ interface Snapshot extends ListState {
     // The rule trigger.
     trigger?: any;
 
-    // The rule action.
-    action?: any;
+    // The rule flow.
+    flow?: any;
 }
 
 @Injectable({
@@ -68,26 +68,26 @@ export class RuleSimulatorState extends State<Snapshot> {
 
     public load(isReload = false): Observable<any> {
         if (!isReload) {
-            const { action, ruleId, trigger } = this.snapshot;
+            const { flow, ruleId, trigger } = this.snapshot;
 
-            this.resetState({ action, ruleId, trigger }, 'Loading Initial');
+            this.resetState({ flow, ruleId, trigger }, 'Loading Initial');
         }
 
         return this.loadInternal(isReload);
     }
 
     private loadInternal(isReload: boolean): Observable<any> {
-        const { action, ruleId, trigger } = this.snapshot;
+        const { flow, ruleId, trigger } = this.snapshot;
 
-        if (!ruleId && !trigger && !action) {
+        if (!ruleId && !trigger && !flow) {
             return EMPTY;
         }
 
         this.next({ isLoading: true }, 'Loading Started');
 
         const request =
-            action && trigger ?
-            this.rulesService.postSimulatedEvents(this.appName, trigger, action) :
+            flow && trigger ?
+            this.rulesService.postSimulatedEvents(this.appName, trigger, flow) :
             this.rulesService.getSimulatedEvents(this.appName, ruleId!);
 
         return request.pipe(
@@ -113,7 +113,7 @@ export class RuleSimulatorState extends State<Snapshot> {
         this.resetState({ ruleId }, 'Select Rule');
     }
 
-    public setRule(trigger: any, action: any) {
-        this.next({ trigger, action }, 'Set Rule');
+    public setRule(trigger: any, flow: any) {
+        this.next({ trigger, flow }, 'Set Rule');
     }
 }

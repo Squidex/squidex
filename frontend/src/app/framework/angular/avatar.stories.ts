@@ -6,7 +6,7 @@
  */
 
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
-import { AvatarComponent } from '@app/framework';
+import { AvatarComponent } from './avatar.component';
 
 export default {
     title: 'Framework/Avatar',

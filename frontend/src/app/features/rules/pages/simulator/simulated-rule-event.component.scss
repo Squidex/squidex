@@ -21,8 +21,7 @@ td {
 }
 
 .event {
-    &-header,
-    &-dump {
+    &-section {
         padding: 0.75rem 1.25rem;
     }
 
@@ -37,50 +36,5 @@ td {
             font-weight: 500;
             margin: 0;
         }
-    }
-}
-
-.history {
-    border-left: 2px dashed $color-border;
-    margin: 0.5rem 0;
-    padding: 0.5rem 1.5rem;
-    padding-right: 0;
-    position: relative;
-
-    &-state {
-        position: relative;
-
-        &::before {
-            @include circle($history-dot-size);
-            @include absolute(0.5rem, null, null, -1.5rem);
-            background: $color-border;
-            content: "";
-            margin: 0;
-            margin-left: $history-dot-offset-x;
-        }
-    }
-
-    &-start,
-    &-stop {
-        @include circle($history-dot-size);
-        background: $color-border;
-    }
-
-    &-start {
-        @include absolute(
-            -$history-dot-size * 0.5,
-            null,
-            null,
-            $history-dot-offset-x
-        );
-    }
-
-    &-stop {
-        @include absolute(
-            null,
-            null,
-            -$history-dot-size * 0.5,
-            $history-dot-offset-x
-        );
     }
 }

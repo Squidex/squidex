@@ -37,7 +37,11 @@
 @if (isLoading) {
     <div class="loader text-center"><sqx-loader /></div>
 }
+
 <ng-template #contentTemplate> <ng-content></ng-content> </ng-template>
+
 <ng-template #topHeaderTemplate> <ng-content select="[topHeader]"></ng-content> </ng-template>
+
 <ng-template #headerTemplate> <ng-content select="[header]"></ng-content> </ng-template>
+
 <ng-template #footerTemplate> <ng-content select="[footer]"></ng-content> </ng-template>

@@ -1,44 +1,24 @@
-<div class="step row g-0" [class.last]="isLast">
-    <div class="col-auto pe-4 icon">
-        @if (isNext) {
-            <i class="icon-caret-right next-icon"></i>
-        }
-        <sqx-rule-element
-            [elementInfo]="stepInfo"
-            [elementType]="stepItem.step.step.stepType"
-            showDescription="false"
-            showName="false"
-            showRemove="false"
-            size="sm" />
-    </div>
-
-    <div class="col details">
-        <div class="row g-2 align-items-center mt-0">
-            <div class="col">
-                <span class="badge rounded-pill badge-{{ state?.status | sqxRuleClass }}">{{ state?.status || "Pending" }}</span>
-            </div>
-
-            <div class="col col-attempts text-sm">{{ stepItem.step.name || stepInfo.title }}</div>
-
-            <div class="col col-attempts text-sm">
-                <strong class="me-1">{{ state?.attempts?.length || 0 }}</strong> {{ "rules.ruleEvents.attempts" | sqxTranslate }}
-            </div>
-
-            <div class="col-auto">
-                <div class="col-auto">
-                    <button
-                        class="btn btn-sm btn-text-secondary text-muted btn-expand"
-                        [class.invisible]="(state?.attempts?.length || 0) === 0"
-                        (click)="toggle()"
-                        type="button">
-                        <span class="hidden">{{ "common.more" | sqxTranslate }}</span>
-                        <i class="icon-sm" [class.icon-angle-down]="isExpanded" [class.icon-angle-right]="!isExpanded"></i>
-                    </button>
-                </div>
-            </div>
+<sqx-history-step
+    [elementInfo]="stepInfo"
+    [elementType]="stepItem.step.step.stepType"
+    [isActive]="isNext"
+    [isExpandable]="!!state && state.attempts.length > 0"
+    [isFirst]="isFirst"
+    [isLast]="isLast">
+    <ng-container summary>
+        <div class="col">
+            <span class="badge rounded-pill badge-{{ state?.status | sqxRuleClass }}">{{ state?.status || "Pending" }}</span>
         </div>
 
-        @if (state && isExpanded) {
+        <div class="col col-attempts text-sm">{{ stepItem.step.name || stepInfo.title }}</div>
+
+        <div class="col text-sm">
+            <strong class="me-1">{{ state?.attempts?.length || 0 }}</strong> {{ "rules.ruleEvents.attempts" | sqxTranslate }}
+        </div>
+    </ng-container>
+
+    <ng-container details>
+        @if (state) {
             <ul class="nav nav-tabs2 mt-2">
                 @for (attempt of state.attempts; let i = $index; track i) {
                     <li class="nav-item">
@@ -52,7 +32,9 @@
                 }
             </ul>
 
-            <div class="details"><sqx-state-attempt [attempt]="state.attempts[attemptIndex]" /></div>
+            @if (state.attempts[attemptIndex]; as attempt) {
+                <div class="details"><sqx-state-attempt [attempt]="attempt" /></div>
+            }
         }
-    </div>
-</div>
+    </ng-container>
+</sqx-history-step>

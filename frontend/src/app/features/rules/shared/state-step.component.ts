@@ -8,8 +8,8 @@
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { BranchItem, FlowExecutionStepStateDto, RuleElementDto, TranslatePipe } from '@app/shared';
+import { HistoryStepComponent } from './history-step.component';
 import { RuleClassPipe } from './pipes';
-import { RuleElementComponent } from './rule-element.component';
 import { StateAttemptComponent } from './state-attempt.component';
 
 @Component({
@@ -19,7 +19,7 @@ import { StateAttemptComponent } from './state-attempt.component';
     templateUrl: './state-step.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        RuleElementComponent,
+        HistoryStepComponent,
         RuleClassPipe,
         StateAttemptComponent,
         TranslatePipe,
@@ -45,12 +45,6 @@ export class StateStepComponent {
     public state?: FlowExecutionStepStateDto;
 
     public attemptIndex = 0;
-
-    public isExpanded = false;
-
-    public toggle() {
-        this.isExpanded = !this.isExpanded;
-    }
 
     public selectAttempt(attempt: number) {
         this.attemptIndex = attempt;

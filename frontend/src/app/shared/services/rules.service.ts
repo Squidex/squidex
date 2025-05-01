@@ -189,10 +189,10 @@ export class RulesService {
             pretifyError('i18n:rules.ruleEvents.loadFailed'));
     }
 
-    public postSimulatedEvents(appName: string, trigger: any, action: any): Observable<SimulatedRuleEventsDto> {
+    public postSimulatedEvents(appName: string, trigger: any, flow: any): Observable<SimulatedRuleEventsDto> {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/simulate`);
 
-        return this.http.post<any>(url, { trigger, action }).pipe(
+        return this.http.post<any>(url, { trigger, flow }).pipe(
             map(body => {
                 return SimulatedRuleEventsDto.fromJSON(body);
             }),

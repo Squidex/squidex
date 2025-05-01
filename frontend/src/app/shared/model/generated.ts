@@ -9467,6 +9467,7 @@ export class SimulatedRuleEventDto implements ISimulatedRuleEventDto {
     readonly eventName!: string;
     /** The source event. */
     readonly event!: any;
+    readonly enrichedEvent?: any | undefined;
     /** The flow state. */
     readonly flowState?: FlowExecutionStateDto | undefined;
     /** The reason why the event has been skipped. */
@@ -9486,6 +9487,7 @@ export class SimulatedRuleEventDto implements ISimulatedRuleEventDto {
         (<any>this).uniqueId = _data["uniqueId"];
         (<any>this).eventName = _data["eventName"];
         (<any>this).event = _data["event"];
+        (<any>this).enrichedEvent = _data["enrichedEvent"];
         (<any>this).flowState = _data["flowState"] ? FlowExecutionStateDto.fromJSON(_data["flowState"]) : <any>undefined;
         if (Array.isArray(_data["skipReasons"])) {
             (<any>this).skipReasons = [] as any;
@@ -9508,6 +9510,7 @@ export class SimulatedRuleEventDto implements ISimulatedRuleEventDto {
         data["uniqueId"] = this.uniqueId;
         data["eventName"] = this.eventName;
         data["event"] = this.event;
+        data["enrichedEvent"] = this.enrichedEvent;
         data["flowState"] = this.flowState ? this.flowState.toJSON() : <any>undefined;
         if (Array.isArray(this.skipReasons)) {
             data["skipReasons"] = [];
@@ -9549,6 +9552,7 @@ export interface ISimulatedRuleEventDto {
     readonly eventName: string;
     /** The source event. */
     readonly event: any;
+    readonly enrichedEvent?: any | undefined;
     /** The flow state. */
     readonly flowState?: FlowExecutionStateDto | undefined;
     /** The reason why the event has been skipped. */

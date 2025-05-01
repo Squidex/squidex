@@ -201,6 +201,10 @@ tbody {
         @include force-width(100px);
     }
 
+    &-label2 {
+        @include force-width(140px);
+    }
+
     &-separator {
         @include force-width(60px);
     }

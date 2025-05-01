@@ -6,9 +6,10 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { BranchItem, CodeEditorComponent, FlowExecutionStateDto, RuleElementDto, TranslatePipe } from '@app/shared';
+import { HistoryStepComponent } from './history-step.component';
 import { StateStepComponent } from './state-step.component';
 
 @Component({
@@ -20,6 +21,7 @@ import { StateStepComponent } from './state-step.component';
     imports: [
         CodeEditorComponent,
         FormsModule,
+        HistoryStepComponent,
         StateStepComponent,
         TranslatePipe,
     ],
@@ -34,9 +36,6 @@ export class StateDetailsComponent {
     @Input({ required: true })
     public state!: FlowExecutionStateDto;
 
-    public isExpanded = false;
-
-    public toggle() {
-        this.isExpanded = !this.isExpanded;
-    }
+    @Input({ transform: booleanAttribute })
+    public showEvent = true;
 }

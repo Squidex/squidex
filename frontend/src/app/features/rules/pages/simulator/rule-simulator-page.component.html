@@ -27,7 +27,11 @@
                 </thead>
 
                 @for (event of ruleSimulatorState.simulatedRuleEvents | async; track event.uniqueId) {
-                    <tbody [expanded]="event.uniqueId === selectedRuleEvent" (expandedChange)="selectEvent(event)" [sqxSimulatedRuleEvent]="event"></tbody>
+                    <tbody
+                        [availableSteps]="availableSteps"
+                        [expanded]="event.uniqueId === selectedRuleEvent"
+                        (expandedChange)="selectEvent(event)"
+                        [sqxSimulatedRuleEvent]="event"></tbody>
                 }
             </table>
         </sqx-list-view>

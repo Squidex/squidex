@@ -10,8 +10,10 @@
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CodeEditorComponent, JoinPipe, TranslatePipe } from '@app/shared';
+import { BranchItem, CodeEditorComponent, FlowView, JoinPipe, RuleElementDto, SimulatedRuleEventDto, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { HistoryStepComponent } from '../../shared/history-step.component';
 import { RuleClassPipe, SimulatedRuleEventStatusPipe } from '../../shared/pipes';
+import { StateDetailsComponent } from '../../shared/state-details.component';
 import { RuleTransitionComponent } from './rule-transition.component';
 
 const ERRORS_AFTER_EVENT = [
@@ -42,16 +44,21 @@ const ERRORS_FAILED = [
     imports: [
         CodeEditorComponent,
         FormsModule,
+        HistoryStepComponent,
         JoinPipe,
         RuleClassPipe,
         RuleTransitionComponent,
         SimulatedRuleEventStatusPipe,
+        StateDetailsComponent,
         TranslatePipe,
     ],
 })
 export class SimulatedRuleEventComponent {
+    @Input({ required: true })
+    public availableSteps: Record<string, RuleElementDto> = {};
+
     @Input('sqxSimulatedRuleEvent')
-    public event!: any;
+    public event!: SimulatedRuleEventDto;
 
     @Input({ transform: booleanAttribute })
     public expanded = false;
@@ -59,7 +66,19 @@ export class SimulatedRuleEventComponent {
     @Output()
     public expandedChange = new EventEmitter<any>();
 
+    public errorsFailed = ERRORS_FAILED;
     public errorsAfterEvent = ERRORS_AFTER_EVENT;
     public errorsAfterEnrichedEvent = ERRORS_AFTER_ENRICHED_EVENT;
-    public errorsFailed = ERRORS_FAILED;
+
+    public stepItems: BranchItem[] = [];
+
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.event) {
+            if (this.event.flowState) {
+                this.stepItems = new FlowView(this.event.flowState.definition as any).getAllItems();
+            } else {
+                this.stepItems = [];
+            }
+        }
+    }
 }

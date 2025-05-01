@@ -1,5 +1,5 @@
 <tr class="table-items-row" [class.expanded]="expanded">
-    <td class="cell-label">
+    <td class="cell-label2">
         <span class="badge rounded-pill badge-{{ event | sqxSimulatedRuleEventStatus | sqxRuleClass }}">
             {{ event | sqxSimulatedRuleEventStatus }}
         </span>
@@ -23,64 +23,44 @@
 @if (expanded) {
     <tr>
         <td class="details" colspan="4">
-            <div class="event-header">
+            <div class="event-header event-section">
                 <h4>{{ "common.details" | sqxTranslate }}</h4>
             </div>
 
-            <div class="event-dump">
-                <div class="history">
-                    <div class="history-start"></div>
-
-                    <div>
-                        @if (event.event) {
-                            <sqx-rule-transition text="i18n:rules.simulation.eventQueried" />
-                            <div class="history-state">
-                                <label>{{ "common.event" | sqxTranslate }}</label>
-                                <sqx-code-editor disabled="true" height="auto" maxLines="20" [ngModel]="event.event" valueMode="Json" wordWrap="false" />
+            <div class="event-dump event-section">
+                @if (event.event) {
+                    <sqx-history-step isExpandable="true" isDefaultExpandable="true">
+                        <ng-container summary>
+                            <div class="col text-sm">
+                                {{ "rules.simulation.eventQueried" | sqxTranslate }}
                             </div>
-                            <sqx-rule-transition [errors]="errorsAfterEvent" [event]="event" text="i18n:rules.simulation.eventTriggerChecked" />
-                            @if (event.enrichedEvent) {
-                                <sqx-rule-transition text="i18n:rules.simulation.eventEnriched" />
-                                @if (event.enrichedEvent) {
-                                    <div class="history-state">
-                                        <label>{{ "rules.enrichedEvent" | sqxTranslate }}</label>
-                                        <sqx-code-editor
-                                            disabled="true"
-                                            height="auto"
-                                            maxLines="20"
-                                            [ngModel]="event.enrichedEvent"
-                                            valueMode="Json"
-                                            wordWrap="false" />
-                                    </div>
-                                }
-                                <sqx-rule-transition [errors]="errorsAfterEnrichedEvent" [event]="event" text="i18n:rules.simulation.eventConditionEvaluated" />
-                                @if (event.actionData) {
-                                    <sqx-rule-transition text="i18n:rules.simulation.actionCreated" />
-                                    <div class="history-state">
-                                        <label>{{ "rules.actionData" | sqxTranslate }}</label>
-                                        <sqx-code-editor
-                                            disabled="true"
-                                            height="auto"
-                                            maxLines="20"
-                                            [ngModel]="event.actionData"
-                                            valueMode="JsonString"
-                                            wordWrap="true" />
-                                    </div>
-                                    <sqx-rule-transition text="i18n:rules.simulation.actionExecuted" />
-                                }
-                            }
-                        }
-                        <sqx-rule-transition [errors]="errorsFailed" [event]="event" />
-                        @if (event.error) {
-                            <div class="history-state">
-                                <label>{{ "common.error" | sqxTranslate }}</label>
-                                <sqx-code-editor disabled="true" height="auto" maxLines="20" [ngModel]="event.error" wordWrap="true" />
-                            </div>
-                        }
-                    </div>
+                        </ng-container>
+                        <ng-container details>
+                            <sqx-code-editor disabled="true" height="auto" maxLines="20" [ngModel]="event.event" valueMode="Json" wordWrap="false" />
+                        </ng-container>
+                    </sqx-history-step>
+                }
 
-                    <div class="history-stop"></div>
-                </div>
+                <sqx-rule-transition [errors]="errorsAfterEvent" [event]="event" text="i18n:rules.simulation.eventTriggerChecked" />
+
+                @if (event.enrichedEvent) {
+                    <sqx-history-step isExpandable="true" isDefaultExpandable="true">
+                        <ng-container summary>
+                            <div class="col text-sm">
+                                {{ "rules.simulation.eventEnriched" | sqxTranslate }}
+                            </div>
+                        </ng-container>
+                        <ng-container details>
+                            <sqx-code-editor disabled="true" height="auto" maxLines="20" [ngModel]="event.enrichedEvent" valueMode="Json" wordWrap="false" />
+                        </ng-container>
+                    </sqx-history-step>
+                }
+
+                <sqx-rule-transition [errors]="errorsAfterEnrichedEvent" [event]="event" text="i18n:rules.simulation.eventConditionEvaluated" />
+
+                @if (event.flowState) {
+                    <sqx-state-details [availableSteps]="availableSteps" showEvent="false" [state]="event.flowState" [stepItems]="stepItems" />
+                }
             </div>
         </td>
     </tr>

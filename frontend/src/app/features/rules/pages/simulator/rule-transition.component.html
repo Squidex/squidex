@@ -1,9 +1,22 @@
+
 @if (text) {
-    <div class="history-transition">{{ text | sqxTranslate }}</div>
+    <sqx-history-step small="true">
+        <ng-container summary>
+            <div class="col text-sm">
+                {{ text | sqxTranslate }}
+            </div>
+        </ng-container>
+    </sqx-history-step>
 }
 
 @if (filteredErrors; as errors) {
     @for (error of errors; track error) {
-        <div class="history-transition text-danger">{{ error | sqxTranslate }}</div>
+        <sqx-history-step small="true">
+            <ng-container summary>
+                <div class="col text-sm text-danger">
+                    {{ error | sqxTranslate }}
+                </div>
+            </ng-container>
+        </sqx-history-step>
     }
 }

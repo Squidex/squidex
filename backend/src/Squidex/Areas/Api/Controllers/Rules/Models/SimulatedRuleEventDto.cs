@@ -33,6 +33,11 @@ public sealed class SimulatedRuleEventDto
     /// </summary>
     public object Event { get; set; }
 
+    // <summary>
+    /// The enriched event.
+    /// </summary>
+    public object? EnrichedEvent { get; set; }
+
     /// <summary>
     /// The flow state.
     /// </summary>

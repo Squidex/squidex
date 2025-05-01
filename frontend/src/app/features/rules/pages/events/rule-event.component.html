@@ -1,5 +1,5 @@
 <tr class="table-items-row" [class.expanded]="expanded">
-    <td class="cell-label">
+    <td class="cell-label2">
         <span class="badge rounded-pill badge-{{ event.flowState.status | sqxRuleClass }}">{{ event.flowState.status }}</span>
     </td>
 
@@ -38,7 +38,7 @@
     <tr>
         <td class="details" colspan="5">
             <div class="event-header event-section">
-                <h4>{{ "rules.ruleEvents.lastInvokedLabel" | sqxTranslate }}</h4>
+                <h4>{{ "common.details" | sqxTranslate }}</h4>
             </div>
 
             <div class="row g-0 event-stats event-section align-items-center">
@@ -79,7 +79,7 @@
                 </div>
             </div>
 
-            <div class="event-section mt-2">
+            <div class="event-section">
                 <sqx-state-details [availableSteps]="availableSteps" [state]="event.flowState" [stepItems]="stepItems" />
             </div>
         </td>

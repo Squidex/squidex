@@ -167,14 +167,11 @@ export class RulePageComponent implements OnInit {
     }
 
     private publishState() {
-        const editableRule = this.editableRule.value;
-        if (!editableRule.trigger) {
-            return;
-        }
+        const { trigger, flow } = this.editableRule.value;
 
-        this.messageBus.emit(new RuleConfigured(
-            editableRule.trigger,
-            editableRule.flow));
+        if (trigger) {
+            this.messageBus.emit(new RuleConfigured(trigger, flow));
+        }
     }
 
     public changeStep(values: Mutable<IDynamicFlowStepDefinitionDto>) {
