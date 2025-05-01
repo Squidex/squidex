@@ -23,7 +23,7 @@
                     @if (assetsState.parentFolder | async; as parent) {
                         <div class="folder-container" cdkDropList [cdkDropListData]="parent?.id" (cdkDropListDropped)="move($event)">
                             <div class="folder-container-over"></div>
-                            <sqx-asset-folder [assetPathItem]="parent" (navigate)="assetsState.navigate($event.id)"></sqx-asset-folder>
+                            <sqx-asset-folder [assetPathItem]="parent" (navigate)="assetsState.navigate($event.id)" />
                         </div>
                     }
                     @for (assetFolder of assetsState.folders | async; track assetFolder.id) {
@@ -41,7 +41,7 @@
                                 [cdkDragData]="assetFolder"
                                 [cdkDragDisabled]="isDisabled || !assetFolder.canMove"
                                 (delete)="deleteAssetFolder($event)"
-                                (navigate)="assetsState.navigate($event.id)"></sqx-asset-folder>
+                                (navigate)="assetsState.navigate($event.id)" />
                         </div>
                     }
                 </div>
@@ -59,7 +59,7 @@
                         [isDisabled]="isDisabled"
                         [isListView]="isListView"
                         (loadDone)="add(file, $event)"
-                        (loadError)="remove(file)"></sqx-asset>
+                        (loadError)="remove(file)" />
                 }
                 @for (asset of assets; track asset.id) {
                     <sqx-asset
@@ -76,7 +76,7 @@
                         [isSelected]="!!isSelected(asset)"
                         (loadDone)="replaceAsset($event)"
                         (selectAsset)="assetSelect.emit(asset)"
-                        (selectFolder)="selectFolder(asset)"></sqx-asset>
+                        (selectFolder)="selectFolder(asset)" />
                 }
             </div>
         }

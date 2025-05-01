@@ -12,7 +12,7 @@
             </div>
         </div>
         <div class="col-auto path">
-            <sqx-query-path [model]="model" [path]="actualComparison.path" (pathChange)="changePath($event)"></sqx-query-path>
+            <sqx-query-path [model]="model" [path]="actualComparison.path" (pathChange)="changePath($event)" />
         </div>
         <div class="col-auto operator">
             <select
@@ -39,14 +39,14 @@
                         hideDateButtons="true"
                         mode="Date"
                         [ngModel]="actualComparison.value"
-                        (ngModelChange)="changeValue($event)"></sqx-date-time-editor>
+                        (ngModelChange)="changeValue($event)" />
                 }
                 @case ("DateTime") {
                     <sqx-date-time-editor
                         hideDateButtons="true"
                         mode="DateTime"
                         [ngModel]="actualComparison.value"
-                        (ngModelChange)="changeValue($event)"></sqx-date-time-editor>
+                        (ngModelChange)="changeValue($event)" />
                 }
                 @case ("Number") {
                     <input class="form-control" [ngModel]="actualComparison.value" (ngModelChange)="changeValue($event)" type="number" />
@@ -59,7 +59,7 @@
                         [ngModel]="actualComparison.value"
                         (ngModelChange)="changeValue($event)"
                         [query]="undefined"
-                        [schemaIds]="field.schema.extra?.schemaIds"></sqx-reference-input>
+                        [schemaIds]="field.schema.extra?.schemaIds" />
                 }
                 @case ("Select") {
                     <select class="form-select" [ngModel]="actualComparison.value" (ngModelChange)="changeValue($event)">

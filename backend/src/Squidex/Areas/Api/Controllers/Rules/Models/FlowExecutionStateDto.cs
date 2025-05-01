@@ -25,6 +25,11 @@ public sealed class FlowExecutionStateDto
     public object Context { get; set; }
 
     /// <summary>
+    /// The description of the execution state (usually the event name).
+    /// </summary>
+    public string Description { get; set; } = string.Empty;
+
+    /// <summary>
     /// The state of each step.
     /// </summary>
     public Dictionary<Guid, FlowExecutionStepStateDto> Steps { get; set; } = [];
@@ -58,6 +63,7 @@ public sealed class FlowExecutionStateDto
     {
         return SimpleMapper.Map(state, new FlowExecutionStateDto
         {
+            Context = state.Context,
             Steps = state.Steps.ToDictionary(
                 x => x.Key,
                 x => FlowExecutionStepStateDto.FromDomain(x.Value)),

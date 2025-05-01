@@ -1,72 +1,115 @@
 <tr class="table-items-row" [class.expanded]="expanded">
+
     <td class="cell-label">
-        <span class="badge rounded-pill badge-{{ event.jobResult | sqxRuleClass }}">{{ event.jobResult }}</span>
+         <span class="badge rounded-pill badge-{{ event.flowState.status | sqxRuleClass }}">{{ event.flowState.status }}</span
+        >
     </td>
+
     <td class="cell-40">
-        <span class="truncate">{{ event.eventName }}</span>
+         <span class="truncate">{{ event.flowState.description }}</span
+        >
     </td>
+
     <td class="cell-60">
-        <span class="truncate">{{ event.description }}</span>
+
+        <div class="d-flex flex-row align-items-center overflow-hidden">
+
+            @for (stepItem of stepItems; track stepItem.id) {
+                 <sqx-rule-element
+                    disabled="true"
+                    [elementInfo]="$any(availableSteps[stepItem.step.step.stepType])"
+                    [elementType]="stepItem.step.step.stepType"
+                    [label]="stepItem.step.name"
+                    showDescription="false"
+                    showName="false"
+                    size="sm" /> <i class="icon-caret-right ms-2 me-2"></i>
+            }
+
+        </div>
+
     </td>
+
     <td class="cell-time">
-        <small class="item-modified">{{ event.created | sqxFromNow }}</small>
+         <small class="item-modified">{{ event.flowState.created | sqxFromNow }}</small
+        >
     </td>
+
     <td class="cell-actions">
-        <button class="btn btn-outline-secondary btn-expand" [class.expanded]="expanded" (click)="expandedChange.emit()" type="button">
-            <span class="hidden">{{ "common.settings" | sqxTranslate }}</span>
-            <i class="icon-settings"></i>
-        </button>
+         <button class="btn btn-outline-secondary btn-expand" [class.expanded]="expanded" (click)="expandedChange.emit()" type="button">
+             <span class="hidden">{{ "common.settings" | sqxTranslate }}</span
+            > <i class="icon-settings"></i> </button
+        >
     </td>
+
 </tr>
+
 @if (expanded) {
+
     <tr>
+
         <td class="details" colspan="5">
-            <div class="event-header">
+
+            <div class="event-header event-section">
+
                 <h4>{{ "rules.ruleEvents.lastInvokedLabel" | sqxTranslate }}</h4>
+
             </div>
-            <div class="row g-0 event-stats align-items-center">
-                <div class="col-3">
-                    <span class="badge rounded-pill badge-{{ event.result | sqxRuleClass }}">{{ event.result }}</span>
+
+            <div class="row g-0 event-stats event-section align-items-center">
+
+                <div class="col">
+                     <label>{{ "common.created" | sqxTranslate }}:&nbsp;</label> <span class="text-sm"
+                        > {{ event.flowState.created.toISOString() }} </span
+                    >
                 </div>
-                <div class="col-2">{{ "rules.ruleEvents.numAttemptsLabel" | sqxTranslate }}: {{ event.numCalls }}</div>
-                <div class="col-4">
-                    {{ "rules.ruleEvents.nextAttemptLabel" | sqxTranslate }}:
-                    @if (event.nextAttempt) {
-                        {{ event.nextAttempt | sqxFromNow }}
-                    }
+
+                <div class="col">
+                     <label>{{ "rules.ruleEvents.nextAttemptLabel" | sqxTranslate }}:&nbsp;</label> <span class="text-sm"
+                        >
+                        @if (event.flowState.nextRun) {
+                             {{ event.flowState.nextRun | sqxFromNow }}
+                        }
+
+                        @else {
+                             -
+                        }
+                         </span
+                    >
                 </div>
+
                 <div class="col-3 text-end">
+
                     @if (event.canDelete) {
-                        <button
+                         <button
                             class="btn btn-danger me-1"
                             confirmRememberKey="cancelRuleEvent"
                             confirmText="i18n:rules.ruleEvents.cancelConfirmText"
                             confirmTitle="i18n:rules.ruleEvents.cancelConfirmTitle"
                             (sqxConfirmClick)="cancel.emit()"
                             type="button">
-                            {{ "common.cancel" | sqxTranslate }}
-                        </button>
+                             {{ "common.cancel" | sqxTranslate }} </button
+                        >
                     }
+
                     @if (event.canUpdate) {
-                        <button class="btn btn-success" (click)="enqueue.emit()" type="button">
-                            {{ "rules.ruleEvents.enqueue" | sqxTranslate }}
-                        </button>
+                         <button class="btn btn-success" (click)="enqueue.emit()" type="button">
+                             {{ "rules.ruleEvents.enqueue" | sqxTranslate }} </button
+                        >
                     }
+
                 </div>
+
             </div>
-            @if (event.lastDump) {
-                <div class="row event-dump">
-                    <div class="col-12">
-                        <sqx-code-editor
-                            disabled="true"
-                            height="auto"
-                            mode="ace/mode/text"
-                            [ngModel]="event.lastDump"
-                            wordWrap="true"></sqx-code-editor>
-                    </div>
-                </div>
-            }
+
+            <div class="event-section mt-2">
+                 <sqx-state-details [availableSteps]="availableSteps" [state]="event.flowState" [stepItems]="stepItems" />
+            </div>
+
         </td>
+
     </tr>
+
 }
+
 <tr class="spacer"></tr>
+

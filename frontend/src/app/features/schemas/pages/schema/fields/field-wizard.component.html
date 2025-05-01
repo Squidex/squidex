@@ -1,59 +1,82 @@
-<sqx-modal-dialog (dialogClose)="emitClose()" size="lg" tourId="fieldForm">
-    <ng-container title>
+<sqx-modal-dialog (dialogClose)="emitClose()" size="lg" tourId="fieldForm"
+    > <ng-container title
+        >
         @if (parent) {
-            {{ "schemas.addNestedField" | sqxTranslate }}
-        } @else {
-            {{ "schemas.addField" | sqxTranslate }}
+             {{ "schemas.addNestedField" | sqxTranslate }}
         }
-    </ng-container>
 
-    <ng-container content>
+        @else {
+             {{ "schemas.addField" | sqxTranslate }}
+        }
+         </ng-container
+    > <ng-container content
+        >
         @if (editForm) {
+
             <form class="edit-form" [formGroup]="editForm.form" (ngSubmit)="save('Close')">
-                <sqx-field-form
+                 <sqx-field-form
                     [field]="editField"
                     [fieldForm]="editForm.form"
                     isEditable="true"
                     [isLocalizable]="isLocalizable"
                     [languages]="(languagesState.isoLanguages | async)!"
                     [schema]="schema"
-                    [settings]="settings"></sqx-field-form>
+                    [settings]="settings" />
             </form>
-        } @else {
+
+        }
+
+        @else {
+
             <form [formGroup]="addFieldForm.form" (ngSubmit)="addField('Close')">
-                <sqx-form-error [error]="addFieldForm.error | async"></sqx-form-error>
+                 <sqx-form-error [error]="addFieldForm.error | async" />
                 <div class="form-group">
+
                     <div class="row">
+
                         @for (fieldType of fieldTypes; track fieldType) {
+
                             <div class="col-4 type">
-                                <label>
-                                    <input
+                                 <label
+                                    > <input
                                         class="radio-input"
                                         formControlName="type"
                                         name="type"
                                         type="radio"
                                         value="{{ fieldType.type }}" />
                                     <div class="row g-0">
+
                                         <div class="col-auto">
+
                                             <div
                                                 class="btn-radio"
                                                 [class.active]="addFieldForm.form.controls['type'].value === fieldType.type">
-                                                <i class="icon-type-{{ fieldType.type }}"></i>
+                                                 <i class="icon-type-{{ fieldType.type }}"></i>
                                             </div>
+
                                         </div>
+
                                         <div class="col">
+
                                             <div class="type-title">{{ fieldType.type }}</div>
+
                                             <div class="type-text text-muted">{{ fieldType.description | sqxTranslate }}</div>
+
                                         </div>
+
                                     </div>
-                                </label>
+                                     </label
+                                >
                             </div>
+
                         }
+
                     </div>
+
                 </div>
+
                 <div class="form-group">
-                    <sqx-control-errors for="name"></sqx-control-errors>
-                    <input
+                     <sqx-control-errors for="name" /> <input
                         class="form-control"
                         #nameInput
                         formControlName="name"
@@ -61,88 +84,89 @@
                         placeholder="{{ 'schemas.field.namePlaceholder' | sqxTranslate }}"
                         sqxFocusOnInit />
                 </div>
+
                 @if (schema.type !== "Component" && !parent && (addFieldForm.isContentField | async)) {
+
                     <div class="form-group">
+
                         <div class="form-check">
-                            <input class="form-check-input" id="isLocalizable" formControlName="isLocalizable" type="checkbox" />
-                            <label class="form-check-label" for="isLocalizable">
-                                {{ "schemas.field.localizable" | sqxTranslate }}
-                            </label>
+                             <input class="form-check-input" id="isLocalizable" formControlName="isLocalizable" type="checkbox" /> <label
+                                class="form-check-label"
+                                for="isLocalizable"
+                                > {{ "schemas.field.localizable" | sqxTranslate }} </label
+                            >
                         </div>
-                        <sqx-form-hint>
-                            {{ "schemas.field.localizableHint" | sqxTranslate }}
-                        </sqx-form-hint>
+                         <sqx-form-hint> {{ "schemas.field.localizableHint" | sqxTranslate }} </sqx-form-hint>
                     </div>
+
                 }
-                <sqx-form-alert class="mt-4">
-                    {{ "schemas.nameWarning" | sqxTranslate }}
-                </sqx-form-alert>
+                 <sqx-form-alert class="mt-4"> {{ "schemas.nameWarning" | sqxTranslate }} </sqx-form-alert>
             </form>
+
         }
-    </ng-container>
-
-    <ng-container footer>
-        <button class="float-start btn btn-text-secondary" (click)="emitClose()" type="button">
-            {{ "common.cancel" | sqxTranslate }}
-        </button>
-
+         </ng-container
+    > <ng-container footer
+        > <button class="float-start btn btn-text-secondary" (click)="emitClose()" type="button">
+             {{ "common.cancel" | sqxTranslate }} </button
+        >
         @if (!editForm) {
+
             <div>
+
                 <div class="btn-group ms-2" attr.aria-label="{{ 'schemas.addField' | sqxTranslate }}" role="group">
-                    <button class="btn btn-success" (click)="addField('Close')" shortcut="CTRL + SHIFT + S">
-                        {{ "schemas.addFieldAndClose" | sqxTranslate }}
-                    </button>
-                    <button
+                     <button class="btn btn-success" (click)="addField('Close')" shortcut="CTRL + SHIFT + S">
+                         {{ "schemas.addFieldAndClose" | sqxTranslate }} </button
+                    > <button
                         class="btn btn-success"
                         #buttonSave
                         attr.aria-label="{{ 'common.more' | sqxTranslate }}"
                         (click)="addFieldModal.toggle()"
                         type="button">
-                        <i class="icon-angle-down"></i>
-                    </button>
-
-                    <sqx-dropdown-menu
+                         <i class="icon-angle-down"></i> </button
+                    > <sqx-dropdown-menu
                         position="top-end"
                         scrollY="true"
                         [sqxAnchoredTo]="buttonSave"
-                        *sqxModal="addFieldModal; closeAlways: true">
-                        <a class="dropdown-item" (click)="addField('Add')">
-                            {{ "schemas.addFieldAndCreate" | sqxTranslate }}
-                        </a>
-                        <a class="dropdown-item" (click)="addField('Edit')">
-                            {{ "schemas.addFieldAndEdit" | sqxTranslate }}
-                        </a>
-                    </sqx-dropdown-menu>
+                        *sqxModal="addFieldModal; closeAlways: true"
+                        > <a class="dropdown-item" (click)="addField('Add')"> {{ "schemas.addFieldAndCreate" | sqxTranslate }} </a> <a
+                            class="dropdown-item"
+                            (click)="addField('Edit')"
+                            > {{ "schemas.addFieldAndEdit" | sqxTranslate }} </a
+                        > </sqx-dropdown-menu
+                    >
                 </div>
+
             </div>
+
         }
 
         @if (editForm) {
+
             <div>
+
                 <div class="btn-group ms-2" attr.aria-label="{{ 'schemas.saveField' | sqxTranslate }}" role="group">
-                    <button class="btn btn-primary" (click)="save('Close')" shortcut="CTRL + SHIFT + S">
-                        {{ "schemas.saveFieldAndClose" | sqxTranslate }}
-                    </button>
-                    <button
+                     <button class="btn btn-primary" (click)="save('Close')" shortcut="CTRL + SHIFT + S">
+                         {{ "schemas.saveFieldAndClose" | sqxTranslate }} </button
+                    > <button
                         class="btn btn-primary"
                         #buttonSave
                         attr.aria-label="{{ 'common.more' | sqxTranslate }}"
                         (click)="addFieldModal.toggle()"
                         type="button">
-                        <i class="icon-angle-down"></i>
-                    </button>
-
-                    <sqx-dropdown-menu
+                         <i class="icon-angle-down"></i> </button
+                    > <sqx-dropdown-menu
                         position="bottom-end"
                         scrollY="true"
                         [sqxAnchoredTo]="buttonSave"
-                        *sqxModal="addFieldModal; closeAlways: true">
-                        <a class="dropdown-item" (click)="save('Add')">
-                            {{ "schemas.saveFieldAndNew" | sqxTranslate }}
-                        </a>
-                    </sqx-dropdown-menu>
+                        *sqxModal="addFieldModal; closeAlways: true"
+                        > <a class="dropdown-item" (click)="save('Add')"> {{ "schemas.saveFieldAndNew" | sqxTranslate }} </a>
+                        </sqx-dropdown-menu
+                    >
                 </div>
+
             </div>
+
         }
-    </ng-container>
-</sqx-modal-dialog>
+         </ng-container
+    > </sqx-modal-dialog
+>

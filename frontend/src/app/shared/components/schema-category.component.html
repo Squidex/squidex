@@ -19,7 +19,7 @@
                         [inputTitle]="schemaCategory.displayName | sqxTranslate"
                         (inputTitleChange)="changeName($event)"
                         inputTitleLength="30"
-                        size="sm"></sqx-editable-title>
+                        size="sm" />
                 </div>
                 <div class="col-auto">
                     @if (schemaCategory.countSchemasInSubtree > 0) {
@@ -91,7 +91,7 @@
             <sqx-schema-category
                 (remove)="remove.emit($event)"
                 [schemaCategory]="category"
-                [schemaTarget]="schemaTarget"></sqx-schema-category>
+                [schemaTarget]="schemaTarget" />
         }
     </div>
 </ul>

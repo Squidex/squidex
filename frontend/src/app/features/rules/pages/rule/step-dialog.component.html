@@ -1,21 +1,19 @@
 <form [formGroup]="currentStep?.form!" (ngSubmit)="save()">
     <sqx-modal-dialog (dialogClose)="dialogClose.emit()" size="xl">
-        <ng-container title>
-            {{ "rules.step.edit" | sqxTranslate }}
-        </ng-container>
-
+        <ng-container title> {{ "rules.step.edit" | sqxTranslate }} </ng-container>
         <ng-container content>
             @if (currentStep) {
                 <div class="form-horizontal" [formGroup]="currentStep.form">
                     <div class="form-group row">
                         <label class="col-3 col-form-label" for="stepName">{{ "common.name" | sqxTranslate }}</label>
-
                         <div class="col-9">
-                            <input class="form-control" id="stepName" [(ngModel)]="stepName" [ngModelOptions]="{ standalone: true }" maxlength="40" />
-
-                            <sqx-form-hint>
-                                {{ "rules.stepNameHint" | sqxTranslate }}
-                            </sqx-form-hint>
+                            <input
+                                class="form-control"
+                                id="stepName"
+                                maxlength="40"
+                                [(ngModel)]="stepName"
+                                [ngModelOptions]="{ standalone: true }" />
+                            <sqx-form-hint> {{ "rules.stepNameHint" | sqxTranslate }} </sqx-form-hint>
                         </div>
                     </div>
 
@@ -27,14 +25,9 @@
                                 [(ngModel)]="stepIgnore"
                                 [ngModelOptions]="{ standalone: true }"
                                 type="checkbox" />
-                            <label class="form-check-label" for="stepIgnore">
-                                {{ "rules.stepIgnoreErrorHint" | sqxTranslate }}
-                            </label>
+                            <label class="form-check-label" for="stepIgnore"> {{ "rules.stepIgnoreErrorHint" | sqxTranslate }} </label>
                         </div>
-
-                        <sqx-form-hint>
-                            {{ "rules.ignoreErrorHint" | sqxTranslate }}
-                        </sqx-form-hint>
+                        <sqx-form-hint> {{ "rules.ignoreErrorHint" | sqxTranslate }} </sqx-form-hint>
                     </div>
 
                     <hr />
@@ -45,28 +38,30 @@
                                 @if (property.editor !== "Checkbox") {
                                     {{ property.display }}
                                 }
+
                                 @if (property.isRequired) {
                                     <small class="hint">&nbsp;*</small>
                                 }
                             </label>
-
                             <div class="col-9">
-                                <sqx-control-errors [for]="property.name"></sqx-control-errors>
-
+                                <sqx-control-errors [for]="property.name" />
                                 @switch (property.editor) {
                                     @case ("Text") {
                                         @if (property.isFormattable) {
-                                            <sqx-formattable-input [formControlName]="property.name" type="Text"></sqx-formattable-input>
+                                            <sqx-formattable-input [formControlName]="property.name" type="Text" />
+
                                         } @else {
                                             <input class="form-control" id="{{ property.name }}" [formControlName]="property.name" />
                                         }
                                     }
+
                                     @case ("TextArea") {
                                         @if (property.isFormattable) {
                                             <sqx-formattable-input
                                                 [completion]="scriptCompletions"
                                                 [formControlName]="property.name"
-                                                type="Code"></sqx-formattable-input>
+                                                type="Code" />
+
                                         } @else {
                                             <textarea
                                                 class="form-control"
@@ -74,12 +69,14 @@
                                                 [formControlName]="property.name"></textarea>
                                         }
                                     }
+
                                     @case ("Javascript") {
                                         <sqx-code-editor
                                             [completion]="scriptCompletions"
                                             [formControlName]="property.name"
-                                            [height]="350"></sqx-code-editor>
+                                            [height]="350" />
                                     }
+
                                     @case ("Checkbox") {
                                         <div class="form-check">
                                             <input
@@ -87,11 +84,10 @@
                                                 id="{{ property.name }}"
                                                 [formControlName]="property.name"
                                                 type="checkbox" />
-                                            <label class="form-check-label" for="{{ property.name }}">
-                                                {{ property.display }}
-                                            </label>
+                                            <label class="form-check-label" for="{{ property.name }}"> {{ property.display }} </label>
                                         </div>
                                     }
+
                                     @case ("Dropdown") {
                                         <select class="form-select" [formControlName]="property.name">
                                             @if (!property.isRequired) {
@@ -103,11 +99,11 @@
                                             }
                                         </select>
                                     }
+
                                     @case ("Branches") {
-                                        <sqx-branches-input
-                                            [control]="currentStep.branch(property.name)"
-                                            [isEditable]="isEditable"></sqx-branches-input>
+                                        <sqx-branches-input [control]="currentStep.branch(property.name)" [isEditable]="isEditable" />
                                     }
+
                                     @default {
                                         <input
                                             class="form-control"
@@ -116,10 +112,8 @@
                                             type="{{ property.editor | lowercase }}" />
                                     }
                                 }
-
                                 <sqx-form-hint>
                                     <span inline="true" [sqxMarkdown]="property.description"></span>
-
                                     @if (property.isFormattable) {
                                         <div>
                                             {{ "rules.advancedFormattingHint" | sqxTranslate }}:
@@ -133,6 +127,7 @@
                         </div>
                     }
                 </div>
+
             } @else {
                 <div class="row g-0">
                     @for (stepType of availableSteps | sqxKeys; track stepType) {
@@ -142,21 +137,18 @@
                                     [elementInfo]="$any(availableSteps)[stepType]"
                                     [elementType]="stepType"
                                     showDescription="true"
-                                    showName="true"></sqx-rule-element>
+                                    showName="true" />
                             </div>
                         </div>
                     }
                 </div>
             }
         </ng-container>
-
         <ng-container footer>
             <button class="btn btn-text-secondary" (click)="dialogClose.emit()" type="button">
                 {{ "common.cancel" | sqxTranslate }}
             </button>
-            <button class="btn btn-success" [disabled]="!currentStep" type="submit">
-                {{ "common.edit" | sqxTranslate }}
-            </button>
+            <button class="btn btn-success" [disabled]="!currentStep" type="submit">{{ "common.edit" | sqxTranslate }}</button>
         </ng-container>
     </sqx-modal-dialog>
 </form>

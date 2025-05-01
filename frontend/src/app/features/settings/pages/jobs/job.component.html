@@ -2,7 +2,7 @@
     <div class="table-items-row-summary">
         <div class="row align-items-center">
             <div class="col-auto pe-4">
-                <sqx-status-icon size="lg" [status]="job.status"></sqx-status-icon>
+                <sqx-status-icon size="lg" [status]="job.status" />
             </div>
             <div class="col">
                 <div>
@@ -11,7 +11,7 @@
 
                 <div class="row">
                     <div class="col">
-                        {{ "jobs.startedLabel" | sqxTranslate }}:
+                        {{ "common.started" | sqxTranslate }}:
 
                         <span>{{ job.started | sqxFromNow }}</span>
                     </div>
@@ -69,7 +69,7 @@
                         minLines="12"
                         mode="ace/mode/text"
                         [ngModel]="details"
-                        wordWrap="true"></sqx-code-editor>
+                        wordWrap="true" />
                 </div>
             </div>
         </div>

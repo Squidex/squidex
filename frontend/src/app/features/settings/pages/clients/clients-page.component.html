@@ -1,4 +1,4 @@
-<sqx-title message="i18n:common.clients"></sqx-title>
+<sqx-title message="i18n:common.clients" />
 
 <sqx-layout innerWidth="50" layout="main" titleIcon="clients" titleText="i18n:common.clients">
     <ng-container menu>
@@ -12,11 +12,11 @@
         <sqx-list-view innerWidth="50rem" [isLoading]="clientsState.isLoading | async">
             @if ((clientsState.isLoaded | async) && (clientsState.clients | async); as clients) {
                 @if (clientsState.canCreate | async) {
-                    <sqx-client-add-form></sqx-client-add-form>
+                    <sqx-client-add-form />
                 }
                 @if (rolesState.roles | async; as roles) {
                     @for (client of clients; track client.id) {
-                        <sqx-client [client]="client" [clientRoles]="roles"></sqx-client>
+                        <sqx-client [client]="client" [clientRoles]="roles" />
                     } @empty {
                         <div class="table-items-row table-items-row-summary table-items-row-empty">
                             {{ "clients.empty" | sqxTranslate }}

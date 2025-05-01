@@ -31,14 +31,14 @@
             [data]="content.data"
             [language]="language"
             [languages]="languages"
-            [schema]="schema"></sqx-translation-status>
+            [schema]="schema" />
     }
     @case (metaFields.translationStatusAverage) {
         <sqx-translation-status
             [data]="content.data"
             [language]="undefined"
             [languages]="languages"
-            [schema]="schema"></sqx-translation-status>
+            [schema]="schema" />
     }
     @case (metaFields.status) {
         @if (content.newStatus) {
@@ -48,7 +48,7 @@
                         layout="text"
                         [status]="content.status"
                         [statusColor]="content.statusColor"
-                        truncate="true"></sqx-content-status>
+                        truncate="true" />
                 </div>
                 <div class="col-auto">
                     <i class="icon-caret-right"></i>
@@ -59,7 +59,7 @@
                         [scheduled]="content.scheduleJob"
                         [status]="content.newStatus"
                         [statusColor]="content.newStatusColor!"
-                        truncate="true"></sqx-content-status>
+                        truncate="true" />
                 </div>
             </div>
         } @else {
@@ -68,7 +68,7 @@
                 [scheduled]="content.scheduleJob"
                 [status]="content.status"
                 [statusColor]="content.statusColor"
-                truncate="true"></sqx-content-status>
+                truncate="true" />
         }
     }
     @case (metaFields.statusNext) {
@@ -77,7 +77,7 @@
                 <sqx-content-status
                     layout="text"
                     [status]="content.scheduleJob.status"
-                    [statusColor]="content.scheduleJob.color"></sqx-content-status>
+                    [statusColor]="content.scheduleJob.color" />
 
                 {{ "contents.scheduledAt" | sqxTranslate }}&nbsp;{{ content.scheduleJob.dueTime | sqxShortDate }}
             </span>
@@ -86,27 +86,27 @@
     @case (metaFields.statusColor) {
         @if (content.newStatus) {
             <span class="text-nowrap truncate">
-                <sqx-content-status [status]="content.status" [statusColor]="content.statusColor"></sqx-content-status>
+                <sqx-content-status [status]="content.status" [statusColor]="content.statusColor" />
 
                 <i class="icon-caret-right"></i>
 
                 <sqx-content-status
                     [scheduled]="content.scheduleJob"
                     [status]="content.newStatus"
-                    [statusColor]="content.newStatusColor!"></sqx-content-status>
+                    [statusColor]="content.newStatusColor!" />
             </span>
         } @else {
             <sqx-content-status
                 [scheduled]="content.scheduleJob"
                 [status]="content.status"
-                [statusColor]="content.statusColor"></sqx-content-status>
+                [statusColor]="content.statusColor" />
         }
     }
     @default {
         @if (field.rootField && isInlineEditable && patchAllowed && patchForm) {
-            <sqx-content-value-editor [field]="field.rootField" [form]="patchForm"></sqx-content-value-editor>
+            <sqx-content-value-editor [field]="field.rootField" [form]="patchForm" />
         } @else {
-            <sqx-content-value [field]="field" [fields]="fields" [value]="snapshot.formatted"></sqx-content-value>
+            <sqx-content-value [field]="field" [fields]="fields" [value]="snapshot.formatted" />
         }
     }
 }

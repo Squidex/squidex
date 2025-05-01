@@ -1,8 +1,8 @@
-@import 'mixins';
-@import 'vars';
+@import "mixins";
+@import "vars";
 
 .card {
-    margin-bottom: .5rem;
+    margin-bottom: 0.5rem;
 
     &-footer {
         font-size: $font-small;

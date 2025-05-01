@@ -1,4 +1,4 @@
-<sqx-title message="i18n:common.workflows"></sqx-title>
+<sqx-title message="i18n:common.workflows" />
 
 <sqx-layout innerWidth="80" layout="main" titleIcon="workflows" titleText="i18n:common.workflows">
     <ng-container menu>
@@ -30,14 +30,14 @@
 
                 @if (schemasSource && (workflowsState.isLoaded | async) && (workflowsState.workflows | async); as workflows) {
                     @for (workflow of workflows; track workflow.id) {
-                        <sqx-workflow [roles]="roles" [schemasSource]="schemasSource" [workflow]="workflow"></sqx-workflow>
+                        <sqx-workflow [roles]="roles" [schemasSource]="schemasSource" [workflow]="workflow" />
                     } @empty {
                         <div class="table-items-row table-items-row-summary table-items-row-empty">
                             {{ "workflows.empty" | sqxTranslate }}
                         </div>
                     }
                     @if (workflowsState.canCreate | async) {
-                        <sqx-workflow-add-form></sqx-workflow-add-form>
+                        <sqx-workflow-add-form />
                     }
                 }
             </ng-container>

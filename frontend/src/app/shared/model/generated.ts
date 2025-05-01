@@ -7224,7 +7224,6 @@ export interface ICreateContentFlowStepFlowStepDto extends IFlowStepDto {
 export class DelayFlowStepFlowStepDto extends FlowStepDto implements IDelayFlowStepFlowStepDto {
     /** The delay in seconds. */
     readonly delayInSec!: number;
-    readonly clock!: IClockDto;
 
     constructor(data?: IDelayFlowStepFlowStepDto) {
         super(data);
@@ -7234,7 +7233,6 @@ export class DelayFlowStepFlowStepDto extends FlowStepDto implements IDelayFlowS
     init(_data: any) {
         super.init(_data);
         (<any>this).delayInSec = _data["delayInSec"];
-        (<any>this).clock = _data["clock"] ? IClockDto.fromJSON(_data["clock"]) : <any>undefined;
         this.cleanup(this);
         return this;
     }
@@ -7248,7 +7246,6 @@ export class DelayFlowStepFlowStepDto extends FlowStepDto implements IDelayFlowS
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         data["delayInSec"] = this.delayInSec;
-        data["clock"] = this.clock ? this.clock.toJSON() : <any>undefined;
         super.toJSON(data);
         this.cleanup(data);
         return data;
@@ -7258,62 +7255,6 @@ export class DelayFlowStepFlowStepDto extends FlowStepDto implements IDelayFlowS
 export interface IDelayFlowStepFlowStepDto extends IFlowStepDto {
     /** The delay in seconds. */
     readonly delayInSec: number;
-    readonly clock: IClockDto;
-}
-
-/** Represents a clock which can return the current time as an Instant. */
-export abstract class IClockDto implements IIClockDto {
-    /** Uses the cache values because the actual object is frozen. */
-    private readonly cachedValues: { [key: string]: any } = {};
-
-    constructor(data?: IIClockDto) {
-        if (data) {
-            for (var property in data) {
-                if (data.hasOwnProperty(property))
-                    (<any>this)[property] = (<any>data)[property];
-            }
-        }
-    }
-
-    init(_data: any) {
-        this.cleanup(this);
-        return this;
-    }
-
-    static fromJSON(data: any): IClockDto {
-        throw new Error("The abstract class 'IClockDto' cannot be instantiated.");
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {}; 
-        this.cleanup(data);
-        return data;
-    }
-
-    protected cleanup(target: any) {
-        for (var property in target) {
-            if (target.hasOwnProperty(property)) {
-                const value = target[property];
-                if (value === undefined) {
-                    delete target[property];
-                }
-            }
-        }
-    }
-
-    protected compute<T>(key: string, action: () => T): T {
-        if (!this.cachedValues.hasOwnProperty(key)) {
-            const value = action();
-            this.cachedValues[key] = value;
-            return value;
-        } else {
-            return this.cachedValues[key] as any;
-        }
-    }
-}
-
-/** Represents a clock which can return the current time as an Instant. */
-export interface IIClockDto {
 }
 
 export class DiscourseFlowStepFlowStepDto extends FlowStepDto implements IDiscourseFlowStepFlowStepDto {
@@ -9621,6 +9562,8 @@ export class FlowExecutionStateDto implements IFlowExecutionStateDto {
     readonly definition!: FlowDefinitionDto;
     /** The context. */
     readonly context!: any;
+    /** The description of the execution state (usually the event name). */
+    readonly description!: string;
     /** The state of each step. */
     readonly steps!: { [key: string]: FlowExecutionStepStateDto; };
     /** The next step to be executed. */
@@ -9646,6 +9589,7 @@ export class FlowExecutionStateDto implements IFlowExecutionStateDto {
     init(_data: any) {
         (<any>this).definition = _data["definition"] ? FlowDefinitionDto.fromJSON(_data["definition"]) : new FlowDefinitionDto();
         (<any>this).context = _data["context"];
+        (<any>this).description = _data["description"];
         if (_data["steps"]) {
             (<any>this).steps = {} as any;
             for (let key in _data["steps"]) {
@@ -9672,6 +9616,7 @@ export class FlowExecutionStateDto implements IFlowExecutionStateDto {
         data = typeof data === 'object' ? data : {}; 
         data["definition"] = this.definition ? this.definition.toJSON() : <any>undefined;
         data["context"] = this.context;
+        data["description"] = this.description;
         if (this.steps) {
             data["steps"] = {};
             for (let key in this.steps) {
@@ -9715,6 +9660,8 @@ export interface IFlowExecutionStateDto {
     readonly definition: FlowDefinitionDto;
     /** The context. */
     readonly context: any;
+    /** The description of the execution state (usually the event name). */
+    readonly description: string;
     /** The state of each step. */
     readonly steps: { [key: string]: FlowExecutionStepStateDto; };
     /** The next step to be executed. */
@@ -9911,7 +9858,7 @@ export class FlowExecutionStepLogEntryDto implements IFlowExecutionStepLogEntryD
     /** Uses the cache values because the actual object is frozen. */
     private readonly cachedValues: { [key: string]: any } = {};
     /** The timestamp. */
-    readonly timeStamp!: DateTime;
+    readonly timestamp!: DateTime;
     /** The log message. */
     readonly message!: string;
     /** A detailed dump. */
@@ -9927,7 +9874,7 @@ export class FlowExecutionStepLogEntryDto implements IFlowExecutionStepLogEntryD
     }
 
     init(_data: any) {
-        (<any>this).timeStamp = _data["timeStamp"] ? DateTime.parseISO(_data["timeStamp"].toString()) : <any>undefined;
+        (<any>this).timestamp = _data["timestamp"] ? DateTime.parseISO(_data["timestamp"].toString()) : <any>undefined;
         (<any>this).message = _data["message"];
         (<any>this).dump = _data["dump"];
         this.cleanup(this);
@@ -9942,7 +9889,7 @@ export class FlowExecutionStepLogEntryDto implements IFlowExecutionStepLogEntryD
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
-        data["timeStamp"] = this.timeStamp ? this.timeStamp.toISOString() : <any>undefined;
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
         data["message"] = this.message;
         data["dump"] = this.dump;
         this.cleanup(data);
@@ -9973,7 +9920,7 @@ export class FlowExecutionStepLogEntryDto implements IFlowExecutionStepLogEntryD
 
 export interface IFlowExecutionStepLogEntryDto {
     /** The timestamp. */
-    readonly timeStamp: DateTime;
+    readonly timestamp: DateTime;
     /** The log message. */
     readonly message: string;
     /** A detailed dump. */

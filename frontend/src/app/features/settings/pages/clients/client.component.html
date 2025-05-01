@@ -6,7 +6,7 @@
                     [disabled]="!client.canUpdate"
                     [inputTitle]="client.name"
                     (inputTitleChange)="rename($event)"
-                    inputTitleLength="100"></sqx-editable-title>
+                    inputTitleLength="100" />
             </div>
             <div class="col-auto">
                 <button class="btn btn-primary" (click)="connectDialog.show()" sqxTourStep="connect" type="button">
@@ -136,4 +136,4 @@
     </div>
 </div>
 
-<sqx-client-connect-form [client]="client" (dialogClose)="connectDialog.hide()" *sqxModal="connectDialog"></sqx-client-connect-form>
+<sqx-client-connect-form [client]="client" (dialogClose)="connectDialog.hide()" *sqxModal="connectDialog" />

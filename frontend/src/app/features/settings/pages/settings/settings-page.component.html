@@ -1,4 +1,4 @@
-<sqx-title message="i18n:appSettings.title"></sqx-title>
+<sqx-title message="i18n:appSettings.title" />
 
 <sqx-layout innerWidth="55" layout="main" titleIcon="patterns" titleText="i18n:appSettings.title">
     <ng-container menu>
@@ -36,7 +36,7 @@
                     @for (form of editForm.patternsControls; track form; let i = $index) {
                         <div class="form-group row gx-2" attr.data-testid="pattern_{{ form.get('name')?.value }}" [formGroup]="form">
                             <div class="col-3">
-                                <sqx-control-errors for="name"></sqx-control-errors>
+                                <sqx-control-errors for="name" />
                                 <input
                                     class="form-control"
                                     formControlName="name"
@@ -44,7 +44,7 @@
                                     placeholder="{{ 'common.name' | sqxTranslate }}" />
                             </div>
                             <div class="col">
-                                <sqx-control-errors for="regex"></sqx-control-errors>
+                                <sqx-control-errors for="regex" />
                                 <input
                                     class="form-control"
                                     formControlName="regex"
@@ -52,7 +52,7 @@
                                     placeholder="{{ 'common.pattern' | sqxTranslate }}" />
                             </div>
                             <div class="col-4">
-                                <sqx-control-errors for="message"></sqx-control-errors>
+                                <sqx-control-errors for="message" />
                                 <input
                                     class="form-control"
                                     formControlName="message"
@@ -117,7 +117,7 @@
                     @for (form of editForm.editorsControls; track form; let i = $index) {
                         <div class="form-group row gx-2" [formGroup]="form">
                             <div class="col-3">
-                                <sqx-control-errors for="name"></sqx-control-errors>
+                                <sqx-control-errors for="name" />
                                 <input
                                     class="form-control"
                                     formControlName="name"
@@ -125,7 +125,7 @@
                                     placeholder="{{ 'common.name' | sqxTranslate }}" />
                             </div>
                             <div class="col">
-                                <sqx-control-errors for="url"></sqx-control-errors>
+                                <sqx-control-errors for="url" />
                                 <input
                                     class="form-control"
                                     formControlName="url"

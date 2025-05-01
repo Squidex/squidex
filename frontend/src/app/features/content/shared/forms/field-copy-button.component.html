@@ -1,36 +1,48 @@
 @if (isLocalized) {
-    <button
+     <button
         class="btn btn-outline-secondary btn-sm ms-1 dropdown-toggle"
         #button
         (click)="dropdown.toggle()"
         tabindex="-1"
         title="{{ 'common.copy' | sqxTranslate }}"
         type="button">
-        <i class="icon-copy"></i>
-    </button>
-    <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="button" *sqxModal="dropdown">
+         <i class="icon-copy"></i> </button
+    > <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="button" *sqxModal="dropdown"
+        >
         <div class="section d-flex justify-content-end">
-            <button class="btn btn-primary" (click)="copy()" tabindex="-1" type="button">
-                {{ "common.copy" | sqxTranslate }}
-            </button>
+             <button class="btn btn-primary" (click)="copy()" tabindex="-1" type="button"> {{ "common.copy" | sqxTranslate }} </button>
         </div>
+
         <div class="dropdown-divider"></div>
+
         <div class="section">
+
             <div class="row">
-                <label class="col-auto col-form-label" for="languageSource">{{ "common.from" | sqxTranslate }}</label>
+                 <label class="col-auto col-form-label" for="languageSource">{{ "common.from" | sqxTranslate }}</label
+                >
                 <div class="col">
-                    <select class="form-select" id="languagesSource" [ngModel]="copySource" (ngModelChange)="setCopySource($event)">
+                     <select class="form-select" id="languagesSource" [ngModel]="copySource" (ngModelChange)="setCopySource($event)">
+
                         @for (language of languages; track language) {
+
                             <option [ngValue]="language.iso2Code">{{ language.iso2Code }}</option>
+
                         }
-                    </select>
+                         </select
+                    >
                 </div>
+
             </div>
+
         </div>
+
         <div class="dropdown-divider"></div>
+
         <div class="section">
-            <label>{{ "common.to" | sqxTranslate }}</label>
-            <sqx-checkbox-group layout="Multiline" [(ngModel)]="copyTargets" [values]="languageCodes"></sqx-checkbox-group>
+             <label>{{ "common.to" | sqxTranslate }}</label
+            > <sqx-checkbox-group layout="Multiline" [(ngModel)]="copyTargets" [values]="languageCodes" />
         </div>
-    </sqx-dropdown-menu>
+         </sqx-dropdown-menu
+    >
 }
+

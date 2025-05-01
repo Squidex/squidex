@@ -16,7 +16,7 @@ public sealed class FlowExecutionStepLogEntryDto
     /// <summary>
     /// The timestamp.
     /// </summary>
-    public Instant TimeStamp { get; set; }
+    public Instant Timestamp { get; set; }
 
     /// <summary>
     /// The log message.

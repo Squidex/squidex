@@ -9,7 +9,7 @@
         </ng-container>
 
         <ng-container content>
-            <sqx-form-error [error]="createForm.error | async"></sqx-form-error>
+            <sqx-form-error [error]="createForm.error | async" />
 
             <div class="form-group mt-2">
                 <label for="appName">
@@ -17,7 +17,7 @@
                     <small class="hint">({{ "common.requiredHint" | sqxTranslate }})</small>
                 </label>
 
-                <sqx-control-errors for="name"></sqx-control-errors>
+                <sqx-control-errors for="name" />
 
                 <input
                     class="form-control"

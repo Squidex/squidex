@@ -1,4 +1,4 @@
-<sqx-title message="i18n:common.templates"></sqx-title>
+<sqx-title message="i18n:common.templates" />
 
 <sqx-layout innerWidth="50" layout="main" titleIcon="templates" titleText="i18n:common.templates">
     <ng-container menu>
@@ -21,7 +21,7 @@
 
             @if ((templatesState.isLoaded | async) && (templatesState.templates | async); as templates) {
                 @for (template of templates; track template.name) {
-                    <sqx-template [template]="template"></sqx-template>
+                    <sqx-template [template]="template" />
                 }
             }
         </sqx-list-view>

@@ -5,19 +5,26 @@
     [cdkDropListConnectedTo]="[availableList]"
     [cdkDropListData]="fieldsAdded"
     (cdkDropListDropped)="drop($event)">
-    <label>{{ "schemas.ui" | sqxTranslate }}</label>
-
+     <label>{{ "schemas.ui" | sqxTranslate }}</label
+    >
     @for (field of fieldsAdded; track field) {
+
         <div class="table-items-row table-items-row-summary truncate" cdkDrag>
-            <i class="icon-drag2 drag-handle"></i>
-            {{ field.title || field.label | sqxTranslate }}:
-            <code>{{ field.name }}</code>
+             <i class="icon-drag2 drag-handle"></i> {{ field.title || field.label | sqxTranslate }}: <code>{{ field.name }}</code
+            >
         </div>
-    } @empty {
-        <div class="empty-hint">
-            <sqx-form-alert>{{ emptyText }}</sqx-form-alert>
-        </div>
+
     }
+
+    @empty {
+
+        <div class="empty-hint">
+             <sqx-form-alert>{{ emptyText }}</sqx-form-alert
+            >
+        </div>
+
+    }
+
 </div>
 
 <div
@@ -28,13 +35,16 @@
     [cdkDropListData]="fieldsNotAdded"
     (cdkDropListDropped)="drop($event)"
     cdkDropListSortingDisabled>
-    <label>{{ "schemas.ui.unassignedFields" | sqxTranslate }}</label>
-
+     <label>{{ "schemas.ui.unassignedFields" | sqxTranslate }}</label
+    >
     @for (field of fieldsNotAdded; track field) {
+
         <div class="table-items-row table-items-row-summary truncate" cdkDrag>
-            <i class="icon-drag2 drag-handle"></i>
-            {{ field.title || field.label | sqxTranslate }}:
-            <code>{{ field.name }}</code>
+             <i class="icon-drag2 drag-handle"></i> {{ field.title || field.label | sqxTranslate }}: <code>{{ field.name }}</code
+            >
         </div>
+
     }
+
 </div>
+

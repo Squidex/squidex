@@ -6,7 +6,7 @@
         [languages]="languages"
         [level]="level"
         [model]="model"
-        (remove)="remove.emit()"></sqx-filter-logical>
+        (remove)="remove.emit()" />
 } @else if (actualComparison) {
     <sqx-filter-comparison
         [filter]="actualComparison"
@@ -14,5 +14,5 @@
         [language]="language"
         [languages]="languages"
         [model]="model"
-        (remove)="remove.emit()"></sqx-filter-comparison>
+        (remove)="remove.emit()" />
 }

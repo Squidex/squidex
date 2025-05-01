@@ -1,18 +1,16 @@
-<sqx-layout layout="right" overflow="true" padding="true" titleText="i18n:common.filters" white="true" width="20">
+<sqx-layout layout="right" overflow="true" padding="true" titleText="i18n:common.filters" white="true" width="20"
+    >
     <h3>{{ "common.tags" | sqxTranslate }}</h3>
-
-    <sqx-asset-tags
+     <sqx-asset-tags
         [canRename]="(assetsState.canRenameTag | async)!"
         [tags]="(assetsState.tags | async)!"
         (tagsReset)="resetTags()"
         [tagsSelected]="(assetsState.tagsSelected | async)!"
-        (toggle)="toggleTag($event)"></sqx-asset-tags>
-
+        (toggle)="toggleTag($event)" />
     <hr />
-
-    <sqx-shared-queries
+     <sqx-shared-queries
         [queries]="assetsQueries"
         [queryUsed]="assetsState.query | async"
         (search)="search($event)"
-        [types]="'common.assets' | sqxTranslate"></sqx-shared-queries>
-</sqx-layout>
+        [types]="'common.assets' | sqxTranslate" /> </sqx-layout
+>

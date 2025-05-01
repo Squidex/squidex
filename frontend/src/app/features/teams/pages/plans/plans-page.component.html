@@ -1,8 +1,8 @@
-<sqx-title message="i18n:common.subscription"></sqx-title>
+<sqx-title message="i18n:common.subscription" />
 
 <sqx-layout innerWidth="60" layout="main" titleIcon="subscription" titleText="i18n:common.subscription">
     <ng-container menu>
-        <sqx-notifo topic="apps/{{ plansState.teamId }}/settings/plan"></sqx-notifo>
+        <sqx-notifo topic="apps/{{ plansState.teamId }}/settings/plan" />
 
         <button class="btn btn-text-secondary" (click)="reload()" shortcut="CTRL + B" title="i18n:plans.refreshTooltip" type="button">
             <i class="icon-reset"></i>
@@ -30,7 +30,7 @@
                     <div class="plans">
                         @for (planInfo of plans; track planInfo.plan.id) {
                             <div class="plan">
-                                <sqx-plan [planInfo]="planInfo"></sqx-plan>
+                                <sqx-plan [planInfo]="planInfo" />
                             </div>
                         }
                     </div>

@@ -27,7 +27,7 @@
                 @if (details | async; as loadedDetails) {
                     <div class="help" [sqxMarkdown]="loadedDetails"></div>
                 } @else {
-                    <sqx-loader></sqx-loader>
+                    <sqx-loader />
                 }
             </div>
         </div>

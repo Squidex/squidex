@@ -1,44 +1,55 @@
-<sqx-form-error bubble="true" closeable="true" [error]="contentForm.error | async"></sqx-form-error>
-
-<sqx-list-view noPadding="true">
-    <ng-container topHeader>
+<sqx-form-error bubble="true" closeable="true" [error]="contentForm.error | async" /> <sqx-list-view noPadding="true"
+    > <ng-container topHeader
+        >
         @if (!contentVersion && isDeleted) {
-            <div class="alert alert-danger">
-                {{ "contents.deleted" | sqxTranslate }}
-            </div>
+
+            <div class="alert alert-danger"> {{ "contents.deleted" | sqxTranslate }} </div>
+
         }
 
         @if (contentVersion) {
+
             <div class="alert alert-danger">
+
                 <div class="float-end">
-                    <a (click)="loadLatest.emit()">{{ "contents.viewLatest" | sqxTranslate }}</a>
+                     <a (click)="loadLatest.emit()">{{ "contents.viewLatest" | sqxTranslate }}</a
+                    >
                 </div>
+
                 @if (isDeleted) {
+
                     <div inline="true" [sqxMarkdown]="'contents.versionViewingDeleted' | sqxTranslate: { version: contentVersion }"></div>
+
                 }
+
                 @if (!isDeleted) {
+
                     <div inline="true" [sqxMarkdown]="'contents.versionViewing' | sqxTranslate: { version: contentVersion }"></div>
+
                 }
+
             </div>
+
         }
 
         @if (isNew && showIdInput) {
+
             <div>
-                <input
+                 <input
                     class="form-control"
                     [ngModel]="contentId"
                     (ngModelChange)="contentIdChange.emit($event)"
                     placeholder="{{ 'contents.idPlaceholder' | sqxTranslate }}" />
             </div>
+
         }
-    </ng-container>
-
-    <ng-container>
+         </ng-container
+    > <ng-container
+        >
         <div class="cursors" sqxCursors>
-            <sqx-cursors></sqx-cursors>
-
+             <sqx-cursors />
             @for (section of contentForm.sections; track section.separator?.fieldId) {
-                <sqx-content-section
+                 <sqx-content-section
                     [form]="contentForm"
                     [formCompare]="contentFormCompare"
                     [formContext]="formContext"
@@ -47,8 +58,10 @@
                     [language]="language"
                     (languageChange)="languageChange.emit($event)"
                     [languages]="languages"
-                    [schema]="schema"></sqx-content-section>
+                    [schema]="schema" />
             }
+
         </div>
-    </ng-container>
-</sqx-list-view>
+         </ng-container
+    > </sqx-list-view
+>

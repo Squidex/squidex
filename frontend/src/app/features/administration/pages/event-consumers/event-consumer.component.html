@@ -1,36 +1,48 @@
 <tr [class.faulted]="eventConsumer.error && eventConsumer.error && eventConsumer.error.length > 0">
+
     <td class="cell-auto">
-        <span class="truncate">
-            <i
+         <span class="truncate"
+            > <i
                 class="faulted-icon icon icon-bug"
                 [class.hidden]="!eventConsumer.error || eventConsumer.error.length === 0"
-                (click)="failure.emit()"></i>
+                (click)="failure.emit()"></i
+            > {{ eventConsumer.name }} </span
+        >
+    </td>
 
-            {{ eventConsumer.name }}
-        </span>
-    </td>
     <td class="cell-auto-right">
-        <span>{{ eventConsumer.count }}</span>
+         <span>{{ eventConsumer.count }}</span
+        >
     </td>
+
     <td class="cell-auto-right">
-        <span>{{ eventConsumer.position }}</span>
+         <span>{{ eventConsumer.position }}</span
+        >
     </td>
+
     <td class="cell-actions-lg">
+
         @if (eventConsumer.canReset) {
-            <button class="btn btn-text-secondary" (click)="reset()" title="i18n:eventConsumers.resetTooltip" type="button">
-                <i class="icon icon-reset"></i>
-            </button>
+             <button class="btn btn-text-secondary" (click)="reset()" title="i18n:eventConsumers.resetTooltip" type="button">
+                 <i class="icon icon-reset"></i> </button
+            >
         }
+
         @if (eventConsumer.canStart) {
-            <button class="btn btn-text-secondary" (click)="start()" title="i18n:eventConsumers.startTooltip" type="button">
-                <i class="icon icon-play"></i>
-            </button>
+             <button class="btn btn-text-secondary" (click)="start()" title="i18n:eventConsumers.startTooltip" type="button">
+                 <i class="icon icon-play"></i> </button
+            >
         }
+
         @if (eventConsumer.canStop) {
-            <button class="btn btn-text-secondary" (click)="stop()" title="i18n:eventConsumers.stopTooltip" type="button">
-                <i class="icon icon-pause"></i>
-            </button>
+             <button class="btn btn-text-secondary" (click)="stop()" title="i18n:eventConsumers.stopTooltip" type="button">
+                 <i class="icon icon-pause"></i> </button
+            >
         }
+
     </td>
+
 </tr>
+
 <tr class="spacer"></tr>
+

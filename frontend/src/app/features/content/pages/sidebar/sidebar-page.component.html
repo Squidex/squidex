@@ -1,7 +1,7 @@
-<sqx-layout layout="right" titleText="i18n:common.sidebar" white="true" width="20">
-    <sqx-content-extension
+<sqx-layout layout="right" titleText="i18n:common.sidebar" white="true" width="20"
+    > <sqx-content-extension
         [contentItem]="contentsState.selectedContent | async"
         [contentSchema]="(schemasState.selectedSchema | async)!"
         [editorUrl]="url | async"
-        scrollable="true"></sqx-content-extension>
-</sqx-layout>
+        scrollable="true" /> </sqx-layout
+>

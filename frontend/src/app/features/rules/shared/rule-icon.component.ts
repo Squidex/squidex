@@ -21,7 +21,7 @@ import { RuleTriggerMetadataDto, SafeHtmlPipe } from '@app/shared';
 })
 export class RuleIconComponent {
     @Input({ required: true })
-    public element!: RuleTriggerMetadataDto;
+    public elementInfo!: RuleTriggerMetadataDto;
 
     @Input()
     public size: 'sm' | 'md' | 'lg' = 'sm';

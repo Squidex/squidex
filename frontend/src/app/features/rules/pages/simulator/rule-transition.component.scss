@@ -1,5 +1,5 @@
-@import 'mixins';
-@import 'vars';
+@import "mixins";
+@import "vars";
 
 .history {
     &-transition {
@@ -11,9 +11,9 @@
 
         &::before {
             @include circle($history-dot-sm-size);
-            @include absolute(.5rem, null, null, -1.5rem);
+            @include absolute(0.5rem, null, null, -1.5rem);
             background: $color-border;
-            content: '';
+            content: "";
             margin: 0;
             margin-left: $history-dot-sm-offset-x;
         }

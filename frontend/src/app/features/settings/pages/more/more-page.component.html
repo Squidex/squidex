@@ -7,7 +7,7 @@
 
                     <div class="card mb-4">
                         <div class="card-body">
-                            <sqx-form-error [error]="updateForm.error | async"></sqx-form-error>
+                            <sqx-form-error [error]="updateForm.error | async" />
 
                             <div class="form-group">
                                 <label for="email">{{ "common.name" | sqxTranslate }}</label>
@@ -18,7 +18,7 @@
                             <div class="form-group">
                                 <label for="label">{{ "common.label" | sqxTranslate }}</label>
 
-                                <sqx-control-errors for="label"></sqx-control-errors>
+                                <sqx-control-errors for="label" />
 
                                 <input class="form-control" id="label" formControlName="label" maxlength="100" />
                             </div>
@@ -26,7 +26,7 @@
                             <div class="form-group">
                                 <label for="description">{{ "common.description" | sqxTranslate }}</label>
 
-                                <sqx-control-errors for="description"></sqx-control-errors>
+                                <sqx-control-errors for="description" />
 
                                 <input class="form-control" id="description" formControlName="description" maxlength="100" />
                             </div>
@@ -54,11 +54,11 @@
                                     sqxDropOnlyImages="true">
                                     @if (uploading) {
                                         <div class="app-progress">
-                                            <sqx-progress-bar mode="Circle" [value]="uploadProgress"></sqx-progress-bar>
+                                            <sqx-progress-bar mode="Circle" [value]="uploadProgress" />
                                         </div>
                                     } @else {
                                         <div>
-                                            <sqx-avatar [identifier]="app.name" [image]="app.image" size="150"></sqx-avatar>
+                                            <sqx-avatar [identifier]="app.name" [image]="app.image" size="150" />
                                             @if (isEditableImage && app.image) {
                                                 <button
                                                     class="btn btn-danger btn-sm app-image-remove"

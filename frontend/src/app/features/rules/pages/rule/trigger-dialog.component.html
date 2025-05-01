@@ -1,56 +1,68 @@
 <form [formGroup]="currentTrigger?.form!" (ngSubmit)="save()">
-    <sqx-modal-dialog (dialogClose)="dialogClose.emit()" size="xl">
-        <ng-container title>
-            {{ "rules.trigger.edit" | sqxTranslate }}
-        </ng-container>
-
-        <ng-container content>
+     <sqx-modal-dialog (dialogClose)="dialogClose.emit()" size="xl"
+        > <ng-container title> {{ "rules.trigger.edit" | sqxTranslate }} </ng-container> <ng-container content
+            >
             @if (currentTrigger) {
+
                 @switch (currentTrigger.triggerType) {
+
                     @case ("AssetChanged") {
-                        <sqx-asset-changed-trigger [triggerForm]="currentTrigger"></sqx-asset-changed-trigger>
+                         <sqx-asset-changed-trigger [triggerForm]="currentTrigger" />
                     }
+
                     @case ("Comment") {
-                        <sqx-comment-trigger [triggerForm]="currentTrigger"></sqx-comment-trigger>
+                         <sqx-comment-trigger [triggerForm]="currentTrigger" />
                     }
+
                     @case ("ContentChanged") {
-                        <sqx-content-changed-trigger
+                         <sqx-content-changed-trigger
                             [schemas]="schemasState.schemas | async"
                             [triggerDto]="currentTrigger.form.value"
-                            [triggerForm]="currentTrigger"></sqx-content-changed-trigger>
+                            [triggerForm]="currentTrigger" />
                     }
+
                     @case ("SchemaChanged") {
-                        <sqx-schema-changed-trigger [triggerForm]="currentTrigger"></sqx-schema-changed-trigger>
+                         <sqx-schema-changed-trigger [triggerForm]="currentTrigger" />
                     }
+
                     @case ("Usage") {
-                        <sqx-usage-trigger [triggerForm]="currentTrigger"></sqx-usage-trigger>
+                         <sqx-usage-trigger [triggerForm]="currentTrigger" />
                     }
+
                 }
-            } @else {
+
+            }
+
+            @else {
+
                 <div class="row g-0">
+
                     @for (triggerType of availableTriggers | sqxKeys; track triggerType) {
+
                         <div class="col-12 col-md-6">
+
                             <div class="rule-element" (click)="selectTrigger(triggerType)">
-                                <sqx-rule-element
+                                 <sqx-rule-element
                                     [elementInfo]="$any(availableTriggers)[triggerType]"
                                     [elementType]="triggerType"
                                     showDescription="true"
-                                    showName="true"></sqx-rule-element>
+                                    showName="true" />
                             </div>
+
                         </div>
+
                     }
+
                 </div>
+
             }
-        </ng-container>
-
-        <ng-container footer>
-            <button class="btn btn-text-secondary" (click)="dialogClose.emit()" type="button">
-                {{ "common.cancel" | sqxTranslate }}
-            </button>
-
-            <button class="btn btn-success" [disabled]="!currentTrigger" type="submit">
-                {{ "common.edit" | sqxTranslate }}
-            </button>
-        </ng-container>
-    </sqx-modal-dialog>
+             </ng-container
+        > <ng-container footer
+            > <button class="btn btn-text-secondary" (click)="dialogClose.emit()" type="button">
+                 {{ "common.cancel" | sqxTranslate }} </button
+            > <button class="btn btn-success" [disabled]="!currentTrigger" type="submit"> {{ "common.edit" | sqxTranslate }} </button>
+            </ng-container
+        > </sqx-modal-dialog
+    >
 </form>
+

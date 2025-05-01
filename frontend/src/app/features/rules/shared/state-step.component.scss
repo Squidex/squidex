@@ -1,0 +1,40 @@
+@import 'mixins';
+@import 'vars';
+
+.step {
+    margin-top: .5rem;
+    margin-bottom: .5rem;
+    position: relative;
+
+    &::before {
+        @include absolute(1rem, null, -1.5rem, 1rem);
+        border: 2px solid $color-border;
+        content: '';
+        margin-bottom: 0;
+        margin-left: -2px;
+    }
+
+    &.last {
+        &::before {
+            display: none;
+        }
+    }
+}
+
+.col, .col-auto {
+    margin-top: 0;
+}
+
+.next-icon {
+    @include absolute(1.25rem, null, null, -.5rem);
+}
+
+.icon {
+    padding-top: .75rem;
+}
+
+.details {
+    border: 1px solid $color-border;
+    border-radius: $border-radius;
+    padding: .75rem;
+}

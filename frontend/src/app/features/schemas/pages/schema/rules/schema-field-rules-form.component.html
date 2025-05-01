@@ -1,45 +1,62 @@
 <form (ngSubmit)="saveSchema()">
+
     <h5>{{ "schemas.rules.title" | sqxTranslate }}</h5>
 
     <div class="card mb-4">
+
         <div class="card-body">
+
             <div class="content">
+
                 @if (!isEditable && editForm.rulesControls.length === 0) {
-                    <div class="mt-4">
-                        {{ "schemas.rules.empty" | sqxTranslate }}
-                    </div>
+
+                    <div class="mt-4"> {{ "schemas.rules.empty" | sqxTranslate }} </div>
+
                 }
 
                 @for (form of editForm.rulesControls; track form; let i = $index) {
+
                     <div class="mb-2 row gx-2" [formGroup]="form">
+
                         <div class="col col-action">
-                            <sqx-control-errors for="action"></sqx-control-errors>
-                            <select class="form-select" formControlName="action">
+                             <sqx-control-errors for="action" /> <select class="form-select" formControlName="action">
+
                                 @for (fieldAction of fieldActions; track fieldAction) {
+
                                     <option [ngValue]="fieldAction">{{ fieldAction }}</option>
+
                                 }
-                            </select>
+                                 </select
+                            >
                         </div>
+
                         <div class="col-3">
-                            <sqx-control-errors for="field"></sqx-control-errors>
-                            <select class="form-select" formControlName="field">
+                             <sqx-control-errors for="field" /> <select class="form-select" formControlName="field">
+
                                 @for (field of fieldNames; track field) {
+
                                     <option [ngValue]="field">{{ field }}</option>
+
                                 }
-                            </select>
+                                 </select
+                            >
                         </div>
+
                         <div class="col-auto">
+
                             <div class="label text-muted">{{ "schemas.rules.when" | sqxTranslate }}</div>
+
                         </div>
+
                         <div class="col">
-                            <sqx-control-errors for="condition"></sqx-control-errors>
-                            <sqx-code-editor
+                             <sqx-control-errors for="condition" /> <sqx-code-editor
                                 [completion]="fieldCompletions | async"
                                 formControlName="condition"
-                                singleLine="true"></sqx-code-editor>
+                                singleLine="true" />
                         </div>
+
                         <div class="col-auto">
-                            <button
+                             <button
                                 class="btn btn-text-danger"
                                 confirmRememberKey="deleteFieldRule"
                                 confirmText="i18n:schemas.deleteRuleConfirmText"
@@ -47,41 +64,63 @@
                                 [disabled]="!isEditable"
                                 (sqxConfirmClick)="editForm.remove(i)"
                                 type="button">
-                                <i class="icon-bin2"></i>
-                            </button>
+                                 <i class="icon-bin2"></i> </button
+                            >
                         </div>
+
                     </div>
+
                 }
 
                 @if (isEditable) {
+
                     <div class="form-group row gx-2">
+
                         <div class="col col-action">
+
                             <div class="form-control preview">{{ "schemas.rules.action" | sqxTranslate }}</div>
+
                         </div>
+
                         <div class="col-3">
+
                             <div class="form-control preview">{{ "common.field" | sqxTranslate }}</div>
+
                         </div>
+
                         <div class="col-auto">
+
                             <div class="label text-muted">{{ "schemas.rules.when" | sqxTranslate }}</div>
+
                         </div>
+
                         <div class="col">
+
                             <div class="form-control preview">{{ "schemas.rules.condition" | sqxTranslate }}</div>
+
                         </div>
+
                         <div class="col-auto">
-                            <button class="btn btn-success" (click)="add()" type="button">
-                                <i class="icon-add"></i>
-                            </button>
+                             <button class="btn btn-success" (click)="add()" type="button"> <i class="icon-add"></i> </button>
                         </div>
+
                     </div>
+
                 }
+
             </div>
+
         </div>
+
         @if (isEditable) {
+
             <div class="card-footer">
-                <button class="float-end btn btn-primary" type="submit">
-                    {{ "common.save" | sqxTranslate }}
-                </button>
+                 <button class="float-end btn btn-primary" type="submit"> {{ "common.save" | sqxTranslate }} </button>
             </div>
+
         }
+
     </div>
+
 </form>
+

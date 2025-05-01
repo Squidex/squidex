@@ -9,7 +9,7 @@
         </ng-container>
 
         <ng-container content>
-            <sqx-form-error [error]="editForm.error | async"></sqx-form-error>
+            <sqx-form-error [error]="editForm.error | async" />
 
             <div class="form-group">
                 <label for="folderName">
@@ -17,7 +17,7 @@
                     <small class="hint">({{ "common.requiredHint" | sqxTranslate }})</small>
                 </label>
 
-                <sqx-control-errors for="folderName"></sqx-control-errors>
+                <sqx-control-errors for="folderName" />
 
                 <input class="form-control" id="folderName" autocomplete="off" formControlName="folderName" sqxFocusOnInit />
             </div>

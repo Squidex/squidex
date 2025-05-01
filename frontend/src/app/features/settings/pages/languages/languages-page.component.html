@@ -1,4 +1,4 @@
-<sqx-title message="i18n:common.languages"></sqx-title>
+<sqx-title message="i18n:common.languages" />
 
 <sqx-layout innerWidth="55" layout="main" titleIcon="languages" titleText="i18n:common.languages">
     <ng-container menu>
@@ -13,13 +13,13 @@
             <div>
                 @if ((languagesState.isLoaded | async) && (languagesState.languages | async); as languages) {
                     @if (languagesState.canCreate | async) {
-                        <sqx-language-add-form [newLanguages]="(languagesState.newLanguages | async)!"></sqx-language-add-form>
+                        <sqx-language-add-form [newLanguages]="(languagesState.newLanguages | async)!" />
                     }
                     @for (languageInfo of languages; track languageInfo.language.iso2Code) {
                         <sqx-language
                             [fallbackLanguages]="languageInfo.fallbackLanguages"
                             [fallbackLanguagesNew]="languageInfo.fallbackLanguagesNew"
-                            [language]="languageInfo.language"></sqx-language>
+                            [language]="languageInfo.language" />
                     }
                 }
             </div>

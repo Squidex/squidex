@@ -1,4 +1,4 @@
-<sqx-title message="i18n:common.jobsBackups"></sqx-title>
+<sqx-title message="i18n:common.jobsBackups" />
 
 <sqx-layout innerWidth="50" layout="main" titleIcon="jobs" titleText="i18n:common.jobsBackups">
     <ng-container menu>
@@ -29,7 +29,7 @@
                     </div>
                 }
                 @for (job of jobs; track job.id) {
-                    <sqx-job [job]="job"></sqx-job>
+                    <sqx-job [job]="job" />
                 }
             }
         </sqx-list-view>

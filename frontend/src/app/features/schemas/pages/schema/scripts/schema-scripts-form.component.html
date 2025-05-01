@@ -1,25 +1,36 @@
 <form class="inner-form" [formGroup]="editForm.form" (ngSubmit)="saveSchema()">
-    <div class="inner-header">
-        <ul class="nav nav-tabs2">
-            @for (script of editForm.form.controls | sqxKeys; track script) {
-                <li class="nav-item">
-                    <a class="nav-link" [class.active]="schemaScript === script" (click)="selectField(script)">
-                        {{ script | sqxScriptName }}
-                    </a>
-                </li>
-            }
-        </ul>
 
-        <button class="float-end btn btn-primary" [class.invisible]="!isEditable" type="submit">
-            {{ "common.save" | sqxTranslate }}
-        </button>
+    <div class="inner-header">
+
+        <ul class="nav nav-tabs2">
+
+            @for (script of editForm.form.controls | sqxKeys; track script) {
+
+                <li class="nav-item">
+                     <a class="nav-link" [class.active]="schemaScript === script" (click)="selectField(script)"
+                        > {{ script | sqxScriptName }} </a
+                    >
+                </li>
+
+            }
+
+        </ul>
+         <button class="float-end btn btn-primary" [class.invisible]="!isEditable" type="submit">
+             {{ "common.save" | sqxTranslate }} </button
+        >
     </div>
 
     <div class="inner-main">
+
         @for (script of editForm.form.controls | sqxKeys; track script) {
+
             @if (schemaScript === script) {
-                <sqx-code-editor borderless="true" [completion]="schemaCompletions | async" [formControlName]="script"></sqx-code-editor>
+                 <sqx-code-editor borderless="true" [completion]="schemaCompletions | async" [formControlName]="script" />
             }
+
         }
+
     </div>
+
 </form>
+

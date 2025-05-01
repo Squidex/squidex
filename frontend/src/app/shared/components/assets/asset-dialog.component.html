@@ -84,7 +84,7 @@
             @switch (selectedTab) {
                 @case (0) {
                     <div class="metadata">
-                        <sqx-form-error [error]="annotateForm.error | async"></sqx-form-error>
+                        <sqx-form-error [error]="annotateForm.error | async" />
                         <div class="form-group g-0">
                             <label for="id">{{ "common.folder" | sqxTranslate }}</label>
                             <div class="path">
@@ -92,7 +92,7 @@
                                     <form [formGroup]="moveForm.form" (ngSubmit)="moveAsset()">
                                         <div class="row align-items-center g-2">
                                             <div class="col">
-                                                <sqx-asset-folder-dropdown formControlName="parentId"></sqx-asset-folder-dropdown>
+                                                <sqx-asset-folder-dropdown formControlName="parentId" />
                                             </div>
                                             <div class="col-auto">
                                                 <button class="btn btn-primary" type="submit">
@@ -107,7 +107,7 @@
                                             <sqx-asset-path
                                                 all="true"
                                                 (navigate)="navigate($event.id)"
-                                                [path]="pathItems | async"></sqx-asset-path>
+                                                [path]="pathItems | async" />
                                         </div>
                                         @if (isMoveable) {
                                             <div class="col-auto">
@@ -146,12 +146,12 @@
                         </div>
                         <div class="form-group">
                             <label for="fileName">{{ "common.name" | sqxTranslate }}</label>
-                            <sqx-control-errors for="fileName"></sqx-control-errors>
+                            <sqx-control-errors for="fileName" />
                             <input class="form-control" id="fileName" formControlName="fileName" spellcheck="false" />
                         </div>
                         <div class="form-group">
                             <label for="slug">{{ "common.slug" | sqxTranslate }}</label>
-                            <sqx-control-errors for="slug"></sqx-control-errors>
+                            <sqx-control-errors for="slug" />
                             <input
                                 class="form-control slug"
                                 id="slug"
@@ -165,12 +165,12 @@
                         @if (annotateTags | async; as tags) {
                             <div class="form-group">
                                 <label>{{ "common.tags" | sqxTranslate }}</label>
-                                <sqx-control-errors for="tags"></sqx-control-errors>
+                                <sqx-control-errors for="tags" />
                                 <sqx-tag-editor
                                     allowDuplicates="false"
                                     formControlName="tags"
                                     [itemsSource]="tags"
-                                    undefinedWhenEmpty="false"></sqx-tag-editor>
+                                    undefinedWhenEmpty="false" />
                             </div>
                         }
                         <div class="form-group">
@@ -178,7 +178,7 @@
                             @for (form of annotateForm.metadataControls; track form; let i = $index) {
                                 <div class="metadata-row row g-0" [formGroup]="form">
                                     <div class="col col-name pe-1">
-                                        <sqx-control-errors fieldName="Name" for="name"></sqx-control-errors>
+                                        <sqx-control-errors fieldName="Name" for="name" />
                                         <input
                                             class="form-control"
                                             formControlName="name"
@@ -187,7 +187,7 @@
                                             spellcheck="false" />
                                     </div>
                                     <div class="col pe-1">
-                                        <sqx-control-errors fieldName="Value" for="value"></sqx-control-errors>
+                                        <sqx-control-errors fieldName="Value" for="value" />
                                         <input
                                             class="form-control"
                                             formControlName="value"
@@ -234,14 +234,14 @@
                 }
                 @case (1) {
                     <div class="editor">
-                        <sqx-image-editor [imageSource]="asset | sqxAssetPreviewUrl"></sqx-image-editor>
+                        <sqx-image-editor [imageSource]="asset | sqxAssetPreviewUrl" />
                         @if (progress > 0) {
                             <div class="editor-progress">
                                 <sqx-progress-bar
                                     strokeWidth="2"
                                     trailColor="transparent"
                                     trailWidth="0"
-                                    [value]="progress"></sqx-progress-bar>
+                                    [value]="progress" />
                             </div>
                         }
                     </div>
@@ -250,14 +250,14 @@
                     <div>
                         <sqx-image-focus-point
                             [focusPoint]="asset.metadata"
-                            [imageSource]="asset | sqxAssetPreviewUrl"></sqx-image-focus-point>
+                            [imageSource]="asset | sqxAssetPreviewUrl" />
                         @if (progress > 0) {
                             <div class="editor-progress">
                                 <sqx-progress-bar
                                     strokeWidth="2"
                                     trailColor="transparent"
                                     trailWidth="0"
-                                    [value]="progress"></sqx-progress-bar>
+                                    [value]="progress" />
                             </div>
                         }
                     </div>
@@ -267,14 +267,14 @@
                         <sqx-asset-text-editor
                             [fileName]="asset.fileName"
                             [fileSource]="asset | sqxAssetPreviewUrl"
-                            [mimeType]="asset.mimeType"></sqx-asset-text-editor>
+                            [mimeType]="asset.mimeType" />
                         @if (progress > 0) {
                             <div class="editor-progress">
                                 <sqx-progress-bar
                                     strokeWidth="2"
                                     trailColor="transparent"
                                     trailWidth="0"
-                                    [value]="progress"></sqx-progress-bar>
+                                    [value]="progress" />
                             </div>
                         }
                     </div>
@@ -287,11 +287,11 @@
                             [url]="asset | sqxAssetPreviewUrl"
                             viewer="google"></ngx-doc-viewer>
                     } @else {
-                        <sqx-video-player [mimeType]="asset.mimeType" [source]="asset | sqxAssetPreviewUrl"></sqx-video-player>
+                        <sqx-video-player [mimeType]="asset.mimeType" [source]="asset | sqxAssetPreviewUrl" />
                     }
                 }
                 @case (5) {
-                    <sqx-asset-history [asset]="asset"></sqx-asset-history>
+                    <sqx-asset-history [asset]="asset" />
                 }
             }
         </ng-container>

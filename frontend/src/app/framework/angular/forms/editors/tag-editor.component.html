@@ -98,7 +98,7 @@
         @if (itemsSorted.length === 0) {
             <div class="text-decent">
                 @if (itemsSourceLoading) {
-                    <sqx-loader color="input"></sqx-loader>
+                    <sqx-loader color="input" />
                 } @else {
                     <small>{{ itemsSourceEmptyText | sqxTranslate }}</small>
                 }

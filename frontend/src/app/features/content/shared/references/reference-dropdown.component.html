@@ -3,11 +3,11 @@
     [formControl]="control"
     [items]="snapshot.contentNames"
     [itemsLoading]="snapshot.isLoading"
-    valueProperty="id">
-    <ng-template let-content="$implicit" let-context="context">
-        <span class="truncate" [innerHTML]="content.name | sqxHighlight: context | sqxSafeHtml"></span>
-    </ng-template>
-    <ng-template let-content="$implicit" let-context="context">
-        <span class="truncate">{{ content.name }}</span>
-    </ng-template>
-</sqx-dropdown>
+    valueProperty="id"
+    > <ng-template let-content="$implicit" let-context="context"
+        > <span class="truncate" [innerHTML]="content.name | sqxHighlight: context | sqxSafeHtml"></span> </ng-template
+    > <ng-template let-content="$implicit" let-context="context"
+        > <span class="truncate">{{ content.name }}</span
+        > </ng-template
+    > </sqx-dropdown
+>

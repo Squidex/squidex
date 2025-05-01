@@ -3,7 +3,6 @@
         <div class="centered">
             <h3 class="d-block white-label">{{ branchTitle }}</h3>
         </div>
-
     }
 
     @if (branchLabel) {
@@ -15,9 +14,7 @@
     @if (branchItems.length > 0) {
         @for (item of branchItems; track item.id; let last = $last; let i = $index) {
             <div class="centered">
-                <button class="btn btn-outline-secondary btn-circle-sm" (click)="add(i - 1)">
-                    <i class="icon-plus"></i>
-                </button>
+                <button class="btn btn-outline-secondary btn-circle-sm" (click)="add(i - 1)"><i class="icon-plus"></i></button>
             </div>
 
             <div class="rule-element" [class.if]="item.step.step.stepType === 'If'">
@@ -30,12 +27,10 @@
                         (remove)="remove(item)"
                         [showDescription]="false"
                         [showName]="false"
-                        [showRemove]="isEditable"></sqx-rule-element>
-
+                        [showRemove]="isEditable" />
                     @if (!parentId) {
-                        <div class="step-title white-label">
-                            {{ item.step.name || availableSteps[item.step.step.stepType].title }}
-                        </div>
+                        <div class="step-title white-label">{{ item.step.name || availableSteps[item.step.step.stepType].title }}</div>
+
                     } @else {
                         <div class="hover-step-title white-label">
                             {{ item.step.name || availableSteps[item.step.step.stepType].title }}
@@ -57,24 +52,21 @@
                             [parentId]="item.id"
                             (stepAdd)="stepAdd.emit($event)"
                             (stepRemove)="stepRemove.emit($event)"
-                            (stepUpdate)="stepUpdate.emit($event)"></sqx-branch>
+                            (stepUpdate)="stepUpdate.emit($event)" />
                     </div>
                 }
             </div>
 
             @if (last && item.step.step.stepType !== "If") {
                 <div class="centered">
-                    <button class="btn btn-outline-secondary btn-circle-sm" (click)="add(i)">
-                        <i class="icon-plus"></i>
-                    </button>
+                    <button class="btn btn-outline-secondary btn-circle-sm" (click)="add(i)"><i class="icon-plus"></i></button>
                 </div>
             }
         }
+
     } @else {
         <div class="centered">
-            <button class="btn btn-outline-secondary btn-circle" (click)="add()">
-                <i class="icon-plus"></i>
-            </button>
+            <button class="btn btn-outline-secondary btn-circle" (click)="add()"><i class="icon-plus"></i></button>
         </div>
     }
 </div>

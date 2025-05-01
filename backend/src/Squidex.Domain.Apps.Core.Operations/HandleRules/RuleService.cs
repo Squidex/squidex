@@ -337,7 +337,7 @@ public sealed class RuleService(
             OwnerId = enrichedEvent.AppId.Id.ToString(),
             DefinitionId = rule.Id.ToString(),
             Definition = rule.Flow,
-            Description = string.Empty,
+            Description = enrichedEvent.Name,
             Context = new FlowEventContext { Event = enrichedEvent },
         };
 

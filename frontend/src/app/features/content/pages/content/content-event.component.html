@@ -1,21 +1,26 @@
 <div class="event row g-0">
+
     <div class="col-auto">
-        <img class="user-picture" [src]="event.actor | sqxUserPictureRef" title="{{ event.actor | sqxUserNameRef }}" />
+         <img class="user-picture" [src]="event.actor | sqxUserPictureRef" title="{{ event.actor | sqxUserNameRef }}" />
     </div>
+
     <div class="col ps-2 event-right">
+
         <div class="event-message">
-            <span class="event-actor user-ref me-1" [title]="event.actor | sqxUserNameRef: null">
-                {{ event.actor | sqxUserNameRef: null }}
-            </span>
-            <span [innerHTML]="event | sqxHistoryMessage"></span>
+             <span class="event-actor user-ref me-1" [title]="event.actor | sqxUserNameRef: null"
+                > {{ event.actor | sqxUserNameRef: null }} </span
+            > <span [innerHTML]="event | sqxHistoryMessage"></span>
         </div>
 
         <div class="event-created">{{ event.created | sqxFromNow }}</div>
 
         @if (canLoadOrCompare) {
-            <a class="event-load force" (click)="dataLoad.emit()">{{ "contents.loadContent" | sqxTranslate }}</a>
-            &middot;
-            <a class="event-load force" (click)="dataCompare.emit()">{{ "contents.versionCompare" | sqxTranslate }}</a>
+             <a class="event-load force" (click)="dataLoad.emit()">{{ "contents.loadContent" | sqxTranslate }}</a
+            > &middot; <a class="event-load force" (click)="dataCompare.emit()">{{ "contents.versionCompare" | sqxTranslate }}</a
+            >
         }
+
     </div>
+
 </div>
+

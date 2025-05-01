@@ -20,7 +20,7 @@
                             (ngModelChange)="selectTags($event)"
                             placeholder="{{ 'assets.searchByTags' | sqxTranslate }}"
                             styleScrollable="true"
-                            undefinedWhenEmpty="false"></sqx-tag-editor>
+                            undefinedWhenEmpty="false" />
                     </div>
                     <div class="col-6">
                         <sqx-search-form
@@ -29,7 +29,7 @@
                             placeholder="{{ 'assets.searchByName' | sqxTranslate }}"
                             [queriesTypes]="'common.assets' | sqxTranslate"
                             [query]="assetsState.query | async"
-                            (queryChange)="search($event)"></sqx-search-form>
+                            (queryChange)="search($event)" />
                     </div>
                 </div>
             </div>
@@ -64,14 +64,14 @@
                     [assetsState]="assetsState"
                     [isDisabled]="true"
                     [isListView]="snapshot.isListView"
-                    [selectedIds]="snapshot.selectedAssets"></sqx-assets-list>
+                    [selectedIds]="snapshot.selectedAssets" />
             </ng-container>
 
             <ng-container footer>
                 <sqx-pager
                     (loadTotal)="reloadTotal()"
                     [paging]="assetsState.paging | async"
-                    (pagingChange)="assetsState.page($event)"></sqx-pager>
+                    (pagingChange)="assetsState.page($event)" />
             </ng-container>
         </sqx-list-view>
     </ng-container>

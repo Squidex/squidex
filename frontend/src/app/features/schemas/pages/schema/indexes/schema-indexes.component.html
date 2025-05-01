@@ -1,55 +1,72 @@
-<sqx-list-view innerWidth="50rem">
+<sqx-list-view innerWidth="50rem"
+    >
     @if (canCreateIndexes) {
+
         <div class="mt-2">
+
             @if ((indexesState.isLoaded | async) && (indexesState.indexes | async); as indexes) {
+
                 @if (indexes.length === 0) {
+
                     <div class="table-items-row table-items-row-summary table-items-row-empty">
-                        {{ "schemas.indexes.empty" | sqxTranslate }}
-
-                        <button class="btn btn-success btn-sm ms-2" (click)="addIndexDialog.show()" sqxTourStep="addField" type="button">
-                            <i class="icon icon-plus"></i>
-                            {{ "schemas.indexes.addIndex" | sqxTranslate }}
-                        </button>
+                         {{ "schemas.indexes.empty" | sqxTranslate }} <button
+                            class="btn btn-success btn-sm ms-2"
+                            (click)="addIndexDialog.show()"
+                            sqxTourStep="addField"
+                            type="button">
+                             <i class="icon icon-plus"></i> {{ "schemas.indexes.addIndex" | sqxTranslate }} </button
+                        >
                     </div>
+
                 }
+
                 @for (index of indexes; track index.name) {
-                    <sqx-index [index]="index"></sqx-index>
+                     <sqx-index [index]="index" />
                 }
+
             }
+
         </div>
-    } @else {
+
+    }
+
+    @else {
+
         <div class="table-items-row table-items-row-summary table-items-row-empty text-sm">
-            {{ "schemas.indexes.empty" | sqxTranslate }}
-
+             {{ "schemas.indexes.empty" | sqxTranslate }}
             <div class="section">
-                <span [sqxMarkdown]="'schemas.indexes.notEnableHint1' | sqxTranslate" trusted="true"></span>
-
+                 <span [sqxMarkdown]="'schemas.indexes.notEnableHint1' | sqxTranslate" trusted="true"></span>
                 <sqx-code>CONTENTS__OPTIMIZEFORSELFHOSTING=true</sqx-code>
             </div>
 
             <div class="section">
-                <span [sqxMarkdown]="'schemas.indexes.notEnableHint2' | sqxTranslate" trusted="true"></span>
-
+                 <span [sqxMarkdown]="'schemas.indexes.notEnableHint2' | sqxTranslate" trusted="true"></span>
                 <sqx-code>REBUILD__CONTENTS=true</sqx-code>
             </div>
-        </div>
-    }
-</sqx-list-view>
 
+        </div>
+
+    }
+     </sqx-list-view
+>
 @if (canCreateIndexes) {
+
     @if (indexesState.canCreate | async) {
-        <button class="btn btn-success index-button" (click)="addIndexDialog.show()" type="button">
-            <i class="icon icon-plus index-button-icon"></i>
+         <button class="btn btn-success index-button" (click)="addIndexDialog.show()" type="button">
+             <i class="icon icon-plus index-button-icon"></i>
             <div class="index-button-text">{{ "schemas.indexes.addIndexButton" | sqxTranslate }}</div>
-        </button>
+             </button
+        >
     }
 
     @if (languagesState.isoLanguages | async; as languages) {
-        <sqx-index-form
+         <sqx-index-form
             (create)="addIndexDialog.hide()"
             (dialogClose)="addIndexDialog.hide()"
             [languages]="languages"
             [schema]="schema"
-            *sqxModal="addIndexDialog"></sqx-index-form>
+            *sqxModal="addIndexDialog" />
     }
+
 }
+

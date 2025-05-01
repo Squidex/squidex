@@ -100,7 +100,7 @@
                 </div>
             } @else if (snapshot.progress > 0) {
                 <div class="upload-progress">
-                    <sqx-progress-bar mode="Circle" [value]="snapshot.progress"></sqx-progress-bar>
+                    <sqx-progress-bar mode="Circle" [value]="snapshot.progress" />
                 </div>
             }
         </div>
@@ -225,7 +225,7 @@
 
         @if (snapshot.progress > 0) {
             <div class="upload-progress">
-                <sqx-progress-bar [showText]="false" [strokeWidth]="0.8" [trailWidth]="0.8" [value]="snapshot.progress"></sqx-progress-bar>
+                <sqx-progress-bar [showText]="false" [strokeWidth]="0.8" [trailWidth]="0.8" [value]="snapshot.progress" />
             </div>
         }
     </div>

@@ -1,6 +1,6 @@
 <div class="row g-1">
     <div class="col">
-        <sqx-query-path [model]="model" [path]="sorting.path" (pathChange)="changePath($event)"></sqx-query-path>
+        <sqx-query-path [model]="model" [path]="sorting.path" (pathChange)="changePath($event)" />
     </div>
     <div class="col-auto">
         <select class="form-select ms-2" [ngModel]="sorting.order" (ngModelChange)="changeOrder($event)">

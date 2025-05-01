@@ -64,8 +64,8 @@
                         @for (control of editForm.controls; track control; let i = $index) {
                             <div class="row gx-2 mb-1">
                                 <div class="col">
-                                    <sqx-control-errors [fieldName]="'Permission'" [for]="control"></sqx-control-errors>
-                                    <sqx-autocomplete [formControl]="control" [itemsSource]="allPermissions"></sqx-autocomplete>
+                                    <sqx-control-errors [fieldName]="'Permission'" [for]="control" />
+                                    <sqx-autocomplete [formControl]="control" [itemsSource]="allPermissions" />
                                 </div>
                                 @if (isEditable) {
                                     <div class="col-auto">

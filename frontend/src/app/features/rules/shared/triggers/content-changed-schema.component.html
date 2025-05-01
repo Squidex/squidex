@@ -1,26 +1,32 @@
 <div class="row gx-2" [formGroup]="form">
-    <div class="col col-3">
-        <sqx-control-errors for="action"></sqx-control-errors>
 
-        <select class="form-select schemas-control" formControlName="schemaId">
+    <div class="col col-3">
+         <sqx-control-errors for="action" /> <select class="form-select schemas-control" formControlName="schemaId">
+
             @for (schema of schemas; track schema.id) {
+
                 <option [ngValue]="schema.id">{{ schema.displayName }}</option>
+
             }
-        </select>
+             </select
+        >
     </div>
 
     <div class="col-auto">
+
         <div class="label text-muted">{{ "rules.when" | sqxTranslate }}</div>
+
     </div>
 
     <div class="col">
-        <sqx-control-errors for="condition"></sqx-control-errors>
-
-        <sqx-code-editor [completion]="completions | async" formControlName="condition" singleLine="true"></sqx-code-editor>
+         <sqx-control-errors for="condition" /> <sqx-code-editor
+            [completion]="completions | async"
+            formControlName="condition"
+            singleLine="true" />
     </div>
 
     <div class="col-auto">
-        <button
+         <button
             class="btn btn-text-danger"
             confirmRememberKey="deleteContentChangedSchema"
             confirmText="i18n:rules.deleteContentChangedSchemaText"
@@ -28,7 +34,9 @@
             [disabled]="form.disabled"
             (sqxConfirmClick)="remove.emit()"
             type="button">
-            <i class="icon-bin2"></i>
-        </button>
+             <i class="icon-bin2"></i> </button
+        >
     </div>
+
 </div>
+

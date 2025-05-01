@@ -4,9 +4,11 @@
     [cdkDropListDisabled]="!sortable"
     (cdkDropListDropped)="sortGroups($event)"
     cdkDropListGroup>
+
     @for (group of fieldGroups; track group.id) {
+
         <div class="table-drag" cdkDrag [cdkDragDisabled]="!group.separator" cdkDragLockAxis="y">
-            <sqx-field-group
+             <sqx-field-group
                 [fieldGroup]="group"
                 [fieldsEmpty]="fieldsEmpty"
                 [languages]="languages"
@@ -14,9 +16,12 @@
                 [schema]="schema"
                 [settings]="settings"
                 [sortable]="sortable"
-                (sorted)="sortFields($event)">
-                <i class="icon-drag2 drag-handle" cdkDragHandle></i>
-            </sqx-field-group>
+                (sorted)="sortFields($event)"
+                > <i class="icon-drag2 drag-handle" cdkDragHandle></i> </sqx-field-group
+            >
         </div>
+
     }
+
 </div>
+

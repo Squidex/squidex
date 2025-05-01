@@ -1,5 +1,5 @@
-@import 'mixins';
-@import 'vars';
+@import "mixins";
+@import "vars";
 
 .btn-circle {
     @include force-height(4rem);
@@ -20,7 +20,7 @@
     border-color: $color-border;
     font-size: 60%;
     font-weight: normal;
-    padding: .125rem;
+    padding: 0.125rem;
 }
 
 .row {
@@ -34,11 +34,11 @@
 
     &.if {
         margin-bottom: 1rem;
-    
+
         &:after {
             @include absolute(0, null, -1rem, 50%);
             border: 2px solid $color-border;
-            content: '';
+            content: "";
             margin-left: -1px;
             margin-top: 0;
             z-index: 0;
@@ -55,7 +55,7 @@
 .step-title {
     @include absolute(50%, null, null, 50%);
     font-size: $font-small;
-    margin-top: -.5rem;
+    margin-top: -0.5rem;
     margin-left: 2.5rem;
     white-space: nowrap;
 }
@@ -63,7 +63,7 @@
 .hover-step-title {
     @include absolute(50%, null, null, 50%);
     font-size: $font-small;
-    margin-top: -.5rem;
+    margin-top: -0.5rem;
     margin-left: 2.5rem;
     white-space: nowrap;
     visibility: hidden;
@@ -85,7 +85,7 @@
     &:before {
         @include absolute(0, null, 0, 50%);
         border: 2px solid $color-border;
-        content: '';
+        content: "";
         margin-left: -1px;
         margin-top: 0;
         z-index: 0;
@@ -106,7 +106,7 @@
     &:before {
         @include absolute(0, 0, null, 0);
         border: 2px solid $color-border;
-        content: '';
+        content: "";
         margin-left: -1px;
         margin-top: 0;
         z-index: 0;
@@ -130,7 +130,7 @@
     background-color: $color-white;
     border-radius: 0;
     border-color: $color-white;
-    padding: .125rem .25rem;
+    padding: 0.125rem 0.25rem;
 }
 
 label {

@@ -9,7 +9,7 @@
                 [ngModel]="workflowView.dto.schemaIds"
                 readonly="true"
                 styleBlank="true"
-                styleScrollable="true"></sqx-tag-editor>
+                styleScrollable="true" />
         </div>
         <div class="col-options">
             <div class="float-end">
@@ -64,7 +64,7 @@
             </div>
             <div class="table-items-row-details-tab">
                 @if (selectedTab === 0) {
-                    <sqx-form-error [error]="error"></sqx-form-error>
+                    <sqx-form-error [error]="error" />
                     <div class="form-group row">
                         <label class="col-form-label" for="{{ workflowView.dto.id }}_name">{{ "common.name" | sqxTranslate }}</label>
                         <div class="col">
@@ -89,7 +89,7 @@
                                 [itemsSource]="(schemasSource.normalConverter | async)?.suggestions"
                                 [ngModel]="workflowView.dto.schemaIds"
                                 (ngModelChange)="changeSchemaIds($event)"
-                                placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}"></sqx-tag-editor>
+                                placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" />
                             <sqx-form-hint>
                                 {{ "workflows.schemasHint" | sqxTranslate }}
                             </sqx-form-hint>
@@ -101,7 +101,7 @@
                             [roles]="roles"
                             [step]="step"
                             (update)="update($event)"
-                            [workflow]="workflowView"></sqx-workflow-step>
+                            [workflow]="workflowView" />
                     }
                     @if (workflowView.dto.canUpdate) {
                         <button class="btn btn-success" (click)="addStep()">
@@ -109,7 +109,7 @@
                         </button>
                     }
                 } @else {
-                    <sqx-workflow-diagram [workflow]="workflowView"></sqx-workflow-diagram>
+                    <sqx-workflow-diagram [workflow]="workflowView" />
                 }
             </div>
         </div>

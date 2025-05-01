@@ -4,7 +4,7 @@
     isRoot="true"
     [language]="language"
     [languages]="languages"
-    [model]="model"></sqx-filter-logical>
+    [model]="model" />
 
 <h4 class="mt-4">{{ "search.sorting" | sqxTranslate }}</h4>
 
@@ -14,7 +14,7 @@
             [model]="model"
             (remove)="removeSorting(i)"
             [sorting]="sorting"
-            (sortingChange)="replaceSorting(i, $event)"></sqx-sorting>
+            (sortingChange)="replaceSorting(i, $event)" />
     </div>
 }
 

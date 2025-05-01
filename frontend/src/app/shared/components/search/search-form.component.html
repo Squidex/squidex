@@ -1,5 +1,5 @@
 @if (enableShortcut) {
-    <sqx-shortcut keys="CTRL + I" (trigger)="inputFind.focus()"></sqx-shortcut>
+    <sqx-shortcut keys="CTRL + I" (trigger)="inputFind.focus()" />
 }
 
 <form [class]="formClass" (ngSubmit)="search()">
@@ -92,7 +92,7 @@
                         [languages]="languages"
                         [model]="queryModel"
                         [query]="query"
-                        (queryChange)="changeQuery($event)"></sqx-query>
+                        (queryChange)="changeQuery($event)" />
 
                     <div class="link" [sqxMarkdown]="'search.help' | sqxTranslate"></div>
                 </div>
@@ -103,7 +103,7 @@
                     [queries]="queries"
                     [queryUsed]="query"
                     (search)="changeQuery($event)"
-                    [types]="queriesTypes"></sqx-shared-queries>
+                    [types]="queriesTypes" />
             </div>
         }
     </ng-container>
@@ -126,7 +126,7 @@
 
             <ng-container content>
                 <div class="form-group mt-2">
-                    <sqx-control-errors for="name"></sqx-control-errors>
+                    <sqx-control-errors for="name" />
 
                     <input class="form-control" id="appName" autocomplete="off" formControlName="name" sqxFocusOnInit />
                 </div>

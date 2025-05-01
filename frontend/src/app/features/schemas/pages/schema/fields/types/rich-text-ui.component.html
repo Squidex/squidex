@@ -1,39 +1,40 @@
 <div [formGroup]="fieldForm">
+
     <div class="form-group row">
-        <label class="col-3 col-form-label">{{ "schemas.fieldTypes.string.classNames" | sqxTranslate }}</label>
-
+         <label class="col-3 col-form-label">{{ "schemas.fieldTypes.string.classNames" | sqxTranslate }}</label
+        >
         <div class="col-9">
-            <sqx-tag-editor formControlName="classNames"></sqx-tag-editor>
-
-            <sqx-form-hint>
-                {{ "schemas.fieldTypes.string.classNamesHint" | sqxTranslate }}
-            </sqx-form-hint>
+             <sqx-tag-editor formControlName="classNames" /> <sqx-form-hint
+                > {{ "schemas.fieldTypes.string.classNamesHint" | sqxTranslate }} </sqx-form-hint
+            >
         </div>
+
     </div>
 
     <div class="form-group row">
-        <label class="col-3 col-form-label" for="{{ field.fieldId }}_folderId">
-            {{ "schemas.fieldTypes.string.folderId" | sqxTranslate }}
-        </label>
-
+         <label class="col-3 col-form-label" for="{{ field.fieldId }}_folderId"
+            > {{ "schemas.fieldTypes.string.folderId" | sqxTranslate }} </label
+        >
         <div class="col-9">
-            <sqx-asset-folder-dropdown formControlName="folderId"></sqx-asset-folder-dropdown>
-
-            <sqx-form-hint>
-                {{ "schemas.fieldTypes.string.folderIdHint" | sqxTranslate }}
-            </sqx-form-hint>
+             <sqx-asset-folder-dropdown formControlName="folderId" /> <sqx-form-hint
+                > {{ "schemas.fieldTypes.string.folderIdHint" | sqxTranslate }} </sqx-form-hint
+            >
         </div>
+
     </div>
 
     <div class="form-group row">
-        <label class="col-3 col-form-label" for="{{ field.fieldId }}_fieldSchemaIds">{{ "common.schemas" | sqxTranslate }}</label>
-
+         <label class="col-3 col-form-label" for="{{ field.fieldId }}_fieldSchemaIds">{{ "common.schemas" | sqxTranslate }}</label
+        >
         <div class="col-9">
-            <sqx-tag-editor
+             <sqx-tag-editor
                 formControlName="schemaIds"
                 [itemConverter]="(schemasSource.normalConverter | async)!"
                 [itemsSource]="(schemasSource.normalConverter | async)?.suggestions"
-                placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}"></sqx-tag-editor>
+                placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" />
         </div>
+
     </div>
+
 </div>
+

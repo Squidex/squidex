@@ -1,8 +1,8 @@
-<sqx-title message="i18n:common.contributors"></sqx-title>
+<sqx-title message="i18n:common.contributors" />
 
 <sqx-layout innerWidth="55" layout="main" titleIcon="contributors" titleText="i18n:common.contributors">
     <ng-container menu>
-        <sqx-notifo topic="apps/{{ contributorsState.teamId }}/settings/contributors"></sqx-notifo>
+        <sqx-notifo topic="apps/{{ contributorsState.teamId }}/settings/contributors" />
 
         <button
             class="btn btn-text-secondary me-2"
@@ -29,7 +29,7 @@
         <sqx-list-view innerWidth="55rem" [isLoading]="contributorsState.isLoading | async">
             <ng-container>
                 @if (contributorsState.canCreate | async) {
-                    <sqx-contributor-add-form></sqx-contributor-add-form>
+                    <sqx-contributor-add-form />
                 }
 
                 @if ((contributorsState.isLoaded | async) && (contributorsState.contributorsFiltered | async); as contributors) {
@@ -47,7 +47,7 @@
             </ng-container>
 
             <ng-container footer>
-                <sqx-pager [paging]="contributorsState.paging | async" (pagingChange)="contributorsState.page($event)"></sqx-pager>
+                <sqx-pager [paging]="contributorsState.paging | async" (pagingChange)="contributorsState.page($event)" />
             </ng-container>
         </sqx-list-view>
     </ng-container>

@@ -14,15 +14,17 @@ import { SimulatedRuleEventDto } from '@app/shared';
     pure: true,
 })
 export class RuleClassPipe implements PipeTransform {
-    public transform(value: string) {
+    public transform(value?: string) {
         if (value === 'Retry' || value === 'Skipped') {
             return 'warning';
         } else if (value === 'Failed' || value === 'Cancelled') {
             return 'danger';
-        } else if (value === 'Pending') {
+        } else if (value === 'Pending' || value === 'Scheduled') {
             return 'secondary';
+        } else  if (value === 'Completed') {
+            return 'success';
         } else {
-            return value.toLowerCase();
+            return value?.toLowerCase() || 'secondary';
         }
     }
 }

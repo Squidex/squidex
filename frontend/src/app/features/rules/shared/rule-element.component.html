@@ -1,41 +1,54 @@
-<div class="row gx-3 large root" [class.align-items-center]="!showDescription" [class.disabled]="disabled">
+<div class="row gx-3 {{ size }} root" [class.align-items-center]="!showDescription" [class.disabled]="disabled">
+
     <div class="col-auto">
+
         <div
-            class="large-icon relative d-flex align-items-center justify-content-center"
+            class="icon relative d-flex align-items-center justify-content-center"
             (click)="iconClick.emit()"
             [style.background]="elementInfo.iconColor! | sqxDarken: 5"
             [style.border]="'none'"
             [title]="label || elementInfo.title">
-            <sqx-rule-icon [element]="elementInfo" size="lg"></sqx-rule-icon>
-
+             <sqx-rule-icon [elementInfo]="elementInfo" [size]="size" />
             @if (showRemove) {
-                <a
+                 <a
                     class="btn btn-sm rounded-full btn-outline-danger"
                     confirmText="i18n:rules.removeElementText"
                     confirmTitle="i18n:rules.removeElementTitle"
                     (sqxConfirmClick)="remove.emit()"
                     sqxStopClick=""
-                    type="button">
-                    <i class="icon-bin2"></i>
-                </a>
+                    type="button"
+                    > <i class="icon-bin2"></i> </a
+                >
             }
+
         </div>
+
     </div>
+
     @if (showName) {
+
         <div class="col">
-            <div class="large-title">{{ elementInfo.title || elementType }}</div>
+
+            <div class="title">{{ elementInfo.title || elementType }}</div>
 
             @if (showDescription) {
-                <div class="large-text text-muted">
-                    {{ elementInfo.description }}
-                </div>
+
+                <div class="text text-muted"> {{ elementInfo.description }} </div>
 
                 @if (elementInfo.readMore) {
-                    <div class="large-link">
-                        <a [href]="elementInfo.readMore" sqxExternalLink sqxStopClick>{{ "rules.readMore" | sqxTranslate }}</a>
+
+                    <div class="link">
+                         <a [href]="elementInfo.readMore" sqxExternalLink sqxStopClick>{{ "rules.readMore" | sqxTranslate }}</a
+                        >
                     </div>
+
                 }
+
             }
+
         </div>
+
     }
+
 </div>
+

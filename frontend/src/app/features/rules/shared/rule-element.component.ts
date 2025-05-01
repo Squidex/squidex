@@ -48,6 +48,9 @@ export class RuleElementComponent {
     @Input({ transform: booleanAttribute })
     public disabled = false;
 
+    @Input()
+    public size: 'sm' | 'md' | 'lg' = 'lg';
+
     @Output()
     public remove = new EventEmitter();
 

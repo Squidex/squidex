@@ -1,26 +1,31 @@
 <tr queryParamsHandling="preserve" [routerLink]="user.id" routerLinkActive="active">
-    <td class="cell-user">
-        <img class="user-picture" [src]="user | sqxUserDtoPicture" title="{{ user.displayName }}" />
-    </td>
+
+    <td class="cell-user"> <img class="user-picture" [src]="user | sqxUserDtoPicture" title="{{ user.displayName }}" /> </td>
+
     <td class="cell-auto">
-        <span class="user-name table-cell">{{ user.displayName }}</span>
+         <span class="user-name table-cell">{{ user.displayName }}</span
+        >
     </td>
+
     <td class="cell-auto">
-        <span class="user-email table-cell">{{ user.email }}</span>
+         <span class="user-email table-cell">{{ user.email }}</span
+        >
     </td>
+
     <td class="cell-actions-lg">
+
         @if (user.canLock) {
-            <button class="btn btn-text-secondary" (click)="lock()" sqxStopClick title="i18n:users.lockTooltip" type="button">
-                <i class="icon icon-unlocked"></i>
-            </button>
-        }
-        @if (user.canUnlock) {
-            <button class="btn btn-text-secondary" (click)="unlock()" sqxStopClick title="i18n:users.unlockTooltip" type="button">
-                <i class="icon icon-lock"></i>
-            </button>
+             <button class="btn btn-text-secondary" (click)="lock()" sqxStopClick title="i18n:users.lockTooltip" type="button">
+                 <i class="icon icon-unlocked"></i> </button
+            >
         }
 
-        <button
+        @if (user.canUnlock) {
+             <button class="btn btn-text-secondary" (click)="unlock()" sqxStopClick title="i18n:users.unlockTooltip" type="button">
+                 <i class="icon icon-lock"></i> </button
+            >
+        }
+         <button
             class="btn btn-text-danger"
             confirmRememberKey="deleteUser"
             confirmText="i18n:users.deleteConfirmText"
@@ -29,8 +34,11 @@
             (sqxConfirmClick)="delete()"
             sqxStopClick
             type="button">
-            <i class="icon-bin2"></i>
-        </button>
+             <i class="icon-bin2"></i> </button
+        >
     </td>
+
 </tr>
+
 <tr class="spacer"></tr>
+

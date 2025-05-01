@@ -1,37 +1,50 @@
 <div class="row g-0" [class.compare]="formModelCompare">
+
     <div [class.col-12]="!formModelCompare" [class.col-6]="formModelCompare">
-        <sqx-focus-marker [controlId]="formModel.fieldPath">
+         <sqx-focus-marker [controlId]="formModel.fieldPath"
+            >
             @if (!(formModel.hiddenChanges | async)) {
+
                 <div class="table-items-row table-items-row-summary" [class.field-invalid]="isInvalid | async">
+
                     <div class="languages-container">
+
                         <div class="languages-buttons">
+
                             <div class="languages-inner">
-                                <sqx-field-languages
+                                 <sqx-field-languages
                                     [formModel]="formModel"
                                     [language]="language"
                                     (languageChange)="languageChange.emit($event)"
                                     [languages]="languages"
                                     [showAllControls]="showAllControls"
-                                    (showAllControlsChange)="changeShowAllControls($event)"></sqx-field-languages>
-                                <sqx-field-copy-button [formModel]="formModel" [languages]="languages"></sqx-field-copy-button>
+                                    (showAllControlsChange)="changeShowAllControls($event)" /> <sqx-field-copy-button
+                                    [formModel]="formModel"
+                                    [languages]="languages" />
                                 @if (isTranslatable) {
-                                    <button
+                                     <button
                                         class="btn btn-sm btn-outline-secondary force no-focus-shadow ms-1"
                                         (click)="translate()"
                                         [disabled]="formModel.field.isDisabled"
                                         tabindex="-1"
                                         title="i18n:contents.autotranslate"
                                         type="button">
-                                        <i class="icon-translate"></i>
-                                    </button>
+                                         <i class="icon-translate"></i> </button
+                                    >
                                 }
+
                             </div>
+
                         </div>
+
                     </div>
+
                     @if (showAllControls) {
+
                         @for (language of languages; track language) {
+
                             <div class="form-group">
-                                <sqx-field-editor
+                                 <sqx-field-editor
                                     [comments]="commentsState"
                                     [displaySuffix]="prefix(language)"
                                     [form]="form"
@@ -41,11 +54,15 @@
                                     [hasChatBot]="hasChatBot"
                                     [isComparing]="!!formModelCompare"
                                     [language]="language"
-                                    [languages]="languages"></sqx-field-editor>
+                                    [languages]="languages" />
                             </div>
+
                         }
-                    } @else {
-                        <sqx-field-editor
+
+                    }
+
+                    @else {
+                         <sqx-field-editor
                             [comments]="commentsState"
                             [form]="form"
                             [formContext]="formContext"
@@ -54,43 +71,62 @@
                             [hasChatBot]="hasChatBot"
                             [isComparing]="!!formModelCompare"
                             [language]="language"
-                            [languages]="languages"></sqx-field-editor>
+                            [languages]="languages" />
                     }
+
                 </div>
+
             }
-        </sqx-focus-marker>
+             </sqx-focus-marker
+        >
     </div>
 
     @if (formModelCompare && formCompare) {
+
         <div class="col-6 col-right">
+
             @if (!(isDisabled | async)) {
+
                 <div class="copy-button-container">
+
                     @if (isDifferent | async) {
-                        <button class="btn btn-primary btn-sm field-copy" (click)="copy()" type="button">
-                            <i class="icon-arrow_back"></i>
-                        </button>
+                         <button class="btn btn-primary btn-sm field-copy" (click)="copy()" type="button">
+                             <i class="icon-arrow_back"></i> </button
+                        >
                     }
+
                 </div>
+
             }
+
             @if (!(formModelCompare!.hiddenChanges | async)) {
+
                 <div class="table-items-row table-items-row-summary">
+
                     <div class="languages-container">
+
                         <div class="languages-buttons-compare">
+
                             <div class="languages-inner">
-                                <sqx-field-languages
+                                 <sqx-field-languages
                                     [formModel]="formModelCompare!"
                                     [language]="language"
                                     (languageChange)="languageChange.emit($event)"
                                     [languages]="languages"
                                     [showAllControls]="showAllControls"
-                                    (showAllControlsChange)="changeShowAllControls($event)"></sqx-field-languages>
+                                    (showAllControlsChange)="changeShowAllControls($event)" />
                             </div>
+
                         </div>
+
                     </div>
+
                     @if (showAllControls) {
+
                         @for (language of languages; track language) {
+
                             <div class="form-group">
-                                <sqx-field-editor
+                                 <sqx-field-editor
                                     [displaySuffix]="prefix(language)"
                                     [form]="formCompare"
                                     [formContext]="formContext"
@@ -99,11 +135,15 @@
                                     [hasChatBot]="hasChatBot"
                                     [isComparing]="!!formModelCompare"
                                     [language]="language"
-                                    [languages]="languages"></sqx-field-editor>
+                                    [languages]="languages" />
                             </div>
+
                         }
-                    } @else {
-                        <sqx-field-editor
+
+                    }
+
+                    @else {
+                         <sqx-field-editor
                             [form]="formCompare"
                             [formContext]="formContext"
                             [formLevel]="formLevel"
@@ -111,10 +151,16 @@
                             [hasChatBot]="hasChatBot"
                             [isComparing]="!!formModelCompare"
                             [language]="language"
-                            [languages]="languages"></sqx-field-editor>
+                            [languages]="languages" />
                     }
+
                 </div>
+
             }
+
         </div>
+
     }
+
 </div>
+

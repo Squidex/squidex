@@ -10,8 +10,10 @@
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CodeEditorComponent, ConfirmClickDirective, FromNowPipe, TranslatePipe } from '@app/shared';
+import { BranchItem, ConfirmClickDirective, FlowView, FromNowPipe, RuleElementDto, RuleEventDto, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 import { RuleClassPipe } from '../../shared/pipes';
+import { RuleElementComponent } from '../../shared/rule-element.component';
+import { StateDetailsComponent } from '../../shared/state-details.component';
 
 @Component({
     standalone: true,
@@ -20,17 +22,21 @@ import { RuleClassPipe } from '../../shared/pipes';
     templateUrl: './rule-event.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        CodeEditorComponent,
         ConfirmClickDirective,
         FormsModule,
         FromNowPipe,
         RuleClassPipe,
+        RuleElementComponent,
+        StateDetailsComponent,
         TranslatePipe,
     ],
 })
 export class RuleEventComponent {
     @Input('sqxRuleEvent')
-    public event!: any;
+    public event!: RuleEventDto;
+
+    @Input({ required: true })
+    public availableSteps: Record<string, RuleElementDto> = {};
 
     @Input({ transform: booleanAttribute })
     public expanded = false;
@@ -43,4 +49,22 @@ export class RuleEventComponent {
 
     @Output()
     public cancel = new EventEmitter<any>();
+
+    public selectedStep: string | null = null;
+
+    public stepItems: BranchItem[] = [];
+
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.event) {
+            this.stepItems = new FlowView(this.event.flowState.definition as any).getAllItems();
+        }
+    }
+
+    public selectStep(id: string) {
+        if (this.selectedStep === id) {
+            this.selectedStep = null;
+        } else {
+            this.selectedStep = id;
+        }
+    }
 }

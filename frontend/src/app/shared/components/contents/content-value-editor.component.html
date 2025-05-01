@@ -6,7 +6,7 @@
                     <input class="form-control" [formControlName]="field.name" [placeholder]="field.displayPlaceholder" type="number" />
                 }
                 @case ("Stars") {
-                    <sqx-stars [formControlName]="field.name" [maximumStars]="field.rawProperties.maxValue"></sqx-stars>
+                    <sqx-stars [formControlName]="field.name" [maximumStars]="field.rawProperties.maxValue" />
                 }
                 @case ("Dropdown") {
                     <select class="form-select" [formControlName]="field.name">
@@ -43,7 +43,7 @@
         @case ("Boolean") {
             @switch (field.rawProperties.editor) {
                 @case ("Toggle") {
-                    <sqx-toggle [formControlName]="field.name" [threeStates]="!field.properties.isRequired"></sqx-toggle>
+                    <sqx-toggle [formControlName]="field.name" [threeStates]="!field.properties.isRequired" />
                 }
                 @case ("Checkbox") {
                     <div class="form-check">

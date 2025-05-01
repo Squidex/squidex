@@ -94,7 +94,7 @@
                     canFollow="false"
                     [commentItem]="item"
                     [comments]="comments"
-                    [userToken]="userToken"></sqx-comment>
+                    [userToken]="userToken" />
             }
             @if (snapshot.mode === "Reply") {
                 <form [formGroup]="replyForm.form" (ngSubmit)="reply()">

@@ -21,41 +21,55 @@
     }
 }
 
-.large {
-    &.editable {
-        cursor: pointer;
+.sm {
+    .icon {   
+        @include force-height(2rem);
+        @include force-width(2rem);
     }
+}
 
-    &-icon {
+.md {
+    .icon {   
+        @include force-height(3rem);
+        @include force-width(3rem);
+    }
+}
+
+.lg {
+    .icon {   
         @include force-height(4rem);
         @include force-width(4rem);
-        border-radius: 100%;
-        border: null;
-        color: $color-white;
-        position: relative;
+    }
+}
 
-        &:hover {
-            .btn-outline-danger {
-                display: block;
-            }
+.icon {
+    position: relative;
+    border-radius: 100%;
+    border: null;
+    color: $color-white;
+    cursor: pointer;
+
+    &:hover {
+        .btn-outline-danger {
+            display: block;
         }
     }
+}
 
-    &-link {
-        font-size: $font-small;
-        font-weight: normal;
-    }
+.link {
+    font-size: $font-small;
+    font-weight: normal;
+}
 
-    &-title {
-        font-style: normal;
-        font-weight: 500;
-        line-height: 1;
-    }
+.title {
+    font-style: normal;
+    font-weight: 500;
+    line-height: 1;
+}
 
-    &-text {
-        font-size: $font-small;
-        font-weight: normal;
-        margin-bottom: .125rem;
-        margin-top: .25rem;
-    }
+.text {
+    font-size: $font-small;
+    font-weight: normal;
+    margin-bottom: .125rem;
+    margin-top: .25rem;
 }

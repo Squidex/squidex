@@ -1,36 +1,34 @@
 <div class="form-horizontal" [formGroup]="triggerForm.form">
+
     <div class="form-group">
-        <label for="condition">{{ "common.condition" | sqxTranslate }}</label>
-
-        <sqx-control-errors for="condition"></sqx-control-errors>
-
-        <textarea
+         <label for="condition">{{ "common.condition" | sqxTranslate }}</label
+        > <sqx-control-errors for="condition" /> <textarea
             class="form-control code"
             id="condition"
             formControlName="condition"
-            placeholder="{{ 'rules.conditionHint' | sqxTranslate }}"></textarea>
+            placeholder="{{ 'rules.conditionHint' | sqxTranslate }}"></textarea
+        >
     </div>
 
     <div class="help">
+
         <h4>{{ "common.conditions" | sqxTranslate }}</h4>
-
-        <sqx-form-hint>
-            {{ "rules.conditionHint2" | sqxTranslate }}
-        </sqx-form-hint>
-
+         <sqx-form-hint> {{ "rules.conditionHint2" | sqxTranslate }} </sqx-form-hint>
         <ul class="help-examples">
-            <li class="help-example">
-                {{ "rules.conditions.event" | sqxTranslate }}:
-                <br />
 
-                <sqx-code>event.type == 'Created' || event.type == 'Updated'</sqx-code>
-            </li>
             <li class="help-example">
-                {{ "rules.conditions.schema" | sqxTranslate }}:
-                <br />
-
-                <sqx-code>schemaId.name === 'my-schema'</sqx-code>
+                 {{ "rules.conditions.event" | sqxTranslate }}: <br /> <sqx-code
+                    >event.type == 'Created' || event.type == 'Updated'</sqx-code
+                >
             </li>
+
+            <li class="help-example">
+                 {{ "rules.conditions.schema" | sqxTranslate }}: <br /> <sqx-code>schemaId.name === 'my-schema'</sqx-code>
+            </li>
+
         </ul>
+
     </div>
+
 </div>
+

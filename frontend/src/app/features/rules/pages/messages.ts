@@ -9,6 +9,5 @@ export class RuleConfigured {
     constructor(
         public readonly trigger: any,
         public readonly flow: any,
-    ) {
-    }
+    ) {}
 }

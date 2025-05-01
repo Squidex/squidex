@@ -5,12 +5,14 @@
     overflow="true"
     titleIcon="contents"
     titleText="i18n:common.contents"
-    white="true">
+    white="true"
+    >
     @if (schema | async; as schema) {
-        <sqx-content-extension
+         <sqx-content-extension
             [contentItem]="undefined"
             [contentSchema]="schema"
             [editorUrl]="schema.properties.contentsListUrl"
-            scrollable="true"></sqx-content-extension>
+            scrollable="true" />
     }
-</sqx-layout>
+     </sqx-layout
+>

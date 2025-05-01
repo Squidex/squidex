@@ -43,14 +43,14 @@
                         placeholder="{{ 'contents.searchPlaceholder' | sqxTranslate }}"
                         [query]="contentsState.query | async"
                         (queryChange)="search($event)"
-                        [queryModel]="queryModel | async"></sqx-search-form>
+                        [queryModel]="queryModel | async" />
                 </div>
                 @if (languages.length > 1) {
                     <div class="col-auto">
                         <sqx-language-selector
                             class="languages-buttons"
                             [(language)]="language"
-                            [languages]="languages"></sqx-language-selector>
+                            [languages]="languages" />
                     </div>
                 }
             }
@@ -70,7 +70,7 @@
                                 <th [field]="metaFields.lastModifiedByAvatar" sqxContentListCell>
                                     <sqx-content-list-header
                                         [field]="metaFields.lastModifiedByAvatar"
-                                        [language]="language"></sqx-content-list-header>
+                                        [language]="language" />
                                 </th>
                                 @for (field of schema.defaultReferenceFields; track field) {
                                     <th>
@@ -78,13 +78,13 @@
                                             [field]="field"
                                             [language]="language"
                                             [query]="(contentsState.query | async)!"
-                                            (queryChange)="search($event)"></sqx-content-list-header>
+                                            (queryChange)="search($event)" />
                                     </th>
                                 }
                                 <th [field]="metaFields.statusColor" sqxContentListCell>
                                     <sqx-content-list-header
                                         [field]="metaFields.statusColor"
-                                        [language]="language"></sqx-content-list-header>
+                                        [language]="language" />
                                 </th>
                             </tr>
                         </thead>
@@ -115,7 +115,7 @@
                     <sqx-pager
                         (loadTotal)="reloadTotal()"
                         [paging]="contentsState.paging | async"
-                        (pagingChange)="contentsState.page($event)"></sqx-pager>
+                        (pagingChange)="contentsState.page($event)" />
                 </ng-container>
             </sqx-list-view>
         }

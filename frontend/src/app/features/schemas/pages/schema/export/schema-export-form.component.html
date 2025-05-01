@@ -1,34 +1,48 @@
 <form class="inner-form" [formGroup]="synchronizeForm.form" (submit)="synchronize()">
+
     @if (isEditable) {
+
         <div class="inner-header">
+
             <div class="row gx-3 align-items-center">
+
                 <div class="col"></div>
+
                 <div class="col-auto">
+
                     <div class="form-check">
-                        <input class="form-check-input" id="fieldsDelete" formControlName="fieldsDelete" type="checkbox" />
-                        <label class="form-check-label" for="fieldsDelete">
-                            {{ "schemas.export.deleteFields" | sqxTranslate }}
-                        </label>
+                         <input class="form-check-input" id="fieldsDelete" formControlName="fieldsDelete" type="checkbox" /> <label
+                            class="form-check-label"
+                            for="fieldsDelete"
+                            > {{ "schemas.export.deleteFields" | sqxTranslate }} </label
+                        >
                     </div>
+
                 </div>
+
                 <div class="col-auto">
+
                     <div class="form-check">
-                        <input class="form-check-input" id="fieldsRecreate" formControlName="fieldsRecreate" type="checkbox" />
-                        <label class="form-check-label" for="fieldsRecreate">
-                            {{ "schemas.export.recreateFields" | sqxTranslate }}
-                        </label>
+                         <input class="form-check-input" id="fieldsRecreate" formControlName="fieldsRecreate" type="checkbox" /> <label
+                            class="form-check-label"
+                            for="fieldsRecreate"
+                            > {{ "schemas.export.recreateFields" | sqxTranslate }} </label
+                        >
                     </div>
+
                 </div>
+
                 <div class="col-auto">
-                    <button class="btn btn-primary" type="submit">
-                        {{ "schemas.export.synchronize" | sqxTranslate }}
-                    </button>
+                     <button class="btn btn-primary" type="submit"> {{ "schemas.export.synchronize" | sqxTranslate }} </button>
                 </div>
+
             </div>
+
         </div>
+
     }
 
-    <div class="inner-main">
-        <sqx-code-editor borderless="true" formControlName="json" valueMode="Json"></sqx-code-editor>
-    </div>
+    <div class="inner-main"> <sqx-code-editor borderless="true" formControlName="json" valueMode="Json" /> </div>
+
 </form>
+

@@ -1,64 +1,59 @@
 @if (config) {
-    <button
+     <button
         class="btn settings-button"
         #buttonSettings
         [class.btn-primary]="needsAttention"
         [class.focused]="needsAttention"
         (click)="dropdownModal.toggle()"
         type="button">
-        <span class="hidden">{{ "common.settings" | sqxTranslate }}</span>
-        <i class="icon-settings"></i>
-    </button>
-    <sqx-dropdown-menu position="bottom-end" scrollY="true" [sqxAnchoredTo]="buttonSettings" *sqxModal="dropdownModal">
+         <span class="hidden">{{ "common.settings" | sqxTranslate }}</span
+        > <i class="icon-settings"></i> </button
+    > <sqx-dropdown-menu position="bottom-end" scrollY="true" [sqxAnchoredTo]="buttonSettings" *sqxModal="dropdownModal"
+        >
         @for (item of configOptions; track item) {
+
             <div class="dropdown-item">
+
                 <div class="form-check">
-                    <input
+                     <input
                         class="form-check-input"
                         id="field_{{ item.type }}"
                         [ngModel]="isSelected(item)"
                         (ngModelChange)="addOrRemove(item)"
-                        type="checkbox" />
-                    <label class="form-check-label" for="field_{{ item.type }}">
-                        {{ item.name }}
-                    </label>
+                        type="checkbox" /> <label class="form-check-label" for="field_{{ item.type }}"> {{ item.name }} </label>
                 </div>
+
             </div>
+
         }
+
         <div class="dropdown-divider"></div>
-        <a class="dropdown-item" (click)="startExpertMode()">
-            {{ "common.expertMode" | sqxTranslate }}
-        </a>
-        <a class="dropdown-item" (click)="saveConfig()">
-            {{ "common.save" | sqxTranslate }}
-        </a>
+         <a class="dropdown-item" (click)="startExpertMode()"> {{ "common.expertMode" | sqxTranslate }} </a> <a
+            class="dropdown-item"
+            (click)="saveConfig()"
+            > {{ "common.save" | sqxTranslate }} </a
+        >
         <div class="dropdown-divider"></div>
-        <a
+         <a
             class="dropdown-item dropdown-item-delete"
             (beforeClick)="dropdownModal.hide()"
             confirmRememberKey="resetConfig"
             confirmText="i18n:dashboard.resetConfigConfirmText"
             confirmTitle="i18n:dashboard.resetConfigConfirmTitle"
-            (sqxConfirmClick)="resetConfig()">
-            {{ "common.reset" | sqxTranslate }}
-        </a>
-    </sqx-dropdown-menu>
-    <sqx-modal-dialog (dialogClose)="expertDialog.hide()" fullHeight="true" size="lg" *sqxModal="expertDialog">
-        <ng-container title>
-            {{ "dashboard.editConfig" | sqxTranslate }}
-        </ng-container>
-        <ng-container content>
-            <div class="json-editor">
-                <sqx-code-editor borderless="true" [(ngModel)]="expertConfig" valueMode="Json"></sqx-code-editor>
-            </div>
-        </ng-container>
-        <ng-container footer>
-            <button class="btn btn-text-secondary" (click)="expertDialog.hide()" type="button">
-                {{ "common.cancel" | sqxTranslate }}
-            </button>
-            <button class="btn btn-primary" (click)="completeExpertMode()" type="button">
-                {{ "common.update" | sqxTranslate }}
-            </button>
-        </ng-container>
-    </sqx-modal-dialog>
+            (sqxConfirmClick)="resetConfig()"
+            > {{ "common.reset" | sqxTranslate }} </a
+        > </sqx-dropdown-menu
+    > <sqx-modal-dialog (dialogClose)="expertDialog.hide()" fullHeight="true" size="lg" *sqxModal="expertDialog"
+        > <ng-container title> {{ "dashboard.editConfig" | sqxTranslate }} </ng-container> <ng-container content
+            >
+            <div class="json-editor"> <sqx-code-editor borderless="true" [(ngModel)]="expertConfig" valueMode="Json" /> </div>
+             </ng-container
+        > <ng-container footer
+            > <button class="btn btn-text-secondary" (click)="expertDialog.hide()" type="button">
+                 {{ "common.cancel" | sqxTranslate }} </button
+            > <button class="btn btn-primary" (click)="completeExpertMode()" type="button"> {{ "common.update" | sqxTranslate }} </button>
+            </ng-container
+        > </sqx-modal-dialog
+    >
 }
+
