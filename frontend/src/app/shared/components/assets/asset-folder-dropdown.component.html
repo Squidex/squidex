@@ -2,7 +2,6 @@
     <div class="form-select" #input (click)="dropdown.show()">
         <div class="truncate">
             {{ selection.item.folderName | sqxTranslate }}
-
             @if (selectionPath) {
                 <span>{{ "common.in" | sqxTranslate }}&nbsp;./{{ selectionPath }}</span>
             }
@@ -12,10 +11,6 @@
 
 <div class="items-container">
     <div class="control-dropdown" position="bottom-start" scrollY="true" [sqxAnchoredTo]="input" *sqxModal="dropdown">
-        <sqx-asset-folder-dropdown-item
-            [appName]="appName"
-            [nodeLevel]="0"
-            [nodeModel]="root"
-            (selectNode)="select($event)" />
+        <sqx-asset-folder-dropdown-item [appName]="appName" [nodeLevel]="0" [nodeModel]="root" (selectNode)="select($event)" />
     </div>
 </div>

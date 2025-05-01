@@ -1,31 +1,27 @@
-<sqx-title message="i18n:api.graphqlPageTitle" /> <sqx-layout hideHeader="true" hideSidebar="true" layout="main"
-    >
+<sqx-title message="i18n:api.graphqlPageTitle" />
+<sqx-layout hideHeader="true" hideSidebar="true" layout="main">
     <div #graphiQLContainer inner sqxTourStep="graphQLExplorer"></div>
 
     @if (clientsReadable) {
-         <button class="btn btn-simple btn-options" (click)="clientsDialog.show()"> <i class="icon-clients"></i> </button>
+        <button class="btn btn-simple btn-options" (click)="clientsDialog.show()"><i class="icon-clients"></i></button>
     }
-     </sqx-layout
-> <sqx-modal-dialog (dialogClose)="clientsDialog.hide()" *sqxModal="clientsDialog"
-    > <ng-container title> {{ "api.selectClient" | sqxTranslate }} </ng-container> <ng-container content
-        > <sqx-form-hint> {{ "api.selectClientDescription" | sqxTranslate }} </sqx-form-hint>
+</sqx-layout>
+<sqx-modal-dialog (dialogClose)="clientsDialog.hide()" *sqxModal="clientsDialog">
+    <ng-container title> {{ "api.selectClient" | sqxTranslate }} </ng-container>
+    <ng-container content>
+        <sqx-form-hint> {{ "api.selectClientDescription" | sqxTranslate }} </sqx-form-hint>
         <div class="form-group">
-             <label for="client">{{ "common.client" | sqxTranslate }}</label
-            > <select class="form-control" id="client" [ngModel]="clientSelected" (ngModelChange)="selectClient($event)">
-
+            <label for="client">{{ "common.client" | sqxTranslate }}</label>
+            <select class="form-control" id="client" [ngModel]="clientSelected" (ngModelChange)="selectClient($event)">
                 <option [ngValue]="null">{{ "api.noClient" | sqxTranslate }}</option>
 
                 @for (client of clientsState.clients | async; track client) {
-
                     <option [ngValue]="client">{{ client.id }}</option>
-
                 }
-                 </select
-            >
+            </select>
         </div>
-         </ng-container
-    > <ng-container footer
-        > <button class="btn btn-text-secondary" (click)="clientsDialog.hide()" type="button"> {{ "common.close" | sqxTranslate }} </button>
-        </ng-container
-    > </sqx-modal-dialog
->
+    </ng-container>
+    <ng-container footer>
+        <button class="btn btn-text-secondary" (click)="clientsDialog.hide()" type="button">{{ "common.close" | sqxTranslate }}</button>
+    </ng-container>
+</sqx-modal-dialog>

@@ -1,12 +1,8 @@
-<sqx-list-view [isLoading]="contentsState.isLoading | async" table="true"
-    > <ng-container
-        >
+<sqx-list-view [isLoading]="contentsState.isLoading | async" table="true">
+    <ng-container>
         @if (contentsState.contents | async; as contents) {
-
             <table class="table table-items table-fixed">
-
                 @for (content of contents; track content.id) {
-
                     <tbody
                         [canRemove]="false"
                         [columns]="contents | sqxContentsColumns"
@@ -17,37 +13,23 @@
                         [sqxReferenceItem]="content"
                         [validations]="(contentsState.validationResults | async)!"
                         [validityVisible]="true"></tbody>
-
                 }
 
                 @if ((contentsState.isLoaded | async) && contents.length === 0) {
-
                     <tbody>
-
                         <tr>
-
                             @if (mode === "references") {
-
-                                <td class="table-items-row-empty"> {{ "contents.noReferences" | sqxTranslate }} </td>
-
+                                <td class="table-items-row-empty">{{ "contents.noReferences" | sqxTranslate }}</td>
                             }
 
                             @if (mode === "referencing") {
-
-                                <td class="table-items-row-empty"> {{ "contents.noReferencing" | sqxTranslate }} </td>
-
+                                <td class="table-items-row-empty">{{ "contents.noReferencing" | sqxTranslate }}</td>
                             }
-
                         </tr>
-
                     </tbody>
-
                 }
-
             </table>
-
         }
-         </ng-container
-    > <ng-container footer> <sqx-pager [paging]="contentsState.paging | async" (pagingChange)="contentsState.page($event)" /> </ng-container
-    > </sqx-list-view
->
+    </ng-container>
+    <ng-container footer> <sqx-pager [paging]="contentsState.paging | async" (pagingChange)="contentsState.page($event)" /> </ng-container>
+</sqx-list-view>

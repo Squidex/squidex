@@ -1,41 +1,36 @@
 <form class="inner-form" (ngSubmit)="saveSchema()">
-
     <div class="inner-header">
-
         <ul class="nav nav-tabs2">
-
             <li class="nav-item">
-                 <a class="nav-link" [class.active]="selectedTab === 0" (click)="selectTab(0)"
-                    > {{ "schemas.listFields" | sqxTranslate }} <small>({{ fieldsInLists.length }})</small> </a
-                >
+                <a class="nav-link" [class.active]="selectedTab === 0" (click)="selectTab(0)">
+                    {{ "schemas.listFields" | sqxTranslate }} <small>({{ fieldsInLists.length }})</small>
+                </a>
             </li>
 
             <li class="nav-item">
-                 <a class="nav-link" [class.active]="selectedTab === 1" (click)="selectTab(1)"
-                    > {{ "schemas.referenceFields" | sqxTranslate }} <small>({{ fieldsInReferences.length }})</small> </a
-                >
+                <a class="nav-link" [class.active]="selectedTab === 1" (click)="selectTab(1)">
+                    {{ "schemas.referenceFields" | sqxTranslate }} <small>({{ fieldsInReferences.length }})</small>
+                </a>
             </li>
-
         </ul>
-         <button class="float-end btn btn-primary" [class.invisible]="!isEditable" type="submit">
-             {{ "common.save" | sqxTranslate }} </button
-        >
+        <button class="float-end btn btn-primary" [class.invisible]="!isEditable" type="submit">
+            {{ "common.save" | sqxTranslate }}
+        </button>
     </div>
 
     <div class="inner-main">
-         <sqx-field-list
+        <sqx-field-list
             [class.hidden]="selectedTab !== 0"
             [emptyText]="'schemas.listFieldsEmpty' | sqxTranslate"
             [fieldNames]="fieldsInLists"
             (fieldNamesChange)="setFieldsInLists($event)"
             [schema]="schema"
-            withMetaFields="true" /> <sqx-field-list
+            withMetaFields="true" />
+        <sqx-field-list
             [class.hidden]="selectedTab !== 1"
             [emptyText]="'schemas.referenceFieldsEmpty' | sqxTranslate"
             [fieldNames]="fieldsInReferences"
             (fieldNamesChange)="setFieldsInReferences($event)"
             [schema]="schema" />
     </div>
-
 </form>
-

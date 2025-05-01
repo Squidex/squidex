@@ -2,19 +2,13 @@
     @if (maximumStars > 0 && maximumStars <= 15) {
         <span class="stars" [class.disabled]="snapshot.isDisabled" (mouseleave)="stopPreview()">
             @for (star of snapshot.starsArray; track star) {
-                <span
-                    class="star"
-                    [class.selected]="star <= snapshot.stars"
-                    (click)="setValue(star)"
-                    (mouseenter)="setPreview(star)"></span>
+                <span class="star" [class.selected]="star <= snapshot.stars" (click)="setValue(star)" (mouseenter)="setPreview(star)"></span>
             }
         </span>
         <button class="btn btn-text-secondary" [class.hidden]="!snapshot.value" (click)="reset()" type="button">
             {{ "common.clear" | sqxTranslate }}
         </button>
     } @else {
-        <div class="many-stars">
-            {{ "common.stars.max" | sqxTranslate }}
-        </div>
+        <div class="many-stars">{{ "common.stars.max" | sqxTranslate }}</div>
     }
 </div>

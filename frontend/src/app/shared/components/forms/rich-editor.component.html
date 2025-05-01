@@ -1,21 +1,10 @@
 <div class="editor" #editor></div>
-
 <sqx-asset-selector (assetSelect)="insertAssets($event)" *sqxModal="assetsDialog" />
-
-<sqx-asset-dialog
-    [asset]="asset"
-    (dialogClose)="closeAssetDialog()"
-    *sqxModal="assetToEdit | async; let asset; isDialog: true" />
-
+<sqx-asset-dialog [asset]="asset" (dialogClose)="closeAssetDialog()" *sqxModal="assetToEdit | async; let asset; isDialog: true" />
 <sqx-content-selector
     (contentSelect)="insertContents($event)"
     [language]="language"
     [languages]="languages"
     [schemaIdentifiers]="schemaIds"
     *sqxModal="contentsDialog" />
-
-<sqx-chat-dialog
-    [configuration]="'text'"
-    (contentSelect)="insertText($event)"
-    [folderId]="folderId"
-    *sqxModal="chatDialog" />
+<sqx-chat-dialog [configuration]="'text'" (contentSelect)="insertText($event)" [folderId]="folderId" *sqxModal="chatDialog" />

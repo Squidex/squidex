@@ -13,12 +13,12 @@
                     <ng-template let-user="$implicit">
                         <span class="autocomplete-user">
                             <img class="user-picture" [src]="user | sqxUserDtoPicture" />
-
                             <span class="user-name">{{ user.displayName }}</span>
                         </span>
                     </ng-template>
                 </sqx-autocomplete>
             </div>
+
             <div class="col-3">
                 <select class="form-select" formControlName="role">
                     @for (role of roles; track role) {
@@ -26,6 +26,7 @@
                     }
                 </select>
             </div>
+
             <div class="col-auto">
                 <button class="btn btn-success" [disabled]="assignContributorForm.hasNoUser | async" type="submit">
                     {{ "contributors.add" | sqxTranslate }}
@@ -41,8 +42,4 @@
         </sqx-form-hint>
     </div>
 </div>
-
-<sqx-import-contributors-dialog
-    (dialogClose)="importDialog.hide()"
-    [roles]="roles"
-    *sqxModal="importDialog" />
+<sqx-import-contributors-dialog (dialogClose)="importDialog.hide()" [roles]="roles" *sqxModal="importDialog" />

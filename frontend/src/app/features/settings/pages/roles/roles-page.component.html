@@ -1,44 +1,36 @@
 <sqx-title message="i18n:common.roles" />
-
 <sqx-layout innerWidth="55" layout="main" titleIcon="roles" titleText="i18n:common.roles">
     <ng-container menu>
         <button class="btn btn-text-secondary" (click)="reload()" shortcut="CTRL + B" title="i18n:roles.refreshTooltip" type="button">
-            <i class="icon-reset"></i>
-            {{ "common.refresh" | sqxTranslate }}
+            <i class="icon-reset"></i> {{ "common.refresh" | sqxTranslate }}
         </button>
     </ng-container>
-
     <ng-container>
         <sqx-list-view innerWidth="55rem" [isLoading]="rolesState.isLoading | async">
             @if (rolesState.isLoaded | async) {
                 @if (rolesState.canCreate | async) {
                     <sqx-role-add-form />
                 }
+
                 @if (rolesState.defaultRoles | async; as defaultRoles) {
                     @if (defaultRoles.length > 0) {
                         <div>
                             <h5 class="mt-4">{{ "roles.defaultRoles" | sqxTranslate }}</h5>
-                            <sqx-form-hint>
-                                {{ "roles.defaultRoles.hint" | sqxTranslate }}
-                            </sqx-form-hint>
+                            <sqx-form-hint> {{ "roles.defaultRoles.hint" | sqxTranslate }} </sqx-form-hint>
                             @for (role of defaultRoles; track role.name) {
-                                <sqx-role
-                                    [allPermissions]="allPermissions"
-                                    [role]="role"
-                                    [schemas]="(schemasState.schemas | async)!" />
+                                <sqx-role [allPermissions]="allPermissions" [role]="role" [schemas]="(schemasState.schemas | async)!" />
                             }
                         </div>
                     }
                 }
+
                 @if (rolesState.customRoles | async; as customRoles) {
                     @if (customRoles.length > 0) {
                         <div>
                             <h5 class="mt-4">{{ "roles.customRoles" | sqxTranslate }}</h5>
+
                             @for (role of customRoles; track role.name) {
-                                <sqx-role
-                                    [allPermissions]="allPermissions"
-                                    [role]="role"
-                                    [schemas]="(schemasState.schemas | async)!" />
+                                <sqx-role [allPermissions]="allPermissions" [role]="role" [schemas]="(schemasState.schemas | async)!" />
                             }
                         </div>
                     }
@@ -46,7 +38,6 @@
             }
         </sqx-list-view>
     </ng-container>
-
     <ng-template sidebarMenu>
         <div class="panel-nav">
             <a
@@ -61,7 +52,6 @@
                 titlePosition="left">
                 <i class="icon-time"></i>
             </a>
-
             <a
                 class="panel-link"
                 attr.aria-label="{{ 'common.help' | sqxTranslate }}"
@@ -77,5 +67,4 @@
         </div>
     </ng-template>
 </sqx-layout>
-
 <router-outlet></router-outlet>

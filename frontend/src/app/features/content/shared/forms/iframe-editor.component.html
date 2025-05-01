@@ -1,17 +1,10 @@
 <div #container>
-
     <div #inner [class.expanded]="isExpanded" [class.fullscreen]="snapshot.isFullscreen">
-         <iframe
-            #iframe
-            [attr.src]="computedUrl | sqxSafeResourceUrl"
-            [scrolling]="!isExpanded ? 'no' : 'yes'"
-            [style.height]="0"
-            width="100%"></iframe
-        >
+        <iframe #iframe [attr.src]="computedUrl | sqxSafeResourceUrl" [scrolling]="!isExpanded ? 'no' : 'yes'" [style.height]="0" width="100%"></iframe>
     </div>
-
 </div>
- <sqx-asset-selector (assetSelect)="pickAssets($event)" *sqxModal="assetsDialog" /> <sqx-content-selector
+<sqx-asset-selector (assetSelect)="pickAssets($event)" *sqxModal="assetsDialog" />
+<sqx-content-selector
     [alreadySelectedIds]="contentsSelectedIds"
     (contentSelect)="pickContents($event)"
     [language]="language"

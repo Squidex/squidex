@@ -5,19 +5,11 @@
     [language]="language"
     [languages]="languages"
     [model]="model" />
-
 <h4 class="mt-4">{{ "search.sorting" | sqxTranslate }}</h4>
 
 @for (sorting of actualQuery.sort; track sorting; let i = $index) {
     <div class="mb-2">
-        <sqx-sorting
-            [model]="model"
-            (remove)="removeSorting(i)"
-            [sorting]="sorting"
-            (sortingChange)="replaceSorting(i, $event)" />
+        <sqx-sorting [model]="model" (remove)="removeSorting(i)" [sorting]="sorting" (sortingChange)="replaceSorting(i, $event)" />
     </div>
 }
-
-<button class="btn btn-outline-success btn-sm me-2" (click)="addSorting()">
-    {{ "search.addSorting" | sqxTranslate }}
-</button>
+<button class="btn btn-outline-success btn-sm me-2" (click)="addSorting()">{{ "search.addSorting" | sqxTranslate }}</button>

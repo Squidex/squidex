@@ -7,43 +7,23 @@
                 {{ "apps.create" | sqxTranslate }}
             }
         </ng-container>
-
         <ng-container content>
             <sqx-form-error [error]="createForm.error | async" />
-
             <div class="form-group mt-2">
                 <label for="appName">
-                    {{ "common.name" | sqxTranslate }}
-                    <small class="hint">({{ "common.requiredHint" | sqxTranslate }})</small>
+                    {{ "common.name" | sqxTranslate }} <small class="hint">({{ "common.requiredHint" | sqxTranslate }})</small>
                 </label>
-
                 <sqx-control-errors for="name" />
-
-                <input
-                    class="form-control"
-                    id="name"
-                    autocomplete="off"
-                    formControlName="name"
-                    sqxFocusOnInit
-                    sqxTransformInput="LowerCase" />
-
-                <sqx-form-hint>
-                    {{ "apps.appNameHint" | sqxTranslate }}
-                </sqx-form-hint>
+                <input class="form-control" id="name" autocomplete="off" formControlName="name" sqxFocusOnInit sqxTransformInput="LowerCase" />
+                <sqx-form-hint> {{ "apps.appNameHint" | sqxTranslate }} </sqx-form-hint>
             </div>
 
             <div class="form-group">
-                <sqx-form-alert marginBottom="0" marginTop="2">
-                    {{ "apps.appNameWarning" | sqxTranslate }}
-                </sqx-form-alert>
+                <sqx-form-alert marginBottom="0" marginTop="2"> {{ "apps.appNameWarning" | sqxTranslate }} </sqx-form-alert>
             </div>
         </ng-container>
-
         <ng-container footer>
-            <button class="btn btn-secondary" (click)="emitClose()" type="button">
-                {{ "common.cancel" | sqxTranslate }}
-            </button>
-
+            <button class="btn btn-secondary" (click)="emitClose()" type="button">{{ "common.cancel" | sqxTranslate }}</button>
             <button class="btn btn-success" type="submit">
                 {{ "common.create" | sqxTranslate }}
             </button>

@@ -3,19 +3,12 @@
         <span class="navbar-brand align-items-center justify-content-center d-flex" routerLink="/app">
             <sqx-logo [isLoading]="loadingService.loading | async" />
         </span>
-        <div class="navbar-nav">
-            <sqx-apps-menu />
-        </div>
+        <div class="navbar-nav"><sqx-apps-menu /></div>
+
         <div class="navbar-nav align-items-center ms-auto">
-            <sqx-search-menu />
-            <sqx-chat-menu />
-            <sqx-asset-uploader />
-            <sqx-notifications-menu />
-            <sqx-profile-menu />
+            <sqx-search-menu /> <sqx-chat-menu /> <sqx-asset-uploader /> <sqx-notifications-menu /> <sqx-profile-menu />
         </div>
     </nav>
 }
 
-<div class="main" [class.top]="isEmbedded">
-    <router-outlet></router-outlet>
-</div>
+<div class="main" [class.top]="isEmbedded"><router-outlet></router-outlet></div>

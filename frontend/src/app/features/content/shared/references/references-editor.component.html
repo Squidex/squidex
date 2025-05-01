@@ -1,28 +1,19 @@
 <div class="row gx-2">
-
     <div class="col" [class.disabled]="snapshot.isDisabled">
-         <button class="btn btn-outline-secondary btn-dashed btn-block" (click)="createContent()" type="button">
-             {{ "contents.referencesCreateNew" | sqxTranslate }} </button
-        >
+        <button class="btn btn-outline-secondary btn-dashed btn-block" (click)="createContent()" type="button">
+            {{ "contents.referencesCreateNew" | sqxTranslate }}
+        </button>
     </div>
 
     <div class="col" [class.disabled]="snapshot.isDisabled">
-         <button class="btn btn-outline-secondary btn-dashed btn-block" (click)="contentSelectorDialog.show()" type="button">
-             {{ "contents.referencesSelectExisting" | sqxTranslate }} </button
-        >
+        <button class="btn btn-outline-secondary btn-dashed btn-block" (click)="contentSelectorDialog.show()" type="button">
+            {{ "contents.referencesSelectExisting" | sqxTranslate }}
+        </button>
     </div>
-
 </div>
 
 @if (snapshot.contentItems && snapshot.contentItems.length > 0) {
-
-    <div
-        class="references-container"
-        [class.expanded]="isExpanded"
-        (sqxResizeCondition)="setCompact($event)"
-        sqxResizeMaxWidth="0"
-        sqxResizeMinWidth="600">
-
+    <div class="references-container" [class.expanded]="isExpanded" (sqxResizeCondition)="setCompact($event)" sqxResizeMaxWidth="0" sqxResizeMinWidth="600">
         <table
             class="table table-items table-fixed"
             cdkDropList
@@ -30,9 +21,7 @@
             [cdkDropListDisabled]="snapshot.isDisabled"
             (cdkDropListDropped)="sort($event)"
             [class.disabled]="snapshot.isDisabled">
-
             @for (content of snapshot.contentItems; track content.id) {
-
                 <tbody
                     class="table-drag"
                     cdkDrag
@@ -45,18 +34,13 @@
                     [language]="language"
                     [languages]="languages"
                     [sqxReferenceItem]="content">
-                     <i class="icon-drag2 drag-handle" cdkDragHandle></i
-                    >
+                    <i class="icon-drag2 drag-handle" cdkDragHandle></i>
                 </tbody>
-
             }
-
         </table>
-
     </div>
-
 }
- <sqx-content-creator
+<sqx-content-creator
     (contentCreate)="select($event)"
     [formContext]="formContext"
     [initialData]="clonedContent?.data"
@@ -64,7 +48,8 @@
     [languages]="languages"
     [schemaIds]="schemaIds"
     [schemaName]="clonedContent?.schemaName"
-    *sqxModal="contentCreatorDialog" /> <sqx-content-selector
+    *sqxModal="contentCreatorDialog" />
+<sqx-content-selector
     [allowDuplicates]="allowDuplicates"
     [alreadySelected]="snapshot.contentItems"
     (contentSelect)="select($event)"

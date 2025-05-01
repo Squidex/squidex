@@ -9,7 +9,7 @@
                 "attributeIgnoreChars": "[]()*",
                 "attributeSort": "ASC",
                 "parser": "angular",
-                "printWidth": 140,
+                "printWidth": 160,
                 "bracketSameLine": true,
                 "bracketSpacing": true,
                 "singleAttributePerLine": false,                                                                                       

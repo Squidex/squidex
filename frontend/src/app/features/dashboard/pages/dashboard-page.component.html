@@ -1,112 +1,93 @@
 <sqx-title message="i18n:dashboard.pageTitle" />
 @if (selectedApp | async; as app) {
-
     <div class="dashboard" @fade>
-
         @if (!isScrolled) {
-
             <div class="dashboard-summary" @fade sqxTourStep="appDashboard">
-
                 <h1 class="dashboard-title">{{ "dashboard.welcomeTitle" | sqxTranslate: { user: user } }}</h1>
 
                 <div class="subtext" [sqxMarkdown]="'dashboard.welcomeText' | sqxTranslate: { app: app.displayName }"></div>
-
             </div>
-
         }
-         <gridster #grid [options]="gridOptions"
-            >
+        <gridster #grid [options]="gridOptions">
             @for (item of gridConfig; track item) {
-                 <gridster-item [item]="item"
-                    >
+                <gridster-item [item]="item">
                     @switch (item.type) {
-
                         @case ("schemas") {
-                             <sqx-schema-card [app]="app" />
+                            <sqx-schema-card [app]="app" />
                         }
 
                         @case ("api") {
-                             <sqx-api-card [app]="app" />
+                            <sqx-api-card [app]="app" />
                         }
 
                         @case ("github") {
-                             <sqx-github-card />
+                            <sqx-github-card />
                         }
 
                         @case ("api-calls") {
-                             <sqx-api-calls-card [app]="app" [usage]="callsUsage" />
+                            <sqx-api-calls-card [app]="app" [usage]="callsUsage" />
                         }
 
                         @case ("api-traffic-summary") {
-                             <sqx-api-traffic-summary-card [usage]="callsUsage" />
+                            <sqx-api-traffic-summary-card [usage]="callsUsage" />
                         }
 
                         @case ("api-calls-summary") {
-                             <sqx-api-calls-summary-card [usage]="callsUsage" />
+                            <sqx-api-calls-summary-card [usage]="callsUsage" />
                         }
 
                         @case ("asset-uploads-count") {
-                             <sqx-asset-uploads-count-card [usage]="storageUsage" />
+                            <sqx-asset-uploads-count-card [usage]="storageUsage" />
                         }
 
                         @case ("asset-uploads-size-summary") {
-                             <sqx-asset-uploads-size-summary-card [usage]="storageCurrent" />
+                            <sqx-asset-uploads-size-summary-card [usage]="storageCurrent" />
                         }
 
                         @case ("asset-uploads-size") {
-                             <sqx-asset-uploads-size-card [usage]="storageUsage" />
+                            <sqx-asset-uploads-size-card [usage]="storageUsage" />
                         }
 
                         @case ("api-traffic") {
-                             <sqx-api-traffic-card
-                                [isStacked]="isStacked"
-                                (isStackedChange)="changeIsStacked($event)"
-                                [usage]="callsUsage" />
+                            <sqx-api-traffic-card [isStacked]="isStacked" (isStackedChange)="changeIsStacked($event)" [usage]="callsUsage" />
                         }
 
                         @case ("api-performance") {
-                             <sqx-api-performance-card
-                                [isStacked]="isStacked"
-                                (isStackedChange)="changeIsStacked($event)"
-                                [usage]="callsUsage" />
+                            <sqx-api-performance-card [isStacked]="isStacked" (isStackedChange)="changeIsStacked($event)" [usage]="callsUsage" />
                         }
 
                         @case ("random-dog") {
-                             <sqx-random-dog-card />
+                            <sqx-random-dog-card />
                         }
 
                         @case ("random-cat") {
-                             <sqx-random-cat-card />
+                            <sqx-random-cat-card />
                         }
 
                         @case ("support") {
-                             <sqx-support-card />
+                            <sqx-support-card />
                         }
 
                         @case ("history") {
-                             <sqx-history-card [app]="app" />
+                            <sqx-history-card [app]="app" />
                         }
 
                         @case ("content-summary") {
-                             <sqx-content-summary-card [app]="app" [options]="item" />
+                            <sqx-content-summary-card [app]="app" [options]="item" />
                         }
 
                         @case ("iframe") {
-                             <sqx-iframe-card [app]="app" [options]="item" />
+                            <sqx-iframe-card [app]="app" [options]="item" />
                         }
-
                     }
-                     </gridster-item
-                >
+                </gridster-item>
             }
 
             <div [style.height]="extendedHeight" [style.width]="'0px'"></div>
-             </gridster
-        >
+        </gridster>
         @if (grid) {
-
             <div class="dashboard-settings">
-                 <sqx-dashboard-config
+                <sqx-dashboard-config
                     [app]="app"
                     [config]="gridConfig!"
                     [configAvailable]="gridConfigAvailable"
@@ -114,10 +95,6 @@
                     [configDefaults]="gridConfigDefaults"
                     [needsAttention]="isScrolled" />
             </div>
-
         }
-
     </div>
-
 }
-

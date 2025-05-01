@@ -1,69 +1,53 @@
 <tr [sqxTabRouterLink]="link">
-
     <td class="cell-select inline-edit" sqxStopClick>
-
         <div class="form-check">
-             <input
-                class="form-check-input"
-                id="{{ content.id }}_selected"
-                [ngModel]="selected"
-                (ngModelChange)="selectedChange.emit($event)"
-                type="checkbox" /> <label class="form-check-label" for="{{ content.id }}_selected"></label>
+            <input class="form-check-input" id="{{ content.id }}_selected" [ngModel]="selected" (ngModelChange)="selectedChange.emit($event)" type="checkbox" />
+            <label class="form-check-label" for="{{ content.id }}_selected"></label>
         </div>
 
         @if (isDirty) {
-
             <div class="edit-menu">
-                 <button class="btn btn-text-secondary btn-cancel me-2" (click)="cancel()" sqxStopClick type="button">
-                     <i class="icon-close"></i> </button
-                > <button class="btn btn-success" (click)="save()" sqxStopClick type="button"> <i class="icon-checkmark"></i> </button>
+                <button class="btn btn-text-secondary btn-cancel me-2" (click)="cancel()" sqxStopClick type="button">
+                    <i class="icon-close"></i>
+                </button>
+                <button class="btn btn-success" (click)="save()" sqxStopClick type="button"><i class="icon-checkmark"></i></button>
             </div>
-
         }
-
     </td>
 
     <td class="cell-actions cell-actions-left" sqxStopClick>
-         <button
-            class="btn btn-text-secondary"
-            #buttonOptions
-            attr.aria-label="{{ 'common.options' | sqxTranslate }}"
-            (click)="dropdown.toggle()"
-            type="button">
-             <i class="icon-dots"></i> </button
-        > <sqx-dropdown-menu position="bottom-start" scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="dropdown; closeAlways: true"
-            > <a class="dropdown-item" [routerLink]="link" sqxExternalLink target="_blank"> {{ "common.editInNewTab" | sqxTranslate }} </a>
+        <button class="btn btn-text-secondary" #buttonOptions attr.aria-label="{{ 'common.options' | sqxTranslate }}" (click)="dropdown.toggle()" type="button">
+            <i class="icon-dots"></i>
+        </button>
+        <sqx-dropdown-menu position="bottom-start" scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="dropdown; closeAlways: true">
+            <a class="dropdown-item" [routerLink]="link" sqxExternalLink target="_blank"> {{ "common.editInNewTab" | sqxTranslate }} </a>
             @for (info of content.statusUpdates; track info) {
-                 <a class="dropdown-item" (click)="statusChange.emit(info.status)"
-                    > {{ "common.statusChangeTo" | sqxTranslate }} <sqx-content-status
-                        layout="text"
-                        small="true"
-                        [status]="info.status"
-                        [statusColor]="info.color" /> </a
-                >
+                <a class="dropdown-item" (click)="statusChange.emit(info.status)">
+                    {{ "common.statusChangeTo" | sqxTranslate }}
+                    <sqx-content-status layout="text" small="true" [status]="info.status" [statusColor]="info.color" />
+                </a>
             }
 
             @if (cloneable) {
-                 <a class="dropdown-item" (click)="clone.emit(); dropdown.hide()"> {{ "common.clone" | sqxTranslate }} </a>
+                <a class="dropdown-item" (click)="clone.emit(); dropdown.hide()"> {{ "common.clone" | sqxTranslate }} </a>
             }
 
             <div class="dropdown-divider"></div>
-             <a
+            <a
                 class="dropdown-item dropdown-item-delete"
                 [class.disabled]="!content.canDelete"
                 confirmRememberKey="deleteContent"
                 confirmText="i18n:contents.deleteConfirmText"
                 confirmTitle="i18n:contents.deleteConfirmTitle"
-                (sqxConfirmClick)="delete.emit()"
-                > {{ "common.delete" | sqxTranslate }} </a
-            > </sqx-dropdown-menu
-        >
+                (sqxConfirmClick)="delete.emit()">
+                {{ "common.delete" | sqxTranslate }}
+            </a>
+        </sqx-dropdown-menu>
     </td>
 
     @for (field of tableFields; track field) {
-
         <td [field]="field" [fields]="tableSettings" sqxContentListCell sqxContentListCellResize [sqxStopClick]="shouldStop(field)">
-             <sqx-content-list-field
+            <sqx-content-list-field
                 [content]="content"
                 [field]="field"
                 [fields]="tableSettings"
@@ -73,10 +57,7 @@
                 [patchForm]="patchForm?.form"
                 [schema]="schema" />
         </td>
-
     }
 
     <td></td>
-
 </tr>
-

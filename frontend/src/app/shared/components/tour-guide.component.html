@@ -4,16 +4,14 @@
             <div class="card" @fade>
                 <div class="card-header">
                     <div class="row align-items-center">
-                        <div class="col">
-                            {{ "tour.guide-title" | sqxTranslate }}
-                        </div>
+                        <div class="col">{{ "tour.guide-title" | sqxTranslate }}</div>
+
                         <div class="col-auto">
-                            <button class="btn btn-simple btn-sm" (click)="toggle()">
-                                <i class="icon-angle-down"></i>
-                            </button>
+                            <button class="btn btn-simple btn-sm" (click)="toggle()"><i class="icon-angle-down"></i></button>
                         </div>
                     </div>
                 </div>
+
                 <div class="card-body" #body>
                     @if (tourState.tasks | async; as tasks) {
                         <div>
@@ -24,11 +22,10 @@
                                             <i class="icon-checkmark" [class.hidden]="!task.isCompleted"></i>
                                         </div>
                                     </div>
-                                    <div
-                                        class="col"
-                                        [class.strikethrough]="task.isCompleted"
-                                        [class.text-completed]="task.isCompleted || !task.isActive">
+
+                                    <div class="col" [class.strikethrough]="task.isCompleted" [class.text-completed]="task.isCompleted || !task.isActive">
                                         <h5 class="mb-0">{{ task.title | sqxTranslate }}</h5>
+
                                         <div>{{ task.description | sqxTranslate }}</div>
                                     </div>
                                 </div>
@@ -43,43 +40,35 @@
                         {{ "tour.complete" | sqxTranslate }}
                     </button>
                 </div>
+
                 <div class="card-footer">
                     <a href="https://squidex.io/help" target="_blank">
                         <div class="row g-0 align-items-center">
-                            <div class="col-auto">
-                                <i class="icon-help"></i>
-                            </div>
-                            <div class="col ps-4">
-                                {{ "tour.documentation" | sqxTranslate }}
-                            </div>
-                            <div class="col-auto">
-                                <i class="icon-angle-right"></i>
-                            </div>
+                            <div class="col-auto"><i class="icon-help"></i></div>
+
+                            <div class="col ps-4">{{ "tour.documentation" | sqxTranslate }}</div>
+
+                            <div class="col-auto"><i class="icon-angle-right"></i></div>
                         </div>
                     </a>
                     <a href="https://support.squidex.io" target="_blank">
                         <div class="row g-0 align-items-center">
-                            <div class="col-auto">
-                                <i class="icon-user-o"></i>
-                            </div>
-                            <div class="col ps-4">
-                                {{ "tour.support" | sqxTranslate }}
-                            </div>
-                            <div class="col-auto">
-                                <i class="icon-angle-right"></i>
-                            </div>
+                            <div class="col-auto"><i class="icon-user-o"></i></div>
+
+                            <div class="col ps-4">{{ "tour.support" | sqxTranslate }}</div>
+
+                            <div class="col-auto"><i class="icon-angle-right"></i></div>
                         </div>
                     </a>
                 </div>
             </div>
         }
+
         <div class="d-flex justify-content-end">
             <div class="summary" [class.expanded]="snapshot.isCollapsed" (click)="toggle()">
                 <div class="counter">{{ tourState.pendingTasks | async }}</div>
                 <span>{{ "tour.guide-title" | sqxTranslate }}</span>
-                <div class="squid">
-                    <img src="./images/squid.svg" />
-                </div>
+                <div class="squid"><img src="./images/squid.svg" /></div>
             </div>
         </div>
     </div>

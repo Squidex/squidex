@@ -1,6 +1,5 @@
 <div class="sidebar-section">
     <h3>{{ "search.sharedQueries" | sqxTranslate }}</h3>
-
     <sqx-query-list
         canRemove="true"
         [queries]="queries.queriesShared | async"
@@ -14,7 +13,6 @@
 
 <div class="sidebar-section">
     <h3>{{ "search.myQueries" | sqxTranslate }}</h3>
-
     <sqx-query-list
         canRemove="true"
         [queries]="queries.queriesUser | async"

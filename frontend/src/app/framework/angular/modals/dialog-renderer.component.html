@@ -1,34 +1,24 @@
 <ng-content></ng-content>
-
 <ng-container *sqxModal="dialogView">
     @if (snapshot.dialogRequest; as request) {
         <sqx-modal-dialog (dialogClose)="cancel()" [showClose]="false">
-            <ng-container title>
-                {{ request.title | sqxTranslate }}
-            </ng-container>
+            <ng-container title> {{ request.title | sqxTranslate }} </ng-container>
             <ng-container content>
                 <span [sqxMarkdown]="request.text | sqxTranslate"></span>
                 @if (request.canRemember) {
                     <div class="form-check mt-4">
                         <input class="form-check-input" id="remember" [(ngModel)]="request.remember" type="checkbox" />
-                        <label class="form-check-label" for="remember">
-                            {{ "common.remember" | sqxTranslate }}
-                        </label>
+                        <label class="form-check-label" for="remember"> {{ "common.remember" | sqxTranslate }} </label>
                     </div>
                 }
             </ng-container>
             <ng-container footer>
-                <button class="btn btn-text-secondary" (click)="cancel()" type="button">
-                    {{ "common.no" | sqxTranslate }}
-                </button>
-                <button class="btn btn-danger" (click)="confirm()" sqxFocusOnInit type="button">
-                    {{ "common.yes" | sqxTranslate }}
-                </button>
+                <button class="btn btn-text-secondary" (click)="cancel()" type="button">{{ "common.no" | sqxTranslate }}</button>
+                <button class="btn btn-danger" (click)="confirm()" sqxFocusOnInit type="button">{{ "common.yes" | sqxTranslate }}</button>
             </ng-container>
         </sqx-modal-dialog>
     }
 </ng-container>
-
 <div class="notification-container notification-container-bottom-right">
     @for (notification of snapshot.notifications; track notification) {
         <div class="alert alert-dismissible alert-{{ notification.messageType }} shadowed" @fade (click)="close(notification)" role="alert">
@@ -40,11 +30,7 @@
 </div>
 
 @for (tooltip of snapshot.tooltips; track tooltip) {
-    <div
-        class="tooltip2 tooltip2-{{ tooltip.textPosition }}"
-        [offset]="6"
-        [position]="tooltip.textPosition"
-        [sqxAnchoredTo]="tooltip.target">
+    <div class="tooltip2 tooltip2-{{ tooltip.textPosition }}" [offset]="6" [position]="tooltip.textPosition" [sqxAnchoredTo]="tooltip.target">
         {{ tooltip.text | sqxTranslate }}
         @if (tooltip.shortcut) {
             &nbsp;({{ tooltip.shortcut }})

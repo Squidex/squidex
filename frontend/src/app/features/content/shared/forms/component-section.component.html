@@ -1,30 +1,22 @@
 @if (!(formSection.hiddenChanges | async)) {
-
     @if (formSection.separator; as separator) {
-
         <div class="header">
-
             <h3>{{ separator!.displayName }}</h3>
 
             @if (separator.properties.hints && separator.properties.hints.length > 0) {
-                 <sqx-form-hint> <span inline="true" optional="true" [sqxMarkdown]="separator.properties.hints"></span> </sqx-form-hint>
+                <sqx-form-hint> <span inline="true" optional="true" [sqxMarkdown]="separator.properties.hints"></span> </sqx-form-hint>
             }
-
         </div>
-
     }
 
     <div class="row">
-
         @for (child of formSection.fields; track child.field.fieldId) {
-
             <div
                 class="form-group"
                 [class.col-12]="isComparing || !child.field.properties.isHalfWidth"
                 [class.col-6]="!isComparing && child.field.properties.isHalfWidth">
-
                 @if (!(child.hiddenChanges | async)) {
-                     <sqx-field-editor
+                    <sqx-field-editor
                         [comments]="null"
                         [form]="form"
                         [formContext]="formContext"
@@ -36,12 +28,7 @@
                         [language]="language"
                         [languages]="languages" />
                 }
-
             </div>
-
         }
-
     </div>
-
 }
-

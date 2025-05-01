@@ -6,7 +6,6 @@
             <div class="row gx-2">
                 <div class="col">
                     <sqx-control-errors for="name" />
-
                     <input
                         class="form-control"
                         autocomplete="off"
@@ -14,21 +13,18 @@
                         maxlength="40"
                         placeholder="{{ 'workflows.workflowNamePlaceholder' | sqxTranslate }}" />
                 </div>
+
                 <div class="col-auto">
                     <button class="btn btn-success" [disabled]="addWorkflowForm.hasNoName | async" type="submit">
                         {{ "workflows.add" | sqxTranslate }}
                     </button>
                 </div>
+
                 <div class="col-auto">
-                    <button class="btn btn-text-secondary" (click)="cancel()" type="reset">
-                        {{ "common.cancel" | sqxTranslate }}
-                    </button>
+                    <button class="btn btn-text-secondary" (click)="cancel()" type="reset">{{ "common.cancel" | sqxTranslate }}</button>
                 </div>
             </div>
         </form>
-
-        <sqx-form-hint>
-            {{ "workflows.add.description" | sqxTranslate }}
-        </sqx-form-hint>
+        <sqx-form-hint> {{ "workflows.add.description" | sqxTranslate }} </sqx-form-hint>
     </div>
 </div>

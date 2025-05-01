@@ -1,9 +1,7 @@
 @if (show) {
     <div [class.form-bubble]="bubble">
         <div class="form-alert form-alert-error" [class.closeable]="closeable">
-            <span class="form-alert-close" (click)="close()">
-                <i class="icon-close"></i>
-            </span>
+            <span class="form-alert-close" (click)="close()"> <i class="icon-close"></i> </span>
             <div [sqxMarkdown]="error | sqxTranslate"></div>
         </div>
     </div>

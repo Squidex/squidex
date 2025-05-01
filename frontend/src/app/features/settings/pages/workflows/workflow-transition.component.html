@@ -1,16 +1,14 @@
 <div class="row transition g-0 align-items-center">
-    <div class="col col-arrow">
-        <i class="icon-corner-down-right text-decent"></i>
-    </div>
+    <div class="col col-arrow"><i class="icon-corner-down-right text-decent"></i></div>
+
     <div class="col col-step">
-        <div class="transition-to">
-            <i class="icon-circle" [style.color]="transition.step.values.color"></i>
-            {{ transition.to }}
-        </div>
+        <div class="transition-to"><i class="icon-circle" [style.color]="transition.step.values.color"></i> {{ transition.to }}</div>
     </div>
+
     <div class="col-auto col-label">
         <span class="text-decent">{{ "workflows.syntax.when" | sqxTranslate }}</span>
     </div>
+
     <div class="col">
         <input
             class="form-control"
@@ -22,9 +20,11 @@
             placeholder="{{ 'workflows.syntax.expression' | sqxTranslate }}"
             spellcheck="false" />
     </div>
+
     <div class="col-auto col-label">
         <span class="text-decent">{{ "workflows.syntax.for" | sqxTranslate }}</span>
     </div>
+
     <div class="col col-roles">
         <sqx-tag-editor
             allowDuplicates="false"
@@ -39,8 +39,6 @@
     </div>
 
     <div class="col col-button ps-2">
-        <button class="btn btn-text-danger" (click)="remove()" [disabled]="disabled" type="button">
-            <i class="icon-bin2"></i>
-        </button>
+        <button class="btn btn-text-danger" (click)="remove()" [disabled]="disabled" type="button"><i class="icon-bin2"></i></button>
     </div>
 </div>

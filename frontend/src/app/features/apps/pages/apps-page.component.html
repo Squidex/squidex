@@ -1,108 +1,67 @@
 <sqx-title message="i18n:apps.listPageTitle" />
 @if (authState.userChanges | async; as user) {
-
     <div class="panel-container page">
-
         <div class="apps-section">
-
             <h1 class="apps-title">{{ "apps.welcomeTitle" | sqxTranslate: { user: user.displayName } }}</h1>
 
-            <div class="subtext"> {{ "apps.welcomeSubtitle" | sqxTranslate }} </div>
-
+            <div class="subtext">{{ "apps.welcomeSubtitle" | sqxTranslate }}</div>
         </div>
 
         @if (groupedApps | async; as groups) {
-
             <div class="apps-section" sqxTourStep="allApps">
-
                 @for (group of groups; track trackByGroup($index, group)) {
-
                     <div class="team">
-
                         @if (group.team) {
-
-                            <div class="team-header"> <sqx-team (leave)="leaveTeam($event)" [team]="group.team" /> </div>
-
+                            <div class="team-header"><sqx-team (leave)="leaveTeam($event)" [team]="group.team" /></div>
                         }
 
                         <div class="team-body" [class.padded]="group.team">
-
                             @for (app of group.apps; track app.id) {
-                                 <sqx-app [app]="app" (leave)="leaveApp($event)" />
+                                <sqx-app [app]="app" (leave)="leaveApp($event)" />
+                            } @empty {
+                                <small class="team-empty"> {{ "teams.empty" | sqxTranslate }} </small>
                             }
-
-                            @empty {
-                                 <small class="team-empty"> {{ "teams.empty" | sqxTranslate }} </small>
-                            }
-
                         </div>
-
                     </div>
-
-                }
-
-                @empty {
-
+                } @empty {
                     <div class="empty">
-
                         <h3 class="empty-headline">{{ "apps.empty" | sqxTranslate }}</h3>
-
                     </div>
-
                 }
-
             </div>
-
         }
 
         @if ((uiState.settings | async)?.canCreateApps) {
-
             <div class="apps-section">
-
                 <div class="card card-template card-href" (click)="createNewApp()" data-testid="new-app" sqxTourStep="addApp">
-
                     <div class="card-body">
-
-                        <div class="card-image"> <img src="./images/add-app.svg" /> </div>
+                        <div class="card-image"><img src="./images/add-app.svg" /></div>
 
                         <h3 class="card-title">{{ "apps.createBlankApp" | sqxTranslate }}</h3>
-                         <sqx-form-hint> {{ "apps.createBlankAppDescription" | sqxTranslate }} </sqx-form-hint>
+                        <sqx-form-hint> {{ "apps.createBlankAppDescription" | sqxTranslate }} </sqx-form-hint>
                     </div>
-
                 </div>
 
                 @for (template of templates | async; track template) {
-
                     <div class="card card-template card-href" (click)="createNewApp(template)">
-
                         <div class="card-body">
-
-                            <div class="card-image"> <img src="./images/add-template.svg" /> </div>
+                            <div class="card-image"><img src="./images/add-template.svg" /></div>
 
                             <h3 class="card-title">{{ template.title }}</h3>
-                             <sqx-form-hint> {{ template.description }} </sqx-form-hint>
+                            <sqx-form-hint> {{ template.description }} </sqx-form-hint>
                         </div>
-
                     </div>
-
                 }
-
             </div>
-
         }
 
         @if (info) {
-
             <div class="apps-section">
-                 <small class="info">{{ info }}</small
-                >
+                <small class="info">{{ info }}</small>
             </div>
-
         }
-
     </div>
-
 }
- <sqx-app-form (dialogClose)="addAppDialog.hide()" *sqxModal="addAppDialog" [template]="addAppTemplate" /> <sqx-onboarding-dialog
-    (dialogClose)="onboardingDialog.hide()"
-    *sqxModal="onboardingDialog" /> <sqx-news-dialog (dialogClose)="newsDialog.hide()" [features]="newsFeatures!" *sqxModal="newsDialog" />
+<sqx-app-form (dialogClose)="addAppDialog.hide()" *sqxModal="addAppDialog" [template]="addAppTemplate" />
+<sqx-onboarding-dialog (dialogClose)="onboardingDialog.hide()" *sqxModal="onboardingDialog" />
+<sqx-news-dialog (dialogClose)="newsDialog.hide()" [features]="newsFeatures!" *sqxModal="newsDialog" />

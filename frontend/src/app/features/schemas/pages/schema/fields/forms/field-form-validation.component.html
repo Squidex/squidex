@@ -1,48 +1,34 @@
 <div [formGroup]="fieldForm">
-
     <div class="form-group row mb-3">
-
         <div class="col-9 offset-3">
-
             <div class="form-check">
-                 <input class="form-check-input" id="{{ field.fieldId }}_fieldRequired" formControlName="isRequired" type="checkbox" />
-                <label class="form-check-label" for="{{ field.fieldId }}_fieldRequired"
-                    > {{ "schemas.field.required" | sqxTranslate }} </label
-                >
+                <input class="form-check-input" id="{{ field.fieldId }}_fieldRequired" formControlName="isRequired" type="checkbox" />
+                <label class="form-check-label" for="{{ field.fieldId }}_fieldRequired">
+                    {{ "schemas.field.required" | sqxTranslate }}
+                </label>
             </div>
-
         </div>
-
     </div>
 
     <div class="form-group row mb-3">
-
         <div class="col-9 offset-3">
-
             <div class="form-check">
-                 <input
-                    class="form-check-input"
-                    id="{{ field.fieldId }}_fieldRequiredOnPublish"
-                    formControlName="isRequiredOnPublish"
-                    type="checkbox" /> <label class="form-check-label" for="{{ field.fieldId }}_fieldRequiredOnPublish"
-                    > {{ "schemas.field.requiredOnPublish" | sqxTranslate }} </label
-                >
+                <input class="form-check-input" id="{{ field.fieldId }}_fieldRequiredOnPublish" formControlName="isRequiredOnPublish" type="checkbox" />
+                <label class="form-check-label" for="{{ field.fieldId }}_fieldRequiredOnPublish">
+                    {{ "schemas.field.requiredOnPublish" | sqxTranslate }}
+                </label>
             </div>
-
         </div>
-
     </div>
-
 </div>
 
 @switch (field.rawProperties.fieldType) {
-
     @case ("Array") {
-         <sqx-array-validation [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
+        <sqx-array-validation [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
     }
 
     @case ("Assets") {
-         <sqx-assets-validation
+        <sqx-assets-validation
             [field]="field"
             [fieldForm]="fieldForm"
             [isLocalizable]="isLocalizable"
@@ -51,7 +37,7 @@
     }
 
     @case ("Boolean") {
-         <sqx-boolean-validation
+        <sqx-boolean-validation
             [field]="field"
             [fieldForm]="fieldForm"
             [isLocalizable]="isLocalizable"
@@ -60,15 +46,15 @@
     }
 
     @case ("Component") {
-         <sqx-component-validation [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
+        <sqx-component-validation [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
     }
 
     @case ("Components") {
-         <sqx-components-validation [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
+        <sqx-components-validation [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
     }
 
     @case ("DateTime") {
-         <sqx-date-time-validation
+        <sqx-date-time-validation
             [field]="field"
             [fieldForm]="fieldForm"
             [isLocalizable]="isLocalizable"
@@ -77,15 +63,15 @@
     }
 
     @case ("Geolocation") {
-         <sqx-geolocation-validation [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
+        <sqx-geolocation-validation [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
     }
 
     @case ("Json") {
-         <sqx-json-validation [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
+        <sqx-json-validation [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
     }
 
     @case ("Number") {
-         <sqx-number-validation
+        <sqx-number-validation
             [field]="field"
             [fieldForm]="fieldForm"
             [isLocalizable]="isLocalizable"
@@ -95,7 +81,7 @@
     }
 
     @case ("References") {
-         <sqx-references-validation
+        <sqx-references-validation
             [field]="field"
             [fieldForm]="fieldForm"
             [isLocalizable]="isLocalizable"
@@ -104,11 +90,11 @@
     }
 
     @case ("RichText") {
-         <sqx-rich-text-validation [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
+        <sqx-rich-text-validation [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
     }
 
     @case ("String") {
-         <sqx-string-validation
+        <sqx-string-validation
             [field]="field"
             [fieldForm]="fieldForm"
             [isLocalizable]="isLocalizable"
@@ -119,13 +105,11 @@
     }
 
     @case ("Tags") {
-         <sqx-tags-validation
+        <sqx-tags-validation
             [field]="field"
             [fieldForm]="fieldForm"
             [isLocalizable]="isLocalizable"
             [languages]="languages"
             [properties]="field.rawProperties" />
     }
-
 }
-

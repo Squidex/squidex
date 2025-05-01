@@ -1,11 +1,9 @@
 <div class="step row g-0" [class.last]="isLast">
-
     <div class="col-auto pe-4 icon">
-
         @if (isNext) {
-             <i class="icon-caret-right next-icon"></i>
+            <i class="icon-caret-right next-icon"></i>
         }
-         <sqx-rule-element
+        <sqx-rule-element
             [elementInfo]="stepInfo"
             [elementType]="stepItem.step.step.stepType"
             showDescription="false"
@@ -15,63 +13,46 @@
     </div>
 
     <div class="col details">
-
         <div class="row g-2 align-items-center mt-0">
-
             <div class="col">
-                 <span class="badge rounded-pill badge-{{ state?.status | sqxRuleClass }}">{{ state?.status || "Pending" }}</span
-                >
+                <span class="badge rounded-pill badge-{{ state?.status | sqxRuleClass }}">{{ state?.status || "Pending" }}</span>
             </div>
 
-            <div class="col col-attempts text-sm"> {{ stepItem.step.name || stepInfo.title }} </div>
+            <div class="col col-attempts text-sm">{{ stepItem.step.name || stepInfo.title }}</div>
 
             <div class="col col-attempts text-sm">
-                 <strong class="me-1">{{ state?.attempts?.length || 0 }}</strong
-                > {{ "rules.ruleEvents.attempts" | sqxTranslate }}
+                <strong class="me-1">{{ state?.attempts?.length || 0 }}</strong> {{ "rules.ruleEvents.attempts" | sqxTranslate }}
             </div>
 
             <div class="col-auto">
-
                 <div class="col-auto">
-                     <button
+                    <button
                         class="btn btn-sm btn-text-secondary text-muted btn-expand"
                         [class.invisible]="(state?.attempts?.length || 0) === 0"
                         (click)="toggle()"
                         type="button">
-                         <span class="hidden">{{ "common.more" | sqxTranslate }}</span
-                        > <i class="icon-sm" [class.icon-angle-down]="isExpanded" [class.icon-angle-right]="!isExpanded"></i> </button
-                    >
+                        <span class="hidden">{{ "common.more" | sqxTranslate }}</span>
+                        <i class="icon-sm" [class.icon-angle-down]="isExpanded" [class.icon-angle-right]="!isExpanded"></i>
+                    </button>
                 </div>
-
             </div>
-
         </div>
 
         @if (state && isExpanded) {
-
             <ul class="nav nav-tabs2 mt-2">
-
                 @for (attempt of state.attempts; let i = $index; track i) {
-
                     <li class="nav-item">
-                         <a class="nav-link" [class.active]="i === attemptIndex" (click)="selectAttempt(i)"
-                            >
+                        <a class="nav-link" [class.active]="i === attemptIndex" (click)="selectAttempt(i)">
                             @if ($first) {
-                                 {{ "rules.ruleEvents.attempt" | sqxTranslate }}&nbsp;
+                                {{ "rules.ruleEvents.attempt" | sqxTranslate }}&nbsp;
                             }
-                             #{{ i + 1 }} </a
-                        >
+                            #{{ i + 1 }}
+                        </a>
                     </li>
-
                 }
-
             </ul>
 
-            <div class="details"> <sqx-state-attempt [attempt]="state.attempts[attemptIndex]" /> </div>
-
+            <div class="details"><sqx-state-attempt [attempt]="state.attempts[attemptIndex]" /></div>
         }
-
     </div>
-
 </div>
-

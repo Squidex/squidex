@@ -5,9 +5,7 @@
     [style.paddingLeft]="paddingLeft">
     @if (nodeModel.isLoading) {
         <ng-container class="loader">
-            <button class="btn btn-sm btn-decent btn-text-secondary" type="button">
-                <sqx-loader size="14" />
-            </button>
+            <button class="btn btn-sm btn-decent btn-text-secondary" type="button"><sqx-loader size="14" /></button>
         </ng-container>
     } @else {
         <button
@@ -16,25 +14,17 @@
             (click)="toggle()"
             sqxStopClick
             type="button">
-            <i
-                [class.icon-caret-down]="nodeModel.isExpanded && nodeModel.isLoaded"
-                [class.icon-caret-right]="!nodeModel.isExpanded || !nodeModel.isLoaded"></i>
+            <i [class.icon-caret-down]="nodeModel.isExpanded && nodeModel.isLoaded" [class.icon-caret-right]="!nodeModel.isExpanded || !nodeModel.isLoaded"></i>
         </button>
     }
 
-    <div class="name truncate">
-        {{ nodeModel.item.folderName | sqxTranslate }}
-    </div>
+    <div class="name truncate">{{ nodeModel.item.folderName | sqxTranslate }}</div>
 </div>
 
 @if (nodeModel.isExpanded || nodeModel.isSelected) {
     <div class="tree-children">
         @for (child of nodeModel.children; track child.item.id) {
-            <sqx-asset-folder-dropdown-item
-                [appName]="appName"
-                [nodeLevel]="nodeLevel + 1"
-                [nodeModel]="child"
-                (selectNode)="selectNode.emit($event)" />
+            <sqx-asset-folder-dropdown-item [appName]="appName" [nodeLevel]="nodeLevel + 1" [nodeModel]="child" (selectNode)="selectNode.emit($event)" />
         }
     </div>
 }

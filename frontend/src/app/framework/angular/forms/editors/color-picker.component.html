@@ -13,12 +13,10 @@
     } @else {
         <div class="circle" (click)="focus()" [style.background]="snapshot.value"></div>
     }
-
     <ng-template #circle>
         <div class="circle" (click)="focus()" [style.background]="snapshot.value"></div>
     </ng-template>
 </span>
-
 <div position="bottom-start" [sqxAnchoredTo]="input" *sqxModal="modal" [style.height]="'280px'" [style.width]="'230px'">
     <div
         [colorPicker]="snapshot.value"

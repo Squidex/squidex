@@ -7,24 +7,14 @@
                     <div class="form-group row">
                         <label class="col-3 col-form-label" for="stepName">{{ "common.name" | sqxTranslate }}</label>
                         <div class="col-9">
-                            <input
-                                class="form-control"
-                                id="stepName"
-                                maxlength="40"
-                                [(ngModel)]="stepName"
-                                [ngModelOptions]="{ standalone: true }" />
+                            <input class="form-control" id="stepName" maxlength="40" [(ngModel)]="stepName" [ngModelOptions]="{ standalone: true }" />
                             <sqx-form-hint> {{ "rules.stepNameHint" | sqxTranslate }} </sqx-form-hint>
                         </div>
                     </div>
 
                     <div class="col-9 offset-3">
                         <div class="form-check">
-                            <input
-                                class="form-check-input"
-                                id="stepIgnore"
-                                [(ngModel)]="stepIgnore"
-                                [ngModelOptions]="{ standalone: true }"
-                                type="checkbox" />
+                            <input class="form-check-input" id="stepIgnore" [(ngModel)]="stepIgnore" [ngModelOptions]="{ standalone: true }" type="checkbox" />
                             <label class="form-check-label" for="stepIgnore"> {{ "rules.stepIgnoreErrorHint" | sqxTranslate }} </label>
                         </div>
                         <sqx-form-hint> {{ "rules.ignoreErrorHint" | sqxTranslate }} </sqx-form-hint>
@@ -49,7 +39,6 @@
                                     @case ("Text") {
                                         @if (property.isFormattable) {
                                             <sqx-formattable-input [formControlName]="property.name" type="Text" />
-
                                         } @else {
                                             <input class="form-control" id="{{ property.name }}" [formControlName]="property.name" />
                                         }
@@ -57,33 +46,19 @@
 
                                     @case ("TextArea") {
                                         @if (property.isFormattable) {
-                                            <sqx-formattable-input
-                                                [completion]="scriptCompletions"
-                                                [formControlName]="property.name"
-                                                type="Code" />
-
+                                            <sqx-formattable-input [completion]="scriptCompletions" [formControlName]="property.name" type="Code" />
                                         } @else {
-                                            <textarea
-                                                class="form-control"
-                                                id="{{ property.name }}"
-                                                [formControlName]="property.name"></textarea>
+                                            <textarea class="form-control" id="{{ property.name }}" [formControlName]="property.name"></textarea>
                                         }
                                     }
 
                                     @case ("Javascript") {
-                                        <sqx-code-editor
-                                            [completion]="scriptCompletions"
-                                            [formControlName]="property.name"
-                                            [height]="350" />
+                                        <sqx-code-editor [completion]="scriptCompletions" [formControlName]="property.name" [height]="350" />
                                     }
 
                                     @case ("Checkbox") {
                                         <div class="form-check">
-                                            <input
-                                                class="form-check-input"
-                                                id="{{ property.name }}"
-                                                [formControlName]="property.name"
-                                                type="checkbox" />
+                                            <input class="form-check-input" id="{{ property.name }}" [formControlName]="property.name" type="checkbox" />
                                             <label class="form-check-label" for="{{ property.name }}"> {{ property.display }} </label>
                                         </div>
                                     }
@@ -127,7 +102,6 @@
                         </div>
                     }
                 </div>
-
             } @else {
                 <div class="row g-0">
                     @for (stepType of availableSteps | sqxKeys; track stepType) {

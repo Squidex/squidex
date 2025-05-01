@@ -7,18 +7,11 @@
     [sqxScrollContainer]="scrollContainer"
     [sqxScrollOffset]="20">
     @if (snapshot.mode !== "Edit") {
-        <div
-            class="comment-text row g-0"
-            sqxSc
-            [sqxScrollActive]="commentItem.isSelected"
-            [sqxScrollContainer]="scrollContainer"
-            [sqxScrollOffset]="-20">
+        <div class="comment-text row g-0" sqxSc [sqxScrollActive]="commentItem.isSelected" [sqxScrollContainer]="scrollContainer" [sqxScrollOffset]="-20">
             <div class="col-auto pe-2">
-                <img
-                    class="user-picture"
-                    [src]="commentItem.comment.user | sqxUserPictureRef"
-                    title="{{ commentItem.comment.user | sqxUserNameRef }}" />
+                <img class="user-picture" [src]="commentItem.comment.user | sqxUserPictureRef" title="{{ commentItem.comment.user | sqxUserNameRef }}" />
             </div>
+
             <div class="col col-text">
                 <div class="comment-message">
                     <div class="user-row">
@@ -26,27 +19,27 @@
                             {{ commentItem.comment.user | sqxUserNameRef: null }}
                         </div>
                     </div>
+
                     <div [sqxMarkdown]="commentItem.comment.text"></div>
+
                     <div class="comment-created text-muted">
                         @if (canFollow && commentItem.comment.url) {
-                            <a [routerLink]="commentItem.comment.url">{{ "comments.follow" | sqxTranslate }}</a>
-                            &nbsp;
+                            <a [routerLink]="commentItem.comment.url">{{ "comments.follow" | sqxTranslate }}</a> &nbsp;
                         }
                         {{ commentItem.comment.time | sqxFromNow }}
                     </div>
                 </div>
             </div>
+
             <div class="actions">
                 @if (canAnswer) {
-                    <button class="btn btn-sm btn-text-secondary" (click)="startReply()" type="button">
-                        <i class="icon-enter"></i>
-                    </button>
+                    <button class="btn btn-sm btn-text-secondary" (click)="startReply()" type="button"><i class="icon-enter"></i></button>
                 }
+
                 @if (isEditable && canEdit) {
-                    <button class="btn btn-sm btn-text-secondary" (click)="startEdit()" type="button">
-                        <i class="icon-pencil"></i>
-                    </button>
+                    <button class="btn btn-sm btn-text-secondary" (click)="startEdit()" type="button"><i class="icon-pencil"></i></button>
                 }
+
                 @if (isDeletable || canDelete) {
                     <button
                         class="btn btn-sm btn-text-danger"
@@ -75,10 +68,7 @@
                 textArea="true">
             </sqx-autocomplete>
             <div class="mt-2">
-                <button class="btn btn-sm btn-primary" type="submit">
-                    <i class="icon-enter"></i>
-                    {{ "common.save" | sqxTranslate }}
-                </button>
+                <button class="btn btn-sm btn-primary" type="submit"><i class="icon-enter"></i> {{ "common.save" | sqxTranslate }}</button>
                 <button class="btn btn-sm btn-text-secondary me-1" (click)="cancelUpdateOrReply()" type="button">
                     {{ "common.cancel" | sqxTranslate }}
                 </button>
@@ -89,13 +79,9 @@
     @if (commentItem.replies.length > 0 || snapshot.mode === "Reply") {
         <div class="replies">
             @for (item of commentItem.replies; track $index) {
-                <sqx-comment
-                    canEdit="true"
-                    canFollow="false"
-                    [commentItem]="item"
-                    [comments]="comments"
-                    [userToken]="userToken" />
+                <sqx-comment canEdit="true" canFollow="false" [commentItem]="item" [comments]="comments" [userToken]="userToken" />
             }
+
             @if (snapshot.mode === "Reply") {
                 <form [formGroup]="replyForm.form" (ngSubmit)="reply()">
                     <sqx-autocomplete
@@ -109,10 +95,7 @@
                         textArea="true">
                     </sqx-autocomplete>
                     <div class="mt-2">
-                        <button class="btn btn-sm btn-primary" type="submit">
-                            <i class="icon-enter"></i>
-                            {{ "common.reply" | sqxTranslate }}
-                        </button>
+                        <button class="btn btn-sm btn-primary" type="submit"><i class="icon-enter"></i> {{ "common.reply" | sqxTranslate }}</button>
                         <button class="btn btn-sm btn-text-secondary me-1" (click)="cancelUpdateOrReply()" type="button">
                             {{ "common.cancel" | sqxTranslate }}
                         </button>

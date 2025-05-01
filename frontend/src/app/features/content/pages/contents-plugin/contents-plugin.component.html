@@ -1,18 +1,5 @@
-<sqx-layout
-    hideHeader="true"
-    hideSidebar="true"
-    layout="main"
-    overflow="true"
-    titleIcon="contents"
-    titleText="i18n:common.contents"
-    white="true"
-    >
+<sqx-layout hideHeader="true" hideSidebar="true" layout="main" overflow="true" titleIcon="contents" titleText="i18n:common.contents" white="true">
     @if (schema | async; as schema) {
-         <sqx-content-extension
-            [contentItem]="undefined"
-            [contentSchema]="schema"
-            [editorUrl]="schema.properties.contentsListUrl"
-            scrollable="true" />
+        <sqx-content-extension [contentItem]="undefined" [contentSchema]="schema" [editorUrl]="schema.properties.contentsListUrl" scrollable="true" />
     }
-     </sqx-layout
->
+</sqx-layout>

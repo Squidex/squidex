@@ -1,13 +1,10 @@
 <sqx-title message="i18n:common.workflows" />
-
 <sqx-layout innerWidth="80" layout="main" titleIcon="workflows" titleText="i18n:common.workflows">
     <ng-container menu>
         <button class="btn btn-text-secondary" (click)="reload()" shortcut="CTRL + B" title="i18n:workflows.refreshTooltip" type="button">
-            <i class="icon-reset"></i>
-            {{ "common.refresh" | sqxTranslate }}
+            <i class="icon-reset"></i> {{ "common.refresh" | sqxTranslate }}
         </button>
     </ng-container>
-
     <ng-container>
         <sqx-list-view innerWidth="80rem" [isLoading]="workflowsState.isLoading | async">
             <ng-container>
@@ -21,10 +18,9 @@
                             </ul>
                         </div>
                     }
+
                     @if (errors.length === 1) {
-                        <div class="alert alert-danger">
-                            {{ errors[0] }}
-                        </div>
+                        <div class="alert alert-danger">{{ errors[0] }}</div>
                     }
                 }
 
@@ -36,6 +32,7 @@
                             {{ "workflows.empty" | sqxTranslate }}
                         </div>
                     }
+
                     @if (workflowsState.canCreate | async) {
                         <sqx-workflow-add-form />
                     }
@@ -43,7 +40,6 @@
             </ng-container>
         </sqx-list-view>
     </ng-container>
-
     <ng-template sidebarMenu>
         <div class="panel-nav">
             <a
@@ -58,7 +54,6 @@
                 titlePosition="left">
                 <i class="icon-time"></i>
             </a>
-
             <a
                 class="panel-link"
                 attr.aria-label="{{ 'common.help' | sqxTranslate }}"
@@ -74,5 +69,4 @@
         </div>
     </ng-template>
 </sqx-layout>
-
 <router-outlet></router-outlet>

@@ -1,12 +1,10 @@
 <div class="card" (dblclick)="emitNavigate()" (mousedown)="preventSelection($event)" [title]="assetFolder.folderName | sqxTranslate">
     <div class="card-body">
         <div class="row g-2">
-            <div class="col-auto">
-                <img src="./images/folder.svg" />
-            </div>
-            <div class="col truncate">
-                {{ assetFolder.folderName | sqxTranslate }}
-            </div>
+            <div class="col-auto"><img src="./images/folder.svg" /></div>
+
+            <div class="col truncate">{{ assetFolder.folderName | sqxTranslate }}</div>
+
             <div class="col-auto">
                 @if ((canDelete || canUpdate) && !isDisabled) {
                     <button
@@ -19,9 +17,7 @@
                     </button>
                     <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="editDropdown; closeAlways: true">
                         @if (canUpdate) {
-                            <a class="dropdown-item" (click)="editDialog.show()">
-                                {{ "common.rename" | sqxTranslate }}
-                            </a>
+                            <a class="dropdown-item" (click)="editDialog.show()"> {{ "common.rename" | sqxTranslate }} </a>
                             <div class="dropdown-divider"></div>
                         }
                         <a
@@ -39,5 +35,4 @@
         </div>
     </div>
 </div>
-
 <sqx-asset-folder-dialog [assetFolder]="assetFolder" (dialogClose)="editDialog.hide()" *sqxModal="editDialog" />

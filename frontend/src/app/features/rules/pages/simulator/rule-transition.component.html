@@ -1,16 +1,9 @@
 @if (text) {
-
-    <div class="history-transition"> {{ text | sqxTranslate }} </div>
-
+    <div class="history-transition">{{ text | sqxTranslate }}</div>
 }
 
 @if (filteredErrors; as errors) {
-
     @for (error of errors; track error) {
-
-        <div class="history-transition text-danger"> {{ error | sqxTranslate }} </div>
-
+        <div class="history-transition text-danger">{{ error | sqxTranslate }}</div>
     }
-
 }
-

@@ -1,11 +1,8 @@
 <div class="card">
-
     <div class="card-header">
-
         <div class="row">
-
             <div class="col col-name">
-                 <sqx-editable-title
+                <sqx-editable-title
                     [disabled]="!rule.canUpdate"
                     [displayFallback]="'rules.unnamed' | sqxTranslate"
                     [inputTitle]="rule.name"
@@ -15,91 +12,78 @@
             </div>
 
             <div class="col-auto" [class.invisible]="!rule.canDelete && !rule.canRun">
-                 <button
+                <button
                     class="btn btn-text-secondary"
                     #buttonOptions
                     attr.aria-label="{{ 'common.options' | sqxTranslate }}"
                     (click)="dropdown.toggle()"
                     type="button">
-                     <i class="icon-dots"></i> </button
-                > <sqx-dropdown-menu
-                    position="bottom-end"
-                    scrollY="true"
-                    [sqxAnchoredTo]="buttonOptions"
-                    *sqxModal="dropdown; closeAlways: true"
-                    >
+                    <i class="icon-dots"></i>
+                </button>
+                <sqx-dropdown-menu position="bottom-end" scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="dropdown; closeAlways: true">
                     @if (rule.canUpdate) {
-                         <a class="dropdown-item" [routerLink]="rule.id"> {{ "common.edit" | sqxTranslate }} </a>
+                        <a class="dropdown-item" [routerLink]="rule.id"> {{ "common.edit" | sqxTranslate }} </a>
                     }
 
                     @if (rule.canEnable) {
-                         <a class="dropdown-item" (click)="enable()"> {{ "common.enable" | sqxTranslate }} </a>
+                        <a class="dropdown-item" (click)="enable()"> {{ "common.enable" | sqxTranslate }} </a>
                     }
 
                     @if (rule.canDisable) {
-                         <a class="dropdown-item" (click)="disable()"> {{ "common.disable" | sqxTranslate }} </a>
+                        <a class="dropdown-item" (click)="disable()"> {{ "common.disable" | sqxTranslate }} </a>
                     }
 
                     <div class="dropdown-divider"></div>
 
                     @if (rule.canRun || rule.canRunFromSnapshots) {
-
                         @if (rule.canRun) {
-                             <a
+                            <a
                                 class="dropdown-item"
                                 confirmRememberKey="runRule"
                                 confirmText="i18n:rules.runRuleConfirmText"
                                 confirmTitle="i18n:rules.runRuleConfirmTitle"
-                                (sqxConfirmClick)="run()"
-                                > {{ "rules.run" | sqxTranslate }} </a
-                            >
+                                (sqxConfirmClick)="run()">
+                                {{ "rules.run" | sqxTranslate }}
+                            </a>
                         }
 
                         @if (rule.canRunFromSnapshots) {
-                             <a
+                            <a
                                 class="dropdown-item"
                                 confirmRememberKey="runRuleFromSnapshots"
                                 confirmText="i18n:rules.runRuleConfirmText"
                                 confirmTitle="i18n:rules.runRuleConfirmTitle"
-                                (sqxConfirmClick)="runFromSnapshots()"
-                                > {{ "rules.runFromSnapshots" | sqxTranslate }} </a
-                            >
+                                (sqxConfirmClick)="runFromSnapshots()">
+                                {{ "rules.runFromSnapshots" | sqxTranslate }}
+                            </a>
                         }
 
                         <div class="dropdown-divider"></div>
-
                     }
 
                     @if (rule.canDelete) {
-                         <a
+                        <a
                             class="dropdown-item dropdown-item-delete"
                             confirmRememberKey="deleteRule"
                             confirmText="i18n:rules.deleteConfirmText"
                             confirmTitle="i18n:rules.deleteConfirmTitle"
-                            (sqxConfirmClick)="delete()"
-                            > {{ "common.delete" | sqxTranslate }} </a
-                        >
+                            (sqxConfirmClick)="delete()">
+                            {{ "common.delete" | sqxTranslate }}
+                        </a>
                     }
-                     </sqx-dropdown-menu
-                >
+                </sqx-dropdown-menu>
             </div>
-
         </div>
-
     </div>
 
     <div class="card-body">
-
         <div class="row align-items-center">
-
             <div class="col-auto">
-
                 <h3>{{ "rules.ruleSyntax.if" | sqxTranslate }}</h3>
-
             </div>
 
             <div class="col-auto">
-                 <sqx-rule-element
+                <sqx-rule-element
                     disabled="true"
                     [elementInfo]="availableTriggers[rule.trigger.triggerType]"
                     [elementType]="rule.trigger.triggerType"
@@ -108,92 +92,68 @@
             </div>
 
             <div class="col-auto">
-
                 <h3>{{ "rules.ruleSyntax.then" | sqxTranslate }}</h3>
-
             </div>
 
             <div class="col col-flow">
-
                 <div class="d-flex flex-row align-items-center">
-
                     @for (item of flow; track item.id) {
-                         <sqx-rule-element
+                        <sqx-rule-element
                             disabled="true"
                             [elementInfo]="$any(availableSteps[item.step.step.stepType])"
                             [elementType]="item.step.step.stepType"
                             [label]="item.step.name"
                             showDescription="false"
-                            showName="false" /> <i class="icon-caret-right ms-2 me-2"></i>
+                            showName="false" />
+                        <i class="icon-caret-right ms-2 me-2"></i>
                     }
-
                 </div>
-
             </div>
 
             <div class="col col-last text-end">
-
                 @if (isManual) {
-                     <button
+                    <button
                         class="btn btn-outline-secondary btn-run"
                         confirmRememberKey="triggerRule"
                         confirmText="i18n:rules.triggerConfirmText"
                         confirmTitle="i18n:rules.triggerConfirmTitle"
                         [disabled]="!rule.canTrigger"
                         (sqxConfirmClick)="trigger()">
-                         <i class="icon-play-line"></i> </button
-                    >
+                        <i class="icon-play-line"></i>
+                    </button>
+                } @else {
+                    <sqx-toggle [disabled]="!rule.canDisable && !rule.canEnable" [ngModel]="rule.isEnabled" (ngModelChange)="toggle()" />
                 }
-
-                @else {
-                     <sqx-toggle [disabled]="!rule.canDisable && !rule.canEnable" [ngModel]="rule.isEnabled" (ngModelChange)="toggle()" />
-                }
-
             </div>
-
         </div>
-
     </div>
 
     <div class="card-footer">
-
         <div class="row">
-
             <div class="col">
-                 {{ "common.succeeded" | sqxTranslate }}
+                {{ "common.succeeded" | sqxTranslate }}
                 @if (rule.numSucceeded > 0) {
-                     <span class="badge badge-success rounded-pill">{{ rule.numSucceeded }}</span
-                    >
+                    <span class="badge badge-success rounded-pill">{{ rule.numSucceeded }}</span>
                 }
-
             </div>
 
             <div class="col">
-                 {{ "common.failed" | sqxTranslate }}
+                {{ "common.failed" | sqxTranslate }}
                 @if (rule.numFailed > 0) {
-                     <span class="badge badge-danger rounded-pill">{{ rule.numFailed }}</span
-                    >
+                    <span class="badge badge-danger rounded-pill">{{ rule.numFailed }}</span>
                 }
-
             </div>
 
             @if (rule.canReadLogs) {
-
                 <div class="col-auto">
-                     <a [queryParams]="{ ruleId: rule.id }" routerLink="events"> {{ "common.logs" | sqxTranslate }} </a>
+                    <a [queryParams]="{ ruleId: rule.id }" routerLink="events"> {{ "common.logs" | sqxTranslate }} </a>
                     @if (!isManual) {
-                         <a class="ms-2" [queryParams]="{ ruleId: rule.id }" routerLink="simulator"
-                            > {{ "rules.simulator" | sqxTranslate }} </a
-                        >
+                        <a class="ms-2" [queryParams]="{ ruleId: rule.id }" routerLink="simulator">
+                            {{ "rules.simulator" | sqxTranslate }}
+                        </a>
                     }
-
                 </div>
-
             }
-
         </div>
-
     </div>
-
 </div>
-

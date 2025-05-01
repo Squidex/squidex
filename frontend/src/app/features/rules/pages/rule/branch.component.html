@@ -30,7 +30,6 @@
                         [showRemove]="isEditable" />
                     @if (!parentId) {
                         <div class="step-title white-label">{{ item.step.name || availableSteps[item.step.step.stepType].title }}</div>
-
                     } @else {
                         <div class="hover-step-title white-label">
                             {{ item.step.name || availableSteps[item.step.step.stepType].title }}
@@ -63,7 +62,6 @@
                 </div>
             }
         }
-
     } @else {
         <div class="centered">
             <button class="btn btn-outline-secondary btn-circle" (click)="add()"><i class="icon-plus"></i></button>

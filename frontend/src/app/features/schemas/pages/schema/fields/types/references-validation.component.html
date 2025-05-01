@@ -1,106 +1,74 @@
 <div [formGroup]="fieldForm">
-
     <div class="form-group row">
-         <label class="col-3 col-form-label" for="{{ field.fieldId }}_fieldSchemaIds">{{ "common.schemas" | sqxTranslate }}</label
-        >
+        <label class="col-3 col-form-label" for="{{ field.fieldId }}_fieldSchemaIds">{{ "common.schemas" | sqxTranslate }}</label>
         <div class="col-9">
-             <sqx-tag-editor
+            <sqx-tag-editor
                 formControlName="schemaIds"
                 [itemConverter]="(schemasSource.normalConverter | async)!"
                 [itemsSource]="(schemasSource.normalConverter | async)?.suggestions"
                 placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" />
         </div>
-
     </div>
 
     <div class="form-group row">
-
         <div class="col-9 offset-3">
-
             <div class="form-check">
-                 <input
-                    class="form-check-input"
-                    id="{{ field.fieldId }}_fieldAllowDuplicates"
-                    formControlName="allowDuplicates"
-                    type="checkbox" /> <label class="form-check-label" for="{{ field.fieldId }}_fieldAllowDuplicates"
-                    > {{ "schemas.fieldTypes.assets.allowDuplicates" | sqxTranslate }} </label
-                >
+                <input class="form-check-input" id="{{ field.fieldId }}_fieldAllowDuplicates" formControlName="allowDuplicates" type="checkbox" />
+                <label class="form-check-label" for="{{ field.fieldId }}_fieldAllowDuplicates">
+                    {{ "schemas.fieldTypes.assets.allowDuplicates" | sqxTranslate }}
+                </label>
             </div>
-
         </div>
-
     </div>
 
     <div class="form-group row">
-         <label class="col-3 col-form-label">{{ "schemas.fieldTypes.references.count" | sqxTranslate }}</label
-        >
+        <label class="col-3 col-form-label">{{ "schemas.fieldTypes.references.count" | sqxTranslate }}</label>
         <div class="col-9">
-
             <div class="row g-0">
-
                 <div class="col">
-                     <input
+                    <input
                         class="form-control"
                         formControlName="minItems"
                         placeholder="{{ 'schemas.fieldTypes.references.countMin' | sqxTranslate }}"
                         type="number" />
                 </div>
 
-                <div class="col-auto"> <label class="col-form-label minmax">-</label> </div>
+                <div class="col-auto"><label class="col-form-label minmax">-</label></div>
 
                 <div class="col">
-                     <input
+                    <input
                         class="form-control"
                         formControlName="maxItems"
                         placeholder="{{ 'schemas.fieldTypes.references.countMax' | sqxTranslate }}"
                         type="number" />
                 </div>
-
             </div>
-
         </div>
-
     </div>
 
     <div class="form-group row mb-3">
-
         <div class="col-9 offset-3">
-
             <div class="form-check">
-                 <input
-                    class="form-check-input"
-                    id="{{ field.fieldId }}_fieldMustBePublished"
-                    formControlName="mustBePublished"
-                    type="checkbox" /> <label class="form-check-label" for="{{ field.fieldId }}_fieldMustBePublished"
-                    > {{ "schemas.fieldTypes.references.mustBePublished" | sqxTranslate }} </label
-                >
+                <input class="form-check-input" id="{{ field.fieldId }}_fieldMustBePublished" formControlName="mustBePublished" type="checkbox" />
+                <label class="form-check-label" for="{{ field.fieldId }}_fieldMustBePublished">
+                    {{ "schemas.fieldTypes.references.mustBePublished" | sqxTranslate }}
+                </label>
             </div>
-
         </div>
-
     </div>
 
     <div class="form-group row">
-         <label class="col-3 col-form-label">{{ "schemas.field.defaultValue" | sqxTranslate }}</label
-        >
-        <div class="col-9"> <sqx-tag-editor formControlName="defaultValue" /> </div>
-
+        <label class="col-3 col-form-label">{{ "schemas.field.defaultValue" | sqxTranslate }}</label>
+        <div class="col-9"><sqx-tag-editor formControlName="defaultValue" /></div>
     </div>
 
     @if (isLocalizable) {
-
         <div class="form-group row">
-             <label class="col-3 col-form-label">{{ "schemas.field.defaultValues" | sqxTranslate }}</label
-            >
+            <label class="col-3 col-form-label">{{ "schemas.field.defaultValues" | sqxTranslate }}</label>
             <div class="col-9">
-                 <sqx-localized-input formControlName="defaultValues" [languages]="languages" type="tags" /> <sqx-form-hint
-                    > {{ "schemas.field.defaultValuesHint" | sqxTranslate }} </sqx-form-hint
-                >
+                <sqx-localized-input formControlName="defaultValues" [languages]="languages" type="tags" />
+                <sqx-form-hint> {{ "schemas.field.defaultValuesHint" | sqxTranslate }} </sqx-form-hint>
             </div>
-
         </div>
-
     }
-
 </div>
-

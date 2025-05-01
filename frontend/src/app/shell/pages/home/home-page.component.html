@@ -2,7 +2,6 @@
     <div class="card">
         <div class="card-body text-center">
             <img class="login-icon login-element" alt="Logo" src="./images/logo.svg" />
-
             <div>
                 <button class="btn btn-success btn-lg login-button login-element" (click)="login()" data-testid="login" type="button">
                     {{ "start.login" | sqxTranslate }}
@@ -10,9 +9,7 @@
             </div>
 
             @if (!isInternetExplorer()) {
-                <div class="login-info login-element">
-                    {{ "start.loginHint" | sqxTranslate }}
-                </div>
+                <div class="login-info login-element">{{ "start.loginHint" | sqxTranslate }}</div>
             }
         </div>
 
@@ -21,8 +18,7 @@
 
     <div class="proudly-made text-center mt-4 mb-4">
         <sqx-form-hint>
-            {{ "start.madeBy" | sqxTranslate }}
-            <br />
+            {{ "start.madeBy" | sqxTranslate }} <br />
             {{ "start.madeByCopyright" | sqxTranslate }}
         </sqx-form-hint>
     </div>

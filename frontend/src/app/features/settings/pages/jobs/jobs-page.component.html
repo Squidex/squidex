@@ -1,40 +1,32 @@
 <sqx-title message="i18n:common.jobsBackups" />
-
 <sqx-layout innerWidth="50" layout="main" titleIcon="jobs" titleText="i18n:common.jobsBackups">
     <ng-container menu>
         <button class="btn btn-text-secondary me-2" (click)="reload()" shortcut="CTRL + B" title="i18n:jobs.refreshTooltip" type="button">
-            <i class="icon-reset"></i>
-            {{ "common.refresh" | sqxTranslate }}
+            <i class="icon-reset"></i> {{ "common.refresh" | sqxTranslate }}
         </button>
-
         @if (jobsState.canCreateBackup | async) {
             <button class="btn btn-success" (click)="startBackup()" [disabled]="jobsState.maxBackupsReached | async" type="button">
                 {{ "jobs.backupStart" | sqxTranslate }}
             </button>
         }
     </ng-container>
-
     <ng-container>
         <sqx-list-view innerWidth="50rem" [isLoading]="jobsState.isLoading | async">
             @if (jobsState.maxBackupsReached | async) {
-                <div class="alert alert-danger mb-4">
-                    {{ "jobs.backupMaximumReached" | sqxTranslate }}
-                </div>
+                <div class="alert alert-danger mb-4">{{ "jobs.backupMaximumReached" | sqxTranslate }}</div>
             }
 
             @if ((jobsState.isLoaded | async) && (jobsState.jobs | async); as jobs) {
                 @if (jobs.length === 0) {
-                    <div class="table-items-row table-items-row-summary table-items-row-empty">
-                        {{ "jobs.empty" | sqxTranslate }}
-                    </div>
+                    <div class="table-items-row table-items-row-summary table-items-row-empty">{{ "jobs.empty" | sqxTranslate }}</div>
                 }
+
                 @for (job of jobs; track job.id) {
                     <sqx-job [job]="job" />
                 }
             }
         </sqx-list-view>
     </ng-container>
-
     <ng-template sidebarMenu>
         <div class="panel-nav">
             <a
@@ -52,5 +44,4 @@
         </div>
     </ng-template>
 </sqx-layout>
-
 <router-outlet></router-outlet>

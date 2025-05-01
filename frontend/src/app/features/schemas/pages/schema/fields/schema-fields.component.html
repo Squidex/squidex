@@ -1,21 +1,17 @@
 @if (schema && schema.fields.length === 0) {
-
     <div class="table-items-row table-items-row-summary table-items-row-empty">
-         {{ "schemas.field.empty" | sqxTranslate }}
+        {{ "schemas.field.empty" | sqxTranslate }}
         @if (schema.canAddField) {
-             <button class="btn btn-success btn-sm ms-2" (click)="fieldWizard.show()" sqxTourStep="addField" type="button">
-                 <i class="icon icon-plus"></i> {{ "schemas.addField" | sqxTranslate }} </button
-            >
+            <button class="btn btn-success btn-sm ms-2" (click)="fieldWizard.show()" sqxTourStep="addField" type="button">
+                <i class="icon icon-plus"></i> {{ "schemas.addField" | sqxTranslate }}
+            </button>
         }
-
     </div>
-
 }
 
 @if (appsState.selectedSettings | async; as settings) {
-
     @if (languageState.isoLanguages | async; as languages) {
-         <sqx-sortable-field-list
+        <sqx-sortable-field-list
             [fields]="schema.fields"
             [fieldsEmpty]="schema.fields.length === 0"
             [languages]="languages"
@@ -24,14 +20,11 @@
             [sortable]="schema.canOrderFields"
             (sorted)="sortFields($event)" />
         @if (schema.canAddField) {
-             <button class="btn btn-success field-button" (click)="fieldWizard.show()" type="button">
-                 <i class="icon icon-plus field-button-icon"></i>
+            <button class="btn btn-success field-button" (click)="fieldWizard.show()" type="button">
+                <i class="icon icon-plus field-button-icon"></i>
                 <div class="field-button-text">{{ "schemas.addFieldButton" | sqxTranslate }}</div>
-                 </button
-            >
+            </button>
         }
-
     }
-     <sqx-field-wizard (dialogClose)="fieldWizard.hide()" [schema]="schema" [settings]="settings" *sqxModal="fieldWizard" />
+    <sqx-field-wizard (dialogClose)="fieldWizard.hide()" [schema]="schema" [settings]="settings" *sqxModal="fieldWizard" />
 }
-

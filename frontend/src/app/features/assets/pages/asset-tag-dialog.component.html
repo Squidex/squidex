@@ -1,22 +1,19 @@
 <form [formGroup]="editForm.form" (ngSubmit)="renameAssetTag()">
-     <sqx-modal-dialog (dialogClose)="emitClose()"
-        > <ng-container title> {{ "common.renameTag" | sqxTranslate }} </ng-container> <ng-container content
-            > <sqx-form-error [error]="editForm.error | async" />
+    <sqx-modal-dialog (dialogClose)="emitClose()">
+        <ng-container title> {{ "common.renameTag" | sqxTranslate }} </ng-container>
+        <ng-container content>
+            <sqx-form-error [error]="editForm.error | async" />
             <div class="form-group">
-                 <label for="tagName"
-                    > {{ "common.name" | sqxTranslate }} <small class="hint">({{ "common.requiredHint" | sqxTranslate }})</small> </label
-                > <sqx-control-errors for="tagName" /> <input
-                    class="form-control"
-                    id="tagName"
-                    autocomplete="off"
-                    formControlName="tagName"
-                    sqxFocusOnInit />
+                <label for="tagName">
+                    {{ "common.name" | sqxTranslate }} <small class="hint">({{ "common.requiredHint" | sqxTranslate }})</small>
+                </label>
+                <sqx-control-errors for="tagName" />
+                <input class="form-control" id="tagName" autocomplete="off" formControlName="tagName" sqxFocusOnInit />
             </div>
-             </ng-container
-        > <ng-container footer
-            > <button class="btn btn-text-secondary" (click)="emitClose()" type="button"> {{ "common.cancel" | sqxTranslate }} </button>
-            <button class="btn btn-success" type="submit"> {{ "common.rename" | sqxTranslate }} </button> </ng-container
-        > </sqx-modal-dialog
-    >
+        </ng-container>
+        <ng-container footer>
+            <button class="btn btn-text-secondary" (click)="emitClose()" type="button">{{ "common.cancel" | sqxTranslate }}</button>
+            <button class="btn btn-success" type="submit">{{ "common.rename" | sqxTranslate }}</button>
+        </ng-container>
+    </sqx-modal-dialog>
 </form>
-

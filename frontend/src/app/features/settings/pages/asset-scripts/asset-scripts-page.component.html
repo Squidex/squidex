@@ -1,50 +1,39 @@
-<sqx-title message="i18n:common.assetScripts" /> <sqx-layout layout="main" titleIcon="assets" titleText="i18n:common.assetScripts"
-    > <ng-container menu
-        > <button class="btn btn-text-secondary me-2" (click)="reload()" shortcut="CTRL + B" title="i18n:jobs.refreshTooltip" type="button">
-             <i class="icon-reset"></i> {{ "common.refresh" | sqxTranslate }} </button
-        > </ng-container
-    > <ng-container
-        >
+<sqx-title message="i18n:common.assetScripts" />
+<sqx-layout layout="main" titleIcon="assets" titleText="i18n:common.assetScripts">
+    <ng-container menu>
+        <button class="btn btn-text-secondary me-2" (click)="reload()" shortcut="CTRL + B" title="i18n:jobs.refreshTooltip" type="button">
+            <i class="icon-reset"></i> {{ "common.refresh" | sqxTranslate }}
+        </button>
+    </ng-container>
+    <ng-container>
         <form class="inner-form" [formGroup]="editForm.form" (ngSubmit)="saveScripts()">
-
             <div class="inner-header">
-
                 <ul class="nav nav-tabs2">
-
                     @for (script of editForm.form.controls | sqxKeys; track script) {
-
                         <li class="nav-item">
-                             <a class="nav-link" [class.active]="assetScript === script" (click)="selectField(script)"
-                                > {{ script | sqxScriptName }} </a
-                            >
+                            <a class="nav-link" [class.active]="assetScript === script" (click)="selectField(script)">
+                                {{ script | sqxScriptName }}
+                            </a>
                         </li>
-
                     }
-
                 </ul>
-                 <button class="float-end btn btn-primary" [class.invisible]="!isEditable" type="submit">
-                     {{ "common.save" | sqxTranslate }} </button
-                >
+                <button class="float-end btn btn-primary" [class.invisible]="!isEditable" type="submit">
+                    {{ "common.save" | sqxTranslate }}
+                </button>
             </div>
 
             <div class="inner-main">
-
                 @for (script of editForm.form.controls | sqxKeys; track script) {
-
                     @if (assetScript === script) {
-                         <sqx-code-editor borderless="true" [completion]="assetCompletions | async" [formControlName]="script" />
+                        <sqx-code-editor borderless="true" [completion]="assetCompletions | async" [formControlName]="script" />
                     }
-
                 }
-
             </div>
-
         </form>
-         </ng-container
-    > <ng-template sidebarMenu
-        >
+    </ng-container>
+    <ng-template sidebarMenu>
         <div class="panel-nav">
-             <a
+            <a
                 class="panel-link"
                 attr.aria-label="{{ 'common.history' | sqxTranslate }}"
                 queryParamsHandling="preserve"
@@ -53,9 +42,10 @@
                 routerLinkActive="active"
                 sqxTourStep="history"
                 title="i18n:common.history"
-                titlePosition="left"
-                > <i class="icon-time"></i> </a
-            > <a
+                titlePosition="left">
+                <i class="icon-time"></i>
+            </a>
+            <a
                 class="panel-link"
                 attr.aria-label="{{ 'common.help' | sqxTranslate }}"
                 queryParamsHandling="preserve"
@@ -64,10 +54,10 @@
                 routerLinkActive="active"
                 sqxTourStep="help"
                 title="i18n:common.help"
-                titlePosition="left"
-                > <i class="icon-help2"></i> </a
-            >
+                titlePosition="left">
+                <i class="icon-help2"></i>
+            </a>
         </div>
-         </ng-template
-    > </sqx-layout
-> <router-outlet></router-outlet>
+    </ng-template>
+</sqx-layout>
+<router-outlet></router-outlet>

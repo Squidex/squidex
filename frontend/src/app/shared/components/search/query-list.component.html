@@ -8,6 +8,7 @@
                             <i class="icon-circle" [class.hidden]="!saved.color" [style.color]="saved.color"></i>
                             {{ saved.name | sqxTranslate }}
                         </div>
+
                         <div class="col-auto">
                             @if (canRemove) {
                                 <a class="btn-sm btn-text-danger btn-remove" (click)="remove.emit(saved)" sqxStopClick>

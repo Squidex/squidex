@@ -1,7 +1,5 @@
 @if (formModel.itemChanges | async; as items) {
-
     @if (items.length > 0 && items.length <= 20) {
-
         <div
             class="array-container static"
             cdkDropList
@@ -10,11 +8,9 @@
             (cdkDropListDropped)="sort($event)"
             [cdkDropListSortingDisabled]="isDisabled | async"
             [class.expanded]="isExpanded">
-
             @for (itemForm of items; track itemForm; let i = $index; let isLast = $last; let isFirst = $first) {
-
                 <div class="table-drag item" cdkDrag cdkDragLockAxis="y" [class.first]="isFirst" [class.last]="isLast">
-                     <sqx-array-item
+                    <sqx-array-item
                         (clone)="addCopy(itemForm)"
                         [form]="form"
                         [formContext]="formContext"
@@ -30,29 +26,23 @@
                         (itemMove)="move(itemForm, $event)"
                         (itemRemove)="removeItem(i)"
                         [language]="language"
-                        [languages]="languages"
-                        > <i class="icon-drag2" cdkDragHandle [class.disabled]="isDisabled | async"></i> </sqx-array-item
-                    >
+                        [languages]="languages">
+                        <i class="icon-drag2" cdkDragHandle [class.disabled]="isDisabled | async"></i>
+                    </sqx-array-item>
                 </div>
-
             }
-
         </div>
-
     }
 
     @if (items.length > 20) {
-
         <div class="array-container" [class.expanded]="isExpanded">
-             <virtual-scroller #scroll [enableUnequalChildrenSizes]="true" [items]="$any(items)"
-                >
+            <virtual-scroller #scroll [enableUnequalChildrenSizes]="true" [items]="$any(items)">
                 @for (itemForm of scroll.viewPortItems; track itemForm; let i = $index) {
-
                     <div
                         class="item"
                         [class.first]="scroll.viewPortInfo.startIndexWithBuffer + i === 0"
                         [class.last]="scroll.viewPortInfo.startIndexWithBuffer + i === items.length - 1">
-                         <sqx-array-item
+                        <sqx-array-item
                             (clone)="addCopy(itemForm)"
                             [form]="form"
                             [formContext]="formContext"
@@ -71,73 +61,55 @@
                             [language]="language"
                             [languages]="languages" />
                     </div>
-
                 }
-                 </virtual-scroller
-            >
+            </virtual-scroller>
         </div>
-
     }
 
     <div class="array-buttons row g-0 align-items-center" [class.expanded]="isExpanded">
-
         <div class="col-auto">
-
             @if (isArray) {
-
                 @if (hasField) {
-                     <button class="btn btn-outline-success" (click)="addItem()" [disabled]="isDisabledOrFull | async" type="button">
-                         {{ "contents.arrayAddItem" | sqxTranslate }} </button
-                    >
+                    <button class="btn btn-outline-success" (click)="addItem()" [disabled]="isDisabledOrFull | async" type="button">
+                        {{ "contents.arrayAddItem" | sqxTranslate }}
+                    </button>
                 }
 
                 @if (!hasField) {
-                     <sqx-form-hint> {{ "contents.arrayNoFields" | sqxTranslate }} </sqx-form-hint>
+                    <sqx-form-hint> {{ "contents.arrayNoFields" | sqxTranslate }} </sqx-form-hint>
                 }
-
-            }
-
-            @else {
-
+            } @else {
                 @if (schemasList.length > 1) {
-                     <button
+                    <button
                         class="btn btn-outline-success dropdown-toggle"
                         #buttonSelect
                         (click)="schemasDropdown.show()"
                         [disabled]="isDisabledOrFull | async"
                         type="button">
-                         {{ "contents.addComponent" | sqxTranslate }} </button
-                    > <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonSelect" *sqxModal="schemasDropdown; closeAlways: true"
-                        >
+                        {{ "contents.addComponent" | sqxTranslate }}
+                    </button>
+                    <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonSelect" *sqxModal="schemasDropdown; closeAlways: true">
                         @for (schema of schemasList; track schema) {
-                             <a class="dropdown-item" (click)="addComponent(schema)"> {{ schema.displayName }} </a>
+                            <a class="dropdown-item" (click)="addComponent(schema)"> {{ schema.displayName }} </a>
                         }
-                         </sqx-dropdown-menu
-                    >
+                    </sqx-dropdown-menu>
                 }
 
                 @if (schemasList.length === 1) {
-                     <button
-                        class="btn btn-outline-success"
-                        (click)="addComponent(schemasList[0])"
-                        [disabled]="isDisabledOrFull | async"
-                        type="button">
-                         {{ "contents.addComponent" | sqxTranslate }} </button
-                    >
+                    <button class="btn btn-outline-success" (click)="addComponent(schemasList[0])" [disabled]="isDisabledOrFull | async" type="button">
+                        {{ "contents.addComponent" | sqxTranslate }}
+                    </button>
                 }
 
                 @if (schemasList.length === 0) {
-                     <sqx-form-hint> {{ "contents.componentsNoSchema" | sqxTranslate }} </sqx-form-hint>
+                    <sqx-form-hint> {{ "contents.componentsNoSchema" | sqxTranslate }} </sqx-form-hint>
                 }
-
             }
-
         </div>
 
         <div class="col">
-
             @if (items.length > 0) {
-                 <button
+                <button
                     class="btn btn-text-danger ms-2"
                     confirmRememberKey="leaveApp"
                     confirmText="i18n:contents.arrayClearConfirmText"
@@ -145,25 +117,20 @@
                     [disabled]="isDisabled | async"
                     (sqxConfirmClick)="clear()"
                     type="button">
-                     {{ "contents.arrayClear" | sqxTranslate }} </button
-                >
+                    {{ "contents.arrayClear" | sqxTranslate }}
+                </button>
             }
-
         </div>
 
         @if (items.length > 0) {
-
             <div class="col-auto">
-                 <button class="btn btn-text-secondary" (click)="expandAll()" title="i18n:contents.arrayExpandAll" type="button">
-                     <i class="icon-plus-square"></i> </button
-                > <button class="btn btn-text-secondary" (click)="collapseAll()" title="i18n:contents.arrayCollapseAll" type="button">
-                     <i class="icon-minus-square"></i> </button
-                >
+                <button class="btn btn-text-secondary" (click)="expandAll()" title="i18n:contents.arrayExpandAll" type="button">
+                    <i class="icon-plus-square"></i>
+                </button>
+                <button class="btn btn-text-secondary" (click)="collapseAll()" title="i18n:contents.arrayCollapseAll" type="button">
+                    <i class="icon-minus-square"></i>
+                </button>
             </div>
-
         }
-
     </div>
-
 }
-

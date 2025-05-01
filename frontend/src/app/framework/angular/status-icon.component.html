@@ -1,19 +1,16 @@
 @switch (status) {
     @case ("Failed") {
-        <div class="status-icon status-icon-failed status-icon-{{ size }}" [title]="statusText">
-            <i class="icon-exclamation"></i>
-        </div>
+        <div class="status-icon status-icon-failed status-icon-{{ size }}" [title]="statusText"><i class="icon-exclamation"></i></div>
     }
+
     @case ("Success") {
-        <div class="status-icon status-icon-success status-icon-{{ size }}" [title]="statusText">
-            <i class="icon-checkmark"></i>
-        </div>
+        <div class="status-icon status-icon-success status-icon-{{ size }}" [title]="statusText"><i class="icon-checkmark"></i></div>
     }
+
     @case ("Completed") {
-        <div class="status-icon status-icon-success status-icon-{{ size }}" [title]="statusText">
-            <i class="icon-checkmark"></i>
-        </div>
+        <div class="status-icon status-icon-success status-icon-{{ size }}" [title]="statusText"><i class="icon-checkmark"></i></div>
     }
+
     @default {
         <div class="status-icon status-icon-pending status-icon-{{ size }} spin" [title]="statusText">
             <i class="icon-hourglass_top"></i>

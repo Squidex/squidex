@@ -1,47 +1,33 @@
 <sqx-title message="i18n:common.administrationPageTitle" />
 <div class="sidebar">
-
     <ul class="nav nav-panel flex-column">
-
         @if (uiState.canReadUsers | async) {
-
             <li class="nav-item">
-                 <a class="nav-link" routerLink="users" routerLinkActive="active"
-                    > <i class="nav-icon icon-user-o"></i>
+                <a class="nav-link" routerLink="users" routerLinkActive="active">
+                    <i class="nav-icon icon-user-o"></i>
                     <div class="nav-text">{{ "common.users" | sqxTranslate }}</div>
-                     </a
-                >
+                </a>
             </li>
-
         }
 
         @if (uiState.canReadEvents | async) {
-
             <li class="nav-item">
-                 <a class="nav-link" routerLink="event-consumers" routerLinkActive="active"
-                    > <i class="nav-icon icon-time"></i>
+                <a class="nav-link" routerLink="event-consumers" routerLinkActive="active">
+                    <i class="nav-icon icon-time"></i>
                     <div class="nav-text">{{ "common.consumers" | sqxTranslate }}</div>
-                     </a
-                >
+                </a>
             </li>
-
         }
 
         @if (uiState.canRestore | async) {
-
             <li class="nav-item">
-                 <a class="nav-link" routerLink="restore" routerLinkActive="active"
-                    > <i class="nav-icon icon-backup"></i>
+                <a class="nav-link" routerLink="restore" routerLinkActive="active">
+                    <i class="nav-icon icon-backup"></i>
                     <div class="nav-text">{{ "common.restore" | sqxTranslate }}</div>
-                     </a
-                >
+                </a>
             </li>
-
         }
-
     </ul>
-
 </div>
 
-<div class="panel-container" sqxLayoutContainer> <router-outlet></router-outlet> </div>
-
+<div class="panel-container" sqxLayoutContainer><router-outlet></router-outlet></div>

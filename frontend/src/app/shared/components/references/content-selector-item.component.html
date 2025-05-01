@@ -1,40 +1,21 @@
 <tr (click)="toggle()">
     <td class="cell-select" sqxStopClick>
-        <input
-            class="form-check"
-            [disabled]="!selectable"
-            [ngModel]="selected || !selectable"
-            (ngModelChange)="select($event)"
-            type="checkbox" />
+        <input class="form-check" [disabled]="!selectable" [ngModel]="selected || !selectable" (ngModelChange)="select($event)" type="checkbox" />
     </td>
 
     <td [field]="metaFields.lastModifiedByAvatar" sqxContentListCell>
-        <sqx-content-list-field
-            [content]="content"
-            [field]="metaFields.lastModifiedByAvatar"
-            [language]="language"
-            [languages]="languages"
-            [schema]="schema" />
+        <sqx-content-list-field [content]="content" [field]="metaFields.lastModifiedByAvatar" [language]="language" [languages]="languages" [schema]="schema" />
     </td>
 
     @for (field of schema.defaultReferenceFields; track field) {
         <td>
-            <sqx-content-list-field
-                [content]="content"
-                [field]="field"
-                [language]="language"
-                [languages]="languages"
-                [schema]="schema" />
+            <sqx-content-list-field [content]="content" [field]="field" [language]="language" [languages]="languages" [schema]="schema" />
         </td>
     }
 
     <td [field]="metaFields.statusColor" sqxContentListCell>
-        <sqx-content-list-field
-            [content]="content"
-            [field]="metaFields.statusColor"
-            [language]="language"
-            [languages]="languages"
-            [schema]="undefined" />
+        <sqx-content-list-field [content]="content" [field]="metaFields.statusColor" [language]="language" [languages]="languages" [schema]="undefined" />
     </td>
 </tr>
+
 <tr class="spacer"></tr>

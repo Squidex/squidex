@@ -1,36 +1,25 @@
-<sqx-modal-dialog (dialogClose)="emitClose()" showFooter="false" size="lg"
-    > <ng-container title
-        >
+<sqx-modal-dialog (dialogClose)="emitClose()" showFooter="false" size="lg">
+    <ng-container title>
         @if (schemas.length > 1) {
-             <select class="form-select" [ngModel]="schema" (ngModelChange)="selectSchema($event)">
-
+            <select class="form-select" [ngModel]="schema" (ngModelChange)="selectSchema($event)">
                 @for (schema of schemas; track schema) {
-
                     <option [ngValue]="schema">
-                         {{ "contents.referencesSelectSchema" | sqxTranslate: { schema: schema.displayName } }}
+                        {{ "contents.referencesSelectSchema" | sqxTranslate: { schema: schema.displayName } }}
                     </option>
-
                 }
-                 </select
-            >
+            </select>
         }
 
         @if (schemas.length === 1) {
-
-            <div> {{ "contents.referencesSelectSchema" | sqxTranslate: { schema: schemas[0].displayName } }} </div>
-
+            <div>{{ "contents.referencesSelectSchema" | sqxTranslate: { schema: schemas[0].displayName } }}</div>
         }
-         </ng-container
-    > <ng-container tabs
-        >
+    </ng-container>
+    <ng-container tabs>
         <div class="row gx-2 mt-3 mb-3">
-
             <div class="col-auto">
-
                 @if (schema && languages.length > 1) {
-
                     <div>
-                         <sqx-language-selector
+                        <sqx-language-selector
                             class="languages-buttons"
                             dropdownPosition="bottom-end"
                             [language]="language"
@@ -38,31 +27,25 @@
                             [languages]="languages"
                             [percents]="contentForm.translationStatus | async" />
                     </div>
-
                 }
-
             </div>
 
             <div class="col text-end">
-                 <button class="btn btn-outline-success" (click)="save()" type="button"> {{ "common.create" | sqxTranslate }} </button>
+                <button class="btn btn-outline-success" (click)="save()" type="button">{{ "common.create" | sqxTranslate }}</button>
                 @if (schema.canContentsCreateAndPublish) {
-                     <button class="btn btn-success ms-2" (click)="saveAndPublish()" type="button">
-                         {{ "contents.referencesCreatePublish" | sqxTranslate }} </button
-                    >
+                    <button class="btn btn-success ms-2" (click)="saveAndPublish()" type="button">
+                        {{ "contents.referencesCreatePublish" | sqxTranslate }}
+                    </button>
                 }
-                 <sqx-form-error bubble="true" closeable="true" [error]="contentForm.error | async" />
+                <sqx-form-error bubble="true" closeable="true" [error]="contentForm.error | async" />
             </div>
-
         </div>
-         </ng-container
-    > <ng-container content
-        >
+    </ng-container>
+    <ng-container content>
         @if (schema && contentForm) {
-
             <form [formGroup]="contentForm.form" (ngSubmit)="saveAndPublish()">
-
                 @for (section of contentForm.sections; track section) {
-                     <sqx-content-section
+                    <sqx-content-section
                         [form]="contentForm"
                         [formContext]="formContext"
                         [formLevel]="0"
@@ -72,10 +55,7 @@
                         [languages]="languages"
                         [schema]="schema" />
                 }
-
             </form>
-
         }
-         </ng-container
-    > </sqx-modal-dialog
->
+    </ng-container>
+</sqx-modal-dialog>

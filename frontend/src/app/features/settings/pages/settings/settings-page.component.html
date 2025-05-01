@@ -1,64 +1,40 @@
 <sqx-title message="i18n:appSettings.title" />
-
 <sqx-layout innerWidth="55" layout="main" titleIcon="patterns" titleText="i18n:appSettings.title">
     <ng-container menu>
-        <button
-            class="btn btn-text-secondary me-2"
-            (click)="reload()"
-            shortcut="CTRL + B"
-            title="i18n:appSettings.refreshTooltip"
-            type="button">
-            <i class="icon-reset"></i>
-            {{ "common.refresh" | sqxTranslate }}
+        <button class="btn btn-text-secondary me-2" (click)="reload()" shortcut="CTRL + B" title="i18n:appSettings.refreshTooltip" type="button">
+            <i class="icon-reset"></i> {{ "common.refresh" | sqxTranslate }}
         </button>
-
         <button class="float-end btn btn-primary" (click)="save()" [disabled]="!isEditable" type="submit">
             {{ "common.save" | sqxTranslate }}
         </button>
     </ng-container>
-
     <ng-container>
         <sqx-list-view innerWidth="55rem">
             <h5>{{ "appSettings.patterns.title" | sqxTranslate }}</h5>
-
-            <sqx-form-hint>
-                {{ "appSettings.patterns.description" | sqxTranslate }}
-            </sqx-form-hint>
-
+            <sqx-form-hint> {{ "appSettings.patterns.description" | sqxTranslate }} </sqx-form-hint>
             <div class="card card-body mb-4" data-testid="patterns">
                 <div class="content">
                     @if (!isEditable && editForm.patternsControls.length === 0) {
-                        <div>
-                            {{ "appSettings.patterns.empty" | sqxTranslate }}
-                        </div>
+                        <div>{{ "appSettings.patterns.empty" | sqxTranslate }}</div>
                     }
 
                     @for (form of editForm.patternsControls; track form; let i = $index) {
                         <div class="form-group row gx-2" attr.data-testid="pattern_{{ form.get('name')?.value }}" [formGroup]="form">
                             <div class="col-3">
                                 <sqx-control-errors for="name" />
-                                <input
-                                    class="form-control"
-                                    formControlName="name"
-                                    maxlength="1000"
-                                    placeholder="{{ 'common.name' | sqxTranslate }}" />
+                                <input class="form-control" formControlName="name" maxlength="1000" placeholder="{{ 'common.name' | sqxTranslate }}" />
                             </div>
+
                             <div class="col">
                                 <sqx-control-errors for="regex" />
-                                <input
-                                    class="form-control"
-                                    formControlName="regex"
-                                    maxlength="1000"
-                                    placeholder="{{ 'common.pattern' | sqxTranslate }}" />
+                                <input class="form-control" formControlName="regex" maxlength="1000" placeholder="{{ 'common.pattern' | sqxTranslate }}" />
                             </div>
+
                             <div class="col-4">
                                 <sqx-control-errors for="message" />
-                                <input
-                                    class="form-control"
-                                    formControlName="message"
-                                    maxlength="1000"
-                                    placeholder="{{ 'common.message' | sqxTranslate }}" />
+                                <input class="form-control" formControlName="message" maxlength="1000" placeholder="{{ 'common.message' | sqxTranslate }}" />
                             </div>
+
                             <div class="col-auto">
                                 <button
                                     class="btn btn-text-danger"
@@ -80,12 +56,15 @@
                             <div class="col-3">
                                 <div class="form-control preview">{{ "common.name" | sqxTranslate }}</div>
                             </div>
+
                             <div class="col">
                                 <div class="form-control preview">{{ "common.pattern" | sqxTranslate }}</div>
                             </div>
+
                             <div class="col-4">
                                 <div class="form-control preview">{{ "common.message" | sqxTranslate }}</div>
                             </div>
+
                             <div class="col-auto">
                                 <button
                                     class="btn btn-success"
@@ -101,37 +80,25 @@
             </div>
 
             <h5 class="mt-2">{{ "appSettings.editors.title" | sqxTranslate }}</h5>
-
-            <sqx-form-hint>
-                {{ "appSettings.editors.description" | sqxTranslate }}
-            </sqx-form-hint>
-
+            <sqx-form-hint> {{ "appSettings.editors.description" | sqxTranslate }} </sqx-form-hint>
             <div class="card card-body mb-4">
                 <div class="content" data-testid="pattern">
                     @if (!isEditable && editForm.editorsControls.length === 0) {
-                        <div>
-                            {{ "appSettings.editors.empty" | sqxTranslate }}
-                        </div>
+                        <div>{{ "appSettings.editors.empty" | sqxTranslate }}</div>
                     }
 
                     @for (form of editForm.editorsControls; track form; let i = $index) {
                         <div class="form-group row gx-2" [formGroup]="form">
                             <div class="col-3">
                                 <sqx-control-errors for="name" />
-                                <input
-                                    class="form-control"
-                                    formControlName="name"
-                                    maxlength="1000"
-                                    placeholder="{{ 'common.name' | sqxTranslate }}" />
+                                <input class="form-control" formControlName="name" maxlength="1000" placeholder="{{ 'common.name' | sqxTranslate }}" />
                             </div>
+
                             <div class="col">
                                 <sqx-control-errors for="url" />
-                                <input
-                                    class="form-control"
-                                    formControlName="url"
-                                    maxlength="1000"
-                                    placeholder="{{ 'common.url' | sqxTranslate }}" />
+                                <input class="form-control" formControlName="url" maxlength="1000" placeholder="{{ 'common.url' | sqxTranslate }}" />
                             </div>
+
                             <div class="col-auto">
                                 <button
                                     class="btn btn-text-danger"
@@ -153,9 +120,11 @@
                             <div class="col-3">
                                 <div class="form-control preview">{{ "common.name" | sqxTranslate }}</div>
                             </div>
+
                             <div class="col">
                                 <div class="form-control preview">{{ "common.url" | sqxTranslate }}</div>
                             </div>
+
                             <div class="col-auto">
                                 <button
                                     class="btn btn-success"
@@ -176,16 +145,12 @@
                 <div class="card-body" [formGroup]="editForm.form">
                     <div class="form-check">
                         <input class="form-check-input" id="hideScheduler" formControlName="hideScheduler" type="checkbox" />
-
-                        <label class="form-check-label" for="hideScheduler">
-                            {{ "appSettings.hideScheduler" | sqxTranslate }}
-                        </label>
+                        <label class="form-check-label" for="hideScheduler"> {{ "appSettings.hideScheduler" | sqxTranslate }} </label>
                     </div>
                 </div>
             </div>
         </sqx-list-view>
     </ng-container>
-
     <ng-template sidebarMenu>
         <div class="panel-nav">
             <a
@@ -200,7 +165,6 @@
                 titlePosition="left">
                 <i class="icon-time"></i>
             </a>
-
             <a
                 class="panel-link"
                 attr.aria-label="{{ 'common.help' | sqxTranslate }}"
@@ -216,5 +180,4 @@
         </div>
     </ng-template>
 </sqx-layout>
-
 <router-outlet></router-outlet>

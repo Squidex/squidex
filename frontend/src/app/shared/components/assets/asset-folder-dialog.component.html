@@ -7,33 +7,22 @@
                 {{ "assets.createFolder" | sqxTranslate }}
             }
         </ng-container>
-
         <ng-container content>
             <sqx-form-error [error]="editForm.error | async" />
-
             <div class="form-group">
                 <label for="folderName">
-                    {{ "assets.folderName" | sqxTranslate }}
-                    <small class="hint">({{ "common.requiredHint" | sqxTranslate }})</small>
+                    {{ "assets.folderName" | sqxTranslate }} <small class="hint">({{ "common.requiredHint" | sqxTranslate }})</small>
                 </label>
-
                 <sqx-control-errors for="folderName" />
-
                 <input class="form-control" id="folderName" autocomplete="off" formControlName="folderName" sqxFocusOnInit />
             </div>
 
             <div class="form-group">
-                <sqx-form-alert marginBottom="0" marginTop="2">
-                    {{ "assets.folderNameHint" | sqxTranslate }}
-                </sqx-form-alert>
+                <sqx-form-alert marginBottom="0" marginTop="2"> {{ "assets.folderNameHint" | sqxTranslate }} </sqx-form-alert>
             </div>
         </ng-container>
-
         <ng-container footer>
-            <button class="btn btn-text-secondary" (click)="emitClose()" type="button">
-                {{ "common.cancel" | sqxTranslate }}
-            </button>
-
+            <button class="btn btn-text-secondary" (click)="emitClose()" type="button">{{ "common.cancel" | sqxTranslate }}</button>
             <button class="btn btn-success" type="submit">
                 @if (assetFolder) {
                     {{ "common.rename" | sqxTranslate }}

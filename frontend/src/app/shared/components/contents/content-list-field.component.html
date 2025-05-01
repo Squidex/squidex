@@ -2,57 +2,52 @@
     @case (metaFields.id) {
         <small class="truncate">{{ content.id }}</small>
     }
+
     @case (metaFields.created) {
         <small class="truncate">{{ content.created | sqxFromNow }}</small>
     }
+
     @case (metaFields.createdByAvatar) {
         <img class="user-picture" [src]="content.createdBy | sqxUserPictureRef" title="{{ content.createdBy | sqxUserNameRef }}" />
     }
+
     @case (metaFields.createdByName) {
         <small class="truncate">{{ content.createdBy | sqxUserNameRef }}</small>
     }
+
     @case (metaFields.lastModified) {
         <small class="truncate">{{ content.lastModified | sqxFromNow }}</small>
     }
+
     @case (metaFields.lastModified) {
         <small class="truncate">{{ content.lastModified | sqxFromNow }}</small>
     }
+
     @case (metaFields.lastModifiedByAvatar) {
-        <img
-            class="user-picture"
-            [src]="content.lastModifiedBy | sqxUserPictureRef"
-            title="{{ content.lastModifiedBy | sqxUserNameRef }}" />
+        <img class="user-picture" [src]="content.lastModifiedBy | sqxUserPictureRef" title="{{ content.lastModifiedBy | sqxUserNameRef }}" />
     }
+
     @case (metaFields.lastModifiedByName) {
         <small class="truncate">{{ content.lastModifiedBy | sqxUserNameRef }}</small>
     }
+
     @case (metaFields.translationStatus) {
-        <sqx-translation-status
-            [data]="content.data"
-            [language]="language"
-            [languages]="languages"
-            [schema]="schema" />
+        <sqx-translation-status [data]="content.data" [language]="language" [languages]="languages" [schema]="schema" />
     }
+
     @case (metaFields.translationStatusAverage) {
-        <sqx-translation-status
-            [data]="content.data"
-            [language]="undefined"
-            [languages]="languages"
-            [schema]="schema" />
+        <sqx-translation-status [data]="content.data" [language]="undefined" [languages]="languages" [schema]="schema" />
     }
+
     @case (metaFields.status) {
         @if (content.newStatus) {
             <div class="row g-0 status-grid">
                 <div class="col">
-                    <sqx-content-status
-                        layout="text"
-                        [status]="content.status"
-                        [statusColor]="content.statusColor"
-                        truncate="true" />
+                    <sqx-content-status layout="text" [status]="content.status" [statusColor]="content.statusColor" truncate="true" />
                 </div>
-                <div class="col-auto">
-                    <i class="icon-caret-right"></i>
-                </div>
+
+                <div class="col-auto"><i class="icon-caret-right"></i></div>
+
                 <div class="col">
                     <sqx-content-status
                         layout="text"
@@ -63,45 +58,30 @@
                 </div>
             </div>
         } @else {
-            <sqx-content-status
-                layout="text"
-                [scheduled]="content.scheduleJob"
-                [status]="content.status"
-                [statusColor]="content.statusColor"
-                truncate="true" />
+            <sqx-content-status layout="text" [scheduled]="content.scheduleJob" [status]="content.status" [statusColor]="content.statusColor" truncate="true" />
         }
     }
+
     @case (metaFields.statusNext) {
         @if (content.scheduleJob) {
             <span class="truncate">
-                <sqx-content-status
-                    layout="text"
-                    [status]="content.scheduleJob.status"
-                    [statusColor]="content.scheduleJob.color" />
-
+                <sqx-content-status layout="text" [status]="content.scheduleJob.status" [statusColor]="content.scheduleJob.color" />
                 {{ "contents.scheduledAt" | sqxTranslate }}&nbsp;{{ content.scheduleJob.dueTime | sqxShortDate }}
             </span>
         }
     }
+
     @case (metaFields.statusColor) {
         @if (content.newStatus) {
             <span class="text-nowrap truncate">
-                <sqx-content-status [status]="content.status" [statusColor]="content.statusColor" />
-
-                <i class="icon-caret-right"></i>
-
-                <sqx-content-status
-                    [scheduled]="content.scheduleJob"
-                    [status]="content.newStatus"
-                    [statusColor]="content.newStatusColor!" />
+                <sqx-content-status [status]="content.status" [statusColor]="content.statusColor" /> <i class="icon-caret-right"></i>
+                <sqx-content-status [scheduled]="content.scheduleJob" [status]="content.newStatus" [statusColor]="content.newStatusColor!" />
             </span>
         } @else {
-            <sqx-content-status
-                [scheduled]="content.scheduleJob"
-                [status]="content.status"
-                [statusColor]="content.statusColor" />
+            <sqx-content-status [scheduled]="content.scheduleJob" [status]="content.status" [statusColor]="content.statusColor" />
         }
     }
+
     @default {
         @if (field.rootField && isInlineEditable && patchAllowed && patchForm) {
             <sqx-content-value-editor [field]="field.rootField" [form]="patchForm" />

@@ -1,16 +1,10 @@
 <form [formGroup]="importForm.form" (ngSubmit)="detect()">
     <sqx-modal-dialog (dialogClose)="dialogClose.emit()">
-        <ng-container title>
-            {{ "contributors.importTitle" | sqxTranslate }}
-        </ng-container>
-
+        <ng-container title> {{ "contributors.importTitle" | sqxTranslate }} </ng-container>
         <ng-container content>
             @switch (importStage) {
                 @case ("Start") {
-                    <textarea
-                        class="form-control content"
-                        formControlName="import"
-                        placeholder="user1@squidex.io;user2@squidex.io"></textarea>
+                    <textarea class="form-control content" formControlName="import" placeholder="user1@squidex.io;user2@squidex.io"></textarea>
                     <sqx-form-hint>
                         @if (importForm.numberOfEmails | async; as count) {
                             {{ "contributors.import.emailsDetected" | sqxTranslate: { count: count } }}
@@ -18,12 +12,12 @@
                         &nbsp;
                     </sqx-form-hint>
                 }
+
                 @case ("Change") {
                     @for (status of importStatus; track status) {
                         <div class="row pb-2">
-                            <div class="col truncate aligned">
-                                {{ status.email }}
-                            </div>
+                            <div class="col truncate aligned">{{ status.email }}</div>
+
                             <div class="col-5 ps-1">
                                 <select class="form-select" [(ngModel)]="status.role" [ngModelOptions]="{ standalone: true }">
                                     @for (role of roles; track role) {
@@ -34,35 +28,31 @@
                         </div>
                     }
                 }
+
                 @case ("Wait") {
                     @for (status of importStatus; track status) {
                         <div class="row pb-2">
-                            <div class="col truncate aligned">
-                                {{ status.email }}
-                            </div>
+                            <div class="col truncate aligned">{{ status.email }}</div>
+
                             <div class="col-auto aligned">
-                                <sqx-status-icon
-                                    size="sm"
-                                    [status]="status.result"
-                                    [statusText]="status.resultText | sqxTranslate" />
+                                <sqx-status-icon size="sm" [status]="status.result" [statusText]="status.resultText | sqxTranslate" />
                             </div>
                         </div>
                     }
                 }
             }
         </ng-container>
-
         <ng-container footer>
             <button class="btn btn-text-secondary" (click)="dialogClose.emit()" type="button">
                 {{ "common.cancel" | sqxTranslate }}
             </button>
-
             @switch (importStage) {
                 @case ("Start") {
                     <button class="btn btn-success" [disabled]="importForm.hasNoUser | async" type="submit">
                         {{ "contributors.import.run" | sqxTranslate }}
                     </button>
                 }
+
                 @case ("Change") {
                     <button class="btn btn-success" (click)="import()" [disabled]="importStatus.length === 0" type="button">
                         {{ "contributors.import.run2" | sqxTranslate }}

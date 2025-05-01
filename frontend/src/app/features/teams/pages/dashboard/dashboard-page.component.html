@@ -1,10 +1,10 @@
 <sqx-title message="i18n:dashboard.pageTitle" />
-
 @if (selectedTeam | async; as team) {
     <div class="dashboard" @fade>
         @if (!isScrolled) {
             <div class="dashboard-summary" @fade>
                 <h1 class="dashboard-title">{{ "dashboard.welcomeTitle" | sqxTranslate: { user: user } }}</h1>
+
                 <div class="subtext" [sqxMarkdown]="'dashboard.welcomeTextTeam' | sqxTranslate: { team: team.name }"></div>
             </div>
         }
@@ -15,51 +15,58 @@
                         @case ("apps") {
                             <sqx-apps-card [team]="team" />
                         }
+
                         @case ("api-calls") {
                             <sqx-api-calls-card [usage]="callsUsage" />
                         }
+
                         @case ("api-traffic-summary") {
                             <sqx-api-traffic-summary-card [usage]="callsUsage" />
                         }
+
                         @case ("api-calls-summary") {
                             <sqx-api-calls-summary-card [usage]="callsUsage" />
                         }
+
                         @case ("asset-uploads-count") {
                             <sqx-asset-uploads-count-card [usage]="storageUsage" />
                         }
+
                         @case ("asset-uploads-size-summary") {
                             <sqx-asset-uploads-size-summary-card [usage]="storageCurrent" />
                         }
+
                         @case ("asset-uploads-size") {
                             <sqx-asset-uploads-size-card [usage]="storageUsage" />
                         }
+
                         @case ("api-traffic") {
-                            <sqx-api-traffic-card
-                                [isStacked]="isStacked"
-                                (isStackedChange)="changeIsStacked($event)"
-                                [usage]="callsUsage" />
+                            <sqx-api-traffic-card [isStacked]="isStacked" (isStackedChange)="changeIsStacked($event)" [usage]="callsUsage" />
                         }
+
                         @case ("api-performance") {
-                            <sqx-api-performance-card
-                                [isStacked]="isStacked"
-                                (isStackedChange)="changeIsStacked($event)"
-                                [usage]="callsUsage" />
+                            <sqx-api-performance-card [isStacked]="isStacked" (isStackedChange)="changeIsStacked($event)" [usage]="callsUsage" />
                         }
+
                         @case ("random-dog") {
                             <sqx-random-dog-card />
                         }
+
                         @case ("random-cat") {
                             <sqx-random-cat-card />
                         }
+
                         @case ("support") {
                             <sqx-support-card />
                         }
+
                         @case ("iframe") {
                             <sqx-iframe-card [options]="item" [team]="team" />
                         }
                     }
                 </gridster-item>
             }
+
             <div [style.height]="extendedHeight" [style.width]="'0px'"></div>
         </gridster>
     </div>

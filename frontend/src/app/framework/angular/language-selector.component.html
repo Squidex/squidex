@@ -19,7 +19,9 @@
                             [class.missing]="exists && !exists[supported.iso2Code]"
                             (click)="selectLanguage(supported)">
                             <td class="text-language">{{ supported.iso2Code }}</td>
+
                             <td>({{ supported.englishName }})</td>
+
                             @if (percents) {
                                 <td class="text-right">{{ percents[supported.iso2Code] || 0 }} %</td>
                             }

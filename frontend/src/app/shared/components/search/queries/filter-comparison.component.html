@@ -2,55 +2,42 @@
     <div class="row gx-2 mb-1 align-items-center">
         <div class="col-auto">
             <div class="btn-group">
-                <button
-                    class="btn btn-secondary btn-toggle btn-code text-sm"
-                    [class.btn-primary]="actualNegated"
-                    (click)="toggleNot()"
-                    type="button">
+                <button class="btn btn-secondary btn-toggle btn-code text-sm" [class.btn-primary]="actualNegated" (click)="toggleNot()" type="button">
                     NOT
                 </button>
             </div>
         </div>
+
         <div class="col-auto path">
             <sqx-query-path [model]="model" [path]="actualComparison.path" (pathChange)="changePath($event)" />
         </div>
+
         <div class="col-auto operator">
-            <select
-                class="form-select"
-                [disabled]="operators.length === 0"
-                [ngModel]="actualComparison.op"
-                (ngModelChange)="changeOp($event)">
+            <select class="form-select" [disabled]="operators.length === 0" [ngModel]="actualComparison.op" (ngModelChange)="changeOp($event)">
                 @for (operator of operators; track operator) {
                     <option [ngValue]="operator">{{ operator | sqxFilterOperator | sqxTranslate }}</option>
                 }
             </select>
         </div>
+
         <div class="col align-items-center">
             @switch (fieldUI) {
                 @case ("Boolean") {
-                    <input
-                        class="form-check-input"
-                        [ngModel]="actualComparison.value"
-                        (ngModelChange)="changeValue($event)"
-                        type="checkbox" />
+                    <input class="form-check-input" [ngModel]="actualComparison.value" (ngModelChange)="changeValue($event)" type="checkbox" />
                 }
+
                 @case ("Date") {
-                    <sqx-date-time-editor
-                        hideDateButtons="true"
-                        mode="Date"
-                        [ngModel]="actualComparison.value"
-                        (ngModelChange)="changeValue($event)" />
+                    <sqx-date-time-editor hideDateButtons="true" mode="Date" [ngModel]="actualComparison.value" (ngModelChange)="changeValue($event)" />
                 }
+
                 @case ("DateTime") {
-                    <sqx-date-time-editor
-                        hideDateButtons="true"
-                        mode="DateTime"
-                        [ngModel]="actualComparison.value"
-                        (ngModelChange)="changeValue($event)" />
+                    <sqx-date-time-editor hideDateButtons="true" mode="DateTime" [ngModel]="actualComparison.value" (ngModelChange)="changeValue($event)" />
                 }
+
                 @case ("Number") {
                     <input class="form-control" [ngModel]="actualComparison.value" (ngModelChange)="changeValue($event)" type="number" />
                 }
+
                 @case ("Reference") {
                     <sqx-reference-input
                         [language]="language"
@@ -61,14 +48,17 @@
                         [query]="undefined"
                         [schemaIds]="field.schema.extra?.schemaIds" />
                 }
+
                 @case ("Select") {
                     <select class="form-select" [ngModel]="actualComparison.value" (ngModelChange)="changeValue($event)">
                         <option [ngValue]="null"></option>
+
                         @for (value of field.schema.extra?.options; track value) {
                             <option [ngValue]="value">{{ value }}</option>
                         }
                     </select>
                 }
+
                 @case ("Status") {
                     <sqx-dropdown
                         canSearch="false"
@@ -76,17 +66,16 @@
                         [ngModel]="actualComparison.value"
                         (ngModelChange)="changeValue($event)"
                         valueProperty="status">
-                        <ng-template let-status="$implicit">
-                            <i class="icon-circle" [style.color]="status.color"></i>
-                            {{ status.status }}
-                        </ng-template>
+                        <ng-template let-status="$implicit"> <i class="icon-circle" [style.color]="status.color"></i> {{ status.status }} </ng-template>
                     </sqx-dropdown>
                 }
+
                 @case ("String") {
                     @if (!field.schema.extra) {
                         <input class="form-control" [ngModel]="actualComparison.value" (ngModelChange)="changeValue($event)" />
                     }
                 }
+
                 @case ("User") {
                     @if (contributorsState.isLoaded | async) {
                         <sqx-dropdown
@@ -109,15 +98,15 @@
                         <input class="form-control" [ngModel]="actualComparison.value" (ngModelChange)="changeValue($event)" />
                     }
                 }
+
                 @case ("Unsupported") {
                     {{ "common.notSupported" | sqxTranslate }}
                 }
             }
         </div>
+
         <div class="col-auto ps-2">
-            <button class="btn btn-text-danger" (click)="remove.emit()" type="button">
-                <i class="icon-bin2"></i>
-            </button>
+            <button class="btn btn-text-danger" (click)="remove.emit()" type="button"><i class="icon-bin2"></i></button>
         </div>
     </div>
 }

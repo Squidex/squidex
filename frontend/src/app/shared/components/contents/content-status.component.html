@@ -5,6 +5,7 @@
         </span>
         <span class="label">{{ status }}</span>
     </div>
+
     @if (scheduled) {
         <div class="content-status-scheduled mt-2">
             <div>
@@ -14,6 +15,7 @@
                 </span>
                 <span>{{ scheduled.status }}</span>
             </div>
+
             <div class="truncate">
                 <span class="label">{{ "contents.scheduledAt" | sqxTranslate }}&nbsp;</span>
                 <span>{{ scheduled.dueTime | sqxFullDateTime }}</span>
@@ -23,11 +25,7 @@
 } @else {
     <span [class.truncate]="truncate">
         @if (scheduled) {
-            <span
-                class="content-status pending"
-                attr.aria-label="{{ tooltipText }}"
-                [style.color]="scheduled.color"
-                title="{{ tooltipText }}">
+            <span class="content-status pending" attr.aria-label="{{ tooltipText }}" [style.color]="scheduled.color" title="{{ tooltipText }}">
                 <i class="icon-clock" [class.icon-sm]="small"></i>
             </span>
         } @else {
@@ -35,6 +33,7 @@
                 <i class="icon-circle" [class.icon-sm]="small"></i>
             </span>
         }
+
         @if (isText) {
             <span class="content-status-label ms-1">{{ status }}</span>
         }

@@ -1,72 +1,49 @@
 <div class="input-group">
-     <button class="btn btn-outline-secondary" (click)="reset()" [disabled]="!valueControl.value" type="button">
-         <i class="icon-close"></i> </button
-    > <button class="btn btn-outline-secondary" (click)="searchDialog.show()" type="button"> <i class="icon-search"></i> </button> <input
-        class="form-control"
-        [disabled]="true"
-        [formControl]="valueControl"
-        readonly />
+    <button class="btn btn-outline-secondary" (click)="reset()" [disabled]="!valueControl.value" type="button">
+        <i class="icon-close"></i>
+    </button>
+    <button class="btn btn-outline-secondary" (click)="searchDialog.show()" type="button"><i class="icon-search"></i></button>
+    <input class="form-control" [disabled]="true" [formControl]="valueControl" readonly />
 </div>
 
 @if (stockPhotoThumbnail | async; as url) {
-
     <div class="preview mt-1" [class.hidden-important]="snapshot.thumbnailStatus === 'Failed'">
-         <img (error)="onThumbnailFailed()" (load)="onThumbnailLoaded()" [src]="url" />
+        <img (error)="onThumbnailFailed()" (load)="onThumbnailLoaded()" [src]="url" />
         @if (snapshot.thumbnailStatus !== "Loaded") {
-             <sqx-loader color="white" />
+            <sqx-loader color="white" />
         }
-
     </div>
-
 }
- <sqx-modal-dialog (dialogClose)="searchDialog.hide()" fullHeight="true" size="lg" *sqxModal="searchDialog"
-    > <ng-container title
-        > <input
-            class="form-control search"
-            [formControl]="stockPhotoSearch"
-            placeholder="{{ 'contents.stockPhotoSearch' | sqxTranslate }}"
-            sqxFocusOnInit />
+<sqx-modal-dialog (dialogClose)="searchDialog.hide()" fullHeight="true" size="lg" *sqxModal="searchDialog">
+    <ng-container title>
+        <input class="form-control search" [formControl]="stockPhotoSearch" placeholder="{{ 'contents.stockPhotoSearch' | sqxTranslate }}" sqxFocusOnInit />
         @if (snapshot.isLoading) {
-             <sqx-loader />
+            <sqx-loader />
         }
-         </ng-container
-    > <ng-container content
-        >
+    </ng-container>
+    <ng-container content>
         <div class="photos">
-
             @for (photo of snapshot.stockPhotos; track photo.thumbUrl) {
-
                 <div class="photo" [class.selected]="isSelected(photo)" (click)="selectPhoto(photo)">
-                     <img [src]="photo.thumbUrl" />
+                    <img [src]="photo.thumbUrl" />
                     <div class="photo-user">
-                         <a class="photo-user-link" [href]="photo.userProfileUrl" sqxExternalLink sqxStopClick> {{ photo.user }} </a>
+                        <a class="photo-user-link" [href]="photo.userProfileUrl" sqxExternalLink sqxStopClick> {{ photo.user }} </a>
                     </div>
-
                 </div>
-
+            } @empty {
+                <div class="empty small text-muted text-center">{{ "contents.stockPhotoSearchEmpty" | sqxTranslate }}</div>
             }
-
-            @empty {
-
-                <div class="empty small text-muted text-center"> {{ "contents.stockPhotoSearchEmpty" | sqxTranslate }} </div>
-
-            }
-
         </div>
 
         @if (snapshot.hasMore) {
-
             <div class="mt-4 text-center">
-                 <button class="btn btn-outline-secondary" (click)="loadMore()" [disabled]="snapshot.isLoading" type="button">
-                     {{ "common.loadMore" | sqxTranslate }}
+                <button class="btn btn-outline-secondary" (click)="loadMore()" [disabled]="snapshot.isLoading" type="button">
+                    {{ "common.loadMore" | sqxTranslate }}
                     @if (snapshot.isLoading) {
-                         <sqx-loader />
+                        <sqx-loader />
                     }
-                     </button
-                >
+                </button>
             </div>
-
         }
-         </ng-container
-    > </sqx-modal-dialog
->
+    </ng-container>
+</sqx-modal-dialog>

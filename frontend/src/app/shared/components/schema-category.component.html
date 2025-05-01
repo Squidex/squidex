@@ -12,6 +12,7 @@
                         <i [class.icon-caret-down]="!isCollapsed" [class.icon-caret-right]="isCollapsed"></i>
                     </button>
                 </div>
+
                 <div class="col overflow-hidden pe-1">
                     <sqx-editable-title
                         closeButton="false"
@@ -21,15 +22,13 @@
                         inputTitleLength="30"
                         size="sm" />
                 </div>
+
                 <div class="col-auto">
                     @if (schemaCategory.countSchemasInSubtree > 0) {
                         <span class="badge rounded-pill badge-secondary">{{ schemaCategory.countSchemasInSubtreeFiltered }}</span>
                     } @else {
                         @if (schemaCategory.name) {
-                            <button
-                                class="btn btn-sm btn-text-secondary btn-remove"
-                                (click)="remove.emit(schemaCategory.name)"
-                                type="button">
+                            <button class="btn btn-sm btn-text-secondary btn-remove" (click)="remove.emit(schemaCategory.name)" type="button">
                                 <i class="icon-bin2"></i>
                             </button>
                         }
@@ -41,12 +40,7 @@
         <div class="nav-collapsed" [hidden]="isCollapsed" [style.height]="getContainerHeight()">
             @if (!forContent) {
                 @for (schema of schemas; track schema.id) {
-                    <li
-                        class="nav-item truncate"
-                        cdkDrag
-                        [cdkDragData]="schema"
-                        (cdkDragStarted)="dragStarted($event)"
-                        sqxTourStep="schema">
+                    <li class="nav-item truncate" cdkDrag [cdkDragData]="schema" (cdkDragStarted)="dragStarted($event)" sqxTourStep="schema">
                         <a
                             class="nav-link truncate"
                             [routerLink]="schemaRoute(schema)"
@@ -55,10 +49,7 @@
                             title="{{ schema.displayName }}"
                             titlePosition="top-start">
                             <i class="icon-drag2 drag-handle" cdkDragHandle></i>
-                            <span
-                                class="item-published me-1"
-                                id="schema_{{ schema.name }}"
-                                [class.unpublished]="!schema.isPublished"></span>
+                            <span class="item-published me-1" id="schema_{{ schema.name }}" [class.unpublished]="!schema.isPublished"></span>
                             {{ schema.displayName }}
                             @if (schema.type === "Singleton") {
                                 <span class="singleton">Singleton</span>
@@ -88,10 +79,7 @@
 
     <div class="categories" [hidden]="isCollapsed">
         @for (category of schemaCategory.categories; track category.displayName) {
-            <sqx-schema-category
-                (remove)="remove.emit($event)"
-                [schemaCategory]="category"
-                [schemaTarget]="schemaTarget" />
+            <sqx-schema-category (remove)="remove.emit($event)" [schemaCategory]="category" [schemaTarget]="schemaTarget" />
         }
     </div>
 </ul>
