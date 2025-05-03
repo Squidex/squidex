@@ -42,6 +42,7 @@ public interface IContentRepository
         CancellationToken ct = default);
 
     Task<Content?> FindContentAsync(App app, Schema schema, DomainId id, SearchScope scope,
+        IEnumerable<string>? fields,
         CancellationToken ct = default);
 
     Task<bool> HasReferrersAsync(App app, DomainId reference, SearchScope scope,

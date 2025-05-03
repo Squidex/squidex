@@ -277,7 +277,7 @@ public sealed class ContentQueryService(
             // Enforce a hard timeout
             combined.CancelAfter(options.TimeoutFind);
 
-            return await contentRepository.FindContentAsync(context.App, schema, id, context.Scope(), combined.Token);
+            return await contentRepository.FindContentAsync(context.App, schema, id, context.Scope(), context.Fields(), combined.Token);
         }
     }
 

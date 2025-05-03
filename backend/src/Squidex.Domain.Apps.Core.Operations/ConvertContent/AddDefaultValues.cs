@@ -46,6 +46,19 @@ public sealed class AddDefaultValues(PartitionResolver partitionResolver, IClock
             data[field.Name] = [];
         }
     }
+    
+    public void ConvertDataAfter(Schema schema, ContentData data)
+    {
+        foreach (var field in schema.Fields)
+        {
+            if (FieldNames?.Contains(field.Name) == true)
+            {
+                continue;
+            }
+
+            data[field.Name] = [];
+        }
+    }
 
     public ContentFieldData? ConvertFieldAfter(IRootField field, ContentFieldData source)
     {

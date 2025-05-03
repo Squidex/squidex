@@ -15,11 +15,12 @@ namespace Squidex.Domain.Apps.Entities.Contents.Operations;
 internal sealed class QueryById : OperationBase
 {
     public async Task<Content?> QueryAsync(Schema schema, DomainId id,
+        IEnumerable<string>? fields,
         CancellationToken ct)
     {
         var filter = Filter.Eq(x => x.DocumentId, DomainId.Combine(schema.AppId, id));
 
-        var contentEntity = await Collection.Find(filter).SelectFields(null).FirstOrDefaultAsync(ct);
+        var contentEntity = await Collection.Find(filter).SelectFields(fields ?? null).FirstOrDefaultAsync(ct);
         if (contentEntity == null || contentEntity.IndexedSchemaId != schema.Id)
         {
             return null;
