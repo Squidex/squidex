@@ -102,7 +102,6 @@ public sealed class AppDto : Resource
         var permissions = PermissionSet.Empty;
 
         var isContributor = false;
-
         if (app.TryGetContributorRole(userId, isFrontend, out var role))
         {
             isContributor = true;

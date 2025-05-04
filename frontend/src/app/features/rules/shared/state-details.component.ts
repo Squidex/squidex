@@ -31,7 +31,7 @@ export class StateDetailsComponent {
     public availableSteps: Record<string, RuleElementDto> = {};
 
     @Input({ required: true })
-    public stepItems: BranchItem[] = [];
+    public branchItems: BranchItem[] = [];
 
     @Input({ required: true })
     public state!: FlowExecutionStateDto;

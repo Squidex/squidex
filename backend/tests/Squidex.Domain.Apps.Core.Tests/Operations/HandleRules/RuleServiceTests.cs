@@ -638,7 +638,7 @@ public class RuleServiceTests
                 {
                     [stepId] = new FlowStepDefinition { Step = new DelayFlowStep() },
                 },
-                InitialStep = stepId,
+                InitialStepId = stepId,
             },
             Trigger = trigger ?? new ContentChangedTriggerV2(),
         };

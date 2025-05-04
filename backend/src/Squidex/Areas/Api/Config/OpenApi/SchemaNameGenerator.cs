@@ -18,7 +18,7 @@ public sealed class SchemaNameGenerator : DefaultSchemaNameGenerator
     {
         if (type.BaseType == typeof(FlowStep))
         {
-            return $"{type.TypeName(false, "Action")}FlowStepDto";
+            return $"{type.TypeName(false, "FlowStep")}FlowStepDto";
         }
 
         if (type == typeof(FlowStep))

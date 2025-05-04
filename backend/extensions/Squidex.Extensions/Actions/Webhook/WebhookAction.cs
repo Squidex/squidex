@@ -7,13 +7,12 @@
 
 using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Flows;
-using Squidex.Flows.Steps;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.Webhook;
 
-[Obsolete("Use Flows")]
+[Obsolete("Has been replaced by flows.")]
 public sealed record WebhookAction : RuleAction
 {
     [LocalizedRequired]
@@ -32,6 +31,6 @@ public sealed record WebhookAction : RuleAction
 
     public override FlowStep ToFlowStep()
     {
-        return SimpleMapper.Map(this, new WebhookFlowStepBase());
+        return SimpleMapper.Map(this, new WebhookFlowStep());
     }
 }

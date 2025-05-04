@@ -17,7 +17,7 @@ public class DynamicFlowDefinitionDto
     /// The ID of the initial step.
     /// </summary>
     [LocalizedRequired]
-    public Guid InitialStep { get; set; }
+    public Guid? InitialStepId { get; set; }
 
     /// <summary>
     /// The steps.

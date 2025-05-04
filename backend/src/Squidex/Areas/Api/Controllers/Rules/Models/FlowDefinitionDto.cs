@@ -18,7 +18,7 @@ public class FlowDefinitionDto
     /// The ID of the initial step.
     /// </summary>
     [LocalizedRequired]
-    public Guid InitialStep { get; set; }
+    public Guid? InitialStepId { get; set; }
 
     /// <summary>
     /// The steps.
@@ -33,7 +33,7 @@ public class FlowDefinitionDto
             Steps = Steps?.ToDictionary(
                 x => x.Key,
                 x => x.Value.ToDefinition())!,
-            InitialStep = InitialStep,
+            InitialStepId = InitialStepId,
         };
     }
 
@@ -44,7 +44,7 @@ public class FlowDefinitionDto
             Steps = definition.Steps.ToDictionary(
                 x => x.Key,
                 x => FlowStepDefinitionDto.FromDomain(x.Value)),
-            InitialStep = definition.InitialStep,
+            InitialStepId = definition.InitialStepId,
         };
     }
 }

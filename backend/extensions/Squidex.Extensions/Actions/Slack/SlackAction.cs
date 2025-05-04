@@ -13,7 +13,7 @@ using Squidex.Infrastructure.Validation;
 
 namespace Migrations.OldActions;
 
-[Obsolete("Use Flows")]
+[Obsolete("Has been replaced by flows.")]
 public sealed record SlackAction : RuleAction
 {
     [AbsoluteUrl]

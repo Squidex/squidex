@@ -202,6 +202,33 @@ public static class ClientExtensions
         return null;
     }
 
+    public static async Task<RuleEventDto?> PollEventAsync(this IRulesClient client, string? ruleId, Func<RuleEventDto, bool> predicate,
+        TimeSpan timeout = default)
+    {
+        try
+        {
+            using var cts = new CancellationTokenSource(GetTimeout(timeout));
+
+            while (!cts.IsCancellationRequested)
+            {
+                var results = await client.GetEventsAsync(ruleId, null, null, cts.Token);
+                var result = results.Items.FirstOrDefault(predicate);
+
+                if (result != null)
+                {
+                    return result;
+                }
+
+                await Task.Delay(200, cts.Token);
+            }
+        }
+        catch (OperationCanceledException)
+        {
+        }
+
+        return null;
+    }
+
     [Obsolete("Replaced with jobs.")]
     public static async Task<BackupJobDto?> PollAsync(this IBackupsClient client, Func<BackupJobDto, bool> predicate,
         TimeSpan timeout = default)

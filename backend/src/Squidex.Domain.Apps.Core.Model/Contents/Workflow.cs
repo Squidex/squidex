@@ -99,7 +99,7 @@ public sealed record Workflow(Status Initial, ReadonlyDictionary<Status, Workflo
         return Steps.TryGetValue(status, out step!);
     }
 
-    public (Status Key, WorkflowStep) GetInitialStep()
+    public (Status Key, WorkflowStep) GetInitialStepId()
     {
         return (Initial, Steps[Initial]);
     }

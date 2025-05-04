@@ -46,7 +46,7 @@ public sealed class RuleTypeProvider(IFlowStepRegistry flowStepRegistry, IOption
         }
     }
 
-    [Obsolete("Use Flows")]
+    [Obsolete("Has been replaced by flows.")]
     private void RegisterActions(TypeRegistry typeRegistry)
     {
         typeRegistry.Discriminator<RuleAction>("actionType");

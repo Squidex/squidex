@@ -18,11 +18,6 @@ public sealed class FlowExecutionStepStateDto
     public FlowExecutionStatus Status { get; set; }
 
     /// <summary>
-    /// Indicates if the step has already been prepared (happens once for all attempts).
-    /// </summary>
-    public bool IsPrepared { get; set; }
-
-    /// <summary>
     /// The different attempts.
     /// </summary>
     public List<FlowExecutionStepAttemptDto> Attempts { get; set; } = [];

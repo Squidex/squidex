@@ -7,7 +7,6 @@
 
 using System.Text.Json.Serialization;
 using Squidex.Domain.Apps.Core.Rules.Deprecated;
-using Squidex.Flows.Internal;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
@@ -48,19 +47,19 @@ public sealed record RuleSorrgate : Rule, ISurrogate<Rule>
     {
         var result = this;
 
-        if (Flow == null)
+        if (ruleDef != null)
         {
-            var name = ruleDef != null ? ruleDef.Name : Name;
-            var actualAction = ruleDef != null ? ruleDef.Action : oldAction;
-            var actualTrigger = ruleDef != null ? ruleDef.Trigger : Trigger;
-            var isEnabled = ruleDef != null ? ruleDef.IsEnabled : IsEnabled;
+            result = this with { Name = result.Name, IsEnabled = ruleDef.IsEnabled, Trigger = ruleDef.Trigger };
+        }
 
-            if (actualAction == null || actualTrigger == null)
+        if (result.Flow == null)
+        {
+            var actualAction = ruleDef != null ? ruleDef.Action : oldAction;
+
+            if (actualAction == null || result.Trigger == null)
             {
                 throw new InvalidOperationException("Neither a flow, nor trigger and action is defined.");
             }
-
-            var stepId = Guid.NewGuid();
 
             if (actualAction is IMigrated<RuleAction> migratedAction)
             {
@@ -69,17 +68,7 @@ public sealed record RuleSorrgate : Rule, ISurrogate<Rule>
 
             result = this with
             {
-                Trigger = actualTrigger,
-                Name = name,
-                Flow = new FlowDefinition
-                {
-                    InitialStep = stepId,
-                    Steps = new Dictionary<Guid, FlowStepDefinition>
-                    {
-                        [stepId] = new FlowStepDefinition { Step = actualAction.ToFlowStep() },
-                    },
-                },
-                IsEnabled = isEnabled,
+                Flow = actualAction.ToFlowDefinition(),
             };
         }
 

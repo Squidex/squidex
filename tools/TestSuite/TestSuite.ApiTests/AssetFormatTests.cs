@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Assets;
+using Squidex.Assets.ImageSharp;
 using Squidex.ClientLibrary;
 using TestSuite.Fixtures;
 
@@ -120,7 +121,7 @@ public class AssetFormatTests(CreatedAppFixture fixture) : IClassFixture<Created
 
         await using (var stream = await httpResonse.Content.ReadAsStreamAsync())
         {
-            var imageLoader = new ImageSharpThumbnailGenerator();
+            var imageLoader = new ImageSharpThumbnailGenerator(null!);
             var imageInfo = await imageLoader.GetImageInfoAsync(stream, "image/jpeg");
 
             Assert.False(imageInfo?.HasSensitiveMetadata);

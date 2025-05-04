@@ -7,7 +7,7 @@
 
 import { firstValueFrom, of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, DynamicCreateRuleDto, DynamicFlowDefinitionDto, DynamicFlowStepDefinitionDto, DynamicRuleDto, DynamicRulesDto, DynamicUpdateRuleDto, ManualRuleTriggerDto, RulesService, versioned } from '@app/shared/internal';
+import { DialogService, DynamicCreateRuleDto, DynamicFlowDefinitionDto, DynamicFlowStepDefinitionDto, DynamicRuleDto, DynamicRulesDto, DynamicUpdateRuleDto, ManualRuleTriggerDto, RulesService, Types, versioned } from '@app/shared/internal';
 import { createRule } from '../services/rules.service.spec';
 import { TestValues } from './_test-helpers';
 import { FlowView, RulesState } from './rules.state';
@@ -238,7 +238,7 @@ describe('RulesState', () => {
 });
 
 describe('FlowView', () => {
-    const dto = new DynamicFlowDefinitionDto({ initialStep: null!, steps: {} });
+    const dto = new DynamicFlowDefinitionDto({ initialStepId: null!, steps: {} });
     let idCounter = 0;
     let idGenerator = () => `${idCounter++}`;
 
@@ -249,8 +249,8 @@ describe('FlowView', () => {
     it('should create empty flow', () => {
         const flow = new FlowView(dto);
 
-        expect(flow.dto.toJSON()).toEqual({
-            initialStep: null!,
+        expect(cleanup(flow.dto.toJSON())).toEqual({
+            initialStepId: null!,
             steps: {
             },
         });
@@ -261,10 +261,10 @@ describe('FlowView', () => {
             new FlowView(dto, idGenerator)
                 .add({ step: { stepType: 'Action' } });
 
-        expect(flow.dto.toJSON()).toEqual({
-            initialStep: '1',
+        expect(cleanup(flow.dto.toJSON())).toEqual({
+            initialStepId: '1',
             steps: {
-                '1': { step: { stepType: 'Action' }, nextStepId: null },
+                '1': { step: { stepType: 'Action' } },
             },
         });
     });
@@ -275,11 +275,11 @@ describe('FlowView', () => {
                 .add({ step: { stepType: 'Action1' } })
                 .add({ step: { stepType: 'Action2' } }, '1');
 
-        expect(flow.dto.toJSON()).toEqual({
-            initialStep: '1',
+        expect(cleanup(flow.dto.toJSON())).toEqual({
+            initialStepId: '1',
             steps: {
                 '1': { step: { stepType: 'Action1' }, nextStepId: '2' },
-                '2': { step: { stepType: 'Action2' }, nextStepId: null },
+                '2': { step: { stepType: 'Action2' } },
             },
         });
     });
@@ -290,10 +290,10 @@ describe('FlowView', () => {
                 .add({ step: { stepType: 'Action1' } })
                 .add({ step: { stepType: 'Action2' } });
 
-        expect(flow.dto.toJSON()).toEqual({
-            initialStep: '2',
+        expect(cleanup(flow.dto.toJSON())).toEqual({
+            initialStepId: '2',
             steps: {
-                '1': { step: { stepType: 'Action1' }, nextStepId: null },
+                '1': { step: { stepType: 'Action1' } },
                 '2': { step: { stepType: 'Action2' }, nextStepId: '1' },
             },
         });
@@ -305,16 +305,16 @@ describe('FlowView', () => {
                 .add({ step: { stepType: 'If', branches: [] } })
                 .add({ step: { stepType: 'Action' } }, undefined, '1');
 
-        expect(flow.dto.toJSON()).toEqual({
-            initialStep: '1',
+        expect(cleanup(flow.dto.toJSON())).toEqual({
+            initialStepId: '1',
             steps: {
-                '1': { step: { stepType: 'If', branches: [], elseStepId: '2' }, nextStepId: null },
+                '1': { step: { stepType: 'If', branches: [], elseStepId: '2' } },
                 '2': { step: { stepType: 'Action' } },
             },
         });
     });
 
-    it('should add step to if-branch', () => {
+    it('should add step to If-branch', () => {
         const flow =
             new FlowView(dto, idGenerator)
                 .add({
@@ -328,20 +328,35 @@ describe('FlowView', () => {
                 })
                 .add({ step: { stepType: 'Action' } }, undefined, '1', 1);
 
-        expect(flow.dto.toJSON()).toEqual({
-            initialStep: '1',
+        expect(cleanup(flow.dto.toJSON())).toEqual({
+            initialStepId: '1',
             steps: {
                 '1': {
                     step: {
                         stepType: 'If',
                         branches: [
                             { condition: 'Condition1' },
-                            { condition: 'Condition2', step: '2' },
+                            { condition: 'Condition2', nextStepId: '2' },
                         ],
                     },
-                    nextStepId: null,
                 },
                 '2': { step: { stepType: 'Action' } },
+            },
+        });
+    });
+
+    it('should add If-step to middle', () => {
+        const flow =
+            new FlowView(dto, idGenerator)
+                .add({ step: { stepType: 'Action' } })
+                .add({ step: { stepType: 'Action' } }, '1')
+                .add({ step: { stepType: 'If' } }, '1');
+
+        expect(cleanup(flow.dto.toJSON())).toEqual({
+            initialStepId: '1',
+            steps: {
+                '1': { step: { stepType: 'Action' }, nextStepId: '3' },
+                '3': { step: { stepType: 'If' } },
             },
         });
     });
@@ -386,14 +401,24 @@ describe('FlowView', () => {
         expect(updated).toBe(flow);
     });
 
+    it('should return same flow if step to add is adder after If-step', () => {
+        const flow =
+            new FlowView(dto, idGenerator)
+                .add({ step: { stepType: 'If', branches: [] } });
+
+        const updated = flow.add({ step: { stepType: 'Action2' } }, '1');
+
+        expect(updated).toBe(flow);
+    });
+
     it('should remove only start step', () => {
         const flow =
             new FlowView(dto, idGenerator)
                 .add({ step: { stepType: 'Action' } })
                 .remove('1');
 
-        expect(flow.dto.toJSON()).toEqual({
-            initialStep: null,
+        expect(cleanup(flow.dto.toJSON())).toEqual({
+            initialStepId: null,
             steps: {
             },
         });
@@ -406,10 +431,10 @@ describe('FlowView', () => {
                 .add({ step: { stepType: 'Action2' } }, '1')
                 .remove('1');
 
-        expect(flow.dto.toJSON()).toEqual({
-            initialStep: '2',
+        expect(cleanup(flow.dto.toJSON())).toEqual({
+            initialStepId: '2',
             steps: {
-                '2': { step: { stepType: 'Action2' }, nextStepId: null },
+                '2': { step: { stepType: 'Action2' } },
             },
         });
     });
@@ -421,10 +446,10 @@ describe('FlowView', () => {
                 .add({ step: { stepType: 'Action2' } }, '1')
                 .remove('2');
 
-        expect(flow.dto.toJSON()).toEqual({
-            initialStep: '1',
+        expect(cleanup(flow.dto.toJSON())).toEqual({
+            initialStepId: '1',
             steps: {
-                '1': { step: { stepType: 'Action1' }, nextStepId: null },
+                '1': { step: { stepType: 'Action1' } },
             },
         });
     });
@@ -437,11 +462,11 @@ describe('FlowView', () => {
                 .add({ step: { stepType: 'Action3' } }, '2')
                 .remove('2');
 
-        expect(flow.dto.toJSON()).toEqual({
-            initialStep: '1',
+        expect(cleanup(flow.dto.toJSON())).toEqual({
+            initialStepId: '1',
             steps: {
                 '1': { step: { stepType: 'Action1' }, nextStepId: '3' },
-                '3': { step: { stepType: 'Action3' }, nextStepId: null },
+                '3': { step: { stepType: 'Action3' } },
             },
         });
     });
@@ -453,32 +478,33 @@ describe('FlowView', () => {
                 .add({ step: { stepType: 'Action' } }, undefined, '1', 1)
                 .remove('2', '1', 1);
 
-        expect(flow.dto.toJSON()).toEqual({
-            initialStep: '1',
+        expect(cleanup(flow.dto.toJSON())).toEqual({
+            initialStepId: '1',
             steps: {
-                '1': { step:  { stepType: 'If', branches: [{}], elseStepId: null }, nextStepId: null },
+                '1': { step:  { stepType: 'If', branches: [{}] } },
             },
         });
     });
 
-    it('should remove from if-branch', () => {
+    it('should remove from If-branch', () => {
         const flow =
             new FlowView(dto, idGenerator)
                 .add({ step: { stepType: 'If', branches: [{}] } })
                 .add({ step: { stepType: 'Action' } }, undefined, '1')
                 .remove('2', '1');
 
-        expect(flow.dto.toJSON()).toEqual({
-            initialStep: '1',
+        expect(cleanup(flow.dto.toJSON())).toEqual({
+            initialStepId: '1',
             steps: {
-                '1': { step:  { stepType: 'If', branches: [{ nextStepId: null }] }, nextStepId: null },
+                '1': { step:  { stepType: 'If', branches: [{}] } },
             },
         });
     });
 
-    it('should remove if branch', () => {
+    it('should remove If-step', () => {
         const flow =
             new FlowView(dto, idGenerator)
+                .add({ step: { stepType: 'Action0' } })
                 .add({
                     step: {
                         stepType: 'If',
@@ -487,17 +513,16 @@ describe('FlowView', () => {
                             { condition: 'Condition2' },
                         ],
                     },
-                })
-                .add({ step: { stepType: 'Action0' } }, '1')
-                .add({ step: { stepType: 'Action1' } }, undefined, '1', 0)
-                .add({ step: { stepType: 'Action2' } }, undefined, '1', 1)
-                .add({ step: { stepType: 'Action3' } }, undefined, '1', 2)
-                .remove('1');
+                }, '1')
+                .add({ step: { stepType: 'Action1' } }, undefined, '2', 0)
+                .add({ step: { stepType: 'Action2' } }, undefined, '2', 1)
+                .add({ step: { stepType: 'Action3' } }, undefined, '2', 2)
+                .remove('2');
 
-        expect(flow.dto.toJSON()).toEqual({
-            initialStep: '2',
+        expect(cleanup(flow.dto.toJSON())).toEqual({
+            initialStepId: '1',
             steps: {
-                '2': { step:  { stepType: 'Action0' }, nextStepId: null },
+                '1': { step:  { stepType: 'Action0' } },
             },
         });
     });
@@ -562,11 +587,11 @@ describe('FlowView', () => {
                 .add({ step: { stepType: 'Delay2' } }, '1')
                 .update('1', { step: { stepType: 'Delay1_2' }, ignoreError: true });
 
-        expect(flow.dto.toJSON()).toEqual({
-            initialStep: '1',
+        expect(cleanup(flow.dto.toJSON())).toEqual({
+            initialStepId: '1',
             steps: {
                 '1': { step: { stepType: 'Delay1_2' }, ignoreError: true, nextStepId: '2' },
-                '2': { step: { stepType: 'Delay2' }, nextStepId: null },
+                '2': { step: { stepType: 'Delay2' } },
             },
         });
     });
@@ -585,6 +610,7 @@ describe('FlowView', () => {
     it('should get branches', () => {
         const flow =
             new FlowView(dto, idGenerator)
+                .add({ step: { stepType: 'Action0' } })
                 .add({
                     step: {
                         stepType: 'If',
@@ -593,13 +619,12 @@ describe('FlowView', () => {
                             { condition: 'Condition2' },
                         ],
                     },
-                })
-                .add({ step: { stepType: 'Action0' } }, '1')
-                .add({ step: { stepType: 'Action1' } }, undefined, '1', 0)
-                .add({ step: { stepType: 'Action2' } }, undefined, '1', 1)
-                .add({ step: { stepType: 'Action3' } }, undefined, '1', 2);
+                }, '1')
+                .add({ step: { stepType: 'Action1' } }, undefined, '2', 0)
+                .add({ step: { stepType: 'Action2' } }, undefined, '2', 1)
+                .add({ step: { stepType: 'Action3' } }, undefined, '2', 2);
 
-        expect(flow.getBranches().map(({ setRoot: _, ...x }) => x)).toEqual([
+        expect(cleanup(flow.getBranches()) as any).toEqual([
             {
                 label: 'root',
                 rootId: '1',
@@ -608,12 +633,7 @@ describe('FlowView', () => {
                         id: '1',
                         step: new DynamicFlowStepDefinitionDto({
                             step: {
-                                stepType: 'If',
-                                branches: [
-                                    { condition: 'Condition1', step: '3' },
-                                    { condition: 'Condition2', step: '4' },
-                                ],
-                                elseStepId: '5',
+                                stepType: 'Action0',
                             },
                             nextStepId: '2',
                         }),
@@ -622,16 +642,20 @@ describe('FlowView', () => {
                         id: '2',
                         step: new DynamicFlowStepDefinitionDto({
                             step: {
-                                stepType: 'Action0',
+                                stepType: 'If',
+                                branches: [
+                                    { condition: 'Condition1', nextStepId: '3' },
+                                    { condition: 'Condition2', nextStepId: '4' },
+                                ],
+                                elseStepId: '5',
                             },
-                            nextStepId: null!,
                         }),
                     },
                 ],
             },
         ]);
 
-        expect(flow.getBranches('1').map(({ setRoot: _, ...x }) => x)).toEqual([
+        expect(cleanup(flow.getBranches('2')) as any).toEqual([
             {
                 label: 'if: Condition1',
                 rootId: '3',
@@ -670,11 +694,107 @@ describe('FlowView', () => {
                             step: {
                                 stepType: 'Action3',
                             },
-                            nextStepId: undefined,
                         }),
                     },
                 ],
             },
         ]);
     });
+
+    it('should get flat items', () => {
+        const flow =
+            new FlowView(dto, idGenerator)
+                .add({ step: { stepType: 'Action0' } })
+                .add({
+                    step: {
+                        stepType: 'If',
+                        branches: [
+                            { condition: 'Condition1' },
+                            { condition: 'Condition2' },
+                        ],
+                    },
+                }, '1')
+                .add({ step: { stepType: 'Action1' } }, undefined, '2', 0)
+                .add({ step: { stepType: 'Action2' } }, undefined, '2', 1)
+                .add({ step: { stepType: 'Action3' } }, undefined, '2', 2);
+
+        expect(cleanup(flow.getAllItems())).toEqual([
+            {
+                id: '1',
+                step: new DynamicFlowStepDefinitionDto({
+                    step: {
+                        stepType: 'Action0',
+                    },
+                    nextStepId: '2',
+                }),
+            },
+            {
+                id: '2',
+                step: new DynamicFlowStepDefinitionDto({
+                    step: {
+                        stepType: 'If',
+                        branches: [
+                            { condition: 'Condition1', nextStepId: '3' },
+                            { condition: 'Condition2', nextStepId: '4' },
+                        ],
+                        elseStepId: '5',
+                    },
+                }),
+            },
+            {
+                id: '3',
+                step: new DynamicFlowStepDefinitionDto({
+                    step: {
+                        stepType: 'Action1',
+                    },
+                }),
+            },
+            {
+                id: '4',
+                step: new DynamicFlowStepDefinitionDto({
+                    step: {
+                        stepType: 'Action2',
+                    },
+                }),
+            },
+            {
+                id: '5',
+                step: new DynamicFlowStepDefinitionDto({
+                    step: {
+                        stepType: 'Action3',
+                    },
+                }),
+            },
+        ]);
+    });
 });
+
+function cleanup<T>(value: T) {
+    if (Types.isArray(value)) {
+        for (const item of value) {
+            cleanup(item);
+        }
+    } else {
+        for (const [key, nested] of Object.entries(value as any)) {
+            if (nested === value) {
+                continue;
+            }
+
+            if (key === 'initialStepId') {
+                continue;
+            }
+
+            if (key === 'setRoot') {
+                delete (value as any)[key];
+            }
+
+            if (Types.isNull(nested) || Types.isUndefined(nested)) {
+                delete (value as any)[key];
+            } else {
+                cleanup(nested);
+            }
+        }
+    }
+
+    return value;
+}

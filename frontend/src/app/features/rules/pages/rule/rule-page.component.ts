@@ -71,7 +71,7 @@ export class RulePageComponent implements OnInit {
     public rule?: DynamicRuleDto | null;
 
     public readonly editableRule = new BehaviorSubject<Snapshot>({
-        flow: new FlowView(new DynamicFlowDefinitionDto({ initialStep: null!, steps: {} })),
+        flow: new FlowView(new DynamicFlowDefinitionDto({ initialStepId: null!, steps: {} })),
         isEditable: true,
         isEnabled: true,
     });
@@ -134,7 +134,7 @@ export class RulePageComponent implements OnInit {
 
     public save() {
         const { flow, isEditable, isEnabled, name, trigger } = this.editableRule.value;
-        if (!isEditable || !trigger || !flow) {
+        if (!isEditable || !trigger || !flow || !flow.dto.steps || Object.entries(flow.dto.steps).length === 0) {
             return;
         }
 
@@ -144,7 +144,7 @@ export class RulePageComponent implements OnInit {
             this.rulesState.update(this.rule, request)
                 .subscribe({
                     complete: () => {
-                        this.dialogs.notifyInfo('i18n.rules.updated');
+                        this.dialogs.notifyInfo('i18n:rules.updated');
                     },
                     error: error => {
                         this.error = error;
@@ -156,8 +156,7 @@ export class RulePageComponent implements OnInit {
             this.rulesState.create(request)
                 .subscribe({
                     complete: () => {
-                        this.dialogs.notifyInfo('i18n.rules.created');
-                        this.back();
+                        this.dialogs.notifyInfo('i18n:rules.created');
                     },
                     error: error => {
                         this.error = error;
@@ -170,7 +169,7 @@ export class RulePageComponent implements OnInit {
         const { trigger, flow } = this.editableRule.value;
 
         if (trigger) {
-            this.messageBus.emit(new RuleConfigured(trigger, flow));
+            this.messageBus.emit(new RuleConfigured(trigger, flow.dto));
         }
     }
 

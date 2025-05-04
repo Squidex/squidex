@@ -30,8 +30,8 @@
 }
 
 .btn-circle {
-    @include force-height(60px);
-    @include force-width(60px);
+    @include force-height(4rem);
+    @include force-width(4rem);
     background-color: $color-white;
     border-radius: 100%;
     border-color: $color-border;

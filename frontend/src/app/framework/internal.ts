@@ -35,7 +35,6 @@ export * from './utils/duration';
 export * from './utils/error';
 export * from './utils/hateos';
 export * from './utils/interpolator';
-export * from './utils/keys';
 export * from './utils/math-helper';
 export * from './utils/markdown';
 export * from './utils/markdown-transform';

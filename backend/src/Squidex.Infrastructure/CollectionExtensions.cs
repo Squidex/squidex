@@ -169,7 +169,6 @@ public static class CollectionExtensions
     public static int IndexOf<T>(this IEnumerable<T> input, Func<T, bool> predicate)
     {
         var i = 0;
-
         foreach (var item in input)
         {
             if (predicate(item))
@@ -228,17 +227,17 @@ public static class CollectionExtensions
 
     public static int SequentialHashCode<T>(this IEnumerable<T> collection, IEqualityComparer<T> comparer)
     {
-        var hashCode = 17;
+        HashCode hashCode = default;
 
         foreach (var item in collection)
         {
             if (!Equals(item, null))
             {
-                hashCode = (hashCode * 23) + comparer.GetHashCode(item);
+                hashCode.Add(item, comparer);
             }
         }
 
-        return hashCode;
+        return hashCode.ToHashCode();
     }
 
     public static int DictionaryHashCode<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary) where TKey : notnull
@@ -248,19 +247,19 @@ public static class CollectionExtensions
 
     public static int DictionaryHashCode<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, IEqualityComparer<TKey> keyComparer, IEqualityComparer<TValue> valueComparer) where TKey : notnull
     {
-        var hashCode = 17;
+        HashCode hashCode = default;
 
         foreach (var (key, value) in dictionary.OrderBy(x => x.Key))
         {
-            hashCode = (hashCode * 23) + keyComparer.GetHashCode(key);
+            hashCode.Add(key, keyComparer);
 
             if (!Equals(value, null))
             {
-                hashCode = (hashCode * 23) + valueComparer.GetHashCode(value);
+                hashCode.Add(value, valueComparer);
             }
         }
 
-        return hashCode;
+        return hashCode.ToHashCode();
     }
 
     public static bool EqualsDictionary<TKey, TValue>(this IReadOnlyDictionary<TKey, TValue> dictionary, IReadOnlyDictionary<TKey, TValue>? other) where TKey : notnull

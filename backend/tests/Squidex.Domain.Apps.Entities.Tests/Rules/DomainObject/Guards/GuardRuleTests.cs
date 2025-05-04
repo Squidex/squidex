@@ -27,7 +27,7 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
         {
             Flow = new FlowDefinition
             {
-                InitialStep = Guid.NewGuid(),
+                InitialStepId = Guid.NewGuid(),
             },
             Trigger = null!,
         });
@@ -63,7 +63,7 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
             },
             Flow = new FlowDefinition
             {
-                InitialStep = Guid.NewGuid(),
+                InitialStepId = Guid.NewGuid(),
             },
         });
 
@@ -97,7 +97,7 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
             },
             Flow = new FlowDefinition
             {
-                InitialStep = Guid.NewGuid(),
+                InitialStepId = Guid.NewGuid(),
             },
             Name = "NewName",
         };

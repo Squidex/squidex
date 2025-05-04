@@ -7,7 +7,6 @@
 
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Flows.Internal.Execution;
-using Squidex.Infrastructure;
 using Squidex.Web;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models;
@@ -17,7 +16,7 @@ public sealed class RuleEventDto : Resource
     /// <summary>
     /// The ID of the event.
     /// </summary>
-    public DomainId Id { get; set; }
+    public Guid Id { get; set; }
 
     /// <summary>
     /// The flow state.
@@ -28,7 +27,7 @@ public sealed class RuleEventDto : Resource
     {
         var result = new RuleEventDto
         {
-            Id = DomainId.Create(state.InstanceId),
+            Id = state.InstanceId,
             FlowState = FlowExecutionStateDto.FromDomain(state),
         };
 

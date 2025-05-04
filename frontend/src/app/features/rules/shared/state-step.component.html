@@ -1,6 +1,6 @@
 <sqx-history-step
     [elementInfo]="stepInfo"
-    [elementType]="stepItem.step.step.stepType"
+    [elementType]="branchItem.step.step.stepType"
     [isActive]="isNext"
     [isExpandable]="!!state && state.attempts.length > 0"
     [isFirst]="isFirst"
@@ -10,7 +10,7 @@
             <span class="badge rounded-pill badge-{{ state?.status | sqxRuleClass }}">{{ state?.status || "Pending" }}</span>
         </div>
 
-        <div class="col col-attempts text-sm">{{ stepItem.step.name || stepInfo.title }}</div>
+        <div class="col col-attempts text-sm">{{ branchItem.step.name || stepInfo.title }}</div>
 
         <div class="col text-sm">
             <strong class="me-1">{{ state?.attempts?.length || 0 }}</strong> {{ "rules.ruleEvents.attempts" | sqxTranslate }}

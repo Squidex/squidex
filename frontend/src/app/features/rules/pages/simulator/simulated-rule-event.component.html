@@ -29,7 +29,7 @@
 
             <div class="event-dump event-section">
                 @if (event.event) {
-                    <sqx-history-step isExpandable="true" isDefaultExpandable="true">
+                    <sqx-history-step isDefaultExpandable="true" isExpandable="true">
                         <ng-container summary>
                             <div class="col text-sm">
                                 {{ "rules.simulation.eventQueried" | sqxTranslate }}
@@ -39,27 +39,41 @@
                             <sqx-code-editor disabled="true" height="auto" maxLines="20" [ngModel]="event.event" valueMode="Json" wordWrap="false" />
                         </ng-container>
                     </sqx-history-step>
-                }
 
-                <sqx-rule-transition [errors]="errorsAfterEvent" [event]="event" text="i18n:rules.simulation.eventTriggerChecked" />
+                    <sqx-rule-transition
+                        [errors]="errorsAfterEvent"
+                        [event]="event"
+                        [isLast]="!event.enrichedEvent"
+                        text="i18n:rules.simulation.eventTriggerChecked" />
 
-                @if (event.enrichedEvent) {
-                    <sqx-history-step isExpandable="true" isDefaultExpandable="true">
-                        <ng-container summary>
-                            <div class="col text-sm">
-                                {{ "rules.simulation.eventEnriched" | sqxTranslate }}
-                            </div>
-                        </ng-container>
-                        <ng-container details>
-                            <sqx-code-editor disabled="true" height="auto" maxLines="20" [ngModel]="event.enrichedEvent" valueMode="Json" wordWrap="false" />
-                        </ng-container>
-                    </sqx-history-step>
-                }
+                    @if (event.enrichedEvent) {
+                        <sqx-history-step isDefaultExpandable="true" isExpandable="true">
+                            <ng-container summary>
+                                <div class="col text-sm">
+                                    {{ "rules.simulation.eventEnriched" | sqxTranslate }}
+                                </div>
+                            </ng-container>
+                            <ng-container details>
+                                <sqx-code-editor
+                                    disabled="true"
+                                    height="auto"
+                                    maxLines="20"
+                                    [ngModel]="event.enrichedEvent"
+                                    valueMode="Json"
+                                    wordWrap="false" />
+                            </ng-container>
+                        </sqx-history-step>
 
-                <sqx-rule-transition [errors]="errorsAfterEnrichedEvent" [event]="event" text="i18n:rules.simulation.eventConditionEvaluated" />
+                        <sqx-rule-transition
+                            [errors]="errorsAfterEnrichedEvent"
+                            [event]="event"
+                            [isLast]="!event.flowState"
+                            text="i18n:rules.simulation.eventConditionEvaluated" />
 
-                @if (event.flowState) {
-                    <sqx-state-details [availableSteps]="availableSteps" showEvent="false" [state]="event.flowState" [stepItems]="stepItems" />
+                        @if (event.flowState) {
+                            <sqx-state-details [availableSteps]="availableSteps" showEvent="false" [state]="event.flowState" [branchItems]="branchItems" />
+                        }
+                    }
                 }
             </div>
         </td>

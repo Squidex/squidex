@@ -11,7 +11,7 @@ using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Extensions.Actions.DeepDetect;
 
-[Obsolete("Use Flows")]
+[Obsolete("Has been replaced by flows.")]
 public sealed record DeepDetectAction : RuleAction
 {
     public long MinimumProbability { get; set; }

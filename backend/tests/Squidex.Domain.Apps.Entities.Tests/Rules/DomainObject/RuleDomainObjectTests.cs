@@ -185,7 +185,7 @@ public class RuleDomainObjectTests : HandlerTestBase<Rule>
             },
             Flow = new FlowDefinition
             {
-                InitialStep = Guid.NewGuid(),
+                InitialStepId = Guid.NewGuid(),
             },
         };
     }
@@ -201,7 +201,7 @@ public class RuleDomainObjectTests : HandlerTestBase<Rule>
             },
             Flow = new FlowDefinition
             {
-                InitialStep = Guid.NewGuid(),
+                InitialStepId = Guid.NewGuid(),
             },
         };
     }

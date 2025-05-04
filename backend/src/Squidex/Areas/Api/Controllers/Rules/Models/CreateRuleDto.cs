@@ -44,36 +44,30 @@ public sealed class CreateRuleDto
     /// <summary>
     /// Enable or disable the rule.
     /// </summary>
-    public bool? IsEnabled { get; set; }
+    public bool? IsEnabled { get; set; } = true;
 
     public Rule ToRule()
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         return new Rule { Trigger = Trigger.ToTrigger(), Flow = GetFlow()! };
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 
     public CreateRule ToCommand()
     {
-        var command = SimpleMapper.Map(this, new CreateRule { Flow = GetFlow() });
-
-        command.Trigger = Trigger?.ToTrigger();
-        return command;
+        return SimpleMapper.Map(this, new CreateRule
+        {
+            IsEnabled = IsEnabled ?? true,
+#pragma warning disable CS0618 // Type or member is obsolete
+            Flow = GetFlow(),
+#pragma warning restore CS0618 // Type or member is obsolete
+            Trigger = Trigger?.ToTrigger(),
+        });
     }
 
+    [Obsolete("Has been replaced by flows.")]
     private FlowDefinition? GetFlow()
     {
-        var flow = Flow?.ToDefinition();
-#pragma warning disable CS0618 // Type or member is obsolete
-        if (flow == null && Action != null)
-        {
-            flow = new FlowDefinition
-            {
-                Steps = new Dictionary<Guid, FlowStepDefinition>
-                {
-                    [Guid.Empty] = new FlowStepDefinition { Step = Action.ToFlowStep() },
-                },
-            };
-        }
-#pragma warning restore CS0618 // Type or member is obsolete
-        return flow;
+        return Flow?.ToDefinition() ?? Action?.ToFlowDefinition();
     }
 }

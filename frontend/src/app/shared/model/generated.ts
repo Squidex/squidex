@@ -6740,7 +6740,7 @@ export class FlowDefinitionDto implements IFlowDefinitionDto {
     /** Uses the cache values because the actual object is frozen. */
     private readonly cachedValues: { [key: string]: any } = {};
     /** The ID of the initial step. */
-    readonly initialStep!: string;
+    readonly initialStepId!: string;
     /** The steps. */
     readonly steps!: { [key: string]: FlowStepDefinitionDto; };
 
@@ -6754,7 +6754,7 @@ export class FlowDefinitionDto implements IFlowDefinitionDto {
     }
 
     init(_data: any) {
-        (<any>this).initialStep = _data["initialStep"];
+        (<any>this).initialStepId = _data["initialStepId"];
         if (_data["steps"]) {
             (<any>this).steps = {} as any;
             for (let key in _data["steps"]) {
@@ -6774,7 +6774,7 @@ export class FlowDefinitionDto implements IFlowDefinitionDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
-        data["initialStep"] = this.initialStep;
+        data["initialStepId"] = this.initialStepId;
         if (this.steps) {
             data["steps"] = {};
             for (let key in this.steps) {
@@ -6810,7 +6810,7 @@ export class FlowDefinitionDto implements IFlowDefinitionDto {
 
 export interface IFlowDefinitionDto {
     /** The ID of the initial step. */
-    readonly initialStep: string;
+    readonly initialStepId: string;
     /** The steps. */
     readonly steps: { [key: string]: FlowStepDefinitionDto; };
 }
@@ -7519,7 +7519,6 @@ export class IfFlowStepFlowStepDto extends FlowStepDto implements IIfFlowStepFlo
     /** The delay in seconds. */
     readonly branches!: IfBranchDto[];
     readonly elseStepId?: string | undefined;
-    readonly nextStep!: string;
 
     constructor(data?: IIfFlowStepFlowStepDto) {
         super(data);
@@ -7534,7 +7533,6 @@ export class IfFlowStepFlowStepDto extends FlowStepDto implements IIfFlowStepFlo
                 (<any>this).branches!.push(IfBranchDto.fromJSON(item));
         }
         (<any>this).elseStepId = _data["elseStepId"];
-        (<any>this).nextStep = _data["nextStep"];
         this.cleanup(this);
         return this;
     }
@@ -7553,7 +7551,6 @@ export class IfFlowStepFlowStepDto extends FlowStepDto implements IIfFlowStepFlo
                 data["branches"].push(item.toJSON());
         }
         data["elseStepId"] = this.elseStepId;
-        data["nextStep"] = this.nextStep;
         super.toJSON(data);
         this.cleanup(data);
         return data;
@@ -7564,7 +7561,6 @@ export interface IIfFlowStepFlowStepDto extends IFlowStepDto {
     /** The delay in seconds. */
     readonly branches: IfBranchDto[];
     readonly elseStepId?: string | undefined;
-    readonly nextStep: string;
 }
 
 export class IfBranchDto implements IIfBranchDto {
@@ -9467,6 +9463,7 @@ export class SimulatedRuleEventDto implements ISimulatedRuleEventDto {
     readonly eventName!: string;
     /** The source event. */
     readonly event!: any;
+    /** The enriched event. */
     readonly enrichedEvent?: any | undefined;
     /** The flow state. */
     readonly flowState?: FlowExecutionStateDto | undefined;
@@ -9552,6 +9549,7 @@ export interface ISimulatedRuleEventDto {
     readonly eventName: string;
     /** The source event. */
     readonly event: any;
+    /** The enriched event. */
     readonly enrichedEvent?: any | undefined;
     /** The flow state. */
     readonly flowState?: FlowExecutionStateDto | undefined;
@@ -9685,8 +9683,6 @@ export class FlowExecutionStepStateDto implements IFlowExecutionStepStateDto {
     private readonly cachedValues: { [key: string]: any } = {};
     /** The status of this step. */
     readonly status!: FlowExecutionStatus;
-    /** Indicates if the step has already been prepared (happens once for all attempts). */
-    readonly isPrepared!: boolean;
     /** The different attempts. */
     readonly attempts!: FlowExecutionStepAttemptDto[];
 
@@ -9701,7 +9697,6 @@ export class FlowExecutionStepStateDto implements IFlowExecutionStepStateDto {
 
     init(_data: any) {
         (<any>this).status = _data["status"];
-        (<any>this).isPrepared = _data["isPrepared"];
         if (Array.isArray(_data["attempts"])) {
             (<any>this).attempts = [] as any;
             for (let item of _data["attempts"])
@@ -9720,7 +9715,6 @@ export class FlowExecutionStepStateDto implements IFlowExecutionStepStateDto {
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         data["status"] = this.status;
-        data["isPrepared"] = this.isPrepared;
         if (Array.isArray(this.attempts)) {
             data["attempts"] = [];
             for (let item of this.attempts)
@@ -9755,8 +9749,6 @@ export class FlowExecutionStepStateDto implements IFlowExecutionStepStateDto {
 export interface IFlowExecutionStepStateDto {
     /** The status of this step. */
     readonly status: FlowExecutionStatus;
-    /** Indicates if the step has already been prepared (happens once for all attempts). */
-    readonly isPrepared: boolean;
     /** The different attempts. */
     readonly attempts: FlowExecutionStepAttemptDto[];
 }
@@ -16192,7 +16184,7 @@ export class DynamicFlowDefinitionDto implements IDynamicFlowDefinitionDto {
     /** Uses the cache values because the actual object is frozen. */
     private readonly cachedValues: { [key: string]: any } = {};
     /** The ID of the initial step. */
-    readonly initialStep!: string;
+    readonly initialStepId!: string;
     /** The steps. */
     readonly steps!: { [key: string]: DynamicFlowStepDefinitionDto; };
 
@@ -16206,7 +16198,7 @@ export class DynamicFlowDefinitionDto implements IDynamicFlowDefinitionDto {
     }
 
     init(_data: any) {
-        (<any>this).initialStep = _data["initialStep"];
+        (<any>this).initialStepId = _data["initialStepId"];
         if (_data["steps"]) {
             (<any>this).steps = {} as any;
             for (let key in _data["steps"]) {
@@ -16226,7 +16218,7 @@ export class DynamicFlowDefinitionDto implements IDynamicFlowDefinitionDto {
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
-        data["initialStep"] = this.initialStep;
+        data["initialStepId"] = this.initialStepId;
         if (this.steps) {
             data["steps"] = {};
             for (let key in this.steps) {
@@ -16262,7 +16254,7 @@ export class DynamicFlowDefinitionDto implements IDynamicFlowDefinitionDto {
 
 export interface IDynamicFlowDefinitionDto {
     /** The ID of the initial step. */
-    readonly initialStep: string;
+    readonly initialStepId: string;
     /** The steps. */
     readonly steps: { [key: string]: DynamicFlowStepDefinitionDto; };
 }

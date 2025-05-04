@@ -8,7 +8,6 @@
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Domain.Apps.Events.Rules;
-using Squidex.Flows.Internal;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Infrastructure.Reflection;
@@ -35,17 +34,7 @@ public sealed class RuleCreated : RuleEvent, IMigrated<IEvent>
 
         return SimpleMapper.Map(this, new RuleCreatedV2
         {
-            Flow = new FlowDefinition
-            {
-                Steps = new Dictionary<Guid, FlowStepDefinition>
-                {
-                    [Guid.Empty] = new FlowStepDefinition
-                    {
-                        Step = Action.ToFlowStep(),
-                    },
-                },
-                InitialStep = Guid.Empty,
-            },
+            Flow = Action?.ToFlowDefinition()!,
         });
     }
 }

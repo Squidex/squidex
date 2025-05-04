@@ -74,7 +74,7 @@ const AVAILABLE_STEPS = {
 };
 
 const DEFINITION = new DynamicFlowDefinitionDto({
-    initialStep: '1',
+    initialStepId: '1',
     steps: {
         '1': new DynamicFlowStepDefinitionDto({
             step: { stepType: 'Delay' },

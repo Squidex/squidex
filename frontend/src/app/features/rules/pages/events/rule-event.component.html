@@ -9,12 +9,12 @@
 
     <td class="cell-60">
         <div class="d-flex flex-row align-items-center overflow-hidden">
-            @for (stepItem of stepItems; track stepItem.id) {
+            @for (item of branchItems; track item.id) {
                 <sqx-rule-element
                     disabled="true"
-                    [elementInfo]="$any(availableSteps[stepItem.step.step.stepType])"
-                    [elementType]="stepItem.step.step.stepType"
-                    [label]="stepItem.step.name"
+                    [elementInfo]="$any(availableSteps[item.step.step.stepType])"
+                    [elementType]="item.step.step.stepType"
+                    [label]="item.step.name"
                     showDescription="false"
                     showName="false"
                     size="sm" />
@@ -80,7 +80,7 @@
             </div>
 
             <div class="event-section">
-                <sqx-state-details [availableSteps]="availableSteps" [state]="event.flowState" [stepItems]="stepItems" />
+                <sqx-state-details [availableSteps]="availableSteps" [state]="event.flowState" [branchItems]="branchItems" />
             </div>
         </td>
     </tr>

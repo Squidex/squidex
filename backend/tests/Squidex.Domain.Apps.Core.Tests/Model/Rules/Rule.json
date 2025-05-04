@@ -3,7 +3,7 @@
     "created": "2022-12-05T11:00:23Z",
     "createdBy": "subject:63761585e06d5466c71521b3",
     "flow": {
-        "initialStep": "06c68527-a2ca-4d84-91eb-a1707aa5b6fb",
+        "InitialStepId": "06c68527-a2ca-4d84-91eb-a1707aa5b6fb",
         "steps": {
             "06c68527-a2ca-4d84-91eb-a1707aa5b6fb": {
                 "ignoreError": false,

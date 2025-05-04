@@ -31,10 +31,6 @@ const ERRORS_AFTER_ENRICHED_EVENT = [
     'ConditionDoesNotMatch',
 ];
 
-const ERRORS_FAILED = [
-    'Failed',
-];
-
 @Component({
     standalone: true,
     selector: '[sqxSimulatedRuleEvent]',
@@ -66,18 +62,17 @@ export class SimulatedRuleEventComponent {
     @Output()
     public expandedChange = new EventEmitter<any>();
 
-    public errorsFailed = ERRORS_FAILED;
     public errorsAfterEvent = ERRORS_AFTER_EVENT;
     public errorsAfterEnrichedEvent = ERRORS_AFTER_ENRICHED_EVENT;
 
-    public stepItems: BranchItem[] = [];
+    public branchItems: BranchItem[] = [];
 
     public ngOnChanges(changes: TypedSimpleChanges<this>) {
         if (changes.event) {
             if (this.event.flowState) {
-                this.stepItems = new FlowView(this.event.flowState.definition as any).getAllItems();
+                this.branchItems = new FlowView(this.event.flowState.definition as any).getAllItems();
             } else {
-                this.stepItems = [];
+                this.branchItems = [];
             }
         }
     }

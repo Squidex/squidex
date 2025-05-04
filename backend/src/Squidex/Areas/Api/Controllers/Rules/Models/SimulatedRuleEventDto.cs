@@ -33,7 +33,7 @@ public sealed class SimulatedRuleEventDto
     /// </summary>
     public object Event { get; set; }
 
-    // <summary>
+    /// <summary>
     /// The enriched event.
     /// </summary>
     public object? EnrichedEvent { get; set; }
@@ -52,8 +52,13 @@ public sealed class SimulatedRuleEventDto
     {
         var result = SimpleMapper.Map(ruleEvent, new SimulatedRuleEventDto
         {
-            FlowState = ruleEvent.State != null ? FlowExecutionStateDto.FromDomain(ruleEvent.State) : null,
+            EnrichedEvent = ruleEvent.EnrichedEvent,
         });
+
+        if (ruleEvent.State != null)
+        {
+            result.FlowState = FlowExecutionStateDto.FromDomain(ruleEvent.State);
+        }
 
         foreach (var reason in Enum.GetValues<SkipReason>())
         {

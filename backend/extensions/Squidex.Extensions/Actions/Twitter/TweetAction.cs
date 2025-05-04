@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.Twitter;
 
-[Obsolete("Use Flows")]
+[Obsolete("Has been replaced by flows.")]
 public sealed record TweetAction : RuleAction
 {
     [LocalizedRequired]

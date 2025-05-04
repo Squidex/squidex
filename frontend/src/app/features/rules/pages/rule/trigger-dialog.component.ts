@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { KeysPipe, ManualRuleTriggerDto, ModalDialogComponent, RuleTriggerDto, RuleTriggerMetadataDto, SchemasState, TranslatePipe, TriggerForm } from '@app/shared';
+import { EntriesPipe, ManualRuleTriggerDto, ModalDialogComponent, RuleTriggerDto, RuleTriggerMetadataDto, SchemasState, TranslatePipe, TriggerForm } from '@app/shared';
 import { RuleElementComponent } from '../../shared/rule-element.component';
 import { AssetChangedTriggerComponent } from '../../shared/triggers/asset-changed-trigger.component';
 import { CommentTriggerComponent } from '../../shared/triggers/comment-trigger.component';
@@ -26,7 +26,7 @@ import { UsageTriggerComponent } from '../../shared/triggers/usage-trigger.compo
         AsyncPipe,
         CommentTriggerComponent,
         ContentChangedTriggerComponent,
-        KeysPipe,
+        EntriesPipe,
         ModalDialogComponent,
         ReactiveFormsModule,
         RuleElementComponent,

@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.Email;
 
-[Obsolete("Use Flows")]
+[Obsolete("Has been replaced by flows.")]
 public sealed record EmailAction : RuleAction
 {
     [LocalizedRequired]

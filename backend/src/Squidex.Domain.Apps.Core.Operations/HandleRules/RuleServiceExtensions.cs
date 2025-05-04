@@ -14,7 +14,7 @@ namespace Microsoft.Extensions.DependencyInjection;
 
 public static class RuleServiceExtensions
 {
-    [Obsolete("Use Flows")]
+    [Obsolete("Has been replaced by flows.")]
     public static void AddRuleAction<T>(this IServiceCollection services) where T : RuleAction
     {
         services.Configure<RulesOptions>(options =>

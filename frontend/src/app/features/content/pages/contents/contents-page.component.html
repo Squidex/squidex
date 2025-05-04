@@ -56,9 +56,9 @@
                         @if (selectionCount > 0) {
                             <div class="selection">
                                 {{ "contents.selectionCount" | sqxTranslate: { count: selectionCount } }}&nbsp;&nbsp;
-                                @for (status of selectionStatuses | sqxKeys; track status) {
-                                    <button class="btn btn-outline-secondary btn-status me-2" (click)="changeSelectedStatus(status)" type="button">
-                                        <sqx-content-status layout="text" [status]="status" [statusColor]="selectionStatuses[status]" />
+                                @for (status of selectionStatuses | sqxEntries; track status.key) {
+                                    <button class="btn btn-outline-secondary btn-status me-2" (click)="changeSelectedStatus(status.key)" type="button">
+                                        <sqx-content-status layout="text" [status]="status.key" [statusColor]="status.value" />
                                     </button>
                                 }
 

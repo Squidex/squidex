@@ -29,14 +29,14 @@ describe('RulesService', () => {
         httpMock.verify();
     }));
 
-    it('should make get request to get actions',
+    it('should make get request to get steps',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
-            let actions: { [ name: string ]: RuleElementDto };
+            let steps: { [ name: string ]: RuleElementDto };
             rulesService.getSteps().subscribe(result => {
-                actions = result;
+                steps = result;
             });
 
-            const req = httpMock.expectOne('http://service/p/api/rules/actions');
+            const req = httpMock.expectOne('http://service/p/api/rules/steps');
 
             expect(req.request.method).toEqual('GET');
             expect(req.request.headers.get('If-Match')).toBeNull();
@@ -83,7 +83,7 @@ describe('RulesService', () => {
                 },
             });
 
-            expect(actions!).toEqual({
+            expect(steps!).toEqual({
                 action2: new RuleElementDto({
                     title: 'title2',
                     display: 'display2',
@@ -163,7 +163,7 @@ describe('RulesService', () => {
                 trigger: new ManualRuleTriggerDto(),
                 flow: new DynamicFlowDefinitionDto({
                     steps: {},
-                    initialStep: 'NONE',
+                    initialStepId: 'NONE',
                 }),
             });
 
@@ -186,11 +186,10 @@ describe('RulesService', () => {
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
             const dto = new DynamicUpdateRuleDto({
                 trigger: new ManualRuleTriggerDto(),
-                action: {
-                    param3: 3,
-                    param4: 4,
-                    actionType: 'Webhook',
-                },
+                flow: new DynamicFlowDefinitionDto({
+                    steps: {},
+                    initialStepId: 'NONE',
+                }),
             });
 
             const resource: Resource = {
@@ -364,8 +363,16 @@ describe('RulesService', () => {
 
     it('should make post request to get simulated rule events with action and trigger',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
+            const dto = new DynamicCreateRuleDto({
+                trigger: new ManualRuleTriggerDto(),
+                flow: new DynamicFlowDefinitionDto({
+                    steps: {},
+                    initialStepId: 'NONE',
+                }),
+            });
+
             let rules: SimulatedRuleEventsDto;
-            rulesService.postSimulatedEvents('my-app', {}, {}).subscribe(result => {
+            rulesService.postSimulatedEvents('my-app', dto).subscribe(result => {
                 rules = result;
             });
 
@@ -482,9 +489,10 @@ describe('RulesService', () => {
                 completed: buildDate(id, 20),
                 context: {},
                 created:buildDate(id, 10),
+                description: 'Description',
                 definition: {
                     steps: {},
-                    initialStep: '0',
+                    initialStepId: '0',
                 },
                 nextStepId: '1',
                 status: `Failed${key}` as any,
@@ -507,9 +515,10 @@ describe('RulesService', () => {
                 completed: buildDate(id, 20),
                 context: {},
                 created: buildDate(id, 10),
+                description: 'Description',
                 definition: {
                     steps: {},
-                    initialStep: '0',
+                    initialStepId: '0',
                 },
                 nextStepId: '1',
                 status: `Failed${key}` as any,
@@ -557,9 +566,10 @@ export function createRuleEvent(id: number, suffix = '') {
             completed: DateTime.parseISO(buildDate(id, 20)),
             context: {},
             created: DateTime.parseISO(buildDate(id, 10)),
+            description: 'Description',
             definition: new FlowDefinitionDto({
                 steps: {},
-                initialStep: '0',
+                initialStepId: '0',
             }),
             nextStepId: '1',
             status: `Failed${key}` as any,
@@ -582,9 +592,10 @@ export function createSimulatedRuleEvent(id: number, suffix = '') {
             completed: DateTime.parseISO(buildDate(id, 20)),
             context: {},
             created: DateTime.parseISO(buildDate(id, 10)),
+            description: 'Description',
             definition: new FlowDefinitionDto({
                 steps: {},
-                initialStep: '0',
+                initialStepId: '0',
             }),
             nextStepId: '1',
             status: `Failed${key}` as any,

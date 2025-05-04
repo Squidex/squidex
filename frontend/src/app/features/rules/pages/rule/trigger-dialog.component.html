@@ -1,6 +1,12 @@
 <form [formGroup]="currentTrigger?.form!" (ngSubmit)="save()">
     <sqx-modal-dialog (dialogClose)="dialogClose.emit()" size="xl">
-        <ng-container title> {{ "rules.trigger.edit" | sqxTranslate }} </ng-container>
+        <ng-container title>
+            @if (!trigger) {
+                {{ "rules.trigger.add" | sqxTranslate }}
+            } @else {
+                {{ "rules.trigger.edit" | sqxTranslate }}
+            }
+        </ng-container>
         <ng-container content>
             @if (currentTrigger) {
                 @switch (currentTrigger.triggerType) {
@@ -29,12 +35,12 @@
                 }
             } @else {
                 <div class="row g-0">
-                    @for (triggerType of availableTriggers | sqxKeys; track triggerType) {
+                    @for (availableTrigger of availableTriggers | sqxEntries: "title"; track availableTrigger.key) {
                         <div class="col-12 col-md-6">
-                            <div class="rule-element" (click)="selectTrigger(triggerType)">
+                            <div class="rule-element" (click)="selectTrigger(availableTrigger.key)">
                                 <sqx-rule-element
-                                    [elementInfo]="$any(availableTriggers)[triggerType]"
-                                    [elementType]="triggerType"
+                                    [elementInfo]="availableTrigger.value"
+                                    [elementType]="availableTrigger.key"
                                     showDescription="true"
                                     showName="true" />
                             </div>
@@ -47,7 +53,7 @@
             <button class="btn btn-text-secondary" (click)="dialogClose.emit()" type="button">
                 {{ "common.cancel" | sqxTranslate }}
             </button>
-            <button class="btn btn-success" [disabled]="!currentTrigger" type="submit">{{ "common.edit" | sqxTranslate }}</button>
+            <button class="btn btn-success" [disabled]="!currentTrigger" type="submit">{{ "common.save" | sqxTranslate }}</button>
         </ng-container>
     </sqx-modal-dialog>
 </form>

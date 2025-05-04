@@ -12,12 +12,12 @@
     </sqx-history-step>
 }
 
-@for (stepItem of stepItems; track stepItem.id) {
+@for (item of branchItems; track item.id) {
     <sqx-state-step
+        [branchItem]="item"
         [isFirst]="$first"
         [isLast]="$last"
-        [isNext]="state.nextStepId === stepItem.id"
-        [state]="state.steps[stepItem.id]"
-        [stepInfo]="availableSteps[stepItem.step.step.stepType]"
-        [stepItem]="stepItem" />
+        [isNext]="state.nextStepId === item.id"
+        [state]="state.steps[item.id]"
+        [stepInfo]="availableSteps[item.step.step.stepType]" />
 }

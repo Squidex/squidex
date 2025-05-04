@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Core.Rules.Deprecated;
 
-[Obsolete("Use Flows")]
+[Obsolete("Has been replaced by flows.")]
 public interface IConvertibleToAction
 {
     RuleAction ToAction();

@@ -54,8 +54,8 @@ describe('RuleSimulatorState', () => {
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
     });
 
-    it('should load simulated rule events by action and trigger', () => {
-        rulesService.setup(x => x.postSimulatedEvents(app, It.isAny(), It.isAny()))
+    it('should load simulated rule events by flow and trigger', () => {
+        rulesService.setup(x => x.postSimulatedEvents(app,  It.isAny()))
             .returns(() => of(oldSimulatedRuleEvents));
 
         ruleSimulatorState.setRule({}, {});

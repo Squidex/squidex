@@ -36,7 +36,7 @@ export class StateStepComponent {
     public isNext = false;
 
     @Input({ required: true })
-    public stepItem!: BranchItem;
+    public branchItem!: BranchItem;
 
     @Input({ required: true })
     public stepInfo!: RuleElementDto;

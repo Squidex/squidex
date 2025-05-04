@@ -244,6 +244,9 @@
   <data name="common.file" xml:space="preserve">
     <value>File</value>
   </data>
+  <data name="common.flow" xml:space="preserve">
+    <value>Field</value>
+  </data>
   <data name="common.folderName" xml:space="preserve">
     <value>Nome della cartella</value>
   </data>
@@ -921,6 +924,18 @@
   </data>
   <data name="login.test.title" xml:space="preserve">
     <value>Login Test</value>
+  </data>
+  <data name="rules.validation.invalidNextStepId" xml:space="preserve">
+    <value>Invalid next step ID</value>
+  </data>
+  <data name="rules.validation.invalidStepId" xml:space="preserve">
+    <value>Invalid step ID</value>
+  </data>
+  <data name="rules.validation.noStartStep" xml:space="preserve">
+    <value>Flow has no start step</value>
+  </data>
+  <data name="rules.validation.noSteps" xml:space="preserve">
+    <value>Flow has no step</value>
   </data>
   <data name="schemas.dateTimeCalculatedDefaultAndDefaultError" xml:space="preserve">
     <value>Il valore predefinito calcolato e il valore predefinito non possono essere utilizzati insieme.</value>

@@ -12,7 +12,7 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.OpenSearch;
 
-[Obsolete("Use Flows")]
+[Obsolete("Has been replaced by flows.")]
 public sealed record OpenSearchAction : RuleAction
 {
     [AbsoluteUrl]

@@ -49,9 +49,10 @@ public sealed class RuleElementDto
 
     public static RuleElementDto FromDomain(FlowStepDescriptor descriptor)
     {
-        var result = SimpleMapper.Map(descriptor, new RuleElementDto());
-
-        result.Properties = descriptor.Properties.Select(x => SimpleMapper.Map(x, new RuleElementPropertyDto())).ToArray();
+        var result = SimpleMapper.Map(descriptor, new RuleElementDto
+        {
+            Properties = descriptor.Properties.Select(RuleElementPropertyDto.FromDomain).ToArray(),
+        });
 
         return result;
     }

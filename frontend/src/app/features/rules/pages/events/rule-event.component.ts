@@ -52,11 +52,11 @@ export class RuleEventComponent {
 
     public selectedStep: string | null = null;
 
-    public stepItems: BranchItem[] = [];
+    public branchItems: BranchItem[] = [];
 
     public ngOnChanges(changes: TypedSimpleChanges<this>) {
         if (changes.event) {
-            this.stepItems = new FlowView(this.event.flowState.definition as any).getAllItems();
+            this.branchItems = new FlowView(this.event.flowState.definition as any).getAllItems();
         }
     }
 

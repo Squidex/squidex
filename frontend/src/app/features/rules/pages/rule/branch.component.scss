@@ -1,28 +1,6 @@
 @import "mixins";
 @import "vars";
 
-.btn-circle {
-    @include force-height(4rem);
-    @include force-width(4rem);
-    background-color: $color-white;
-    border-radius: 100%;
-    border-color: $color-border;
-    margin-left: 2rem;
-    margin-right: 2rem;
-    padding: 1rem;
-}
-
-.btn-circle-sm {
-    @include force-height(1.5rem);
-    @include force-width(1.5rem);
-    background-color: $color-white;
-    border-radius: 100%;
-    border-color: $color-border;
-    font-size: 60%;
-    font-weight: normal;
-    padding: 0.125rem;
-}
-
 .row {
     position: relative;
 }

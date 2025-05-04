@@ -141,8 +141,8 @@ public class RuleTests
     [Fact]
     public void Should_replace_action()
     {
-        var newAction1 = new FlowDefinition { InitialStep = Guid.NewGuid() };
-        var newAction2 = new FlowDefinition { InitialStep = newAction1.InitialStep };
+        var newAction1 = new FlowDefinition { InitialStepId = Guid.NewGuid() };
+        var newAction2 = new FlowDefinition { InitialStepId = newAction1.InitialStepId };
 
         var rule_1 = rule_0.Update(newAction1);
         var rule_2 = rule_1.Update(newAction2);

@@ -1,6 +1,12 @@
 <form [formGroup]="currentStep?.form!" (ngSubmit)="save()">
     <sqx-modal-dialog (dialogClose)="dialogClose.emit()" size="xl">
-        <ng-container title> {{ "rules.step.edit" | sqxTranslate }} </ng-container>
+        <ng-container title>
+            @if (!stepDefinition) {
+                {{ "rules.step.add" | sqxTranslate }}
+            } @else {
+                {{ "rules.step.edit" | sqxTranslate }}
+            }
+        </ng-container>
         <ng-container content>
             @if (currentStep) {
                 <div class="form-horizontal" [formGroup]="currentStep.form">
@@ -15,9 +21,9 @@
                     <div class="col-9 offset-3">
                         <div class="form-check">
                             <input class="form-check-input" id="stepIgnore" [(ngModel)]="stepIgnore" [ngModelOptions]="{ standalone: true }" type="checkbox" />
-                            <label class="form-check-label" for="stepIgnore"> {{ "rules.stepIgnoreErrorHint" | sqxTranslate }} </label>
+                            <label class="form-check-label" for="stepIgnore"> {{ "rules.stepIgnoreError" | sqxTranslate }} </label>
                         </div>
-                        <sqx-form-hint> {{ "rules.ignoreErrorHint" | sqxTranslate }} </sqx-form-hint>
+                        <sqx-form-hint> {{ "rules.stepIgnoreErrorHint" | sqxTranslate }} </sqx-form-hint>
                     </div>
 
                     <hr />
@@ -104,12 +110,12 @@
                 </div>
             } @else {
                 <div class="row g-0">
-                    @for (stepType of availableSteps | sqxKeys; track stepType) {
+                    @for (availableStep of availableSteps | sqxEntries: "title"; track availableStep.key) {
                         <div class="col-12 col-md-6">
-                            <div class="rule-element" (click)="selectStep(stepType)">
+                            <div class="rule-element" (click)="selectStep(availableStep.key)">
                                 <sqx-rule-element
-                                    [elementInfo]="$any(availableSteps)[stepType]"
-                                    [elementType]="stepType"
+                                    [elementInfo]="availableStep.value"
+                                    [elementType]="availableStep.key"
                                     showDescription="true"
                                     showName="true" />
                             </div>
@@ -122,7 +128,7 @@
             <button class="btn btn-text-secondary" (click)="dialogClose.emit()" type="button">
                 {{ "common.cancel" | sqxTranslate }}
             </button>
-            <button class="btn btn-success" [disabled]="!currentStep" type="submit">{{ "common.edit" | sqxTranslate }}</button>
+            <button class="btn btn-success" [disabled]="!currentStep" type="submit">{{ "common.save" | sqxTranslate }}</button>
         </ng-container>
     </sqx-modal-dialog>
 </form>

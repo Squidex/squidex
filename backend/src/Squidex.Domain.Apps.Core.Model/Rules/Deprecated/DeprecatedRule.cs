@@ -7,7 +7,7 @@
 
 namespace Squidex.Domain.Apps.Core.Rules.Deprecated;
 
-[Obsolete("Use Flows")]
+[Obsolete("Has been replaced by flows.")]
 public class DeprecatedRule
 {
     public string? Name { get; init; }

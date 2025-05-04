@@ -7,13 +7,12 @@
 
 using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Flows;
-using Squidex.Flows.Steps;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Extensions.Actions.Script;
 
-[Obsolete("Use Flows")]
+[Obsolete("Has been replaced by flows.")]
 public sealed record ScriptAction : RuleAction
 {
     [LocalizedRequired]
@@ -21,6 +20,6 @@ public sealed record ScriptAction : RuleAction
 
     public override FlowStep ToFlowStep()
     {
-        return SimpleMapper.Map(this, new ScriptFlowStepBase());
+        return SimpleMapper.Map(this, new ScriptFlowStep());
     }
 }

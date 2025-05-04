@@ -27,43 +27,6 @@ public sealed class RuleEventFormatter(
 {
     private const string GlobalFallback = "null";
 
-    private struct TextPart
-    {
-        public bool IsText;
-
-        public int TextLength;
-
-        public int TextOffset;
-
-        public string VarFallback;
-
-        public string VarTransform;
-
-        public ValueTask<string?> Var;
-
-        public static TextPart Text(int offset, int length)
-        {
-            var result = default(TextPart);
-
-            result.TextOffset = offset;
-            result.TextLength = length;
-            result.IsText = true;
-
-            return result;
-        }
-
-        public static TextPart Variable(ValueTask<string?> replacement, string fallback, string transform)
-        {
-            var result = default(TextPart);
-
-            result.Var = replacement;
-            result.VarFallback = fallback;
-            result.VarTransform = transform;
-
-            return result;
-        }
-    }
-
     public string SerializeJson<T>(T value)
     {
         return serializer.Serialize(value, true);

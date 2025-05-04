@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { EMPTY, Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, ListState, shareSubscribed, State } from '@app/framework';
-import { SimulatedRuleEventDto } from '../model';
+import { DynamicCreateRuleDto, SimulatedRuleEventDto } from '../model';
 import { RulesService } from '../services/rules.service';
 import { AppsState } from './apps.state';
 
@@ -87,7 +87,7 @@ export class RuleSimulatorState extends State<Snapshot> {
 
         const request =
             flow && trigger ?
-            this.rulesService.postSimulatedEvents(this.appName, trigger, flow) :
+            this.rulesService.postSimulatedEvents(this.appName, new DynamicCreateRuleDto({ flow, trigger })) :
             this.rulesService.getSimulatedEvents(this.appName, ruleId!);
 
         return request.pipe(

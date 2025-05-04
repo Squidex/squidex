@@ -6,7 +6,7 @@
  */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { BranchItem, BranchList, FlowView, RuleElementDto } from '@app/shared';
+import { BranchItem, BranchList, FlowView, RuleElementDto, TranslatePipe } from '@app/shared';
 import { RuleElementComponent } from '../../shared/rule-element.component';
 import { FlowStepAdd, FlowStepRemove, FlowStepUpdate } from './types';
 
@@ -18,6 +18,7 @@ import { FlowStepAdd, FlowStepRemove, FlowStepUpdate } from './types';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         RuleElementComponent,
+        TranslatePipe,
     ],
 })
 export class BranchComponent {

@@ -18,7 +18,7 @@ namespace Squidex.Providers.Postgres.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.13")
+                .HasAnnotation("ProductVersion", "8.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "postgis");
@@ -326,7 +326,8 @@ namespace Squidex.Providers.Postgres.Migrations
             modelBuilder.Entity("Squidex.AI.Mongo.EFChatEntity", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("text");
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.Property<DateTime>("LastUpdated")
                         .HasColumnType("timestamp with time zone");
@@ -349,7 +350,8 @@ namespace Squidex.Providers.Postgres.Migrations
             modelBuilder.Entity("Squidex.Assets.EntityFramework.EFAssetKeyValueEntity<Squidex.Assets.TusAdapter.TusMetadata>", b =>
                 {
                     b.Property<string>("Key")
-                        .HasColumnType("text");
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.Property<DateTimeOffset>("Expires")
                         .HasColumnType("timestamp with time zone");
@@ -976,59 +978,6 @@ namespace Squidex.Providers.Postgres.Migrations
                     b.ToTable("States_Rule", (string)null);
                 });
 
-            modelBuilder.Entity("Squidex.Domain.Apps.Entities.Rules.EFRuleEventEntity", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<string>("AppId")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.Property<DateTimeOffset>("Created")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTimeOffset>("Expires")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("Job")
-                        .IsRequired()
-                        .HasColumnType("jsonb");
-
-                    b.Property<string>("JobResult")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("LastDump")
-                        .HasColumnType("text");
-
-                    b.Property<DateTimeOffset>("LastModified")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<DateTimeOffset?>("NextAttempt")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<int>("NumCalls")
-                        .HasColumnType("integer");
-
-                    b.Property<string>("Result")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("RuleId")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("character varying(255)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("RuleEvents");
-                });
-
             modelBuilder.Entity("Squidex.Domain.Apps.Entities.Schemas.EFSchemaEntity", b =>
                 {
                     b.Property<string>("DocumentId")
@@ -1105,7 +1054,8 @@ namespace Squidex.Providers.Postgres.Migrations
 
                     b.Property<string>("EventStream")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(750)
+                        .HasColumnType("character varying(750)");
 
                     b.Property<long>("EventStreamOffset")
                         .HasColumnType("bigint");
@@ -1146,6 +1096,42 @@ namespace Squidex.Providers.Postgres.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("EventPosition");
+                });
+
+            modelBuilder.Entity("Squidex.Flows.EntityFramework.EFFlowStateEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("DefinitionId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTimeOffset?>("DueTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("OwnerId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<int>("SchedulePartition")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DueTime", "SchedulePartition");
+
+                    b.ToTable("Flows", (string)null);
                 });
 
             modelBuilder.Entity("Squidex.Infrastructure.Caching.EFCacheEntity", b =>
@@ -1423,7 +1409,8 @@ namespace Squidex.Providers.Postgres.Migrations
 
                     b.Property<string>("ChannelName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.Property<byte[]>("MessageData")
                         .IsRequired()
@@ -1431,11 +1418,13 @@ namespace Squidex.Providers.Postgres.Migrations
 
                     b.Property<string>("MessageHeaders")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)");
 
                     b.Property<string>("QueueName")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.Property<DateTime?>("TimeHandled")
                         .HasColumnType("timestamp with time zone");
@@ -1457,10 +1446,12 @@ namespace Squidex.Providers.Postgres.Migrations
             modelBuilder.Entity("Squidex.Messaging.EntityFramework.EFMessagingDataEntity", b =>
                 {
                     b.Property<string>("Group")
-                        .HasColumnType("text");
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.Property<string>("Key")
-                        .HasColumnType("text");
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.Property<DateTime>("Expiration")
                         .HasColumnType("timestamp with time zone");
@@ -1470,11 +1461,13 @@ namespace Squidex.Providers.Postgres.Migrations
                         .HasColumnType("bytea");
 
                     b.Property<string>("ValueFormat")
-                        .HasColumnType("text");
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.Property<string>("ValueType")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.HasKey("Group", "Key");
 
