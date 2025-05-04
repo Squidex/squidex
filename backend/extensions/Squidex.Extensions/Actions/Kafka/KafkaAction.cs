@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+#if INCLUDE_KAFKA
 using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Flows;
 using Squidex.Infrastructure.Reflection;
@@ -35,3 +36,4 @@ public sealed record KafkaAction : RuleAction
         return SimpleMapper.Map(this, new KafkaFlowStep());
     }
 }
+#endif
