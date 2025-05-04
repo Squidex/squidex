@@ -39,7 +39,7 @@ describe('ReversePipe', () => {
     const pipe = new ReversePipe();
 
     it('should reverse entries', () => {
-        const value = [2, 1];
+        const value = [1, 2];
 
         const actual = pipe.transform(value);
         const expected = [2, 1];

@@ -133,9 +133,10 @@ public class CollectionExtensionsTests
     [Fact]
     public void SequentialHashCode_should_ignore_null_values()
     {
-        var collection = new string?[] { null, null };
+        var collection1 = new string?[] { null, null };
+        var collection2 = new string?[] { null };
 
-        Assert.Equal(17, collection.SequentialHashCode());
+        Assert.Equal(collection2.SequentialHashCode(), collection1.SequentialHashCode());
     }
 
     [Fact]

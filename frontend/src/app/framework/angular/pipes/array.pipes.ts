@@ -38,7 +38,7 @@ export class EntriesPipe implements PipeTransform {
         const result = Object.entries(value).map(([key, value]) => ({ key, value }));
 
         if (sort) {
-            result.sortByString(x => (x as any)?.[sort]);
+            result.sortByString(x => (x.value as any)?.[sort]?.toString() || '');
         }
 
         return result;

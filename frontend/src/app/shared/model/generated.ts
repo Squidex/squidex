@@ -6917,70 +6917,64 @@ export abstract class FlowStepDto implements IFlowStepDto {
 
     static fromJSON(data: any): FlowStepDto {
         if (data["stepType"] === "Algolia") {
-            return new AlgoliaFlowStepFlowStepDto().init(data);
+            return new AlgoliaFlowStepDto().init(data);
         }
         if (data["stepType"] === "AzureQueue") {
-            return new AzureQueueFlowStepFlowStepDto().init(data);
+            return new AzureQueueFlowStepDto().init(data);
         }
         if (data["stepType"] === "Comment") {
-            return new CommentFlowStepFlowStepDto().init(data);
+            return new CommentFlowStepDto().init(data);
         }
         if (data["stepType"] === "CreateContent") {
-            return new CreateContentFlowStepFlowStepDto().init(data);
+            return new CreateContentFlowStepDto().init(data);
         }
         if (data["stepType"] === "Delay") {
-            return new DelayFlowStepFlowStepDto().init(data);
+            return new DelayFlowStepDto().init(data);
         }
         if (data["stepType"] === "Discourse") {
-            return new DiscourseFlowStepFlowStepDto().init(data);
+            return new DiscourseFlowStepDto().init(data);
         }
         if (data["stepType"] === "ElasticSearch") {
-            return new ElasticSearchFlowStepFlowStepDto().init(data);
+            return new ElasticSearchFlowStepDto().init(data);
         }
         if (data["stepType"] === "Email") {
-            return new EmailFlowStepFlowStepDto().init(data);
+            return new EmailFlowStepDto().init(data);
         }
         if (data["stepType"] === "Fastly") {
-            return new FastlyFlowStepFlowStepDto().init(data);
+            return new FastlyFlowStepDto().init(data);
         }
         if (data["stepType"] === "If") {
-            return new IfFlowStepFlowStepDto().init(data);
+            return new IfFlowStepDto().init(data);
         }
         if (data["stepType"] === "Medium") {
-            return new MediumFlowStepFlowStepDto().init(data);
+            return new MediumFlowStepDto().init(data);
         }
         if (data["stepType"] === "Notification") {
-            return new NotificationFlowStepFlowStepDto().init(data);
+            return new NotificationFlowStepDto().init(data);
         }
         if (data["stepType"] === "OpenSearch") {
-            return new OpenSearchFlowStepFlowStepDto().init(data);
+            return new OpenSearchFlowStepDto().init(data);
         }
         if (data["stepType"] === "Prerender") {
-            return new PrerenderFlowStepFlowStepDto().init(data);
+            return new PrerenderFlowStepDto().init(data);
         }
         if (data["stepType"] === "Script") {
-            return new ScriptFlowStep().init(data);
-        }
-        if (data["stepType"] === "ScriptFlowStepBaseFlowStepDto") {
-            return new ScriptFlowStepBaseFlowStepDto().init(data);
+            return new ScriptFlowStepDto().init(data);
         }
         if (data["stepType"] === "SignalR") {
-            return new SignalRFlowStepFlowStepDto().init(data);
+            return new SignalRFlowStepDto().init(data);
         }
         if (data["stepType"] === "Slack") {
-            return new SlackFlowStepFlowStepDto().init(data);
+            return new SlackFlowStepDto().init(data);
         }
         if (data["stepType"] === "Tweet") {
-            return new TweetFlowStepFlowStepDto().init(data);
+            return new TweetFlowStepDto().init(data);
         }
         if (data["stepType"] === "Typesense") {
-            return new TypesenseFlowStepFlowStepDto().init(data);
+            return new TypesenseFlowStepDto().init(data);
         }
         if (data["stepType"] === "Webhook") {
-            return new WebhookFlowStep().init(data);
-        }
-        if (data["stepType"] === "WebhookFlowStepBaseFlowStepDto") {
-            return new WebhookFlowStepBaseFlowStepDto().init(data);
+            return new WebhookFlowStepDto().init(data);
         }
         throw new Error("The abstract class 'FlowStepDto' cannot be instantiated.");
     }
@@ -7017,7 +7011,7 @@ export abstract class FlowStepDto implements IFlowStepDto {
 export interface IFlowStepDto {
 }
 
-export class AlgoliaFlowStepFlowStepDto extends FlowStepDto implements IAlgoliaFlowStepFlowStepDto {
+export class AlgoliaFlowStepDto extends FlowStepDto implements IAlgoliaFlowStepDto {
     /** The application ID. */
     readonly appId!: string;
     /** The API key to grant access to Squidex. */
@@ -7029,7 +7023,7 @@ export class AlgoliaFlowStepFlowStepDto extends FlowStepDto implements IAlgoliaF
     /** The condition when to delete the entry. */
     readonly delete?: string | undefined;
 
-    constructor(data?: IAlgoliaFlowStepFlowStepDto) {
+    constructor(data?: IAlgoliaFlowStepDto) {
         super(data);
         (<any>this).stepType = "Algolia";
     }
@@ -7045,8 +7039,8 @@ export class AlgoliaFlowStepFlowStepDto extends FlowStepDto implements IAlgoliaF
         return this;
     }
 
-    static fromJSON(data: any): AlgoliaFlowStepFlowStepDto {
-        const result = new AlgoliaFlowStepFlowStepDto().init(data);
+    static fromJSON(data: any): AlgoliaFlowStepDto {
+        const result = new AlgoliaFlowStepDto().init(data);
         result.cleanup(this);
         return result;
     }
@@ -7064,7 +7058,7 @@ export class AlgoliaFlowStepFlowStepDto extends FlowStepDto implements IAlgoliaF
     }
 }
 
-export interface IAlgoliaFlowStepFlowStepDto extends IFlowStepDto {
+export interface IAlgoliaFlowStepDto extends IFlowStepDto {
     /** The application ID. */
     readonly appId: string;
     /** The API key to grant access to Squidex. */
@@ -7077,7 +7071,7 @@ export interface IAlgoliaFlowStepFlowStepDto extends IFlowStepDto {
     readonly delete?: string | undefined;
 }
 
-export class AzureQueueFlowStepFlowStepDto extends FlowStepDto implements IAzureQueueFlowStepFlowStepDto {
+export class AzureQueueFlowStepDto extends FlowStepDto implements IAzureQueueFlowStepDto {
     /** The connection string to the storage account. */
     readonly connectionString!: string;
     /** The name of the queue. */
@@ -7085,7 +7079,7 @@ export class AzureQueueFlowStepFlowStepDto extends FlowStepDto implements IAzure
     /** Leave it empty to use the full event as body. */
     readonly payload?: string | undefined;
 
-    constructor(data?: IAzureQueueFlowStepFlowStepDto) {
+    constructor(data?: IAzureQueueFlowStepDto) {
         super(data);
         (<any>this).stepType = "AzureQueue";
     }
@@ -7099,8 +7093,8 @@ export class AzureQueueFlowStepFlowStepDto extends FlowStepDto implements IAzure
         return this;
     }
 
-    static fromJSON(data: any): AzureQueueFlowStepFlowStepDto {
-        const result = new AzureQueueFlowStepFlowStepDto().init(data);
+    static fromJSON(data: any): AzureQueueFlowStepDto {
+        const result = new AzureQueueFlowStepDto().init(data);
         result.cleanup(this);
         return result;
     }
@@ -7116,7 +7110,7 @@ export class AzureQueueFlowStepFlowStepDto extends FlowStepDto implements IAzure
     }
 }
 
-export interface IAzureQueueFlowStepFlowStepDto extends IFlowStepDto {
+export interface IAzureQueueFlowStepDto extends IFlowStepDto {
     /** The connection string to the storage account. */
     readonly connectionString: string;
     /** The name of the queue. */
@@ -7125,13 +7119,13 @@ export interface IAzureQueueFlowStepFlowStepDto extends IFlowStepDto {
     readonly payload?: string | undefined;
 }
 
-export class CommentFlowStepFlowStepDto extends FlowStepDto implements ICommentFlowStepFlowStepDto {
+export class CommentFlowStepDto extends FlowStepDto implements ICommentFlowStepDto {
     /** The comment text. */
     readonly text!: string;
     /** An optional client name. */
     readonly client?: string | undefined;
 
-    constructor(data?: ICommentFlowStepFlowStepDto) {
+    constructor(data?: ICommentFlowStepDto) {
         super(data);
         (<any>this).stepType = "Comment";
     }
@@ -7144,8 +7138,8 @@ export class CommentFlowStepFlowStepDto extends FlowStepDto implements ICommentF
         return this;
     }
 
-    static fromJSON(data: any): CommentFlowStepFlowStepDto {
-        const result = new CommentFlowStepFlowStepDto().init(data);
+    static fromJSON(data: any): CommentFlowStepDto {
+        const result = new CommentFlowStepDto().init(data);
         result.cleanup(this);
         return result;
     }
@@ -7160,14 +7154,14 @@ export class CommentFlowStepFlowStepDto extends FlowStepDto implements ICommentF
     }
 }
 
-export interface ICommentFlowStepFlowStepDto extends IFlowStepDto {
+export interface ICommentFlowStepDto extends IFlowStepDto {
     /** The comment text. */
     readonly text: string;
     /** An optional client name. */
     readonly client?: string | undefined;
 }
 
-export class CreateContentFlowStepFlowStepDto extends FlowStepDto implements ICreateContentFlowStepFlowStepDto {
+export class CreateContentFlowStepDto extends FlowStepDto implements ICreateContentFlowStepDto {
     /** The content data. */
     readonly data!: string;
     /** The name of the schema. */
@@ -7177,7 +7171,7 @@ export class CreateContentFlowStepFlowStepDto extends FlowStepDto implements ICr
     /** Publish the content. */
     readonly publish!: boolean;
 
-    constructor(data?: ICreateContentFlowStepFlowStepDto) {
+    constructor(data?: ICreateContentFlowStepDto) {
         super(data);
         (<any>this).stepType = "CreateContent";
     }
@@ -7192,8 +7186,8 @@ export class CreateContentFlowStepFlowStepDto extends FlowStepDto implements ICr
         return this;
     }
 
-    static fromJSON(data: any): CreateContentFlowStepFlowStepDto {
-        const result = new CreateContentFlowStepFlowStepDto().init(data);
+    static fromJSON(data: any): CreateContentFlowStepDto {
+        const result = new CreateContentFlowStepDto().init(data);
         result.cleanup(this);
         return result;
     }
@@ -7210,7 +7204,7 @@ export class CreateContentFlowStepFlowStepDto extends FlowStepDto implements ICr
     }
 }
 
-export interface ICreateContentFlowStepFlowStepDto extends IFlowStepDto {
+export interface ICreateContentFlowStepDto extends IFlowStepDto {
     /** The content data. */
     readonly data: string;
     /** The name of the schema. */
@@ -7221,11 +7215,11 @@ export interface ICreateContentFlowStepFlowStepDto extends IFlowStepDto {
     readonly publish: boolean;
 }
 
-export class DelayFlowStepFlowStepDto extends FlowStepDto implements IDelayFlowStepFlowStepDto {
+export class DelayFlowStepDto extends FlowStepDto implements IDelayFlowStepDto {
     /** The delay in seconds. */
     readonly delayInSec!: number;
 
-    constructor(data?: IDelayFlowStepFlowStepDto) {
+    constructor(data?: IDelayFlowStepDto) {
         super(data);
         (<any>this).stepType = "Delay";
     }
@@ -7237,8 +7231,8 @@ export class DelayFlowStepFlowStepDto extends FlowStepDto implements IDelayFlowS
         return this;
     }
 
-    static fromJSON(data: any): DelayFlowStepFlowStepDto {
-        const result = new DelayFlowStepFlowStepDto().init(data);
+    static fromJSON(data: any): DelayFlowStepDto {
+        const result = new DelayFlowStepDto().init(data);
         result.cleanup(this);
         return result;
     }
@@ -7252,12 +7246,12 @@ export class DelayFlowStepFlowStepDto extends FlowStepDto implements IDelayFlowS
     }
 }
 
-export interface IDelayFlowStepFlowStepDto extends IFlowStepDto {
+export interface IDelayFlowStepDto extends IFlowStepDto {
     /** The delay in seconds. */
     readonly delayInSec: number;
 }
 
-export class DiscourseFlowStepFlowStepDto extends FlowStepDto implements IDiscourseFlowStepFlowStepDto {
+export class DiscourseFlowStepDto extends FlowStepDto implements IDiscourseFlowStepDto {
     /** The url to the discourse server. */
     readonly url!: string;
     /** The api key to authenticate to your discourse server. */
@@ -7273,7 +7267,7 @@ export class DiscourseFlowStepFlowStepDto extends FlowStepDto implements IDiscou
     /** The optional category id. */
     readonly category?: number | undefined;
 
-    constructor(data?: IDiscourseFlowStepFlowStepDto) {
+    constructor(data?: IDiscourseFlowStepDto) {
         super(data);
         (<any>this).stepType = "Discourse";
     }
@@ -7291,8 +7285,8 @@ export class DiscourseFlowStepFlowStepDto extends FlowStepDto implements IDiscou
         return this;
     }
 
-    static fromJSON(data: any): DiscourseFlowStepFlowStepDto {
-        const result = new DiscourseFlowStepFlowStepDto().init(data);
+    static fromJSON(data: any): DiscourseFlowStepDto {
+        const result = new DiscourseFlowStepDto().init(data);
         result.cleanup(this);
         return result;
     }
@@ -7312,7 +7306,7 @@ export class DiscourseFlowStepFlowStepDto extends FlowStepDto implements IDiscou
     }
 }
 
-export interface IDiscourseFlowStepFlowStepDto extends IFlowStepDto {
+export interface IDiscourseFlowStepDto extends IFlowStepDto {
     /** The url to the discourse server. */
     readonly url: string;
     /** The api key to authenticate to your discourse server. */
@@ -7329,7 +7323,7 @@ export interface IDiscourseFlowStepFlowStepDto extends IFlowStepDto {
     readonly category?: number | undefined;
 }
 
-export class ElasticSearchFlowStepFlowStepDto extends FlowStepDto implements IElasticSearchFlowStepFlowStepDto {
+export class ElasticSearchFlowStepDto extends FlowStepDto implements IElasticSearchFlowStepDto {
     /** The url to the instance or cluster. */
     readonly host!: string;
     /** The name of the index. */
@@ -7343,7 +7337,7 @@ export class ElasticSearchFlowStepFlowStepDto extends FlowStepDto implements IEl
     /** The condition when to delete the document. */
     readonly delete?: string | undefined;
 
-    constructor(data?: IElasticSearchFlowStepFlowStepDto) {
+    constructor(data?: IElasticSearchFlowStepDto) {
         super(data);
         (<any>this).stepType = "ElasticSearch";
     }
@@ -7360,8 +7354,8 @@ export class ElasticSearchFlowStepFlowStepDto extends FlowStepDto implements IEl
         return this;
     }
 
-    static fromJSON(data: any): ElasticSearchFlowStepFlowStepDto {
-        const result = new ElasticSearchFlowStepFlowStepDto().init(data);
+    static fromJSON(data: any): ElasticSearchFlowStepDto {
+        const result = new ElasticSearchFlowStepDto().init(data);
         result.cleanup(this);
         return result;
     }
@@ -7380,7 +7374,7 @@ export class ElasticSearchFlowStepFlowStepDto extends FlowStepDto implements IEl
     }
 }
 
-export interface IElasticSearchFlowStepFlowStepDto extends IFlowStepDto {
+export interface IElasticSearchFlowStepDto extends IFlowStepDto {
     /** The url to the instance or cluster. */
     readonly host: string;
     /** The name of the index. */
@@ -7395,7 +7389,7 @@ export interface IElasticSearchFlowStepFlowStepDto extends IFlowStepDto {
     readonly delete?: string | undefined;
 }
 
-export class EmailFlowStepFlowStepDto extends FlowStepDto implements IEmailFlowStepFlowStepDto {
+export class EmailFlowStepDto extends FlowStepDto implements IEmailFlowStepDto {
     /** The IP address or host to the SMTP server. */
     readonly serverHost!: string;
     /** The port to the SMTP server. */
@@ -7413,7 +7407,7 @@ export class EmailFlowStepFlowStepDto extends FlowStepDto implements IEmailFlowS
     /** The message body. */
     readonly messageBody!: string;
 
-    constructor(data?: IEmailFlowStepFlowStepDto) {
+    constructor(data?: IEmailFlowStepDto) {
         super(data);
         (<any>this).stepType = "Email";
     }
@@ -7432,8 +7426,8 @@ export class EmailFlowStepFlowStepDto extends FlowStepDto implements IEmailFlowS
         return this;
     }
 
-    static fromJSON(data: any): EmailFlowStepFlowStepDto {
-        const result = new EmailFlowStepFlowStepDto().init(data);
+    static fromJSON(data: any): EmailFlowStepDto {
+        const result = new EmailFlowStepDto().init(data);
         result.cleanup(this);
         return result;
     }
@@ -7454,7 +7448,7 @@ export class EmailFlowStepFlowStepDto extends FlowStepDto implements IEmailFlowS
     }
 }
 
-export interface IEmailFlowStepFlowStepDto extends IFlowStepDto {
+export interface IEmailFlowStepDto extends IFlowStepDto {
     /** The IP address or host to the SMTP server. */
     readonly serverHost: string;
     /** The port to the SMTP server. */
@@ -7473,13 +7467,13 @@ export interface IEmailFlowStepFlowStepDto extends IFlowStepDto {
     readonly messageBody: string;
 }
 
-export class FastlyFlowStepFlowStepDto extends FlowStepDto implements IFastlyFlowStepFlowStepDto {
+export class FastlyFlowStepDto extends FlowStepDto implements IFastlyFlowStepDto {
     /** The API key to grant access to Squidex. */
     readonly apiKey!: string;
     /** The ID of the fastly service. */
     readonly serviceId!: string;
 
-    constructor(data?: IFastlyFlowStepFlowStepDto) {
+    constructor(data?: IFastlyFlowStepDto) {
         super(data);
         (<any>this).stepType = "Fastly";
     }
@@ -7492,8 +7486,8 @@ export class FastlyFlowStepFlowStepDto extends FlowStepDto implements IFastlyFlo
         return this;
     }
 
-    static fromJSON(data: any): FastlyFlowStepFlowStepDto {
-        const result = new FastlyFlowStepFlowStepDto().init(data);
+    static fromJSON(data: any): FastlyFlowStepDto {
+        const result = new FastlyFlowStepDto().init(data);
         result.cleanup(this);
         return result;
     }
@@ -7508,19 +7502,19 @@ export class FastlyFlowStepFlowStepDto extends FlowStepDto implements IFastlyFlo
     }
 }
 
-export interface IFastlyFlowStepFlowStepDto extends IFlowStepDto {
+export interface IFastlyFlowStepDto extends IFlowStepDto {
     /** The API key to grant access to Squidex. */
     readonly apiKey: string;
     /** The ID of the fastly service. */
     readonly serviceId: string;
 }
 
-export class IfFlowStepFlowStepDto extends FlowStepDto implements IIfFlowStepFlowStepDto {
+export class IfFlowStepDto extends FlowStepDto implements IIfFlowStepDto {
     /** The delay in seconds. */
-    readonly branches!: IfBranchDto[];
+    readonly branches!: IfFlowBranchDto[];
     readonly elseStepId?: string | undefined;
 
-    constructor(data?: IIfFlowStepFlowStepDto) {
+    constructor(data?: IIfFlowStepDto) {
         super(data);
         (<any>this).stepType = "If";
     }
@@ -7530,15 +7524,15 @@ export class IfFlowStepFlowStepDto extends FlowStepDto implements IIfFlowStepFlo
         if (Array.isArray(_data["branches"])) {
             (<any>this).branches = [] as any;
             for (let item of _data["branches"])
-                (<any>this).branches!.push(IfBranchDto.fromJSON(item));
+                (<any>this).branches!.push(IfFlowBranchDto.fromJSON(item));
         }
         (<any>this).elseStepId = _data["elseStepId"];
         this.cleanup(this);
         return this;
     }
 
-    static fromJSON(data: any): IfFlowStepFlowStepDto {
-        const result = new IfFlowStepFlowStepDto().init(data);
+    static fromJSON(data: any): IfFlowStepDto {
+        const result = new IfFlowStepDto().init(data);
         result.cleanup(this);
         return result;
     }
@@ -7557,19 +7551,19 @@ export class IfFlowStepFlowStepDto extends FlowStepDto implements IIfFlowStepFlo
     }
 }
 
-export interface IIfFlowStepFlowStepDto extends IFlowStepDto {
+export interface IIfFlowStepDto extends IFlowStepDto {
     /** The delay in seconds. */
-    readonly branches: IfBranchDto[];
+    readonly branches: IfFlowBranchDto[];
     readonly elseStepId?: string | undefined;
 }
 
-export class IfBranchDto implements IIfBranchDto {
+export class IfFlowBranchDto implements IIfFlowBranchDto {
     /** Uses the cache values because the actual object is frozen. */
     private readonly cachedValues: { [key: string]: any } = {};
     readonly condition?: string | undefined;
     readonly nextStepId?: string | undefined;
 
-    constructor(data?: IIfBranchDto) {
+    constructor(data?: IIfFlowBranchDto) {
         if (data) {
             for (var property in data) {
                 if (data.hasOwnProperty(property))
@@ -7585,8 +7579,8 @@ export class IfBranchDto implements IIfBranchDto {
         return this;
     }
 
-    static fromJSON(data: any): IfBranchDto {
-        const result = new IfBranchDto().init(data);
+    static fromJSON(data: any): IfFlowBranchDto {
+        const result = new IfFlowBranchDto().init(data);
         result.cleanup(this);
         return result;
     }
@@ -7621,12 +7615,12 @@ export class IfBranchDto implements IIfBranchDto {
     }
 }
 
-export interface IIfBranchDto {
+export interface IIfFlowBranchDto {
     readonly condition?: string | undefined;
     readonly nextStepId?: string | undefined;
 }
 
-export class MediumFlowStepFlowStepDto extends FlowStepDto implements IMediumFlowStepFlowStepDto {
+export class MediumFlowStepDto extends FlowStepDto implements IMediumFlowStepDto {
     /** The self issued access token. */
     readonly accessToken!: string;
     /** The title, used for the url. */
@@ -7642,7 +7636,7 @@ export class MediumFlowStepFlowStepDto extends FlowStepDto implements IMediumFlo
     /** Indicates whether the content is markdown or html. */
     readonly isHtml!: boolean;
 
-    constructor(data?: IMediumFlowStepFlowStepDto) {
+    constructor(data?: IMediumFlowStepDto) {
         super(data);
         (<any>this).stepType = "Medium";
     }
@@ -7660,8 +7654,8 @@ export class MediumFlowStepFlowStepDto extends FlowStepDto implements IMediumFlo
         return this;
     }
 
-    static fromJSON(data: any): MediumFlowStepFlowStepDto {
-        const result = new MediumFlowStepFlowStepDto().init(data);
+    static fromJSON(data: any): MediumFlowStepDto {
+        const result = new MediumFlowStepDto().init(data);
         result.cleanup(this);
         return result;
     }
@@ -7681,7 +7675,7 @@ export class MediumFlowStepFlowStepDto extends FlowStepDto implements IMediumFlo
     }
 }
 
-export interface IMediumFlowStepFlowStepDto extends IFlowStepDto {
+export interface IMediumFlowStepDto extends IFlowStepDto {
     /** The self issued access token. */
     readonly accessToken: string;
     /** The title, used for the url. */
@@ -7698,7 +7692,7 @@ export interface IMediumFlowStepFlowStepDto extends IFlowStepDto {
     readonly isHtml: boolean;
 }
 
-export class NotificationFlowStepFlowStepDto extends FlowStepDto implements INotificationFlowStepFlowStepDto {
+export class NotificationFlowStepDto extends FlowStepDto implements INotificationFlowStepDto {
     /** The user id or email. */
     readonly user!: string;
     /** The text to send. */
@@ -7708,7 +7702,7 @@ export class NotificationFlowStepFlowStepDto extends FlowStepDto implements INot
     /** An optional client name. */
     readonly client?: string | undefined;
 
-    constructor(data?: INotificationFlowStepFlowStepDto) {
+    constructor(data?: INotificationFlowStepDto) {
         super(data);
         (<any>this).stepType = "Notification";
     }
@@ -7723,8 +7717,8 @@ export class NotificationFlowStepFlowStepDto extends FlowStepDto implements INot
         return this;
     }
 
-    static fromJSON(data: any): NotificationFlowStepFlowStepDto {
-        const result = new NotificationFlowStepFlowStepDto().init(data);
+    static fromJSON(data: any): NotificationFlowStepDto {
+        const result = new NotificationFlowStepDto().init(data);
         result.cleanup(this);
         return result;
     }
@@ -7741,7 +7735,7 @@ export class NotificationFlowStepFlowStepDto extends FlowStepDto implements INot
     }
 }
 
-export interface INotificationFlowStepFlowStepDto extends IFlowStepDto {
+export interface INotificationFlowStepDto extends IFlowStepDto {
     /** The user id or email. */
     readonly user: string;
     /** The text to send. */
@@ -7752,7 +7746,7 @@ export interface INotificationFlowStepFlowStepDto extends IFlowStepDto {
     readonly client?: string | undefined;
 }
 
-export class OpenSearchFlowStepFlowStepDto extends FlowStepDto implements IOpenSearchFlowStepFlowStepDto {
+export class OpenSearchFlowStepDto extends FlowStepDto implements IOpenSearchFlowStepDto {
     /** The url to the instance or cluster. */
     readonly host!: string;
     /** The name of the index. */
@@ -7766,7 +7760,7 @@ export class OpenSearchFlowStepFlowStepDto extends FlowStepDto implements IOpenS
     /** The condition when to delete the document. */
     readonly delete?: string | undefined;
 
-    constructor(data?: IOpenSearchFlowStepFlowStepDto) {
+    constructor(data?: IOpenSearchFlowStepDto) {
         super(data);
         (<any>this).stepType = "OpenSearch";
     }
@@ -7783,8 +7777,8 @@ export class OpenSearchFlowStepFlowStepDto extends FlowStepDto implements IOpenS
         return this;
     }
 
-    static fromJSON(data: any): OpenSearchFlowStepFlowStepDto {
-        const result = new OpenSearchFlowStepFlowStepDto().init(data);
+    static fromJSON(data: any): OpenSearchFlowStepDto {
+        const result = new OpenSearchFlowStepDto().init(data);
         result.cleanup(this);
         return result;
     }
@@ -7803,7 +7797,7 @@ export class OpenSearchFlowStepFlowStepDto extends FlowStepDto implements IOpenS
     }
 }
 
-export interface IOpenSearchFlowStepFlowStepDto extends IFlowStepDto {
+export interface IOpenSearchFlowStepDto extends IFlowStepDto {
     /** The url to the instance or cluster. */
     readonly host: string;
     /** The name of the index. */
@@ -7818,13 +7812,13 @@ export interface IOpenSearchFlowStepFlowStepDto extends IFlowStepDto {
     readonly delete?: string | undefined;
 }
 
-export class PrerenderFlowStepFlowStepDto extends FlowStepDto implements IPrerenderFlowStepFlowStepDto {
+export class PrerenderFlowStepDto extends FlowStepDto implements IPrerenderFlowStepDto {
     /** The prerender token from your account. */
     readonly token!: string;
     /** The url to recache. */
     readonly url!: string;
 
-    constructor(data?: IPrerenderFlowStepFlowStepDto) {
+    constructor(data?: IPrerenderFlowStepDto) {
         super(data);
         (<any>this).stepType = "Prerender";
     }
@@ -7837,8 +7831,8 @@ export class PrerenderFlowStepFlowStepDto extends FlowStepDto implements IPreren
         return this;
     }
 
-    static fromJSON(data: any): PrerenderFlowStepFlowStepDto {
-        const result = new PrerenderFlowStepFlowStepDto().init(data);
+    static fromJSON(data: any): PrerenderFlowStepDto {
+        const result = new PrerenderFlowStepDto().init(data);
         result.cleanup(this);
         return result;
     }
@@ -7853,20 +7847,20 @@ export class PrerenderFlowStepFlowStepDto extends FlowStepDto implements IPreren
     }
 }
 
-export interface IPrerenderFlowStepFlowStepDto extends IFlowStepDto {
+export interface IPrerenderFlowStepDto extends IFlowStepDto {
     /** The prerender token from your account. */
     readonly token: string;
     /** The url to recache. */
     readonly url: string;
 }
 
-export class ScriptFlowStepBaseFlowStepDto extends FlowStepDto implements IScriptFlowStepBaseFlowStepDto {
+export class ScriptFlowStepDto extends FlowStepDto implements IScriptFlowStepDto {
     /** The script to execute. */
     readonly script?: string | undefined;
 
-    constructor(data?: IScriptFlowStepBaseFlowStepDto) {
+    constructor(data?: IScriptFlowStepDto) {
         super(data);
-        (<any>this).stepType = "ScriptFlowStepBaseFlowStepDto";
+        (<any>this).stepType = "Script";
     }
 
     init(_data: any) {
@@ -7876,11 +7870,8 @@ export class ScriptFlowStepBaseFlowStepDto extends FlowStepDto implements IScrip
         return this;
     }
 
-    static fromJSON(data: any): ScriptFlowStepBaseFlowStepDto {
-        if (data["stepType"] === "Script") {
-            return new ScriptFlowStep().init(data);
-        }
-        const result = new ScriptFlowStepBaseFlowStepDto().init(data);
+    static fromJSON(data: any): ScriptFlowStepDto {
+        const result = new ScriptFlowStepDto().init(data);
         result.cleanup(this);
         return result;
     }
@@ -7894,42 +7885,12 @@ export class ScriptFlowStepBaseFlowStepDto extends FlowStepDto implements IScrip
     }
 }
 
-export interface IScriptFlowStepBaseFlowStepDto extends IFlowStepDto {
+export interface IScriptFlowStepDto extends IFlowStepDto {
     /** The script to execute. */
     readonly script?: string | undefined;
 }
 
-export class ScriptFlowStep extends ScriptFlowStepBaseFlowStepDto implements IScriptFlowStep {
-
-    constructor(data?: IScriptFlowStep) {
-        super(data);
-        (<any>this).stepType = "Script";
-    }
-
-    init(_data: any) {
-        super.init(_data);
-        this.cleanup(this);
-        return this;
-    }
-
-    static fromJSON(data: any): ScriptFlowStep {
-        const result = new ScriptFlowStep().init(data);
-        result.cleanup(this);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {}; 
-        super.toJSON(data);
-        this.cleanup(data);
-        return data;
-    }
-}
-
-export interface IScriptFlowStep extends IScriptFlowStepBaseFlowStepDto {
-}
-
-export class SignalRFlowStepFlowStepDto extends FlowStepDto implements ISignalRFlowStepFlowStepDto {
+export class SignalRFlowStepDto extends FlowStepDto implements ISignalRFlowStepDto {
     /** The connection string to the Azure SignalR. */
     readonly connectionString!: string;
     /** The name of the hub. */
@@ -7945,7 +7906,7 @@ export class SignalRFlowStepFlowStepDto extends FlowStepDto implements ISignalRF
     /** Leave it empty to use the full event as body. */
     readonly payload?: string | undefined;
 
-    constructor(data?: ISignalRFlowStepFlowStepDto) {
+    constructor(data?: ISignalRFlowStepDto) {
         super(data);
         (<any>this).stepType = "SignalR";
     }
@@ -7962,8 +7923,8 @@ export class SignalRFlowStepFlowStepDto extends FlowStepDto implements ISignalRF
         return this;
     }
 
-    static fromJSON(data: any): SignalRFlowStepFlowStepDto {
-        const result = new SignalRFlowStepFlowStepDto().init(data);
+    static fromJSON(data: any): SignalRFlowStepDto {
+        const result = new SignalRFlowStepDto().init(data);
         result.cleanup(this);
         return result;
     }
@@ -7982,7 +7943,7 @@ export class SignalRFlowStepFlowStepDto extends FlowStepDto implements ISignalRF
     }
 }
 
-export interface ISignalRFlowStepFlowStepDto extends IFlowStepDto {
+export interface ISignalRFlowStepDto extends IFlowStepDto {
     /** The connection string to the Azure SignalR. */
     readonly connectionString: string;
     /** The name of the hub. */
@@ -8007,13 +7968,13 @@ export const SignalRActionTypeValues: ReadonlyArray<SignalRActionType> = [
 	"Group"
 ];
 
-export class SlackFlowStepFlowStepDto extends FlowStepDto implements ISlackFlowStepFlowStepDto {
+export class SlackFlowStepDto extends FlowStepDto implements ISlackFlowStepDto {
     /** The slack webhook url. */
     readonly webhookUrl!: string;
     /** The text that is sent as message to slack. */
     readonly text!: string;
 
-    constructor(data?: ISlackFlowStepFlowStepDto) {
+    constructor(data?: ISlackFlowStepDto) {
         super(data);
         (<any>this).stepType = "Slack";
     }
@@ -8026,8 +7987,8 @@ export class SlackFlowStepFlowStepDto extends FlowStepDto implements ISlackFlowS
         return this;
     }
 
-    static fromJSON(data: any): SlackFlowStepFlowStepDto {
-        const result = new SlackFlowStepFlowStepDto().init(data);
+    static fromJSON(data: any): SlackFlowStepDto {
+        const result = new SlackFlowStepDto().init(data);
         result.cleanup(this);
         return result;
     }
@@ -8042,14 +8003,14 @@ export class SlackFlowStepFlowStepDto extends FlowStepDto implements ISlackFlowS
     }
 }
 
-export interface ISlackFlowStepFlowStepDto extends IFlowStepDto {
+export interface ISlackFlowStepDto extends IFlowStepDto {
     /** The slack webhook url. */
     readonly webhookUrl: string;
     /** The text that is sent as message to slack. */
     readonly text: string;
 }
 
-export class TweetFlowStepFlowStepDto extends FlowStepDto implements ITweetFlowStepFlowStepDto {
+export class TweetFlowStepDto extends FlowStepDto implements ITweetFlowStepDto {
     /** The generated access token. */
     readonly accessToken!: string;
     /** The generated access secret. */
@@ -8057,7 +8018,7 @@ export class TweetFlowStepFlowStepDto extends FlowStepDto implements ITweetFlowS
     /** The text that is sent as tweet to twitter. */
     readonly text!: string;
 
-    constructor(data?: ITweetFlowStepFlowStepDto) {
+    constructor(data?: ITweetFlowStepDto) {
         super(data);
         (<any>this).stepType = "Tweet";
     }
@@ -8071,8 +8032,8 @@ export class TweetFlowStepFlowStepDto extends FlowStepDto implements ITweetFlowS
         return this;
     }
 
-    static fromJSON(data: any): TweetFlowStepFlowStepDto {
-        const result = new TweetFlowStepFlowStepDto().init(data);
+    static fromJSON(data: any): TweetFlowStepDto {
+        const result = new TweetFlowStepDto().init(data);
         result.cleanup(this);
         return result;
     }
@@ -8088,7 +8049,7 @@ export class TweetFlowStepFlowStepDto extends FlowStepDto implements ITweetFlowS
     }
 }
 
-export interface ITweetFlowStepFlowStepDto extends IFlowStepDto {
+export interface ITweetFlowStepDto extends IFlowStepDto {
     /** The generated access token. */
     readonly accessToken: string;
     /** The generated access secret. */
@@ -8097,7 +8058,7 @@ export interface ITweetFlowStepFlowStepDto extends IFlowStepDto {
     readonly text: string;
 }
 
-export class TypesenseFlowStepFlowStepDto extends FlowStepDto implements ITypesenseFlowStepFlowStepDto {
+export class TypesenseFlowStepDto extends FlowStepDto implements ITypesenseFlowStepDto {
     /** The url to the instance or cluster. */
     readonly host!: string;
     /** The name of the index. */
@@ -8109,7 +8070,7 @@ export class TypesenseFlowStepFlowStepDto extends FlowStepDto implements ITypese
     /** The condition when to delete the document. */
     readonly delete?: string | undefined;
 
-    constructor(data?: ITypesenseFlowStepFlowStepDto) {
+    constructor(data?: ITypesenseFlowStepDto) {
         super(data);
         (<any>this).stepType = "Typesense";
     }
@@ -8125,8 +8086,8 @@ export class TypesenseFlowStepFlowStepDto extends FlowStepDto implements ITypese
         return this;
     }
 
-    static fromJSON(data: any): TypesenseFlowStepFlowStepDto {
-        const result = new TypesenseFlowStepFlowStepDto().init(data);
+    static fromJSON(data: any): TypesenseFlowStepDto {
+        const result = new TypesenseFlowStepDto().init(data);
         result.cleanup(this);
         return result;
     }
@@ -8144,7 +8105,7 @@ export class TypesenseFlowStepFlowStepDto extends FlowStepDto implements ITypese
     }
 }
 
-export interface ITypesenseFlowStepFlowStepDto extends IFlowStepDto {
+export interface ITypesenseFlowStepDto extends IFlowStepDto {
     /** The url to the instance or cluster. */
     readonly host: string;
     /** The name of the index. */
@@ -8157,11 +8118,11 @@ export interface ITypesenseFlowStepFlowStepDto extends IFlowStepDto {
     readonly delete?: string | undefined;
 }
 
-export class WebhookFlowStepBaseFlowStepDto extends FlowStepDto implements IWebhookFlowStepBaseFlowStepDto {
+export class WebhookFlowStepDto extends FlowStepDto implements IWebhookFlowStepDto {
     /** The type of the request. */
     readonly method!: WebhookMethod;
     /** The URL to the webhook. */
-    readonly uri!: string;
+    readonly url!: string;
     /** Leave it empty to use the full event as body. */
     readonly payload?: string | undefined;
     /** The message headers in the format '[Key]=[Value]', one entry per line. */
@@ -8171,15 +8132,15 @@ export class WebhookFlowStepBaseFlowStepDto extends FlowStepDto implements IWebh
     /** The shared secret that is used to calculate the payload signature. */
     readonly sharedSecret?: string | undefined;
 
-    constructor(data?: IWebhookFlowStepBaseFlowStepDto) {
+    constructor(data?: IWebhookFlowStepDto) {
         super(data);
-        (<any>this).stepType = "WebhookFlowStepBaseFlowStepDto";
+        (<any>this).stepType = "Webhook";
     }
 
     init(_data: any) {
         super.init(_data);
         (<any>this).method = _data["method"];
-        (<any>this).uri = _data["uri"];
+        (<any>this).url = _data["url"];
         (<any>this).payload = _data["payload"];
         (<any>this).headers = _data["headers"];
         (<any>this).payloadType = _data["payloadType"];
@@ -8188,11 +8149,8 @@ export class WebhookFlowStepBaseFlowStepDto extends FlowStepDto implements IWebh
         return this;
     }
 
-    static fromJSON(data: any): WebhookFlowStepBaseFlowStepDto {
-        if (data["stepType"] === "Webhook") {
-            return new WebhookFlowStep().init(data);
-        }
-        const result = new WebhookFlowStepBaseFlowStepDto().init(data);
+    static fromJSON(data: any): WebhookFlowStepDto {
+        const result = new WebhookFlowStepDto().init(data);
         result.cleanup(this);
         return result;
     }
@@ -8200,7 +8158,7 @@ export class WebhookFlowStepBaseFlowStepDto extends FlowStepDto implements IWebh
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
         data["method"] = this.method;
-        data["uri"] = this.uri;
+        data["url"] = this.url;
         data["payload"] = this.payload;
         data["headers"] = this.headers;
         data["payloadType"] = this.payloadType;
@@ -8211,11 +8169,11 @@ export class WebhookFlowStepBaseFlowStepDto extends FlowStepDto implements IWebh
     }
 }
 
-export interface IWebhookFlowStepBaseFlowStepDto extends IFlowStepDto {
+export interface IWebhookFlowStepDto extends IFlowStepDto {
     /** The type of the request. */
     readonly method: WebhookMethod;
     /** The URL to the webhook. */
-    readonly uri: string;
+    readonly url: string;
     /** Leave it empty to use the full event as body. */
     readonly payload?: string | undefined;
     /** The message headers in the format '[Key]=[Value]', one entry per line. */
@@ -8224,36 +8182,6 @@ export interface IWebhookFlowStepBaseFlowStepDto extends IFlowStepDto {
     readonly payloadType?: string | undefined;
     /** The shared secret that is used to calculate the payload signature. */
     readonly sharedSecret?: string | undefined;
-}
-
-export class WebhookFlowStep extends WebhookFlowStepBaseFlowStepDto implements IWebhookFlowStep {
-
-    constructor(data?: IWebhookFlowStep) {
-        super(data);
-        (<any>this).stepType = "Webhook";
-    }
-
-    init(_data: any) {
-        super.init(_data);
-        this.cleanup(this);
-        return this;
-    }
-
-    static fromJSON(data: any): WebhookFlowStep {
-        const result = new WebhookFlowStep().init(data);
-        result.cleanup(this);
-        return result;
-    }
-
-    toJSON(data?: any) {
-        data = typeof data === 'object' ? data : {}; 
-        super.toJSON(data);
-        this.cleanup(data);
-        return data;
-    }
-}
-
-export interface IWebhookFlowStep extends IWebhookFlowStepBaseFlowStepDto {
 }
 
 export type WebhookMethod = "POST" | "PUT" | "GET" | "DELETE" | "PATCH";
@@ -9328,7 +9256,7 @@ export class UpdateRuleDto implements IUpdateRuleDto {
     /** The flow to describe the sequence of actions to perform. */
     readonly action?: RuleActionDto | undefined;
     /** The flow. */
-    readonly flow!: FlowDefinitionDto;
+    readonly flow?: FlowDefinitionDto | undefined;
     /** Enable or disable the rule. */
     readonly isEnabled?: boolean | undefined;
 
@@ -9345,7 +9273,7 @@ export class UpdateRuleDto implements IUpdateRuleDto {
         (<any>this).name = _data["name"];
         (<any>this).trigger = _data["trigger"] ? RuleTriggerDto.fromJSON(_data["trigger"]) : <any>undefined;
         (<any>this).action = _data["action"] ? RuleActionDto.fromJSON(_data["action"]) : <any>undefined;
-        (<any>this).flow = _data["flow"] ? FlowDefinitionDto.fromJSON(_data["flow"]) : new FlowDefinitionDto();
+        (<any>this).flow = _data["flow"] ? FlowDefinitionDto.fromJSON(_data["flow"]) : <any>undefined;
         (<any>this).isEnabled = _data["isEnabled"];
         this.cleanup(this);
         return this;
@@ -9398,7 +9326,7 @@ export interface IUpdateRuleDto {
     /** The flow to describe the sequence of actions to perform. */
     readonly action?: RuleActionDto | undefined;
     /** The flow. */
-    readonly flow: FlowDefinitionDto;
+    readonly flow?: FlowDefinitionDto | undefined;
     /** Enable or disable the rule. */
     readonly isEnabled?: boolean | undefined;
 }
