@@ -3,11 +3,10 @@
     "created": "2022-12-05T11:00:23Z",
     "createdBy": "subject:63761585e06d5466c71521b3",
     "flow": {
-        "InitialStepId": "06c68527-a2ca-4d84-91eb-a1707aa5b6fb",
+        "initialStepId": "06c68527-a2ca-4d84-91eb-a1707aa5b6fb",
         "steps": {
             "06c68527-a2ca-4d84-91eb-a1707aa5b6fb": {
                 "ignoreError": false,
-                "nextStepId": "00000000-0000-0000-0000-000000000000",
                 "step": {
                     "stepType": "TestStep1",
                     "property": "42"

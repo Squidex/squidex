@@ -47,9 +47,20 @@ public sealed record RuleSorrgate : Rule, ISurrogate<Rule>
     {
         var result = this;
 
-        if (ruleDef != null)
+        if (ruleDef != null && (!string.Equals(ruleDef.Name, result.Name, StringComparison.Ordinal) || ruleDef.IsEnabled != result.IsEnabled))
         {
-            result = this with { Name = result.Name, IsEnabled = ruleDef.IsEnabled, Trigger = ruleDef.Trigger };
+            result = result with { Name = result.Name, IsEnabled = ruleDef.IsEnabled };
+        }
+
+        var newTrigger = ruleDef?.Trigger ?? Trigger;
+        if (newTrigger is IMigrated<RuleTrigger> migratedTrigger)
+        {
+            newTrigger = migratedTrigger.Migrate();
+        }
+
+        if (result.Trigger != newTrigger)
+        {
+            result = result with { Trigger = newTrigger };
         }
 
         if (result.Flow == null)
@@ -66,15 +77,10 @@ public sealed record RuleSorrgate : Rule, ISurrogate<Rule>
                 actualAction = migratedAction.Migrate();
             }
 
-            result = this with
+            result = result with
             {
                 Flow = actualAction.ToFlowDefinition(),
             };
-        }
-
-        if (result.Trigger is IMigrated<RuleTrigger> migratedTrigger)
-        {
-            return this with { Trigger = migratedTrigger.Migrate() };
         }
 
         return result;

@@ -167,12 +167,7 @@ public class RuleTests
 
         var deserialized = TestUtils.DefaultSerializer.Deserialize<Rule>(File.ReadAllText("Model/Rules/Rule_Old.json"));
 
-        deserialized.Should().BeEquivalentTo(original, o => o
-            .Excluding(x => x.Type == typeof(Guid))
-            .Using<Dictionary<Guid, FlowStepDefinition>>(x =>
-            {
-                x.Subject.Values.Should().BeEquivalentTo(x.Expectation.Values);
-            }).When(x => x.RuntimeType == typeof(Dictionary<Guid, FlowStepDefinition>)));
+        AssertRules(original, deserialized);
     }
 
     [Fact]
@@ -182,12 +177,7 @@ public class RuleTests
 
         var deserialized = TestUtils.DefaultSerializer.Deserialize<Rule>(File.ReadAllText("Model/Rules/Rule_Action.json"));
 
-        deserialized.Should().BeEquivalentTo(original, o => o
-            .Excluding(x => x.Type == typeof(Guid))
-            .Using<Dictionary<Guid, FlowStepDefinition>>(x =>
-            {
-                x.Subject.Values.Should().BeEquivalentTo(x.Expectation.Values);
-            }).When(x => x.RuntimeType == typeof(Dictionary<Guid, FlowStepDefinition>)));
+        AssertRules(original, deserialized);
     }
 
     [Fact]
@@ -218,5 +208,16 @@ public class RuleTests
         var serialized = rule_X.SerializeAndDeserializeAsJson();
 
         Assert.IsType<OtherTrigger>(serialized.Trigger);
+    }
+
+    private static void AssertRules(Rule original, Rule deserialized)
+    {
+        deserialized.Should().BeEquivalentTo(original, o => o
+            .Excluding(x => x.Type == typeof(Guid))
+            .Excluding(x => x.Type == typeof(Guid?))
+            .Using<Dictionary<Guid, FlowStepDefinition>>(x =>
+            {
+                x.Subject.Values.Should().BeEquivalentTo(x.Expectation.Values);
+            }).When(x => x.RuntimeType == typeof(Dictionary<Guid, FlowStepDefinition>)));
     }
 }
