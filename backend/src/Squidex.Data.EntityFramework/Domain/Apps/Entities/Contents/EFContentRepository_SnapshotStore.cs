@@ -269,7 +269,7 @@ public sealed partial class EFContentRepository<TContext, TContentContext> : ISn
 
                 if (dedicatedTables)
                 {
-                    var contentDbContext = await dynamicTables.CreateDbContextAsync(job.Value.AppId.Id, job.Value.AppId.Id, ct);
+                    var contentDbContext = await dynamicTables.CreateDbContextAsync(job.Value.AppId.Id, job.Value.SchemaId.Id, ct);
 
                     await contentDbContext.UpsertAsync(completeEntity, job.OldVersion, ct);
                     await contentDbContext.UpsertOrDeleteAsync(publishedEntity, job.Key, job.OldVersion, ct);

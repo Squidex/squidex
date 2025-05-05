@@ -16,6 +16,7 @@ using Squidex.Shared;
 
 namespace Squidex.EntityFramework.Domain.Contents;
 
+[ReuseLabel("dedicated")]
 public abstract class EFContentRepositorySnapshotDedicatedTests<TContext, TContentContext>(ISqlContentFixture<TContext, TContentContext> fixture)
     : ContentSnapshotStoreTests
     where TContext : DbContext, IDbContextWithDialect where TContentContext : ContentDbContext

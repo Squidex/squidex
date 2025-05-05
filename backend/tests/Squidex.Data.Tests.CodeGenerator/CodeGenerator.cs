@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Diagnostics;
 using System.Text;
 using HandlebarsDotNet;
 using Microsoft.CodeAnalysis;
