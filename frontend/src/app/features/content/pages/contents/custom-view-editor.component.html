@@ -1,8 +1,6 @@
 <div class="container">
     <div class="header">
-        <button class="btn btn-secondary btn-sm" (click)="resetDefault()" type="button">
-            {{ "contents.viewReset" | sqxTranslate }}
-        </button>
+        <button class="btn btn-secondary btn-sm" (click)="resetDefault()" type="button">{{ "contents.viewReset" | sqxTranslate }}</button>
     </div>
 
     <hr />
@@ -12,20 +10,14 @@
             <div cdkDrag>
                 <i class="icon-drag2 drag-handle"></i>
                 <div class="form-check">
-                    <input
-                        class="form-check-input"
-                        id="field_{{ field }}"
-                        checked
-                        (click)="removeField(field)"
-                        [disabled]="!field"
-                        type="checkbox" />
+                    <input class="form-check-input" id="field_{{ field }}" checked (click)="removeField(field)" [disabled]="!field" type="checkbox" />
                     <label class="form-check-label" for="field_{{ field }}">
                         @if (field.name) {
                             <span>
-                                {{ field.title || field.label | sqxTranslate }}:
-                                <code>{{ field.name }}</code>
+                                {{ field.title || field.label | sqxTranslate }}: <code>{{ field.name }}</code>
                             </span>
                         }
+
                         @if (!field.name) {
                             <span class="text-muted">- Placeholder -</span>
                         }
@@ -37,6 +29,7 @@
 
     @if (fieldsNotAdded.length > 0) {
         <hr />
+
         <div>
             @for (field of fieldsNotAdded; track field) {
                 <div>
@@ -46,10 +39,10 @@
                         <label class="form-check-label" for="field_{{ field }}">
                             @if (field.name) {
                                 <span>
-                                    {{ field.title || field.label | sqxTranslate }}:
-                                    <code>{{ field.name }}</code>
+                                    {{ field.title || field.label | sqxTranslate }}: <code>{{ field.name }}</code>
                                 </span>
                             }
+
                             @if (!field.name) {
                                 <span class="text-muted">- Placeholder -</span>
                             }

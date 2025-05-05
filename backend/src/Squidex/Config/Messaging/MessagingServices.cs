@@ -7,6 +7,7 @@
 
 using System.Text.Json;
 using Squidex.AI;
+using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Subscriptions;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -15,9 +16,9 @@ using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Indexes;
 using Squidex.Domain.Apps.Entities.Jobs;
-using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Runner;
 using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
+using Squidex.Flows.Internal.Execution;
 using Squidex.Hosting.Configuration;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.EventSourcing.Consume;
@@ -53,7 +54,7 @@ public static class MessagingServices
             services.AddSingletonAs<ContentSchedulerProcess>()
                 .AsSelf();
 
-            services.AddSingletonAs<RuleDequeuerWorker>()
+            services.AddSingletonAs<FlowExecutionWorker<FlowEventContext>>()
                 .AsSelf();
 
             services.AddSingletonAs<EventConsumerWorker>()
@@ -67,6 +68,9 @@ public static class MessagingServices
 
             services.AddSingletonAs<UsageTrackerWorker>()
                 .AsSelf().As<IMessageHandler>();
+
+            services.AddFlowsCore()
+                .AddWorker<FlowEventContext>();
         }
 
         if (isRandomName)

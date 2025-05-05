@@ -7,7 +7,7 @@
 
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { RuleElementMetadataDto, SafeHtmlPipe } from '@app/shared';
+import { RuleTriggerMetadataDto, SafeHtmlPipe } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -21,7 +21,7 @@ import { RuleElementMetadataDto, SafeHtmlPipe } from '@app/shared';
 })
 export class RuleIconComponent {
     @Input({ required: true })
-    public element!: RuleElementMetadataDto;
+    public elementInfo!: RuleTriggerMetadataDto;
 
     @Input()
     public size: 'sm' | 'md' | 'lg' = 'sm';

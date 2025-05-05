@@ -5,37 +5,32 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Entities.Rules.Runner;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models;
 
-public sealed record SimulatedRuleEventDto
+public sealed class SimulatedRuleEventDto
 {
     /// <summary>
     /// The unique event id.
     /// </summary>
-    [Required]
     public Guid EventId { get; init; }
 
     /// <summary>
     /// The the unique id of the simulated event.
     /// </summary>
-    [Required]
     public string UniqueId { get; set; }
 
     /// <summary>
     /// The name of the event.
     /// </summary>
-    [Required]
     public string EventName { get; set; }
 
     /// <summary>
     /// The source event.
     /// </summary>
-    [Required]
     public object Event { get; set; }
 
     /// <summary>
@@ -44,32 +39,26 @@ public sealed record SimulatedRuleEventDto
     public object? EnrichedEvent { get; set; }
 
     /// <summary>
-    /// The data for the action.
+    /// The flow state.
     /// </summary>
-    public string? ActionName { get; set; }
-
-    /// <summary>
-    /// The name of the action.
-    /// </summary>
-    public string? ActionData { get; set; }
-
-    /// <summary>
-    /// The name of the event.
-    /// </summary>
-    public string? Error { get; set; }
+    public FlowExecutionStateDto? FlowState { get; set; }
 
     /// <summary>
     /// The reason why the event has been skipped.
     /// </summary>
-    [Required]
-    public List<SkipReason> SkipReasons { get; set; }
+    public List<SkipReason> SkipReasons { get; set; } = [];
 
     public static SimulatedRuleEventDto FromDomain(SimulatedRuleEvent ruleEvent)
     {
         var result = SimpleMapper.Map(ruleEvent, new SimulatedRuleEventDto
         {
-            SkipReasons = [],
+            EnrichedEvent = ruleEvent.EnrichedEvent,
         });
+
+        if (ruleEvent.State != null)
+        {
+            result.FlowState = FlowExecutionStateDto.FromDomain(ruleEvent.State);
+        }
 
         foreach (var reason in Enum.GetValues<SkipReason>())
         {

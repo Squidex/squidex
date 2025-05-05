@@ -4,8 +4,7 @@
     <form [formGroup]="addClientForm.form" (ngSubmit)="addClient()">
         <div class="row gx-2">
             <div class="col">
-                <sqx-control-errors for="id"></sqx-control-errors>
-
+                <sqx-control-errors for="id" />
                 <input
                     class="form-control"
                     autocomplete="off"
@@ -14,20 +13,17 @@
                     placeholder="{{ 'clients.clientNamePlaceholder' | sqxTranslate }}"
                     sqxTransformInput="LowerCase" />
             </div>
+
             <div class="col-auto">
                 <button class="btn btn-success" [disabled]="addClientForm.hasNoId | async" type="submit">
                     {{ "clients.add" | sqxTranslate }}
                 </button>
             </div>
+
             <div class="col-auto">
-                <button class="btn btn-text-secondary" (click)="cancel()" type="button">
-                    {{ "common.cancel" | sqxTranslate }}
-                </button>
+                <button class="btn btn-text-secondary" (click)="cancel()" type="button">{{ "common.cancel" | sqxTranslate }}</button>
             </div>
         </div>
     </form>
-
-    <sqx-form-hint>
-        {{ "clients.add.description" | sqxTranslate }}
-    </sqx-form-hint>
+    <sqx-form-hint> {{ "clients.add.description" | sqxTranslate }} </sqx-form-hint>
 </div>

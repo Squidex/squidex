@@ -388,12 +388,12 @@ public class UsageGateTests : GivenContext
 
         var actual = await ((IRuleUsageTracker)sut).QueryByAppAsync(AppId.Id, today, today.AddDays(2), CancellationToken);
 
-        actual.Should().BeEquivalentTo(new List<RuleStats>
-        {
+        actual.Should().BeEquivalentTo(
+        [
             new RuleStats(today.AddDays(0), new RuleCounters(100, 120, 140)),
             new RuleStats(today.AddDays(1), new RuleCounters(200, 220, 240)),
             new RuleStats(today.AddDays(2), new RuleCounters(300, 320, 340)),
-        });
+        ]);
     }
 
     [Fact]
@@ -403,12 +403,12 @@ public class UsageGateTests : GivenContext
 
         var actual = await ((IRuleUsageTracker)sut).QueryByTeamAsync(TeamId, today, today.AddDays(2), CancellationToken);
 
-        actual.Should().BeEquivalentTo(new List<RuleStats>
-        {
+        actual.Should().BeEquivalentTo(
+        [
             new RuleStats(today.AddDays(0), new RuleCounters(100, 120, 140)),
             new RuleStats(today.AddDays(1), new RuleCounters(200, 220, 240)),
             new RuleStats(today.AddDays(2), new RuleCounters(300, 320, 340)),
-        });
+        ]);
     }
 
     private void SetupRulesQuery(string key)
@@ -539,12 +539,12 @@ public class UsageGateTests : GivenContext
 
         var actual = await ((IAssetUsageTracker)sut).QueryByAppAsync(AppId.Id, today, today.AddDays(2), CancellationToken);
 
-        actual.Should().BeEquivalentTo(new List<AssetStats>
-        {
+        actual.Should().BeEquivalentTo(
+        [
             new AssetStats(today.AddDays(0), new AssetCounters(128, 2)),
             new AssetStats(today.AddDays(1), new AssetCounters(256, 3)),
             new AssetStats(today.AddDays(2), new AssetCounters(512, 4)),
-        });
+        ]);
     }
 
     [Fact]
@@ -554,12 +554,12 @@ public class UsageGateTests : GivenContext
 
         var actual = await ((IAssetUsageTracker)sut).QueryByTeamAsync(TeamId, today, today.AddDays(2), CancellationToken);
 
-        actual.Should().BeEquivalentTo(new List<AssetStats>
-        {
+        actual.Should().BeEquivalentTo(
+        [
             new AssetStats(today.AddDays(0), new AssetCounters(128, 2)),
             new AssetStats(today.AddDays(1), new AssetCounters(256, 3)),
             new AssetStats(today.AddDays(2), new AssetCounters(512, 4)),
-        });
+        ]);
     }
 
     private void SetupAssetQuery(string key)

@@ -9,7 +9,6 @@
                 </li>
             }
         </ul>
-
         <button class="float-end btn btn-primary" [class.invisible]="!isEditable" type="submit">
             {{ "common.save" | sqxTranslate }}
         </button>
@@ -18,7 +17,7 @@
     <div class="inner-main">
         @for (script of editForm.form.controls | sqxKeys; track script) {
             @if (schemaScript === script) {
-                <sqx-code-editor borderless="true" [completion]="schemaCompletions | async" [formControlName]="script"></sqx-code-editor>
+                <sqx-code-editor borderless="true" [completion]="schemaCompletions | async" [formControlName]="script" />
             }
         }
     </div>

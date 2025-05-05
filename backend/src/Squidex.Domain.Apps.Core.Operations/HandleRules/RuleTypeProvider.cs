@@ -5,220 +5,58 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.ComponentModel.DataAnnotations;
-using System.Reflection;
+using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
+using Squidex.Flows;
 using Squidex.Infrastructure.Reflection;
-using Squidex.Text;
-
-#pragma warning disable RECS0033 // Convert 'if' to '||' expression
 
 namespace Squidex.Domain.Apps.Core.HandleRules;
 
-public sealed class RuleTypeProvider : ITypeProvider
+public sealed class RuleTypeProvider(IFlowStepRegistry flowStepRegistry, IOptions<RulesOptions> options) : ITypeProvider
 {
-    private const string ActionSuffix = "Action";
-    private const string ActionSuffixV2 = "ActionV2";
-    private readonly Dictionary<string, RuleActionDefinition> actionTypes = [];
-
-    public IReadOnlyDictionary<string, RuleActionDefinition> Actions
-    {
-        get => actionTypes;
-    }
-
-    public RuleTypeProvider(IEnumerable<RuleActionRegistration>? registrations = null)
-    {
-        if (registrations != null)
-        {
-            foreach (var registration in registrations)
-            {
-                Add(registration.ActionType);
-            }
-        }
-    }
-
-    public RuleTypeProvider Add<T>() where T : RuleAction
-    {
-        return Add(typeof(T));
-    }
-
-    private RuleTypeProvider Add(Type actionType)
-    {
-        var metadata = actionType.GetCustomAttribute<RuleActionAttribute>();
-
-        if (metadata == null)
-        {
-            return this;
-        }
-
-        var name = GetActionName(actionType);
-
-        var definition =
-            new RuleActionDefinition
-            {
-                Type = actionType,
-                Title = metadata.Title,
-                Display = metadata.Display,
-                Description = metadata.Description,
-                IconColor = metadata.IconColor,
-                IconImage = metadata.IconImage,
-                ReadMore = metadata.ReadMore,
-            };
-
-        foreach (var property in actionType.GetProperties())
-        {
-            if (property.CanRead && property.CanWrite)
-            {
-                var actionProperty = new RuleActionProperty
-                {
-                    Name = property.Name.ToCamelCase(),
-                };
-
-                var display = property.GetCustomAttribute<DisplayAttribute>();
-
-                if (!string.IsNullOrWhiteSpace(display?.Name))
-                {
-                    actionProperty.Display = display.Name;
-                }
-                else
-                {
-                    actionProperty.Display = property.Name;
-                }
-
-                if (!string.IsNullOrWhiteSpace(display?.Description))
-                {
-                    actionProperty.Description = display.Description;
-                }
-
-                var type = GetType(property);
-
-                if (!IsNullable(property.PropertyType))
-                {
-                    if (GetDataAttribute<RequiredAttribute>(property) != null)
-                    {
-                        actionProperty.IsRequired = true;
-                    }
-
-                    if (type.IsValueType && !IsBoolean(type) && !type.IsEnum)
-                    {
-                        actionProperty.IsRequired = true;
-                    }
-                }
-
-                if (property.GetCustomAttribute<FormattableAttribute>() != null)
-                {
-                    actionProperty.IsFormattable = true;
-                }
-
-                if (type.IsEnum)
-                {
-                    var values = Enum.GetNames(type);
-
-                    actionProperty.Options = values;
-                    actionProperty.Editor = RuleFieldEditor.Dropdown;
-                }
-                else if (IsBoolean(type))
-                {
-                    actionProperty.Editor = RuleFieldEditor.Checkbox;
-                }
-                else if (IsNumericType(type))
-                {
-                    actionProperty.Editor = RuleFieldEditor.Number;
-                }
-                else
-                {
-                    actionProperty.Editor = GetEditor(property);
-                }
-
-                definition.Properties.Add(actionProperty);
-            }
-        }
-
-        actionTypes[name] = definition;
-
-        return this;
-    }
-
-    private static T? GetDataAttribute<T>(PropertyInfo property) where T : ValidationAttribute
-    {
-        var result = property.GetCustomAttribute<T>();
-
-        result?.IsValid(null);
-
-        return result;
-    }
-
-    private static RuleFieldEditor GetEditor(PropertyInfo property)
-    {
-        return property.GetCustomAttribute<EditorAttribute>()?.Editor ?? RuleFieldEditor.Text;
-    }
-
-    private static bool IsNullable(Type type)
-    {
-        return type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
-    }
-
-    private static bool IsBoolean(Type type)
-    {
-        switch (Type.GetTypeCode(type))
-        {
-            case TypeCode.Boolean:
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    private static bool IsNumericType(Type type)
-    {
-        switch (Type.GetTypeCode(type))
-        {
-            case TypeCode.Byte:
-            case TypeCode.SByte:
-            case TypeCode.UInt16:
-            case TypeCode.UInt32:
-            case TypeCode.UInt64:
-            case TypeCode.Int16:
-            case TypeCode.Int32:
-            case TypeCode.Int64:
-            case TypeCode.Decimal:
-            case TypeCode.Double:
-            case TypeCode.Single:
-                return true;
-            default:
-                return false;
-        }
-    }
-
-    private static Type GetType(PropertyInfo property)
-    {
-        var type = property.PropertyType;
-
-        if (type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>))
-        {
-            type = type.GetGenericArguments()[0];
-        }
-
-        return type;
-    }
-
-    private static string GetActionName(Type type)
-    {
-        return type.TypeName(false, ActionSuffix, ActionSuffixV2);
-    }
-
     public void Map(TypeRegistry typeRegistry)
+    {
+        RegisterEvents(typeRegistry);
+        RegisterSteps(typeRegistry);
+        RegisterTriggers(typeRegistry);
+#pragma warning disable CS0618 // Type or member is obsolete
+        RegisterActions(typeRegistry);
+#pragma warning restore CS0618 // Type or member is obsolete
+    }
+
+    private static void RegisterTriggers(TypeRegistry typeRegistry)
+    {
+        typeRegistry.Map(new AssemblyTypeProvider<RuleTrigger>("triggerType"));
+    }
+
+    private static void RegisterEvents(TypeRegistry typeRegistry)
+    {
+        typeRegistry.Map(new AssemblyTypeProvider<EnrichedEvent>());
+    }
+
+    private void RegisterSteps(TypeRegistry typeRegistry)
+    {
+        typeRegistry.Discriminator<FlowStep>("stepType");
+
+        foreach (var (stepName, stepDefinition) in flowStepRegistry.Steps)
+        {
+            typeRegistry.Add<FlowStep>(stepDefinition.Type, stepName);
+        }
+    }
+
+    [Obsolete("Has been replaced by flows.")]
+    private void RegisterActions(TypeRegistry typeRegistry)
     {
         typeRegistry.Discriminator<RuleAction>("actionType");
 
-        foreach (var (name, actionType) in actionTypes)
+        foreach (var actionType in options.Value.Actions)
         {
-            typeRegistry.Add<RuleAction>(actionType.Type, actionType.Type.Name);
-            typeRegistry.Add<RuleAction>(actionType.Type, name);
-        }
+            var nameWithoutPRefix = actionType.TypeName(false, "Action", "ActionV2");
 
-        typeRegistry.Map(new AssemblyTypeProvider<EnrichedEvent>());
-        typeRegistry.Map(new AssemblyTypeProvider<RuleTrigger>("triggerType"));
+            typeRegistry.Add<RuleAction>(actionType, actionType.Name);
+            typeRegistry.Add<RuleAction>(actionType, nameWithoutPRefix);
+        }
     }
 }

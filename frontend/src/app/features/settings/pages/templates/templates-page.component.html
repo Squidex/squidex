@@ -1,32 +1,22 @@
-<sqx-title message="i18n:common.templates"></sqx-title>
-
+<sqx-title message="i18n:common.templates" />
 <sqx-layout innerWidth="50" layout="main" titleIcon="templates" titleText="i18n:common.templates">
     <ng-container menu>
-        <button
-            class="btn btn-text-secondary me-2"
-            (click)="reload()"
-            shortcut="CTRL + B"
-            title="i18n:templates.refreshTooltip"
-            type="button">
-            <i class="icon-reset"></i>
-            {{ "common.refresh" | sqxTranslate }}
+        <button class="btn btn-text-secondary me-2" (click)="reload()" shortcut="CTRL + B" title="i18n:templates.refreshTooltip" type="button">
+            <i class="icon-reset"></i> {{ "common.refresh" | sqxTranslate }}
         </button>
     </ng-container>
-
     <ng-container>
         <sqx-list-view innerWidth="50rem" [isLoading]="templatesState.isLoading | async">
             <sqx-form-alert light="true">
                 <div inline="true" [sqxMarkdown]="'templates.cliHint' | sqxTranslate"></div>
             </sqx-form-alert>
-
             @if ((templatesState.isLoaded | async) && (templatesState.templates | async); as templates) {
                 @for (template of templates; track template.name) {
-                    <sqx-template [template]="template"></sqx-template>
+                    <sqx-template [template]="template" />
                 }
             }
         </sqx-list-view>
     </ng-container>
-
     <ng-template sidebarMenu>
         <div class="panel-nav">
             <a
@@ -44,5 +34,4 @@
         </div>
     </ng-template>
 </sqx-layout>
-
 <router-outlet></router-outlet>

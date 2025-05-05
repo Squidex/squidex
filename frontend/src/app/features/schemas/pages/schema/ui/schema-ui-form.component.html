@@ -3,18 +3,16 @@
         <ul class="nav nav-tabs2">
             <li class="nav-item">
                 <a class="nav-link" [class.active]="selectedTab === 0" (click)="selectTab(0)">
-                    {{ "schemas.listFields" | sqxTranslate }}
-                    <small>({{ fieldsInLists.length }})</small>
+                    {{ "schemas.listFields" | sqxTranslate }} <small>({{ fieldsInLists.length }})</small>
                 </a>
             </li>
+
             <li class="nav-item">
                 <a class="nav-link" [class.active]="selectedTab === 1" (click)="selectTab(1)">
-                    {{ "schemas.referenceFields" | sqxTranslate }}
-                    <small>({{ fieldsInReferences.length }})</small>
+                    {{ "schemas.referenceFields" | sqxTranslate }} <small>({{ fieldsInReferences.length }})</small>
                 </a>
             </li>
         </ul>
-
         <button class="float-end btn btn-primary" [class.invisible]="!isEditable" type="submit">
             {{ "common.save" | sqxTranslate }}
         </button>
@@ -27,13 +25,12 @@
             [fieldNames]="fieldsInLists"
             (fieldNamesChange)="setFieldsInLists($event)"
             [schema]="schema"
-            withMetaFields="true"></sqx-field-list>
-
+            withMetaFields="true" />
         <sqx-field-list
             [class.hidden]="selectedTab !== 1"
             [emptyText]="'schemas.referenceFieldsEmpty' | sqxTranslate"
             [fieldNames]="fieldsInReferences"
             (fieldNamesChange)="setFieldsInReferences($event)"
-            [schema]="schema"></sqx-field-list>
+            [schema]="schema" />
     </div>
 </form>

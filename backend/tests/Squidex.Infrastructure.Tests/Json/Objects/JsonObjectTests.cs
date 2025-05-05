@@ -299,7 +299,7 @@ public class JsonObjectTests
         {
             new JsonValue(input),
             JsonValue.Array(1, 2),
-            JsonValue.Array(new int[] { 1, 2 }),
+            JsonValue.Array([1, 2]),
             JsonValue.Create(input),
             JsonValue.Create((object?)input),
             JsonValue.Create(new object[] { 1, 2 }),
@@ -393,7 +393,7 @@ public class JsonObjectTests
     [Fact]
     public void Should_clone_array_and_also_children()
     {
-        var source = JsonValue.Array(new JsonArray(), new JsonArray()).AsArray;
+        var source = JsonValue.Array(JsonValue.Array(), JsonValue.Array()).AsArray;
 
         var clone = ((JsonValue)source).Clone().AsArray;
 
@@ -408,7 +408,7 @@ public class JsonObjectTests
     [Fact]
     public void Should_clone_object_and_also_children()
     {
-        var source = JsonValue.Object().Add("1", new JsonArray()).Add("2", new JsonArray());
+        var source = JsonValue.Object().Add("1", JsonValue.Array()).Add("2", JsonValue.Array());
 
         var clone = ((JsonValue)source).Clone().AsObject;
 

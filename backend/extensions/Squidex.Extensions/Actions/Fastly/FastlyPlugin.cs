@@ -21,6 +21,9 @@ public sealed class FastlyPlugin : IPlugin
             options.Timeout = TimeSpan.FromSeconds(2);
         });
 
-        services.AddRuleAction<FastlyAction, FastlyActionHandler>();
+        services.AddFlowStep<FastlyFlowStep>();
+#pragma warning disable CS0618 // Type or member is obsolete
+        services.AddRuleAction<FastlyAction>();
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

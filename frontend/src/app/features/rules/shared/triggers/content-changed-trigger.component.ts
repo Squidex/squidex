@@ -34,7 +34,7 @@ export class ContentChangedTriggerComponent {
     public schemas?: ReadonlyArray<SchemaDto> | null;
 
     @Input({ required: true })
-    public trigger!: any;
+    public triggerDto!: any;
 
     @Input({ required: true })
     public triggerForm!: TriggerForm;
@@ -55,7 +55,7 @@ export class ContentChangedTriggerComponent {
         this.referencedSchemasForm.add();
     }
 
-    public removeSchema(index: number) {
+    public remove(index: number) {
         this.schemasForm.removeAt(index);
     }
 

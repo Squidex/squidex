@@ -1,8 +1,8 @@
-@import 'mixins';
-@import 'vars';
+@import "mixins";
+@import "vars";
 
 .card {
-    margin-bottom: .5rem;
+    margin-bottom: 0.5rem;
 
     &-footer {
         font-size: $font-small;
@@ -17,6 +17,16 @@ a {
     text-decoration: none;
 }
 
+.col-flow {
+    overflow: hidden;
+}
+
 .col-last {
     @include force-width(80px);
+}
+
+.icon-caret-right {
+    &:last-child {
+        display: none;
+    }
 }

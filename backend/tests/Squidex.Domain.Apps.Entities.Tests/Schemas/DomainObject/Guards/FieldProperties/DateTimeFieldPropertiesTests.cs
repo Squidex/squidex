@@ -38,10 +38,9 @@ public class DateTimeFieldPropertiesTests : IClassFixture<TranslationsFixture>
         var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Max value must be greater than min value.", "MinValue", "MaxValue"),
-            });
+            ]);
     }
 
     [Fact]
@@ -52,10 +51,9 @@ public class DateTimeFieldPropertiesTests : IClassFixture<TranslationsFixture>
         var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Editor is not a valid value.", "Editor"),
-            });
+            ]);
     }
 
     [Fact]
@@ -66,10 +64,9 @@ public class DateTimeFieldPropertiesTests : IClassFixture<TranslationsFixture>
         var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Calculated default value is not a valid value.", "CalculatedDefaultValue"),
-            });
+            ]);
     }
 
     [Fact]
@@ -80,10 +77,9 @@ public class DateTimeFieldPropertiesTests : IClassFixture<TranslationsFixture>
         var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Calculated default value and default value cannot be used together.", "CalculatedDefaultValue", "DefaultValue"),
-            });
+            ]);
     }
 
     private static Instant FutureDays(int days)

@@ -14,15 +14,11 @@
                     <ng-template let-language="$implicit">{{ language.iso2Code }} ({{ language.englishName }})</ng-template>
                 </sqx-autocomplete>
             </div>
+
             <div class="col-auto">
-                <button class="btn btn-success" type="submit">
-                    {{ "languages.add" | sqxTranslate }}
-                </button>
+                <button class="btn btn-success" type="submit">{{ "languages.add" | sqxTranslate }}</button>
             </div>
         </div>
     </form>
-
-    <sqx-form-hint>
-        {{ "languages.add.description" | sqxTranslate }}
-    </sqx-form-hint>
+    <sqx-form-hint> {{ "languages.add.description" | sqxTranslate }} </sqx-form-hint>
 </div>

@@ -1,8 +1,6 @@
 <div class="nav nav-light flex-column">
     <div class="nav-item">
-        <a class="nav-link" [class.active]="isEmpty()" (click)="tagsReset.emit()">
-            {{ "common.tagsAll" | sqxTranslate }}
-        </a>
+        <a class="nav-link" [class.active]="isEmpty()" (click)="tagsReset.emit()"> {{ "common.tagsAll" | sqxTranslate }} </a>
     </div>
 
     @for (tag of tags; track tag.name) {
@@ -12,8 +10,10 @@
                     <div class="col">
                         <span class="truncate">{{ tag.name }}</span>
                     </div>
+
                     <div class="col-auto">
                         <div class="badge badge-secondary rounded-pill">{{ tag.count }}</div>
+
                         @if (canRename) {
                             <a class="btn-sm btn-text-secondary btn-rename" (click)="renameTag(tag)" sqxStopClick>
                                 <i class="icon-pencil"></i>
@@ -25,8 +25,4 @@
         </div>
     }
 </div>
-
-<sqx-asset-tag-dialog
-    (dialogClose)="tagRenameDialog.hide()"
-    *sqxModal="tagRenameDialog"
-    [tagName]="tagRenaming!.name"></sqx-asset-tag-dialog>
+<sqx-asset-tag-dialog (dialogClose)="tagRenameDialog.hide()" *sqxModal="tagRenameDialog" [tagName]="tagRenaming!.name" />

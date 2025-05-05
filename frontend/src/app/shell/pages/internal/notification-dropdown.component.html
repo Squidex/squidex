@@ -1,13 +1,11 @@
 <li class="nav-item nav-icon dropdown d-flex align-items-center position-relative" #button>
     <span class="nav-link dropdown-toggle" (click)="modalMenu.show()">
         <i class="icon-comments"></i>
-
         @if (commentsState.unreadCountChanges | async; as unread) {
             <span class="badge rounded-pill badge-danger">{{ unread }}</span>
         }
     </span>
 </li>
-
 <sqx-dropdown-menu
     #scrollMe
     offset="8"
@@ -24,11 +22,9 @@
                 [commentItem]="item"
                 [comments]="commentsState"
                 confirmDelete="false"
-                [userToken]="commentUser"></sqx-comment>
+                [userToken]="commentUser" />
         } @empty {
-            <small class="text-muted">
-                {{ "notifications.empty" | sqxTranslate }}
-            </small>
+            <small class="text-muted"> {{ "notifications.empty" | sqxTranslate }} </small>
         }
     }
 </sqx-dropdown-menu>

@@ -3,35 +3,28 @@
 
     <div class="card mb-4">
         <div class="card-body">
-            <sqx-form-alert>
-                {{ "schemas.previewUrls.help" | sqxTranslate }}
-            </sqx-form-alert>
-
+            <sqx-form-alert> {{ "schemas.previewUrls.help" | sqxTranslate }} </sqx-form-alert>
             <div class="content">
                 @if (!isEditable && editForm.previewControls.length === 0) {
-                    <div class="mt-4">
-                        {{ "schemas.previewUrls.empty" | sqxTranslate }}
-                    </div>
+                    <div class="mt-4">{{ "schemas.previewUrls.empty" | sqxTranslate }}</div>
                 }
 
                 @for (form of editForm.previewControls; track form; let i = $index) {
                     <div class="mb-2 row gx-2" [formGroup]="form">
                         <div class="col col-name">
-                            <sqx-control-errors for="name"></sqx-control-errors>
+                            <sqx-control-errors for="name" />
                             <input
                                 class="form-control"
                                 formControlName="name"
                                 maxlength="1000"
                                 placeholder="{{ 'schemas.previewUrls.namePlaceholder' | sqxTranslate }}" />
                         </div>
+
                         <div class="col">
-                            <sqx-control-errors for="url"></sqx-control-errors>
-                            <sqx-code-editor
-                                [completion]="fieldCompletions | async"
-                                formControlName="url"
-                                mode="ace/mode/liquid"
-                                singleLine="true"></sqx-code-editor>
+                            <sqx-control-errors for="url" />
+                            <sqx-code-editor [completion]="fieldCompletions | async" formControlName="url" mode="ace/mode/liquid" singleLine="true" />
                         </div>
+
                         <div class="col-auto">
                             <button
                                 class="btn btn-text-danger"
@@ -52,23 +45,22 @@
                         <div class="col col-name">
                             <div class="form-control preview">{{ "schemas.previewUrls.namePlaceholder" | sqxTranslate }}</div>
                         </div>
+
                         <div class="col">
                             <div class="form-control preview">{{ "schemas.previewUrls.urlPlaceholder" | sqxTranslate }}</div>
                         </div>
+
                         <div class="col-auto col-options">
-                            <button class="btn btn-success" (click)="editForm.form.add()" type="button">
-                                <i class="icon-add"></i>
-                            </button>
+                            <button class="btn btn-success" (click)="editForm.form.add()" type="button"><i class="icon-add"></i></button>
                         </div>
                     </div>
                 }
             </div>
         </div>
+
         @if (isEditable) {
             <div class="card-footer">
-                <button class="float-end btn btn-primary" type="submit">
-                    {{ "common.save" | sqxTranslate }}
-                </button>
+                <button class="float-end btn btn-primary" type="submit">{{ "common.save" | sqxTranslate }}</button>
             </div>
         }
     </div>

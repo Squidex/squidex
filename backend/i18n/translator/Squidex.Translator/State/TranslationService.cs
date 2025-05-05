@@ -21,7 +21,7 @@ public sealed class TranslationService
         AllowTrailingCommas = true,
         PropertyNameCaseInsensitive = true,
         PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
-        WriteIndented = true
+        WriteIndented = true,
     };
 
     private readonly Dictionary<string, TranslatedTexts> translations = [];

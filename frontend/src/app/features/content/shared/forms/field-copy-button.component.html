@@ -10,11 +10,11 @@
     </button>
     <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="button" *sqxModal="dropdown">
         <div class="section d-flex justify-content-end">
-            <button class="btn btn-primary" (click)="copy()" tabindex="-1" type="button">
-                {{ "common.copy" | sqxTranslate }}
-            </button>
+            <button class="btn btn-primary" (click)="copy()" tabindex="-1" type="button">{{ "common.copy" | sqxTranslate }}</button>
         </div>
+
         <div class="dropdown-divider"></div>
+
         <div class="section">
             <div class="row">
                 <label class="col-auto col-form-label" for="languageSource">{{ "common.from" | sqxTranslate }}</label>
@@ -27,10 +27,12 @@
                 </div>
             </div>
         </div>
+
         <div class="dropdown-divider"></div>
+
         <div class="section">
             <label>{{ "common.to" | sqxTranslate }}</label>
-            <sqx-checkbox-group layout="Multiline" [(ngModel)]="copyTargets" [values]="languageCodes"></sqx-checkbox-group>
+            <sqx-checkbox-group layout="Multiline" [(ngModel)]="copyTargets" [values]="languageCodes" />
         </div>
     </sqx-dropdown-menu>
 }

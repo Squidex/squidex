@@ -13,6 +13,8 @@ using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Rules;
+using Squidex.Flows;
+using Squidex.Flows.Internal;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
@@ -22,18 +24,13 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject;
 public class RuleDomainObjectTests : HandlerTestBase<Rule>
 {
     private readonly IRuleEnqueuer ruleEnqueuer = A.Fake<IRuleEnqueuer>();
+    private readonly IFlowManager<FlowEventContext> flowManager = A.Fake<IFlowManager<FlowEventContext>>();
     private readonly DomainId ruleId = DomainId.NewGuid();
     private readonly RuleDomainObject sut;
 
     protected override DomainId Id
     {
         get => DomainId.Combine(AppId, ruleId);
-    }
-
-    [RuleAction]
-    public sealed record TestAction : RuleAction
-    {
-        public int Value { get; set; }
     }
 
     public RuleDomainObjectTests()
@@ -43,6 +40,7 @@ public class RuleDomainObjectTests : HandlerTestBase<Rule>
         var serviceProvider =
             new ServiceCollection()
                 .AddSingleton(AppProvider)
+                .AddSingleton(flowManager)
                 .AddSingleton(ruleEnqueuer)
                 .BuildServiceProvider();
 
@@ -189,9 +187,9 @@ public class RuleDomainObjectTests : HandlerTestBase<Rule>
             {
                 HandleAll = false,
             },
-            Action = new TestAction
+            Flow = new FlowDefinition
             {
-                Value = 123,
+                InitialStepId = Guid.NewGuid(),
             },
         };
     }
@@ -205,9 +203,9 @@ public class RuleDomainObjectTests : HandlerTestBase<Rule>
             {
                 HandleAll = true,
             },
-            Action = new TestAction
+            Flow = new FlowDefinition
             {
-                Value = 456,
+                InitialStepId = Guid.NewGuid(),
             },
         };
     }

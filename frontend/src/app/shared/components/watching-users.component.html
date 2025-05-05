@@ -9,6 +9,7 @@
                     title="{{ state.user.displayName }}" />
             </div>
         }
+
         @if (currentUsers.length > 5) {
             <div class="user-item" [style]="{ zIndex: 6 }">
                 <div class="user-more">+{{ currentUsers.length - 5 }}</div>

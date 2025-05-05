@@ -41,7 +41,7 @@ public class WorkflowTests
     [Fact]
     public void Should_provide_initial_state()
     {
-        var (status, step) = workflow.GetInitialStep();
+        var (status, step) = workflow.GetInitialStepId();
 
         Assert.Equal(Status.Draft, status);
         Assert.Equal(StatusColors.Draft, step.Color);

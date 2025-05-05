@@ -2,20 +2,10 @@
     <div class="row g-0">
         <div class="col">
             <div class="btn-group">
-                <button
-                    class="btn btn-secondary btn-toggle btn-code"
-                    [class.btn-primary]="isAnd"
-                    (click)="toggleType()"
-                    [disabled]="isAnd"
-                    type="button">
+                <button class="btn btn-secondary btn-toggle btn-code" [class.btn-primary]="isAnd" (click)="toggleType()" [disabled]="isAnd" type="button">
                     AND
                 </button>
-                <button
-                    class="btn btn-secondary btn-toggle btn-code"
-                    [class.btn-primary]="isOr"
-                    (click)="toggleType()"
-                    [disabled]="isOr"
-                    type="button">
+                <button class="btn btn-secondary btn-toggle btn-code" [class.btn-primary]="isOr" (click)="toggleType()" [disabled]="isOr" type="button">
                     OR
                 </button>
             </div>
@@ -23,16 +13,13 @@
 
         @if (!isRoot) {
             <div class="col-auto ps-2">
-                <button class="btn btn-text-danger" (click)="remove.emit()" type="button">
-                    <i class="icon-bin2"></i>
-                </button>
+                <button class="btn btn-text-danger" (click)="remove.emit()" type="button"><i class="icon-bin2"></i></button>
             </div>
         }
     </div>
 
     <div class="filters">
         <span class="filter-line-v"></span>
-
         @for (filter of filters; track $index; let i = $index) {
             <div class="filter mt-3">
                 <span class="filter-line-h"></span>
@@ -43,21 +30,17 @@
                     [languages]="languages"
                     [level]="level + 1"
                     [model]="model"
-                    (remove)="removeNode(i)"></sqx-filter-node>
+                    (remove)="removeNode(i)" />
             </div>
         }
 
         <div class="filter filter-add mt-3">
             <span class="filter-line-h"></span>
-
             <button class="btn btn-outline-success btn-sm me-2" (click)="addComparison()">
                 {{ "search.addFilter" | sqxTranslate }}
             </button>
-
             @if (level < 1) {
-                <button class="btn btn-outline-success btn-sm" (click)="addLogical()">
-                    {{ "search.addGroup" | sqxTranslate }}
-                </button>
+                <button class="btn btn-outline-success btn-sm" (click)="addLogical()">{{ "search.addGroup" | sqxTranslate }}</button>
             }
         </div>
     </div>

@@ -25,13 +25,12 @@ public class ContentChangedTriggerTests : GivenContext, IClassFixture<Translatio
             Schemas = ReadonlyList.Create(new SchemaCondition()),
         };
 
-        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider);
+        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider, CancellationToken);
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Schema ID is required.", "Schemas"),
-            });
+            ]);
 
         A.CallTo(() => AppProvider.GetSchemaAsync(AppId.Id, A<DomainId>._, false, default))
             .MustNotHaveHappened();
@@ -40,7 +39,7 @@ public class ContentChangedTriggerTests : GivenContext, IClassFixture<Translatio
     [Fact]
     public async Task Should_add_error_if_schemas_ids_are_not_valid()
     {
-        A.CallTo(() => AppProvider.GetSchemaAsync(AppId.Id, SchemaId.Id, false, default))
+        A.CallTo(() => AppProvider.GetSchemaAsync(AppId.Id, SchemaId.Id, false, CancellationToken))
             .Returns(Task.FromResult<Schema?>(null));
 
         var trigger = new ContentChangedTriggerV2
@@ -48,13 +47,12 @@ public class ContentChangedTriggerTests : GivenContext, IClassFixture<Translatio
             Schemas = ReadonlyList.Create(new SchemaCondition { SchemaId = SchemaId.Id }),
         };
 
-        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider);
+        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider, CancellationToken);
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError($"Schema {SchemaId.Id} does not exist.", "Schemas"),
-            });
+            ]);
     }
 
     [Fact]
@@ -62,7 +60,7 @@ public class ContentChangedTriggerTests : GivenContext, IClassFixture<Translatio
     {
         var trigger = new ContentChangedTriggerV2();
 
-        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider);
+        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider, CancellationToken);
 
         Assert.Empty(errors);
     }
@@ -75,7 +73,7 @@ public class ContentChangedTriggerTests : GivenContext, IClassFixture<Translatio
             Schemas = [],
         };
 
-        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider);
+        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider, CancellationToken);
 
         Assert.Empty(errors);
     }
@@ -91,7 +89,7 @@ public class ContentChangedTriggerTests : GivenContext, IClassFixture<Translatio
             Schemas = ReadonlyList.Create(new SchemaCondition { SchemaId = SchemaId.Id }),
         };
 
-        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider);
+        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider, CancellationToken);
 
         Assert.Empty(errors);
     }

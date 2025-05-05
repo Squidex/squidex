@@ -1,9 +1,8 @@
 <div class="table-items-row table-items-row-expandable field" [class.plain]="plain" sqxTourStep="schemaField">
     <div class="table-items-row-summary">
         <div class="row align-items-center">
-            <div class="col col-auto">
-                <ng-content></ng-content>
-            </div>
+            <div class="col col-auto"><ng-content></ng-content></div>
+
             <div class="col">
                 <span class="field-name">
                     @if (!plain) {
@@ -21,38 +20,30 @@
                     }
                 </span>
             </div>
+
             @if (!plain) {
                 <div class="col-4 flex-nowrap">
                     <div class="float-end">
                         @if (field.isLocked) {
-                            <span class="ms-1 badge rounded-pill badge-danger">
-                                {{ "schemas.field.lockedMarker" | sqxTranslate }}
-                            </span>
+                            <span class="ms-1 badge rounded-pill badge-danger"> {{ "schemas.field.lockedMarker" | sqxTranslate }} </span>
                         }
+
                         @if (!field.isDisabled) {
-                            <span class="ms-1 badge rounded-pill badge-success">
-                                {{ "schemas.field.enabledMarker" | sqxTranslate }}
-                            </span>
+                            <span class="ms-1 badge rounded-pill badge-success"> {{ "schemas.field.enabledMarker" | sqxTranslate }} </span>
                         }
+
                         @if (field.isDisabled) {
-                            <span class="ms-1 badge rounded-pill badge-danger">
-                                {{ "schemas.field.disabledMarker" | sqxTranslate }}
-                            </span>
+                            <span class="ms-1 badge rounded-pill badge-danger"> {{ "schemas.field.disabledMarker" | sqxTranslate }} </span>
                         }
                     </div>
                 </div>
             }
+
             <div class="col col-options flex-nowrap">
                 <div class="float-end">
-                    <button
-                        class="btn btn-outline-secondary btn-expand"
-                        [class.expanded]="isEditing"
-                        (click)="toggleEditing()"
-                        type="button">
-                        <span class="hidden">{{ "common.settings" | sqxTranslate }}</span>
-                        <i class="icon-settings"></i>
+                    <button class="btn btn-outline-secondary btn-expand" [class.expanded]="isEditing" (click)="toggleEditing()" type="button">
+                        <span class="hidden">{{ "common.settings" | sqxTranslate }}</span> <i class="icon-settings"></i>
                     </button>
-
                     <button
                         class="btn btn-text-secondary ms-1"
                         #buttonOptions
@@ -62,28 +53,22 @@
                         type="button">
                         <i class="icon-dots"></i>
                     </button>
-
                     <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="dropdown; closeAlways: true">
                         @if (field.properties.isContentField) {
                             @if (field.canEnable) {
-                                <a class="dropdown-item" (click)="enableField()">
-                                    {{ "schemas.field.enable" | sqxTranslate }}
-                                </a>
+                                <a class="dropdown-item" (click)="enableField()"> {{ "schemas.field.enable" | sqxTranslate }} </a>
                             }
+
                             @if (field.canDisable) {
-                                <a class="dropdown-item" (click)="disableField()">
-                                    {{ "schemas.field.disable" | sqxTranslate }}
-                                </a>
+                                <a class="dropdown-item" (click)="disableField()"> {{ "schemas.field.disable" | sqxTranslate }} </a>
                             }
+
                             @if (field.canHide) {
-                                <a class="dropdown-item" (click)="hideField()">
-                                    {{ "schemas.field.hide" | sqxTranslate }}
-                                </a>
+                                <a class="dropdown-item" (click)="hideField()"> {{ "schemas.field.hide" | sqxTranslate }} </a>
                             }
+
                             @if (field.canShow) {
-                                <a class="dropdown-item" (click)="showField()">
-                                    {{ "schemas.field.show" | sqxTranslate }}
-                                </a>
+                                <a class="dropdown-item" (click)="showField()"> {{ "schemas.field.show" | sqxTranslate }} </a>
                             }
                         }
 
@@ -98,10 +83,8 @@
                                 {{ "schemas.field.lock" | sqxTranslate }}
                             </a>
                         }
-
                         <ng-container>
                             <div class="dropdown-divider"></div>
-
                             <a
                                 class="dropdown-item dropdown-item-delete"
                                 [class.disabled]="!field.canDelete"
@@ -130,7 +113,7 @@
                     [languages]="languages"
                     [schema]="schema"
                     [settings]="settings"
-                    showButtons="true"></sqx-field-form>
+                    showButtons="true" />
             </form>
         </div>
     }
@@ -147,22 +130,16 @@
                     [schema]="schema"
                     [settings]="settings"
                     [sortable]="isEditable === true"
-                    (sorted)="sortFields($event)"></sqx-sortable-field-list>
+                    (sorted)="sortFields($event)" />
                 @if (isEditable) {
                     <div class="nested-field nested-field-add">
                         <span class="nested-field-line-h"></span>
                         <button class="btn btn-success btn-sm" (click)="fieldWizard.show()" type="button">
-                            <i class="icon icon-plus"></i>
-                            {{ "schemas.addNestedField" | sqxTranslate }}
+                            <i class="icon icon-plus"></i> {{ "schemas.addNestedField" | sqxTranslate }}
                         </button>
                     </div>
                 }
-                <sqx-field-wizard
-                    (dialogClose)="fieldWizard.hide()"
-                    [parent]="$any(field)"
-                    [schema]="schema"
-                    [settings]="settings"
-                    *sqxModal="fieldWizard"></sqx-field-wizard>
+                <sqx-field-wizard (dialogClose)="fieldWizard.hide()" [parent]="$any(field)" [schema]="schema" [settings]="settings" *sqxModal="fieldWizard" />
             }
         </div>
     }

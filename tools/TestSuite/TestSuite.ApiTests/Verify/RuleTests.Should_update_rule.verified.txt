@@ -6,8 +6,16 @@
   Trigger: {
     HandleAll: true
   },
-  Action: {
-    Url: http://squidex.io
+  Flow: {
+    InitialStepId: Guid_3,
+    Steps: {
+      Guid_3: {
+        Step: {
+          Url: http://squidex.io
+        },
+        IgnoreError: false
+      }
+    }
   },
   Links: {
     delete: {

@@ -8,7 +8,7 @@
 
 import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ColorPickerComponent, DropdownComponent, EditableTitleComponent, TagEditorComponent, TranslatePipe, TypedSimpleChanges, WorkflowStepValues, WorkflowStepView, WorkflowTransitionValues, WorkflowTransitionView, WorkflowView } from '@app/shared';
+import { ColorPickerComponent, DropdownComponent, EditableTitleComponent, TagEditorComponent, TranslatePipe, TypedSimpleChanges, WorkflowStepValues, WorkflowStepView, WorkflowTransitionView, WorkflowView } from '@app/shared';
 import { WorkflowTransitionComponent } from './workflow-transition.component';
 
 @Component({
@@ -30,25 +30,7 @@ export class WorkflowStepComponent {
     public readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };
 
     @Output()
-    public makeInitial = new EventEmitter();
-
-    @Output()
-    public transitionAdd = new EventEmitter<WorkflowStepView>();
-
-    @Output()
-    public transitionRemove = new EventEmitter<WorkflowTransitionView>();
-
-    @Output()
-    public transitionUpdate = new EventEmitter<{ transition: WorkflowTransitionView; values: WorkflowTransitionValues }>();
-
-    @Output()
-    public update = new EventEmitter<WorkflowStepValues>();
-
-    @Output()
-    public rename = new EventEmitter<string>();
-
-    @Output()
-    public remove = new EventEmitter();
+    public update = new EventEmitter<WorkflowView>();
 
     @Input({ required: true })
     public workflow!: WorkflowView;
@@ -76,31 +58,53 @@ export class WorkflowStepComponent {
         }
     }
 
-    public changeTransition(transition: WorkflowTransitionView, values: WorkflowTransitionValues) {
-        this.transitionUpdate.emit({ transition, values });
-    }
-
-    public changeName(name: string) {
-        this.rename.emit(name);
-    }
-
     public changeColor(color: string) {
-        this.update.emit({ color });
+        this.change({ color });
     }
 
     public changeValidate(validate: boolean) {
-        this.update.emit({ validate });
+        this.change({ validate });
     }
 
     public changeNoUpdate(noUpdate: boolean) {
-        this.update.emit({ noUpdate });
+        this.change({ noUpdate });
     }
 
     public changeNoUpdateExpression(noUpdateExpression?: string) {
-        this.update.emit({ noUpdateExpression });
+        this.change({ noUpdateExpression });
     }
 
     public changeNoUpdateRoles(noUpdateRoles?: string[]) {
-        this.update.emit({ noUpdateRoles });
+        this.change({ noUpdateRoles });
+    }
+
+    public addTransition(to: string) {
+        const { name } = this.step;
+        this.update.emit(this.workflow.setTransition(name, to));
+    }
+
+    public remove() {
+        const { name } = this.step;
+        this.update.emit(this.workflow.removeStep(name));
+    }
+
+    public removeTransition(to: string) {
+        const { name } = this.step;
+        this.update.emit(this.workflow.removeTransition(name, to));
+    }
+
+    public makeInitial() {
+        const { name } = this.step;
+        this.update.emit(this.workflow.setInitial(name));
+    }
+
+    public changeName(newName: string) {
+        const { name } = this.step;
+        this.update.emit(this.workflow.renameStep(name, newName));
+    }
+
+    private change(changes: Partial<WorkflowStepValues>) {
+        const { name } = this.step;
+        this.update.emit(this.workflow.setStep(name, changes));
     }
 }

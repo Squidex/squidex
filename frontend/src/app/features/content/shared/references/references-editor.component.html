@@ -4,6 +4,7 @@
             {{ "contents.referencesCreateNew" | sqxTranslate }}
         </button>
     </div>
+
     <div class="col" [class.disabled]="snapshot.isDisabled">
         <button class="btn btn-outline-secondary btn-dashed btn-block" (click)="contentSelectorDialog.show()" type="button">
             {{ "contents.referencesSelectExisting" | sqxTranslate }}
@@ -12,12 +13,7 @@
 </div>
 
 @if (snapshot.contentItems && snapshot.contentItems.length > 0) {
-    <div
-        class="references-container"
-        [class.expanded]="isExpanded"
-        (sqxResizeCondition)="setCompact($event)"
-        sqxResizeMaxWidth="0"
-        sqxResizeMinWidth="600">
+    <div class="references-container" [class.expanded]="isExpanded" (sqxResizeCondition)="setCompact($event)" sqxResizeMaxWidth="0" sqxResizeMinWidth="600">
         <table
             class="table table-items table-fixed"
             cdkDropList
@@ -44,7 +40,6 @@
         </table>
     </div>
 }
-
 <sqx-content-creator
     (contentCreate)="select($event)"
     [formContext]="formContext"
@@ -53,8 +48,7 @@
     [languages]="languages"
     [schemaIds]="schemaIds"
     [schemaName]="clonedContent?.schemaName"
-    *sqxModal="contentCreatorDialog"></sqx-content-creator>
-
+    *sqxModal="contentCreatorDialog" />
 <sqx-content-selector
     [allowDuplicates]="allowDuplicates"
     [alreadySelected]="snapshot.contentItems"
@@ -63,4 +57,4 @@
     [languages]="languages"
     [query]="query"
     [schemaIdentifiers]="schemaIds"
-    *sqxModal="contentSelectorDialog"></sqx-content-selector>
+    *sqxModal="contentSelectorDialog" />

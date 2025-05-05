@@ -46,7 +46,7 @@ public class GuardAssetFolderTests : GivenContext, IClassFixture<TranslationsFix
         var operation = Operation(CreateAssetFolder());
 
         A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId.Id, parentId, CancellationToken))
-            .Returns(new List<AssetFolder>());
+            .Returns([]);
 
         await ValidationAssert.ThrowsAsync(() => operation.MustMoveToValidFolder(parentId, CancellationToken),
             new ValidationError("Asset folder does not exist.", "ParentId"));
@@ -60,7 +60,7 @@ public class GuardAssetFolderTests : GivenContext, IClassFixture<TranslationsFix
         var operation = Operation(CreateAssetFolder());
 
         A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId.Id, parentId, CancellationToken))
-            .Returns(new List<AssetFolder> { CreateAssetFolder() });
+            .Returns([CreateAssetFolder()]);
 
         await operation.MustMoveToValidFolder(parentId, CancellationToken);
     }
@@ -99,11 +99,11 @@ public class GuardAssetFolderTests : GivenContext, IClassFixture<TranslationsFix
         var operation = Operation(CreateAssetFolder());
 
         A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId.Id, parentId, CancellationToken))
-            .Returns(new List<AssetFolder>
-            {
+            .Returns(
+            [
                 CreateAssetFolder().WithId(operation.CommandId),
                 CreateAssetFolder().WithId(parentId) with { ParentId = operation.CommandId },
-            });
+            ]);
 
         await ValidationAssert.ThrowsAsync(() => operation.MustMoveToValidFolder(parentId, CancellationToken),
             new ValidationError("Cannot add folder to its own child.", "ParentId"));

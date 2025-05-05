@@ -1,12 +1,9 @@
-<sqx-title message="i18n:rules.ruleEvents.listPageTitle"></sqx-title>
-
+<sqx-title message="i18n:rules.ruleEvents.listPageTitle" />
 <sqx-layout hideSidebar="true" layout="main" titleIcon="events" titleText="i18n:common.events" width="50">
     <ng-container menu>
         <button class="btn btn-text-secondary" (click)="reload()" shortcut="CTRL + B" title="i18n:rules.refreshEventsTooltip" type="button">
-            <i class="icon-reset"></i>
-            {{ "common.refresh" | sqxTranslate }}
+            <i class="icon-reset"></i> {{ "common.refresh" | sqxTranslate }}
         </button>
-
         @if (ruleEventsState.canCancelAll | async) {
             <button
                 class="btn btn-danger ms-2"
@@ -19,30 +16,34 @@
             </button>
         }
     </ng-container>
-
     <ng-container>
         <sqx-list-view [isLoading]="ruleEventsState.isLoading | async" table="true">
             <table class="table table-items table-fixed">
                 <thead>
                     <tr>
-                        <th class="cell-label">
+                        <th class="cell-label2">
                             <span class="truncate">{{ "common.status" | sqxTranslate }}</span>
                         </th>
+
                         <th class="cell-40">
                             <span class="truncate">{{ "common.event" | sqxTranslate }}</span>
                         </th>
+
                         <th class="cell-60">
-                            <span class="truncate">{{ "common.description" | sqxTranslate }}</span>
+                            <span class="truncate">{{ "common.actions" | sqxTranslate }}</span>
                         </th>
+
                         <th class="cell-time">
                             <span class="truncate">{{ "common.created" | sqxTranslate }}</span>
                         </th>
+
                         <th class="cell-actions">&nbsp;</th>
                     </tr>
                 </thead>
 
                 @for (event of ruleEventsState.ruleEvents | async; track event.id) {
                     <tbody
+                        [availableSteps]="availableSteps"
                         (cancel)="cancel(event)"
                         (enqueue)="enqueue(event)"
                         [expanded]="event.id === selectedEventId"
@@ -50,8 +51,7 @@
                         [sqxRuleEvent]="event"></tbody>
                 }
             </table>
-
-            <sqx-pager autoHide="true" [paging]="ruleEventsState.paging | async" (pagingChange)="ruleEventsState.page($event)"></sqx-pager>
+            <sqx-pager autoHide="true" [paging]="ruleEventsState.paging | async" (pagingChange)="ruleEventsState.page($event)" />
         </sqx-list-view>
     </ng-container>
 </sqx-layout>

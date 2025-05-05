@@ -18,7 +18,7 @@ namespace Squidex.Providers.SqlServer.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.13")
+                .HasAnnotation("ProductVersion", "8.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -328,7 +328,8 @@ namespace Squidex.Providers.SqlServer.Migrations
             modelBuilder.Entity("Squidex.AI.Mongo.EFChatEntity", b =>
                 {
                     b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime>("LastUpdated")
                         .HasColumnType("datetime2");
@@ -351,7 +352,8 @@ namespace Squidex.Providers.SqlServer.Migrations
             modelBuilder.Entity("Squidex.Assets.EntityFramework.EFAssetKeyValueEntity<Squidex.Assets.TusAdapter.TusMetadata>", b =>
                 {
                     b.Property<string>("Key")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTimeOffset>("Expires")
                         .HasColumnType("datetimeoffset");
@@ -978,59 +980,6 @@ namespace Squidex.Providers.SqlServer.Migrations
                     b.ToTable("States_Rule", (string)null);
                 });
 
-            modelBuilder.Entity("Squidex.Domain.Apps.Entities.Rules.EFRuleEventEntity", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<string>("AppId")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.Property<DateTimeOffset>("Created")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset>("Expires")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<string>("Job")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("JobResult")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("LastDump")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTimeOffset>("LastModified")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<DateTimeOffset?>("NextAttempt")
-                        .HasColumnType("datetimeoffset");
-
-                    b.Property<int>("NumCalls")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Result")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
-
-                    b.Property<string>("RuleId")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("RuleEvents");
-                });
-
             modelBuilder.Entity("Squidex.Domain.Apps.Entities.Schemas.EFSchemaEntity", b =>
                 {
                     b.Property<string>("DocumentId")
@@ -1107,7 +1056,8 @@ namespace Squidex.Providers.SqlServer.Migrations
 
                     b.Property<string>("EventStream")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(750)
+                        .HasColumnType("nvarchar(750)");
 
                     b.Property<long>("EventStreamOffset")
                         .HasColumnType("bigint");
@@ -1148,6 +1098,42 @@ namespace Squidex.Providers.SqlServer.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("EventPosition");
+                });
+
+            modelBuilder.Entity("Squidex.Flows.EntityFramework.EFFlowStateEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("DefinitionId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTimeOffset?>("DueTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<string>("OwnerId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<int>("SchedulePartition")
+                        .HasColumnType("int");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DueTime", "SchedulePartition");
+
+                    b.ToTable("Flows", (string)null);
                 });
 
             modelBuilder.Entity("Squidex.Infrastructure.Caching.EFCacheEntity", b =>
@@ -1425,7 +1411,8 @@ namespace Squidex.Providers.SqlServer.Migrations
 
                     b.Property<string>("ChannelName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<byte[]>("MessageData")
                         .IsRequired()
@@ -1433,11 +1420,13 @@ namespace Squidex.Providers.SqlServer.Migrations
 
                     b.Property<string>("MessageHeaders")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(2000)
+                        .HasColumnType("nvarchar(2000)");
 
                     b.Property<string>("QueueName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime?>("TimeHandled")
                         .HasColumnType("datetime2");
@@ -1459,10 +1448,12 @@ namespace Squidex.Providers.SqlServer.Migrations
             modelBuilder.Entity("Squidex.Messaging.EntityFramework.EFMessagingDataEntity", b =>
                 {
                     b.Property<string>("Group")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("Key")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<DateTime>("Expiration")
                         .HasColumnType("datetime2");
@@ -1472,11 +1463,13 @@ namespace Squidex.Providers.SqlServer.Migrations
                         .HasColumnType("varbinary(max)");
 
                     b.Property<string>("ValueFormat")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.Property<string>("ValueType")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
                     b.HasKey("Group", "Key");
 

@@ -28,7 +28,7 @@ public class RuleEventsTests(ClientFixture fixture) : IClassFixture<ClientFixtur
         var events_0 = await app.Rules.GetEventsAsync(rule.Id);
 
         Assert.Single(events_0.Items);
-        Assert.Single(events_0.Items, x => x.NextAttempt != null);
+        Assert.Single(events_0.Items, x => x.FlowState.NextRun != null);
 
 
         // STEP 2: Cancel event.
@@ -37,7 +37,7 @@ public class RuleEventsTests(ClientFixture fixture) : IClassFixture<ClientFixtur
         var events_1 = await app.Rules.GetEventsAsync(rule.Id);
 
         Assert.Single(events_1.Items);
-        Assert.Single(events_1.Items, x => x.NextAttempt == null);
+        Assert.Single(events_1.Items, x => x.FlowState.NextRun == null);
     }
 
     [Fact]
@@ -51,7 +51,7 @@ public class RuleEventsTests(ClientFixture fixture) : IClassFixture<ClientFixtur
         var events_0 = await app.Rules.GetEventsAsync(rule.Id);
 
         Assert.Single(events_0.Items);
-        Assert.Single(events_0.Items, x => x.NextAttempt != null);
+        Assert.Single(events_0.Items, x => x.FlowState.NextRun != null);
 
 
         // STEP 2: Cancel event.
@@ -60,7 +60,7 @@ public class RuleEventsTests(ClientFixture fixture) : IClassFixture<ClientFixtur
         var events_1 = await app.Rules.GetEventsAsync(rule.Id);
 
         Assert.Single(events_1.Items);
-        Assert.Single(events_1.Items, x => x.NextAttempt == null);
+        Assert.Single(events_1.Items, x => x.FlowState.NextRun == null);
     }
 
     [Fact]
@@ -74,7 +74,7 @@ public class RuleEventsTests(ClientFixture fixture) : IClassFixture<ClientFixtur
         var events_0 = await app.Rules.GetEventsAsync(rule.Id);
 
         Assert.Single(events_0.Items);
-        Assert.Single(events_0.Items, x => x.NextAttempt != null);
+        Assert.Single(events_0.Items, x => x.FlowState.NextRun != null);
 
 
         // STEP 2: Cancel event.
@@ -83,21 +83,32 @@ public class RuleEventsTests(ClientFixture fixture) : IClassFixture<ClientFixtur
         var events_1 = await app.Rules.GetEventsAsync(rule.Id);
 
         Assert.Single(events_1.Items);
-        Assert.Single(events_1.Items, x => x.NextAttempt == null);
+        Assert.Single(events_1.Items, x => x.FlowState.NextRun == null);
     }
 
     private async Task<(ISquidexClient App, RuleDto)> CreateAppAndRuleAsync()
     {
         var (app, _) = await _.PostAppAsync();
 
+        var stepId = Guid.NewGuid();
         var createRule = new CreateRuleDto
         {
-            Action = new WebhookRuleActionDto
+            Flow = new FlowDefinitionDto
             {
-                Method = WebhookMethod.POST,
-                Payload = null,
-                PayloadType = null,
-                Url = new Uri("http://squidex.io")
+                InitialStepId = stepId,
+                Steps = new Dictionary<string, FlowStepDefinitionDto>
+                {
+                    [stepId.ToString()] = new FlowStepDefinitionDto
+                    {
+                        Step = new WebhookFlowStepDto
+                        {
+                            Method = WebhookMethod.POST,
+                            Payload = null,
+                            PayloadType = null,
+                            Url = new Uri("http://squidex.io")
+                        }
+                    }
+                }
             },
             Trigger = new ManualRuleTriggerDto(),
         };

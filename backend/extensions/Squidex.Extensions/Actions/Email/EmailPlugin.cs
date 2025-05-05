@@ -15,6 +15,9 @@ public sealed class EmailPlugin : IPlugin
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        services.AddRuleAction<EmailAction, EmailActionHandler>();
+        services.AddFlowStep<EmailFlowStep>();
+#pragma warning disable CS0618 // Type or member is obsolete
+        services.AddRuleAction<EmailAction>();
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

@@ -15,26 +15,20 @@
         </div>
 
         @if (schemas.length === 1) {
-            <div>
-                {{ "contents.referencesSelectSchema" | sqxTranslate: { schema: schemas[0].displayName } }}
-            </div>
+            <div>{{ "contents.referencesSelectSchema" | sqxTranslate: { schema: schemas[0].displayName } }}</div>
         }
 
         @if (schemas.length === 0) {
-            <div>
-                {{ "contents.referencesNoSchema" | sqxTranslate }}
-            </div>
+            <div>{{ "contents.referencesNoSchema" | sqxTranslate }}</div>
         }
     </ng-container>
-
     <ng-container tabs>
         <div class="row gx-2 mt-3 mb-3">
             @if (schema) {
                 <div class="col-auto">
-                    <button class="btn btn-text-secondary" (click)="reload()" type="button">
-                        <i class="icon-reset"></i>
-                    </button>
+                    <button class="btn btn-text-secondary" (click)="reload()" type="button"><i class="icon-reset"></i></button>
                 </div>
+
                 <div class="col">
                     <sqx-search-form
                         formClass="form"
@@ -43,20 +37,17 @@
                         placeholder="{{ 'contents.searchPlaceholder' | sqxTranslate }}"
                         [query]="contentsState.query | async"
                         (queryChange)="search($event)"
-                        [queryModel]="queryModel | async"></sqx-search-form>
+                        [queryModel]="queryModel | async" />
                 </div>
+
                 @if (languages.length > 1) {
                     <div class="col-auto">
-                        <sqx-language-selector
-                            class="languages-buttons"
-                            [(language)]="language"
-                            [languages]="languages"></sqx-language-selector>
+                        <sqx-language-selector class="languages-buttons" [(language)]="language" [languages]="languages" />
                     </div>
                 }
             }
         </div>
     </ng-container>
-
     <ng-container content>
         @if (schema) {
             <sqx-list-view [isLoading]="contentsState.isLoading | async" syncedHeader="true" table="true">
@@ -67,24 +58,23 @@
                                 <th class="cell-select">
                                     <input class="form-check" [ngModel]="selectedAll" (ngModelChange)="selectAll($event)" type="checkbox" />
                                 </th>
+
                                 <th [field]="metaFields.lastModifiedByAvatar" sqxContentListCell>
-                                    <sqx-content-list-header
-                                        [field]="metaFields.lastModifiedByAvatar"
-                                        [language]="language"></sqx-content-list-header>
+                                    <sqx-content-list-header [field]="metaFields.lastModifiedByAvatar" [language]="language" />
                                 </th>
+
                                 @for (field of schema.defaultReferenceFields; track field) {
                                     <th>
                                         <sqx-content-list-header
                                             [field]="field"
                                             [language]="language"
                                             [query]="(contentsState.query | async)!"
-                                            (queryChange)="search($event)"></sqx-content-list-header>
+                                            (queryChange)="search($event)" />
                                     </th>
                                 }
+
                                 <th [field]="metaFields.statusColor" sqxContentListCell>
-                                    <sqx-content-list-header
-                                        [field]="metaFields.statusColor"
-                                        [language]="language"></sqx-content-list-header>
+                                    <sqx-content-list-header [field]="metaFields.statusColor" [language]="language" />
                                 </th>
                             </tr>
                         </thead>
@@ -93,10 +83,7 @@
                 <ng-container content>
                     <div class="table-container">
                         @if (contentsState.contents | async; as contents) {
-                            <table
-                                class="table table-items table-fixed"
-                                [sqxContentListWidth]="schema.defaultReferenceFields"
-                                [sqxSyncWidth]="header">
+                            <table class="table table-items table-fixed" [sqxContentListWidth]="schema.defaultReferenceFields" [sqxSyncWidth]="header">
                                 @for (content of contents; track content.id) {
                                     <tbody
                                         [language]="language"
@@ -112,20 +99,13 @@
                     </div>
                 </ng-container>
                 <ng-container footer>
-                    <sqx-pager
-                        (loadTotal)="reloadTotal()"
-                        [paging]="contentsState.paging | async"
-                        (pagingChange)="contentsState.page($event)"></sqx-pager>
+                    <sqx-pager (loadTotal)="reloadTotal()" [paging]="contentsState.paging | async" (pagingChange)="contentsState.page($event)" />
                 </ng-container>
             </sqx-list-view>
         }
     </ng-container>
-
     <ng-container footer>
-        <button class="btn btn-text-secondary" (click)="emitClose()" type="button">
-            {{ "common.cancel" | sqxTranslate }}
-        </button>
-
+        <button class="btn btn-text-secondary" (click)="emitClose()" type="button">{{ "common.cancel" | sqxTranslate }}</button>
         <button class="btn btn-success" (click)="emitSelect()" [disabled]="selectionCount === 0 || selectionCount > maxItems" type="submit">
             {{ "contents.referencesLink" | sqxTranslate: { count: selectionCount } }}
         </button>

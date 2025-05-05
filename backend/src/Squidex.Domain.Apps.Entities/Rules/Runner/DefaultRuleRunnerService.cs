@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Domain.Apps.Events;
 using Squidex.Events;
+using Squidex.Flows;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.EventSourcing;
@@ -23,6 +24,7 @@ public sealed class DefaultRuleRunnerService(
     IJobService jobService,
     IEventFormatter eventFormatter,
     IEventStore eventStore,
+    IFlowManager<FlowEventContext> flowManager,
     IRuleService ruleService)
     : IRuleRunnerService
 {
@@ -67,24 +69,21 @@ public sealed class DefaultRuleRunnerService(
             // Also create jobs for rules with failing conditions because we want to show them in the table.
             await foreach (var job in ruleService.CreateJobsAsync(@event, context, ct).Take(MaxSimulatedEvents).WithCancellation(ct))
             {
-                var eventName = job.Job?.EventName;
-
-                if (string.IsNullOrWhiteSpace(eventName))
-                {
-                    eventName = ruleService.GetName(appEvent);
-                }
+                var state =
+                    job.Job != null ?
+                    await flowManager.SimulateAsync(job.Job.Value, ct) :
+                    null;
 
                 var eventId = @event.Headers.EventId();
 
                 simulatedEvents.Add(new SimulatedRuleEvent
                 {
-                    ActionData = job.Job?.ActionData,
-                    ActionName = job.Job?.ActionName,
                     EnrichedEvent = job.EnrichedEvent,
                     Error = job.EnrichmentError?.Message,
                     Event = @event.Payload,
                     EventId = eventId,
-                    EventName = eventName,
+                    EventName = ruleService.GetName(appEvent),
+                    State = state,
                     SkipReason = job.SkipReason,
                     UniqueId = $"{eventId}_{job.Offset}",
                 });

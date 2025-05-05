@@ -1,0 +1,23 @@
+@if (showEvent) {
+    <sqx-history-step isExpandable="true">
+        <ng-container summary>
+            <div class="col">
+                <span class="text-sm">{{ "common.event" | sqxTranslate }}</span>
+            </div>
+        </ng-container>
+
+        <ng-container details>
+            <sqx-code-editor disabled="true" height="auto" mode="ace/mode/json" [ngModel]="state.context" valueFile="" valueMode="Json" wordWrap="true" />
+        </ng-container>
+    </sqx-history-step>
+}
+
+@for (item of branchItems; track item.id) {
+    <sqx-state-step
+        [branchItem]="item"
+        [isFirst]="$first"
+        [isLast]="$last"
+        [isNext]="state.nextStepId === item.id"
+        [state]="state.steps[item.id]"
+        [stepInfo]="availableSteps[item.step.step.stepType]" />
+}

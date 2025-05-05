@@ -15,6 +15,9 @@ public sealed class AzureQueuePlugin : IPlugin
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        services.AddRuleAction<AzureQueueAction, AzureQueueActionHandler>();
+        services.AddFlowStep<AzureQueueFlowStep>();
+#pragma warning disable CS0618 // Type or member is obsolete
+        services.AddRuleAction<AzureQueueAction>();
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

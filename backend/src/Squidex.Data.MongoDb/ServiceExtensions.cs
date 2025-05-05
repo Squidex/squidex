@@ -20,6 +20,7 @@ using Squidex.AI;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Teams;
@@ -163,9 +164,6 @@ public static class ServiceExtensions
         services.AddSingletonAs<MongoRuleRepository>()
             .As<IRuleRepository>().As<ISnapshotStore<Rule>>().As<IDeleter>();
 
-        services.AddSingletonAs<MongoRuleEventRepository>()
-            .As<IRuleEventRepository>().As<IDeleter>();
-
         services.AddSingletonAs<MongoSchemaRepository>()
             .As<ISchemaRepository>().As<ISnapshotStore<Schema>>().As<IDeleter>();
 
@@ -186,6 +184,9 @@ public static class ServiceExtensions
 
         services.AddSingletonAs<MongoUserStore>()
             .As<IUserStore<IdentityUser>>().As<IUserFactory>();
+
+        services.AddFlowsCore()
+            .AddMongoFlowStore<FlowEventContext>();
 
         services.AddSingletonAs(c =>
         {

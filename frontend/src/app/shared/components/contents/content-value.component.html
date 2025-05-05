@@ -2,10 +2,9 @@
     <div class="value-container" [title]="title" titlePosition="top-start">
         <div #valueElement [class.truncate]="!snapshot.wrapping">{{ value }}</div>
     </div>
+
     @if (isString && fields) {
-        <button class="btn btn-icon" (click)="toggle()" sqxStopClick>
-            <i class="icon-wrap_text"></i>
-        </button>
+        <button class="btn btn-icon" (click)="toggle()" sqxStopClick><i class="icon-wrap_text"></i></button>
     }
 } @else {
     <div
@@ -16,6 +15,7 @@
         longHoverDuration="1500"
         [longHoverSelector]="'img'"
         (sqxLongHover)="show()"></div>
+
     <div class="preview" position="bottom-start" [sqxAnchoredTo]="htmlValue" *sqxModal="previewModal; closeAuto: false">
         <img [src]="value.preview" />
     </div>

@@ -140,7 +140,7 @@ public class BackgroundUsageTrackerTests
         var dateTo = dateFrom.AddDays(4);
 
         A.CallTo(() => usageStore.QueryAsync(key, dateFrom, dateTo, ct))
-            .Returns(new List<StoredUsage>());
+            .Returns([]);
 
         var actual = await sut.QueryAsync(key, dateFrom, dateTo, ct);
 

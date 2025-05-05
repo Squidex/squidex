@@ -9,6 +9,7 @@ using GraphQL.Utilities;
 using NJsonSchema;
 using NJsonSchema.Generation;
 using Squidex.Infrastructure.Reflection;
+using System.Reflection;
 
 namespace Squidex.Areas.Api.Config.OpenApi;
 
@@ -35,6 +36,8 @@ public sealed class DiscriminatorProcessor(TypeRegistry typeRegistry) : ISchemaP
         };
 
         var schema = context.Schema;
+
+        var isObsolete = context.ContextualType.Type.GetCustomAttribute<ObsoleteAttribute>();
 
         foreach (var (derivedType, typeName) in config.DerivedTypes().OrderBy(x => x.TypeName))
         {

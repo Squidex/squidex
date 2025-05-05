@@ -11,13 +11,11 @@
             <div class="col-auto">
                 <div class="badge rounded-pill badge-primary">{{ field.path }}</div>
             </div>
+
             <div class="col text-end">
                 <sqx-form-hint>{{ field.description }}</sqx-form-hint>
             </div>
         </div>
     </ng-template>
-
-    <ng-template let-field="$implicit">
-        {{ field.path }}
-    </ng-template>
+    <ng-template let-field="$implicit"> {{ field.path }} </ng-template>
 </sqx-dropdown>

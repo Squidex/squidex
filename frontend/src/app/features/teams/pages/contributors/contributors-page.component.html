@@ -1,19 +1,10 @@
-<sqx-title message="i18n:common.contributors"></sqx-title>
-
+<sqx-title message="i18n:common.contributors" />
 <sqx-layout innerWidth="55" layout="main" titleIcon="contributors" titleText="i18n:common.contributors">
     <ng-container menu>
-        <sqx-notifo topic="apps/{{ contributorsState.teamId }}/settings/contributors"></sqx-notifo>
-
-        <button
-            class="btn btn-text-secondary me-2"
-            (click)="reload()"
-            shortcut="CTRL + B"
-            title="i18n:contributors.refreshTooltip"
-            type="button">
-            <i class="icon-reset"></i>
-            {{ "common.refresh" | sqxTranslate }}
+        <sqx-notifo topic="apps/{{ contributorsState.teamId }}/settings/contributors" />
+        <button class="btn btn-text-secondary me-2" (click)="reload()" shortcut="CTRL + B" title="i18n:contributors.refreshTooltip" type="button">
+            <i class="icon-reset"></i> {{ "common.refresh" | sqxTranslate }}
         </button>
-
         <div class="form-inline">
             <input
                 class="form-control"
@@ -24,12 +15,11 @@
                 shortcutAction="focus" />
         </div>
     </ng-container>
-
     <ng-container>
         <sqx-list-view innerWidth="55rem" [isLoading]="contributorsState.isLoading | async">
             <ng-container>
                 @if (contributorsState.canCreate | async) {
-                    <sqx-contributor-add-form></sqx-contributor-add-form>
+                    <sqx-contributor-add-form />
                 }
 
                 @if ((contributorsState.isLoaded | async) && (contributorsState.contributorsFiltered | async); as contributors) {
@@ -38,6 +28,7 @@
                             {{ "contributors.empty" | sqxTranslate }}
                         </div>
                     }
+
                     <table class="table table-items table-fixed">
                         @for (contributor of contributors; track contributor.contributorId) {
                             <tbody [search]="contributorsState.queryRegex | async" [sqxContributor]="contributor"></tbody>
@@ -45,13 +36,11 @@
                     </table>
                 }
             </ng-container>
-
             <ng-container footer>
-                <sqx-pager [paging]="contributorsState.paging | async" (pagingChange)="contributorsState.page($event)"></sqx-pager>
+                <sqx-pager [paging]="contributorsState.paging | async" (pagingChange)="contributorsState.page($event)" />
             </ng-container>
         </sqx-list-view>
     </ng-container>
-
     <ng-template sidebarMenu>
         <div class="panel-nav">
             <a
@@ -66,7 +55,6 @@
                 titlePosition="left">
                 <i class="icon-time"></i>
             </a>
-
             <a
                 class="panel-link"
                 attr.aria-label="{{ 'common.help' | sqxTranslate }}"
@@ -82,5 +70,4 @@
         </div>
     </ng-template>
 </sqx-layout>
-
 <router-outlet></router-outlet>

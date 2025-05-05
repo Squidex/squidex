@@ -5,7 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.HandleRules;
+using Squidex.Flows;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Controllers.Rules.Models;
 
@@ -14,7 +15,7 @@ public sealed class RuleElementPropertyDto
     /// <summary>
     /// The html editor.
     /// </summary>
-    public RuleFieldEditor Editor { get; set; }
+    public string Editor { get; set; }
 
     /// <summary>
     /// The name of the editor.
@@ -45,4 +46,11 @@ public sealed class RuleElementPropertyDto
     /// Indicates if the property is required.
     /// </summary>
     public bool IsRequired { get; set; }
+
+    public static RuleElementPropertyDto FromDomain(FlowStepPropertyDescriptor descriptor)
+    {
+        var result = SimpleMapper.Map(descriptor, new RuleElementPropertyDto());
+
+        return result;
+    }
 }

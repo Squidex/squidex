@@ -1,0 +1,67 @@
+﻿{
+  Id: Guid_1,
+  FlowState: {
+    Definition: {
+      InitialStepId: Guid_2,
+      Steps: {
+        Guid_2: {
+          Step: {
+            Script:
+                                console.debug('Hello debug');
+                                console.error('Hello error');
+                                console.info('Hello info');                                
+                                console.log('Hello Log');
+                                console.warn('Hello warn');
+
+                            
+          },
+          IgnoreError: false
+        }
+      }
+    },
+    Context: {
+      event: {
+        $type: [],
+        actor: [],
+        appId: [],
+        name: [],
+        partition: [],
+        timestamp: [],
+        version: []
+      }
+    },
+    Description: Manual,
+    Steps: {
+      Guid_2: {
+        Status: Completed,
+        Attempts: [
+          {
+            Log: [
+              {
+                Message: DEBUG: Hello debug
+              },
+              {
+                Message: ERROR: Hello error
+              },
+              {
+                Message: INFO: Hello info
+              },
+              {
+                Message: Hello Log
+              },
+              {
+                Message: WARN: Hello warn
+              }
+            ]
+          }
+        ]
+      }
+    },
+    Status: Completed
+  },
+  Links: {
+    update: {
+      Method: PUT
+    }
+  }
+}

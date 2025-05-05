@@ -1,38 +1,22 @@
 <div class="card item" [class.invalid]="isInvalidForm | async">
     <div class="card-header drag-handle">
         <div class="row">
-            <div class="col-auto pe-1">
-                <ng-content></ng-content>
-            </div>
+            <div class="col-auto pe-1"><ng-content></ng-content></div>
+
             <div class="col">
                 <div class="truncate">
-                    <span class="header-index">#{{ index + 1 }}</span>
-                    <span class="header-title">{{ title | async }}</span>
+                    <span class="header-index">#{{ index + 1 }}</span> <span class="header-title">{{ title | async }}</span>
                 </div>
             </div>
+
             <div class="col-auto pe-4">
-                <button
-                    class="btn btn-text-secondary"
-                    (click)="moveTop()"
-                    [disabled]="isDisabled || isFirst"
-                    title="i18n:contents.arrayMoveTop"
-                    type="button">
+                <button class="btn btn-text-secondary" (click)="moveTop()" [disabled]="isDisabled || isFirst" title="i18n:contents.arrayMoveTop" type="button">
                     <i class="icon-caret-top"></i>
                 </button>
-                <button
-                    class="btn btn-text-secondary"
-                    (click)="moveUp()"
-                    [disabled]="isDisabled || isFirst"
-                    title="i18n:contents.arrayMoveUp"
-                    type="button">
+                <button class="btn btn-text-secondary" (click)="moveUp()" [disabled]="isDisabled || isFirst" title="i18n:contents.arrayMoveUp" type="button">
                     <i class="icon-caret-up"></i>
                 </button>
-                <button
-                    class="btn btn-text-secondary"
-                    (click)="moveDown()"
-                    [disabled]="isDisabled || isLast"
-                    title="i18n:contents.arrayMoveDown"
-                    type="button">
+                <button class="btn btn-text-secondary" (click)="moveDown()" [disabled]="isDisabled || isLast" title="i18n:contents.arrayMoveDown" type="button">
                     <i class="icon-caret-down"></i>
                 </button>
                 <button
@@ -60,16 +44,11 @@
                     <i class="icon-minus-square"></i>
                 </button>
             </div>
+
             <div class="col-auto">
-                <button
-                    class="btn btn-text-secondary"
-                    (click)="clone.emit()"
-                    [disabled]="isDisabled"
-                    title="i18n:contents.arrayCloneItem"
-                    type="button">
+                <button class="btn btn-text-secondary" (click)="clone.emit()" [disabled]="isDisabled" title="i18n:contents.arrayCloneItem" type="button">
                     <i class="icon-clone"></i>
                 </button>
-
                 <button class="btn btn-text-danger" (click)="itemRemove.emit()" [disabled]="isDisabled" type="button">
                     <i class="icon-bin2"></i>
                 </button>
@@ -89,14 +68,12 @@
                     [index]="index"
                     [isComparing]="isComparing"
                     [language]="language"
-                    [languages]="languages"></sqx-component-section>
+                    [languages]="languages" />
             </div>
         }
 
         @if (isInvalidComponent | async) {
-            <sqx-form-hint>
-                {{ "contents.componentInvalid" | sqxTranslate }}
-            </sqx-form-hint>
+            <sqx-form-hint> {{ "contents.componentInvalid" | sqxTranslate }} </sqx-form-hint>
         }
     </div>
 </div>

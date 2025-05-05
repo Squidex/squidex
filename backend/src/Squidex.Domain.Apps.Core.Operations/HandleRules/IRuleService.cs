@@ -22,7 +22,4 @@ public interface IRuleService
 
     IAsyncEnumerable<JobResult> CreateJobsAsync(Envelope<IEvent> @event, RulesContext context,
         CancellationToken ct = default);
-
-    Task<(Result Result, TimeSpan Elapsed)> InvokeAsync(string actionName, string job,
-        CancellationToken ct = default);
 }

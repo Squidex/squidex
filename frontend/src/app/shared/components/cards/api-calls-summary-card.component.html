@@ -1,14 +1,15 @@
 <div class="card card">
     <div class="card-header">{{ "dashboard.apiCallsSummaryCard" | sqxTranslate }}</div>
+
     <div class="card-body">
         @if (callsMonth >= 0) {
             <div class="aggregation">
                 <div class="aggregation-label">{{ "dashboard.currentMonthLabel" | sqxTranslate }}</div>
+
                 <div class="aggregation-value">{{ callsMonth | sqxKNumber }}</div>
+
                 @if (callsAllowed > 0) {
-                    <div class="aggregation-label">
-                        {{ "dashboard.apiCallsLimitLabel" | sqxTranslate }}: {{ callsAllowed | sqxKNumber }}
-                    </div>
+                    <div class="aggregation-label">{{ "dashboard.apiCallsLimitLabel" | sqxTranslate }}: {{ callsAllowed | sqxKNumber }}</div>
                 }
             </div>
         }

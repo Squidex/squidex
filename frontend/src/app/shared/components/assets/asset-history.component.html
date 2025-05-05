@@ -2,11 +2,9 @@
     @for (assetEvent of assetEvents | async; track assetEvent.event.eventId) {
         <div class="event row g-0">
             <div class="col-auto">
-                <img
-                    class="user-picture"
-                    [src]="assetEvent.event.actor | sqxUserPictureRef"
-                    title="{{ assetEvent.event.actor | sqxUserNameRef }}" />
+                <img class="user-picture" [src]="assetEvent.event.actor | sqxUserPictureRef" title="{{ assetEvent.event.actor | sqxUserNameRef }}" />
             </div>
+
             <div class="col ps-2">
                 <div class="event-message">
                     <span class="event-actor user-ref me-1" [title]="assetEvent.event.actor | sqxUserNameRef: null">
@@ -14,7 +12,9 @@
                     </span>
                     <span [innerHTML]="assetEvent.event | sqxHistoryMessage"></span>
                 </div>
+
                 <div class="event-created">{{ assetEvent.event.created | sqxFromNow }}</div>
+
                 @if (assetEvent.canDownload) {
                     <a class="event-load force" [href]="asset | sqxAssetUrl: assetEvent.version" sqxExternalLink="noicon">
                         {{ "assets.downloadVersion" | sqxTranslate }}

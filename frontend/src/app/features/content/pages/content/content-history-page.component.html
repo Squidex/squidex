@@ -2,25 +2,23 @@
     <ng-container>
         <div class="section mb-2">
             <label for="id">{{ "common.id" | sqxTranslate }}</label>
-
             <div class="input-group">
                 <input class="form-control" id="id" #inputId name="id" readonly value="{{ content.id }}" />
-
                 <button class="btn btn-outline-secondary" [sqxCopy]="inputId" type="button">
                     <i class="icon-copy"></i>
                 </button>
             </div>
         </div>
+
         <div class="section mb-4">
-            <label for="version">{{ "common.version" | sqxTranslate }}</label>: <span id="version">{{ content.version }}</span>
+            <label for="version">{{ "common.version" | sqxTranslate }}</label
+            >: <span id="version">{{ content.version }}</span>
         </div>
 
         @if (content.canDraftCreate || content.canDraftDelete) {
             <div class="section mb-4">
                 @if (!content.newStatus) {
-                    <button class="btn btn-success btn-block" (click)="createDraft()">
-                        {{ "contents.draftNew" | sqxTranslate }}
-                    </button>
+                    <button class="btn btn-success btn-block" (click)="createDraft()">{{ "contents.draftNew" | sqxTranslate }}</button>
                 } @else {
                     <label>{{ "contents.draftStatus" | sqxTranslate }}</label>
                     <button
@@ -33,17 +31,17 @@
                             layout="multiline"
                             [scheduled]="content.scheduleJob"
                             [status]="content.newStatus!"
-                            [statusColor]="content.newStatusColor!"></sqx-content-status>
+                            [statusColor]="content.newStatusColor!" />
                     </button>
                     <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="dropdownNew; closeAlways: true">
                         @if (content.statusUpdates.length > 0) {
                             @for (info of content.statusUpdates; track info) {
                                 <a class="dropdown-item" (click)="changeStatus(info.status)">
                                     {{ "common.statusChangeTo" | sqxTranslate }}
-                                    <i class="icon-circle icon-sm" [style.color]="info.color"></i>
-                                    {{ info.status }}
+                                    <i class="icon-circle icon-sm" [style.color]="info.color"></i> {{ info.status }}
                                 </a>
                             }
+
                             <div class="dropdown-divider"></div>
                         }
                         <a
@@ -72,7 +70,6 @@
 
         <div class="section">
             <label>{{ "contents.currentStatusLabel" | sqxTranslate }}</label>
-
             @if (!content.newStatus) {
                 <div>
                     <button
@@ -86,20 +83,17 @@
                             [scheduled]="content.scheduleJob"
                             small="true"
                             [status]="content.status"
-                            [statusColor]="content.statusColor"></sqx-content-status>
+                            [statusColor]="content.statusColor" />
                     </button>
                     <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="dropdown; closeAlways: true">
                         @if (content.statusUpdates.length > 0) {
                             @for (info of content.statusUpdates; track info) {
                                 <a class="dropdown-item" (click)="changeStatus(info.status)">
                                     {{ "common.statusChangeTo" | sqxTranslate }}
-                                    <sqx-content-status
-                                        layout="text"
-                                        small="true"
-                                        [status]="info.status"
-                                        [statusColor]="info.color"></sqx-content-status>
+                                    <sqx-content-status layout="text" small="true" [status]="info.status" [statusColor]="info.color" />
                                 </a>
                             }
+
                             <div class="dropdown-divider"></div>
                         }
                         <a
@@ -125,30 +119,19 @@
                 </div>
             } @else {
                 <button class="btn btn-outline-secondary btn-block btn-status" type="button">
-                    <sqx-content-status
-                        layout="multiline"
-                        [status]="content.status"
-                        [statusColor]="content.statusColor"></sqx-content-status>
+                    <sqx-content-status layout="multiline" [status]="content.status" [statusColor]="content.statusColor" />
                 </button>
             }
-
-            <sqx-form-hint marginTop="1">
-                {{ "contents.lastUpdatedLabel" | sqxTranslate }}: {{ content.lastModified | sqxFromNow }}
-            </sqx-form-hint>
+            <sqx-form-hint marginTop="1"> {{ "contents.lastUpdatedLabel" | sqxTranslate }}: {{ content.lastModified | sqxFromNow }} </sqx-form-hint>
         </div>
 
         <div class="section">
             <h3 class="bordered">{{ "common.history" | sqxTranslate }}</h3>
 
             @for (event of contentEvents | async; track event.eventId) {
-                <sqx-content-event
-                    [content]="content"
-                    (dataCompare)="compareVersion(event)"
-                    (dataLoad)="loadVersion(event)"
-                    [event]="event"></sqx-content-event>
+                <sqx-content-event [content]="content" (dataCompare)="compareVersion(event)" (dataLoad)="loadVersion(event)" [event]="event" />
             }
         </div>
     </ng-container>
 </sqx-layout>
-
-<sqx-due-time-selector #dueTimeSelector [disabled]="disableScheduler"></sqx-due-time-selector>
+<sqx-due-time-selector #dueTimeSelector [disabled]="disableScheduler" />

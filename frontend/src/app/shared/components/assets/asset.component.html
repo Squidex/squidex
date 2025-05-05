@@ -11,19 +11,13 @@
             @if (asset && snapshot.progress === 0) {
                 <div class="file-preview">
                     @if (asset.fileType) {
-                        <span class="file-type">
-                            {{ asset.fileType }}
-                        </span>
+                        <span class="file-type"> {{ asset.fileType }} </span>
                     }
 
                     @if (asset.canPreview) {
-                        <div class="file-image">
-                            <img layoutKey="asset-large" [sqxImageSource]="asset | sqxAssetPreviewUrl" />
-                        </div>
+                        <div class="file-image"><img layoutKey="asset-large" [sqxImageSource]="asset | sqxAssetPreviewUrl" /></div>
                     } @else {
-                        <div class="file-icon">
-                            <img [src]="asset | sqxFileIcon" />
-                        </div>
+                        <div class="file-icon"><img [src]="asset | sqxFileIcon" /></div>
                     }
 
                     <div class="overlay">
@@ -35,7 +29,6 @@
                                     <i class="icon-pencil"></i>
                                 </a>
                             }
-
                             <a
                                 class="file-download ms-2"
                                 attr.aria-label="{{ 'common.download' | sqxTranslate }}"
@@ -44,11 +37,8 @@
                                 sqxStopClick>
                                 <i class="icon-download"></i>
                             </a>
-
                             @if (folderIcon) {
-                                <a class="file-folder ms-2" (click)="selectFolder.emit(asset.parentId)">
-                                    <i class="icon-folder"></i>
-                                </a>
+                                <a class="file-folder ms-2" (click)="selectFolder.emit(asset.parentId)"> <i class="icon-folder"></i> </a>
                             }
 
                             @if (!isDisabled && !removeMode && asset.canDelete) {
@@ -77,31 +67,24 @@
                         </div>
 
                         @if (asset.fileType) {
-                            <span class="overlay-type">
-                                {{ asset.fileType }}
-                            </span>
+                            <span class="overlay-type"> {{ asset.fileType }} </span>
                         }
 
                         <div class="overlay-user">
-                            <div>
-                                <i class="icon-user"></i>
-                                {{ asset.lastModifiedBy | sqxUserNameRef }}
-                            </div>
-                            <div>
-                                {{ asset.lastModified | sqxFromNow }}
-                            </div>
+                            <div><i class="icon-user"></i> {{ asset.lastModifiedBy | sqxUserNameRef }}</div>
+
+                            <div>{{ asset.lastModified | sqxFromNow }}</div>
                         </div>
                     </div>
 
                     <div class="drop-overlay align-items-center justify-content-center">
                         <div class="drop-overlay-background"></div>
+
                         <div class="drop-overlay-text">{{ "assets.dropToUpdate" | sqxTranslate }}</div>
                     </div>
                 </div>
             } @else if (snapshot.progress > 0) {
-                <div class="upload-progress">
-                    <sqx-progress-bar mode="Circle" [value]="snapshot.progress"></sqx-progress-bar>
-                </div>
+                <div class="upload-progress"><sqx-progress-bar mode="Circle" [value]="snapshot.progress" /></div>
             }
         </div>
 
@@ -112,18 +95,17 @@
                         @if (asset.isProtected) {
                             <i class="icon-lock"></i>
                         }
-
                         {{ asset.fileName }}
                     </div>
                 </div>
+
                 <div class="file-tags tags">
                     @for (tag of asset.tags; track tag) {
                         <div class="tag">{{ tag }}</div>
                     }
                 </div>
-                <div class="file-info">
-                    {{ asset.metadataText }}
-                </div>
+
+                <div class="file-info">{{ asset.metadataText }}</div>
             }
         </div>
     </div>
@@ -143,9 +125,7 @@
                     <img class="bg2" layoutKey="asset-small" [sqxImageSource]="asset | sqxAssetPreviewUrl" />
                 </div>
             } @else {
-                <div class="image image-padded" [class.image-left]="!isSelectable">
-                    <img class="icon" [src]="asset | sqxFileIcon" />
-                </div>
+                <div class="image image-padded" [class.image-left]="!isSelectable"><img class="icon" [src]="asset | sqxFileIcon" /></div>
             }
 
             <table class="table-fixed">
@@ -155,7 +135,6 @@
                             @if (asset.isProtected) {
                                 <i class="icon-lock"></i>
                             }
-
                             {{ asset.fileName }}
                         </div>
                     </td>
@@ -164,21 +143,15 @@
                         <td class="col-info">
                             <div class="truncate">{{ asset.metadataText }}</div>
                         </td>
+
                         <td class="col-user">
-                            <img
-                                class="user-picture"
-                                [src]="asset.lastModifiedBy | sqxUserPictureRef"
-                                title="{{ asset.lastModifiedBy | sqxUserNameRef }}" />
+                            <img class="user-picture" [src]="asset.lastModifiedBy | sqxUserPictureRef" title="{{ asset.lastModifiedBy | sqxUserNameRef }}" />
                         </td>
+
                         <td class="col-actions text-end">
-                            <a
-                                class="btn btn-text-secondary"
-                                [href]="asset | sqxAssetUrl: asset.version : false"
-                                sqxExternalLink="noicon"
-                                sqxStopClick>
+                            <a class="btn btn-text-secondary" [href]="asset | sqxAssetUrl: asset.version : false" sqxExternalLink="noicon" sqxStopClick>
                                 <i class="icon-download"></i>
                             </a>
-
                             @if (folderIcon) {
                                 <button class="btn btn-text-secondary" (click)="selectFolder.emit(asset.parentId)" type="button">
                                     <i class="icon-folder"></i>
@@ -219,13 +192,14 @@
 
             <div class="drop-overlay align-items-center justify-content-center">
                 <div class="drop-overlay-background"></div>
+
                 <div class="drop-overlay-text">{{ "assets.dropToUpdate" | sqxTranslate }}</div>
             </div>
         }
 
         @if (snapshot.progress > 0) {
             <div class="upload-progress">
-                <sqx-progress-bar [showText]="false" [strokeWidth]="0.8" [trailWidth]="0.8" [value]="snapshot.progress"></sqx-progress-bar>
+                <sqx-progress-bar [showText]="false" [strokeWidth]="0.8" [trailWidth]="0.8" [value]="snapshot.progress" />
             </div>
         }
     </div>

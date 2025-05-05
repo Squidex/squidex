@@ -1,33 +1,22 @@
 <sqx-modal-dialog (dialogClose)="dialogClose.emit()" size="lg">
-    <ng-container title>
-        {{ "clients.connect" | sqxTranslate }}
-    </ng-container>
-
+    <ng-container title> {{ "clients.connect" | sqxTranslate }} </ng-container>
     <ng-container content>
         <nav aria-label="breadcrumb">
             <ol class="breadcrumb mb-4 steps">
-                <li class="breadcrumb-item done">
-                    <i class="icon-checkmark"></i>
-                    {{ "clients.connectWizard.step0Title" | sqxTranslate }}
-                </li>
+                <li class="breadcrumb-item done"><i class="icon-checkmark"></i> {{ "clients.connectWizard.step0Title" | sqxTranslate }}</li>
+
                 @if (step === "Start") {
                     <li class="breadcrumb-item active">
-                        <span>
-                            <i class="icon-checkmark"></i>
-                            {{ "clients.connectWizard.step1Title" | sqxTranslate }}
-                        </span>
+                        <span> <i class="icon-checkmark"></i> {{ "clients.connectWizard.step1Title" | sqxTranslate }} </span>
                     </li>
                 } @else {
                     <li class="breadcrumb-item done">
-                        <a class="force" (click)="go('Start')">
-                            <i class="icon-checkmark"></i>
-                            {{ "clients.connectWizard.step1Title" | sqxTranslate }}
-                        </a>
+                        <a class="force" (click)="go('Start')"> <i class="icon-checkmark"></i> {{ "clients.connectWizard.step1Title" | sqxTranslate }} </a>
                     </li>
                 }
+
                 <li class="breadcrumb-item" [class.active]="step !== 'Start'">
-                    <i class="icon-checkmark"></i>
-                    {{ "clients.connectWizard.step2Title" | sqxTranslate }}
+                    <i class="icon-checkmark"></i> {{ "clients.connectWizard.step2Title" | sqxTranslate }}
                 </li>
             </ol>
         </nav>
@@ -41,121 +30,108 @@
                 <div class="section">
                     <div class="option" (click)="go('HTTP')">
                         <h5>{{ "clients.connectWizard.manually" | sqxTranslate }}</h5>
-                        <sqx-form-hint>
-                            {{ "clients.connectWizard.manuallyHint" | sqxTranslate }}
-                        </sqx-form-hint>
+                        <sqx-form-hint> {{ "clients.connectWizard.manuallyHint" | sqxTranslate }} </sqx-form-hint>
                         <i class="icon-angle-right"></i>
                     </div>
+
                     <div class="option" (click)="go('CLI')">
                         <h5>{{ "clients.connectWizard.cli" | sqxTranslate }}</h5>
-                        <sqx-form-hint>
-                            {{ "clients.connectWizard.cliHint" | sqxTranslate }}
-                        </sqx-form-hint>
+                        <sqx-form-hint> {{ "clients.connectWizard.cliHint" | sqxTranslate }} </sqx-form-hint>
                         <i class="icon-angle-right"></i>
                     </div>
+
                     <div class="option" (click)="go('SDK')">
                         <h5>{{ "clients.connectWizard.sdk" | sqxTranslate }}</h5>
-                        <sqx-form-hint>
-                            {{ "clients.connectWizard.sdkHint" | sqxTranslate }}
-                        </sqx-form-hint>
+                        <sqx-form-hint> {{ "clients.connectWizard.sdkHint" | sqxTranslate }} </sqx-form-hint>
                         <i class="icon-angle-right"></i>
                     </div>
                 </div>
             }
+
             @case ("HTTP") {
                 <div class="section step">
-                    <h5>
-                        <span class="badge rounded-pill bg-dark">1</span>
-                        {{ "clients.connectWizard.manuallyStep1" | sqxTranslate }}
-                    </h5>
+                    <h5><span class="badge rounded-pill bg-dark">1</span> {{ "clients.connectWizard.manuallyStep1" | sqxTranslate }}</h5>
+
                     <p>
                         <sqx-code>
                             <div ngPreserveWhitespaces>$ curl</div>
+
                             <div ngPreserveWhitespaces>-X POST '{{ apiUrl.buildUrl("/identity-server/connect/token") }}'</div>
+
                             <div ngPreserveWhitespaces>-H 'Content-Type: application/x-www-form-urlencoded'</div>
+
                             <div ngPreserveWhitespaces>-d 'grant_type=client_credentials&</div>
+
                             <div ngPreserveWhitespaces>client_id={{ appName }}:{{ client.id }}</div>
+
                             <div ngPreserveWhitespaces>client_secret={{ client.secret }}</div>
+
                             <div ngPreserveWhitespaces>scope=squidex-api'</div>
                         </sqx-code>
                     </p>
                 </div>
+
                 <div class="section step">
-                    <h5>
-                        <span class="badge rounded-pill bg-dark">2</span>
-                        {{ "clients.connectWizard.manuallyStep2" | sqxTranslate }}
-                    </h5>
+                    <h5><span class="badge rounded-pill bg-dark">2</span> {{ "clients.connectWizard.manuallyStep2" | sqxTranslate }}</h5>
+
                     <p>
                         <sqx-code>{{ appToken?.accessToken }}</sqx-code>
                     </p>
                 </div>
+
                 <div class="section step">
-                    <h5>
-                        <span class="badge rounded-pill bg-dark">3</span>
-                        {{ "clients.connectWizard.manuallyStep3" | sqxTranslate }}
-                    </h5>
-                    <p>
-                        <sqx-code>Authorization: Bearer [YOUR_TOKEN]</sqx-code>
-                    </p>
+                    <h5><span class="badge rounded-pill bg-dark">3</span> {{ "clients.connectWizard.manuallyStep3" | sqxTranslate }}</h5>
+
+                    <p><sqx-code>Authorization: Bearer [YOUR_TOKEN]</sqx-code></p>
                 </div>
-                <sqx-form-hint>
-                    {{ "clients.connectWizard.manuallyTokenHint" | sqxTranslate }}
-                </sqx-form-hint>
+                <sqx-form-hint> {{ "clients.connectWizard.manuallyTokenHint" | sqxTranslate }} </sqx-form-hint>
             }
+
             @case ("CLI") {
                 <div class="section step">
-                    <h5>
-                        <span class="badge rounded-pill bg-dark">1</span>
-                        {{ "clients.connectWizard.cliStep1" | sqxTranslate }}
-                    </h5>
+                    <h5><span class="badge rounded-pill bg-dark">1</span> {{ "clients.connectWizard.cliStep1" | sqxTranslate }}</h5>
+
                     <div [sqxMarkdown]="'clients.connectWizard.cliStep1Download' | sqxTranslate" trusted="true"></div>
-                    <sqx-form-hint>
-                        {{ "clients.connectWizard.cliStep1Hint" | sqxTranslate }}
-                    </sqx-form-hint>
+                    <sqx-form-hint> {{ "clients.connectWizard.cliStep1Hint" | sqxTranslate }} </sqx-form-hint>
                 </div>
+
                 <div class="section step">
                     <h5>
                         <span class="badge rounded-pill bg-dark">2</span>
                         <span [sqxMarkdown]="'clients.connectWizard.cliStep2' | sqxTranslate" trusted="true"></span>
                     </h5>
                 </div>
+
                 <div class="section step">
-                    <h5>
-                        <span class="badge rounded-pill bg-dark">3</span>
-                        {{ "clients.connectWizard.cliStep3" | sqxTranslate }}
-                    </h5>
+                    <h5><span class="badge rounded-pill bg-dark">3</span> {{ "clients.connectWizard.cliStep3" | sqxTranslate }}</h5>
+
                     <p>
-                        <sqx-code>
-                            sq config add {{ appName }} {{ appName }}:{{ client.id }} {{ client.secret }} -u {{ apiUrl.value }} --use
-                        </sqx-code>
-                        <sqx-form-hint>
-                            {{ "clients.connectWizard.cliStep3Hint" | sqxTranslate }}
-                        </sqx-form-hint>
+                        <sqx-code> sq config add {{ appName }} {{ appName }}:{{ client.id }} {{ client.secret }} -u {{ apiUrl.value }} --use </sqx-code>
+                        <sqx-form-hint> {{ "clients.connectWizard.cliStep3Hint" | sqxTranslate }} </sqx-form-hint>
                     </p>
                 </div>
+
                 <div class="section step">
-                    <h5>
-                        <span class="badge rounded-pill bg-dark">4</span>
-                        {{ "clients.connectWizard.cliStep4" | sqxTranslate }}
-                    </h5>
+                    <h5><span class="badge rounded-pill bg-dark">4</span> {{ "clients.connectWizard.cliStep4" | sqxTranslate }}</h5>
+
                     <p>
                         <sqx-code>sq config use {{ appName }}</sqx-code>
                     </p>
                 </div>
             }
+
             @case ("SDK") {
                 @if (sdks | async; as sdks) {
                     <div>
                         @for (availableSDK of sdks | keyvalue; track availableSDK) {
                             <div class="sdk-header" [class.active]="sdk === availableSDK.value" (click)="select(availableSDK.value)">
-                                <div
-                                    class="logo d-flex align-items-center justify-content-center"
-                                    [sqxMarkdown]="availableSDK.value.logo"></div>
+                                <div class="logo d-flex align-items-center justify-content-center" [sqxMarkdown]="availableSDK.value.logo"></div>
                                 {{ availableSDK.value.name }}
                             </div>
                         }
                     </div>
                 }
+
                 @if (sdk) {
                     <div class="section markdown">
                         <div>
@@ -166,20 +142,18 @@
                         <span inline="false" [sqxMarkdown]="sdk.instructions" trusted="true"></span>
                     </div>
                 }
+
                 @if (sdk) {
                     <div class="section">
                         <sqx-form-hint>
                             {{ "clients.connectWizard.sdkHelp" | sqxTranslate }}
-                            <a href="https://support.squidex.io" sqxExternalLink>{{
-                                "clients.connectWizard.sdkHelpLink" | sqxTranslate
-                            }}</a>
+                            <a href="https://support.squidex.io" sqxExternalLink>{{ "clients.connectWizard.sdkHelpLink" | sqxTranslate }}</a>
                         </sqx-form-hint>
                     </div>
                 }
             }
         }
     </ng-container>
-
     <ng-container footer>
         <button class="btn btn-text-secondary" (click)="go('Start')" [disabled]="step === 'Start'">
             {{ "common.back" | sqxTranslate }}

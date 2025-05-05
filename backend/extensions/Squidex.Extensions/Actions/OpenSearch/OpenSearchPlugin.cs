@@ -15,6 +15,9 @@ public sealed class OpenSearchPlugin : IPlugin
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        services.AddRuleAction<OpenSearchAction, OpenSearchActionHandler>();
+        services.AddFlowStep<OpenSearchFlowStep>();
+#pragma warning disable CS0618 // Type or member is obsolete
+        services.AddRuleAction<OpenSearchAction>();
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

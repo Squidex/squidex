@@ -1,25 +1,23 @@
 <div class="sidebar-section">
     <h3>{{ "search.sharedQueries" | sqxTranslate }}</h3>
-
     <sqx-query-list
         canRemove="true"
         [queries]="queries.queriesShared | async"
         [queryUsed]="queryUsed"
         (remove)="queries.removeShared($event)"
         (search)="search.emit($event)"
-        [types]="types"></sqx-query-list>
+        [types]="types" />
 </div>
 
 <hr />
 
 <div class="sidebar-section">
     <h3>{{ "search.myQueries" | sqxTranslate }}</h3>
-
     <sqx-query-list
         canRemove="true"
         [queries]="queries.queriesUser | async"
         [queryUsed]="queryUsed"
         (remove)="queries.removeUser($event)"
         (search)="search.emit($event)"
-        [types]="types"></sqx-query-list>
+        [types]="types" />
 </div>

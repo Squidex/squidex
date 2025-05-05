@@ -18,7 +18,7 @@ export class CreateIndexForm extends Form<TemplatedFormArray, CreateIndexDto> {
     constructor() {
         super(new TemplatedFormArray(FieldTemplate.INSTANCE));
     }
-        
+
     protected transformSubmit(value: any[]) {
         return new CreateIndexDto({ fields: value.map(x => new IndexFieldDto(x)) });
     }

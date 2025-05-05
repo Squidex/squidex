@@ -22,19 +22,5 @@ public static class EFRuleBuilder
             b.Property(x => x.IndexedAppId).AsString();
             b.Property(x => x.IndexedId).AsString();
         });
-
-        builder.Entity<EFRuleEventEntity>(b =>
-        {
-            b.Property(x => x.Id).AsString();
-            b.Property(x => x.AppId).AsString();
-            b.Property(x => x.Created).AsDateTimeOffset();
-            b.Property(x => x.Expires).AsDateTimeOffset();
-            b.Property(x => x.Job).AsJsonString(jsonSerializer, jsonColumn);
-            b.Property(x => x.JobResult).AsString();
-            b.Property(x => x.LastModified).AsDateTimeOffset();
-            b.Property(x => x.NextAttempt).AsDateTimeOffset();
-            b.Property(x => x.Result).AsString();
-            b.Property(x => x.RuleId).AsString();
-        });
     }
 }

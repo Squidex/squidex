@@ -7,18 +7,11 @@
 
                     <div class="card mb-4">
                         <div class="card-body">
-                            <sqx-form-error [error]="updateForm.error | async"></sqx-form-error>
-
+                            <sqx-form-error [error]="updateForm.error | async" />
                             <div class="form-group">
-                                <label for="name">{{ "common.name" | sqxTranslate }}</label>
-
-                                <sqx-control-errors for="name"></sqx-control-errors>
-
+                                <label for="name">{{ "common.name" | sqxTranslate }}</label> <sqx-control-errors for="name" />
                                 <input class="form-control" id="name" formControlName="name" maxlength="100" />
-
-                                <sqx-form-hint>
-                                    {{ "teams.teamNameHint" | sqxTranslate }}
-                                </sqx-form-hint>
+                                <sqx-form-hint> {{ "teams.teamNameHint" | sqxTranslate }} </sqx-form-hint>
                             </div>
                         </div>
 
@@ -36,11 +29,9 @@
                     <div class="row">
                         <div class="col">
                             <h5>{{ "teams.delete" | sqxTranslate }}</h5>
-
-                            <sqx-form-hint>
-                                {{ "teams.deleteWarning" | sqxTranslate }}
-                            </sqx-form-hint>
+                            <sqx-form-hint> {{ "teams.deleteWarning" | sqxTranslate }} </sqx-form-hint>
                         </div>
+
                         <div class="col-auto">
                             <button
                                 class="btn btn-danger"
@@ -57,7 +48,6 @@
             </ng-container>
         </sqx-list-view>
     </ng-container>
-
     <ng-template sidebarMenu>
         <div class="panel-nav">
             <a
@@ -72,7 +62,6 @@
                 titlePosition="left">
                 <i class="icon-time"></i>
             </a>
-
             <a
                 class="panel-link"
                 attr.aria-label="{{ 'common.help' | sqxTranslate }}"
@@ -88,5 +77,4 @@
         </div>
     </ng-template>
 </sqx-layout>
-
 <router-outlet></router-outlet>

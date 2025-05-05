@@ -1,29 +1,23 @@
 <div class="card card-href card-app" [routerLink]="['/app', app.name]">
     <div class="card-body" sqxTourStep="app">
         <div class="row g-0">
-            <div class="col-auto card-left">
-                <sqx-avatar [identifier]="app.name" [image]="app.image"></sqx-avatar>
-            </div>
+            <div class="col-auto card-left"><sqx-avatar [identifier]="app.name" [image]="app.image" /></div>
+
             <div class="col card-right">
                 <h3 class="card-title">{{ app.displayName }}</h3>
 
                 <div class="card-text card-links truncate">
                     <a [routerLink]="['/app', app.name]" sqxStopClick>{{ "common.edit" | sqxTranslate }}</a>
-
                     <span class="deeplinks">
                         &nbsp;|
-                        <a [routerLink]="['/app', app.name, 'content']" sqxStopClick>{{ "common.content" | sqxTranslate }}</a>
-                        &middot;
-                        <a [routerLink]="['/app', app.name, 'assets']" sqxStopClick>{{ "common.assets" | sqxTranslate }}</a>
-                        &middot;
+                        <a [routerLink]="['/app', app.name, 'content']" sqxStopClick>{{ "common.content" | sqxTranslate }}</a> &middot;
+                        <a [routerLink]="['/app', app.name, 'assets']" sqxStopClick>{{ "common.assets" | sqxTranslate }}</a> &middot;
                         <a [routerLink]="['/app', app.name, 'settings']" sqxStopClick>{{ "common.settings" | sqxTranslate }}</a>
                     </span>
                 </div>
 
                 @if (app.description) {
-                    <div class="card-text">
-                        {{ app.description }}
-                    </div>
+                    <div class="card-text">{{ app.description }}</div>
                 }
             </div>
         </div>

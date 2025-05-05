@@ -9,17 +9,26 @@ import { AbstractControl, UntypedFormControl, UntypedFormGroup, Validators } fro
 import { ExtendedFormGroup, Form, TemplatedFormArray, ValidatorsEx } from '@app/framework';
 import { RuleElementDto, RuleTriggerDto } from '../model';
 
-export class ActionForm extends Form<UntypedFormGroup, Record<string, any>> {
+export class StepForm extends Form<UntypedFormGroup, Record<string, any>> {
+    public get editableProperties() {
+        return this.definition.properties.filter(x => x.editor !== 'None');
+    }
+
     constructor(public readonly definition: RuleElementDto,
-        public readonly actionType: string,
+        public readonly stepType: string,
     ) {
-        super(ActionForm.builForm(definition));
+        super(StepForm.builForm(definition));
     }
 
     private static builForm(definition: RuleElementDto) {
         const controls: { [name: string]: AbstractControl } = {};
 
         for (const property of definition.properties) {
+            if (property.editor === 'Branches') {
+                controls[property.name] = new TemplatedFormArray(BranchTemplate.INSTANCE);
+                continue;
+            }
+
             const validator =
                 property.isRequired ?
                 Validators.required :
@@ -37,10 +46,28 @@ export class ActionForm extends Form<UntypedFormGroup, Record<string, any>> {
         return new ExtendedFormGroup(controls);
     }
 
-    protected transformSubmit(value: any): any {
-        value.actionType = this.actionType;
+    public branch(name: string) {
+        return this.form.controls[name] as TemplatedFormArray;
+    }
 
+    protected transformSubmit(value: any): any {
+        value.stepType = this.stepType;
         return value;
+    }
+}
+
+class BranchTemplate {
+    public static readonly INSTANCE = new BranchTemplate();
+
+    public createControl() {
+        return new ExtendedFormGroup({
+            condition: new UntypedFormControl('',
+                Validators.nullValidator,
+            ),
+            nextStepId: new UntypedFormControl('',
+                Validators.nullValidator,
+            ),
+        });
     }
 }
 

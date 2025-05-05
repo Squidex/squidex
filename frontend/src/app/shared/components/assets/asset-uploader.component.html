@@ -4,8 +4,7 @@
             <ul class="nav navbar-nav align-items-center" (sqxDropFile)="addFiles($event)">
                 <li class="nav-item nav-icon dropdown d-flex align-items-center" #button>
                     <span class="nav-link dropdown-toggle" (click)="modalMenu.toggle()">
-                        <i class="icon-upload-3"></i>
-                        <span>{{ uploads.length }}</span>
+                        <i class="icon-upload-3"></i> <span>{{ uploads.length }}</span>
                     </span>
                     <sqx-dropdown-menu
                         class="container"
@@ -16,42 +15,35 @@
                         *sqxModal="modalMenu; onRoot: false">
                         <div class="uploads">
                             @if (uploads.length === 0) {
-                                <small class="uploads-empty text-muted">
-                                    {{ "assets.uploaderUploadHere" | sqxTranslate }}
-                                </small>
+                                <small class="uploads-empty text-muted"> {{ "assets.uploaderUploadHere" | sqxTranslate }} </small>
                             }
+
                             @for (upload of uploads; track upload.id) {
                                 <div class="upload row g-0">
                                     <div class="col-auto">
                                         @switch (upload.status) {
                                             @case ("Failed") {
-                                                <div class="upload-status upload-status-failed">
-                                                    <i class="icon-exclamation"></i>
-                                                </div>
+                                                <div class="upload-status upload-status-failed"><i class="icon-exclamation"></i></div>
                                             }
+
                                             @case ("Completed") {
-                                                <div class="upload-status upload-status-success">
-                                                    <i class="icon-checkmark"></i>
-                                                </div>
+                                                <div class="upload-status upload-status-success"><i class="icon-checkmark"></i></div>
                                             }
+
                                             @default {
-                                                <div class="upload-status upload-status-running">
-                                                    <i class="icon-hour-glass"></i>
-                                                </div>
+                                                <div class="upload-status upload-status-running"><i class="icon-hour-glass"></i></div>
                                             }
                                         }
                                     </div>
+
                                     <div class="col-6">
                                         <div class="upload-name">{{ upload.name }}</div>
                                     </div>
+
                                     <div class="col">
-                                        <sqx-progress-bar
-                                            animated="false"
-                                            showText="false"
-                                            strokeWidth="1.5"
-                                            trailWidth="1.5"
-                                            [value]="upload.progress"></sqx-progress-bar>
+                                        <sqx-progress-bar animated="false" showText="false" strokeWidth="1.5" trailWidth="1.5" [value]="upload.progress" />
                                     </div>
+
                                     <div class="col-auto">
                                         <button class="btn btn-text-secondary" (click)="stopUpload(upload)" type="button">
                                             <i class="icon-close"></i>

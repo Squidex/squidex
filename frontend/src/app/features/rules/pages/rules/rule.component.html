@@ -8,8 +8,9 @@
                     [inputTitle]="rule.name"
                     (inputTitleChange)="rename($event)"
                     inputTitleLength="60"
-                    inputTitleRequired="false"></sqx-editable-title>
+                    inputTitleRequired="false" />
             </div>
+
             <div class="col-auto" [class.invisible]="!rule.canDelete && !rule.canRun">
                 <button
                     class="btn btn-text-secondary"
@@ -19,28 +20,17 @@
                     type="button">
                     <i class="icon-dots"></i>
                 </button>
-
-                <sqx-dropdown-menu
-                    position="bottom-end"
-                    scrollY="true"
-                    [sqxAnchoredTo]="buttonOptions"
-                    *sqxModal="dropdown; closeAlways: true">
+                <sqx-dropdown-menu position="bottom-end" scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="dropdown; closeAlways: true">
                     @if (rule.canUpdate) {
-                        <a class="dropdown-item" [routerLink]="rule.id">
-                            {{ "common.edit" | sqxTranslate }}
-                        </a>
+                        <a class="dropdown-item" [routerLink]="rule.id"> {{ "common.edit" | sqxTranslate }} </a>
                     }
 
                     @if (rule.canEnable) {
-                        <a class="dropdown-item" (click)="enable()">
-                            {{ "common.enable" | sqxTranslate }}
-                        </a>
+                        <a class="dropdown-item" (click)="enable()"> {{ "common.enable" | sqxTranslate }} </a>
                     }
 
                     @if (rule.canDisable) {
-                        <a class="dropdown-item" (click)="disable()">
-                            {{ "common.disable" | sqxTranslate }}
-                        </a>
+                        <a class="dropdown-item" (click)="disable()"> {{ "common.disable" | sqxTranslate }} </a>
                     }
 
                     <div class="dropdown-divider"></div>
@@ -56,6 +46,7 @@
                                 {{ "rules.run" | sqxTranslate }}
                             </a>
                         }
+
                         @if (rule.canRunFromSnapshots) {
                             <a
                                 class="dropdown-item"
@@ -66,6 +57,7 @@
                                 {{ "rules.runFromSnapshots" | sqxTranslate }}
                             </a>
                         }
+
                         <div class="dropdown-divider"></div>
                     }
 
@@ -83,23 +75,41 @@
             </div>
         </div>
     </div>
+
     <div class="card-body">
         <div class="row align-items-center">
             <div class="col-auto">
                 <h3>{{ "rules.ruleSyntax.if" | sqxTranslate }}</h3>
             </div>
-            <div class="col">
-                <sqx-rule-element disabled="true" [element]="ruleTriggers[rule.trigger.triggerType]" [type]="rule.trigger.triggerType"></sqx-rule-element>
+
+            <div class="col-auto">
+                <sqx-rule-element
+                    disabled="true"
+                    [elementInfo]="availableTriggers[rule.trigger.triggerType]"
+                    [elementType]="rule.trigger.triggerType"
+                    showDescription="false"
+                    showName="false" />
             </div>
+
             <div class="col-auto">
                 <h3>{{ "rules.ruleSyntax.then" | sqxTranslate }}</h3>
             </div>
-            <div class="col">
-                <sqx-rule-element
-                    disabled="true"
-                    [element]="$any(ruleActions[rule.action.actionType])"
-                    [type]="rule.action.actionType"></sqx-rule-element>
+
+            <div class="col col-flow">
+                <div class="d-flex flex-row align-items-center">
+                    @for (item of flow; track item.id) {
+                        <sqx-rule-element
+                            disabled="true"
+                            [elementInfo]="$any(availableSteps[item.step.step.stepType])"
+                            [elementType]="item.step.step.stepType"
+                            [label]="item.step.name"
+                            showDescription="false"
+                            showName="false" />
+                        <i class="icon-caret-right ms-2 me-2"></i>
+                    }
+                </div>
             </div>
+
             <div class="col col-last text-end">
                 @if (isManual) {
                     <button
@@ -112,35 +122,31 @@
                         <i class="icon-play-line"></i>
                     </button>
                 } @else {
-                    <sqx-toggle
-                        [disabled]="!rule.canDisable && !rule.canEnable"
-                        [ngModel]="rule.isEnabled"
-                        (ngModelChange)="toggle()"></sqx-toggle>
+                    <sqx-toggle [disabled]="!rule.canDisable && !rule.canEnable" [ngModel]="rule.isEnabled" (ngModelChange)="toggle()" />
                 }
             </div>
         </div>
     </div>
+
     <div class="card-footer">
         <div class="row">
             <div class="col">
                 {{ "common.succeeded" | sqxTranslate }}
-
                 @if (rule.numSucceeded > 0) {
                     <span class="badge badge-success rounded-pill">{{ rule.numSucceeded }}</span>
                 }
             </div>
+
             <div class="col">
                 {{ "common.failed" | sqxTranslate }}
-
                 @if (rule.numFailed > 0) {
                     <span class="badge badge-danger rounded-pill">{{ rule.numFailed }}</span>
                 }
             </div>
+
             @if (rule.canReadLogs) {
                 <div class="col-auto">
-                    <a [queryParams]="{ ruleId: rule.id }" routerLink="events">
-                        {{ "common.logs" | sqxTranslate }}
-                    </a>
+                    <a [queryParams]="{ ruleId: rule.id }" routerLink="events"> {{ "common.logs" | sqxTranslate }} </a>
                     @if (!isManual) {
                         <a class="ms-2" [queryParams]="{ ruleId: rule.id }" routerLink="simulator">
                             {{ "rules.simulator" | sqxTranslate }}

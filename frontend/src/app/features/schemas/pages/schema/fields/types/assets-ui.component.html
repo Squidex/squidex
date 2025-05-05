@@ -3,17 +3,15 @@
         <label class="col-3 col-form-label" for="{{ field.fieldId }}_previewMode">
             {{ "schemas.fieldTypes.assets.previewMode" | sqxTranslate }}
         </label>
-
         <div class="col-9">
             <select class="form-select" id="{{ field.fieldId }}_previewMode" formControlName="previewMode">
                 <option value="ImageAndFileName">{{ "schemas.fieldTypes.assets.previewImageAndFileName" | sqxTranslate }}</option>
+
                 <option value="Image">{{ "schemas.fieldTypes.assets.previewImage" | sqxTranslate }}</option>
+
                 <option value="FileName">{{ "schemas.fieldTypes.assets.previewFileName" | sqxTranslate }}</option>
             </select>
-
-            <sqx-form-hint>
-                {{ "schemas.fieldTypes.assets.previewModeHint" | sqxTranslate }}
-            </sqx-form-hint>
+            <sqx-form-hint> {{ "schemas.fieldTypes.assets.previewModeHint" | sqxTranslate }} </sqx-form-hint>
         </div>
     </div>
 
@@ -21,10 +19,8 @@
         <label class="col-3 col-form-label" for="{{ field.fieldId }}_previewFormat">
             {{ "schemas.fieldTypes.assets.previewFormat" | sqxTranslate }}
         </label>
-
         <div class="col-9">
             <input class="form-control" id="{{ field.fieldId }}_previewFormat" formControlName="previewFormat" />
-
             <sqx-form-hint>
                 <span inline="true" [sqxMarkdown]="'schemas.fieldTypes.assets.previewFormatHint' | sqxTranslate"></span>
             </sqx-form-hint>
@@ -39,7 +35,6 @@
                     {{ "schemas.fieldTypes.assets.resolve" | sqxTranslate }}
                 </label>
             </div>
-
             <sqx-form-hint>
                 <span inline="true" [sqxMarkdown]="'schemas.fieldTypes.assets.resolveHint' | sqxTranslate"></span>
             </sqx-form-hint>
@@ -50,13 +45,9 @@
         <label class="col-3 col-form-label" for="{{ field.fieldId }}_folderId">
             {{ "schemas.fieldTypes.assets.folderId" | sqxTranslate }}
         </label>
-
         <div class="col-9">
-            <sqx-asset-folder-dropdown formControlName="folderId"></sqx-asset-folder-dropdown>
-
-            <sqx-form-hint>
-                {{ "schemas.fieldTypes.assets.folderIdHint" | sqxTranslate }}
-            </sqx-form-hint>
+            <sqx-asset-folder-dropdown formControlName="folderId" />
+            <sqx-form-hint> {{ "schemas.fieldTypes.assets.folderIdHint" | sqxTranslate }} </sqx-form-hint>
         </div>
     </div>
 </div>

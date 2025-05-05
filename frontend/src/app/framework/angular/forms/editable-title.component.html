@@ -3,7 +3,7 @@
         <div class="row g-1 align-items-center">
             <div class="col">
                 <div class="form-group">
-                    <sqx-control-errors [for]="renameForm"></sqx-control-errors>
+                    <sqx-control-errors [for]="renameForm" />
                     <input
                         class="form-control form-control-{{ size }}"
                         [formControl]="renameForm"
@@ -13,6 +13,7 @@
                         sqxFocusOnInit />
                 </div>
             </div>
+
             <div class="col-auto">
                 <button
                     class="btn btn-primary btn-{{ size }}"
@@ -22,6 +23,7 @@
                     <i class="icon-checkmark"></i>
                 </button>
             </div>
+
             @if (closeButton) {
                 <div class="col-auto">
                     <button
@@ -42,6 +44,7 @@
                 {{ inputTitle || displayFallback }}
             </h3>
         </div>
+
         @if (!disabled) {
             <div class="col-auto title-edit">
                 <button
@@ -53,6 +56,7 @@
                 </button>
             </div>
         }
+
         <div class="col-auto">
             <button class="btn btn-text-secondary btn-{{ size }} btn-placeholder" (click)="toggleRename()" type="button">&nbsp;</button>
         </div>

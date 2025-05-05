@@ -1,35 +1,28 @@
 <ng-container>
     <div class="section">
         <h4>{{ "common.schemas" | sqxTranslate }}</h4>
-
-        <sqx-form-hint>
-            {{ "rules.schemas.hint" | sqxTranslate }}
-        </sqx-form-hint>
-
+        <sqx-form-hint> {{ "rules.schemas.hint" | sqxTranslate }} </sqx-form-hint>
         @if (!triggerForm.form.controls.handleAll.value) {
             <div>
                 @for (form of schemasForm.controls; track form; let i = $index) {
-                    <div class="mb-2">
-                        <sqx-content-changed-schema
-                            [form]="$any(form)"
-                            (remove)="removeSchema(i)"
-                            [schemas]="schemas"></sqx-content-changed-schema>
-                    </div>
+                    <div class="mb-2"><sqx-content-changed-schema [form]="$any(form)" (remove)="remove(i)" [schemas]="schemas" /></div>
                 }
+
                 <div class="form-group row gx-2 align-items-center">
                     <div class="col-3">
                         <div class="form-control preview">{{ "common.schema" | sqxTranslate }}</div>
                     </div>
+
                     <div class="col-auto">
                         <div class="label text-muted">{{ "rules.when" | sqxTranslate }}</div>
                     </div>
+
                     <div class="col">
                         <div class="form-control preview">{{ "rules.condition" | sqxTranslate }}</div>
                     </div>
+
                     <div class="col-auto">
-                        <button class="btn btn-success" (click)="addSchema()" type="button">
-                            <i class="icon-add"></i>
-                        </button>
+                        <button class="btn btn-success" (click)="addSchema()" type="button"><i class="icon-add"></i></button>
                     </div>
                 </div>
             </div>
@@ -38,26 +31,17 @@
         <div class="form-group" [formGroup]="triggerForm.form">
             <div class="form-check">
                 <input class="form-check-input" id="handleAll" formControlName="handleAll" type="checkbox" />
-                <label class="form-check-label" for="handleAll">
-                    {{ "rules.triggerAll" | sqxTranslate }}
-                </label>
+                <label class="form-check-label" for="handleAll"> {{ "rules.triggerAll" | sqxTranslate }} </label>
             </div>
         </div>
     </div>
 
     <div class="section">
         <h4>{{ "rules.referencedSchemas" | sqxTranslate }}</h4>
-
-        <sqx-form-hint>
-            {{ "rules.referencedSchemasHint" | sqxTranslate }}
-        </sqx-form-hint>
-
+        <sqx-form-hint> {{ "rules.referencedSchemasHint" | sqxTranslate }} </sqx-form-hint>
         @for (form of referencedSchemasForm.controls; track form; let i = $index) {
             <div class="mb-2">
-                <sqx-content-changed-schema
-                    [form]="$any(form)"
-                    (remove)="removeReferencedSchema(i)"
-                    [schemas]="schemas"></sqx-content-changed-schema>
+                <sqx-content-changed-schema [form]="$any(form)" (remove)="removeReferencedSchema(i)" [schemas]="schemas" />
             </div>
         }
 
@@ -75,37 +59,27 @@
             </div>
 
             <div class="col-auto">
-                <button class="btn btn-success" (click)="addReferencedSchema()" type="button">
-                    <i class="icon-add"></i>
-                </button>
+                <button class="btn btn-success" (click)="addReferencedSchema()" type="button"><i class="icon-add"></i></button>
             </div>
         </div>
     </div>
 
     <div class="help">
         <h4>{{ "common.conditions" | sqxTranslate }}</h4>
-
-        <sqx-form-hint>
-            {{ "rules.conditionHint2" | sqxTranslate }}
-        </sqx-form-hint>
-
+        <sqx-form-hint> {{ "rules.conditionHint2" | sqxTranslate }} </sqx-form-hint>
         <ul class="help-examples">
             <li class="help-example">
-                {{ "rules.conditions.event" | sqxTranslate }}:
-                <br />
-
+                {{ "rules.conditions.event" | sqxTranslate }}: <br />
                 <sqx-code>event.type == 'Created' || event.type == 'Published'</sqx-code>
             </li>
-            <li class="help-example">
-                {{ "rules.conditions.contentValue" | sqxTranslate }}:
-                <br />
 
+            <li class="help-example">
+                {{ "rules.conditions.contentValue" | sqxTranslate }}: <br />
                 <sqx-code>event.data.important.iv === true</sqx-code>
             </li>
-            <li class="help-example">
-                {{ "rules.conditions.updatedBy" | sqxTranslate }}:
-                <br />
 
+            <li class="help-example">
+                {{ "rules.conditions.updatedBy" | sqxTranslate }}: <br />
                 <sqx-code>user.email === 'user&#64;squidex.io'</sqx-code>
             </li>
         </ul>

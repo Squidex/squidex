@@ -11,13 +11,13 @@
         (keydown)="onKeyDown($event)"
         [name]="formName"
         readonly />
-
     @if (snapshot.selectedItem; as selectedItem) {
         <div class="control-dropdown-item">
             <div class="no-wrap">
                 @if (!templateSelection) {
                     <span class="truncate">{{ selectedItem }}</span>
                 }
+
                 @if (templateSelection) {
                     <ng-template [item]="selectedItem" [sqxTemplateWrapper]="templateSelection"></ng-template>
                 }
@@ -59,6 +59,7 @@
                     @if (!templateItem) {
                         {{ item }}
                     }
+
                     @if (templateItem) {
                         <ng-template [context]="snapshot.query" [index]="i" [item]="item" [sqxTemplateWrapper]="templateItem"></ng-template>
                     }
@@ -66,7 +67,7 @@
             } @empty {
                 <div class="text-decent control-dropdown-item no-events">
                     @if (itemsLoading) {
-                        <sqx-loader color="input"></sqx-loader>
+                        <sqx-loader color="input" />
                     } @else {
                         <small>{{ itemsEmptyText | sqxTranslate }}</small>
                     }

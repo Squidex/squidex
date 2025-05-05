@@ -3,9 +3,11 @@
         <div class="col">
             <h3>{{ team.name }}</h3>
         </div>
+
         <div class="col-auto">
             <a class="link" [routerLink]="['/app/teams', team.id]" sqxStopClick>{{ "common.edit" | sqxTranslate }}</a>
         </div>
+
         <div class="col-auto">
             <button
                 class="btn btn-sm btn-text-secondary"
@@ -16,7 +18,6 @@
                 type="button">
                 <i class="icon-dots"></i>
             </button>
-
             <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="dropdown; closeAlways: true">
                 <a
                     class="dropdown-item dropdown-item-delete"

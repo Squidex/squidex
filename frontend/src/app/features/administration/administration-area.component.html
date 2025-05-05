@@ -1,5 +1,4 @@
-<sqx-title message="i18n:common.administrationPageTitle"></sqx-title>
-
+<sqx-title message="i18n:common.administrationPageTitle" />
 <div class="sidebar">
     <ul class="nav nav-panel flex-column">
         @if (uiState.canReadUsers | async) {
@@ -10,6 +9,7 @@
                 </a>
             </li>
         }
+
         @if (uiState.canReadEvents | async) {
             <li class="nav-item">
                 <a class="nav-link" routerLink="event-consumers" routerLinkActive="active">
@@ -18,6 +18,7 @@
                 </a>
             </li>
         }
+
         @if (uiState.canRestore | async) {
             <li class="nav-item">
                 <a class="nav-link" routerLink="restore" routerLinkActive="active">
@@ -29,6 +30,4 @@
     </ul>
 </div>
 
-<div class="panel-container" sqxLayoutContainer>
-    <router-outlet></router-outlet>
-</div>
+<div class="panel-container" sqxLayoutContainer><router-outlet></router-outlet></div>

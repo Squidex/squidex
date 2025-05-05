@@ -1,13 +1,20 @@
+
 @if (text) {
-    <div class="history-transition">
-        {{ text | sqxTranslate }}
-    </div>
+    <sqx-history-step small="true" [isLast]="isLast && filteredErrors.length === 0">
+        <ng-container summary>
+            <div class="col text-sm truncate">
+                {{ text | sqxTranslate }}
+            </div>
+        </ng-container>
+    </sqx-history-step>
 }
 
-@if (filteredErrors; as errors) {
-    @for (error of errors; track error) {
-        <div class="history-transition text-danger">
-            {{ error | sqxTranslate }}
-        </div>
-    }
+@for (error of filteredErrors; track error; let last = $last) {
+    <sqx-history-step small="true" [isLast]="isLast && last">
+        <ng-container summary>
+            <div class="col text-sm text-danger truncate">
+                {{ error | sqxTranslate }}
+            </div>
+        </ng-container>
+    </sqx-history-step>
 }

@@ -14,7 +14,6 @@
 
     <div class="form-group row">
         <label class="col-3 col-form-label">{{ "schemas.fieldTypes.number.range" | sqxTranslate }}</label>
-
         <div class="col-9">
             <div class="row g-0">
                 <div class="col">
@@ -24,9 +23,9 @@
                         placeholder="{{ 'schemas.fieldTypes.number.rangeMin' | sqxTranslate }}"
                         type="number" />
                 </div>
-                <div class="col-auto">
-                    <label class="col-form-label minmax">-</label>
-                </div>
+
+                <div class="col-auto"><label class="col-form-label minmax">-</label></div>
+
                 <div class="col">
                     <input
                         class="form-control"
@@ -42,7 +41,6 @@
         <label class="col-3 col-form-label" for="{{ field.fieldId }}_fieldDefaultValue">
             {{ "schemas.field.defaultValue" | sqxTranslate }}
         </label>
-
         <div class="col-9">
             <input class="form-control" id="{{ field.fieldId }}_fieldDefaultValue" formControlName="defaultValue" type="number" />
         </div>
@@ -54,14 +52,8 @@
                 {{ "schemas.field.defaultValues" | sqxTranslate }}
             </label>
             <div class="col-9">
-                <sqx-localized-input
-                    id="{{ field.fieldId }}_fieldDefaultValues"
-                    formControlName="defaultValues"
-                    [languages]="languages"
-                    type="number"></sqx-localized-input>
-                <sqx-form-hint>
-                    {{ "schemas.field.defaultValuesHint" | sqxTranslate }}
-                </sqx-form-hint>
+                <sqx-localized-input id="{{ field.fieldId }}_fieldDefaultValues" formControlName="defaultValues" [languages]="languages" type="number" />
+                <sqx-form-hint> {{ "schemas.field.defaultValuesHint" | sqxTranslate }} </sqx-form-hint>
             </div>
         </div>
     }

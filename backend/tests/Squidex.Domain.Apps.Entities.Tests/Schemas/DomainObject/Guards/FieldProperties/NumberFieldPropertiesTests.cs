@@ -37,10 +37,9 @@ public class NumberFieldPropertiesTests : IClassFixture<TranslationsFixture>
         var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Max value must be greater than min value.", "MinValue", "MaxValue"),
-            });
+            ]);
     }
 
     [Fact]
@@ -51,10 +50,9 @@ public class NumberFieldPropertiesTests : IClassFixture<TranslationsFixture>
         var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Radio buttons or dropdown list need allowed values.", "AllowedValues"),
-            });
+            ]);
     }
 
     [Fact]
@@ -65,10 +63,9 @@ public class NumberFieldPropertiesTests : IClassFixture<TranslationsFixture>
         var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Editor is not a valid value.", "Editor"),
-            });
+            ]);
     }
 
     [Theory]
@@ -80,10 +77,9 @@ public class NumberFieldPropertiesTests : IClassFixture<TranslationsFixture>
         var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Inline editing is not allowed for Radio editor.", "InlineEditable", "Editor"),
-            });
+            ]);
     }
 
     [Theory]

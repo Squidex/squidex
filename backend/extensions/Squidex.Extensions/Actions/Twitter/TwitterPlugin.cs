@@ -18,6 +18,9 @@ public sealed class TwitterPlugin : IPlugin
         services.Configure<TwitterOptions>(
             config.GetSection("twitter"));
 
-        services.AddRuleAction<TweetAction, TweetActionHandler>();
+        services.AddFlowStep<TweetFlowStep>();
+#pragma warning disable CS0618 // Type or member is obsolete
+        services.AddRuleAction<TweetAction>();
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

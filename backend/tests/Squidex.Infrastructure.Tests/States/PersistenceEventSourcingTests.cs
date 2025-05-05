@@ -67,7 +67,7 @@ public class PersistenceEventSourcingTests
         var storedEvent = new StoredEvent("1", "1", 0, new EventData("Type", [], "Payload"));
 
         A.CallTo(() => eventStore.QueryStreamAsync(key.ToString(), -1, A<CancellationToken>._))
-            .Returns(new List<StoredEvent> { storedEvent });
+            .Returns([storedEvent]);
 
         A.CallTo(() => eventFormatter.ParseIfKnown(storedEvent))
             .Returns(null);

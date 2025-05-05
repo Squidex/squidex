@@ -15,6 +15,7 @@ using Squidex.Assets.TusAdapter;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Teams;
@@ -187,9 +188,6 @@ public static class ServiceExtensions
         services.AddSingletonAs<EFRuleRepository<TContext>>()
             .As<IRuleRepository>().As<ISnapshotStore<Rule>>().As<IDeleter>();
 
-        services.AddSingletonAs<EFRuleEventRepository<TContext>>()
-            .As<IRuleEventRepository>().As<IDeleter>();
-
         services.AddSingletonAs<EFSchemaRepository<TContext>>()
             .As<ISchemaRepository>().As<ISnapshotStore<Schema>>().As<IDeleter>().As<ISchemasHash>();
 
@@ -207,6 +205,9 @@ public static class ServiceExtensions
 
         services.AddSingletonAs<EFUserFactory>()
             .As<IUserFactory>();
+
+        services.AddFlowsCore()
+            .AddEntityFrameworkStore<TContext, FlowEventContext>();
 
         services.AddEntityFrameworkAssetKeyValueStore<TContext, TusMetadata>();
     }

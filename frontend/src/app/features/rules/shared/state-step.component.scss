@@ -1,0 +1,12 @@
+@import 'mixins';
+@import 'vars';
+
+.details {
+    border: 1px solid $color-border;
+    border-radius: $border-radius;
+    padding: .75rem;
+}
+
+.nav-item {
+    font-size: $font-small;
+}

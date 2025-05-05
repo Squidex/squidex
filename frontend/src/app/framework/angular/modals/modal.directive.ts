@@ -33,7 +33,6 @@ export class ModalDirective<T = unknown> implements OnDestroy {
             this.currentModel = value;
 
             this.eventsModel.unsubscribeAll();
-
             this.subscribeToModel(value);
         }
     }

@@ -70,7 +70,7 @@ public class RuleEventFormatterTests
             new FakeContentResolver(),
         };
 
-        sut = new RuleEventFormatter(TestUtils.DefaultSerializer, formatters, BuildTemplateEngine(), BuildScriptEngine());
+        sut = new RuleEventFormatter(TestUtils.DefaultSerializer, BuildScriptEngine(), BuildTemplateEngine(), new SimpleFormatter(formatters));
     }
 
     private static FluidTemplateEngine BuildTemplateEngine()
@@ -106,7 +106,7 @@ public class RuleEventFormatterTests
     [Fact]
     public void Should_serialize_object_to_json()
     {
-        var actual = sut.ToPayload(new { Value = 1 });
+        var actual = sut.SerializeJson(new { Value = 1 });
 
         Assert.NotNull(actual);
     }
@@ -116,17 +116,27 @@ public class RuleEventFormatterTests
     {
         var @event = new EnrichedContentEvent { AppId = appId };
 
-        var actual = sut.ToPayload(@event);
+        var actual = sut.SerializeJson(@event);
 
         Assert.NotNull(actual);
     }
 
     [Fact]
-    public void Should_create_envelope_data_from_event()
+    public async Task Should_create_envelope_data_from_event()
     {
         var @event = new EnrichedContentEvent { AppId = appId, Name = "MyEventName" };
 
-        var actual = sut.ToEnvelope(@event);
+        var actual = await sut.RenderAsync(null, @event, Flows.ExpressionFallback.Envelope);
+
+        Assert.Contains("MyEventName", actual, StringComparison.Ordinal);
+    }
+
+    [Fact]
+    public async Task Should_create_envelope_data_from_context()
+    {
+        var context = new FlowEventContext { Event = new EnrichedContentEvent { AppId = appId, Name = "MyEventName" } };
+
+        var actual = await sut.RenderAsync(null, context, Flows.ExpressionFallback.Envelope);
 
         Assert.Contains("MyEventName", actual, StringComparison.Ordinal);
     }
@@ -143,7 +153,7 @@ public class RuleEventFormatterTests
                             .AddInvariant(new JsonArray())),
         };
 
-        var actual = await sut.FormatAsync("${CONTENT_DATA.city.iv.data.name}", @event);
+        var actual = await sut.RenderAsync("${CONTENT_DATA.city.iv.data.name}", @event);
 
         Assert.Equal("Reference", actual);
     }
@@ -154,7 +164,7 @@ public class RuleEventFormatterTests
     {
         var @event = new EnrichedAssetEvent { AppId = appId, FileName = null! };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal(expect, actual);
     }
@@ -165,7 +175,7 @@ public class RuleEventFormatterTests
     {
         var @event = new EnrichedAssetEvent { AppId = appId, FileName = null! };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal(expect, actual);
     }
@@ -178,7 +188,7 @@ public class RuleEventFormatterTests
     {
         var @event = new EnrichedAssetEvent { AppId = appId, FileName = "Donald Duck" };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal(expect, actual);
     }
@@ -194,7 +204,7 @@ public class RuleEventFormatterTests
     {
         var @event = new EnrichedAssetEvent { AppId = appId, FileName = name };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal(expect, actual);
     }
@@ -211,9 +221,9 @@ public class RuleEventFormatterTests
         var @event = new EnrichedContentEvent { AppId = appId, User = user };
 
         A.CallTo(() => user.Claims)
-            .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, name) });
+            .Returns([new Claim(SquidexClaimTypes.DisplayName, name)]);
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal(expect, actual);
     }
@@ -225,7 +235,7 @@ public class RuleEventFormatterTests
     {
         var @event = new EnrichedAssetEvent { AppId = appId, FileName = "Donald Duck" };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal(expect, actual);
     }
@@ -235,7 +245,7 @@ public class RuleEventFormatterTests
     {
         var @event = new EnrichedContentEvent { AppId = appId, Actor = RefToken.Client("android") };
 
-        var actual = await sut.FormatAsync("Script(JSON.stringify({ actor: event.actor.toString() }))", @event);
+        var actual = await sut.RenderAsync("Script(JSON.stringify({ actor: event.actor.toString() }))", @event);
 
         Assert.Equal("{\"actor\":\"client:android\"}", actual);
     }
@@ -245,7 +255,7 @@ public class RuleEventFormatterTests
     {
         var @event = new EnrichedContentEvent { AppId = appId, Actor = RefToken.Client("mobile\"android") };
 
-        var actual = await sut.FormatAsync("Script(JSON.stringify({ actor: event.actor.toString() }))", @event);
+        var actual = await sut.RenderAsync("Script(JSON.stringify({ actor: event.actor.toString() }))", @event);
 
         Assert.Equal("{\"actor\":\"client:mobile\\\"android\"}", actual);
     }
@@ -255,7 +265,7 @@ public class RuleEventFormatterTests
     {
         var @event = new EnrichedContentEvent { AppId = appId, Type = EnrichedContentEventType.Created };
 
-        var actual = await sut.FormatAsync(" Script(`${event.type}`)", @event);
+        var actual = await sut.RenderAsync(" Script(`${event.type}`)", @event);
 
         Assert.Equal("Created", actual);
     }
@@ -265,7 +275,7 @@ public class RuleEventFormatterTests
     {
         var @event = new EnrichedContentEvent { AppId = appId, Type = EnrichedContentEventType.Created };
 
-        var actual = await sut.FormatAsync("Script(`${event.type}`) ", @event);
+        var actual = await sut.RenderAsync("Script(`${event.type}`) ", @event);
 
         Assert.Equal("Created", actual);
     }
@@ -289,7 +299,7 @@ public class RuleEventFormatterTests
                     'categories': event.data.categories.iv
                 }))";
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("{'categories':['ref1','ref2','ref3']}", actual?
             .Replace(" ", string.Empty, StringComparison.Ordinal)

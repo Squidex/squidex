@@ -126,13 +126,18 @@ describe('WorkflowsState', () => {
     });
 });
 
-describe('Workflow', () => {
+describe('WorkflowView', () => {
     const dto = new WorkflowDto({ id: 'id', steps: {}, initial: null!, _links: {} });
 
     it('should create empty workflow', () => {
         const workflow = new WorkflowView(dto);
 
-        expect(workflow.dto.initial).toBeNull();
+
+        expect(workflow.toUpdate().toJSON()).toEqual({
+            initial: null,
+            steps: {
+            },
+        });
     });
 
     it('should add step to workflow', () => {
@@ -140,13 +145,11 @@ describe('Workflow', () => {
             new WorkflowView(dto)
                 .setStep('Draft', { color: '#00ff00' });
 
-        expect(workflow.dto.toJSON()).toEqual({
-            id: 'id',
+        expect(workflow.toUpdate().toJSON()).toEqual({
             initial: 'Draft',
             steps: {
                 'Draft': { transitions: {}, color: '#00ff00' },
             },
-            _links: {},
         });
     });
 
@@ -156,13 +159,11 @@ describe('Workflow', () => {
                 .setStep('1', { color: '#00ff00', noUpdate: true })
                 .setStep('1', { color: 'red' });
 
-        expect(workflow.dto.toJSON()).toEqual({
-            id: 'id',
+        expect(workflow.toUpdate().toJSON()).toEqual({
             initial: '1',
             steps: {
                 1: { transitions: {}, color: 'red', noUpdate: true },
             },
-            _links: {},
         });
     });
 
@@ -209,8 +210,7 @@ describe('Workflow', () => {
                 .setTransition('2', '3', { expression: '2 === 3' })
                 .removeStep('1');
 
-        expect(workflow.dto.toJSON()).toEqual({
-            id: 'id',
+        expect(workflow.toUpdate().toJSON()).toEqual({
             initial: '2',
             steps: {
                 2: {
@@ -221,7 +221,6 @@ describe('Workflow', () => {
                 },
                 3: { transitions: {}, color: '#0000ff' },
             },
-            _links: {},
         });
     });
 
@@ -233,14 +232,12 @@ describe('Workflow', () => {
                 .setStep('Public')
                 .removeStep('1');
 
-        expect(workflow.dto.toJSON()).toEqual({
-            id: 'id',
+        expect(workflow.toUpdate().toJSON()).toEqual({
             initial: 'Public',
             steps: {
                 Published: { transitions: {} },
                 Public: { transitions: {} },
             },
-            _links: {},
         });
     });
 
@@ -250,11 +247,10 @@ describe('Workflow', () => {
                 .setStep('1')
                 .removeStep('1');
 
-        expect(workflow.dto.toJSON()).toEqual({
-            id: 'id',
+        expect(workflow.toUpdate().toJSON()).toEqual({
             initial: null,
-            steps: {},
-            _links: {},
+            steps: {
+            },
         });
     });
 
@@ -269,8 +265,7 @@ describe('Workflow', () => {
                 .setTransition('2', '3', { expression: '2 === 3' })
                 .renameStep('1', 'a');
 
-        expect(workflow.dto.toJSON()).toEqual({
-            id: 'id',
+        expect(workflow.toUpdate().toJSON()).toEqual({
             initial: '1',
             steps: {
                 a: {
@@ -288,7 +283,6 @@ describe('Workflow', () => {
                 },
                 3: { transitions: {}, color: '#0000ff' },
             },
-            _links: {},
         });
     });
 
@@ -300,8 +294,7 @@ describe('Workflow', () => {
                 .setTransition('1', '2', { expression: '1 === 2' })
                 .setTransition('2', '1', { expression: '2 === 1' });
 
-        expect(workflow.dto.toJSON()).toEqual({
-            id: 'id',
+        expect(workflow.toUpdate().toJSON()).toEqual({
             initial: '1',
             steps: {
                 1: {
@@ -315,7 +308,6 @@ describe('Workflow', () => {
                     },
                 },
             },
-            _links: {},
         });
     });
 
@@ -328,8 +320,7 @@ describe('Workflow', () => {
                 .setTransition('2', '1', { expression: '2 === 1' })
                 .removeTransition('1', '2');
 
-        expect(workflow.dto.toJSON()).toEqual({
-            id: 'id',
+        expect(workflow.toUpdate().toJSON()).toEqual({
             initial: '1',
             steps: {
                 1: { transitions: {} },
@@ -339,7 +330,6 @@ describe('Workflow', () => {
                     },
                 },
             },
-            _links: {},
         });
     });
 
@@ -351,8 +341,7 @@ describe('Workflow', () => {
                 .setTransition('2', '1', { expression: '2 === 1', roles: ['Role'] })
                 .setTransition('2', '1', { expression: '2 !== 1' });
 
-        expect(workflow.dto.toJSON()).toEqual({
-            id: 'id',
+        expect(workflow.toUpdate().toJSON()).toEqual({
             initial: '1',
             steps: {
                 1: { transitions: {} },
@@ -362,7 +351,6 @@ describe('Workflow', () => {
                     },
                 },
             },
-            _links: {},
         });
     });
 
@@ -420,14 +408,12 @@ describe('Workflow', () => {
                 .setStep('2')
                 .setInitial('2');
 
-        expect(workflow.dto.toJSON()).toEqual({
-            id: 'id',
+        expect(workflow.toUpdate().toJSON()).toEqual({
             initial: '2',
             steps: {
                 1: { transitions: {} },
                 2: { transitions: {} },
             },
-            _links: {},
         });
     });
 
@@ -436,12 +422,11 @@ describe('Workflow', () => {
             new WorkflowView(dto)
                 .changeName('name');
 
-        expect(workflow.dto.toJSON()).toEqual({
-            id: 'id',
+        expect(workflow.toUpdate().toJSON()).toEqual({
             initial: null,
+            steps: {
+            },
             name: 'name',
-            steps: {},
-            _links: {},
         });
     });
 
@@ -450,12 +435,11 @@ describe('Workflow', () => {
             new WorkflowView(dto)
                 .changeSchemaIds(['1', '2']);
 
-        expect(workflow.dto.toJSON()).toEqual({
-            id: 'id',
+        expect(workflow.toUpdate().toJSON()).toEqual({
             initial: null,
+            steps: {
+            },
             schemaIds: ['1', '2'],
-            steps: {},
-            _links: {},
         });
     });
 });

@@ -4,21 +4,23 @@
             [queries]="queries.defaultQueries"
             [queryUsed]="contentsState.query | async"
             (search)="search($event)"
-            [types]="'common.contents' | sqxTranslate"></sqx-query-list>
+            [types]="'common.contents' | sqxTranslate" />
         <hr />
+
         <div class="sidebar-section">
             <h3>{{ "contents.statusQueries" | sqxTranslate }}</h3>
             <sqx-query-list
                 [queries]="contentsState.statusQueries | async"
                 [queryUsed]="contentsState.query | async"
                 (search)="search($event)"
-                [types]="'common.contents' | sqxTranslate"></sqx-query-list>
+                [types]="'common.contents' | sqxTranslate" />
         </div>
+
         <hr />
         <sqx-shared-queries
             [queries]="queries"
             [queryUsed]="contentsState.query | async"
             (search)="search($event)"
-            [types]="'common.contents' | sqxTranslate"></sqx-shared-queries>
+            [types]="'common.contents' | sqxTranslate" />
     }
 </sqx-layout>

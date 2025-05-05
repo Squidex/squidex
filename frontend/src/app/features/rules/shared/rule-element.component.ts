@@ -6,8 +6,8 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { DarkenPipe, ExternalLinkDirective, HoverBackgroundDirective, RuleElementMetadataDto, StopClickDirective, TranslatePipe } from '@app/shared';
+import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { ConfirmClickDirective, DarkenPipe, ExternalLinkDirective, RuleTriggerMetadataDto, StopClickDirective, TooltipDirective, TranslatePipe } from '@app/shared';
 import { RuleIconComponent } from './rule-icon.component';
 
 @Component({
@@ -17,24 +17,43 @@ import { RuleIconComponent } from './rule-icon.component';
     templateUrl: './rule-element.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
+        ConfirmClickDirective,
         DarkenPipe,
         ExternalLinkDirective,
-        HoverBackgroundDirective,
         RuleIconComponent,
         StopClickDirective,
+        TooltipDirective,
         TranslatePipe,
     ],
 })
 export class RuleElementComponent {
     @Input({ required: true })
-    public type!: string;
+    public elementType!: string;
 
     @Input({ required: true })
-    public element!: RuleElementMetadataDto;
+    public elementInfo!: RuleTriggerMetadataDto;
+
+    @Input()
+    public label?: string;
 
     @Input({ transform: booleanAttribute })
-    public isSmall?: boolean | null = true;
+    public showName?: boolean | null = true;
+
+    @Input({ transform: booleanAttribute })
+    public showDescription?: boolean | null = true;
+
+    @Input({ transform: booleanAttribute })
+    public showRemove?: boolean | null = false;
 
     @Input({ transform: booleanAttribute })
     public disabled = false;
+
+    @Input()
+    public size: 'sm' | 'md' | 'lg' = 'lg';
+
+    @Output()
+    public remove = new EventEmitter();
+
+    @Output()
+    public iconClick = new EventEmitter();
 }

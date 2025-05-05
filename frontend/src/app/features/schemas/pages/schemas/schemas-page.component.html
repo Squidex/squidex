@@ -1,5 +1,4 @@
-<sqx-title message="i18n:common.schemas"></sqx-title>
-
+<sqx-title message="i18n:common.schemas" />
 <sqx-layout layout="left" overflow="true" padding="true" titleCollapsed="i18n:common.schemas" white="true" width="18">
     <ng-container menu>
         <div class="row g-0">
@@ -26,16 +25,14 @@
                     placeholder="{{ 'schemas.searchPlaceholder' | sqxTranslate }}"
                     shortcut="CTRL + I"
                     shortcutAction="focus" />
-
                 <i class="icon-search"></i>
             </div>
         </div>
     </ng-container>
-
     <ng-container>
         <div cdkDropListGroup>
             @for (category of categories | async; track category.displayName) {
-                <sqx-schema-category (remove)="removeCategory($event)" [schemaCategory]="category"></sqx-schema-category>
+                <sqx-schema-category (remove)="removeCategory($event)" [schemaCategory]="category" />
             }
         </div>
 
@@ -44,11 +41,5 @@
         </form>
     </ng-container>
 </sqx-layout>
-
-<sqx-schema-form
-    (create)="redirectSchema($event)"
-    (dialogClose)="addSchemaDialog.hide()"
-    [import]="import"
-    *sqxModal="addSchemaDialog"></sqx-schema-form>
-
+<sqx-schema-form (create)="redirectSchema($event)" (dialogClose)="addSchemaDialog.hide()" [import]="import" *sqxModal="addSchemaDialog" />
 <router-outlet></router-outlet>

@@ -1,0 +1,117 @@
+@import "mixins";
+@import "vars";
+
+.row {
+    position: relative;
+}
+
+.rule-element {
+    position: relative;
+    margin-left: 2rem;
+    margin-right: 2rem;
+
+    &.if {
+        margin-bottom: 1rem;
+
+        &:after {
+            @include absolute(0, null, -1rem, 50%);
+            border: 2px solid $color-border;
+            content: "";
+            margin-left: -1px;
+            margin-top: 0;
+            z-index: 0;
+        }
+    }
+
+    &:hover {
+        .hover-step-title {
+            visibility: visible;
+        }
+    }
+}
+
+.step-title {
+    @include absolute(50%, null, null, 50%);
+    font-size: $font-small;
+    margin-top: -0.5rem;
+    margin-left: 2.5rem;
+    white-space: nowrap;
+}
+
+.hover-step-title {
+    @include absolute(50%, null, null, 50%);
+    font-size: $font-small;
+    margin-top: -0.5rem;
+    margin-left: 2.5rem;
+    white-space: nowrap;
+    visibility: hidden;
+}
+
+.centered {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 0;
+    padding-top: 14px;
+    padding-bottom: 0;
+    position: relative;
+
+    & > * {
+        z-index: 1;
+    }
+
+    &:before {
+        @include absolute(0, null, 0, 50%);
+        border: 2px solid $color-border;
+        content: "";
+        margin-left: -1px;
+        margin-top: 0;
+        z-index: 0;
+    }
+}
+
+.branches {
+    display: flex;
+    flex-direction: row;
+    flex-wrap: nowrap;
+}
+
+.subbranch {
+    margin-top: 0;
+    margin-bottom: 0;
+    position: relative;
+
+    &:before {
+        @include absolute(0, 0, null, 0);
+        border: 2px solid $color-border;
+        content: "";
+        margin-left: -1px;
+        margin-top: 0;
+        z-index: 0;
+    }
+
+    &:first-child {
+        &:before {
+            left: calc(50% + 2px);
+        }
+    }
+
+    &:last-child {
+        &:before {
+            right: 50%;
+        }
+    }
+}
+
+.white-label {
+    display: inline-block;
+    background-color: $color-white;
+    border-radius: 0;
+    border-color: $color-white;
+    padding: 0.125rem 0.25rem;
+}
+
+label {
+    @include truncate;
+    max-width: 7rem;
+}

@@ -221,7 +221,7 @@ public class ApiExceptionFilterAttributeTests
 
         var actual = context.Result;
 
-        return new ResultExecutedContext(actionContext, new List<IFilterMetadata>(), actual, context.Controller);
+        return new ResultExecutedContext(actionContext, [], actual, context.Controller);
     }
 
     private ResultExecutingContext Problem(ProblemDetails problem)
@@ -230,14 +230,14 @@ public class ApiExceptionFilterAttributeTests
 
         var actual = new ObjectResult(problem) { StatusCode = problem.Status };
 
-        return new ResultExecutingContext(actionContext, new List<IFilterMetadata>(), actual, null!);
+        return new ResultExecutingContext(actionContext, [], actual, null!);
     }
 
     private ExceptionContext Error(Exception exception)
     {
         var actionContext = ActionContext();
 
-        return new ExceptionContext(actionContext, new List<IFilterMetadata>())
+        return new ExceptionContext(actionContext, [])
         {
             Exception = exception,
         };
@@ -257,7 +257,7 @@ public class ApiExceptionFilterAttributeTests
 
         var actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor
         {
-            FilterDescriptors = new List<FilterDescriptor>(),
+            FilterDescriptors = [],
         });
 
         return actionContext;

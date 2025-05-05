@@ -76,7 +76,7 @@ public class RuleEventFormatterCompareTests
             new FakeContentResolver(),
         };
 
-        sut = new RuleEventFormatter(TestUtils.DefaultSerializer, formatters, BuildTemplateEngine(), BuildScriptEngine());
+        sut = new RuleEventFormatter(TestUtils.DefaultSerializer, BuildScriptEngine(), BuildTemplateEngine(), new SimpleFormatter(formatters));
     }
 
     private FluidTemplateEngine BuildTemplateEngine()
@@ -124,7 +124,7 @@ public class RuleEventFormatterCompareTests
     {
         var @event = new EnrichedContentEvent { AppId = appId };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal($"Name my-app has id {appId.Id}", actual);
     }
@@ -140,7 +140,7 @@ public class RuleEventFormatterCompareTests
     {
         var @event = new EnrichedContentEvent { AppId = appId, SchemaId = schemaId };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal($"Name my-schema has id {schemaId.Id}", actual);
     }
@@ -156,7 +156,7 @@ public class RuleEventFormatterCompareTests
     {
         var @event = new EnrichedContentEvent { AppId = appId, Timestamp = now };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal($"DateTime: {now:yyyy-MM-dd-hh-mm-ss}", actual);
     }
@@ -172,7 +172,7 @@ public class RuleEventFormatterCompareTests
     {
         var @event = new EnrichedContentEvent { AppId = appId, Timestamp = now };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal($"Date: {now:yyyy-MM-dd}", actual);
     }
@@ -188,7 +188,7 @@ public class RuleEventFormatterCompareTests
     {
         var @event = new EnrichedCommentEvent { AppId = appId, MentionedUser = user };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("From me (me@email.com, user123)", actual);
     }
@@ -204,7 +204,7 @@ public class RuleEventFormatterCompareTests
     {
         var @event = new EnrichedContentEvent { AppId = appId, User = user };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("From me (me@email.com, user123)", actual);
     }
@@ -220,7 +220,7 @@ public class RuleEventFormatterCompareTests
     {
         var @event = new EnrichedContentEvent { AppId = appId };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("From null (null, null)", actual);
     }
@@ -236,7 +236,7 @@ public class RuleEventFormatterCompareTests
     {
         var @event = new EnrichedContentEvent { AppId = appId, User = new ClientUser(RefToken.Client("android")) };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("From android (client:android, android)", actual);
     }
@@ -252,7 +252,7 @@ public class RuleEventFormatterCompareTests
     {
         var @event = new EnrichedAssetEvent { AppId = appId, Version = 13 };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("Version: 13", actual);
     }
@@ -268,7 +268,7 @@ public class RuleEventFormatterCompareTests
     {
         var @event = new EnrichedAssetEvent { AppId = appId, FileName = "my-file.png" };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("File: my-file.png", actual);
     }
@@ -284,7 +284,7 @@ public class RuleEventFormatterCompareTests
     {
         var @event = new EnrichedAssetEvent { AppId = appId, AssetType = AssetType.Audio };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("Type: Audio", actual);
     }
@@ -301,7 +301,7 @@ public class RuleEventFormatterCompareTests
     {
         var @event = new EnrichedAssetEvent { AppId = appId, Id = assetId };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("Download at asset-content-url", actual);
     }
@@ -318,7 +318,7 @@ public class RuleEventFormatterCompareTests
     {
         var @event = new EnrichedContentEvent { AppId = appId };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("Download at null", actual);
     }
@@ -335,7 +335,7 @@ public class RuleEventFormatterCompareTests
     {
         var @event = new EnrichedAssetEvent { AppId = appId, Id = assetId, FileName = "File Name" };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("Download at asset-content-url", actual);
     }
@@ -352,7 +352,7 @@ public class RuleEventFormatterCompareTests
     {
         var @event = new EnrichedContentEvent { AppId = appId };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("Download at null", actual);
     }
@@ -369,7 +369,7 @@ public class RuleEventFormatterCompareTests
     {
         var @event = new EnrichedAssetEvent { AppId = appId, Id = assetId, FileName = "File Name" };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("Download at asset-content-slug-url", actual);
     }
@@ -386,7 +386,7 @@ public class RuleEventFormatterCompareTests
     {
         var @event = new EnrichedContentEvent { AppId = appId };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("Download at null", actual);
     }
@@ -402,7 +402,7 @@ public class RuleEventFormatterCompareTests
     {
         var @event = new EnrichedContentEvent { AppId = appId, Id = contentId, SchemaId = schemaId };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("Go to content-url", actual);
     }
@@ -418,7 +418,7 @@ public class RuleEventFormatterCompareTests
     {
         var @event = new EnrichedAssetEvent { AppId = appId };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("Go to null", actual);
     }
@@ -434,7 +434,7 @@ public class RuleEventFormatterCompareTests
     {
         var @event = new EnrichedContentEvent { AppId = appId, Status = Status.Published };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("Published", actual);
     }
@@ -450,7 +450,7 @@ public class RuleEventFormatterCompareTests
     {
         var @event = new EnrichedAssetEvent { AppId = appId };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("null", actual);
     }
@@ -466,7 +466,7 @@ public class RuleEventFormatterCompareTests
     {
         var @event = new EnrichedContentEvent { AppId = appId, Type = EnrichedContentEventType.Created };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("Created", actual);
     }
@@ -482,7 +482,7 @@ public class RuleEventFormatterCompareTests
     {
         var @event = new EnrichedAssetEvent { AppId = appId };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("null", actual);
     }
@@ -506,7 +506,7 @@ public class RuleEventFormatterCompareTests
                             .AddLocalized("zh-TW", "Berlin")),
         };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("Berlin", actual);
     }
@@ -530,7 +530,7 @@ public class RuleEventFormatterCompareTests
                             .AddInvariant("Berlin")),
         };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("null", actual);
     }
@@ -554,7 +554,7 @@ public class RuleEventFormatterCompareTests
                             .AddInvariant("Berlin")),
         };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("null", actual);
     }
@@ -578,7 +578,7 @@ public class RuleEventFormatterCompareTests
                             .AddInvariant(new JsonArray())),
         };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("null", actual);
     }
@@ -602,7 +602,7 @@ public class RuleEventFormatterCompareTests
                             .AddInvariant(JsonValue.Object().Add("name", "Berlin"))),
         };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("null", actual);
     }
@@ -626,7 +626,7 @@ public class RuleEventFormatterCompareTests
                             .AddInvariant("Berlin")),
         };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("Berlin", actual);
     }
@@ -650,7 +650,7 @@ public class RuleEventFormatterCompareTests
                             .AddInvariant(JsonValue.Array("Berlin"))),
         };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("Berlin", actual);
     }
@@ -674,7 +674,7 @@ public class RuleEventFormatterCompareTests
                             .AddInvariant(JsonValue.Object().Add("name", "Berlin"))),
         };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("Berlin", actual);
     }
@@ -698,7 +698,7 @@ public class RuleEventFormatterCompareTests
                             .AddInvariant(JsonValue.Object().Add("name", "Berlin"))),
         };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("{\"name\":\"Berlin\"}", actual);
     }
@@ -722,7 +722,7 @@ public class RuleEventFormatterCompareTests
                             .AddInvariant(JsonValue.Array(1, 2, 3))),
         };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("[1,2,3]", actual?.Replace(" ", string.Empty, StringComparison.Ordinal));
     }
@@ -746,7 +746,7 @@ public class RuleEventFormatterCompareTests
                             .AddInvariant(JsonValue.Object().Add("name", "Berlin"))),
         };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("{\"city\":{\"iv\":{\"name\":\"Berlin\"}}}", actual);
     }
@@ -762,7 +762,7 @@ public class RuleEventFormatterCompareTests
     {
         var @event = new EnrichedContentEvent { AppId = appId, Actor = RefToken.Client("android") };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("From client:android", actual);
     }
@@ -778,7 +778,7 @@ public class RuleEventFormatterCompareTests
     {
         var @event = new EnrichedAssetEvent { AppId = appId, LastModified = Instant.FromUnixTimeSeconds(1590769584) };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("1590769584000", actual);
     }
@@ -801,7 +801,7 @@ public class RuleEventFormatterCompareTests
                             .AddInvariant("2020-06-01T10:10:20Z")),
         };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("1591006220000", actual);
     }
@@ -817,7 +817,7 @@ public class RuleEventFormatterCompareTests
     {
         var @event = new EnrichedAssetEvent { AppId = appId, LastModified = Instant.FromUnixTimeSeconds(1590769584) };
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("1590769584", actual);
     }
@@ -834,9 +834,9 @@ public class RuleEventFormatterCompareTests
         var @event = new EnrichedContentEvent { AppId = appId, User = user };
 
         A.CallTo(() => user.Claims)
-            .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Donald Duck") });
+            .Returns([new Claim(SquidexClaimTypes.DisplayName, "Donald Duck")]);
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("DONALD DUCK", actual);
     }
@@ -853,9 +853,9 @@ public class RuleEventFormatterCompareTests
         var @event = new EnrichedContentEvent { AppId = appId, User = user };
 
         A.CallTo(() => user.Claims)
-            .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Donald Duck") });
+            .Returns([new Claim(SquidexClaimTypes.DisplayName, "Donald Duck")]);
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("donald duck", actual);
     }
@@ -872,9 +872,9 @@ public class RuleEventFormatterCompareTests
         var @event = new EnrichedContentEvent { AppId = appId, User = user };
 
         A.CallTo(() => user.Claims)
-            .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Donald Duck  ") });
+            .Returns([new Claim(SquidexClaimTypes.DisplayName, "Donald Duck  ")]);
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("Donald Duck", actual);
     }
@@ -891,9 +891,9 @@ public class RuleEventFormatterCompareTests
         var @event = new EnrichedContentEvent { AppId = appId, User = user };
 
         A.CallTo(() => user.Claims)
-            .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Donald Duck") });
+            .Returns([new Claim(SquidexClaimTypes.DisplayName, "Donald Duck")]);
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("donald-duck", actual);
     }
@@ -910,9 +910,9 @@ public class RuleEventFormatterCompareTests
         var @event = new EnrichedContentEvent { AppId = appId, User = user };
 
         A.CallTo(() => user.Claims)
-            .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Donald Duck  ") });
+            .Returns([new Claim(SquidexClaimTypes.DisplayName, "Donald Duck  ")]);
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("DONALD DUCK", actual);
     }
@@ -929,9 +929,9 @@ public class RuleEventFormatterCompareTests
         var @event = new EnrichedContentEvent { AppId = appId, User = user };
 
         A.CallTo(() => user.Claims)
-            .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Donald\"Duck") });
+            .Returns([new Claim(SquidexClaimTypes.DisplayName, "Donald\"Duck")]);
 
-        var actual = await sut.FormatAsync(script, @event);
+        var actual = await sut.RenderAsync(script, @event);
 
         Assert.Equal("Donald\\\"Duck", actual);
     }

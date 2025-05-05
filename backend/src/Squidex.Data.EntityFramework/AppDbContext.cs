@@ -44,6 +44,7 @@ public abstract class AppDbContext(DbContextOptions options, IJsonSerializer jso
         builder.UseContentTables();
         builder.UseEvents(jsonSerializer, jsonColumnType);
         builder.UseEventStore();
+        builder.UseFlows();
         builder.UseHistory(jsonSerializer, jsonColumnType);
         builder.UseIdentity(jsonSerializer, jsonColumnType);
         builder.UseJobs(jsonSerializer, jsonColumnType);

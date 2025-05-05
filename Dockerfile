@@ -70,7 +70,8 @@ RUN npm install --loglevel=error --force
 COPY frontend .
 
 # Build Frontend
-RUN npm run test:coverage \
+RUN npm run lint \
+ && npm run test:coverage \
  && npm run build
 
 RUN cp -a build /build/

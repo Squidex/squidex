@@ -10,6 +10,7 @@ using System.Security.Claims;
 using System.Text.Json;
 using System.Text.Json.Serialization;
 using System.Text.Json.Serialization.Metadata;
+using Microsoft.Extensions.Options;
 using NetTopologySuite.IO.Converters;
 using NodaTime;
 using NodaTime.Serialization.SystemTextJson;
@@ -19,11 +20,13 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Contents.Json;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Domain.Apps.Core.Rules.Json;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Domain.Apps.Events;
 using Squidex.Events.Utils;
+using Squidex.Flows;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
@@ -53,6 +56,7 @@ public static class TestUtils
 
     public static TypeRegistry CreateTypeRegistry(Assembly assembly)
     {
+#pragma warning disable CS0618 // Type or member is obsolete
         var typeRegistry =
             new TypeRegistry()
                 .Map(new FieldTypeProvider())
@@ -60,7 +64,9 @@ public static class TestUtils
                 .Map(new AssemblyTypeProvider<IEvent>(SquidexEvents.Assembly))
                 .Map(new AssemblyTypeProvider<RuleAction>(assembly))
                 .Map(new AssemblyTypeProvider<RuleTrigger>(assembly))
-                .Map(new RuleTypeProvider());
+                .Map(new AssemblyTypeProvider<FlowStep>(assembly))
+                .Map(new RuleTypeProvider(A.Fake<IFlowStepRegistry>(), Options.Create(new RulesOptions())));
+#pragma warning restore CS0618 // Type or member is obsolete
 
         return typeRegistry;
     }
@@ -84,8 +90,8 @@ public static class TestUtils
         options.Converters.Add(new HeaderValueConverter());
         options.Converters.Add(new JsonValueConverter());
         options.Converters.Add(new PolymorphicConverter<FieldProperties>(TypeRegistry));
+        options.Converters.Add(new PolymorphicConverter<FlowStep>(TypeRegistry));
         options.Converters.Add(new PolymorphicConverter<IEvent>(TypeRegistry));
-        options.Converters.Add(new PolymorphicConverter<RuleAction>(TypeRegistry));
         options.Converters.Add(new PolymorphicConverter<RuleTrigger>(TypeRegistry));
         options.Converters.Add(new ReadonlyDictionaryConverterFactory());
         options.Converters.Add(new ReadonlyListConverterFactory());
@@ -114,6 +120,9 @@ public static class TestUtils
             .WithAddedModifier(PolymorphicConverter<None>.Modifier(TypeRegistry))
             .WithAddedModifier(JsonIgnoreReadonlyProperties.Modifier<Entity>())
             .WithAddedModifier(JsonRenameAttribute.Modifier);
+#pragma warning disable CS0618 // Type or member is obsolete
+        options.Converters.Add(new PolymorphicConverter<RuleAction>(TypeRegistry));
+#pragma warning restore CS0618 // Type or member is obsolete
         configure?.Invoke(options);
 
         return options;

@@ -10,8 +10,10 @@
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CodeEditorComponent, JoinPipe, SimulatedRuleEventDto, TranslatePipe } from '@app/shared';
+import { BranchItem, CodeEditorComponent, FlowView, JoinPipe, RuleElementDto, SimulatedRuleEventDto, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { HistoryStepComponent } from '../../shared/history-step.component';
 import { RuleClassPipe, SimulatedRuleEventStatusPipe } from '../../shared/pipes';
+import { StateDetailsComponent } from '../../shared/state-details.component';
 import { RuleTransitionComponent } from './rule-transition.component';
 
 const ERRORS_AFTER_EVENT = [
@@ -29,10 +31,6 @@ const ERRORS_AFTER_ENRICHED_EVENT = [
     'ConditionDoesNotMatch',
 ];
 
-const ERRORS_FAILED = [
-    'Failed',
-];
-
 @Component({
     standalone: true,
     selector: '[sqxSimulatedRuleEvent]',
@@ -42,14 +40,19 @@ const ERRORS_FAILED = [
     imports: [
         CodeEditorComponent,
         FormsModule,
+        HistoryStepComponent,
         JoinPipe,
         RuleClassPipe,
         RuleTransitionComponent,
         SimulatedRuleEventStatusPipe,
+        StateDetailsComponent,
         TranslatePipe,
     ],
 })
 export class SimulatedRuleEventComponent {
+    @Input({ required: true })
+    public availableSteps: Record<string, RuleElementDto> = {};
+
     @Input('sqxSimulatedRuleEvent')
     public event!: SimulatedRuleEventDto;
 
@@ -61,5 +64,16 @@ export class SimulatedRuleEventComponent {
 
     public errorsAfterEvent = ERRORS_AFTER_EVENT;
     public errorsAfterEnrichedEvent = ERRORS_AFTER_ENRICHED_EVENT;
-    public errorsFailed = ERRORS_FAILED;
+
+    public branchItems: BranchItem[] = [];
+
+    public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.event) {
+            if (this.event.flowState) {
+                this.branchItems = new FlowView(this.event.flowState.definition as any).getAllItems();
+            } else {
+                this.branchItems = [];
+            }
+        }
+    }
 }

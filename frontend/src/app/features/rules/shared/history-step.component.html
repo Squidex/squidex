@@ -1,0 +1,39 @@
+<div class="step row g-0" [class.last]="isLast" [class.small-step]="small">
+    <div class="col col-icon icon">
+        @if (isActive) {
+            <i class="icon-caret-right active-icon"></i>
+        }
+
+        @if (elementInfo && elementType) {
+            <sqx-rule-element [elementInfo]="elementInfo" [elementType]="elementType" showDescription="false" showName="false" showRemove="false" size="sm" />
+        } @else {
+            <div class="circle" [class.sm]="small"></div>
+        }
+    </div>
+
+    <div class="col">
+        <div class="details">
+            <div class="row g-2 align-items-center mt-0">
+                <ng-content select="[summary]"></ng-content>
+
+                <div class="col col-expand">
+                    @if (isExpandable) {
+                        <button class="btn btn-sm btn-text-secondary text-muted btn-expand" (click)="toggle()" type="button">
+                            <span class="hidden">{{ "common.more" | sqxTranslate }}</span>
+                            <i class="icon-sm" [class.icon-angle-down]="isExpanded" [class.icon-angle-right]="!isExpanded"></i>
+                        </button>
+                    }
+                </div>
+            </div>
+
+            @if (isExpanded && isExpandable) {
+                <div class="mt-3">
+                    <ng-container *ngTemplateOutlet="detailsTemplate"></ng-container>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+
+<ng-template #detailsTemplate> <ng-content select="[details]"></ng-content> </ng-template>

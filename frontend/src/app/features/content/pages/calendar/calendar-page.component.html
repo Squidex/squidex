@@ -1,15 +1,14 @@
-<sqx-title message="i18n:contents.calendar"></sqx-title>
-
+<sqx-title message="i18n:contents.calendar" />
 <sqx-layout hideSidebar="true" layout="main" titleText="i18n:contents.calendar">
     <ng-container menu>
         {{ title }}
-
         <select class="form-select ms-4" [disabled]="isLoading" [ngModel]="view" (ngModelChange)="changeView($event)">
             <option ngValue="day">{{ "common.daily" | sqxTranslate }}</option>
+
             <option ngValue="week">{{ "common.weekly" | sqxTranslate }}</option>
+
             <option ngValue="month">{{ "common.monthly" | sqxTranslate }}</option>
         </select>
-
         <button class="btn btn-text-secondary btn-navigate ms-2" (click)="goPrev()" [disabled]="isLoading" type="button">
             <i class="icon-caret-left"></i>
         </button>
@@ -17,17 +16,12 @@
             <i class="icon-caret-right"></i>
         </button>
     </ng-container>
-
     <ng-container content>
         <div class="calendar" #calendarContainer></div>
     </ng-container>
 </sqx-layout>
-
 <sqx-modal-dialog (dialogClose)="contentDialog.hide()" *sqxModal="contentDialog">
-    <ng-container title>
-        {{ "common.content" | sqxTranslate }}
-    </ng-container>
-
+    <ng-container title> {{ "common.content" | sqxTranslate }} </ng-container>
     <ng-container content>
         @if (contentSelected && contentSelected.scheduleJob) {
             <div>
@@ -42,6 +36,7 @@
                         </div>
                     </div>
                 </div>
+
                 <div class="form-group form-group-aligned row">
                     <label class="col-4 col-form-label">{{ "common.content" | sqxTranslate }}</label>
                     <div class="col-8">
@@ -50,25 +45,23 @@
                         </a>
                     </div>
                 </div>
+
                 <div class="form-group form-group-aligned row">
                     <label class="col-4 col-form-label">{{ "common.schema" | sqxTranslate }}</label>
                     <div class="col-8">
-                        <a class="truncate" [routerLink]="['../', contentSelected.schemaName]">
-                            {{ contentSelected.schemaDisplayName }}
-                        </a>
+                        <a class="truncate" [routerLink]="['../', contentSelected.schemaName]"> {{ contentSelected.schemaDisplayName }} </a>
                     </div>
                 </div>
+
                 <div class="form-group form-group-aligned row">
                     <label class="col-4 col-form-label">{{ "common.status" | sqxTranslate }}</label>
                     <div class="col-8">
-                        <sqx-content-status
-                            layout="text"
-                            small="true"
-                            [status]="contentSelected.status"
-                            [statusColor]="contentSelected.statusColor"></sqx-content-status>
+                        <sqx-content-status layout="text" small="true" [status]="contentSelected.status" [statusColor]="contentSelected.statusColor" />
                     </div>
                 </div>
+
                 <hr />
+
                 <div class="form-group form-group-aligned row">
                     <label class="col-4 col-form-label">{{ "contents.scheduledToLabel" | sqxTranslate }}</label>
                     <div class="col-8">
@@ -76,15 +69,15 @@
                             layout="text"
                             small="true"
                             [status]="contentSelected.scheduleJob.status"
-                            [statusColor]="contentSelected.scheduleJob.color"></sqx-content-status>
+                            [statusColor]="contentSelected.scheduleJob.color" />
                     </div>
                 </div>
+
                 <div class="form-group form-group-aligned row">
                     <label class="col-4 col-form-label">{{ "contents.scheduledAt" | sqxTranslate }}</label>
-                    <div class="col-8">
-                        {{ contentSelected.scheduleJob.dueTime | sqxFullDateTime }}
-                    </div>
+                    <div class="col-8">{{ contentSelected.scheduleJob.dueTime | sqxFullDateTime }}</div>
                 </div>
+
                 <div class="form-group form-group-aligned row">
                     <label class="col-4 col-form-label">{{ "contents.scheduledBy" | sqxTranslate }}</label>
                     <div class="col-8">
@@ -92,8 +85,10 @@
                         {{ contentSelected.scheduleJob.scheduledBy | sqxUserNameRef }}
                     </div>
                 </div>
+
                 @if (contentSelected.canCancelStatus) {
                     <hr />
+
                     <div class="row">
                         <div class="col-8 offset-4">
                             <button

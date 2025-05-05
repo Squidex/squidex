@@ -1,9 +1,7 @@
 <div class="component">
     @if (formModel.schemaChanges | async; as schema) {
         <div>
-            <sqx-form-hint>
-                {{ schema.displayName }}
-            </sqx-form-hint>
+            <sqx-form-hint> {{ schema.displayName }} </sqx-form-hint>
             @for (section of formModel.sectionsChanges | async; track section) {
                 <div class="form-group">
                     <sqx-component-section
@@ -14,7 +12,7 @@
                         [hasChatBot]="hasChatBot"
                         [isComparing]="isComparing"
                         [language]="language"
-                        [languages]="languages"></sqx-component-section>
+                        [languages]="languages" />
                 </div>
             }
         </div>
@@ -30,21 +28,19 @@
             </button>
             <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonSelect" *sqxModal="schemasDropdown; closeAlways: true">
                 @for (schema of schemasList; track schema) {
-                    <a class="dropdown-item" (click)="setSchema(schema)">
-                        {{ schema.displayName }}
-                    </a>
+                    <a class="dropdown-item" (click)="setSchema(schema)"> {{ schema.displayName }} </a>
                 }
             </sqx-dropdown-menu>
         }
+
         @if (schemasList.length === 1) {
             <button class="btn btn-outline-success" (click)="setSchema(schemasList[0])" [disabled]="isDisabled | async" type="button">
                 {{ "contents.addComponent" | sqxTranslate }}
             </button>
         }
+
         @if (schemasList.length === 0) {
-            <sqx-form-hint>
-                {{ "contents.componentNoSchema" | sqxTranslate }}
-            </sqx-form-hint>
+            <sqx-form-hint> {{ "contents.componentNoSchema" | sqxTranslate }} </sqx-form-hint>
         }
     }
 </div>

@@ -14,7 +14,6 @@
 
     <div class="form-group row">
         <label class="col-3 col-form-label">{{ "schemas.fieldTypes.string.length" | sqxTranslate }}</label>
-
         <div class="col-9">
             <div class="row g-0">
                 <div class="col">
@@ -24,9 +23,9 @@
                         placeholder="{{ 'schemas.fieldTypes.string.lengthMin' | sqxTranslate }}"
                         type="number" />
                 </div>
-                <div class="col-auto">
-                    <label class="col-form-label minmax">-</label>
-                </div>
+
+                <div class="col-auto"><label class="col-form-label minmax">-</label></div>
+
                 <div class="col">
                     <input
                         class="form-control"
@@ -40,7 +39,6 @@
 
     <div class="form-group row">
         <label class="col-3 col-form-label" for="{{ field.fieldId }}_fieldPattern">{{ "common.pattern" | sqxTranslate }}</label>
-
         <div class="col-9">
             <input
                 class="form-control"
@@ -52,27 +50,20 @@
                 (focus)="patternsModal.show()"
                 formControlName="pattern"
                 placeholder="{{ 'schemas.fieldTypes.string.pattern' | sqxTranslate }}" />
-
             @if (settings.patterns.length > 0 && (showPatternSuggestions | async)) {
-                <sqx-dropdown-menu
-                    class="control-dropdown"
-                    position="bottom-start"
-                    scrollY="true"
-                    [sqxAnchoredTo]="inputPattern"
-                    *sqxModal="patternsModal">
+                <sqx-dropdown-menu class="control-dropdown" position="bottom-start" scrollY="true" [sqxAnchoredTo]="inputPattern" *sqxModal="patternsModal">
                     <h4>{{ "schemas.fieldTypes.string.suggestions" | sqxTranslate }}</h4>
+
                     @for (pattern of settings.patterns; track pattern) {
                         <div class="control-dropdown-item control-dropdown-item-selectable" (mousedown)="setPattern(pattern)">
                             <div class="truncate">{{ pattern.name }}</div>
+
                             <div class="truncate text-muted">{{ pattern.regex }}</div>
                         </div>
                     }
                 </sqx-dropdown-menu>
             }
-
-            <sqx-form-hint>
-                {{ patternName }}
-            </sqx-form-hint>
+            <sqx-form-hint> {{ patternName }} </sqx-form-hint>
         </div>
     </div>
 
@@ -89,15 +80,12 @@
 
     <div class="form-group row">
         <div class="col-9 offset-3">
-            <sqx-form-hint>
-                {{ "schemas.fieldTypes.string.wordHint" | sqxTranslate }}
-            </sqx-form-hint>
+            <sqx-form-hint> {{ "schemas.fieldTypes.string.wordHint" | sqxTranslate }} </sqx-form-hint>
         </div>
     </div>
 
     <div class="form-group row">
         <label class="col-3 col-form-label">{{ "schemas.fieldTypes.string.contentType" | sqxTranslate }}</label>
-
         <div class="col-9">
             <select class="form-select" formControlName="contentType">
                 @for (contentType of contentTypes; track contentType) {
@@ -109,7 +97,6 @@
 
     <div class="form-group row">
         <label class="col-3 col-form-label">{{ "schemas.fieldTypes.string.characters" | sqxTranslate }}</label>
-
         <div class="col-9">
             <div class="row g-0">
                 <div class="col">
@@ -119,9 +106,9 @@
                         placeholder="{{ 'schemas.fieldTypes.string.charactersMin' | sqxTranslate }}"
                         type="number" />
                 </div>
-                <div class="col-auto">
-                    <label class="col-form-label minmax">-</label>
-                </div>
+
+                <div class="col-auto"><label class="col-form-label minmax">-</label></div>
+
                 <div class="col">
                     <input
                         class="form-control"
@@ -135,7 +122,6 @@
 
     <div class="form-group row">
         <label class="col-3 col-form-label">{{ "schemas.fieldTypes.string.words" | sqxTranslate }}</label>
-
         <div class="col-9">
             <div class="row g-0">
                 <div class="col">
@@ -145,9 +131,9 @@
                         placeholder="{{ 'schemas.fieldTypes.string.wordsMin' | sqxTranslate }}"
                         type="number" />
                 </div>
-                <div class="col-auto">
-                    <label class="col-form-label minmax">-</label>
-                </div>
+
+                <div class="col-auto"><label class="col-form-label minmax">-</label></div>
+
                 <div class="col">
                     <input
                         class="form-control"
@@ -163,10 +149,7 @@
         <label class="col-3 col-form-label" for="{{ field.fieldId }}_fieldDefaultValue">
             {{ "schemas.field.defaultValue" | sqxTranslate }}
         </label>
-
-        <div class="col-9">
-            <input class="form-control" id="{{ field.fieldId }}_fieldDefaultValue" formControlName="defaultValue" />
-        </div>
+        <div class="col-9"><input class="form-control" id="{{ field.fieldId }}_fieldDefaultValue" formControlName="defaultValue" /></div>
     </div>
 
     @if (isLocalizable) {
@@ -175,13 +158,8 @@
                 {{ "schemas.field.defaultValues" | sqxTranslate }}
             </label>
             <div class="col-9">
-                <sqx-localized-input
-                    id="{{ field.fieldId }}_fieldDefaultValues"
-                    formControlName="defaultValues"
-                    [languages]="languages"></sqx-localized-input>
-                <sqx-form-hint>
-                    {{ "schemas.field.defaultValuesHint" | sqxTranslate }}
-                </sqx-form-hint>
+                <sqx-localized-input id="{{ field.fieldId }}_fieldDefaultValues" formControlName="defaultValues" [languages]="languages" />
+                <sqx-form-hint> {{ "schemas.field.defaultValuesHint" | sqxTranslate }} </sqx-form-hint>
             </div>
         </div>
     }

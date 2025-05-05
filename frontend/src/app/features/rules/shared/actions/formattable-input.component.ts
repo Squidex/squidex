@@ -12,8 +12,6 @@ import { CodeEditorComponent, ScriptCompletions, Types } from '@app/shared';
 
 type TemplateMode = 'Text' | 'Script' | 'Liquid';
 
-const TEMPLATE_MODES: ReadonlyArray<TemplateMode> = ['Text', 'Script', 'Liquid'];
-
 export const SQX_FORMATTABLE_INPUT_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => FormattableInputComponent), multi: true,
 };
@@ -48,7 +46,7 @@ export class FormattableInputComponent implements ControlValueAccessor, AfterVie
 
     public disabled = false;
 
-    public modes = TEMPLATE_MODES;
+    public modes: TemplateMode[] = ['Text', 'Script', 'Liquid'];
     public mode: TemplateMode = 'Text';
 
     public editorMode = 'ace/mode/text';

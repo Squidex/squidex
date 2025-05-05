@@ -7,6 +7,7 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Migrations.OldActions;
 using Squidex.Infrastructure.Plugins;
 
 namespace Squidex.Extensions.Actions.Slack;
@@ -20,6 +21,9 @@ public sealed class SlackPlugin : IPlugin
             options.Timeout = TimeSpan.FromSeconds(2);
         });
 
-        services.AddRuleAction<SlackAction, SlackActionHandler>();
+        services.AddFlowStep<SlackFlowStep>();
+#pragma warning disable CS0618 // Type or member is obsolete
+        services.AddRuleAction<SlackAction>();
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

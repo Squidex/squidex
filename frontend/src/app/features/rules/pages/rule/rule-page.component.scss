@@ -1,34 +1,17 @@
-@import 'mixins';
-@import 'vars';
+@import "mixins";
+@import "vars";
 
-.summary-row {
-    @include force-height(4rem);
-
-    h3 {
-        margin: 0;
+:host ::ng-deep {
+    .panel2-main-inner.white {
+        background-image: radial-gradient(
+            lighten($color-border, 2%) 1px,
+            transparent 0
+        );
+        background-size: 1rem 1rem;
     }
 
-    .col-syntax {
-        width: 4rem;
-    }
-
-    .col-icon {
-        max-width: 15rem;
-    }
-}
-
-.title {
-    display: inline-block;
-    margin-left: 2rem;
-}
-
-.card {
-    &-header {
-        margin-bottom: -1px;
-    }
-
-    &-body {
-        &:empty {
+    .trigger {
+        .centered:first-child:before {
             display: none;
         }
     }
@@ -39,5 +22,69 @@
 }
 
 .btn-enabled {
+    @include absolute(1.5rem, 1.75rem, null, null);
+
+    &:hover {
+        background-color: $color-white;
+    }
+}
+
+.btn-circle {
+    @include force-height(4rem);
+    @include force-width(4rem);
+    background-color: $color-white;
+    border-radius: 100%;
     border-color: $color-border;
+    padding: 1rem;
+}
+
+.input-name {
+    @include absolute(1.5rem, null, null, 1.75rem);
+    width: 15rem;
+}
+
+.trigger-title {
+    @include absolute(50%, null, null, 50%);
+    font-size: $font-small;
+    margin-top: -0.5rem;
+    margin-left: 3rem;
+    white-space: nowrap;
+}
+
+.flow {
+    margin: 0 auto;
+    padding-top: 2rem;
+    padding-left: 4rem;
+    padding-right: 4rem;
+}
+
+.centered {
+    align-items: center;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 0;
+    padding-top: 14px;
+    padding-bottom: 0;
+    position: relative;
+
+    & > * {
+        z-index: 1;
+    }
+
+    &:before {
+        @include absolute(0, null, 0, 50%);
+        border: 2px solid $color-border;
+        content: "";
+        margin-left: -1px;
+        margin-top: 0;
+        z-index: 0;
+    }
+}
+
+label {
+    @include truncate;
+    background-color: $color-white;
+    display: inline-block;
+    max-width: 7rem;
+    padding: 0.125rem 0.25rem;
 }

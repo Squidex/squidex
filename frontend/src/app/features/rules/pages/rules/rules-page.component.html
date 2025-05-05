@@ -1,20 +1,15 @@
-<sqx-title message="i18n:rules.listPageTitle"></sqx-title>
-
+<sqx-title message="i18n:rules.listPageTitle" />
 <sqx-layout innerWidth="54" layout="main" titleIcon="rules" titleText="i18n:common.rules">
     <ng-container menu>
         <button class="btn btn-text-secondary" (click)="reload()" shortcut="CTRL + B" title="i18n:rules.refreshTooltip" type="button">
-            <i class="icon-reset"></i>
-            {{ "common.refresh" | sqxTranslate }}
+            <i class="icon-reset"></i> {{ "common.refresh" | sqxTranslate }}
         </button>
-
         @if (rulesState.canCreate | async) {
             <a class="btn btn-success ms-2" routerLink="new" shortcut="CTRL + U" title="i18n:rules.createTooltip">
-                <i class="icon-plus"></i>
-                {{ "rules.create" | sqxTranslate }}
+                <i class="icon-plus"></i> {{ "rules.create" | sqxTranslate }}
             </a>
         }
     </ng-container>
-
     <ng-container>
         <sqx-list-view innerWidth="54rem" [isLoading]="rulesState.isLoading | async">
             @if (rulesState.runningRule | async; as runningRule) {
@@ -24,21 +19,20 @@
                 </div>
             }
 
-            @if (supportedActions && supportedTriggers && (rulesState.isLoaded | async) && (rulesState.rules | async); as rules) {
+            @if (availableSteps && availableTriggers && (rulesState.isLoaded | async) && (rulesState.rules | async); as rules) {
                 @for (rule of rules; track rule.id) {
                     <sqx-rule
+                        [availableSteps]="availableSteps"
+                        [availableTriggers]="availableTriggers"
                         (delete)="delete(rule)"
                         [rule]="rule"
-                        [ruleActions]="supportedActions"
-                        [ruleTriggers]="supportedTriggers"
-                        (toggle)="toggle(rule)"></sqx-rule>
+                        (toggle)="toggle(rule)" />
                 } @empty {
                     <div class="table-items-row table-items-row-summary table-items-row-empty">
                         {{ "rules.empty" | sqxTranslate }}
                         @if (rulesState.canCreate | async) {
                             <button class="btn btn-success btn-sm ms-1" routerLink="new" type="button">
-                                <i class="icon icon-plus"></i>
-                                {{ "rules.emptyAddRule" | sqxTranslate }}
+                                <i class="icon icon-plus"></i> {{ "rules.emptyAddRule" | sqxTranslate }}
                             </button>
                         }
                     </div>
@@ -46,7 +40,6 @@
             }
         </sqx-list-view>
     </ng-container>
-
     <ng-template sidebarMenu>
         <div class="panel-nav">
             @if (rulesState.canReadEvents | async) {
@@ -61,7 +54,6 @@
                     <i class="icon-time"></i>
                 </a>
             }
-
             <a
                 class="panel-link"
                 #helpLink
@@ -80,5 +72,4 @@
         </div>
     </ng-template>
 </sqx-layout>
-
 <router-outlet></router-outlet>

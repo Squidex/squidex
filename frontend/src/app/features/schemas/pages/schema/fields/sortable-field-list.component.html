@@ -1,9 +1,4 @@
-<div
-    cdkDropList
-    [cdkDropListData]="fieldGroups"
-    [cdkDropListDisabled]="!sortable"
-    (cdkDropListDropped)="sortGroups($event)"
-    cdkDropListGroup>
+<div cdkDropList [cdkDropListData]="fieldGroups" [cdkDropListDisabled]="!sortable" (cdkDropListDropped)="sortGroups($event)" cdkDropListGroup>
     @for (group of fieldGroups; track group.id) {
         <div class="table-drag" cdkDrag [cdkDragDisabled]="!group.separator" cdkDragLockAxis="y">
             <sqx-field-group

@@ -1,9 +1,8 @@
 <div class="table-items-row table-items-row-expandable">
     <div class="table-items-row-summary">
         <div class="row align-items-center">
-            <div class="col-auto pe-4">
-                <sqx-status-icon size="lg" [status]="job.status"></sqx-status-icon>
-            </div>
+            <div class="col-auto pe-4"><sqx-status-icon size="lg" [status]="job.status" /></div>
+
             <div class="col">
                 <div>
                     <h4>{{ job.description }}</h4>
@@ -11,19 +10,18 @@
 
                 <div class="row">
                     <div class="col">
-                        {{ "jobs.startedLabel" | sqxTranslate }}:
-
-                        <span>{{ job.started | sqxFromNow }}</span>
+                        {{ "common.started" | sqxTranslate }}: <span>{{ job.started | sqxFromNow }}</span>
                     </div>
+
                     <div class="col">
                         {{ "jobs.jobDuration" | sqxTranslate }}:
-
                         @if (job.stopped) {
                             <span>{{ duration }}</span>
                         }
                     </div>
                 </div>
             </div>
+
             <div class="col-options text-right">
                 <a
                     class="btn btn-text-secondary"
@@ -32,16 +30,9 @@
                     sqxExternalLink="noicon">
                     <i class="icon-download"></i>
                 </a>
-
-                <button
-                    class="btn btn-outline-secondary btn-expand ms-1"
-                    [class.expanded]="isExpanded"
-                    (click)="toggleExpanded()"
-                    type="button">
-                    <span class="hidden">{{ "common.settings" | sqxTranslate }}</span>
-                    <i class="icon-settings"></i>
+                <button class="btn btn-outline-secondary btn-expand ms-1" [class.expanded]="isExpanded" (click)="toggleExpanded()" type="button">
+                    <span class="hidden">{{ "common.settings" | sqxTranslate }}</span> <i class="icon-settings"></i>
                 </button>
-
                 <button
                     class="btn btn-text-danger ms-1"
                     confirmRememberKey="deleteBackup"
@@ -61,15 +52,10 @@
             <div class="job-header">
                 <h4>{{ "common.details" | sqxTranslate }}</h4>
             </div>
+
             <div class="row job-dump">
                 <div class="col-12">
-                    <sqx-code-editor
-                        disabled="true"
-                        height="auto"
-                        minLines="12"
-                        mode="ace/mode/text"
-                        [ngModel]="details"
-                        wordWrap="true"></sqx-code-editor>
+                    <sqx-code-editor disabled="true" height="auto" minLines="12" mode="ace/mode/text" [ngModel]="details" wordWrap="true" />
                 </div>
             </div>
         </div>

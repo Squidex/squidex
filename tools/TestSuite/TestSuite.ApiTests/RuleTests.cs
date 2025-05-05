@@ -8,6 +8,7 @@
 using Squidex.ClientLibrary;
 using TestSuite.Fixtures;
 
+#pragma warning disable CS0618 // Type or member is obsolete
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
 
@@ -16,6 +17,7 @@ namespace TestSuite.ApiTests;
 public class RuleTests(ClientFixture fixture) : IClassFixture<ClientFixture>
 {
     private readonly string ruleName = Guid.NewGuid().ToString();
+    private readonly Guid stepId = Guid.NewGuid();
 
     public ClientFixture _ { get; } = fixture;
 
@@ -29,6 +31,46 @@ public class RuleTests(ClientFixture fixture) : IClassFixture<ClientFixture>
         // STEP 1: Create rule.
         var createRule = new CreateRuleDto
         {
+            Flow = new FlowDefinitionDto
+            {
+                InitialStepId = stepId,
+                Steps = new Dictionary<string, FlowStepDefinitionDto>
+                {
+                    [stepId.ToString()] = new FlowStepDefinitionDto
+                    {
+                        Step = new WebhookFlowStepDto
+                        {
+                            Method = WebhookMethod.POST,
+                            Payload = null,
+                            PayloadType = null,
+                            Url = new Uri("http://squidex.io")
+                        }
+                    }
+                }
+            },
+            Trigger = new ContentChangedRuleTriggerDto
+            {
+                HandleAll = true
+            }
+        };
+
+        var rule = await app.Rules.PostRuleAsync(createRule);
+
+        Assert.IsType<WebhookRuleActionDto>(rule.Action);
+        await Verify(rule);
+    }
+
+    [Fact]
+    public async Task Should_create_rule_with_action()
+    {
+        // STEP 0: Create app.
+        var (app, _) = await _.PostAppAsync();
+
+
+        // STEP 1: Create rule.
+        var createRule = new CreateRuleDto
+        {
+            Flow = null!,
             Action = new WebhookRuleActionDto
             {
                 Method = WebhookMethod.POST,
@@ -45,7 +87,6 @@ public class RuleTests(ClientFixture fixture) : IClassFixture<ClientFixture>
         var rule = await app.Rules.PostRuleAsync(createRule);
 
         Assert.IsType<WebhookRuleActionDto>(rule.Action);
-
         await Verify(rule);
     }
 
@@ -59,12 +100,22 @@ public class RuleTests(ClientFixture fixture) : IClassFixture<ClientFixture>
         // STEP 1: Create rule.
         var createRequest = new CreateRuleDto
         {
-            Action = new WebhookRuleActionDto
+            Flow = new FlowDefinitionDto
             {
-                Method = WebhookMethod.POST,
-                Payload = null,
-                PayloadType = null,
-                Url = new Uri("http://squidex.io")
+                InitialStepId = stepId,
+                Steps = new Dictionary<string, FlowStepDefinitionDto>
+                {
+                    [stepId.ToString()] = new FlowStepDefinitionDto
+                    {
+                        Step = new WebhookFlowStepDto
+                        {
+                            Method = WebhookMethod.POST,
+                            Payload = null,
+                            PayloadType = null,
+                            Url = new Uri("http://squidex.io")
+                        }
+                    }
+                }
             },
             Trigger = new ContentChangedRuleTriggerDto
             {
@@ -84,7 +135,6 @@ public class RuleTests(ClientFixture fixture) : IClassFixture<ClientFixture>
         var rule_1 = await app.Rules.PutRuleAsync(rule_0.Id, updateRequest);
 
         Assert.Equal(ruleName, rule_1.Name);
-
         await Verify(rule_1);
     }
 
@@ -98,12 +148,22 @@ public class RuleTests(ClientFixture fixture) : IClassFixture<ClientFixture>
         // STEP 1: Create rule.
         var createRequest = new CreateRuleDto
         {
-            Action = new WebhookRuleActionDto
+            Flow = new FlowDefinitionDto
             {
-                Method = WebhookMethod.POST,
-                Payload = null,
-                PayloadType = null,
-                Url = new Uri("http://squidex.io")
+                InitialStepId = stepId,
+                Steps = new Dictionary<string, FlowStepDefinitionDto>
+                {
+                    [stepId.ToString()] = new FlowStepDefinitionDto
+                    {
+                        Step = new WebhookFlowStepDto
+                        {
+                            Method = WebhookMethod.POST,
+                            Payload = null,
+                            PayloadType = null,
+                            Url = new Uri("http://squidex.io")
+                        }
+                    }
+                }
             },
             Trigger = new ContentChangedRuleTriggerDto
             {
@@ -123,11 +183,11 @@ public class RuleTests(ClientFixture fixture) : IClassFixture<ClientFixture>
     }
 
     [Fact]
-    public async Task Should_get_actions()
+    public async Task Should_get_steps()
     {
-        var actions = await _.Client.Rules.GetActionsAsync();
+        var steps = await _.Client.Rules.GetStepsAsync();
 
-        Assert.NotEmpty(actions);
+        Assert.NotEmpty(steps);
     }
 
     [Fact]

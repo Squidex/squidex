@@ -21,12 +21,14 @@ using Squidex.Domain.Apps.Core.Apps.Json;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Contents.Json;
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Rules.Json;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Schemas.Json;
 using Squidex.Domain.Apps.Events;
 using Squidex.Events.Utils;
+using Squidex.Flows;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
@@ -48,6 +50,10 @@ public static class SerializationServices
         // It is also a readonly list, so we have to register it first, so that other converters do not pick this up.
         options.Converters.Add(new StringConverter<PropertyPath>(x => x));
 
+#pragma warning disable CS0618 // Type or member is obsolete
+        options.Converters.Add(new PolymorphicConverter<RuleAction>(typeRegistry));
+#pragma warning restore CS0618 // Type or member is obsolete
+
         options.ConfigureForNodaTime(DateTimeZoneProviders.Tzdb);
         options.Converters.Add(new HeaderValueConverter());
         options.Converters.Add(new GeoJsonConverterFactory());
@@ -55,7 +61,7 @@ public static class SerializationServices
         options.Converters.Add(new PolymorphicConverter<EnrichedEvent>(typeRegistry));
         options.Converters.Add(new PolymorphicConverter<FieldProperties>(typeRegistry));
         options.Converters.Add(new PolymorphicConverter<FieldPropertiesDto>(typeRegistry));
-        options.Converters.Add(new PolymorphicConverter<RuleAction>(typeRegistry));
+        options.Converters.Add(new PolymorphicConverter<FlowStep>(typeRegistry));
         options.Converters.Add(new PolymorphicConverter<RuleTrigger>(typeRegistry));
         options.Converters.Add(new PolymorphicConverter<RuleTriggerDto>(typeRegistry));
         options.Converters.Add(new JsonValueConverter());

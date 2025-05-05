@@ -69,7 +69,7 @@ public class RecursiveDeleterTests : GivenContext
         var childFolderId2 = DomainId.NewGuid();
 
         A.CallTo(() => assetFolderRepository.QueryChildIdsAsync(AppId.Id, @event.AssetFolderId, default))
-            .Returns(new List<DomainId> { childFolderId1, childFolderId2 });
+            .Returns([childFolderId1, childFolderId2]);
 
         await sut.On(Envelope.Create(@event));
 
@@ -89,7 +89,7 @@ public class RecursiveDeleterTests : GivenContext
         var childId2 = DomainId.NewGuid();
 
         A.CallTo(() => assetRepository.QueryChildIdsAsync(AppId.Id, @event.AssetFolderId, default))
-            .Returns(new List<DomainId> { childId1, childId2 });
+            .Returns([childId1, childId2]);
 
         await sut.On(Envelope.Create(@event));
 
@@ -112,7 +112,7 @@ public class RecursiveDeleterTests : GivenContext
             .Throws(new InvalidOperationException());
 
         A.CallTo(() => assetRepository.QueryChildIdsAsync(AppId.Id, @event.AssetFolderId, default))
-            .Returns(new List<DomainId> { childId1, childId2 });
+            .Returns([childId1, childId2]);
 
         await sut.On(Envelope.Create(@event));
 

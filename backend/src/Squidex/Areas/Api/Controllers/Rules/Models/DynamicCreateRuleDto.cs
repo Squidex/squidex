@@ -14,6 +14,11 @@ namespace Squidex.Areas.Api.Controllers.Rules.Models;
 public sealed class DynamicCreateRuleDto
 {
     /// <summary>
+    /// Optional rule name.
+    /// </summary>
+    public string? Name { get; set; }
+
+    /// <summary>
     /// The trigger properties.
     /// </summary>
     [LocalizedRequired]
@@ -22,6 +27,17 @@ public sealed class DynamicCreateRuleDto
     /// <summary>
     /// The action properties.
     /// </summary>
+    [Obsolete("Use the new 'Flow' property to define actions")]
+    public Dictionary<string, object>? Action { get; set; }
+
+    /// <summary>
+    /// The flow to describe the sequence of actions to perform.
+    /// </summary>
     [LocalizedRequired]
-    public Dictionary<string, object> Action { get; set; }
+    public DynamicFlowDefinitionDto Flow { get; set; }
+
+    /// <summary>
+    /// Enable or disable the rule.
+    /// </summary>
+    public bool? IsEnabled { get; set; }
 }

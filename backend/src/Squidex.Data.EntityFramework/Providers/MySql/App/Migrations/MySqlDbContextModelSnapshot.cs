@@ -18,7 +18,7 @@ namespace Squidex.Providers.MySql.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.13")
+                .HasAnnotation("ProductVersion", "8.0.14")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
@@ -325,6 +325,7 @@ namespace Squidex.Providers.MySql.Migrations
             modelBuilder.Entity("Squidex.AI.Mongo.EFChatEntity", b =>
                 {
                     b.Property<string>("Id")
+                        .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
 
                     b.Property<DateTime>("LastUpdated")
@@ -348,6 +349,7 @@ namespace Squidex.Providers.MySql.Migrations
             modelBuilder.Entity("Squidex.Assets.EntityFramework.EFAssetKeyValueEntity<Squidex.Assets.TusAdapter.TusMetadata>", b =>
                 {
                     b.Property<string>("Key")
+                        .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
 
                     b.Property<DateTimeOffset>("Expires")
@@ -975,59 +977,6 @@ namespace Squidex.Providers.MySql.Migrations
                     b.ToTable("States_Rule", (string)null);
                 });
 
-            modelBuilder.Entity("Squidex.Domain.Apps.Entities.Rules.EFRuleEventEntity", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<string>("AppId")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
-
-                    b.Property<DateTimeOffset>("Created")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTimeOffset>("Expires")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<string>("Job")
-                        .IsRequired()
-                        .HasColumnType("json");
-
-                    b.Property<string>("JobResult")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<string>("LastDump")
-                        .HasColumnType("longtext");
-
-                    b.Property<DateTimeOffset>("LastModified")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<DateTimeOffset?>("NextAttempt")
-                        .HasColumnType("datetime(6)");
-
-                    b.Property<int>("NumCalls")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Result")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("varchar(100)");
-
-                    b.Property<string>("RuleId")
-                        .IsRequired()
-                        .HasMaxLength(255)
-                        .HasColumnType("varchar(255)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("RuleEvents");
-                });
-
             modelBuilder.Entity("Squidex.Domain.Apps.Entities.Schemas.EFSchemaEntity", b =>
                 {
                     b.Property<string>("DocumentId")
@@ -1104,7 +1053,8 @@ namespace Squidex.Providers.MySql.Migrations
 
                     b.Property<string>("EventStream")
                         .IsRequired()
-                        .HasColumnType("varchar(255)");
+                        .HasMaxLength(750)
+                        .HasColumnType("varchar(750)");
 
                     b.Property<long>("EventStreamOffset")
                         .HasColumnType("bigint");
@@ -1145,6 +1095,42 @@ namespace Squidex.Providers.MySql.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("EventPosition");
+                });
+
+            modelBuilder.Entity("Squidex.Flows.EntityFramework.EFFlowStateEntity", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("char(36)");
+
+                    b.Property<DateTimeOffset>("Created")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("DefinitionId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<DateTimeOffset?>("DueTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.Property<string>("OwnerId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<int>("SchedulePartition")
+                        .HasColumnType("int");
+
+                    b.Property<string>("State")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DueTime", "SchedulePartition");
+
+                    b.ToTable("Flows", (string)null);
                 });
 
             modelBuilder.Entity("Squidex.Infrastructure.Caching.EFCacheEntity", b =>
@@ -1422,6 +1408,7 @@ namespace Squidex.Providers.MySql.Migrations
 
                     b.Property<string>("ChannelName")
                         .IsRequired()
+                        .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
 
                     b.Property<byte[]>("MessageData")
@@ -1430,11 +1417,13 @@ namespace Squidex.Providers.MySql.Migrations
 
                     b.Property<string>("MessageHeaders")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(2000)
+                        .HasColumnType("varchar(2000)");
 
                     b.Property<string>("QueueName")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<DateTime?>("TimeHandled")
                         .HasColumnType("datetime(6)");
@@ -1456,9 +1445,11 @@ namespace Squidex.Providers.MySql.Migrations
             modelBuilder.Entity("Squidex.Messaging.EntityFramework.EFMessagingDataEntity", b =>
                 {
                     b.Property<string>("Group")
+                        .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("Key")
+                        .HasMaxLength(255)
                         .HasColumnType("varchar(255)");
 
                     b.Property<DateTime>("Expiration")
@@ -1469,11 +1460,13 @@ namespace Squidex.Providers.MySql.Migrations
                         .HasColumnType("longblob");
 
                     b.Property<string>("ValueFormat")
-                        .HasColumnType("longtext");
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
 
                     b.Property<string>("ValueType")
                         .IsRequired()
-                        .HasColumnType("longtext");
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
 
                     b.HasKey("Group", "Key");
 

@@ -45,7 +45,7 @@ public partial class TranslateTemplates(DirectoryInfo folder, TranslationService
             // Keep the original casing, otherwise *ngIf is translated to ngif
             var html = new HtmlDocument
             {
-                OptionOutputOriginalCase = true
+                OptionOutputOriginalCase = true,
             };
 
             html.LoadHtml(File.ReadAllText(file.FullName));

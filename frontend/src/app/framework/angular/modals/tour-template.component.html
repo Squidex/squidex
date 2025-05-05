@@ -13,9 +13,7 @@
     <div class="tour-body">
         <div class="row g-2">
             <div class="col-auto">
-                <div class="squid d-flex align-items-center justify-content-center bordered">
-                    <img src="./images/squid.svg" />
-                </div>
+                <div class="squid d-flex align-items-center justify-content-center bordered"><img src="./images/squid.svg" /></div>
             </div>
 
             <div class="col">
@@ -24,9 +22,7 @@
                 <div [sqxMarkdown]="currentStep.content | sqxTranslate"></div>
             </div>
 
-            <div class="col-auto">
-                <button class="btn btn-sm btn-close" (click)="tourService.end()" type="button"></button>
-            </div>
+            <div class="col-auto"><button class="btn btn-sm btn-close" (click)="tourService.end()" type="button"></button></div>
         </div>
     </div>
 
@@ -39,23 +35,27 @@
                             {{ "common.prev" | sqxTranslate }}
                         </button>
                     }
+
                     @if (currentStep.hideAll) {
                         <button class="btn btn-outline-danger btn-sm" (click)="currentStep.hideAll()">
                             {{ "tour.tooltipStop" | sqxTranslate }}
                         </button>
                     }
                 </div>
+
                 <div class="d-flex ps-4">
                     @if (hasNext) {
                         <button class="btn btn-outline-secondary btn-sm" (click)="tourService.next()">
                             {{ "common.next" | sqxTranslate }}
                         </button>
                     }
+
                     @if (hasFinish) {
                         <button class="btn btn-outline-success btn-sm" (click)="tourService.end()">
                             {{ "common.finish" | sqxTranslate }}
                         </button>
                     }
+
                     @if (currentStep.hideThis) {
                         <button class="btn btn-outline-success btn-sm" (click)="currentStep.hideThis()">
                             {{ "tour.tooltipConfirm" | sqxTranslate }}

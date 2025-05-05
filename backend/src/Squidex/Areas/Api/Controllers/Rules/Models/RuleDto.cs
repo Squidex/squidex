@@ -7,7 +7,7 @@
 
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Rules.Models.Converters;
-using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Runner;
 using Squidex.Infrastructure;
@@ -64,8 +64,14 @@ public sealed class RuleDto : Resource
     public RuleTriggerDto Trigger { get; set; }
 
     /// <summary>
+    /// The flow to describe the sequence of actions to perform.
+    /// </summary>
+    public FlowDefinitionDto Flow { get; set; }
+
+    /// <summary>
     /// The action properties.
     /// </summary>
+    [Obsolete("Use the new 'Flow' property to define actions. Can be null if the flow cannot be converted.")]
     public RuleAction Action { get; set; }
 
     /// <summary>
@@ -86,13 +92,26 @@ public sealed class RuleDto : Resource
 
     public static RuleDto FromDomain(EnrichedRule rule, bool canRun, IRuleRunnerService ruleRunnerService, Resources resources)
     {
-        var result = new RuleDto();
-
-        SimpleMapper.Map(rule, result);
+        var result = SimpleMapper.Map(rule, new RuleDto());
 
         if (rule.Trigger != null)
         {
             result.Trigger = RuleTriggerDtoFactory.Create(rule.Trigger);
+        }
+
+        if (rule.Flow != null)
+        {
+            result.Flow = FlowDefinitionDto.FromDomain(rule.Flow);
+        }
+
+        if (rule.Flow != null && rule.Flow.Steps.Count == 1)
+        {
+#pragma warning disable CS0618 // Type or member is obsolete
+            if (rule.Flow.Steps.First().Value.Step is IConvertibleToAction convertible)
+            {
+                result.Action = convertible.ToAction();
+            }
+#pragma warning restore CS0618 // Type or member is obsolete
         }
 
         return result.CreateLinks(resources, rule, canRun, ruleRunnerService);

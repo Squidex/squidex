@@ -14,13 +14,13 @@
             <ng-template let-contributor="$implicit">
                 <span class="autocomplete-user">
                     <img class="user-picture" [src]="contributor.contributorId | sqxUserPicture" />
-
                     <span class="user-name">{{ contributor.contributorName }}</span>
                 </span>
             </ng-template>
         </sqx-autocomplete>
     </form>
 </div>
+
 <div class="comments-list" #scrollContainer>
     @for (comment of commentsItems | async; track comment.index) {
         <sqx-comment
@@ -32,6 +32,6 @@
             [contributors]="contributorsDataSource"
             [currentUrl]="router.url"
             [scrollContainer]="'.comments-list'"
-            [userToken]="commentUser"></sqx-comment>
+            [userToken]="commentUser" />
     }
 </div>

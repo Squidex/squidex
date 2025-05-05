@@ -5,112 +5,64 @@
         <div class="card-body">
             <div class="form-group">
                 <label for="name">{{ "common.name" | sqxTranslate }}</label>
-
                 <input class="form-control" id="name" [ngModel]="schema.name" [ngModelOptions]="{ standalone: true }" readonly />
             </div>
 
             <div class="form-group">
-                <label for="label">{{ "common.label" | sqxTranslate }}</label>
-
-                <sqx-control-errors for="label"></sqx-control-errors>
-
+                <label for="label">{{ "common.label" | sqxTranslate }}</label> <sqx-control-errors for="label" />
                 <input class="form-control" id="label" formControlName="label" />
-
-                <sqx-form-hint>
-                    {{ "schemas.schemaLabelHint" | sqxTranslate }}
-                </sqx-form-hint>
+                <sqx-form-hint> {{ "schemas.schemaLabelHint" | sqxTranslate }} </sqx-form-hint>
             </div>
 
             <div class="form-group">
-                <label for="hints">{{ "common.hints" | sqxTranslate }}</label>
-
-                <sqx-control-errors for="hints"></sqx-control-errors>
-
+                <label for="hints">{{ "common.hints" | sqxTranslate }}</label> <sqx-control-errors for="hints" />
                 <textarea class="form-control" id="hints" formControlName="hints" rows="4"></textarea>
-
-                <sqx-form-hint>
-                    {{ "schemas.schemaHintsHint" | sqxTranslate }}
-                </sqx-form-hint>
+                <sqx-form-hint> {{ "schemas.schemaHintsHint" | sqxTranslate }} </sqx-form-hint>
             </div>
 
             <div class="form-group">
                 <label for="hints">{{ "schemas.contentsSidebarUrl" | sqxTranslate }}</label>
-
-                <sqx-control-errors for="contentsSidebarUrl"></sqx-control-errors>
-
+                <sqx-control-errors for="contentsSidebarUrl" />
                 <input class="form-control" id="contentsSidebarUrl" formControlName="contentsSidebarUrl" type="url" />
-
-                <sqx-form-hint>
-                    {{ "schemas.contentsSidebarUrlHint" | sqxTranslate }}
-                </sqx-form-hint>
+                <sqx-form-hint> {{ "schemas.contentsSidebarUrlHint" | sqxTranslate }} </sqx-form-hint>
             </div>
 
             <div class="form-group">
-                <label for="hints">{{ "schemas.contentSidebarUrl" | sqxTranslate }}</label>
-
-                <sqx-control-errors for="contentSidebarUrl"></sqx-control-errors>
-
+                <label for="hints">{{ "schemas.contentSidebarUrl" | sqxTranslate }}</label> <sqx-control-errors for="contentSidebarUrl" />
                 <input class="form-control" id="contentSidebarUrl" formControlName="contentSidebarUrl" type="url" />
-
-                <sqx-form-hint>
-                    {{ "schemas.contentSidebarUrlHint" | sqxTranslate }}
-                </sqx-form-hint>
+                <sqx-form-hint> {{ "schemas.contentSidebarUrlHint" | sqxTranslate }} </sqx-form-hint>
             </div>
 
             <div class="form-group">
-                <label for="hints">{{ "schemas.contentEditorUrl" | sqxTranslate }}</label>
-
-                <sqx-control-errors for="contentEditorUrl"></sqx-control-errors>
-
+                <label for="hints">{{ "schemas.contentEditorUrl" | sqxTranslate }}</label> <sqx-control-errors for="contentEditorUrl" />
                 <input class="form-control" id="contentEditorUrl" formControlName="contentEditorUrl" type="url" />
-
-                <sqx-form-hint>
-                    {{ "schemas.contentEditorUrlHint" | sqxTranslate }}
-                </sqx-form-hint>
+                <sqx-form-hint> {{ "schemas.contentEditorUrlHint" | sqxTranslate }} </sqx-form-hint>
             </div>
 
             <div class="form-group">
-                <label for="hints">{{ "schemas.contentsListUrl" | sqxTranslate }}</label>
-
-                <sqx-control-errors for="contentsListUrl"></sqx-control-errors>
-
+                <label for="hints">{{ "schemas.contentsListUrl" | sqxTranslate }}</label> <sqx-control-errors for="contentsListUrl" />
                 <input class="form-control" id="contentsListUrl" formControlName="contentsListUrl" type="url" />
-
-                <sqx-form-hint>
-                    {{ "schemas.contentsListUrlHint" | sqxTranslate }}
-                </sqx-form-hint>
+                <sqx-form-hint> {{ "schemas.contentsListUrlHint" | sqxTranslate }} </sqx-form-hint>
             </div>
 
             <div class="form-group">
-                <label for="tags">{{ "common.tags" | sqxTranslate }}</label>
-
-                <sqx-control-errors for="tags"></sqx-control-errors>
-
-                <sqx-tag-editor id="tags" formControlName="tags"></sqx-tag-editor>
-
-                <sqx-form-hint>
-                    {{ "schemas.schemaTagsHint" | sqxTranslate }}
-                </sqx-form-hint>
+                <label for="tags">{{ "common.tags" | sqxTranslate }}</label> <sqx-control-errors for="tags" />
+                <sqx-tag-editor id="tags" formControlName="tags" />
+                <sqx-form-hint> {{ "schemas.schemaTagsHint" | sqxTranslate }} </sqx-form-hint>
             </div>
 
             <div class="form-group">
                 <div class="form-check">
                     <input class="form-check-input" id="validateOnPublish" formControlName="validateOnPublish" type="checkbox" />
-                    <label class="form-check-label" for="validateOnPublish">
-                        {{ "schemas.validateOnPublish" | sqxTranslate }}
-                    </label>
+                    <label class="form-check-label" for="validateOnPublish"> {{ "schemas.validateOnPublish" | sqxTranslate }} </label>
                 </div>
-
-                <sqx-form-alert>
-                    {{ "schemas.validateOnPublishHint" | sqxTranslate }}
-                </sqx-form-alert>
+                <sqx-form-alert> {{ "schemas.validateOnPublishHint" | sqxTranslate }} </sqx-form-alert>
             </div>
         </div>
+
         <div class="card-footer">
             @if (isEditable) {
-                <button class="float-end btn btn-primary" type="submit">
-                    {{ "common.save" | sqxTranslate }}
-                </button>
+                <button class="float-end btn btn-primary" type="submit">{{ "common.save" | sqxTranslate }}</button>
             }
         </div>
     </div>

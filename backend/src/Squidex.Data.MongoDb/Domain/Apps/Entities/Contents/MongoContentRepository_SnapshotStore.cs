@@ -8,6 +8,7 @@
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
@@ -47,6 +48,16 @@ public partial class MongoContentRepository : ISnapshotStore<WriteContent>, IDel
         {
             await collectionComplete.DeleteAppAsync(app.Id, ct);
             await collectionPublished.DeleteAppAsync(app.Id, ct);
+        }
+    }
+
+    async Task IDeleter.DeleteSchemaAsync(App app, Schema schema,
+        CancellationToken ct)
+    {
+        using (Telemetry.Activities.StartActivity("MongoContentRepository/DeleteAppAsync"))
+        {
+            await collectionComplete.DeleteSchemaAsync(schema.Id, ct);
+            await collectionPublished.DeleteSchemaAsync(schema.Id, ct);
         }
     }
 

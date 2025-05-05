@@ -3,6 +3,7 @@
         <div class="col">
             <span class="truncate">{{ index.name }}</span>
         </div>
+
         <div class="col-auto">
             <div class="float-end">
                 <button
@@ -11,10 +12,8 @@
                     [class.expanded]="isExpanded"
                     (click)="toggleExpanded()"
                     type="button">
-                    <span class="hidden">{{ "common.settings" | sqxTranslate }}</span>
-                    <i class="icon-settings"></i>
+                    <span class="hidden">{{ "common.settings" | sqxTranslate }}</span> <i class="icon-settings"></i>
                 </button>
-
                 <button
                     class="btn btn-text-danger"
                     attr.aria-label="{{ 'common.delete' | sqxTranslate }}"
@@ -35,18 +34,23 @@
             <table class="table table-sm table-fixed mb-0">
                 <colgroup>
                     <col />
+
                     <col style="width: 300px" />
                 </colgroup>
+
                 <thead>
                     <tr>
                         <th>{{ "common.field" | sqxTranslate }}</th>
+
                         <th>{{ "common.order" | sqxTranslate }}</th>
                     </tr>
                 </thead>
+
                 <tbody>
                     @for (field of index.fields; track field.name) {
                         <tr>
                             <td>{{ field.name }}</td>
+
                             <td>{{ field.order }}</td>
                         </tr>
                     }

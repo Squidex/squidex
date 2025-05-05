@@ -20,6 +20,7 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
     private readonly string schemaName = $"schema-{Guid.NewGuid()}";
     private readonly string schemaNameRef = $"schema-{Guid.NewGuid()}-ref";
     private readonly string contentString = Guid.NewGuid().ToString();
+    private readonly Guid stepId = Guid.NewGuid();
     private readonly WebhookCatcherClient webhookCatcher = webhookCatcher.Client;
 
     public ClientFixture _ { get; } = fixture;
@@ -38,11 +39,21 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
         // STEP 2: Create rule.
         var createRule = new CreateRuleDto
         {
-            Action = new WebhookRuleActionDto
+            Flow = new FlowDefinitionDto
             {
-                Url = new Uri(url),
-                // Also test the secret in this case.
-                SharedSecret = secret
+                InitialStepId = stepId,
+                Steps = new Dictionary<string, FlowStepDefinitionDto>
+                {
+                    [stepId.ToString()] = new FlowStepDefinitionDto
+                    {
+                        Step = new WebhookFlowStepDto
+                        {
+                            Url = new Uri(url),
+                            // Also test the secret in this case.
+                            SharedSecret = secret
+                        }
+                    }
+                }
             },
             Trigger = new ContentChangedRuleTriggerDto
             {
@@ -109,20 +120,30 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
         // STEP 2: Create rule.
         var createRule = new CreateRuleDto
         {
-            Action = new WebhookRuleActionDto
+            Flow = new FlowDefinitionDto
             {
-                Payload = @$"Script(
-                    getReferences(event.data.{TestEntityWithReferencesData.ReferencesField}.iv, function (references) {{
-                        var payload = {{
-                            name: references[0].data.{TestEntityData.StringField}.iv,
-                            type: event.type
-                        }};
-                        complete(payload);
-                    }});
-                )",
-                Url = new Uri(url),
-                // Also test the secret in this case.
-                SharedSecret = secret
+                InitialStepId = stepId,
+                Steps = new Dictionary<string, FlowStepDefinitionDto>
+                {
+                    [stepId.ToString()] = new FlowStepDefinitionDto
+                    {
+                        Step = new WebhookFlowStepDto
+                        {
+                            Payload = @$"Script(
+                                getReferences(event.data.{TestEntityWithReferencesData.ReferencesField}.iv, function (references) {{
+                                    var payload = {{
+                                        name: references[0].data.{TestEntityData.StringField}.iv,
+                                        type: event.type
+                                    }};
+                                    complete(payload);
+                                }});
+                            )",
+                            Url = new Uri(url),
+                            // Also test the secret in this case.
+                            SharedSecret = secret
+                        }
+                    }
+                }
             },
             Trigger = new ContentChangedRuleTriggerDto
             {
@@ -184,11 +205,21 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
         // STEP 2: Create rule.
         var createRule = new CreateRuleDto
         {
-            Action = new ScriptRuleActionDto
+            Flow = new FlowDefinitionDto
             {
-                Script = $@"
-                    postJSON('{url}', {{ schemaName: event.schemaId.Name }}, function () {{}})
-                "
+                InitialStepId = stepId,
+                Steps = new Dictionary<string, FlowStepDefinitionDto>
+                {
+                    [stepId.ToString()] = new FlowStepDefinitionDto
+                    {
+                        Step = new ScriptFlowStepDto
+                        {
+                            Script = $@"
+                                postJSON('{url}', {{ schemaName: event.schemaId.Name }}, function () {{}})
+                            "
+                        }
+                    }
+                }
             },
             Trigger = new ContentChangedRuleTriggerDto
             {
@@ -230,11 +261,21 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
         // STEP 2: Create rule.
         var createRule = new CreateRuleDto
         {
-            Action = new WebhookRuleActionDto
+            Flow = new FlowDefinitionDto
             {
-                Url = new Uri(url),
-                // Also test the secret in this case.
-                SharedSecret = secret
+                InitialStepId = stepId,
+                Steps = new Dictionary<string, FlowStepDefinitionDto>
+                {
+                    [stepId.ToString()] = new FlowStepDefinitionDto
+                    {
+                        Step = new WebhookFlowStepDto
+                        {
+                            Url = new Uri(url),
+                            // Also test the secret in this case.
+                            SharedSecret = secret
+                        }
+                    }
+                }
             },
             Trigger = new AssetChangedRuleTriggerDto()
         };
@@ -273,15 +314,25 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
         // STEP 2: Create rule.
         var createRule = new CreateRuleDto
         {
-            Action = new ScriptRuleActionDto
+            Flow = new FlowDefinitionDto
             {
-                Script = @"
-                    getAssetBlurHash(event, function (blurHash) {
-                        var metadata = { ...event.metadata, blurHash };
+                InitialStepId = stepId,
+                Steps = new Dictionary<string, FlowStepDefinitionDto>
+                {
+                    [stepId.ToString()] = new FlowStepDefinitionDto
+                    {
+                        Step = new ScriptFlowStepDto
+                        {
+                            Script = @"
+                                getAssetBlurHash(event, function (blurHash) {
+                                    var metadata = { ...event.metadata, blurHash };
 
-                        updateAsset(event, metadata);
-                    });
-                    "
+                                    updateAsset(event, metadata);
+                                });
+                                "
+                        }
+                    }
+                }
             },
             Trigger = new AssetChangedRuleTriggerDto()
         };
@@ -312,11 +363,21 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
         // STEP 2: Create rule.
         var createRule = new CreateRuleDto
         {
-            Action = new WebhookRuleActionDto
+            Flow = new FlowDefinitionDto
             {
-                Url = new Uri(url),
-                // Also test the secret in this case.
-                SharedSecret = secret
+                InitialStepId = stepId,
+                Steps = new Dictionary<string, FlowStepDefinitionDto>
+                {
+                    [stepId.ToString()] = new FlowStepDefinitionDto
+                    {
+                        Step = new WebhookFlowStepDto
+                        {
+                            Url = new Uri(url),
+                            // Also test the secret in this case.
+                            SharedSecret = secret
+                        }
+                    }
+                }
             },
             Trigger = new SchemaChangedRuleTriggerDto()
         };
@@ -355,11 +416,21 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
         // STEP 2: Create rule.
         var createRule = new CreateRuleDto
         {
-            Action = new WebhookRuleActionDto
+            Flow = new FlowDefinitionDto
             {
-                Url = new Uri(url),
-                // Also test the secret in this case.
-                SharedSecret = secret
+                InitialStepId = stepId,
+                Steps = new Dictionary<string, FlowStepDefinitionDto>
+                {
+                    [stepId.ToString()] = new FlowStepDefinitionDto
+                    {
+                        Step = new WebhookFlowStepDto
+                        {
+                            Url = new Uri(url),
+                            // Also test the secret in this case.
+                            SharedSecret = secret
+                        }
+                    }
+                }
             },
             Trigger = new ManualRuleTriggerDto()
         };
@@ -400,11 +471,21 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
         // STEP 2: Create disabled rule.
         var createRule = new CreateRuleDto
         {
-            Action = new WebhookRuleActionDto
+            Flow = new FlowDefinitionDto
             {
-                Url = new Uri(url),
-                // Also test the secret in this case.
-                SharedSecret = secret
+                InitialStepId = stepId,
+                Steps = new Dictionary<string, FlowStepDefinitionDto>
+                {
+                    [stepId.ToString()] = new FlowStepDefinitionDto
+                    {
+                        Step = new WebhookFlowStepDto
+                        {
+                            Url = new Uri(url),
+                            // Also test the secret in this case.
+                            SharedSecret = secret
+                        }
+                    }
+                }
             },
             Trigger = new ContentChangedRuleTriggerDto
             {
@@ -429,6 +510,53 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
         var request = await webhookCatcher.PollAsync(sessionId, x => x.IsPost() && x.HasContent(schemaName));
 
         AssertRequest(request);
+    }
+
+    [Fact]
+    public async Task Should_log_to_console_in_rules()
+    {
+        // STEP 0: Create app.
+        var (app, _) = await _.PostAppAsync();
+
+
+        // STEP 1: Create rule.
+        var createRule = new CreateRuleDto
+        {
+            Flow = new FlowDefinitionDto
+            {
+                InitialStepId = stepId,
+                Steps = new Dictionary<string, FlowStepDefinitionDto>
+                {
+                    [stepId.ToString()] = new FlowStepDefinitionDto
+                    {
+                        Step = new ScriptFlowStepDto
+                        {
+                            Script = @"
+                                console.debug('Hello debug');
+                                console.error('Hello error');
+                                console.info('Hello info');                                
+                                console.log('Hello Log');
+                                console.warn('Hello warn');
+
+                            "
+                        }
+                    }
+                }
+            },
+            Trigger = new ManualRuleTriggerDto()
+        };
+
+        var rule = await app.Rules.PostRuleAsync(createRule);
+
+
+        // STEP 2: Create test content.
+        await app.Rules.TriggerRuleAsync(rule.Id);
+
+
+        // STEP 3: Get events.
+        var @event = await app.Rules.PollEventAsync(rule.Id, x => x.FlowState.Status == FlowExecutionStatus.Completed);
+
+        await Verify(@event);
     }
 
     private async Task CreateContentAsync(ISquidexClient app)

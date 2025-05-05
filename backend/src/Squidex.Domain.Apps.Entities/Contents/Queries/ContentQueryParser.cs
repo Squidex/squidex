@@ -92,7 +92,7 @@ public class ContentQueryParser(
         var fullTextIds = await textIndex.SearchAsync(context.App, textQuery, context.Scope(), ct);
         var fullTextFilter = ClrFilter.Eq("id", "__notfound__");
 
-        if (fullTextIds?.Any() == true)
+        if (fullTextIds?.Count > 0)
         {
             fullTextFilter = ClrFilter.In("id", fullTextIds.Select(x => x.ToString()).ToList());
         }

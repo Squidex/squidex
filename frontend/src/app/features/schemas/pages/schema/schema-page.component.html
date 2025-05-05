@@ -1,5 +1,4 @@
-<sqx-title [message]="schemasState.schemaName"></sqx-title>
-
+<sqx-title [message]="schemasState.schemaName" />
 @if (schemaTab | async; as tab) {
     <sqx-layout innerWidth="50" layout="main">
         <ng-container title>
@@ -9,6 +8,7 @@
                         {{ "schemas.tabFields" | sqxTranslate }}
                     </a>
                 </li>
+
                 @if (schema.type !== "Component") {
                     <li>
                         <a class="nav-link" [class.active]="tab === 'ui'" [queryParams]="{ tab: 'ui' }" [routerLink]="[]">
@@ -16,6 +16,7 @@
                         </a>
                     </li>
                 }
+
                 @if (schema.type !== "Component") {
                     <li>
                         <a class="nav-link" [class.active]="tab === 'scripts'" [queryParams]="{ tab: 'scripts' }" [routerLink]="[]">
@@ -23,11 +24,13 @@
                         </a>
                     </li>
                 }
+
                 <li>
                     <a class="nav-link" [class.active]="tab === 'json'" [queryParams]="{ tab: 'json' }" [routerLink]="[]">
                         {{ "schemas.tabJson" | sqxTranslate }}
                     </a>
                 </li>
+
                 @if (!hideIndexes) {
                     <li>
                         <a class="nav-link" [class.active]="tab === 'indexes'" [queryParams]="{ tab: 'indexes' }" [routerLink]="[]">
@@ -35,6 +38,7 @@
                         </a>
                     </li>
                 }
+
                 <li>
                     <a class="nav-link" [class.active]="tab === 'more'" [queryParams]="{ tab: 'more' }" [routerLink]="[]">
                         {{ "schemas.tabMore" | sqxTranslate }}
@@ -72,9 +76,7 @@
             <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="editOptionsDropdown; closeAlways: true">
                 @if (schemasState.canCreate) {
                     <div class="dropdown-divider"></div>
-                    <a class="dropdown-item" (click)="cloneSchema()">
-                        {{ "common.clone" | sqxTranslate }}
-                    </a>
+                    <a class="dropdown-item" (click)="cloneSchema()"> {{ "common.clone" | sqxTranslate }} </a>
                 }
                 <ng-container>
                     <div class="dropdown-divider"></div>
@@ -93,33 +95,35 @@
         <ng-container content>
             @switch (tab) {
                 @case ("ui") {
-                    <sqx-schema-ui-form [schema]="schema"></sqx-schema-ui-form>
+                    <sqx-schema-ui-form [schema]="schema" />
                 }
+
                 @case ("scripts") {
-                    <sqx-schema-scripts-form [schema]="schema"></sqx-schema-scripts-form>
+                    <sqx-schema-scripts-form [schema]="schema" />
                 }
+
                 @case ("json") {
-                    <sqx-schema-export-form [schema]="schema"></sqx-schema-export-form>
+                    <sqx-schema-export-form [schema]="schema" />
                 }
+
                 @case ("indexes") {
-                    <sqx-schema-indexes [schema]="schema"></sqx-schema-indexes>
+                    <sqx-schema-indexes [schema]="schema" />
                 }
+
                 @case ("more") {
                     <sqx-list-view innerWidth="50rem">
                         <div>
                             @if (schema.type !== "Component") {
-                                <sqx-schema-preview-urls-form [schema]="schema"></sqx-schema-preview-urls-form>
+                                <sqx-schema-preview-urls-form [schema]="schema" />
                             }
-                            <sqx-schema-field-rules-form [schema]="schema"></sqx-schema-field-rules-form>
-                            <sqx-schema-edit-form [schema]="schema"></sqx-schema-edit-form>
+                            <sqx-schema-field-rules-form [schema]="schema" /> <sqx-schema-edit-form [schema]="schema" />
                         </div>
                     </sqx-list-view>
                 }
+
                 @default {
                     <sqx-list-view innerWidth="50rem" table="true">
-                        <div>
-                            <sqx-schema-fields [schema]="schema"></sqx-schema-fields>
-                        </div>
+                        <div><sqx-schema-fields [schema]="schema" /></div>
                     </sqx-list-view>
                 }
             }
@@ -154,5 +158,4 @@
         </ng-template>
     </sqx-layout>
 }
-
 <router-outlet></router-outlet>

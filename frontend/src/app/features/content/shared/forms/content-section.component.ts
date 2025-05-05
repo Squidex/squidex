@@ -7,7 +7,7 @@
 
 import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, forwardRef, Input, numberAttribute, Output } from '@angular/core';
-import { AppLanguageDto, EditContentForm, FieldForm, FieldSection, FormHintComponent, LocalStoreService, MarkdownDirective, FieldDto, SchemaDto, Settings, StatefulComponent, TypedSimpleChanges } from '@app/shared';
+import { AppLanguageDto, EditContentForm, FieldDto, FieldForm, FieldSection, FormHintComponent, LocalStoreService, MarkdownDirective, SchemaDto, Settings, StatefulComponent, TypedSimpleChanges } from '@app/shared';
 import { ContentFieldComponent } from './content-field.component';
 
 interface State {

@@ -1,31 +1,20 @@
-<sqx-title message="i18n:common.references"></sqx-title>
-
+<sqx-title message="i18n:common.references" />
 <sqx-layout layout="main" titleIcon="contents" titleText="i18n:common.references">
     <ng-container menu>
         <div class="row flex-nowrap flex-grow-1 gx-2">
             <div class="col-auto ms-8">
-                <button
-                    class="btn btn-text-secondary"
-                    (click)="reload()"
-                    shortcut="CTRL + B"
-                    title="i18n:contents.refreshTooltip"
-                    type="button">
-                    <i class="icon-reset"></i>
-                    {{ "common.refresh" | sqxTranslate }}
+                <button class="btn btn-text-secondary" (click)="reload()" shortcut="CTRL + B" title="i18n:contents.refreshTooltip" type="button">
+                    <i class="icon-reset"></i> {{ "common.refresh" | sqxTranslate }}
                 </button>
             </div>
+
             @if (languages.length > 1) {
                 <div class="col-auto">
-                    <sqx-language-selector
-                        class="languages-buttons"
-                        [language]="language"
-                        (languageChange)="changeLanguage($event)"
-                        [languages]="languages"></sqx-language-selector>
+                    <sqx-language-selector class="languages-buttons" [language]="language" (languageChange)="changeLanguage($event)" [languages]="languages" />
                 </div>
             }
         </div>
     </ng-container>
-
     <ng-container>
         <sqx-list-view [isLoading]="contentsState.isLoading | async" table="true">
             <ng-container>
@@ -43,21 +32,19 @@
                                 [validations]="(contentsState.validationResults | async)!"
                                 [validityVisible]="true"></tbody>
                         }
+
                         @if ((contentsState.isLoaded | async) && contents.length === 0) {
                             <tbody>
                                 <tr>
-                                    <td class="table-items-row-empty">
-                                        {{ "contents.noReferencing" | sqxTranslate }}
-                                    </td>
+                                    <td class="table-items-row-empty">{{ "contents.noReferencing" | sqxTranslate }}</td>
                                 </tr>
                             </tbody>
                         }
                     </table>
                 }
             </ng-container>
-
             <ng-container footer>
-                <sqx-pager [paging]="contentsState.paging | async" (pagingChange)="contentsState.page($event)"></sqx-pager>
+                <sqx-pager [paging]="contentsState.paging | async" (pagingChange)="contentsState.page($event)" />
             </ng-container>
         </sqx-list-view>
     </ng-container>

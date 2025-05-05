@@ -1,0 +1,40 @@
+<sqx-history-step
+    [elementInfo]="stepInfo"
+    [elementType]="branchItem.step.step.stepType"
+    [isActive]="isNext"
+    [isExpandable]="!!state && state.attempts.length > 0"
+    [isFirst]="isFirst"
+    [isLast]="isLast">
+    <ng-container summary>
+        <div class="col">
+            <span class="badge rounded-pill badge-{{ state?.status | sqxRuleClass }}">{{ state?.status || "Pending" }}</span>
+        </div>
+
+        <div class="col col-attempts text-sm">{{ branchItem.step.name || stepInfo.title }}</div>
+
+        <div class="col text-sm">
+            <strong class="me-1">{{ state?.attempts?.length || 0 }}</strong> {{ "rules.ruleEvents.attempts" | sqxTranslate }}
+        </div>
+    </ng-container>
+
+    <ng-container details>
+        @if (state) {
+            <ul class="nav nav-tabs2 mt-2">
+                @for (attempt of state.attempts; let i = $index; track i) {
+                    <li class="nav-item">
+                        <a class="nav-link" [class.active]="i === attemptIndex" (click)="selectAttempt(i)">
+                            @if ($first) {
+                                {{ "rules.ruleEvents.attempt" | sqxTranslate }}&nbsp;
+                            }
+                            #{{ i + 1 }}
+                        </a>
+                    </li>
+                }
+            </ul>
+
+            @if (state.attempts[attemptIndex]; as attempt) {
+                <div class="details"><sqx-state-attempt [attempt]="attempt" /></div>
+            }
+        }
+    </ng-container>
+</sqx-history-step>

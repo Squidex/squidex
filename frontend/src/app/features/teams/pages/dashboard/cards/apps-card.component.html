@@ -1,20 +1,18 @@
 <div class="card card">
     <div class="card-header">{{ "common.apps" | sqxTranslate }}</div>
+
     <div class="card-body">
         @if (snapshot.apps; as apps) {
             @for (app of apps; track app) {
                 <div class="row">
-                    <div class="col">
-                        {{ app.displayName }}
-                    </div>
+                    <div class="col">{{ app.displayName }}</div>
+
                     <div class="col-auto">
                         <a [routerLink]="['/app', app.name]" sqxStopClick>{{ "common.edit" | sqxTranslate }}</a>
                     </div>
                 </div>
             } @empty {
-                <small class="app-empty">
-                    {{ "apps.empty" | sqxTranslate }}
-                </small>
+                <small class="app-empty"> {{ "apps.empty" | sqxTranslate }} </small>
             }
         }
     </div>

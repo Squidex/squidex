@@ -8,6 +8,7 @@
             }
         </button>
     }
+
     @if (formModel.field.properties.isComplexUI || !showAllControls) {
         <div class="button-container ms-1">
             <sqx-language-selector
@@ -19,7 +20,7 @@
                 (languageChange)="languageChange.emit($event)"
                 [languages]="languages"
                 size="sm"
-                sqxTourStep="languages"></sqx-language-selector>
+                sqxTourStep="languages" />
         </div>
     }
 }

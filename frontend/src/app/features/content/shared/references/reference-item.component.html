@@ -1,7 +1,5 @@
 <tr>
-    <td class="cell-select">
-        <ng-content></ng-content>
-    </td>
+    <td class="cell-select"><ng-content></ng-content></td>
 
     <td class="content-field" [field]="metaFields.lastModifiedByAvatar" sqxContentListCell>
         <sqx-content-list-field
@@ -9,13 +7,11 @@
             [field]="metaFields.lastModifiedByAvatar"
             [language]="language"
             [languages]="languages"
-            [schema]="undefined"></sqx-content-list-field>
+            [schema]="undefined" />
     </td>
 
     @for (value of values; track value) {
-        <td class="cell-auto cell-content">
-            <sqx-content-value [value]="value"></sqx-content-value>
-        </td>
+        <td class="cell-auto cell-content"><sqx-content-value [value]="value" /></td>
     }
 
     @if (validityVisible) {
@@ -23,6 +19,7 @@
             @if (isValid === true) {
                 <span class="badge rounded-pill badge-success">VALID</span>
             }
+
             @if (isValid === false) {
                 <span class="badge rounded-pill badge-danger">INVALID</span>
             }
@@ -30,12 +27,7 @@
     }
 
     <td [field]="metaFields.statusColor" sqxContentListCell>
-        <sqx-content-list-field
-            [content]="content"
-            [field]="metaFields.statusColor"
-            [language]="language"
-            [languages]="languages"
-            [schema]="undefined"></sqx-content-list-field>
+        <sqx-content-list-field [content]="content" [field]="metaFields.statusColor" [language]="language" [languages]="languages" [schema]="undefined" />
     </td>
 
     @if (!isCompact) {
@@ -51,12 +43,10 @@
             <button class="btn btn-text-secondary" attr.aria-label="{{ 'common.options' | sqxTranslate }}" type="button">
                 <i class="icon-dots"></i>
             </button>
-
             <div class="reference-menu">
                 <button class="btn btn-text-secondary" (click)="clone.emit()" title="{{ 'common.clone' | sqxTranslate }}">
                     <i class="icon-copy"></i>
                 </button>
-
                 @if (canRemove) {
                     <button
                         class="btn btn-text-secondary"
@@ -68,7 +58,6 @@
                         <i class="icon-close"></i>
                     </button>
                 }
-
                 <a class="btn btn-text-secondary" [routerLink]="['../..', content.schemaName, content.id]" target="_blank">
                     <i class="icon-pencil"></i>
                 </a>
@@ -76,4 +65,5 @@
         </div>
     </td>
 </tr>
+
 <tr class="spacer"></tr>

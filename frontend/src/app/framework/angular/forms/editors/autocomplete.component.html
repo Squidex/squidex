@@ -46,7 +46,7 @@
     @if (icon) {
         <div class="icon">
             @if (snapshot.isLoading) {
-                <sqx-loader color="input"></sqx-loader>
+                <sqx-loader color="input" />
             } @else {
                 <i class="icon-{{ icon }}"></i>
             }
@@ -54,11 +54,8 @@
     }
 
     @if (allowOpen) {
-        <div class="btn btn-sm" (click)="openModal()" sqxStopClick>
-            <i class="icon-caret-down"></i>
-        </div>
+        <div class="btn btn-sm" (click)="openModal()" sqxStopClick><i class="icon-caret-down"></i></div>
     }
-
     <sqx-dropdown-menu
         class="control-dropdown"
         #container
@@ -81,6 +78,7 @@
                 @if (!itemTemplate) {
                     {{ item }}
                 }
+
                 @if (itemTemplate) {
                     <ng-template [index]="i" [item]="item" [sqxTemplateWrapper]="itemTemplate"></ng-template>
                 }

@@ -1,9 +1,6 @@
 @if (selectedApp | async; as app) {
-    <sqx-title [message]="app.displayName"></sqx-title>
-    <div class="sidebar">
-        <sqx-left-menu [app]="app"></sqx-left-menu>
-    </div>
-    <div class="panel-container" sqxLayoutContainer>
-        <router-outlet></router-outlet>
-    </div>
+    <sqx-title [message]="app.displayName" />
+    <div class="sidebar"><sqx-left-menu [app]="app" /></div>
+
+    <div class="panel-container" sqxLayoutContainer><router-outlet></router-outlet></div>
 }

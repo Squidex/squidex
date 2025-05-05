@@ -1,234 +1,151 @@
-<sqx-title message="i18n:rules.listPageTitle" [url]="['..']"></sqx-title>
-<sqx-title message="i18n:rules.itemPageTitle"></sqx-title>
+<sqx-title message="i18n:rules.listPageTitle" [url]="['..']" /> <sqx-title message="i18n:rules.itemPageTitle" />
+<sqx-layout layout="main" overflow="true" padding="true" white="true">
+    <ng-container title>
+        <div class="d-flex align-items-center">
+            <a class="btn btn-text-secondary" attr.aria-label="{{ 'common.back' | sqxTranslate }}" (click)="back()">
+                <i class="icon-angle-left"></i>
+            </a>
+            <h3 class="title">{{ "common.rule" | sqxTranslate }}</h3>
+        </div>
+    </ng-container>
+    <ng-container menu>
+        @if (rule) {}
 
-<form (ngSubmit)="save()">
-    #
-    <sqx-layout innerWidth="54" layout="main">
-        <ng-container title>
-            <div class="d-flex align-items-center">
-                <a class="btn btn-text-secondary" attr.aria-label="{{ 'common.back' | sqxTranslate }}" (click)="back()">
-                    <i class="icon-angle-left"></i>
-                </a>
+        @if (isManual) {
+            <button
+                class="btn btn-outline-secondary btn-run ms-2"
+                confirmRememberKey="triggerRule"
+                confirmText="i18n:rules.triggerConfirmText"
+                confirmTitle="i18n:rules.triggerConfirmTitle"
+                [disabled]="!rule?.canTrigger"
+                (sqxConfirmClick)="trigger()">
+                <i class="icon-play-line"></i>
+            </button>
+        }
+        <button class="btn btn-primary ms-2" (click)="save()" type="button">{{ "common.save" | sqxTranslate }}</button>
+    </ng-container>
+    <ng-container>
+        @if (availableTriggers && availableTriggers && editableRule | async; as rule) {
+            @if (rule.isEditable) {
+                <div>
+                    <div class="btn btn-outline-secondary btn-enabled">
+                        @if (rule.isEnabled) {
+                            <span class="me-2"> {{ "common.enabled" | sqxTranslate }} </span>
+                        }
 
-                <h3 class="title">{{ "common.rule" | sqxTranslate }}</h3>
-            </div>
-        </ng-container>
-
-        <ng-container menu>
-            @if (rule) {
-                <div class="btn btn-outline-secondary btn-enabled ms-2">
-                    @if (isEnabled) {
-                        <span class="me-2">
-                            {{ "common.enabled" | sqxTranslate }}
-                        </span>
-                    }
-                    @if (!isEnabled) {
-                        <span class="me-2">
-                            {{ "common.disabled" | sqxTranslate }}
-                        </span>
-                    }
-                    <sqx-toggle [disabled]="!isEditable" [(ngModel)]="isEnabled" [ngModelOptions]="{ standalone: true }"></sqx-toggle>
+                        @if (!rule.isEnabled) {
+                            <span class="me-2"> {{ "common.disabled" | sqxTranslate }} </span>
+                        }
+                        <sqx-toggle [ngModel]="rule.isEnabled" (ngModelChange)="changeEnabled($event)" />
+                    </div>
+                    <input
+                        class="input-name form-control"
+                        [ngModel]="rule.name"
+                        (ngModelChange)="rename($event)"
+                        placeholder="{{ 'common.name' | sqxTranslate }}" />
                 </div>
             }
 
-            @if (isManual) {
-                <button
-                    class="btn btn-outline-secondary btn-run ms-2"
-                    confirmRememberKey="triggerRule"
-                    confirmText="i18n:rules.triggerConfirmText"
-                    confirmTitle="i18n:rules.triggerConfirmTitle"
-                    [disabled]="!rule?.canTrigger"
-                    (sqxConfirmClick)="trigger()">
-                    <i class="icon-play-line"></i>
-                </button>
-            }
+            <div class="flow">
+                <div class="trigger">
+                    <div class="centered">
+                        <h3>{{ "rules.ruleSyntax.if" | sqxTranslate | lowercase }}</h3>
+                    </div>
 
-            <button class="btn btn-primary ms-2" (click)="save()" type="button">
-                {{ "common.save" | sqxTranslate }}
-            </button>
-        </ng-container>
-
-        <ng-container>
-            @if (supportedActions && supportedTriggers) {
-                <sqx-list-view innerWidth="54rem">
-                    <div class="card mb-2">
-                        <div class="card-header">
-                            <div class="row align-items-center g-0 summary-row">
-                                <div class="col-auto col-syntax">
-                                    <h3>{{ "rules.ruleSyntax.if" | sqxTranslate }}</h3>
-                                </div>
-                                @if (currentTrigger) {
-                                    <div class="col col-icon">
-                                        <sqx-rule-element
-                                            disabled="true"
-                                            [element]="triggerElement"
-                                            isSmall="true"
-                                            [type]="currentTrigger.triggerType"></sqx-rule-element>
-                                    </div>
-                                }
-                                @if (currentTrigger && !rule) {
-                                    <div class="col text-end">
-                                        <button class="btn btn-text-danger" (click)="resetTrigger()" type="button">
-                                            <i class="icon-bin2"></i>
-                                        </button>
-                                    </div>
-                                }
-                                @if (!currentTrigger) {
-                                    <div class="col">
-                                        <h3>...</h3>
-                                    </div>
-                                }
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            @if (currentTrigger) {
-                                @if (!rule) {
-                                    <sqx-form-alert marginTop="0">
-                                        {{ "rules.triggerHint" | sqxTranslate }}
-                                    </sqx-form-alert>
-                                }
-                                @switch (currentTrigger.triggerType) {
-                                    @case ("AssetChanged") {
-                                        <sqx-asset-changed-trigger [triggerForm]="currentTrigger"></sqx-asset-changed-trigger>
-                                    }
-                                    @case ("Comment") {
-                                        <sqx-comment-trigger [triggerForm]="currentTrigger"></sqx-comment-trigger>
-                                    }
-                                    @case ("ContentChanged") {
-                                        <sqx-content-changed-trigger
-                                            [schemas]="schemasState.schemas | async"
-                                            [trigger]="currentTrigger.form.value"
-                                            [triggerForm]="currentTrigger"></sqx-content-changed-trigger>
-                                    }
-                                    @case ("SchemaChanged") {
-                                        <sqx-schema-changed-trigger [triggerForm]="currentTrigger"></sqx-schema-changed-trigger>
-                                    }
-                                    @case ("Usage") {
-                                        <sqx-usage-trigger [triggerForm]="currentTrigger"></sqx-usage-trigger>
-                                    }
-                                }
+                    <div class="centered">
+                        <div class="foreground">
+                            @if (rule.trigger) {
+                                <sqx-rule-element
+                                    [elementInfo]="availableTriggers[rule.trigger.triggerType]"
+                                    [elementType]="rule.trigger.triggerType"
+                                    (iconClick)="startUpdateTrigger(rule.trigger)"
+                                    (remove)="removeTrigger()"
+                                    [showDescription]="false"
+                                    [showName]="false"
+                                    [showRemove]="rule.isEditable" />
+                                <div class="trigger-title">{{ availableTriggers[rule.trigger.triggerType].title }}</div>
                             } @else {
-                                <div class="row g-0">
-                                    @for (triggerType of supportedTriggers | sqxKeys; track triggerType) {
-                                        <div class="col-12 col-md-6">
-                                            <div class="rule-element" (click)="selectTrigger(triggerType)">
-                                                <sqx-rule-element
-                                                    [element]="$any(supportedTriggers)[triggerType]"
-                                                    isSmall="false"
-                                                    [type]="triggerType"></sqx-rule-element>
-                                            </div>
-                                        </div>
-                                    }
-                                </div>
+                                <button
+                                    class="btn btn-outline-secondary btn-circle"
+                                    attr.aria-label="{{ 'rules.addTrigger' | sqxTranslate }}"
+                                    (click)="triggerDialog.show()">
+                                    <i class="icon-plus"></i>
+                                </button>
                             }
                         </div>
                     </div>
-                    <div class="card">
-                        <div class="card-header">
-                            <div class="row align-items-center g-0 summary-row">
-                                <div class="col-auto col-syntax">
-                                    <h3>{{ "rules.ruleSyntax.then" | sqxTranslate }}</h3>
-                                </div>
-                                @if (currentAction) {
-                                    <div class="col col-icon">
-                                        <sqx-rule-element
-                                            disabled="true"
-                                            [element]="$any(actionElement)"
-                                            isSmall="true"
-                                            [type]="currentAction.actionType"></sqx-rule-element>
-                                    </div>
-                                }
-                                @if (currentAction && !rule) {
-                                    <div class="col text-end">
-                                        <button class="btn btn-text-danger" (click)="resetAction()" type="button">
-                                            <i class="icon-bin2"></i>
-                                        </button>
-                                    </div>
-                                }
-                                @if (!currentAction) {
-                                    <div class="col">
-                                        <h3>...</h3>
-                                    </div>
-                                }
-                            </div>
-                        </div>
-                        <div class="card-body">
-                            @if (currentAction) {
-                                @if (!rule) {
-                                    <sqx-form-alert marginTop="0">
-                                        {{ "rules.actionHint" | sqxTranslate }}
-                                    </sqx-form-alert>
-                                }
-                                <sqx-generic-action
-                                    [actionForm]="currentAction"
-                                    [appName]="rulesState.appName"
-                                    [trigger]="currentTrigger?.form?.value || {}"
-                                    [triggerType]="currentTrigger?.triggerType"></sqx-generic-action>
-                            } @else {
-                                <div class="row g-0">
-                                    @for (actionType of supportedActions | sqxKeys; track actionType) {
-                                        <div class="col-12 col-md-6">
-                                            <div class="rule-element" (click)="selectAction(actionType)">
-                                                <sqx-rule-element
-                                                    [element]="$any(supportedActions[actionType])"
-                                                    isSmall="false"
-                                                    [type]="actionType"></sqx-rule-element>
-                                            </div>
-                                        </div>
-                                    }
-                                </div>
-                            }
-                        </div>
-                    </div>
-                </sqx-list-view>
-            }
-        </ng-container>
-
-        <ng-template sidebarMenu>
-            <div class="panel-nav">
-                @if (rule && (rulesState.canReadEvents | async)) {
-                    <a
-                        class="panel-link panel-link-gray"
-                        attr.aria-label="{{ 'common.history' | sqxTranslate }}"
-                        [queryParams]="{ ruleId: rule.id }"
-                        routerLink="events"
-                        routerLinkActive="active"
-                        sqxTourStep="history"
-                        title="i18n:common.history"
-                        titlePosition="left">
-                        <i class="icon-time"></i>
-                    </a>
-                    <a
-                        class="panel-link panel-link-gray"
-                        attr.aria-label="{{ 'rules.simulator' | sqxTranslate }}"
-                        [queryParams]="{ ruleId: rule.id }"
-                        routerLink="simulator"
-                        routerLinkActive="active"
-                        sqxTourStep="simulator"
-                        title="i18n:rules.simulator"
-                        titlePosition="left">
-                        <i class="icon-play-line"></i>
-                    </a>
-                }
-
-                <a
-                    class="panel-link"
-                    #helpLink
-                    attr.aria-label="{{ 'common.help' | sqxTranslate }}"
-                    hintAfter="180000"
-                    hintText="i18n:common.helpTour"
-                    queryParamsHandling="preserve"
-                    replaceUrl="true"
-                    routerLink="help"
-                    routerLinkActive="active"
-                    sqxTourStep="help"
-                    title="i18n:common.help"
-                    titlePosition="left">
-                    <i class="icon-help2"></i>
-                </a>
+                </div>
+                <sqx-branch
+                    [availableSteps]="availableSteps"
+                    [branchItems]="rule.flow.getBranches()[0].items"
+                    [branchTitle]="'rules.ruleSyntax.then' | sqxTranslate | lowercase"
+                    [flow]="rule.flow"
+                    [isEditable]="rule.isEditable"
+                    [parentBranch]="0"
+                    [parentId]="undefined"
+                    (stepAdd)="startAddStep($event)"
+                    (stepRemove)="removeStep($event)"
+                    (stepUpdate)="startUpdateStep($event)" />
             </div>
-        </ng-template>
-    </sqx-layout>
-</form>
-
+        }
+    </ng-container>
+    <ng-template sidebarMenu>
+        <div class="panel-nav">
+            @if (rule && (rulesState.canReadEvents | async)) {
+                <a
+                    class="panel-link panel-link-gray"
+                    attr.aria-label="{{ 'common.history' | sqxTranslate }}"
+                    [queryParams]="{ ruleId: rule.id }"
+                    routerLink="events"
+                    routerLinkActive="active"
+                    sqxTourStep="history"
+                    title="i18n:common.history"
+                    titlePosition="left">
+                    <i class="icon-time"></i>
+                </a>
+                <a
+                    class="panel-link panel-link-gray"
+                    attr.aria-label="{{ 'rules.simulator' | sqxTranslate }}"
+                    [queryParams]="{ ruleId: rule.id }"
+                    routerLink="simulator"
+                    routerLinkActive="active"
+                    sqxTourStep="simulator"
+                    title="i18n:rules.simulator"
+                    titlePosition="left">
+                    <i class="icon-play-line"></i>
+                </a>
+            }
+            <a
+                class="panel-link"
+                #helpLink
+                attr.aria-label="{{ 'common.help' | sqxTranslate }}"
+                hintAfter="180000"
+                hintText="i18n:common.helpTour"
+                queryParamsHandling="preserve"
+                replaceUrl="true"
+                routerLink="help"
+                routerLinkActive="active"
+                sqxTourStep="help"
+                title="i18n:common.help"
+                titlePosition="left">
+                <i class="icon-help2"></i>
+            </a>
+        </div>
+    </ng-template>
+</sqx-layout>
+<sqx-trigger-dialog
+    [availableTriggers]="availableTriggers"
+    (dialogClose)="cancel()"
+    (dialogSave)="changeTrigger($event)"
+    [isEditable]="editableRule.value.isEditable"
+    *sqxModal="triggerDialog"
+    [trigger]="triggerToEdit" />
+<sqx-step-dialog
+    [availableSteps]="availableSteps"
+    (dialogClose)="cancel()"
+    (dialogSave)="changeStep($event)"
+    [isEditable]="editableRule.value.isEditable"
+    [scriptCompletions]="scriptCompletions | async"
+    *sqxModal="stepDialog"
+    [stepDefinition]="stepToUpsert?.step" />
 <router-outlet></router-outlet>

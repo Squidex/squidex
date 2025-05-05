@@ -1,7 +1,6 @@
 <div class="row gx-2" [formGroup]="form">
     <div class="col col-3">
-        <sqx-control-errors for="action"></sqx-control-errors>
-
+        <sqx-control-errors for="action" />
         <select class="form-select schemas-control" formControlName="schemaId">
             @for (schema of schemas; track schema.id) {
                 <option [ngValue]="schema.id">{{ schema.displayName }}</option>
@@ -14,9 +13,8 @@
     </div>
 
     <div class="col">
-        <sqx-control-errors for="condition"></sqx-control-errors>
-
-        <sqx-code-editor [completion]="completions | async" formControlName="condition" singleLine="true"></sqx-code-editor>
+        <sqx-control-errors for="condition" />
+        <sqx-code-editor [completion]="completions | async" formControlName="condition" singleLine="true" />
     </div>
 
     <div class="col-auto">

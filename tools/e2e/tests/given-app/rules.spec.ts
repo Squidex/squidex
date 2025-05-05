@@ -3,9 +3,6 @@ import { RulePage, RulesPage } from '../pages';
 import { getRandomId } from '../utils';
 import { test } from './_fixture';
 
-// We have no easy way to identity rules. Therefore run them sequentially.
-test.describe.configure({ mode: 'serial' });
-
 test.beforeEach(async ({ appName, rulesPage }) => {
     await rulesPage.goto(appName);
 });
@@ -68,21 +65,36 @@ test('edit rule', async ({ page, rulePage, rulesPage }) => {
     await expect(page.getByText('Enabled')).toBeVisible();
 });
 
+test('rename rule', async ({ rulePage, rulesPage }) => {
+    const ruleName = await createRandomRule(rulesPage, rulePage);
+    const ruleCard = await rulesPage.getRuleCard(ruleName);
+
+    const newName = `rule-${getRandomId()}`;
+
+    const renameDialog = await ruleCard.startRenameDblClick();
+    await renameDialog.enterName(newName);
+    await renameDialog.save();
+
+    const newCard = await rulesPage.getRuleCard(newName);
+    await expect(newCard.root).toBeVisible();
+});
+
 async function createRandomRule(rulesPage: RulesPage, rulePage: RulePage) {
     const ruleName = `rule-${getRandomId()}`;
 
     await rulesPage.addRule();
 
-    await rulePage.selectContentChangedTrigger();
-    await rulePage.selectWebhookAction();
+    const triggerDialog = await rulePage.addTrigger();
+    await triggerDialog.selectContentChangedTrigger();
+    await triggerDialog.save();
+
+    const stepDialog = await rulePage.addStep();
+    await stepDialog.selectWebhookAction();
+    await stepDialog.save();
+
+    await rulePage.enterName(ruleName);
     await rulePage.save();
     await rulePage.back();
-
-    const ruleCard = await rulesPage.getRuleCard('Unnamed Rule');
-
-    const renameDialog = await ruleCard.startRenameDblClick();
-    await renameDialog.enterName(ruleName);
-    await renameDialog.save();
 
     return ruleName;
 }

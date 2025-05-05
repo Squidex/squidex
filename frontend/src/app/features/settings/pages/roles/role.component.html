@@ -3,29 +3,24 @@
         <div class="col-5" [class.built]="role.isDefaultRole">
             <span class="role-name">{{ role.name }}</span>
         </div>
+
         <div class="col text-decent">
             {{ "common.clients" | sqxTranslate }}
-
             <span class="badge badge-secondary rounded-pill" [class.text-muted]="role.numClients <= 0">{{ role.numClients }}</span>
         </div>
+
         <div class="col text-decent">
             {{ "common.users" | sqxTranslate }}
-
             <span class="badge badge-secondary rounded-pill" [class.text-muted]="role.numContributors <= 0">
                 {{ role.numContributors }}
             </span>
         </div>
+
         <div class="col-auto">
             <div class="float-end">
-                <button
-                    class="btn btn-outline-secondary btn-expand me-1"
-                    [class.expanded]="isEditing"
-                    (click)="toggleEditing()"
-                    type="button">
-                    <span class="hidden">{{ "common.settings" | sqxTranslate }}</span>
-                    <i class="icon-settings"></i>
+                <button class="btn btn-outline-secondary btn-expand me-1" [class.expanded]="isEditing" (click)="toggleEditing()" type="button">
+                    <span class="hidden">{{ "common.settings" | sqxTranslate }}</span> <i class="icon-settings"></i>
                 </button>
-
                 <button
                     class="btn btn-text-danger"
                     confirmRememberKey="deleteRole"
@@ -49,24 +44,22 @@
                             {{ "common.cancel" | sqxTranslate }}
                         </button>
                         @if (isEditable) {
-                            <button class="btn btn-primary ms-1" type="submit">
-                                {{ "common.save" | sqxTranslate }}
-                            </button>
+                            <button class="btn btn-primary ms-1" type="submit">{{ "common.save" | sqxTranslate }}</button>
                         }
                     </div>
                 </div>
+
                 <div class="table-items-row-details-tab">
                     <h3>{{ "roles.permissions" | sqxTranslate }}</h3>
-                    <sqx-form-hint marginBottom="3">
-                        {{ "roles.permissionsDescription" | sqxTranslate }}
-                    </sqx-form-hint>
+                    <sqx-form-hint marginBottom="3"> {{ "roles.permissionsDescription" | sqxTranslate }} </sqx-form-hint>
                     @if (!role.isDefaultRole) {
                         @for (control of editForm.controls; track control; let i = $index) {
                             <div class="row gx-2 mb-1">
                                 <div class="col">
-                                    <sqx-control-errors [fieldName]="'Permission'" [for]="control"></sqx-control-errors>
-                                    <sqx-autocomplete [formControl]="control" [itemsSource]="allPermissions"></sqx-autocomplete>
+                                    <sqx-control-errors [fieldName]="'Permission'" [for]="control" />
+                                    <sqx-autocomplete [formControl]="control" [itemsSource]="allPermissions" />
                                 </div>
+
                                 @if (isEditable) {
                                     <div class="col-auto">
                                         <button class="btn btn-text-danger" (click)="editForm.form.removeAt(i)" type="button">
@@ -77,26 +70,24 @@
                             </div>
                         }
                     } @else {
-                        <sqx-form-alert>
-                            {{ descriptions[role.name] | sqxTranslate }}
-                        </sqx-form-alert>
+                        <sqx-form-alert> {{ descriptions[role.name] | sqxTranslate }} </sqx-form-alert>
                         <table class="table table-bordered table-fixed">
                             <tbody>
                                 @for (control of editForm.controls; track control; let i = $index) {
                                     <tr>
-                                        <td>
-                                            {{ control.value }}
-                                        </td>
+                                        <td>{{ control.value }}</td>
                                     </tr>
                                 }
                             </tbody>
                         </table>
                     }
+
                     @if (isEditable) {
                         <div class="form-group row gx-2">
                             <div class="col">
                                 <div class="form-control preview">{{ "common.permission" | sqxTranslate }}</div>
                             </div>
+
                             <div class="col-auto">
                                 <button class="btn btn-success col-action" (click)="addPermission()" type="button">
                                     <i class="icon-plus"></i>
@@ -104,12 +95,11 @@
                             </div>
                         </div>
                     }
+
                     @if (!role.isDefaultRole) {
                         <div class="mt-4">
                             <h3>{{ "roles.properties" | sqxTranslate }}</h3>
-                            <sqx-form-hint marginBottom="3">
-                                {{ "roles.propertiesDescription" | sqxTranslate }}
-                            </sqx-form-hint>
+                            <sqx-form-hint marginBottom="3"> {{ "roles.propertiesDescription" | sqxTranslate }} </sqx-form-hint>
                             <div class="row g-0 rule-section">
                                 @for (property of propertiesSimple; track property.key) {
                                     <div class="form-check col-6">
@@ -127,9 +117,11 @@
                                     </div>
                                 }
                             </div>
+
                             @if (schemas && schemas.length > 0) {
                                 <div class="mt-4">
                                     <h5>{{ "common.schemas" | sqxTranslate }}</h5>
+
                                     <div class="row g-0 rule-section">
                                         <div class="col-6">
                                             @for (schema of schemas | slice: 0 : halfSchemas; track schema.id) {
@@ -144,15 +136,13 @@
                                                         type="checkbox" />
                                                     <label class="form-check-label" for="{{ role.name }}_schema_{{ schema.name }}">
                                                         <span class="truncate">
-                                                            {{
-                                                                "roles.properties.hideContents"
-                                                                    | sqxTranslate: { schema: schema.displayName }
-                                                            }}
+                                                            {{ "roles.properties.hideContents" | sqxTranslate: { schema: schema.displayName } }}
                                                         </span>
                                                     </label>
                                                 </div>
                                             }
                                         </div>
+
                                         <div class="col-6">
                                             @for (schema of schemas | slice: halfSchemas; track schema.id) {
                                                 <div class="form-check">
@@ -166,10 +156,7 @@
                                                         type="checkbox" />
                                                     <label class="form-check-label" for="{{ role.name }}_schema_{{ schema.name }}">
                                                         <span class="truncate">
-                                                            {{
-                                                                "roles.properties.hideContents"
-                                                                    | sqxTranslate: { schema: schema.displayName }
-                                                            }}
+                                                            {{ "roles.properties.hideContents" | sqxTranslate: { schema: schema.displayName } }}
                                                         </span>
                                                     </label>
                                                 </div>

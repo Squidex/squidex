@@ -15,6 +15,9 @@ public sealed class ElasticSearchPlugin : IPlugin
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        services.AddRuleAction<ElasticSearchAction, ElasticSearchActionHandler>();
+        services.AddFlowStep<ElasticSearchFlowStep>();
+#pragma warning disable CS0618 // Type or member is obsolete
+        services.AddRuleAction<ElasticSearchAction>();
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

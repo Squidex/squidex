@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { LayoutComponent, ListViewComponent, MessageBus, RuleSimulatorState, SimulatedRuleEventDto, Subscriptions, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
+import { LayoutComponent, ListViewComponent, MessageBus, RuleElementDto, RuleSimulatorState, RulesService, SimulatedRuleEventDto, Subscriptions, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
 import { RuleConfigured } from '../messages';
 import { SimulatedRuleEventComponent } from './simulated-rule-event.component';
 
@@ -30,20 +30,27 @@ import { SimulatedRuleEventComponent } from './simulated-rule-event.component';
 export class RuleSimulatorPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();
 
+    public availableSteps: Record<string, RuleElementDto> = {};
+
     public selectedRuleEvent?: string | null;
 
     constructor(
         public readonly ruleSimulatorState: RuleSimulatorState,
         private readonly route: ActivatedRoute,
+        private readonly rulesService: RulesService,
         private readonly messageBus: MessageBus,
     ) {
     }
 
     public ngOnInit() {
+        this.rulesService.getSteps().subscribe((steps) => {
+            this.availableSteps = steps;
+        });
+
         this.subscriptions.add(
             this.messageBus.of(RuleConfigured)
                 .subscribe(message => {
-                    this.ruleSimulatorState.setRule(message.trigger, message.action);
+                    this.ruleSimulatorState.setRule(message.trigger, message.flow);
                 }));
 
         this.subscriptions.add(

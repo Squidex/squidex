@@ -1,5 +1,4 @@
-<sqx-form-error bubble="true" closeable="true" [error]="contentError"></sqx-form-error>
-
+<sqx-form-error bubble="true" closeable="true" [error]="contentError" />
 <div class="inner-menu">
     @if (mode | async; as currentMode) {
         <ul class="nav nav-tabs2">
@@ -8,11 +7,13 @@
                     {{ "contents.inspectContent" | sqxTranslate }}
                 </a>
             </li>
+
             <li class="nav-item">
                 <a class="nav-link" [class.active]="currentMode === 'Data'" (click)="setMode('Data')">
                     {{ "contents.inspectData" | sqxTranslate }}
                 </a>
             </li>
+
             <li class="nav-item">
                 <a class="nav-link" [class.active]="currentMode === 'FlatData'" (click)="setMode('FlatData')">
                     {{ "contents.inspectFlatData" | sqxTranslate }}
@@ -23,5 +24,5 @@
 </div>
 
 <div class="inner-main">
-    <sqx-code-editor borderless="true" [ngModel]="actualData | async" (ngModelChange)="setData($event)" valueMode="Json"></sqx-code-editor>
+    <sqx-code-editor borderless="true" [ngModel]="actualData | async" (ngModelChange)="setData($event)" valueMode="Json" />
 </div>

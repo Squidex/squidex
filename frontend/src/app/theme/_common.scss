@@ -39,6 +39,14 @@ hr {
     word-break: break-all;
 }
 
+.text-sm {
+    font-size: $font-small;
+}
+
+.rounded-full {
+    border-radius: 100%;
+}
+
 .drag-handle {
     color: $color-text-decent;
     cursor: move;

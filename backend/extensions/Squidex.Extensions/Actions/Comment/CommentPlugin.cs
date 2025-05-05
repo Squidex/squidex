@@ -15,6 +15,9 @@ public sealed class CommentPlugin : IPlugin
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        services.AddRuleAction<CommentAction, CommentActionHandler>();
+        services.AddFlowStep<CommentFlowStep>();
+#pragma warning disable CS0618 // Type or member is obsolete
+        services.AddRuleAction<CommentAction>();
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

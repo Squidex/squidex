@@ -1,0 +1,59 @@
+<form [formGroup]="currentTrigger?.form!" (ngSubmit)="save()">
+    <sqx-modal-dialog (dialogClose)="dialogClose.emit()" size="xl">
+        <ng-container title>
+            @if (!trigger) {
+                {{ "rules.trigger.add" | sqxTranslate }}
+            } @else {
+                {{ "rules.trigger.edit" | sqxTranslate }}
+            }
+        </ng-container>
+        <ng-container content>
+            @if (currentTrigger) {
+                @switch (currentTrigger.triggerType) {
+                    @case ("AssetChanged") {
+                        <sqx-asset-changed-trigger [triggerForm]="currentTrigger" />
+                    }
+
+                    @case ("Comment") {
+                        <sqx-comment-trigger [triggerForm]="currentTrigger" />
+                    }
+
+                    @case ("ContentChanged") {
+                        <sqx-content-changed-trigger
+                            [schemas]="schemasState.schemas | async"
+                            [triggerDto]="currentTrigger.form.value"
+                            [triggerForm]="currentTrigger" />
+                    }
+
+                    @case ("SchemaChanged") {
+                        <sqx-schema-changed-trigger [triggerForm]="currentTrigger" />
+                    }
+
+                    @case ("Usage") {
+                        <sqx-usage-trigger [triggerForm]="currentTrigger" />
+                    }
+                }
+            } @else {
+                <div class="row g-0">
+                    @for (availableTrigger of availableTriggers | sqxEntries: "title"; track availableTrigger.key) {
+                        <div class="col-12 col-md-6">
+                            <div class="rule-element" (click)="selectTrigger(availableTrigger.key)">
+                                <sqx-rule-element
+                                    [elementInfo]="availableTrigger.value"
+                                    [elementType]="availableTrigger.key"
+                                    showDescription="true"
+                                    showName="true" />
+                            </div>
+                        </div>
+                    }
+                </div>
+            }
+        </ng-container>
+        <ng-container footer>
+            <button class="btn btn-text-secondary" (click)="dialogClose.emit()" type="button">
+                {{ "common.cancel" | sqxTranslate }}
+            </button>
+            <button class="btn btn-success" [disabled]="!currentTrigger" type="submit">{{ "common.save" | sqxTranslate }}</button>
+        </ng-container>
+    </sqx-modal-dialog>
+</form>

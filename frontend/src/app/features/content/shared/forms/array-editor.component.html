@@ -33,6 +33,7 @@
             }
         </div>
     }
+
     @if (items.length > 20) {
         <div class="array-container" [class.expanded]="isExpanded">
             <virtual-scroller #scroll [enableUnequalChildrenSizes]="true" [items]="$any(items)">
@@ -58,12 +59,13 @@
                             (itemMove)="move(itemForm, $event)"
                             (itemRemove)="removeItem(scroll.viewPortInfo.startIndexWithBuffer + i)"
                             [language]="language"
-                            [languages]="languages"></sqx-array-item>
+                            [languages]="languages" />
                     </div>
                 }
             </virtual-scroller>
         </div>
     }
+
     <div class="array-buttons row g-0 align-items-center" [class.expanded]="isExpanded">
         <div class="col-auto">
             @if (isArray) {
@@ -72,10 +74,9 @@
                         {{ "contents.arrayAddItem" | sqxTranslate }}
                     </button>
                 }
+
                 @if (!hasField) {
-                    <sqx-form-hint>
-                        {{ "contents.arrayNoFields" | sqxTranslate }}
-                    </sqx-form-hint>
+                    <sqx-form-hint> {{ "contents.arrayNoFields" | sqxTranslate }} </sqx-form-hint>
                 }
             } @else {
                 @if (schemasList.length > 1) {
@@ -89,28 +90,23 @@
                     </button>
                     <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonSelect" *sqxModal="schemasDropdown; closeAlways: true">
                         @for (schema of schemasList; track schema) {
-                            <a class="dropdown-item" (click)="addComponent(schema)">
-                                {{ schema.displayName }}
-                            </a>
+                            <a class="dropdown-item" (click)="addComponent(schema)"> {{ schema.displayName }} </a>
                         }
                     </sqx-dropdown-menu>
                 }
+
                 @if (schemasList.length === 1) {
-                    <button
-                        class="btn btn-outline-success"
-                        (click)="addComponent(schemasList[0])"
-                        [disabled]="isDisabledOrFull | async"
-                        type="button">
+                    <button class="btn btn-outline-success" (click)="addComponent(schemasList[0])" [disabled]="isDisabledOrFull | async" type="button">
                         {{ "contents.addComponent" | sqxTranslate }}
                     </button>
                 }
+
                 @if (schemasList.length === 0) {
-                    <sqx-form-hint>
-                        {{ "contents.componentsNoSchema" | sqxTranslate }}
-                    </sqx-form-hint>
+                    <sqx-form-hint> {{ "contents.componentsNoSchema" | sqxTranslate }} </sqx-form-hint>
                 }
             }
         </div>
+
         <div class="col">
             @if (items.length > 0) {
                 <button
@@ -125,6 +121,7 @@
                 </button>
             }
         </div>
+
         @if (items.length > 0) {
             <div class="col-auto">
                 <button class="btn btn-text-secondary" (click)="expandAll()" title="i18n:contents.arrayExpandAll" type="button">

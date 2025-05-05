@@ -5,12 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Flows;
+using Squidex.Flows.Internal;
 using Squidex.Infrastructure.Migrations;
 
+#pragma warning disable CS0618 // Type or member is obsolete
 #pragma warning disable SA1310 // Field names must not contain underscore
 
 namespace Squidex.Domain.Apps.Core.Model.Rules;
@@ -24,7 +27,7 @@ public class RuleTests
             .Select(x => new[] { x })
             .ToList()!;
 
-    private readonly Rule rule_0 = new Rule { Action = new TestAction1(), Trigger = new ContentChangedTriggerV2() };
+    private readonly Rule rule_0 = new Rule { Flow = new FlowDefinition(), Trigger = new ContentChangedTriggerV2() };
 
     public sealed record OtherTrigger : RuleTrigger
     {
@@ -47,16 +50,24 @@ public class RuleTests
         }
     }
 
-    [RuleAction]
+    public sealed record TestStep1 : FlowStep
+    {
+        public string Property { get; set; }
+
+        public override ValueTask<FlowStepResult> ExecuteAsync(FlowExecutionContext executionContext, CancellationToken ct)
+        {
+            return new ValueTask<FlowStepResult>(FlowStepResult.Next());
+        }
+    }
+
     public sealed record TestAction1 : RuleAction
     {
         public string Property { get; set; }
-    }
 
-    [RuleAction]
-    public sealed record TestAction2 : RuleAction
-    {
-        public string Property { get; set; }
+        public override FlowStep ToFlowStep()
+        {
+            return new TestStep1 { Property = Property };
+        }
     }
 
     [Fact]
@@ -108,7 +119,7 @@ public class RuleTests
         var rule_1 = rule_0.Update(newTrigger1);
         var rule_2 = rule_1.Update(newTrigger2);
 
-        Assert.NotSame(rule_0.Action, newTrigger1);
+        Assert.NotSame(rule_0.Trigger, newTrigger1);
         Assert.NotSame(rule_0, rule_1);
         Assert.Same(newTrigger1, rule_1.Trigger);
         Assert.Same(newTrigger1, rule_2.Trigger);
@@ -130,29 +141,23 @@ public class RuleTests
     [Fact]
     public void Should_replace_action()
     {
-        var newAction1 = new TestAction1 { Property = "NewValue" };
-        var newAction2 = new TestAction1 { Property = "NewValue" };
+        var newAction1 = new FlowDefinition { InitialStepId = Guid.NewGuid() };
+        var newAction2 = new FlowDefinition { InitialStepId = newAction1.InitialStepId };
 
         var rule_1 = rule_0.Update(newAction1);
         var rule_2 = rule_1.Update(newAction2);
 
-        Assert.NotSame(rule_0.Action, newAction1);
+        Assert.NotSame(rule_0.Flow, newAction1);
         Assert.NotSame(rule_0, rule_1);
-        Assert.Same(newAction1, rule_1.Action);
-        Assert.Same(newAction1, rule_2.Action);
+        Assert.Same(newAction1, rule_1.Flow);
+        Assert.Same(newAction1, rule_2.Flow);
         Assert.Same(rule_1, rule_2);
     }
 
     [Fact]
     public void Should_throw_exception_if_action_trigger_is_null()
     {
-        Assert.Throws<ArgumentNullException>(() => rule_0.Update((RuleAction)null!));
-    }
-
-    [Fact]
-    public void Should_throw_exception_if_new_action_has_other_type()
-    {
-        Assert.Throws<ArgumentException>(() => rule_0.Update(new TestAction2()));
+        Assert.Throws<ArgumentNullException>(() => rule_0.Update((FlowDefinition)null!));
     }
 
     [Fact]
@@ -162,7 +167,17 @@ public class RuleTests
 
         var deserialized = TestUtils.DefaultSerializer.Deserialize<Rule>(File.ReadAllText("Model/Rules/Rule_Old.json"));
 
-        deserialized.Should().BeEquivalentTo(original);
+        AssertRules(original, deserialized);
+    }
+
+    [Fact]
+    public void Should_deserialize_old_actions()
+    {
+        var original = TestUtils.DefaultSerializer.Deserialize<Rule>(File.ReadAllText("Model/Rules/Rule.json"));
+
+        var deserialized = TestUtils.DefaultSerializer.Deserialize<Rule>(File.ReadAllText("Model/Rules/Rule_Action.json"));
+
+        AssertRules(original, deserialized);
     }
 
     [Fact]
@@ -188,10 +203,21 @@ public class RuleTests
     [Fact]
     public void Should_serialize_and_deserialize_and_migrate_trigger()
     {
-        var rule_X = new Rule { Trigger = new MigratedTrigger(), Action = new TestAction1() };
+        var rule_X = new Rule { Trigger = new MigratedTrigger(), Flow = new FlowDefinition() };
 
         var serialized = rule_X.SerializeAndDeserializeAsJson();
 
         Assert.IsType<OtherTrigger>(serialized.Trigger);
+    }
+
+    private static void AssertRules(Rule original, Rule deserialized)
+    {
+        deserialized.Should().BeEquivalentTo(original, o => o
+            .Excluding(x => x.Type == typeof(Guid))
+            .Excluding(x => x.Type == typeof(Guid?))
+            .Using<Dictionary<Guid, FlowStepDefinition>>(x =>
+            {
+                x.Subject.Values.Should().BeEquivalentTo(x.Expectation.Values);
+            }).When(x => x.RuntimeType == typeof(Dictionary<Guid, FlowStepDefinition>)));
     }
 }

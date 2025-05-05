@@ -51,7 +51,7 @@
     <PackageReference Include="Microsoft.OData.Core" Version="8.2.1" />
     <PackageReference Include="NetTopologySuite.IO.GeoJSON4STJ" Version="4.0.0" />
     <PackageReference Include="NJsonSchema" Version="11.0.2" />
-    <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.2.0" />
+    <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.3.0" />
     <PackageReference Include="NSwag.AspNetCore" Version="14.1.0" />
     <PackageReference Include="OpenCover" Version="4.7.1221" PrivateAssets="all" />
     <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.9.0" />
@@ -59,17 +59,17 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.9.0" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
     <PackageReference Include="ReportGenerator" Version="5.4.1" PrivateAssets="all" />
-    <PackageReference Include="Squidex.Assets.Azure" Version="6.37.0" />
-    <PackageReference Include="Squidex.Assets.GoogleCloud" Version="6.37.0" />
-    <PackageReference Include="Squidex.Assets.FTP" Version="6.37.0" />
-    <PackageReference Include="Squidex.Assets.ImageSharp" Version="6.37.0" />
-    <PackageReference Include="Squidex.Assets.S3" Version="6.37.0" />
-    <PackageReference Include="Squidex.Assets.TusAdapter" Version="6.37.0" />
+    <PackageReference Include="Squidex.Assets.Azure" Version="7.1.4" />
+    <PackageReference Include="Squidex.Assets.GoogleCloud" Version="7.1.4" />
+    <PackageReference Include="Squidex.Assets.FTP" Version="7.1.4" />
+    <PackageReference Include="Squidex.Assets.ImageSharp" Version="7.1.4" />
+    <PackageReference Include="Squidex.Assets.S3" Version="7.1.4" />
+    <PackageReference Include="Squidex.Assets.TusAdapter" Version="7.1.4" />
     <PackageReference Include="Squidex.ClientLibrary" Version="20.1.0" />
-    <PackageReference Include="Squidex.Events.GetEventStore" Version="6.37.0" />
-    <PackageReference Include="Squidex.Hosting" Version="6.37.0" />
-    <PackageReference Include="Squidex.Messaging.All" Version="6.37.0" />
-    <PackageReference Include="Squidex.Messaging.Subscriptions" Version="6.37.0" />
+    <PackageReference Include="Squidex.Events.GetEventStore" Version="7.1.4" />
+    <PackageReference Include="Squidex.Hosting" Version="7.1.4" />
+    <PackageReference Include="Squidex.Messaging.All" Version="7.1.4" />
+    <PackageReference Include="Squidex.Messaging.Subscriptions" Version="7.1.4" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="YDotNet" Version="0.4.3" />
     <PackageReference Include="YDotNet.Native" Version="0.4.3" />
@@ -83,11 +83,11 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(IncludeMagick)' == 'true'">
-    <PackageReference Include="Squidex.Assets.ImageMagick" Version="6.37.0" />
+    <PackageReference Include="Squidex.Assets.ImageMagick" Version="7.1.4" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(IncludeKafka)' == 'true'">
-    <PackageReference Include="Squidex.Messaging.Kafka" Version="6.37.0" />
+    <PackageReference Include="Squidex.Messaging.Kafka" Version="7.1.4" />
   </ItemGroup>
 
   <PropertyGroup>

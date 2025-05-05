@@ -10,8 +10,8 @@ using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Jobs;
-using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Events;
+using Squidex.Flows;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Translations;
@@ -28,7 +28,7 @@ public sealed class RuleRunnerJob : IJobRunner
     private readonly IAppProvider appProvider;
     private readonly IEventFormatter eventFormatter;
     private readonly IEventStore eventStore;
-    private readonly IRuleEventRepository ruleEventRepository;
+    private readonly IFlowManager<FlowEventContext> flowManager;
     private readonly IRuleService ruleService;
     private readonly IRuleUsageTracker ruleUsageTracker;
     private readonly ILogger<RuleRunnerJob> log;
@@ -39,7 +39,7 @@ public sealed class RuleRunnerJob : IJobRunner
         IAppProvider appProvider,
         IEventFormatter eventFormatter,
         IEventStore eventStore,
-        IRuleEventRepository ruleEventRepository,
+        IFlowManager<FlowEventContext> flowManager,
         IRuleService ruleService,
         IRuleUsageTracker ruleUsageTracker,
         ILogger<RuleRunnerJob> log)
@@ -47,7 +47,7 @@ public sealed class RuleRunnerJob : IJobRunner
         this.appProvider = appProvider;
         this.eventStore = eventStore;
         this.eventFormatter = eventFormatter;
-        this.ruleEventRepository = ruleEventRepository;
+        this.flowManager = flowManager;
         this.ruleService = ruleService;
         this.ruleUsageTracker = ruleUsageTracker;
         this.log = log;
@@ -154,12 +154,12 @@ public sealed class RuleRunnerJob : IJobRunner
         // We collect errors and allow a few erors before we throw an exception.
         var errors = 0;
 
-        // Write in batches of 100 items for better performance. Using completes the last write.
-        await using var batch = new RuleQueueWriter(ruleEventRepository, ruleUsageTracker, null);
+        // Write in batches of 100 items for better performance. Dispose completes the last write.
+        await using var batch = new RuleQueueWriter(flowManager, ruleUsageTracker, null);
 
         await foreach (var result in ruleService.CreateSnapshotJobsAsync(context, ct))
         {
-            await batch.WriteAsync(result);
+            await batch.WriteAsync(context.AppId.Id, result);
 
             if (result.EnrichmentError != null)
             {
@@ -183,8 +183,8 @@ public sealed class RuleRunnerJob : IJobRunner
         // We collect errors and allow a few erors before we throw an exception.
         var errors = 0;
 
-        // Write in batches of 100 items for better performance. Using completes the last write.
-        await using var batch = new RuleQueueWriter(ruleEventRepository, ruleUsageTracker, null);
+        // Write in batches of 100 items for better performance. Dispose completes the last write.
+        await using var batch = new RuleQueueWriter(flowManager, ruleUsageTracker, null);
 
         // Use a prefix query so that the storage can use an index for the query.
         var streamFilter = StreamFilter.Prefix($"%-{run.OwnerId}");
@@ -200,7 +200,7 @@ public sealed class RuleRunnerJob : IJobRunner
 
             await foreach (var result in ruleService.CreateJobsAsync(@event, context.ToRulesContext(), ct))
             {
-                await batch.WriteAsync(result);
+                await batch.WriteAsync(context.AppId.Id, result);
 
                 if (result.EnrichmentError != null)
                 {

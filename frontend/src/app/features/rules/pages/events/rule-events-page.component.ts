@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { ConfirmClickDirective, LayoutComponent, ListViewComponent, PagerComponent, Router2State, RuleEventDto, RuleEventsState, ShortcutDirective, Subscriptions, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
+import { ConfirmClickDirective, LayoutComponent, ListViewComponent, PagerComponent, Router2State, RuleElementDto, RuleEventDto, RuleEventsState, RulesService, ShortcutDirective, Subscriptions, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
 import { RuleEventComponent } from './rule-event.component';
 
 @Component({
@@ -35,16 +35,23 @@ import { RuleEventComponent } from './rule-event.component';
 export class RuleEventsPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();
 
+    public availableSteps: Record<string, RuleElementDto> = {};
+
     public selectedEventId: string | null = null;
 
     constructor(
-        private readonly route: ActivatedRoute,
         public readonly ruleEventsRoute: Router2State,
         public readonly ruleEventsState: RuleEventsState,
+        private readonly route: ActivatedRoute,
+        private readonly rulesService: RulesService,
     ) {
     }
 
     public ngOnInit() {
+        this.rulesService.getSteps().subscribe((steps) => {
+            this.availableSteps = steps;
+        });
+
         this.subscriptions.add(
             this.route.queryParams
                 .subscribe(() => {

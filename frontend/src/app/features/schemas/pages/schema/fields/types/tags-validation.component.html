@@ -1,7 +1,6 @@
 <div [formGroup]="fieldForm">
     <div class="form-group row">
         <label class="col-3 col-form-label">{{ "schemas.fieldTypes.tags.count" | sqxTranslate }}</label>
-
         <div class="col-9">
             <div class="row g-0">
                 <div class="col">
@@ -11,9 +10,9 @@
                         placeholder="{{ 'schemas.fieldTypes.tags.countMin' | sqxTranslate }}"
                         type="number" />
                 </div>
-                <div class="col-auto">
-                    <label class="col-form-label minmax">-</label>
-                </div>
+
+                <div class="col-auto"><label class="col-form-label minmax">-</label></div>
+
                 <div class="col">
                     <input
                         class="form-control"
@@ -27,20 +26,15 @@
 
     <div class="form-group row">
         <label class="col-3 col-form-label">{{ "schemas.field.defaultValue" | sqxTranslate }}</label>
-
-        <div class="col-9">
-            <sqx-tag-editor formControlName="defaultValue"></sqx-tag-editor>
-        </div>
+        <div class="col-9"><sqx-tag-editor formControlName="defaultValue" /></div>
     </div>
 
     @if (isLocalizable) {
         <div class="form-group row">
             <label class="col-3 col-form-label">{{ "schemas.field.defaultValues" | sqxTranslate }}</label>
             <div class="col-9">
-                <sqx-localized-input formControlName="defaultValues" [languages]="languages" type="tags"></sqx-localized-input>
-                <sqx-form-hint>
-                    {{ "schemas.field.defaultValuesHint" | sqxTranslate }}
-                </sqx-form-hint>
+                <sqx-localized-input formControlName="defaultValues" [languages]="languages" type="tags" />
+                <sqx-form-hint> {{ "schemas.field.defaultValuesHint" | sqxTranslate }} </sqx-form-hint>
             </div>
         </div>
     }

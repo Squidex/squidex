@@ -11,7 +11,6 @@
                 }
             }
         </span>
-
         <sqx-dropdown-menu
             class="d-flex flex-column"
             position="bottom-start"
@@ -22,9 +21,8 @@
                 @if (apps.length > 0) {
                     <a class="dropdown-item dropdown-header" routerLink="/app">
                         <div class="row g-0 align-items-center">
-                            <div class="col">
-                                {{ "apps.allApps" | sqxTranslate }}
-                            </div>
+                            <div class="col">{{ "apps.allApps" | sqxTranslate }}</div>
+
                             <div class="col-auto">
                                 <span class="badge badge-primary rounded-pill">{{ apps.length }}</span>
                             </div>
@@ -32,9 +30,7 @@
                     </a>
                     <div class="apps-list">
                         @for (app of apps; track app.id) {
-                            <a class="dropdown-item" [routerLink]="['/app', app.name]" routerLinkActive="active">
-                                {{ app.displayName }}
-                            </a>
+                            <a class="dropdown-item" [routerLink]="['/app', app.name]" routerLinkActive="active"> {{ app.displayName }} </a>
                         }
                     </div>
                 }
@@ -45,9 +41,8 @@
                     <div class="dropdown-divider"></div>
                     <a class="dropdown-item dropdown-header" routerLink="/app">
                         <div class="row g-0 align-items-center">
-                            <div class="col">
-                                {{ "apps.allTeams" | sqxTranslate }}
-                            </div>
+                            <div class="col">{{ "apps.allTeams" | sqxTranslate }}</div>
+
                             <div class="col-auto">
                                 <span class="badge badge-primary rounded-pill">{{ teams.length }}</span>
                             </div>
@@ -55,9 +50,7 @@
                     </a>
                     <div class="teams-list">
                         @for (team of teams; track team.id) {
-                            <a class="dropdown-item" [routerLink]="['/app/teams', team.id]" routerLinkActive="active">
-                                {{ team.name }}
-                            </a>
+                            <a class="dropdown-item" [routerLink]="['/app/teams', team.id]" routerLinkActive="active"> {{ team.name }} </a>
                         }
                     </div>
                 }
@@ -65,12 +58,13 @@
 
             @if ((uiState.settings | async)?.canCreateApps || (uiState.settings | async)?.canCreateApps) {
                 <div class="dropdown-divider"></div>
+
                 <div class="dropdown-header">
                     <button class="btn btn-block btn-success" (click)="addAppDialog.show()" type="button">
-                        <i class="icon-plus"></i>
-                        {{ "apps.appsButtonCreate" | sqxTranslate }}
+                        <i class="icon-plus"></i> {{ "apps.appsButtonCreate" | sqxTranslate }}
                     </button>
                 </div>
+
                 @if ((uiState.settings | async)?.canCreateTeams) {
                     <div class="dropdown-header">
                         <button class="btn btn-block btn-sm btn-text-success" (click)="addTeamDialog.show()" type="button">
@@ -87,6 +81,7 @@
             @if (path.length > 0) {
                 <ol class="breadcrumb ms-2">
                     <li class="breadcrumb-item"></li>
+
                     @for (item of path; track item.value; let last = $last) {
                         <li class="breadcrumb-item" [class.active]="last">
                             <a [class.disabled]="last" [relativeTo]="route" [routerLink]="item.route">{{ item.localized }}</a>
@@ -97,7 +92,5 @@
         </nav>
     }
 </ul>
-
-<sqx-app-form (dialogClose)="addAppDialog.hide()" *sqxModal="addAppDialog"></sqx-app-form>
-
-<sqx-team-form (dialogClose)="addTeamDialog.hide()" *sqxModal="addTeamDialog"></sqx-team-form>
+<sqx-app-form (dialogClose)="addAppDialog.hide()" *sqxModal="addAppDialog" />
+<sqx-team-form (dialogClose)="addTeamDialog.hide()" *sqxModal="addTeamDialog" />

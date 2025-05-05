@@ -51,7 +51,7 @@ public class AssetDomainObjectTests : HandlerTestBase<Asset>
         };
 
         A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId.Id, parentId, A<CancellationToken>._))
-            .Returns(new List<AssetFolder> { A.Fake<AssetFolder>() });
+            .Returns([A.Fake<AssetFolder>()]);
 
         A.CallTo(() => tagService.GetTagIdsAsync(AppId.Id, TagGroups.Assets, A<HashSet<string>>._, default))
             .ReturnsLazily(x => Task.FromResult(x.GetArgument<HashSet<string>>(2)?.ToDictionary(x => x) ?? []));

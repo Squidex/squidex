@@ -1,0 +1,73 @@
+@import "mixins";
+@import "vars";
+
+.step {
+    margin-top: .5rem;
+    margin-bottom: 0rem;
+    position: relative;
+
+    &::before {
+        @include absolute(1rem, null, -1.5rem, 1rem);
+        border: 2px solid $color-border;
+        content: "";
+        margin-bottom: 0;
+        margin-left: -2px;
+    }
+
+    &.last {
+        &::before {
+            display: none;
+        }
+    }
+
+    .g-2 {
+        --bs-gutter-y: 0 !important;
+    }
+}
+
+.circle {
+    @include circle(2rem);
+    border: 1px solid $color-border;
+    background: $color-white;
+    position: relative;
+
+    &.sm {
+        @include circle(1rem);
+        border: 1px solid $color-border;
+        margin-left: .5rem;
+        margin-top: .5rem;
+    } 
+}
+
+.active-icon {
+    @include absolute(1.25rem, null, null, -.5rem);
+}
+
+.col-expand {
+    @include force-width(2rem);
+}
+
+.col-icon {
+    @include force-width(3rem);
+}
+
+.icon {
+    padding-top: .75rem;
+}
+
+.details {
+    border: 1px solid $color-border;
+    border-radius: $border-radius;
+    padding: .75rem;
+}
+
+.small-step {
+    .icon {
+        padding-top: .5rem;
+    }
+
+    .details {
+        border: 0;
+        padding: .75rem 0;
+    }
+}

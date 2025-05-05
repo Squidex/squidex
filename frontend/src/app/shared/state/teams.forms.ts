@@ -20,7 +20,7 @@ export class CreateTeamForm extends Form<ExtendedFormGroup, CreateTeamDto> {
             ]),
         }));
     }
-    
+
     public transformSubmit(value: any) {
         return new CreateTeamDto(value);
     }
@@ -35,7 +35,7 @@ export class UpdateTeamForm extends Form<ExtendedFormGroup, UpdateTeamDto, TeamD
             ]),
         }));
     }
-    
+
     public transformSubmit(value: any) {
         return new UpdateTeamDto(value);
     }

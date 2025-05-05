@@ -39,12 +39,11 @@ public class IndexParserTests
         Assert.True(result);
 
         definition.Should().BeEquivalentTo(
-            new IndexDefinition()
-            {
+            [
                 new IndexField("lastModified", SortOrder.Ascending),
                 new IndexField("lastModifiedBy", SortOrder.Descending),
                 new IndexField("data.field1", SortOrder.Ascending),
-            });
+            ]);
     }
 
     [Fact]

@@ -1,31 +1,28 @@
-<sqx-title message="i18n:common.languages"></sqx-title>
-
+<sqx-title message="i18n:common.languages" />
 <sqx-layout innerWidth="55" layout="main" titleIcon="languages" titleText="i18n:common.languages">
     <ng-container menu>
         <button class="btn btn-text-secondary" (click)="reload()" shortcut="CTRL + B" title="i18n:languages.refreshTooltip" type="button">
-            <i class="icon-reset"></i>
-            {{ "common.refresh" | sqxTranslate }}
+            <i class="icon-reset"></i> {{ "common.refresh" | sqxTranslate }}
         </button>
     </ng-container>
-
     <ng-container>
         <sqx-list-view innerWidth="55rem" [isLoading]="languagesState.isLoading | async">
             <div>
                 @if ((languagesState.isLoaded | async) && (languagesState.languages | async); as languages) {
                     @if (languagesState.canCreate | async) {
-                        <sqx-language-add-form [newLanguages]="(languagesState.newLanguages | async)!"></sqx-language-add-form>
+                        <sqx-language-add-form [newLanguages]="(languagesState.newLanguages | async)!" />
                     }
+
                     @for (languageInfo of languages; track languageInfo.language.iso2Code) {
                         <sqx-language
                             [fallbackLanguages]="languageInfo.fallbackLanguages"
                             [fallbackLanguagesNew]="languageInfo.fallbackLanguagesNew"
-                            [language]="languageInfo.language"></sqx-language>
+                            [language]="languageInfo.language" />
                     }
                 }
             </div>
         </sqx-list-view>
     </ng-container>
-
     <ng-template sidebarMenu>
         <div class="panel-nav">
             <a
@@ -39,7 +36,6 @@
                 titlePosition="left">
                 <i class="icon-time"></i>
             </a>
-
             <a
                 class="panel-link"
                 attr.aria-label="{{ 'common.help' | sqxTranslate }}"
@@ -55,5 +51,4 @@
         </div>
     </ng-template>
 </sqx-layout>
-
 <router-outlet></router-outlet>

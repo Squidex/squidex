@@ -20,6 +20,9 @@ public sealed class PrerenderPlugin : IPlugin
             options.BaseAddress = new Uri("https://api.prerender.io");
         });
 
-        services.AddRuleAction<PrerenderAction, PrerenderActionHandler>();
+        services.AddFlowStep<PrerenderFlowStep>();
+#pragma warning disable CS0618 // Type or member is obsolete
+        services.AddRuleAction<PrerenderAction>();
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

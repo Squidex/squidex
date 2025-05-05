@@ -3,14 +3,12 @@
 
 :host ::ng-deep {
     svg {
-        display: block;
-
         fill: $color-white;
     }
 }
 
 .svg-icon {
-    display: inline-block;
+    display: flex;
 }
 
 .icon {
@@ -19,11 +17,13 @@
 
 .sm {
     .icon {
-        font-size: 14px;
+        font-size: 18px;
     }
 
-    .svg-icon {
-        width: 14px;
+    ::ng-deep {
+        .svg-icon svg, .svg-icon {
+            width: 18px;
+        }
     }
 }
 
@@ -32,8 +32,10 @@
         font-size: 20px;
     }
 
-    .svg-icon {
-        width: 20px;
+    ::ng-deep {
+        .svg-icon svg, .svg-icon {
+            width: 20px;
+        }
     }
 }
 
@@ -42,7 +44,9 @@
         font-size: 30px;
     }
 
-    .svg-icon {
-        width: 30px;
+    ::ng-deep {
+        .svg-icon svg, .svg-icon {
+            width: 30px;
+        }
     }
 }

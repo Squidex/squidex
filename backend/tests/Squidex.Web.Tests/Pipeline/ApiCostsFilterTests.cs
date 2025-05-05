@@ -32,7 +32,7 @@ public class ApiCostsFilterTests : GivenContext
             new ActionExecutingContext(
                 new ActionContext(httpContext, new RouteData(),
                     new ActionDescriptor()),
-                new List<IFilterMetadata>(), new Dictionary<string, object?>(), null!);
+                [], new Dictionary<string, object?>(), null!);
 
         next = () =>
         {

@@ -6,15 +6,12 @@
                     <div class="card-header">
                         <div class="row">
                             <div class="col-auto">
-                                <sqx-toggle [disabled]="!isEditable" [ngModel]="isEditing" (ngModelChange)="toggle($event)"></sqx-toggle>
+                                <sqx-toggle [disabled]="!isEditable" [ngModel]="isEditing" (ngModelChange)="toggle($event)" />
                             </div>
 
                             <div class="col">
                                 <h5>{{ "teams.auth.use" | sqxTranslate }}</h5>
-
-                                <sqx-form-hint marginTop="2">
-                                    {{ "teams.auth.useHint" | sqxTranslate }}
-                                </sqx-form-hint>
+                                <sqx-form-hint marginTop="2"> {{ "teams.auth.useHint" | sqxTranslate }} </sqx-form-hint>
                             </div>
                         </div>
                     </div>
@@ -22,68 +19,68 @@
                     @if (isEditing) {
                         <form [formGroup]="updateForm.form" (ngSubmit)="save()">
                             <div class="card-body">
-                                <sqx-form-error [error]="updateForm.error | async"></sqx-form-error>
+                                <sqx-form-error [error]="updateForm.error | async" />
                                 <div class="form-group row">
                                     <label class="col-3 col-form-label" for="domain">{{ "teams.auth.domain" | sqxTranslate }}</label>
                                     <div class="col-9">
-                                        <sqx-control-errors for="domain"></sqx-control-errors>
+                                        <sqx-control-errors for="domain" />
                                         <input class="form-control" id="domain" formControlName="domain" />
-                                        <sqx-form-hint>
-                                            {{ "teams.auth.domainHint" | sqxTranslate }}
-                                        </sqx-form-hint>
+                                        <sqx-form-hint> {{ "teams.auth.domainHint" | sqxTranslate }} </sqx-form-hint>
                                         <sqx-form-hint>
                                             {{ "teams.auth.domainHintEmail" | sqxTranslate }}:
                                             <strong>user&commat;{{ updateForm.domainValue$ | async }}</strong>
                                         </sqx-form-hint>
                                     </div>
                                 </div>
+
                                 <div class="form-group row">
                                     <label class="col-3 col-form-label" for="displayName">
                                         {{ "teams.auth.displayName" | sqxTranslate }}
                                     </label>
                                     <div class="col-9">
-                                        <sqx-control-errors for="displayName"></sqx-control-errors>
+                                        <sqx-control-errors for="displayName" />
                                         <input class="form-control" id="displayName" formControlName="displayName" />
-                                        <sqx-form-hint>
-                                            {{ "teams.auth.displayNameHint" | sqxTranslate }}
-                                        </sqx-form-hint>
+                                        <sqx-form-hint> {{ "teams.auth.displayNameHint" | sqxTranslate }} </sqx-form-hint>
                                     </div>
                                 </div>
+
                                 <div class="form-group row">
                                     <label class="col-3 col-form-label" for="clientId">{{ "teams.auth.clientId" | sqxTranslate }}</label>
                                     <div class="col-9">
-                                        <sqx-control-errors for="clientId"></sqx-control-errors>
+                                        <sqx-control-errors for="clientId" />
                                         <input class="form-control" id="clientId" formControlName="clientId" />
                                     </div>
                                 </div>
+
                                 <div class="form-group row">
                                     <label class="col-3 col-form-label" for="clientSecret">
                                         {{ "teams.auth.clientSecret" | sqxTranslate }}
                                     </label>
                                     <div class="col-9">
-                                        <sqx-control-errors for="clientSecret"></sqx-control-errors>
+                                        <sqx-control-errors for="clientSecret" />
                                         <input class="form-control" id="clientSecret" formControlName="clientSecret" />
                                     </div>
                                 </div>
+
                                 <div class="form-group row">
                                     <label class="col-3 col-form-label" for="authority">{{ "teams.auth.authority" | sqxTranslate }}</label>
                                     <div class="col-9">
-                                        <sqx-control-errors for="authority"></sqx-control-errors>
+                                        <sqx-control-errors for="authority" />
                                         <input class="form-control" id="authority" formControlName="authority" />
-                                        <sqx-form-hint>
-                                            {{ "teams.auth.authorityHint" | sqxTranslate }}
-                                        </sqx-form-hint>
+                                        <sqx-form-hint> {{ "teams.auth.authorityHint" | sqxTranslate }} </sqx-form-hint>
                                     </div>
                                 </div>
+
                                 <div class="form-group row">
                                     <label class="col-3 col-form-label" for="signoutRedirectUrl">
                                         {{ "teams.auth.signoutRedirectUrl" | sqxTranslate }}
                                     </label>
                                     <div class="col-9">
-                                        <sqx-control-errors for="signoutRedirectUrl"></sqx-control-errors>
+                                        <sqx-control-errors for="signoutRedirectUrl" />
                                         <input class="form-control" id="signoutRedirectUrl" formControlName="signoutRedirectUrl" />
                                     </div>
                                 </div>
+
                                 <div class="form-group row">
                                     <label class="col-3 col-form-label" for="redirectUrl">
                                         {{ "teams.auth.redirectUrl" | sqxTranslate }}
@@ -95,19 +92,14 @@
                                                 <i class="icon-copy"></i>
                                             </button>
                                         </div>
-                                        <sqx-form-hint>
-                                            {{ "teams.auth.redirectUrlHint" | sqxTranslate }}
-                                        </sqx-form-hint>
+                                        <sqx-form-hint> {{ "teams.auth.redirectUrlHint" | sqxTranslate }} </sqx-form-hint>
                                     </div>
                                 </div>
                             </div>
+
                             <div class="card-footer">
                                 <div class="d-flex justify-content-between">
-                                    <a
-                                        class="float-end btn btn-success"
-                                        href="{{ urlToTest }}?{{ updateForm.url | async }}"
-                                        target="_blank"
-                                        type="type">
+                                    <a class="float-end btn btn-success" href="{{ urlToTest }}?{{ updateForm.url | async }}" target="_blank" type="type">
                                         {{ "teams.auth.testLogin" | sqxTranslate }}
                                     </a>
                                     <button class="float-end btn btn-primary" [disabled]="!isEditable" type="submit">
@@ -121,7 +113,6 @@
             </ng-container>
         </sqx-list-view>
     </ng-container>
-
     <ng-template sidebarMenu>
         <div class="panel-nav">
             <a
@@ -151,5 +142,4 @@
         </div>
     </ng-template>
 </sqx-layout>
-
 <router-outlet></router-outlet>

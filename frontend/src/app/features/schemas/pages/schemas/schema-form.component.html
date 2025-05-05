@@ -7,29 +7,15 @@
                 {{ "schemas.create" | sqxTranslate }}
             }
         </ng-container>
-
         <ng-container content>
-            <sqx-form-error [error]="createForm.error | async"></sqx-form-error>
-
+            <sqx-form-error [error]="createForm.error | async" />
             <div class="form-group">
                 <label for="name">
-                    {{ "common.name" | sqxTranslate }}
-                    <small class="hint">({{ "common.requiredHint" | sqxTranslate }})</small>
+                    {{ "common.name" | sqxTranslate }} <small class="hint">({{ "common.requiredHint" | sqxTranslate }})</small>
                 </label>
-
-                <sqx-control-errors for="name"></sqx-control-errors>
-
-                <input
-                    class="form-control"
-                    id="name"
-                    autocomplete="off"
-                    formControlName="name"
-                    sqxFocusOnInit
-                    sqxTransformInput="LowerCase" />
-
-                <sqx-form-hint>
-                    {{ "schemas.schemaNameHint" | sqxTranslate }}
-                </sqx-form-hint>
+                <sqx-control-errors for="name" />
+                <input class="form-control" id="name" autocomplete="off" formControlName="name" sqxFocusOnInit sqxTransformInput="LowerCase" />
+                <sqx-form-hint> {{ "schemas.schemaNameHint" | sqxTranslate }} </sqx-form-hint>
             </div>
 
             <div class="form-group mt-4">
@@ -37,49 +23,54 @@
                     <div class="col-6 type">
                         <label>
                             <input class="radio-input" formControlName="type" name="type" type="radio" [value]="'Default'" />
-
                             <div class="row g-0">
                                 <div class="col-auto">
                                     <div class="btn-radio" [class.active]="createForm.form.controls['type'].value === 'Default'">
                                         <i class="icon-multiple-content"></i>
                                     </div>
                                 </div>
+
                                 <div class="col">
                                     <div class="type-title">{{ "schemas.modeMultiple" | sqxTranslate }}</div>
+
                                     <div class="type-text text-muted">{{ "schemas.modeMultipleDescription" | sqxTranslate }}</div>
                                 </div>
                             </div>
                         </label>
                     </div>
+
                     <div class="col-6 type">
                         <label>
                             <input class="radio-input" formControlName="type" name="type" type="radio" [value]="'Singleton'" />
-
                             <div class="row g-0">
                                 <div class="col-auto">
                                     <div class="btn-radio" [class.active]="createForm.form.controls['type'].value === 'Singleton'">
                                         <i class="icon-single-content"></i>
                                     </div>
                                 </div>
+
                                 <div class="col">
                                     <div class="type-title">{{ "schemas.modeSingle" | sqxTranslate }}</div>
+
                                     <div class="type-text text-muted">{{ "schemas.modeSingleDescription" | sqxTranslate }}</div>
                                 </div>
                             </div>
                         </label>
                     </div>
+
                     <div class="col-6 type">
                         <label>
                             <input class="radio-input" formControlName="type" name="type" type="radio" [value]="'Component'" />
-
                             <div class="row g-0">
                                 <div class="col-auto">
                                     <div class="btn-radio" [class.active]="createForm.form.controls['type'].value === 'Component'">
                                         <i class="icon-component"></i>
                                     </div>
                                 </div>
+
                                 <div class="col">
                                     <div class="type-title">{{ "schemas.modeComponent" | sqxTranslate }}</div>
+
                                     <div class="type-text text-muted">{{ "schemas.modeComponentDescription" | sqxTranslate }}</div>
                                 </div>
                             </div>
@@ -87,17 +78,14 @@
                     </div>
                 </div>
             </div>
-
-            <sqx-form-alert>
-                {{ "schemas.nameWarning" | sqxTranslate }}
-            </sqx-form-alert>
-
+            <sqx-form-alert> {{ "schemas.nameWarning" | sqxTranslate }} </sqx-form-alert>
             @if (schemasState.categoryNames | async; as categories) {
                 @if (categories.length > 0) {
                     <div class="form-group">
                         <label for="category">{{ "common.category" | sqxTranslate }}</label>
                         <select class="form-select" id="category" formControlName="initialCategory">
                             <option></option>
+
                             @for (category of categories; track category) {
                                 <option [ngValue]="category">{{ category }}</option>
                             }
@@ -113,21 +101,16 @@
                 <button class="btn btn-sm btn-text-secondary force" [class.hidden]="!showImport" (click)="toggleImport()" type="button">
                     {{ "common.hide" | sqxTranslate }}
                 </button>
-
                 @if (showImport) {
-                    <sqx-code-editor formControlName="importing" [height]="250" valueMode="Json"></sqx-code-editor>
+                    <sqx-code-editor formControlName="importing" [height]="250" valueMode="Json" />
                 }
             </div>
         </ng-container>
-
         <ng-container footer>
             <button class="btn btn-text-secondary" (click)="dialogClose.emit()" type="button">
                 {{ "common.cancel" | sqxTranslate }}
             </button>
-
-            <button class="btn btn-success" type="submit">
-                {{ "common.create" | sqxTranslate }}
-            </button>
+            <button class="btn btn-success" type="submit">{{ "common.create" | sqxTranslate }}</button>
         </ng-container>
     </sqx-modal-dialog>
 </form>

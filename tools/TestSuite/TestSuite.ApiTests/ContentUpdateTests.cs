@@ -1205,8 +1205,8 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             ]
         });
 
-        result_1.OrderBy(x => x.JobIndex).Should().BeEquivalentTo(new List<BulkResult>
-        {
+        result_1.OrderBy(x => x.JobIndex).Should().BeEquivalentTo(
+        [
             new BulkResult
             {
                 ContentId = result_0[0].ContentId,
@@ -1216,8 +1216,8 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             {
                 ContentId = result_0[1].ContentId,
                 JobIndex = 1
-            }
-        });
+            },
+        ]);
 
 
         // STEP 2: Get contents.

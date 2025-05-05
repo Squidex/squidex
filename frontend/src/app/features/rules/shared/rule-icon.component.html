@@ -1,7 +1,7 @@
-<span class="icon {{ size }}">
-    @if (element.iconCode) {
-        <i class="icon icon-{{ element.iconCode }}"></i>
+<span class="rounded-full icon {{ size }}">
+    @if (elementInfo.iconCode) {
+        <i class="icon icon-{{ elementInfo.iconCode }}"></i>
     } @else {
-        <i class="svg-icon" [innerHtml]="$any(element.iconImage) | sqxSafeHtml"></i>
+        <i class="svg-icon" [innerHtml]="$any(elementInfo.iconImage) | sqxSafeHtml"></i>
     }
 </span>

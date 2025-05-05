@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
@@ -27,9 +27,15 @@ public sealed class UpdateRuleDto
     public RuleTriggerDto? Trigger { get; set; }
 
     /// <summary>
-    /// The action properties.
+    /// The flow to describe the sequence of actions to perform.
     /// </summary>
+    [Obsolete("Use the new 'Flow' property to define actions")]
     public RuleAction? Action { get; set; }
+
+    /// <summary>
+    /// The flow.
+    /// </summary>
+    public FlowDefinitionDto? Flow { get; set; }
 
     /// <summary>
     /// Enable or disable the rule.
@@ -38,10 +44,13 @@ public sealed class UpdateRuleDto
 
     public UpdateRule ToCommand(DomainId id)
     {
-        var command = SimpleMapper.Map(this, new UpdateRule { RuleId = id });
-
-        command.Trigger = Trigger?.ToTrigger();
-
-        return command;
+        return SimpleMapper.Map(this, new UpdateRule
+        {
+            RuleId = id,
+#pragma warning disable CS0618 // Type or member is obsolete
+            Flow = Flow?.ToDefinition() ?? Action?.ToFlowDefinition(),
+#pragma warning restore CS0618 // Type or member is obsolete
+            Trigger = Trigger?.ToTrigger(),
+        });
     }
 }

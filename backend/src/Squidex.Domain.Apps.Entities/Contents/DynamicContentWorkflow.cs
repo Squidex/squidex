@@ -76,7 +76,7 @@ public sealed class DynamicContentWorkflow(IScriptEngine scriptEngine, IAppProvi
     {
         var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
 
-        var (status, _) = workflow.GetInitialStep();
+        var (status, _) = workflow.GetInitialStepId();
 
         return status;
     }

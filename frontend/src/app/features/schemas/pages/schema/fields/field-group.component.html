@@ -1,13 +1,7 @@
 @if (fieldGroup.separator) {
     <div class="nested-field">
         <span class="nested-field-line-h"></span>
-        <sqx-field
-            [field]="$any(fieldGroup.separator)"
-            [languages]="languages"
-            [parent]="parent"
-            plain="true"
-            [schema]="schema"
-            [settings]="settings">
+        <sqx-field [field]="$any(fieldGroup.separator)" [languages]="languages" [parent]="parent" plain="true" [schema]="schema" [settings]="settings">
             <div class="d-flex align-items-center">
                 <ng-content></ng-content>
                 <button class="btn btn-sm btn-text-secondary ms-2" (click)="toggle()" type="button">

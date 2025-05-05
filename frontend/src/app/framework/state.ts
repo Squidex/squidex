@@ -10,7 +10,7 @@ import { distinctUntilChanged, map, shareReplay } from 'rxjs/operators';
 import { Types } from './utils/types';
 
 export type Mutable<T> = {
-    -readonly [P in keyof T ]: T[P]
+    -readonly [P in keyof T ]: T[P];
 };
 
 export class Model<T> {

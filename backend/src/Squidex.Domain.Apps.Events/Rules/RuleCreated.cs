@@ -6,19 +6,22 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Flows.Internal;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Migrations;
 
 namespace Squidex.Domain.Apps.Events.Rules;
 
-[EventType(nameof(RuleCreated))]
+[EventType(nameof(RuleCreated), 2)]
 public sealed class RuleCreated : RuleEvent, IMigrated<IEvent>
 {
+    public string? Name { get; set; }
+
     public RuleTrigger Trigger { get; set; }
 
-    public RuleAction Action { get; set; }
+    public FlowDefinition Flow { get; set; }
 
-    public string Name { get; set; }
+    public bool? IsEnabled { get; set; }
 
     public IEvent Migrate()
     {

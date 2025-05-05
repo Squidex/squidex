@@ -133,9 +133,10 @@ public class CollectionExtensionsTests
     [Fact]
     public void SequentialHashCode_should_ignore_null_values()
     {
-        var collection = new string?[] { null, null };
+        var collection1 = new string?[] { null, null };
+        var collection2 = new string?[] { null };
 
-        Assert.Equal(17, collection.SequentialHashCode());
+        Assert.Equal(collection2.SequentialHashCode(), collection1.SequentialHashCode());
     }
 
     [Fact]
@@ -341,11 +342,11 @@ public class CollectionExtensionsTests
         var actual = source.Batch(2).ToArray();
 
         actual.Should().BeEquivalentTo(
-            new[]
+            new List<int>[]
             {
-                new List<int> { 1, 2 },
-                new List<int> { 3, 4 },
-                new List<int> { 5 },
+                [1, 2],
+                [3, 4],
+                [5],
             });
     }
 
@@ -357,11 +358,11 @@ public class CollectionExtensionsTests
         var actual = await source.ToAsyncEnumerable().Batch(2).ToArrayAsync();
 
         actual.Should().BeEquivalentTo(
-            new[]
+            new List<int>[]
             {
-                new List<int> { 1, 2 },
-                new List<int> { 3, 4 },
-                new List<int> { 5 },
+                [1, 2],
+                [3, 4],
+                [5],
             });
     }
 }

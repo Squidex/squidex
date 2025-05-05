@@ -11,12 +11,9 @@
         }
 
         @if (schemas.length === 1) {
-            <div>
-                {{ "contents.referencesSelectSchema" | sqxTranslate: { schema: schemas[0].displayName } }}
-            </div>
+            <div>{{ "contents.referencesSelectSchema" | sqxTranslate: { schema: schemas[0].displayName } }}</div>
         }
     </ng-container>
-
     <ng-container tabs>
         <div class="row gx-2 mt-3 mb-3">
             <div class="col-auto">
@@ -28,27 +25,22 @@
                             [language]="language"
                             (languageChange)="language = $event"
                             [languages]="languages"
-                            [percents]="contentForm.translationStatus | async"></sqx-language-selector>
+                            [percents]="contentForm.translationStatus | async" />
                     </div>
                 }
             </div>
 
             <div class="col text-end">
-                <button class="btn btn-outline-success" (click)="save()" type="button">
-                    {{ "common.create" | sqxTranslate }}
-                </button>
-
+                <button class="btn btn-outline-success" (click)="save()" type="button">{{ "common.create" | sqxTranslate }}</button>
                 @if (schema.canContentsCreateAndPublish) {
                     <button class="btn btn-success ms-2" (click)="saveAndPublish()" type="button">
                         {{ "contents.referencesCreatePublish" | sqxTranslate }}
                     </button>
                 }
-
-                <sqx-form-error bubble="true" closeable="true" [error]="contentForm.error | async"></sqx-form-error>
+                <sqx-form-error bubble="true" closeable="true" [error]="contentForm.error | async" />
             </div>
         </div>
     </ng-container>
-
     <ng-container content>
         @if (schema && contentForm) {
             <form [formGroup]="contentForm.form" (ngSubmit)="saveAndPublish()">
@@ -61,7 +53,7 @@
                         [isCompact]="true"
                         [(language)]="language"
                         [languages]="languages"
-                        [schema]="schema"></sqx-content-section>
+                        [schema]="schema" />
                 }
             </form>
         }

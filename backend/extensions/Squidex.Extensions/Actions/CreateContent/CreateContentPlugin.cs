@@ -15,6 +15,9 @@ public sealed class CreateContentPlugin : IPlugin
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
-        services.AddRuleAction<CreateContentAction, CreateContentActionHandler>();
+        services.AddFlowStep<CreateContentFlowStep>();
+#pragma warning disable CS0618 // Type or member is obsolete
+        services.AddRuleAction<CreateContentAction>();
+#pragma warning restore CS0618 // Type or member is obsolete
     }
 }

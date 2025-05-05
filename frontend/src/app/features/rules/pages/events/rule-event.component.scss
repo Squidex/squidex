@@ -1,5 +1,5 @@
-@import 'mixins';
-@import 'vars';
+@import "mixins";
+@import "vars";
 
 td {
     &.details {
@@ -21,15 +21,11 @@ td {
 }
 
 .event {
-    &-header,
-    &-dump,
-    &-stats {
-        padding: .75rem 1.25rem;
+    &-section {
+        padding: 0.75rem 1.25rem;
     }
 
     &-stats {
-        font-size: $font-smallest;
-        font-weight: normal;
         height: 4rem;
     }
 
@@ -44,5 +40,11 @@ td {
             font-weight: 500;
             margin: 0;
         }
+    }
+}
+
+.icon-caret-right {
+    &:last-child {
+        display: none;
     }
 }

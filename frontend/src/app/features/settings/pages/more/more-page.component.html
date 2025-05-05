@@ -7,27 +7,20 @@
 
                     <div class="card mb-4">
                         <div class="card-body">
-                            <sqx-form-error [error]="updateForm.error | async"></sqx-form-error>
-
+                            <sqx-form-error [error]="updateForm.error | async" />
                             <div class="form-group">
                                 <label for="email">{{ "common.name" | sqxTranslate }}</label>
-
                                 <input class="form-control" readonly [value]="app.name" />
                             </div>
 
                             <div class="form-group">
-                                <label for="label">{{ "common.label" | sqxTranslate }}</label>
-
-                                <sqx-control-errors for="label"></sqx-control-errors>
-
+                                <label for="label">{{ "common.label" | sqxTranslate }}</label> <sqx-control-errors for="label" />
                                 <input class="form-control" id="label" formControlName="label" maxlength="100" />
                             </div>
 
                             <div class="form-group">
                                 <label for="description">{{ "common.description" | sqxTranslate }}</label>
-
-                                <sqx-control-errors for="description"></sqx-control-errors>
-
+                                <sqx-control-errors for="description" />
                                 <input class="form-control" id="description" formControlName="description" maxlength="100" />
                             </div>
                         </div>
@@ -53,36 +46,30 @@
                                     sqxDropNoPaste="true"
                                     sqxDropOnlyImages="true">
                                     @if (uploading) {
-                                        <div class="app-progress">
-                                            <sqx-progress-bar mode="Circle" [value]="uploadProgress"></sqx-progress-bar>
-                                        </div>
+                                        <div class="app-progress"><sqx-progress-bar mode="Circle" [value]="uploadProgress" /></div>
                                     } @else {
                                         <div>
-                                            <sqx-avatar [identifier]="app.name" [image]="app.image" size="150"></sqx-avatar>
+                                            <sqx-avatar [identifier]="app.name" [image]="app.image" size="150" />
                                             @if (isEditableImage && app.image) {
-                                                <button
-                                                    class="btn btn-danger btn-sm app-image-remove"
-                                                    (click)="removeImage()"
-                                                    title="i18n:apps.removeImage">
+                                                <button class="btn btn-danger btn-sm app-image-remove" (click)="removeImage()" title="i18n:apps.removeImage">
                                                     <i class="icon-bin2"></i>
                                                 </button>
                                             }
                                         </div>
+
                                         <div class="drop-overlay align-items-center justify-content-center">
                                             <div class="drop-overlay-background"></div>
+
                                             <div class="drop-overlay-text">{{ "apps.imageDrop" | sqxTranslate }}</div>
                                         </div>
                                     }
                                 </div>
                             </div>
-                            <div class="col align-self-center">
-                                <sqx-form-hint>
-                                    {{ "apps.uploadImage" | sqxTranslate }}
-                                </sqx-form-hint>
 
+                            <div class="col align-self-center">
+                                <sqx-form-hint> {{ "apps.uploadImage" | sqxTranslate }} </sqx-form-hint>
                                 <span class="btn btn-success upload-button" [class.disabled]="!isEditableImage" (click)="fileInput.click()">
                                     <span>{{ "apps.uploadImageButton" | sqxTranslate }}</span>
-
                                     <input
                                         #fileInput
                                         accept="image/x-png,image/gif,image/jpeg"
@@ -102,19 +89,19 @@
                         <div class="row pt-2 g-2">
                             <div class="col-6">
                                 <h5>{{ "apps.transferTitle" | sqxTranslate }}</h5>
-
-                                <sqx-form-hint>
-                                    {{ "apps.transferWarning" | sqxTranslate }}
-                                </sqx-form-hint>
+                                <sqx-form-hint> {{ "apps.transferWarning" | sqxTranslate }} </sqx-form-hint>
                             </div>
+
                             <div class="col">
                                 <select class="form-select" formControlName="teamId">
                                     <option [ngValue]="null">-</option>
+
                                     @for (team of teamsState.snapshot.teams; track team) {
                                         <option [ngValue]="team.id">{{ team.name }}</option>
                                     }
                                 </select>
                             </div>
+
                             <div class="col-auto">
                                 <button class="btn btn-primary" [disabled]="!isTransferable" type="button" type="submit">
                                     {{ "apps.transfer" | sqxTranslate }}
@@ -128,11 +115,9 @@
                     <div class="row">
                         <div class="col">
                             <h5>{{ "apps.delete" | sqxTranslate }}</h5>
-
-                            <sqx-form-hint>
-                                {{ "apps.deleteWarning" | sqxTranslate }}
-                            </sqx-form-hint>
+                            <sqx-form-hint> {{ "apps.deleteWarning" | sqxTranslate }} </sqx-form-hint>
                         </div>
+
                         <div class="col-auto">
                             <button
                                 class="btn btn-danger"
@@ -149,7 +134,6 @@
             </ng-container>
         </sqx-list-view>
     </ng-container>
-
     <ng-template sidebarMenu>
         <div class="panel-nav">
             <a
@@ -164,7 +148,6 @@
                 titlePosition="left">
                 <i class="icon-time"></i>
             </a>
-
             <a
                 class="panel-link"
                 attr.aria-label="{{ 'common.help' | sqxTranslate }}"
@@ -180,5 +163,4 @@
         </div>
     </ng-template>
 </sqx-layout>
-
 <router-outlet></router-outlet>

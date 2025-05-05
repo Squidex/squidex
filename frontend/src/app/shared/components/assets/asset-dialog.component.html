@@ -1,9 +1,6 @@
 <form [formGroup]="annotateForm.form" (ngSubmit)="annotateAsset()">
     <sqx-modal-dialog (dialogClose)="dialogClose.emit()" fullHeight="true" hasTabs="true" showFooter="false" size="xl">
-        <ng-container title>
-            {{ "assets.edit" | sqxTranslate }}
-        </ng-container>
-
+        <ng-container title> {{ "assets.edit" | sqxTranslate }} </ng-container>
         <ng-container tabs>
             <div class="row align-items-center">
                 <div class="col">
@@ -13,6 +10,7 @@
                                 {{ "assets.tabMetadata" | sqxTranslate }}
                             </a>
                         </li>
+
                         <li class="nav-item">
                             @if (isImage) {
                                 <a class="nav-link" [class.active]="selectedTab === 1" (click)="selectTab(1)">
@@ -20,6 +18,7 @@
                                 </a>
                             }
                         </li>
+
                         <li class="nav-item">
                             @if (isImage) {
                                 <a class="nav-link" [class.active]="selectedTab === 2" (click)="selectTab(2)">
@@ -27,6 +26,7 @@
                                 </a>
                             }
                         </li>
+
                         <li class="nav-item">
                             @if (isDocumentLikely) {
                                 <a class="nav-link" [class.active]="selectedTab === 3" (click)="selectTab(3)">
@@ -34,6 +34,7 @@
                                 </a>
                             }
                         </li>
+
                         <li class="nav-item">
                             @if (isVideo || (asset | sqxPreviewable)) {
                                 <a class="nav-link" [class.active]="selectedTab === 4" (click)="selectTab(4)">
@@ -41,6 +42,7 @@
                                 </a>
                             }
                         </li>
+
                         <li class="nav-item">
                             <a class="nav-link" [class.active]="selectedTab === 5" (click)="selectTab(5)">
                                 {{ "assets.tabHistory" | sqxTranslate }}
@@ -48,6 +50,7 @@
                         </li>
                     </ul>
                 </div>
+
                 <div class="col-auto">
                     @switch (selectedTab) {
                         @case (0) {
@@ -55,21 +58,19 @@
                                 {{ "common.save" | sqxTranslate }}
                             </button>
                         }
+
                         @case (1) {
-                            <button
-                                class="btn btn-primary"
-                                [class.invisible]="!isUploadable"
-                                (click)="cropImage()"
-                                [disabled]="progress > 0"
-                                type="button">
+                            <button class="btn btn-primary" [class.invisible]="!isUploadable" (click)="cropImage()" [disabled]="progress > 0" type="button">
                                 {{ "common.upload" | sqxTranslate }}
                             </button>
                         }
+
                         @case (2) {
                             <button class="btn btn-primary" [class.invisible]="!isEditable" (click)="setFocusPoint()" type="button">
                                 {{ "common.save" | sqxTranslate }}
                             </button>
                         }
+
                         @case (3) {
                             <button class="btn btn-primary" [class.invisible]="!isUploadable" (click)="saveText()" type="button">
                                 {{ "common.upload" | sqxTranslate }}
@@ -79,36 +80,30 @@
                 </div>
             </div>
         </ng-container>
-
         <ng-container content>
             @switch (selectedTab) {
                 @case (0) {
                     <div class="metadata">
-                        <sqx-form-error [error]="annotateForm.error | async"></sqx-form-error>
+                        <sqx-form-error [error]="annotateForm.error | async" />
                         <div class="form-group g-0">
                             <label for="id">{{ "common.folder" | sqxTranslate }}</label>
                             <div class="path">
                                 @if (isMoving) {
                                     <form [formGroup]="moveForm.form" (ngSubmit)="moveAsset()">
                                         <div class="row align-items-center g-2">
-                                            <div class="col">
-                                                <sqx-asset-folder-dropdown formControlName="parentId"></sqx-asset-folder-dropdown>
-                                            </div>
+                                            <div class="col"><sqx-asset-folder-dropdown formControlName="parentId" /></div>
+
                                             <div class="col-auto">
-                                                <button class="btn btn-primary" type="submit">
-                                                    {{ "assets.move" | sqxTranslate }}
-                                                </button>
+                                                <button class="btn btn-primary" type="submit">{{ "assets.move" | sqxTranslate }}</button>
                                             </div>
                                         </div>
                                     </form>
                                 } @else {
                                     <div class="row align-items-center g-2">
                                         <div class="col">
-                                            <sqx-asset-path
-                                                all="true"
-                                                (navigate)="navigate($event.id)"
-                                                [path]="pathItems | async"></sqx-asset-path>
+                                            <sqx-asset-path all="true" (navigate)="navigate($event.id)" [path]="pathItems | async" />
                                         </div>
+
                                         @if (isMoveable) {
                                             <div class="col-auto">
                                                 <button class="btn btn-outline-secondary" (click)="startMoving()" type="button">
@@ -120,6 +115,7 @@
                                 }
                             </div>
                         </div>
+
                         <div class="form-group">
                             <label for="id">{{ "common.id" | sqxTranslate }}</label>
                             <div class="input-group">
@@ -129,56 +125,43 @@
                                 </button>
                             </div>
                         </div>
+
                         <div class="form-group">
                             <label for="url">{{ "common.url" | sqxTranslate }}</label>
                             <div class="input-group">
-                                <input
-                                    class="form-control"
-                                    id="url"
-                                    #inputUrl
-                                    name="url"
-                                    readonly
-                                    value="{{ asset | sqxAssetUrl: asset.version : false }}" />
+                                <input class="form-control" id="url" #inputUrl name="url" readonly value="{{ asset | sqxAssetUrl: asset.version : false }}" />
                                 <button class="btn btn-outline-secondary" [sqxCopy]="inputUrl" type="button">
                                     <i class="icon-copy"></i>
                                 </button>
                             </div>
                         </div>
+
                         <div class="form-group">
-                            <label for="fileName">{{ "common.name" | sqxTranslate }}</label>
-                            <sqx-control-errors for="fileName"></sqx-control-errors>
+                            <label for="fileName">{{ "common.name" | sqxTranslate }}</label> <sqx-control-errors for="fileName" />
                             <input class="form-control" id="fileName" formControlName="fileName" spellcheck="false" />
                         </div>
+
                         <div class="form-group">
-                            <label for="slug">{{ "common.slug" | sqxTranslate }}</label>
-                            <sqx-control-errors for="slug"></sqx-control-errors>
-                            <input
-                                class="form-control slug"
-                                id="slug"
-                                formControlName="slug"
-                                spellcheck="false"
-                                sqxTransformInput="Slugify" />
+                            <label for="slug">{{ "common.slug" | sqxTranslate }}</label> <sqx-control-errors for="slug" />
+                            <input class="form-control slug" id="slug" formControlName="slug" spellcheck="false" sqxTransformInput="Slugify" />
                             <button class="btn btn-text-secondary btn-sm slug-generate" (click)="generateSlug()" type="button">
                                 {{ "common.generate" | sqxTranslate }}
                             </button>
                         </div>
+
                         @if (annotateTags | async; as tags) {
                             <div class="form-group">
-                                <label>{{ "common.tags" | sqxTranslate }}</label>
-                                <sqx-control-errors for="tags"></sqx-control-errors>
-                                <sqx-tag-editor
-                                    allowDuplicates="false"
-                                    formControlName="tags"
-                                    [itemsSource]="tags"
-                                    undefinedWhenEmpty="false"></sqx-tag-editor>
+                                <label>{{ "common.tags" | sqxTranslate }}</label> <sqx-control-errors for="tags" />
+                                <sqx-tag-editor allowDuplicates="false" formControlName="tags" [itemsSource]="tags" undefinedWhenEmpty="false" />
                             </div>
                         }
+
                         <div class="form-group">
                             <label>{{ "assets.metadata" | sqxTranslate }}</label>
                             @for (form of annotateForm.metadataControls; track form; let i = $index) {
                                 <div class="metadata-row row g-0" [formGroup]="form">
                                     <div class="col col-name pe-1">
-                                        <sqx-control-errors fieldName="Name" for="name"></sqx-control-errors>
+                                        <sqx-control-errors fieldName="Name" for="name" />
                                         <input
                                             class="form-control"
                                             formControlName="name"
@@ -186,13 +169,12 @@
                                             placeholder="{{ 'common.name' | sqxTranslate }}"
                                             spellcheck="false" />
                                     </div>
+
                                     <div class="col pe-1">
-                                        <sqx-control-errors fieldName="Value" for="value"></sqx-control-errors>
-                                        <input
-                                            class="form-control"
-                                            formControlName="value"
-                                            placeholder="{{ 'common.value' | sqxTranslate }}" />
+                                        <sqx-control-errors fieldName="Value" for="value" />
+                                        <input class="form-control" formControlName="value" placeholder="{{ 'common.value' | sqxTranslate }}" />
                                     </div>
+
                                     <div class="col-auto col-options">
                                         <button
                                             class="btn btn-text-danger"
@@ -207,24 +189,22 @@
                                     </div>
                                 </div>
                             }
+
                             <div class="form-group">
-                                <button
-                                    class="btn btn-success"
-                                    (click)="annotateForm.metadata.add()"
-                                    [disabled]="!isEditable"
-                                    type="button">
+                                <button class="btn btn-success" (click)="annotateForm.metadata.add()" [disabled]="!isEditable" type="button">
                                     {{ "assets.metadataAdd" | sqxTranslate }}
                                 </button>
                             </div>
                         </div>
+
                         <div class="form-group form-check">
                             <input class="form-check-input" id="isProtected" formControlName="isProtected" type="checkbox" />
                             <label class="form-check-label" for="isProtected">{{ "assets.protected" | sqxTranslate }}</label>
-                            <sqx-form-hint>
-                                {{ "assets.protectedHint" | sqxTranslate }}
-                            </sqx-form-hint>
+                            <sqx-form-hint> {{ "assets.protectedHint" | sqxTranslate }} </sqx-form-hint>
                         </div>
+
                         <hr />
+
                         <div class="form-group">
                             <a [routerLink]="['../content/__references', asset.id]" target="_blank">
                                 {{ "assets.viewReferences" | sqxTranslate }}
@@ -232,66 +212,50 @@
                         </div>
                     </div>
                 }
+
                 @case (1) {
                     <div class="editor">
-                        <sqx-image-editor [imageSource]="asset | sqxAssetPreviewUrl"></sqx-image-editor>
+                        <sqx-image-editor [imageSource]="asset | sqxAssetPreviewUrl" />
                         @if (progress > 0) {
                             <div class="editor-progress">
-                                <sqx-progress-bar
-                                    strokeWidth="2"
-                                    trailColor="transparent"
-                                    trailWidth="0"
-                                    [value]="progress"></sqx-progress-bar>
+                                <sqx-progress-bar strokeWidth="2" trailColor="transparent" trailWidth="0" [value]="progress" />
                             </div>
                         }
                     </div>
                 }
+
                 @case (2) {
                     <div>
-                        <sqx-image-focus-point
-                            [focusPoint]="asset.metadata"
-                            [imageSource]="asset | sqxAssetPreviewUrl"></sqx-image-focus-point>
+                        <sqx-image-focus-point [focusPoint]="asset.metadata" [imageSource]="asset | sqxAssetPreviewUrl" />
                         @if (progress > 0) {
                             <div class="editor-progress">
-                                <sqx-progress-bar
-                                    strokeWidth="2"
-                                    trailColor="transparent"
-                                    trailWidth="0"
-                                    [value]="progress"></sqx-progress-bar>
+                                <sqx-progress-bar strokeWidth="2" trailColor="transparent" trailWidth="0" [value]="progress" />
                             </div>
                         }
                     </div>
                 }
+
                 @case (3) {
                     <div class="editor">
-                        <sqx-asset-text-editor
-                            [fileName]="asset.fileName"
-                            [fileSource]="asset | sqxAssetPreviewUrl"
-                            [mimeType]="asset.mimeType"></sqx-asset-text-editor>
+                        <sqx-asset-text-editor [fileName]="asset.fileName" [fileSource]="asset | sqxAssetPreviewUrl" [mimeType]="asset.mimeType" />
                         @if (progress > 0) {
                             <div class="editor-progress">
-                                <sqx-progress-bar
-                                    strokeWidth="2"
-                                    trailColor="transparent"
-                                    trailWidth="0"
-                                    [value]="progress"></sqx-progress-bar>
+                                <sqx-progress-bar strokeWidth="2" trailColor="transparent" trailWidth="0" [value]="progress" />
                             </div>
                         }
                     </div>
                 }
+
                 @case (4) {
                     @if (asset | sqxPreviewable) {
-                        <ngx-doc-viewer
-                            [style]="{}"
-                            style="width: 100%; height: 50vh"
-                            [url]="asset | sqxAssetPreviewUrl"
-                            viewer="google"></ngx-doc-viewer>
+                        <ngx-doc-viewer [style]="{}" style="width: 100%; height: 50vh" [url]="asset | sqxAssetPreviewUrl" viewer="google"></ngx-doc-viewer>
                     } @else {
-                        <sqx-video-player [mimeType]="asset.mimeType" [source]="asset | sqxAssetPreviewUrl"></sqx-video-player>
+                        <sqx-video-player [mimeType]="asset.mimeType" [source]="asset | sqxAssetPreviewUrl" />
                     }
                 }
+
                 @case (5) {
-                    <sqx-asset-history [asset]="asset"></sqx-asset-history>
+                    <sqx-asset-history [asset]="asset" />
                 }
             }
         </ng-container>
