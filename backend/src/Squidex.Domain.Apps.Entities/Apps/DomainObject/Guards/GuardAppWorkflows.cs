@@ -49,7 +49,7 @@ public static class GuardAppWorkflows
 
             if (!workflow.Steps.ContainsKey(workflow.Initial))
             {
-                e(Not.Defined("InitialStepId"), $"{nameof(command.Workflow)}.{nameof(workflow.Initial)}");
+                e(Not.Defined("InitialStep"), $"{nameof(command.Workflow)}.{nameof(workflow.Initial)}");
             }
 
             if (workflow.Initial == Status.Published)

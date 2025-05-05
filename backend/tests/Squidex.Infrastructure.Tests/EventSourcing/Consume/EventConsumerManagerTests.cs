@@ -64,11 +64,10 @@ public class EventConsumerManagerTests
         var actual = await sut.GetConsumersAsync(default);
 
         actual.Should().BeEquivalentTo(
-            new List<EventConsumerInfo>
-            {
+            [
                 new EventConsumerInfo { Name = consumerName1, Position = "1" },
                 new EventConsumerInfo { Name = consumerName2, Position = "2" },
-            });
+            ]);
     }
 
     [Fact]

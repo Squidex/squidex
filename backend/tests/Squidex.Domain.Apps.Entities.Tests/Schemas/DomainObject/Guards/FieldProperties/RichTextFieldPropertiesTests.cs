@@ -31,10 +31,9 @@ public class RichTextFieldPropertiesTests : IClassFixture<TranslationsFixture>
         var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Max length must be greater or equal to min length.", "MinLength", "MaxLength"),
-            });
+            ]);
     }
 
     [Fact]
@@ -55,10 +54,9 @@ public class RichTextFieldPropertiesTests : IClassFixture<TranslationsFixture>
         var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Max characters must be greater or equal to min characters.", "MinCharacters", "MaxCharacters"),
-            });
+            ]);
     }
 
     [Fact]
@@ -79,10 +77,9 @@ public class RichTextFieldPropertiesTests : IClassFixture<TranslationsFixture>
         var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Max words must be greater or equal to min words.", "MinWords", "MaxWords"),
-            });
+            ]);
     }
 
     [Fact]

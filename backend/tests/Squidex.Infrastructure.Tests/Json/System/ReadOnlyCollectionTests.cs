@@ -38,11 +38,11 @@ public class ReadOnlyCollectionTests
     {
         var source = new MyClass<IReadOnlyList<int>>
         {
-            Values = new List<int>
-            {
+            Values =
+            [
                 2,
                 3,
-            },
+            ],
         };
 
         var serialized = source.SerializeAndDeserializeJson();

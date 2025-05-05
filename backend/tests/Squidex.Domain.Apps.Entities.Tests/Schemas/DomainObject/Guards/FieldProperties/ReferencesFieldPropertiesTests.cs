@@ -21,10 +21,9 @@ public class ReferencesFieldPropertiesTests : IClassFixture<TranslationsFixture>
         var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Max items must be greater or equal to min items.", "MinItems", "MaxItems"),
-            });
+            ]);
     }
 
     [Fact]
@@ -35,10 +34,9 @@ public class ReferencesFieldPropertiesTests : IClassFixture<TranslationsFixture>
         var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Editor is not a valid value.", "Editor"),
-            });
+            ]);
     }
 
     [Fact]
@@ -49,10 +47,9 @@ public class ReferencesFieldPropertiesTests : IClassFixture<TranslationsFixture>
         var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Can only resolve references when MaxItems is 1.", "ResolveReference", "MaxItems"),
-            });
+            ]);
     }
 
     [Fact]

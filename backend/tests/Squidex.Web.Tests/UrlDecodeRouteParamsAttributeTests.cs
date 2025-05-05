@@ -22,10 +22,10 @@ public class UrlDecodeRouteParamsAttributeTests
 
         var actionContext = new ActionContext(new DefaultHttpContext(), new RouteData(), new ActionDescriptor
         {
-            FilterDescriptors = new List<FilterDescriptor>(),
+            FilterDescriptors = [],
         });
 
-        var actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object?>
+        var actionExecutingContext = new ActionExecutingContext(actionContext, [], new Dictionary<string, object?>
         {
             ["key"] = "path%2Fto%2Fsomething",
         }, null!);

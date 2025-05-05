@@ -48,7 +48,7 @@ public sealed partial class ScriptingCompleter(IEnumerable<IScriptDescriptor> de
             case "Usage":
                 return UsageTrigger();
             default:
-                return new List<ScriptingValue>();
+                return [];
         }
     }
 

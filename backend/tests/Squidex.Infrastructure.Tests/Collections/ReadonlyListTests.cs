@@ -79,12 +79,12 @@ public class ReadonlyListTests
     [Fact]
     public void Should_serialize_and_deserialize_inherited()
     {
-        var sut = new Inherited(new List<int>
-        {
+        var sut = new Inherited(
+        [
             1,
             2,
             3,
-        });
+        ]);
 
         var serialized = sut.SerializeAndDeserializeJson();
 

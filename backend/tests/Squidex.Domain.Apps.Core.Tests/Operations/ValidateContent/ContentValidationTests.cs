@@ -47,10 +47,9 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         await data.ValidateAsync(languages.ToResolver(), errors, schema, factory: validatorFactory);
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Validation failed with internal error.", "myField.iv"),
-            });
+            ]);
     }
 
     [Fact]
@@ -78,10 +77,9 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         await data.ValidateAsync(languages.ToResolver(), errors, schema, factory: validatorFactory);
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Validation failed with internal error.", "myField"),
-            });
+            ]);
     }
 
     [Fact]
@@ -95,10 +93,9 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         await data.ValidateAsync(languages.ToResolver(), errors, schema);
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Not a known field.", "unknown"),
-            });
+            ]);
     }
 
     [Fact]
@@ -116,10 +113,9 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         await data.ValidateAsync(languages.ToResolver(), errors, schema);
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Must be less or equal to 100.", "myField.iv"),
-            });
+            ]);
     }
 
     [Fact]
@@ -137,11 +133,10 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         await data.ValidateAsync(languages.ToResolver(), errors, schema);
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Not a known invariant value.", "myField.es"),
                 new ValidationError("Not a known invariant value.", "myField.it"),
-            });
+            ]);
     }
 
     [Fact]
@@ -156,11 +151,10 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         await data.ValidateAsync(languages.ToResolver(), errors, schema);
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Field is required.", "myField.de"),
                 new ValidationError("Field is required.", "myField.en"),
-            });
+            ]);
     }
 
     [Fact]
@@ -175,10 +169,9 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         await data.ValidateAsync(languages.ToResolver(), errors, schema);
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Field is required.", "myField.iv"),
-            });
+            ]);
     }
 
     [Fact]
@@ -193,10 +186,9 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         await data.ValidateAsync(languages.ToResolver(), errors, schema);
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Field is required.", "myField.iv"),
-            });
+            ]);
     }
 
     [Fact]
@@ -214,10 +206,9 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         await data.ValidateAsync(languages.ToResolver(), errors, schema);
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Not a known language.", "myField.ru"),
-            });
+            ]);
     }
 
     [Fact]
@@ -258,11 +249,10 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         await data.ValidateAsync(languages.ToResolver(), errors, schema);
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Not a known language.", "myField.es"),
                 new ValidationError("Not a known language.", "myField.it"),
-            });
+            ]);
     }
 
     [Fact]
@@ -276,10 +266,9 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         await data.ValidatePartialAsync(languages.ToResolver(), errors, schema);
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Not a known field.", "unknown"),
-            });
+            ]);
     }
 
     [Fact]
@@ -297,10 +286,9 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         await data.ValidatePartialAsync(languages.ToResolver(), errors, schema);
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Must be less or equal to 100.", "myField.iv"),
-            });
+            ]);
     }
 
     [Fact]
@@ -318,11 +306,10 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         await data.ValidatePartialAsync(languages.ToResolver(), errors, schema);
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Not a known invariant value.", "myField.es"),
                 new ValidationError("Not a known invariant value.", "myField.it"),
-            });
+            ]);
     }
 
     [Fact]
@@ -368,10 +355,9 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         await data.ValidatePartialAsync(languages.ToResolver(), errors, schema);
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Not a known language.", "myField.ru"),
-            });
+            ]);
     }
 
     [Fact]
@@ -389,11 +375,10 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         await data.ValidatePartialAsync(languages.ToResolver(), errors, schema);
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Not a known language.", "myField.es"),
                 new ValidationError("Not a known language.", "myField.it"),
-            });
+            ]);
     }
 
     [Fact]
@@ -415,11 +400,10 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         await data.ValidatePartialAsync(languages.ToResolver(), errors, schema);
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Field is required.", "myField.iv[1].myNested"),
                 new ValidationError("Field is required.", "myField.iv[3].myNested"),
-            });
+            ]);
     }
 
     [Fact]
@@ -469,10 +453,9 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         await data.ValidatePartialAsync(languages.ToResolver(), errors, schema);
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Field is required.", "myField.iv"),
-            });
+            ]);
     }
 
     [Fact]
@@ -492,10 +475,9 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         await data.ValidatePartialAsync(languages.ToResolver(), errors, schema);
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Field is required.", "myField.iv"),
-            });
+            ]);
     }
 
     [Fact]
@@ -513,10 +495,9 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         await data.ValidateAsync(languages.ToResolver(), errors, schema);
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Field is required.", "myField.iv"),
-            });
+            ]);
     }
 
     [Fact]
@@ -536,9 +517,8 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
         await data.ValidateAsync(languages.ToResolver(), errors, schema);
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Field is required.", "myField.iv"),
-            });
+            ]);
     }
 }

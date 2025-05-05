@@ -31,7 +31,7 @@ public class GuardAssetTests : GivenContext, IClassFixture<TranslationsFixture>
         var operation = Operation(CreateAsset());
 
         A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId.Id, parentId, CancellationToken))
-            .Returns(new List<AssetFolder>());
+            .Returns([]);
 
         await ValidationAssert.ThrowsAsync(() => operation.MustMoveToValidFolder(parentId, CancellationToken),
             new ValidationError("Asset folder does not exist.", "ParentId"));
@@ -45,7 +45,7 @@ public class GuardAssetTests : GivenContext, IClassFixture<TranslationsFixture>
         var operation = Operation(CreateAsset());
 
         A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId.Id, parentId, CancellationToken))
-            .Returns(new List<AssetFolder> { CreateAssetFolder() });
+            .Returns([CreateAssetFolder()]);
 
         await operation.MustMoveToValidFolder(parentId, CancellationToken);
     }

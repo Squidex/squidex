@@ -22,10 +22,9 @@ public class UsageTriggerValidationTests : GivenContext, IClassFixture<Translati
         var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider, CancellationToken);
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Num days must be between 1 and 30.", "NumDays"),
-            });
+            ]);
     }
 
     [Fact]
@@ -36,10 +35,9 @@ public class UsageTriggerValidationTests : GivenContext, IClassFixture<Translati
         var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider, CancellationToken);
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Num days must be between 1 and 30.", "NumDays"),
-            });
+            ]);
     }
 
     [Fact]

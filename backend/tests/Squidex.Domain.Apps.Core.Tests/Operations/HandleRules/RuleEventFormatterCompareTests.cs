@@ -834,7 +834,7 @@ public class RuleEventFormatterCompareTests
         var @event = new EnrichedContentEvent { AppId = appId, User = user };
 
         A.CallTo(() => user.Claims)
-            .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Donald Duck") });
+            .Returns([new Claim(SquidexClaimTypes.DisplayName, "Donald Duck")]);
 
         var actual = await sut.RenderAsync(script, @event);
 
@@ -853,7 +853,7 @@ public class RuleEventFormatterCompareTests
         var @event = new EnrichedContentEvent { AppId = appId, User = user };
 
         A.CallTo(() => user.Claims)
-            .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Donald Duck") });
+            .Returns([new Claim(SquidexClaimTypes.DisplayName, "Donald Duck")]);
 
         var actual = await sut.RenderAsync(script, @event);
 
@@ -872,7 +872,7 @@ public class RuleEventFormatterCompareTests
         var @event = new EnrichedContentEvent { AppId = appId, User = user };
 
         A.CallTo(() => user.Claims)
-            .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Donald Duck  ") });
+            .Returns([new Claim(SquidexClaimTypes.DisplayName, "Donald Duck  ")]);
 
         var actual = await sut.RenderAsync(script, @event);
 
@@ -891,7 +891,7 @@ public class RuleEventFormatterCompareTests
         var @event = new EnrichedContentEvent { AppId = appId, User = user };
 
         A.CallTo(() => user.Claims)
-            .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Donald Duck") });
+            .Returns([new Claim(SquidexClaimTypes.DisplayName, "Donald Duck")]);
 
         var actual = await sut.RenderAsync(script, @event);
 
@@ -910,7 +910,7 @@ public class RuleEventFormatterCompareTests
         var @event = new EnrichedContentEvent { AppId = appId, User = user };
 
         A.CallTo(() => user.Claims)
-            .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Donald Duck  ") });
+            .Returns([new Claim(SquidexClaimTypes.DisplayName, "Donald Duck  ")]);
 
         var actual = await sut.RenderAsync(script, @event);
 
@@ -929,7 +929,7 @@ public class RuleEventFormatterCompareTests
         var @event = new EnrichedContentEvent { AppId = appId, User = user };
 
         A.CallTo(() => user.Claims)
-            .Returns(new List<Claim> { new Claim(SquidexClaimTypes.DisplayName, "Donald\"Duck") });
+            .Returns([new Claim(SquidexClaimTypes.DisplayName, "Donald\"Duck")]);
 
         var actual = await sut.RenderAsync(script, @event);
 

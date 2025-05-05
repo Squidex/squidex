@@ -36,10 +36,10 @@ public class AppResolverTests : GivenContext
     {
         actionContext = new ActionContext(httpContext, new RouteData(), new ActionDescriptor
         {
-            EndpointMetadata = new List<object>(),
+            EndpointMetadata = [],
         });
 
-        actionExecutingContext = new ActionExecutingContext(actionContext, new List<IFilterMetadata>(), new Dictionary<string, object?>(), this);
+        actionExecutingContext = new ActionExecutingContext(actionContext, [], new Dictionary<string, object?>(), this);
         actionExecutingContext.HttpContext = httpContext;
         actionExecutingContext.RouteData.Values["app"] = AppId.Name;
 

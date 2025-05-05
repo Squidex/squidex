@@ -342,11 +342,11 @@ public class CollectionExtensionsTests
         var actual = source.Batch(2).ToArray();
 
         actual.Should().BeEquivalentTo(
-            new[]
+            new List<int>[]
             {
-                new List<int> { 1, 2 },
-                new List<int> { 3, 4 },
-                new List<int> { 5 },
+                [1, 2],
+                [3, 4],
+                [5],
             });
     }
 
@@ -358,11 +358,11 @@ public class CollectionExtensionsTests
         var actual = await source.ToAsyncEnumerable().Batch(2).ToArrayAsync();
 
         actual.Should().BeEquivalentTo(
-            new[]
+            new List<int>[]
             {
-                new List<int> { 1, 2 },
-                new List<int> { 3, 4 },
-                new List<int> { 5 },
+                [1, 2],
+                [3, 4],
+                [5],
             });
     }
 }

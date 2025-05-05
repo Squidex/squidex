@@ -32,7 +32,7 @@ public class AssetFolderDomainObjectTests : HandlerTestBase<AssetFolder>
     public AssetFolderDomainObjectTests()
     {
         A.CallTo(() => assetQuery.FindAssetFolderAsync(AppId.Id, parentId, A<CancellationToken>._))
-            .Returns(new List<AssetFolder> { A.Fake<AssetFolder>() });
+            .Returns([A.Fake<AssetFolder>()]);
 
         var log = A.Fake<ILogger<AssetFolderDomainObject>>();
 

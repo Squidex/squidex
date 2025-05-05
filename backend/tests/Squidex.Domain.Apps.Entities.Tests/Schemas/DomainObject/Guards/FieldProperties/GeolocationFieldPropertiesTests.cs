@@ -21,9 +21,8 @@ public class GeolocationFieldPropertiesTests : IClassFixture<TranslationsFixture
         var errors = FieldPropertiesValidator.Validate(sut).ToList();
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Editor is not a valid value.", "Editor"),
-            });
+            ]);
     }
 }

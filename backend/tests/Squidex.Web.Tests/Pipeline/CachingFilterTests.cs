@@ -68,10 +68,10 @@ public class CachingFilterTests
     [InlineData("W/\"13\"", "W/\"13\"")]
     public async Task Should_not_return_304_for_same_etags_when_disabled_via_metadata(string ifNoneMatch, string etag)
     {
-        executingContext.ActionDescriptor.EndpointMetadata = new List<object>
-        {
+        executingContext.ActionDescriptor.EndpointMetadata =
+        [
             new IgnoreCacheFilterAttribute(),
-        };
+        ];
 
         httpContext.Request.Method = HttpMethods.Get;
         httpContext.Request.Headers[HeaderNames.IfNoneMatch] = ifNoneMatch;

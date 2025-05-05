@@ -28,10 +28,9 @@ public class ContentChangedTriggerTests : GivenContext, IClassFixture<Translatio
         var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider, CancellationToken);
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError("Schema ID is required.", "Schemas"),
-            });
+            ]);
 
         A.CallTo(() => AppProvider.GetSchemaAsync(AppId.Id, A<DomainId>._, false, default))
             .MustNotHaveHappened();
@@ -51,10 +50,9 @@ public class ContentChangedTriggerTests : GivenContext, IClassFixture<Translatio
         var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider, CancellationToken);
 
         errors.Should().BeEquivalentTo(
-            new List<ValidationError>
-            {
+            [
                 new ValidationError($"Schema {SchemaId.Id} does not exist.", "Schemas"),
-            });
+            ]);
     }
 
     [Fact]
