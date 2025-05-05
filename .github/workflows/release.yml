@@ -37,7 +37,7 @@ jobs:
           dotnet-version: 8.0.x
 
       - name: Test - TestContainers
-        run: dotnet test backend/Squidex.sln --filter Category=TestContainers
+        run: dotnet test backend/Squidex.sln --filter Category=TestContainer
 
   test-mongo:
     runs-on: ubuntu-latest

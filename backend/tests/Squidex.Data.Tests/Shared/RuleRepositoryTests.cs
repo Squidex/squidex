@@ -10,6 +10,7 @@ using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
+using Squidex.Flows.Internal;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 
@@ -52,6 +53,7 @@ public abstract class RuleRepositoryTests
             Name = "rule1",
             Created = created,
             CreatedBy = createdBy,
+            Flow = new FlowDefinition(),
         };
 
         var rule2 = new Rule
@@ -61,6 +63,7 @@ public abstract class RuleRepositoryTests
             Name = "rule2",
             Created = created,
             CreatedBy = createdBy,
+            Flow = new FlowDefinition(),
         };
 
         var otherApp = new Rule
@@ -70,6 +73,7 @@ public abstract class RuleRepositoryTests
             Name = "rule3",
             Created = created,
             CreatedBy = createdBy,
+            Flow = new FlowDefinition(),
         };
 
         await PrepareAsync(sut, [
@@ -107,6 +111,7 @@ public abstract class RuleRepositoryTests
             AppId = appId,
             Id = DomainId.NewGuid(),
             Name = "my-rule",
+            Flow = new FlowDefinition(),
         };
 
         var rule2 = new Rule
@@ -114,6 +119,7 @@ public abstract class RuleRepositoryTests
             AppId = appId,
             Id = DomainId.NewGuid(),
             Name = "my-rule",
+            Flow = new FlowDefinition(),
         };
 
         await PrepareAsync(sut, [
