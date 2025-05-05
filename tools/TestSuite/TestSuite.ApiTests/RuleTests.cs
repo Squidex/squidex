@@ -57,7 +57,6 @@ public class RuleTests(ClientFixture fixture) : IClassFixture<ClientFixture>
         var rule = await app.Rules.PostRuleAsync(createRule);
 
         Assert.IsType<WebhookRuleActionDto>(rule.Action);
-
         await Verify(rule);
     }
 
@@ -88,7 +87,6 @@ public class RuleTests(ClientFixture fixture) : IClassFixture<ClientFixture>
         var rule = await app.Rules.PostRuleAsync(createRule);
 
         Assert.IsType<WebhookRuleActionDto>(rule.Action);
-
         await Verify(rule);
     }
 
@@ -137,7 +135,6 @@ public class RuleTests(ClientFixture fixture) : IClassFixture<ClientFixture>
         var rule_1 = await app.Rules.PutRuleAsync(rule_0.Id, updateRequest);
 
         Assert.Equal(ruleName, rule_1.Name);
-
         await Verify(rule_1);
     }
 
