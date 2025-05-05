@@ -27,8 +27,7 @@ public sealed partial class EFContentRepository<TContext, TContentContext>(
 {
     private readonly DynamicTables<TContext, TContentContext> dynamicTables = new DynamicTables<TContext, TContentContext>(dbContextFactory, dbContentContextFactory);
 
-    public async Task<Content?> FindContentAsync(App app, Schema schema, DomainId id, SearchScope scope,
-        IEnumerable<string>? fields, // TODO: Not used yet
+    public async Task<Content?> FindContentAsync(App app, Schema schema, DomainId id, SearchScope scope, IEnumerable<string>? fields, // TODO: Not used yet
         CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("EFContentRepository/FindContentAsync"))

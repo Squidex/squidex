@@ -106,8 +106,7 @@ public partial class MongoContentRepository(
         return GetCollection(scope).QueryAsync(app, schema, q, ct);
     }
 
-    public Task<Content?> FindContentAsync(App app, Schema schema, DomainId id, SearchScope scope,
-        IEnumerable<string>? fields,
+    public Task<Content?> FindContentAsync(App app, Schema schema, DomainId id, SearchScope scope, IEnumerable<string>? fields,
         CancellationToken ct = default)
     {
         return GetCollection(scope).FindContentAsync(schema, id, fields, ct);
