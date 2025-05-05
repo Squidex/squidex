@@ -245,7 +245,7 @@
     <value>文件</value>
   </data>
   <data name="common.flow" xml:space="preserve">
-    <value>Field</value>
+    <value>Flow</value>
   </data>
   <data name="common.folderName" xml:space="preserve">
     <value>文件夹名称</value>

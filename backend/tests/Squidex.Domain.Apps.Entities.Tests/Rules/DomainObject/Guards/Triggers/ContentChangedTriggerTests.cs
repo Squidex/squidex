@@ -40,7 +40,7 @@ public class ContentChangedTriggerTests : GivenContext, IClassFixture<Translatio
     [Fact]
     public async Task Should_add_error_if_schemas_ids_are_not_valid()
     {
-        A.CallTo(() => AppProvider.GetSchemaAsync(AppId.Id, SchemaId.Id, false, default))
+        A.CallTo(() => AppProvider.GetSchemaAsync(AppId.Id, SchemaId.Id, false, CancellationToken))
             .Returns(Task.FromResult<Schema?>(null));
 
         var trigger = new ContentChangedTriggerV2

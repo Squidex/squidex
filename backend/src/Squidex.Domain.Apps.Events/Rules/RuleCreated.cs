@@ -21,7 +21,7 @@ public sealed class RuleCreated : RuleEvent, IMigrated<IEvent>
 
     public FlowDefinition Flow { get; set; }
 
-    public bool IsEnabled { get; set; }
+    public bool? IsEnabled { get; set; }
 
     public IEvent Migrate()
     {

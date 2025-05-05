@@ -6,8 +6,8 @@
       Trigger: {
         HandleAll: true
       },
-      Action: {
-        Value: 456
+      Flow: {
+        InitialStepId: Guid_3
       },
       IsEnabled: true,
       UniqueId: Guid_1--Guid_2,
@@ -25,15 +25,15 @@
     {
       Headers: {
         AggregateId: Guid_1--Guid_2,
-        EventId: Guid_3
+        EventId: Guid_4
       },
       Payload: {
         Name: NewName,
         Trigger: {
           HandleAll: true
         },
-        Action: {
-          Value: 456
+        Flow: {
+          InitialStepId: Guid_3
         },
         RuleId: Guid_2,
         AppId: Guid_1,my-app,

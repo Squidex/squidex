@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Org.BouncyCastle.Pkcs;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Rules;
@@ -22,7 +23,7 @@ public partial class RuleDomainObject
         switch (@event.Payload)
         {
             case RuleCreated e:
-                newSnapshot = new Rule { Id = e.RuleId };
+                newSnapshot = new Rule { Id = e.RuleId, IsEnabled = e.IsEnabled ?? true };
                 SimpleMapper.Map(e, newSnapshot);
                 break;
 
