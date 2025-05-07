@@ -37,7 +37,7 @@
     "core-js": "3.37.1",
     "cropperjs": "2.0.0-alpha.1",
     "date-fns": "3.6.0",
-    "graphiql": "3.2.2",
+    "graphiql": "4.0.0",
     "graphql": "16.8.1",
     "graphql-ws": "^5.16.0",
     "image-focus": "1.2.1",
