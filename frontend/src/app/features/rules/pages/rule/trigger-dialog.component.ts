@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
-import { EntriesPipe, ManualRuleTriggerDto, ModalDialogComponent, RuleTriggerDto, RuleTriggerMetadataDto, SchemasState, TranslatePipe, TriggerForm } from '@app/shared';
+import { EntriesPipe, FormErrorComponent, ManualRuleTriggerDto, ModalDialogComponent, RulesService, RuleTriggerDto, RuleTriggerMetadataDto, SchemasState, TranslatePipe, TriggerForm } from '@app/shared';
 import { RuleElementComponent } from '../../shared/rule-element.component';
 import { AssetChangedTriggerComponent } from '../../shared/triggers/asset-changed-trigger.component';
 import { CommentTriggerComponent } from '../../shared/triggers/comment-trigger.component';
@@ -27,6 +27,7 @@ import { UsageTriggerComponent } from '../../shared/triggers/usage-trigger.compo
         CommentTriggerComponent,
         ContentChangedTriggerComponent,
         EntriesPipe,
+        FormErrorComponent,
         ModalDialogComponent,
         ReactiveFormsModule,
         RuleElementComponent,
@@ -55,6 +56,7 @@ export class TriggerDialogComponent implements OnInit {
 
     constructor(
         public readonly schemasState: SchemasState,
+        private readonly rulesService: RulesService,
     ) {
     }
 
@@ -65,8 +67,15 @@ export class TriggerDialogComponent implements OnInit {
     }
 
     public selectTrigger(type: string, values?: any) {
-        if (type === 'Manual') {
+        const metadata = this.availableTriggers[type];
+
+        if (!metadata) {
+            return;
+        }
+
+        if (!metadata.hasProperties) {
             this.dialogSave.emit(new ManualRuleTriggerDto());
+            return;
         }
 
         if (this.currentTrigger?.triggerType !== type) {
@@ -89,6 +98,14 @@ export class TriggerDialogComponent implements OnInit {
             return;
         }
 
-        this.dialogSave.emit(values);
+        this.rulesService.validateTrigger(this.schemasState.appName, values)
+            .subscribe({
+                error: error =>{
+                    this.currentTrigger?.submitFailed(error);
+                },
+                complete: () => {
+                    this.dialogSave.emit(values);
+                },
+            });
     }
 }

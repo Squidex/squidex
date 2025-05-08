@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Security.Claims;
-using NodaTime;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Templates;
@@ -44,7 +43,19 @@ public sealed class RuleEventFormatter(
             return false;
         }
 
-        return scriptEngine.Evaluate(new ScriptVars { ["@event"] = value }, expression);
+        if (value is not EnrichedEvent @event)
+        {
+            if (value is not FlowEventContext context)
+            {
+                return false;
+            }
+
+            @event = context.Event;
+        }
+
+        var vars = CreateScriptVars(value, @event);
+
+        return scriptEngine.Evaluate(vars, expression);
     }
 
     public async ValueTask<string?> RenderAsync<T>(string? expression, T value, ExpressionFallback fallback = default)
@@ -64,13 +75,11 @@ public sealed class RuleEventFormatter(
             switch (fallback)
             {
                 case ExpressionFallback.Context:
-                    // Provide this overload with object to serialize the derived type and not the static type.
                     return serializer.Serialize(value, true);
                 case ExpressionFallback.Event:
-                    // Provide this overload with object to serialize the derived type and not the static type.
                     return serializer.Serialize(@event, true);
                 case ExpressionFallback.Envelope:
-                    return ToEnvelope(@event.Name, @event, @event.Timestamp);
+                    return serializer.Serialize(new { type = @event.Name, payload = @event, timestamp = @event.Timestamp }, true);
                 default:
                     return expression;
             }
@@ -78,26 +87,16 @@ public sealed class RuleEventFormatter(
 
         if (TryGetTemplate(expression.Trim(), out var template))
         {
-            var vars = new TemplateVars
-            {
-                ["event"] = @event,
-            };
+            var input = CreateTemplateVars(value, @event);
+            var result = await templateEngine.RenderAsync(template, input);
 
-            return await templateEngine.RenderAsync(template, vars);
+            return result;
         }
 
         if (TryGetScript(expression.Trim(), out var script))
         {
-            // Script vars are just wrappers over dictionaries for better performance.
-            var vars = new EventScriptVars
-            {
-                Event = @event,
-                AppId = @event.AppId.Id,
-                AppName = @event.AppId.Name,
-                User = Admin(),
-            };
-
-            var result = (await scriptEngine.ExecuteAsync(vars, script)).ToString();
+            var input = CreateScriptVars(value, @event);
+            var result = (await scriptEngine.ExecuteAsync(input, script)).ToString();
 
             if (result == "undefined")
             {
@@ -110,12 +109,6 @@ public sealed class RuleEventFormatter(
         return await simpleFormatter.Format(expression, @event, GlobalFallback);
     }
 
-    private string ToEnvelope(string type, object payload, Instant timestamp)
-    {
-        // Provide this overload with object to serialize the derived type and not the static type.
-        return serializer.Serialize(new { type, payload, timestamp }, true);
-    }
-
     private static ClaimsPrincipal Admin()
     {
         var claimsIdentity = new ClaimsIdentity();
@@ -124,6 +117,30 @@ public sealed class RuleEventFormatter(
         claimsIdentity.AddClaim(new Claim(SquidexClaimTypes.Permissions, PermissionIds.All));
 
         return claimsPrincipal;
+    }
+
+    private static EventScriptVars CreateScriptVars<T>(T value, EnrichedEvent @event)
+    {
+        return new EventScriptVars
+        {
+            AppId = @event.AppId.Id,
+            AppName = @event.AppId.Name,
+            Event = @event,
+            User = Admin(),
+            UserData = (value as FlowEventContext)?.UserData ?? [],
+        };
+    }
+
+    private static TemplateVars CreateTemplateVars<T>(T value, EnrichedEvent @event)
+    {
+        return new TemplateVars
+        {
+            ["appId"] = @event.AppId.Id,
+            ["appName"] = @event.AppId.Name,
+            ["event"] = @event,
+            ["user"] = new { displayName = "FlowUser" },
+            ["userData"] = (value as FlowEventContext)?.UserData ?? [],
+        };
     }
 
     private static bool TryGetScript(string text, out string script)

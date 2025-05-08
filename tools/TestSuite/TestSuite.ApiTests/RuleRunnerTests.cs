@@ -20,7 +20,9 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
     private readonly string schemaName = $"schema-{Guid.NewGuid()}";
     private readonly string schemaNameRef = $"schema-{Guid.NewGuid()}-ref";
     private readonly string contentString = Guid.NewGuid().ToString();
-    private readonly Guid stepId = Guid.NewGuid();
+    private readonly Guid stepId1 = Guid.NewGuid();
+    private readonly Guid stepId2 = Guid.NewGuid();
+    private readonly Guid stepId3 = Guid.NewGuid();
     private readonly WebhookCatcherClient webhookCatcher = webhookCatcher.Client;
 
     public ClientFixture _ { get; } = fixture;
@@ -41,10 +43,10 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
         {
             Flow = new FlowDefinitionDto
             {
-                InitialStepId = stepId,
+                InitialStepId = stepId1,
                 Steps = new Dictionary<string, FlowStepDefinitionDto>
                 {
-                    [stepId.ToString()] = new FlowStepDefinitionDto
+                    [stepId1.ToString()] = new FlowStepDefinitionDto
                     {
                         Step = new WebhookFlowStepDto
                         {
@@ -122,10 +124,10 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
         {
             Flow = new FlowDefinitionDto
             {
-                InitialStepId = stepId,
+                InitialStepId = stepId1,
                 Steps = new Dictionary<string, FlowStepDefinitionDto>
                 {
-                    [stepId.ToString()] = new FlowStepDefinitionDto
+                    [stepId1.ToString()] = new FlowStepDefinitionDto
                     {
                         Step = new WebhookFlowStepDto
                         {
@@ -207,10 +209,10 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
         {
             Flow = new FlowDefinitionDto
             {
-                InitialStepId = stepId,
+                InitialStepId = stepId1,
                 Steps = new Dictionary<string, FlowStepDefinitionDto>
                 {
-                    [stepId.ToString()] = new FlowStepDefinitionDto
+                    [stepId1.ToString()] = new FlowStepDefinitionDto
                     {
                         Step = new ScriptFlowStepDto
                         {
@@ -263,10 +265,10 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
         {
             Flow = new FlowDefinitionDto
             {
-                InitialStepId = stepId,
+                InitialStepId = stepId1,
                 Steps = new Dictionary<string, FlowStepDefinitionDto>
                 {
-                    [stepId.ToString()] = new FlowStepDefinitionDto
+                    [stepId1.ToString()] = new FlowStepDefinitionDto
                     {
                         Step = new WebhookFlowStepDto
                         {
@@ -316,10 +318,10 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
         {
             Flow = new FlowDefinitionDto
             {
-                InitialStepId = stepId,
+                InitialStepId = stepId1,
                 Steps = new Dictionary<string, FlowStepDefinitionDto>
                 {
-                    [stepId.ToString()] = new FlowStepDefinitionDto
+                    [stepId1.ToString()] = new FlowStepDefinitionDto
                     {
                         Step = new ScriptFlowStepDto
                         {
@@ -365,10 +367,10 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
         {
             Flow = new FlowDefinitionDto
             {
-                InitialStepId = stepId,
+                InitialStepId = stepId1,
                 Steps = new Dictionary<string, FlowStepDefinitionDto>
                 {
-                    [stepId.ToString()] = new FlowStepDefinitionDto
+                    [stepId1.ToString()] = new FlowStepDefinitionDto
                     {
                         Step = new WebhookFlowStepDto
                         {
@@ -418,10 +420,10 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
         {
             Flow = new FlowDefinitionDto
             {
-                InitialStepId = stepId,
+                InitialStepId = stepId1,
                 Steps = new Dictionary<string, FlowStepDefinitionDto>
                 {
-                    [stepId.ToString()] = new FlowStepDefinitionDto
+                    [stepId1.ToString()] = new FlowStepDefinitionDto
                     {
                         Step = new WebhookFlowStepDto
                         {
@@ -439,7 +441,7 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
 
 
         // STEP 3: Trigger rule.
-        await app.Rules.TriggerRuleAsync(rule.Id);
+        await app.Rules.TriggerRuleAsync(rule.Id, new TriggerRuleDto());
 
         // Get requests.
         var request = await webhookCatcher.PollAsync(sessionId, x => x.IsPost());
@@ -473,10 +475,10 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
         {
             Flow = new FlowDefinitionDto
             {
-                InitialStepId = stepId,
+                InitialStepId = stepId1,
                 Steps = new Dictionary<string, FlowStepDefinitionDto>
                 {
-                    [stepId.ToString()] = new FlowStepDefinitionDto
+                    [stepId1.ToString()] = new FlowStepDefinitionDto
                     {
                         Step = new WebhookFlowStepDto
                         {
@@ -524,10 +526,10 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
         {
             Flow = new FlowDefinitionDto
             {
-                InitialStepId = stepId,
+                InitialStepId = stepId1,
                 Steps = new Dictionary<string, FlowStepDefinitionDto>
                 {
-                    [stepId.ToString()] = new FlowStepDefinitionDto
+                    [stepId1.ToString()] = new FlowStepDefinitionDto
                     {
                         Step = new ScriptFlowStepDto
                         {
@@ -550,13 +552,113 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
 
 
         // STEP 2: Create test content.
-        await app.Rules.TriggerRuleAsync(rule.Id);
+        await app.Rules.TriggerRuleAsync(rule.Id, new TriggerRuleDto());
 
 
         // STEP 3: Get events.
         var @event = await app.Rules.PollEventAsync(rule.Id, x => x.FlowState.Status == FlowExecutionStatus.Completed);
 
         await Verify(@event);
+    }
+
+    [Fact]
+    public async Task Should_run_rule_with_condition()
+    {
+        // STEP 0: Create app.
+        var (app, _) = await _.PostAppAsync();
+
+
+        // STEP 1: Create rule.
+        var createRule = new CreateRuleDto
+        {
+            Flow = new FlowDefinitionDto
+            {
+                InitialStepId = stepId1,
+                Steps = new Dictionary<string, FlowStepDefinitionDto>
+                {
+                    [stepId1.ToString()] = new FlowStepDefinitionDto
+                    {
+                        Step = new IfFlowStepDto
+                        {
+                            Branches =
+                            [
+                                new IfFlowBranch
+                                {
+                                    Condition = "event.value.testValue == 1",
+                                    NextStepId = stepId2,
+                                },
+                                new IfFlowBranch
+                                {
+                                    Condition = "event.value.testValue == 2",
+                                    NextStepId = stepId3,
+                                },
+                            ]
+                        }
+                    },
+                    [stepId2.ToString()] = new FlowStepDefinitionDto
+                    {
+                        Step = new ScriptFlowStepDto
+                        {
+                            Script = @"
+                                console.info('Hello from Branch1');
+
+                            "
+                        }
+                    },
+                    [stepId3.ToString()] = new FlowStepDefinitionDto
+                    {
+                        Step = new ScriptFlowStepDto
+                        {
+                            Script = @"
+                                console.info('Hello from Branch2');
+
+                            "
+                        }
+                    }
+                }
+            },
+            Trigger = new ManualRuleTriggerDto()
+        };
+
+        var rule = await app.Rules.PostRuleAsync(createRule);
+
+
+        // STEP 2: Trigger rules 1.
+        await app.Rules.TriggerRuleAsync(rule.Id, new TriggerRuleDto
+        {
+            Value = new Dictionary<string, int>
+            {
+                ["testValue"] = 1
+            }
+        });
+
+        var @event1 = await app.Rules.PollEventAsync(rule.Id, x => x.FlowState.Status == FlowExecutionStatus.Completed);
+
+        var allLogs1 =
+            @event1?.FlowState.Steps.Values
+                .SelectMany(x => x.Attempts)
+                .SelectMany(x => x.Log) ?? [];
+
+        Assert.Contains(allLogs1, x => x.Message.Contains("Hello from Branch1", StringComparison.Ordinal));
+
+
+        // STEP 3: Trigger rules 2.
+        await app.Rules.TriggerRuleAsync(rule.Id, new TriggerRuleDto
+        {
+            Value = new Dictionary<string, int>
+            {
+                ["testValue"] = 2
+            }
+        });
+
+        var @event2 = await app.Rules.PollEventAsync(rule.Id, x => x.FlowState.Status == FlowExecutionStatus.Completed && x.Id != event1!.Id);
+
+        var allLogs2 =
+            @event2?.FlowState.Steps.Values
+                .SelectMany(x => x.Attempts)
+                .SelectMany(x => x.Log) ?? [];
+
+        Assert.Contains(allLogs2, x => x.Message.Contains("Hello from Branch2", StringComparison.Ordinal));
     }
 
     private async Task CreateContentAsync(ISquidexClient app)

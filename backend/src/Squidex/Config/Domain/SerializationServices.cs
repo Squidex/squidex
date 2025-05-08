@@ -112,7 +112,7 @@ public static class SerializationServices
             new AssemblyTypeProvider<RuleTriggerDto>("triggerType"));
 
         services.AddSingleton<ITypeProvider>(
-            new AssemblyTypeProvider<EnrichedEvent>());
+            new AssemblyTypeProvider<EnrichedEvent>("$type"));
 
         services.AddSingletonAs<FieldTypeProvider>()
             .As<ITypeProvider>();

@@ -19,9 +19,15 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards;
 public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
 {
     private readonly IFlowManager<FlowEventContext> flowManager = A.Fake<IFlowManager<FlowEventContext>>();
+    private readonly IRuleValidator validator;
+
+    public GuardRuleTests()
+    {
+        validator = new RuleValidator(flowManager, AppProvider);
+    }
 
     [Fact]
-    public async Task CanCreate_should_throw_exception_if_trigger_null()
+    public async Task CanCreate_should_throw_exception_if_trigger_is_null()
     {
         var command = CreateCommand(new CreateRule
         {
@@ -32,12 +38,12 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
             Trigger = null!,
         });
 
-        await ValidationAssert.ThrowsAsync(() => GuardRule.CanCreate(command, AppProvider, flowManager, CancellationToken),
+        await ValidationAssert.ThrowsAsync(() => GuardRule.CanCreate(command, validator, CancellationToken),
             new ValidationError("Trigger is required.", "Trigger"));
     }
 
     [Fact]
-    public async Task CanCreate_should_throw_exception_if_flow_null()
+    public async Task CanCreate_should_throw_exception_if_flow_is_null()
     {
         var command = CreateCommand(new CreateRule
         {
@@ -48,7 +54,7 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
             Flow = null!,
         });
 
-        await ValidationAssert.ThrowsAsync(() => GuardRule.CanCreate(command, AppProvider, flowManager, CancellationToken),
+        await ValidationAssert.ThrowsAsync(() => GuardRule.CanCreate(command, validator, CancellationToken),
             new ValidationError("Flow is required.", "Flow"));
     }
 
@@ -67,7 +73,7 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
             },
         });
 
-        await GuardRule.CanCreate(command, AppProvider, flowManager, CancellationToken);
+        await GuardRule.CanCreate(command, validator, CancellationToken);
     }
 
     [Fact]
@@ -75,7 +81,7 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = new UpdateRule();
 
-        await GuardRule.CanUpdate(command, CreateRule(), AppProvider, flowManager, CancellationToken);
+        await GuardRule.CanUpdate(command, CreateRule(), validator, CancellationToken);
     }
 
     [Fact]
@@ -83,7 +89,7 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = new UpdateRule { Name = "MyName" };
 
-        await GuardRule.CanUpdate(command, CreateRule(), AppProvider, flowManager, CancellationToken);
+        await GuardRule.CanUpdate(command, CreateRule(), validator, CancellationToken);
     }
 
     [Fact]
@@ -102,7 +108,7 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
             Name = "NewName",
         };
 
-        await GuardRule.CanUpdate(command, CreateRule(), AppProvider, flowManager, CancellationToken);
+        await GuardRule.CanUpdate(command, CreateRule(), validator, CancellationToken);
     }
 
     private CreateRule CreateCommand(CreateRule command)

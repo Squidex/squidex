@@ -5,8 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Infrastructure.Json.Objects;
+
 namespace Squidex.Domain.Apps.Events.Rules;
 
 public sealed class RuleManuallyTriggered : RuleEvent
 {
+    public JsonValue Value { get; set; }
 }

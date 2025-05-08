@@ -35,9 +35,9 @@ public class RuleServiceTests
 
     public sealed record InvalidTrigger : RuleTrigger
     {
-        public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
+        public override T Accept<T, TArgs>(IRuleTriggerVisitor<T, TArgs> visitor, TArgs args)
         {
-            return default!;
+            throw new NotSupportedException();
         }
     }
 

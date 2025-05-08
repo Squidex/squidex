@@ -19,8 +19,8 @@ public sealed record ContentChangedTriggerV2 : RuleTrigger
 
     public bool HandleAll { get; init; }
 
-    public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
+    public override T Accept<T, TArgs>(IRuleTriggerVisitor<T, TArgs> visitor, TArgs args)
     {
-        return visitor.Visit(this);
+        return visitor.Visit(this, args);
     }
 }

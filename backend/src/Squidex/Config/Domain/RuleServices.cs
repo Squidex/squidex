@@ -75,6 +75,9 @@ public static class RuleServices
         services.AddSingletonAs<RuleEnricher>()
             .As<IRuleEnricher>();
 
+        services.AddSingletonAs<RuleValidator>()
+            .As<IRuleValidator>();
+
         services.AddSingletonAs<RuleEnqueuer>()
             .As<IRuleEnqueuer>().As<IEventConsumer>();
 

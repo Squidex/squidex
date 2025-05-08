@@ -20,6 +20,7 @@ using Squidex.Flows;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
+using Squidex.Infrastructure.Validation;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -36,6 +37,7 @@ public sealed class RulesController(
     IFlowManager<FlowEventContext> flowManager,
     IRuleQueryService ruleQuery,
     IRuleRunnerService ruleRunnerService,
+    IRuleValidator ruleValidator,
     EventJsonSchemaGenerator eventJsonSchemaGenerator)
     : ApiController(commandBus)
 {
@@ -194,6 +196,7 @@ public sealed class RulesController(
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the rule to disable.</param>
+    /// <param name="request">The arguments for the rule flow.</param>
     /// <response code="204">Rule triggered.</response>
     /// <response code="404">Rule or app not found.</response>
     [HttpPut]
@@ -201,9 +204,9 @@ public sealed class RulesController(
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ApiPermissionOrAnonymous(PermissionIds.AppRulesEventsRun)]
     [ApiCosts(1)]
-    public async Task<IActionResult> TriggerRule(string app, DomainId id)
+    public async Task<IActionResult> TriggerRule(string app, DomainId id, [FromBody] TriggerRuleDto request)
     {
-        var command = new TriggerRule { RuleId = id };
+        var command = request.ToCommand(id);
 
         await CommandBus.PublishAsync(command, HttpContext.RequestAborted);
 
@@ -243,6 +246,54 @@ public sealed class RulesController(
     public async Task<IActionResult> DeleteRuleEvents(string app, DomainId id)
     {
         await flowManager.CancelByDefinitionIdAsync(id.ToString(), HttpContext.RequestAborted);
+
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Validates a rule trigger.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <param name="request">The rule trigger that needs to be validate.</param>
+    /// <response code="204">Rule trigger validated.</response>
+    /// <response code="400">Rule trigger not valid.</response>
+    /// <response code="404">Rule or app not found.</response>
+    [HttpPost]
+    [Route("apps/{app}/rules/validate/trigger/")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ApiPermission]
+    [ApiCosts(0)]
+    public async Task<IActionResult> ValidateTrigger(string app, [FromBody] RuleTriggerDto request)
+    {
+        await Validate.It(async e =>
+        {
+            await ruleValidator.ValidateTriggerAsync(request.ToTrigger(), AppId, e,
+                HttpContext.RequestAborted);
+        });
+
+        return NoContent();
+    }
+
+    /// <summary>
+    /// Validates a rule step.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <param name="request">The rule step that needs to be validate.</param>
+    /// <response code="204">Rule step validated.</response>
+    /// <response code="400">Rule step not valid.</response>
+    /// <response code="404">Rule or app not found.</response>
+    [HttpPost]
+    [Route("apps/{app}/rules/validate/step/")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ApiPermission]
+    [ApiCosts(0)]
+    public async Task<IActionResult> ValidateStep(string app, [FromBody] FlowStep request)
+    {
+        await Validate.It(async e =>
+        {
+            await ruleValidator.ValidateStepAsync(request, e,
+                HttpContext.RequestAborted);
+        });
 
         return NoContent();
     }
@@ -290,9 +341,8 @@ public sealed class RulesController(
             return NotFound();
         }
 
-        var simulation = await ruleRunnerService.SimulateAsync(rule, HttpContext.RequestAborted);
-
-        var response = SimulatedRuleEventsDto.FromDomain(simulation);
+        var result = await ruleRunnerService.SimulateAsync(rule, HttpContext.RequestAborted);
+        var response = SimulatedRuleEventsDto.FromDomain(result);
 
         return Ok(response);
     }
@@ -334,7 +384,9 @@ public sealed class RulesController(
     [ApiCosts(0)]
     public async Task<IActionResult> GetEvents(string app, [FromQuery] DomainId? ruleId = null, [FromQuery] int skip = 0, [FromQuery] int take = 20)
     {
-        var (states, total) = await flowManager.QueryInstancesByOwnerAsync(AppId.ToString(), ruleId?.ToString(), skip, take, HttpContext.RequestAborted);
+        var (states, total) =
+            await flowManager.QueryInstancesByOwnerAsync(AppId.ToString(), ruleId?.ToString(), skip, take,
+                HttpContext.RequestAborted);
 
         var response = RuleEventsDto.FromDomain(ResultList.Create(total, states), Resources, ruleId);
 
@@ -373,7 +425,7 @@ public sealed class RulesController(
     [HttpDelete]
     [Route("apps/{app}/rules/events/{id}/")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ApiPermissionOrAnonymous(PermissionIds.AppRulesEventsDelete)]
+    [ApiPermission]
     [ApiCosts(0)]
     public async Task<IActionResult> DeleteEvent(string app, Guid id)
     {

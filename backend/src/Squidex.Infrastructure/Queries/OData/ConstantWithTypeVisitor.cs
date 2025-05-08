@@ -144,6 +144,36 @@ public sealed class ConstantWithTypeVisitor : QueryNodeVisitor<ClrValue>
         return default!;
     }
 
+    public override ClrValue Visit(SingleValueFunctionCallNode nodeIn)
+    {
+        var parameterNode = nodeIn.Parameters.ElementAtOrDefault(0);
+        if (parameterNode == null)
+        {
+            ThrowHelper.NotSupportedException();
+            return default!;
+        }
+
+        var value = Visit(parameterNode);
+        if (value.Value is not string text)
+        {
+            ThrowHelper.NotSupportedException();
+            return default!;
+        }
+
+        if (string.Equals(nodeIn.Name, "tolower", StringComparison.OrdinalIgnoreCase))
+        {
+            return text.ToLowerInvariant();
+        }
+
+        if (string.Equals(nodeIn.Name, "toupper", StringComparison.OrdinalIgnoreCase))
+        {
+            return text.ToUpperInvariant();
+        }
+
+        ThrowHelper.NotSupportedException();
+        return default!;
+    }
+
     private static Instant ParseInstant(object value)
     {
         if (value is DateTimeOffset dateTimeOffset)

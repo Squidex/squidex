@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { LowerCasePipe } from '@angular/common';
+import { AsyncPipe, LowerCasePipe } from '@angular/common';
 import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { CodeEditorComponent, ControlErrorsComponent, DynamicFlowStepDefinitionDto, EntriesPipe, FormHintComponent, MarkdownDirective, ModalDialogComponent, RuleElementDto, ScriptCompletions, StepForm, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { AppsState, CodeEditorComponent, ControlErrorsComponent, DynamicFlowStepDefinitionDto, EntriesPipe, FormErrorComponent, FormHintComponent, MarkdownDirective, ModalDialogComponent, RuleElementDto, RulesService, ScriptCompletions, StepForm, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 import { BranchesInputComponent } from '../../shared/actions/branches-input.component';
 import { FormattableInputComponent } from '../../shared/actions/formattable-input.component';
 import { RuleElementComponent } from '../../shared/rule-element.component';
@@ -19,11 +19,13 @@ import { RuleElementComponent } from '../../shared/rule-element.component';
     styleUrls: ['./step-dialog.component.scss'],
     templateUrl: './step-dialog.component.html',
     imports: [
+        AsyncPipe,
         BranchesInputComponent,
         CodeEditorComponent,
         ControlErrorsComponent,
         EntriesPipe,
         FormattableInputComponent,
+        FormErrorComponent,
         FormHintComponent,
         FormsModule,
         LowerCasePipe,
@@ -59,14 +61,19 @@ export class StepDialogComponent {
     public currentStep?: StepForm;
 
     public stepName?: string;
+    public stepIgnoreError = false;
 
-    public stepIgnore = false;
+    constructor(
+        public appsState: AppsState,
+        private rulesService: RulesService,
+    ) {
+    }
 
     public ngOnChanges(changes: TypedSimpleChanges<this>) {
         if (changes.stepDefinition && this.stepDefinition) {
             this.selectStep(this.stepDefinition.step.stepType, this.stepDefinition.step);
 
-            this.stepIgnore = this.stepDefinition.ignoreError || false;
+            this.stepIgnoreError = this.stepDefinition.ignoreError || false;
             this.stepName = this.stepDefinition?.name;
         }
     }
@@ -89,11 +96,20 @@ export class StepDialogComponent {
             return;
         }
 
-        const step = this.currentStep.submit();
-        if (!step) {
+        const values = this.currentStep.submit();
+        if (!values) {
             return;
         }
 
-        this.dialogSave.emit(new DynamicFlowStepDefinitionDto({ name: this.stepName, ignoreError: this.stepIgnore, step }));
+        this.rulesService.validateStep(this.appsState.appName, values)
+            .subscribe({
+                error: error =>{
+                    this.currentStep?.submitFailed(error);
+                },
+                complete: () => {
+                    this.dialogSave.emit(new DynamicFlowStepDefinitionDto({ name: this.stepName, ignoreError: this.stepIgnoreError, step: values }));
+                },
+            });
+
     }
 }

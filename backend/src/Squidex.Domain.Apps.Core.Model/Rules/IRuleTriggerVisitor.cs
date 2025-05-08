@@ -9,17 +9,17 @@ using Squidex.Domain.Apps.Core.Rules.Triggers;
 
 namespace Squidex.Domain.Apps.Core.Rules;
 
-public interface IRuleTriggerVisitor<out T>
+public interface IRuleTriggerVisitor<out T, in TArgs>
 {
-    T Visit(AssetChangedTriggerV2 trigger);
+    T Visit(AssetChangedTriggerV2 trigger, TArgs args);
 
-    T Visit(ContentChangedTriggerV2 trigger);
+    T Visit(ContentChangedTriggerV2 trigger, TArgs args);
 
-    T Visit(CommentTrigger trigger);
+    T Visit(CommentTrigger trigger, TArgs args);
 
-    T Visit(ManualTrigger trigger);
+    T Visit(ManualTrigger trigger, TArgs args);
 
-    T Visit(SchemaChangedTrigger trigger);
+    T Visit(SchemaChangedTrigger trigger, TArgs args);
 
-    T Visit(UsageTrigger trigger);
+    T Visit(UsageTrigger trigger, TArgs args);
 }

@@ -111,7 +111,7 @@
             </div>
 
             <div class="col col-last text-end">
-                @if (isManual) {
+                @if (rule.canTrigger) {
                     <button
                         class="btn btn-outline-secondary btn-run"
                         confirmRememberKey="triggerRule"
@@ -147,7 +147,7 @@
             @if (rule.canReadLogs) {
                 <div class="col-auto">
                     <a [queryParams]="{ ruleId: rule.id }" routerLink="events"> {{ "common.logs" | sqxTranslate }} </a>
-                    @if (!isManual) {
+                    @if (!rule.canTrigger) {
                         <a class="ms-2" [queryParams]="{ ruleId: rule.id }" routerLink="simulator">
                             {{ "rules.simulator" | sqxTranslate }}
                         </a>

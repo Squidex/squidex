@@ -9,6 +9,8 @@
         </ng-container>
         <ng-container content>
             @if (currentTrigger) {
+                <sqx-form-error [error]="currentTrigger.error | async" />
+
                 @switch (currentTrigger.triggerType) {
                     @case ("AssetChanged") {
                         <sqx-asset-changed-trigger [triggerForm]="currentTrigger" />

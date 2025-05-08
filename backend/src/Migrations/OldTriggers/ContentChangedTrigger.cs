@@ -20,7 +20,7 @@ public sealed record ContentChangedTrigger : RuleTrigger, IMigrated<RuleTrigger>
 
     public bool HandleAll { get; set; }
 
-    public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
+    public override T Accept<T, TArgs>(IRuleTriggerVisitor<T, TArgs> visitor, TArgs args)
     {
         throw new NotSupportedException();
     }

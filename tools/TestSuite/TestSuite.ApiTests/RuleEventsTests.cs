@@ -115,7 +115,7 @@ public class RuleEventsTests(ClientFixture fixture) : IClassFixture<ClientFixtur
 
         var rule = await app.Rules.PostRuleAsync(createRule);
 
-        await app.Rules.TriggerRuleAsync(rule.Id);
+        await app.Rules.TriggerRuleAsync(rule.Id, new TriggerRuleDto());
 
         return (app, rule);
     }

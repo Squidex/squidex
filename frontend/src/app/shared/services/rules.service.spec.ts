@@ -435,6 +435,34 @@ describe('RulesService', () => {
             req.flush({});
         }));
 
+    it('should make post request to validate trigger',
+        inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
+            const dto = new ManualRuleTriggerDto();
+
+            rulesService.validateTrigger('my-app', dto).subscribe();
+
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/validate/trigger');
+
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toBeNull();
+
+            req.flush({});
+        }));
+
+    it('should make post request to validate step',
+        inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
+            const dto = {};
+
+            rulesService.validateStep('my-app', dto).subscribe();
+
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/validate/step');
+
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toBeNull();
+
+            req.flush({});
+        }));
+
     it('should make get request to get completions',
         inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
             let completions: ScriptCompletions;

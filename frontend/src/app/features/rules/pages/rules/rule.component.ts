@@ -45,10 +45,6 @@ export class RuleComponent {
 
     public dropdown = new ModalModel();
 
-    public get isManual() {
-        return this.rule.trigger.triggerType === 'Manual';
-    }
-
     constructor(
         private readonly rulesState: RulesState,
     ) {
