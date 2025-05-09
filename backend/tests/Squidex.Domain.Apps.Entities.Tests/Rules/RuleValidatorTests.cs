@@ -49,7 +49,7 @@ public class RuleValidatorTests : GivenContext, IClassFixture<TranslationsFixtur
 
         errors.Should().BeEquivalentTo(
             [
-                new ValidationError("Num days must be between 1 and 30.", "NumDays")
+                new ValidationError("Num days must be between 1 and 30.", "NumDays"),
             ]);
     }
 
@@ -73,7 +73,7 @@ public class RuleValidatorTests : GivenContext, IClassFixture<TranslationsFixtur
 
         errors.Should().BeEquivalentTo(
             [
-                new ValidationError("Invalid property.", "Path")
+                new ValidationError("Invalid property.", "Path"),
             ]);
     }
 
@@ -100,7 +100,7 @@ public class RuleValidatorTests : GivenContext, IClassFixture<TranslationsFixtur
 
         errors.Should().BeEquivalentTo(
             [
-                new ValidationError(expectedMessage, "Path")
+                new ValidationError(expectedMessage, "Path"),
             ]);
     }
 }

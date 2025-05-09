@@ -8,6 +8,7 @@
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Flows;
@@ -95,7 +96,7 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
     [Fact]
     public async Task CanUpdate_should_not_throw_exception_if_trigger_flow_and_name_are_valid()
     {
-        var command = new UpdateRule
+        var command = CreateCommand(new UpdateRule
         {
             Trigger = new ContentChangedTriggerV2
             {
@@ -106,12 +107,12 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
                 InitialStepId = Guid.NewGuid(),
             },
             Name = "NewName",
-        };
+        });
 
         await GuardRule.CanUpdate(command, CreateRule(), validator, CancellationToken);
     }
 
-    private CreateRule CreateCommand(CreateRule command)
+    private T CreateCommand<T>(T command) where T : IAppCommand
     {
         command.AppId = AppId;
 
