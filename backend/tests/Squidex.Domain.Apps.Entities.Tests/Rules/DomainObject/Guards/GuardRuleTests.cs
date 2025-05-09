@@ -8,6 +8,7 @@
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Flows;
@@ -19,9 +20,15 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards;
 public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
 {
     private readonly IFlowManager<FlowEventContext> flowManager = A.Fake<IFlowManager<FlowEventContext>>();
+    private readonly IRuleValidator validator;
+
+    public GuardRuleTests()
+    {
+        validator = new RuleValidator(flowManager, AppProvider);
+    }
 
     [Fact]
-    public async Task CanCreate_should_throw_exception_if_trigger_null()
+    public async Task CanCreate_should_throw_exception_if_trigger_is_null()
     {
         var command = CreateCommand(new CreateRule
         {
@@ -32,12 +39,12 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
             Trigger = null!,
         });
 
-        await ValidationAssert.ThrowsAsync(() => GuardRule.CanCreate(command, AppProvider, flowManager, CancellationToken),
+        await ValidationAssert.ThrowsAsync(() => GuardRule.CanCreate(command, validator, CancellationToken),
             new ValidationError("Trigger is required.", "Trigger"));
     }
 
     [Fact]
-    public async Task CanCreate_should_throw_exception_if_flow_null()
+    public async Task CanCreate_should_throw_exception_if_flow_is_null()
     {
         var command = CreateCommand(new CreateRule
         {
@@ -48,7 +55,7 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
             Flow = null!,
         });
 
-        await ValidationAssert.ThrowsAsync(() => GuardRule.CanCreate(command, AppProvider, flowManager, CancellationToken),
+        await ValidationAssert.ThrowsAsync(() => GuardRule.CanCreate(command, validator, CancellationToken),
             new ValidationError("Flow is required.", "Flow"));
     }
 
@@ -67,7 +74,7 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
             },
         });
 
-        await GuardRule.CanCreate(command, AppProvider, flowManager, CancellationToken);
+        await GuardRule.CanCreate(command, validator, CancellationToken);
     }
 
     [Fact]
@@ -75,7 +82,7 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = new UpdateRule();
 
-        await GuardRule.CanUpdate(command, CreateRule(), AppProvider, flowManager, CancellationToken);
+        await GuardRule.CanUpdate(command, CreateRule(), validator, CancellationToken);
     }
 
     [Fact]
@@ -83,13 +90,13 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = new UpdateRule { Name = "MyName" };
 
-        await GuardRule.CanUpdate(command, CreateRule(), AppProvider, flowManager, CancellationToken);
+        await GuardRule.CanUpdate(command, CreateRule(), validator, CancellationToken);
     }
 
     [Fact]
     public async Task CanUpdate_should_not_throw_exception_if_trigger_flow_and_name_are_valid()
     {
-        var command = new UpdateRule
+        var command = CreateCommand(new UpdateRule
         {
             Trigger = new ContentChangedTriggerV2
             {
@@ -100,12 +107,12 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
                 InitialStepId = Guid.NewGuid(),
             },
             Name = "NewName",
-        };
+        });
 
-        await GuardRule.CanUpdate(command, CreateRule(), AppProvider, flowManager, CancellationToken);
+        await GuardRule.CanUpdate(command, CreateRule(), validator, CancellationToken);
     }
 
-    private CreateRule CreateCommand(CreateRule command)
+    private T CreateCommand<T>(T command) where T : IAppCommand
     {
         command.AppId = AppId;
 

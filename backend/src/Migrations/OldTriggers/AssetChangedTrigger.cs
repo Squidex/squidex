@@ -24,7 +24,7 @@ public sealed record AssetChangedTrigger : RuleTrigger, IMigrated<RuleTrigger>
 
     public bool SendDelete { get; set; }
 
-    public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
+    public override T Accept<T, TArgs>(IRuleTriggerVisitor<T, TArgs> visitor, TArgs args)
     {
         throw new NotSupportedException();
     }

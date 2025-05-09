@@ -7,13 +7,11 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards;
 using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Rules;
-using Squidex.Flows;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
@@ -64,7 +62,7 @@ public partial class RuleDomainObject(
             case CreateRule createRule:
                 return ApplyReturnAsync(createRule, async (c, ct) =>
                 {
-                    await GuardRule.CanCreate(c, AppProvider(), FlowManager(), ct);
+                    await GuardRule.CanCreate(c, Validator(), ct);
 
                     Create(c);
 
@@ -74,7 +72,7 @@ public partial class RuleDomainObject(
             case UpdateRule updateRule:
                 return ApplyReturnAsync(updateRule, async (c, ct) =>
                 {
-                    await GuardRule.CanUpdate(c, Snapshot, AppProvider(), FlowManager(), ct);
+                    await GuardRule.CanUpdate(c, Snapshot, Validator(), ct);
 
                     Update(c);
 
@@ -124,12 +122,7 @@ public partial class RuleDomainObject(
         SimpleMapper.Map(command, @event);
         SimpleMapper.Map(Snapshot, @event);
 
-        await RuleEnqueuer().EnqueueAsync(Snapshot.Id, Snapshot, Envelope.Create(@event));
-    }
-
-    private IRuleEnqueuer RuleEnqueuer()
-    {
-        return serviceProvider.GetRequiredService<IRuleEnqueuer>();
+        await Enqueuer().EnqueueAsync(Snapshot.Id, Snapshot, Envelope.Create(@event));
     }
 
     private void Create(CreateRule command)
@@ -162,13 +155,13 @@ public partial class RuleDomainObject(
         RaiseEvent(Envelope.Create(SimpleMapper.Map(command, @event)));
     }
 
-    private IAppProvider AppProvider()
+    private IRuleEnqueuer Enqueuer()
     {
-        return serviceProvider.GetRequiredService<IAppProvider>();
+        return serviceProvider.GetRequiredService<IRuleEnqueuer>();
     }
 
-    private IFlowManager<FlowEventContext> FlowManager()
+    private IRuleValidator Validator()
     {
-        return serviceProvider.GetRequiredService<IFlowManager<FlowEventContext>>();
+        return serviceProvider.GetRequiredService<IRuleValidator>();
     }
 }

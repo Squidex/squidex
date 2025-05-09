@@ -31,7 +31,7 @@ public class RuleTests
 
     public sealed record OtherTrigger : RuleTrigger
     {
-        public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
+        public override T Accept<T, TArgs>(IRuleTriggerVisitor<T, TArgs> visitor, TArgs args)
         {
             throw new NotSupportedException();
         }
@@ -39,7 +39,7 @@ public class RuleTests
 
     public sealed record MigratedTrigger : RuleTrigger, IMigrated<RuleTrigger>
     {
-        public override T Accept<T>(IRuleTriggerVisitor<T> visitor)
+        public override T Accept<T, TArgs>(IRuleTriggerVisitor<T, TArgs> visitor, TArgs args)
         {
             throw new NotSupportedException();
         }

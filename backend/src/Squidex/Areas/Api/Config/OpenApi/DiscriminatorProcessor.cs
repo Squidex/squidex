@@ -8,8 +8,9 @@
 using GraphQL.Utilities;
 using NJsonSchema;
 using NJsonSchema.Generation;
+using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Infrastructure.Reflection;
-using System.Reflection;
+using System.Diagnostics;
 
 namespace Squidex.Areas.Api.Config.OpenApi;
 
@@ -22,9 +23,12 @@ public sealed class DiscriminatorProcessor(TypeRegistry typeRegistry) : ISchemaP
             return;
         }
 
-        if (!typeRegistry.TryGetConfig(context.ContextualType.Type, out var config) ||
-            config.IsEmpty ||
-            config.DiscriminatorProperty == null)
+        if (!typeRegistry.TryGetConfig(context.ContextualType.Type, out var config))
+        {
+            return;
+        }
+
+        if (config.IsEmpty || config.DiscriminatorProperty == null)
         {
             return;
         }
@@ -36,8 +40,6 @@ public sealed class DiscriminatorProcessor(TypeRegistry typeRegistry) : ISchemaP
         };
 
         var schema = context.Schema;
-
-        var isObsolete = context.ContextualType.Type.GetCustomAttribute<ObsoleteAttribute>();
 
         foreach (var (derivedType, typeName) in config.DerivedTypes().OrderBy(x => x.TypeName))
         {

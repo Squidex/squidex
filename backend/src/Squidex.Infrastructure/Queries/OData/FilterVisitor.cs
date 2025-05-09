@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Text.RegularExpressions;
+using Google.Protobuf;
 using Microsoft.OData.UriParser;
 using Microsoft.Spatial;
 
@@ -48,7 +50,12 @@ public sealed class FilterVisitor : QueryNodeVisitor<FilterNode<ClrValue>>
 
     public override FilterNode<ClrValue> Visit(SingleValueFunctionCallNode nodeIn)
     {
-        var fieldNode = nodeIn.Parameters.ElementAt(0);
+        var fieldNode = nodeIn.Parameters.ElementAtOrDefault(0);
+        if (fieldNode == null)
+        {
+            ThrowHelper.NotSupportedException();
+            return default!;
+        }
 
         if (string.Equals(nodeIn.Name, "empty", StringComparison.OrdinalIgnoreCase))
         {
@@ -65,7 +72,12 @@ public sealed class FilterVisitor : QueryNodeVisitor<FilterNode<ClrValue>>
             return ClrFilter.Exists(PropertyPathVisitor.Visit(fieldNode));
         }
 
-        var valueNode = nodeIn.Parameters.ElementAt(1);
+        var valueNode = nodeIn.Parameters.ElementAtOrDefault(1);
+        if (valueNode == null)
+        {
+            ThrowHelper.NotSupportedException();
+            return default!;
+        }
 
         if (string.Equals(nodeIn.Name, "matchs", StringComparison.OrdinalIgnoreCase))
         {
@@ -113,42 +125,33 @@ public sealed class FilterVisitor : QueryNodeVisitor<FilterNode<ClrValue>>
 
         if (nodeIn.Left is SingleValueFunctionCallNode functionNode)
         {
-            if (string.Equals(functionNode.Name, "geo.distance", StringComparison.OrdinalIgnoreCase) && nodeIn.OperatorKind == BinaryOperatorKind.LessThan)
+            if (string.Equals(functionNode.Name, "geo.distance", StringComparison.OrdinalIgnoreCase))
             {
-                var valueDistance = (double)ConstantWithTypeVisitor.Visit(nodeIn.Right).Value!;
-
-                if (functionNode.Parameters.ElementAt(1) is not ConstantNode constantNode)
-                {
-                    ThrowHelper.NotSupportedException();
-                    return default!;
-                }
-
-                if (constantNode.Value is not GeographyPoint geographyPoint)
-                {
-                    ThrowHelper.NotSupportedException();
-                    return default!;
-                }
-
-                var property = PropertyPathVisitor.Visit(functionNode.Parameters.ElementAt(0));
-
-                return ClrFilter.Lt(property, new FilterSphere(geographyPoint.Longitude, geographyPoint.Latitude, valueDistance));
+                return ParseGeoDistance(nodeIn, functionNode);
             }
-            else
+
+            if (string.Equals(functionNode.Name, "toupper", StringComparison.OrdinalIgnoreCase))
             {
-                var regexFilter = Visit(functionNode);
+                return ParseMatch(nodeIn, functionNode, c => !char.IsLetter(c) || char.IsUpper(c));
+            }
 
-                var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
+            if (string.Equals(functionNode.Name, "tolower", StringComparison.OrdinalIgnoreCase))
+            {
+                return ParseMatch(nodeIn, functionNode, c => !char.IsLetter(c) || char.IsLower(c));
+            }
 
-                if (value.ValueType == ClrValueType.Boolean && value.Value is bool booleanRight)
+            var innerFunction = Visit(functionNode);
+
+            var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
+            if (value.ValueType == ClrValueType.Boolean && value.Value is bool booleanRight)
+            {
+                if ((nodeIn.OperatorKind == BinaryOperatorKind.Equal && !booleanRight) ||
+                    (nodeIn.OperatorKind == BinaryOperatorKind.NotEqual && booleanRight))
                 {
-                    if ((nodeIn.OperatorKind == BinaryOperatorKind.Equal && !booleanRight) ||
-                        (nodeIn.OperatorKind == BinaryOperatorKind.NotEqual && booleanRight))
-                    {
-                        regexFilter = ClrFilter.Not(regexFilter);
-                    }
-
-                    return regexFilter;
+                    innerFunction = ClrFilter.Not(innerFunction);
                 }
+
+                return innerFunction;
             }
         }
         else
@@ -198,5 +201,60 @@ public sealed class FilterVisitor : QueryNodeVisitor<FilterNode<ClrValue>>
 
         ThrowHelper.NotSupportedException();
         return default!;
+    }
+
+    private static FilterNode<ClrValue> ParseMatch(BinaryOperatorNode nodeIn, SingleValueFunctionCallNode functionNode, Func<char, bool> condition)
+    {
+        if (nodeIn.OperatorKind is not BinaryOperatorKind.Equal and not BinaryOperatorKind.NotEqual)
+        {
+            ThrowHelper.NotSupportedException();
+            return default!;
+        }
+
+        var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
+        if (value.Value is not string text || !text.All(condition))
+        {
+            ThrowHelper.NotSupportedException();
+            return default!;
+        }
+
+        FilterNode<ClrValue> filter =
+            ClrFilter.Matchs(
+                PropertyPathVisitor.Visit(functionNode.Parameters.ElementAt(0)),
+                $"/^{Regex.Escape(text)}$/i");
+
+        if (nodeIn.OperatorKind == BinaryOperatorKind.NotEqual)
+        {
+            filter = ClrFilter.Not(filter);
+        }
+
+        return filter;
+    }
+
+    private static FilterNode<ClrValue> ParseGeoDistance(BinaryOperatorNode nodeIn, SingleValueFunctionCallNode functionNode)
+    {
+        if (nodeIn.OperatorKind != BinaryOperatorKind.LessThan)
+        {
+            ThrowHelper.NotSupportedException();
+            return default!;
+        }
+
+        var valueDistance = (double)ConstantWithTypeVisitor.Visit(nodeIn.Right).Value!;
+
+        if (functionNode.Parameters.ElementAt(1) is not ConstantNode constantNode)
+        {
+            ThrowHelper.NotSupportedException();
+            return default!;
+        }
+
+        if (constantNode.Value is not GeographyPoint geographyPoint)
+        {
+            ThrowHelper.NotSupportedException();
+            return default!;
+        }
+
+        var property = PropertyPathVisitor.Visit(functionNode.Parameters.ElementAt(0));
+
+        return ClrFilter.Lt(property, new FilterSphere(geographyPoint.Longitude, geographyPoint.Latitude, valueDistance));
     }
 }

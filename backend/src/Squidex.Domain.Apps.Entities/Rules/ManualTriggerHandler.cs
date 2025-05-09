@@ -34,7 +34,6 @@ public sealed class ManualTriggerHandler : IRuleTriggerHandler
         SimpleMapper.Map((RuleManuallyTriggered)@event.Payload, result);
 
         await Task.Yield();
-
         yield return result;
     }
 

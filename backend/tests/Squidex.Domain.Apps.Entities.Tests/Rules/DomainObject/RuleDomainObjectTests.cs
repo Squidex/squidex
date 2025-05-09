@@ -7,13 +7,11 @@
 
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Rules;
-using Squidex.Flows;
 using Squidex.Flows.Internal;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
@@ -24,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject;
 public class RuleDomainObjectTests : HandlerTestBase<Rule>
 {
     private readonly IRuleEnqueuer ruleEnqueuer = A.Fake<IRuleEnqueuer>();
-    private readonly IFlowManager<FlowEventContext> flowManager = A.Fake<IFlowManager<FlowEventContext>>();
+    private readonly IRuleValidator ruleValidator = A.Fake<IRuleValidator>();
     private readonly DomainId ruleId = DomainId.NewGuid();
     private readonly RuleDomainObject sut;
 
@@ -40,7 +38,7 @@ public class RuleDomainObjectTests : HandlerTestBase<Rule>
         var serviceProvider =
             new ServiceCollection()
                 .AddSingleton(AppProvider)
-                .AddSingleton(flowManager)
+                .AddSingleton(ruleValidator)
                 .AddSingleton(ruleEnqueuer)
                 .BuildServiceProvider();
 

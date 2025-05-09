@@ -8,6 +8,7 @@
 using NodaTime;
 using Squidex.Areas.Api.Controllers.Rules.Models.Converters;
 using Squidex.Domain.Apps.Core.Rules.Deprecated;
+using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Runner;
 using Squidex.Infrastructure;
@@ -143,8 +144,11 @@ public sealed class RuleDto : Resource
 
         if (resources.CanRunRuleEvents)
         {
-            AddPutLink("trigger",
-                resources.Url<RulesController>(x => nameof(x.TriggerRule), values));
+            if (rule.Trigger is ManualTrigger)
+            {
+                AddPutLink("trigger",
+                    resources.Url<RulesController>(x => nameof(x.TriggerRule), values));
+            }
 
             if (canRun && ruleRunnerService.CanRunRule(rule))
             {

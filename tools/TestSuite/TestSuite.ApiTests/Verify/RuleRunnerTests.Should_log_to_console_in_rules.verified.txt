@@ -27,6 +27,7 @@
         name: [],
         partition: [],
         timestamp: [],
+        value: [],
         version: []
       }
     },

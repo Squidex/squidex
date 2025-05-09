@@ -46,6 +46,29 @@ public static class Validate
             throw new ValidationException(errors);
         }
     }
+
+    public static AddValidation WithPrefix(string prefix, AddValidation inner)
+    {
+        return (message, propertyNames) =>
+        {
+            if (propertyNames.Length == 0)
+            {
+                inner(message, propertyNames);
+            }
+
+            var withPrefix = propertyNames.Select(path =>
+            {
+                if (!string.IsNullOrWhiteSpace(path))
+                {
+                    return $"{prefix}.{path}";
+                }
+
+                return path;
+            }).ToArray();
+
+            inner(message, withPrefix);
+        };
+    }
 }
 
 public delegate void AddValidation(string message, params string[] propertyNames);

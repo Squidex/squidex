@@ -16,6 +16,7 @@ using NSwag.Generation.Processors.Contexts;
 using Squidex.Areas.Api.Controllers.Rules.Models;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
@@ -90,6 +91,7 @@ public static class OpenApiServices
         services.AddOpenApiDocument((settings, services) =>
         {
             ConfigureSchemaSettings(settings.SchemaSettings, services.GetRequiredService<TypeRegistry>(), false);
+            settings.DocumentProcessors.Add(new AddAdditionalTypeProcessor<EnrichedEvent>());
             settings.DocumentProcessors.Add(new AddAdditionalTypeProcessor<DynamicCreateRuleDto>());
             settings.DocumentProcessors.Add(new AddAdditionalTypeProcessor<DynamicFlowExecutionStateDto>());
             settings.DocumentProcessors.Add(new AddAdditionalTypeProcessor<DynamicRulesDto>());

@@ -9,5 +9,5 @@ namespace Squidex.Domain.Apps.Core.Rules;
 
 public abstract record RuleTrigger
 {
-    public abstract T Accept<T>(IRuleTriggerVisitor<T> visitor);
+    public abstract T Accept<T, TArgs>(IRuleTriggerVisitor<T, TArgs> visitor, TArgs args);
 }

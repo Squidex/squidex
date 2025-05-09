@@ -32,4 +32,9 @@ public sealed class EventScriptVars : ScriptVars
     {
         set => SetInitial(value);
     }
+
+    public Dictionary<string, string> UserData
+    {
+        set => SetInitial(value);
+    }
 }

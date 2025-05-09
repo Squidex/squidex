@@ -134,7 +134,7 @@ export class RulePageComponent implements OnInit {
 
     public save() {
         const { flow, isEditable, isEnabled, name, trigger } = this.editableRule.value;
-        if (!isEditable || !trigger || !flow || !flow.dto.steps || Object.entries(flow.dto.steps).length === 0) {
+        if (!isEditable || !trigger || !flow?.dto.steps || Object.entries(flow.dto.steps).length === 0) {
             return;
         }
 
@@ -155,6 +155,9 @@ export class RulePageComponent implements OnInit {
 
             this.rulesState.create(request)
                 .subscribe({
+                    next: rule => {
+                        this.router.navigate(['../', rule.id], { relativeTo: this.route, replaceUrl: true });
+                    },
                     complete: () => {
                         this.dialogs.notifyInfo('i18n:rules.created');
                     },
@@ -183,9 +186,14 @@ export class RulePageComponent implements OnInit {
         }));
     }
 
-    public startAddStep(target: FlowStepAdd) {
-        this.stepToUpsert = { target };
-        this.stepDialog.show();
+    public startUpdateTrigger(update: RuleTriggerDto) {
+        const metadata = this.availableTriggers[update.triggerType];
+        if (!metadata || !metadata.hasProperties) {
+            return;
+        }
+
+        this.triggerToEdit = update;
+        this.triggerDialog.show();
     }
 
     public startUpdateStep(update: FlowStepUpdate) {
@@ -193,9 +201,9 @@ export class RulePageComponent implements OnInit {
         this.stepDialog.show();
     }
 
-    public startUpdateTrigger(update: RuleTriggerDto) {
-        this.triggerToEdit = update;
-        this.triggerDialog.show();
+    public startAddStep(target: FlowStepAdd) {
+        this.stepToUpsert = { target };
+        this.stepDialog.show();
     }
 
     public changeTrigger(trigger: RuleTriggerDto) {

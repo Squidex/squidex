@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -14,12 +15,19 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards.Triggers;
 
 public class UsageTriggerValidationTests : GivenContext, IClassFixture<TranslationsFixture>
 {
+    private readonly IRuleValidator validator;
+
+    public UsageTriggerValidationTests()
+    {
+        validator = new RuleValidator(null!, AppProvider);
+    }
+
     [Fact]
     public async Task Should_add_error_if_num_days_less_than_1()
     {
         var trigger = new UsageTrigger { NumDays = 0 };
 
-        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider, CancellationToken);
+        var errors = await ValidateAsync(trigger);
 
         errors.Should().BeEquivalentTo(
             [
@@ -32,7 +40,7 @@ public class UsageTriggerValidationTests : GivenContext, IClassFixture<Translati
     {
         var trigger = new UsageTrigger { NumDays = 32 };
 
-        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider, CancellationToken);
+        var errors = await ValidateAsync(trigger);
 
         errors.Should().BeEquivalentTo(
             [
@@ -45,7 +53,7 @@ public class UsageTriggerValidationTests : GivenContext, IClassFixture<Translati
     {
         var trigger = new UsageTrigger { NumDays = 20 };
 
-        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider, CancellationToken);
+        var errors = await ValidateAsync(trigger);
 
         Assert.Empty(errors);
     }
@@ -55,8 +63,16 @@ public class UsageTriggerValidationTests : GivenContext, IClassFixture<Translati
     {
         var trigger = new UsageTrigger();
 
-        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider, CancellationToken);
+        var errors = await ValidateAsync(trigger);
 
         Assert.Empty(errors);
+    }
+
+    private async Task<List<ValidationError>> ValidateAsync(RuleTrigger trigger)
+    {
+        var errors = new List<ValidationError>();
+
+        await validator.ValidateTriggerAsync(trigger, AppId.Id, (m, p) => errors.Add(new ValidationError(m, p)), CancellationToken);
+        return errors;
     }
 }

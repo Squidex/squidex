@@ -281,6 +281,30 @@ public class RuleEventFormatterTests
     }
 
     [Fact]
+    public void Should_evaluate_expression()
+    {
+        var @event = new EnrichedManualEvent { Value = 1, AppId = appId };
+
+        var actual1 = sut.Evaluate("event.value == 1", @event);
+        var actual2 = sut.Evaluate("event.value == 2", @event);
+
+        Assert.True(actual1);
+        Assert.False(actual2);
+    }
+
+    [Fact]
+    public void Should_evaluate_expression_with_context()
+    {
+        var context = new FlowEventContext { Event = new EnrichedManualEvent { Value = 1, AppId = appId } };
+
+        var actual1 = sut.Evaluate("event.value == 1", context);
+        var actual2 = sut.Evaluate("event.value == 2", context);
+
+        Assert.True(actual1);
+        Assert.False(actual2);
+    }
+
+    [Fact]
     public async Task Should_return_json_string_if_array()
     {
         var @event = new EnrichedContentEvent
@@ -293,16 +317,25 @@ public class RuleEventFormatterTests
                             .AddInvariant(JsonValue.Array("ref1", "ref2", "ref3"))),
         };
 
-        var script = @"
-                Script(JSON.stringify(
-                {
-                    'categories': event.data.categories.iv
-                }))";
+        var actual = await sut.RenderAsync(@"Script(JSON.stringify({ categories: event.data.categories.iv }))", @event);
 
-        var actual = await sut.RenderAsync(script, @event);
+        Assert.Equal("{'categories':['ref1','ref2','ref3']}",
+            actual?
+                .Replace(" ", string.Empty, StringComparison.Ordinal)
+                .Replace('"', '\''));
+    }
 
-        Assert.Equal("{'categories':['ref1','ref2','ref3']}", actual?
-            .Replace(" ", string.Empty, StringComparison.Ordinal)
-            .Replace('"', '\''));
+    [Fact]
+    public async Task Should_add_to_context()
+    {
+        var context = new FlowEventContext
+        {
+            Event = new EnrichedManualEvent { Value = 1, AppId = appId },
+            UserData = [],
+        };
+
+        await sut.RenderAsync(@"Script(userData['myValue'] = '42')", context);
+
+        Assert.Equal("42", context.UserData["myValue"]);
     }
 }

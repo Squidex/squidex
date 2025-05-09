@@ -10,7 +10,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlConfig, HTTP, pretifyError, Resource, ScriptCompletions, StringHelper, VersionOrTag } from '@app/framework';
-import { DynamicCreateRuleDto, DynamicRuleDto, DynamicRulesDto, DynamicUpdateRuleDto, RuleElementDto, RuleEventsDto, SimulatedRuleEventsDto } from './../model';
+import { DynamicCreateRuleDto, DynamicRuleDto, DynamicRulesDto, DynamicUpdateRuleDto, RuleElementDto, RuleEventsDto, RuleTriggerDto, SimulatedRuleEventsDto } from './../model';
 
 export type RuleTriggerMetadataDto = Readonly<{
     description: string;
@@ -18,6 +18,7 @@ export type RuleTriggerMetadataDto = Readonly<{
     iconColor?: string;
     iconCode?: string | null;
     iconImage?: string;
+    hasProperties?: boolean;
     title?: string;
     readMore?: string;
 }>;
@@ -28,6 +29,7 @@ export const ALL_TRIGGERS: Record<string, RuleTriggerMetadataDto> = {
         display: 'Asset changed',
         iconColor: '#3389ff',
         iconCode: 'assets',
+        hasProperties: true,
         title: 'Asset changed',
     },
     Comment: {
@@ -35,6 +37,7 @@ export const ALL_TRIGGERS: Record<string, RuleTriggerMetadataDto> = {
         display: 'User mentioned',
         iconColor: '#3389ff',
         iconCode: 'comments',
+        hasProperties: true,
         title: 'User mentioned',
     },
     ContentChanged: {
@@ -42,6 +45,7 @@ export const ALL_TRIGGERS: Record<string, RuleTriggerMetadataDto> = {
         display: 'Content changed',
         iconColor: '#3389ff',
         iconCode: 'contents',
+        hasProperties: true,
         title: 'Content changed',
     },
     Manual: {
@@ -49,6 +53,7 @@ export const ALL_TRIGGERS: Record<string, RuleTriggerMetadataDto> = {
         display: 'Manually triggered',
         iconColor: '#3389ff',
         iconCode: 'play-line',
+        hasProperties: false,
         title: 'Manually triggered',
     },
     SchemaChanged: {
@@ -56,6 +61,7 @@ export const ALL_TRIGGERS: Record<string, RuleTriggerMetadataDto> = {
         display: 'Schema changed',
         iconColor: '#3389ff',
         iconCode: 'schemas',
+        hasProperties: true,
         title: 'Schema changed',
     },
     Usage: {
@@ -63,6 +69,7 @@ export const ALL_TRIGGERS: Record<string, RuleTriggerMetadataDto> = {
         display: 'Usage exceeded',
         iconColor: '#3389ff',
         iconCode: 'dashboard',
+        hasProperties: true,
         title: 'Usage',
     },
 };
@@ -215,6 +222,20 @@ export class RulesService {
 
         return HTTP.requestVersioned(this.http, link.method, url).pipe(
             pretifyError('i18n:rules.ruleEvents.cancelFailed'));
+    }
+
+    public validateTrigger(appName: string, dto: RuleTriggerDto): Observable<DynamicRuleDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/validate/trigger`);
+
+        return this.http.post<any>(url, dto.toJSON()).pipe(
+            pretifyError('i18n:rules.ruleEvents.validationFailed'));
+    }
+
+    public validateStep(appName: string, dto: Record<string, any>): Observable<DynamicRuleDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/validate/step`);
+
+        return this.http.post<any>(url, dto).pipe(
+            pretifyError('i18n:rules.ruleEvents.validationFailed'));
     }
 
     public getCompletions(appName: string, actionType: string): Observable<ScriptCompletions> {

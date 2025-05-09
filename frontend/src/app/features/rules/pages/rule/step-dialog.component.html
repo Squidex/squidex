@@ -20,13 +20,15 @@
 
                     <div class="col-9 offset-3">
                         <div class="form-check">
-                            <input class="form-check-input" id="stepIgnore" [(ngModel)]="stepIgnore" [ngModelOptions]="{ standalone: true }" type="checkbox" />
+                            <input class="form-check-input" id="stepIgnore" [(ngModel)]="stepIgnoreError" [ngModelOptions]="{ standalone: true }" type="checkbox" />
                             <label class="form-check-label" for="stepIgnore"> {{ "rules.stepIgnoreError" | sqxTranslate }} </label>
                         </div>
                         <sqx-form-hint> {{ "rules.stepIgnoreErrorHint" | sqxTranslate }} </sqx-form-hint>
                     </div>
 
                     <hr />
+
+                    <sqx-form-error [error]="currentStep.error | async" />
 
                     @for (property of currentStep.editableProperties; track property.name) {
                         <div class="form-group row">

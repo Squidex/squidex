@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -17,6 +18,13 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards.Triggers;
 
 public class ContentChangedTriggerTests : GivenContext, IClassFixture<TranslationsFixture>
 {
+    private readonly RuleValidator validator;
+
+    public ContentChangedTriggerTests()
+    {
+        validator = new RuleValidator(null!, AppProvider);
+    }
+
     [Fact]
     public async Task Should_add_error_if_schema_id_is_not_defined()
     {
@@ -25,7 +33,7 @@ public class ContentChangedTriggerTests : GivenContext, IClassFixture<Translatio
             Schemas = ReadonlyList.Create(new SchemaCondition()),
         };
 
-        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider, CancellationToken);
+        var errors = await ValidateAsync(trigger);
 
         errors.Should().BeEquivalentTo(
             [
@@ -47,7 +55,7 @@ public class ContentChangedTriggerTests : GivenContext, IClassFixture<Translatio
             Schemas = ReadonlyList.Create(new SchemaCondition { SchemaId = SchemaId.Id }),
         };
 
-        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider, CancellationToken);
+        var errors = await ValidateAsync(trigger);
 
         errors.Should().BeEquivalentTo(
             [
@@ -60,7 +68,7 @@ public class ContentChangedTriggerTests : GivenContext, IClassFixture<Translatio
     {
         var trigger = new ContentChangedTriggerV2();
 
-        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider, CancellationToken);
+        var errors = await ValidateAsync(trigger);
 
         Assert.Empty(errors);
     }
@@ -73,7 +81,7 @@ public class ContentChangedTriggerTests : GivenContext, IClassFixture<Translatio
             Schemas = [],
         };
 
-        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider, CancellationToken);
+        var errors = await ValidateAsync(trigger);
 
         Assert.Empty(errors);
     }
@@ -89,8 +97,16 @@ public class ContentChangedTriggerTests : GivenContext, IClassFixture<Translatio
             Schemas = ReadonlyList.Create(new SchemaCondition { SchemaId = SchemaId.Id }),
         };
 
-        var errors = await RuleTriggerValidator.ValidateAsync(AppId.Id, trigger, AppProvider, CancellationToken);
+        var errors = await ValidateAsync(trigger);
 
         Assert.Empty(errors);
+    }
+
+    private async Task<List<ValidationError>> ValidateAsync(RuleTrigger trigger)
+    {
+        var errors = new List<ValidationError>();
+
+        await validator.ValidateTriggerAsync(trigger, AppId.Id, (m, p) => errors.Add(new ValidationError(m, p)), CancellationToken);
+        return errors;
     }
 }

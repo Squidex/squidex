@@ -181,28 +181,4 @@ public class RuleTests(ClientFixture fixture) : IClassFixture<ClientFixture>
 
         Assert.DoesNotContain(rules.Items, x => x.Id == rule.Id);
     }
-
-    [Fact]
-    public async Task Should_get_steps()
-    {
-        var steps = await _.Client.Rules.GetStepsAsync();
-
-        Assert.NotEmpty(steps);
-    }
-
-    [Fact]
-    public async Task Should_get_event_schemas()
-    {
-        var schema = await _.Client.Rules.GetEventSchemaAsync("EnrichedContentEvent");
-
-        Assert.NotNull(schema);
-    }
-
-    [Fact]
-    public async Task Should_get_event_types()
-    {
-        var eventTypes = await _.Client.Rules.GetEventTypesAsync();
-
-        Assert.NotEmpty(eventTypes);
-    }
 }
