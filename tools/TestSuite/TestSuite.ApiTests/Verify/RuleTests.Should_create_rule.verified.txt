@@ -31,9 +31,6 @@
     run/snapshots: {
       Method: PUT
     },
-    trigger: {
-      Method: PUT
-    },
     update: {
       Method: PUT
     }
