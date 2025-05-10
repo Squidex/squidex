@@ -22,9 +22,10 @@ public sealed class MongoShardedContentRepository(IShardingStrategy sharding, Fu
     : ShardedSnapshotStore<MongoContentRepository, WriteContent>(sharding, factory, x => x.AppId.Id), IContentRepository, IDeleter
 {
     public Task<Content?> FindContentAsync(App app, Schema schema, DomainId id, SearchScope scope,
+        IEnumerable<string>? fields,
         CancellationToken ct = default)
     {
-        return Shard(app.Id).FindContentAsync(app, schema, id, scope, ct);
+        return Shard(app.Id).FindContentAsync(app, schema, id, scope, fields, ct);
     }
 
     public Task<bool> HasReferrersAsync(App app, DomainId reference, SearchScope scope,
