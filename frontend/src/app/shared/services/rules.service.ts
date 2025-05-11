@@ -48,6 +48,14 @@ export const ALL_TRIGGERS: Record<string, RuleTriggerMetadataDto> = {
         hasProperties: true,
         title: 'Content changed',
     },
+    CronJob: {
+        description: 'To run tasks regularly, based on a cron expression...',
+        display: 'CronJob',
+        iconColor: '#3389ff',
+        iconCode: 'clock',
+        hasProperties: true,
+        title: 'ConJob scheduled',
+    },
     Manual: {
         description: 'To invoke processes manually, for example to update your static site...',
         display: 'Manually triggered',
@@ -242,5 +250,11 @@ export class RulesService {
         const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/completion/${actionType}`);
 
         return this.http.get<ScriptCompletions>(url);
+    }
+
+    public getTimezones(appName: string): Observable<ReadonlyArray<string>> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/rules/timezones`);
+
+        return this.http.get<ReadonlyArray<string>>(url);
     }
 }

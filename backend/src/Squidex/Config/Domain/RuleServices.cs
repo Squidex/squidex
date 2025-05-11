@@ -112,5 +112,6 @@ public static class RuleServices
             .As<IFlowExecutionCallback<FlowEventContext>>();
 
         services.AddFlows<FlowEventContext>(config);
+        services.AddCronJobs<CronJobContext>(config);
     }
 }

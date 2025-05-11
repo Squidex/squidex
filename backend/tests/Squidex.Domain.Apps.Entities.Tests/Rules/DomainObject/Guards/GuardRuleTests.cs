@@ -11,6 +11,7 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Flows;
+using Squidex.Flows.CronJobs;
 using Squidex.Flows.Internal;
 using Squidex.Infrastructure.Validation;
 
@@ -19,11 +20,12 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards;
 public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
 {
     private readonly IFlowManager<FlowEventContext> flowManager = A.Fake<IFlowManager<FlowEventContext>>();
+    private readonly IFlowCronJobManager<CronJobContext> flowCronJobs = A.Fake<IFlowCronJobManager<CronJobContext>>();
     private readonly IRuleValidator validator;
 
     public GuardRuleTests()
     {
-        validator = new RuleValidator(flowManager, AppProvider);
+        validator = new RuleValidator(flowManager, flowCronJobs, AppProvider);
     }
 
     [Fact]

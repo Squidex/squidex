@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Text.RegularExpressions;
-using Google.Protobuf;
 using Microsoft.OData.UriParser;
 using Microsoft.Spatial;
 

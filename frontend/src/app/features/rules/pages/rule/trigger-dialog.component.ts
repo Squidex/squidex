@@ -13,6 +13,7 @@ import { RuleElementComponent } from '../../shared/rule-element.component';
 import { AssetChangedTriggerComponent } from '../../shared/triggers/asset-changed-trigger.component';
 import { CommentTriggerComponent } from '../../shared/triggers/comment-trigger.component';
 import { ContentChangedTriggerComponent } from '../../shared/triggers/content-changed-trigger.component';
+import { CronJobTriggerComponent } from '../../shared/triggers/cron-job-trigger.component';
 import { SchemaChangedTriggerComponent } from '../../shared/triggers/schema-changed-trigger.component';
 import { UsageTriggerComponent } from '../../shared/triggers/usage-trigger.component';
 
@@ -26,6 +27,7 @@ import { UsageTriggerComponent } from '../../shared/triggers/usage-trigger.compo
         AsyncPipe,
         CommentTriggerComponent,
         ContentChangedTriggerComponent,
+        CronJobTriggerComponent,
         EntriesPipe,
         FormErrorComponent,
         ModalDialogComponent,

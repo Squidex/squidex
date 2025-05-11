@@ -7,7 +7,6 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.Text;
-using Google.Apis.Json;
 using Migrations.OldActions;
 using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Flows;

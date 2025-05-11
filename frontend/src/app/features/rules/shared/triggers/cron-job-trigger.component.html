@@ -1,0 +1,20 @@
+<div class="form-horizontal" [formGroup]="triggerForm.form">
+    <div class="form-group">
+        <label for="cronExpression">{{ "rules.conditions.cronExpression" | sqxTranslate }}</label>
+        <sqx-control-errors for="cronExpression" />
+        <input class="form-control" id="cronExpression" formControlName="cronExpression" />
+        <sqx-form-hint> {{ "rules.conditions.cronExpressionHint" | sqxTranslate }} </sqx-form-hint>
+    </div>
+
+    <div class="form-group">
+        <label for="cronTimezone">{{ "rules.conditions.cronTimezone" | sqxTranslate }}</label>
+        <sqx-control-errors for="cronTimezone" />
+        <select class="form-control" id="cronTimezone" formControlName="cronTimezone">
+            <option></option>
+            @for (timezone of timezones | async; track timezone) {
+                <option [ngValue]="timezone">{{ timezone }}</option>
+            }
+        </select>
+        <sqx-form-hint> {{ "rules.conditions.cronTimezoneHint" | sqxTranslate }} </sqx-form-hint>
+    </div>
+</div>

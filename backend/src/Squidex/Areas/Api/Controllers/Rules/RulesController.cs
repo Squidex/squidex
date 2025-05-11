@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Runner;
 using Squidex.Flows;
+using Squidex.Flows.CronJobs;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
@@ -35,9 +36,11 @@ public sealed class RulesController(
     IAppProvider appProvider,
     IFlowStepRegistry flowStepRegistry,
     IFlowManager<FlowEventContext> flowManager,
+    IFlowCronJobManager<CronJobContext> flowCronJobs,
     IRuleQueryService ruleQuery,
     IRuleRunnerService ruleRunnerService,
     IRuleValidator ruleValidator,
+    ScriptingCompleter scriptingCompleter,
     EventJsonSchemaGenerator eventJsonSchemaGenerator)
     : ApiController(commandBus)
 {
@@ -495,12 +498,23 @@ public sealed class RulesController(
     [ApiPermissionOrAnonymous]
     [ApiCosts(1)]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public IActionResult GetScriptCompletion(string app, string triggerType,
-        [FromServices] ScriptingCompleter completer)
+    public IActionResult GetScriptCompletion(string app, string triggerType)
     {
-        var completion = completer.Trigger(triggerType);
+        var completion = scriptingCompleter.Trigger(triggerType);
 
         return Ok(completion);
+    }
+
+    [HttpGet]
+    [Route("apps/{app}/rules/timezones")]
+    [ApiPermissionOrAnonymous]
+    [ApiCosts(1)]
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public IActionResult GetTimezones(string app)
+    {
+        var timezones = flowCronJobs.GetAvailableTimezoneIds();
+
+        return Ok(timezones);
     }
 
     private async Task<RuleDto> InvokeCommandAsync(ICommand command)

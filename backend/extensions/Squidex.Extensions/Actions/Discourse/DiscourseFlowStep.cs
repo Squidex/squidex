@@ -10,7 +10,6 @@ using System.Text;
 using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Extensions.Actions.Algolia;
 using Squidex.Flows;
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 

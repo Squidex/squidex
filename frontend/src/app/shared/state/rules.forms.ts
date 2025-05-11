@@ -103,6 +103,16 @@ export class TriggerForm extends Form<UntypedFormGroup, RuleTriggerDto> {
                     ),
                 });
             }
+            case 'CronJob': {
+                return new ExtendedFormGroup({
+                    cronExpression: new UntypedFormControl('',
+                        Validators.required,
+                    ),
+                    cronTimezone: new UntypedFormControl('',
+                        Validators.nullValidator,
+                    ),
+                });
+            }
             default: {
                 return new ExtendedFormGroup({
                     condition: new UntypedFormControl('',

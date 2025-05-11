@@ -15,7 +15,6 @@ using Squidex.Domain.Apps.Entities;
 using Squidex.Flows;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 using Command = Squidex.Domain.Apps.Entities.Contents.Commands.CreateContent;

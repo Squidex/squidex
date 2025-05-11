@@ -43,9 +43,9 @@ public sealed class RuleEnqueuer(
         get => GetType().Name;
     }
 
-    public async Task EnqueueAsync(DomainId ruleId, Rule rule, Envelope<IEvent> @event)
+    public async Task EnqueueAsync(DomainId ruleId, Rule? rule, Envelope<IEvent> @event,
+        CancellationToken ct = default)
     {
-        Guard.NotNull(rule);
         Guard.NotNull(@event, nameof(@event));
 
         if (@event.Payload is not AppEvent appEvent)
@@ -58,15 +58,13 @@ public sealed class RuleEnqueuer(
             AppId = appEvent.AppId,
             IncludeSkipped = false,
             IncludeStale = false,
-            Rules = new Dictionary<DomainId, Rule>
+            Rules = rule != null ? new Dictionary<DomainId, Rule>
             {
                 [ruleId] = rule,
-            }.ToReadonlyDictionary(),
+            }.ToReadonlyDictionary() : [],
         };
 
-        // Write in batches of 100 items for better performance. Dispose completes the last write.
-        await using var batch = new RuleQueueWriter(flowManager, ruleUsageTracker, log);
-
+        var batch = new RuleQueueWriter(flowManager, ruleUsageTracker, log);
         await foreach (var result in ruleService.CreateJobsAsync(@event, context))
         {
             await batch.WriteAsync(appEvent.AppId.Id, result);

@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Text.Json;
-using Squidex.AI;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Subscriptions;
 using Squidex.Domain.Apps.Entities;
@@ -71,6 +70,9 @@ public static class MessagingServices
 
             services.AddFlowsCore()
                 .AddWorker<FlowEventContext>();
+
+            services.AddCronJobsCore()
+                .AddWorker<CronJobContext>();
         }
 
         if (isRandomName)

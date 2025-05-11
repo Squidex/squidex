@@ -6385,6 +6385,9 @@ export abstract class RuleTriggerDto implements IRuleTriggerDto {
         if (data["triggerType"] === "ContentChanged") {
             return new ContentChangedRuleTriggerDto().init(data);
         }
+        if (data["triggerType"] === "CronJob") {
+            return new CronJobRuleTriggerDto().init(data);
+        }
         if (data["triggerType"] === "Manual") {
             return new ManualRuleTriggerDto().init(data);
         }
@@ -6626,6 +6629,54 @@ export class SchemaConditionDto implements ISchemaConditionDto {
 export interface ISchemaConditionDto {
     readonly schemaId: string;
     readonly condition?: string | undefined;
+}
+
+export class CronJobRuleTriggerDto extends RuleTriggerDto implements ICronJobRuleTriggerDto {
+    /** The cron expression that defines the interval. */
+    readonly cronExpression!: string;
+    /** The optional timezone. */
+    readonly cronTimezone?: string | undefined;
+    /** The value sent to the flow. */
+    readonly value!: any;
+
+    constructor(data?: ICronJobRuleTriggerDto) {
+        super(data);
+        (<any>this).triggerType = "CronJob";
+    }
+
+    init(_data: any) {
+        super.init(_data);
+        (<any>this).cronExpression = _data["cronExpression"];
+        (<any>this).cronTimezone = _data["cronTimezone"];
+        (<any>this).value = _data["value"];
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): CronJobRuleTriggerDto {
+        const result = new CronJobRuleTriggerDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["cronExpression"] = this.cronExpression;
+        data["cronTimezone"] = this.cronTimezone;
+        data["value"] = this.value;
+        super.toJSON(data);
+        this.cleanup(data);
+        return data;
+    }
+}
+
+export interface ICronJobRuleTriggerDto extends IRuleTriggerDto {
+    /** The cron expression that defines the interval. */
+    readonly cronExpression: string;
+    /** The optional timezone. */
+    readonly cronTimezone?: string | undefined;
+    /** The value sent to the flow. */
+    readonly value: any;
 }
 
 export class ManualRuleTriggerDto extends RuleTriggerDto implements IManualRuleTriggerDto {
@@ -7511,7 +7562,7 @@ export interface IFastlyFlowStepDto extends IFlowStepDto {
 
 export class IfFlowStepDto extends FlowStepDto implements IIfFlowStepDto {
     /** The delay in seconds. */
-    readonly branches!: IfFlowBranchDto[];
+    readonly branches?: IfFlowBranchDto[] | undefined;
     readonly elseStepId?: string | undefined;
 
     constructor(data?: IIfFlowStepDto) {
@@ -7553,7 +7604,7 @@ export class IfFlowStepDto extends FlowStepDto implements IIfFlowStepDto {
 
 export interface IIfFlowStepDto extends IFlowStepDto {
     /** The delay in seconds. */
-    readonly branches: IfFlowBranchDto[];
+    readonly branches?: IfFlowBranchDto[] | undefined;
     readonly elseStepId?: string | undefined;
 }
 
@@ -9329,6 +9380,67 @@ export interface IUpdateRuleDto {
     readonly flow?: FlowDefinitionDto | undefined;
     /** Enable or disable the rule. */
     readonly isEnabled?: boolean | undefined;
+}
+
+export class TriggerRuleDto implements ITriggerRuleDto {
+    /** Uses the cache values because the actual object is frozen. */
+    private readonly cachedValues: { [key: string]: any } = {};
+    /** The optional value to send to the flow. */
+    readonly value?: any;
+
+    constructor(data?: ITriggerRuleDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data: any) {
+        (<any>this).value = _data["value"];
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): TriggerRuleDto {
+        const result = new TriggerRuleDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["value"] = this.value;
+        this.cleanup(data);
+        return data;
+    }
+
+    protected cleanup(target: any) {
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
+    }
+
+    protected compute<T>(key: string, action: () => T): T {
+        if (!this.cachedValues.hasOwnProperty(key)) {
+            const value = action();
+            this.cachedValues[key] = value;
+            return value;
+        } else {
+            return this.cachedValues[key] as any;
+        }
+    }
+}
+
+export interface ITriggerRuleDto {
+    /** The optional value to send to the flow. */
+    readonly value?: any;
 }
 
 export class SimulatedRuleEventsDto extends ResourceDto implements ISimulatedRuleEventsDto {
@@ -16009,6 +16121,650 @@ export interface IUpdateWorkflowDto {
     readonly schemaIds?: string[] | undefined;
     /** The initial step. */
     readonly initial: string;
+}
+
+export abstract class EnrichedEventDto implements IEnrichedEventDto {
+    /** The discriminator. */
+    public readonly $type!: string;
+    /** Uses the cache values because the actual object is frozen. */
+    private readonly cachedValues: { [key: string]: any } = {};
+    readonly appId!: string;
+    readonly timestamp!: DateTime;
+    readonly name!: string;
+    readonly version!: number;
+    readonly partition!: number;
+
+    constructor(data?: IEnrichedEventDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+        (<any>this).$type = "EnrichedEventDto";
+    }
+
+    init(_data: any) {
+        (<any>this).appId = _data["appId"];
+        (<any>this).timestamp = _data["timestamp"] ? DateTime.parseISO(_data["timestamp"].toString()) : <any>undefined;
+        (<any>this).name = _data["name"];
+        (<any>this).version = _data["version"];
+        (<any>this).partition = _data["partition"];
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): EnrichedEventDto {
+        if (data["$type"] === "EnrichedAssetEvent") {
+            return new EnrichedAssetEventDto().init(data);
+        }
+        if (data["$type"] === "EnrichedUserEventBaseEventDto") {
+            throw new Error("The abstract class 'EnrichedUserEventBaseEventDto' cannot be instantiated.");
+        }
+        if (data["$type"] === "EnrichedCommentEvent") {
+            return new EnrichedCommentEventDto().init(data);
+        }
+        if (data["$type"] === "EnrichedContentEvent") {
+            return new EnrichedContentEventDto().init(data);
+        }
+        if (data["$type"] === "EnrichedSchemaEventBaseEventDto") {
+            throw new Error("The abstract class 'EnrichedSchemaEventBaseEventDto' cannot be instantiated.");
+        }
+        if (data["$type"] === "EnrichedCronJobEvent") {
+            return new EnrichedCronJobEventDto().init(data);
+        }
+        if (data["$type"] === "EnrichedManualEvent") {
+            return new EnrichedManualEventDto().init(data);
+        }
+        if (data["$type"] === "EnrichedSchemaEvent") {
+            return new EnrichedSchemaEventDto().init(data);
+        }
+        if (data["$type"] === "EnrichedUsageExceededEvent") {
+            return new EnrichedUsageExceededEventDto().init(data);
+        }
+        throw new Error("The abstract class 'EnrichedEventDto' cannot be instantiated.");
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["$type"] = this.$type;
+        data["appId"] = this.appId;
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["name"] = this.name;
+        data["version"] = this.version;
+        data["partition"] = this.partition;
+        this.cleanup(data);
+        return data;
+    }
+
+    protected cleanup(target: any) {
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
+    }
+
+    protected compute<T>(key: string, action: () => T): T {
+        if (!this.cachedValues.hasOwnProperty(key)) {
+            const value = action();
+            this.cachedValues[key] = value;
+            return value;
+        } else {
+            return this.cachedValues[key] as any;
+        }
+    }
+}
+
+export interface IEnrichedEventDto {
+    readonly appId: string;
+    readonly timestamp: DateTime;
+    readonly name: string;
+    readonly version: number;
+    readonly partition: number;
+}
+
+export abstract class EnrichedUserEventBaseEventDto extends EnrichedEventDto implements IEnrichedUserEventBaseEventDto {
+    readonly actor!: string;
+
+    constructor(data?: IEnrichedUserEventBaseEventDto) {
+        super(data);
+        (<any>this).$type = "EnrichedUserEventBaseEventDto";
+    }
+
+    init(_data: any) {
+        super.init(_data);
+        (<any>this).actor = _data["actor"];
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): EnrichedUserEventBaseEventDto {
+        if (data["$type"] === "EnrichedAssetEvent") {
+            return new EnrichedAssetEventDto().init(data);
+        }
+        if (data["$type"] === "EnrichedCommentEvent") {
+            return new EnrichedCommentEventDto().init(data);
+        }
+        if (data["$type"] === "EnrichedContentEvent") {
+            return new EnrichedContentEventDto().init(data);
+        }
+        if (data["$type"] === "EnrichedSchemaEventBaseEventDto") {
+            throw new Error("The abstract class 'EnrichedSchemaEventBaseEventDto' cannot be instantiated.");
+        }
+        if (data["$type"] === "EnrichedCronJobEvent") {
+            return new EnrichedCronJobEventDto().init(data);
+        }
+        if (data["$type"] === "EnrichedManualEvent") {
+            return new EnrichedManualEventDto().init(data);
+        }
+        if (data["$type"] === "EnrichedSchemaEvent") {
+            return new EnrichedSchemaEventDto().init(data);
+        }
+        throw new Error("The abstract class 'EnrichedUserEventBaseEventDto' cannot be instantiated.");
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["actor"] = this.actor;
+        super.toJSON(data);
+        this.cleanup(data);
+        return data;
+    }
+}
+
+export interface IEnrichedUserEventBaseEventDto extends IEnrichedEventDto {
+    readonly actor: string;
+}
+
+export class EnrichedAssetEventDto extends EnrichedUserEventBaseEventDto implements IEnrichedAssetEventDto {
+    readonly type!: EnrichedAssetEventType;
+    readonly id!: string;
+    readonly created!: DateTime;
+    readonly lastModified!: DateTime;
+    readonly createdBy!: string;
+    readonly lastModifiedBy!: string;
+    readonly parentId!: string;
+    readonly mimeType!: string;
+    readonly fileName!: string;
+    readonly fileHash!: string;
+    readonly slug!: string;
+    readonly fileVersion!: number;
+    readonly fileSize!: number;
+    readonly isProtected!: boolean;
+    readonly pixelWidth?: number | undefined;
+    readonly pixelHeight?: number | undefined;
+    readonly assetType!: AssetType;
+    readonly metadata!: { [key: string]: any; };
+    readonly isImage!: boolean;
+    readonly partition!: number;
+
+    constructor(data?: IEnrichedAssetEventDto) {
+        super(data);
+        (<any>this).$type = "EnrichedAssetEvent";
+    }
+
+    init(_data: any) {
+        super.init(_data);
+        (<any>this).type = _data["type"];
+        (<any>this).id = _data["id"];
+        (<any>this).created = _data["created"] ? DateTime.parseISO(_data["created"].toString()) : <any>undefined;
+        (<any>this).lastModified = _data["lastModified"] ? DateTime.parseISO(_data["lastModified"].toString()) : <any>undefined;
+        (<any>this).createdBy = _data["createdBy"];
+        (<any>this).lastModifiedBy = _data["lastModifiedBy"];
+        (<any>this).parentId = _data["parentId"];
+        (<any>this).mimeType = _data["mimeType"];
+        (<any>this).fileName = _data["fileName"];
+        (<any>this).fileHash = _data["fileHash"];
+        (<any>this).slug = _data["slug"];
+        (<any>this).fileVersion = _data["fileVersion"];
+        (<any>this).fileSize = _data["fileSize"];
+        (<any>this).isProtected = _data["isProtected"];
+        (<any>this).pixelWidth = _data["pixelWidth"];
+        (<any>this).pixelHeight = _data["pixelHeight"];
+        (<any>this).assetType = _data["assetType"];
+        if (_data["metadata"]) {
+            (<any>this).metadata = {} as any;
+            for (let key in _data["metadata"]) {
+                if (_data["metadata"].hasOwnProperty(key))
+                    (<any>(<any>this).metadata)![key] = _data["metadata"][key];
+            }
+        }
+        (<any>this).isImage = _data["isImage"];
+        (<any>this).partition = _data["partition"];
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): EnrichedAssetEventDto {
+        const result = new EnrichedAssetEventDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["type"] = this.type;
+        data["id"] = this.id;
+        data["created"] = this.created ? this.created.toISOString() : <any>undefined;
+        data["lastModified"] = this.lastModified ? this.lastModified.toISOString() : <any>undefined;
+        data["createdBy"] = this.createdBy;
+        data["lastModifiedBy"] = this.lastModifiedBy;
+        data["parentId"] = this.parentId;
+        data["mimeType"] = this.mimeType;
+        data["fileName"] = this.fileName;
+        data["fileHash"] = this.fileHash;
+        data["slug"] = this.slug;
+        data["fileVersion"] = this.fileVersion;
+        data["fileSize"] = this.fileSize;
+        data["isProtected"] = this.isProtected;
+        data["pixelWidth"] = this.pixelWidth;
+        data["pixelHeight"] = this.pixelHeight;
+        data["assetType"] = this.assetType;
+        if (this.metadata) {
+            data["metadata"] = {};
+            for (let key in this.metadata) {
+                if (this.metadata.hasOwnProperty(key))
+                    (<any>data["metadata"])[key] = (<any>this.metadata)[key];
+            }
+        }
+        data["isImage"] = this.isImage;
+        data["partition"] = this.partition;
+        super.toJSON(data);
+        this.cleanup(data);
+        return data;
+    }
+}
+
+export interface IEnrichedAssetEventDto extends IEnrichedUserEventBaseEventDto {
+    readonly type: EnrichedAssetEventType;
+    readonly id: string;
+    readonly created: DateTime;
+    readonly lastModified: DateTime;
+    readonly createdBy: string;
+    readonly lastModifiedBy: string;
+    readonly parentId: string;
+    readonly mimeType: string;
+    readonly fileName: string;
+    readonly fileHash: string;
+    readonly slug: string;
+    readonly fileVersion: number;
+    readonly fileSize: number;
+    readonly isProtected: boolean;
+    readonly pixelWidth?: number | undefined;
+    readonly pixelHeight?: number | undefined;
+    readonly assetType: AssetType;
+    readonly metadata: { [key: string]: any; };
+    readonly isImage: boolean;
+    readonly partition: number;
+}
+
+export type EnrichedAssetEventType = "Created" | "Deleted" | "Annotated" | "Updated";
+
+export const EnrichedAssetEventTypeValues: ReadonlyArray<EnrichedAssetEventType> = [
+	"Created",
+	"Deleted",
+	"Annotated",
+	"Updated"
+];
+
+export class EnrichedCommentEventDto extends EnrichedUserEventBaseEventDto implements IEnrichedCommentEventDto {
+    readonly text!: string;
+    readonly url?: string | undefined;
+
+    constructor(data?: IEnrichedCommentEventDto) {
+        super(data);
+        (<any>this).$type = "EnrichedCommentEvent";
+    }
+
+    init(_data: any) {
+        super.init(_data);
+        (<any>this).text = _data["text"];
+        (<any>this).url = _data["url"];
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): EnrichedCommentEventDto {
+        const result = new EnrichedCommentEventDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["text"] = this.text;
+        data["url"] = this.url;
+        super.toJSON(data);
+        this.cleanup(data);
+        return data;
+    }
+}
+
+export interface IEnrichedCommentEventDto extends IEnrichedUserEventBaseEventDto {
+    readonly text: string;
+    readonly url?: string | undefined;
+}
+
+export abstract class EnrichedSchemaEventBaseEventDto extends EnrichedUserEventBaseEventDto implements IEnrichedSchemaEventBaseEventDto {
+    readonly schemaId!: string;
+
+    constructor(data?: IEnrichedSchemaEventBaseEventDto) {
+        super(data);
+        (<any>this).$type = "EnrichedSchemaEventBaseEventDto";
+    }
+
+    init(_data: any) {
+        super.init(_data);
+        (<any>this).schemaId = _data["schemaId"];
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): EnrichedSchemaEventBaseEventDto {
+        if (data["$type"] === "EnrichedContentEvent") {
+            return new EnrichedContentEventDto().init(data);
+        }
+        if (data["$type"] === "EnrichedSchemaEvent") {
+            return new EnrichedSchemaEventDto().init(data);
+        }
+        throw new Error("The abstract class 'EnrichedSchemaEventBaseEventDto' cannot be instantiated.");
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["schemaId"] = this.schemaId;
+        super.toJSON(data);
+        this.cleanup(data);
+        return data;
+    }
+}
+
+export interface IEnrichedSchemaEventBaseEventDto extends IEnrichedUserEventBaseEventDto {
+    readonly schemaId: string;
+}
+
+export class EnrichedContentEventDto extends EnrichedSchemaEventBaseEventDto implements IEnrichedContentEventDto {
+    readonly type!: EnrichedContentEventType;
+    readonly id!: string;
+    readonly created!: DateTime;
+    readonly lastModified!: DateTime;
+    readonly createdBy!: string;
+    readonly lastModifiedBy!: string;
+    readonly data!: { [key: string]: { [key: string]: any; }; };
+    readonly dataOld?: { [key: string]: { [key: string]: any; }; } | undefined;
+    readonly status!: string;
+    readonly newStatus?: string | undefined;
+    readonly partition!: number;
+
+    constructor(data?: IEnrichedContentEventDto) {
+        super(data);
+        (<any>this).$type = "EnrichedContentEvent";
+    }
+
+    init(_data: any) {
+        super.init(_data);
+        (<any>this).type = _data["type"];
+        (<any>this).id = _data["id"];
+        (<any>this).created = _data["created"] ? DateTime.parseISO(_data["created"].toString()) : <any>undefined;
+        (<any>this).lastModified = _data["lastModified"] ? DateTime.parseISO(_data["lastModified"].toString()) : <any>undefined;
+        (<any>this).createdBy = _data["createdBy"];
+        (<any>this).lastModifiedBy = _data["lastModifiedBy"];
+        if (_data["data"]) {
+            (<any>this).data = {} as any;
+            for (let key in _data["data"]) {
+                if (_data["data"].hasOwnProperty(key))
+                    (<any>(<any>this).data)![key] = _data["data"][key];
+            }
+        }
+        if (_data["dataOld"]) {
+            (<any>this).dataOld = {} as any;
+            for (let key in _data["dataOld"]) {
+                if (_data["dataOld"].hasOwnProperty(key))
+                    (<any>(<any>this).dataOld)![key] = _data["dataOld"][key];
+            }
+        }
+        (<any>this).status = _data["status"];
+        (<any>this).newStatus = _data["newStatus"];
+        (<any>this).partition = _data["partition"];
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): EnrichedContentEventDto {
+        const result = new EnrichedContentEventDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["type"] = this.type;
+        data["id"] = this.id;
+        data["created"] = this.created ? this.created.toISOString() : <any>undefined;
+        data["lastModified"] = this.lastModified ? this.lastModified.toISOString() : <any>undefined;
+        data["createdBy"] = this.createdBy;
+        data["lastModifiedBy"] = this.lastModifiedBy;
+        if (this.data) {
+            data["data"] = {};
+            for (let key in this.data) {
+                if (this.data.hasOwnProperty(key))
+                    (<any>data["data"])[key] = (<any>this.data)[key];
+            }
+        }
+        if (this.dataOld) {
+            data["dataOld"] = {};
+            for (let key in this.dataOld) {
+                if (this.dataOld.hasOwnProperty(key))
+                    (<any>data["dataOld"])[key] = (<any>this.dataOld)[key];
+            }
+        }
+        data["status"] = this.status;
+        data["newStatus"] = this.newStatus;
+        data["partition"] = this.partition;
+        super.toJSON(data);
+        this.cleanup(data);
+        return data;
+    }
+}
+
+export interface IEnrichedContentEventDto extends IEnrichedSchemaEventBaseEventDto {
+    readonly type: EnrichedContentEventType;
+    readonly id: string;
+    readonly created: DateTime;
+    readonly lastModified: DateTime;
+    readonly createdBy: string;
+    readonly lastModifiedBy: string;
+    readonly data: { [key: string]: { [key: string]: any; }; };
+    readonly dataOld?: { [key: string]: { [key: string]: any; }; } | undefined;
+    readonly status: string;
+    readonly newStatus?: string | undefined;
+    readonly partition: number;
+}
+
+export type EnrichedContentEventType = "Created" | "Deleted" | "Published" | "StatusChanged" | "Updated" | "Unpublished" | "ReferenceUpdated";
+
+export const EnrichedContentEventTypeValues: ReadonlyArray<EnrichedContentEventType> = [
+	"Created",
+	"Deleted",
+	"Published",
+	"StatusChanged",
+	"Updated",
+	"Unpublished",
+	"ReferenceUpdated"
+];
+
+export class EnrichedCronJobEventDto extends EnrichedUserEventBaseEventDto implements IEnrichedCronJobEventDto {
+    readonly value!: any;
+    readonly partition!: number;
+
+    constructor(data?: IEnrichedCronJobEventDto) {
+        super(data);
+        (<any>this).$type = "EnrichedCronJobEvent";
+    }
+
+    init(_data: any) {
+        super.init(_data);
+        (<any>this).value = _data["value"];
+        (<any>this).partition = _data["partition"];
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): EnrichedCronJobEventDto {
+        const result = new EnrichedCronJobEventDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["value"] = this.value;
+        data["partition"] = this.partition;
+        super.toJSON(data);
+        this.cleanup(data);
+        return data;
+    }
+}
+
+export interface IEnrichedCronJobEventDto extends IEnrichedUserEventBaseEventDto {
+    readonly value: any;
+    readonly partition: number;
+}
+
+export class EnrichedManualEventDto extends EnrichedUserEventBaseEventDto implements IEnrichedManualEventDto {
+    readonly value!: any;
+    readonly partition!: number;
+
+    constructor(data?: IEnrichedManualEventDto) {
+        super(data);
+        (<any>this).$type = "EnrichedManualEvent";
+    }
+
+    init(_data: any) {
+        super.init(_data);
+        (<any>this).value = _data["value"];
+        (<any>this).partition = _data["partition"];
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): EnrichedManualEventDto {
+        const result = new EnrichedManualEventDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["value"] = this.value;
+        data["partition"] = this.partition;
+        super.toJSON(data);
+        this.cleanup(data);
+        return data;
+    }
+}
+
+export interface IEnrichedManualEventDto extends IEnrichedUserEventBaseEventDto {
+    readonly value: any;
+    readonly partition: number;
+}
+
+export class EnrichedSchemaEventDto extends EnrichedSchemaEventBaseEventDto implements IEnrichedSchemaEventDto {
+    readonly type!: EnrichedSchemaEventType;
+    readonly id!: string;
+    readonly partition!: number;
+
+    constructor(data?: IEnrichedSchemaEventDto) {
+        super(data);
+        (<any>this).$type = "EnrichedSchemaEvent";
+    }
+
+    init(_data: any) {
+        super.init(_data);
+        (<any>this).type = _data["type"];
+        (<any>this).id = _data["id"];
+        (<any>this).partition = _data["partition"];
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): EnrichedSchemaEventDto {
+        const result = new EnrichedSchemaEventDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["type"] = this.type;
+        data["id"] = this.id;
+        data["partition"] = this.partition;
+        super.toJSON(data);
+        this.cleanup(data);
+        return data;
+    }
+}
+
+export interface IEnrichedSchemaEventDto extends IEnrichedSchemaEventBaseEventDto {
+    readonly type: EnrichedSchemaEventType;
+    readonly id: string;
+    readonly partition: number;
+}
+
+export type EnrichedSchemaEventType = "Created" | "Deleted" | "Published" | "Unpublished" | "Updated";
+
+export const EnrichedSchemaEventTypeValues: ReadonlyArray<EnrichedSchemaEventType> = [
+	"Created",
+	"Deleted",
+	"Published",
+	"Unpublished",
+	"Updated"
+];
+
+export class EnrichedUsageExceededEventDto extends EnrichedEventDto implements IEnrichedUsageExceededEventDto {
+    readonly callsCurrent!: number;
+    readonly callsLimit!: number;
+    readonly partition!: number;
+
+    constructor(data?: IEnrichedUsageExceededEventDto) {
+        super(data);
+        (<any>this).$type = "EnrichedUsageExceededEvent";
+    }
+
+    init(_data: any) {
+        super.init(_data);
+        (<any>this).callsCurrent = _data["callsCurrent"];
+        (<any>this).callsLimit = _data["callsLimit"];
+        (<any>this).partition = _data["partition"];
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): EnrichedUsageExceededEventDto {
+        const result = new EnrichedUsageExceededEventDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["callsCurrent"] = this.callsCurrent;
+        data["callsLimit"] = this.callsLimit;
+        data["partition"] = this.partition;
+        super.toJSON(data);
+        this.cleanup(data);
+        return data;
+    }
+}
+
+export interface IEnrichedUsageExceededEventDto extends IEnrichedEventDto {
+    readonly callsCurrent: number;
+    readonly callsLimit: number;
+    readonly partition: number;
 }
 
 export class DynamicCreateRuleDto implements IDynamicCreateRuleDto {

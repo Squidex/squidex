@@ -27,6 +27,10 @@
                             [triggerForm]="currentTrigger" />
                     }
 
+                    @case ("CronJob") {
+                        <sqx-cron-job-trigger [triggerForm]="currentTrigger" />
+                    }
+
                     @case ("SchemaChanged") {
                         <sqx-schema-changed-trigger [triggerForm]="currentTrigger" />
                     }

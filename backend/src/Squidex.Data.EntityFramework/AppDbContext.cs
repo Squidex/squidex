@@ -37,11 +37,12 @@ public abstract class AppDbContext(DbContextOptions options, IJsonSerializer jso
         builder.UseAssetKeyValueStore<TusMetadata>();
         builder.UseAssets(jsonSerializer, jsonColumnType);
         builder.UseCache();
-        builder.UseCounters(jsonSerializer, jsonColumnType);
         builder.UseChatStore();
         builder.UseContent(jsonSerializer, jsonColumnType, string.Empty);
         builder.UseContentReferences(string.Empty);
         builder.UseContentTables();
+        builder.UseCounters(jsonSerializer, jsonColumnType);
+        builder.UseCronJobs();
         builder.UseEvents(jsonSerializer, jsonColumnType);
         builder.UseEventStore();
         builder.UseFlows();

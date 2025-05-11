@@ -5,14 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Domain.Apps.Entities.Rules;
+namespace Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 
-public interface IRuleEnqueuer
+public sealed class EnrichedCronJobEvent : EnrichedUserEventBase
 {
-    Task EnqueueAsync(DomainId ruleId, Rule? rule, Envelope<IEvent> @event,
-        CancellationToken ct = default);
+    public JsonValue Value { get; set; }
+
+    public override long Partition
+    {
+        get => 0;
+    }
 }

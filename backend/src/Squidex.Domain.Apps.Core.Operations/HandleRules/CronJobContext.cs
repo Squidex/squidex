@@ -5,14 +5,16 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Json.Objects;
 
-namespace Squidex.Domain.Apps.Entities.Rules;
+namespace Squidex.Domain.Apps.Core.HandleRules;
 
-public interface IRuleEnqueuer
+public sealed class CronJobContext
 {
-    Task EnqueueAsync(DomainId ruleId, Rule? rule, Envelope<IEvent> @event,
-        CancellationToken ct = default);
+    required public NamedId<DomainId> AppId { get; set; }
+
+    required public DomainId RuleId { get; set; }
+
+    required public JsonValue Value { get; set; }
 }

@@ -27,7 +27,12 @@ namespace Squidex.Areas.Api.Controllers.Schemas;
 /// Update and query information about schemas.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Schemas))]
-public sealed class SchemasController(ICommandBus commandBus, IAppProvider appProvider, IContentWorkflow workflow) : ApiController(commandBus)
+public sealed class SchemasController(
+    ICommandBus commandBus,
+    IContentWorkflow workflow,
+    IAppProvider appProvider,
+    ScriptingCompleter scriptingCompleter)
+    : ApiController(commandBus)
 {
     /// <summary>
     /// Get schemas.
@@ -307,10 +312,9 @@ public sealed class SchemasController(ICommandBus commandBus, IAppProvider appPr
     [ApiPermissionOrAnonymous]
     [ApiCosts(1)]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<IActionResult> GetContentScriptsCompletion(string app, string schema,
-        [FromServices] ScriptingCompleter completer)
+    public async Task<IActionResult> GetContentScriptsCompletion(string app, string schema)
     {
-        var completion = completer.ContentScript(await BuildModel());
+        var completion = scriptingCompleter.ContentScript(await BuildModel());
 
         return Ok(completion);
     }
@@ -320,10 +324,9 @@ public sealed class SchemasController(ICommandBus commandBus, IAppProvider appPr
     [ApiPermissionOrAnonymous]
     [ApiCosts(1)]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<IActionResult> GetContentTriggersCompletion(string app, string schema,
-        [FromServices] ScriptingCompleter completer)
+    public async Task<IActionResult> GetContentTriggersCompletion(string app, string schema)
     {
-        var completion = completer.ContentTrigger(await BuildModel());
+        var completion = scriptingCompleter.ContentTrigger(await BuildModel());
 
         return Ok(completion);
     }
@@ -333,10 +336,9 @@ public sealed class SchemasController(ICommandBus commandBus, IAppProvider appPr
     [ApiPermissionOrAnonymous]
     [ApiCosts(1)]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<IActionResult> GetFieldRulesCompletion(string app, string schema,
-        [FromServices] ScriptingCompleter completer)
+    public async Task<IActionResult> GetFieldRulesCompletion(string app, string schema)
     {
-        var completion = completer.FieldRule(await BuildModel());
+        var completion = scriptingCompleter.FieldRule(await BuildModel());
 
         return Ok(completion);
     }
@@ -346,10 +348,9 @@ public sealed class SchemasController(ICommandBus commandBus, IAppProvider appPr
     [ApiPermissionOrAnonymous]
     [ApiCosts(1)]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public async Task<IActionResult> GetPreviewUrlsCompletion(string app, string schema,
-        [FromServices] ScriptingCompleter completer)
+    public async Task<IActionResult> GetPreviewUrlsCompletion(string app, string schema)
     {
-        var completion = completer.PreviewUrl(await BuildModel());
+        var completion = scriptingCompleter.PreviewUrl(await BuildModel());
 
         return Ok(completion);
     }
