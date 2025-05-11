@@ -1,6 +1,10 @@
 @import 'mixins';
 @import 'vars';
 
+:host {
+    display: inline-flex
+}
+
 :host ::ng-deep {
     svg {
         fill: $color-white;

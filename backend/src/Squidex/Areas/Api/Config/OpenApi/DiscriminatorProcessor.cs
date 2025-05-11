@@ -8,6 +8,7 @@
 using GraphQL.Utilities;
 using NJsonSchema;
 using NJsonSchema.Generation;
+using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Areas.Api.Config.OpenApi;
