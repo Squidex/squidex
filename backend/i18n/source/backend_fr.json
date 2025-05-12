@@ -270,7 +270,7 @@
   "schemas.fieldsNotCovered": "Les ID de champ ne couvrent pas tous les champs.",
   "schemas.nameAlreadyExists": "Un schéma portant le même nom existe déjà.",
   "schemas.noPermission": "Vous n'avez pas l'autorisation pour ce schéma.",
-  "schemas.notFoundId": "Le schéma {id} n'existe pas.",
+  "rules.validation.schemaNotFound": "Le schéma {id} n'existe pas.",
   "schemas.number.inlineEditorError": "L'édition en ligne n'est pas autorisée pour l'éditeur radio.",
   "schemas.onlyArraysHaveNested": "Seuls les champs de tableau peuvent avoir des champs imbriqués.",
   "schemas.onylArraysInRoot": "Les champs imbriqués ne peuvent pas être des champs de tableau.",

@@ -251,7 +251,7 @@
   "schemas.fieldsNotCovered": "Veld-id's dekken niet alle velden.",
   "schemas.nameAlreadyExists": "Er bestaat al een schema met dezelfde naam.",
   "schemas.noPermission": "Je hebt geen toestemming voor dit schema.",
-  "schemas.notFoundId": "Schema {id} bestaat niet.",
+  "rules.validation.schemaNotFound": "Schema {id} bestaat niet.",
   "schemas.number.inlineEditorError": "Inline bewerken is niet toegestaan ​​voor Radio-editor.",
   "schemas.onlyArraysHaveNested": "Alleen matrixvelden kunnen geneste velden bevatten.",
   "schemas.onylArraysInRoot": "Genest veld mag geen matrixvelden zijn.",

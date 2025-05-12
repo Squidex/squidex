@@ -141,7 +141,7 @@ public sealed class RuleValidator(
                 }
                 else if (await args.AppProvider.GetSchemaAsync(args.AppId, schema.SchemaId, false, args.CancellationToken) == null)
                 {
-                    args.AddError(T.Get("schemas.notFoundId", new { id = schema.SchemaId }), nameof(trigger.Schemas));
+                    args.AddError(T.Get("rules.validation.schemaNotFound", new { id = schema.SchemaId }), nameof(trigger.Schemas));
                 }
             }
 

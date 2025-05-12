@@ -240,7 +240,7 @@
   "schemas.fieldsNotCovered": "Non tutti i campi hanno degli ID associati.",
   "schemas.nameAlreadyExists": "Esiste già uno schema con lo stesso nome.",
   "schemas.noPermission": "Non hai i permessi per questo schema.",
-  "schemas.notFoundId": "Lo schema {id} non esiste.",
+  "rules.validation.schemaNotFound": "Lo schema {id} non esiste.",
   "schemas.number.inlineEditorError": "Non è consentita per l'editor di tipo radio la modifica in linea.",
   "schemas.onlyArraysHaveNested": "Solo i campi di tipo array possono avere campi annidati.",
   "schemas.onylArraysInRoot": "Non è possibile annidare un campo di tipo array.",

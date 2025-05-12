@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AppsState, ControlErrorsComponent, FormHintComponent, RulesService, TranslatePipe, TriggerForm } from '@app/shared';
+import { AppsState, CodeComponent, ControlErrorsComponent, FormHintComponent, RulesService, TranslatePipe, TriggerForm } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -17,6 +17,7 @@ import { AppsState, ControlErrorsComponent, FormHintComponent, RulesService, Tra
     templateUrl: './cron-job-trigger.component.html',
     imports: [
         AsyncPipe,
+        CodeComponent,
         ControlErrorsComponent,
         FormHintComponent,
         FormsModule,

@@ -31,6 +31,7 @@ public sealed class DefaultRuleRunnerService(
     : IRuleRunnerService
 {
     private const int MaxSimulatedEvents = 100;
+    private static readonly RefToken SimulatorUser = RefToken.Client("Simulator");
 
     public IClock Clock { get; set; } = SystemClock.Instance;
 
@@ -97,9 +98,9 @@ public sealed class DefaultRuleRunnerService(
             yield return Envelope.Create<AppEvent>(
                 new RuleManuallyTriggered
                 {
+                    Actor = SimulatorUser,
                     AppId = appId,
-                    Actor = RefToken.Client("Simulator"),
-                    RuleId = rule.Id
+                    RuleId = rule.Id,
                 });
 
             yield break;
@@ -110,8 +111,8 @@ public sealed class DefaultRuleRunnerService(
             yield return Envelope.Create<AppEvent>(
                 new RuleCronJobTriggered
                 {
+                    Actor = SimulatorUser,
                     AppId = appId,
-                    Actor = RefToken.Client("Simulator"),
                     RuleId = rule.Id,
                     Value = cronJob.Value,
                 });

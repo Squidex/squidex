@@ -13,6 +13,6 @@ namespace Squidex.Domain.Apps.Entities.Rules;
 
 public interface IRuleEnqueuer
 {
-    Task EnqueueAsync(DomainId ruleId, Rule? rule, Envelope<IEvent> @event,
+    Task EnqueueAsync(DomainId ruleId, Rule rule, Envelope<IEvent> @event,
         CancellationToken ct = default);
 }

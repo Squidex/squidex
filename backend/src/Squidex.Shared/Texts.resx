@@ -943,6 +943,9 @@
   <data name="rules.validation.noSteps" xml:space="preserve">
     <value>Flow has no step</value>
   </data>
+  <data name="rules.validation.schemaNotFound" xml:space="preserve">
+    <value>Schema {id} does not exist.</value>
+  </data>
   <data name="schemas.dateTimeCalculatedDefaultAndDefaultError" xml:space="preserve">
     <value>Calculated default value and default value cannot be used together.</value>
   </data>
@@ -969,9 +972,6 @@
   </data>
   <data name="schemas.noPermission" xml:space="preserve">
     <value>You do not have permission for this schema.</value>
-  </data>
-  <data name="schemas.notFoundId" xml:space="preserve">
-    <value>Schema {id} does not exist.</value>
   </data>
   <data name="schemas.number.inlineEditorError" xml:space="preserve">
     <value>Inline editing is not allowed for Radio editor.</value>

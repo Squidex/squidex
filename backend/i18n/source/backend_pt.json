@@ -269,7 +269,7 @@
   "schemas.fieldsNotCovered": "Ids do campo não cobrem todos os campos.",
   "schemas.nameAlreadyExists": "Um esquema com o mesmo nome já existe.",
   "schemas.noPermission": "Não tem permissões para este esquema.",
-  "schemas.notFoundId": "Esquema {id} não existe.",
+  "rules.validation.schemaNotFound": "Esquema {id} não existe.",
   "schemas.number.inlineEditorError": "Não é permitido alteração em linha no Radio editor.",
   "schemas.onlyArraysHaveNested": "So campos lista podem ter campos aninhados.",
   "schemas.onylArraysInRoot": "Campo aninhado não pode ser lista de campos.",

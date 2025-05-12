@@ -59,7 +59,16 @@
             <button class="btn btn-text-secondary" (click)="dialogClose.emit()" type="button">
                 {{ "common.cancel" | sqxTranslate }}
             </button>
-            <button class="btn btn-success" [disabled]="!currentTrigger" type="submit">{{ "common.save" | sqxTranslate }}</button>
+
+            @if (trigger) {
+                <button class="btn btn-primary" [disabled]="!currentTrigger" type="submit">
+                    {{ "common.save" | sqxTranslate }}
+                </button>
+            } @else {
+                <button class="btn btn-success" [disabled]="!currentTrigger" type="submit">
+                    {{ "common.add" | sqxTranslate }}
+                </button>
+            }
         </ng-container>
     </sqx-modal-dialog>
 </form>

@@ -43,10 +43,11 @@ public sealed class RuleEnqueuer(
         get => GetType().Name;
     }
 
-    public async Task EnqueueAsync(DomainId ruleId, Rule? rule, Envelope<IEvent> @event,
+    public async Task EnqueueAsync(DomainId ruleId, Rule rule, Envelope<IEvent> @event,
         CancellationToken ct = default)
     {
-        Guard.NotNull(@event, nameof(@event));
+        Guard.NotNull(rule);
+        Guard.NotNull(@event);
 
         if (@event.Payload is not AppEvent appEvent)
         {
@@ -64,8 +65,8 @@ public sealed class RuleEnqueuer(
             }.ToReadonlyDictionary() : [],
         };
 
-        var batch = new RuleQueueWriter(flowManager, ruleUsageTracker, log);
-        await foreach (var result in ruleService.CreateJobsAsync(@event, context))
+        await using var batch = new RuleQueueWriter(flowManager, ruleUsageTracker, log);
+        await foreach (var result in ruleService.CreateJobsAsync(@event, context, ct))
         {
             await batch.WriteAsync(appEvent.AppId.Id, result);
         }
