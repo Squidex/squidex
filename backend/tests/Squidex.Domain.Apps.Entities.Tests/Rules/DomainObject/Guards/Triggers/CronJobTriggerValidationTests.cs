@@ -17,18 +17,18 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards.Triggers;
 
 public class CronJobTriggerValidationTests : GivenContext, IClassFixture<TranslationsFixture>
 {
-    private readonly IFlowCronJobManager<CronJobContext> flowCronJobs = A.Fake<IFlowCronJobManager<CronJobContext>>();
+    private readonly ICronJobManager<CronJobContext> cronJobs = A.Fake<ICronJobManager<CronJobContext>>();
     private readonly RuleValidator validator;
 
     public CronJobTriggerValidationTests()
     {
-        A.CallTo(() => flowCronJobs.IsValidCronExpression(A<string>._))
+        A.CallTo(() => cronJobs.IsValidCronExpression(A<string>._))
             .Returns(true);
 
-        A.CallTo(() => flowCronJobs.IsValidTimezone(A<string>._))
+        A.CallTo(() => cronJobs.IsValidTimezone(A<string>._))
             .Returns(true);
 
-        validator = new RuleValidator(null!, flowCronJobs, AppProvider);
+        validator = new RuleValidator(null!, cronJobs, AppProvider);
     }
 
     [Fact]
@@ -36,10 +36,10 @@ public class CronJobTriggerValidationTests : GivenContext, IClassFixture<Transla
     {
         var trigger = new CronJobTrigger
         {
-            CronExpression = "invalid"
+            CronExpression = "invalid",
         };
 
-        A.CallTo(() => flowCronJobs.IsValidCronExpression("invalid"))
+        A.CallTo(() => cronJobs.IsValidCronExpression("invalid"))
             .Returns(false);
 
         var errors = await ValidateAsync(trigger);
@@ -55,10 +55,10 @@ public class CronJobTriggerValidationTests : GivenContext, IClassFixture<Transla
     {
         var trigger = new CronJobTrigger
         {
-            CronTimezone = "invalid"
+            CronTimezone = "invalid",
         };
 
-        A.CallTo(() => flowCronJobs.IsValidTimezone("invalid"))
+        A.CallTo(() => cronJobs.IsValidTimezone("invalid"))
             .Returns(false);
 
         var errors = await ValidateAsync(trigger);

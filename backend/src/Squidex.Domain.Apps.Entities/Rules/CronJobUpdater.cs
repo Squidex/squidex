@@ -18,7 +18,7 @@ namespace Squidex.Domain.Apps.Entities.Rules;
 
 public sealed class CronJobUpdater(
     IAppProvider appProvider,
-    IFlowCronJobManager<CronJobContext> flowCronJobs,
+    ICronJobManager<CronJobContext> cronJobs,
     IRuleEnqueuer ruleEnqueuer)
     : IEventConsumer, IInitializable
 {
@@ -27,7 +27,7 @@ public sealed class CronJobUpdater(
     public Task InitializeAsync(
         CancellationToken ct)
     {
-        flowCronJobs.Subscribe(HandleCronJobAsync);
+        cronJobs.Subscribe(HandleCronJobAsync);
         return Task.CompletedTask;
     }
 
@@ -66,19 +66,19 @@ public sealed class CronJobUpdater(
             }
             else
             {
-                await flowCronJobs.RemoveAsync(ruleUpdated.RuleId.ToString());
+                await cronJobs.RemoveAsync(ruleUpdated.RuleId.ToString());
             }
         }
         else if (@event.Payload is RuleDeleted ruleDeleted)
         {
-            await flowCronJobs.RemoveAsync(ruleDeleted.RuleId.ToString());
+            await cronJobs.RemoveAsync(ruleDeleted.RuleId.ToString());
         }
     }
 
     private async Task AddCronJobAsync(NamedId<DomainId> appId, DomainId id, CronJobTrigger trigger,
         CancellationToken ct)
     {
-        await flowCronJobs.AddAsync(new CronJob<CronJobContext>
+        await cronJobs.AddAsync(new CronJob<CronJobContext>
         {
             Id = id.ToString(),
             Context = new CronJobContext { AppId = appId, RuleId = id },

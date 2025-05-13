@@ -11,6 +11,7 @@ using System.Text.Json.Serialization;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Flows;
+using Squidex.Flows.Steps.Utils;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
@@ -99,15 +100,16 @@ public sealed record TypesenseFlowStep : FlowStep, IConvertibleToAction
             return Next();
         }
 
-        if (executionContext.IsSimulation)
-        {
-            executionContext.LogSkipSimulation();
-            return Next();
-        }
-
         async Task SendAsync(HttpRequestMessage request, string? body, string message)
         {
             request.Headers.TryAddWithoutValidation("X-Typesense-Api-Key", ApiKey);
+
+            if (executionContext.IsSimulation)
+            {
+                executionContext.LogSkipSimulation(
+                    HttpDumpFormatter.BuildDump(request, null, null));
+                return;
+            }
 
             var httpClient =
                 executionContext.Resolve<IHttpClientFactory>()

@@ -21,12 +21,12 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards;
 public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
 {
     private readonly IFlowManager<FlowEventContext> flowManager = A.Fake<IFlowManager<FlowEventContext>>();
-    private readonly IFlowCronJobManager<CronJobContext> flowCronJobs = A.Fake<IFlowCronJobManager<CronJobContext>>();
+    private readonly ICronJobManager<CronJobContext> cronJobs = A.Fake<ICronJobManager<CronJobContext>>();
     private readonly IRuleValidator validator;
 
     public GuardRuleTests()
     {
-        validator = new RuleValidator(flowManager, flowCronJobs, AppProvider);
+        validator = new RuleValidator(flowManager, cronJobs, AppProvider);
     }
 
     [Fact]

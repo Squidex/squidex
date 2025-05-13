@@ -74,6 +74,8 @@ public sealed record WebhookFlowStep : FlowStep, IConvertibleToAction
                 break;
         }
 
+        string? requestBody = null;
+
         var request = new HttpRequestMessage(method, Url);
         if (!string.IsNullOrEmpty(Payload) && Method != WebhookMethod.GET)
         {
@@ -83,6 +85,7 @@ public sealed record WebhookFlowStep : FlowStep, IConvertibleToAction
                 mediaType = "application/json";
             }
 
+            requestBody = Payload;
             request.Content = new StringContent(Payload, Encoding.UTF8, mediaType);
         }
 
@@ -95,21 +98,23 @@ public sealed record WebhookFlowStep : FlowStep, IConvertibleToAction
             }
         }
 
-        var signature = $"{Payload}{SharedSecret}".ToSha256Base64();
+        if (!string.IsNullOrWhiteSpace(SharedSecret))
+        {
+            var signature = $"{Payload}{SharedSecret}".ToSha256Base64();
 
-        request.Headers.Add("X-Signature", signature);
+            request.Headers.Add("X-Signature", signature);
+        }
 
         if (executionContext.IsSimulation)
         {
-            var simulationDump = HttpDumpFormatter.BuildDump(request, null, null);
             executionContext.LogSkipSimulation(
-                HttpDumpFormatter.BuildDump(request, null, null));
+                HttpDumpFormatter.BuildDump(request, null, requestBody, null));
             return Next();
         }
 
         var httpClient = executionContext.Resolve<IHttpClientFactory>().CreateClient("FlowClient");
 
-        var (_, dump) = await httpClient.SendAsync(executionContext, request, Payload, ct);
+        var (_, dump) = await httpClient.SendAsync(executionContext, request, requestBody, ct);
 
         executionContext.Log("HTTP request sent", dump);
         return Next();

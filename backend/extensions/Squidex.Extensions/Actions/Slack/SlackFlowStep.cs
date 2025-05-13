@@ -10,6 +10,7 @@ using System.Text;
 using Migrations.OldActions;
 using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Flows;
+using Squidex.Flows.Steps.Utils;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
@@ -41,12 +42,6 @@ public sealed record SlackFlowStep : FlowStep, IConvertibleToAction
     public override async ValueTask<FlowStepResult> ExecuteAsync(FlowExecutionContext executionContext,
         CancellationToken ct)
     {
-        if (executionContext.IsSimulation)
-        {
-            executionContext.LogSkipSimulation();
-            return Next();
-        }
-
         var body = new { text = Text };
 
         var jsonRequest = executionContext.SerializeJson(body);
@@ -55,6 +50,13 @@ public sealed record SlackFlowStep : FlowStep, IConvertibleToAction
         {
             Content = new StringContent(jsonRequest, Encoding.UTF8, "application/json"),
         };
+
+        if (executionContext.IsSimulation)
+        {
+            executionContext.LogSkipSimulation(
+                HttpDumpFormatter.BuildDump(request, null, null));
+            return Next();
+        }
 
         var httpClient =
             executionContext.Resolve<IHttpClientFactory>()

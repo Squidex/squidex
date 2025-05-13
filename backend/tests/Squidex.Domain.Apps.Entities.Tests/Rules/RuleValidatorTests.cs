@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Rules;
 public class RuleValidatorTests : GivenContext, IClassFixture<TranslationsFixture>
 {
     private readonly IFlowManager<FlowEventContext> flowManager = A.Fake<IFlowManager<FlowEventContext>>();
-    private readonly IFlowCronJobManager<CronJobContext> flowCronJobs = A.Fake<IFlowCronJobManager<CronJobContext>>();
+    private readonly ICronJobManager<CronJobContext> cronJobs = A.Fake<ICronJobManager<CronJobContext>>();
     private readonly RuleValidator sut;
 
     private sealed record TestFlowStep : FlowStep
@@ -33,7 +33,7 @@ public class RuleValidatorTests : GivenContext, IClassFixture<TranslationsFixtur
 
     public RuleValidatorTests()
     {
-        sut = new RuleValidator(flowManager, flowCronJobs, AppProvider);
+        sut = new RuleValidator(flowManager, cronJobs, AppProvider);
     }
 
     [Fact]
@@ -51,7 +51,7 @@ public class RuleValidatorTests : GivenContext, IClassFixture<TranslationsFixtur
 
         errors.Should().BeEquivalentTo(
             [
-                new ValidationError("Num days must be between 1 and 30.", "NumDays")
+                new ValidationError("Num days must be between 1 and 30.", "NumDays"),
             ]);
     }
 
@@ -75,7 +75,7 @@ public class RuleValidatorTests : GivenContext, IClassFixture<TranslationsFixtur
 
         errors.Should().BeEquivalentTo(
             [
-                new ValidationError("Invalid property.", "Path")
+                new ValidationError("Invalid property.", "Path"),
             ]);
     }
 
@@ -102,7 +102,7 @@ public class RuleValidatorTests : GivenContext, IClassFixture<TranslationsFixtur
 
         errors.Should().BeEquivalentTo(
             [
-                new ValidationError(expectedMessage, "Path")
+                new ValidationError(expectedMessage, "Path"),
             ]);
     }
 }

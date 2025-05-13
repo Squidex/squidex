@@ -7,13 +7,14 @@
 
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Rules;
+using Squidex.Flows.Internal;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Rules.Runner;
 
 public interface IRuleRunnerService
 {
-    Task<List<SimulatedRuleEvent>> SimulateAsync(NamedId<DomainId> appId, DomainId ruleId, Rule rule,
+    Task<List<SimulatedRuleEvent>> SimulateAsync(NamedId<DomainId> appId, RuleTrigger trigger, FlowDefinition flow,
         CancellationToken ct = default);
 
     Task<List<SimulatedRuleEvent>> SimulateAsync(Rule rule,

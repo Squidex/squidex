@@ -33,10 +33,10 @@ namespace Squidex.Areas.Api.Controllers.Rules;
 [ApiExplorerSettings(GroupName = nameof(Rules))]
 public sealed class RulesController(
     ICommandBus commandBus,
+    ICronJobManager<CronJobContext> cronJobs,
     IAppProvider appProvider,
     IFlowStepRegistry flowStepRegistry,
     IFlowManager<FlowEventContext> flowManager,
-    IFlowCronJobManager<CronJobContext> flowCronJobs,
     IRuleQueryService ruleQuery,
     IRuleRunnerService ruleRunnerService,
     IRuleValidator ruleValidator,
@@ -315,8 +315,18 @@ public sealed class RulesController(
     [ApiCosts(5)]
     public async Task<IActionResult> Simulate(string app, [FromBody] CreateRuleDto request)
     {
-        var simulated = request.ToRule();
-        var simulation = await ruleRunnerService.SimulateAsync(App.NamedId(), DomainId.Empty, simulated, HttpContext.RequestAborted);
+#pragma warning disable CS0618 // Type or member is obsolete
+        var flow = request.GetFlow();
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        if (flow == null)
+        {
+            return Ok(SimulatedRuleEventsDto.FromDomain([]));
+        }
+
+        var simulation =
+            await ruleRunnerService.SimulateAsync(App.NamedId(), request.Trigger.ToTrigger(), flow,
+                HttpContext.RequestAborted);
 
         var response = SimulatedRuleEventsDto.FromDomain(simulation);
 
@@ -512,7 +522,7 @@ public sealed class RulesController(
     [ApiExplorerSettings(IgnoreApi = true)]
     public IActionResult GetTimezones(string app)
     {
-        var timezones = flowCronJobs.GetAvailableTimezoneIds();
+        var timezones = cronJobs.GetAvailableTimezoneIds();
 
         return Ok(timezones);
     }

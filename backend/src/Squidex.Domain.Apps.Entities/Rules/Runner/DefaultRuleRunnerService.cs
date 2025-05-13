@@ -16,6 +16,7 @@ using Squidex.Domain.Apps.Events;
 using Squidex.Domain.Apps.Events.Rules;
 using Squidex.Events;
 using Squidex.Flows;
+using Squidex.Flows.Internal;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.EventSourcing;
@@ -35,25 +36,39 @@ public sealed class DefaultRuleRunnerService(
 
     public IClock Clock { get; set; } = SystemClock.Instance;
 
-    public Task<List<SimulatedRuleEvent>> SimulateAsync(Rule rule,
+    public Task<List<SimulatedRuleEvent>> SimulateAsync(NamedId<DomainId> appId, RuleTrigger trigger, FlowDefinition flow,
         CancellationToken ct = default)
     {
-        return SimulateAsync(rule.AppId, rule.Id, rule, ct);
+        var now = SystemClock.Instance.GetCurrentInstant();
+
+        var rule = new Rule
+        {
+            AppId = appId,
+            Created = now,
+            CreatedBy = SimulatorUser,
+            Flow = flow,
+            IsEnabled = true,
+            LastModified = now,
+            LastModifiedBy = SimulatorUser,
+            Trigger = trigger,
+        };
+
+        return SimulateAsync(rule, ct);
     }
 
-    public async Task<List<SimulatedRuleEvent>> SimulateAsync(NamedId<DomainId> appId, DomainId ruleId, Rule rule,
+    public async Task<List<SimulatedRuleEvent>> SimulateAsync(Rule rule,
         CancellationToken ct = default)
     {
         Guard.NotNull(rule);
 
         var context = new RulesContext
         {
-            AppId = appId,
+            AppId = rule.AppId,
             IncludeSkipped = true,
             IncludeStale = true,
             Rules = new Dictionary<DomainId, Rule>
             {
-                [ruleId] = rule,
+                [rule.Id] = rule,
             }.ToReadonlyDictionary(),
         };
 

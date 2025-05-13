@@ -943,6 +943,9 @@
   <data name="rules.validation.noSteps" xml:space="preserve">
     <value>Flow has no step</value>
   </data>
+  <data name="rules.validation.schemaNotFound" xml:space="preserve">
+    <value>Lo schema {id} non esiste.</value>
+  </data>
   <data name="schemas.dateTimeCalculatedDefaultAndDefaultError" xml:space="preserve">
     <value>Il valore predefinito calcolato e il valore predefinito non possono essere utilizzati insieme.</value>
   </data>
@@ -969,9 +972,6 @@
   </data>
   <data name="schemas.noPermission" xml:space="preserve">
     <value>Non hai i permessi per questo schema.</value>
-  </data>
-  <data name="schemas.notFoundId" xml:space="preserve">
-    <value>Lo schema {id} non esiste.</value>
   </data>
   <data name="schemas.number.inlineEditorError" xml:space="preserve">
     <value>Non è consentita per l'editor di tipo radio la modifica in linea.</value>

@@ -19,7 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Rules;
 
 public sealed class RuleValidator(
     IFlowManager<FlowEventContext> flowManager,
-    IFlowCronJobManager<CronJobContext> flowCronJobs,
+    ICronJobManager<CronJobContext> cronJobs,
     IAppProvider appProvider)
     : IRuleValidator
 {
@@ -29,7 +29,7 @@ public sealed class RuleValidator(
         Guard.NotNull(trigger);
         Guard.NotNull(addError);
 
-        var context = new TriggerValidationContext(appId, addError, appProvider, flowCronJobs, ct);
+        var context = new TriggerValidationContext(appId, addError, appProvider, cronJobs, ct);
 
         await trigger.Accept(RuleTriggerValidator.Instance, context);
     }
@@ -155,7 +155,7 @@ public sealed class RuleValidator(
         DomainId AppId,
         AddValidation AddError,
         IAppProvider AppProvider,
-        IFlowCronJobManager<CronJobContext> CronJobs,
+        ICronJobManager<CronJobContext> CronJobs,
         CancellationToken CancellationToken);
 #pragma warning restore RECS0082 // Parameter has the same name as a member and hides it
 #pragma warning restore SA1313 // Parameter names should begin with lower-case letter
