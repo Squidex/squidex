@@ -29,6 +29,7 @@ public class EventJsonSchemaGeneratorTests
         yield return nameof(EnrichedAssetEvent);
         yield return nameof(EnrichedCommentEvent);
         yield return nameof(EnrichedContentEvent);
+        yield return nameof(EnrichedCronJobEvent);
         yield return nameof(EnrichedManualEvent);
         yield return nameof(EnrichedSchemaEvent);
         yield return nameof(EnrichedUsageExceededEvent);
