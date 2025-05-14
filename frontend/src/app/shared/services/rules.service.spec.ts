@@ -487,7 +487,7 @@ describe('RulesService', () => {
                 timezones = result;
             });
 
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/timeszones');
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/timezones');
 
             expect(req.request.method).toEqual('GET');
             expect(req.request.headers.get('If-Match')).toBeNull();

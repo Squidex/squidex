@@ -2,7 +2,7 @@
     [elementInfo]="stepInfo"
     [elementType]="branchItem.step.step.stepType"
     [isActive]="isNext"
-    [isExpandable]="!!state && state.attempts.length > 0"
+    [isExpandable]="(!!state && state.attempts.length > 0) || stepInfo.properties.length > 0"
     [isFirst]="isFirst"
     [isLast]="isLast">
     <ng-container summary>
@@ -20,9 +20,17 @@
     <ng-container details>
         @if (state) {
             <ul class="nav nav-tabs2 mt-2">
+                @if (stepInfo.properties.length > 0) {
+                    <li class="nav-item">
+                        <a class="nav-link" [class.active]="attemptIndex === -1" (click)="selectAttempt(-1)">
+                            {{ "common.properties" | sqxTranslate }}
+                        </a>
+                    </li>
+                }
+
                 @for (attempt of state.attempts; let i = $index; track i) {
                     <li class="nav-item">
-                        <a class="nav-link" [class.active]="i === attemptIndex" (click)="selectAttempt(i)">
+                        <a class="nav-link" [class.active]="attemptIndex === i" (click)="selectAttempt(i)">
                             @if ($first) {
                                 {{ "rules.ruleEvents.attempt" | sqxTranslate }}&nbsp;
                             }
@@ -32,8 +40,14 @@
                 }
             </ul>
 
-            @if (state.attempts[attemptIndex]; as attempt) {
-                <div class="details"><sqx-state-attempt [attempt]="attempt" /></div>
+            @if (attemptIndex === -1) {
+                <div class="details">
+                    @for (property of stepInfo.properties; track property.name) {
+                        <sqx-state-step-property [property]="property" [value]="$any(stepDefinition)[property.name]" />
+                    }
+                </div>
+            } @else if (state.attempts[attemptIndex]) {
+                <div class="details"><sqx-state-attempt [attempt]="state.attempts[attemptIndex]" /></div>
             }
         }
     </ng-container>

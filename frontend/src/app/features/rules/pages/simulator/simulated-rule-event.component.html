@@ -29,7 +29,7 @@
 
             <div class="event-dump event-section">
                 @if (event.event) {
-                    <sqx-history-step isDefaultExpandable="true" isExpandable="true">
+                    <sqx-history-step isExpandable="true">
                         <ng-container summary>
                             <div class="col text-sm">
                                 {{ "rules.simulation.eventQueried" | sqxTranslate }}
@@ -47,7 +47,7 @@
                         text="i18n:rules.simulation.eventTriggerChecked" />
 
                     @if (event.enrichedEvent) {
-                        <sqx-history-step isDefaultExpandable="true" isExpandable="true">
+                        <sqx-history-step isExpandable="true">
                             <ng-container summary>
                                 <div class="col text-sm">
                                     {{ "rules.simulation.eventEnriched" | sqxTranslate }}

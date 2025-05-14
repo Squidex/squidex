@@ -6,8 +6,6 @@
 :host ::ng-deep {
     .ace_editor {
         background: $color-white;
-        border: 1px solid $color-input;
-        border-radius: 0;
 
         &.no-border {
             border: 0;
@@ -39,7 +37,7 @@
     }
 
     .ace_gutter {
-        background: $color-border !important;
+        bottom: -1px;
     }
 
     .ace_bracket {
@@ -68,4 +66,8 @@
             display: none;
         }
     }
+}
+
+.editor-container {
+    border: 1px solid $color-input;
 }

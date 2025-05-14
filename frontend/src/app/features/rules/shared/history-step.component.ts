@@ -8,7 +8,7 @@
 
 import { NgTemplateOutlet } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { RuleTriggerMetadataDto, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { RuleTriggerMetadataDto, TranslatePipe } from '@app/shared';
 import { RuleElementComponent } from './rule-element.component';
 
 @Component({
@@ -34,9 +34,6 @@ export class HistoryStepComponent {
     public isExpandable = false;
 
     @Input({ transform: booleanAttribute })
-    public isDefaultExpandable = false;
-
-    @Input({ transform: booleanAttribute })
     public isActive = false;
 
     @Input({ transform: booleanAttribute })
@@ -49,12 +46,6 @@ export class HistoryStepComponent {
     public elementInfo?: RuleTriggerMetadataDto;
 
     public isExpanded = false;
-
-    public ngOnChanges(changes: TypedSimpleChanges<this>) {
-        if (changes.isDefaultExpandable) {
-            this.isExpanded = this.isDefaultExpandable;
-        }
-    }
 
     public toggle() {
         this.isExpanded = !this.isExpanded;

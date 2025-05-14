@@ -34,44 +34,45 @@ public sealed class CronJobUpdater(
     public async Task HandleCronJobAsync(CronJob<CronJobContext> job,
         CancellationToken ct)
     {
-        var context = job.Context;
+        var (appId, ruleId) = job.Context;
 
-        var rule = await appProvider.GetRuleAsync(context.AppId.Id, context.RuleId, ct);
+        var rule = await appProvider.GetRuleAsync(appId.Id, ruleId, ct);
+
+        // The rule might have been updated or deleted in the meantime, but we are running asynchronously.
         if (rule == null || rule.Trigger is not CronJobTrigger cronJob)
         {
             return;
         }
 
-        var @event =
-            Envelope.Create(
-                new RuleCronJobTriggered { AppId = context.AppId, RuleId = context.RuleId, Value = cronJob.Value });
+        // The rule enqueue needs an event.
+        var @event = new RuleCronJobTriggered { AppId = appId, RuleId = ruleId, Value = cronJob.Value };
 
-        await ruleEnqueuer.EnqueueAsync(context.RuleId, rule, @event, ct);
+        await ruleEnqueuer.EnqueueAsync(rule, Envelope.Create(@event), ct);
     }
 
     public async Task On(Envelope<IEvent> @event)
     {
-        if (@event.Payload is RuleCreated ruleCreated)
+        if (@event.Payload is RuleCreated created)
         {
-            if (ruleCreated.Trigger is CronJobTrigger cronJob)
+            if (created.Trigger is CronJobTrigger cronJob)
             {
-                await AddCronJobAsync(ruleCreated.AppId, ruleCreated.RuleId, cronJob, default);
+                await AddCronJobAsync(created.AppId, created.RuleId, cronJob, default);
             }
         }
-        else if (@event.Payload is RuleUpdated ruleUpdated && ruleUpdated.Trigger != null)
+        else if (@event.Payload is RuleUpdated updated && updated.Trigger != null)
         {
-            if (ruleUpdated.Trigger is CronJobTrigger cronJob)
+            if (updated.Trigger is CronJobTrigger cronJob)
             {
-                await AddCronJobAsync(ruleUpdated.AppId, ruleUpdated.RuleId, cronJob, default);
+                await AddCronJobAsync(updated.AppId, updated.RuleId, cronJob, default);
             }
             else
             {
-                await cronJobs.RemoveAsync(ruleUpdated.RuleId.ToString());
+                await cronJobs.RemoveAsync(updated.RuleId.ToString());
             }
         }
-        else if (@event.Payload is RuleDeleted ruleDeleted)
+        else if (@event.Payload is RuleDeleted deleted)
         {
-            await cronJobs.RemoveAsync(ruleDeleted.RuleId.ToString());
+            await cronJobs.RemoveAsync(deleted.RuleId.ToString());
         }
     }
 
@@ -81,9 +82,9 @@ public sealed class CronJobUpdater(
         await cronJobs.AddAsync(new CronJob<CronJobContext>
         {
             Id = id.ToString(),
-            Context = new CronJobContext { AppId = appId, RuleId = id },
             CronExpression = trigger.CronExpression,
             CronTimezone = trigger.CronTimezone,
+            Context = new CronJobContext(appId, id),
         }, ct);
     }
 }

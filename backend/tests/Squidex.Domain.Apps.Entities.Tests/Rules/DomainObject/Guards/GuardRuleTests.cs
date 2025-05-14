@@ -84,7 +84,7 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = new UpdateRule();
 
-        await GuardRule.CanUpdate(command, CreateRule(), validator, CancellationToken);
+        await GuardRule.CanUpdate(command, validator, CancellationToken);
     }
 
     [Fact]
@@ -92,7 +92,7 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = new UpdateRule { Name = "MyName" };
 
-        await GuardRule.CanUpdate(command, CreateRule(), validator, CancellationToken);
+        await GuardRule.CanUpdate(command, validator, CancellationToken);
     }
 
     [Fact]
@@ -111,7 +111,7 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
             Name = "NewName",
         });
 
-        await GuardRule.CanUpdate(command, CreateRule(), validator, CancellationToken);
+        await GuardRule.CanUpdate(command, validator, CancellationToken);
     }
 
     private T CreateCommand<T>(T command) where T : IAppCommand

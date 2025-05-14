@@ -19,5 +19,6 @@
         [isLast]="$last"
         [isNext]="state.nextStepId === item.id"
         [state]="state.steps[item.id]"
-        [stepInfo]="availableSteps[item.step.step.stepType]" />
+        [stepInfo]="availableSteps[item.step.step.stepType]"
+        [stepDefinition]="state.definition.steps[item.id].step" />
 }

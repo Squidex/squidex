@@ -43,7 +43,7 @@ public sealed class RuleEnqueuer(
         get => GetType().Name;
     }
 
-    public async Task EnqueueAsync(DomainId ruleId, Rule rule, Envelope<IEvent> @event,
+    public async Task EnqueueAsync(Rule rule, Envelope<IEvent> @event,
         CancellationToken ct = default)
     {
         Guard.NotNull(rule);
@@ -61,7 +61,7 @@ public sealed class RuleEnqueuer(
             IncludeStale = false,
             Rules = rule != null ? new Dictionary<DomainId, Rule>
             {
-                [ruleId] = rule,
+                [rule.Id] = rule,
             }.ToReadonlyDictionary() : [],
         };
 

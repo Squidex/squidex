@@ -143,12 +143,10 @@ export const Default: Story = {
                                 log: [],
                             }),
                         ],
-                        isPrepared: true,
                     }),
                     '2': new FlowExecutionStepStateDto({
                         status: 'Completed',
                         attempts: [],
-                        isPrepared: true,
                     }),
                 },
             }),
