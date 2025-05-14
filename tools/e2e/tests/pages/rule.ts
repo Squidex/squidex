@@ -46,6 +46,10 @@ export class TriggerDialog {
         await this.page.getByText('Content changed').click();
     }
 
+    public async add() {
+        await this.root.getByRole('button', { name: 'Add' }).click();
+    }
+
     public async save() {
         await this.root.getByRole('button', { name: 'Save' }).click();
     }
@@ -60,6 +64,10 @@ export class StepDialog {
     public async selectWebhookAction() {
         await this.page.getByText('Webhook').click();
         await this.page.locator('sqx-formattable-input').first().getByRole('textbox').fill('https:/squidex.io');
+    }
+
+    public async add() {
+        await this.root.getByRole('button', { name: 'Add' }).click();
     }
 
     public async save() {
