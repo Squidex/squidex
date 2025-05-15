@@ -9,7 +9,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Flows;
-using Squidex.Infrastructure.Json;
+using Squidex.Flows.Steps.Utils;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
@@ -41,12 +41,6 @@ public sealed record PrerenderFlowStep : FlowStep, IConvertibleToAction
     public override async ValueTask<FlowStepResult> ExecuteAsync(FlowExecutionContext executionContext,
         CancellationToken ct)
     {
-        if (executionContext.IsSimulation)
-        {
-            executionContext.LogSkipSimulation();
-            return Next();
-        }
-
         var requestObject = new { prerenderToken = Token, Url };
         var requestBody = executionContext.SerializeJson(requestObject);
 
@@ -54,6 +48,13 @@ public sealed record PrerenderFlowStep : FlowStep, IConvertibleToAction
         {
             Content = new StringContent(requestBody, Encoding.UTF8, "application/json"),
         };
+
+        if (executionContext.IsSimulation)
+        {
+            executionContext.LogSkipSimulation(
+                HttpDumpFormatter.BuildDump(request, null, null));
+            return Next();
+        }
 
         var httpClient =
             executionContext.Resolve<IHttpClientFactory>()

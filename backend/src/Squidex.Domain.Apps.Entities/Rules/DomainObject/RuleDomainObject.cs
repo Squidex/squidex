@@ -72,7 +72,7 @@ public partial class RuleDomainObject(
             case UpdateRule updateRule:
                 return ApplyReturnAsync(updateRule, async (c, ct) =>
                 {
-                    await GuardRule.CanUpdate(c, Snapshot, Validator(), ct);
+                    await GuardRule.CanUpdate(c, Validator(), ct);
 
                     Update(c);
 
@@ -122,7 +122,7 @@ public partial class RuleDomainObject(
         SimpleMapper.Map(command, @event);
         SimpleMapper.Map(Snapshot, @event);
 
-        await Enqueuer().EnqueueAsync(Snapshot.Id, Snapshot, Envelope.Create(@event));
+        await Enqueuer().EnqueueAsync(Snapshot, Envelope.Create(@event));
     }
 
     private void Create(CreateRule command)

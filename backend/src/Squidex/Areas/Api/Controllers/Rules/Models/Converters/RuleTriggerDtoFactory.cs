@@ -35,6 +35,11 @@ public sealed class RuleTriggerDtoFactory : IRuleTriggerVisitor<RuleTriggerDto, 
         return CommentRuleTriggerDto.FromDomain(trigger);
     }
 
+    public RuleTriggerDto Visit(CronJobTrigger trigger, None args)
+    {
+        return CronJobRuleTriggerDto.FromDomain(trigger);
+    }
+
     public RuleTriggerDto Visit(ManualTrigger trigger, None args)
     {
         return ManualRuleTriggerDto.FromDomain(trigger);

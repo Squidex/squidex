@@ -55,7 +55,7 @@ test('enable rule', async ({ rulePage, rulesPage }) => {
     await expect(ruleCard.root.locator('sqx-toggle .toggle-container')).toHaveAttribute('data-state', 'checked');
 });
 
-test('edit rule', async ({ page, rulePage, rulesPage }) => {
+test('navigate to edit page', async ({ page, rulePage, rulesPage }) => {
     const ruleName = await createRandomRule(rulesPage, rulePage);
     const ruleCard = await rulesPage.getRuleCard(ruleName);
 
@@ -86,11 +86,11 @@ async function createRandomRule(rulesPage: RulesPage, rulePage: RulePage) {
 
     const triggerDialog = await rulePage.addTrigger();
     await triggerDialog.selectContentChangedTrigger();
-    await triggerDialog.save();
+    await triggerDialog.add();
 
     const stepDialog = await rulePage.addStep();
     await stepDialog.selectWebhookAction();
-    await stepDialog.save();
+    await stepDialog.add();
 
     await rulePage.enterName(ruleName);
     await rulePage.save();

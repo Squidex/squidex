@@ -1097,6 +1097,26 @@ namespace Squidex.Providers.MySql.Migrations
                     b.ToTable("EventPosition");
                 });
 
+            modelBuilder.Entity("Squidex.Flows.EntityFramework.EFCronJobEntity", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(255)
+                        .HasColumnType("varchar(255)");
+
+                    b.Property<string>("Data")
+                        .IsRequired()
+                        .HasColumnType("longtext");
+
+                    b.Property<DateTimeOffset>("DueTime")
+                        .HasColumnType("datetime(6)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DueTime");
+
+                    b.ToTable("CronJobs", (string)null);
+                });
+
             modelBuilder.Entity("Squidex.Flows.EntityFramework.EFFlowStateEntity", b =>
                 {
                     b.Property<Guid>("Id")

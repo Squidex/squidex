@@ -137,12 +137,14 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="fileName">{{ "common.name" | sqxTranslate }}</label> <sqx-control-errors for="fileName" />
+                            <label for="fileName">{{ "common.name" | sqxTranslate }}</label>
+                            <sqx-control-errors for="fileName" />
                             <input class="form-control" id="fileName" formControlName="fileName" spellcheck="false" />
                         </div>
 
                         <div class="form-group">
-                            <label for="slug">{{ "common.slug" | sqxTranslate }}</label> <sqx-control-errors for="slug" />
+                            <label for="slug">{{ "common.slug" | sqxTranslate }}</label>
+                            <sqx-control-errors for="slug" />
                             <input class="form-control slug" id="slug" formControlName="slug" spellcheck="false" sqxTransformInput="Slugify" />
                             <button class="btn btn-text-secondary btn-sm slug-generate" (click)="generateSlug()" type="button">
                                 {{ "common.generate" | sqxTranslate }}
@@ -151,7 +153,8 @@
 
                         @if (annotateTags | async; as tags) {
                             <div class="form-group">
-                                <label>{{ "common.tags" | sqxTranslate }}</label> <sqx-control-errors for="tags" />
+                                <label>{{ "common.tags" | sqxTranslate }}</label>
+                                <sqx-control-errors for="tags" />
                                 <sqx-tag-editor allowDuplicates="false" formControlName="tags" [itemsSource]="tags" undefinedWhenEmpty="false" />
                             </div>
                         }
@@ -161,7 +164,7 @@
                             @for (form of annotateForm.metadataControls; track form; let i = $index) {
                                 <div class="metadata-row row g-0" [formGroup]="form">
                                     <div class="col col-name pe-1">
-                                        <sqx-control-errors fieldName="Name" for="name" />
+                                        <sqx-control-errors for="name" />
                                         <input
                                             class="form-control"
                                             formControlName="name"
@@ -171,7 +174,7 @@
                                     </div>
 
                                     <div class="col pe-1">
-                                        <sqx-control-errors fieldName="Value" for="value" />
+                                        <sqx-control-errors for="value" />
                                         <input class="form-control" formControlName="value" placeholder="{{ 'common.value' | sqxTranslate }}" />
                                     </div>
 

@@ -1100,6 +1100,26 @@ namespace Squidex.Providers.SqlServer.Migrations
                     b.ToTable("EventPosition");
                 });
 
+            modelBuilder.Entity("Squidex.Flows.EntityFramework.EFCronJobEntity", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Data")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("DueTime")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DueTime");
+
+                    b.ToTable("CronJobs", (string)null);
+                });
+
             modelBuilder.Entity("Squidex.Flows.EntityFramework.EFFlowStateEntity", b =>
                 {
                     b.Property<Guid>("Id")

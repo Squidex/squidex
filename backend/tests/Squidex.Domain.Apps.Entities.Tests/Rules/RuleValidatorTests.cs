@@ -10,6 +10,7 @@ using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Flows;
+using Squidex.Flows.CronJobs;
 using Squidex.Flows.Internal;
 using Squidex.Infrastructure.Validation;
 
@@ -18,6 +19,7 @@ namespace Squidex.Domain.Apps.Entities.Rules;
 public class RuleValidatorTests : GivenContext, IClassFixture<TranslationsFixture>
 {
     private readonly IFlowManager<FlowEventContext> flowManager = A.Fake<IFlowManager<FlowEventContext>>();
+    private readonly ICronJobManager<CronJobContext> cronJobs = A.Fake<ICronJobManager<CronJobContext>>();
     private readonly RuleValidator sut;
 
     private sealed record TestFlowStep : FlowStep
@@ -31,7 +33,7 @@ public class RuleValidatorTests : GivenContext, IClassFixture<TranslationsFixtur
 
     public RuleValidatorTests()
     {
-        sut = new RuleValidator(flowManager, AppProvider);
+        sut = new RuleValidator(flowManager, cronJobs, AppProvider);
     }
 
     [Fact]

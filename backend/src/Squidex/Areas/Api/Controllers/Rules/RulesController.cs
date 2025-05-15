@@ -17,6 +17,7 @@ using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Runner;
 using Squidex.Flows;
+using Squidex.Flows.CronJobs;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
@@ -32,12 +33,14 @@ namespace Squidex.Areas.Api.Controllers.Rules;
 [ApiExplorerSettings(GroupName = nameof(Rules))]
 public sealed class RulesController(
     ICommandBus commandBus,
+    ICronJobManager<CronJobContext> cronJobs,
     IAppProvider appProvider,
     IFlowStepRegistry flowStepRegistry,
     IFlowManager<FlowEventContext> flowManager,
     IRuleQueryService ruleQuery,
     IRuleRunnerService ruleRunnerService,
     IRuleValidator ruleValidator,
+    ScriptingCompleter scriptingCompleter,
     EventJsonSchemaGenerator eventJsonSchemaGenerator)
     : ApiController(commandBus)
 {
@@ -312,8 +315,18 @@ public sealed class RulesController(
     [ApiCosts(5)]
     public async Task<IActionResult> Simulate(string app, [FromBody] CreateRuleDto request)
     {
-        var simulated = request.ToRule();
-        var simulation = await ruleRunnerService.SimulateAsync(App.NamedId(), DomainId.Empty, simulated, HttpContext.RequestAborted);
+#pragma warning disable CS0618 // Type or member is obsolete
+        var flow = request.GetFlow();
+#pragma warning restore CS0618 // Type or member is obsolete
+
+        if (flow == null)
+        {
+            return Ok(SimulatedRuleEventsDto.FromDomain([]));
+        }
+
+        var simulation =
+            await ruleRunnerService.SimulateAsync(App.NamedId(), request.Trigger.ToTrigger(), flow,
+                HttpContext.RequestAborted);
 
         var response = SimulatedRuleEventsDto.FromDomain(simulation);
 
@@ -495,12 +508,23 @@ public sealed class RulesController(
     [ApiPermissionOrAnonymous]
     [ApiCosts(1)]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public IActionResult GetScriptCompletion(string app, string triggerType,
-        [FromServices] ScriptingCompleter completer)
+    public IActionResult GetScriptCompletion(string app, string triggerType)
     {
-        var completion = completer.Trigger(triggerType);
+        var completion = scriptingCompleter.Trigger(triggerType);
 
         return Ok(completion);
+    }
+
+    [HttpGet]
+    [Route("apps/{app}/rules/timezones")]
+    [ApiPermissionOrAnonymous]
+    [ApiCosts(1)]
+    [ApiExplorerSettings(IgnoreApi = true)]
+    public IActionResult GetTimezones(string app)
+    {
+        var timezones = cronJobs.GetAvailableTimezoneIds();
+
+        return Ok(timezones);
     }
 
     private async Task<RuleDto> InvokeCommandAsync(ICommand command)

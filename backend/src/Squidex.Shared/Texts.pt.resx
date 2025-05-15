@@ -925,6 +925,12 @@
   <data name="login.test.title" xml:space="preserve">
     <value>Login Test</value>
   </data>
+  <data name="rules.validation.invalidCronExpression" xml:space="preserve">
+    <value>Cron Expression is invalid.</value>
+  </data>
+  <data name="rules.validation.invalidCronTimezone" xml:space="preserve">
+    <value>Timezone is not a valid IANA identifier.</value>
+  </data>
   <data name="rules.validation.invalidNextStepId" xml:space="preserve">
     <value>Invalid next step ID</value>
   </data>
@@ -936,6 +942,9 @@
   </data>
   <data name="rules.validation.noSteps" xml:space="preserve">
     <value>Flow has no step</value>
+  </data>
+  <data name="rules.validation.schemaNotFound" xml:space="preserve">
+    <value>Esquema {id} não existe.</value>
   </data>
   <data name="schemas.dateTimeCalculatedDefaultAndDefaultError" xml:space="preserve">
     <value>Valor por defeito calculado e valor por defeito não podem ser usado em conjunto.</value>
@@ -963,9 +972,6 @@
   </data>
   <data name="schemas.noPermission" xml:space="preserve">
     <value>Não tem permissões para este esquema.</value>
-  </data>
-  <data name="schemas.notFoundId" xml:space="preserve">
-    <value>Esquema {id} não existe.</value>
   </data>
   <data name="schemas.number.inlineEditorError" xml:space="preserve">
     <value>Não é permitido alteração em linha no Radio editor.</value>

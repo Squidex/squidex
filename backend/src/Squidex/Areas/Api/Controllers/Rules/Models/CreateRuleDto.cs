@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Flows.Internal;
@@ -46,13 +45,6 @@ public sealed class CreateRuleDto
     /// </summary>
     public bool? IsEnabled { get; set; } = true;
 
-    public Rule ToRule()
-    {
-#pragma warning disable CS0618 // Type or member is obsolete
-        return new Rule { Trigger = Trigger.ToTrigger(), Flow = GetFlow()! };
-#pragma warning restore CS0618 // Type or member is obsolete
-    }
-
     public CreateRule ToCommand()
     {
         return SimpleMapper.Map(this, new CreateRule
@@ -66,7 +58,7 @@ public sealed class CreateRuleDto
     }
 
     [Obsolete("Has been replaced by flows.")]
-    private FlowDefinition? GetFlow()
+    public FlowDefinition? GetFlow()
     {
         return Flow?.ToDefinition() ?? Action?.ToFlowDefinition();
     }

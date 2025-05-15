@@ -9,6 +9,7 @@ using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Rules;
 using Squidex.Domain.Apps.Core.Rules.Triggers;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Teams;
@@ -169,9 +170,9 @@ public class GivenContext
         return result;
     }
 
-    public EnrichedRule CreateAndSetupRule()
+    public EnrichedRule CreateAndSetupRule(RuleTrigger? trigger = null)
     {
-        var rule = CreateRule();
+        var rule = CreateRule(trigger);
 
         A.CallTo(() => AppProvider.GetRulesAsync(AppId.Id, A<CancellationToken>._))
             .Returns([rule]);
@@ -226,7 +227,7 @@ public class GivenContext
         };
     }
 
-    public EnrichedRule CreateRule()
+    public EnrichedRule CreateRule(RuleTrigger? trigger = null)
     {
         var id = DomainId.NewGuid();
 
@@ -240,7 +241,7 @@ public class GivenContext
             Name = "My Rule",
             LastModified = Timestamp(),
             LastModifiedBy = User,
-            Trigger = new ContentChangedTriggerV2(),
+            Trigger = trigger ?? new ContentChangedTriggerV2(),
             Version = 1,
         };
     }

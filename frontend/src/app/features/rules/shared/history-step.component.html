@@ -17,12 +17,10 @@
                 <ng-content select="[summary]"></ng-content>
 
                 <div class="col col-expand">
-                    @if (isExpandable) {
-                        <button class="btn btn-sm btn-text-secondary text-muted btn-expand" (click)="toggle()" type="button">
-                            <span class="hidden">{{ "common.more" | sqxTranslate }}</span>
-                            <i class="icon-sm" [class.icon-angle-down]="isExpanded" [class.icon-angle-right]="!isExpanded"></i>
-                        </button>
-                    }
+                    <button class="btn btn-sm btn-text-secondary text-muted btn-expand" [class.invisible]="!isExpandable" (click)="toggle()" type="button">
+                        <span class="hidden">{{ "common.more" | sqxTranslate }}</span>
+                        <i class="icon-sm" [class.icon-angle-down]="isExpanded" [class.icon-angle-right]="!isExpanded"></i>
+                    </button>
                 </div>
             </div>
 
@@ -34,6 +32,5 @@
         </div>
     </div>
 </div>
-
 
 <ng-template #detailsTemplate> <ng-content select="[details]"></ng-content> </ng-template>

@@ -9,7 +9,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Flows;
-using Squidex.Infrastructure.Json;
+using Squidex.Flows.Steps.Utils;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
@@ -64,12 +64,6 @@ public sealed record MediumFlowStep : FlowStep, IConvertibleToAction
     public override async ValueTask<FlowStepResult> ExecuteAsync(FlowExecutionContext executionContext,
         CancellationToken ct)
     {
-        if (executionContext.IsSimulation)
-        {
-            executionContext.LogSkipSimulation();
-            return Next();
-        }
-
         var httpClient =
             executionContext.Resolve<IHttpClientFactory>()
                 .CreateClient("MediumAction");
@@ -78,6 +72,10 @@ public sealed record MediumFlowStep : FlowStep, IConvertibleToAction
         if (!string.IsNullOrWhiteSpace(PublicationId))
         {
             path = $"/v1/publications/{PublicationId}/posts";
+        }
+        else if (executionContext.IsSimulation)
+        {
+            path = "/v1/users/simulated-id/posts";
         }
         else
         {
@@ -101,8 +99,16 @@ public sealed record MediumFlowStep : FlowStep, IConvertibleToAction
         };
 
         var requestJson = executionContext.SerializeJson(requestBody);
+        var requestMessage = BuildPostRequest(path, requestJson);
 
-        var (_, dump) = await httpClient.SendAsync(executionContext, BuildPostRequest(path, requestJson), requestJson, ct);
+        if (executionContext.IsSimulation)
+        {
+            executionContext.LogSkipSimulation(
+                HttpDumpFormatter.BuildDump(requestMessage, null, null));
+            return Next();
+        }
+
+        var (_, dump) = await httpClient.SendAsync(executionContext, requestMessage, requestJson, ct);
 
         executionContext.Log("Post created", dump);
         return Next();

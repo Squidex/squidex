@@ -20,7 +20,12 @@
 
                     <div class="col-9 offset-3">
                         <div class="form-check">
-                            <input class="form-check-input" id="stepIgnore" [(ngModel)]="stepIgnoreError" [ngModelOptions]="{ standalone: true }" type="checkbox" />
+                            <input
+                                class="form-check-input"
+                                id="stepIgnore"
+                                [(ngModel)]="stepIgnoreError"
+                                [ngModelOptions]="{ standalone: true }"
+                                type="checkbox" />
                             <label class="form-check-label" for="stepIgnore"> {{ "rules.stepIgnoreError" | sqxTranslate }} </label>
                         </div>
                         <sqx-form-hint> {{ "rules.stepIgnoreErrorHint" | sqxTranslate }} </sqx-form-hint>
@@ -130,7 +135,16 @@
             <button class="btn btn-text-secondary" (click)="dialogClose.emit()" type="button">
                 {{ "common.cancel" | sqxTranslate }}
             </button>
-            <button class="btn btn-success" [disabled]="!currentStep" type="submit">{{ "common.save" | sqxTranslate }}</button>
+
+            @if (stepDefinition) {
+                <button class="btn btn-primary" [disabled]="!currentStep" type="submit">
+                    {{ "common.save" | sqxTranslate }}
+                </button>
+            } @else {
+                <button class="btn btn-success" [disabled]="!currentStep" type="submit">
+                    {{ "common.add" | sqxTranslate }}
+                </button>
+            }
         </ng-container>
     </sqx-modal-dialog>
 </form>

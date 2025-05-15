@@ -43,8 +43,7 @@ public static class GuardRule
         });
     }
 
-    public static Task CanUpdate(UpdateRule command, Rule rule, IRuleValidator validator,
-        CancellationToken ct)
+    public static Task CanUpdate(UpdateRule command, IRuleValidator validator, CancellationToken ct)
     {
         Guard.NotNull(command);
 

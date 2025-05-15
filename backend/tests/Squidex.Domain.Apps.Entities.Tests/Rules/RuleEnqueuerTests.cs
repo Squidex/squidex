@@ -76,12 +76,12 @@ public class RuleEnqueuerTests : GivenContext
 
         var rule = CreateAndSetupRule();
 
-        A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
+        A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), CancellationToken))
             .Returns(Enumerable.Repeat(new JobResult(), 1).ToAsyncEnumerable());
 
-        await sut.EnqueueAsync(rule.Id, rule, @event);
+        await sut.EnqueueAsync(rule, @event, CancellationToken);
 
-        A.CallTo(() => flowManager.EnqueueAsync(A<CreateFlowInstanceRequest<FlowEventContext>[]>._, default))
+        A.CallTo(() => flowManager.EnqueueAsync(A<CreateFlowInstanceRequest<FlowEventContext>[]>._, CancellationToken))
             .MustNotHaveHappened();
     }
 
@@ -112,10 +112,10 @@ public class RuleEnqueuerTests : GivenContext
         A.CallTo(() => flowManager.EnqueueAsync(A<CreateFlowInstanceRequest<FlowEventContext>[]>._, default))
             .Invokes(x => writes = x.GetArgument<CreateFlowInstanceRequest<FlowEventContext>[]>(0)!);
 
-        A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
+        A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), CancellationToken))
             .Returns(new[] { result }.ToAsyncEnumerable());
 
-        await sut.EnqueueAsync(rule.Id, rule, @event);
+        await sut.EnqueueAsync(rule, @event, CancellationToken);
 
         Assert.Equal(new[] { result.Job.Value }, writes);
 
@@ -144,15 +144,15 @@ public class RuleEnqueuerTests : GivenContext
             },
         };
 
-        A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
+        A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), CancellationToken))
             .Returns(new[] { result }.ToAsyncEnumerable());
 
-        await sut.EnqueueAsync(rule.Id, rule, @event);
+        await sut.EnqueueAsync(rule, @event, CancellationToken);
 
         A.CallTo(ruleUsageTracker)
             .MustNotHaveHappened();
 
-        A.CallTo(() => flowManager.EnqueueAsync(A<CreateFlowInstanceRequest<FlowEventContext>[]>._, default))
+        A.CallTo(() => flowManager.EnqueueAsync(A<CreateFlowInstanceRequest<FlowEventContext>[]>._, CancellationToken))
             .MustNotHaveHappened();
     }
 
@@ -171,15 +171,15 @@ public class RuleEnqueuerTests : GivenContext
             Rule = rule,
         };
 
-        A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), default))
+        A.CallTo(() => ruleService.CreateJobsAsync(@event, MatchingContext(rule), CancellationToken))
             .Returns(new[] { result }.ToAsyncEnumerable());
 
-        await sut.EnqueueAsync(rule.Id, rule, @event);
+        await sut.EnqueueAsync(rule, @event, CancellationToken);
 
         A.CallTo(ruleUsageTracker)
             .MustNotHaveHappened();
 
-        A.CallTo(() => flowManager.EnqueueAsync(A<CreateFlowInstanceRequest<FlowEventContext>[]>._, default))
+        A.CallTo(() => flowManager.EnqueueAsync(A<CreateFlowInstanceRequest<FlowEventContext>[]>._, CancellationToken))
             .MustNotHaveHappened();
     }
 

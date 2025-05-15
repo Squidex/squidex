@@ -1098,6 +1098,26 @@ namespace Squidex.Providers.Postgres.Migrations
                     b.ToTable("EventPosition");
                 });
 
+            modelBuilder.Entity("Squidex.Flows.EntityFramework.EFCronJobEntity", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Data")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTimeOffset>("DueTime")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DueTime");
+
+                    b.ToTable("CronJobs", (string)null);
+                });
+
             modelBuilder.Entity("Squidex.Flows.EntityFramework.EFFlowStateEntity", b =>
                 {
                     b.Property<Guid>("Id")

@@ -10,6 +10,7 @@ using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Flows;
+using Squidex.Flows.Steps.Utils;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
@@ -40,12 +41,6 @@ public sealed record FastlyFlowStep : FlowStep, IConvertibleToAction
     public override async ValueTask<FlowStepResult> ExecuteAsync(FlowExecutionContext executionContext,
         CancellationToken ct)
     {
-        if (executionContext.IsSimulation)
-        {
-            executionContext.LogSkipSimulation();
-            return Next();
-        }
-
         var @event = ((FlowEventContext)executionContext.Context).Event;
 
         var id = string.Empty;
@@ -60,6 +55,13 @@ public sealed record FastlyFlowStep : FlowStep, IConvertibleToAction
 
         var requestUrl = $"/service/{ServiceId}/purge/{id}";
         var request = new HttpRequestMessage(HttpMethod.Post, requestUrl);
+
+        if (executionContext.IsSimulation)
+        {
+            executionContext.LogSkipSimulation(
+                HttpDumpFormatter.BuildDump(request, null, null));
+            return Next();
+        }
 
         request.Headers.Add("Fastly-Key", ApiKey);
 

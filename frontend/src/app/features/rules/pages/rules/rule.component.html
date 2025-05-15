@@ -147,11 +147,9 @@
             @if (rule.canReadLogs) {
                 <div class="col-auto">
                     <a [queryParams]="{ ruleId: rule.id }" routerLink="events"> {{ "common.logs" | sqxTranslate }} </a>
-                    @if (!rule.canTrigger) {
-                        <a class="ms-2" [queryParams]="{ ruleId: rule.id }" routerLink="simulator">
-                            {{ "rules.simulator" | sqxTranslate }}
-                        </a>
-                    }
+                    <a class="ms-2" [queryParams]="{ ruleId: rule.id }" routerLink="simulator">
+                        {{ "rules.simulator" | sqxTranslate }}
+                    </a>
                 </div>
             }
         </div>

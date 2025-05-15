@@ -166,7 +166,7 @@ public abstract partial class DomainObject<T> : IAggregate where T : Entity, new
 
     protected virtual void RaiseEvent(Envelope<IEvent> @event)
     {
-        Guard.NotNull(@event, nameof(@event));
+        Guard.NotNull(@event);
 
         @event.SetAggregateId(uniqueId);
 

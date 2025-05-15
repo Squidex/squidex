@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Domain.Apps.Entities.Rules.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Flows;
+using Squidex.Flows.CronJobs;
 using Squidex.Flows.Internal;
 using Squidex.Infrastructure.Validation;
 
@@ -20,11 +21,12 @@ namespace Squidex.Domain.Apps.Entities.Rules.DomainObject.Guards;
 public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
 {
     private readonly IFlowManager<FlowEventContext> flowManager = A.Fake<IFlowManager<FlowEventContext>>();
+    private readonly ICronJobManager<CronJobContext> cronJobs = A.Fake<ICronJobManager<CronJobContext>>();
     private readonly IRuleValidator validator;
 
     public GuardRuleTests()
     {
-        validator = new RuleValidator(flowManager, AppProvider);
+        validator = new RuleValidator(flowManager, cronJobs, AppProvider);
     }
 
     [Fact]
@@ -82,7 +84,7 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = new UpdateRule();
 
-        await GuardRule.CanUpdate(command, CreateRule(), validator, CancellationToken);
+        await GuardRule.CanUpdate(command, validator, CancellationToken);
     }
 
     [Fact]
@@ -90,7 +92,7 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
     {
         var command = new UpdateRule { Name = "MyName" };
 
-        await GuardRule.CanUpdate(command, CreateRule(), validator, CancellationToken);
+        await GuardRule.CanUpdate(command, validator, CancellationToken);
     }
 
     [Fact]
@@ -109,7 +111,7 @@ public class GuardRuleTests : GivenContext, IClassFixture<TranslationsFixture>
             Name = "NewName",
         });
 
-        await GuardRule.CanUpdate(command, CreateRule(), validator, CancellationToken);
+        await GuardRule.CanUpdate(command, validator, CancellationToken);
     }
 
     private T CreateCommand<T>(T command) where T : IAppCommand

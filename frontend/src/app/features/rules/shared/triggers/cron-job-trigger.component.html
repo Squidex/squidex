@@ -1,0 +1,56 @@
+<div class="form-horizontal" [formGroup]="triggerForm.form">
+    <div class="form-group row">
+        <label class="col-3 col-form-label" for="cronExpression"> {{ "rules.conditions.cronExpression" | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <sqx-control-errors for="cronExpression" />
+            <input class="form-control" id="cronExpression" formControlName="cronExpression" />
+            
+            <sqx-form-hint>
+                {{ "rules.conditions.cronExpressionHint" | sqxTranslate }}
+                <div>
+                    {{ "rules.readMore" | sqxTranslate }}:
+                    <a href="https://en.wikipedia.org/wiki/Cron" sqxExternalLink tabindex="-1">
+                        {{ "common.documentation" | sqxTranslate }}
+                    </a>
+                </div>
+            </sqx-form-hint>
+
+            <div class="help">
+                <h4>{{ "rules.conditions.cronExpressionsTitle" | sqxTranslate }}</h4>
+                <sqx-form-hint> {{ "rules.conditions.cronExpressionsHint" | sqxTranslate }} </sqx-form-hint>
+                <ul class="help-examples">
+                    <li class="help-example">
+                        {{ "rules.conditions.cronExpressionEvery4Hours" | sqxTranslate }}: <br />
+                        <sqx-code>0 */4 * * *</sqx-code>
+                    </li>
+
+                    <li class="help-example">
+                        {{ "rules.conditions.cronExpressionEveryMorning" | sqxTranslate }}: <br />
+                        <sqx-code>0 6 * * *</sqx-code>
+                    </li>
+
+                    <li class="help-example">
+                        {{ "rules.conditions.cronExpressionEveryMonth" | sqxTranslate }}: <br />
+                        <sqx-code>0 6 1 * *</sqx-code>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <label class="col-3 col-form-label" for="cronTimezone">{{ "rules.conditions.cronTimezone" | sqxTranslate }}</label>
+
+        <div class="col-9">
+            <sqx-control-errors for="cronTimezone" />
+            <select class="form-select" id="cronTimezone" formControlName="cronTimezone">
+                <option></option>
+                @for (timezone of timezones | async; track timezone) {
+                    <option [ngValue]="timezone">{{ timezone }}</option>
+                }
+            </select>
+            <sqx-form-hint> {{ "rules.conditions.cronTimezoneHint" | sqxTranslate }} </sqx-form-hint>
+        </div>
+    </div>
+</div>

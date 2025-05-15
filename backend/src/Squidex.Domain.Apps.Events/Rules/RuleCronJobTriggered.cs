@@ -5,13 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Rules;
+using Squidex.Infrastructure.Json.Objects;
 
-public enum RuleJobResult
+namespace Squidex.Domain.Apps.Events.Rules;
+
+public sealed class RuleCronJobTriggered : RuleEvent
 {
-    Pending,
-    Success,
-    Retry,
-    Failed,
-    Cancelled,
+    public JsonValue Value { get; set; }
 }

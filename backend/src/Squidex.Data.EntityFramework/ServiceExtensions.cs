@@ -10,7 +10,6 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.AI;
 using Squidex.Assets.TusAdapter;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Assets;
@@ -208,6 +207,9 @@ public static class ServiceExtensions
 
         services.AddFlowsCore()
             .AddEntityFrameworkStore<TContext, FlowEventContext>();
+
+        services.AddCronJobsCore()
+            .AddEntityFrameworkStore<TContext, CronJobContext>();
 
         services.AddEntityFrameworkAssetKeyValueStore<TContext, TusMetadata>();
     }

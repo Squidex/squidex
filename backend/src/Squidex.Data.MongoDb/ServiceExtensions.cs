@@ -16,7 +16,6 @@ using MongoDB.Bson;
 using MongoDB.Driver;
 using MongoDB.Driver.Core.Extensions.DiagnosticSources;
 using MongoDB.Driver.GridFS;
-using Squidex.AI;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.Contents;
@@ -186,7 +185,10 @@ public static class ServiceExtensions
             .As<IUserStore<IdentityUser>>().As<IUserFactory>();
 
         services.AddFlowsCore()
-            .AddMongoFlowStore<FlowEventContext>();
+            .AddMongoStore<FlowEventContext>();
+
+        services.AddCronJobsCore()
+            .AddMongoStore<CronJobContext>();
 
         services.AddSingletonAs(c =>
         {

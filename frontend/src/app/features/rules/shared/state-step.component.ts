@@ -6,11 +6,12 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { BranchItem, FlowExecutionStepStateDto, RuleElementDto, TranslatePipe } from '@app/shared';
+import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
+import { BranchItem, FlowExecutionStepStateDto, FlowStepDto, RuleElementDto, TranslatePipe } from '@app/shared';
 import { HistoryStepComponent } from './history-step.component';
 import { RuleClassPipe } from './pipes';
 import { StateAttemptComponent } from './state-attempt.component';
+import { StateStepPropertyComponent } from './state-step-property.component';
 
 @Component({
     standalone: true,
@@ -22,10 +23,11 @@ import { StateAttemptComponent } from './state-attempt.component';
         HistoryStepComponent,
         RuleClassPipe,
         StateAttemptComponent,
+        StateStepPropertyComponent,
         TranslatePipe,
     ],
 })
-export class StateStepComponent {
+export class StateStepComponent implements OnChanges {
     @Input({ required: true })
     public isFirst = false;
 
@@ -42,9 +44,16 @@ export class StateStepComponent {
     public stepInfo!: RuleElementDto;
 
     @Input({ required: true })
+    public stepDefinition!: FlowStepDto;
+
+    @Input({ required: true })
     public state?: FlowExecutionStepStateDto;
 
     public attemptIndex = 0;
+
+    public ngOnChanges() {
+        this.attemptIndex = this.stepInfo.properties.length > 0 ? -1 : 0;
+    }
 
     public selectAttempt(attempt: number) {
         this.attemptIndex = attempt;

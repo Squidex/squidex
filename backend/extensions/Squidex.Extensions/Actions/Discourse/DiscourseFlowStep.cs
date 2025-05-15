@@ -10,7 +10,7 @@ using System.Text;
 using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Extensions.Actions.Algolia;
 using Squidex.Flows;
-using Squidex.Infrastructure.Json;
+using Squidex.Flows.Steps.Utils;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
 
@@ -65,12 +65,6 @@ public sealed record DiscourseFlowStep : FlowStep, IConvertibleToAction
     public override async ValueTask<FlowStepResult> ExecuteAsync(FlowExecutionContext executionContext,
         CancellationToken ct)
     {
-        if (executionContext.IsSimulation)
-        {
-            executionContext.LogSkipSimulation();
-            return Next();
-        }
-
         var url = $"{Url.ToString().TrimEnd('/')}/posts.json?api_key={ApiKey}&api_username={ApiUsername}";
 
         var body = new Dictionary<string, object?>
@@ -92,10 +86,6 @@ public sealed record DiscourseFlowStep : FlowStep, IConvertibleToAction
 
         var jsonRequest = executionContext.SerializeJson(body);
 
-        var httpClient =
-            executionContext.Resolve<IHttpClientFactory>()
-                .CreateClient("DiscourseAction");
-
         var request = new HttpRequestMessage(HttpMethod.Post, url)
         {
             Content = new StringContent(jsonRequest, Encoding.UTF8, "application/json"),
@@ -103,6 +93,17 @@ public sealed record DiscourseFlowStep : FlowStep, IConvertibleToAction
 
         request.Headers.TryAddWithoutValidation("Api-Key", ApiKey);
         request.Headers.TryAddWithoutValidation("Api-Username", ApiUsername);
+
+        if (executionContext.IsSimulation)
+        {
+            executionContext.LogSkipSimulation(
+                HttpDumpFormatter.BuildDump(request, null, null));
+            return Next();
+        }
+
+        var httpClient =
+            executionContext.Resolve<IHttpClientFactory>()
+                .CreateClient("DiscourseAction");
 
         var (_, dump) = await httpClient.SendAsync(executionContext, request, jsonRequest, ct);
 

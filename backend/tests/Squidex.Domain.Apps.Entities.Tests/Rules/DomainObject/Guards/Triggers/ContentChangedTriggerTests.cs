@@ -22,7 +22,7 @@ public class ContentChangedTriggerTests : GivenContext, IClassFixture<Translatio
 
     public ContentChangedTriggerTests()
     {
-        validator = new RuleValidator(null!, AppProvider);
+        validator = new RuleValidator(null!, null!, AppProvider);
     }
 
     [Fact]

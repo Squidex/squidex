@@ -480,6 +480,23 @@ describe('RulesService', () => {
             expect(completions!).toEqual([]);
         }));
 
+    it('should make get request to get timezones',
+        inject([RulesService, HttpTestingController], (rulesService: RulesService, httpMock: HttpTestingController) => {
+            let timezones: ReadonlyArray<string>;
+            rulesService.getTimezones('my-app').subscribe(result => {
+                timezones = result;
+            });
+
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/rules/timezones');
+
+            expect(req.request.method).toEqual('GET');
+            expect(req.request.headers.get('If-Match')).toBeNull();
+
+            req.flush(['Europe/Berlin']);
+
+            expect(timezones!).toEqual(['Europe/Berlin']);
+        }));
+
     function ruleResponse(id: number, suffix = '') {
         const key = `${id}${suffix}`;
 

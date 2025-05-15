@@ -157,8 +157,10 @@ public class RuleDomainObjectTests : HandlerTestBase<Rule>
 
         await VerifySutAsync(actual, None.Value);
 
-        A.CallTo(() => ruleEnqueuer.EnqueueAsync(sut.Snapshot.Id, sut.Snapshot,
-                A<Envelope<IEvent>>.That.Matches(x => x.Payload is RuleManuallyTriggered)))
+        A.CallTo(() => ruleEnqueuer.EnqueueAsync(
+                sut.Snapshot,
+                A<Envelope<IEvent>>.That.Matches(x => x.Payload is RuleManuallyTriggered),
+                A<CancellationToken>._))
             .MustHaveHappened();
     }
 

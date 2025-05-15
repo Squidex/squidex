@@ -30,6 +30,7 @@ public sealed class AssetsController(
     ICommandBus commandBus,
     IAssetQueryService assetQuery,
     ITagService tagService,
+    ScriptingCompleter scriptingCompleter,
     AssetTusRunner assetTusRunner)
     : ApiController(commandBus)
 {
@@ -384,10 +385,9 @@ public sealed class AssetsController(
     [ApiPermissionOrAnonymous]
     [ApiCosts(1)]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public IActionResult GetScriptCompletion(string app, string schema,
-        [FromServices] ScriptingCompleter completer)
+    public IActionResult GetScriptCompletion(string app, string schema)
     {
-        var completion = completer.AssetScript();
+        var completion = scriptingCompleter.AssetScript();
 
         return Ok(completion);
     }
@@ -397,10 +397,9 @@ public sealed class AssetsController(
     [ApiPermissionOrAnonymous]
     [ApiCosts(1)]
     [ApiExplorerSettings(IgnoreApi = true)]
-    public IActionResult GetScriptTriggerCompletion(string app, string schema,
-        [FromServices] ScriptingCompleter completer)
+    public IActionResult GetScriptTriggerCompletion(string app, string schema)
     {
-        var completion = completer.AssetTrigger();
+        var completion = scriptingCompleter.AssetTrigger();
 
         return Ok(completion);
     }

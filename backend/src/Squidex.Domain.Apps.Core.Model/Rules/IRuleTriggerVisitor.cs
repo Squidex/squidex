@@ -17,6 +17,8 @@ public interface IRuleTriggerVisitor<out T, in TArgs>
 
     T Visit(CommentTrigger trigger, TArgs args);
 
+    T Visit(CronJobTrigger trigger, TArgs args);
+
     T Visit(ManualTrigger trigger, TArgs args);
 
     T Visit(SchemaChangedTrigger trigger, TArgs args);

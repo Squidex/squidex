@@ -19,7 +19,7 @@ public class UsageTriggerValidationTests : GivenContext, IClassFixture<Translati
 
     public UsageTriggerValidationTests()
     {
-        validator = new RuleValidator(null!, AppProvider);
+        validator = new RuleValidator(null!, null!, AppProvider);
     }
 
     [Fact]

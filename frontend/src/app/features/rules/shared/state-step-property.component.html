@@ -1,0 +1,12 @@
+<div class="row form-group mt-3">
+    <label class="col-3 text-end">{{ property.display }}</label>
+    <div class="col-9">
+        @if (valueType === "MultilineJson") {
+            <sqx-code-editor disabled="true" height="auto" [ngModel]="valueFormatted" />
+        } @else if (valueType === "MultilineAny") {
+            <sqx-code-editor disabled="true" height="auto" mode="ace/mode/text" [ngModel]="valueFormatted" />
+        } @else {
+            <div class="simple-value">{{ valueFormatted }}</div>
+        }
+    </div>
+</div>

@@ -9,7 +9,7 @@ using System.ComponentModel.DataAnnotations;
 using System.Text;
 using Squidex.Domain.Apps.Core.Rules.Deprecated;
 using Squidex.Flows;
-using Squidex.Flows.Steps;
+using Squidex.Flows.Steps.Utils;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.Validation;
@@ -74,13 +74,7 @@ public sealed record WebhookFlowStep : FlowStep, IConvertibleToAction
                 break;
         }
 
-        if (executionContext.IsSimulation)
-        {
-            executionContext.LogSkipSimulation();
-            return Next();
-        }
-
-        var httpClient = executionContext.Resolve<IHttpClientFactory>().CreateClient("FlowClient");
+        string? requestBody = null;
 
         var request = new HttpRequestMessage(method, Url);
         if (!string.IsNullOrEmpty(Payload) && Method != WebhookMethod.GET)
@@ -91,6 +85,7 @@ public sealed record WebhookFlowStep : FlowStep, IConvertibleToAction
                 mediaType = "application/json";
             }
 
+            requestBody = Payload;
             request.Content = new StringContent(Payload, Encoding.UTF8, mediaType);
         }
 
@@ -103,11 +98,23 @@ public sealed record WebhookFlowStep : FlowStep, IConvertibleToAction
             }
         }
 
-        var signature = $"{Payload}{SharedSecret}".ToSha256Base64();
+        if (!string.IsNullOrWhiteSpace(SharedSecret))
+        {
+            var signature = $"{Payload}{SharedSecret}".ToSha256Base64();
 
-        request.Headers.Add("X-Signature", signature);
+            request.Headers.Add("X-Signature", signature);
+        }
 
-        var (_, dump) = await httpClient.SendAsync(executionContext, request, Payload, ct);
+        if (executionContext.IsSimulation)
+        {
+            executionContext.LogSkipSimulation(
+                HttpDumpFormatter.BuildDump(request, null, requestBody, null));
+            return Next();
+        }
+
+        var httpClient = executionContext.Resolve<IHttpClientFactory>().CreateClient("FlowClient");
+
+        var (_, dump) = await httpClient.SendAsync(executionContext, request, requestBody, ct);
 
         executionContext.Log("HTTP request sent", dump);
         return Next();
