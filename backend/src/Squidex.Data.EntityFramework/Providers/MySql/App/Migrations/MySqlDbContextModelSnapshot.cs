@@ -426,7 +426,6 @@ namespace Squidex.Providers.MySql.Migrations
                         .HasColumnType("varchar(100)");
 
                     b.Property<string>("FileHash")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("FileName")
@@ -477,7 +476,6 @@ namespace Squidex.Providers.MySql.Migrations
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("Slug")
-                        .IsRequired()
                         .HasColumnType("longtext");
 
                     b.Property<string>("Tags")

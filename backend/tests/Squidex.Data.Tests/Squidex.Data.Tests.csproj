@@ -10,11 +10,6 @@
     <NoWarn>SA0001;NETSDK1206</NoWarn>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Remove="Providers\**" />
-    <EmbeddedResource Remove="Providers\**" />
-    <None Remove="Providers\**" />
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\..\src\Squidex.Data.EntityFramework\Squidex.Data.EntityFramework.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Data.MongoDb\Squidex.Data.MongoDb.csproj" />
     <ProjectReference Include="..\..\src\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />
@@ -24,6 +19,10 @@
     <ProjectReference Include="..\Squidex.Infrastructure.Tests\Squidex.Infrastructure.Tests.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="FakeItEasy" Version="8.3.0" />
     <PackageReference Include="FluentAssertions" Version="[7.0.0]" />
     <PackageReference Include="Meziantou.Analyzer" Version="2.0.179">

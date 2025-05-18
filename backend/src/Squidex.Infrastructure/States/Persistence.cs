@@ -8,8 +8,6 @@
 using Squidex.Events;
 using Squidex.Infrastructure.EventSourcing;
 
-#pragma warning disable RECS0012 // 'if' statement can be re-written as 'switch' statement
-
 namespace Squidex.Infrastructure.States;
 
 internal sealed class Persistence<T>(
@@ -54,8 +52,10 @@ internal sealed class Persistence<T>(
     {
         if (UseSnapshots)
         {
-            using (Telemetry.Activities.StartActivity("Persistence/ReadState"))
+            using (var activity = Telemetry.Activities.StartActivity("Persistence/ReadState"))
             {
+                activity?.SetTag("ownerType", ownerType.Name);
+                activity?.SetTag("ownerKey", ownerKey);
                 await snapshotStore.RemoveAsync(ownerKey, ct);
             }
 
@@ -64,8 +64,10 @@ internal sealed class Persistence<T>(
 
         if (UseEventSourcing)
         {
-            using (Telemetry.Activities.StartActivity("Persistence/ReadEvents"))
+            using (var activity = Telemetry.Activities.StartActivity("Persistence/ReadEvents"))
             {
+                activity?.SetTag("ownerType", ownerType.Name);
+                activity?.SetTag("ownerKey", ownerKey);
                 await eventStore.DeleteAsync(StreamFilter.Name(streamName.Value), ct);
             }
 
@@ -172,8 +174,11 @@ internal sealed class Persistence<T>(
             return;
         }
 
-        using (Telemetry.Activities.StartActivity("Persistence/WriteState"))
+        using (var activity = Telemetry.Activities.StartActivity("Persistence/WriteState"))
         {
+            activity?.SetTag("ownerType", ownerType.Name);
+            activity?.SetTag("ownerKey", ownerKey);
+
             var job = new SnapshotWriteJob<T>(ownerKey, state, newVersion)
             {
                 OldVersion = oldVersion,
@@ -204,8 +209,11 @@ internal sealed class Persistence<T>(
 
         try
         {
-            using (Telemetry.Activities.StartActivity("Persistence/WriteEvents"))
+            using (var activity = Telemetry.Activities.StartActivity("Persistence/WriteEvents"))
             {
+                activity?.SetTag("ownerType", ownerType.Name);
+                activity?.SetTag("ownerKey", ownerKey);
+
                 await eventStore.AppendAsync(eventCommitId, streamName.Value, oldVersion, eventData, ct);
             }
         }

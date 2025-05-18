@@ -427,7 +427,6 @@ namespace Squidex.Providers.Postgres.Migrations
                         .HasColumnType("character varying(100)");
 
                     b.Property<string>("FileHash")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("FileName")
@@ -478,7 +477,6 @@ namespace Squidex.Providers.Postgres.Migrations
                         .HasColumnType("character varying(255)");
 
                     b.Property<string>("Slug")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("Tags")
