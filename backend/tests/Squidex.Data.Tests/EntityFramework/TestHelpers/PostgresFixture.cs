@@ -13,7 +13,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Providers.Postgres;
 using Squidex.Providers.Postgres.Content;
-using Squidex.Providers.SqlServer;
 using Testcontainers.PostgreSql;
 
 namespace Squidex.EntityFramework.TestHelpers;

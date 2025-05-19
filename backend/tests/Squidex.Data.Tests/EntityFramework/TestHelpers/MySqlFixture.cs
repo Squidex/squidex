@@ -13,7 +13,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Providers.MySql;
 using Squidex.Providers.MySql.Content;
-using Squidex.Providers.Postgres;
 using Testcontainers.MySql;
 
 namespace Squidex.EntityFramework.TestHelpers;

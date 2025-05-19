@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure.Migrations;
+using Squidex.Providers.MySql;
 using Squidex.Providers.MySql.App;
 using Testcontainers.MySql;
 
@@ -34,19 +35,20 @@ public class MySqlMigrationTests : IAsyncLifetime
     {
         var services =
             new ServiceCollection()
-                 .AddDbContextFactory<MySqlAppDbContext>(b =>
-                 {
-                     var connectionString = mysql.GetConnectionString();
+                .AddDbContextFactory<MySqlAppDbContext>(b =>
+                {
+                    var connectionString = mysql.GetConnectionString();
 
-                     b.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), options =>
-                     {
-                         options.UseNetTopologySuite();
-                         options.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
-                     });
-                 })
-                 .AddSingleton(TestUtils.DefaultSerializer)
-                 .AddSingleton<DatabaseMigrator<MySqlAppDbContext>>()
-                 .BuildServiceProvider();
+                    b.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), options =>
+                    {
+                        options.UseNetTopologySuite();
+                        options.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
+                    });
+                })
+                .AddSingleton<ConnectionStringParser, MySqlConnectionStringParser>()
+                .AddSingleton(TestUtils.DefaultSerializer)
+                .AddSingleton<DatabaseMigrator<MySqlAppDbContext>>()
+                .BuildServiceProvider();
 
         var databaseMigrator = services.GetRequiredService<DatabaseMigrator<MySqlAppDbContext>>();
         var databaseFactory = services.GetRequiredService<IDbContextFactory<MySqlAppDbContext>>();
