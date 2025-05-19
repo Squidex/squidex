@@ -17,7 +17,7 @@ jobs:
         uses: docker/setup-buildx-action@v3.10.0
 
       - name: Build
-        uses: docker/build-push-action@v6.16.0
+        uses: docker/build-push-action@v6.17.0
         env:
           DOCKER_BUILD_RECORD_UPLOAD: false
         with:
@@ -60,7 +60,7 @@ jobs:
           node-version: 18
 
       - name: Build
-        uses: docker/build-push-action@v6.16.0
+        uses: docker/build-push-action@v6.17.0
         env:
           DOCKER_BUILD_RECORD_UPLOAD: false
           DOCKER_BUILD_SUMMARY: false
@@ -161,7 +161,7 @@ jobs:
           node-version: 18
 
       - name: Build
-        uses: docker/build-push-action@v6.16.0
+        uses: docker/build-push-action@v6.17.0
         env:
           DOCKER_BUILD_RECORD_UPLOAD: false
           DOCKER_BUILD_SUMMARY: false
@@ -243,7 +243,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build & Push for Multi-Platforms
-        uses: docker/build-push-action@v6.16.0
+        uses: docker/build-push-action@v6.17.0
         env:
           DOCKER_BUILD_RECORD_UPLOAD: false
         with:
