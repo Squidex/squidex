@@ -11,7 +11,9 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
+using Squidex.Providers.Postgres;
 using Squidex.Providers.Postgres.Content;
+using Squidex.Providers.SqlServer;
 using Testcontainers.PostgreSql;
 
 namespace Squidex.EntityFramework.TestHelpers;
@@ -57,6 +59,7 @@ public class PostgresFixture(string? reuseId) : IAsyncLifetime, ISqlContentFixtu
                 {
                     return new PostgresContentDbContext(name, connectionString, jsonSerializer);
                 })
+                .AddSingleton<ConnectionStringParser, PostgresConnectionStringParser>()
                 .AddSingletonAs<DatabaseCreator<TestDbContextPostgres>>().Done()
                 .AddSingleton(TestUtils.DefaultSerializer)
                 .BuildServiceProvider();
