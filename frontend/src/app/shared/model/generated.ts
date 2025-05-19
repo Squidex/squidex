@@ -319,7 +319,7 @@ export class UsersDto extends ResourceDto implements IUsersDto {
     /** The users. */
     readonly items!: UserDto[];
 
-    get canCreate() {
+    public get canCreate() {
         return this.compute('canCreate', () => hasAnyLink(this._links, 'create'));
     }
 
@@ -378,19 +378,19 @@ export class UserDto extends ResourceDto implements IUserDto {
     /** Additional permissions for the user. */
     readonly permissions!: string[];
 
-    get canDelete() {
+    public get canDelete() {
         return this.compute('canDelete', () => hasAnyLink(this._links, 'delete'));
     }
 
-    get canLock() {
+    public get canLock() {
         return this.compute('canLock', () => hasAnyLink(this._links, 'lock'));
     }
 
-    get canUnlock() {
+    public get canUnlock() {
         return this.compute('canUnlock', () => hasAnyLink(this._links, 'unlock'));
     }
 
-    get canUpdate() {
+    public get canUpdate() {
         return this.compute('canUpdate', () => hasAnyLink(this._links, 'update'));
     }
 
@@ -1094,11 +1094,11 @@ export class ContributorsDto extends ResourceDto implements IContributorsDto {
     /** The metadata to provide information about this request. */
     readonly _meta?: ContributorsMetadataDto | undefined;
 
-    get canCreate() {
+    public get canCreate() {
         return this.compute('canCreate', () => hasAnyLink(this._links, 'create'));
     }
 
-    get isInvited() {
+    public get isInvited() {
         return this.compute('isInvited', () => this._meta?.['isInvited'] === '1');
     }
 
@@ -1163,12 +1163,12 @@ export class ContributorDto extends ResourceDto implements IContributorDto {
         return `subject:${this.contributorId}`;
     }
 
-    get canRevoke() {
-        return this.compute('canRevoke ', () => hasAnyLink(this._links, 'update'));
+    public get canRevoke() {
+        return this.compute('canRevoke', () => hasAnyLink(this._links, 'update'));
     }
 
-    get canUpdate() {
-        return this.compute('canUpdate  ', () => hasAnyLink(this._links, 'update'));
+    public get canUpdate() {
+        return this.compute('canUpdate', () => hasAnyLink(this._links, 'update'));
     }
 
     constructor(data?: IContributorDto) {
@@ -1366,23 +1366,23 @@ export class TeamDto extends ResourceDto implements ITeamDto {
     /** The role name of the user. */
     readonly roleName?: string | undefined;
 
-    get canDelete() {
+    public get canDelete() {
         return this.compute('canDelete', () => hasAnyLink(this._links, 'delete'));
     }
 
-    get canReadAuth() {
+    public get canReadAuth() {
         return this.compute('canReadAuth', () => hasAnyLink(this._links, 'auth'));
     }
 
-    get canReadContributors() {
+    public get canReadContributors() {
         return this.compute('canReadContributors', () => hasAnyLink(this._links, 'contributors'));
     }
 
-    get canReadPlans() {
+    public get canReadPlans() {
         return this.compute('canReadPlans', () => hasAnyLink(this._links, 'plans'));
     }
 
-    get canUpdateGeneral() {
+    public get canUpdateGeneral() {
         return this.compute('canUpdateGeneral', () => hasAnyLink(this._links, 'update'));
     }
 
@@ -1571,7 +1571,7 @@ export class AuthSchemeResponseDto extends ResourceDto implements IAuthSchemeRes
     /** The auth scheme if configured. */
     readonly scheme?: AuthSchemeDto | undefined;
 
-    get canUpdate() {
+    public get canUpdate() {
         return this.compute('canUpdate', () => hasAnyLink(this._links, 'update'));
     }
 
@@ -2167,7 +2167,7 @@ export class SearchResultDto extends ResourceDto implements ISearchResultDto {
     /** An optional label. */
     readonly label?: string | undefined;
 
-    get url() {
+    public get url() {
         return this.compute('url', () => this._links['url'].href);
     }
 
@@ -2259,79 +2259,79 @@ export class SchemaDto extends ResourceDto implements ISchemaDto {
     /** The list of fields. */
     readonly fields!: FieldDto[];
 
-    get canAddField() {
+    public get canAddField() {
         return this.compute('canAddField', () => hasAnyLink(this._links, 'fields/add'));
     }
 
-    get canContentsCreate() {
+    public get canContentsCreate() {
         return this.compute('canContentsCreate', () => hasAnyLink(this._links, 'contents/create'));
     }
 
-    get canContentsCreateAndPublish() {
+    public get canContentsCreateAndPublish() {
         return this.compute('canContentsCreateAndPublish', () => hasAnyLink(this._links, 'contents/create/publish'));
     }
 
-    get canContentsRead() {
-        return this.compute('canContentsCreateAndPublish', () => hasAnyLink(this._links, 'contents'));
+    public get canContentsRead() {
+        return this.compute('canContentsRead', () => hasAnyLink(this._links, 'contents'));
     }
 
-    get canDelete() {
+    public get canDelete() {
         return this.compute('canDelete', () => hasAnyLink(this._links, 'delete'));
     }
 
-    get canOrderFields() {
+    public get canOrderFields() {
         return this.compute('canOrderFields', () => hasAnyLink(this._links, 'fields/order'));
     }
 
-    get canPublish() {
+    public get canPublish() {
         return this.compute('canPublish', () => hasAnyLink(this._links, 'publish'));
     }
 
-    get canReadContents() {
+    public get canReadContents() {
         return this.compute('canReadContents', () => hasAnyLink(this._links, 'contents'));
     }
 
-    get canSynchronize() {
-        return this.compute('canReadContents', () => hasAnyLink(this._links, 'update/sync'));
+    public get canSynchronize() {
+        return this.compute('canSynchronize', () => hasAnyLink(this._links, 'update/sync'));
     }
 
-    get canUnpublish() {
-        return this.compute('canReadContents', () => hasAnyLink(this._links, 'unpublish'));
+    public get canUnpublish() {
+        return this.compute('canUnpublish', () => hasAnyLink(this._links, 'unpublish'));
     }
 
-    get canUpdate() {
-        return this.compute('canReadContents', () => hasAnyLink(this._links, 'update'));
+    public get canUpdate() {
+        return this.compute('canUpdate', () => hasAnyLink(this._links, 'update'));
     }
 
-    get canUpdateCategory() {
+    public get canUpdateCategory() {
         return this.compute('canUpdateCategory', () => hasAnyLink(this._links, 'update/category'));
     }
 
-    get canUpdateRules() {
-        return this.compute('canUpdateCategory', () => hasAnyLink(this._links, 'update/rules'));
+    public get canUpdateRules() {
+        return this.compute('canUpdateRules', () => hasAnyLink(this._links, 'update/rules'));
     }
 
-    get canUpdateScripts() {
+    public get canUpdateScripts() {
         return this.compute('canUpdateScripts', () => hasAnyLink(this._links, 'update/scripts'));
     }
 
-    get canUpdateUIFields() {
+    public get canUpdateUIFields() {
         return this.compute('canUpdateUIFields', () => hasAnyLink(this._links, 'fields/ui'));
     }
 
-    get canUpdateUrls() {
+    public get canUpdateUrls() {
         return this.compute('canUpdateUrls', () => hasAnyLink(this._links, 'update/urls'));
     }
 
-    get displayName() {
+    public get displayName() {
         return this.compute('displayName', () => StringHelper.firstNonEmpty(this.properties.label, this.name));
     }
 
-    get contentFields() {
-        return this.compute('displayName', () => this.fields.filter(x => x.properties.isContentField).map(tableField));
+    public get contentFields() {
+        return this.compute('contentFields', () => this.fields.filter(x => x.properties.isContentField).map(tableField));
     }
 
-    get defaultListFields() {
+    public get defaultListFields() {
         return this.compute('defaultListFields', () => {
             const listFields = tableFields(this.fieldsInLists, this.contentFields);
 
@@ -2352,7 +2352,7 @@ export class SchemaDto extends ResourceDto implements ISchemaDto {
         });
     }
 
-    get defaultReferenceFields() {
+    public get defaultReferenceFields() {
         return this.compute('defaultReferenceFields', () => {
             const referenceFields = tableFields(this.fieldsInReferences, this.contentFields);
 
@@ -2886,15 +2886,15 @@ export class FieldDto extends ResourceDto implements IFieldDto {
         return this.properties;
     }
 
-    public get isInlineEditable(): boolean {
+    public get isInlineEditable() {
         return this.compute('isInlineEditable', () => !this.isDisabled && this.rawProperties.inlineEditable === true);
     }
 
-    public get isInvariant(): boolean {
+    public get isInvariant() {
         return this.compute('isInvariant', () => this.partitioning === 'invariant');
     }
 
-    public get isLocalizable(): boolean {
+    public get isLocalizable() {
         return this.compute('isLocalizable', () => this.partitioning === 'language');
     }
 
@@ -2906,39 +2906,39 @@ export class FieldDto extends ResourceDto implements IFieldDto {
         return this.compute('displayPlaceholder', () => this.properties.placeholder || '');
     }
 
-    get canAddField() {
+    public get canAddField() {
         return this.compute('canAddField', () => hasAnyLink(this._links, 'fields/add'));
     }
 
-    get canDelete() {
+    public get canDelete() {
         return this.compute('canDelete', () => hasAnyLink(this._links, 'delete'));
     }
 
-    get canDisable() {
+    public get canDisable() {
         return this.compute('canDisable', () => hasAnyLink(this._links, 'disable'));
     }
 
-    get canEnable() {
+    public get canEnable() {
         return this.compute('canEnable', () => hasAnyLink(this._links, 'enable'));
     }
 
-    get canOrderFields() {
+    public get canOrderFields() {
         return this.compute('canOrderFields', () => hasAnyLink(this._links, 'fields/order'));
     }
 
-    get canHide() {
+    public get canHide() {
         return this.compute('canHide', () => hasAnyLink(this._links, 'hide'));
     }
 
-    get canLock() {
+    public get canLock() {
         return this.compute('canLock', () => hasAnyLink(this._links, 'lock'));
     }
 
-    get canShow() {
+    public get canShow() {
         return this.compute('canShow', () => hasAnyLink(this._links, 'show'));
     }
 
-    get canUpdate() {
+    public get canUpdate() {
         return this.compute('canUpdate', () => hasAnyLink(this._links, 'update'));
     }
 
@@ -4664,30 +4664,30 @@ export class NestedFieldDto extends ResourceDto implements INestedFieldDto {
         return this.compute('displayPlaceholder', () => this.properties.placeholder || '');
     }
 
-    get canDelete() {
+    public get canDelete() {
         return this.compute('canDelete', () => hasAnyLink(this._links, 'delete'));
     }
 
-    get canDisable() {
+    public get canDisable() {
         return this.compute('canDisable', () => hasAnyLink(this._links, 'disable'));
     }
 
-    get canEnable() {
+    public get canEnable() {
         return this.compute('canEnable', () => hasAnyLink(this._links, 'enable'));
     }
-    get canHide() {
+    public get canHide() {
         return this.compute('canHide', () => hasAnyLink(this._links, 'hide'));
     }
 
-    get canLock() {
+    public get canLock() {
         return this.compute('canLock', () => hasAnyLink(this._links, 'lock'));
     }
 
-    get canShow() {
+    public get canShow() {
         return this.compute('canShow', () => hasAnyLink(this._links, 'show'));
     }
 
-    get canUpdate() {
+    public get canUpdate() {
         return this.compute('canUpdate', () => hasAnyLink(this._links, 'update'));
     }
 
@@ -5032,7 +5032,7 @@ export class IndexesDto extends ResourceDto implements IIndexesDto {
     /** The indexes. */
     readonly items!: IndexDto[];
 
-    get canCreate() {
+    public get canCreate() {
         return this.compute('canCreate', () => hasAnyLink(this._links, 'create'));
     }
 
@@ -5081,7 +5081,7 @@ export class IndexDto extends ResourceDto implements IIndexDto {
     /** The index fields. */
     readonly fields!: IndexFieldDto[];
 
-    get canDelete() {
+    public get canDelete() {
         return this.compute('canDelete', () => hasAnyLink(this._links, 'delete'));
     }
 
@@ -5275,7 +5275,7 @@ export class SchemasDto extends ResourceDto implements ISchemasDto {
     /** The schemas. */
     readonly items!: SchemaDto[];
 
-    get canCreate() {
+    public get canCreate() {
         return this.compute('canCreate', () => hasAnyLink(this._links, 'create'));
     }
 
@@ -9984,8 +9984,8 @@ export class RuleEventsDto extends ResourceDto implements IRuleEventsDto {
     /** The rule events. */
     readonly items!: RuleEventDto[];
 
-    get canCancelAll() {
-        return this.compute('canCancelAll ', () => hasAnyLink(this._links, 'cancel'));
+    public get canCancelAll() {
+        return this.compute('canCancelAll', () => hasAnyLink(this._links, 'cancel'));
     }
 
     constructor(data?: IRuleEventsDto) {
@@ -10037,11 +10037,11 @@ export class RuleEventDto extends ResourceDto implements IRuleEventDto {
     /** The flow state. */
     readonly flowState!: FlowExecutionStateDto;
 
-    get canDelete() {
+    public get canDelete() {
         return this.compute('canDelete', () => hasAnyLink(this._links, 'cancel'));
     }
 
-    get canUpdate() {
+    public get canUpdate() {
         return this.compute('canUpdate', () => hasAnyLink(this._links, 'update'));
     }
 
@@ -10711,7 +10711,7 @@ export class JobsDto extends ResourceDto implements IJobsDto {
     /** The jobs. */
     readonly items!: JobDto[];
 
-    get canCreateBackup() {
+    public get canCreateBackup() {
         return this.compute('canCreateBackup', () => hasAnyLink(this._links, 'create/backups'));
     }
 
@@ -10774,19 +10774,19 @@ export class JobDto extends ResourceDto implements IJobDto {
     /** Indicates whether the job can be downloaded. */
     readonly canDownload!: boolean;
 
-    get canDelete() {
+    public get canDelete() {
         return this.compute('canDelete', () => hasAnyLink(this._links, 'delete'));
     }
 
-    get canDownloadUrl() {
+    public get canDownloadUrl() {
         return this.compute('canDownloadUrl', () => hasAnyLink(this._links, 'download'));
     }
 
-    get downloadUrl() {
+    public get downloadUrl() {
         return this.compute('downloadUrl', () => this._links['download']?.href);
     }
 
-    get isfailed() {
+    public get isfailed() {
         return this.status === 'Failed';
     }
 
@@ -11098,15 +11098,15 @@ export class EventConsumerDto extends ResourceDto implements IEventConsumerDto {
     /** The position within the vent stream. */
     readonly position?: string | undefined;
 
-    get canReset() {
-        return this.compute('reset', () => hasAnyLink(this._links, 'reset'));
+    public get canReset() {
+        return this.compute('canReset', () => hasAnyLink(this._links, 'reset'));
     }
 
-    get canStart() {
+    public get canStart() {
         return this.compute('canStart', () => hasAnyLink(this._links, 'start'));
     }
 
-    get canStop() {
+    public get canStop() {
         return this.compute('canStop', () => hasAnyLink(this._links, 'stop'));
     }
 
@@ -11169,12 +11169,12 @@ export class ContentsDto extends ResourceDto implements IContentsDto {
     /** The possible statuses. */
     readonly statuses!: StatusInfoDto[];
 
-    get canCreate() {
+    public get canCreate() {
         return this.compute('canCreate', () => hasAnyLink(this._links, 'create'));
     }
 
-    get canCreateAndPublish() {
-        return this.compute('canCreate', () => hasAnyLink(this._links, 'create/publish'));
+    public get canCreateAndPublish() {
+        return this.compute('canCreateAndPublish', () => hasAnyLink(this._links, 'create/publish'));
     }
 
     constructor(data?: IContentsDto) {
@@ -11272,31 +11272,31 @@ export class ContentDto extends ResourceDto implements IContentDto {
     /** The version of the content. */
     readonly version!: number;
 
-    get canPublish() {
+    public get canPublish() {
         return this.compute('canPublish', () => this.statusUpdates.find(x => x.status === 'Published'));
     }
 
-    get canDelete() {
+    public get canDelete() {
         return this.compute('canDelete', () => hasAnyLink(this._links, 'update'));
     }
 
-    get canDraftCreate() {
+    public get canDraftCreate() {
         return this.compute('canDraftCreate', () => hasAnyLink(this._links, 'draft/create'));
     }
 
-    get canDraftDelete() {
+    public get canDraftDelete() {
         return this.compute('canDraftDelete', () => hasAnyLink(this._links, 'draft/delete'));
     }
 
-    get canCancelStatus() {
+    public get canCancelStatus() {
         return this.compute('canCancelStatus', () => hasAnyLink(this._links, 'cancel'));
     }
 
-    get canUpdate() {
+    public get canUpdate() {
         return this.compute('canUpdate', () => hasAnyLink(this._links, 'update'));
     }
 
-    get statusUpdates() {
+    public get statusUpdates() {
         return this.compute('statusUpdates', () => {
             const updates: { status: string; color: string }[] = [];
             for (const [key, link] of Object.entries(this._links)) {
@@ -12747,7 +12747,7 @@ export class AssetFoldersDto extends ResourceDto implements IAssetFoldersDto {
     /** The path to the current folder. */
     readonly path!: AssetFolderDto[];
 
-    get canCreate() {
+    public get canCreate() {
         return this.compute('canCreate', () => hasAnyLink(this._links, 'create'));
     }
 
@@ -12816,15 +12816,15 @@ export class AssetFolderDto extends ResourceDto implements IAssetFolderDto {
     /** The version of the asset folder. */
     readonly version!: number;
 
-    get canDelete() {
+    public get canDelete() {
         return this.compute('canDelete', () => hasAnyLink(this._links, 'update'));
     }
 
-    get canMove() {
+    public get canMove() {
         return this.compute('canMove', () => hasAnyLink(this._links, 'move'));
     }
 
-    get canUpdate() {
+    public get canUpdate() {
         return this.compute('canUpdate', () => hasAnyLink(this._links, 'update'));
     }
 
@@ -13135,11 +13135,11 @@ export class AssetsDto extends ResourceDto implements IAssetsDto {
     /** The assets. */
     readonly items!: AssetDto[];
 
-    get canCreate() {
+    public get canCreate() {
         return this.compute('canCreate', () => hasAnyLink(this._links, 'create'));
     }
 
-    get canRenameTag() {
+    public get canRenameTag() {
         return this.compute('canRenameTag', () => hasAnyLink(this._links, 'tags/rename'));
     }
 
@@ -13244,23 +13244,23 @@ export class AssetDto extends ResourceDto implements IAssetDto {
         return this.compute('contentUrl', () => this._links['content']?.href);
     }
 
-    get canDelete() {
+    public get canDelete() {
         return this.compute('canDelete', () => hasAnyLink(this._links, 'update'));
     }
 
-    get canMove() {
+    public get canMove() {
         return this.compute('canMove', () => hasAnyLink(this._links, 'move'));
     }
 
-    get canUpdate() {
+    public get canUpdate() {
         return this.compute('canUpdate', () => hasAnyLink(this._links, 'update'));
     }
 
-    get canUpload() {
+    public get canUpload() {
         return this.compute('canUpload', () => hasAnyLink(this._links, 'upload'));
     }
 
-    get canPreview() {
+    public get canPreview() {
         return this.compute('canPreview', () => {
             const SVG_PREVIEW_LIMIT = 10 * 1024;
             const MIME_TIFF = 'image/tiff';
@@ -13909,7 +13909,7 @@ export class AssetScriptsDto extends ResourceDto implements IAssetScriptsDto {
     /** The version of the app. */
     readonly version!: number;
 
-    get canUpdate() {
+    public get canUpdate() {
         return this.compute('canUpdate', () => hasAnyLink(this._links, 'update'));
     }
 
@@ -14073,7 +14073,7 @@ export class ClientsDto extends ResourceDto implements IClientsDto {
     /** The clients. */
     readonly items!: ClientDto[];
 
-    get canCreate() {
+    public get canCreate() {
         return this.compute('canCreate', () => hasAnyLink(this._links, 'create'));
     }
 
@@ -14132,11 +14132,11 @@ export class ClientDto extends ResourceDto implements IClientDto {
     /** True to allow anonymous access without an access token for this client. */
     readonly allowAnonymous!: boolean;
 
-    get canRevoke() {
+    public get canRevoke() {
         return this.compute('canRevoke', () => hasAnyLink(this._links, 'delete'));
     }
 
-    get canUpdate() {
+    public get canUpdate() {
         return this.compute('canUpdate', () => hasAnyLink(this._links, 'update'));
     }
 
@@ -14345,7 +14345,7 @@ export class AppLanguagesDto extends ResourceDto implements IAppLanguagesDto {
     /** The languages. */
     readonly items!: AppLanguageDto[];
 
-    get canCreate() {
+    public get canCreate() {
         return this.compute('canCreate', () => hasAnyLink(this._links, 'create'));
     }
 
@@ -14400,11 +14400,11 @@ export class AppLanguageDto extends ResourceDto implements IAppLanguageDto {
     /** Indicates if the language is optional. */
     readonly isOptional!: boolean;
 
-    get canDelete() {
+    public get canDelete() {
         return this.compute('canDelete', () => hasAnyLink(this._links, 'delete'));
     }
 
-    get canUpdate() {
+    public get canUpdate() {
         return this.compute('canUpdate', () => hasAnyLink(this._links, 'update'));
     }
 
@@ -14609,7 +14609,7 @@ export class RolesDto extends ResourceDto implements IRolesDto {
     /** The roles. */
     readonly items!: RoleDto[];
 
-    get canCreate() {
+    public get canCreate() {
         return this.compute('canCreate', () => hasAnyLink(this._links, 'create'));
     }
 
@@ -14666,11 +14666,11 @@ export class RoleDto extends ResourceDto implements IRoleDto {
     /** Associated list of UI properties. */
     readonly properties!: { [key: string]: any; };
 
-    get canDelete() {
+    public get canDelete() {
         return this.compute('canDelete', () => hasAnyLink(this._links, 'update'));
     }
 
-    get canUpdate() {
+    public get canUpdate() {
         return this.compute('canUpdate', () => hasAnyLink(this._links, 'update'));
     }
 
@@ -14925,87 +14925,87 @@ export class AppDto extends ResourceDto implements IAppDto {
     /** The properties from the role. */
     readonly roleProperties!: { [key: string]: any; };
 
-    get displayName() {
+    public get displayName() {
         return this.compute('displayName', () => StringHelper.firstNonEmpty(this.label, this.name));
     }
 
-    get canCreateSchema() {
+    public get canCreateSchema() {
         return this.compute('canCreateSchema', () => hasAnyLink(this._links, 'schemas/create'));
     }
 
-    get canDelete() {
+    public get canDelete() {
         return this.compute('canDelete', () => hasAnyLink(this._links, 'delete'));
     }
 
-    get canLeave() {
+    public get canLeave() {
         return this.compute('canLeave', () => hasAnyLink(this._links, 'leave'));
     }
 
-    get canReadAssets() {
+    public get canReadAssets() {
         return this.compute('canReadAssets', () => hasAnyLink(this._links, 'assets'));
     }
 
-    get canReadAssetsScripts() {
+    public get canReadAssetsScripts() {
         return this.compute('canReadAssetsScripts', () => hasAnyLink(this._links, 'assets/scripts'));
     }
 
-    get canReadClients() {
+    public get canReadClients() {
         return this.compute('canReadClients', () => hasAnyLink(this._links, 'clients'));
     }
 
-    get canReadContributors() {
+    public get canReadContributors() {
         return this.compute('canReadContributors', () => hasAnyLink(this._links, 'contributors'));
     }
 
-    get canReadJobs() {
+    public get canReadJobs() {
         return this.compute('canReadJobs', () => hasAnyLink(this._links, 'jobs'));
     }
 
-    get canReadLanguages() {
+    public get canReadLanguages() {
         return this.compute('canReadLanguages', () => hasAnyLink(this._links, 'languages'));
     }
 
-    get canReadPatterns() {
+    public get canReadPatterns() {
         return this.compute('canReadPatterns', () => hasAnyLink(this._links, 'patterns'));
     }
 
-    get canReadPlans() {
+    public get canReadPlans() {
         return this.compute('canReadPlans', () => hasAnyLink(this._links, 'plans'));
     }
 
-    get canReadRoles() {
+    public get canReadRoles() {
         return this.compute('canReadRoles', () => hasAnyLink(this._links, 'roles'));
     }
 
-    get canReadRules() {
+    public get canReadRules() {
         return this.compute('canReadRules', () => hasAnyLink(this._links, 'rules'));
     }
 
-    get canReadSchemas() {
+    public get canReadSchemas() {
         return this.compute('canReadSchemas', () => hasAnyLink(this._links, 'schemas'));
     }
 
-    get canReadWorkflows() {
+    public get canReadWorkflows() {
         return this.compute('canReadWorkflows', () => hasAnyLink(this._links, 'workflows'));
     }
 
-    get canUpdateGeneral() {
+    public get canUpdateGeneral() {
         return this.compute('canUpdateGeneral', () => hasAnyLink(this._links, 'update'));
     }
 
-    get canUpdateImage() {
+    public get canUpdateImage() {
         return this.compute('canUpdateImage', () => hasAnyLink(this._links, 'image/upload'));
     }
 
-    get canUpdateTeam() {
+    public get canUpdateTeam() {
         return this.compute('canUpdateTeam', () => hasAnyLink(this._links, 'transfer'));
     }
 
-    get canUploadAssets() {
+    public get canUploadAssets() {
         return this.compute('canUploadAssets', () => hasAnyLink(this._links, 'assets/create'));
     }
 
-    get image() {
+    public get image() {
         return this.compute('image', () => this._links['image']?.href);
     }
 
@@ -15323,7 +15323,7 @@ export class AppSettingsDto extends ResourceDto implements IAppSettingsDto {
     /** The version of the app. */
     readonly version!: number;
 
-    get canUpdate() {
+    public get canUpdate() {
         return this.compute('canUpdate', () => hasAnyLink(this._links, 'update'));
     }
 
@@ -15631,7 +15631,7 @@ export class WorkflowsDto extends ResourceDto implements IWorkflowsDto {
     /** The errros that should be fixed. */
     readonly errors!: string[];
 
-    get canCreate() {
+    public get canCreate() {
         return this.compute('canCreate', () => hasAnyLink(this._links, 'create'));
     }
 
@@ -15698,15 +15698,15 @@ export class WorkflowDto extends ResourceDto implements IWorkflowDto {
     /** The initial step. */
     readonly initial!: string;
 
-    get displayName() {
+    public get displayName() {
         return this.compute('displayName', () => StringHelper.firstNonEmpty(this.name, 'i18n:workflows.notNamed'));
     }
 
-    get canDelete() {
+    public get canDelete() {
         return this.compute('canDelete', () => hasAnyLink(this._links, 'delete'));
     }
 
-    get canUpdate() {
+    public get canUpdate() {
         return this.compute('canUpdate', () => hasAnyLink(this._links, 'update'));
     }
 
@@ -17155,15 +17155,15 @@ export class DynamicRulesDto extends ResourceDto implements IDynamicRulesDto {
     /** The ID of the rule that is currently rerunning. */
     readonly runningRuleId?: string | undefined;
 
-    get canCreate() {
+    public get canCreate() {
         return this.compute('canCreate', () => hasAnyLink(this._links, 'create'));
     }
 
-    get canReadEvents() {
+    public get canReadEvents() {
         return this.compute('canReadEvents', () => hasAnyLink(this._links, 'events'));
     }
 
-    get canCancelRun() {
+    public get canCancelRun() {
         return this.compute('canCancelRun', () => hasAnyLink(this._links, 'run/cancel'));
     }
 
@@ -17240,35 +17240,35 @@ export class DynamicRuleDto extends ResourceDto implements IDynamicRuleDto {
     /** The date and time when the rule was executed the last time. */
     readonly lastExecuted?: DateTime | undefined;
 
-    get canDelete() {
+    public get canDelete() {
         return this.compute('canDelete', () => hasAnyLink(this._links, 'delete'));
     }
 
-    get canDisable() {
+    public get canDisable() {
         return this.compute('canDisable', () => hasAnyLink(this._links, 'disable'));
     }
 
-    get canEnable() {
+    public get canEnable() {
         return this.compute('canEnable', () => hasAnyLink(this._links, 'enable'));
     }
 
-    get canReadLogs() {
+    public get canReadLogs() {
         return this.compute('canReadLogs', () => hasAnyLink(this._links, 'logs'));
     }
 
-    get canRun() {
+    public get canRun() {
         return this.compute('canRun', () => hasAnyLink(this._links, 'run'));
     }
 
-    get canRunFromSnapshots() {
+    public get canRunFromSnapshots() {
         return this.compute('canRunFromSnapshots', () => hasAnyLink(this._links, 'run/snapshots'));
     }
 
-    get canTrigger() {
+    public get canTrigger() {
         return this.compute('canTrigger', () => hasAnyLink(this._links, 'trigger'));
     }
 
-    get canUpdate() {
+    public get canUpdate() {
         return this.compute('canUpdate', () => hasAnyLink(this._links, 'update'));
     }
 
