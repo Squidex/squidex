@@ -93,6 +93,9 @@ public static class ServiceExtensions
 
                 services.AddSingletonAs<MySqlDiagnostics>()
                     .As<ITelemetryConfigurator>();
+
+                services.AddSingletonAs<MySqlConnectionStringParser>()
+                    .As<ConnectionStringParser>();
             },
             ["Postgres"] = () =>
             {
@@ -115,6 +118,9 @@ public static class ServiceExtensions
 
                 services.AddSingletonAs<PostgresDiagnostics>()
                     .As<ITelemetryConfigurator>();
+
+                services.AddSingletonAs<PostgresConnectionStringParser>()
+                    .As<ConnectionStringParser>();
             },
             ["SqlServer"] = () =>
             {
@@ -137,6 +143,9 @@ public static class ServiceExtensions
 
                 services.AddSingletonAs<SqlServerDiagnostics>()
                     .As<ITelemetryConfigurator>();
+
+                services.AddSingletonAs<SqlServerConnectionStringParser>()
+                    .As<ConnectionStringParser>();
             },
         });
     }
