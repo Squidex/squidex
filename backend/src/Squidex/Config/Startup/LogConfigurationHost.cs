@@ -12,9 +12,11 @@ namespace Squidex.Config.Startup;
 
 public sealed class LogConfigurationHost(IConfiguration configuration, ISemanticLog log) : IHostedService
 {
+    private static readonly string RedactedValue = "*****";
     private static readonly Regex[] SensitivePatterns =
     [
         // Authentication and API keys
+#pragma warning disable MA0110 // Use the Regex source generator
         new Regex(@"(?i)(secret|token|key|password|credential|auth|api[_-]?key)$"),
         new Regex(@"(?i)^(aws|azure|google|microsoft|github)[_-]"),
         new Regex(@"(?i)(jwt|bearer|oauth|saml)"),
@@ -31,9 +33,8 @@ public sealed class LogConfigurationHost(IConfiguration configuration, ISemantic
         // Database specific
         new Regex(@"(?i)(mongodb|sqlserver|postgres|mysql)://.*"),
         new Regex(@"(?i)(database|db|server|host|port|user|pass)="),
+#pragma warning restore MA0110 // Use the Regex source generator
     ];
-
-    private static readonly string RedactedValue = "*****";
 
     public Task StartAsync(
         CancellationToken cancellationToken)
@@ -44,16 +45,22 @@ public sealed class LogConfigurationHost(IConfiguration configuration, ISemantic
             {
                 var logged = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
 
-                var orderedConfigs = configuration.AsEnumerable()
-                    .Where(kvp => kvp.Value != null)
-                    .OrderBy(x => x.Key, StringComparer.OrdinalIgnoreCase);
+                var orderedConfigs =
+                    configuration.AsEnumerable()
+                        .OrderBy(x => x.Key, StringComparer.OrdinalIgnoreCase);
 
-                foreach (var (key, val) in orderedConfigs)
+                foreach (var (key, value) in orderedConfigs)
                 {
-                    if (logged.Add(key))
+                    if (string.IsNullOrWhiteSpace(value))
                     {
-                        var keyLower = key.ToLowerInvariant();
-                        var value = IsSensitiveKey(keyLower) || IsSensitiveValue(val) ? RedactedValue : val;
+                        continue;
+                    }
+
+                    var keyLower = key.ToLowerInvariant();
+
+                    if (logged.Add(keyLower))
+                    {
+                        var formattedValue = IsSensitiveKey(keyLower) || IsSensitiveValue(value) ? RedactedValue : value;
 
                         c.WriteProperty(keyLower, value);
                     }
@@ -70,17 +77,16 @@ public sealed class LogConfigurationHost(IConfiguration configuration, ISemantic
 
     private static bool IsSensitiveValue(string? value)
     {
-        if (string.IsNullOrEmpty(value))
+        // Check for connection strings and URLs with credentials
+        if (string.IsNullOrEmpty(value) || !value.Contains("://", StringComparison.Ordinal))
         {
             return false;
         }
 
-        // Check for connection strings and URLs with credentials
-        return value.Contains("://") && (
-            value.Contains("@") || // Contains username/password in URL
-            value.Contains(";") || // Contains connection string parameters
-            value.Contains("=") // Contains key-value pairs
-        );
+        // Contains username/password, connection string parameters or query strings.
+        return value.Contains('@', StringComparison.Ordinal)
+            || value.Contains(';', StringComparison.Ordinal)
+            || value.Contains('=', StringComparison.Ordinal);
     }
 
     public Task StopAsync(

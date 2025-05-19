@@ -180,5 +180,8 @@ dotnet_diagnostic.SA1615.severity = none
 # SA1623: Property summary documentation should match accessors
 dotnet_diagnostic.SA1623.severity = none
 
+# SYSLIB1045: Convert to 'GeneratedRegexAttribute'.
+dotnet_diagnostic.SYSLIB1045.severity = none
+
 # xUnit1033: Test classes decorated with 'Xunit.IClassFixture<TFixture>' or 'Xunit.ICollectionFixture<TFixture>' should add a constructor argument of type TFixture
 dotnet_diagnostic.xUnit1033.severity = none

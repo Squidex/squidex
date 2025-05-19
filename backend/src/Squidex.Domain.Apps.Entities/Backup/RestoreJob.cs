@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Apps;
@@ -106,7 +107,6 @@ public sealed class RestoreJob(
             await context.LogAsync("  * Restore all objects like app, schemas and contents");
             await context.LogAsync("  * Complete the restore operation for all objects");
             await context.FlushAsync();
-
             log.LogInformation("Backup with job id {backupId} with from URL '{url}' started.", context.Job.Id, state.Url);
 
             state.Reader = await DownloadAsync(context, state, ct);
@@ -145,7 +145,6 @@ public sealed class RestoreJob(
 
             // Add the current user to the app, so that the admin can see it and verify integrity.
             await AssignContributorAsync(context, state);
-
             await context.LogAsync("Completed, Yeah!");
 
             log.LogInformation("Backup with job id {backupId} from URL '{url}' completed.", context.Job.Id, state.Url);
@@ -239,9 +238,7 @@ public sealed class RestoreJob(
         using (Telemetry.Activities.StartActivity("Download"))
         {
             await run.LogAsync("Downloading Backup");
-
             var reader = await backupArchiveLocation.OpenReaderAsync(state.Url, run.Job.Id, ct);
-
             await run.LogAsync("Downloaded Backup");
 
             return reader;
@@ -264,15 +261,27 @@ public sealed class RestoreJob(
         },
         async (batch, ct) =>
         {
-            var commits =
-                batch.Select(item =>
-                    EventCommitBuilder.Create(
-                        item.Stream,
-                        item.Offset,
-                        item.Event,
-                        eventFormatter));
+            using (var activity = Telemetry.Activities.StartActivity("StoreEvents"))
+            {
+                var commits =
+                    batch.Select(item =>
+                        EventCommitBuilder.Create(
+                            item.Stream,
+                            item.Offset,
+                            item.Event,
+                            eventFormatter))
+                    .ToList();
 
-            await eventStore.AppendUnsafeAsync(commits, ct);
+                activity?.SetTag("totalCommits", commits.Count);
+                activity?.SetTag("totalEvents", commits.Sum(x => x.Events.Count));
+
+                if (commits.Any(x => x.StreamName.Contains("46b2fb05-3438-4b99-8c1d-bac8925a33dd")))
+                {
+                    Debugger.Break();
+                }
+
+                await eventStore.AppendUnsafeAsync(commits, ct);
+            }
 
             // Just in case we use parallel inserts later.
             Interlocked.Add(ref handled, batch.Count);
@@ -359,9 +368,7 @@ public sealed class RestoreJob(
         using (Telemetry.Activities.StartActivity("CreateUsers"))
         {
             await run.LogAsync("Creating Users");
-
             await userMapping.RestoreAsync(state.Reader, userResolver, ct);
-
             await run.LogAsync("Created Users");
         }
 

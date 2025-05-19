@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
+using Squidex.Providers.SqlServer;
 using Squidex.Providers.SqlServer.Content;
 using Testcontainers.MsSql;
 
@@ -59,6 +60,7 @@ public class SqlServerFixture(string? reuseId = null) : IAsyncLifetime, ISqlCont
                 {
                     return new SqlServerContentDbContext(name, connectionString, jsonSerializer);
                 })
+                .AddSingleton<ConnectionStringParser, SqlServerConnectionStringParser>()
                 .AddSingletonAs<DatabaseCreator<TestDbContextSqlServer>>().Done()
                 .AddSingleton(TestUtils.DefaultSerializer)
                 .BuildServiceProvider();

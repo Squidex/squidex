@@ -20,6 +20,10 @@
     <ProjectReference Include="..\Squidex.Infrastructure.Tests\Squidex.Infrastructure.Tests.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="coverlet.collector" Version="6.0.4">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
     <PackageReference Include="FakeItEasy" Version="8.3.0" />
     <PackageReference Include="FluentAssertions" Version="[7.0.0]" />
     <PackageReference Include="GraphQL" Version="8.2.1" />

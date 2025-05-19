@@ -1,86 +1,105 @@
 Param(
-	[switch]$infrastructure,
-	[switch]$appsCore,
-	[switch]$appsEntities,
-	[switch]$users,
-	[switch]$web,
-	[switch]$all
+	[switch]$testInfrastructure,
+	[switch]$testAppsCore,
+	[switch]$testAppsEntities,
+	[switch]$testUsers,
+	[switch]$testWeb,
+	[switch]$testAll,
+    [switch]$noClean
 )
 
 $ErrorActionPreference = "Stop"
 
 $folderReports = ".\_test-output"
-$folderHome = $env:USERPROFILE
 $folderWorking = Get-Location
+$versionOpenCover = "4.7.1221"
+$versionReportGenerator = "5.4.1"
 
-if (Test-Path $folderReports) {
-    Remove-Item $folderReports -recurse
+if ($testAll) {
+    $testInfrastructure = $true
+    $testAppsCore = $true
+    $testAppsEntities = $true
+    $testUsers = $true
+    $testWeb = $true
 }
 
-Write-Host "Recreated '$folderReports' folder"
+Write-Host "Test Infrastructure: $testInfrastructure"
+Write-Host "Test Apps Core:      $testAppsCore"
+Write-Host "Test Apps Entities:  $testAppsEntities"
+Write-Host "Test Users:          $testUsers"
+Write-Host "Test Web:            $testWeb"
 
-New-Item -ItemType directory -Path $folderReports
+if (!$noClean) {
+    if (Test-Path $folderReports) {
+        Remove-Item $folderReports -recurse
 
-if ($all -Or $infrastructure) {
-	&"$folderHome\.nuget\packages\OpenCover\4.7.1221\tools\OpenCover.Console.exe" `
-	-register:user `
-	-target:"C:\Program Files\dotnet\dotnet.exe" `
-	-targetargs:"test --filter Category!=Dependencies $folderWorking\Squidex.Infrastructure.Tests\Squidex.Infrastructure.Tests.csproj" `
-	-filter:"+[Squidex.*]* -[*.Tests]* -[Squidex.*]*CodeGen*" `
-	-excludebyattribute:*.ExcludeFromCodeCoverage* `
-	-skipautoprops `
-	-output:"$folderWorking\$folderReports\Infrastructure.xml" `
-	-oldStyle
+        Write-Host "Recreated '$folderReports' folder"
+    }
 }
 
-if ($all -Or $appsCore) {
-	&"$folderHome\.nuget\packages\OpenCover\4.7.1221\tools\OpenCover.Console.exe" `
-	-register:user `
-	-target:"C:\Program Files\dotnet\dotnet.exe" `
-	-targetargs:"test --filter Category!=Dependencies $folderWorking\Squidex.Domain.Apps.Core.Tests\Squidex.Domain.Apps.Core.Tests.csproj" `
-	-filter:"+[Squidex.*]* -[*.Tests]* -[Squidex.*]*CodeGen*" `
-	-excludebyattribute:*.ExcludeFromCodeCoverage* `
-	-skipautoprops `
-	-output:"$folderWorking\$folderReports\Core.xml" `
-	-oldStyle
+if (!(Test-Path $folderReports)) {
+    New-Item -ItemType directory -Path $folderReports
 }
 
-if ($all -Or $appsEntities) {
-	&"$folderHome\.nuget\packages\OpenCover\4.7.1221\tools\OpenCover.Console.exe" `
-	-register:user `
-	-target:"C:\Program Files\dotnet\dotnet.exe" `
-	-targetargs:"test --filter Category!=Dependencies $folderWorking\Squidex.Domain.Apps.Entities.Tests\Squidex.Domain.Apps.Entities.Tests.csproj" `
-	-filter:"+[Squidex.*]* -[*.Tests]* -[Squidex.*]*CodeGen*" `
-	-excludebyattribute:*.ExcludeFromCodeCoverage* `
-	-skipautoprops `
-	-output:"$folderWorking\$folderReports\Entities.xml" `
-	-oldStyle
+if ($testInfrastructure) {
+    $projectName = "Squidex.Infrastructure.Tests"
+
+    dotnet test "$folderWorking\$projectName\$projectName.csproj" `
+        --no-restore `
+        --filter "Category!=Dependencies & Category!=TestContainer" `
+        --collect "XPlat Code Coverage" `
+        --results-directory "$folderReports" `
+        --settings "$folderWorking\coverlet.runsettings.xml"
 }
 
-if ($all -Or $users) {
-	&"$folderHome\.nuget\packages\OpenCover\4.7.1221\tools\OpenCover.Console.exe" `
-	-register:user `
-	-target:"C:\Program Files\dotnet\dotnet.exe" `
-	-targetargs:"test --filter Category!=Dependencies $folderWorking\Squidex.Domain.Users.Tests\Squidex.Domain.Users.Tests.csproj" `
-	-filter:"+[Squidex.*]* -[*.Tests]* -[Squidex.*]*CodeGen*" `
-	-excludebyattribute:*.ExcludeFromCodeCoverage* `
-	-skipautoprops `
-	-output:"$folderWorking\$folderReports\Users.xml" `
-	-oldStyle
+if ($testAppsCore) {
+    $projectName = "Squidex.Domain.Apps.Core.Tests"
+
+    dotnet test "$folderWorking\$projectName\$projectName.csproj" `
+        --no-restore `
+        --filter "Category!=Dependencies & Category!=TestContainer" `
+        --collect "XPlat Code Coverage" `
+        --results-directory "$folderReports" `
+        --settings "$folderWorking\coverlet.runsettings.xml"
 }
 
-if ($all -Or $web) {
-	&"$folderHome\.nuget\packages\OpenCover\4.7.1221\tools\OpenCover.Console.exe" `
-	-register:user `
-	-target:"C:\Program Files\dotnet\dotnet.exe" `
-	-targetargs:"test --filter Category!=Dependencies $folderWorking\Squidex.Web.Tests\Squidex.Web.Tests.csproj" `
-	-filter:"+[Squidex.*]* -[*.Tests]* -[Squidex.*]*CodeGen*" `
-	-excludebyattribute:*.ExcludeFromCodeCoverage* `
-	-skipautoprops `
-	-output:"$folderWorking\$folderReports\Web.xml" `
-	-oldStyle
+if ($testAppsEntities) {
+    $projectName = "Squidex.Domain.Apps.Entities.Tests"
+
+    dotnet test "$folderWorking\$projectName\$projectName.csproj" `
+        --no-restore `
+        --filter "Category!=Dependencies & Category!=TestContainer" `
+        --collect "XPlat Code Coverage" `
+        --results-directory "$folderReports" `
+        --settings "$folderWorking\coverlet.runsettings.xml"
 }
 
-&"$folderHome\.nuget\packages\ReportGenerator\5.1.9\tools\net47\ReportGenerator.exe" `
--reports:"$folderWorking\$folderReports\*.xml" `
--targetdir:"$folderWorking\$folderReports\Output"
+if ($testUsers) {
+    $projectName = "Squidex.Domain.Users.Tests"
+
+    dotnet test "$folderWorking\$projectName\$projectName.csproj" `
+        --no-restore `
+        --filter "Category!=Dependencies & Category!=TestContainer" `
+        --collect "XPlat Code Coverage" `
+        --results-directory "$folderReports" `
+        --settings "$folderWorking\coverlet.runsettings.xml"
+}
+
+if ($testWeb) {
+    $projectName = "Squidex.Web.Tests"
+
+    dotnet test "$folderWorking\$projectName\$projectName.csproj" `
+        --no-restore `
+        --filter "Category!=Dependencies & Category!=TestContainer" `
+        --collect "XPlat Code Coverage" `
+        --results-directory "$folderReports" `
+        --settings "$folderWorking\coverlet.runsettings.xml"
+}
+
+
+dotnet tool install -g dotnet-reportgenerator-globaltool
+
+reportgenerator `
+    -reports:"$folderReports\**\coverage.cobertura.xml" `
+    -targetdir:"$folderReports\report" `
+    -reporttypes:Html

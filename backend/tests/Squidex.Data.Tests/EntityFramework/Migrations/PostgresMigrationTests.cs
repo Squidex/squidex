@@ -9,6 +9,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure.Migrations;
+using Squidex.Providers.Postgres;
 using Squidex.Providers.Postgres.App;
 using Testcontainers.PostgreSql;
 
@@ -37,16 +38,17 @@ public class PostgresMigrationTests : IAsyncLifetime
     {
         var services =
             new ServiceCollection()
-                 .AddDbContextFactory<PostgresAppDbContext>(b =>
-                 {
-                     b.UseNpgsql(postgreSql.GetConnectionString(), options =>
-                     {
-                         options.UseNetTopologySuite();
-                     });
-                 })
-                 .AddSingleton(TestUtils.DefaultSerializer)
-                 .AddSingleton<DatabaseMigrator<PostgresAppDbContext>>()
-                 .BuildServiceProvider();
+                .AddDbContextFactory<PostgresAppDbContext>(b =>
+                {
+                    b.UseNpgsql(postgreSql.GetConnectionString(), options =>
+                    {
+                        options.UseNetTopologySuite();
+                    });
+                })
+                .AddSingleton<ConnectionStringParser, PostgresConnectionStringParser>()
+                .AddSingleton(TestUtils.DefaultSerializer)
+                .AddSingleton<DatabaseMigrator<PostgresAppDbContext>>()
+                .BuildServiceProvider();
 
         var databaseMigrator = services.GetRequiredService<DatabaseMigrator<PostgresAppDbContext>>();
         var databaseFactory = services.GetRequiredService<IDbContextFactory<PostgresAppDbContext>>();

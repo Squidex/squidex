@@ -5,13 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Infrastructure.EventSourcing;
+using Npgsql;
+using Squidex.Infrastructure.Migrations;
 
-namespace Squidex.Domain.Apps.Entities.Rules;
+namespace Squidex.Providers.Postgres;
 
-public interface IRuleEnqueuer
+public class PostgresConnectionStringParser : ConnectionStringParser
 {
-    Task EnqueueAsync(Rule rule, Envelope<IEvent> @event,
-        CancellationToken ct = default);
+    protected override string? GetProviderSpecificHostName(string source)
+    {
+        var builder = new NpgsqlConnectionStringBuilder(source);
+
+        return builder.Host;
+    }
 }

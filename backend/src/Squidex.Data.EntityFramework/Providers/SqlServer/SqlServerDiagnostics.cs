@@ -5,13 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Infrastructure.EventSourcing;
+using OpenTelemetry.Trace;
+using Squidex.Infrastructure;
 
-namespace Squidex.Domain.Apps.Entities.Rules;
+namespace Squidex.Providers.SqlServer;
 
-public interface IRuleEnqueuer
+public sealed class SqlServerDiagnostics : ITelemetryConfigurator
 {
-    Task EnqueueAsync(Rule rule, Envelope<IEvent> @event,
-        CancellationToken ct = default);
+    public void Configure(TracerProviderBuilder builder)
+    {
+    }
 }

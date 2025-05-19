@@ -205,6 +205,7 @@ public sealed class JobProcessor
     {
         try
         {
+            using var activity = Telemetry.Activities.StartActivity($"Job {runner.Name}");
             await SetStatusAsync(context, JobStatus.Started);
 
             using (localCache.StartContext())

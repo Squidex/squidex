@@ -5,13 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Infrastructure.EventSourcing;
+using MySqlConnector;
+using Squidex.Infrastructure.Migrations;
 
-namespace Squidex.Domain.Apps.Entities.Rules;
+namespace Squidex.Providers.MySql;
 
-public interface IRuleEnqueuer
+public sealed class MySqlConnectionStringParser : ConnectionStringParser
 {
-    Task EnqueueAsync(Rule rule, Envelope<IEvent> @event,
-        CancellationToken ct = default);
+    protected override string? GetProviderSpecificHostName(string source)
+    {
+        var builder = new MySqlConnectionStringBuilder(source);
+
+        return builder.Server;
+    }
 }

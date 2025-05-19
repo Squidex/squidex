@@ -5,13 +5,17 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Rules;
-using Squidex.Infrastructure.EventSourcing;
+using Microsoft.Data.SqlClient;
+using Squidex.Infrastructure.Migrations;
 
-namespace Squidex.Domain.Apps.Entities.Rules;
+namespace Squidex.Providers.SqlServer;
 
-public interface IRuleEnqueuer
+public sealed class SqlServerConnectionStringParser : ConnectionStringParser
 {
-    Task EnqueueAsync(Rule rule, Envelope<IEvent> @event,
-        CancellationToken ct = default);
+    protected override string? GetProviderSpecificHostName(string source)
+    {
+        var builder = new SqlConnectionStringBuilder(source);
+
+        return builder.DataSource;
+    }
 }
