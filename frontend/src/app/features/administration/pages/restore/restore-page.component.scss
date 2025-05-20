@@ -49,6 +49,5 @@ h3 {
 
     &-url {
         @include truncate;
-        line-height: $circle-size;
     }
 }

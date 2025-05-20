@@ -8,6 +8,9 @@ namespace Generator;
 
 internal partial class Program
 {
+    private static readonly Regex RegexComputed = new Regex("return this\\.compute\\('(?<Name>[^']*)',");
+    private static readonly Regex RegexProperty = new Regex("public get (?<Name>[^(]*)\\(\\) {");
+
     static async Task Main(string[] args)
     {
         var cacheFile = "cache.json";
@@ -142,6 +145,8 @@ internal partial class Program
 
         var targetFolder = Path.Combine(codePath, @"..\\..\\src\\app\\shared\\model\\generated.ts");
 
+        ValidateComputed(code);
+
         File.WriteAllText(targetFolder, code);
     }
 
@@ -160,6 +165,43 @@ internal partial class Program
             }
 
             folder = folder.Parent!;
+        }
+    }
+
+    private static void ValidateComputed(string code)
+    {
+        var lines = code.Split('\n');
+
+        var i = 0;
+        foreach (var line in lines)
+        {
+            ValidateLine(lines, line, i);
+            i++;
+        }
+    }
+
+    private static void ValidateLine(string[] lines, string line, int index)
+    {
+        var computed = RegexComputed.Match(line);
+        if (!computed.Success)
+        {
+            return;
+        }
+
+        var cacheKey = computed.Groups["Name"].Value;
+
+        var previousLine = lines[index - 1];
+        var property = RegexProperty.Match(previousLine);
+        if (!property.Success)
+        {
+            Console.WriteLine($"Line {index}: Cannot find property for computed '{cacheKey}'");
+            return;
+        }
+
+        var propertyName = property.Groups["Name"].Value;
+        if (propertyName != cacheKey)
+        {
+            Console.WriteLine($"Line {index}: Invalid cache key '{cacheKey}' for property '{propertyName}'");
         }
     }
 }
