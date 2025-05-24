@@ -7,7 +7,6 @@
 
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
-using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Squidex.Domain.Apps.Core.Apps;
@@ -105,7 +104,7 @@ public sealed partial class EFAssetFolderRepository<TContext> : ISnapshotStore<A
             }
 
             await using var dbContext = await CreateDbContextAsync(ct);
-            await dbContext.BulkInsertAsync(entities, cancellationToken: ct);
+            await dbContext.BulkInsertAsync(entities, ct);
         }
     }
 

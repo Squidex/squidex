@@ -12,9 +12,10 @@ using Testcontainers.MongoDb;
 
 namespace Squidex.MongoDb.TestHelpers;
 
-[CollectionDefinition("Mongo")]
+[CollectionDefinition(Name)]
 public sealed class MongoFixtureCollection : ICollectionFixture<MongoFixture>
 {
+    public const string Name = "Mongo";
 }
 
 public class MongoFixture : IAsyncLifetime
@@ -38,7 +39,7 @@ public class MongoFixture : IAsyncLifetime
     {
         await mongoDb.StartAsync();
 
-        Client = new MongoClient(mongoDb.GetConnectionString());
+        Client = new MongoClient("mongodb://localhost:27017");
     }
 
     public async Task DisposeAsync()

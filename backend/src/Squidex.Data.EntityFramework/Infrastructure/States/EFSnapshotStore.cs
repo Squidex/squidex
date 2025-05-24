@@ -7,7 +7,6 @@
 
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
-using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 
@@ -106,7 +105,7 @@ public class EFSnapshotStore<TContext, T, TState>(IDbContextFactory<TContext> db
             }
 
             await using var dbContext = await CreateDbContextAsync(ct);
-            await dbContext.BulkInsertOrUpdateAsync(entities, cancellationToken: ct);
+            await dbContext.BulkUpsertAsync(entities, ct);
         }
     }
 

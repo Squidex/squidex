@@ -5,5 +5,8 @@ dotnet_diagnostic.MA0007.severity = none
 # MA0048: File name must match type name
 dotnet_diagnostic.MA0048.severity = none
 
+# SA1122: Use string.Empty for empty strings
+dotnet_diagnostic.SA1122.severity = none
+
 # SA1633: File must have header
 dotnet_diagnostic.SA1633.severity = none

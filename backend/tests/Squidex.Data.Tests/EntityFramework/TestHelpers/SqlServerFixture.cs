@@ -35,11 +35,6 @@ public class SqlServerFixture(string? reuseId = null) : IAsyncLifetime, ISqlCont
     public IDbContextNamedFactory<SqlServerContentDbContext> DbContextNamedFactory
         => services.GetRequiredService<IDbContextNamedFactory<SqlServerContentDbContext>>();
 
-    static SqlServerFixture()
-    {
-        BulkHelper.Configure();
-    }
-
     public async Task InitializeAsync()
     {
         await sqlServer.StartAsync();

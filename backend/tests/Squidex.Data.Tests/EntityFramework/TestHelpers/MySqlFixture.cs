@@ -34,11 +34,6 @@ public class MySqlFixture(string? reuseId = null) : IAsyncLifetime, ISqlContentF
     public IDbContextNamedFactory<MySqlContentDbContext> DbContextNamedFactory
         => services.GetRequiredService<IDbContextNamedFactory<MySqlContentDbContext>>();
 
-    static MySqlFixture()
-    {
-        BulkHelper.Configure();
-    }
-
     public async Task InitializeAsync()
     {
         await mysql.StartAsync();

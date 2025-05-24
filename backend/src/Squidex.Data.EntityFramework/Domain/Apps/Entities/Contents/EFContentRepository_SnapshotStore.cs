@@ -7,7 +7,6 @@
 
 using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
-using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
@@ -334,10 +333,10 @@ public sealed partial class EFContentRepository<TContext, TContentContext> : ISn
                     }
                 }
 
-                await dbContext.BulkInsertAsync(writesToCompleteContents, cancellationToken: ct);
-                await dbContext.BulkInsertAsync(writesToCompleteReferences, cancellationToken: ct);
-                await dbContext.BulkInsertAsync(writesToPublishedContents, cancellationToken: ct);
-                await dbContext.BulkInsertAsync(writesToPublishedReferences, cancellationToken: ct);
+                await dbContext.BulkInsertAsync(writesToCompleteContents, ct);
+                await dbContext.BulkInsertAsync(writesToCompleteReferences, ct);
+                await dbContext.BulkInsertAsync(writesToPublishedContents, ct);
+                await dbContext.BulkInsertAsync(writesToPublishedReferences, ct);
                 await dbContext.SaveChangesAsync(ct);
 
                 if (dedicatedTables)
@@ -347,10 +346,13 @@ public sealed partial class EFContentRepository<TContext, TContentContext> : ISn
                         var contentDbContext = await dynamicTables.CreateDbContextAsync(bySchema.Key.AppId, bySchema.Key.SchemaId, ct);
 
                         // Just fetch the published context, so that we can reuse the context.
-                        var publishedContents = writesToPublishedContents.Where(x => x.AppId.Id == bySchema.Key.AppId && x.SchemaId.Id == bySchema.Key.SchemaId);
+                        var publishedContents =
+                            writesToPublishedContents
+                                .Where(x => x.AppId.Id == bySchema.Key.AppId && x.SchemaId.Id == bySchema.Key.SchemaId)
+                                .ToList();
 
-                        await contentDbContext.BulkInsertAsync(bySchema, cancellationToken: ct);
-                        await contentDbContext.BulkInsertAsync(publishedContents, cancellationToken: ct);
+                        await contentDbContext.BulkInsertAsync(bySchema.ToList(), ct);
+                        await contentDbContext.BulkInsertAsync(publishedContents, ct);
                     }
                 }
 

@@ -439,11 +439,10 @@ public abstract class TextIndexerTests : GivenContext
     {
         var query = new GeoQuery(SchemaId.Id, field, latitude, longitude, 1000, 1000)
         {
-            SchemaId = default,
+            SchemaId = SchemaId.Id,
         };
 
         var actual = await SearchAsync(i => i.SearchAsync(App, query, target, default), x => IsExpected(x, expected));
-
         AssertIds(actual, expected);
     }
 
@@ -455,7 +454,6 @@ public abstract class TextIndexerTests : GivenContext
         };
 
         var actual = await SearchAsync(i => i.SearchAsync(App, query, target, default), x => IsExpected(x, expected));
-
         AssertIds(actual, expected);
     }
 
@@ -467,7 +465,6 @@ public abstract class TextIndexerTests : GivenContext
         };
 
         var actual = await SearchAsync(i => i.SearchAsync(App, query, target, default), x => IsExpected(x, expected));
-
         AssertIds(actual, expected);
     }
 
