@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.History.Repositories;
@@ -65,7 +64,7 @@ public sealed class EFHistoryEventRepository<TContext>(IDbContextFactory<TContex
         }
 
         await using var dbContext = await CreateDbContextAsync(ct);
-        await dbContext.BulkInsertOrUpdateAsync(entities, cancellationToken: ct);
+        await dbContext.BulkUpsertAsync(entities, ct);
     }
 
     private Task<TContext> CreateDbContextAsync(CancellationToken ct)

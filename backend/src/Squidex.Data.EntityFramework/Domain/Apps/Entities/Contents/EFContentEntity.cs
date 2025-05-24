@@ -188,7 +188,7 @@ public record EFContentEntity : Content, IVersionedEntity<DomainId>
 
         if (data.CanHaveReference())
         {
-            var components = await appProvider.GetComponentsAsync(schema, ct: ct);
+            var components = await appProvider.GetComponentsAsync(schema, ct);
 
             data.AddReferencedIds(schema, referencedIds, components);
         }

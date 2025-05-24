@@ -10,6 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.DependencyInjection;
+using PhenX.EntityFrameworkCore.BulkInsert.Extensions;
+using PhenX.EntityFrameworkCore.BulkInsert.Options;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Queries;
@@ -58,6 +60,28 @@ public static class Extensions
         }
 
         return source.Where(predicate);
+    }
+
+    public static Task BulkUpsertAsync<T>(this DbContext dbContext, List<T> source,
+        CancellationToken ct) where T : class
+    {
+        if (source.Count == 0)
+        {
+            return Task.CompletedTask;
+        }
+
+        return dbContext.ExecuteBulkInsertAsync(source, o => { }, new OnConflictOptions<T> { Update = e => e }, ct);
+    }
+
+    public static Task BulkInsertAsync<T>(this DbContext dbContext, List<T> source,
+        CancellationToken ct) where T : class
+    {
+        if (source.Count == 0)
+        {
+            return Task.CompletedTask;
+        }
+
+        return dbContext.ExecuteBulkInsertAsync(source, cancellationToken: ct);
     }
 
     public static async Task<IResultList<T>> QueryAsync<T>(this IQueryable<T> queryable, Q q,

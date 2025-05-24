@@ -12,7 +12,7 @@ using Squidex.Shared;
 namespace Squidex.MongoDb.Infrastructure.Migrations;
 
 [Trait("Category", "TestContainer")]
-[Collection("Mongo")]
+[Collection(MongoFixtureCollection.Name)]
 public class MongoMigrationStatusTests(MongoFixture fixture) : MigrationStatusTests
 {
     protected override async Task<IMigrationStatus> CreateSutAsync()

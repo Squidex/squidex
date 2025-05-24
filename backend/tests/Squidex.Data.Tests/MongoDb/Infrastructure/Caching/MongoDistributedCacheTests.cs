@@ -13,7 +13,7 @@ using Squidex.Shared;
 namespace Squidex.MongoDb.Infrastructure.Caching;
 
 [Trait("Category", "TestContainer")]
-[Collection("Mongo")]
+[Collection(MongoFixtureCollection.Name)]
 public class MongoDistributedCacheTests(MongoFixture fixture) : DistributedCacheTests
 {
     protected override async Task<IDistributedCache> CreateSutAsync(TimeProvider timeProvider)

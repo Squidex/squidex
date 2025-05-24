@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using EFCore.BulkExtensions;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
@@ -291,8 +290,8 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
             }
         }
 
-        await dbContext.BulkInsertOrUpdateAsync(insertsText, cancellationToken: ct);
-        await dbContext.BulkInsertOrUpdateAsync(insertsGeo, cancellationToken: ct);
+        await dbContext.BulkUpsertAsync(insertsText, ct);
+        await dbContext.BulkUpsertAsync(insertsGeo, ct);
     }
 
     private Task<TContext> CreateDbContextAsync(CancellationToken ct)

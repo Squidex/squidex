@@ -19,7 +19,7 @@ using Squidex.MongoDb.TestHelpers;
 namespace Squidex.MongoDb.Domain.Schemas;
 
 [Trait("Category", "TestContainer")]
-[Collection("Mongo")]
+[Collection(MongoFixtureCollection.Name)]
 public class MongoSchemasHashTests(MongoFixture fixture) : GivenContext, IAsyncLifetime
 {
     private readonly MongoSchemasHash sut = new MongoSchemasHash(fixture.Database);

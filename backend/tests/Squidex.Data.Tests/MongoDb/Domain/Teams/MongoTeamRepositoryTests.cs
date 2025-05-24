@@ -13,7 +13,7 @@ using Squidex.Shared;
 namespace Squidex.MongoDb.Domain.Teams;
 
 [Trait("Category", "TestContainer")]
-[Collection("Mongo")]
+[Collection(MongoFixtureCollection.Name)]
 public class MongoTeamRepositoryTests(MongoFixture fixture) : TeamRepositoryTests
 {
     protected override async Task<ITeamRepository> CreateSutAsync()

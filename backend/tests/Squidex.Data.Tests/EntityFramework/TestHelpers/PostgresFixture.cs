@@ -34,11 +34,6 @@ public class PostgresFixture(string? reuseId) : IAsyncLifetime, ISqlContentFixtu
     public IDbContextNamedFactory<PostgresContentDbContext> DbContextNamedFactory
         => services.GetRequiredService<IDbContextNamedFactory<PostgresContentDbContext>>();
 
-    static PostgresFixture()
-    {
-        BulkHelper.Configure();
-    }
-
     public async Task InitializeAsync()
     {
         await postgreSql.StartAsync();

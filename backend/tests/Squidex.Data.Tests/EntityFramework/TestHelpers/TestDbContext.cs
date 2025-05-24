@@ -6,6 +6,9 @@
 // ==========================================================================
 
 using Microsoft.EntityFrameworkCore;
+using PhenX.EntityFrameworkCore.BulkInsert.MySql;
+using PhenX.EntityFrameworkCore.BulkInsert.PostgreSql;
+using PhenX.EntityFrameworkCore.BulkInsert.SqlServer;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Queries;
@@ -24,18 +27,36 @@ public class TestDbContextMySql(DbContextOptions options, IJsonSerializer jsonSe
     : TestDbContext(options, jsonSerializer)
 {
     public override SqlDialect Dialect => MySqlDialect.Instance;
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseBulkInsertMySql();
+        base.OnConfiguring(optionsBuilder);
+    }
 }
 
 public class TestDbContextPostgres(DbContextOptions options, IJsonSerializer jsonSerializer)
     : TestDbContext(options, jsonSerializer)
 {
     public override SqlDialect Dialect => PostgresDialect.Instance;
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseBulkInsertPostgreSql();
+        base.OnConfiguring(optionsBuilder);
+    }
 }
 
 public class TestDbContextSqlServer(DbContextOptions options, IJsonSerializer jsonSerializer)
     : TestDbContext(options, jsonSerializer)
 {
     public override SqlDialect Dialect => SqlServerDialect.Instance;
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseBulkInsertSqlServer();
+        base.OnConfiguring(optionsBuilder);
+    }
 }
 
 public abstract class TestDbContext(DbContextOptions options, IJsonSerializer jsonSerializer)

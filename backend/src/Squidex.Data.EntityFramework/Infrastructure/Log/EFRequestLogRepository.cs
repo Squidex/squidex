@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Runtime.CompilerServices;
-using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using NodaTime;
@@ -72,7 +71,7 @@ public sealed class EFRequestLogRepository<TContext>(IDbContextFactory<TContext>
 
         await using var dbContext = await CreateDbContextAsync(ct);
 
-        await dbContext.BulkInsertAsync(entities, cancellationToken: ct);
+        await dbContext.BulkInsertAsync(entities, ct);
     }
 
     public async IAsyncEnumerable<Request> QueryAllAsync(string key, Instant fromTime, Instant toTime,

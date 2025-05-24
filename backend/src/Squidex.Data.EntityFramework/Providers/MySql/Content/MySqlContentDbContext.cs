@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.EntityFrameworkCore;
+using PhenX.EntityFrameworkCore.BulkInsert.MySql;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Queries;
@@ -27,6 +28,7 @@ public sealed class MySqlContentDbContext(string prefix, string connectionString
             ServerVersion.AutoDetect(connectionString);
 
         optionsBuilder.SetDefaultWarnings();
+        optionsBuilder.UseBulkInsertMySql();
         optionsBuilder.UseMySql(connectionString, version, options =>
         {
             options.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);

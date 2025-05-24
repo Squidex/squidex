@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using EFCore.BulkExtensions;
 using Microsoft.EntityFrameworkCore;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -90,14 +89,14 @@ public sealed class EFTextIndexerState<TContext>(IDbContextFactory<TContext> dbC
     public async Task SetAsync(List<TextContentState> updates,
         CancellationToken ct = default)
     {
-        var toDelete = new List<TextContentState>();
+        var toDelete = new List<UniqueContentId>();
         var toUpsert = new List<TextContentState>();
 
         foreach (var update in updates)
         {
             if (update.State == TextState.Deleted)
             {
-                toDelete.Add(update);
+                toDelete.Add(update.UniqueContentId);
             }
             else
             {
@@ -111,8 +110,18 @@ public sealed class EFTextIndexerState<TContext>(IDbContextFactory<TContext> dbC
         }
 
         await using var dbContext = await CreateDbContextAsync(ct);
-        await dbContext.BulkDeleteAsync(toDelete, cancellationToken: ct);
-        await dbContext.BulkInsertOrUpdateAsync(toUpsert, cancellationToken: ct);
+
+        if (toUpsert.Count > 0)
+        {
+            await dbContext.BulkUpsertAsync(toUpsert, ct);
+        }
+
+        if (toDelete.Count > 0)
+        {
+            await dbContext.Set<TextContentState>()
+                .Where(x => toDelete.Contains(x.UniqueContentId))
+                .ExecuteDeleteAsync(ct);
+        }
     }
 
     private Task<TContext> CreateDbContextAsync(CancellationToken ct)

@@ -11,7 +11,7 @@ using Squidex.MongoDb.TestHelpers;
 namespace Squidex.MongoDb.Domain.Contents.Text;
 
 [Trait("Category", "Dependencies")]
-[Collection("Mongo")]
+[Collection(MongoFixtureCollection.Name)]
 public class MongoTextIndexTests(MongoFixture fixture) : TextIndexerTests
 {
     public override bool SupportsQuerySyntax => false;

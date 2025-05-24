@@ -12,7 +12,7 @@ using Squidex.Shared;
 namespace Squidex.MongoDb.Infrastructure.States;
 
 [Trait("Category", "TestContainer")]
-[Collection("Mongo")]
+[Collection(MongoFixtureCollection.Name)]
 public class MongoSnapshotStoreTests(MongoFixture fixture) : SnapshotStoreTests
 {
     protected override async Task<ISnapshotStore<SnapshotValue>> CreateSutAsync()

@@ -13,7 +13,7 @@ using Squidex.Shared;
 namespace Squidex.MongoDb.Domain.History;
 
 [Trait("Category", "TestContainer")]
-[Collection("Mongo")]
+[Collection(MongoFixtureCollection.Name)]
 public class MongoHistoryEventRepositoryTests(MongoFixture fixture) : HistoryEventRepositoryTests
 {
     protected override async Task<IHistoryEventRepository> CreateSutAsync()

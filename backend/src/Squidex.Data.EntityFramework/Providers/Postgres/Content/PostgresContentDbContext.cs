@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.EntityFrameworkCore;
+using PhenX.EntityFrameworkCore.BulkInsert.PostgreSql;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Queries;
@@ -21,6 +22,7 @@ public sealed class PostgresContentDbContext(string prefix, string connectionStr
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
+        optionsBuilder.UseBulkInsertPostgreSql();
         optionsBuilder.SetDefaultWarnings();
         optionsBuilder.UseNpgsql(connectionString, options =>
         {

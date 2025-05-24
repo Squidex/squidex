@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.EntityFrameworkCore;
+using PhenX.EntityFrameworkCore.BulkInsert.MySql;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Queries;
 
@@ -15,4 +16,10 @@ public sealed class MySqlAppDbContext(DbContextOptions options, IJsonSerializer 
     : AppDbContext(options, jsonSerializer)
 {
     public override SqlDialect Dialect => MySqlDialect.Instance;
+
+    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    {
+        optionsBuilder.UseBulkInsertMySql();
+        base.OnConfiguring(optionsBuilder);
+    }
 }
