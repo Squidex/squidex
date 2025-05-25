@@ -39,7 +39,7 @@ public class MongoFixture : IAsyncLifetime
     {
         await mongoDb.StartAsync();
 
-        Client = new MongoClient("mongodb://localhost:27017");
+        Client = new MongoClient(mongoDb.GetConnectionString());
     }
 
     public async Task DisposeAsync()

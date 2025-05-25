@@ -7,7 +7,7 @@
 
 import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { AppsState, ChatDialogComponent, DialogModel, ModalDirective, UIOptions } from '@app/shared';
+import { AppsState, AuthService, ChatDialogComponent, DialogModel, ModalDirective, UIOptions } from '@app/shared';
 
 @Component({
     standalone: true,
@@ -28,6 +28,7 @@ export class ChatMenuComponent {
 
     constructor(
         public readonly appsState: AppsState,
+        public readonly authService: AuthService,
     ) {
     }
 }
