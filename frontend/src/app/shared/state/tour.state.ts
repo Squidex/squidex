@@ -96,7 +96,8 @@ export class TourState extends State<Snapshot> {
             return;
         }
 
-        this.tourService.run(task.steps);
+        this.tourService.initialize(task.steps);
+        this.tourService.start();
     }
 
     public disableAllHints() {

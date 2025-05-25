@@ -7,7 +7,7 @@
 
 import { inject, InjectionToken } from '@angular/core';
 import { filter, Observable, take } from 'rxjs';
-import { MessageBus, StepDefinition, waitForAnchor } from '@app/framework';
+import { MessageBus, StepDefinition, waitForAnchor, waitForAnchorClick, waitForElement } from '@app/framework';
 import { ClientTourStated, QueryExecuted } from '../utils/messages';
 import { AppsState } from './apps.state';
 import { AssetsState } from './assets.state';
@@ -128,11 +128,13 @@ export function buildTasks() {
         }, {
             anchorId: 'help',
             content: 'i18n:tour.createSchema.helpContent',
+            endOnCondition: waitForElement('.panel2.minimized .right'),
             scrollContainer: '.panel-container',
             position: 'left-start',
         }, {
             anchorId: 'history',
             content: 'i18n:tour.createSchema.historyContent',
+            endOnCondition: waitForElement('.panel2.minimized .right'),
             scrollContainer: '.panel-container',
             position: 'left-start',
         }],
@@ -183,6 +185,8 @@ export function buildTasks() {
         }, {
             anchorId: 'status',
             content: 'i18n:tour.createContent.statusContent',
+            endOnCondition: waitForAnchorClick(),
+            nextOnAnchorClick: true,
             isAsync: true,
             position: 'left-start',
         }],
@@ -221,6 +225,7 @@ export function buildTasks() {
             anchorId: 'filter',
             content: 'i18n:tour.createAsset.filterContent',
             position: 'left-start',
+            endOnCondition: waitForElement('.panel2.minimized .right'),
         }],
         onComplete: (() => {
             const assetsState = inject(AssetsState);

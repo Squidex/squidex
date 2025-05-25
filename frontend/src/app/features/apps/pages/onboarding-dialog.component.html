@@ -12,7 +12,7 @@
                         {{ "tour.welcome" | sqxTranslate }} <span class="header-focus">{{ "tour.welcomeProduct" | sqxTranslate }}</span>
                     </h1>
 
-                    <div [sqxMarkdown]="'tour.stepIntroText' | sqxTranslate"></div>
+                    <div inline="false" [sqxMarkdown]="'tour.stepIntroText' | sqxTranslate"></div>
 
                     <div class="mt-4">
                         <button class="btn btn-success" (click)="next()">{{ "tour.stepIntroNext" | sqxTranslate }}</button>
@@ -34,15 +34,10 @@
                             <label for="role">{{ "tour.stepDataCompanyRole" | sqxTranslate }}</label>
                             <select class="form-select" id="companyRole" formControlName="companyRole">
                                 <option [ngValue]="'RoleEmployee'">{{ "tour.roleEmployee" | sqxTranslate }}</option>
-
                                 <option [ngValue]="'RoleBusinessOwner'">{{ "tour.roleBusinessOwner" | sqxTranslate }}</option>
-
                                 <option [ngValue]="'RoleProductManager'">{{ "tour.roleProductManager" | sqxTranslate }}</option>
-
                                 <option [ngValue]="'RoleContentCreator'">{{ "tour.roleContentCreator" | sqxTranslate }}</option>
-
                                 <option [ngValue]="'RoleSoftwareDeveloper'">{{ "tour.roleSoftwareDeveloper" | sqxTranslate }}</option>
-
                                 <option [ngValue]="'RoleBusinessAnalyst'">{{ "tour.roleBusinessAnalyst" | sqxTranslate }}</option>
                             </select>
                         </div>
@@ -51,13 +46,9 @@
                             <label for="companySize">{{ "tour.stepDataCompanySize" | sqxTranslate }}</label>
                             <select class="form-select" id="companySize" formControlName="companySize">
                                 <option [ngValue]="'SizeSingle'">{{ "tour.sizeSingle" | sqxTranslate }}</option>
-
                                 <option [ngValue]="'SizeSmall'">{{ "tour.sizeSmall" | sqxTranslate }}</option>
-
                                 <option [ngValue]="'SizeMedium'">{{ "tour.sizeMedium" | sqxTranslate }}</option>
-
                                 <option [ngValue]="'SizeLarge'">{{ "tour.sizeLarge" | sqxTranslate }}</option>
-
                                 <option [ngValue]="'SizeVeryLarge'">{{ "tour.sizeVeryLarge" | sqxTranslate }}</option>
                             </select>
                         </div>
@@ -66,17 +57,11 @@
                             <label for="project">{{ "tour.stepDataProject" | sqxTranslate }}</label>
                             <select class="form-select" id="project" formControlName="project">
                                 <option [ngValue]="'ProjectNewsMagazine'">{{ "tour.projectNewsMagazine" | sqxTranslate }}</option>
-
                                 <option [ngValue]="'ProjectPersonalBlog'">{{ "tour.projectPersonalBlog" | sqxTranslate }}</option>
-
                                 <option [ngValue]="'ProjectSmallBusiness'">{{ "tour.projectSmallBusiness" | sqxTranslate }}</option>
-
                                 <option [ngValue]="'ProjectCommerce'">{{ "tour.projectCommerce" | sqxTranslate }}</option>
-
                                 <option [ngValue]="'ProjectMobileApp'">{{ "tour.projectMobileApp" | sqxTranslate }}</option>
-
                                 <option [ngValue]="'ProjectBackend'">{{ "tour.projectBackend" | sqxTranslate }}</option>
-
                                 <option [ngValue]="'ProjectLearning'">{{ "tour.projectLearning" | sqxTranslate }}</option>
                             </select>
                         </div>

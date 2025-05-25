@@ -63,10 +63,6 @@ export class TourGuideComponent extends StatefulComponent<State> implements OnIn
     }
 
     public start(task: TaskSnapshot) {
-        if (!task.isActive) {
-            return;
-        }
-
         this.tourState.runTask(task);
     }
 }
