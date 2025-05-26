@@ -33,9 +33,9 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="8.0.11" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.NetTopologySuite" Version="8.0.11" />
     <PackageReference Include="Npgsql.OpenTelemetry" Version="8.0.7" />
-	<PackageReference Include="PhenX.EntityFrameworkCore.BulkInsert.MySql" Version="0.2.1" />
-	<PackageReference Include="PhenX.EntityFrameworkCore.BulkInsert.PostgreSql" Version="0.2.1" />
-	<PackageReference Include="PhenX.EntityFrameworkCore.BulkInsert.SqlServer" Version="0.2.1" />
+	<PackageReference Include="PhenX.EntityFrameworkCore.BulkInsert.MySql" Version="0.2.3" />
+	<PackageReference Include="PhenX.EntityFrameworkCore.BulkInsert.PostgreSql" Version="0.2.3" />
+	<PackageReference Include="PhenX.EntityFrameworkCore.BulkInsert.SqlServer" Version="0.2.3" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.3" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql.Json.Microsoft" Version="8.0.3" />
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql.NetTopologySuite" Version="8.0.3" />
