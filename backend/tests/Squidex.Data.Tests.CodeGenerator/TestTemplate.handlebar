@@ -11,37 +11,37 @@ namespace {{classNamespace}};
 
 {{#if HasContentContext}}
 [Trait("Category", "TestContainer")]
-[Collection("Postgres{{CollectionSuffix}}")]
+[Collection(Postgres{{CollectionSuffix}}FixtureCollection.Name)]
 public class Postgres{{className}}(Postgres{{CollectionSuffix}}Fixture fixture) : {{baseName}}<TestDbContextPostgres, PostgresContentDbContext>(fixture)
 {
 }
 
 [Trait("Category", "TestContainer")]
-[Collection("MySql{{CollectionSuffix}}")]
+[Collection(MySql{{CollectionSuffix}}FixtureCollection.Name)]
 public class MySql{{className}}(MySql{{CollectionSuffix}}Fixture fixture) : {{baseName}}<TestDbContextMySql, MySqlContentDbContext>(fixture)
 {
 }
 
 [Trait("Category", "TestContainer")]
-[Collection("SqlServer{{CollectionSuffix}}")]
+[Collection(SqlServer{{CollectionSuffix}}FixtureCollection.Name)]
 public class SqlServer{{className}}(SqlServer{{CollectionSuffix}}Fixture fixture) : {{baseName}}<TestDbContextSqlServer, SqlServerContentDbContext>(fixture)
 {
 }
 {{else}}
 [Trait("Category", "TestContainer")]
-[Collection("Postgres{{CollectionSuffix}}")]
+[Collection(Postgres{{CollectionSuffix}}FixtureCollection.Name)]
 public class Postgres{{className}}(Postgres{{CollectionSuffix}}Fixture fixture) : {{baseName}}<TestDbContextPostgres>(fixture)
 {
 }
 
 [Trait("Category", "TestContainer")]
-[Collection("MySql{{CollectionSuffix}}")]
+[Collection(MySql{{CollectionSuffix}}FixtureCollection.Name)]
 public class MySql{{className}}(MySql{{CollectionSuffix}}Fixture fixture) : {{baseName}}<TestDbContextMySql>(fixture)
 {
 }
 
 [Trait("Category", "TestContainer")]
-[Collection("SqlServer{{CollectionSuffix}}")]
+[Collection(SqlServer{{CollectionSuffix}}FixtureCollection.Name)]
 public class SqlServer{{className}}(SqlServer{{CollectionSuffix}}Fixture fixture) : {{baseName}}<TestDbContextSqlServer>(fixture)
 {
 }

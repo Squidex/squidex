@@ -77,6 +77,7 @@ $caret-size: 14px;
 .summary {
     align-items: center;
     color: $color-white;
+    cursor: pointer;
     display: inline-flex;
     flex-direction: row;
     flex-wrap: nowrap;

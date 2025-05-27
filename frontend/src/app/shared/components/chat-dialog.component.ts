@@ -8,7 +8,7 @@
 
 import { Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { Observable } from 'rxjs';
+import { Observable, ReplaySubject, Subject } from 'rxjs';
 import { HTTP, MathHelper, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AppsState, AuthService, ChatEventDto, StatefulComponent, TranslationsService } from '@app/shared/internal';
 import { ChatItemComponent } from './chat-item.component';
@@ -21,7 +21,7 @@ interface State {
     isRunning: boolean;
 
     // The answers.
-    chatItems: ReadonlyArray<{ content: string | Observable<ChatEventDto>; type: 'User' | 'Bot' | 'System' }>;
+    chatItems: ReadonlyArray<{ content: string | Observable<ChatEventDto>; type: 'User' | 'Assistant' | 'System' }>;
 }
 
 @Component({
@@ -38,13 +38,14 @@ interface State {
     ],
 })
 export class ChatDialogComponent extends StatefulComponent<State> {
-    private readonly conversationId = MathHelper.guid();
-
     @Output()
     public contentSelect = new EventEmitter<string | HTTP.UploadFile | undefined | null>();
 
     @Input()
     public configuration?: string;
+
+    @Input()
+    public conversationId = MathHelper.guid();
 
     @Input()
     public folderId?: string;
@@ -71,14 +72,32 @@ export class ChatDialogComponent extends StatefulComponent<State> {
 
     public ngOnInit() {
         const { configuration, conversationId } = this;
-        const stream = this.translator.ask(this.appsState.appName, { conversationId, configuration });
 
-        this.next(s => ({
-            ...s,
-            chatQuestion: '',
-            chatItems: [...s.chatItems, { content: stream, type: 'Bot' }],
-            isRunning: true,
-        }));
+        let observable: Subject<ChatEventDto>;
+        this.translator.ask(this.appsState.appName, { conversationId, configuration })
+            .subscribe(message => {
+                if (message.type === 'History') {
+                    const { content, source } = message;
+
+                    this.next(s => ({
+                        ...s,
+                        chatItems: [...s.chatItems, { content, type: source }],
+                    }));
+                } else {
+                    if (!observable) {
+                        observable = new ReplaySubject<ChatEventDto>();
+
+                        this.next(s => ({
+                            ...s,
+                            chatQuestion: '',
+                            chatItems: [...s.chatItems, { content: observable, type: 'Assistant' }],
+                            isRunning: true,
+                        }));
+                    }
+
+                    observable.next(message);
+                }
+            });
     }
 
     public setQuestion(chatQuestion: string) {
@@ -105,7 +124,7 @@ export class ChatDialogComponent extends StatefulComponent<State> {
             chatItems: [
                 ...s.chatItems,
                 { content: prompt, type: 'User' },
-                { content: stream, type: 'Bot' },
+                { content: stream, type: 'Assistant' },
             ],
             isRunning: true,
         }));

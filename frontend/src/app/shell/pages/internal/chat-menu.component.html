@@ -3,4 +3,4 @@
         <li class="nav-item nav-icon" (click)="chatDialog.show()"><span class="nav-link">AI</span></li>
     </ul>
 }
-<sqx-chat-dialog (contentSelect)="chatDialog.hide()" *sqxModal="chatDialog" />
+<sqx-chat-dialog (contentSelect)="chatDialog.hide()" [conversationId]="authService.user!.id" *sqxModal="chatDialog" />

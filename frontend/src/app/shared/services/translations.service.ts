@@ -31,6 +31,16 @@ export interface ChatChunkDto {
     content: string;
 }
 
+export interface ChatHistoryLoaded {
+    type: 'History';
+
+    // The content of the chunk.
+    content: string;
+
+    // Defines where the message was created from.
+    source: 'User' | 'Assistant';
+}
+
 export interface ChatToolStartDto {
     type: 'ToolStart';
 
@@ -45,7 +55,7 @@ export interface ChatToolEndDto {
     tool: string;
 }
 
-export type ChatEventDto = ChatChunkDto | ChatToolStartDto | ChatToolEndDto;
+export type ChatEventDto = ChatChunkDto | ChatToolStartDto | ChatToolEndDto | ChatHistoryLoaded;
 
 
 @Injectable({

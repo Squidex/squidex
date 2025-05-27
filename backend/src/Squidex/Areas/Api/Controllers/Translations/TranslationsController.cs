@@ -77,6 +77,7 @@ public sealed class TranslationsController(ICommandBus commandBus, IAssetStore a
     {
         var chatRequest = new ChatRequest
         {
+            LoadHistory = true,
             Configuration = request.Configuration,
             ConversationId = request.ConversationId,
             Prompt = request.Prompt,
@@ -104,6 +105,10 @@ public sealed class TranslationsController(ICommandBus commandBus, IAssetStore a
                         break;
                     case ToolEndEvent toolEnd:
                         json = new { type = "ToolEnd", tool = toolEnd.Tool.Spec.DisplayName };
+                        break;
+                    case ChatHistoryLoaded historyLoaded:
+                        var message = historyLoaded.Message;
+                        json = new { type = "History", content = message.Content, source = message.Type.ToString() };
                         break;
                 }
 

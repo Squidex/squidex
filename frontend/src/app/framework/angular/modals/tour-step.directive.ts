@@ -16,6 +16,7 @@ import { StepDefinition, TourService } from './tour.service';
 export class TourStepDirective implements OnInit, OnDestroy, TourAnchorDirective {
     private isNextOnClick = false;
     private isActive = false;
+    private currentAnchorId?: string | null;
     private wasClicked = false;
 
     @Input({ alias: 'sqxTourStep', required: true })
@@ -27,28 +28,30 @@ export class TourStepDirective implements OnInit, OnDestroy, TourAnchorDirective
     }
 
     public ngOnInit(): void {
-        if (!this.anchorId) {
+        this.currentAnchorId = this.anchorId;
+
+        if (!this.currentAnchorId) {
             return;
         }
 
-        this.tourService.register(this.anchorId, this);
+        this.tourService.register(this.currentAnchorId, this);
     }
 
     public ngOnDestroy(): void {
-        if (!this.anchorId) {
+        if (!this.currentAnchorId) {
             return;
         }
 
         if (this.isActive && (!this.isNextOnClick || !this.wasClicked)) {
             setTimeout(() => {
-                if (this.tourService.currentStep.anchorId === this.anchorId) {
+                if (this.tourService.currentStep.anchorId === this.currentAnchorId) {
                     this.tourService.render(null, null);
                     this.tourService.pause();
                 }
             }, 200);
         }
 
-        this.tourService.unregister(this.anchorId);
+        this.tourService.unregister(this.currentAnchorId);
     }
 
     @HostListener('click')

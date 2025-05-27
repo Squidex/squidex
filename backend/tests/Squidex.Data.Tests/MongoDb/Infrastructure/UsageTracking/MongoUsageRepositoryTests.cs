@@ -12,7 +12,7 @@ using Squidex.Shared;
 namespace Squidex.MongoDb.Infrastructure.UsageTracking;
 
 [Trait("Category", "TestContainer")]
-[Collection("Mongo")]
+[Collection(MongoFixtureCollection.Name)]
 public class MongoUsageRepositoryTests(MongoFixture fixture) : UsageRepositoryTests
 {
     protected override async Task<IUsageRepository> CreateSutAsync()

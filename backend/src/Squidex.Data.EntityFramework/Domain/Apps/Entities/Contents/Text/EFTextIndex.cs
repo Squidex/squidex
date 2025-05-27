@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using EFCore.BulkExtensions;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using NetTopologySuite.Geometries;
@@ -87,7 +86,10 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
 
         await using var dbContext = await CreateDbContextAsync(ct);
 
-        var point = new Point(query.Longitude, query.Latitude) { SRID = 4326 };
+        var point = new Point(query.Longitude, query.Latitude)
+        {
+            SRID = 4326,
+        };
 
         // The distance must be converted to decrees (in contrast to MongoDB, which uses radian).
         var degrees = query.Radius / 111320;
@@ -291,8 +293,8 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
             }
         }
 
-        await dbContext.BulkInsertOrUpdateAsync(insertsText, cancellationToken: ct);
-        await dbContext.BulkInsertOrUpdateAsync(insertsGeo, cancellationToken: ct);
+        await dbContext.BulkUpsertAsync(insertsText, ct);
+        await dbContext.BulkUpsertAsync(insertsGeo, ct);
     }
 
     private Task<TContext> CreateDbContextAsync(CancellationToken ct)

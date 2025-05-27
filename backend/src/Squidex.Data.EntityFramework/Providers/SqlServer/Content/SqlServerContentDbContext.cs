@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.EntityFrameworkCore;
+using PhenX.EntityFrameworkCore.BulkInsert.SqlServer;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Queries;
@@ -22,6 +23,7 @@ public sealed class SqlServerContentDbContext(string prefix, string connectionSt
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
         optionsBuilder.SetDefaultWarnings();
+        optionsBuilder.UseBulkInsertSqlServer();
         optionsBuilder.UseSqlServer(connectionString, options =>
         {
             options.MigrationsHistoryTable($"{prefix}MigrationHistory");

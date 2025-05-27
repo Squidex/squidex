@@ -36,6 +36,8 @@ using Squidex.Domain.Apps.Entities.Schemas.Repositories;
 using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Domain.Apps.Entities.Teams.Repositories;
 using Squidex.Domain.Users;
+using Squidex.Events.EntityFramework;
+using Squidex.Flows.EntityFramework;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Log;
@@ -225,6 +227,9 @@ public static class ServiceExtensions
 
         services.AddSingletonAs<EFUserFactory>()
             .As<IUserFactory>();
+
+        services.AddSingletonAs<BulkInserter>()
+            .As<IDbEventStoreBulkInserter>().As<IDbFlowsBulkInserter>();
 
         services.AddFlowsCore()
             .AddEntityFrameworkStore<TContext, FlowEventContext>();

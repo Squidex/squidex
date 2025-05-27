@@ -17,15 +17,15 @@ internal class AddFlows_Before : Migration
     protected override void Up(MigrationBuilder migrationBuilder)
     {
         migrationBuilder.DropPrimaryKey(
-            name: "PK_MessagingData",
-            table: "MessagingData");
+            "PK_MessagingData",
+            "MessagingData");
 
         migrationBuilder.DropPrimaryKey(
-            name: "PK_Chats",
-            table: "Chats");
+            "PK_Chats",
+            "Chats");
 
         migrationBuilder.DropPrimaryKey(
-            name: "PK_AssetKeyValueStore_TusMetadata",
-            table: "AssetKeyValueStore_TusMetadata");
+            "PK_AssetKeyValueStore_TusMetadata",
+            "AssetKeyValueStore_TusMetadata");
     }
 }

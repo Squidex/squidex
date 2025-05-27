@@ -28,7 +28,7 @@ public class ConnectionStringParser
             {
                 var builder = new DbConnectionStringBuilder
                 {
-                    ConnectionString = source
+                    ConnectionString = source,
                 };
 
                 if (builder.TryGetValue("Server", out var server))

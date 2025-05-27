@@ -49,7 +49,7 @@ export class ChatItemComponent extends StatefulComponent<State> {
     public focusElement!: ElementRef<HTMLElement>;
 
     @Input({ required: true })
-    public type: 'Bot' | 'User' | 'System' = 'Bot';
+    public type: 'Assistant' | 'User' | 'System' = 'Assistant';
 
     @Input({ required: true })
     public folderId?: string;

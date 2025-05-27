@@ -12,9 +12,10 @@ using Testcontainers.MongoDb;
 
 namespace Squidex.MongoDb.TestHelpers;
 
-[CollectionDefinition("Mongo")]
+[CollectionDefinition(Name)]
 public sealed class MongoFixtureCollection : ICollectionFixture<MongoFixture>
 {
+    public const string Name = "Mongo";
 }
 
 public class MongoFixture : IAsyncLifetime
