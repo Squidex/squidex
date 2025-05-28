@@ -4,6 +4,33 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.19.0] - 2025-05-28
+
+The highlight of this release is the new flow system. It replaces how rule actions are defined. It is backwards compatible with old versions and will automatically migrate actions to flows. But the system and how things are tracked in the database has been improved significantly. Therefore it was not possible to migrate existing rule logs. If you have failed items in your log, it is recommended to wait for the update until your rules are successful again. Alternatively you can go to the administration section and disabel the rule enqueue to halt the execution of rules until everything has been processed successfully.
+
+### Added
+
+* **API**: Content compression for JSON endpoints.
+* **Rules**: Better debuggability of rules by separate tracking of each action attempt.
+* **Rules**: New rule trigger: Cron jobs with a minimum time between jobs of 4 hours.
+* **UI**: Keep history of AI chat conversation and restore it.
+
+### Changed
+
+* **Logging**: Redact sensitive configuration values in the log.
+* **Rules**: New workflow (flows) system.
+* **SQL**: Migration to new framework for bulk updates.
+* **UI**: Disable autocompletion for password fields.
+* **UI**: Migration to generated code for API models.
+
+### Fixed
+
+* **Identity**: New option to disable OIDC profile scope for custom authentication server.
+* **UI**: Fixed the expanded mode for editors.
+* **UI**: Fixed the title service, which is reponsible to show tht eitle in the broswer tab.
+* **UI**: Several fixes to the onboarding system.
+* **UI**: Use proper default value for star controls.
+
 ## [7.18.0] - 2025-03-09
 
 This version adds support for SQL databases. A lot of tests have been implemented to ensure it is working properly, but this is still in an early version.
