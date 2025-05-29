@@ -7,6 +7,7 @@
 
 using System.Collections.Concurrent;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Internal;
 
 #pragma warning disable EF1001 // Internal EF Core API usage.
@@ -41,13 +42,14 @@ public sealed class PooledDbNamedContextFactory<TContext>(
 
     private DbContextPool<TContext> CreatePool(string name)
     {
-        var builder =
-            new DbContextOptionsBuilder<TContext>()
-                .UsePoolSize(128)
-                .UsePrefix(name);
+        var builder = new DbContextOptionsBuilder<TContext>();
 
         configure(builder, name);
 
-        return new DbContextPool<TContext>(builder.Options, serviceProvider);
+        builder.UsePoolSize(128);
+        builder.UsePrefix(name);
+
+        var pool = new DbContextPool<TContext>(builder.Options, serviceProvider);
+        return pool;
     }
 }

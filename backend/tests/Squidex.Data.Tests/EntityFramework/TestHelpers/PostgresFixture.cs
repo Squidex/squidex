@@ -43,7 +43,7 @@ public class PostgresFixture(string? reuseId) : IAsyncLifetime, ISqlContentFixtu
 
         services =
             new ServiceCollection()
-                .AddDbContextFactory<TestDbContextPostgres>(builder =>
+                .AddPooledDbContextFactory<TestDbContextPostgres>(builder =>
                 {
                     builder.UseBulkInsertPostgreSql();
                     builder.UseNpgsql(connectionString, options =>

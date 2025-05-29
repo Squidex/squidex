@@ -43,18 +43,22 @@ public class MySqlFixture(string? reuseId = null) : IAsyncLifetime, ISqlContentF
 
         services =
             new ServiceCollection()
-                .AddDbContextFactory<TestDbContextMySql>(builder =>
+                .AddPooledDbContextFactory<TestDbContextMySql>(builder =>
                 {
                     builder.UseBulkInsertMySql();
                     builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), options =>
                     {
                         options.UseNetTopologySuite();
+                        options.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
                     });
                 })
                 .AddNamedDbContext<MySqlContentDbContext>((builder, name) =>
                 {
                     builder.UseBulkInsertMySql();
-                    builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
+                    builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), options =>
+                    {
+                        options.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
+                    });
                 })
                 .AddSingleton<ConnectionStringParser, MySqlConnectionStringParser>()
                 .AddSingletonAs<DatabaseCreator<TestDbContextMySql>>().Done()

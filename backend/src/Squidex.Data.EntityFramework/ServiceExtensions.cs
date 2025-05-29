@@ -84,6 +84,7 @@ public static class ServiceExtensions
                     builder.UseMySql(connectionString, version, options =>
                     {
                         options.UseNetTopologySuite();
+                        options.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
                     });
                     builder.UseBulkInsertMySql();
                 });
@@ -95,6 +96,7 @@ public static class ServiceExtensions
                     builder.UseMySql(connectionString, version, options =>
                     {
                         options.MigrationsHistoryTable($"{name}MigrationHistory");
+                        options.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
                     });
                 });
 

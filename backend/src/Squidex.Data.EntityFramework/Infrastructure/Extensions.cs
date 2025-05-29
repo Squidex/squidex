@@ -6,11 +6,13 @@
 // ==========================================================================
 
 using System.Linq.Expressions;
+using Google.Protobuf;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using PhenX.EntityFrameworkCore.BulkInsert.Extensions;
 using PhenX.EntityFrameworkCore.BulkInsert.Options;
 using Squidex.Domain.Apps.Entities;
@@ -34,7 +36,7 @@ public static class Extensions
     public static DbContextOptionsBuilder<TContext> UsePrefix<TContext>(this DbContextOptionsBuilder<TContext> builder, string prefix)
         where TContext : DbContext
     {
-        builder.Options.WithExtension(new PrefixExtension(prefix));
+        ((IDbContextOptionsBuilderInfrastructure)builder).AddOrUpdateExtension(new PrefixExtension(prefix));
         return builder;
     }
 
@@ -45,7 +47,7 @@ public static class Extensions
             (builder.Options.FindExtension<CoreOptionsExtension>() ?? new CoreOptionsExtension())
                 .WithMaxPoolSize(poolSize);
 
-        builder.Options.WithExtension(extension);
+        ((IDbContextOptionsBuilderInfrastructure)builder).AddOrUpdateExtension(extension);
         return builder;
     }
 

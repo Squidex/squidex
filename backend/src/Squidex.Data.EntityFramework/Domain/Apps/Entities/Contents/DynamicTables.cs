@@ -77,11 +77,12 @@ public sealed class DynamicTables<TContext, TContentContext>(
         {
             var prefix = await GetPrefixAsync(name);
 
-            using var dbContext = await dbContextNamedFactory.CreateDbContextAsync(prefix, default);
+            await using var dbContext = await dbContextNamedFactory.CreateDbContextAsync(prefix, default);
 
             // Make the prefix available as async local variable because migrations cannot use it otherwise.
             TableName.Prefix = prefix;
             await dbContext.Database.MigrateAsync(default);
+            await dbContext.DisposeAsync();
 
             return prefix;
         }

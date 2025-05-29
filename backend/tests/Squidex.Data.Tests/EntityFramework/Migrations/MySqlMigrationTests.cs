@@ -42,6 +42,7 @@ public class MySqlMigrationTests : IAsyncLifetime
                     b.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), options =>
                     {
                         options.UseNetTopologySuite();
+                        options.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
                     });
                 })
                 .AddSingleton<ConnectionStringParser, MySqlConnectionStringParser>()
