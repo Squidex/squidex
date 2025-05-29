@@ -6,8 +6,6 @@
 // ==========================================================================
 
 using Microsoft.EntityFrameworkCore;
-using PhenX.EntityFrameworkCore.BulkInsert.SqlServer;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Queries;
 
@@ -15,20 +13,13 @@ using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Providers.SqlServer.Content;
 
-public sealed class SqlServerContentDbContext(string prefix, string connectionString, IJsonSerializer jsonSerializer)
-    : ContentDbContext(prefix, jsonSerializer)
+public sealed class SqlServerContentDbContext(DbContextOptions options, IJsonSerializer jsonSerializer)
+    : ContentDbContext(options, jsonSerializer)
 {
     public override SqlDialect Dialect => SqlServerDialect.Instance;
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        optionsBuilder.SetDefaultWarnings();
-        optionsBuilder.UseBulkInsertSqlServer();
-        optionsBuilder.UseSqlServer(connectionString, options =>
-        {
-            options.MigrationsHistoryTable($"{prefix}MigrationHistory");
-        });
-
         base.OnConfiguring(optionsBuilder);
     }
 }

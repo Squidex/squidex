@@ -20,7 +20,6 @@ public sealed class ContentLoader(IDomainObjectFactory domainObjectFactory, IDom
         var uniqueId = DomainId.Combine(appId, id);
 
         var content = await GetCachedAsync(uniqueId, version, ct);
-
         if (content == null)
         {
             content = await GetAsync(uniqueId, version, ct);

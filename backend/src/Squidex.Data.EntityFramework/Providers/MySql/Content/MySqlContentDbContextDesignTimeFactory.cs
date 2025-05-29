@@ -6,8 +6,11 @@
 // ==========================================================================
 
 using System.Text.Json;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.System;
+using Squidex.Providers.MySql.App;
 
 namespace Squidex.Providers.MySql.Content;
 
@@ -17,6 +20,13 @@ public sealed class MySqlContentDbContextDesignTimeFactory : IDesignTimeDbContex
     {
         const string ConnectionString = "Server=localhost;Port=33060;Database=test;User=mysql;Password=mysql";
 
-        return new MySqlContentDbContext(string.Empty, ConnectionString, null, new SystemJsonSerializer(JsonSerializerOptions.Default));
+        var builder = new DbContextOptionsBuilder<MySqlAppDbContext>()
+            .UsePrefix(string.Empty)
+            .UseMySql(ConnectionString, ServerVersion.AutoDetect(ConnectionString), options =>
+            {
+                options.UseNetTopologySuite();
+            });
+
+        return new MySqlContentDbContext(builder.Options, new SystemJsonSerializer(JsonSerializerOptions.Default));
     }
 }

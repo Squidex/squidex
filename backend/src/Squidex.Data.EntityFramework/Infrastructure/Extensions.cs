@@ -8,12 +8,12 @@
 using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Query;
 using Microsoft.Extensions.DependencyInjection;
 using PhenX.EntityFrameworkCore.BulkInsert.Extensions;
 using PhenX.EntityFrameworkCore.BulkInsert.Options;
 using Squidex.Domain.Apps.Entities;
-using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.States;
 
@@ -22,13 +22,36 @@ namespace Squidex.Infrastructure;
 public static class Extensions
 {
     public static IServiceCollection AddNamedDbContext<TContext>(this IServiceCollection services,
-        Func<IJsonSerializer, string, TContext> factory)
+        Action<DbContextOptionsBuilder<TContext>, string> configure)
          where TContext : DbContext
     {
         services.AddSingleton<IDbContextNamedFactory<TContext>>(c =>
-            ActivatorUtilities.CreateInstance<DelegatingDbNamedContextFactory<TContext>>(c, factory));
+            ActivatorUtilities.CreateInstance<PooledDbNamedContextFactory<TContext>>(c, configure));
 
         return services;
+    }
+
+    public static DbContextOptionsBuilder<TContext> UsePrefix<TContext>(this DbContextOptionsBuilder<TContext> builder, string prefix)
+        where TContext : DbContext
+    {
+        builder.Options.WithExtension(new PrefixExtension(prefix));
+        return builder;
+    }
+
+    public static DbContextOptionsBuilder<TContext> UsePoolSize<TContext>(this DbContextOptionsBuilder<TContext> builder, int poolSize)
+        where TContext : DbContext
+    {
+        var extension =
+            (builder.Options.FindExtension<CoreOptionsExtension>() ?? new CoreOptionsExtension())
+                .WithMaxPoolSize(poolSize);
+
+        builder.Options.WithExtension(extension);
+        return builder;
+    }
+
+    public static string Prefix(this DbContextOptions options)
+    {
+        return options.GetExtension<PrefixExtension>().Prefix;
     }
 
     public static DbContextOptionsBuilder SetDefaultWarnings(this DbContextOptionsBuilder builder)

@@ -10,6 +10,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using PhenX.EntityFrameworkCore.BulkInsert.MySql;
+using PhenX.EntityFrameworkCore.BulkInsert.PostgreSql;
+using PhenX.EntityFrameworkCore.BulkInsert.SqlServer;
 using Squidex.Assets.TusAdapter;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Assets;
@@ -70,24 +73,29 @@ public static class ServiceExtensions
             {
                 var versionString = config.GetOptionalValue<string>("store:sql:version");
 
-                services.AddDbContextFactory<MySqlAppDbContext>(builder =>
-                {
-                    var version =
-                        !string.IsNullOrWhiteSpace(versionString) ?
-                        ServerVersion.Parse(versionString) :
-                        ServerVersion.AutoDetect(connectionString);
+                var version =
+                    !string.IsNullOrWhiteSpace(versionString) ?
+                    ServerVersion.Parse(versionString) :
+                    ServerVersion.AutoDetect(connectionString);
 
+                services.AddPooledDbContextFactory<MySqlAppDbContext>(builder =>
+                {
                     builder.SetDefaultWarnings();
                     builder.UseMySql(connectionString, version, options =>
                     {
                         options.UseNetTopologySuite();
-                        options.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
                     });
+                    builder.UseBulkInsertMySql();
                 });
 
-                services.AddNamedDbContext((jsonSerializer, name) =>
+                services.AddNamedDbContext<MySqlContentDbContext>((builder, name) =>
                 {
-                    return new MySqlContentDbContext(name, connectionString, versionString, jsonSerializer);
+                    builder.SetDefaultWarnings();
+                    builder.UseBulkInsertMySql();
+                    builder.UseMySql(connectionString, version, options =>
+                    {
+                        options.MigrationsHistoryTable($"{name}MigrationHistory");
+                    });
                 });
 
                 services.AddSingleton(typeof(ISnapshotStore<>), typeof(MySqlSnapshotStore<>));
@@ -101,18 +109,24 @@ public static class ServiceExtensions
             },
             ["Postgres"] = () =>
             {
-                services.AddDbContextFactory<PostgresAppDbContext>(builder =>
+                services.AddPooledDbContextFactory<PostgresAppDbContext>(builder =>
                 {
                     builder.SetDefaultWarnings();
+                    builder.UseBulkInsertPostgreSql();
                     builder.UseNpgsql(connectionString, options =>
                     {
                         options.UseNetTopologySuite();
                     });
                 });
 
-                services.AddNamedDbContext((jsonSerializer, name) =>
+                services.AddNamedDbContext<PostgresContentDbContext>((builder, name) =>
                 {
-                    return new PostgresContentDbContext(name, connectionString, jsonSerializer);
+                    builder.SetDefaultWarnings();
+                    builder.UseBulkInsertPostgreSql();
+                    builder.UseNpgsql(connectionString, options =>
+                    {
+                        options.MigrationsHistoryTable($"{name}MigrationHistory");
+                    });
                 });
 
                 services.AddSingleton(typeof(ISnapshotStore<>), typeof(PostgresSnapshotStore<>));
@@ -126,18 +140,24 @@ public static class ServiceExtensions
             },
             ["SqlServer"] = () =>
             {
-                services.AddDbContextFactory<SqlServerAppDbContext>(builder =>
+                services.AddPooledDbContextFactory<SqlServerAppDbContext>(builder =>
                 {
                     builder.SetDefaultWarnings();
                     builder.UseSqlServer(connectionString, options =>
                     {
                         options.UseNetTopologySuite();
                     });
+                    builder.UseBulkInsertSqlServer();
                 });
 
-                services.AddNamedDbContext((jsonSerializer, name) =>
+                services.AddNamedDbContext<SqlServerContentDbContext>((builder, name) =>
                 {
-                    return new SqlServerContentDbContext(name, connectionString, jsonSerializer);
+                    builder.SetDefaultWarnings();
+                    builder.UseBulkInsertSqlServer();
+                    builder.UseSqlServer(connectionString, options =>
+                    {
+                        options.MigrationsHistoryTable($"{name}MigrationHistory");
+                    });
                 });
 
                 services.AddSingleton(typeof(ISnapshotStore<>), typeof(SqlServerSnapshotStore<>));

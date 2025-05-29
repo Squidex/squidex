@@ -7,6 +7,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PhenX.EntityFrameworkCore.BulkInsert.PostgreSql;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Hosting;
 using Squidex.Infrastructure;
@@ -42,16 +43,18 @@ public class PostgresFixture(string? reuseId) : IAsyncLifetime, ISqlContentFixtu
 
         services =
             new ServiceCollection()
-                .AddDbContextFactory<TestDbContextPostgres>(b =>
+                .AddDbContextFactory<TestDbContextPostgres>(builder =>
                 {
-                    b.UseNpgsql(connectionString, options =>
+                    builder.UseBulkInsertPostgreSql();
+                    builder.UseNpgsql(connectionString, options =>
                     {
                         options.UseNetTopologySuite();
                     });
                 })
-                .AddNamedDbContext((jsonSerializer, name) =>
+                .AddNamedDbContext<PostgresContentDbContext>((builder, name) =>
                 {
-                    return new PostgresContentDbContext(name, connectionString, jsonSerializer);
+                    builder.UseBulkInsertPostgreSql();
+                    builder.UseNpgsql(connectionString);
                 })
                 .AddSingleton<ConnectionStringParser, PostgresConnectionStringParser>()
                 .AddSingletonAs<DatabaseCreator<TestDbContextPostgres>>().Done()

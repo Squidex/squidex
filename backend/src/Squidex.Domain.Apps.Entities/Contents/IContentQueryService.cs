@@ -27,6 +27,6 @@ public interface IContentQueryService
     Task<Schema> GetSchemaOrThrowAsync(Context context, string schemaIdOrName,
         CancellationToken ct = default);
 
-    Task<Schema?> GetSchemaAsync(Context context, string schemaIdOrNama,
+    Task<Schema?> GetSchemaAsync(Context context, string schemaIdOrName,
         CancellationToken ct = default);
 }

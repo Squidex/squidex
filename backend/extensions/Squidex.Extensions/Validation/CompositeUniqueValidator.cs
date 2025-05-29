@@ -35,7 +35,6 @@ internal sealed class CompositeUniqueValidator(string contentTag, IContentReposi
         foreach (var field in validateableFields)
         {
             var fieldValue = TryGetValue(field, data);
-
             if (fieldValue != null)
             {
                 filters.Add(ClrFilter.Eq($"data.{field.Name}.iv", fieldValue));
@@ -47,7 +46,6 @@ internal sealed class CompositeUniqueValidator(string contentTag, IContentReposi
             var filter = ClrFilter.And(filters);
 
             var found = await contentRepository.QueryIdsAsync(context.Root.App, context.Root.Schema, filter, SearchScope.All);
-
             if (found.Any(x => x.Id != context.Root.ContentId))
             {
                 context.AddError(Enumerable.Empty<string>(), "A content with the same values already exist.");

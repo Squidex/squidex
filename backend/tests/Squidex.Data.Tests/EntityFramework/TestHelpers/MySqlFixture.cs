@@ -7,6 +7,7 @@
 
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PhenX.EntityFrameworkCore.BulkInsert.MySql;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Hosting;
 using Squidex.Infrastructure;
@@ -42,17 +43,18 @@ public class MySqlFixture(string? reuseId = null) : IAsyncLifetime, ISqlContentF
 
         services =
             new ServiceCollection()
-                .AddDbContextFactory<TestDbContextMySql>(b =>
+                .AddDbContextFactory<TestDbContextMySql>(builder =>
                 {
-                    b.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), options =>
+                    builder.UseBulkInsertMySql();
+                    builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), options =>
                     {
                         options.UseNetTopologySuite();
-                        options.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
                     });
                 })
-                .AddNamedDbContext((jsonSerializer, name) =>
+                .AddNamedDbContext<MySqlContentDbContext>((builder, name) =>
                 {
-                    return new MySqlContentDbContext(name, connectionString, null, jsonSerializer);
+                    builder.UseBulkInsertMySql();
+                    builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString));
                 })
                 .AddSingleton<ConnectionStringParser, MySqlConnectionStringParser>()
                 .AddSingletonAs<DatabaseCreator<TestDbContextMySql>>().Done()

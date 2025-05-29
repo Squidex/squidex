@@ -64,7 +64,7 @@ class BranchTemplate {
             condition: new UntypedFormControl('',
                 Validators.nullValidator,
             ),
-            nextStepId: new UntypedFormControl('',
+            nextStepId: new UntypedFormControl(undefined,
                 Validators.nullValidator,
             ),
         });
