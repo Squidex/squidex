@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.20.0] - 2025-05-29
+
+### Changed
+
+* **SQL**: Using pooling for DbContext creation.
+
+### Fixed
+
+* **UI**: Fixed the validation of If-flow steps.
+* **UI**: Correct size for rule flow icons.
+* **UI**: Correct background color for button to disable or enable rules.
+
 ## [7.19.0] - 2025-05-28
 
 The highlight of this release is the new flow system. It replaces how rule actions are defined. It is backwards compatible with old versions and will automatically migrate actions to flows. But the system and how things are tracked in the database has been improved significantly. Therefore it was not possible to migrate existing rule logs. If you have failed items in your log, it is recommended to wait for the update until your rules are successful again. Alternatively you can go to the administration section and disabel the rule enqueue to halt the execution of rules until everything has been processed successfully.
