@@ -8,6 +8,7 @@
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using PhenX.EntityFrameworkCore.BulkInsert.SqlServer;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Hosting;
 using Squidex.Infrastructure;
@@ -44,16 +45,18 @@ public class SqlServerFixture(string? reuseId = null) : IAsyncLifetime, ISqlCont
 
         services =
             new ServiceCollection()
-                .AddDbContextFactory<TestDbContextSqlServer>(b =>
+                .AddPooledDbContextFactory<TestDbContextSqlServer>(builder =>
                 {
-                    b.UseSqlServer(connectionString, options =>
+                    builder.UseBulkInsertSqlServer();
+                    builder.UseSqlServer(connectionString, options =>
                     {
                         options.UseNetTopologySuite();
                     });
                 })
-                .AddNamedDbContext((jsonSerializer, name) =>
+                .AddNamedDbContext<SqlServerContentDbContext>((builder, name) =>
                 {
-                    return new SqlServerContentDbContext(name, connectionString, jsonSerializer);
+                    builder.UseBulkInsertSqlServer();
+                    builder.UseSqlServer(connectionString);
                 })
                 .AddSingleton<ConnectionStringParser, SqlServerConnectionStringParser>()
                 .AddSingletonAs<DatabaseCreator<TestDbContextSqlServer>>().Done()

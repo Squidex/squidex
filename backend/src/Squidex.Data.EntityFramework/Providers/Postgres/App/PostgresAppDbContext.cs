@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Microsoft.EntityFrameworkCore;
-using PhenX.EntityFrameworkCore.BulkInsert.PostgreSql;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Queries;
 
@@ -16,10 +15,4 @@ public class PostgresAppDbContext(DbContextOptions options, IJsonSerializer json
     : AppDbContext(options, jsonSerializer)
 {
     public override SqlDialect Dialect => PostgresDialect.Instance;
-
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        optionsBuilder.UseBulkInsertPostgreSql();
-        base.OnConfiguring(optionsBuilder);
-    }
 }

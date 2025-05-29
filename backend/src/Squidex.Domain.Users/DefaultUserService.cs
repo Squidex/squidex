@@ -77,7 +77,7 @@ public sealed class DefaultUserService(
             return result;
         }
 
-        var userItems = QueryUsers(query).Skip(skip).Take(take).ToList();
+        var userItems = QueryUsers(query).OrderBy(x => x.NormalizedEmail).Skip(skip).Take(take).ToList();
         var userTotal = QueryUsers(query).LongCount();
         var resolved = await ResolveAsync(userItems);
 

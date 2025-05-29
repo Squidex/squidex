@@ -3,10 +3,7 @@
 
 :host ::ng-deep {
     .panel2-main-inner.white {
-        background-image: radial-gradient(
-            lighten($color-border, 2%) 1px,
-            transparent 0
-        );
+        background-image: radial-gradient(lighten($color-border, 2%) 1px, transparent 0);
         background-size: 1rem 1rem;
     }
 
@@ -23,6 +20,7 @@
 
 .btn-enabled {
     @include absolute(1.5rem, 1.75rem, null, null);
+    background-color: $color-white;
 
     &:hover {
         background-color: $color-white;
