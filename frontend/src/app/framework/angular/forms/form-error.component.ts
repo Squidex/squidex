@@ -12,7 +12,6 @@ import { MarkdownDirective } from '../markdown.directive';
 import { TranslatePipe } from '../pipes/translate.pipe';
 
 @Component({
-    standalone: true,
     selector: 'sqx-form-error',
     styleUrls: ['./form-error.component.scss'],
     templateUrl: './form-error.component.html',
@@ -20,7 +19,7 @@ import { TranslatePipe } from '../pipes/translate.pipe';
     imports: [
         MarkdownDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class FormErrorComponent {
     @Input({ required: true })

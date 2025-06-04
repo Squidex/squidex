@@ -12,7 +12,6 @@ import { EMPTY, Observable, shareReplay } from 'rxjs';
 import { AppsState, CodeEditorComponent, EditSchemaScriptsForm, KeysPipe, SchemaDto, SchemasService, SchemasState, ScriptCompletions, ScriptNamePipe, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-schema-scripts-form',
     styleUrls: ['./schema-scripts-form.component.scss'],
     templateUrl: './schema-scripts-form.component.html',
@@ -24,7 +23,7 @@ import { AppsState, CodeEditorComponent, EditSchemaScriptsForm, KeysPipe, Schema
         ReactiveFormsModule,
         ScriptNamePipe,
         TranslatePipe,
-    ],
+    ]
 })
 export class SchemaScriptsFormComponent {
     @Input()

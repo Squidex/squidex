@@ -13,7 +13,6 @@ import { FieldDto, ReferencesFieldPropertiesDto, TranslatePipe } from '@app/shar
 const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['EmptyArray', 'Null'];
 
 @Component({
-    standalone: true,
     selector: 'sqx-components-ui',
     styleUrls: ['components-ui.component.scss'],
     templateUrl: 'components-ui.component.html',
@@ -21,7 +20,7 @@ const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['EmptyArray', 'Null'];
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ],
+    ]
 })
 export class ComponentsUIComponent {
     @Input({ required: true })

@@ -18,7 +18,6 @@ import { SearchFormComponent } from '../search/search-form.component';
 import { ContentSelectorItemComponent } from './content-selector-item.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-content-selector',
     styleUrls: ['./content-selector.component.scss'],
     templateUrl: './content-selector.component.html',
@@ -40,7 +39,7 @@ import { ContentSelectorItemComponent } from './content-selector-item.component'
         TooltipDirective,
         TranslatePipe,
         forwardRef(() => SearchFormComponent),
-    ],
+    ]
 })
 export class ContentSelectorComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

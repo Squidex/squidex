@@ -13,7 +13,6 @@ import { CompletionsCache } from './completions-cache';
 import { ContentChangedSchemaComponent } from './content-changed-schema.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-content-changed-trigger',
     styleUrls: ['./content-changed-trigger.component.scss'],
     templateUrl: './content-changed-trigger.component.html',
@@ -27,7 +26,7 @@ import { ContentChangedSchemaComponent } from './content-changed-schema.componen
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ],
+    ]
 })
 export class ContentChangedTriggerComponent {
     @Input()

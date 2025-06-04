@@ -38,7 +38,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-tag-editor',
     styleUrls: ['./tag-editor.component.scss'],
     templateUrl: './tag-editor.component.html',
@@ -57,7 +56,7 @@ interface State {
         StopClickDirective,
         TooltipDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class TagEditorComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterViewInit, OnInit {
     private readonly subscriptions = new Subscriptions();

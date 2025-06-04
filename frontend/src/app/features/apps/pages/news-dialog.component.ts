@@ -10,7 +10,6 @@ import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { FeatureDto, HelpMarkdownPipe, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-news-dialog',
     styleUrls: ['./news-dialog.component.scss'],
     templateUrl: './news-dialog.component.html',
@@ -19,7 +18,7 @@ import { FeatureDto, HelpMarkdownPipe, ModalDialogComponent, TooltipDirective, T
         ModalDialogComponent,
         TooltipDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class NewsDialogComponent {
     @Output()

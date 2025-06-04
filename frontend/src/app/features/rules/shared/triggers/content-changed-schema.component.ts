@@ -13,7 +13,6 @@ import { CodeEditorComponent, ConfirmClickDirective, ControlErrorsComponent, Sch
 import { CompletionsCache } from './completions-cache';
 
 @Component({
-    standalone: true,
     selector: 'sqx-content-changed-schema',
     styleUrls: ['./content-changed-schema.component.scss'],
     templateUrl: './content-changed-schema.component.html',
@@ -25,7 +24,7 @@ import { CompletionsCache } from './completions-cache';
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ],
+    ]
 })
 export class ContentChangedSchemaComponent {
     @Input({ required: true })

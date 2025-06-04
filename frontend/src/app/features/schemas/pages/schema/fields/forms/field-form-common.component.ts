@@ -11,7 +11,6 @@ import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/for
 import { ControlErrorsComponent, FieldDto, FormHintComponent, SchemaDto, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-field-form-common',
     styleUrls: ['./field-form-common.component.scss'],
     templateUrl: './field-form-common.component.html',
@@ -22,7 +21,7 @@ import { ControlErrorsComponent, FieldDto, FormHintComponent, SchemaDto, TagEdit
         ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,
-    ],
+    ]
 })
 export class FieldFormCommonComponent {
     @Input({ required: true })

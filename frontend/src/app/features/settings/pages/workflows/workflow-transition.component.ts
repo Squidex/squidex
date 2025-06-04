@@ -10,7 +10,6 @@ import { FormsModule } from '@angular/forms';
 import { TagEditorComponent, TranslatePipe, WorkflowTransitionValues, WorkflowTransitionView, WorkflowView } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-workflow-transition',
     styleUrls: ['./workflow-transition.component.scss'],
     templateUrl: './workflow-transition.component.html',
@@ -18,7 +17,7 @@ import { TagEditorComponent, TranslatePipe, WorkflowTransitionValues, WorkflowTr
         FormsModule,
         TagEditorComponent,
         TranslatePipe,
-    ],
+    ]
 })
 export class WorkflowTransitionComponent {
     public readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };

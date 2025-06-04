@@ -18,7 +18,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-asset',
     styleUrls: ['./asset.component.scss'],
     templateUrl: './asset.component.html',
@@ -38,7 +37,7 @@ interface State {
         TranslatePipe,
         UserNameRefPipe,
         UserPictureRefPipe,
-    ],
+    ]
 })
 export class AssetComponent extends StatefulComponent<State> implements OnInit {
     @Output()

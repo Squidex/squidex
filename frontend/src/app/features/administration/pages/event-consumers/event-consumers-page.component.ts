@@ -15,7 +15,6 @@ import { EventConsumersState } from '../../internal';
 import { EventConsumerComponent } from './event-consumer.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-event-consumers-page',
     styleUrls: ['./event-consumers-page.component.scss'],
     templateUrl: './event-consumers-page.component.html',
@@ -36,7 +35,7 @@ import { EventConsumerComponent } from './event-consumer.component';
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class EventConsumersPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

@@ -18,7 +18,6 @@ import { SchemaChangedTriggerComponent } from '../../shared/triggers/schema-chan
 import { UsageTriggerComponent } from '../../shared/triggers/usage-trigger.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-trigger-dialog',
     styleUrls: ['./trigger-dialog.component.scss'],
     templateUrl: './trigger-dialog.component.html',
@@ -36,7 +35,7 @@ import { UsageTriggerComponent } from '../../shared/triggers/usage-trigger.compo
         SchemaChangedTriggerComponent,
         TranslatePipe,
         UsageTriggerComponent,
-    ],
+    ]
 })
 export class TriggerDialogComponent implements OnInit {
     @Input({ required: true })

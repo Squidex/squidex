@@ -12,7 +12,6 @@ import { FieldWizardComponent } from './field-wizard.component';
 import { SortableFieldListComponent } from './sortable-field-list.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-schema-fields',
     styleUrls: ['./schema-fields.component.scss'],
     templateUrl: './schema-fields.component.html',
@@ -23,7 +22,7 @@ import { SortableFieldListComponent } from './sortable-field-list.component';
         TourStepDirective,
         TranslatePipe,
         forwardRef(() => SortableFieldListComponent),
-    ],
+    ]
 })
 export class SchemaFieldsComponent implements OnInit {
     @Input({ required: true })

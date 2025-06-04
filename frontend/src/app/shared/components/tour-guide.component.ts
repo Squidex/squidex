@@ -16,7 +16,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-tour-guide',
     styleUrls: ['./tour-guide.component.scss'],
     templateUrl: './tour-guide.component.html',
@@ -28,7 +27,7 @@ interface State {
         AsyncPipe,
         ScrollActiveDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class TourGuideComponent extends StatefulComponent<State> implements OnInit {
     private readonly subscriptions = new Subscriptions();

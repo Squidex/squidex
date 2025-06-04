@@ -12,7 +12,6 @@ import { Queries, Query } from '@app/shared/internal';
 import { QueryListComponent } from './query-list.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-shared-queries',
     styleUrls: ['./shared-queries.component.scss'],
     templateUrl: './shared-queries.component.html',
@@ -21,7 +20,7 @@ import { QueryListComponent } from './query-list.component';
         AsyncPipe,
         QueryListComponent,
         TranslatePipe,
-    ],
+    ]
 })
 export class SavedQueriesComponent {
     @Output()

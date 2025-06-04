@@ -12,7 +12,6 @@ import { defined, LayoutContainerDirective, TeamsState, TitleComponent } from '@
 import { LeftMenuComponent } from './left-menu.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-team-area',
     styleUrls: ['./team-area.component.scss'],
     templateUrl: './team-area.component.html',
@@ -22,7 +21,7 @@ import { LeftMenuComponent } from './left-menu.component';
         LeftMenuComponent,
         RouterOutlet,
         TitleComponent,
-    ],
+    ]
 })
 export class TeamAreaComponent {
     public selectedTeam = this.teamsState.selectedTeam.pipe(defined());

@@ -21,7 +21,6 @@ type ImportStatus = {
 };
 
 @Component({
-    standalone: true,
     selector: 'sqx-import-contributors-dialog',
     styleUrls: ['./import-contributors-dialog.component.scss'],
     templateUrl: './import-contributors-dialog.component.html',
@@ -34,7 +33,7 @@ type ImportStatus = {
         StatusIconComponent,
         TooltipDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class ImportContributorsDialogComponent {
     @Output()

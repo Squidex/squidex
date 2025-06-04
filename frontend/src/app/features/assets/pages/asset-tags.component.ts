@@ -13,7 +13,6 @@ import { DialogModel, ModalDirective, StopClickDirective, TagItem, TagsSelected,
 import { AssetTagDialogComponent } from './asset-tag-dialog.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-asset-tags',
     styleUrls: ['./asset-tags.component.scss'],
     templateUrl: './asset-tags.component.html',
@@ -23,7 +22,7 @@ import { AssetTagDialogComponent } from './asset-tag-dialog.component';
         ModalDirective,
         StopClickDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class AssetTagsComponent {
     @Output()

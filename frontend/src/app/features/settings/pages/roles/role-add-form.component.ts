@@ -11,7 +11,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AddRoleForm, ControlErrorsComponent, FormHintComponent, RolesState, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-role-add-form',
     styleUrls: ['./role-add-form.component.scss'],
     templateUrl: './role-add-form.component.html',
@@ -23,7 +22,7 @@ import { AddRoleForm, ControlErrorsComponent, FormHintComponent, RolesState, Tra
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ],
+    ]
 })
 export class RoleAddFormComponent {
     public addRoleForm = new AddRoleForm();

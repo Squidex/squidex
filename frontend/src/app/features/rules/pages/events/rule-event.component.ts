@@ -16,7 +16,6 @@ import { RuleElementComponent } from '../../shared/rule-element.component';
 import { StateDetailsComponent } from '../../shared/state-details.component';
 
 @Component({
-    standalone: true,
     selector: '[sqxRuleEvent]',
     styleUrls: ['./rule-event.component.scss'],
     templateUrl: './rule-event.component.html',
@@ -29,7 +28,7 @@ import { StateDetailsComponent } from '../../shared/state-details.component';
         RuleElementComponent,
         StateDetailsComponent,
         TranslatePipe,
-    ],
+    ]
 })
 export class RuleEventComponent {
     @Input('sqxRuleEvent')

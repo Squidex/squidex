@@ -11,7 +11,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ControlErrorsComponent, ExtendedFormGroup, TemplatedFormArray, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-branches-input',
     styleUrls: ['./branches-input.component.scss'],
     templateUrl: './branches-input.component.html',
@@ -21,7 +20,7 @@ import { ControlErrorsComponent, ExtendedFormGroup, TemplatedFormArray, Translat
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ],
+    ]
 })
 export class BranchesInputComponent {
     @Input({ required: true })

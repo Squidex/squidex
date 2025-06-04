@@ -24,7 +24,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-checkbox-group',
     styleUrls: ['./checkbox-group.component.scss'],
     templateUrl: './checkbox-group.component.html',
@@ -34,7 +33,7 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ResizedDirective,
-    ],
+    ]
 })
 export class CheckboxGroupComponent extends StatefulControlComponent<State, string[]> implements AfterViewInit, AfterViewChecked {
     private readonly textMeasurer: TextMeasurer;

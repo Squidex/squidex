@@ -12,7 +12,6 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AppSettingsDto, AppsState, ConfirmClickDirective, ControlErrorsComponent, EditAppSettingsForm, FormHintComponent, LayoutComponent, ListViewComponent, ShortcutDirective, SidebarMenuDirective, Subscriptions, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-settings-page',
     styleUrls: ['./settings-page.component.scss'],
     templateUrl: './settings-page.component.html',
@@ -33,7 +32,7 @@ import { AppSettingsDto, AppsState, ConfirmClickDirective, ControlErrorsComponen
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class SettingsPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

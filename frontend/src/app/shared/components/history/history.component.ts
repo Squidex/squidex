@@ -15,7 +15,6 @@ import { allParams, AppsState, HistoryChannelUpdated, HistoryEventDto, HistorySe
 import { HistoryListComponent } from './history-list.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-history',
     styleUrls: ['./history.component.scss'],
     templateUrl: './history.component.html',
@@ -24,7 +23,7 @@ import { HistoryListComponent } from './history-list.component';
         AsyncPipe,
         HistoryListComponent,
         LayoutComponent,
-    ],
+    ]
 })
 export class HistoryComponent {
     private readonly channel = this.calculateChannel();

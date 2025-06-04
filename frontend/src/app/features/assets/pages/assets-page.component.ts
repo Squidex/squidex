@@ -12,7 +12,6 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AssetDialogComponent, AssetDto, AssetFolderDialogComponent, AssetPathComponent, AssetsListComponent, AssetsState, DialogModel, LayoutComponent, ListViewComponent, LocalStoreService, MathHelper, ModalDirective, PagerComponent, Queries, Query, QueryFullTextSynchronizer, Router2State, SearchFormComponent, Settings, ShortcutDirective, SidebarMenuDirective, TagEditorComponent, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, UIState } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-assets-page',
     styleUrls: ['./assets-page.component.scss'],
     templateUrl: './assets-page.component.html',
@@ -41,7 +40,7 @@ import { AssetDialogComponent, AssetDto, AssetFolderDialogComponent, AssetPathCo
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class AssetsPageComponent implements OnInit {
     public editAsset?: AssetDto;

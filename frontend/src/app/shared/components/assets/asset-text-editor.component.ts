@@ -11,7 +11,6 @@ import { FormsModule } from '@angular/forms';
 import { CodeEditorComponent } from '@app/framework';
 
 @Component({
-    standalone: true,
     selector: 'sqx-asset-text-editor',
     styleUrls: ['./asset-text-editor.component.scss'],
     templateUrl: './asset-text-editor.component.html',
@@ -19,7 +18,7 @@ import { CodeEditorComponent } from '@app/framework';
     imports: [
         CodeEditorComponent,
         FormsModule,
-    ],
+    ]
 })
 export class AssetTextEditorComponent implements OnInit {
     @Input()

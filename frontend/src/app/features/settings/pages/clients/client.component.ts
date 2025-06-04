@@ -12,7 +12,6 @@ import { AppsState, ClientDto, ClientsState, ConfirmClickDirective, CopyDirectiv
 import { ClientConnectFormComponent } from './client-connect-form.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-client',
     styleUrls: ['./client.component.scss'],
     templateUrl: './client.component.html',
@@ -28,7 +27,7 @@ import { ClientConnectFormComponent } from './client-connect-form.component';
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class ClientComponent {
     @Input({ required: true })

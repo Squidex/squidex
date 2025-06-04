@@ -10,7 +10,6 @@ import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/for
 import { CodeEditorComponent, FieldDto, FormHintComponent, JsonFieldPropertiesDto, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-json-more',
     styleUrls: ['json-more.component.scss'],
     templateUrl: 'json-more.component.html',
@@ -20,7 +19,7 @@ import { CodeEditorComponent, FieldDto, FormHintComponent, JsonFieldPropertiesDt
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ],
+    ]
 })
 export class JsonMoreComponent {
     @Input({ required: true })

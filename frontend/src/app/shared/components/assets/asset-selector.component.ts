@@ -25,7 +25,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-asset-selector',
     styleUrls: ['./asset-selector.component.scss'],
     templateUrl: './asset-selector.component.html',
@@ -44,7 +43,7 @@ interface State {
         TagEditorComponent,
         TooltipDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class AssetSelectorComponent extends StatefulComponent<State> implements OnInit {
     @Output()

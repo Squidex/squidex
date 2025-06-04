@@ -12,7 +12,6 @@ import { AppLanguageDto, AppSettingsDto, FieldDto, FieldGroup, groupFields, Sche
 import { FieldGroupComponent } from './field-group.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-sortable-field-list',
     styleUrls: ['./sortable-field-list.component.scss'],
     templateUrl: './sortable-field-list.component.html',
@@ -22,7 +21,7 @@ import { FieldGroupComponent } from './field-group.component';
         CdkDropList,
         CdkDropListGroup,
         forwardRef(() => FieldGroupComponent),
-    ],
+    ]
 })
 export class SortableFieldListComponent {
     @Output()

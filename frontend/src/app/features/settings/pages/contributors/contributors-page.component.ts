@@ -14,7 +14,6 @@ import { ContributorAddFormComponent } from './contributor-add-form.component';
 import { ContributorComponent } from './contributor.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-contributors-page',
     styleUrls: ['./contributors-page.component.scss'],
     templateUrl: './contributors-page.component.html',
@@ -39,7 +38,7 @@ import { ContributorComponent } from './contributor.component';
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class ContributorsPageComponent implements OnInit {
     constructor(

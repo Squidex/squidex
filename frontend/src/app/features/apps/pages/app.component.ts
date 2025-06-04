@@ -11,7 +11,6 @@ import { RouterLink } from '@angular/router';
 import { AppDto, AvatarComponent, ConfirmClickDirective, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, StopClickDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-app',
     styleUrls: ['./app.component.scss'],
     templateUrl: './app.component.html',
@@ -26,7 +25,7 @@ import { AppDto, AvatarComponent, ConfirmClickDirective, DropdownMenuComponent, 
         StopClickDirective,
         TourStepDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class AppComponent {
     @Input({ required: true })

@@ -34,7 +34,6 @@ const SIMPLE_PROPERTIES: ReadonlyArray<Property> = [{
 }];
 
 @Component({
-    standalone: true,
     selector: 'sqx-role',
     styleUrls: ['./role.component.scss'],
     templateUrl: './role.component.html',
@@ -49,7 +48,7 @@ const SIMPLE_PROPERTIES: ReadonlyArray<Property> = [{
         ReactiveFormsModule,
         SlicePipe,
         TranslatePipe,
-    ],
+    ]
 })
 export class RoleComponent {
     @Input({ required: true })

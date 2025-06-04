@@ -11,7 +11,6 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { TableField, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-custom-view-editor',
     styleUrls: ['./custom-view-editor.component.scss'],
     templateUrl: './custom-view-editor.component.html',
@@ -20,7 +19,7 @@ import { TableField, TranslatePipe } from '@app/shared';
         CdkDrag,
         CdkDropList,
         TranslatePipe,
-    ],
+    ]
 })
 export class CustomViewEditorComponent {
     @Output()

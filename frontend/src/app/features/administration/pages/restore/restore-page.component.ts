@@ -13,7 +13,6 @@ import { timer } from 'rxjs';
 import { AuthService, ControlErrorsComponent, DialogService, ISODatePipe, JobsService, LayoutComponent, ListViewComponent, RestoreForm, SidebarMenuDirective, switchSafe, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-restore-page',
     styleUrls: ['./restore-page.component.scss'],
     templateUrl: './restore-page.component.html',
@@ -33,7 +32,7 @@ import { AuthService, ControlErrorsComponent, DialogService, ISODatePipe, JobsSe
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class RestorePageComponent {
     public restoreForm = new RestoreForm();

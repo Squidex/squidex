@@ -13,7 +13,6 @@ import { TranslatePipe } from '@app/framework';
 import { CodeEditorComponent, ConfigureFieldRulesForm, ConfirmClickDirective, ControlErrorsComponent, FIELD_RULE_ACTIONS, SchemaDto, SchemasService, SchemasState, ScriptCompletions } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-schema-field-rules-form',
     styleUrls: ['./schema-field-rules-form.component.scss'],
     templateUrl: './schema-field-rules-form.component.html',
@@ -25,7 +24,7 @@ import { CodeEditorComponent, ConfigureFieldRulesForm, ConfirmClickDirective, Co
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ],
+    ]
 })
 export class SchemaFieldRulesFormComponent implements  OnInit {
     @Input()

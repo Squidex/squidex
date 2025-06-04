@@ -12,7 +12,6 @@ import { ClientsState, FormAlertComponent, LayoutComponent, ListViewComponent, M
 import { TemplateComponent } from './template.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-templates-page',
     styleUrls: ['./templates-page.component.scss'],
     templateUrl: './templates-page.component.html',
@@ -32,7 +31,7 @@ import { TemplateComponent } from './template.component';
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class TemplatesPageComponent implements OnInit {
     constructor(

@@ -16,7 +16,6 @@ declare const tui: any;
 type ViewMode = 'day' | 'week' | 'month';
 
 @Component({
-    standalone: true,
     selector: 'sqx-calendar-page',
     styleUrls: ['./calendar-page.component.scss'],
     templateUrl: './calendar-page.component.html',
@@ -35,7 +34,7 @@ type ViewMode = 'day' | 'week' | 'month';
         TranslatePipe,
         UserNameRefPipe,
         UserPictureRefPipe,
-    ],
+    ]
 })
 export class CalendarPageComponent implements AfterViewInit, OnDestroy, OnInit {
     private calendar: any;

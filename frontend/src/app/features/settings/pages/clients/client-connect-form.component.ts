@@ -10,7 +10,6 @@ import { ChangeDetectorRef, Component, EventEmitter, Input, OnInit, Output } fro
 import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, ClientTourStated, CodeComponent, DialogService, ExternalLinkDirective, FormHintComponent, HelpService, MarkdownDirective, MessageBus, ModalDialogComponent, SDKEntry, TooltipDirective, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-client-connect-form',
     styleUrls: ['./client-connect-form.component.scss'],
     templateUrl: './client-connect-form.component.html',
@@ -24,7 +23,7 @@ import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, Cli
         ModalDialogComponent,
         TooltipDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class ClientConnectFormComponent implements OnInit {
     @Output()

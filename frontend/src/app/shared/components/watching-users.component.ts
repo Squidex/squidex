@@ -12,7 +12,6 @@ import { CollaborationService } from '@app/shared/internal';
 import { UserPicturePipe } from './pipes';
 
 @Component({
-    standalone: true,
     selector: 'sqx-watching-users',
     styleUrls: ['./watching-users.component.scss'],
     templateUrl: './watching-users.component.html',
@@ -23,7 +22,7 @@ import { UserPicturePipe } from './pipes';
         StringColorPipe,
         TooltipDirective,
         UserPicturePipe,
-    ],
+    ]
 })
 export class WatchingUsersComponent {
     constructor(

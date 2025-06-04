@@ -14,7 +14,6 @@ import { CollaborationService, Profile } from '@app/shared/internal';
 type CursorState = { user: Profile; cursor: { x: number; y: number } };
 
 @Component({
-    standalone: true,
     selector: 'sqx-cursors',
     styleUrls: ['./cursors.component.scss'],
     templateUrl: './cursors.component.html',
@@ -22,7 +21,7 @@ type CursorState = { user: Profile; cursor: { x: number; y: number } };
     imports: [
         AsyncPipe,
         StringColorPipe,
-    ],
+    ]
 })
 export class CursorsComponent  {
     public otherCursor =

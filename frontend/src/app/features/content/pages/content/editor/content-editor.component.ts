@@ -12,7 +12,6 @@ import { AppLanguageDto, CursorsComponent, CursorsDirective, EditContentForm, Fo
 import { ContentSectionComponent } from '../../../shared/forms/content-section.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-content-editor',
     styleUrls: ['./content-editor.component.scss'],
     templateUrl: './content-editor.component.html',
@@ -26,7 +25,7 @@ import { ContentSectionComponent } from '../../../shared/forms/content-section.c
         ListViewComponent,
         MarkdownDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class ContentEditorComponent {
     @Output()

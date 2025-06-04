@@ -17,7 +17,6 @@ import { CommentComponent } from './comment.component';
 import { ContributorsDataSource } from './data-source';
 
 @Component({
-    standalone: true,
     selector: 'sqx-comments',
     styleUrls: ['./comments.component.scss'],
     templateUrl: './comments.component.html',
@@ -32,7 +31,7 @@ import { ContributorsDataSource } from './data-source';
         ReactiveFormsModule,
         TranslatePipe,
         UserPicturePipe,
-    ],
+    ]
 })
 export class CommentsComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

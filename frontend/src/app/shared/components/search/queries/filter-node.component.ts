@@ -12,7 +12,6 @@ import { FilterComparisonComponent } from './filter-comparison.component';
 import { FilterLogicalComponent } from './filter-logical.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-filter-node',
     styleUrls: ['./filter-node.component.scss'],
     templateUrl: './filter-node.component.html',
@@ -20,7 +19,7 @@ import { FilterLogicalComponent } from './filter-logical.component';
     imports: [
         forwardRef(() => FilterComparisonComponent),
         forwardRef(() => FilterLogicalComponent),
-    ],
+    ]
 })
 export class FilterNodeComponent {
     @Output()

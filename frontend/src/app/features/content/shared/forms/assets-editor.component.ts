@@ -41,7 +41,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-assets-editor',
     styleUrls: ['./assets-editor.component.scss'],
     templateUrl: './assets-editor.component.html',
@@ -60,7 +59,7 @@ interface State {
         ModalDirective,
         ResizedDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class AssetsEditorComponent extends StatefulControlComponent<State, ReadonlyArray<string>> implements OnInit {
     private readonly subscriptions = new Subscriptions();

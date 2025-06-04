@@ -26,7 +26,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-localized-input',
     styleUrls: ['./localized-input.component.scss'],
     templateUrl: './localized-input.component.html',
@@ -40,7 +39,7 @@ interface State {
         IndeterminateValueDirective,
         LanguageSelectorComponent,
         TagEditorComponent,
-    ],
+    ]
 })
 export class LocalizedInputComponent extends StatefulControlComponent<State, { [key: string]: any }> {
     private value: { [key: string]: any } | undefined;

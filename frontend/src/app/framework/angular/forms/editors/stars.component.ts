@@ -27,7 +27,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-stars',
     styleUrls: ['./stars.component.scss'],
     templateUrl: './stars.component.html',
@@ -37,7 +36,7 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TranslatePipe,
-    ],
+    ]
 })
 export class StarsComponent extends StatefulControlComponent<State, number | null> {
     private maximumStarsValue = 5;

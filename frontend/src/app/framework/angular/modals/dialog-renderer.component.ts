@@ -30,7 +30,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-dialog-renderer',
     styleUrls: ['./dialog-renderer.component.scss'],
     templateUrl: './dialog-renderer.component.html',
@@ -47,7 +46,7 @@ interface State {
         ModalPlacementDirective,
         TooltipDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class DialogRendererComponent extends StatefulComponent<State> implements OnInit {
     private readonly subscriptions = new Subscriptions();

@@ -10,7 +10,6 @@ import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/for
 import { AssetFolderDropdownComponent, AssetsFieldPropertiesDto, FieldDto, FormHintComponent, MarkdownDirective, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-assets-ui',
     styleUrls: ['assets-ui.component.scss'],
     templateUrl: 'assets-ui.component.html',
@@ -21,7 +20,7 @@ import { AssetFolderDropdownComponent, AssetsFieldPropertiesDto, FieldDto, FormH
         MarkdownDirective,
         ReactiveFormsModule,
         TranslatePipe,
-    ],
+    ]
 })
 export class AssetsUIComponent {
     @Input({ required: true })

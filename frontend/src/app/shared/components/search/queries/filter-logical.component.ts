@@ -12,7 +12,6 @@ import { AppLanguageDto, FilterLogical, FilterNode, isLogicalAnd, isLogicalOr, Q
 import { FilterNodeComponent } from './filter-node.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-filter-logical',
     styleUrls: ['./filter-logical.component.scss'],
     templateUrl: './filter-logical.component.html',
@@ -20,7 +19,7 @@ import { FilterNodeComponent } from './filter-node.component';
     imports: [
         FilterNodeComponent,
         TranslatePipe,
-    ],
+    ]
 })
 export class FilterLogicalComponent {
     @Output()

@@ -32,7 +32,6 @@ const ERRORS_AFTER_ENRICHED_EVENT = [
 ];
 
 @Component({
-    standalone: true,
     selector: '[sqxSimulatedRuleEvent]',
     styleUrls: ['./simulated-rule-event.component.scss'],
     templateUrl: './simulated-rule-event.component.html',
@@ -47,7 +46,7 @@ const ERRORS_AFTER_ENRICHED_EVENT = [
         SimulatedRuleEventStatusPipe,
         StateDetailsComponent,
         TranslatePipe,
-    ],
+    ]
 })
 export class SimulatedRuleEventComponent {
     @Input({ required: true })

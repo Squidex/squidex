@@ -13,14 +13,13 @@ import { EventConsumerDto, TooltipDirective } from '@app/shared';
 import { EventConsumersState } from '../../internal';
 
 @Component({
-    standalone: true,
     selector: '[sqxEventConsumer]',
     styleUrls: ['./event-consumer.component.scss'],
     templateUrl: './event-consumer.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TooltipDirective,
-    ],
+    ]
 })
 export class EventConsumerComponent {
     @Output()

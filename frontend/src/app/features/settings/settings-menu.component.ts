@@ -11,7 +11,6 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { AppDto, TourStepDirective, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-settings-menu',
     styleUrls: ['./settings-menu.component.scss'],
     templateUrl: './settings-menu.component.html',
@@ -21,7 +20,7 @@ import { AppDto, TourStepDirective, TranslatePipe } from '@app/shared';
         RouterLinkActive,
         TourStepDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class SettingsMenuComponent {
     @Input({ required: true })

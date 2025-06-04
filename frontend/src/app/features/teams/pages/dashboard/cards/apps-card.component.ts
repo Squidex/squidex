@@ -16,7 +16,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-apps-card',
     styleUrls: ['./apps-card.component.scss'],
     templateUrl: './apps-card.component.html',
@@ -25,7 +24,7 @@ interface State {
         RouterLink,
         StopClickDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class AppsCardComponent extends StatefulComponent<State> implements OnInit {
     @Input({ required: true })

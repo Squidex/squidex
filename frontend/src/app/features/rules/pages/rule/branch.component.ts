@@ -11,7 +11,6 @@ import { RuleElementComponent } from '../../shared/rule-element.component';
 import { FlowStepAdd, FlowStepRemove, FlowStepUpdate } from './types';
 
 @Component({
-    standalone: true,
     selector: 'sqx-branch',
     styleUrls: ['./branch.component.scss'],
     templateUrl: './branch.component.html',
@@ -19,7 +18,7 @@ import { FlowStepAdd, FlowStepRemove, FlowStepUpdate } from './types';
     imports: [
         RuleElementComponent,
         TranslatePipe,
-    ],
+    ]
 })
 export class BranchComponent {
     @Input({ required: true })

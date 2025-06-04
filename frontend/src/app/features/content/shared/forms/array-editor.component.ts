@@ -14,7 +14,6 @@ import { AppLanguageDto, ComponentsFieldPropertiesDto, ConfirmClickDirective, di
 import { ArrayItemComponent } from './array-item.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-array-editor',
     styleUrls: ['./array-editor.component.scss'],
     templateUrl: './array-editor.component.html',
@@ -33,7 +32,7 @@ import { ArrayItemComponent } from './array-item.component';
         TooltipDirective,
         TranslatePipe,
         VirtualScrollerModule,
-    ],
+    ]
 })
 export class ArrayEditorComponent {
     @Input({ required: true })

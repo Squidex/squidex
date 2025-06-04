@@ -10,7 +10,6 @@ import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/for
 import { FieldDto, RichTextFieldPropertiesDto, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-rich-text-validation',
     styleUrls: ['rich-text-validation.component.scss'],
     templateUrl: 'rich-text-validation.component.html',
@@ -18,7 +17,7 @@ import { FieldDto, RichTextFieldPropertiesDto, TranslatePipe } from '@app/shared
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ],
+    ]
 })
 export class RichTextValidationComponent  {
     @Input({ required: true })

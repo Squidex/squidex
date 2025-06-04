@@ -21,7 +21,6 @@ import { ContentReferencesComponent } from './references/content-references.comp
 type SaveNavigationMode = 'Close' | 'Add' | 'Edit';
 
 @Component({
-    standalone: true,
     selector: 'sqx-content-page',
     styleUrls: ['./content-page.component.scss'],
     templateUrl: './content-page.component.html',
@@ -60,7 +59,7 @@ type SaveNavigationMode = 'Close' | 'Add' | 'Edit';
         TourStepDirective,
         TranslatePipe,
         WatchingUsersComponent,
-    ],
+    ]
 })
 export class ContentPageComponent implements CanComponentDeactivate, OnInit {
     private readonly subscriptions = new Subscriptions();

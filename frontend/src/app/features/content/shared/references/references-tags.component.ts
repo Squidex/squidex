@@ -26,7 +26,6 @@ interface State {
 const NO_EMIT = { emitEvent: false };
 
 @Component({
-    standalone: true,
     selector: 'sqx-references-tags',
     styleUrls: ['./references-tags.component.scss'],
     templateUrl: './references-tags.component.html',
@@ -39,7 +38,7 @@ const NO_EMIT = { emitEvent: false };
         ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,
-    ],
+    ]
 })
 export class ReferencesTagsComponent extends StatefulControlComponent<State, ReadonlyArray<string>> {
     private readonly subscriptions = new Subscriptions();

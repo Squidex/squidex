@@ -11,7 +11,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AddClientForm, ClientsState, ControlErrorsComponent, FormHintComponent, TransformInputDirective, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-client-add-form',
     styleUrls: ['./client-add-form.component.scss'],
     templateUrl: './client-add-form.component.html',
@@ -24,7 +23,7 @@ import { AddClientForm, ClientsState, ControlErrorsComponent, FormHintComponent,
         ReactiveFormsModule,
         TransformInputDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class ClientAddFormComponent {
     public addClientForm = new AddClientForm();

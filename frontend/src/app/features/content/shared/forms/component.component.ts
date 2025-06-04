@@ -12,7 +12,6 @@ import { AppLanguageDto, ComponentFieldPropertiesDto, ComponentForm, disabled$, 
 import { ComponentSectionComponent } from './component-section.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-component',
     styleUrls: ['./component.component.scss'],
     templateUrl: './component.component.html',
@@ -25,7 +24,7 @@ import { ComponentSectionComponent } from './component-section.component';
         ModalDirective,
         ModalPlacementDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class ComponentComponent {
     private readonly subscriptions = new Subscriptions();

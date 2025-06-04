@@ -11,7 +11,6 @@ import { FormsModule } from '@angular/forms';
 import { AppLanguageDto, CheckboxGroupComponent, DropdownMenuComponent, FieldForm, ModalDirective, ModalModel, ModalPlacementDirective, TooltipDirective, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-field-copy-button',
     styleUrls: ['./field-copy-button.component.scss'],
     templateUrl: './field-copy-button.component.html',
@@ -23,7 +22,7 @@ import { AppLanguageDto, CheckboxGroupComponent, DropdownMenuComponent, FieldFor
         ModalPlacementDirective,
         TooltipDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class FieldCopyButtonComponent {
     @Input({ required: true })

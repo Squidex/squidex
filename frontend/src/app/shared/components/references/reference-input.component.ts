@@ -24,7 +24,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-reference-input',
     styleUrls: ['./reference-input.component.scss'],
     templateUrl: './reference-input.component.html',
@@ -37,7 +36,7 @@ interface State {
         FormsModule,
         ModalDirective,
         StopClickDirective,
-    ],
+    ]
 })
 export class ReferenceInputComponent extends StatefulControlComponent<State, ReadonlyArray<string> | string> {
     @Input()

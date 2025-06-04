@@ -28,7 +28,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-profile-menu',
     styleUrls: ['./profile-menu.component.scss'],
     templateUrl: './profile-menu.component.html',
@@ -43,7 +42,7 @@ interface State {
         StopClickDirective,
         TranslatePipe,
         UserIdPicturePipe,
-    ],
+    ]
 })
 export class ProfileMenuComponent extends StatefulComponent<State> implements OnInit {
     private readonly subscriptions = new Subscriptions();

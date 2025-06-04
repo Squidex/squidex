@@ -10,7 +10,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CodeComponent, ControlErrorsComponent, FormHintComponent, TranslatePipe, TriggerForm } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-comment-trigger',
     styleUrls: ['./comment-trigger.component.scss'],
     templateUrl: './comment-trigger.component.html',
@@ -21,7 +20,7 @@ import { CodeComponent, ControlErrorsComponent, FormHintComponent, TranslatePipe
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ],
+    ]
 })
 export class CommentTriggerComponent {
     @Input({ required: true })

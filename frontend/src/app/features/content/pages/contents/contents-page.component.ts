@@ -19,7 +19,6 @@ import { ContentComponent } from '../../shared/list/content.component';
 import { CustomViewEditorComponent } from './custom-view-editor.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-contents-page',
     styleUrls: ['./contents-page.component.scss'],
     templateUrl: './contents-page.component.html',
@@ -58,7 +57,7 @@ import { CustomViewEditorComponent } from './custom-view-editor.component';
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class ContentsPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

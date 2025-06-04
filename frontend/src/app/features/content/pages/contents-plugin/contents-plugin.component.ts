@@ -11,7 +11,6 @@ import { LayoutComponent, SchemasState } from '@app/shared';
 import { ContentExtensionComponent } from '../../shared/content-extension.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-contents-plugin',
     styleUrls: ['./contents-plugin.component.scss'],
     templateUrl: './contents-plugin.component.html',
@@ -20,7 +19,7 @@ import { ContentExtensionComponent } from '../../shared/content-extension.compon
         AsyncPipe,
         ContentExtensionComponent,
         LayoutComponent,
-    ],
+    ]
 })
 export class ContentsPluginComponent {
     public schema = this.schemasState.selectedSchema;

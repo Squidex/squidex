@@ -10,7 +10,6 @@ import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { AppsState, AuthService, ChatDialogComponent, DialogModel, ModalDirective, UIOptions } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-chat-menu',
     styleUrls: ['./chat-menu.component.scss'],
     templateUrl: './chat-menu.component.html',
@@ -19,7 +18,7 @@ import { AppsState, AuthService, ChatDialogComponent, DialogModel, ModalDirectiv
         AsyncPipe,
         ChatDialogComponent,
         ModalDirective,
-    ],
+    ]
 })
 export class ChatMenuComponent {
     public readonly chatDialog = new DialogModel();

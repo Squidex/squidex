@@ -27,7 +27,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-color-picker',
     styleUrls: ['./color-picker.component.scss'],
     templateUrl: './color-picker.component.html',
@@ -40,7 +39,7 @@ interface State {
         FormsModule,
         ModalDirective,
         ModalPlacementDirective,
-    ],
+    ]
 })
 export class ColorPickerComponent extends StatefulControlComponent<State, string> implements FocusComponent {
     private wasOpen = false;

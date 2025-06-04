@@ -15,7 +15,6 @@ import { StopClickDirective } from './stop-click.directive';
 import { SidebarMenuDirective } from './template.directive';
 
 @Component({
-    standalone: true,
     selector: 'sqx-layout',
     styleUrls: ['./layout.component.scss'],
     templateUrl: './layout.component.html',
@@ -26,7 +25,7 @@ import { SidebarMenuDirective } from './template.directive';
         RouterLink,
         StopClickDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     private widthPrevious?: string;

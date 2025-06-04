@@ -13,7 +13,6 @@ import { FilterLogicalComponent } from './filter-logical.component';
 import { SortingComponent } from './sorting.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-query',
     styleUrls: ['./query.component.scss'],
     templateUrl: './query.component.html',
@@ -22,7 +21,7 @@ import { SortingComponent } from './sorting.component';
         FilterLogicalComponent,
         SortingComponent,
         TranslatePipe,
-    ],
+    ]
 })
 export class QueryComponent {
     @Output()

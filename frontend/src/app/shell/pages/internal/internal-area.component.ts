@@ -18,7 +18,6 @@ import { ProfileMenuComponent } from './profile-menu.component';
 import { SearchMenuComponent } from './search-menu.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-internal-area',
     styleUrls: ['./internal-area.component.scss'],
     templateUrl: './internal-area.component.html',
@@ -33,7 +32,7 @@ import { SearchMenuComponent } from './search-menu.component';
         RouterLink,
         RouterOutlet,
         SearchMenuComponent,
-    ],
+    ]
 })
 export class InternalAreaComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

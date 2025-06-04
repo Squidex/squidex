@@ -11,7 +11,6 @@ import { AuthService, NotifoComponent, UIOptions } from '@app/shared';
 import { NotificationDropdownComponent } from './notification-dropdown.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-notifications-menu',
     styleUrls: ['./notifications-menu.component.scss'],
     templateUrl: './notifications-menu.component.html',
@@ -19,7 +18,7 @@ import { NotificationDropdownComponent } from './notification-dropdown.component
     imports: [
         NotificationDropdownComponent,
         NotifoComponent,
-    ],
+    ]
 })
 export class NotificationsMenuComponent {
     public isNotifoConfigured = false;

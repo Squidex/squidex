@@ -15,7 +15,6 @@ import { FieldFormComponent } from './forms/field-form.component';
 type SaveNavigationMode = 'Close' | 'Add' | 'Edit';
 
 @Component({
-    standalone: true,
     selector: 'sqx-field-wizard',
     styleUrls: ['./field-wizard.component.scss'],
     templateUrl: './field-wizard.component.html',
@@ -35,7 +34,7 @@ type SaveNavigationMode = 'Close' | 'Add' | 'Edit';
         ReactiveFormsModule,
         TooltipDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class FieldWizardComponent implements OnInit {
     @ViewChild('nameInput', { static: false })

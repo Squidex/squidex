@@ -14,7 +14,6 @@ import { map } from 'rxjs/operators';
 import { AppsState, getCategoryTree, LayoutComponent, SchemaCategoryComponent, SchemasState, Settings, TitleComponent, TranslatePipe, UIOptions, value$ } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-schemas-page',
     styleUrls: ['./schemas-page.component.scss'],
     templateUrl: './schemas-page.component.html',
@@ -29,8 +28,8 @@ import { AppsState, getCategoryTree, LayoutComponent, SchemaCategoryComponent, S
         SchemaCategoryComponent,
         TitleComponent,
         TranslatePipe,
-    ],
-        })
+    ]
+})
 export class SchemasPageComponent {
     public schemasFilter = new UntypedFormControl();
 

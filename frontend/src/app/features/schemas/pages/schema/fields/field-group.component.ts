@@ -17,7 +17,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-field-group',
     styleUrls: ['./field-group.component.scss'],
     templateUrl: './field-group.component.html',
@@ -26,7 +25,7 @@ interface State {
         CdkDragHandle,
         CdkDropList,
         FieldComponent,
-    ],
+    ]
 })
 export class FieldGroupComponent extends StatefulComponent<State> {
     @Output()

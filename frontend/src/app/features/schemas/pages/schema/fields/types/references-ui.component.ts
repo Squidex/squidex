@@ -11,7 +11,6 @@ import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/for
 import { FieldDto, FormHintComponent, ReferencesFieldEditorValues, ReferencesFieldPropertiesDto, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-references-ui',
     styleUrls: ['references-ui.component.scss'],
     templateUrl: 'references-ui.component.html',
@@ -20,7 +19,7 @@ import { FieldDto, FormHintComponent, ReferencesFieldEditorValues, ReferencesFie
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ],
+    ]
 })
 export class ReferencesUIComponent {
     public readonly editors = ReferencesFieldEditorValues;

@@ -13,7 +13,6 @@ import { LanguageAddFormComponent } from './language-add-form.component';
 import { LanguageComponent } from './language.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-languages-page',
     styleUrls: ['./languages-page.component.scss'],
     templateUrl: './languages-page.component.html',
@@ -32,7 +31,7 @@ import { LanguageComponent } from './language.component';
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class LanguagesPageComponent implements OnInit {
     constructor(

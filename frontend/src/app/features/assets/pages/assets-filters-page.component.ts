@@ -11,7 +11,6 @@ import { AssetsState, LayoutComponent, Queries, Query, SavedQueriesComponent, Tr
 import { AssetTagsComponent } from './asset-tags.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-assets-filters-page',
     styleUrls: ['./assets-filters-page.component.scss'],
     templateUrl: './assets-filters-page.component.html',
@@ -21,7 +20,7 @@ import { AssetTagsComponent } from './asset-tags.component';
         LayoutComponent,
         SavedQueriesComponent,
         TranslatePipe,
-    ],
+    ]
 })
 export class AssetsFiltersPageComponent {
     public assetsQueries: Queries;

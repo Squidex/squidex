@@ -11,7 +11,6 @@ import { ConfirmClickDirective, DarkenPipe, ExternalLinkDirective, RuleTriggerMe
 import { RuleIconComponent } from './rule-icon.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-rule-element',
     styleUrls: ['./rule-element.component.scss'],
     templateUrl: './rule-element.component.html',
@@ -24,7 +23,7 @@ import { RuleIconComponent } from './rule-icon.component';
         StopClickDirective,
         TooltipDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class RuleElementComponent {
     @Input({ required: true })

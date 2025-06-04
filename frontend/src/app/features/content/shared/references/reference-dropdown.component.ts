@@ -30,7 +30,6 @@ type ContentName = { name: string; id?: string };
 const NO_EMIT = { emitEvent: false };
 
 @Component({
-    standalone: true,
     selector: 'sqx-reference-dropdown',
     styleUrls: ['./reference-dropdown.component.scss'],
     templateUrl: './reference-dropdown.component.html',
@@ -44,7 +43,7 @@ const NO_EMIT = { emitEvent: false };
         HighlightPipe,
         ReactiveFormsModule,
         SafeHtmlPipe,
-    ],
+    ]
 })
 export class ReferenceDropdownComponent extends StatefulControlComponent<State, ReadonlyArray<string> | string> {
     private readonly subscriptions = new Subscriptions();

@@ -12,7 +12,6 @@ import { IndeterminateValueDirective, StarsComponent, ToggleComponent, Transform
 import { FieldDto, MathHelper } from '@app/shared/internal';
 
 @Component({
-    standalone: true,
     selector: 'sqx-content-value-editor',
     styleUrls: ['./content-value-editor.component.scss'],
     templateUrl: './content-value-editor.component.html',
@@ -24,7 +23,7 @@ import { FieldDto, MathHelper } from '@app/shared/internal';
         StarsComponent,
         ToggleComponent,
         TransformInputDirective,
-    ],
+    ]
 })
 export class ContentValueEditorComponent {
     @Input({ required: true })

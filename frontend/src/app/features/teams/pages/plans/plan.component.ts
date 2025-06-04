@@ -11,7 +11,6 @@ import { ConfirmClickDirective, FileSizePipe, FormHintComponent, KNumberPipe, Pl
 import { TeamPlansState } from '../../internal';
 
 @Component({
-    standalone: true,
     selector: 'sqx-plan',
     styleUrls: ['./plan.component.scss'],
     templateUrl: './plan.component.html',
@@ -23,7 +22,7 @@ import { TeamPlansState } from '../../internal';
         FormHintComponent,
         KNumberPipe,
         TranslatePipe,
-    ],
+    ]
 })
 export class PlanComponent {
     @Input({ required: true })

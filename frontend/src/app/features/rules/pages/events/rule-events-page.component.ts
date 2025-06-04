@@ -12,7 +12,6 @@ import { ConfirmClickDirective, LayoutComponent, ListViewComponent, PagerCompone
 import { RuleEventComponent } from './rule-event.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-rule-events-page',
     styleUrls: ['./rule-events-page.component.scss'],
     templateUrl: './rule-events-page.component.html',
@@ -30,7 +29,7 @@ import { RuleEventComponent } from './rule-event.component';
         TitleComponent,
         TooltipDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class RuleEventsPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

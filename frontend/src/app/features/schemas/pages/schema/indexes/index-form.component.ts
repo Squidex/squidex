@@ -11,7 +11,6 @@ import { AppLanguageDto, ConfirmClickDirective, ControlErrorsComponent, CreateIn
 
 
 @Component({
-    standalone: true,
     selector: 'sqx-index-form',
     styleUrls: ['./index-form.component.scss'],
     templateUrl: './index-form.component.html',
@@ -24,7 +23,7 @@ import { AppLanguageDto, ConfirmClickDirective, ControlErrorsComponent, CreateIn
         ModalDialogComponent,
         ReactiveFormsModule,
         TranslatePipe,
-    ],
+    ]
 })
 export class IndexFormComponent {
     @Output()

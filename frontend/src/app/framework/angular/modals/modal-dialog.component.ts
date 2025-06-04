@@ -13,7 +13,6 @@ import { ShortcutComponent } from '../shortcut.component';
 import { TourStepDirective } from './tour-step.directive';
 
 @Component({
-    standalone: true,
     selector: 'sqx-modal-dialog',
     styleUrls: ['./modal-dialog.component.scss'],
     templateUrl: './modal-dialog.component.html',
@@ -25,7 +24,7 @@ import { TourStepDirective } from './tour-step.directive';
         ShortcutComponent,
         TranslatePipe,
         TourStepDirective,
-    ],
+    ]
 })
 export class ModalDialogComponent implements AfterViewInit {
     @Output()

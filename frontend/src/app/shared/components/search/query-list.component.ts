@@ -11,7 +11,6 @@ import { StopClickDirective, TranslatePipe } from '@app/framework';
 import { equalsQuery, Query, SavedQuery } from '@app/shared/internal';
 
 @Component({
-    standalone: true,
     selector: 'sqx-query-list',
     styleUrls: ['./query-list.component.scss'],
     templateUrl: './query-list.component.html',
@@ -19,7 +18,7 @@ import { equalsQuery, Query, SavedQuery } from '@app/shared/internal';
     imports: [
         StopClickDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class QueryListComponent {
     @Output()

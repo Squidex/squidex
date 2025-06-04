@@ -11,7 +11,6 @@ import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/for
 import { FieldDto, FormHintComponent, TagEditorComponent, TagsFieldEditorValues, TagsFieldPropertiesDto, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-tags-ui',
     styleUrls: ['tags-ui.component.scss'],
     templateUrl: 'tags-ui.component.html',
@@ -21,7 +20,7 @@ import { FieldDto, FormHintComponent, TagEditorComponent, TagsFieldEditorValues,
         ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,
-    ],
+    ]
 })
 export class TagsUIComponent {
     public readonly editors = TagsFieldEditorValues;

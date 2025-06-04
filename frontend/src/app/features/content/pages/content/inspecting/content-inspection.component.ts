@@ -15,7 +15,6 @@ import { AppLanguageDto, CodeEditorComponent, ContentDto, ContentsService, Conte
 type Mode = 'Content' | 'Data' | 'FlatData';
 
 @Component({
-    standalone: true,
     selector: 'sqx-content-inspection',
     styleUrls: ['./content-inspection.component.scss'],
     templateUrl: './content-inspection.component.html',
@@ -25,7 +24,7 @@ type Mode = 'Content' | 'Data' | 'FlatData';
         FormErrorComponent,
         FormsModule,
         TranslatePipe,
-    ],
+    ]
 })
 export class ContentInspectionComponent implements OnDestroy {
     private languageChanges$ = new BehaviorSubject<AppLanguageDto | null>(null);

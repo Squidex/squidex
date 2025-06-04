@@ -33,7 +33,6 @@ export class SearchSource implements AutocompleteSource {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-search-menu',
     styleUrls: ['./search-menu.component.scss'],
     templateUrl: './search-menu.component.html',
@@ -49,7 +48,7 @@ export class SearchSource implements AutocompleteSource {
         ShortcutDirective,
         TooltipDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class SearchMenuComponent {
     @ViewChild(AutocompleteComponent, { static: false })

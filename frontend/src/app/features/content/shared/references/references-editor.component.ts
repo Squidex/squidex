@@ -26,7 +26,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-references-editor',
     styleUrls: ['./references-editor.component.scss'],
     templateUrl: './references-editor.component.html',
@@ -45,7 +44,7 @@ interface State {
         ResizedDirective,
         TranslatePipe,
         forwardRef(() => ContentCreatorComponent),
-    ],
+    ]
 })
 export class ReferencesEditorComponent extends StatefulControlComponent<State, ReadonlyArray<string>> {
     @Input({ transform: booleanAttribute })

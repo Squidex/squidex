@@ -16,7 +16,6 @@ import { QueryPathComponent } from './query-path.component';
 import { FilterOperatorPipe } from './query.pipes';
 
 @Component({
-    standalone: true,
     selector: 'sqx-filter-comparison',
     styleUrls: ['./filter-comparison.component.scss'],
     templateUrl: './filter-comparison.component.html',
@@ -32,7 +31,7 @@ import { FilterOperatorPipe } from './query.pipes';
         ReferenceInputComponent,
         TranslatePipe,
         UserDtoPicture,
-    ],
+    ]
 })
 export class FilterComparisonComponent {
     @Output()

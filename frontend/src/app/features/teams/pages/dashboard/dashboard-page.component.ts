@@ -12,7 +12,6 @@ import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCard
 import { AppsCardComponent } from './cards/apps-card.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-dashboard-page',
     styleUrls: ['./dashboard-page.component.scss'],
     templateUrl: './dashboard-page.component.html',
@@ -39,7 +38,7 @@ import { AppsCardComponent } from './cards/apps-card.component';
         SupportCardComponent,
         TitleComponent,
         TranslatePipe,
-    ],
+    ]
 })
 export class DashboardPageComponent implements AfterViewInit, OnInit {
     private readonly subscriptions = new Subscriptions();

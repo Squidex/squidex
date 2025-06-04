@@ -12,7 +12,6 @@ import { map } from 'rxjs/operators';
 import { CommentsComponent, LayoutComponent } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-comments-page',
     styleUrls: ['./comments-page.component.scss'],
     templateUrl: './comments-page.component.html',
@@ -20,7 +19,7 @@ import { CommentsComponent, LayoutComponent } from '@app/shared';
         AsyncPipe,
         CommentsComponent,
         LayoutComponent,
-    ],
+    ]
 })
 export class CommentsPageComponent {
     public commentsId = this.route.parent!.params.pipe(map(x => x['contentId']));

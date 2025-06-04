@@ -16,7 +16,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-content-section',
     styleUrls: ['./content-section.component.scss'],
     templateUrl: './content-section.component.html',
@@ -26,7 +25,7 @@ interface State {
         FormHintComponent,
         MarkdownDirective,
         forwardRef(() => ContentFieldComponent),
-    ],
+    ]
 })
 export class ContentSectionComponent extends StatefulComponent<State> {
     @Output()

@@ -16,7 +16,6 @@ import { QueryComponent } from './queries/query.component';
 import { SavedQueriesComponent } from './shared-queries.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-search-form',
     styleUrls: ['./search-form.component.scss'],
     templateUrl: './search-form.component.html',
@@ -38,7 +37,7 @@ import { SavedQueriesComponent } from './shared-queries.component';
         TourHintDirective,
         TourStepDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class SearchFormComponent {
     private previousQuery?: Query | null;

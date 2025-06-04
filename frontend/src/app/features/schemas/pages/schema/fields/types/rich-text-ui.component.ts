@@ -11,7 +11,6 @@ import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/for
 import { FieldDto, FormHintComponent, RichTextFieldPropertiesDto, SchemaTagSource, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-rich-text-ui',
     styleUrls: ['rich-text-ui.component.scss'],
     templateUrl: 'rich-text-ui.component.html',
@@ -22,7 +21,7 @@ import { FieldDto, FormHintComponent, RichTextFieldPropertiesDto, SchemaTagSourc
         ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,
-    ],
+    ]
 })
 export class RichTextUIComponent  {
     @Input({ required: true })

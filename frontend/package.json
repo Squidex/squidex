@@ -15,17 +15,17 @@
   },
   "private": true,
   "dependencies": {
-    "@angular/animations": "18.0.1",
+    "@angular/animations": "19.2.14",
     "@angular/cdk": "18.0.1",
     "@angular/cdk-experimental": "18.0.1",
-    "@angular/common": "18.0.1",
-    "@angular/core": "18.0.1",
-    "@angular/forms": "18.0.1",
-    "@angular/localize": "18.0.1",
-    "@angular/platform-browser": "18.0.1",
-    "@angular/platform-browser-dynamic": "18.0.1",
-    "@angular/platform-server": "18.0.1",
-    "@angular/router": "18.0.1",
+    "@angular/common": "19.2.14",
+    "@angular/core": "19.2.14",
+    "@angular/forms": "19.2.14",
+    "@angular/localize": "19.2.14",
+    "@angular/platform-browser": "19.2.14",
+    "@angular/platform-browser-dynamic": "19.2.14",
+    "@angular/platform-server": "19.2.14",
+    "@angular/router": "19.2.14",
     "@egjs/hammerjs": "2.0.17",
     "@floating-ui/dom": "^1.6.5",
     "@graphiql/toolkit": "^0.9.1",
@@ -67,20 +67,20 @@
     "vis-util": "5.0.7",
     "y-protocols": "^1.0.6",
     "y-websocket": "^2.0.3",
-    "zone.js": "0.14.6"
+    "zone.js": "0.15.1"
   },
   "devDependencies": {
-    "@angular-devkit/architect": "^0.1800.2",
-    "@angular-devkit/build-angular": "^18.0.2",
+    "@angular-devkit/architect": "^0.1902.14",
+    "@angular-devkit/build-angular": "^19.2.14",
     "@angular-eslint/builder": "18.0.0",
     "@angular-eslint/eslint-plugin": "18.0.0",
     "@angular-eslint/eslint-plugin-template": "18.0.0",
     "@angular-eslint/schematics": "18.0.0",
     "@angular-eslint/template-parser": "18.0.0",
-    "@angular/cli": "^18.0.2",
-    "@angular/compiler": "^18.0.1",
-    "@angular/compiler-cli": "^18.0.1",
-    "@angular/elements": "^18.0.1",
+    "@angular/cli": "^19.2.14",
+    "@angular/compiler": "^19.2.14",
+    "@angular/compiler-cli": "^19.2.14",
+    "@angular/elements": "^19.2.14",
     "@compodoc/compodoc": "^1.1.25",
     "@storybook/addon-actions": "^8.1.5",
     "@storybook/addon-essentials": "^8.1.5",
@@ -121,7 +121,7 @@
     "stylelint-config-standard": "36.0.0",
     "stylelint-config-standard-scss": "^13.1.0",
     "stylelint-scss": "6.3.0",
-    "typescript": "5.4.5"
+    "typescript": "5.8.3"
   },
   "overrides": {
     "ng2-charts": {
@@ -129,6 +129,6 @@
     },
     "tui-calendar": {
       "dompurify": "^2.5.8"
-    }    
+    }
   }
 }

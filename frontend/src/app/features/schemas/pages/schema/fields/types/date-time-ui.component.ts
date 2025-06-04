@@ -11,7 +11,6 @@ import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/for
 import { DateTimeFieldEditorValues, DateTimeFieldPropertiesDto, FieldDto, FloatConverter, FormHintComponent, MarkdownDirective, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-date-time-ui',
     styleUrls: ['date-time-ui.component.scss'],
     templateUrl: 'date-time-ui.component.html',
@@ -21,7 +20,7 @@ import { DateTimeFieldEditorValues, DateTimeFieldPropertiesDto, FieldDto, FloatC
         MarkdownDirective,
         ReactiveFormsModule,
         TranslatePipe,
-    ],
+    ]
 })
 export class DateTimeUIComponent {
     public readonly converter = FloatConverter.INSTANCE;

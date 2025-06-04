@@ -15,7 +15,6 @@ import { ContentEventComponent } from './content-event.component';
 import { ContentPageComponent } from './content-page.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-history',
     styleUrls: ['./content-history-page.component.scss'],
     templateUrl: './content-history-page.component.html',
@@ -34,7 +33,7 @@ import { ContentPageComponent } from './content-page.component';
         ModalPlacementDirective,
         TourStepDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class ContentHistoryPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

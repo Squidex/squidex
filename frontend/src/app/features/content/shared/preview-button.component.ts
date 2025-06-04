@@ -20,7 +20,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-preview-button',
     styleUrls: ['./preview-button.component.scss'],
     templateUrl: './preview-button.component.html',
@@ -30,7 +29,7 @@ interface State {
         ModalDirective,
         ModalPlacementDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class PreviewButtonComponent extends StatefulComponent<State> implements OnChanges {
     @Input()

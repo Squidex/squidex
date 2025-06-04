@@ -18,7 +18,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-comment',
     styleUrls: ['./comment.component.scss'],
     templateUrl: './comment.component.html',
@@ -38,7 +37,7 @@ interface State {
         TranslatePipe,
         UserNameRefPipe,
         UserPictureRefPipe,
-    ],
+    ]
 })
 export class CommentComponent extends StatefulComponent<State> {
     @Input({ transform: booleanAttribute })

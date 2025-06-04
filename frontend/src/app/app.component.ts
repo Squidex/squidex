@@ -11,7 +11,6 @@ import { RouterOutlet } from '@angular/router';
 import { AnalyticsService, CopyGlobalDirective, DialogRendererComponent, RootViewComponent, TourGuideComponent, TourTemplateComponent, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-app',
     styleUrls: ['./app.component.scss'],
     templateUrl: './app.component.html',
@@ -23,7 +22,7 @@ import { AnalyticsService, CopyGlobalDirective, DialogRendererComponent, RootVie
         TourGuideComponent,
         TourTemplateComponent,
         TranslatePipe,
-    ],
+    ]
 })
 export class AppComponent {
     public isLoaded?: boolean | null;

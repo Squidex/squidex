@@ -11,7 +11,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppsState, CodeComponent, ControlErrorsComponent, FormHintComponent, RulesService, TranslatePipe, TriggerForm } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-cron-job-trigger',
     styleUrls: ['./cron-job-trigger.component.scss'],
     templateUrl: './cron-job-trigger.component.html',
@@ -23,7 +22,7 @@ import { AppsState, CodeComponent, ControlErrorsComponent, FormHintComponent, Ru
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ],
+    ]
 })
 export class CronJobTriggerComponent {
     @Input({ required: true })

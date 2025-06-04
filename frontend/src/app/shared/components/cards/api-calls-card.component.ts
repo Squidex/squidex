@@ -12,7 +12,6 @@ import { TranslatePipe } from '@app/framework';
 import { AppDto, CallsUsageDto, ChartHelpers, ChartOptions, UsagesService } from '@app/shared/internal';
 
 @Component({
-    standalone: true,
     selector: 'sqx-api-calls-card',
     styleUrls: ['./api-calls-card.component.scss'],
     templateUrl: './api-calls-card.component.html',
@@ -20,7 +19,7 @@ import { AppDto, CallsUsageDto, ChartHelpers, ChartOptions, UsagesService } from
     imports: [
         BaseChartDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class ApiCallsCardComponent {
     @Input()

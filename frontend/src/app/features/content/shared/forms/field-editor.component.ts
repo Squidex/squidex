@@ -22,7 +22,6 @@ import { IFrameEditorComponent } from './iframe-editor.component';
 import { StockPhotoEditorComponent } from './stock-photo-editor.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-field-editor',
     styleUrls: ['./field-editor.component.scss'],
     templateUrl: './field-editor.component.html',
@@ -60,7 +59,7 @@ import { StockPhotoEditorComponent } from './stock-photo-editor.component';
         ToggleComponent,
         TooltipDirective,
         TransformInputDirective,
-    ],
+    ]
 })
 export class FieldEditorComponent {
     public readonly uniqueId = MathHelper.guid();

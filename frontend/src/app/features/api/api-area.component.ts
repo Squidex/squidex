@@ -10,7 +10,6 @@ import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AppsState, ExternalLinkDirective, LayoutComponent, TitleComponent, TourStepDirective, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-api-area',
     styleUrls: ['./api-area.component.scss'],
     templateUrl: './api-area.component.html',
@@ -23,7 +22,7 @@ import { AppsState, ExternalLinkDirective, LayoutComponent, TitleComponent, Tour
         TitleComponent,
         TourStepDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class ApiAreaComponent {
     constructor(

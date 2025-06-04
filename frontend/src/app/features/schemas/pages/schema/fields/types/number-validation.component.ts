@@ -11,7 +11,6 @@ import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/for
 import { AppLanguageDto, FieldDto, FormHintComponent, LocalizedInputComponent, NumberFieldPropertiesDto, SchemaDto, TranslatePipe, Types } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-number-validation',
     styleUrls: ['number-validation.component.scss'],
     templateUrl: 'number-validation.component.html',
@@ -21,7 +20,7 @@ import { AppLanguageDto, FieldDto, FormHintComponent, LocalizedInputComponent, N
         LocalizedInputComponent,
         ReactiveFormsModule,
         TranslatePipe,
-    ],
+    ]
 })
 export class NumberValidationComponent {
     @Input({ required: true })

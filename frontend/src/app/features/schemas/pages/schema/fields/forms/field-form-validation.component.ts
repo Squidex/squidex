@@ -24,7 +24,6 @@ import { StringValidationComponent } from '../types/string-validation.component'
 import { TagsValidationComponent } from '../types/tags-validation.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-field-form-validation',
     styleUrls: ['./field-form-validation.component.scss'],
     templateUrl: './field-form-validation.component.html',
@@ -45,7 +44,7 @@ import { TagsValidationComponent } from '../types/tags-validation.component';
         StringValidationComponent,
         TagsValidationComponent,
         TranslatePipe,
-    ],
+    ]
 })
 export class FieldFormValidationComponent {
     @Input({ required: true })

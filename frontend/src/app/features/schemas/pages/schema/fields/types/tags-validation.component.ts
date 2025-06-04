@@ -11,7 +11,6 @@ import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/for
 import { AppLanguageDto, FieldDto, FormHintComponent, LocalizedInputComponent, TagEditorComponent, TagsFieldPropertiesDto, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-tags-validation',
     styleUrls: ['tags-validation.component.scss'],
     templateUrl: 'tags-validation.component.html',
@@ -22,7 +21,7 @@ import { AppLanguageDto, FieldDto, FormHintComponent, LocalizedInputComponent, T
         ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,
-    ],
+    ]
 })
 export class TagsValidationComponent {
     @Input({ required: true })

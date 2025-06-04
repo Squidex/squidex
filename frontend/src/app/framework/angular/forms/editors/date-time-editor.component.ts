@@ -29,7 +29,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-date-time-editor',
     styleUrls: ['./date-time-editor.component.scss'],
     templateUrl: './date-time-editor.component.html',
@@ -43,7 +42,7 @@ interface State {
         ResizedDirective,
         TooltipDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class DateTimeEditorComponent extends StatefulControlComponent<State, string | null> implements OnInit, AfterViewInit, FocusComponent {
     private readonly subscriptions = new Subscriptions();

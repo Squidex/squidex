@@ -12,7 +12,6 @@ import { QueryModel, QuerySorting, SORT_MODES } from '@app/shared/internal';
 import { QueryPathComponent } from './query-path.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-sorting',
     styleUrls: ['./sorting.component.scss'],
     templateUrl: './sorting.component.html',
@@ -20,7 +19,7 @@ import { QueryPathComponent } from './query-path.component';
     imports: [
         FormsModule,
         QueryPathComponent,
-    ],
+    ]
 })
 export class SortingComponent {
     public readonly modes = SORT_MODES;

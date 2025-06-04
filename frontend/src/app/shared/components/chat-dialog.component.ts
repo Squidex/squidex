@@ -25,7 +25,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-chat-dialog',
     styleUrls: ['./chat-dialog.component.scss'],
     templateUrl: './chat-dialog.component.html',
@@ -35,7 +34,7 @@ interface State {
         ModalDialogComponent,
         TooltipDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class ChatDialogComponent extends StatefulComponent<State> {
     @Output()

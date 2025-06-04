@@ -18,7 +18,6 @@ import { AssetUrlPipe } from './pipes';
 interface AssetEvent { event: HistoryEventDto; version: number; canDownload: boolean }
 
 @Component({
-    standalone: true,
     selector: 'sqx-asset-history',
     styleUrls: ['./asset-history.component.scss'],
     templateUrl: './asset-history.component.html',
@@ -32,7 +31,7 @@ interface AssetEvent { event: HistoryEventDto; version: number; canDownload: boo
         TranslatePipe,
         UserNameRefPipe,
         UserPictureRefPipe,
-    ],
+    ]
 })
 export class AssetHistoryComponent {
     @Input({ required: true })

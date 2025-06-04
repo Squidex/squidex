@@ -12,7 +12,6 @@ import { ColorPickerComponent, DropdownComponent, EditableTitleComponent, TagEdi
 import { WorkflowTransitionComponent } from './workflow-transition.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-workflow-step',
     styleUrls: ['./workflow-step.component.scss'],
     templateUrl: './workflow-step.component.html',
@@ -24,7 +23,7 @@ import { WorkflowTransitionComponent } from './workflow-transition.component';
         TagEditorComponent,
         TranslatePipe,
         WorkflowTransitionComponent,
-    ],
+    ]
 })
 export class WorkflowStepComponent {
     public readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };

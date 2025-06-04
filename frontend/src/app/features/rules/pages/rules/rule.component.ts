@@ -13,7 +13,6 @@ import { BranchItem, ConfirmClickDirective, DropdownMenuComponent, DynamicRuleDt
 import { RuleElementComponent } from '../../shared/rule-element.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-rule',
     styleUrls: ['./rule.component.scss'],
     templateUrl: './rule.component.html',
@@ -29,7 +28,7 @@ import { RuleElementComponent } from '../../shared/rule-element.component';
         RuleElementComponent,
         ToggleComponent,
         TranslatePipe,
-    ],
+    ]
 })
 export class RuleComponent {
     @Input({ required: true })

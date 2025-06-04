@@ -18,7 +18,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-list-view',
     styleUrls: ['./list-view.component.scss'],
     templateUrl: './list-view.component.html',
@@ -28,7 +27,7 @@ interface State {
         LoaderComponent,
         NgTemplateOutlet,
         SyncScollingDirective,
-    ],
+    ]
 })
 export class ListViewComponent extends StatefulComponent<State> implements AfterViewInit {
     private timer: any;

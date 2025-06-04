@@ -11,14 +11,13 @@ import { TranslatePipe, Types } from '@app/framework';
 import { AnnotateAssetDto, AssetDto } from '@app/shared/internal';
 
 @Component({
-    standalone: true,
     selector: 'sqx-image-focus-point',
     styleUrls: ['./image-focus-point.component.scss'],
     templateUrl: './image-focus-point.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TranslatePipe,
-    ],
+    ]
 })
 export class ImageFocusPointComponent implements AfterViewInit, OnDestroy {
     private readonly previewImages: FocusedImage[] = [];

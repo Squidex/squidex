@@ -11,7 +11,6 @@ import { SimulatedRuleEventDto, TranslatePipe, TypedSimpleChanges } from '@app/s
 import { HistoryStepComponent } from '../../shared/history-step.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-rule-transition',
     styleUrls: ['./rule-transition.component.scss'],
     templateUrl: './rule-transition.component.html',
@@ -19,7 +18,7 @@ import { HistoryStepComponent } from '../../shared/history-step.component';
     imports: [
         HistoryStepComponent,
         TranslatePipe,
-    ],
+    ]
 })
 export class RuleTransitionComponent {
     @Input({ transform: booleanAttribute })

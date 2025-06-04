@@ -10,7 +10,6 @@ import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/for
 import { ArrayFieldPropertiesDto, FieldDto, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-array-validation',
     styleUrls: ['array-validation.component.scss'],
     templateUrl: 'array-validation.component.html',
@@ -19,7 +18,7 @@ import { ArrayFieldPropertiesDto, FieldDto, TagEditorComponent, TranslatePipe } 
         ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,
-    ],
+    ]
 })
 export class ArrayValidationComponent {
     @Input({ required: true })

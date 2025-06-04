@@ -12,7 +12,6 @@ import { Observable } from 'rxjs';
 import { AppLanguageDto, AppSettingsDto, DropdownMenuComponent, FieldDto, FormHintComponent, hasNoValue$, hasValue$, LocalizedInputComponent, ModalDirective, ModalModel, ModalPlacementDirective, PatternDto, SchemaDto, StringContentTypeValues, StringFieldPropertiesDto, Subscriptions, TranslatePipe, TypedSimpleChanges, Types, value$ } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-string-validation',
     styleUrls: ['string-validation.component.scss'],
     templateUrl: 'string-validation.component.html',
@@ -26,7 +25,7 @@ import { AppLanguageDto, AppSettingsDto, DropdownMenuComponent, FieldDto, FormHi
         ModalPlacementDirective,
         ReactiveFormsModule,
         TranslatePipe,
-    ],
+    ]
 })
 export class StringValidationComponent  {
     private readonly subscriptions = new Subscriptions();

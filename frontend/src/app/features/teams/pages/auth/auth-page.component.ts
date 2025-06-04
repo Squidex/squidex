@@ -13,7 +13,6 @@ import { ApiUrlConfig, ControlErrorsComponent, CopyDirective, defined, FormError
 import { TeamAuthState, UpdateTeamAuthForm } from '../../internal';
 
 @Component({
-    standalone: true,
     selector: 'sqx-auth-page',
     styleUrls: ['./auth-page.component.scss'],
     templateUrl: './auth-page.component.html',
@@ -35,7 +34,7 @@ import { TeamAuthState, UpdateTeamAuthForm } from '../../internal';
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class AuthPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

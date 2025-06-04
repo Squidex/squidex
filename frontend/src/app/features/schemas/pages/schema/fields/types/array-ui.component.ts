@@ -13,7 +13,6 @@ import { ArrayFieldPropertiesDto, FieldDto, TranslatePipe } from '@app/shared';
 const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['EmptyArray', 'Null'];
 
 @Component({
-    standalone: true,
     selector: 'sqx-array-ui',
     styleUrls: ['array-ui.component.scss'],
     templateUrl: 'array-ui.component.html',
@@ -21,7 +20,7 @@ const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['EmptyArray', 'Null'];
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ],
+    ]
 })
 export class ArrayUIComponent {
     @Input({ required: true })

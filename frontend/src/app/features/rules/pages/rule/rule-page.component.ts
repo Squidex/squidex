@@ -27,7 +27,6 @@ type Snapshot = {
 };
 
 @Component({
-    standalone: true,
     selector: 'sqx-rule-page',
     styleUrls: ['./rule-page.component.scss'],
     templateUrl: './rule-page.component.html',
@@ -52,7 +51,7 @@ type Snapshot = {
         TourStepDirective,
         TranslatePipe,
         TriggerDialogComponent,
-    ],
+    ]
 })
 export class RulePageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

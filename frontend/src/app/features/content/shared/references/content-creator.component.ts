@@ -12,7 +12,6 @@ import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, Fo
 import { ContentSectionComponent } from '../forms/content-section.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-content-creator',
     styleUrls: ['./content-creator.component.scss'],
     templateUrl: './content-creator.component.html',
@@ -31,7 +30,7 @@ import { ContentSectionComponent } from '../forms/content-section.component';
         TooltipDirective,
         TranslatePipe,
         forwardRef(() => ContentSectionComponent),
-    ],
+    ]
 })
 export class ContentCreatorComponent implements OnInit {
     @Output()

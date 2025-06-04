@@ -9,7 +9,6 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 import { ExternalLinkDirective, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-github-card',
     styleUrls: ['./github-card.component.scss'],
     templateUrl: './github-card.component.html',
@@ -17,7 +16,7 @@ import { ExternalLinkDirective, TranslatePipe } from '@app/shared';
     imports: [
         ExternalLinkDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class GithubCardComponent {
 }

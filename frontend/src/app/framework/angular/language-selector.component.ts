@@ -16,7 +16,6 @@ import { TooltipDirective } from './modals/tooltip.directive';
 export interface Language { iso2Code: string; englishName: string; isMasterLanguage?: boolean }
 
 @Component({
-    standalone: true,
     selector: 'sqx-language-selector',
     styleUrls: ['./language-selector.component.scss'],
     templateUrl: './language-selector.component.html',
@@ -26,7 +25,7 @@ export interface Language { iso2Code: string; englishName: string; isMasterLangu
         ModalDirective,
         ModalPlacementDirective,
         TooltipDirective,
-    ],
+    ]
 })
 export class LanguageSelectorComponent implements  OnInit {
     @Output()

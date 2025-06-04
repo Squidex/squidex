@@ -12,7 +12,6 @@ import { AssetFolderDto, AssetPathItem, DialogModel, ModalModel, Types } from '@
 import { AssetFolderDialogComponent } from './asset-folder-dialog.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-asset-folder',
     styleUrls: ['./asset-folder.component.scss'],
     templateUrl: './asset-folder.component.html',
@@ -25,7 +24,7 @@ import { AssetFolderDialogComponent } from './asset-folder-dialog.component';
         ModalPlacementDirective,
         TooltipDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class AssetFolderComponent {
     @Output()

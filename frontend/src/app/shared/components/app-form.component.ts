@@ -12,7 +12,6 @@ import { ApiUrlConfig, ControlErrorsComponent, FocusOnInitDirective, FormAlertCo
 import { AppsState, CreateAppDto, CreateAppForm, TemplateDto } from '@app/shared/internal';
 
 @Component({
-    standalone: true,
     selector: 'sqx-app-form',
     styleUrls: ['./app-form.component.scss'],
     templateUrl: './app-form.component.html',
@@ -30,7 +29,7 @@ import { AppsState, CreateAppDto, CreateAppForm, TemplateDto } from '@app/shared
         TooltipDirective,
         TransformInputDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class AppFormComponent {
     @Output()

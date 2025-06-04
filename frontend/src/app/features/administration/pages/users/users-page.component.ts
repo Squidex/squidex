@@ -14,7 +14,6 @@ import { UsersState } from '../../internal';
 import { UserComponent } from './user.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-users-page',
     styleUrls: ['./users-page.component.scss'],
     templateUrl: './users-page.component.html',
@@ -39,7 +38,7 @@ import { UserComponent } from './user.component';
         TourStepDirective,
         TranslatePipe,
         UserComponent,
-    ],
+    ]
 })
 export class UsersPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

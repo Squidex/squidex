@@ -11,7 +11,6 @@ import { Observable } from 'rxjs';
 import { AppDto, HistoryEventDto, HistoryListComponent, HistoryService, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-history-card',
     styleUrls: ['./history-card.component.scss'],
     templateUrl: './history-card.component.html',
@@ -20,7 +19,7 @@ import { AppDto, HistoryEventDto, HistoryListComponent, HistoryService, Translat
         AsyncPipe,
         HistoryListComponent,
         TranslatePipe,
-    ],
+    ]
 })
 export class HistoryCardComponent {
     @Input({ required: true })

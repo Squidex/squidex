@@ -11,14 +11,13 @@ import { TranslatePipe } from '@app/framework';
 import { AppLanguageDto, Query, SortMode, Types } from '@app/shared/internal';
 
 @Component({
-    standalone: true,
     selector: 'sqx-table-header',
     styleUrls: ['./table-header.component.scss'],
     templateUrl: './table-header.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TranslatePipe,
-    ],
+    ]
 })
 export class TableHeaderComponent {
     @Output()

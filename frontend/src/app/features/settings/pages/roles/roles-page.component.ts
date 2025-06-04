@@ -32,7 +32,6 @@ class PermissionsAutocomplete implements AutocompleteSource {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-roles-page',
     styleUrls: ['./roles-page.component.scss'],
     templateUrl: './roles-page.component.html',
@@ -52,7 +51,7 @@ class PermissionsAutocomplete implements AutocompleteSource {
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class RolesPageComponent implements OnInit {
     public allPermissions: AutocompleteSource = new PermissionsAutocomplete(this.appsState, this.rolesService);

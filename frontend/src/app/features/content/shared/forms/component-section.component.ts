@@ -11,7 +11,6 @@ import { AppLanguageDto, EditContentForm, FieldDto, FieldSection, FormHintCompon
 import { FieldEditorComponent } from './field-editor.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-component-section',
     styleUrls: ['./component-section.component.scss'],
     templateUrl: './component-section.component.html',
@@ -21,7 +20,7 @@ import { FieldEditorComponent } from './field-editor.component';
         FormHintComponent,
         MarkdownDirective,
         forwardRef(() => FieldEditorComponent),
-    ],
+    ]
 })
 export class ComponentSectionComponent {
     @Input({ required: true })

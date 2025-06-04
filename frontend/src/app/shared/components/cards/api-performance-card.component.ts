@@ -12,7 +12,6 @@ import { TranslatePipe } from '@app/framework';
 import { CallsUsageDto, ChartHelpers, ChartOptions } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-api-performance-card',
     styleUrls: ['./api-performance-card.component.scss'],
     templateUrl: './api-performance-card.component.html',
@@ -21,7 +20,7 @@ import { CallsUsageDto, ChartHelpers, ChartOptions } from '@app/shared';
         BaseChartDirective,
         FormsModule,
         TranslatePipe,
-    ],
+    ]
 })
 export class ApiPerformanceCardComponent {
     @Input({ required: true })

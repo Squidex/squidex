@@ -11,7 +11,6 @@ import { RouterLink } from '@angular/router';
 import { AppDto, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-schema-card',
     styleUrls: ['./schema-card.component.scss'],
     templateUrl: './schema-card.component.html',
@@ -19,7 +18,7 @@ import { AppDto, TranslatePipe } from '@app/shared';
     imports: [
         RouterLink,
         TranslatePipe,
-    ],
+    ]
 })
 export class SchemaCardComponent {
     @Input({ required: true })

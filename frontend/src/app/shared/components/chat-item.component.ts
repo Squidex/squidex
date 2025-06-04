@@ -31,7 +31,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-chat-item',
     styleUrls: ['./chat-item.component.scss'],
     templateUrl: './chat-item.component.html',
@@ -42,7 +41,7 @@ interface State {
         TranslatePipe,
         UserIdPicturePipe,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush,
+    changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class ChatItemComponent extends StatefulComponent<State> {
     @ViewChild('focusElement', { static: false })

@@ -21,7 +21,6 @@ export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 @Component({
-    standalone: true,
     selector: 'sqx-rich-editor',
     styleUrls: ['./rich-editor.component.scss'],
     templateUrl: './rich-editor.component.html',
@@ -36,7 +35,7 @@ export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
         ChatDialogComponent,
         ContentSelectorComponent,
         ModalDirective,
-    ],
+    ]
 })
 export class RichEditorComponent extends StatefulControlComponent<{}, EditorValue> implements AfterViewInit, OnDestroy {
     private readonly assetId = new BehaviorSubject<string | null>(null);

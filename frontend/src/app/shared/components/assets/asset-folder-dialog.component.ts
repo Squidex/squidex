@@ -12,7 +12,6 @@ import { ControlErrorsComponent, FocusOnInitDirective, FormAlertComponent, FormE
 import { AssetFolderDto, AssetsState, RenameAssetFolderForm } from '@app/shared/internal';
 
 @Component({
-    standalone: true,
     selector: 'sqx-asset-folder-dialog',
     styleUrls: ['./asset-folder-dialog.component.scss'],
     templateUrl: './asset-folder-dialog.component.html',
@@ -27,7 +26,7 @@ import { AssetFolderDto, AssetsState, RenameAssetFolderForm } from '@app/shared/
         ReactiveFormsModule,
         TooltipDirective,
         TranslatePipe,
-    ],
+    ]
 })
 export class AssetFolderDialogComponent implements OnInit {
     @Output()

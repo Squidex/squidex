@@ -10,6 +10,7 @@ import { Pipe, PipeTransform } from '@angular/core';
 @Pipe({
     name: 'sqxReverse',
     pure: true,
+    standalone: false
 })
 export class ReversePipe implements PipeTransform {
     public transform<T>(value: ReadonlyArray<T>) {

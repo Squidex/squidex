@@ -40,7 +40,6 @@ class LanguageSource implements AutocompleteSource {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-language-add-form',
     styleUrls: ['./language-add-form.component.scss'],
     templateUrl: './language-add-form.component.html',
@@ -51,7 +50,7 @@ class LanguageSource implements AutocompleteSource {
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ],
+    ]
 })
 export class LanguageAddFormComponent {
     @Input()
