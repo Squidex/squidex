@@ -30,7 +30,7 @@ import { ContentSectionComponent } from '../forms/content-section.component';
         TooltipDirective,
         TranslatePipe,
         forwardRef(() => ContentSectionComponent),
-    ]
+    ],
 })
 export class ContentCreatorComponent implements OnInit {
     @Output()

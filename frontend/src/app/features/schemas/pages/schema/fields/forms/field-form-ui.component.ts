@@ -45,7 +45,7 @@ import { TagsUIComponent } from '../types/tags-ui.component';
         StringUIComponent,
         TagsUIComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class FieldFormUIComponent {
     @Input({ required: true })

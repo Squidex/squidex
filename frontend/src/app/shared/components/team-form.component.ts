@@ -29,7 +29,7 @@ import { ApiUrlConfig, CreateTeamForm, TeamsState } from '@app/shared/internal';
         TooltipDirective,
         TransformInputDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class TeamFormComponent {
     @Output()

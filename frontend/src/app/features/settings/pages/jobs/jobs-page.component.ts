@@ -31,7 +31,7 @@ import { JobComponent } from './job.component';
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class JobsPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

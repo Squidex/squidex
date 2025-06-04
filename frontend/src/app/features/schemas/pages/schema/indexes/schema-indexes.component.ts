@@ -26,7 +26,7 @@ import { IndexComponent } from './index.component';
         ModalDirective,
         ListViewComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class SchemaIndexesComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

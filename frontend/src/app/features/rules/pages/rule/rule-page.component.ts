@@ -51,7 +51,7 @@ type Snapshot = {
         TourStepDirective,
         TranslatePipe,
         TriggerDialogComponent,
-    ]
+    ],
 })
 export class RulePageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

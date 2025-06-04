@@ -23,7 +23,7 @@ import { AssetFolderDropdownComponent, FieldDto, FormHintComponent, SchemaTagSou
         ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class StringUIComponent  {
     private readonly subscriptions = new Subscriptions();

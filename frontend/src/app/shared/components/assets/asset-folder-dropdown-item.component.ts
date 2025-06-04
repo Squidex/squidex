@@ -19,7 +19,7 @@ import { AssetFolderDropdowNode } from './asset-folder-dropdown.state';
         LoaderComponent,
         StopClickDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class AssetFolderDropdownItemComponent {
     @Input({ required: true })

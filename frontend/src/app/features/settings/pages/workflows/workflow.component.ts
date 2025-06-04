@@ -26,7 +26,7 @@ import { WorkflowStepComponent } from './workflow-step.component';
         TranslatePipe,
         WorkflowDiagramComponent,
         WorkflowStepComponent,
-    ]
+    ],
 })
 export class WorkflowComponent {
     public readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };

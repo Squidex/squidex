@@ -21,7 +21,7 @@ type CursorState = { user: Profile; cursor: { x: number; y: number } };
     imports: [
         AsyncPipe,
         StringColorPipe,
-    ]
+    ],
 })
 export class CursorsComponent  {
     public otherCursor =

@@ -22,7 +22,7 @@ import { ApiUrlConfig, CodeEditorComponent, ConfirmClickDirective, Duration, Ext
         FromNowPipe,
         StatusIconComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class JobComponent {
     @Input({ required: true })

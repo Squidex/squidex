@@ -19,7 +19,7 @@ import { CodeEditorComponent, FlowExecutionStepAttemptDto, TranslatePipe, TypedS
         CodeEditorComponent,
         FormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class StateAttemptComponent {
     @Input({ required: true })

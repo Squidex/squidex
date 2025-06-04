@@ -23,7 +23,7 @@ import { AppLanguageDto, ConfirmClickDirective, ControlErrorsComponent, CreateIn
         ModalDialogComponent,
         ReactiveFormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class IndexFormComponent {
     @Output()

@@ -18,7 +18,7 @@ import { FeatureDto, HelpMarkdownPipe, ModalDialogComponent, TooltipDirective, T
         ModalDialogComponent,
         TooltipDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class NewsDialogComponent {
     @Output()

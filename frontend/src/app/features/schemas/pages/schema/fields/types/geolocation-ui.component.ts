@@ -17,7 +17,7 @@ import { FieldDto, GeolocationFieldPropertiesDto, TranslatePipe } from '@app/sha
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class GeolocationUIComponent {
     @Input({ required: true })

@@ -23,7 +23,7 @@ import { HistoryListComponent } from './history-list.component';
         AsyncPipe,
         HistoryListComponent,
         LayoutComponent,
-    ]
+    ],
 })
 export class HistoryComponent {
     private readonly channel = this.calculateChannel();

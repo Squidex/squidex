@@ -16,7 +16,6 @@ export const SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 @Component({
-    standalone: true,
     selector: 'sqx-code-editor',
     styleUrls: ['./code-editor.component.scss'],
     templateUrl: './code-editor.component.html',

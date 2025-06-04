@@ -34,7 +34,7 @@ import { PlanComponent } from './plan.component';
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class PlansPageComponent implements OnInit {
     private overridePlanId?: string;

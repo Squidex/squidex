@@ -25,7 +25,7 @@ import { AssetsState, RenameAssetTagForm } from '@app/shared/internal';
         ReactiveFormsModule,
         TooltipDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class AssetTagDialogComponent implements OnInit {
     @Output()

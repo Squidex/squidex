@@ -23,7 +23,7 @@ import { AppsState, AssetsState, AssetUploaderState, ModalModel, Types, Upload }
         ModalPlacementDirective,
         ProgressBarComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class AssetUploaderComponent {
     public modalMenu = new ModalModel();

@@ -29,7 +29,7 @@ interface State {
         ModalDirective,
         ModalPlacementDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class PreviewButtonComponent extends StatefulComponent<State> implements OnChanges {
     @Input()

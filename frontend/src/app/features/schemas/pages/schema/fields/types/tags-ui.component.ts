@@ -20,7 +20,7 @@ import { FieldDto, FormHintComponent, TagEditorComponent, TagsFieldEditorValues,
         ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class TagsUIComponent {
     public readonly editors = TagsFieldEditorValues;

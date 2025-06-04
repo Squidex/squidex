@@ -35,7 +35,7 @@ import { AppDto, AppsState, AvatarComponent, ConfirmClickDirective, ControlError
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class MorePageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

@@ -37,7 +37,7 @@ interface State {
         TranslatePipe,
         UserNameRefPipe,
         UserPictureRefPipe,
-    ]
+    ],
 })
 export class CommentComponent extends StatefulComponent<State> {
     @Input({ transform: booleanAttribute })

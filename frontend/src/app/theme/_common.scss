@@ -1,3 +1,4 @@
+@use 'sass:color';
 @import 'mixins';
 @import 'vars';
 
@@ -102,7 +103,7 @@ hr {
         &::before {
             @include force-height(100%);
             background: $color-white;
-            border: 2px dashed darken($color-border, 5%);
+            border: 2px dashed color.adjust($color-border, $lightness: -5%);
             border-radius: 2px;
             display: block;
             content: '';
@@ -184,14 +185,14 @@ hr {
 
 .code-copy {
     @include absolute(0, 0, auto, auto);
-    background: darken($color-border-dark, 30%);
+    background: color.adjust($color-border-dark, $lightness: -30%);
     border: 0;
     color: $color-white;
     padding-left: .375rem;
     padding-right: .375rem;
 
     &:focus {
-        background: darken($color-border-dark, 40%);
+        background: color.adjust($color-border-dark, $lightness: -40%);
     }
 }
 
@@ -308,7 +309,7 @@ hr {
             align-items: center;
             border: 2px dashed $color-border;
             border-radius: $border-radius;
-            color: darken($color-border, 30%);
+            color: color.adjust($color-border, $lightness: -30%);
             display: none;
             font-size: 1.2rem;
             font-weight: normal;
@@ -321,8 +322,8 @@ hr {
         }
 
         &.drag {
-            border-color: darken($color-border, 10%);
-            color: darken($color-border, 40%);
+            border-color: color.adjust($color-border, $lightness: -10%);
+            color: color.adjust($color-border, $lightness: -40%);
             cursor: copy;
             text-decoration: none;
         }

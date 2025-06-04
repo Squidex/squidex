@@ -26,7 +26,7 @@ import { ReferenceItemComponent } from '../../../shared/references/reference-ite
         PagerComponent,
         ReferenceItemComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class ContentReferencesComponent implements OnInit, OnDestroy {
     @Input({ required: true })

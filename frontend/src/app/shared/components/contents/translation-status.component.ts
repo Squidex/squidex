@@ -9,7 +9,6 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { AppLanguageDto, contentTranslationStatus, SchemaDto } from '@app/shared/internal';
 
 @Component({
-    standalone: true,
     selector: 'sqx-translation-status',
     styleUrls: ['./translation-status.component.scss'],
     templateUrl: './translation-status.component.html',

@@ -24,7 +24,7 @@ const OPTION_IMMEDIATELY = 'Immediately';
         ModalDirective,
         TooltipDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class DueTimeSelectorComponent {
     private dueTimeResult?: Subject<DateTime | undefined>;

@@ -34,7 +34,7 @@ import { ScriptNamePipe } from '@app/shared/components/pipes';
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class AssetScriptsPageComponent implements OnInit {
     public assetScript = 'query';

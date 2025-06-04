@@ -8,7 +8,6 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
 
 @Component({
-    standalone: true,
     selector: 'sqx-random-dog-card',
     styleUrls: ['./random-dog-card.component.scss'],
     templateUrl: './random-dog-card.component.html',

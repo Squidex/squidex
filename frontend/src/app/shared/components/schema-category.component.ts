@@ -30,7 +30,7 @@ const ITEM_HEIGHT = 2.5;
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class SchemaCategoryComponent {
     @Output()

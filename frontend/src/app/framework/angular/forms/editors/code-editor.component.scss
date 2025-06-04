@@ -1,3 +1,4 @@
+@use 'sass:color';
 @import 'mixins';
 @import 'vars';
 
@@ -33,7 +34,7 @@
     }
 
     .ace_gutter-active-line {
-        background: darken($color-border, 5%) !important;
+        background: color.adjust($color-border, $lightness: -5%) !important;
     }
 
     .ace_gutter {

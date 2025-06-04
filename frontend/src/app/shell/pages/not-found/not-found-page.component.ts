@@ -16,7 +16,7 @@ import { TitleComponent, TranslatePipe } from '@app/shared';
     imports: [
         TitleComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class NotFoundPageComponent {
     constructor(

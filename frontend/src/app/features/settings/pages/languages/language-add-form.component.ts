@@ -50,7 +50,7 @@ class LanguageSource implements AutocompleteSource {
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class LanguageAddFormComponent {
     @Input()

@@ -12,7 +12,6 @@ import { formatHistoryMessage, HistoryEventDto, UsersProviderService } from '@ap
 @Pipe({
     name: 'sqxHistoryMessage',
     pure: false,
-    standalone: true,
 })
 export class HistoryMessagePipe implements OnDestroy, PipeTransform {
     private subscription?: Subscription;

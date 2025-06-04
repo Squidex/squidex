@@ -17,7 +17,7 @@ import { TourHintDirective } from './tour-hint.directive';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TourHintDirective,
-    ]
+    ],
 })
 export class NotifoComponent implements AfterViewInit, OnDestroy {
     private readonly notifoApiUrl: string = inject(UIOptions).value.notifoApi;

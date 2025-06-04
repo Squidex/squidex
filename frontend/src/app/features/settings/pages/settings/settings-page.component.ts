@@ -32,7 +32,7 @@ import { AppSettingsDto, AppsState, ConfirmClickDirective, ControlErrorsComponen
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class SettingsPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

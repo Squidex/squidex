@@ -31,7 +31,7 @@ import { LanguageComponent } from './language.component';
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class LanguagesPageComponent implements OnInit {
     constructor(

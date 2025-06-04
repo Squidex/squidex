@@ -12,7 +12,6 @@ import { Directive, EventEmitter, HostListener, Input, numberAttribute, Output, 
 
 @Directive({
     selector: '[sqxLongHover]',
-    standalone: true,
 })
 export class LongHoverDirective {
     private timerOut: Function | null = null;

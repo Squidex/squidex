@@ -33,7 +33,7 @@ import { ReferenceItemComponent } from '../../shared/references/reference-item.c
         TitleComponent,
         TooltipDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class ReferencesPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

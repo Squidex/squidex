@@ -33,7 +33,7 @@ import { ContentPageComponent } from './content-page.component';
         ModalPlacementDirective,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class ContentHistoryPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

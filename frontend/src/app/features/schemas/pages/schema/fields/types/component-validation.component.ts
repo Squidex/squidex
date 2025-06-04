@@ -20,7 +20,7 @@ import { FieldDto, ReferencesFieldPropertiesDto, SchemaTagSource, TagEditorCompo
         ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class ComponentValidationComponent {
     @Input({ required: true })

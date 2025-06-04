@@ -20,7 +20,7 @@ import { AppLanguageDto, FieldForm, LanguageSelectorComponent, TourHintDirective
         TourHintDirective,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class FieldLanguagesComponent {
     @Output()

@@ -21,7 +21,7 @@ import { LeftMenuComponent } from './left-menu.component';
         LeftMenuComponent,
         RouterOutlet,
         TitleComponent,
-    ]
+    ],
 })
 export class TeamAreaComponent {
     public selectedTeam = this.teamsState.selectedTeam.pipe(defined());

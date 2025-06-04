@@ -23,7 +23,7 @@ import { AddClientForm, ClientsState, ControlErrorsComponent, FormHintComponent,
         ReactiveFormsModule,
         TransformInputDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class ClientAddFormComponent {
     public addClientForm = new AddClientForm();

@@ -1,3 +1,4 @@
+@use 'sass:color';
 @import 'mixins';
 @import 'vars';
 
@@ -23,7 +24,7 @@ $toggle-button-size: $toggle-height - .25rem;
 
     &-container {
         @include box-shadow-outer;
-        background: lighten($color-border, 6%);
+        background: color.adjust($color-border, $lightness: 6%);
         border: 0;
         border-radius: $toggle-height * .5;
         height: $toggle-height;

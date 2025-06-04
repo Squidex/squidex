@@ -35,7 +35,7 @@ import { UsageTriggerComponent } from '../../shared/triggers/usage-trigger.compo
         SchemaChangedTriggerComponent,
         TranslatePipe,
         UsageTriggerComponent,
-    ]
+    ],
 })
 export class TriggerDialogComponent implements OnInit {
     @Input({ required: true })

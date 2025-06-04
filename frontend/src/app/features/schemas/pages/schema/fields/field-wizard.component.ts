@@ -34,7 +34,7 @@ type SaveNavigationMode = 'Close' | 'Add' | 'Edit';
         ReactiveFormsModule,
         TooltipDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class FieldWizardComponent implements OnInit {
     @ViewChild('nameInput', { static: false })

@@ -38,7 +38,7 @@ import { ContributorComponent } from './contributor.component';
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class ContributorsPageComponent implements OnInit {
     constructor(

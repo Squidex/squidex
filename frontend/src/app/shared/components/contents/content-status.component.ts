@@ -19,7 +19,7 @@ import { ScheduleJobDto } from '@app/shared/internal';
         FullDateTimePipe,
         TooltipDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class ContentStatusComponent {
     @Input({ required: true })

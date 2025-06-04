@@ -48,7 +48,7 @@ const SIMPLE_PROPERTIES: ReadonlyArray<Property> = [{
         ReactiveFormsModule,
         SlicePipe,
         TranslatePipe,
-    ]
+    ],
 })
 export class RoleComponent {
     @Input({ required: true })

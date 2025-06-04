@@ -22,7 +22,7 @@ import { AddRoleForm, ControlErrorsComponent, FormHintComponent, RolesState, Tra
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class RoleAddFormComponent {
     public addRoleForm = new AddRoleForm();

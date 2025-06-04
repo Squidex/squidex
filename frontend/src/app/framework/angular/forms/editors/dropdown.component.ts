@@ -56,7 +56,7 @@ interface State {
         ScrollActiveDirective,
         TemplateWrapperDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class DropdownComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterContentInit, OnInit {
     private readonly subscriptions = new Subscriptions();

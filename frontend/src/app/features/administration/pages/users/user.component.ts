@@ -25,7 +25,7 @@ import { UserDto, UsersState } from '../../internal';
         StopClickDirective,
         TooltipDirective,
         UserDtoPicture,
-    ]
+    ],
 })
 export class UserComponent {
     @Input('sqxUser')

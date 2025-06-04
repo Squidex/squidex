@@ -40,7 +40,7 @@ import { AssetDialogComponent, AssetDto, AssetFolderDialogComponent, AssetPathCo
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class AssetsPageComponent implements OnInit {
     public editAsset?: AssetDto;

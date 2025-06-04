@@ -19,7 +19,7 @@ import { AppDto, CallsUsageDto, ChartHelpers, ChartOptions, UsagesService } from
     imports: [
         BaseChartDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class ApiCallsCardComponent {
     @Input()

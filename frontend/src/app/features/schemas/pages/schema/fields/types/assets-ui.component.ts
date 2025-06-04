@@ -20,7 +20,7 @@ import { AssetFolderDropdownComponent, AssetsFieldPropertiesDto, FieldDto, FormH
         MarkdownDirective,
         ReactiveFormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class AssetsUIComponent {
     @Input({ required: true })

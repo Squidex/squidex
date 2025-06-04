@@ -24,7 +24,7 @@ type Mode = 'Content' | 'Data' | 'FlatData';
         FormErrorComponent,
         FormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class ContentInspectionComponent implements OnDestroy {
     private languageChanges$ = new BehaviorSubject<AppLanguageDto | null>(null);

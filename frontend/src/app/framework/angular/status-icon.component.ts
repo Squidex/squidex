@@ -16,7 +16,7 @@ import { TooltipDirective } from './modals/tooltip.directive';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TooltipDirective,
-    ]
+    ],
 })
 export class StatusIconComponent {
     @Input({ required: true })

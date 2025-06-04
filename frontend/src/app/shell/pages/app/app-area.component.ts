@@ -21,7 +21,7 @@ import { LeftMenuComponent } from './left-menu.component';
         LeftMenuComponent,
         RouterOutlet,
         TitleComponent,
-    ]
+    ],
 })
 export class AppAreaComponent {
     public selectedApp = this.appsState.selectedApp.pipe(defined());

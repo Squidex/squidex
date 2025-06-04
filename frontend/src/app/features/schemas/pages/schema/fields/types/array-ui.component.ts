@@ -20,7 +20,7 @@ const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['EmptyArray', 'Null'];
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class ArrayUIComponent {
     @Input({ required: true })

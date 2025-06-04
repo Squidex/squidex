@@ -23,7 +23,7 @@ import { AccessTokenDto, ApiUrlConfig, AppsState, ClientDto, ClientsService, Cli
         ModalDialogComponent,
         TooltipDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class ClientConnectFormComponent implements OnInit {
     @Output()

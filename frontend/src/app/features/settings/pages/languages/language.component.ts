@@ -24,7 +24,7 @@ import { AppLanguageDto, ConfirmClickDirective, EditLanguageForm, FormHintCompon
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class LanguageComponent {
     @Input({ required: true })

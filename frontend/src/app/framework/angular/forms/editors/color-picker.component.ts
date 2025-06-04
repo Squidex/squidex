@@ -8,7 +8,7 @@
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { ColorPickerModule } from 'ngx-color-picker';
+import { ColorPickerDirective } from 'ngx-color-picker';
 import { MathHelper, ModalModel, StatefulControlComponent } from '@app/framework/internal';
 import { ModalPlacementDirective } from '../../modals/modal-placement.directive';
 import { ModalDirective } from '../../modals/modal.directive';
@@ -35,11 +35,11 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        ColorPickerModule,
+        ColorPickerDirective,
         FormsModule,
         ModalDirective,
         ModalPlacementDirective,
-    ]
+    ],
 })
 export class ColorPickerComponent extends StatefulControlComponent<State, string> implements FocusComponent {
     private wasOpen = false;

@@ -19,7 +19,7 @@ import { TableField, TranslatePipe } from '@app/shared';
         CdkDrag,
         CdkDropList,
         TranslatePipe,
-    ]
+    ],
 })
 export class CustomViewEditorComponent {
     @Output()

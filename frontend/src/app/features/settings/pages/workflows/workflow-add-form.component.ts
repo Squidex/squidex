@@ -22,7 +22,7 @@ import { AddWorkflowForm, ControlErrorsComponent, FormHintComponent, TranslatePi
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class WorkflowAddFormComponent {
     public addWorkflowForm = new AddWorkflowForm();

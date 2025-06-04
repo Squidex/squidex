@@ -9,7 +9,6 @@
 import { AfterViewInit, Directive, DoCheck, ElementRef, HostBinding, HostListener, Input, numberAttribute, Renderer2 } from '@angular/core';
 
 @Directive({
-    standalone: true,
     selector: 'textarea[sqxAutosize]',
 })
 export class AutosizeDirective implements AfterViewInit, DoCheck {

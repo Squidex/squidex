@@ -31,7 +31,7 @@ import { FilterOperatorPipe } from './query.pipes';
         ReferenceInputComponent,
         TranslatePipe,
         UserDtoPicture,
-    ]
+    ],
 })
 export class FilterComparisonComponent {
     @Output()

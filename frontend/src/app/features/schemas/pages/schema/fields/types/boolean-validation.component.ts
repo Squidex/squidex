@@ -22,7 +22,7 @@ import { AppLanguageDto, BooleanFieldPropertiesDto, FieldDto, FormHintComponent,
         LocalizedInputComponent,
         ReactiveFormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class BooleanValidationComponent {
     @Input({ required: true })

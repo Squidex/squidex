@@ -33,7 +33,7 @@ const NO_EMIT = { emitEvent: false };
         FormsModule,
         RadioGroupComponent,
         ReactiveFormsModule,
-    ]
+    ],
 })
 export class ReferencesRadioButtonsComponent extends StatefulControlComponent<State, ReadonlyArray<string> | null | undefined> {
     private readonly subscriptions = new Subscriptions();

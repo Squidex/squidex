@@ -21,7 +21,7 @@ import { FieldDto, FormHintComponent, RichTextFieldPropertiesDto, SchemaTagSourc
         ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class RichTextUIComponent  {
     @Input({ required: true })

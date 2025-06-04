@@ -18,7 +18,7 @@ import { AppDto, TranslatePipe } from '@app/shared';
     imports: [
         RouterLink,
         TranslatePipe,
-    ]
+    ],
 })
 export class SchemaCardComponent {
     @Input({ required: true })

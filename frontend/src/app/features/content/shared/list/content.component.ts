@@ -34,7 +34,7 @@ import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirec
         StopClickDirective,
         TabRouterlinkDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class ContentComponent {
     @Output()

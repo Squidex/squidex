@@ -24,7 +24,7 @@ interface State {
         RouterLink,
         StopClickDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class AppsCardComponent extends StatefulComponent<State> implements OnInit {
     @Input({ required: true })

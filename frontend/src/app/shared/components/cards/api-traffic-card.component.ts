@@ -21,7 +21,7 @@ import { CallsUsageDto, ChartHelpers, ChartOptions, TypedSimpleChanges } from '@
         FileSizePipe,
         FormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class ApiTrafficCardComponent {
     @Input({ required: true })

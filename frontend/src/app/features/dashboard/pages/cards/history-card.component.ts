@@ -19,7 +19,7 @@ import { AppDto, HistoryEventDto, HistoryListComponent, HistoryService, Translat
         AsyncPipe,
         HistoryListComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class HistoryCardComponent {
     @Input({ required: true })

@@ -18,7 +18,7 @@ import { ArrayFieldPropertiesDto, FieldDto, TagEditorComponent, TranslatePipe } 
         ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class ArrayValidationComponent {
     @Input({ required: true })

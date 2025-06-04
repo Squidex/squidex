@@ -31,7 +31,7 @@ import { ClientComponent } from './client.component';
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class ClientsPageComponent implements OnInit {
     constructor(

@@ -32,7 +32,7 @@ import { AuthService, ControlErrorsComponent, DialogService, ISODatePipe, JobsSe
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class RestorePageComponent {
     public restoreForm = new RestoreForm();

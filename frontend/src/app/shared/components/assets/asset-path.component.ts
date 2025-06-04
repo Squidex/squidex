@@ -17,7 +17,7 @@ import { AssetPathItem } from '@app/shared/internal';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TranslatePipe,
-    ]
+    ],
 })
 export class AssetPathComponent {
     @Output()

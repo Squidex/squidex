@@ -36,7 +36,7 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TranslatePipe,
-    ]
+    ],
 })
 export class StarsComponent extends StatefulControlComponent<State, number | null> {
     private maximumStarsValue = 5;

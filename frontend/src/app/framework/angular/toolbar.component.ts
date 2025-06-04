@@ -18,7 +18,7 @@ import { TranslatePipe } from './pipes/translate.pipe';
     imports: [
         AsyncPipe,
         TranslatePipe,
-    ]
+    ],
 })
 export class ToolbarComponent {
     constructor(

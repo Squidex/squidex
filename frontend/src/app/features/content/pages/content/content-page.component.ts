@@ -59,7 +59,7 @@ type SaveNavigationMode = 'Close' | 'Add' | 'Edit';
         TourStepDirective,
         TranslatePipe,
         WatchingUsersComponent,
-    ]
+    ],
 })
 export class ContentPageComponent implements CanComponentDeactivate, OnInit {
     private readonly subscriptions = new Subscriptions();

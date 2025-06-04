@@ -30,7 +30,7 @@ import { SortableFieldListComponent } from './sortable-field-list.component';
         TourStepDirective,
         TranslatePipe,
         forwardRef(() => SortableFieldListComponent),
-    ]
+    ],
 })
 export class FieldComponent {
     @Input({ required: true })

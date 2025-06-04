@@ -24,7 +24,7 @@ import { ComponentSectionComponent } from './component-section.component';
         ModalDirective,
         ModalPlacementDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class ComponentComponent {
     private readonly subscriptions = new Subscriptions();

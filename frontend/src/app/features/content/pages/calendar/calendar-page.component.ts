@@ -34,7 +34,7 @@ type ViewMode = 'day' | 'week' | 'month';
         TranslatePipe,
         UserNameRefPipe,
         UserPictureRefPipe,
-    ]
+    ],
 })
 export class CalendarPageComponent implements AfterViewInit, OnDestroy, OnInit {
     private calendar: any;

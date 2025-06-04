@@ -10,7 +10,6 @@ import { DialogService, Types } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxCopy]',
-    standalone: true,
 })
 export class CopyDirective {
     @Input('sqxCopy')

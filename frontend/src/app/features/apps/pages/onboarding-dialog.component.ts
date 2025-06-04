@@ -23,7 +23,7 @@ import { fadeAnimation, MarkdownDirective, ModalDialogComponent, slideAnimation,
         ModalDialogComponent,
         ReactiveFormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class OnboardingDialogComponent {
 

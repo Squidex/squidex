@@ -29,7 +29,7 @@ import { RuleEventComponent } from './rule-event.component';
         TitleComponent,
         TooltipDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class RuleEventsPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

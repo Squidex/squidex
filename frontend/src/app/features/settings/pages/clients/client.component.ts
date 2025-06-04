@@ -27,7 +27,7 @@ import { ClientConnectFormComponent } from './client-connect-form.component';
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class ClientComponent {
     @Input({ required: true })

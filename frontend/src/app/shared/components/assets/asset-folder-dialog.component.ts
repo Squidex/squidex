@@ -26,7 +26,7 @@ import { AssetFolderDto, AssetsState, RenameAssetFolderForm } from '@app/shared/
         ReactiveFormsModule,
         TooltipDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class AssetFolderDialogComponent implements OnInit {
     @Output()

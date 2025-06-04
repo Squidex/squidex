@@ -28,7 +28,7 @@ import { ApiUrlConfig, AppsState, CodeEditorComponent, ControlErrorsComponent, C
         TooltipDirective,
         TransformInputDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class SchemaFormComponent implements OnInit {
     @Output()

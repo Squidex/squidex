@@ -19,7 +19,7 @@ import { TeamDto, TranslatePipe } from '@app/shared';
         RouterLink,
         RouterLinkActive,
         TranslatePipe,
-    ]
+    ],
 })
 export class SettingsMenuComponent {
     @Input({ required: true })

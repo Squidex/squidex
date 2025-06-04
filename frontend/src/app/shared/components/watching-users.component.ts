@@ -22,7 +22,7 @@ import { UserPicturePipe } from './pipes';
         StringColorPipe,
         TooltipDirective,
         UserPicturePipe,
-    ]
+    ],
 })
 export class WatchingUsersComponent {
     constructor(

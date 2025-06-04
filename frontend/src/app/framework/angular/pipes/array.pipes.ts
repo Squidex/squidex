@@ -10,7 +10,6 @@ import { Pipe, PipeTransform } from '@angular/core';
 @Pipe({
     name: 'sqxReverse',
     pure: true,
-    standalone: false
 })
 export class ReversePipe implements PipeTransform {
     public transform<T>(value: ReadonlyArray<T>) {
@@ -21,7 +20,6 @@ export class ReversePipe implements PipeTransform {
 @Pipe({
     name: 'sqxKeys',
     pure: true,
-    standalone: true,
 })
 export class KeysPipe implements PipeTransform {
     public transform(value: any): any {
@@ -32,7 +30,6 @@ export class KeysPipe implements PipeTransform {
 @Pipe({
     name: 'sqxEntries',
     pure: true,
-    standalone: true,
 })
 export class EntriesPipe implements PipeTransform {
     public transform<T>(value: Record<string, T>, sort?: string): ReadonlyArray<{ key: string; value: T }> {

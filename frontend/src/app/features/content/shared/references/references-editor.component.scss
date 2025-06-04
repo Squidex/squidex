@@ -1,3 +1,4 @@
+@use 'sass:color';
 @import 'mixins';
 @import 'vars';
 
@@ -31,7 +32,7 @@
 }
 
 .invalid {
-    color: darken($color-border, 30%);
+    color: color.adjust($color-border, $lightness: -30%);
     font-size: 1.2rem;
     font-weight: normal;
     padding: 2rem;

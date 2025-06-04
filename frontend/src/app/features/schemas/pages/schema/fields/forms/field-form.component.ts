@@ -24,7 +24,7 @@ import { FieldFormValidationComponent } from './field-form-validation.component'
         FieldFormValidationComponent,
         JsonMoreComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class FieldFormComponent implements AfterViewInit {
     @Input({ transform: booleanAttribute })

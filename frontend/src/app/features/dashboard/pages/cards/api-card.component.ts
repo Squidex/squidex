@@ -16,7 +16,7 @@ import { AppDto, ExternalLinkDirective, TranslatePipe } from '@app/shared';
     imports: [
         ExternalLinkDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class ApiCardComponent {
     @Input({ required: true })

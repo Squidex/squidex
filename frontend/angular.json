@@ -95,7 +95,10 @@
             "stylePreprocessorOptions": {
               "includePaths": [
                 "./src/app/theme"
-              ]
+              ],
+              "sass": {
+                "silenceDeprecations": ["color-functions", "global-builtin", "import"]
+              }
             },
             "scripts": []
           },
@@ -175,7 +178,10 @@
             "stylePreprocessorOptions": {
               "includePaths": [
                 "./src/app/theme"
-              ]
+              ],
+              "sass": {
+                "silenceDeprecations": ["color-functions", "global-builtin", "import"]
+              }
             },
             "scripts": []
           }

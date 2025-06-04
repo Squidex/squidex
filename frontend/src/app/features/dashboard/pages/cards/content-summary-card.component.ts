@@ -20,7 +20,7 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TranslatePipe,
-    ]
+    ],
 })
 export class ContentSummaryCardComponent extends StatefulComponent<State> implements OnInit {
     @Input({ required: true })

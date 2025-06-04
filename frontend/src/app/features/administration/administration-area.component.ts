@@ -22,7 +22,7 @@ import { LayoutContainerDirective, TitleComponent, TranslatePipe, UIState } from
         RouterOutlet,
         TitleComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class AdministrationAreaComponent {
     constructor(

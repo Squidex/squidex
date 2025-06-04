@@ -20,7 +20,7 @@ import { RuleElementComponent } from './rule-element.component';
         NgTemplateOutlet,
         RuleElementComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class HistoryStepComponent {
     @Input({ transform: booleanAttribute })

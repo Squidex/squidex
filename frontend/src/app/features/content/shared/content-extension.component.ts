@@ -16,7 +16,7 @@ import { ApiUrlConfig, AppsState, AuthService, computeEditorUrl, ContentDto, Saf
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         SafeResourceUrlPipe,
-    ]
+    ],
 })
 export class ContentExtensionComponent {
     private readonly context: any;

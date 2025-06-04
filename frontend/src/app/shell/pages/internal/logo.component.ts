@@ -15,7 +15,7 @@ import { LoaderComponent } from '@app/shared';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         LoaderComponent,
-    ]
+    ],
 })
 export class LogoComponent {
     @Input({ transform: booleanAttribute })

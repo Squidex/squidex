@@ -17,7 +17,7 @@ import { TagEditorComponent, TranslatePipe, WorkflowTransitionValues, WorkflowTr
         FormsModule,
         TagEditorComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class WorkflowTransitionComponent {
     public readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };

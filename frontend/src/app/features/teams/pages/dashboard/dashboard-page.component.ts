@@ -38,7 +38,7 @@ import { AppsCardComponent } from './cards/apps-card.component';
         SupportCardComponent,
         TitleComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class DashboardPageComponent implements AfterViewInit, OnInit {
     private readonly subscriptions = new Subscriptions();

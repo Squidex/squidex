@@ -24,7 +24,7 @@ import { FieldLanguagesComponent } from './field-languages.component';
         FieldLanguagesComponent,
         FocusMarkerComponent,
         TooltipDirective,
-    ]
+    ],
 })
 export class ContentFieldComponent {
     @Output()

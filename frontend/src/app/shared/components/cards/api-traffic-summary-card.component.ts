@@ -18,7 +18,7 @@ import { CallsUsageDto, FileSizePipe } from '@app/shared/internal';
     imports: [
         FileSizePipe,
         TranslatePipe,
-    ]
+    ],
 })
 export class ApiTrafficSummaryCardComponent {
     @Input({ required: true })

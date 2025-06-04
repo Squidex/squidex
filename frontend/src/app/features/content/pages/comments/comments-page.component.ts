@@ -19,7 +19,7 @@ import { CommentsComponent, LayoutComponent } from '@app/shared';
         AsyncPipe,
         CommentsComponent,
         LayoutComponent,
-    ]
+    ],
 })
 export class CommentsPageComponent {
     public commentsId = this.route.parent!.params.pipe(map(x => x['contentId']));

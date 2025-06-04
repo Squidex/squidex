@@ -84,7 +84,7 @@ const RANGE_LIMIT = 60;
         ScrollActiveDirective,
         StopClickDirective,
         TemplateWrapperDirective,
-    ]
+    ],
 })
 export class AutocompleteComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements OnInit, OnDestroy {
     private readonly subscriptions = new Subscriptions();

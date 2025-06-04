@@ -18,7 +18,7 @@ import { HistoryStepComponent } from '../../shared/history-step.component';
     imports: [
         HistoryStepComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class RuleTransitionComponent {
     @Input({ transform: booleanAttribute })

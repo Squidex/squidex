@@ -14,7 +14,7 @@ import { RouterOutlet } from '@angular/router';
     templateUrl: './teams-area.component.html',
     imports: [
         RouterOutlet,
-    ]
+    ],
 })
 export class TeamsAreaComponent {
 }

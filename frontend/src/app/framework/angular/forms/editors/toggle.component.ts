@@ -19,7 +19,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-toggle',
     styleUrls: ['./toggle.component.scss'],
     templateUrl: './toggle.component.html',

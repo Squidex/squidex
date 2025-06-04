@@ -46,7 +46,7 @@ interface State {
         ModalPlacementDirective,
         TooltipDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class DialogRendererComponent extends StatefulComponent<State> implements OnInit {
     private readonly subscriptions = new Subscriptions();

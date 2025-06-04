@@ -23,7 +23,7 @@ import { RuleIconComponent } from './rule-icon.component';
         StopClickDirective,
         TooltipDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class RuleElementComponent {
     @Input({ required: true })

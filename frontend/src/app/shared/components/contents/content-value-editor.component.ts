@@ -23,7 +23,7 @@ import { FieldDto, MathHelper } from '@app/shared/internal';
         StarsComponent,
         ToggleComponent,
         TransformInputDirective,
-    ]
+    ],
 })
 export class ContentValueEditorComponent {
     @Input({ required: true })

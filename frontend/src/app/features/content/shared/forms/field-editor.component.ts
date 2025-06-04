@@ -59,7 +59,7 @@ import { StockPhotoEditorComponent } from './stock-photo-editor.component';
         ToggleComponent,
         TooltipDirective,
         TransformInputDirective,
-    ]
+    ],
 })
 export class FieldEditorComponent {
     public readonly uniqueId = MathHelper.guid();

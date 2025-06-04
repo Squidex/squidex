@@ -33,7 +33,7 @@ const NO_EMIT = { emitEvent: false };
         CheckboxGroupComponent,
         FormsModule,
         ReactiveFormsModule,
-    ]
+    ],
 })
 export class ReferencesCheckboxesComponent extends StatefulControlComponent<State, ReadonlyArray<string> | null | undefined> {
     private readonly subscriptions = new Subscriptions();

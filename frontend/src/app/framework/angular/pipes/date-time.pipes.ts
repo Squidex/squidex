@@ -11,7 +11,6 @@ import { DateTime, Duration, Types } from '@app/framework/internal';
 @Pipe({
     name: 'sqxShortDate',
     pure: true,
-    standalone: true,
 })
 export class ShortDatePipe implements PipeTransform {
     public transform(value: DateTime | string | undefined | null, fallback = ''): string {
@@ -30,7 +29,6 @@ export class ShortDatePipe implements PipeTransform {
 @Pipe({
     name: 'sqxISODate',
     pure: true,
-    standalone: true,
 })
 export class ISODatePipe implements PipeTransform {
     public transform(value: DateTime | string | undefined | null, fallback = ''): string {
@@ -49,7 +47,6 @@ export class ISODatePipe implements PipeTransform {
 @Pipe({
     name: 'sqxDate',
     pure: true,
-    standalone: true,
 })
 export class DatePipe implements PipeTransform {
     public transform(value: DateTime | string | undefined | null, fallback = ''): string {
@@ -68,7 +65,6 @@ export class DatePipe implements PipeTransform {
 @Pipe({
     name: 'sqxMonth',
     pure: true,
-    standalone: true,
 })
 export class MonthPipe implements PipeTransform {
     public transform(value: DateTime | string | undefined | null, fallback = ''): string {
@@ -87,7 +83,6 @@ export class MonthPipe implements PipeTransform {
 @Pipe({
     name: 'sqxFromNow',
     pure: true,
-    standalone: true,
 })
 export class FromNowPipe implements PipeTransform {
     public transform(value: DateTime | string | undefined | null, fallback = ''): string {
@@ -106,7 +101,6 @@ export class FromNowPipe implements PipeTransform {
 @Pipe({
     name: 'sqxDayOfWeek',
     pure: true,
-    standalone: true,
 })
 export class DayOfWeekPipe implements PipeTransform {
     public transform(value: DateTime | string | undefined | null, fallback = ''): string {
@@ -125,7 +119,6 @@ export class DayOfWeekPipe implements PipeTransform {
 @Pipe({
     name: 'sqxDay',
     pure: true,
-    standalone: true,
 })
 export class DayPipe implements PipeTransform {
     public transform(value: DateTime | string | undefined | null, fallback = ''): string {
@@ -144,7 +137,6 @@ export class DayPipe implements PipeTransform {
 @Pipe({
     name: 'sqxShortTime',
     pure: true,
-    standalone: true,
 })
 export class ShortTimePipe implements PipeTransform {
     public transform(value: DateTime | string | undefined | null, fallback = ''): string {
@@ -163,7 +155,6 @@ export class ShortTimePipe implements PipeTransform {
 @Pipe({
     name: 'sqxFullDateTime',
     pure: true,
-    standalone: true,
 })
 export class FullDateTimePipe implements PipeTransform {
     public transform(value: DateTime | string | undefined | null, fallback = ''): string {
@@ -182,7 +173,6 @@ export class FullDateTimePipe implements PipeTransform {
 @Pipe({
     name: 'sqxDuration',
     pure: true,
-    standalone: true,
 })
 export class DurationPipe implements PipeTransform {
     public transform(value: Duration | undefined | null, fallback = ''): string {

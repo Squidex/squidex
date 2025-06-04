@@ -21,7 +21,7 @@ import { ConfirmClickDirective, FileSizePipe, FormHintComponent, KNumberPipe, Pl
         FormHintComponent,
         KNumberPipe,
         TranslatePipe,
-    ]
+    ],
 })
 export class PlanComponent {
     @Input({ required: true })

@@ -33,7 +33,7 @@ type GroupedApps = { team?: TeamDto; apps: AppDto[] };
         TitleComponent,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class AppsPageComponent implements OnInit {
     public addAppDialog = new DialogModel();

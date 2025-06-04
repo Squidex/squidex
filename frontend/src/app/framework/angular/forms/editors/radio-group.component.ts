@@ -31,7 +31,7 @@ interface State {
     imports: [
         FormsModule,
         ResizedDirective,
-    ]
+    ],
 })
 export class RadioGroupComponent extends StatefulControlComponent<State, string> implements AfterViewInit, AfterViewChecked {
     private readonly textMeasurer: TextMeasurer;

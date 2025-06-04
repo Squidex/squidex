@@ -34,7 +34,7 @@ import { TeamAuthState, UpdateTeamAuthForm } from '../../internal';
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class AuthPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

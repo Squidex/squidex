@@ -35,7 +35,7 @@ import { EventConsumerComponent } from './event-consumer.component';
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class EventConsumersPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

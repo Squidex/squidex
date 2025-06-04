@@ -43,7 +43,7 @@ interface State {
         TagEditorComponent,
         TooltipDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class AssetSelectorComponent extends StatefulComponent<State> implements OnInit {
     @Output()

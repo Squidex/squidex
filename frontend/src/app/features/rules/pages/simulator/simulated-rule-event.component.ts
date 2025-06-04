@@ -46,7 +46,7 @@ const ERRORS_AFTER_ENRICHED_EVENT = [
         SimulatedRuleEventStatusPipe,
         StateDetailsComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class SimulatedRuleEventComponent {
     @Input({ required: true })

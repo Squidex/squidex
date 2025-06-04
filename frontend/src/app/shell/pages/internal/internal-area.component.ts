@@ -32,7 +32,7 @@ import { SearchMenuComponent } from './search-menu.component';
         RouterLink,
         RouterOutlet,
         SearchMenuComponent,
-    ]
+    ],
 })
 export class InternalAreaComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

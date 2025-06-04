@@ -20,7 +20,7 @@ import { ContentsState, defined, LayoutComponent, Queries, Query, QueryListCompo
         QueryListComponent,
         SavedQueriesComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class ContentsFiltersPageComponent {
     public schemaQueries =

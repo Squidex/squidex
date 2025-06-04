@@ -45,7 +45,7 @@ type UpdateOptions = { reset?: boolean; pan?: true; fire?: boolean };
         ResizedDirective,
         TooltipDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class GeolocationEditorComponent extends StatefulControlComponent<State, Geolocation> implements AfterViewInit {
     private readonly googleMapsKey = inject(UIOptions).value.map.googleMaps.key;

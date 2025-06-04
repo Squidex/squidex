@@ -17,7 +17,7 @@ import { FieldDto, RichTextFieldPropertiesDto, TranslatePipe } from '@app/shared
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class RichTextValidationComponent  {
     @Input({ required: true })

@@ -1,3 +1,4 @@
+@use 'sass:color';
 @import 'mixins';
 @import 'vars';
 
@@ -78,7 +79,7 @@ sqx-code {
     position: relative;
 
     &:hover {
-        border-color: darken($color-border, 10%);
+        border-color: color.adjust($color-border, $lightness: -10%);
     }
 
     i {

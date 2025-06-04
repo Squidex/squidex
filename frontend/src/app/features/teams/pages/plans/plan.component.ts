@@ -22,7 +22,7 @@ import { TeamPlansState } from '../../internal';
         FormHintComponent,
         KNumberPipe,
         TranslatePipe,
-    ]
+    ],
 })
 export class PlanComponent {
     @Input({ required: true })

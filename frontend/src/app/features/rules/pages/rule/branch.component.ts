@@ -18,7 +18,7 @@ import { FlowStepAdd, FlowStepRemove, FlowStepUpdate } from './types';
     imports: [
         RuleElementComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class BranchComponent {
     @Input({ required: true })

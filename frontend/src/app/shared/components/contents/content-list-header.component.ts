@@ -16,7 +16,7 @@ import { TableHeaderComponent } from '../table-header.component';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TableHeaderComponent,
-    ]
+    ],
 })
 export class ContentListHeaderComponent {
     public readonly metaFields = META_FIELDS;

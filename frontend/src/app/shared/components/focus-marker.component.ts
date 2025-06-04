@@ -18,7 +18,7 @@ import { CollaborationService, Subscriptions } from '@app/shared/internal';
     imports: [
         AsyncPipe,
         StringColorPipe,
-    ]
+    ],
 })
 export class FocusMarkerComponent {
     private readonly subscriptions = new Subscriptions();

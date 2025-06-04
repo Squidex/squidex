@@ -21,7 +21,7 @@ import { ControlErrorsComponent, FieldDto, FormHintComponent, SchemaDto, TagEdit
         ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class FieldFormCommonComponent {
     @Input({ required: true })

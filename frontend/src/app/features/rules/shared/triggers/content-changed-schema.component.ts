@@ -24,7 +24,7 @@ import { CompletionsCache } from './completions-cache';
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class ContentChangedSchemaComponent {
     @Input({ required: true })

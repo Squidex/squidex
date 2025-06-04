@@ -28,7 +28,7 @@ import { AppsState, getCategoryTree, LayoutComponent, SchemaCategoryComponent, S
         SchemaCategoryComponent,
         TitleComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class SchemasPageComponent {
     public schemasFilter = new UntypedFormControl();

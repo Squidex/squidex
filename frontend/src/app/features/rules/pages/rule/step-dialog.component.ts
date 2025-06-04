@@ -33,7 +33,7 @@ import { RuleElementComponent } from '../../shared/rule-element.component';
         ReactiveFormsModule,
         RuleElementComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class StepDialogComponent {
     @Input({ required: true })

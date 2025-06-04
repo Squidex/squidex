@@ -5,43 +5,43 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { marked } from 'marked';
+import { marked, Renderer, Tokens } from 'marked';
 import { MathHelper } from './math-helper';
 
-function renderLink(href: string, _: string, text: string) {
-    if (href && href.startsWith('mailto')) {
-        return `<a href="${href}">${text}</a>`;
-    } else {
-        return `<a href="${href}" target="_blank", rel="noopener">${text} <i class="icon-external-link"></i></a>`;
+class CustomRenderer extends Renderer {
+    public static readonly INSTANCE = new CustomRenderer();
+
+    public link({ href, tokens }: Tokens.Link): string {
+        const text = this.parser.parseInline(tokens);
+        if (href && href.startsWith('mailto')) {
+            return `<a href="${href}">${text}</a>`;
+        } else {
+            return `<a href="${href}" target="_blank", rel="noopener">${text} <i class="icon-external-link"></i></a>`;
+        }
+    }
+
+    public code({ text }: Tokens.Code): string {
+        const id = MathHelper.guid();
+
+        return `
+            <div class="code-container">
+                <button type="button" class="code-copy" copy="${id}">
+                    <i class="icon-copy"></i>
+                </button>
+    
+                <pre class="code" id="${id}">${text}</pre>
+            </div>
+        `.trim();
     }
 }
 
-function renderCode(code: string) {
-    const id = MathHelper.guid();
+class InlineRenderer extends CustomRenderer {
+    public static readonly INSTANCE = new InlineRenderer();
 
-    return `
-        <div class="code-container">
-            <button type="button" class="code-copy" copy="${id}">
-                <i class="icon-copy"></i>
-            </button>
-
-            <pre class="code" id="${id}">${code}</pre>
-        </div>
-    `.trim();
+    public paragraph({ tokens }: Tokens.Paragraph): string {
+        return this.parser.parseInline(tokens);
+    }
 }
-
-function renderInlineParagraph(text: string) {
-    return text;
-}
-
-const RENDERER_INLINE = new marked.Renderer();
-RENDERER_INLINE.paragraph = renderInlineParagraph;
-RENDERER_INLINE.link = renderLink;
-RENDERER_INLINE.code = renderCode;
-
-const RENDERER_DEFAULT = new marked.Renderer();
-RENDERER_DEFAULT.link = renderLink;
-RENDERER_DEFAULT.code = renderCode;
 
 export function markdownRender(input: string | undefined | null, inline: boolean, trusted = false) {
     if (!input) {
@@ -53,9 +53,9 @@ export function markdownRender(input: string | undefined | null, inline: boolean
     }
 
     if (inline) {
-        return marked(input, { renderer: RENDERER_INLINE }) as string;
+        return marked(input, { renderer: InlineRenderer.INSTANCE }) as string;
     } else {
-        return marked(input, { renderer: RENDERER_DEFAULT, breaks: true }) as string;
+        return marked(input, { renderer: CustomRenderer.INSTANCE, breaks: true }) as string;
     }
 }
 

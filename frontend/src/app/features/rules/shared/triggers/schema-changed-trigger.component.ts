@@ -20,7 +20,7 @@ import { CodeComponent, ControlErrorsComponent, FormHintComponent, TranslatePipe
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class SchemaChangedTriggerComponent {
     @Input({ required: true })

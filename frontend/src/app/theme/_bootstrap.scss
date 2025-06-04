@@ -1,3 +1,4 @@
+@use 'sass:color';
 @import 'mixins';
 @import 'vars';
 
@@ -77,7 +78,7 @@
 }
 
 .alert-hint {
-    background: lighten($color-theme-brand, 35%);
+    background: color.adjust($color-theme-brand, $lightness: 35%);
     border: 0;
     border-radius: $border-radius;
     color: $color-text;
@@ -215,7 +216,7 @@ a {
 
             &:disabled,
             &.disabled {
-                color: lighten($color-theme-error, 20%);
+                color: color.adjust($color-theme-error, $lightness: 20%);
             }
         }
     }
@@ -280,7 +281,7 @@ a {
         }
 
         &::before {
-            color: darken($color-border, 10%);
+            color: color.adjust($color-border, $lightness: -10%);
         }
 
         &.done {
@@ -508,8 +509,8 @@ a {
     &-dashed {
         @include truncate-nowidth;
         border-style: dashed;
-        border-color: darken($color-theme-secondary, 10%);
-        color: lighten($color-text-decent, 20%);
+        border-color: color.adjust($color-theme-secondary, $lightness: -10%);
+        color: color.adjust($color-text-decent, $lightness: 20%);
     }
 
     &-decent {

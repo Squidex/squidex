@@ -27,7 +27,7 @@ interface State {
         LoaderComponent,
         NgTemplateOutlet,
         SyncScollingDirective,
-    ]
+    ],
 })
 export class ListViewComponent extends StatefulComponent<State> implements AfterViewInit {
     private timer: any;

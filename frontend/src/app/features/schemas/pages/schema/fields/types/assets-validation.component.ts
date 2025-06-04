@@ -21,7 +21,7 @@ import { AppLanguageDto, AssetsFieldPropertiesDto, FieldDto, FormHintComponent, 
         ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class AssetsValidationComponent {
     @Input({ required: true })

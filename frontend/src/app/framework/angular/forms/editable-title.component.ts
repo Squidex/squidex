@@ -23,7 +23,7 @@ import { FocusOnInitDirective } from './focus-on-init.directive';
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class EditableTitleComponent {
     @Output()

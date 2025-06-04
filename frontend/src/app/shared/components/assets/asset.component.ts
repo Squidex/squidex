@@ -37,7 +37,7 @@ interface State {
         TranslatePipe,
         UserNameRefPipe,
         UserPictureRefPipe,
-    ]
+    ],
 })
 export class AssetComponent extends StatefulComponent<State> implements OnInit {
     @Output()

@@ -19,7 +19,7 @@ import { EventConsumersState } from '../../internal';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TooltipDirective,
-    ]
+    ],
 })
 export class EventConsumerComponent {
     @Output()

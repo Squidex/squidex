@@ -19,7 +19,7 @@ import { FilterLogicalComponent } from './filter-logical.component';
     imports: [
         forwardRef(() => FilterComparisonComponent),
         forwardRef(() => FilterLogicalComponent),
-    ]
+    ],
 })
 export class FilterNodeComponent {
     @Output()

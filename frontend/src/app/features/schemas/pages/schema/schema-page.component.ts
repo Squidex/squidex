@@ -48,7 +48,7 @@ import { SchemaUIFormComponent } from './ui/schema-ui-form.component';
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class SchemaPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

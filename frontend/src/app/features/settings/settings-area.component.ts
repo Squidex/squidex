@@ -21,7 +21,7 @@ import { SettingsMenuComponent } from './settings-menu.component';
         RouterOutlet,
         SettingsMenuComponent,
         TitleComponent,
-    ]
+    ],
 })
 export class SettingsAreaComponent {
     public selectedApp = this.appsState.selectedApp.pipe(defined());

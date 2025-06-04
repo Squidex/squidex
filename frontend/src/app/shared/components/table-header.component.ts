@@ -17,7 +17,7 @@ import { AppLanguageDto, Query, SortMode, Types } from '@app/shared/internal';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TranslatePipe,
-    ]
+    ],
 })
 export class TableHeaderComponent {
     @Output()

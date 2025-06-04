@@ -22,7 +22,7 @@ import { ConfirmClickDirective, DropdownMenuComponent, ModalDirective, ModalMode
         RouterLink,
         StopClickDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class TeamComponent {
     @Input({ required: true })

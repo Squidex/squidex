@@ -19,7 +19,7 @@ import { TranslatePipe } from '../pipes/translate.pipe';
     imports: [
         MarkdownDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class FormErrorComponent {
     @Input({ required: true })

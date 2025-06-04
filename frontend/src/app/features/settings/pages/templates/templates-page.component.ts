@@ -31,7 +31,7 @@ import { TemplateComponent } from './template.component';
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class TemplatesPageComponent implements OnInit {
     constructor(

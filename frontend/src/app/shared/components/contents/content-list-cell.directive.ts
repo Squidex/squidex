@@ -49,7 +49,6 @@ export function getCellWidth(field: TableField, sizes: FieldSizes | undefined | 
 @Pipe({
     name: 'sqxContentsColumns',
     pure: true,
-    standalone: true,
 })
 export class ContentsColumnsPipe implements PipeTransform {
     public transform(value: ReadonlyArray<ContentDto>) {
@@ -65,7 +64,6 @@ export class ContentsColumnsPipe implements PipeTransform {
 
 @Directive({
     selector: '[sqxContentListWidth]',
-    standalone: true,
 })
 export class ContentListWidthDirective  {
     private readonly subscriptions = new Subscriptions();
@@ -119,7 +117,6 @@ export class ContentListWidthDirective  {
 
 @Directive({
     selector: '[sqxContentListCell]',
-    standalone: true,
 })
 export class ContentListCellDirective  {
     private readonly subscriptions = new Subscriptions();
@@ -173,7 +170,6 @@ export class ContentListCellDirective  {
 
 @Directive({
     selector: '[sqxContentListCellResize][field][fields]',
-    standalone: true,
 })
 export class ContentListCellResizeDirective implements OnInit, OnDestroy {
     private mouseMove?: Function;

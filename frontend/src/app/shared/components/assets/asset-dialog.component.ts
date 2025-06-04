@@ -53,7 +53,7 @@ import { AssetPreviewUrlPipe, AssetUrlPipe, PreviewableType } from './pipes';
         TransformInputDirective,
         TranslatePipe,
         VideoPlayerComponent,
-    ]
+    ],
 })
 export class AssetDialogComponent implements OnInit {
     @Output()

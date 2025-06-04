@@ -57,7 +57,7 @@ import { CustomViewEditorComponent } from './custom-view-editor.component';
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class ContentsPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

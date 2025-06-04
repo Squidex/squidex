@@ -25,7 +25,7 @@ import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirec
         RouterLink,
         TooltipDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class ReferenceItemComponent {
     public readonly metaFields = META_FIELDS;

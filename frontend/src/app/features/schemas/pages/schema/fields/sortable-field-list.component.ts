@@ -21,7 +21,7 @@ import { FieldGroupComponent } from './field-group.component';
         CdkDropList,
         CdkDropListGroup,
         forwardRef(() => FieldGroupComponent),
-    ]
+    ],
 })
 export class SortableFieldListComponent {
     @Output()

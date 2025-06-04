@@ -28,7 +28,7 @@ import { RuleElementComponent } from '../../shared/rule-element.component';
         RuleElementComponent,
         ToggleComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class RuleComponent {
     @Input({ required: true })

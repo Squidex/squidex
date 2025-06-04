@@ -23,7 +23,7 @@ import { HistoryMessagePipe } from './pipes';
         TooltipDirective,
         UserNameRefPipe,
         UserPictureRefPipe,
-    ]
+    ],
 })
 export class HistoryListComponent {
     @Input({ required: true })

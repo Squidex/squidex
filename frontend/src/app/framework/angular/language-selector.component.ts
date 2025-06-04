@@ -25,7 +25,7 @@ export interface Language { iso2Code: string; englishName: string; isMasterLangu
         ModalDirective,
         ModalPlacementDirective,
         TooltipDirective,
-    ]
+    ],
 })
 export class LanguageSelectorComponent implements  OnInit {
     @Output()

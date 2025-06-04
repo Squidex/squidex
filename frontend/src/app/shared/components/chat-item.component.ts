@@ -41,7 +41,7 @@ interface State {
         TranslatePipe,
         UserIdPicturePipe,
     ],
-    changeDetection: ChangeDetectionStrategy.OnPush
+    changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ChatItemComponent extends StatefulComponent<State> {
     @ViewChild('focusElement', { static: false })

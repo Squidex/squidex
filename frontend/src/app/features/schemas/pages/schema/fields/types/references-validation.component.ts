@@ -22,7 +22,7 @@ import { AppLanguageDto, FieldDto, FormHintComponent, LocalizedInputComponent, R
         ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class ReferencesValidationComponent {
     @Input({ required: true })

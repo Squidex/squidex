@@ -38,7 +38,7 @@ import { UserComponent } from './user.component';
         TourStepDirective,
         TranslatePipe,
         UserComponent,
-    ]
+    ],
 })
 export class UsersPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

@@ -57,7 +57,7 @@ export class UsersDataSource implements AutocompleteSource {
         ReactiveFormsModule,
         TranslatePipe,
         UserDtoPicture,
-    ]
+    ],
 })
 export class ContributorAddFormComponent {
     private defaultValue: any;

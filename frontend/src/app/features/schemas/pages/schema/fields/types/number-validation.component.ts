@@ -20,7 +20,7 @@ import { AppLanguageDto, FieldDto, FormHintComponent, LocalizedInputComponent, N
         LocalizedInputComponent,
         ReactiveFormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class NumberValidationComponent {
     @Input({ required: true })

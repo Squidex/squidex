@@ -20,7 +20,7 @@ import { AssetTagsComponent } from './asset-tags.component';
         LayoutComponent,
         SavedQueriesComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class AssetsFiltersPageComponent {
     public assetsQueries: Queries;

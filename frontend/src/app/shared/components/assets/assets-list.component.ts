@@ -33,7 +33,7 @@ interface State {
         FileDropDirective,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class AssetsListComponent extends StatefulComponent<State> {
     @Output()

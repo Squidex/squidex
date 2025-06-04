@@ -20,7 +20,7 @@ import { AppDto, Settings, TourStepDirective, TranslatePipe } from '@app/shared'
         RouterLinkActive,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class LeftMenuComponent {
     @Input({ required: true })

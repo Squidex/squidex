@@ -25,7 +25,7 @@ interface State {
         ContentSelectorComponent,
         ModalDirective,
         SafeResourceUrlPipe,
-    ]
+    ],
 })
 export class IFrameEditorComponent extends StatefulComponent<State> implements OnDestroy {
     private readonly subscriptions = new Subscriptions();

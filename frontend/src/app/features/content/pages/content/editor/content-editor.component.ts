@@ -25,7 +25,7 @@ import { ContentSectionComponent } from '../../../shared/forms/content-section.c
         ListViewComponent,
         MarkdownDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class ContentEditorComponent {
     @Output()

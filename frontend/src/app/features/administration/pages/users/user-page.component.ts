@@ -27,7 +27,7 @@ import { UserDto, UserForm, UsersState } from '../../internal';
         TitleComponent,
         TooltipDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class UserPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

@@ -31,7 +31,7 @@ import { WorkflowComponent } from './workflow.component';
         TranslatePipe,
         WorkflowAddFormComponent,
         WorkflowComponent,
-    ]
+    ],
 })
 export class WorkflowsPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

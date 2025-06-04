@@ -18,7 +18,7 @@ import { CurrentStorageDto } from '@app/shared/internal';
     imports: [
         FileSizePipe,
         TranslatePipe,
-    ]
+    ],
 })
 export class AssetUploadsSizeSummaryCardComponent {
     @Input({ required: true })

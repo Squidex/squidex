@@ -20,7 +20,7 @@ import { ContentExtensionComponent } from '../../shared/content-extension.compon
         AsyncPipe,
         ContentExtensionComponent,
         LayoutComponent,
-    ]
+    ],
 })
 export class SidebarPageComponent {
     public url = combineLatest([

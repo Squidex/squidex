@@ -61,7 +61,7 @@ export class UsersDataSource implements AutocompleteSource {
         ReactiveFormsModule,
         TranslatePipe,
         UserDtoPicture,
-    ]
+    ],
 })
 export class ContributorAddFormComponent {
     public assignContributorForm = new AssignTeamContributorForm();

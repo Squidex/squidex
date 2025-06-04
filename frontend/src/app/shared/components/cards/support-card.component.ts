@@ -16,7 +16,7 @@ import { ExternalLinkDirective, TranslatePipe } from '@app/framework';
     imports: [
         ExternalLinkDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class SupportCardComponent {
 }

@@ -22,7 +22,7 @@ import { AppsState, CodeComponent, ControlErrorsComponent, FormHintComponent, Ru
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class CronJobTriggerComponent {
     @Input({ required: true })

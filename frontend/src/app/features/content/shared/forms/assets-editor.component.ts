@@ -59,7 +59,7 @@ interface State {
         ModalDirective,
         ResizedDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class AssetsEditorComponent extends StatefulControlComponent<State, ReadonlyArray<string>> implements OnInit {
     private readonly subscriptions = new Subscriptions();

@@ -18,7 +18,7 @@ import { CodeEditorComponent, RuleElementPropertyDto, Types } from '@app/shared'
     imports: [
         CodeEditorComponent,
         FormsModule,
-    ]
+    ],
 })
 export class StateStepPropertyComponent {
     @Input()

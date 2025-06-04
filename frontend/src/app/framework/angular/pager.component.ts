@@ -23,7 +23,7 @@ export const PAGE_SIZES: ReadonlyArray<number> = [10, 20, 30, 50];
         FormsModule,
         TooltipDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class PagerComponent {
     @Output()

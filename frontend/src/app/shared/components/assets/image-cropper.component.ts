@@ -16,7 +16,7 @@ import { TooltipDirective, Types } from '@app/framework';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TooltipDirective,
-    ]
+    ],
 })
 export class ImageCropperComponent implements AfterViewInit, OnDestroy {
     private cropper: Cropper | null = null;

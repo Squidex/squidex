@@ -10,7 +10,6 @@ import * as ProgressBar from 'progressbar.js';
 import { TypedSimpleChanges } from '@app/framework/internal';
 
 @Component({
-    standalone: true,
     selector: 'sqx-progress-bar',
     styles: [`
         :host ::ng-deep svg {

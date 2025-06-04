@@ -22,7 +22,7 @@ const META_FIELD_NAMES = Object.values(META_FIELDS).filter(x => x !== META_FIELD
         CdkDropList,
         FormAlertComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class FieldListComponent {
     @Input()

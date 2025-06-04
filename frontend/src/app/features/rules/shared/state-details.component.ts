@@ -23,7 +23,7 @@ import { StateStepComponent } from './state-step.component';
         HistoryStepComponent,
         StateStepComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class StateDetailsComponent {
     @Input({ required: true })

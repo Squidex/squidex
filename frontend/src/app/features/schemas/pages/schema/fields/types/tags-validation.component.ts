@@ -21,7 +21,7 @@ import { AppLanguageDto, FieldDto, FormHintComponent, LocalizedInputComponent, T
         ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class TagsValidationComponent {
     @Input({ required: true })

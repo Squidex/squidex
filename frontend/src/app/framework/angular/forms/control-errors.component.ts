@@ -26,7 +26,7 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ControlErrorsMessagesComponent,
-    ]
+    ],
 })
 export class ControlErrorsComponent extends StatefulComponent<State> implements  OnDestroy {
     private readonly subscriptions = new Subscriptions();

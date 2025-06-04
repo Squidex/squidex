@@ -42,7 +42,7 @@ interface State {
         StopClickDirective,
         TranslatePipe,
         UserIdPicturePipe,
-    ]
+    ],
 })
 export class ProfileMenuComponent extends StatefulComponent<State> implements OnInit {
     private readonly subscriptions = new Subscriptions();

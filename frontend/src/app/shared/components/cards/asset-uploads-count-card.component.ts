@@ -18,7 +18,7 @@ import { ChartHelpers, ChartOptions, StorageUsagePerDateDto } from '@app/shared/
     imports: [
         BaseChartDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class AssetUploadsCountCardComponent {
     @Input({ required: true })

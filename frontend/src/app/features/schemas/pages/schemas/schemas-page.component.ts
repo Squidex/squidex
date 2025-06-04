@@ -35,7 +35,7 @@ import { SchemaFormComponent } from './schema-form.component';
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class SchemasPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

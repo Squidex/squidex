@@ -32,7 +32,7 @@ import { ArrayItemComponent } from './array-item.component';
         TooltipDirective,
         TranslatePipe,
         VirtualScrollerModule,
-    ]
+    ],
 })
 export class ArrayEditorComponent {
     @Input({ required: true })

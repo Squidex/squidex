@@ -20,7 +20,7 @@ import { DateTimeFieldEditorValues, DateTimeFieldPropertiesDto, FieldDto, FloatC
         MarkdownDirective,
         ReactiveFormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class DateTimeUIComponent {
     public readonly converter = FloatConverter.INSTANCE;

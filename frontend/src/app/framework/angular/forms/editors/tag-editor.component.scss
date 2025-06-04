@@ -1,3 +1,4 @@
+@use 'sass:color';
 @import 'mixins';
 @import 'vars';
 
@@ -169,7 +170,7 @@ div {
     }
 
     &:hover {
-        background: darken($color-input, 10%);
+        background: color.adjust($color-input, $lightness: -10%);
     }
 }
 

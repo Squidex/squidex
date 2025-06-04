@@ -16,7 +16,7 @@ import { ExternalLinkDirective, TranslatePipe } from '@app/shared';
     imports: [
         ExternalLinkDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class GithubCardComponent {
 }

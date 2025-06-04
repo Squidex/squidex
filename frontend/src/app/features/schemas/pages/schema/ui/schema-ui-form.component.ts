@@ -18,7 +18,7 @@ import { FieldListComponent } from './field-list.component';
         FieldListComponent,
         FormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class SchemaUIFormComponent {
     @Input()

@@ -25,7 +25,7 @@ import { SidebarMenuDirective } from './template.directive';
         RouterLink,
         StopClickDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     private widthPrevious?: string;

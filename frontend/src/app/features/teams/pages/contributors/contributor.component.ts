@@ -21,7 +21,7 @@ import { TeamContributorsState } from '../../internal';
         HighlightPipe,
         TooltipDirective,
         UserPicturePipe,
-    ]
+    ],
 })
 export class ContributorComponent {
     @Input()

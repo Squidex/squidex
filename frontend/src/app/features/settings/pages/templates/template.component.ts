@@ -21,7 +21,7 @@ import { AppsState, ClientsState, FormHintComponent, LoaderComponent, MarkdownDi
         LoaderComponent,
         MarkdownDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class TemplateComponent {
     @Input({ required: true })

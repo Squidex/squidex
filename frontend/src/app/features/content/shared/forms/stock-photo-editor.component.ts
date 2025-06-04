@@ -52,7 +52,7 @@ type Request = { search?: string; page: number };
         StopClickDirective,
         TooltipDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class StockPhotoEditorComponent extends StatefulControlComponent<State, string> implements OnInit {
     private readonly subscriptions = new Subscriptions();

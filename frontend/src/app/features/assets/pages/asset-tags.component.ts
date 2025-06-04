@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable @angular-eslint/no-output-native */
 /* eslint-disable @typescript-eslint/no-unnecessary-boolean-literal-compare */
-
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { DialogModel, ModalDirective, StopClickDirective, TagItem, TagsSelected, TranslatePipe } from '@app/shared';
@@ -22,7 +22,7 @@ import { AssetTagDialogComponent } from './asset-tag-dialog.component';
         ModalDirective,
         StopClickDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class AssetTagsComponent {
     @Output()

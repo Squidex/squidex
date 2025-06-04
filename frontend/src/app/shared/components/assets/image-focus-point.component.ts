@@ -17,7 +17,7 @@ import { AnnotateAssetDto, AssetDto } from '@app/shared/internal';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         TranslatePipe,
-    ]
+    ],
 })
 export class ImageFocusPointComponent implements AfterViewInit, OnDestroy {
     private readonly previewImages: FocusedImage[] = [];

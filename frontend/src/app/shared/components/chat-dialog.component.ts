@@ -34,7 +34,7 @@ interface State {
         ModalDialogComponent,
         TooltipDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class ChatDialogComponent extends StatefulComponent<State> {
     @Output()

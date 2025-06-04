@@ -22,7 +22,7 @@ import { FieldDto, FloatConverter, FormHintComponent, NumberFieldEditorValues, N
         ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class NumberUIComponent  {
     private readonly subscriptions = new Subscriptions();

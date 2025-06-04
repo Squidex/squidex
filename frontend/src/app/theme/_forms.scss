@@ -1,3 +1,4 @@
+@use 'sass:color';
 @import 'mixins';
 @import 'vars';
 
@@ -170,7 +171,7 @@
         }
 
         &.separated {
-            border-bottom: 1px solid lighten($color-input, 5%);
+            border-bottom: 1px solid color.adjust($color-input, $lightness: 5%);
 
             &:last-child {
                 border: 0;

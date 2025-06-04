@@ -27,7 +27,7 @@ import { AuthService, CollaborationService, CommentComponent, CommentsState, Dro
         ModalDirective,
         ModalPlacementDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class NotificationDropdownComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

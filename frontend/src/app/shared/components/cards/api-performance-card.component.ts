@@ -20,7 +20,7 @@ import { CallsUsageDto, ChartHelpers, ChartOptions } from '@app/shared';
         BaseChartDirective,
         FormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class ApiPerformanceCardComponent {
     @Input({ required: true })

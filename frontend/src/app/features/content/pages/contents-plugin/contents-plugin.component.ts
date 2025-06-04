@@ -19,7 +19,7 @@ import { ContentExtensionComponent } from '../../shared/content-extension.compon
         AsyncPipe,
         ContentExtensionComponent,
         LayoutComponent,
-    ]
+    ],
 })
 export class ContentsPluginComponent {
     public schema = this.schemasState.selectedSchema;

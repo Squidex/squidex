@@ -11,7 +11,6 @@ import { StringHelper } from '@app/framework/internal';
 @Pipe({
     name: 'sqxDisplayName',
     pure: true,
-    standalone: true,
 })
 export class DisplayNamePipe implements PipeTransform {
     public transform(value: any, field1 = 'label', field2 = 'name'): any {

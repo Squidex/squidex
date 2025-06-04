@@ -21,7 +21,7 @@ import { SortingComponent } from './sorting.component';
         FilterLogicalComponent,
         SortingComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class QueryComponent {
     @Output()

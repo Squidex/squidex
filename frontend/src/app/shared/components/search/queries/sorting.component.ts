@@ -19,7 +19,7 @@ import { QueryPathComponent } from './query-path.component';
     imports: [
         FormsModule,
         QueryPathComponent,
-    ]
+    ],
 })
 export class SortingComponent {
     public readonly modes = SORT_MODES;

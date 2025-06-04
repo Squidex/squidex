@@ -18,7 +18,7 @@ import { AppsState, AuthService, ChatDialogComponent, DialogModel, ModalDirectiv
         AsyncPipe,
         ChatDialogComponent,
         ModalDirective,
-    ]
+    ],
 })
 export class ChatMenuComponent {
     public readonly chatDialog = new DialogModel();

@@ -24,7 +24,7 @@ import { CodeEditorComponent, ConfigureFieldRulesForm, ConfirmClickDirective, Co
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class SchemaFieldRulesFormComponent implements  OnInit {
     @Input()

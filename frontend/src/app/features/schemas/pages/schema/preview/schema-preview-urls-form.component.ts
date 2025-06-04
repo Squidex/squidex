@@ -24,7 +24,7 @@ import { CodeEditorComponent, ConfigurePreviewUrlsForm, ConfirmClickDirective, C
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class SchemaPreviewUrlsFormComponent implements OnInit {
     @Input()

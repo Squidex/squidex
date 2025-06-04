@@ -33,7 +33,7 @@ type ImportStatus = {
         StatusIconComponent,
         TooltipDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class ImportContributorsDialogComponent {
     @Output()

@@ -19,7 +19,7 @@ import { FilterNodeComponent } from './filter-node.component';
     imports: [
         FilterNodeComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class FilterLogicalComponent {
     @Output()

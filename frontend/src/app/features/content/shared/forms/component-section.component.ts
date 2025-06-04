@@ -20,7 +20,7 @@ import { FieldEditorComponent } from './field-editor.component';
         FormHintComponent,
         MarkdownDirective,
         forwardRef(() => FieldEditorComponent),
-    ]
+    ],
 })
 export class ComponentSectionComponent {
     @Input({ required: true })

@@ -17,7 +17,7 @@ import { SafeUrlPipe } from './safe-html.pipe';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         SafeUrlPipe,
-    ]
+    ],
 })
 export class AvatarComponent {
     @Input()

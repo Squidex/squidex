@@ -18,7 +18,7 @@ import { NotificationDropdownComponent } from './notification-dropdown.component
     imports: [
         NotificationDropdownComponent,
         NotifoComponent,
-    ]
+    ],
 })
 export class NotificationsMenuComponent {
     public isNotifoConfigured = false;

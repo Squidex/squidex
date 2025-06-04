@@ -43,7 +43,7 @@ const NO_EMIT = { emitEvent: false };
         HighlightPipe,
         ReactiveFormsModule,
         SafeHtmlPipe,
-    ]
+    ],
 })
 export class ReferenceDropdownComponent extends StatefulControlComponent<State, ReadonlyArray<string> | string> {
     private readonly subscriptions = new Subscriptions();

@@ -25,7 +25,7 @@ const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['Now', 'Today'];
         LocalizedInputComponent,
         ReactiveFormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class DateTimeValidationComponent {
     @Input({ required: true })

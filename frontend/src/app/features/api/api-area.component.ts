@@ -22,7 +22,7 @@ import { AppsState, ExternalLinkDirective, LayoutComponent, TitleComponent, Tour
         TitleComponent,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class ApiAreaComponent {
     constructor(

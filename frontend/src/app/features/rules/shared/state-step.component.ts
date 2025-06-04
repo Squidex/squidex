@@ -24,7 +24,7 @@ import { StateStepPropertyComponent } from './state-step-property.component';
         StateAttemptComponent,
         StateStepPropertyComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class StateStepComponent implements OnChanges {
     @Input({ required: true })

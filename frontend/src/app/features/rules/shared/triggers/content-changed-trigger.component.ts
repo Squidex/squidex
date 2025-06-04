@@ -26,7 +26,7 @@ import { ContentChangedSchemaComponent } from './content-changed-schema.componen
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class ContentChangedTriggerComponent {
     @Input()

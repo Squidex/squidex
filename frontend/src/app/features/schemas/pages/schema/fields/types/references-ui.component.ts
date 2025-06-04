@@ -19,7 +19,7 @@ import { FieldDto, FormHintComponent, ReferencesFieldEditorValues, ReferencesFie
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class ReferencesUIComponent {
     public readonly editors = ReferencesFieldEditorValues;

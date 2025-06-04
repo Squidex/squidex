@@ -25,7 +25,7 @@ import { ContentListFieldComponent } from '../contents/content-list-field.compon
         ContentListFieldComponent,
         FormsModule,
         StopClickDirective,
-    ]
+    ],
 })
 export class ContentSelectorItemComponent {
     public readonly metaFields = META_FIELDS;

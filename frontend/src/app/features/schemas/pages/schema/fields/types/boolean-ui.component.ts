@@ -19,7 +19,7 @@ import { BooleanFieldEditorValues, BooleanFieldPropertiesDto, FieldDto, FormHint
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class BooleanUIComponent {
     public readonly editors = BooleanFieldEditorValues;

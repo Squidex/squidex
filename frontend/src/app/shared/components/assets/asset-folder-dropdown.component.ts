@@ -29,7 +29,7 @@ export const SQX_ASSETS_FOLDER_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
         ModalDirective,
         ModalPlacementDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class AssetFolderDropdownComponent extends StatefulControlComponent<any, string> {
     @Input({ transform: booleanAttribute })

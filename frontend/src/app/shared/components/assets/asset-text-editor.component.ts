@@ -18,7 +18,7 @@ import { CodeEditorComponent } from '@app/framework';
     imports: [
         CodeEditorComponent,
         FormsModule,
-    ]
+    ],
 })
 export class AssetTextEditorComponent implements OnInit {
     @Input()

@@ -19,7 +19,7 @@ import { FilterableField, QueryModel } from '@app/shared/internal';
         DropdownComponent,
         FormHintComponent,
         FormsModule,
-    ]
+    ],
 })
 export class QueryPathComponent {
     @Output()

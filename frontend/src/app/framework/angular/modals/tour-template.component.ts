@@ -27,7 +27,7 @@ import { StepDefinition, TourService } from './tour.service';
         ModalDirective,
         ModalPlacementDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class TourTemplateComponent extends StatefulComponent implements AfterContentInit {
     private delayedDestory: any;

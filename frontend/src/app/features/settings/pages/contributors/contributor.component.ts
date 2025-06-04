@@ -23,7 +23,7 @@ import { AssignContributorDto, ConfirmClickDirective, ContributorDto, Contributo
         HighlightPipe,
         TooltipDirective,
         UserPicturePipe,
-    ]
+    ],
 })
 export class ContributorComponent {
     @Input()

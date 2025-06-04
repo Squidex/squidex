@@ -25,7 +25,7 @@ import { AppDto, AvatarComponent, ConfirmClickDirective, DropdownMenuComponent, 
         StopClickDirective,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class AppComponent {
     @Input({ required: true })

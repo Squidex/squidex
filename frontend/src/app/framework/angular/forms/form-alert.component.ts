@@ -8,7 +8,6 @@
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input, numberAttribute } from '@angular/core';
 
 @Component({
-    standalone: true,
     selector: 'sqx-form-alert',
     styleUrls: ['./form-alert.component.scss'],
     templateUrl: './form-alert.component.html',

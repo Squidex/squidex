@@ -19,7 +19,7 @@ import { ControlErrorsComponent, FormHintComponent, TranslatePipe, TriggerForm }
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class UsageTriggerComponent {
     @Input({ required: true })

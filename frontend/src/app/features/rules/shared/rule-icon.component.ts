@@ -16,7 +16,7 @@ import { RuleTriggerMetadataDto, SafeHtmlPipe } from '@app/shared';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         SafeHtmlPipe,
-    ]
+    ],
 })
 export class RuleIconComponent {
     @Input({ required: true })

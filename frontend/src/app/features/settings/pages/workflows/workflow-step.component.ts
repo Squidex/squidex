@@ -23,7 +23,7 @@ import { WorkflowTransitionComponent } from './workflow-transition.component';
         TagEditorComponent,
         TranslatePipe,
         WorkflowTransitionComponent,
-    ]
+    ],
 })
 export class WorkflowStepComponent {
     public readonly onBlur: { updateOn: 'blur' } = { updateOn: 'blur' };

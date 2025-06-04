@@ -25,7 +25,7 @@ interface State {
         FormHintComponent,
         MarkdownDirective,
         forwardRef(() => ContentFieldComponent),
-    ]
+    ],
 })
 export class ContentSectionComponent extends StatefulComponent<State> {
     @Output()

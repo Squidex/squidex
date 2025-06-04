@@ -25,7 +25,7 @@ interface State {
         CdkDragHandle,
         CdkDropList,
         FieldComponent,
-    ]
+    ],
 })
 export class FieldGroupComponent extends StatefulComponent<State> {
     @Output()

@@ -15,7 +15,7 @@ import { ConfirmClickDirective, IndexDto, IndexesState, TranslatePipe } from '@a
     imports: [
         ConfirmClickDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class IndexComponent {
     @Input({ required: true })

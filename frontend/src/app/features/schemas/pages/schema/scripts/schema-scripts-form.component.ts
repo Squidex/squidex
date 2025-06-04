@@ -23,7 +23,7 @@ import { AppsState, CodeEditorComponent, EditSchemaScriptsForm, KeysPipe, Schema
         ReactiveFormsModule,
         ScriptNamePipe,
         TranslatePipe,
-    ]
+    ],
 })
 export class SchemaScriptsFormComponent {
     @Input()

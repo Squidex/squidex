@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { createGraphiQLFetcher } from '@graphiql/toolkit';
-import GraphiQL from 'graphiql';
+import { GraphiQL } from 'graphiql';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { ApiUrlConfig, AppsState, AuthService, ClientDto, ClientsService, ClientsState, DialogModel, FormHintComponent, LayoutComponent, MessageBus, ModalDialogComponent, ModalDirective, QueryExecuted, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, Types } from '@app/shared';
@@ -29,7 +29,7 @@ import { ApiUrlConfig, AppsState, AuthService, ClientDto, ClientsService, Client
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class GraphQLPageComponent implements AfterViewInit, OnInit {
     @ViewChild('graphiQLContainer', { static: false })

@@ -24,7 +24,7 @@ import { TourStepDirective } from './tour-step.directive';
         ShortcutComponent,
         TranslatePipe,
         TourStepDirective,
-    ]
+    ],
 })
 export class ModalDialogComponent implements AfterViewInit {
     @Output()

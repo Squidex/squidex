@@ -37,7 +37,7 @@ interface State {
         TranslationStatusComponent,
         UserNameRefPipe,
         UserPictureRefPipe,
-    ]
+    ],
 })
 export class ContentListFieldComponent extends StatefulComponent<State> {
     public readonly metaFields = META_FIELDS;

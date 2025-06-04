@@ -21,7 +21,7 @@ import { ContentDto, FromNowPipe, HistoryEventDto, HistoryMessagePipe, TooltipDi
         TranslatePipe,
         UserNameRefPipe,
         UserPictureRefPipe,
-    ]
+    ],
 })
 export class ContentEventComponent {
     @Output()

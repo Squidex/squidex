@@ -29,7 +29,7 @@ import { AppsState, CreateAppDto, CreateAppForm, TemplateDto } from '@app/shared
         TooltipDirective,
         TransformInputDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class AppFormComponent {
     @Output()

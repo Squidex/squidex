@@ -22,7 +22,7 @@ import { ControlErrorsComponent, EditSchemaForm, FormAlertComponent, FormHintCom
         ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class SchemaEditFormComponent {
     @Input({ required: true })

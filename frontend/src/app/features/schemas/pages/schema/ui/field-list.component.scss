@@ -1,3 +1,4 @@
+@use 'sass:color';
 @import 'mixins';
 @import 'vars';
 
@@ -9,7 +10,7 @@
 
     &-assigned {
         @include absolute(0, 50%, 0, 0);
-        border-right: 1px solid darken($color-input, 2%);
+        border-right: 1px solid color.adjust($color-input, $lightness: -2%);
     }
 
     &-available {

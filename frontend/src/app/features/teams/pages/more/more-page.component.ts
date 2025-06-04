@@ -32,7 +32,7 @@ import { ConfirmClickDirective, ControlErrorsComponent, defined, FormErrorCompon
         TooltipDirective,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class MorePageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

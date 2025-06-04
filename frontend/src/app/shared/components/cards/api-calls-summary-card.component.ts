@@ -18,7 +18,7 @@ import { CallsUsageDto } from '@app/shared';
     imports: [
         KNumberPipe,
         TranslatePipe,
-    ]
+    ],
 })
 export class ApiCallsSummaryCardComponent {
     @Input({ required: true })

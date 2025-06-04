@@ -25,7 +25,7 @@ interface State {
         ModalPlacementDirective,
         StopClickDirective,
         TooltipDirective,
-    ]
+    ],
 })
 export class ContentValueComponent extends StatefulComponent<State> {
     private readonly subscriptions = new Subscriptions();

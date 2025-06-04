@@ -38,7 +38,7 @@ const NO_EMIT = { emitEvent: false };
         ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class ReferencesTagsComponent extends StatefulControlComponent<State, ReadonlyArray<string>> {
     private readonly subscriptions = new Subscriptions();

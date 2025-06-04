@@ -49,7 +49,7 @@ import { DashboardConfigComponent } from './dashboard-config.component';
         TitleComponent,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class DashboardPageComponent implements AfterViewInit, OnInit {
     private readonly subscriptions = new Subscriptions();

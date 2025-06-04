@@ -24,7 +24,7 @@ import { ComponentSectionComponent } from './component-section.component';
         IfOnceDirective,
         TooltipDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class ArrayItemComponent {
     @Output()

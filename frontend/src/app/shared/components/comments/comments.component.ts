@@ -31,7 +31,7 @@ import { ContributorsDataSource } from './data-source';
         ReactiveFormsModule,
         TranslatePipe,
         UserPicturePipe,
-    ]
+    ],
 })
 export class CommentsComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

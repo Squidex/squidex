@@ -24,7 +24,7 @@ import { AssetFolderDialogComponent } from './asset-folder-dialog.component';
         ModalPlacementDirective,
         TooltipDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class AssetFolderComponent {
     @Output()

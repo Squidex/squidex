@@ -19,7 +19,7 @@ import { CodeEditorComponent, FieldDto, FormHintComponent, JsonFieldPropertiesDt
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class JsonMoreComponent {
     @Input({ required: true })

@@ -31,7 +31,7 @@ interface AssetEvent { event: HistoryEventDto; version: number; canDownload: boo
         TranslatePipe,
         UserNameRefPipe,
         UserPictureRefPipe,
-    ]
+    ],
 })
 export class AssetHistoryComponent {
     @Input({ required: true })

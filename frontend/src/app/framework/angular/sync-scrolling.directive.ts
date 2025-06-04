@@ -9,7 +9,6 @@ import { Directive, HostListener, Input, Renderer2 } from '@angular/core';
 
 @Directive({
     selector: '[sqxSyncScrolling]',
-    standalone: true,
 })
 export class SyncScollingDirective {
     @Input('sqxSyncScrolling')

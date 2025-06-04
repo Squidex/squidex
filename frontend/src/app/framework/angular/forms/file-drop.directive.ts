@@ -12,7 +12,6 @@ import { Types } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxDropFile]',
-    standalone: true,
 })
 export class FileDropDirective {
     private dragCounter = 0;

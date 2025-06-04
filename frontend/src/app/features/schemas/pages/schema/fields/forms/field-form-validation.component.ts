@@ -44,7 +44,7 @@ import { TagsValidationComponent } from '../types/tags-validation.component';
         StringValidationComponent,
         TagsValidationComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class FieldFormValidationComponent {
     @Input({ required: true })

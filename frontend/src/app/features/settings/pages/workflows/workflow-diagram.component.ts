@@ -16,7 +16,7 @@ declare const vis: any;
     templateUrl: './workflow-diagram.component.html',
     imports: [
         ListViewComponent,
-    ]
+    ],
 })
 export class WorkflowDiagramComponent implements AfterViewInit, OnDestroy {
     private network: any;

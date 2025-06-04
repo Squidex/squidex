@@ -56,7 +56,7 @@ interface State {
         StopClickDirective,
         TooltipDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class TagEditorComponent extends StatefulControlComponent<State, ReadonlyArray<any>> implements AfterViewInit, OnInit {
     private readonly subscriptions = new Subscriptions();

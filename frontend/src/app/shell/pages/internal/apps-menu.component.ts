@@ -27,7 +27,7 @@ import { AppFormComponent, AppsState, DialogModel, DropdownMenuComponent, ModalD
         RouterLinkActive,
         TeamFormComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class AppsMenuComponent {
     public addAppDialog = new DialogModel();

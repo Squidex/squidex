@@ -42,7 +42,7 @@ interface State {
         ResizedDirective,
         TooltipDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class DateTimeEditorComponent extends StatefulControlComponent<State, string | null> implements OnInit, AfterViewInit, FocusComponent {
     private readonly subscriptions = new Subscriptions();

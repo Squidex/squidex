@@ -9,7 +9,6 @@ import { Directive, ElementRef, HostListener, Input, Renderer2 } from '@angular/
 
 @Directive({
     selector: '[sqxHoverBackground]',
-    standalone: true,
 })
 export class HoverBackgroundDirective {
     private previousBackground?: string | null;

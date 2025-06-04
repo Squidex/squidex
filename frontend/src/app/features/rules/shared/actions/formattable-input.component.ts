@@ -27,7 +27,7 @@ export const SQX_FORMATTABLE_INPUT_CONTROL_VALUE_ACCESSOR: any = {
     imports: [
         CodeEditorComponent,
         FormsModule,
-    ]
+    ],
 })
 export class FormattableInputComponent implements ControlValueAccessor, AfterViewInit {
     private fnChanged = (_: any) => { /* NOOP */ };

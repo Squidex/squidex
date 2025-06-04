@@ -22,7 +22,7 @@ import { AppLanguageDto, CheckboxGroupComponent, DropdownMenuComponent, FieldFor
         ModalPlacementDirective,
         TooltipDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class FieldCopyButtonComponent {
     @Input({ required: true })

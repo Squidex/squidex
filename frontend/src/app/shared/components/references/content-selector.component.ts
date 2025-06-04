@@ -39,7 +39,7 @@ import { ContentSelectorItemComponent } from './content-selector-item.component'
         TooltipDirective,
         TranslatePipe,
         forwardRef(() => SearchFormComponent),
-    ]
+    ],
 })
 export class ContentSelectorComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

@@ -17,7 +17,7 @@ import { AuthService, FormHintComponent, TranslatePipe, UIOptions } from '@app/s
     imports: [
         FormHintComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class HomePageComponent {
     private readonly redirectToLogin = inject(UIOptions).value.redirectToLogin;

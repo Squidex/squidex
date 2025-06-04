@@ -20,7 +20,7 @@ import { ControlErrorsComponent, ExtendedFormGroup, TemplatedFormArray, Translat
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class BranchesInputComponent {
     @Input({ required: true })

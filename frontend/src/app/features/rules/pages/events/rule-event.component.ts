@@ -6,7 +6,7 @@
  */
 
 /* eslint-disable @angular-eslint/component-selector */
-
+/* eslint-disable @angular-eslint/no-output-native */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -28,7 +28,7 @@ import { StateDetailsComponent } from '../../shared/state-details.component';
         RuleElementComponent,
         StateDetailsComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class RuleEventComponent {
     @Input('sqxRuleEvent')

@@ -26,7 +26,7 @@ import { AppDto, AppsState, AuthService, CodeEditorComponent, ConfirmClickDirect
         ModalPlacementDirective,
         TooltipDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class DashboardConfigComponent {
     @Input({ required: true })

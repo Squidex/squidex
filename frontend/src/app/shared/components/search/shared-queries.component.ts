@@ -5,6 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+/* eslint-disable @angular-eslint/no-output-native */
+
 import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { TranslatePipe } from '@app/framework';
@@ -20,7 +22,7 @@ import { QueryListComponent } from './query-list.component';
         AsyncPipe,
         QueryListComponent,
         TranslatePipe,
-    ]
+    ],
 })
 export class SavedQueriesComponent {
     @Output()

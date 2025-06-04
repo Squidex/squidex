@@ -37,7 +37,7 @@ import { SavedQueriesComponent } from './shared-queries.component';
         TourHintDirective,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class SearchFormComponent {
     private previousQuery?: Query | null;

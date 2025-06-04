@@ -30,7 +30,7 @@ import { RuleComponent } from './rule.component';
         TourHintDirective,
         TourStepDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class RulesPageComponent implements OnInit {
     public availableTriggers = ALL_TRIGGERS;

@@ -25,7 +25,7 @@ import { AppLanguageDto, AppSettingsDto, DropdownMenuComponent, FieldDto, FormHi
         ModalPlacementDirective,
         ReactiveFormsModule,
         TranslatePipe,
-    ]
+    ],
 })
 export class StringValidationComponent  {
     private readonly subscriptions = new Subscriptions();

@@ -24,7 +24,7 @@ import { SimulatedRuleEventComponent } from './simulated-rule-event.component';
         TitleComponent,
         TooltipDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class RuleSimulatorPageComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();

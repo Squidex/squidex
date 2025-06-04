@@ -48,7 +48,7 @@ export class SearchSource implements AutocompleteSource {
         ShortcutDirective,
         TooltipDirective,
         TranslatePipe,
-    ]
+    ],
 })
 export class SearchMenuComponent {
     @ViewChild(AutocompleteComponent, { static: false })
