@@ -128,7 +128,7 @@
                     }
 
                     @case ("DateTime") {
-                        <sqx-date-time-editor enforceTime="true" [formControl]="$any(fieldForm)" [mode]="field.rawProperties.editor" />
+                        <sqx-date-time-editor [formControl]="$any(fieldForm)" [mode]="field.rawProperties.editor" />
                     }
 
                     @case ("Geolocation") {

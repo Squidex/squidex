@@ -5,40 +5,15 @@
     max-width: 400px;
 }
 
-.flex-grow {
-    flex-grow: 1;
-}
-
-.form-group {
+.form-container {
     position: relative;
 }
 
-.form-time {
-    width: 45%;
-}
-
-.form-date {
-    width: 55%;
-
-    &.with-buttons {
-        padding-left: 3.3rem;
-    }
-}
-
-.form-control {
-    &:last-child {
-        padding-left: .75rem;
-        padding-right: 2rem;
-        position: relative;
-    }
+.with-buttons {
+    padding-left: 3.3rem;
 }
 
 .btn {
-    &-clear {
-        @include absolute(auto, 4px, 3px, auto);
-        z-index: 1;
-    }
-
     &-time-mode {
         @include absolute(1px, auto, -1px, auto);
         z-index: 1;
@@ -65,6 +40,10 @@
     }
 
     .btn-quick {
+        display: none;
+    }
+
+    .btn-clear {
         display: none;
     }
 

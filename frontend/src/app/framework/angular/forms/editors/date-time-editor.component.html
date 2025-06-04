@@ -1,5 +1,5 @@
-<div class="d-flex root" [class.compact]="size === 'Compact'" [class.mini]="size === 'Mini'" (sqxResized)="setSize($event)">
-    <div class="form-group flex-grow me-1 mb-0">
+<div class="d-flex root gap-1" [class.compact]="size === 'Compact'" [class.mini]="size === 'Mini'" (sqxResized)="setSize($event)">
+    <div class="form-container flex-grow">
         @if (isDateTimeMode && shouldShowDateTimeModeButton) {
             <div>
                 @if (snapshot.isLocal) {
@@ -16,51 +16,45 @@
             </div>
         }
 
-        <div class="input-group flex-grow">
-            <input
-                class="form-control form-date"
-                #dateInput
-                (blur)="callTouched()"
-                [class.with-buttons]="isDateTimeMode && shouldShowDateTimeModeButton"
-                [formControl]="dateControl"
-                maxlength="10"
-                minlength="0"
-                placeholder="{{ 'common.date' | sqxTranslate }}" />
-            @if (isDateTimeMode) {
-                <input class="form-control form-time" (blur)="callTouched()" [formControl]="timeControl" placeholder="{{ 'common.time' | sqxTranslate }}" />
-            }
-        </div>
-
-        @if (!hideClear) {
-            <button class="btn btn-text-secondary btn-sm btn-clear" [class.hidden]="!hasValue" (click)="reset()" [disabled]="snapshot.isDisabled" type="button">
-                <i class="icon-close"></i>
-            </button>
-        }
+        <input
+            class="form-control form-date"
+            #dateInput
+            (blur)="callTouched()"
+            [class.with-buttons]="isDateTimeMode && shouldShowDateTimeModeButton"
+            [class.with-clear]="!hideClear"
+            [disabled]="snapshot.isDisabled"
+            [ngModel]="snapshot.inputValue"
+            (ngModelChange)="updateValue($event)"
+            [ngModelOptions]="{ standalone: true }"
+            placeholder="{{ 'common.date' | sqxTranslate }}"
+            [type]="isDateTimeMode ? 'datetime-local' : 'date'" />
     </div>
 
     @if (isDateTimeMode && shouldShowDateButtons) {
-        <div class="form-group">
-            <button
-                class="btn btn-text-secondary btn-quick"
-                (click)="writeNow()"
-                [disabled]="snapshot.isDisabled"
-                title="i18n:common.dateTimeEditor.nowTooltip"
-                type="button">
-                {{ "common.dateTimeEditor.now" | sqxTranslate }}
-            </button>
-        </div>
+        <button
+            class="btn btn-text-secondary btn-quick"
+            (click)="writeNow()"
+            [disabled]="snapshot.isDisabled"
+            title="i18n:common.dateTimeEditor.nowTooltip"
+            type="button">
+            {{ "common.dateTimeEditor.now" | sqxTranslate }}
+        </button>
     }
 
     @if (!isDateTimeMode && shouldShowDateButtons) {
-        <div class="form-group">
-            <button
-                class="btn btn-text-secondary btn-quick"
-                (click)="writeToday()"
-                [disabled]="snapshot.isDisabled"
-                title="i18n:common.dateTimeEditor.todayTooltip"
-                type="button">
-                {{ "common.dateTimeEditor.today" | sqxTranslate }}
-            </button>
-        </div>
+        <button
+            class="btn btn-text-secondary btn-quick"
+            (click)="writeToday()"
+            [disabled]="snapshot.isDisabled"
+            title="i18n:common.dateTimeEditor.todayTooltip"
+            type="button">
+            {{ "common.dateTimeEditor.today" | sqxTranslate }}
+        </button>
+    }
+
+    @if (!hideClear) {
+        <button class="btn btn-text-secondary btn-clear" [class.invisible]="!hasValue" (click)="reset()" [disabled]="snapshot.isDisabled" type="button">
+            <i class="icon-close"></i>
+        </button>
     }
 </div>

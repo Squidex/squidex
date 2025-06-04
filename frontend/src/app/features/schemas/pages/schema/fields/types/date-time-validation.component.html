@@ -1,12 +1,12 @@
 <div [formGroup]="fieldForm">
     <div class="form-group row">
         <label class="col-3 col-form-label">{{ "schemas.fieldTypes.dateTime.rangeMin" | sqxTranslate }}</label>
-        <div class="col-9"><sqx-date-time-editor enforceTime="true" formControlName="minValue" mode="DateTime" /></div>
+        <div class="col-9"><sqx-date-time-editor formControlName="minValue" mode="DateTime" /></div>
     </div>
 
     <div class="form-group row">
         <label class="col-3 col-form-label">{{ "schemas.fieldTypes.dateTime.rangeMax" | sqxTranslate }}</label>
-        <div class="col-9"><sqx-date-time-editor enforceTime="true" formControlName="maxValue" mode="DateTime" /></div>
+        <div class="col-9"><sqx-date-time-editor formControlName="maxValue" mode="DateTime" /></div>
     </div>
 
     @if (showDefaultValues | async) {
@@ -26,7 +26,7 @@
         @if (showDefaultValue | async) {
             <div class="form-group row">
                 <label class="col-3 col-form-label">{{ "schemas.field.defaultValue" | sqxTranslate }}</label>
-                <div class="col-9"><sqx-date-time-editor enforceTime="true" formControlName="defaultValue" mode="DateTime" /></div>
+                <div class="col-9"><sqx-date-time-editor formControlName="defaultValue" mode="DateTime" /></div>
             </div>
         }
 

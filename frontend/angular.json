@@ -31,6 +31,14 @@
             "allowedCommonJsDependencies": [
               "@tweenjs/tween.js",
               "client-only",
+              "codemirror",
+              "codemirror/addon/comment/comment.js",
+              "codemirror/addon/hint/show-hint.js",
+              "codemirror/addon/fold/brace-fold.js",
+              "codemirror/addon/fold/foldgutter.js",
+              "codemirror/addon/search/jump-to-line.js",
+              "codemirror/addon/search/search.js",
+              "codemirror/mode/javascript/javascript.js",
               "copy-to-clipboard",
               "cropperjs",
               "crypto-js",
@@ -38,18 +46,20 @@
               "crypto-js/enc-base64.js",
               "crypto-js/enc-utf8.js",
               "crypto-js/sha256.js",
+              "get-value",
               "graphql-ws",
               "markdown-it",
               "mersenne-twister",
               "mousetrap",
               "nullthrows",
-              "pikaday",
-              "pikaday/pikaday",
               "progressbar.js",
+              "react-compiler-runtime",
               "react-dom",
               "react",
               "set-value",
-              "slugify"
+              "slugify",
+              "textarea-caret",
+              "use-sync-external-store/with-selector"
             ],
             "assets": [
               "src/app/assets",
@@ -178,10 +188,7 @@
             "stylePreprocessorOptions": {
               "includePaths": [
                 "./src/app/theme"
-              ],
-              "sass": {
-                "silenceDeprecations": ["color-functions", "global-builtin", "import"]
-              }
+              ]
             },
             "scripts": []
           }

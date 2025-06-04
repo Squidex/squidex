@@ -6,12 +6,9 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, ViewChild } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { ColorPickerDirective } from 'ngx-color-picker';
-import { MathHelper, ModalModel, StatefulControlComponent } from '@app/framework/internal';
-import { ModalPlacementDirective } from '../../modals/modal-placement.directive';
-import { ModalDirective } from '../../modals/modal.directive';
+import { MathHelper, StatefulControlComponent } from '@app/framework/internal';
 import { FocusComponent } from '../forms-helper';
 
 export const SQX_COLOR_PICKER_CONTROL_VALUE_ACCESSOR: any = {
@@ -21,6 +18,9 @@ export const SQX_COLOR_PICKER_CONTROL_VALUE_ACCESSOR: any = {
 interface State {
     // The current value.
     value: string;
+
+    // The hex color.
+    parsed: string;
 
     // The foreground color.
     foreground: string;
@@ -35,15 +35,10 @@ interface State {
     ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        ColorPickerDirective,
         FormsModule,
-        ModalDirective,
-        ModalPlacementDirective,
     ],
 })
 export class ColorPickerComponent extends StatefulControlComponent<State, string> implements FocusComponent {
-    private wasOpen = false;
-
     @Input()
     public placeholder = '';
 
@@ -55,35 +50,25 @@ export class ColorPickerComponent extends StatefulControlComponent<State, string
         this.setDisabledState(value === true);
     }
 
-    public modal = new ModalModel();
+    @ViewChild('input')
+    public input?: ElementRef<HTMLInputElement>;
 
     constructor() {
-        super({ foreground: 'black', value: 'black' });
-
-        this.modal.isOpenChanges.subscribe(open => {
-            if (open) {
-                this.wasOpen = true;
-            } else {
-                if (this.wasOpen) {
-                    this.callTouched();
-                }
-
-                this.wasOpen = false;
-            }
-        });
+        super({ foreground: 'black', value: 'black', parsed: '#000000' });
     }
 
     public writeValue(value: any) {
         const previousColor = this.snapshot.value;
+        const parsedColor = parseColor(value);
 
-        if (previousColor !== value) {
+        if (previousColor !== parsedColor) {
             let foreground = 'black';
 
-            if (MathHelper.toLuminance(MathHelper.parseColor(value)!) < 0.5) {
+            if (MathHelper.toLuminance(MathHelper.parseColor(parsedColor)!) < 0.5) {
                 foreground = 'white';
             }
 
-            this.next({ value, foreground });
+            this.next({ value, parsed: parsedColor, foreground });
         }
     }
 
@@ -92,7 +77,7 @@ export class ColorPickerComponent extends StatefulControlComponent<State, string
             return;
         }
 
-        this.modal.show();
+        this.input?.nativeElement?.focus();
     }
 
     public blur() {
@@ -110,8 +95,22 @@ export class ColorPickerComponent extends StatefulControlComponent<State, string
 
         if (this.snapshot.value !== value) {
             this.callChange(value);
-
             this.writeValue(value);
         }
     }
+}
+
+let canvas: HTMLCanvasElement;
+function parseColor(color: string) {
+    if (!canvas) {
+        canvas = document.createElement('canvas');
+    }
+
+    const ctx = canvas.getContext('2d')!;
+    if (!ctx) {
+        return color;
+    }
+
+    ctx.fillStyle = color;
+    return ctx.fillStyle;
 }

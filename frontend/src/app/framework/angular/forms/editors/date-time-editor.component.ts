@@ -6,26 +6,27 @@
  */
 
 
-import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, inject, Input, OnInit, Output, ViewChild } from '@angular/core';
-import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
-import Pikaday from 'pikaday/pikaday';
-import { DateHelper, DateTime, StatefulControlComponent, Subscriptions, UIOptions } from '@app/framework/internal';
+import { booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, inject, Input, Output, ViewChild } from '@angular/core';
+import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
+import { DateHelper, DateTime, StatefulControlComponent, UIOptions } from '@app/framework/internal';
 import { TooltipDirective } from '../../modals/tooltip.directive';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { ResizedDirective } from '../../resized.directive';
 import { FocusComponent } from '../forms-helper';
 
-declare module 'pikaday/pikaday';
-
 export const SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DateTimeEditorComponent), multi: true,
 };
 
-const NO_EMIT = { emitEvent: false };
-
 interface State {
     // True when the editor is in local mode.
     isLocal: boolean;
+
+    // The actual value.
+    value?: DateTime | null;
+
+    // The value for the input.
+    inputValue?: string | null;
 }
 
 @Component({
@@ -44,22 +45,15 @@ interface State {
         TranslatePipe,
     ],
 })
-export class DateTimeEditorComponent extends StatefulControlComponent<State, string | null> implements OnInit, AfterViewInit, FocusComponent {
-    private readonly subscriptions = new Subscriptions();
+export class DateTimeEditorComponent extends StatefulControlComponent<State, string | null> implements FocusComponent {
     private readonly hideDateButtonsSettings: boolean = !!inject(UIOptions).value.hideDateButtons;
     private readonly hideDateTimeModeButtonSetting: boolean = !!inject(UIOptions).value.hideDateTimeModeButton;
-    private picker: any;
-    private dateTime?: DateTime | null;
-    private suppressEvents = false;
 
     @Output()
     public editorBlur = new EventEmitter();
 
     @Input()
     public mode: 'DateTime' | 'Date' = 'Date';
-
-    @Input({ transform: booleanAttribute })
-    public enforceTime?: boolean | null;
 
     @Input({ transform: booleanAttribute })
     public hideClear?: boolean | null;
@@ -81,9 +75,6 @@ export class DateTimeEditorComponent extends StatefulControlComponent<State, str
     @ViewChild('dateInput', { static: false })
     public dateInput!: ElementRef<HTMLInputElement>;
 
-    public readonly timeControl = new UntypedFormControl();
-    public readonly dateControl = new UntypedFormControl();
-
     public get shouldShowDateButtons() {
         return !this.hideDateButtonsSettings && !this.hideDateButtons;
     }
@@ -97,37 +88,11 @@ export class DateTimeEditorComponent extends StatefulControlComponent<State, str
     }
 
     public get hasValue() {
-        return !!this.dateTime;
+        return !!this.snapshot.value;
     }
 
     constructor() {
         super({ isLocal: true });
-    }
-
-    public ngOnInit() {
-        this.subscriptions.add(
-            this.timeControl.valueChanges.subscribe(() => {
-                this.dateTime = this.getValue();
-
-                this.callChangeFormatted();
-            }));
-
-        this.subscriptions.add(
-            this.dateControl.valueChanges.subscribe(() => {
-                this.dateTime = this.getValue();
-
-                this.callChangeFormatted();
-            }));
-    }
-
-    public writeValue(obj: any) {
-        try {
-            this.dateTime = DateTime.parseISO(obj, false);
-        } catch (ex) {
-            this.dateTime = null;
-        }
-
-        this.updateControls();
     }
 
     public callTouched() {
@@ -136,127 +101,71 @@ export class DateTimeEditorComponent extends StatefulControlComponent<State, str
         super.callTouched();
     }
 
-    public onDisabled(isDisabled: boolean) {
-        if (isDisabled) {
-            this.dateControl.disable(NO_EMIT);
-            this.timeControl.disable(NO_EMIT);
-        } else {
-            this.dateControl.enable(NO_EMIT);
-            this.timeControl.enable(NO_EMIT);
-        }
-    }
-
     public focus() {
         this.dateInput.nativeElement.focus();
     }
 
-    public ngAfterViewInit() {
-        const i18n = getLocalizationSettings();
+    public writeValue(obj: any) {
+        let value: DateTime | null;
+        try {
+            value = DateTime.parseISO(obj, false);
+        } catch (ex) {
+            value = null;
+        }
 
-        this.picker = new Pikaday({
-            field: this.dateInput.nativeElement,
-            i18n,
-            format: 'YYYY-MM-DD',
-            onSelect: () => {
-                if (this.suppressEvents) {
-                    return;
-                }
-
-                this.dateControl.setValue(this.picker.toString('YYYY-MM-DD'));
-
-                this.callTouched();
-            },
-        });
-
-        this.updateControls();
+        this.update(value, this.snapshot.isLocal, false);
     }
 
     public writeToday() {
-        this.dateTime = new DateTime(DateHelper.getLocalDate(DateTime.today().raw));
-
-        this.updateControls();
-        this.callChangeFormatted();
-        this.callTouched();
-
+        this.update(new DateTime(DateHelper.getLocalDate(DateTime.today().raw)), this.snapshot.isLocal, true);
         return false;
     }
 
     public writeNow() {
-        this.dateTime = DateTime.now();
-
-        this.updateControls();
-        this.callChangeFormatted();
-        this.callTouched();
-
+        this.update(DateTime.now(), this.snapshot.isLocal, true);
         return false;
     }
 
     public reset() {
-        this.dateTime = null;
-
-        this.updateControls();
-        this.callChangeFormatted();
-        this.callTouched();
-
+        this.update(null, this.snapshot.isLocal, true);
         return false;
     }
 
-    private callChangeFormatted() {
-        this.callChange(this.dateTime?.toISOString());
-    }
-
-    private getValue(): DateTime | null {
-        if (!this.dateControl.value) {
-            return null;
-        }
-
-        if (this.isDateTimeMode && this.timeControl.value) {
-            const combined = `${this.dateControl.value}T${this.timeControl.value}`;
-
-            return DateTime.tryParseISO(combined, !this.snapshot.isLocal);
-        }
-
-        return DateTime.tryParseISO(this.dateControl.value);
-    }
-
-    private updateControls() {
-        this.suppressEvents = true;
-
-        if (this.dateTime && this.isDateTimeMode) {
-            if (this.snapshot.isLocal) {
-                this.timeControl.setValue(this.dateTime.toStringFormat('HH:mm:ss'), NO_EMIT);
-            } else {
-                this.timeControl.setValue(this.dateTime.toStringFormatUTC('HH:mm:ss'), NO_EMIT);
-            }
-        } else {
-            this.timeControl.setValue(null, NO_EMIT);
-        }
-
-        if (this.dateTime && this.picker) {
-            let dateString: string;
-
-            if (this.isDateTimeMode && this.snapshot.isLocal) {
-                dateString = this.dateTime.toStringFormat('yyyy-MM-dd');
-
-                this.picker.setDate(DateHelper.getLocalDate(this.dateTime.raw), true);
-            } else {
-                dateString = this.dateTime.toStringFormatUTC('yyyy-MM-dd');
-
-                this.picker.setDate(DateHelper.getUTCDate(this.dateTime.raw), true);
-            }
-
-            this.dateControl.setValue(dateString, NO_EMIT);
-        } else {
-            this.dateControl.setValue(null, NO_EMIT);
-        }
-
-        this.suppressEvents = false;
-    }
-
     public setLocalMode(isLocal: boolean) {
-        this.next({ isLocal });
+        this.update(this.snapshot.value, isLocal, true);
+        return false;
+    }
 
-        this.updateControls();
+    public updateValue(source: string) {
+        this.update(DateTime.tryParseISO(source), this.snapshot.isLocal, true);
+        return false;
+    }
+
+    private update(value: DateTime | null | undefined, isLocal: boolean, emit: boolean) {
+        let inputValue: string | null = null;
+
+        if (value) {
+            if (this.isDateTimeMode) {
+                if (isLocal) {
+                    inputValue = value.toStringFormat('yyyy-MM-dd\'T\'HH:mm:ss');
+                } else {
+                    inputValue = value.toStringFormatUTC('yyyy-MM-dd\'T\'HH:mm:ss');
+                }
+            } else {
+                if (isLocal) {
+                    inputValue = value.toStringFormat('yyyy-MM-dd');
+                } else {
+                    inputValue = value.toStringFormatUTC('yyyy-MM-dd');
+                }
+            }
+        }
+
+        this.next({ inputValue, value, isLocal });
+
+        if (emit) {
+            this.callChange(value?.toISOString());
+            this.callTouched();
+        }
     }
 
     public setSize(size: DOMRect) {
@@ -268,31 +177,4 @@ export class DateTimeEditorComponent extends StatefulControlComponent<State, str
             this.size = 'Normal';
         }
     }
-}
-
-let localizedValues: any;
-
-function getLocalizationSettings() {
-    if (!localizedValues) {
-        localizedValues = {
-            months: [],
-            weekdays: [],
-            weekdaysShort: [],
-        };
-
-        for (let i = 0; i < 12; i++) {
-            const firstOfMonth = new DateTime(new Date(2020, i, 1, 12, 0, 0));
-
-            localizedValues.months.push(firstOfMonth.toStringFormat('LLLL'));
-        }
-
-        for (let i = 1; i <= 7; i++) {
-            const weekDay = new DateTime(new Date(2020, 10, i, 12, 0, 0));
-
-            localizedValues.weekdays.push(weekDay.toStringFormat('EEEE'));
-            localizedValues.weekdaysShort.push(weekDay.toStringFormat('EEE'));
-        }
-    }
-
-    return localizedValues;
 }

@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-declare module 'pikaday/pikaday';
 declare module 'progressbar.js';
 
 declare module 'textarea-caret' {
