@@ -12,7 +12,6 @@ import { RuleTriggerMetadataDto, TranslatePipe } from '@app/shared';
 import { RuleElementComponent } from './rule-element.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-history-step',
     styleUrls: ['./history-step.component.scss'],
     templateUrl: './history-step.component.html',

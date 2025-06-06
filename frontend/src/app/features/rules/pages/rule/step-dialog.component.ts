@@ -14,7 +14,6 @@ import { FormattableInputComponent } from '../../shared/actions/formattable-inpu
 import { RuleElementComponent } from '../../shared/rule-element.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-step-dialog',
     styleUrls: ['./step-dialog.component.scss'],
     templateUrl: './step-dialog.component.html',

@@ -10,7 +10,6 @@ import { Router } from '@angular/router';
 import { ApiUrlConfig, AppsState, AuthService, computeEditorUrl, ContentDto, SafeResourceUrlPipe, SchemaDto, TypedSimpleChanges, Types } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-content-extension',
     styleUrls: ['./content-extension.component.scss'],
     templateUrl: './content-extension.component.html',

@@ -16,7 +16,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-apps-card',
     styleUrls: ['./apps-card.component.scss'],
     templateUrl: './apps-card.component.html',

@@ -10,7 +10,6 @@ import { ResizeListener, ResizeService, Subscriptions } from '@app/framework/int
 
 @Directive({
     selector: '[sqxSyncWidth]',
-    standalone: true,
 })
 export class SyncWidthDirective implements AfterViewInit, ResizeListener {
     private readonly subscriptions = new Subscriptions();

@@ -10,7 +10,6 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { fadeAnimation } from '@app/framework/internal';
 
 @Component({
-    standalone: true,
     selector: 'sqx-errors-messages',
     styleUrls: ['./control-errors-messages.component.scss'],
     templateUrl: './control-errors-messages.component.html',

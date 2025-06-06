@@ -1,3 +1,4 @@
+@use 'sass:color';
 @import 'mixins';
 @import 'vars';
 
@@ -90,7 +91,7 @@ $padding: 1rem;
     }
 
     &-hidden {
-        color: lighten($color-text-decent, 40%);
+        color: color.adjust($color-text-decent, $lightness: 40%);
     }
 
     &-partitioning {

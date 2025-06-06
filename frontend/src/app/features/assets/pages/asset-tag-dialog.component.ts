@@ -12,7 +12,6 @@ import { ControlErrorsComponent, FocusOnInitDirective, FormErrorComponent, Modal
 import { AssetsState, RenameAssetTagForm } from '@app/shared/internal';
 
 @Component({
-    standalone: true,
     selector: 'sqx-asset-tag-dialog',
     styleUrls: ['./asset-tag-dialog.component.scss'],
     templateUrl: './asset-tag-dialog.component.html',

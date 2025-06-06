@@ -20,7 +20,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-control-errors',
     styleUrls: ['./control-errors.component.scss'],
     templateUrl: './control-errors.component.html',

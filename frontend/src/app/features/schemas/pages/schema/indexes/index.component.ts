@@ -9,7 +9,6 @@ import { Component, Input } from '@angular/core';
 import { ConfirmClickDirective, IndexDto, IndexesState, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-index',
     styleUrls: ['./index.component.scss'],
     templateUrl: './index.component.html',

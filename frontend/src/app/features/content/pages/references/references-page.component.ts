@@ -13,7 +13,6 @@ import { AppLanguageDto, ComponentContentsState, ContentsColumnsPipe, LanguageSe
 import { ReferenceItemComponent } from '../../shared/references/reference-item.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-references-page',
     styleUrls: ['./references-page.component.scss'],
     templateUrl: './references-page.component.html',

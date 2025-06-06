@@ -12,7 +12,6 @@ import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, Fo
 import { ContentSectionComponent } from '../forms/content-section.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-content-creator',
     styleUrls: ['./content-creator.component.scss'],
     templateUrl: './content-creator.component.html',

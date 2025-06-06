@@ -11,7 +11,6 @@ import { AppLanguageDto, ComponentContentsState, ContentDto, ContentsColumnsPipe
 import { ReferenceItemComponent } from '../../../shared/references/reference-item.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-content-references',
     styleUrls: ['./content-references.component.scss'],
     templateUrl: './content-references.component.html',

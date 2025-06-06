@@ -27,7 +27,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-stars',
     styleUrls: ['./stars.component.scss'],
     templateUrl: './stars.component.html',

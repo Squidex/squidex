@@ -13,7 +13,6 @@ import { RouterLink } from '@angular/router';
 import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirective, ContentListFieldComponent, ContentValueComponent, getContentValue, META_FIELDS, TooltipDirective, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: '[sqxReferenceItem][language][languages]',
     styleUrls: ['./reference-item.component.scss'],
     templateUrl: './reference-item.component.html',

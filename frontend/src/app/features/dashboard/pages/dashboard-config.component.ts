@@ -13,7 +13,6 @@ import { take } from 'rxjs/operators';
 import { AppDto, AppsState, AuthService, CodeEditorComponent, ConfirmClickDirective, DialogModel, DialogService, DropdownMenuComponent, LocalizerService, ModalDialogComponent, ModalDirective, ModalModel, ModalPlacementDirective, TooltipDirective, TranslatePipe, TypedSimpleChanges, Types, UIState } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-dashboard-config',
     styleUrls: ['./dashboard-config.component.scss'],
     templateUrl: './dashboard-config.component.html',

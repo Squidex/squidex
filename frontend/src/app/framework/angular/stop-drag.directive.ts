@@ -9,7 +9,6 @@ import { booleanAttribute, Directive, HostListener, Input } from '@angular/core'
 
 @Directive({
     selector: '[sqxStopDrag]',
-    standalone: true,
 })
 export class StopDragDirective {
     @Input({ alias: 'sqxStopDrag', transform: booleanAttribute })

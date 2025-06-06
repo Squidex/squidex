@@ -13,7 +13,6 @@ import { WorkflowAddFormComponent } from './workflow-add-form.component';
 import { WorkflowComponent } from './workflow.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-workflows-page',
     styleUrls: ['./workflows-page.component.scss'],
     templateUrl: './workflows-page.component.html',

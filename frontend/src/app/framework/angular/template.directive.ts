@@ -11,7 +11,6 @@ import { Directive, TemplateRef } from '@angular/core';
 
 @Directive({
     selector: '[sidebarMenu]',
-    standalone: true,
 })
 export class SidebarMenuDirective {
     constructor(

@@ -33,7 +33,6 @@ interface State {
 type Request = { search?: string; page: number };
 
 @Component({
-    standalone: true,
     selector: 'sqx-stock-photo-editor',
     styleUrls: ['./stock-photo-editor.component.scss'],
     templateUrl: './stock-photo-editor.component.html',

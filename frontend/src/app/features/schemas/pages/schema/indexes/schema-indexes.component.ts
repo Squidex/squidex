@@ -14,7 +14,6 @@ import { IndexFormComponent } from './index-form.component';
 import { IndexComponent } from './index.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-schema-indexes',
     styleUrls: ['./schema-indexes.component.scss'],
     templateUrl: './schema-indexes.component.html',

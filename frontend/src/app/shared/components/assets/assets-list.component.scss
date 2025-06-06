@@ -1,3 +1,4 @@
+@use 'sass:color';
 @import 'mixins';
 @import 'vars';
 
@@ -50,7 +51,7 @@ h5 {
     transition: border-color .4s ease;
 
     &.drag {
-        border-color: darken($color-border, 10%);
+        border-color: color.adjust($color-border, $lightness: -10%);
         border-style: dashed;
         cursor: copy;
     }
@@ -68,7 +69,7 @@ h5 {
     }
 
     &-info {
-        color: darken($color-border, 30%);
+        color: color.adjust($color-border, $lightness: -30%);
     }
 }
 

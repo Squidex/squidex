@@ -12,7 +12,6 @@ import { DialogService, FloatingPlacement, Tooltip } from '@app/framework/intern
 
 @Directive({
     selector: '[title]:not(sqx-layout),[shortcut]',
-    standalone: true,
 })
 export class TooltipDirective implements OnDestroy {
     private titleText: string | undefined | null;

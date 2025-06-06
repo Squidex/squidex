@@ -15,7 +15,6 @@ import { RouterLink } from '@angular/router';
 import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirective, ContentListCellResizeDirective, ContentListFieldComponent, ContentsState, ContentStatusComponent, DropdownMenuComponent, ExternalLinkDirective, ModalDirective, ModalModel, ModalPlacementDirective, PatchContentForm, SchemaDto, StopClickDirective, TableField, TableSettings, TabRouterlinkDirective, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: '[sqxContent][language][languages][tableFields][schema][tableSettings]',
     styleUrls: ['./content.component.scss'],
     templateUrl: './content.component.html',

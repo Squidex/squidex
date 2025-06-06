@@ -11,7 +11,6 @@ import { picasso, TypedSimpleChanges } from '@app/framework/internal';
 import { SafeUrlPipe } from './safe-html.pipe';
 
 @Component({
-    standalone: true,
     selector: 'sqx-avatar',
     styleUrls: ['./avatar.component.scss'],
     templateUrl: './avatar.component.html',

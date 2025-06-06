@@ -12,7 +12,6 @@ import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/rou
 import { ConfirmClickDirective, ControlErrorsComponent, defined, FormErrorComponent, FormHintComponent, LayoutComponent, ListViewComponent, SidebarMenuDirective, Subscriptions, TeamDto, TeamsState, TooltipDirective, TourStepDirective, TranslatePipe, UpdateTeamForm } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-more-page',
     styleUrls: ['./more-page.component.scss'],
     templateUrl: './more-page.component.html',

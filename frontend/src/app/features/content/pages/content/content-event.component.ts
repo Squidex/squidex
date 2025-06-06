@@ -10,7 +10,6 @@ import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from 
 import { ContentDto, FromNowPipe, HistoryEventDto, HistoryMessagePipe, TooltipDirective, TranslatePipe, TypedSimpleChanges, UserNameRefPipe, UserPictureRefPipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-content-event',
     styleUrls: ['./content-event.component.scss'],
     templateUrl: './content-event.component.html',

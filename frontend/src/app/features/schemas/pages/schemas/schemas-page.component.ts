@@ -17,7 +17,6 @@ import { SchemaCloning } from '../messages';
 import { SchemaFormComponent } from './schema-form.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-schemas-page',
     styleUrls: ['./schemas-page.component.scss'],
     templateUrl: './schemas-page.component.html',

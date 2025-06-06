@@ -12,7 +12,6 @@ import { AssetsService } from '@app/shared/internal';
 import { AssetFolderDropdowNode } from './asset-folder-dropdown.state';
 
 @Component({
-    standalone: true,
     selector: 'sqx-asset-folder-dropdown-item',
     styleUrls: ['./asset-folder-dropdown-item.component.scss'],
     templateUrl: './asset-folder-dropdown-item.component.html',

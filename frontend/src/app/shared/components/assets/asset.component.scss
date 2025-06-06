@@ -1,3 +1,4 @@
+@use 'sass:color';
 @import 'mixins';
 @import 'vars';
 
@@ -143,15 +144,18 @@ $list-height: 2.25rem;
 
 .overlay {
     @include overlay;
-    cursor: pointer;
-    font-size: $font-smallest;
-    font-weight: normal;
+    
+    & {
+        cursor: pointer;
+        font-size: $font-smallest;
+        font-weight: normal;
+    }
 
     &-menu {
         @include absolute(1rem, 1rem, auto, auto);
 
         a {
-            color: darken($color-white, 10%);
+            color: color.adjust($color-white, $lightness: -10%);
             cursor: pointer;
             font-size: 1.1rem;
             font-weight: normal;
@@ -260,7 +264,10 @@ $list-height: 2.25rem;
 
 .drop-overlay {
     @include overlay;
-    pointer-events: none;
+    
+    & {
+        pointer-events: none;
+    }
 
     &-text {
         font-size: 1.25rem;

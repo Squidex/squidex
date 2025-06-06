@@ -24,7 +24,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-reference-input',
     styleUrls: ['./reference-input.component.scss'],
     templateUrl: './reference-input.component.html',

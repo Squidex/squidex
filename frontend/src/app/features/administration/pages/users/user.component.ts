@@ -14,7 +14,6 @@ import { ConfirmClickDirective, StopClickDirective, TooltipDirective, UserDtoPic
 import { UserDto, UsersState } from '../../internal';
 
 @Component({
-    standalone: true,
     selector: '[sqxUser]',
     styleUrls: ['./user.component.scss'],
     templateUrl: './user.component.html',

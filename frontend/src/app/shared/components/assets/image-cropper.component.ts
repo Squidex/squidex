@@ -10,7 +10,6 @@ import Cropper from 'cropperjs';
 import { TooltipDirective, Types } from '@app/framework';
 
 @Component({
-    standalone: true,
     selector: 'sqx-image-editor',
     styleUrls: ['./image-cropper.component.scss'],
     templateUrl: './image-cropper.component.html',

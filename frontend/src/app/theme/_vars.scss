@@ -1,12 +1,13 @@
 /* stylelint-disable */
+@use 'sass:color';
 
 $color-background:          #f5f6f9;
 
 $color-border:              #dedfe3;
 $color-border-light:        #f5f6f9;
-$color-border-lighter:      lighten($color-border-light, 1%);
+$color-border-lighter:      color.adjust($color-border-light, $lightness: 1%);
 $color-border-dark:         #e7e8ea;
-$color-border-darker:       darken($color-border, 15%);
+$color-border-darker:       color.adjust($color-border, $lightness: -15%);
 
 $color-title:               #000;
 $color-text:                #373a3c;
@@ -41,7 +42,7 @@ $color-white:   #fff;
 $color-input:               #e0e1e5;
 $color-input-background:    #fff;
 $color-input-disabled:      #eff1f4;
-$color-input-placeholder:   lighten($color-text-decent, 20%);
+$color-input-placeholder:   color.adjust($color-text-decent, $lightness: 20%);
 $color-input-shortcut:      rgba(255, 255, 255, .2);
 
 $color-badge-success-background:    #e4f6e6;

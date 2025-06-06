@@ -27,7 +27,6 @@ type Snapshot = {
 };
 
 @Component({
-    standalone: true,
     selector: 'sqx-rule-page',
     styleUrls: ['./rule-page.component.scss'],
     templateUrl: './rule-page.component.html',

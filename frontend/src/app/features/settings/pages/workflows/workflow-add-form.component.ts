@@ -11,7 +11,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AddWorkflowForm, ControlErrorsComponent, FormHintComponent, TranslatePipe, WorkflowsState } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-workflow-add-form',
     styleUrls: ['./workflow-add-form.component.scss'],
     templateUrl: './workflow-add-form.component.html',

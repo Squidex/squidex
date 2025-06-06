@@ -24,7 +24,6 @@ import { StringUIComponent } from '../types/string-ui.component';
 import { TagsUIComponent } from '../types/tags-ui.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-field-form-ui',
     styleUrls: ['./field-form-ui.component.scss'],
     templateUrl: './field-form-ui.component.html',

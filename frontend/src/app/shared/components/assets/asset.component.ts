@@ -18,7 +18,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-asset',
     styleUrls: ['./asset.component.scss'],
     templateUrl: './asset.component.html',

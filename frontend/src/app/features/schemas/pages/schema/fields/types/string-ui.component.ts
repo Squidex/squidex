@@ -12,7 +12,6 @@ import { Observable } from 'rxjs';
 import { AssetFolderDropdownComponent, FieldDto, FormHintComponent, SchemaTagSource, StringFieldEditorValues, StringFieldPropertiesDto, Subscriptions, TagEditorComponent, TranslatePipe, TypedSimpleChanges, valueProjection$ } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-string-ui',
     styleUrls: ['string-ui.component.scss'],
     templateUrl: 'string-ui.component.html',

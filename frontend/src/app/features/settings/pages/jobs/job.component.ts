@@ -10,7 +10,6 @@ import { FormsModule } from '@angular/forms';
 import { ApiUrlConfig, CodeEditorComponent, ConfirmClickDirective, Duration, ExternalLinkDirective, FromNowPipe, JobDto, JobsState, StatusIconComponent, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-job',
     styleUrls: ['./job.component.scss'],
     templateUrl: './job.component.html',

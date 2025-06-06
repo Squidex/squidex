@@ -12,7 +12,6 @@ import { EMPTY, Observable, shareReplay } from 'rxjs';
 import { CodeEditorComponent, ConfigurePreviewUrlsForm, ConfirmClickDirective, ControlErrorsComponent, FormAlertComponent, SchemaDto, SchemasService, SchemasState, ScriptCompletions, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-schema-preview-urls-form',
     styleUrls: ['./schema-preview-urls-form.component.scss'],
     templateUrl: './schema-preview-urls-form.component.html',

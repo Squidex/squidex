@@ -10,7 +10,6 @@ import { RouterLink } from '@angular/router';
 import { ConfirmClickDirective, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, StopClickDirective, TeamDto, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-team',
     styleUrls: ['./team.component.scss'],
     templateUrl: './team.component.html',

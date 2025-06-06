@@ -11,7 +11,6 @@ import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/for
 import { BooleanFieldEditorValues, BooleanFieldPropertiesDto, FieldDto, FormHintComponent, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-boolean-ui',
     styleUrls: ['boolean-ui.component.scss'],
     templateUrl: 'boolean-ui.component.html',

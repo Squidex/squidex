@@ -28,7 +28,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-profile-menu',
     styleUrls: ['./profile-menu.component.scss'],
     templateUrl: './profile-menu.component.html',

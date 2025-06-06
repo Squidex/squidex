@@ -12,7 +12,6 @@ import { TypedSimpleChanges, Types } from '../internal';
 
 @Directive({
     selector: '[sqxScrollActive]',
-    standalone: true,
 })
 export class ScrollActiveDirective implements AfterViewInit {
     @Input({ alias: 'sqxScrollActive', transform: booleanAttribute })

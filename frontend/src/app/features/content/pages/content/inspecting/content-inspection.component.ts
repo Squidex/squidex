@@ -15,7 +15,6 @@ import { AppLanguageDto, CodeEditorComponent, ContentDto, ContentsService, Conte
 type Mode = 'Content' | 'Data' | 'FlatData';
 
 @Component({
-    standalone: true,
     selector: 'sqx-content-inspection',
     styleUrls: ['./content-inspection.component.scss'],
     templateUrl: './content-inspection.component.html',

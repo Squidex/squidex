@@ -14,7 +14,6 @@ import { ApiUrlConfig, JobsState, LayoutComponent, ListViewComponent, ShortcutDi
 import { JobComponent } from './job.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-jobs-page',
     styleUrls: ['./jobs-page.component.scss'],
     templateUrl: './jobs-page.component.html',

@@ -3,7 +3,8 @@
         <input
             class="form-control"
             (blur)="blur()"
-            (focus)="focus()"
+            (click)="picker.click()"
+            (focus)="picker.click()"
             [ngModel]="snapshot.value"
             (ngModelChange)="updateValue($event)"
             [placeholder]="placeholder"
@@ -11,18 +12,8 @@
             [style.color]="snapshot.foreground"
             type="text" />
     } @else {
-        <div class="circle" (click)="focus()" [style.background]="snapshot.value"></div>
+        <div class="circle" (click)="picker.click()" (focus)="picker.click()" [style.background]="snapshot.value"></div>
     }
-    <ng-template #circle>
-        <div class="circle" (click)="focus()" [style.background]="snapshot.value"></div>
-    </ng-template>
+
+    <input class="color-picker" #picker [ngModel]="snapshot.parsed" (ngModelChange)="updateValue($event)" type="color" />
 </span>
-<div position="bottom-start" [sqxAnchoredTo]="input" *sqxModal="modal" [style.height]="'280px'" [style.width]="'230px'">
-    <div
-        [colorPicker]="snapshot.value"
-        (colorPickerChange)="updateValue($event)"
-        [cpCancelButton]="false"
-        [cpDialogDisplay]="'inline'"
-        [cpToggle]="true"
-        [style.background]="snapshot.value"></div>
-</div>

@@ -13,7 +13,6 @@ import { WorkflowDiagramComponent } from './workflow-diagram.component';
 import { WorkflowStepComponent } from './workflow-step.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-workflow',
     styleUrls: ['./workflow.component.scss'],
     templateUrl: './workflow.component.html',

@@ -13,7 +13,6 @@ import { FormsModule } from '@angular/forms';
 import { AssignContributorDto, ConfirmClickDirective, ContributorDto, ContributorsState, HighlightPipe, RoleDto, TooltipDirective, UserPicturePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: '[sqxContributor][roles]',
     styleUrls: ['./contributor.component.scss'],
     templateUrl: './contributor.component.html',

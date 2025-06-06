@@ -10,7 +10,6 @@ import { FormsModule } from '@angular/forms';
 import { TagEditorComponent, TranslatePipe, WorkflowTransitionValues, WorkflowTransitionView, WorkflowView } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-workflow-transition',
     styleUrls: ['./workflow-transition.component.scss'],
     templateUrl: './workflow-transition.component.html',

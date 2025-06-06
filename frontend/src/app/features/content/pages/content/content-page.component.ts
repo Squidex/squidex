@@ -21,7 +21,6 @@ import { ContentReferencesComponent } from './references/content-references.comp
 type SaveNavigationMode = 'Close' | 'Add' | 'Edit';
 
 @Component({
-    standalone: true,
     selector: 'sqx-content-page',
     styleUrls: ['./content-page.component.scss'],
     templateUrl: './content-page.component.html',

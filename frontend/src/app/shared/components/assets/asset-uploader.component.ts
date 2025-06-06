@@ -11,7 +11,6 @@ import { DropdownMenuComponent, FileDropDirective, HTTP, ModalDirective, ModalPl
 import { AppsState, AssetsState, AssetUploaderState, ModalModel, Types, Upload } from '@app/shared/internal';
 
 @Component({
-    standalone: true,
     selector: 'sqx-asset-uploader',
     styleUrls: ['./asset-uploader.component.scss'],
     templateUrl: './asset-uploader.component.html',

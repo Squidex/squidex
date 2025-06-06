@@ -12,7 +12,6 @@ import { ResizeListener, ResizeService, Subscriptions } from '@app/framework/int
 
 @Directive({
     selector: '[sqxResized], [sqxResizeCondition]',
-    standalone: true,
 })
 export class ResizedDirective implements ResizeListener {
     private readonly subscriptions = new Subscriptions();

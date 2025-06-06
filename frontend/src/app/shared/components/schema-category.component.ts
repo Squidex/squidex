@@ -15,7 +15,6 @@ import { LocalStoreService, SchemaCategory, SchemaDto, SchemasState } from '@app
 const ITEM_HEIGHT = 2.5;
 
 @Component({
-    standalone: true,
     selector: 'sqx-schema-category',
     styleUrls: ['./schema-category.component.scss'],
     templateUrl: './schema-category.component.html',

@@ -26,7 +26,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-references-editor',
     styleUrls: ['./references-editor.component.scss'],
     templateUrl: './references-editor.component.html',

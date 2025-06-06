@@ -11,7 +11,6 @@ import { RouterLink } from '@angular/router';
 import { AppDto, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-schema-card',
     styleUrls: ['./schema-card.component.scss'],
     templateUrl: './schema-card.component.html',

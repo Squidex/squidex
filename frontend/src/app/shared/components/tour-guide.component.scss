@@ -1,3 +1,4 @@
+@use 'sass:color';
 @import 'mixins';
 @import 'vars';
 
@@ -44,7 +45,7 @@ $caret-size: 14px;
 
     &.active {
         &:hover {
-            color: darken($color-text, 50%) !important;
+            color: color.adjust($color-text, $lightness: -50%) !important;
             cursor: pointer
         }
     }

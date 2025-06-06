@@ -16,7 +16,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-content-section',
     styleUrls: ['./content-section.component.scss'],
     templateUrl: './content-section.component.html',

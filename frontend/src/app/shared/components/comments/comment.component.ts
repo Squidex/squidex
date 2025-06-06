@@ -18,7 +18,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-comment',
     styleUrls: ['./comment.component.scss'],
     templateUrl: './comment.component.html',

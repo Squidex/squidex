@@ -13,7 +13,6 @@ import { ControlErrorsComponent, FormErrorComponent, LayoutComponent, ShortcutDi
 import { UserDto, UserForm, UsersState } from '../../internal';
 
 @Component({
-    standalone: true,
     selector: 'sqx-user-page',
     styleUrls: ['./user-page.component.scss'],
     templateUrl: './user-page.component.html',

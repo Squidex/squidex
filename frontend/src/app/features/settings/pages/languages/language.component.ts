@@ -12,7 +12,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppLanguageDto, ConfirmClickDirective, EditLanguageForm, FormHintComponent, LanguageDto, LanguagesState, sorted, TranslatePipe, UpdateLanguageDto } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-language',
     styleUrls: ['./language.component.scss'],
     templateUrl: './language.component.html',

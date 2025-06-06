@@ -13,7 +13,6 @@ import { HistoryStepComponent } from './history-step.component';
 import { StateStepComponent } from './state-step.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-state-details',
     styleUrls: ['./state-details.component.scss'],
     templateUrl: './state-details.component.html',

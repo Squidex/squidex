@@ -12,7 +12,6 @@ import { defined, LayoutContainerDirective, TeamsState, TitleComponent } from '@
 import { LeftMenuComponent } from './left-menu.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-team-area',
     styleUrls: ['./team-area.component.scss'],
     templateUrl: './team-area.component.html',

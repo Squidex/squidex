@@ -11,7 +11,6 @@ import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/for
 import { AppLanguageDto, AssetsFieldPropertiesDto, FieldDto, FormHintComponent, LocalizedInputComponent, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-assets-validation',
     styleUrls: ['assets-validation.component.scss'],
     templateUrl: 'assets-validation.component.html',

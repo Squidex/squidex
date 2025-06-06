@@ -11,7 +11,6 @@ import { LayoutComponent, SchemasState } from '@app/shared';
 import { ContentExtensionComponent } from '../../shared/content-extension.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-contents-plugin',
     styleUrls: ['./contents-plugin.component.scss'],
     templateUrl: './contents-plugin.component.html',

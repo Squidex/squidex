@@ -11,7 +11,6 @@ import { ToolbarService } from '@app/framework/internal';
 import { TranslatePipe } from './pipes/translate.pipe';
 
 @Component({
-    standalone: true,
     selector: 'sqx-toolbar',
     styleUrls: ['./toolbar.component.scss'],
     templateUrl: './toolbar.component.html',

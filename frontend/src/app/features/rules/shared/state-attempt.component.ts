@@ -11,7 +11,6 @@ import { FormsModule } from '@angular/forms';
 import { CodeEditorComponent, FlowExecutionStepAttemptDto, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-state-attempt',
     styleUrls: ['./state-attempt.component.scss'],
     templateUrl: './state-attempt.component.html',

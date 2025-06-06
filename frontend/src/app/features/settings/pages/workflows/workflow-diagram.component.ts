@@ -11,7 +11,6 @@ import { ListViewComponent, ResourceLoaderService, WorkflowView } from '@app/sha
 declare const vis: any;
 
 @Component({
-    standalone: true,
     selector: 'sqx-workflow-diagram',
     styleUrls: ['./workflow-diagram.component.scss'],
     templateUrl: './workflow-diagram.component.html',

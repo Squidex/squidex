@@ -11,7 +11,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { CodeEditorComponent, SchemaDto, SchemasState, SynchronizeSchemaForm, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-schema-export-form',
     styleUrls: ['./schema-export-form.component.scss'],
     templateUrl: './schema-export-form.component.html',

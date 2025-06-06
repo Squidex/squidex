@@ -21,7 +21,6 @@ import { SchemaScriptsFormComponent } from './scripts/schema-scripts-form.compon
 import { SchemaUIFormComponent } from './ui/schema-ui-form.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-schema-page',
     styleUrls: ['./schema-page.component.scss'],
     templateUrl: './schema-page.component.html',

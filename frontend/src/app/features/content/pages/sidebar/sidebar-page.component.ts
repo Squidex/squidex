@@ -12,7 +12,6 @@ import { ContentsState, defined, LayoutComponent, SchemasState } from '@app/shar
 import { ContentExtensionComponent } from '../../shared/content-extension.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-sidebar-page',
     styleUrls: ['./sidebar-page.component.scss'],
     templateUrl: './sidebar-page.component.html',

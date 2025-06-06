@@ -10,7 +10,6 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
 import { TeamDto, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-left-menu',
     styleUrls: ['./left-menu.component.scss'],
     templateUrl: './left-menu.component.html',

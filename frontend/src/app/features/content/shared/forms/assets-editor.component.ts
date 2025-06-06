@@ -41,7 +41,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-assets-editor',
     styleUrls: ['./assets-editor.component.scss'],
     templateUrl: './assets-editor.component.html',

@@ -13,7 +13,6 @@ import { LanguageAddFormComponent } from './language-add-form.component';
 import { LanguageComponent } from './language.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-languages-page',
     styleUrls: ['./languages-page.component.scss'],
     templateUrl: './languages-page.component.html',

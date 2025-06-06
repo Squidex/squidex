@@ -12,7 +12,6 @@ import { defined, LayoutComponent, TeamsState, TitleComponent } from '@app/share
 import { SettingsMenuComponent } from './settings-menu.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-settings-area',
     styleUrls: ['./settings-area.component.scss'],
     templateUrl: './settings-area.component.html',

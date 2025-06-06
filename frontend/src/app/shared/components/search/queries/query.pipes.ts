@@ -10,7 +10,6 @@ import { Pipe, PipeTransform } from '@angular/core';
 @Pipe({
     name: 'sqxFilterOperator',
     pure: true,
-    standalone: true,
 })
 export class FilterOperatorPipe implements PipeTransform {
     public transform(value: any) {

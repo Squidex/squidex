@@ -30,7 +30,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-dialog-renderer',
     styleUrls: ['./dialog-renderer.component.scss'],
     templateUrl: './dialog-renderer.component.html',

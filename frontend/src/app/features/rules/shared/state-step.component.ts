@@ -14,7 +14,6 @@ import { StateAttemptComponent } from './state-attempt.component';
 import { StateStepPropertyComponent } from './state-step-property.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-state-step',
     styleUrls: ['./state-step.component.scss'],
     templateUrl: './state-step.component.html',

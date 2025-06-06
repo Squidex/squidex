@@ -11,7 +11,6 @@ import { FormsModule } from '@angular/forms';
 import { CodeEditorComponent, RuleElementPropertyDto, Types } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-state-step-property',
     styleUrls: ['./state-step-property.component.scss'],
     templateUrl: './state-step-property.component.html',

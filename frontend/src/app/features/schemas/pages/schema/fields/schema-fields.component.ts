@@ -12,7 +12,6 @@ import { FieldWizardComponent } from './field-wizard.component';
 import { SortableFieldListComponent } from './sortable-field-list.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-schema-fields',
     styleUrls: ['./schema-fields.component.scss'],
     templateUrl: './schema-fields.component.html',

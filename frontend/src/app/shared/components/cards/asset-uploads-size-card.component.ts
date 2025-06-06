@@ -11,7 +11,6 @@ import { TranslatePipe } from '@app/framework';
 import { ChartHelpers, ChartOptions, StorageUsagePerDateDto } from '@app/shared/internal';
 
 @Component({
-    standalone: true,
     selector: 'sqx-asset-uploads-size-card',
     styleUrls: ['./asset-uploads-size-card.component.scss'],
     templateUrl: './asset-uploads-size-card.component.html',

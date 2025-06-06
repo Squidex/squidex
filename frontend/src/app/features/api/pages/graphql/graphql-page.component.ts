@@ -6,16 +6,15 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { createGraphiQLFetcher } from '@graphiql/toolkit';
-import GraphiQL from 'graphiql';
+import { GraphiQL } from 'graphiql';
 import * as React from 'react';
-import * as ReactDOM from 'react-dom';
+import * as ReactDOM from 'react-dom/client';
 import { ApiUrlConfig, AppsState, AuthService, ClientDto, ClientsService, ClientsState, DialogModel, FormHintComponent, LayoutComponent, MessageBus, ModalDialogComponent, ModalDirective, QueryExecuted, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, Types } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-graphql-page',
     styleUrls: ['./graphql-page.component.scss'],
     templateUrl: './graphql-page.component.html',
@@ -32,7 +31,9 @@ import { ApiUrlConfig, AppsState, AuthService, ClientDto, ClientsService, Client
         TranslatePipe,
     ],
 })
-export class GraphQLPageComponent implements AfterViewInit, OnInit {
+export class GraphQLPageComponent implements AfterViewInit, OnInit, OnDestroy {
+    private reactRoot?: ReactDOM.Root | null;
+
     @ViewChild('graphiQLContainer', { static: false })
     public graphiQLContainer!: ElementRef;
 
@@ -50,6 +51,11 @@ export class GraphQLPageComponent implements AfterViewInit, OnInit {
     ) {
     }
 
+    public ngOnDestroy() {
+        this.reactRoot?.unmount();
+        this.reactRoot = null;
+    }
+
     public ngOnInit() {
         this.clientsReadable = this.appsState.snapshot.selectedApp!.canReadClients;
 
@@ -59,6 +65,7 @@ export class GraphQLPageComponent implements AfterViewInit, OnInit {
     }
 
     public ngAfterViewInit() {
+        this.reactRoot = ReactDOM.createRoot(this.graphiQLContainer.nativeElement);
         this.selectClient(null);
     }
 
@@ -103,12 +110,10 @@ export class GraphQLPageComponent implements AfterViewInit, OnInit {
             subscriptionUrl,
         });
 
-        // eslint-disable-next-line deprecation/deprecation
-        ReactDOM.render(
+        this.reactRoot?.render(
             React.createElement(GraphiQL, {
                 fetcher,
             }),
-            this.graphiQLContainer.nativeElement,
         );
     }
 }

@@ -11,7 +11,6 @@ import { map, Observable, shareReplay } from 'rxjs';
 import { AppsState, ClientsState, FormHintComponent, LoaderComponent, MarkdownDirective, TemplateDetailsDto, TemplateDto, TemplatesService, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-template',
     styleUrls: ['./template.component.scss'],
     templateUrl: './template.component.html',

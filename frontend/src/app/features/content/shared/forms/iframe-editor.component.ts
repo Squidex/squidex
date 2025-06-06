@@ -16,7 +16,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-iframe-editor',
     styleUrls: ['./iframe-editor.component.scss'],
     templateUrl: './iframe-editor.component.html',

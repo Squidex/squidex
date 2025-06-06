@@ -13,7 +13,6 @@ import { DateTime, DateTimeEditorComponent, DialogModel, FocusOnInitDirective, M
 const OPTION_IMMEDIATELY = 'Immediately';
 
 @Component({
-    standalone: true,
     selector: 'sqx-due-time-selector',
     styleUrls: ['./due-time-selector.component.scss'],
     templateUrl: './due-time-selector.component.html',

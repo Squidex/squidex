@@ -31,7 +31,6 @@ interface State {
 type UpdateOptions = { reset?: boolean; pan?: true; fire?: boolean };
 
 @Component({
-    standalone: true,
     selector: 'sqx-geolocation-editor',
     styleUrls: ['./geolocation-editor.component.scss'],
     templateUrl: './geolocation-editor.component.html',

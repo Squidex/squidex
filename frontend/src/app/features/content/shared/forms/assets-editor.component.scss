@@ -1,3 +1,4 @@
+@use 'sass:color';
 @import 'mixins';
 @import 'vars';
 
@@ -36,8 +37,8 @@
 
 .btn-add {
     &.drag {
-        border-color: darken($color-theme-secondary, 20%);
-        color: darken($color-border, 40%);
+        border-color: color.adjust($color-theme-secondary, $lightness: -20%);
+        color: color.adjust($color-border, $lightness: -40%);
         cursor: copy;
     }
 }

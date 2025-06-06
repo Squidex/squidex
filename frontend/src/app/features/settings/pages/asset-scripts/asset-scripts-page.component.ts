@@ -14,7 +14,6 @@ import { AppsState, AssetScriptsState, AssetsService, CodeEditorComponent, EditA
 import { ScriptNamePipe } from '@app/shared/components/pipes';
 
 @Component({
-    standalone: true,
     selector: 'sqx-asset-scripts-page',
     styleUrls: ['./asset-scripts-page.component.scss'],
     templateUrl: './asset-scripts-page.component.html',

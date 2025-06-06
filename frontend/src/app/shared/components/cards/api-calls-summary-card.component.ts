@@ -11,7 +11,6 @@ import { KNumberPipe, TranslatePipe } from '@app/framework';
 import { CallsUsageDto } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-api-calls-summary-card',
     styleUrls: ['./api-calls-summary-card.component.scss'],
     templateUrl: './api-calls-summary-card.component.html',

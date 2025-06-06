@@ -38,7 +38,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-tag-editor',
     styleUrls: ['./tag-editor.component.scss'],
     templateUrl: './tag-editor.component.html',

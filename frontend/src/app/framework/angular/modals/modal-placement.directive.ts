@@ -11,7 +11,6 @@ import { FloatingPlacement, TypedSimpleChanges, Types } from '@app/framework/int
 
 @Directive({
     selector: '[sqxAnchoredTo]',
-    standalone: true,
 })
 export class ModalPlacementDirective implements AfterViewInit, OnDestroy {
     private currentListener?: any;

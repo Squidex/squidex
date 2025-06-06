@@ -1,3 +1,4 @@
+@use 'sass:color';
 @import 'mixins';
 @import 'vars';
 
@@ -47,8 +48,8 @@
     margin-bottom: 1rem;
 
     &-separator {
-        border-bottom: 1px solid darken($color-border, 5%);
-        color: lighten($color-text, 20%);
+        border-bottom: 1px solid color.adjust($color-border, $lightness: -5%);
+        color: color.adjust($color-text, $lightness: 20%);
         font-size: 1.3rem;
         font-weight: normal;
         margin-bottom: 0;

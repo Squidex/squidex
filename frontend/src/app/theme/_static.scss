@@ -1,3 +1,4 @@
+@use 'sass:color';
 @import 'mixins';
 @import 'vars';
 
@@ -118,7 +119,7 @@ noscript {
             background: $color-white;
             border: 0;
             bottom: -.75rem;
-            color: darken($color-border, 15%);
+            color: color.adjust($color-border, $lightness: -15%);
             display: inline-block;
             padding: 0 1rem;
             position: relative;

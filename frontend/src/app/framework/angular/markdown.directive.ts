@@ -10,7 +10,6 @@ import { markdownRender } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxMarkdown]',
-    standalone: true,
 })
 export class MarkdownDirective {
     @Input('sqxMarkdown')

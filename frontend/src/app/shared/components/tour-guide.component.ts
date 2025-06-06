@@ -16,7 +16,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-tour-guide',
     styleUrls: ['./tour-guide.component.scss'],
     templateUrl: './tour-guide.component.html',

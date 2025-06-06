@@ -10,7 +10,6 @@ import { ResizeListener, ResizeService, Subscriptions } from '@app/framework/int
 
 @Directive({
     selector: '[sqxCompensateScrollbar]',
-    standalone: true,
 })
 export class CompensateScrollbarDirective implements AfterViewInit, ResizeListener {
     private readonly subscriptions = new Subscriptions();

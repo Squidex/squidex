@@ -23,7 +23,6 @@ import { ImageFocusPointComponent } from './image-focus-point.component';
 import { AssetPreviewUrlPipe, AssetUrlPipe, PreviewableType } from './pipes';
 
 @Component({
-    standalone: true,
     selector: 'sqx-asset-dialog',
     styleUrls: ['./asset-dialog.component.scss'],
     templateUrl: './asset-dialog.component.html',

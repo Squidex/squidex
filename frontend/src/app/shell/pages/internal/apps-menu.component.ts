@@ -13,7 +13,6 @@ import { map } from 'rxjs/operators';
 import { AppFormComponent, AppsState, DialogModel, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, TeamFormComponent, TeamsState, Title, TitleService, TranslatePipe, UIState } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-apps-menu',
     styleUrls: ['./apps-menu.component.scss'],
     templateUrl: './apps-menu.component.html',

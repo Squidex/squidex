@@ -22,7 +22,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-content-list-field',
     styleUrls: ['./content-list-field.component.scss'],
     templateUrl: './content-list-field.component.html',

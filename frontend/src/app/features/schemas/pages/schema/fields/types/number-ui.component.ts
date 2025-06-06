@@ -12,7 +12,6 @@ import { Observable } from 'rxjs';
 import { FieldDto, FloatConverter, FormHintComponent, NumberFieldEditorValues, NumberFieldPropertiesDto, Subscriptions, TagEditorComponent, TranslatePipe, TypedSimpleChanges, valueProjection$ } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-number-ui',
     styleUrls: ['number-ui.component.scss'],
     templateUrl: 'number-ui.component.html',

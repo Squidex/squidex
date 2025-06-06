@@ -32,7 +32,6 @@ const ERRORS_AFTER_ENRICHED_EVENT = [
 ];
 
 @Component({
-    standalone: true,
     selector: '[sqxSimulatedRuleEvent]',
     styleUrls: ['./simulated-rule-event.component.scss'],
     templateUrl: './simulated-rule-event.component.html',

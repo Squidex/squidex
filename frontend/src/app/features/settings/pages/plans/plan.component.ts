@@ -10,7 +10,6 @@ import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ConfirmClickDirective, FileSizePipe, FormHintComponent, KNumberPipe, PlanInfo, PlansState, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-plan',
     styleUrls: ['./plan.component.scss'],
     templateUrl: './plan.component.html',

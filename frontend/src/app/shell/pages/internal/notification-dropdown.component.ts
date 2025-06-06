@@ -12,7 +12,6 @@ import { tap } from 'rxjs/operators';
 import { AuthService, CollaborationService, CommentComponent, CommentsState, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, Subscriptions, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-notification-dropdown',
     styleUrls: ['./notification-dropdown.component.scss'],
     templateUrl: './notification-dropdown.component.html',

@@ -12,7 +12,7 @@
 
     &:hover,
     &:focus {
-        color: darken($color, 10%);
+        color: color.adjust($color, $lightness: -10%);
     }
 }
 
@@ -40,7 +40,7 @@
 
     &:active,
     &:hover {
-        color: darken($color, 15%);
+        color: color.adjust($color, $lightness: -15%);
     }
 
     &:active {

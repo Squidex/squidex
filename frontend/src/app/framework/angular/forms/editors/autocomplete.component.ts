@@ -65,7 +65,6 @@ const NO_QUERY = { text: '' };
 const RANGE_LIMIT = 60;
 
 @Component({
-    standalone: true,
     selector: 'sqx-autocomplete',
     styleUrls: ['./autocomplete.component.scss'],
     templateUrl: './autocomplete.component.html',

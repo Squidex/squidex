@@ -22,7 +22,6 @@ import { IFrameEditorComponent } from './iframe-editor.component';
 import { StockPhotoEditorComponent } from './stock-photo-editor.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-field-editor',
     styleUrls: ['./field-editor.component.scss'],
     templateUrl: './field-editor.component.html',

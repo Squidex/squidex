@@ -14,7 +14,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-content-summary-card',
     styleUrls: ['./content-summary-card.component.scss'],
     templateUrl: './content-summary-card.component.html',

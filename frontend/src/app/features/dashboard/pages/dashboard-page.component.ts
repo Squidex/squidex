@@ -17,7 +17,6 @@ import { SchemaCardComponent } from './cards/schema-card.component';
 import { DashboardConfigComponent } from './dashboard-config.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-dashboard-page',
     styleUrls: ['./dashboard-page.component.scss'],
     templateUrl: './dashboard-page.component.html',

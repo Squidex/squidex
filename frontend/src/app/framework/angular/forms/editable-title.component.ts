@@ -14,7 +14,6 @@ import { ControlErrorsComponent } from './control-errors.component';
 import { FocusOnInitDirective } from './focus-on-init.directive';
 
 @Component({
-    standalone: true,
     selector: 'sqx-editable-title',
     styleUrls: ['./editable-title.component.scss'],
     templateUrl: './editable-title.component.html',

@@ -18,7 +18,6 @@ import { TeamComponent } from './team.component';
 type GroupedApps = { team?: TeamDto; apps: AppDto[] };
 
 @Component({
-    standalone: true,
     selector: 'sqx-apps-page',
     styleUrls: ['./apps-page.component.scss'],
     templateUrl: './apps-page.component.html',

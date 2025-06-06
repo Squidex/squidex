@@ -11,7 +11,6 @@ import { DialogService, Types } from '@app/framework/internal';
 
 @Directive({
     selector: '[sqxConfirmClick]',
-    standalone: true,
 })
 export class ConfirmClickDirective {
     @Input()

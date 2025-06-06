@@ -11,7 +11,6 @@ import { map } from 'rxjs/operators';
 import { ContentsState, defined, LayoutComponent, Queries, Query, QueryListComponent, SavedQueriesComponent, SchemasState, TranslatePipe, UIState } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-contents-filters-page',
     styleUrls: ['./contents-filters-page.component.scss'],
     templateUrl: './contents-filters-page.component.html',

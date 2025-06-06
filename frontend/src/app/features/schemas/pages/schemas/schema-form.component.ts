@@ -11,7 +11,6 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ApiUrlConfig, AppsState, CodeEditorComponent, ControlErrorsComponent, CreateSchemaForm, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, ModalDialogComponent, SchemaDto, SchemasState, TooltipDirective, TransformInputDirective, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-schema-form',
     styleUrls: ['./schema-form.component.scss'],
     templateUrl: './schema-form.component.html',

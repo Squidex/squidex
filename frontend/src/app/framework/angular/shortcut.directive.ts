@@ -12,7 +12,6 @@ import { ShortcutService } from '@app/framework/internal';
 
 @Directive({
     selector: '[shortcut]',
-    standalone: true,
 })
 export class ShortcutDirective implements OnDestroy, OnInit {
     private subscription?: Function;

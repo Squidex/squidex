@@ -20,7 +20,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-preview-button',
     styleUrls: ['./preview-button.component.scss'],
     templateUrl: './preview-button.component.html',

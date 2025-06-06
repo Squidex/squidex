@@ -13,7 +13,6 @@ import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
 import { HistoryMessagePipe } from './pipes';
 
 @Component({
-    standalone: true,
     selector: 'sqx-history-list',
     styleUrls: ['./history-list.component.scss'],
     templateUrl: './history-list.component.html',

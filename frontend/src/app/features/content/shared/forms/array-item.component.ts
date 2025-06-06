@@ -13,7 +13,6 @@ import { AppLanguageDto, ComponentForm, EditContentForm, FieldDto, FieldFormatte
 import { ComponentSectionComponent } from './component-section.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-array-item',
     styleUrls: ['./array-item.component.scss'],
     templateUrl: './array-item.component.html',

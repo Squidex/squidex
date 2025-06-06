@@ -17,7 +17,6 @@ export const SQX_FORMATTABLE_INPUT_CONTROL_VALUE_ACCESSOR: any = {
 };
 
 @Component({
-    standalone: true,
     selector: 'sqx-formattable-input',
     styleUrls: ['./formattable-input.component.scss'],
     templateUrl: './formattable-input.component.html',

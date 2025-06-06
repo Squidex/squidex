@@ -14,7 +14,6 @@ import { UsersState } from '../../internal';
 import { UserComponent } from './user.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-users-page',
     styleUrls: ['./users-page.component.scss'],
     templateUrl: './users-page.component.html',

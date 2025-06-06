@@ -11,7 +11,6 @@ import { AuthService } from '@app/shared/internal';
 import { TourHintDirective } from './tour-hint.directive';
 
 @Component({
-    standalone: true,
     selector: 'sqx-notifo',
     styleUrls: ['./notifo.component.scss'],
     templateUrl: './notifo.component.html',

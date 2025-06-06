@@ -11,7 +11,6 @@ import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/for
 import { AppLanguageDto, FieldDto, FormHintComponent, LocalizedInputComponent, ReferencesFieldPropertiesDto, SchemaTagSource, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-references-validation',
     styleUrls: ['references-validation.component.scss'],
     templateUrl: 'references-validation.component.html',

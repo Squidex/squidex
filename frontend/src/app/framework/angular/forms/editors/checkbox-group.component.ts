@@ -24,7 +24,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-checkbox-group',
     styleUrls: ['./checkbox-group.component.scss'],
     templateUrl: './checkbox-group.component.html',

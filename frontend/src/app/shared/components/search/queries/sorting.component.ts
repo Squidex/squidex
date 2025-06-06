@@ -12,7 +12,6 @@ import { QueryModel, QuerySorting, SORT_MODES } from '@app/shared/internal';
 import { QueryPathComponent } from './query-path.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-sorting',
     styleUrls: ['./sorting.component.scss'],
     templateUrl: './sorting.component.html',

@@ -1,9 +1,12 @@
+@use 'sass:color';
 @import "mixins";
 @import "vars";
 
+$background-color: color.adjust($color-border, $lightness: 2%);
+
 :host ::ng-deep {
     .panel2-main-inner.white {
-        background-image: radial-gradient(lighten($color-border, 2%) 1px, transparent 0);
+        background-image: radial-gradient($background-color 1px, transparent 0);
         background-size: 1rem 1rem;
     }
 

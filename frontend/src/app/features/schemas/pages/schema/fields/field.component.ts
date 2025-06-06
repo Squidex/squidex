@@ -14,7 +14,6 @@ import { FieldFormComponent } from './forms/field-form.component';
 import { SortableFieldListComponent } from './sortable-field-list.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-field',
     styleUrls: ['./field.component.scss'],
     templateUrl: './field.component.html',

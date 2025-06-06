@@ -13,7 +13,6 @@ import { HelpService } from '@app/shared/internal';
 import { HelpMarkdownPipe } from './help-markdown.pipe';
 
 @Component({
-    standalone: true,
     selector: 'sqx-help',
     styleUrls: ['./help.component.scss'],
     templateUrl: './help.component.html',

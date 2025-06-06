@@ -12,7 +12,6 @@ import { ControlErrorsComponent, FocusOnInitDirective, FormAlertComponent, FormE
 import { ApiUrlConfig, CreateTeamForm, TeamsState } from '@app/shared/internal';
 
 @Component({
-    standalone: true,
     selector: 'sqx-team-form',
     styleUrls: ['./team-form.component.scss'],
     templateUrl: './team-form.component.html',

@@ -13,7 +13,6 @@ import { TeamPlansState } from '../../internal';
 import { PlanComponent } from './plan.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-plans-page',
     styleUrls: ['./plans-page.component.scss'],
     templateUrl: './plans-page.component.html',

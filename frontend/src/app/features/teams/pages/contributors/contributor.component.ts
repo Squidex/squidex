@@ -12,7 +12,6 @@ import { AssignContributorDto, ConfirmClickDirective, ContributorDto, HighlightP
 import { TeamContributorsState } from '../../internal';
 
 @Component({
-    standalone: true,
     selector: '[sqxContributor]',
     styleUrls: ['./contributor.component.scss'],
     templateUrl: './contributor.component.html',

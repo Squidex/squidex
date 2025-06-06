@@ -14,7 +14,6 @@ import { FieldEditorComponent } from './field-editor.component';
 import { FieldLanguagesComponent } from './field-languages.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-content-field',
     styleUrls: ['./content-field.component.scss'],
     templateUrl: './content-field.component.html',

@@ -22,7 +22,6 @@ interface State {
 const NO_EMIT = { emitEvent: false };
 
 @Component({
-    standalone: true,
     selector: 'sqx-references-radio-buttons',
     styleUrls: ['./references-radio-buttons.component.scss'],
     templateUrl: './references-radio-buttons.component.html',

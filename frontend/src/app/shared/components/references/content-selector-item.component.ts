@@ -16,7 +16,6 @@ import { ContentListCellDirective } from '../contents/content-list-cell.directiv
 import { ContentListFieldComponent } from '../contents/content-list-field.component';
 
 @Component({
-    standalone: true,
     selector: '[sqxContentSelectorItem][language][languages][schema]',
     styleUrls: ['./content-selector-item.component.scss'],
     templateUrl: './content-selector-item.component.html',

@@ -10,7 +10,6 @@ import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Inp
 import { AppLanguageDto, FieldForm, LanguageSelectorComponent, TourHintDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 
 @Component({
-    standalone: true,
     selector: 'sqx-field-languages',
     styleUrls: ['./field-languages.component.scss'],
     templateUrl: './field-languages.component.html',

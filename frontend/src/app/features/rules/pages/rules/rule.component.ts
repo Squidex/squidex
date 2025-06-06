@@ -13,7 +13,6 @@ import { BranchItem, ConfirmClickDirective, DropdownMenuComponent, DynamicRuleDt
 import { RuleElementComponent } from '../../shared/rule-element.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-rule',
     styleUrls: ['./rule.component.scss'],
     templateUrl: './rule.component.html',

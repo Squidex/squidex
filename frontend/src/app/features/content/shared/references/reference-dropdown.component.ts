@@ -30,7 +30,6 @@ type ContentName = { name: string; id?: string };
 const NO_EMIT = { emitEvent: false };
 
 @Component({
-    standalone: true,
     selector: 'sqx-reference-dropdown',
     styleUrls: ['./reference-dropdown.component.scss'],
     templateUrl: './reference-dropdown.component.html',

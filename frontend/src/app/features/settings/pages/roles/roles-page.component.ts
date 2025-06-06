@@ -32,7 +32,6 @@ class PermissionsAutocomplete implements AutocompleteSource {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-roles-page',
     styleUrls: ['./roles-page.component.scss'],
     templateUrl: './roles-page.component.html',

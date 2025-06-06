@@ -11,7 +11,6 @@ import { ColorHelper } from '@app/framework/utils/color-helper';
 @Pipe({
     name: 'sqxDarken',
     pure: true,
-    standalone: true,
 })
 export class DarkenPipe implements PipeTransform {
     public transform(value: string, percentage: number): any {
@@ -27,7 +26,6 @@ export class DarkenPipe implements PipeTransform {
 @Pipe({
     name: 'sqxLighten',
     pure: true,
-    standalone: true,
 })
 export class LightenPipe implements PipeTransform {
     public transform(value: string, percentage: number): any {
@@ -43,7 +41,6 @@ export class LightenPipe implements PipeTransform {
 @Pipe({
     name: 'sqxStringColor',
     pure: true,
-    standalone: true,
 })
 export class StringColorPipe implements PipeTransform {
     public transform(value?: string) {

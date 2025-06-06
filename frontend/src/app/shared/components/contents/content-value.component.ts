@@ -15,7 +15,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-content-value',
     styleUrls: ['./content-value.component.scss'],
     templateUrl: './content-value.component.html',

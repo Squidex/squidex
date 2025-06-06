@@ -21,7 +21,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-radio-group',
     styleUrls: ['./radio-group.component.scss'],
     templateUrl: './radio-group.component.html',

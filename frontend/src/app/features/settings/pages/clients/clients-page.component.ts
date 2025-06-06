@@ -13,7 +13,6 @@ import { ClientAddFormComponent } from './client-add-form.component';
 import { ClientComponent } from './client.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-clients-page',
     styleUrls: ['./clients-page.component.scss'],
     templateUrl: './clients-page.component.html',

@@ -17,6 +17,14 @@
 
 .color-container {
     display: inline-block;
+    position: relative;
+}
+
+.color-picker {
+    @include absolute(0, 0, 0, 0);
+    visibility: hidden;
+    width: auto;
+    height: auto;
 }
 
 .circle {

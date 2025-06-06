@@ -15,7 +15,6 @@ import { TranslatePipe } from './pipes/translate.pipe';
 export const PAGE_SIZES: ReadonlyArray<number> = [10, 20, 30, 50];
 
 @Component({
-    standalone: true,
     selector: 'sqx-pager',
     styleUrls: ['./pager.component.scss'],
     templateUrl: './pager.component.html',

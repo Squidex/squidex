@@ -11,7 +11,6 @@ import { FullDateTimePipe, LocalizerService, TooltipDirective, TranslatePipe, Ty
 import { ScheduleJobDto } from '@app/shared/internal';
 
 @Component({
-    standalone: true,
     selector: 'sqx-content-status',
     styleUrls: ['./content-status.component.scss'],
     templateUrl: './content-status.component.html',

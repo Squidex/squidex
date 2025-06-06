@@ -11,7 +11,6 @@ import { DomSanitizer, SafeHtml, SafeResourceUrl, SafeUrl } from '@angular/platf
 @Pipe({
     name: 'sqxSafeHtml',
     pure: true,
-    standalone: true,
 })
 export class SafeHtmlPipe implements PipeTransform {
     constructor(
@@ -27,7 +26,6 @@ export class SafeHtmlPipe implements PipeTransform {
 @Pipe({
     name: 'sqxSafeUrl',
     pure: true,
-    standalone: true,
 })
 export class SafeUrlPipe implements PipeTransform {
     constructor(
@@ -43,7 +41,6 @@ export class SafeUrlPipe implements PipeTransform {
 @Pipe({
     name: 'sqxSafeResourceUrl',
     pure: true,
-    standalone: true,
 })
 export class SafeResourceUrlPipe implements PipeTransform {
     constructor(

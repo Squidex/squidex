@@ -46,7 +46,10 @@
 
 .drop-overlay {
     @include overlay;
-    pointer-events: none;
+
+    & {
+        pointer-events: none;
+    }
 
     &-text {
         font-size: 1.25rem;

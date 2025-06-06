@@ -31,7 +31,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-chat-item',
     styleUrls: ['./chat-item.component.scss'],
     templateUrl: './chat-item.component.html',

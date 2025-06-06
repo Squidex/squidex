@@ -11,7 +11,6 @@ import { TranslatePipe } from '@app/framework';
 import { AssetPathItem } from '@app/shared/internal';
 
 @Component({
-    standalone: true,
     selector: 'sqx-asset-path',
     styleUrls: ['./asset-path.component.scss'],
     templateUrl: './asset-path.component.html',

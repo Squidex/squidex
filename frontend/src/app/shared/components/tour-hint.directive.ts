@@ -14,7 +14,6 @@ import { FloatingPlacement, StepDefinition, Subscriptions, TourService, TourStat
 
 @Directive({
     selector: '[hintText]',
-    standalone: true,
 })
 export class TourHintDirective implements OnInit {
     private readonly subscriptions = new Subscriptions();

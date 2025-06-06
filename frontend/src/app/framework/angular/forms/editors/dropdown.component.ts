@@ -38,7 +38,6 @@ interface State {
 }
 
 @Component({
-    standalone: true,
     selector: 'sqx-dropdown',
     styleUrls: ['./dropdown.component.scss'],
     templateUrl: './dropdown.component.html',

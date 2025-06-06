@@ -13,7 +13,6 @@ import { FormAlertComponent, META_FIELDS, SchemaDto, TableField, TranslatePipe }
 const META_FIELD_NAMES = Object.values(META_FIELDS).filter(x => x !== META_FIELDS.empty);
 
 @Component({
-    standalone: true,
     selector: 'sqx-field-list',
     styleUrls: ['./field-list.component.scss'],
     templateUrl: './field-list.component.html',

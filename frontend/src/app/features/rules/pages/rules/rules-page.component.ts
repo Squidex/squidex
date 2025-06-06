@@ -12,7 +12,6 @@ import { ALL_TRIGGERS, DynamicRuleDto, DynamicUpdateRuleDto, LayoutComponent, Li
 import { RuleComponent } from './rule.component';
 
 @Component({
-    standalone: true,
     selector: 'sqx-rules-page',
     styleUrls: ['./rules-page.component.scss'],
     templateUrl: './rules-page.component.html',
