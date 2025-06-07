@@ -7,8 +7,9 @@
 
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { SortOrder } from 'ngx-inline-filter';
 import { TranslatePipe } from '@app/framework';
-import { AppLanguageDto, Query, SortMode, Types } from '@app/shared/internal';
+import { AppLanguageDto, Query, Types } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-table-header',
@@ -39,9 +40,9 @@ export class TableHeaderComponent {
     public sortable?: boolean | null;
 
     @Input()
-    public sortDefault: SortMode | undefined | null;
+    public sortDefault: SortOrder | undefined | null;
 
-    public order: SortMode | undefined | null;
+    public order: SortOrder | undefined | null;
 
     public ngOnChanges() {
         const { query, sortDefault, sortable, sortPath } = this;
