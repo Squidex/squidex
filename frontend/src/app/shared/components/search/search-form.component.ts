@@ -8,10 +8,10 @@
 import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output, Type } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BooleanValue, BootstrapClasses, FieldComponent, FilterField, Input as FilterInput, FilterModel, FilterOptions, NumberValue, StringValue } from 'ngx-inline-filter';
+import { BooleanValue, BootstrapClasses, EMPTY_FILTER_MODEL, FieldComponent, FilterField, Input as FilterInput, FilterModel, FilterOptions, NumberValue, StringValue } from 'ngx-inline-filter';
 import { Observable } from 'rxjs';
-import { ControlErrorsComponent, DropdownComponent, FocusOnInitDirective, HighlightPipe, LocalizerService, ModalDialogComponent, ModalDirective, ShortcutComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/framework';
-import { AppLanguageDto, ContributorsState, DialogModel, Queries, Query, QueryModel, SaveQueryForm, StatusInfo, TypedSimpleChanges } from '@app/shared/internal';
+import { ControlErrorsComponent, DateTimeEditorComponent, DropdownComponent, FocusOnInitDirective, HighlightPipe, LocalizerService, ModalDialogComponent, ModalDirective, ShortcutComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/framework';
+import { AppLanguageDto, ContributorsState, DialogModel, Queries, Query, QueryModel, sanitize, SaveQueryForm, TypedSimpleChanges } from '@app/shared/internal';
 import { UserDtoPicture } from '../pipes';
 import { ReferenceInputComponent } from '../references/reference-input.component';
 import { TourHintDirective } from '../tour-hint.directive';
@@ -24,6 +24,7 @@ import { TourHintDirective } from '../tour-hint.directive';
     imports: [
         AsyncPipe,
         ControlErrorsComponent,
+        DateTimeEditorComponent,
         DropdownComponent,
         FilterInput,
         FocusOnInitDirective,
@@ -64,22 +65,18 @@ export class SearchFormComponent {
     public queries?: Queries | null;
 
     @Input()
-    public statuses: ReadonlyArray<StatusInfo> = [];
-
-    @Input()
     public queriesTypes = '';
 
     @Input({ transform: booleanAttribute })
     public enableShortcut?: boolean | null;
 
-    @Input()
-    public model?: QueryModel;
-
-    public filterModel!: FilterModel;
+    public filterModel = EMPTY_FILTER_MODEL;
 
     public saveKey!: Observable<string | undefined>;
     public saveQueryDialog = new DialogModel();
     public saveQueryForm = new SaveQueryForm();
+
+    public cleanedQuery: Query = sanitize();
 
     public readonly options: FilterOptions;
 
@@ -88,7 +85,16 @@ export class SearchFormComponent {
         private readonly localizer: LocalizerService,
     ) {
         this.options = {
-            cssClasses: BootstrapClasses,
+            cssClasses: {
+                ...BootstrapClasses,
+                buttonAdd: 'btn btn-success',
+                buttonAddOutline: 'btn btn-outline-success btn-sm',
+                buttonDefault: () => 'btn',
+                buttonLogical: active => `btn btn-sm btn-secondary btn-toggle ${active ? 'btn-primary' : ''}`,
+                dropdown: 'bg-white',
+                dropdownItem: active => `control-dropdown-item control-dropdown-item-selectable separated ${active ? 'active' : ''}`,
+                dropdownSearch: 'p-2',
+            },
             texts: {
                 addComparison: localizer.getOrKey('search.addFilter'),
                 addGroup: localizer.getOrKey('search.addGroup'),
@@ -100,31 +106,38 @@ export class SearchFormComponent {
                 save: localizer.getOrKey('common.save'),
                 searchPlaceholder: localizer.getOrKey('common.search'),
                 searchShortcut: 'CTRL + I',
-                sortAsc: 'asc',
-                sortDesc: 'desc',
+                sortAsc: 'ascending',
+                sortDesc: 'descending',
                 sorting: localizer.getOrKey('search.sorting'),
             },
         };
     }
 
     public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.query) {
+            this.cleanedQuery = sanitize(this.query);
+        }
+
         if (changes.query || changes.queries) {
             this.updateSaveKey();
         }
 
-        if (changes.model) {
+        if (changes.queryModel) {
             this.updateFilterModel();
         }
     }
 
     private updateFilterModel() {
-        const filterModel: FilterModel = { fields: [], operators: [] };
-        if (!this.model) {
-            return filterModel;
+        const model = this.queryModel;
+        if (!model) {
+            this.filterModel = EMPTY_FILTER_MODEL;
+            return;
         }
 
+        const filterModel: FilterModel = { fields: [], operators: [] };
+
         const uniqueOperators = new Set<string>();
-        for (var operators of Object.values(this.model.operators)) {
+        for (var operators of Object.values(model.operators)) {
             for (const operator of operators) {
                 uniqueOperators.add(operator);
             }
@@ -140,7 +153,7 @@ export class SearchFormComponent {
             filterModel.operators.push({ value: operator, label, isEmpty });
         }
 
-        for (const field of this.model.schema.fields) {
+        for (const field of model.schema.fields) {
             let args;
             let component: Type<FieldComponent<any>> | undefined = undefined;
 
@@ -150,11 +163,11 @@ export class SearchFormComponent {
             } else if (type === 'DateTime' && extra?.editor === 'Date') {
                 args = { editor: 'Date' };
             } else if (type === 'DateTime') {
-                args = { editor: 'Date' };
+                args = { editor: 'DateTime' };
             } else if (type === 'Number') {
                 component = NumberValue;
             } else if (type === 'String' && extra?.editor === 'Status') {
-                args = { editor: 'Status' };
+                args = { editor: 'Status', statuses: model.statuses };
             } else if (type === 'String' && extra?.editor === 'User') {
                 args = { editor: 'User' };
             } else if (type === 'String' && !extra) {
@@ -173,7 +186,7 @@ export class SearchFormComponent {
                 defaultValue: null,
                 description: field.description,
                 label: field.path,
-                operators: this.model.operators[field.schema.type] as any,
+                operators: model.operators[field.schema.type] as any,
                 path: field.path,
             };
 
@@ -181,6 +194,12 @@ export class SearchFormComponent {
         }
 
         this.filterModel = filterModel;
+    }
+
+    public bookmark(value: boolean) {
+        if (value) {
+            this.saveQueryDialog.show();
+        }
     }
 
     public saveQuery() {

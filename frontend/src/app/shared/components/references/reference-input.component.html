@@ -1,10 +1,8 @@
-<div class="input-group">
-    <input class="form-control" (click)="openDialog()" [ngModel]="snapshot.selectedName" readonly />
-    <button class="btn btn-outline-secondary" (click)="selectContent()" [disabled]="snapshot.isDisabled" sqxStopClick type="button">
-        <i class="icon-close"></i>
-    </button>
-</div>
+<input class="form-control" [class.form-control-sm]="small" (click)="openDialog()" [ngModel]="snapshot.selectedName" readonly />
+
 <sqx-content-selector
+    canClear="true"
+    (contentClear)="select([], true)"
     (contentSelect)="select($event)"
     [language]="language"
     [languages]="languages"

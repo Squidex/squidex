@@ -927,7 +927,6 @@
   "search.addFilter": "Adicionar filtro",
   "search.addGroup": "Adicionar Grupo",
   "search.addSorting": "Adicionar Classificação",
-  "search.advancedTour": "Clique neste ícone para mostrar o menu de pesquisa avançado!",
   "search.customQuery": "Consulta personalizada",
   "search.fullTextTour": "Pes para obter conteúdos com textos completos para todos os campos e para os direitos de texto.",
   "search.help": "Ler mais sobre filtros em [Documentação](https://docs.squidex.io/04-guides/02-api.html).",

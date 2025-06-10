@@ -1078,7 +1078,7 @@
   "search.addFilter": "添加过滤器",
   "search.addGroup": "添加组",
   "search.addSorting": "添加排序",
-  "search.advancedTour": "单击此图标可显示高级搜索菜单！",
+  "search.advancedTour": "Use filters to get exactly the content your are looking for.",
   "search.customQuery": "自定义查询",
   "search.fullTextTour": "使用全文搜索在所有领域和语言中搜索内容！",
   "search.help": "在 [文档](https://docs.squidex.io/04-guides/02-api.html) 中阅读有关过滤的更多信息。",

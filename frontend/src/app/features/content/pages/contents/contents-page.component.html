@@ -1,11 +1,11 @@
 <sqx-title [message]="schema.displayName" />
-<sqx-layout layout="main" titleIcon="contents" titleText="i18n:common.contents">
+<sqx-layout layout="main">
     <ng-container menu>
         <div class="row flex-nowrap flex-grow-1 gx-2">
             <div class="col-auto ms-8">
                 <sqx-notifo position="bottom-left" topic="apps/{{ contentsState.appId }}/schemas/{{ schema.id }}/contents" />
                 <button class="btn btn-text-secondary" (click)="reload()" shortcut="CTRL + B" title="i18n:contents.refreshTooltip" type="button">
-                    <i class="icon-reset"></i> {{ "common.refresh" | sqxTranslate }}
+                    <i class="icon-reset"></i>
                 </button>
             </div>
 

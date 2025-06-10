@@ -3,9 +3,18 @@
 }
 
 <div hintAfter="60000" hintPosition="bottom-end" hintText="i18n:search.advancedTour" sqxTourStep="search">
-    <filter-input #inputFind [isBookmarked]="!!(saveKey | async)" [model]="filterModel" [options]="options" [valueTemplate]="valueTemplate" />
+    <filter-input
+        #inputFind
+        [isBookmarked]="!!(saveKey | async)"
+        (isBookmarkedChange)="bookmark($event)"
+        [model]="filterModel"
+        [options]="options"
+        [query]="cleanedQuery"
+        (queryChange)="cleanedQuery = $event"
+        (search)="queryChange.emit($event)"
+        [valueTemplate]="valueTemplate" />
 
-    <ng-template #valueTemplate let-field="field" let-onChange="onChange" let-value="value">
+    <ng-template #valueTemplate let-field="field" let-grid="grid" let-onChange="onChange" let-value="value">
         @switch (field.args.editor) {
             @case ("Date") {
                 <sqx-date-time-editor hideDateButtons="true" mode="Date" [ngModel]="value" (ngModelChange)="onChange($event)" />
@@ -27,7 +36,7 @@
             }
 
             @case ("Status") {
-                <sqx-dropdown canSearch="false" [items]="statuses" [ngModel]="value" (ngModelChange)="onChange($event)" valueProperty="status">
+                <sqx-dropdown canSearch="false" [items]="field.args.statuses" [ngModel]="value" (ngModelChange)="onChange($event)" valueProperty="status">
                     <ng-template let-status="$implicit"> <i class="icon-circle" [style.color]="status.color"></i> {{ status.status }} </ng-template>
                 </sqx-dropdown>
             }

@@ -1078,7 +1078,7 @@
   "search.addFilter": "Add Filter",
   "search.addGroup": "Add Group",
   "search.addSorting": "Add Sorting",
-  "search.advancedTour": "Click this icon to show the advanced search menu!",
+  "search.advancedTour": "Use filters to get exactly the content your are looking for.",
   "search.customQuery": "Custom Query",
   "search.fullTextTour": "Search for content using full text search over all fields and languages!",
   "search.help": "Read more about filtering in the [Documentation](https://docs.squidex.io/04-guides/02-api.html).",

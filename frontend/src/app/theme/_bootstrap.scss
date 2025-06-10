@@ -460,10 +460,6 @@ a {
             &.btn-warning {
                 @include build-toggle-button($color-theme-warning, $color-badge-warning-background);
             }
-
-            &.btn-secondary {
-                color: $color-text-decent;
-            }
         }
 
         .btn + .btn-toggle {
@@ -722,10 +718,10 @@ $icon-size: 4.5rem;
 
 .form-control {
     &[readonly] {
-        color: $input-disabled-color;
         background-color: $input-disabled-bg;
         border-color: $input-disabled-border-color;
-        border-radius: inherit;
+        border-radius: $border-radius;
+        color: $input-disabled-color;
         opacity: 1;
     }
 }

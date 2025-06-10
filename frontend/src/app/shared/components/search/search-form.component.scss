@@ -1,32 +1,70 @@
 @import 'mixins';
 @import 'vars';
 
-.search-form {
-    display: inline-block;
-}
+::ng-deep {
+    .nf-details {
+        background-color: $color-white;
 
-.form-inline {
-    position: relative;
-}
+        input, select, button {
+            height: auto;
+        }
+    }
 
-.form-horizontal {
-    min-width: 35rem;
-}
+    .nf {
+        svg {
+            fill: $color-text-decent;
+        }
 
-.buttons {
-    @include absolute(8px, 8px);
-}
+        .btn-success {
+            svg {
+                fill: $color-white;
+            }
+        }
+    }
 
-.buttons2 {
-    @include absolute(.75rem, 1.75rem);
-}
+    .nf-dropdown {
+        .nf-dropdown-description {
+            color: $color-text-decent
+        }
 
-.link {
-    font-size: $font-small;
-    font-weight: normal;
-    margin-top: 1.5rem;
-}
+        .control-dropdown-item.active {
+            .nf-dropdown-description {
+                color: $color-white;
+            }
+        }
+    }
 
-.col-form-label {
-    text-align: left;
+    .nf-button {
+        &.btn-sm {
+            padding-top: .25rem;
+            padding-bottom: .25rem;
+        }
+    }
+
+    .nf-comparison-inline {
+        font-size: $font-small;
+
+        * {
+            font-size: .9rem;
+        }
+
+        input {
+            box-shadow: none;
+        }
+
+        .btn,
+        .form-control,
+        .form-select {
+            background: none !important;
+            border: 0;
+            border-radius: 0;
+            height: calc(1.75rem - 2px);
+            padding-top: 0.1875rem;
+            padding-bottom: .25rem;
+        }
+    }
+
+    .dropdown-user {
+        margin-right: .5rem;
+    }
 }

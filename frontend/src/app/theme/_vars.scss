@@ -89,6 +89,8 @@ $btn-disabled-color:        inherit;
 $btn-disabled-bg:           inherit;
 $btn-disabled-border-color: inherit;
 
+$dropdown-bg:               $color-white;
+
 $modal-content-bg:          $color-white;
 
 $history-dot-size:          10px;
@@ -104,3 +106,9 @@ $asset-footer:              7rem;
 $asset-background:          url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAA8CAIAAAC1nk4lAAAAAXNSR0IArs4c6QAAAARnQU1BAACxjwv8YQUAAAAJcEhZcwAADsMAAA7DAcdvqGQAAAAYdEVYdFNvZnR3YXJlAHBhaW50Lm5ldCA0LjEuMWMqnEsAAACbSURBVGhD7c6hDQAxAMPA33+m7vYlJh7AoFKOBMbfyfyZRRsPgUUbD4FFGw+BRRsPgUUbD4FFGw+BRRsPgUUbD4FFGw+BRRsPgUUbD4FFGw+BRRsPgUUbD4E3o9kA7YFFGw+BRRsPgUUbD4FFGw+BRRsPgUUbD4FFGw+BRRsPgUUbD4FFGw+BRRsPgUUbD4FFGw+BRRsPgQejz7nPYYKl8IqSfgAAAABJRU5ErkJggg==');
 
 $gutter-y: 0;
+
+$nf-color-border:           $color-border;
+$nf-color-add-background:   $color-theme-success;
+$nf-color-primary:          $color-theme-brand;
+$nf-color-text:             $color-text;
+$nf-color-text-muted:       $color-text-decent;
