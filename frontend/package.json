@@ -48,7 +48,7 @@
     "mousetrap": "1.6.5",
     "ng2-charts": "^8.0.0",
     "ngx-doc-viewer": "15.0.1",
-    "ngx-inline-filter": "^0.2.0",
+    "ngx-inline-filter": "^0.2.1",
     "ngx-scrollbar": "^18.0.0",
     "ngx-ui-tour-core": "14.0.0",
     "oidc-client-ts": "^3.2.1",
