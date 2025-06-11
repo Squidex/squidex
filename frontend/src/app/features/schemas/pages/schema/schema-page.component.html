@@ -116,7 +116,8 @@
                             @if (schema.type !== "Component") {
                                 <sqx-schema-preview-urls-form [schema]="schema" />
                             }
-                            <sqx-schema-field-rules-form [schema]="schema" /> <sqx-schema-edit-form [schema]="schema" />
+                            <sqx-schema-field-rules-form [schema]="schema" />
+                            <sqx-schema-edit-form [schema]="schema" />
                         </div>
                     </sqx-list-view>
                 }
@@ -158,4 +159,4 @@
         </ng-template>
     </sqx-layout>
 }
-<router-outlet></router-outlet>
+<router-outlet />
