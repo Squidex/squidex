@@ -116,7 +116,7 @@ export class QuerySynchronizer implements RouteSynchronizer {
 
 export function sanitize(query?: Query | null) {
     if (!query) {
-        return { filter: { and: [] }, sorting: [] };
+        return { filter: { and: [] }, sort: [] };
     }
 
     if (!query.sort) {
@@ -146,7 +146,7 @@ export function deserializeQuery(raw?: string): Query | undefined {
             if (raw.indexOf('{') === 0) {
                 query = JSON.parse(raw);
             } else {
-                query = { fullText: raw, filter: { and: [] }, sort: [] };
+                query = { fullText: raw };
             }
         }
     } catch (ex) {
