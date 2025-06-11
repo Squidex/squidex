@@ -13,11 +13,6 @@ namespace Squidex.Infrastructure.Translations;
 
 public sealed class ResourcesLocalizer(ResourceManager resourceManager) : ILocalizer
 {
-#if DEBUG
-    private static readonly MissingKeys MissingKeys = new MissingKeys();
-
-#endif
-
     public (string Result, bool Found) Get(CultureInfo culture, string key, string fallback, object? args = null)
     {
         Guard.NotNull(culture);
@@ -38,11 +33,9 @@ public sealed class ResourcesLocalizer(ResourceManager resourceManager) : ILocal
             var sb = new StringBuilder(translation.Length);
 
             var span = translation.AsSpan();
-
             while (span.Length > 0)
             {
                 var indexOfStart = span.IndexOf('{');
-
                 if (indexOfStart < 0)
                 {
                     break;
@@ -51,7 +44,6 @@ public sealed class ResourcesLocalizer(ResourceManager resourceManager) : ILocal
                 indexOfStart++;
 
                 var indexOfEnd = span[indexOfStart..].IndexOf('}');
-
                 if (indexOfEnd < 0)
                 {
                     break;
@@ -62,7 +54,6 @@ public sealed class ResourcesLocalizer(ResourceManager resourceManager) : ILocal
                 sb.Append(span[.. (indexOfStart - 1)]);
 
                 var variable = span[indexOfStart..indexOfEnd];
-
                 var shouldLower = false;
                 var shouldUpper = false;
 
@@ -83,7 +74,6 @@ public sealed class ResourcesLocalizer(ResourceManager resourceManager) : ILocal
 
                 var variableName = variable.ToString();
                 var variableValue = variableName;
-
                 var property = argsType.GetProperty(variableName);
 
                 if (property != null)
@@ -129,7 +119,6 @@ public sealed class ResourcesLocalizer(ResourceManager resourceManager) : ILocal
             }
 
             sb.Append(span);
-
             return (sb.ToString(), true);
         }
 
@@ -138,13 +127,6 @@ public sealed class ResourcesLocalizer(ResourceManager resourceManager) : ILocal
 
     private string? GetCore(CultureInfo culture, string key)
     {
-        var translation = resourceManager.GetString(key, culture);
-#if DEBUG
-        if (translation == null)
-        {
-            MissingKeys.Log(key);
-        }
-#endif
-        return translation;
+        return resourceManager.GetString(key, culture);
     }
 }
