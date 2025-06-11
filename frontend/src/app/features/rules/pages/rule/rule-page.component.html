@@ -31,11 +31,10 @@
                     <div class="btn btn-outline-secondary btn-enabled">
                         @if (rule.isEnabled) {
                             <span class="me-2"> {{ "common.enabled" | sqxTranslate }} </span>
-                        }
-
-                        @if (!rule.isEnabled) {
+                        } @else {
                             <span class="me-2"> {{ "common.disabled" | sqxTranslate }} </span>
                         }
+
                         <sqx-toggle [ngModel]="rule.isEnabled" (ngModelChange)="changeEnabled($event)" />
                     </div>
                     <input
