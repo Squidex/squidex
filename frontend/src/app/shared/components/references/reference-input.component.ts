@@ -7,7 +7,7 @@
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { ModalDirective, StopClickDirective } from '@app/framework';
+import { ModalDirective } from '@app/framework';
 import { AppLanguageDto, AppsState, ContentDto, ContentsService, DialogModel, getContentValue, LocalizerService, StatefulControlComponent, TypedSimpleChanges, Types } from '@app/shared/internal';
 import { ContentSelectorComponent } from './content-selector.component';
 
@@ -35,7 +35,6 @@ interface State {
         ContentSelectorComponent,
         FormsModule,
         ModalDirective,
-        StopClickDirective,
     ],
 })
 export class ReferenceInputComponent extends StatefulControlComponent<State, ReadonlyArray<string> | string> {
@@ -53,6 +52,9 @@ export class ReferenceInputComponent extends StatefulControlComponent<State, Rea
 
     @Input({ required: true })
     public mode: 'Array' | 'Single' = 'Single';
+
+    @Input()
+    public small = false;
 
     @Input({ transform: booleanAttribute })
     public set disabled(value: boolean | undefined | null) {
@@ -105,8 +107,8 @@ export class ReferenceInputComponent extends StatefulControlComponent<State, Rea
         this.contentSelectorDialog.show();
     }
 
-    public select(contents: ReadonlyArray<ContentDto>) {
-        if (contents.length > 0) {
+    public select(contents: ReadonlyArray<ContentDto>, clear = false) {
+        if (contents.length > 0 || clear) {
             this.selectContent(contents[0]);
         }
 
@@ -133,7 +135,6 @@ export class ReferenceInputComponent extends StatefulControlComponent<State, Rea
         }
 
         this.callTouched();
-
         this.updateContent(selectedContent);
     }
 

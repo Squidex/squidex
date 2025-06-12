@@ -6,14 +6,15 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output, Type } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { BooleanValue, BootstrapClasses, EMPTY_FILTER_MODEL, FieldComponent, FilterField, Input as FilterInput, FilterModel, FilterOptions, NumberValue, StringValue } from 'ngx-inline-filter';
 import { Observable } from 'rxjs';
-import { ControlErrorsComponent, FocusOnInitDirective, MarkdownDirective, ModalDialogComponent, ModalDirective, ShortcutComponent, ShortcutDirective, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/framework';
-import { AppLanguageDto, DialogModel, equalsQuery, hasFilter, Queries, Query, QueryModel, SaveQueryForm, TypedSimpleChanges } from '@app/shared/internal';
+import { ControlErrorsComponent, DateTimeEditorComponent, DropdownComponent, FocusOnInitDirective, HighlightPipe, LocalizerService, ModalDialogComponent, ModalDirective, ShortcutComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/framework';
+import { AppLanguageDto, ContributorsState, DialogModel, Queries, Query, QueryModel, sanitize, SaveQueryForm, TypedSimpleChanges } from '@app/shared/internal';
+import { UserDtoPicture } from '../pipes';
+import { ReferenceInputComponent } from '../references/reference-input.component';
 import { TourHintDirective } from '../tour-hint.directive';
-import { QueryComponent } from './queries/query.component';
-import { SavedQueriesComponent } from './shared-queries.component';
 
 @Component({
     selector: 'sqx-search-form',
@@ -23,25 +24,25 @@ import { SavedQueriesComponent } from './shared-queries.component';
     imports: [
         AsyncPipe,
         ControlErrorsComponent,
+        DateTimeEditorComponent,
+        DropdownComponent,
+        FilterInput,
         FocusOnInitDirective,
         FormsModule,
-        MarkdownDirective,
+        HighlightPipe,
         ModalDialogComponent,
         ModalDirective,
-        QueryComponent,
+        ReferenceInputComponent,
         ReactiveFormsModule,
-        SavedQueriesComponent,
         ShortcutComponent,
-        ShortcutDirective,
         TooltipDirective,
         TourHintDirective,
         TourStepDirective,
         TranslatePipe,
+        UserDtoPicture,
     ],
 })
 export class SearchFormComponent {
-    private previousQuery?: Query | null;
-
     @Output()
     public queryChange = new EventEmitter<Query>();
 
@@ -69,42 +70,135 @@ export class SearchFormComponent {
     @Input({ transform: booleanAttribute })
     public enableShortcut?: boolean | null;
 
-    @Input()
-    public formClass = 'form-inline search-form';
-
-    public showQueries = true;
+    public filterModel = EMPTY_FILTER_MODEL;
 
     public saveKey!: Observable<string | undefined>;
     public saveQueryDialog = new DialogModel();
     public saveQueryForm = new SaveQueryForm();
 
-    public searchDialog = new DialogModel(false);
+    public cleanedQuery: Query = sanitize();
 
-    public hasFilter = false;
+    public readonly options: FilterOptions;
+
+    constructor(
+        public readonly contributorsState: ContributorsState,
+        private readonly localizer: LocalizerService,
+    ) {
+        this.options = {
+            cssClasses: {
+                ...BootstrapClasses,
+                buttonAdd: 'btn btn-success',
+                buttonAddOutline: 'btn btn-outline-success btn-sm',
+                buttonDefault: () => 'btn',
+                buttonLogical: active => `btn btn-sm btn-secondary btn-toggle ${active ? 'btn-primary' : ''}`,
+                dropdown: 'bg-white',
+                dropdownItem: active => `control-dropdown-item control-dropdown-item-selectable separated ${active ? 'active' : ''}`,
+                dropdownSearch: 'p-2',
+            },
+            texts: {
+                addComparison: localizer.getOrKey('search.addFilter'),
+                addGroup: localizer.getOrKey('search.addGroup'),
+                addSorting: localizer.getOrKey('search.addSorting'),
+                and: 'AND',
+                not: 'NOT',
+                noResults: ' - ',
+                or: 'OR',
+                save: localizer.getOrKey('common.save'),
+                searchPlaceholder: localizer.getOrKey('common.search'),
+                searchShortcut: 'CTRL + I',
+                sortAsc: 'ascending',
+                sortDesc: 'descending',
+                sorting: localizer.getOrKey('search.sorting'),
+            },
+        };
+    }
 
     public ngOnChanges(changes: TypedSimpleChanges<this>) {
+        if (changes.query) {
+            this.cleanedQuery = sanitize(this.query);
+        }
+
         if (changes.query || changes.queries) {
             this.updateSaveKey();
         }
 
-        if (changes.query) {
-            this.previousQuery = this.query;
+        if (changes.queryModel) {
+            this.updateFilterModel();
         }
-
-        this.hasFilter = hasFilter(this.query);
     }
 
-    public search(close = false) {
-        this.hasFilter = hasFilter(this.query);
-
-        if (this.query && !equalsQuery(this.query, this.previousQuery)) {
-            this.queryChange.emit(this.query);
-
-            this.previousQuery = this.query;
+    private updateFilterModel() {
+        const model = this.queryModel;
+        if (!model) {
+            this.filterModel = EMPTY_FILTER_MODEL;
+            return;
         }
 
-        if (close) {
-            this.searchDialog.hide();
+        const filterModel: FilterModel = { fields: [], operators: [] };
+
+        const uniqueOperators = new Set<string>();
+        for (var operators of Object.values(model.operators)) {
+            for (const operator of operators) {
+                uniqueOperators.add(operator);
+            }
+        }
+
+        for (const operator of uniqueOperators) {
+            const isEmpty =
+                operator === 'empty' ||
+                operator === 'exists';
+
+            const label = this.localizer.get(`common.queryOperators.${operator}`) || operator;
+
+            filterModel.operators.push({ value: operator, label, isEmpty });
+        }
+
+        for (const field of model.schema.fields) {
+            let args;
+            let component: Type<FieldComponent<any>> | undefined = undefined;
+
+            const { type, extra } = field.schema;
+            if (field.schema.type === 'Boolean') {
+                component = BooleanValue;
+            } else if (type === 'DateTime' && extra?.editor === 'Date') {
+                args = { editor: 'Date' };
+            } else if (type === 'DateTime') {
+                args = { editor: 'DateTime' };
+            } else if (type === 'Number') {
+                component = NumberValue;
+            } else if (type === 'String' && extra?.editor === 'Status') {
+                args = { editor: 'Status', statuses: model.statuses };
+            } else if (type === 'String' && extra?.editor === 'User') {
+                args = { editor: 'User' };
+            } else if (type === 'String' && !extra) {
+                component = StringValue;
+            } else if (type === 'StringArray' && extra?.schemaIds) {
+                args = { editor: 'Reference', schemaIds: extra.schemaIds };
+            } else if (type === 'StringArray') {
+                component = StringValue;
+            } else {
+                continue;
+            }
+
+            const filterField: FilterField = {
+                args,
+                component,
+                defaultValue: null,
+                description: field.description,
+                label: field.path,
+                operators: model.operators[field.schema.type] as any,
+                path: field.path,
+            };
+
+            filterModel.fields.push(filterField);
+        }
+
+        this.filterModel = filterModel;
+    }
+
+    public bookmark(value: boolean) {
+        if (value) {
+            this.saveQueryDialog.show();
         }
     }
 
@@ -129,22 +223,6 @@ export class SearchFormComponent {
 
         this.saveQueryForm.submitCompleted();
         this.saveQueryDialog.hide();
-    }
-
-    public changeQueryFullText(fullText: string) {
-        this.query = { ...this.query, fullText };
-
-        this.updateSaveKey();
-    }
-
-    public changeQuery(query: Query) {
-        this.query = query;
-
-        this.updateSaveKey();
-    }
-
-    public changeView(value: boolean) {
-        this.showQueries = value;
     }
 
     private updateSaveKey() {

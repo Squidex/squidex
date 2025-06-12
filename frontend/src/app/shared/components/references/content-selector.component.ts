@@ -50,6 +50,9 @@ export class ContentSelectorComponent implements OnInit {
     @Output()
     public contentSelect = new EventEmitter<ReadonlyArray<ContentDto>>();
 
+    @Output()
+    public contentClear = new EventEmitter();
+
     @Input({ transform: numberAttribute })
     public maxItems = Number.MAX_VALUE;
 
@@ -58,6 +61,9 @@ export class ContentSelectorComponent implements OnInit {
 
     @Input()
     public schemaIdentifiers?: ReadonlyArray<string>;
+
+    @Input({ transform: booleanAttribute })
+    public canClear = false;
 
     @Input()
     public query?: string;
@@ -158,6 +164,10 @@ export class ContentSelectorComponent implements OnInit {
 
     public emitClose() {
         this.contentSelect.emit([]);
+    }
+
+    public emitClear() {
+        this.contentClear.emit();
     }
 
     public emitSelect() {

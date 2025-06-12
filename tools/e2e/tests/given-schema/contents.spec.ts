@@ -14,8 +14,8 @@ test.beforeEach(async ({ appName, schemaName, contentsPage }) => {
     await contentsPage.increasePageSize();
 });
 
-test('has header', async ({ page }) => {
-    const header = page.getByRole('heading', { name: 'Contents' });
+test('has filter', async ({ page }) => {
+    const header =   page.getByRole('button', { name: 'AND' });
 
     await expect(header).toBeVisible();
 });

@@ -101,7 +101,8 @@
         </div>
     </ng-template>
 </sqx-layout>
-<router-outlet></router-outlet> <sqx-asset-folder-dialog (dialogClose)="addAssetFolderDialog.hide()" *sqxModal="addAssetFolderDialog" />
+<router-outlet />
+<sqx-asset-folder-dialog (dialogClose)="addAssetFolderDialog.hide()" *sqxModal="addAssetFolderDialog" />
 <sqx-asset-dialog
     [asset]="editAsset!"
     (assetReplaced)="replaceAsset($event)"

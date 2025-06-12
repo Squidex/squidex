@@ -751,7 +751,6 @@
   "search.addFilter": "Aggiungi un Filtro",
   "search.addGroup": "Aggiungi un Gruppo",
   "search.addSorting": "Aggiungi ordinamento",
-  "search.advancedTour": "Fai clic su questa icona per visualizzare il menu della ricerca avanzata!",
   "search.customQuery": "Query personalizzata",
   "search.fullTextTour": "Cerca contenuti utilizzando la ricerca testuale su tutti i campi e le lingue!",
   "search.help": "Ulteriori informazioni sui filtri su [Documentazione](https://docs.squidex.io/04-guides/02-api.html).",

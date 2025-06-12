@@ -14,10 +14,17 @@ test('has header', async ({ page }) => {
 });
 
 test('create rule', async ({ rulesPage, rulePage }) => {
-    const ruleName = await createRandomRule(rulesPage, rulePage);
+    const ruleName = await createRandomRule(rulesPage, rulePage, true);
     const ruleCard = await rulesPage.getRuleCard(ruleName);
 
     await expect(ruleCard.root).toBeVisible();
+});
+
+test('create disabled rule', async ({ rulesPage, rulePage }) => {
+    const ruleName = await createRandomRule(rulesPage, rulePage, true);
+    const ruleCard = await rulesPage.getRuleCard(ruleName);
+
+    await expect(ruleCard.root.locator('sqx-toggle div').first()).toHaveAttribute('data-state', 'unchecked');
 });
 
 test('delete rule', async ({ rulesPage, rulePage }) => {
@@ -79,7 +86,7 @@ test('rename rule', async ({ rulePage, rulesPage }) => {
     await expect(newCard.root).toBeVisible();
 });
 
-async function createRandomRule(rulesPage: RulesPage, rulePage: RulePage) {
+async function createRandomRule(rulesPage: RulesPage, rulePage: RulePage, disabled = false) {
     const ruleName = `rule-${getRandomId()}`;
 
     await rulesPage.addRule();
@@ -93,6 +100,11 @@ async function createRandomRule(rulesPage: RulesPage, rulePage: RulePage) {
     await stepDialog.add();
 
     await rulePage.enterName(ruleName);
+
+    if (disabled) {
+        await rulePage.toggleEnabled();
+    }
+
     await rulePage.save();
     await rulePage.back();
 

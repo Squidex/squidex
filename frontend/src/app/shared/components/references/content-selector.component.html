@@ -106,8 +106,17 @@
     </ng-container>
     <ng-container footer>
         <button class="btn btn-text-secondary" (click)="emitClose()" type="button">{{ "common.cancel" | sqxTranslate }}</button>
-        <button class="btn btn-success" (click)="emitSelect()" [disabled]="selectionCount === 0 || selectionCount > maxItems" type="submit">
-            {{ "contents.referencesLink" | sqxTranslate: { count: selectionCount } }}
-        </button>
+
+        <div>
+            @if (canClear) {
+                <button class="btn me-2" (click)="emitClear()" type="button">
+                    {{ "common.clear" | sqxTranslate: { count: 0 } }}
+                </button>
+            }
+
+            <button class="btn btn-success" (click)="emitSelect()" [disabled]="selectionCount === 0 || selectionCount > maxItems" type="submit">
+                {{ "contents.referencesLink" | sqxTranslate: { count: selectionCount } }}
+            </button>
+        </div>
     </ng-container>
 </sqx-modal-dialog>

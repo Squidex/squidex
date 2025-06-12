@@ -48,7 +48,7 @@
         </div>
     </ng-template>
 </sqx-layout>
-<router-outlet></router-outlet>
+<router-outlet />
 <sqx-modal-dialog (dialogClose)="eventConsumerErrorDialog.hide()" *sqxModal="eventConsumerErrorDialog">
     <ng-container title> {{ "common.error" | sqxTranslate }} </ng-container>
     <ng-container content>

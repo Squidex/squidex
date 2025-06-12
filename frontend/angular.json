@@ -187,7 +187,8 @@
             ],
             "stylePreprocessorOptions": {
               "includePaths": [
-                "./src/app/theme"
+                "./src/app/theme",
+                "node_modules"
               ]
             },
             "scripts": []

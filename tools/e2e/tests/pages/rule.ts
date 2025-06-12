@@ -26,9 +26,13 @@ export class RulePage {
         return new StepDialog(this.page, this.page.getByTestId('dialog'));
     }
 
+    public async toggleEnabled() {
+        await this.page.locator('sqx-toggle div').first().click();
+    }
+
     public async save() {
         await this.page.getByRole('button', { name: 'Save' }).click();
-        await this.page.getByText('Enabled').waitFor({ state: 'visible' });
+        await this.page.getByRole('alert').waitFor({ state: 'visible' });
     }
 
     public async back() {
@@ -48,10 +52,12 @@ export class TriggerDialog {
 
     public async add() {
         await this.root.getByRole('button', { name: 'Add' }).click();
+        await this.root.waitFor({ state: 'detached' });
     }
 
     public async save() {
         await this.root.getByRole('button', { name: 'Save' }).click();
+        await this.root.waitFor({ state: 'detached' });
     }
 }
 
@@ -68,9 +74,11 @@ export class StepDialog {
 
     public async add() {
         await this.root.getByRole('button', { name: 'Add' }).click();
+        await this.root.waitFor({ state: 'detached' });
     }
 
     public async save() {
         await this.root.getByRole('button', { name: 'Save' }).click();
+        await this.root.waitFor({ state: 'detached' });
     }
 }

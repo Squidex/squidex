@@ -31,5 +31,7 @@
             </table>
         }
     </ng-container>
-    <ng-container footer> <sqx-pager [paging]="contentsState.paging | async" (pagingChange)="contentsState.page($event)" /> </ng-container>
+    <ng-container footer>
+        <sqx-pager [paging]="contentsState.paging | async" (pagingChange)="contentsState.page($event)" />
+    </ng-container>
 </sqx-list-view>

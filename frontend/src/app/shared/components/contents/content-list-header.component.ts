@@ -6,7 +6,8 @@
  */
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { AppLanguageDto, META_FIELDS, Query, SortMode, TableField } from '@app/shared/internal';
+import { SortOrder } from 'ngx-inline-filter';
+import { AppLanguageDto, META_FIELDS, Query, TableField } from '@app/shared/internal';
 import { TableHeaderComponent } from '../table-header.component';
 
 @Component({
@@ -34,7 +35,7 @@ export class ContentListHeaderComponent {
     public language!: AppLanguageDto;
 
     public sortPath?: string;
-    public sortDefault?: SortMode;
+    public sortDefault?: SortOrder;
 
     public ngOnChanges() {
         const { field, language } = this;
