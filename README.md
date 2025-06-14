@@ -22,7 +22,7 @@ Current Version ![GitHub release](https://img.shields.io/github/release/squidex/
 
 * [Visual Studio Code](https://code.visualstudio.com/) or [Visual Studio 2022](https://visualstudio.microsoft.com/vs/)
 * [Node.js](https://nodejs.org/en/) (development only)
-* [MongoDB](https://www.mongodb.com/)
+* [MongoDB](https://www.mongodb.com/), PostgreSQL, MySQL or SQLServer
 * [.NET 8 SDK](https://dotnet.microsoft.com/download#/current) (Already part of Visual Studio 2022 v17.8)
 
 ## Deployment Options
