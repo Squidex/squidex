@@ -200,7 +200,13 @@
             "configDir": ".storybook",
             "browserTarget": "squidex:build",
             "compodoc": false,
-            "port": 6006
+            "port": 6006,
+            "stylePreprocessorOptions": {
+              "includePaths": [
+                "./src/app/theme",
+                "node_modules"
+              ]
+            }
           }
         },
         "build-storybook": {
