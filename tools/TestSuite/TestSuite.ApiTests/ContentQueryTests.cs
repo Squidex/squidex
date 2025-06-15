@@ -60,6 +60,35 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
     }
 
     [Fact]
+    public async Task Should_query_by_id_with_flatten()
+    {
+        var q = new ContentQuery { OrderBy = "data/number/iv asc" };
+
+        var items_0 = await _.Contents.GetAsync(q);
+        var id = items_0.Items[0].Id;
+
+        var context = QueryContext.Default.Flatten();
+
+        var testEntry = await _.Contents.GetAsync(id, context); // Newtonsoft.Json.JsonSerializationException: Property must have a invariant language property.
+    }
+
+    [Fact]
+    public async Task Should_query_by_id_with_fields()
+    {
+        var q = new ContentQuery { OrderBy = "data/number/iv asc" };
+
+        var items_0 = await _.Contents.GetAsync(q);
+        var id = items_0.Items[0].Id;
+
+        var context = QueryContext.Default
+            .WithFields(TestEntityData.StringField);
+
+        var dynamicContent = await _.Client.DynamicContents(_.SchemaName).GetAsync(id, context);
+
+        Assert.Single(dynamicContent.Data);
+    }
+
+    [Fact]
     public async Task Should_query_by_ids()
     {
         var q = new ContentQuery { OrderBy = "data/number/iv asc" };
