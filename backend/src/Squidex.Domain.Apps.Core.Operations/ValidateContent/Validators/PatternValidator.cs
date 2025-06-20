@@ -35,29 +35,28 @@ public class PatternValidator : IValidator
 
     public void Validate(object? value, ValidationContext context)
     {
-        if (value is string stringValue)
+        if (value is not string stringValue || string.IsNullOrEmpty(stringValue))
         {
-            if (!string.IsNullOrEmpty(stringValue))
+            return;
+        }
+
+        try
+        {
+            if (!regex.IsMatch(stringValue))
             {
-                try
+                if (string.IsNullOrWhiteSpace(errorMessage))
                 {
-                    if (!regex.IsMatch(stringValue))
-                    {
-                        if (string.IsNullOrWhiteSpace(errorMessage))
-                        {
-                            context.AddError(context.Path, T.Get("contents.validation.pattern"));
-                        }
-                        else
-                        {
-                            context.AddError(context.Path, errorMessage);
-                        }
-                    }
+                    context.AddError(T.Get("contents.validation.pattern"));
                 }
-                catch
+                else
                 {
-                    context.AddError(context.Path, T.Get("contents.validation.regexTooSlow"));
+                    context.AddError(errorMessage);
                 }
             }
+        }
+        catch
+        {
+            context.AddError(T.Get("contents.validation.regexTooSlow"));
         }
     }
 }

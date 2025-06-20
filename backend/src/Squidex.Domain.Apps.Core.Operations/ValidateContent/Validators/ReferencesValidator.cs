@@ -49,7 +49,7 @@ public sealed class ReferencesValidator : IValidator
         context.Root.AddTask(ct => ValidateCoreAsync(value, context, ct));
     }
 
-    private async Task ValidateCoreAsync(object? value, ValidationContext context,
+    private async ValueTask ValidateCoreAsync(object? value, ValidationContext context,
         CancellationToken ct)
     {
         var foundIds = new List<DomainId>();
@@ -69,7 +69,7 @@ public sealed class ReferencesValidator : IValidator
                 {
                     if (context.Action == ValidationAction.Upsert)
                     {
-                        context.AddError(path, T.Get("contents.validation.referenceNotFound", new { id }));
+                        context.AddError(T.Get("contents.validation.referenceNotFound", new { id }), path);
                     }
 
                     continue;
@@ -81,7 +81,7 @@ public sealed class ReferencesValidator : IValidator
                 {
                     if (context.Action == ValidationAction.Upsert)
                     {
-                        context.AddError(path, T.Get("contents.validation.referenceToInvalidSchema", new { id }));
+                        context.AddError(T.Get("contents.validation.referenceToInvalidSchema", new { id }), path);
                     }
 
                     isValid = false;

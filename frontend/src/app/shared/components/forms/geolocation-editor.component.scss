@@ -24,3 +24,15 @@
         max-width: 100%;
     }
 }
+
+.coordinate {
+    position: relative;
+
+    label {
+        @include absolute(.5rem, null, null, 1rem);
+    }
+    
+    .form-control {
+        padding-left: 3rem;
+    }
+}

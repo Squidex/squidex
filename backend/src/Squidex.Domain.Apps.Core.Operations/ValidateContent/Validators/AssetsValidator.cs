@@ -50,7 +50,7 @@ public sealed class AssetsValidator : IValidator
         context.Root.AddTask(ct => ValidateCoreAsync(value, context, ct));
     }
 
-    private async Task ValidateCoreAsync(object? value, ValidationContext context,
+    private async ValueTask ValidateCoreAsync(object? value, ValidationContext context,
         CancellationToken ct)
     {
         var foundIds = new List<DomainId>();
@@ -69,7 +69,7 @@ public sealed class AssetsValidator : IValidator
                 {
                     if (context.Action == ValidationAction.Upsert)
                     {
-                        context.AddError(assetPath, T.Get("contents.validation.assetNotFound", new { id = assetId }));
+                        context.AddError(T.Get("contents.validation.assetNotFound", new { id = assetId }), assetPath);
                     }
 
                     continue;
@@ -118,19 +118,19 @@ public sealed class AssetsValidator : IValidator
         {
             var min = properties.MinSize.Value.ToReadableSize();
 
-            context.AddError(path, T.Get("contents.validation.minimumSize", new { size = asset.FileSize.ToReadableSize(), min }));
+            context.AddError(T.Get("contents.validation.minimumSize", new { size = asset.FileSize.ToReadableSize(), min }), path);
         }
 
         if (properties.MaxSize != null && asset.FileSize > properties.MaxSize)
         {
             var max = properties.MaxSize.Value.ToReadableSize();
 
-            context.AddError(path, T.Get("contents.validation.maximumSize", new { size = asset.FileSize.ToReadableSize(), max }));
+            context.AddError(T.Get("contents.validation.maximumSize", new { size = asset.FileSize.ToReadableSize(), max }), path);
         }
 
         if (properties.AllowedExtensions is { Count: > 0 } && !properties.AllowedExtensions.Any(x => asset.FileName.EndsWith("." + x, StringComparison.OrdinalIgnoreCase)))
         {
-            context.AddError(path, T.Get("contents.validation.extension"));
+            context.AddError(T.Get("contents.validation.extension"), path);
         }
     }
 
@@ -140,7 +140,7 @@ public sealed class AssetsValidator : IValidator
 
         if (properties.ExpectedType != null && properties.ExpectedType != type)
         {
-            context.AddError(path, T.Get("contents.validation.assetType", new { type = properties.ExpectedType }));
+            context.AddError(T.Get("contents.validation.assetType", new { type = properties.ExpectedType }), path);
         }
     }
 
@@ -150,22 +150,22 @@ public sealed class AssetsValidator : IValidator
 
         if (properties.MinWidth != null && w < properties.MinWidth)
         {
-            context.AddError(path, T.Get("contents.validation.minimumWidth", new { width = w, min = properties.MinWidth }));
+            context.AddError(T.Get("contents.validation.minimumWidth", new { width = w, min = properties.MinWidth }), path);
         }
 
         if (properties.MaxWidth != null && w > properties.MaxWidth)
         {
-            context.AddError(path, T.Get("contents.validation.maximumWidth", new { width = w, max = properties.MaxWidth }));
+            context.AddError(T.Get("contents.validation.maximumWidth", new { width = w, max = properties.MaxWidth }), path);
         }
 
         if (properties.MinHeight != null && h < properties.MinHeight)
         {
-            context.AddError(path, T.Get("contents.validation.minimumHeight", new { height = h, min = properties.MinHeight }));
+            context.AddError(T.Get("contents.validation.minimumHeight", new { height = h, min = properties.MinHeight }), path);
         }
 
         if (properties.MaxHeight != null && h > properties.MaxHeight)
         {
-            context.AddError(path, T.Get("contents.validation.maximumHeight", new { height = h, max = properties.MaxHeight }));
+            context.AddError(T.Get("contents.validation.maximumHeight", new { height = h, max = properties.MaxHeight }), path);
         }
 
         if (properties.AspectHeight != null && properties.AspectWidth != null)
@@ -174,7 +174,7 @@ public sealed class AssetsValidator : IValidator
 
             if (Math.Abs(expectedRatio - actualRatio) > double.Epsilon)
             {
-                context.AddError(path, T.Get("contents.validation.aspectRatio", new { width = properties.AspectWidth, height = properties.AspectHeight }));
+                context.AddError(T.Get("contents.validation.aspectRatio", new { width = properties.AspectWidth, height = properties.AspectHeight }), path);
             }
         }
     }

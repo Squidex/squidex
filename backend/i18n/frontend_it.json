@@ -852,6 +852,7 @@
   "schemas.field.allowedValues": "Valori consentiti",
   "schemas.field.createEnum": "Generate GraphQL Enum.",
   "schemas.field.createEnumHint": "Generate a GraphQL enumeration for this field. The input format is not compatible with a string anymore and can be a breaking change for your client.",
+  "schemas.field.createOnly": "Immutable (cannot be changed)",
   "schemas.field.defaultValue": "Valore predefinito",
   "schemas.field.defaultValues": "Valori predefiniti",
   "schemas.field.defaultValuesHint": "Imposta il valore predefinito per la lingua e sovrascrivere il valore predefinito, se definito. Usalo solo se davvero necessario.",

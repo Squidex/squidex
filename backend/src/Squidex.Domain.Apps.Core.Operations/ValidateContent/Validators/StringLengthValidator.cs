@@ -28,30 +28,32 @@ public class StringLengthValidator : IValidator
 
     public void Validate(object? value, ValidationContext context)
     {
-        if (value is string stringValue && !string.IsNullOrEmpty(stringValue))
+        if (value is not string stringValue || string.IsNullOrEmpty(stringValue))
         {
-            if (minLength != null && maxLength != null)
-            {
-                if (minLength == maxLength && minLength != stringValue.Length)
-                {
-                    context.AddError(context.Path, T.Get("contents.validation.characterCount", new { count = minLength }));
-                }
-                else if (stringValue.Length < minLength || stringValue.Length > maxLength)
-                {
-                    context.AddError(context.Path, T.Get("contents.validation.charactersBetween", new { min = minLength, max = maxLength }));
-                }
-            }
-            else
-            {
-                if (minLength != null && stringValue.Length < minLength)
-                {
-                    context.AddError(context.Path, T.Get("contents.validation.minLength", new { min = minLength }));
-                }
+            return;
+        }
 
-                if (maxLength != null && stringValue.Length > maxLength)
-                {
-                    context.AddError(context.Path, T.Get("contents.validation.maxLength", new { max = maxLength }));
-                }
+        if (minLength != null && maxLength != null)
+        {
+            if (minLength == maxLength && minLength != stringValue.Length)
+            {
+                context.AddError(T.Get("contents.validation.characterCount", new { count = minLength }), context.Path);
+            }
+            else if (stringValue.Length < minLength || stringValue.Length > maxLength)
+            {
+                context.AddError(T.Get("contents.validation.charactersBetween", new { min = minLength, max = maxLength }), context.Path);
+            }
+        }
+        else
+        {
+            if (minLength != null && stringValue.Length < minLength)
+            {
+                context.AddError(T.Get("contents.validation.minLength", new { min = minLength }), context.Path);
+            }
+
+            if (maxLength != null && stringValue.Length > maxLength)
+            {
+                context.AddError(T.Get("contents.validation.maxLength", new { max = maxLength }), context.Path);
             }
         }
     }
