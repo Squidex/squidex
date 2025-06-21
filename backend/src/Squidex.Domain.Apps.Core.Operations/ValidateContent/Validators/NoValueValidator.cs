@@ -21,7 +21,7 @@ public sealed class NoValueValidator : IValidator
     {
         if (!value.IsUndefined())
         {
-            context.AddError(context.Path, T.Get("contents.validation.mustBeEmpty"));
+            context.AddError(T.Get("contents.validation.mustBeEmpty"));
         }
     }
 }

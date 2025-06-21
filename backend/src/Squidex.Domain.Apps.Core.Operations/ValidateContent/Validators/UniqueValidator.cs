@@ -42,14 +42,14 @@ public sealed class UniqueValidator(CheckUniqueness checkUniqueness) : IValidato
         }
     }
 
-    private async Task ValidateCoreAsync(ValidationContext context, FilterNode<ClrValue> filter,
+    private async ValueTask ValidateCoreAsync(ValidationContext context, FilterNode<ClrValue> filter,
         CancellationToken ct)
     {
         var found = await checkUniqueness(filter, ct);
 
         if (found.Any(x => x.Id != context.Root.ContentId))
         {
-            context.AddError(context.Path, T.Get("contents.validation.unique"));
+            context.AddError(T.Get("contents.validation.unique"));
         }
     }
 

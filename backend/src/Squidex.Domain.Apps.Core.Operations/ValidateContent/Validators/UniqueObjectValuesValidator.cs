@@ -37,7 +37,7 @@ public sealed class UniqueObjectValuesValidator(IEnumerable<string> fields) : IV
             {
                 if (item.TryGetValue(field, out var fieldValue) && !duplicates.Add(fieldValue))
                 {
-                    context.AddError(context.Path, T.Get("contents.validation.uniqueObjectValues", new { field }));
+                    context.AddError(T.Get("contents.validation.uniqueObjectValues", new { field }));
                     break;
                 }
             }

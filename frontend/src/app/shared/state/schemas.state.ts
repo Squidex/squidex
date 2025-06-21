@@ -249,7 +249,7 @@ export class SchemasState extends State<Snapshot> {
     }
 
     public configureFieldRules(schema: SchemaDto, request: ConfigureFieldRulesDto): Observable<SchemaDto> {
-        return this.schemasService.putFieldRules(this.appName, schema, { fieldRules: request } as any, schema.version).pipe(
+        return this.schemasService.putFieldRules(this.appName, schema, request, schema.version).pipe(
             tap(updated => {
                 this.replaceSchema(updated, schema.version, 'i18n:schemas.saved');
             }),

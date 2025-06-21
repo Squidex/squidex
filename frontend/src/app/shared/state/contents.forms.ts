@@ -10,9 +10,9 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { debounceTimeSafe, ExtendedFormGroup, Form, FormArrayTemplate, TemplatedFormArray, Types, value$ } from '@app/framework';
 import { FormGroupTemplate, TemplatedFormGroup } from '@app/framework/angular/forms/templated-form-group';
-import { AppLanguageDto, ComponentFieldPropertiesDto, FieldDto, fieldInvariant, LanguageDto, NestedFieldDto, SchemaDto, TableField } from '../model';
-import { ComponentRulesProvider, RootRulesProvider, RulesProvider } from './contents.form-rules';
-import { AbstractContentForm, AbstractContentFormState, AnyFieldDto, contentTranslationStatus, FieldSection, fieldTranslationStatus, FormGlobals, groupFields, PartitionConfig } from './contents.forms-helpers';
+import { AppLanguageDto, ComponentFieldPropertiesDto, FieldDto, fieldInvariant, LanguageDto, SchemaDto, TableField } from '../model';
+import { ComponentRulesProvider, RootRulesProvider } from './contents.form-rules';
+import { AbstractContentForm, AbstractContentFormState, AnyFieldDto, contentTranslationStatus, ControlArgs, FieldSection, fieldTranslationStatus, FormGlobals, groupFields, PartitionConfig } from './contents.forms-helpers';
 import { FieldDefaultValue, FieldsValidators } from './contents.forms.visitors';
 
 type SaveQueryFormType = { name: string; user: boolean };
@@ -104,6 +104,7 @@ export class EditContentForm extends Form<ExtendedFormGroup, any> {
             remoteValidator: this.remoteValidator,
         };
 
+        const form = this.form;
         const rules = new RootRulesProvider(schema);
 
         this.sections = groupFields(schema.fields).map(({ separator, fields }) => {
@@ -111,16 +112,17 @@ export class EditContentForm extends Form<ExtendedFormGroup, any> {
 
             for (const field of fields) {
                 const childForm =
-                    new FieldForm(
-                        globals,
+                    new FieldForm({
                         field,
-                        field.name,
-                        rules);
+                        globals,
+                        isOptional: false,
+                        partition: '',
+                        path: field.name,
+                        rules,
+                    });
 
-                this.form.setControl(field.name, childForm.form);
-
+                form.setControl(field.name, childForm.form);
                 forms.push(childForm);
-
                 this.fields[field.name] = childForm;
             }
 
@@ -212,25 +214,24 @@ export class FieldForm extends AbstractContentForm<FieldDto, UntypedFormGroup> {
     public readonly translationStatus =
         value$(this.form).pipe(map(x => fieldTranslationStatus(x)));
 
-    constructor(globals: FormGlobals, field: FieldDto, fieldPath: string, rules: RulesProvider) {
-        super(globals, field, fieldPath, FieldForm.buildForm(), false, rules);
+    constructor(args: ControlArgs<FieldDto>) {
+        super(args, FieldForm.buildForm());
 
-        for (const { key, isOptional } of globals.partitions.getAll(field)) {
+        for (const { key: partition, isOptional } of args.globals.partitions.getAll(args.field)) {
             const childForm =
-                buildForm(
-                    this.globals,
-                    field,
-                    this.path(key),
+                buildForm({
+                    ...args,
                     isOptional,
-                    rules,
-                    key);
+                    partition,
+                    path: this.relativePath(partition),
+                });
 
-            this.partitions[key] = childForm;
+            this.partitions[partition] = childForm;
 
-            this.form.setControl(key, childForm.form);
+            this.form.setControl(partition, childForm.form);
         }
 
-        this.isRequired = !!field.properties.isRequired;
+        this.isRequired = !!args.field.properties.isRequired;
     }
 
     public get(language: string | LanguageDto | AppLanguageDto) {
@@ -277,15 +278,13 @@ export class FieldForm extends AbstractContentForm<FieldDto, UntypedFormGroup> {
     }
 }
 
-export class FieldValueForm extends AbstractContentForm<FieldDto | NestedFieldDto, UntypedFormControl> {
+export class FieldValueForm extends AbstractContentForm<AnyFieldDto, UntypedFormControl> {
     private isRequired = false;
 
-    constructor(globals: FormGlobals, field: FieldDto | NestedFieldDto, fieldPath: string, isOptional: boolean, rules: RulesProvider, partition: string) {
-        super(globals, field, fieldPath,
-            FieldValueForm.buildControl(field, isOptional, partition, globals),
-            isOptional, rules);
+    constructor(args: ControlArgs) {
+        super(args, FieldValueForm.buildControl(args, args.partition));
 
-        this.isRequired = !!field.properties.isRequired && !isOptional;
+        this.isRequired = !!args.field.properties.isRequired && !args.isOptional;
     }
 
     protected updateCustomState(_context: any, _itemData: any, state: AbstractContentFormState) {
@@ -295,7 +294,6 @@ export class FieldValueForm extends AbstractContentForm<FieldDto | NestedFieldDt
             this.isRequired = isRequired;
 
             let validators = FieldsValidators.create(this.field, true);
-
             if (isRequired) {
                 validators.push(Validators.required);
             } else {
@@ -307,20 +305,20 @@ export class FieldValueForm extends AbstractContentForm<FieldDto | NestedFieldDt
         }
     }
 
-    private static buildControl(field: FieldDto | NestedFieldDto, isOptional: boolean, partition: string, globals: FormGlobals) {
-        const value = FieldDefaultValue.get(field, partition);
+    private static buildControl(args: ControlArgs, partition: string) {
+        const value = FieldDefaultValue.get(args.field, partition);
 
-        const validators = FieldsValidators.create(field, isOptional);
+        const validators = FieldsValidators.create(args.field, args.isOptional);
 
-        if (globals.remoteValidator) {
-            validators.push(globals.remoteValidator);
+        if (args.globals.remoteValidator) {
+            validators.push(args.globals.remoteValidator);
         }
 
         return new UntypedFormControl(value, { validators });
     }
 }
 
-export class FieldArrayForm extends AbstractContentForm<FieldDto | NestedFieldDto, TemplatedFormArray> {
+export class FieldArrayForm extends AbstractContentForm<AnyFieldDto, TemplatedFormArray> {
     private readonly item$ = new BehaviorSubject<ReadonlyArray<ObjectFormBase>>([]);
 
     public get itemChanges(): Observable<ReadonlyArray<ObjectFormBase>> {
@@ -335,15 +333,15 @@ export class FieldArrayForm extends AbstractContentForm<FieldDto | NestedFieldDt
         this.item$.next(value);
     }
 
-    constructor(globals: FormGlobals, field: FieldDto | NestedFieldDto, fieldPath: string, isOptional: boolean, rules: RulesProvider,
-        public readonly partition: string,
+    constructor(args: ControlArgs,
         public readonly isComponents: boolean,
     ) {
-        super(globals, field, fieldPath,
-            new TemplatedFormArray(new ArrayTemplate(() => this), FieldsValidators.create(field, isOptional)),
-            isOptional, rules);
+        super(args,
+            new TemplatedFormArray(
+                new ArrayTemplate(() => this),
+                FieldsValidators.create(args.field, args.isOptional)));
 
-        this.form.setValue(FieldDefaultValue.get(field, this.partition), { emitEvent: false });
+        this.form.setValue(FieldDefaultValue.get(args.field, args.partition), { emitEvent: false });
 
         (this.form.template as any)['form'] = this;
     }
@@ -410,40 +408,25 @@ class ArrayTemplate implements FormArrayTemplate {
             this.createItem(model);
 
         model.internalItems = [...this.model.items, child];
-
         return child.form;
     }
 
     public removeControl(index: number) {
         const model = this.model;
-
         model.internalItems = model.items.filter((_, i) => i !== index);
     }
 
     public clearControls() {
         const model = this.model;
-
         model.internalItems = [];
     }
 
     private createItem(model: FieldArrayForm) {
-        return new ArrayItemForm(
-            model.globals,
-            model.field as FieldDto,
-            model.fieldPath,
-            model.isOptional,
-            model.rules,
-            model.partition);
+        return new ArrayItemForm(model.args);
     }
 
     private createComponent(model: FieldArrayForm) {
-        return new ComponentForm(
-            model.globals,
-            model.field as FieldDto,
-            model.fieldPath,
-            model.isOptional,
-            model.rules,
-            model.partition);
+        return new ComponentForm(model.args);
     }
 }
 
@@ -479,12 +462,8 @@ export class ObjectFormBase extends AbstractContentForm<AnyFieldDto, TemplatedFo
         this.fields$.next(value);
     }
 
-    constructor(globals: FormGlobals, field: AnyFieldDto, fieldPath: string, isOptional: boolean, rules: RulesProvider, template: ObjectTemplate,
-        public readonly partition: string,
-    ) {
-        super(globals, field, fieldPath,
-            ObjectFormBase.buildControl(template),
-            isOptional, rules);
+    constructor(args: ControlArgs, template: ObjectTemplate) {
+        super(args, ObjectFormBase.buildControl(template));
     }
 
     public get(field: string | { name: string }): FieldItemForm | undefined {
@@ -507,7 +486,7 @@ export class ObjectFormBase extends AbstractContentForm<AnyFieldDto, TemplatedFo
 }
 
 abstract class ObjectTemplate<T extends ObjectFormBase = ObjectFormBase> implements FormGroupTemplate {
-    private currentSchema: ReadonlyArray<FieldDto | NestedFieldDto> | undefined;
+    private currentSchema: ReadonlyArray<AnyFieldDto> | undefined;
 
     protected get model() {
         return this.modelProvider();
@@ -552,18 +531,14 @@ abstract class ObjectTemplate<T extends ObjectFormBase = ObjectFormBase> impleme
             const forms: FieldItemForm[] = [];
 
             for (const field of fields) {
-                const childForm = buildForm(
-                    model.globals,
+                const childForm = buildForm({
+                    ...model.args,
                     field,
-                    model.path(field.name),
-                    model.isOptional,
-                    model.rules,
-                    model.partition);
+                    path: model.relativePath(field.name),
+                });
 
                 form.setControl(field.name, childForm.form);
-
                 forms.push(childForm);
-
                 fieldByName[field.name] = childForm;
             }
 
@@ -585,10 +560,8 @@ abstract class ObjectTemplate<T extends ObjectFormBase = ObjectFormBase> impleme
 }
 
 export class ArrayItemForm extends ObjectFormBase {
-    constructor(globals: FormGlobals, field: FieldDto, fieldPath: string, isOptional: boolean, rules: RulesProvider, partition: string) {
-        super(globals, field, fieldPath, isOptional, rules,
-            new ArrayItemTemplate(() => this), partition);
-
+    constructor(args: ControlArgs) {
+        super(args, new ArrayItemTemplate(() => this));
         this.form.build({});
     }
 }
@@ -622,11 +595,11 @@ export class ComponentForm extends ObjectFormBase {
         return this.field.properties as ComponentFieldPropertiesDto;
     }
 
-    constructor(globals: FormGlobals, field: AnyFieldDto, fieldPath: string, isOptional: boolean, rules: RulesProvider, partition: string) {
-        super(globals, field, fieldPath, isOptional,
-            new ComponentRulesProvider(fieldPath, rules, () => this.schema),
-            new ComponentTemplate(() => this),
-            partition);
+    constructor(args: ControlArgs) {
+        super({
+            ...args,
+            rules: new ComponentRulesProvider(args.path, args.rules, () => this.schema),
+        }, new ComponentTemplate(() => this));
 
         this.form.reset(undefined);
     }
@@ -656,15 +629,15 @@ class ComponentTemplate extends ObjectTemplate<ComponentForm> {
     }
 }
 
-function buildForm(globals: FormGlobals, field: FieldDto | NestedFieldDto, fieldPath: string, isOptional: boolean, rules: RulesProvider, partition: string) {
-    switch (field.properties.fieldType) {
+function buildForm(args: ControlArgs) {
+    switch (args.field.properties.fieldType) {
         case 'Array':
-            return new FieldArrayForm(globals, field, fieldPath, isOptional, rules, partition, false);
+            return new FieldArrayForm(args, false);
         case 'Component':
-            return new ComponentForm(globals, field, fieldPath, isOptional, rules, partition);
+            return new ComponentForm(args);
         case 'Components':
-            return new FieldArrayForm(globals, field, fieldPath, isOptional, rules, partition, true);
+            return new FieldArrayForm(args, true);
         default:
-            return new FieldValueForm(globals, field, fieldPath, isOptional, rules, partition);
+            return new FieldValueForm(args);
     }
 }

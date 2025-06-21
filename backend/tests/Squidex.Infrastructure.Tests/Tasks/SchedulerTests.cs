@@ -104,7 +104,6 @@ public class SchedulerTests
         target.Schedule(async _ =>
         {
             await Task.Delay(1);
-
             actuals.Add(value);
         });
     }
@@ -114,8 +113,7 @@ public class SchedulerTests
         target.Schedule(_ =>
         {
             actuals.Add(value);
-
-            return Task.CompletedTask;
+            return default;
         });
     }
 }

@@ -82,6 +82,14 @@ public sealed class TestEntity : Content<TestEntityData>
                         IsRequired = false
                     }
                 },
+                new UpsertSchemaFieldDto
+                {
+                    Name = TestEntityData.ImmutableField,
+                    Properties = new StringFieldPropertiesDto
+                    {
+                        IsCreateOnly = true
+                    }
+                },
             ],
             Scripts = scripts,
             IsPublished = true
@@ -133,6 +141,8 @@ public sealed class TestEntityData
 
     public static readonly string SearchableField = nameof(Searchable).ToLowerInvariant();
 
+    public static readonly string ImmutableField = nameof(Immutable).ToLowerInvariant();
+
     public static readonly string StringField = nameof(String).ToLowerInvariant();
 
     public static readonly string NumberField = nameof(Number).ToLowerInvariant();
@@ -150,6 +160,9 @@ public sealed class TestEntityData
 
     [JsonConverter(typeof(InvariantConverter))]
     public string? Id { get; set; }
+
+    [JsonConverter(typeof(InvariantConverter))]
+    public string? Immutable { get; set; }
 
     [JsonConverter(typeof(InvariantConverter))]
     public string? String { get; set; }

@@ -763,6 +763,24 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The type of action that is performed..
+        /// </summary>
+        public static string FieldRuleAction {
+            get {
+                return ResourceManager.GetString("FieldRuleAction", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The context object..
+        /// </summary>
+        public static string FieldRuleContext {
+            get {
+                return ResourceManager.GetString("FieldRuleContext", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to The graphql request..
         /// </summary>
         public static string GraphqlRequest {

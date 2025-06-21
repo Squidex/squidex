@@ -35,7 +35,7 @@ public sealed class CollectionValidator : IValidator
         {
             if (isRequired && !context.IsOptional)
             {
-                context.AddError(context.Path, T.Get("contents.validation.required"));
+                context.AddError(T.Get("contents.validation.required"));
             }
 
             return;
@@ -45,23 +45,23 @@ public sealed class CollectionValidator : IValidator
         {
             if (minItems == maxItems && minItems != items.Count)
             {
-                context.AddError(context.Path, T.Get("contents.validation.itemCount", new { count = minItems }));
+                context.AddError(T.Get("contents.validation.itemCount", new { count = minItems }));
             }
             else if (items.Count < minItems || items.Count > maxItems)
             {
-                context.AddError(context.Path, T.Get("contents.validation.itemCountBetween", new { min = minItems, max = maxItems }));
+                context.AddError(T.Get("contents.validation.itemCountBetween", new { min = minItems, max = maxItems }));
             }
         }
         else
         {
             if (minItems != null && items.Count < minItems)
             {
-                context.AddError(context.Path, T.Get("contents.validation.minItems", new { min = minItems }));
+                context.AddError(T.Get("contents.validation.minItems", new { min = minItems }));
             }
 
             if (maxItems != null && items.Count > maxItems)
             {
-                context.AddError(context.Path, T.Get("contents.validation.maxItems", new { max = maxItems }));
+                context.AddError(T.Get("contents.validation.maxItems", new { max = maxItems }));
             }
         }
     }

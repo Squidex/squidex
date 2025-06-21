@@ -852,6 +852,7 @@
   "schemas.field.allowedValues": "Valeurs autorisées",
   "schemas.field.createEnum": "Générer l'énumération GraphQL.",
   "schemas.field.createEnumHint": "Générez une énumération GraphQL pour ce champ. Le format d'entrée n'est plus compatible avec une chaîne et peut constituer un changement radical pour votre client.",
+  "schemas.field.createOnly": "Immutable (cannot be changed)",
   "schemas.field.defaultValue": "Valeur par défaut",
   "schemas.field.defaultValues": "Les valeurs par défaut",
   "schemas.field.defaultValuesHint": "Définissez la valeur par défaut par langue et remplacez la propriété de valeur par défaut, si elle est définie. Ne l'utilisez qu'en cas de besoin.",

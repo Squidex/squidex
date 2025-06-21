@@ -183,7 +183,7 @@ export class GeolocationEditorComponent extends StatefulControlComponent<State, 
 
         await Promise.all([
             this.resourceLoader.loadLocalStyle('dependencies/leaflet/Control.Geocoder.css'),
-            this.resourceLoader.loadLocalScript('dependencies/leaflet/Control.Geocoder.min.js'),
+            this.resourceLoader.loadLocalScript('dependencies/leaflet/Control.Geocoder.js'),
         ]);
 
         this.map = L.map(this.editor.nativeElement).fitWorld();

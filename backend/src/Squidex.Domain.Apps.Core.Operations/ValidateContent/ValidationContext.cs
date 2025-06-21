@@ -21,9 +21,9 @@ public sealed record ValidationContext(RootContext Root)
 
     public ValidationAction Action { get; init; }
 
-    public void AddError(IEnumerable<string> path, string message)
+    public void AddError(string message, IEnumerable<string>? path = null)
     {
-        Root.AddError(path, message);
+        Root.AddError(path ?? Path, message);
     }
 
     public ValidationContext Optimized(bool optimized = true)

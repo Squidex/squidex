@@ -179,6 +179,8 @@ public class ScriptingCompleterTests
         AssertCompletion(actual,
             new[]
             {
+                "ctx",
+                "ctx.action",
                 "data",
                 "data['my-field']",
                 "data['my-field'].iv",

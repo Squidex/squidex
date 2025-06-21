@@ -94,8 +94,8 @@ export class ConfigureFieldRulesForm extends Form<TemplatedFormArray, ConfigureF
         super(new TemplatedFormArray(FieldRuleTemplate.INSTANCE));
     }
 
-    public add(fieldNames: ReadonlyArray<string>) {
-        this.form.add(fieldNames);
+    public add(name?: string) {
+        this.form.add(name);
     }
 
     public remove(index: number) {
@@ -114,17 +114,15 @@ export class ConfigureFieldRulesForm extends Form<TemplatedFormArray, ConfigureF
 class FieldRuleTemplate {
     public static readonly INSTANCE = new FieldRuleTemplate();
 
-    public createControl(_: any, fieldNames?: ReadonlyArray<string>) {
+    public createControl(_: any, fieldName?: string) {
         return new ExtendedFormGroup({
             action: new UntypedFormControl('Disable',
                 Validators.required,
             ),
-            field: new UntypedFormControl(fieldNames?.[0],
+            field: new UntypedFormControl(fieldName,
                 Validators.required,
             ),
-            condition: new UntypedFormControl('',
-                Validators.required,
-            ),
+            condition: new UntypedFormControl(''),
         });
     }
 }
@@ -227,6 +225,9 @@ export class EditFieldForm extends Form<ExtendedFormGroup, {}, FieldPropertiesDt
                 Validators.nullValidator,
             ),
             isRequiredOnPublish: new UntypedFormControl(false,
+                Validators.nullValidator,
+            ),
+            isCreateOnly: new UntypedFormControl(false,
                 Validators.nullValidator,
             ),
             isHalfWidth: new UntypedFormControl(false,

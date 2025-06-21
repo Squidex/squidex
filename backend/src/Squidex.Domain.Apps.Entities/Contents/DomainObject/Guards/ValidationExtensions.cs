@@ -48,10 +48,13 @@ public static class ValidationExtensions
     }
 
     public static async Task ValidateInputAsync(this ContentOperation operation,
-        ContentData data, bool optimize, bool published,
+        ContentData data,
+        bool optimize,
+        bool published,
+        ContentData? previousData,
         CancellationToken ct)
     {
-        var validator = GetValidator(operation, optimize, published);
+        var validator = GetValidator(operation, optimize, published, previousData);
 
         await validator.ValidateInputAsync(data, ct);
 
@@ -59,10 +62,12 @@ public static class ValidationExtensions
     }
 
     public static async Task ValidateInputPartialAsync(this ContentOperation operation,
-        ContentData data, bool optimize, bool published,
+        ContentData data,
+        bool optimize,
+        bool published,
         CancellationToken ct)
     {
-        var validator = GetValidator(operation, optimize, published);
+        var validator = GetValidator(operation, optimize, published, null);
 
         await validator.ValidateInputPartialAsync(data, ct);
 
@@ -70,10 +75,12 @@ public static class ValidationExtensions
     }
 
     public static async Task ValidateContentAsync(this ContentOperation operation,
-        ContentData data, bool optimize, bool published,
+        ContentData data,
+        bool optimize,
+        bool published,
         CancellationToken ct)
     {
-        var validator = GetValidator(operation, optimize, published);
+        var validator = GetValidator(operation, optimize, published, null);
 
         await validator.ValidateContentAsync(data, ct);
 
@@ -81,10 +88,12 @@ public static class ValidationExtensions
     }
 
     public static async Task ValidateContentAndInputAsync(this ContentOperation operation,
-        ContentData data, bool optimize, bool published,
+        ContentData data,
+        bool optimize,
+        bool published,
         CancellationToken ct)
     {
-        var validator = GetValidator(operation, optimize, published);
+        var validator = GetValidator(operation, optimize, published, null);
 
         await validator.ValidateInputAndContentAsync(data, ct);
 
@@ -128,7 +137,10 @@ public static class ValidationExtensions
         }
     }
 
-    private static ContentValidator GetValidator(this ContentOperation operation, bool optimize, bool published)
+    private static ContentValidator GetValidator(this ContentOperation operation,
+        bool optimize,
+        bool published,
+        ContentData? previousData)
     {
         var rootContext =
             new RootContext(
@@ -136,7 +148,10 @@ public static class ValidationExtensions
                 operation.Schema,
                 operation.CommandId,
                 operation.Components,
-                operation.Resolve<IJsonSerializer>());
+                operation.Resolve<IJsonSerializer>())
+            {
+                PreviousData = previousData
+            };
 
         var validationContext = new ValidationContext(rootContext).Optimized(optimize).AsPublishing(published);
 

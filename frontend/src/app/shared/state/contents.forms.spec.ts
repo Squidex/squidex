@@ -828,9 +828,25 @@ describe('ContentForm', () => {
                 },
             });
 
-            // Should hide fields.
             expect(array.get(0)!.get('field1')!.hidden).toBeTruthy();
             expect(array.get(1)!.get('field1')!.hidden).toBeFalsy();
+        });
+
+        it('should hide field based on tags', () => {
+            const contentForm = createForm([
+                createField({ id: 1, properties: createProperties('Number', { tags: ['tag1'] }), partitioning: 'invariant' }),
+                createField({ id: 2, properties: createProperties('Number'), partitioning: 'invariant' }),
+            ], [
+                new FieldRuleDto({ field: 'tag:tag1', action: 'Hide' }),
+            ]);
+
+            const field1 = contentForm.get('field1');
+            const field1_iv = contentForm.get('field1')!.get('iv');
+            const field2 = contentForm.get('field2');
+
+            expect(field1!.hidden).toBeTruthy();
+            expect(field2!.hidden).toBeFalsy();
+            expect(field1_iv!.hidden).toBeTruthy();
         });
 
         it('should add component with default values', () => {

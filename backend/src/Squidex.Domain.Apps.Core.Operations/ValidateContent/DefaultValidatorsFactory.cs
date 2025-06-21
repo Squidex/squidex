@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.ValidateContent.Validators;
 
@@ -17,6 +18,11 @@ public sealed class DefaultValidatorsFactory : IValidatorsFactory
         if (field is IField<UIFieldProperties>)
         {
             yield return NoValueValidator.Instance;
+        }
+
+        if (field is IRootField rootField && field.RawProperties.IsCreateOnly && context.Root.PreviousData is ContentData previous)
+        {
+            yield return new NotChangedValidator(rootField, previous);
         }
     }
 

@@ -544,6 +544,9 @@
   <data name="contents.validation.charactersBetween" xml:space="preserve">
     <value>必须在 {min} 到 {max} 个字符之间。</value>
   </data>
+  <data name="contents.validation.createOnly" xml:space="preserve">
+    <value>Field cannot be changed after creation.</value>
+  </data>
   <data name="contents.validation.duplicates" xml:space="preserve">
     <value>不得包含重复值。</value>
   </data>

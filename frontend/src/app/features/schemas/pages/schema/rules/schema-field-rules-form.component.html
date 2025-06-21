@@ -22,8 +22,8 @@
                         <div class="col-3">
                             <sqx-control-errors for="field" />
                             <select class="form-select" formControlName="field">
-                                @for (field of fieldNames; track field) {
-                                    <option [ngValue]="field">{{ field }}</option>
+                                @for (option of fieldOptions; track option.value) {
+                                    <option [ngValue]="option.value">{{ option.label }}</option>
                                 }
                             </select>
                         </div>

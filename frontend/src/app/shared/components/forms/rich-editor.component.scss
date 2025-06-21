@@ -1,2 +1,8 @@
 @import 'mixins';
 @import 'vars';
+
+:host ::ng-deep {
+    fieldset {
+        min-width: auto;
+    }
+}

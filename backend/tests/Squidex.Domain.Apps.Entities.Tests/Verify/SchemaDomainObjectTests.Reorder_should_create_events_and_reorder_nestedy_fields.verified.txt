@@ -18,7 +18,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -29,7 +30,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 3,
                 Name: field2,
@@ -47,7 +49,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -58,7 +61,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 2,
                 Name: field1,
@@ -78,7 +82,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -89,7 +94,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 2,
                 Name: field1,
@@ -107,7 +113,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -118,7 +125,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 3,
                 Name: field2,
@@ -138,7 +146,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -149,7 +158,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 2,
                 Name: field1,
@@ -167,7 +177,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -178,7 +189,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 3,
                 Name: field2,
@@ -199,7 +211,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   RawProperties: {
                     MinLength: 10,
@@ -210,7 +223,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   Id: 3,
                   Name: field2,
@@ -228,7 +242,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   RawProperties: {
                     MinLength: 10,
@@ -239,7 +254,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   Id: 2,
                   Name: field1,
@@ -259,7 +275,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   RawProperties: {
                     MinLength: 10,
@@ -270,7 +287,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   Id: 2,
                   Name: field1,
@@ -288,7 +306,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   RawProperties: {
                     MinLength: 10,
@@ -299,7 +318,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   Id: 3,
                   Name: field2,
@@ -319,7 +339,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   RawProperties: {
                     MinLength: 10,
@@ -330,7 +351,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   Id: 2,
                   Name: field1,
@@ -348,7 +370,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   RawProperties: {
                     MinLength: 10,
@@ -359,7 +382,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   Id: 3,
                   Name: field2,
@@ -372,12 +396,14 @@
             Properties: {
               IsRequired: false,
               IsRequiredOnPublish: false,
-              IsHalfWidth: false
+              IsHalfWidth: false,
+              IsCreateOnly: false
             },
             RawProperties: {
               IsRequired: false,
               IsRequiredOnPublish: false,
-              IsHalfWidth: false
+              IsHalfWidth: false,
+              IsCreateOnly: false
             },
             Id: 1,
             Name: array,
@@ -402,7 +428,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -413,7 +440,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 3,
                 Name: field2,
@@ -431,7 +459,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -442,7 +471,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 2,
                 Name: field1,
@@ -462,7 +492,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -473,7 +504,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 2,
                 Name: field1,
@@ -491,7 +523,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -502,7 +535,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 3,
                 Name: field2,
@@ -522,7 +556,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -533,7 +568,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 2,
                 Name: field1,
@@ -551,7 +587,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -562,7 +599,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 3,
                 Name: field2,
@@ -583,7 +621,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   RawProperties: {
                     MinLength: 10,
@@ -594,7 +633,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   Id: 3,
                   Name: field2,
@@ -612,7 +652,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   RawProperties: {
                     MinLength: 10,
@@ -623,7 +664,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   Id: 2,
                   Name: field1,
@@ -643,7 +685,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   RawProperties: {
                     MinLength: 10,
@@ -654,7 +697,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   Id: 2,
                   Name: field1,
@@ -672,7 +716,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   RawProperties: {
                     MinLength: 10,
@@ -683,7 +728,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   Id: 3,
                   Name: field2,
@@ -703,7 +749,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   RawProperties: {
                     MinLength: 10,
@@ -714,7 +761,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   Id: 2,
                   Name: field1,
@@ -732,7 +780,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   RawProperties: {
                     MinLength: 10,
@@ -743,7 +792,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   Id: 3,
                   Name: field2,
@@ -756,12 +806,14 @@
             Properties: {
               IsRequired: false,
               IsRequiredOnPublish: false,
-              IsHalfWidth: false
+              IsHalfWidth: false,
+              IsCreateOnly: false
             },
             RawProperties: {
               IsRequired: false,
               IsRequiredOnPublish: false,
-              IsHalfWidth: false
+              IsHalfWidth: false,
+              IsCreateOnly: false
             },
             Id: 1,
             Name: array,
@@ -786,7 +838,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -797,7 +850,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 3,
                 Name: field2,
@@ -815,7 +869,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -826,7 +881,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 2,
                 Name: field1,
@@ -846,7 +902,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -857,7 +914,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 2,
                 Name: field1,
@@ -875,7 +933,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -886,7 +945,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 3,
                 Name: field2,
@@ -906,7 +966,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -917,7 +978,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 2,
                 Name: field1,
@@ -935,7 +997,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -946,7 +1009,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 3,
                 Name: field2,
@@ -967,7 +1031,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   RawProperties: {
                     MinLength: 10,
@@ -978,7 +1043,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   Id: 3,
                   Name: field2,
@@ -996,7 +1062,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   RawProperties: {
                     MinLength: 10,
@@ -1007,7 +1074,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   Id: 2,
                   Name: field1,
@@ -1027,7 +1095,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   RawProperties: {
                     MinLength: 10,
@@ -1038,7 +1107,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   Id: 2,
                   Name: field1,
@@ -1056,7 +1126,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   RawProperties: {
                     MinLength: 10,
@@ -1067,7 +1138,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   Id: 3,
                   Name: field2,
@@ -1087,7 +1159,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   RawProperties: {
                     MinLength: 10,
@@ -1098,7 +1171,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   Id: 2,
                   Name: field1,
@@ -1116,7 +1190,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   RawProperties: {
                     MinLength: 10,
@@ -1127,7 +1202,8 @@
                     CreateEnum: false,
                     IsRequired: false,
                     IsRequiredOnPublish: false,
-                    IsHalfWidth: false
+                    IsHalfWidth: false,
+                    IsCreateOnly: false
                   },
                   Id: 3,
                   Name: field2,
@@ -1140,12 +1216,14 @@
             Properties: {
               IsRequired: false,
               IsRequiredOnPublish: false,
-              IsHalfWidth: false
+              IsHalfWidth: false,
+              IsCreateOnly: false
             },
             RawProperties: {
               IsRequired: false,
               IsRequiredOnPublish: false,
-              IsHalfWidth: false
+              IsHalfWidth: false,
+              IsCreateOnly: false
             },
             Id: 1,
             Name: array,
@@ -1176,7 +1254,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               RawProperties: {
                 MinLength: 10,
@@ -1187,7 +1266,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               Id: 3,
               Name: field2,
@@ -1205,7 +1285,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               RawProperties: {
                 MinLength: 10,
@@ -1216,7 +1297,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               Id: 2,
               Name: field1,
@@ -1236,7 +1318,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               RawProperties: {
                 MinLength: 10,
@@ -1247,7 +1330,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               Id: 2,
               Name: field1,
@@ -1265,7 +1349,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               RawProperties: {
                 MinLength: 10,
@@ -1276,7 +1361,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               Id: 3,
               Name: field2,
@@ -1296,7 +1382,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               RawProperties: {
                 MinLength: 10,
@@ -1307,7 +1394,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               Id: 2,
               Name: field1,
@@ -1325,7 +1413,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               RawProperties: {
                 MinLength: 10,
@@ -1336,7 +1425,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               Id: 3,
               Name: field2,
@@ -1357,7 +1447,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -1368,7 +1459,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 3,
                 Name: field2,
@@ -1386,7 +1478,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -1397,7 +1490,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 2,
                 Name: field1,
@@ -1417,7 +1511,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -1428,7 +1523,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 2,
                 Name: field1,
@@ -1446,7 +1542,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -1457,7 +1554,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 3,
                 Name: field2,
@@ -1477,7 +1575,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -1488,7 +1587,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 2,
                 Name: field1,
@@ -1506,7 +1606,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -1517,7 +1618,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 3,
                 Name: field2,
@@ -1530,12 +1632,14 @@
           Properties: {
             IsRequired: false,
             IsRequiredOnPublish: false,
-            IsHalfWidth: false
+            IsHalfWidth: false,
+            IsCreateOnly: false
           },
           RawProperties: {
             IsRequired: false,
             IsRequiredOnPublish: false,
-            IsHalfWidth: false
+            IsHalfWidth: false,
+            IsCreateOnly: false
           },
           Id: 1,
           Name: array,
@@ -1560,7 +1664,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               RawProperties: {
                 MinLength: 10,
@@ -1571,7 +1676,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               Id: 3,
               Name: field2,
@@ -1589,7 +1695,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               RawProperties: {
                 MinLength: 10,
@@ -1600,7 +1707,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               Id: 2,
               Name: field1,
@@ -1620,7 +1728,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               RawProperties: {
                 MinLength: 10,
@@ -1631,7 +1740,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               Id: 2,
               Name: field1,
@@ -1649,7 +1759,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               RawProperties: {
                 MinLength: 10,
@@ -1660,7 +1771,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               Id: 3,
               Name: field2,
@@ -1680,7 +1792,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               RawProperties: {
                 MinLength: 10,
@@ -1691,7 +1804,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               Id: 2,
               Name: field1,
@@ -1709,7 +1823,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               RawProperties: {
                 MinLength: 10,
@@ -1720,7 +1835,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               Id: 3,
               Name: field2,
@@ -1741,7 +1857,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -1752,7 +1869,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 3,
                 Name: field2,
@@ -1770,7 +1888,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -1781,7 +1900,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 2,
                 Name: field1,
@@ -1801,7 +1921,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -1812,7 +1933,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 2,
                 Name: field1,
@@ -1830,7 +1952,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -1841,7 +1964,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 3,
                 Name: field2,
@@ -1861,7 +1985,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -1872,7 +1997,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 2,
                 Name: field1,
@@ -1890,7 +2016,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -1901,7 +2028,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 3,
                 Name: field2,
@@ -1914,12 +2042,14 @@
           Properties: {
             IsRequired: false,
             IsRequiredOnPublish: false,
-            IsHalfWidth: false
+            IsHalfWidth: false,
+            IsCreateOnly: false
           },
           RawProperties: {
             IsRequired: false,
             IsRequiredOnPublish: false,
-            IsHalfWidth: false
+            IsHalfWidth: false,
+            IsCreateOnly: false
           },
           Id: 1,
           Name: array,
@@ -1944,7 +2074,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               RawProperties: {
                 MinLength: 10,
@@ -1955,7 +2086,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               Id: 3,
               Name: field2,
@@ -1973,7 +2105,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               RawProperties: {
                 MinLength: 10,
@@ -1984,7 +2117,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               Id: 2,
               Name: field1,
@@ -2004,7 +2138,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               RawProperties: {
                 MinLength: 10,
@@ -2015,7 +2150,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               Id: 2,
               Name: field1,
@@ -2033,7 +2169,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               RawProperties: {
                 MinLength: 10,
@@ -2044,7 +2181,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               Id: 3,
               Name: field2,
@@ -2064,7 +2202,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               RawProperties: {
                 MinLength: 10,
@@ -2075,7 +2214,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               Id: 2,
               Name: field1,
@@ -2093,7 +2233,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               RawProperties: {
                 MinLength: 10,
@@ -2104,7 +2245,8 @@
                 CreateEnum: false,
                 IsRequired: false,
                 IsRequiredOnPublish: false,
-                IsHalfWidth: false
+                IsHalfWidth: false,
+                IsCreateOnly: false
               },
               Id: 3,
               Name: field2,
@@ -2125,7 +2267,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -2136,7 +2279,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 3,
                 Name: field2,
@@ -2154,7 +2298,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -2165,7 +2310,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 2,
                 Name: field1,
@@ -2185,7 +2331,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -2196,7 +2343,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 2,
                 Name: field1,
@@ -2214,7 +2362,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -2225,7 +2374,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 3,
                 Name: field2,
@@ -2245,7 +2395,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -2256,7 +2407,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 2,
                 Name: field1,
@@ -2274,7 +2426,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 RawProperties: {
                   MinLength: 10,
@@ -2285,7 +2438,8 @@
                   CreateEnum: false,
                   IsRequired: false,
                   IsRequiredOnPublish: false,
-                  IsHalfWidth: false
+                  IsHalfWidth: false,
+                  IsCreateOnly: false
                 },
                 Id: 3,
                 Name: field2,
@@ -2298,12 +2452,14 @@
           Properties: {
             IsRequired: false,
             IsRequiredOnPublish: false,
-            IsHalfWidth: false
+            IsHalfWidth: false,
+            IsCreateOnly: false
           },
           RawProperties: {
             IsRequired: false,
             IsRequiredOnPublish: false,
-            IsHalfWidth: false
+            IsHalfWidth: false,
+            IsCreateOnly: false
           },
           Id: 1,
           Name: array,

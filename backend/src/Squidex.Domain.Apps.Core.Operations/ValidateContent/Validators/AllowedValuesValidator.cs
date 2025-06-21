@@ -30,7 +30,7 @@ public sealed class AllowedValuesValidator<TValue> : IValidator
     {
         if (value is TValue typedValue && !allowedValues.Contains(typedValue))
         {
-            context.AddError(context.Path, T.Get("contents.validation.notAllowed"));
+            context.AddError(T.Get("contents.validation.notAllowed"), context.Path);
         }
     }
 }

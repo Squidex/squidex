@@ -15,7 +15,7 @@
                 @if (rolesState.defaultRoles | async; as defaultRoles) {
                     @if (defaultRoles.length > 0) {
                         <div>
-                            <h5 class="mt-4">{{ "roles.defaultRoles" | sqxTranslate }}</h5>
+                            <h5>{{ "roles.defaultRoles" | sqxTranslate }}</h5>
                             <sqx-form-hint> {{ "roles.defaultRoles.hint" | sqxTranslate }} </sqx-form-hint>
                             @for (role of defaultRoles; track role.name) {
                                 <sqx-role [allPermissions]="allPermissions" [role]="role" [schemas]="(schemasState.schemas | async)!" />

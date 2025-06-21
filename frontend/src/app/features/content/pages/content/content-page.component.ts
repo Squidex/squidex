@@ -109,6 +109,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
         const role = appsState.snapshot.selectedApp?.roleName;
 
         this.mutableContext = {
+            action: 'Create',
             apiUrl: apiUrl.buildUrl('api'),
             appId: contentsState.appId,
             appName: contentsState.appName,
@@ -224,6 +225,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
     }
 
     private updateContext() {
+        this.mutableContext['action'] = this.content ? 'Create' : 'Update';
         this.mutableContext['initialContent'] = this.content;
         this.mutableContext['language'] = this.language;
         this.mutableContext['languages'] = this.languages;

@@ -29,41 +29,44 @@ public sealed class FieldValidator : IValidator
 
     public void Validate(object? value, ValidationContext context)
     {
-        var typedValue = value;
+        var typedValue = ResolveValue(value, context);
 
+        validator.Validate(typedValue, context);
+    }
+
+    private object? ResolveValue(object? value, ValidationContext context)
+    {
+        if (value is not JsonValue jsonValue)
+        {
+            return value;
+        }
+
+        if (jsonValue == default || Updates.IsUnset(jsonValue))
+        {
+            return null;
+        }
+
+        var result = jsonValue.Value;
         try
         {
-            if (value is JsonValue jsonValue)
+            var (typed, error) = JsonValueConverter.ConvertValue(field, jsonValue,
+                context.Root.Serializer,
+                context.Root.Components);
+
+            if (error != null)
             {
-                if (jsonValue == default || Updates.IsUnset(jsonValue))
-                {
-                    typedValue = null;
-                }
-                else
-                {
-                    typedValue = jsonValue.Value;
-
-                    var (typed, error) = JsonValueConverter.ConvertValue(field, jsonValue,
-                        context.Root.Serializer,
-                        context.Root.Components);
-
-                    if (error != null)
-                    {
-                        context.AddError(context.Path, error.Error);
-                    }
-                    else
-                    {
-                        typedValue = typed;
-                    }
-                }
+                context.AddError(error.Error);
+            }
+            else
+            {
+                result = typed;
             }
         }
         catch
         {
-            context.AddError(context.Path, T.Get("contents.validation.invalid"));
-            return;
+            context.AddError(T.Get("contents.validation.invalid"));
         }
 
-        validator.Validate(typedValue, context);
+        return result;
     }
 }

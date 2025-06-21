@@ -28,30 +28,32 @@ public sealed class RangeValidator<TValue> : IValidator where TValue : struct, I
 
     public void Validate(object? value, ValidationContext context)
     {
-        if (value is TValue typedValue)
+        if (value is not TValue typedValue)
         {
-            if (min != null && max != null)
-            {
-                if (Equals(min, max) && Equals(min.Value, max.Value))
-                {
-                    context.AddError(context.Path, T.Get("contents.validation.exactValue", new { value = max.Value }));
-                }
-                else if (typedValue.CompareTo(min.Value) < 0 || typedValue.CompareTo(max.Value) > 0)
-                {
-                    context.AddError(context.Path, T.Get("contents.validation.between", new { min, max }));
-                }
-            }
-            else
-            {
-                if (min != null && typedValue.CompareTo(min.Value) < 0)
-                {
-                    context.AddError(context.Path, T.Get("contents.validation.min", new { min }));
-                }
+            return;
+        }
 
-                if (max != null && typedValue.CompareTo(max.Value) > 0)
-                {
-                    context.AddError(context.Path, T.Get("contents.validation.max", new { max }));
-                }
+        if (min != null && max != null)
+        {
+            if (Equals(min, max) && Equals(min.Value, max.Value))
+            {
+                context.AddError(T.Get("contents.validation.exactValue", new { value = max.Value }));
+            }
+            else if (typedValue.CompareTo(min.Value) < 0 || typedValue.CompareTo(max.Value) > 0)
+            {
+                context.AddError(T.Get("contents.validation.between", new { min, max }));
+            }
+        }
+        else
+        {
+            if (min != null && typedValue.CompareTo(min.Value) < 0)
+            {
+                context.AddError(T.Get("contents.validation.min", new { min }));
+            }
+
+            if (max != null && typedValue.CompareTo(max.Value) > 0)
+            {
+                context.AddError(T.Get("contents.validation.max", new { max }));
             }
         }
     }

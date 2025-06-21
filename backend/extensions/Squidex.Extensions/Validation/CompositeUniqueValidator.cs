@@ -22,11 +22,11 @@ internal sealed class CompositeUniqueValidator(string contentTag, IContentReposi
     {
         if (value is ContentData data)
         {
-            context.Root.AddTask(async ct => await ValidateAsync(data, context));
+            context.Root.AddTask(ct => ValidateAsync(data, context));
         }
     }
 
-    private async Task ValidateAsync(ContentData data, ValidationContext context)
+    private async ValueTask ValidateAsync(ContentData data, ValidationContext context)
     {
         var validateableFields = context.Root.Schema.Fields.Where(IsValidateableField);
 
@@ -48,7 +48,7 @@ internal sealed class CompositeUniqueValidator(string contentTag, IContentReposi
             var found = await contentRepository.QueryIdsAsync(context.Root.App, context.Root.Schema, filter, SearchScope.All);
             if (found.Any(x => x.Id != context.Root.ContentId))
             {
-                context.AddError(Enumerable.Empty<string>(), "A content with the same values already exist.");
+                context.AddError("A content with the same values already exist.", Enumerable.Empty<string>());
             }
         }
     }

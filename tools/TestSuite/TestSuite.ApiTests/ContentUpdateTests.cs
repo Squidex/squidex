@@ -1232,4 +1232,29 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         Assert.Equal($"{prefix}_1_x", content0?.Data.String);
         Assert.Equal($"{prefix}_2_y", content1?.Data.String);
     }
+
+    [Fact]
+    public async Task Should_prevent_update()
+    {
+        // STEP 1: Create a new item.
+        var content = await _.Contents.CreateAsync(new TestEntityData
+        {
+            Immutable = "v1"
+        }, ContentCreateOptions.AsPublish);
+
+
+        // STEP 2: Update content, but do not change immutable.
+        content.Data.Number = 2;
+
+        await _.Contents.UpdateAsync(content);
+
+
+        // STEP 3: Update immutable.
+        content.Data.Immutable = "v2";
+
+        var ex = await Assert.ThrowsAsync<SquidexException<ErrorDto>>(() => _.Contents.UpdateAsync(content));
+
+        Assert.Equal(400, ex.StatusCode);
+        Assert.Contains("Validation error: immutable.iv: Field cannot be changed", ex.ToString());
+    }
 }

@@ -521,4 +521,48 @@ public class ContentValidationTests : IClassFixture<TranslationsFixture>
                 new ValidationError("Field is required.", "myField.iv"),
             ]);
     }
+
+    [Fact]
+    public async Task Should_not_allow_changed_fields()
+    {
+        schema = schema.AddString(1, "myField1", Partitioning.Invariant,
+            new StringFieldProperties { IsCreateOnly = true });
+
+        schema = schema.AddString(2, "myField2", Partitioning.Invariant,
+            new StringFieldProperties { IsCreateOnly = true });
+
+        schema = schema.AddString(3, "myField3", Partitioning.Invariant,
+            new StringFieldProperties());
+
+        var data =
+            new ContentData()
+                .AddField("myField1",
+                    new ContentFieldData()
+                        .AddInvariant("Value1_0"))
+                .AddField("myField2",
+                    new ContentFieldData()
+                        .AddInvariant("Value2_0"))
+                .AddField("myField3",
+                    new ContentFieldData()
+                        .AddInvariant("Value3_0"));
+
+        var previousData =
+            new ContentData()
+                .AddField("myField1",
+                    new ContentFieldData()
+                        .AddInvariant("Value1_1"))
+                .AddField("myField2",
+                    new ContentFieldData()
+                        .AddInvariant("Value2_0"))
+                .AddField("myField3",
+                    new ContentFieldData()
+                        .AddInvariant("Value3_0"));
+
+        await data.ValidateAsync(languages.ToResolver(), errors, schema, previousData: previousData);
+
+        errors.Should().BeEquivalentTo(
+            [
+                new ValidationError("Field cannot be changed after creation.", "myField1.iv"),
+            ]);
+    }
 }

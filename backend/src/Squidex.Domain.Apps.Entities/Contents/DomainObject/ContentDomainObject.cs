@@ -249,7 +249,7 @@ public partial class ContentDomainObject(
 
         if (!c.DoNotValidate)
         {
-            await operation.ValidateInputAsync(c.Data, c.OptimizeValidation, Snapshot.IsPublished, ct);
+            await operation.ValidateInputAsync(c.Data, c.OptimizeValidation, Snapshot.IsPublished, null, ct);
         }
 
         var status = await operation.GetInitialStatusAsync();
@@ -322,7 +322,7 @@ public partial class ContentDomainObject(
 
         if (!c.DoNotValidate)
         {
-            await operation.ValidateInputAsync(newData, c.OptimizeValidation, Snapshot.IsPublished, ct);
+            await operation.ValidateInputAsync(newData, c.OptimizeValidation, Snapshot.IsPublished, Snapshot.EditingData, ct);
         }
 
         if (!c.DoNotValidateWorkflow)

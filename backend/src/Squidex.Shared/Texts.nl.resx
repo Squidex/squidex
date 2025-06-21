@@ -544,6 +544,9 @@
   <data name="contents.validation.charactersBetween" xml:space="preserve">
     <value>Moet tussen {min} en {max} teken (s) bevatten.</value>
   </data>
+  <data name="contents.validation.createOnly" xml:space="preserve">
+    <value>Field cannot be changed after creation.</value>
+  </data>
   <data name="contents.validation.duplicates" xml:space="preserve">
     <value>Mag geen dubbele waarden bevatten.</value>
   </data>

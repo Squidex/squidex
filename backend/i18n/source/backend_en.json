@@ -153,6 +153,7 @@
   "contents.validation.between": "Must be between {min} and {max}.",
   "contents.validation.characterCount": "Must have exactly {count} character(s).",
   "contents.validation.charactersBetween": "Must have between {min} and {max} character(s).",
+  "contents.validation.createOnly": "Field cannot be changed after creation.",
   "contents.validation.duplicates": "Must not contain duplicate values.",
   "contents.validation.error": "Validation failed with internal error.",
   "contents.validation.exactValue": "Must be exactly {value}.",

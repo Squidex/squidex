@@ -20,7 +20,7 @@ public class RequiredStringValidator(bool validateEmptyStrings = false) : IValid
 
         if (value.IsNullOrUndefined() || IsEmptyString(value))
         {
-            context.AddError(context.Path, T.Get("contents.validation.required"));
+            context.AddError(T.Get("contents.validation.required"));
         }
     }
 

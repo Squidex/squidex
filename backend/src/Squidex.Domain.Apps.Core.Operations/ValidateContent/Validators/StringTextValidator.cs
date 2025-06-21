@@ -44,68 +44,70 @@ public sealed class StringTextValidator : IValidator
 
     public void Validate(object? value, ValidationContext context)
     {
-        if (value is string stringValue && !string.IsNullOrEmpty(stringValue))
+        if (value is not string stringValue || string.IsNullOrEmpty(stringValue))
         {
-            if (transform != null)
-            {
-                stringValue = transform(stringValue);
-            }
+            return;
+        }
 
-            if (minWords != null || maxWords != null)
-            {
-                var words = stringValue.WordCount();
+        if (transform != null)
+        {
+            stringValue = transform(stringValue);
+        }
 
-                if (minWords != null && maxWords != null)
+        if (minWords != null || maxWords != null)
+        {
+            var words = stringValue.WordCount();
+
+            if (minWords != null && maxWords != null)
+            {
+                if (minWords == maxWords && minWords != words)
                 {
-                    if (minWords == maxWords && minWords != words)
-                    {
-                        context.AddError(context.Path, T.Get("contents.validation.wordCount", new { count = minWords }));
-                    }
-                    else if (words < minWords || words > maxWords)
-                    {
-                        context.AddError(context.Path, T.Get("contents.validation.wordsBetween", new { min = minWords, max = maxWords }));
-                    }
+                    context.AddError(T.Get("contents.validation.wordCount", new { count = minWords }));
                 }
-                else
+                else if (words < minWords || words > maxWords)
                 {
-                    if (words < minWords)
-                    {
-                        context.AddError(context.Path, T.Get("contents.validation.minWords", new { min = minWords }));
-                    }
-
-                    if (words > maxWords)
-                    {
-                        context.AddError(context.Path, T.Get("contents.validation.maxWords", new { max = maxWords }));
-                    }
+                    context.AddError(T.Get("contents.validation.wordsBetween", new { min = minWords, max = maxWords }));
                 }
             }
-
-            if (minCharacters != null || maxCharacters != null)
+            else
             {
-                var characters = stringValue.CharacterCount();
-
-                if (minCharacters != null && maxCharacters != null)
+                if (words < minWords)
                 {
-                    if (minCharacters == maxCharacters && minCharacters != characters)
-                    {
-                        context.AddError(context.Path, T.Get("contents.validation.normalCharacterCount", new { count = minCharacters }));
-                    }
-                    else if (characters < minCharacters || characters > maxCharacters)
-                    {
-                        context.AddError(context.Path, T.Get("contents.validation.normalCharactersBetween", new { min = minCharacters, max = maxCharacters }));
-                    }
+                    context.AddError(T.Get("contents.validation.minWords", new { min = minWords }));
                 }
-                else
-                {
-                    if (characters < minCharacters)
-                    {
-                        context.AddError(context.Path, T.Get("contents.validation.minNormalCharacters", new { min = minCharacters }));
-                    }
 
-                    if (characters > maxCharacters)
-                    {
-                        context.AddError(context.Path, T.Get("contents.validation.maxCharacters", new { max = maxCharacters }));
-                    }
+                if (words > maxWords)
+                {
+                    context.AddError(T.Get("contents.validation.maxWords", new { max = maxWords }));
+                }
+            }
+        }
+
+        if (minCharacters != null || maxCharacters != null)
+        {
+            var characters = stringValue.CharacterCount();
+
+            if (minCharacters != null && maxCharacters != null)
+            {
+                if (minCharacters == maxCharacters && minCharacters != characters)
+                {
+                    context.AddError(T.Get("contents.validation.normalCharacterCount", new { count = minCharacters }));
+                }
+                else if (characters < minCharacters || characters > maxCharacters)
+                {
+                    context.AddError(T.Get("contents.validation.normalCharactersBetween", new { min = minCharacters, max = maxCharacters }));
+                }
+            }
+            else
+            {
+                if (characters < minCharacters)
+                {
+                    context.AddError(T.Get("contents.validation.minNormalCharacters", new { min = minCharacters }), context.Path);
+                }
+
+                if (characters > maxCharacters)
+                {
+                    context.AddError(T.Get("contents.validation.maxCharacters", new { max = maxCharacters }), context.Path);
                 }
             }
         }

@@ -17,6 +17,8 @@ public abstract record FieldProperties : NamedElementPropertiesBase
 
     public bool IsHalfWidth { get; init; }
 
+    public bool IsCreateOnly { get; init; }
+
     public string? Placeholder { get; init; }
 
     public string? EditorUrl { get; init; }

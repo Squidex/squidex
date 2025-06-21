@@ -8,7 +8,7 @@
 import { firstValueFrom, of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { customMatchers } from 'src/spec/matchers';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { AddFieldDto, ChangeCategoryDto, ConfigureUIFieldsDto, CreateSchemaDto, DialogService, SchemaDto, SchemasDto, SchemasService, SynchronizeSchemaDto, UpdateFieldDto, UpdateSchemaDto, versioned } from '@app/shared/internal';
+import { AddFieldDto, ChangeCategoryDto, ConfigureFieldRulesDto, ConfigureUIFieldsDto, CreateSchemaDto, DialogService, SchemaDto, SchemasDto, SchemasService, SynchronizeSchemaDto, UpdateFieldDto, UpdateSchemaDto, versioned } from '@app/shared/internal';
 import { createSchema } from '../services/schemas.service.spec';
 import { TestValues } from './_test-helpers';
 import { getCategoryTree, SchemasState } from './schemas.state';
@@ -244,7 +244,7 @@ describe('SchemasState', () => {
 
                 const updated = createSchema(1, '_new');
 
-                schemasService.setup(x => x.putSchema(app, schema1, It.isAny(), schema1.version))
+                schemasService.setup(x => x.putSchema(app, schema1, request, schema1.version))
                     .returns(() => of(updated)).verifiable();
 
                 schemasState.update(schema1, request).subscribe();
@@ -258,7 +258,7 @@ describe('SchemasState', () => {
 
                 const updated = createSchema(1, '_new');
 
-                schemasService.setup(x => x.putSchemaSync(app, schema1, It.isAny(), schema1.version))
+                schemasService.setup(x => x.putSchemaSync(app, schema1, request, schema1.version))
                     .returns(() => of(updated)).verifiable();
 
                 schemasState.synchronize(schema1, request).subscribe();
@@ -272,7 +272,7 @@ describe('SchemasState', () => {
 
                 const updated = createSchema(1, '_new');
 
-                schemasService.setup(x => x.putScripts(app, schema1, It.isAny(), schema1.version))
+                schemasService.setup(x => x.putScripts(app, schema1, request, schema1.version))
                     .returns(() => of(updated)).verifiable();
 
                 schemasState.configureScripts(schema1, request).subscribe();
@@ -286,10 +286,24 @@ describe('SchemasState', () => {
 
                 const updated = createSchema(1, '_new');
 
-                schemasService.setup(x => x.putPreviewUrls(app, schema1, It.isAny(), schema1.version))
+                schemasService.setup(x => x.putPreviewUrls(app, schema1, request, schema1.version))
                     .returns(() => of(updated)).verifiable();
 
                 schemasState.configurePreviewUrls(schema1, request).subscribe();
+
+                expect(schemasState.snapshot.schemas).toEqualIgnoringProps([updated, schema2]);
+                expect(schemasState.snapshot.selectedSchema).toEqualIgnoringProps(updated);
+            });
+
+            it('should update schema and selected schema if field rulesconfigured', () => {
+                const request = new ConfigureFieldRulesDto({ fieldRules: [] });
+
+                const updated = createSchema(1, '_new');
+
+                schemasService.setup(x => x.putFieldRules(app, schema1, request, schema1.version))
+                    .returns(() => of(updated)).verifiable();
+
+                schemasState.configureFieldRules(schema1, request).subscribe();
 
                 expect(schemasState.snapshot.schemas).toEqualIgnoringProps([updated, schema2]);
                 expect(schemasState.snapshot.selectedSchema).toEqualIgnoringProps(updated);

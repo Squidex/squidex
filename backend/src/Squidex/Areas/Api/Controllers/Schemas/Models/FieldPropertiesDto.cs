@@ -49,6 +49,11 @@ public abstract class FieldPropertiesDto
     public bool IsHalfWidth { get; set; }
 
     /// <summary>
+    /// Indicates if the field can only be created and not modified.
+    /// </summary>
+    public bool IsCreateOnly { get; set; }
+
+    /// <summary>
     /// Optional url to the editor.
     /// </summary>
     public string? EditorUrl { get; set; }

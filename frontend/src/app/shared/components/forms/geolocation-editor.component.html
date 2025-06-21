@@ -12,26 +12,22 @@
     <div class="row g-0 mt-2">
         <form class="col form-inline" (change)="updateValueByInput()" [formGroup]="geolocationForm" (ngSubmit)="updateValueByInput()">
             <div class="row g-2 align-items-center">
-                @if (!snapshot.isCompact) {
-                    <div class="col-auto mb pe-2">
-                        <label for="latitude">{{ "common.latitudeShort" | sqxTranslate }}:</label>
-                    </div>
-                }
-
-                <div class="col">
+                <div class="col coordinate">
                     <sqx-control-errors for="latitude" style="z-index: 10000" />
                     <input class="form-control" id="latitude" formControlName="latitude" step="any" type="number" />
+
+                    @if (!snapshot.isCompact) {
+                        <label for="latitude">{{ "common.latitudeShort" | sqxTranslate }}</label>
+                    }
                 </div>
 
-                @if (!snapshot.isCompact) {
-                    <div class="col col-auto ps-2">
-                        <label for="longitude">{{ "common.longitudeShort" | sqxTranslate }}:</label>
-                    </div>
-                }
-
-                <div class="col">
+                <div class="col coordinate">
                     <sqx-control-errors for="longitude" style="z-index: 10000" />
                     <input class="form-control" id="longitude" formControlName="longitude" step="any" type="number" />
+
+                    @if (!snapshot.isCompact) {
+                        <label for="longitude">{{ "common.longitudeShort" | sqxTranslate }}</label>
+                    }
                 </div>
 
                 @if (!snapshot.isCompact) {
