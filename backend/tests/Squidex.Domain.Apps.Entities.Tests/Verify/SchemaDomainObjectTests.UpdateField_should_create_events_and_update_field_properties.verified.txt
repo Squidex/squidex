@@ -14,7 +14,8 @@
               CreateEnum: false,
               IsRequired: false,
               IsRequiredOnPublish: false,
-              IsHalfWidth: false
+              IsHalfWidth: false,
+              IsCreateOnly: false
             },
             RawProperties: {
               IsUnique: false,
@@ -23,7 +24,8 @@
               CreateEnum: false,
               IsRequired: false,
               IsRequiredOnPublish: false,
-              IsHalfWidth: false
+              IsHalfWidth: false,
+              IsCreateOnly: false
             },
             Id: 1,
             Name: age,
@@ -44,7 +46,8 @@
               CreateEnum: false,
               IsRequired: false,
               IsRequiredOnPublish: false,
-              IsHalfWidth: false
+              IsHalfWidth: false,
+              IsCreateOnly: false
             },
             RawProperties: {
               IsUnique: false,
@@ -53,7 +56,8 @@
               CreateEnum: false,
               IsRequired: false,
               IsRequiredOnPublish: false,
-              IsHalfWidth: false
+              IsHalfWidth: false,
+              IsCreateOnly: false
             },
             Id: 1,
             Name: age,
@@ -74,7 +78,8 @@
               CreateEnum: false,
               IsRequired: false,
               IsRequiredOnPublish: false,
-              IsHalfWidth: false
+              IsHalfWidth: false,
+              IsCreateOnly: false
             },
             RawProperties: {
               IsUnique: false,
@@ -83,7 +88,8 @@
               CreateEnum: false,
               IsRequired: false,
               IsRequiredOnPublish: false,
-              IsHalfWidth: false
+              IsHalfWidth: false,
+              IsCreateOnly: false
             },
             Id: 1,
             Name: age,
@@ -110,7 +116,8 @@
             CreateEnum: false,
             IsRequired: false,
             IsRequiredOnPublish: false,
-            IsHalfWidth: false
+            IsHalfWidth: false,
+            IsCreateOnly: false
           },
           RawProperties: {
             IsUnique: false,
@@ -119,7 +126,8 @@
             CreateEnum: false,
             IsRequired: false,
             IsRequiredOnPublish: false,
-            IsHalfWidth: false
+            IsHalfWidth: false,
+            IsCreateOnly: false
           },
           Id: 1,
           Name: age,
@@ -140,7 +148,8 @@
             CreateEnum: false,
             IsRequired: false,
             IsRequiredOnPublish: false,
-            IsHalfWidth: false
+            IsHalfWidth: false,
+            IsCreateOnly: false
           },
           RawProperties: {
             IsUnique: false,
@@ -149,7 +158,8 @@
             CreateEnum: false,
             IsRequired: false,
             IsRequiredOnPublish: false,
-            IsHalfWidth: false
+            IsHalfWidth: false,
+            IsCreateOnly: false
           },
           Id: 1,
           Name: age,
@@ -170,7 +180,8 @@
             CreateEnum: false,
             IsRequired: false,
             IsRequiredOnPublish: false,
-            IsHalfWidth: false
+            IsHalfWidth: false,
+            IsCreateOnly: false
           },
           RawProperties: {
             IsUnique: false,
@@ -179,7 +190,8 @@
             CreateEnum: false,
             IsRequired: false,
             IsRequiredOnPublish: false,
-            IsHalfWidth: false
+            IsHalfWidth: false,
+            IsCreateOnly: false
           },
           Id: 1,
           Name: age,
@@ -216,7 +228,8 @@
           CreateEnum: false,
           IsRequired: false,
           IsRequiredOnPublish: false,
-          IsHalfWidth: false
+          IsHalfWidth: false,
+          IsCreateOnly: false
         },
         FieldId: 1,age,
         SchemaId: Guid_2,my-schema,
