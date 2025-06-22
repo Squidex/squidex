@@ -41,7 +41,7 @@ public interface IContentRepository
     Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(App app, HashSet<DomainId> ids, SearchScope scope,
         CancellationToken ct = default);
 
-    Task<Content?> FindContentAsync(App app, Schema schema, DomainId id, SearchScope scope,
+    Task<Content?> FindContentAsync(App app, Schema schema, DomainId id, IReadOnlySet<string>? fields, SearchScope scope,
         CancellationToken ct = default);
 
     Task<bool> HasReferrersAsync(App app, DomainId reference, SearchScope scope,

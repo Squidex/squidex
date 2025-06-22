@@ -190,12 +190,7 @@ public sealed class ContentQueryService(
     {
         var schema = await GetSchemaAsync(context, schemaIdOrName, ct);
 
-        if (schema == null)
-        {
-            throw new DomainObjectNotFoundException(schemaIdOrName);
-        }
-
-        return schema;
+        return schema ?? throw new DomainObjectNotFoundException(schemaIdOrName);
     }
 
     public async Task<Schema?> GetSchemaAsync(Context context, string schemaIdOrName,
@@ -277,7 +272,7 @@ public sealed class ContentQueryService(
             // Enforce a hard timeout
             combined.CancelAfter(options.TimeoutFind);
 
-            return await contentRepository.FindContentAsync(context.App, schema, id, context.Scope(), combined.Token);
+            return await contentRepository.FindContentAsync(context.App, schema, id, context.Fields(), context.Scope(), combined.Token);
         }
     }
 

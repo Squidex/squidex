@@ -21,10 +21,10 @@ namespace Squidex.Domain.Apps.Entities.Contents;
 public sealed class MongoShardedContentRepository(IShardingStrategy sharding, Func<string, MongoContentRepository> factory)
     : ShardedSnapshotStore<MongoContentRepository, WriteContent>(sharding, factory, x => x.AppId.Id), IContentRepository, IDeleter
 {
-    public Task<Content?> FindContentAsync(App app, Schema schema, DomainId id, SearchScope scope,
+    public Task<Content?> FindContentAsync(App app, Schema schema, DomainId id, IReadOnlySet<string>? fields, SearchScope scope,
         CancellationToken ct = default)
     {
-        return Shard(app.Id).FindContentAsync(app, schema, id, scope, ct);
+        return Shard(app.Id).FindContentAsync(app, schema, id, fields, scope, ct);
     }
 
     public Task<bool> HasReferrersAsync(App app, DomainId reference, SearchScope scope,

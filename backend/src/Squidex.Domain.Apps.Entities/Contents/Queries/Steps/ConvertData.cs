@@ -154,6 +154,11 @@ public sealed class ConvertData(
             }
         }
 
+        if (fieldNames?.Count > 0)
+        {
+            converter.Add(new ExcludeOtherFields(fieldNames));
+        }
+
         if (!context.IsFrontendClient || context.ResolveSchemaNames())
         {
             converter.Add(new AddSchemaNames(components));

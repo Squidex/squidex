@@ -213,12 +213,12 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
         }
     }
 
-    public async Task<Content?> FindContentAsync(Schema schema, DomainId id,
+    public async Task<Content?> FindContentAsync(Schema schema, DomainId id, IReadOnlySet<string>? fields,
         CancellationToken ct)
     {
         using (Telemetry.Activities.StartActivity("MongoContentCollection/FindContentAsync"))
         {
-            return await queryBdId.QueryAsync(schema, id, ct);
+            return await queryBdId.QueryAsync(schema, id, fields, ct);
         }
     }
 

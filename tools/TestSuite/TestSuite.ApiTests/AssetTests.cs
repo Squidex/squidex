@@ -589,10 +589,11 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
 
 
         // STEP 2: Query asset by pixel width.
-        var assets_1 = await _.Client.Assets.GetAssetsAsync(new AssetQuery
-        {
-            Filter = "metadata/pixelWidth eq 600"
-        });
+        var assets_1 = await _.Client.Assets.GetAssetsAsync(
+            new AssetQuery
+            {
+                Filter = "metadata/pixelWidth eq 600"
+            });
 
         Assert.Contains(assets_1.Items, x => x.Id == asset_1.Id);
 
@@ -600,17 +601,20 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
         // STEP 3: Add custom metadata.
         asset_1.Metadata["custom"] = "foo";
 
-        await _.Client.Assets.PutAssetAsync(asset_1.Id, new AnnotateAssetDto
-        {
-            Metadata = asset_1.Metadata
-        });
+        await _.Client.Assets.PutAssetAsync(
+            asset_1.Id,
+            new AnnotateAssetDto
+            {
+                Metadata = asset_1.Metadata
+            });
 
 
         // STEP 4: Query asset by custom metadata.
-        var assets_2 = await _.Client.Assets.GetAssetsAsync(new AssetQuery
-        {
-            Filter = "metadata/custom eq 'foo'"
-        });
+        var assets_2 = await _.Client.Assets.GetAssetsAsync(
+            new AssetQuery
+            {
+                Filter = "metadata/custom eq 'foo'"
+            });
 
         Assert.Contains(assets_2.Items, x => x.Id == asset_1.Id);
     }
@@ -623,10 +627,11 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
 
 
         // STEP 2: Query asset by root folder.
-        var assets_1 = await _.Client.Assets.GetAssetsAsync(new AssetQuery
-        {
-            ParentId = Guid.Empty.ToString()
-        });
+        var assets_1 = await _.Client.Assets.GetAssetsAsync(
+            new AssetQuery
+            {
+                ParentId = Guid.Empty.ToString()
+            });
 
         Assert.Contains(assets_1.Items, x => x.Id == asset_1.Id);
     }
@@ -648,10 +653,11 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
 
 
         // STEP 2: Query asset by root folder.
-        var assets_1 = await _.Client.Assets.GetAssetsAsync(new AssetQuery
-        {
-            ParentId = folder.Id
-        });
+        var assets_1 = await _.Client.Assets.GetAssetsAsync(
+            new AssetQuery
+            {
+                ParentId = folder.Id
+            });
 
         Assert.Single(assets_1.Items, x => x.Id == asset_1.Id);
     }
@@ -727,10 +733,11 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
 
 
         // STEP 4: Retrieve all deleted items and check if found.
-        var deleted = await _.Client.Assets.GetAssetsAsync(new AssetQuery
-        {
-            Filter = "isDeleted eq true"
-        });
+        var deleted = await _.Client.Assets.GetAssetsAsync(
+            new AssetQuery
+            {
+                Filter = "isDeleted eq true"
+            });
 
         var permanent = strategy is ContentStrategies.Deletion.SinglePermanent or ContentStrategies.Deletion.BulkPermanent;
 
@@ -774,18 +781,19 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
 
 
         // STEP 3: Query and recreate asset.
-        var assets = await client.Assets.GetAssetsAsync(new AssetQuery
-        {
-            Query = new
+        var assets = await client.Assets.GetAssetsAsync(
+            new AssetQuery
             {
-                filter = new
+                Query = new
                 {
-                    path = "isDeleted",
-                    op = "eq",
-                    value = true,
+                    filter = new
+                    {
+                        path = "isDeleted",
+                        op = "eq",
+                        value = true,
+                    }
                 }
-            }
-        });
+            });
 
         Assert.NotEmpty(assets.Items);
 

@@ -57,20 +57,26 @@ public class ContentCollationTests(CreatedAppFixture fixture) : IClassFixture<Cr
         // STEP 1: Create content.
         var contents = _.Client.Contents<SimpleEntity, SimpleEntityData>(schemaName);
 
-        await contents.CreateAsync(new SimpleEntityData
-        {
-            String = "İstanbul"
-        }, ContentCreateOptions.AsPublish);
+        await contents.CreateAsync(
+            new SimpleEntityData
+            {
+                String = "İstanbul"
+            },
+            ContentCreateOptions.AsPublish);
 
-        await contents.CreateAsync(new SimpleEntityData
-        {
-            String = "Mersin"
-        }, ContentCreateOptions.AsPublish);
+        await contents.CreateAsync(
+            new SimpleEntityData
+            {
+                String = "Mersin"
+            },
+            ContentCreateOptions.AsPublish);
 
-        await contents.CreateAsync(new SimpleEntityData
-        {
-            String = "Lüleburgaz"
-        }, ContentCreateOptions.AsPublish);
+        await contents.CreateAsync(
+            new SimpleEntityData
+            {
+                String = "Lüleburgaz"
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Get sorted contents.

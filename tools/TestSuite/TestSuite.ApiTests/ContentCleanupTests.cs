@@ -30,10 +30,11 @@ public class ContentCleanupTests(CreatedAppFixture fixture) : IClassFixture<Crea
 
 
         // STEP 2: Create a content for this schema.
-        var content_1 = await contents.CreateAsync(new TestEntityData
-        {
-            String = "hello"
-        });
+        var content_1 = await contents.CreateAsync(
+            new TestEntityData
+            {
+                String = "hello"
+            });
 
         Assert.Equal("hello", content_1.Data.String);
 
@@ -43,10 +44,12 @@ public class ContentCleanupTests(CreatedAppFixture fixture) : IClassFixture<Crea
 
 
         // STEP 4: Make any update.
-        var content_2 = await contents.ChangeStatusAsync(content_1.Id, new ChangeStatus
-        {
-            Status = "Published"
-        });
+        var content_2 = await contents.ChangeStatusAsync(
+            content_1.Id,
+            new ChangeStatus
+            {
+                Status = "Published"
+            });
 
         // Should not return deleted field.
         Assert.Null(content_2.Data.String);
@@ -62,17 +65,19 @@ public class ContentCleanupTests(CreatedAppFixture fixture) : IClassFixture<Crea
 
 
         // STEP 2: Create a referenced content.
-        var contentA_1 = await contents.CreateAsync(new TestEntityWithReferencesData
-        {
-            References = null
-        });
+        var contentA_1 = await contents.CreateAsync(
+            new TestEntityWithReferencesData
+            {
+                References = null
+            });
 
 
         // STEP 3: Create a content with a reference.
-        var contentB_1 = await contents.CreateAsync(new TestEntityWithReferencesData
-        {
-            References = [contentA_1.Id]
-        });
+        var contentB_1 = await contents.CreateAsync(
+            new TestEntityWithReferencesData
+            {
+                References = [contentA_1.Id]
+            });
 
 
         // STEP 3: Delete a reference.
@@ -80,10 +85,11 @@ public class ContentCleanupTests(CreatedAppFixture fixture) : IClassFixture<Crea
 
 
         // STEP 4: Make any update.
-        var contentB_2 = await contents.ChangeStatusAsync(contentB_1.Id, new ChangeStatus
-        {
-            Status = "Published"
-        });
+        var contentB_2 = await contents.ChangeStatusAsync(contentB_1.Id,
+            new ChangeStatus
+            {
+                Status = "Published"
+            });
 
         // Should not return deleted field.
         Assert.Empty(contentB_2.Data.References!);

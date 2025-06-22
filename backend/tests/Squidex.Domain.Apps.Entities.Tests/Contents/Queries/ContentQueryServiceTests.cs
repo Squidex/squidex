@@ -22,7 +22,6 @@ public class ContentQueryServiceTests : GivenContext
     private readonly IContentEnricher contentEnricher = A.Fake<IContentEnricher>();
     private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
     private readonly IContentLoader contentVersionLoader = A.Fake<IContentLoader>();
-    private readonly ContentData contentData = [];
     private readonly ContentQueryParser queryParser = A.Fake<ContentQueryParser>();
     private readonly ContentQueryService sut;
 
@@ -97,7 +96,7 @@ public class ContentQueryServiceTests : GivenContext
 
         var content = CreateContent() as Content;
 
-        A.CallTo(() => contentRepository.FindContentAsync(App, Schema, content.Id, A<SearchScope>._, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.FindContentAsync(App, Schema, content.Id, null, A<SearchScope>._, A<CancellationToken>._))
             .Returns(content);
 
         await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.FindAsync(requestContext, SchemaId.Name, content.Id, ct: CancellationToken));
@@ -110,7 +109,7 @@ public class ContentQueryServiceTests : GivenContext
 
         var content = CreateContent();
 
-        A.CallTo(() => contentRepository.FindContentAsync(App, Schema, content.Id, A<SearchScope>._, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.FindContentAsync(App, Schema, content.Id, null, A<SearchScope>._, A<CancellationToken>._))
             .Returns<Content?>(null);
 
         var actual = await sut.FindAsync(requestContext, SchemaId.Name, content.Id, ct: CancellationToken);
@@ -125,7 +124,7 @@ public class ContentQueryServiceTests : GivenContext
 
         var content = CreateContent();
 
-        A.CallTo(() => contentRepository.FindContentAsync(App, Schema, SchemaId.Id, SearchScope.Published, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.FindContentAsync(App, Schema, SchemaId.Id, null, SearchScope.Published, A<CancellationToken>._))
             .Returns(content);
 
         var actual = await sut.FindAsync(requestContext, SchemaId.Name, DomainId.Create("_schemaId_"), ct: CancellationToken);
@@ -144,7 +143,7 @@ public class ContentQueryServiceTests : GivenContext
 
         var content = CreateContent();
 
-        A.CallTo(() => contentRepository.FindContentAsync(App, Schema, content.Id, scope, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.FindContentAsync(App, Schema, content.Id, null, scope, A<CancellationToken>._))
             .Returns(content);
 
         var actual = await sut.FindAsync(requestContext, SchemaId.Name, content.Id, ct: CancellationToken);

@@ -21,14 +21,17 @@ public class ContentLanguageTests(ContentFixture fixture) : IClassFixture<Conten
     public async Task Should_filter_language()
     {
         // STEP 1: Create content.
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Localized = new Dictionary<string, string?>
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
             {
-                ["de"] = "Hallo",
-                ["en"] = "Hello"
-            }
-        }, ContentCreateOptions.AsPublish, QueryContext.Default.WithLanguages("de"));
+                Localized = new Dictionary<string, string?>
+                {
+                    ["de"] = "Hallo",
+                    ["en"] = "Hello"
+                }
+            },
+            ContentCreateOptions.AsPublish,
+            QueryContext.Default.WithLanguages("de"));
 
         Assert.False(content.Data.Localized.ContainsKey("en"));
         Assert.Equal("Hallo", content.Data.Localized["de"]);
@@ -41,15 +44,17 @@ public class ContentLanguageTests(ContentFixture fixture) : IClassFixture<Conten
     public async Task Should_flatten_language(string code, string expected)
     {
         // STEP 1: Create content.
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Localized = new Dictionary<string, string?>
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
             {
-                ["de"] = "Hallo",
-                ["en"] = "Hello",
-                ["custom"] = "Custom"
-            }
-        }, ContentCreateOptions.AsPublish);
+                Localized = new Dictionary<string, string?>
+                {
+                    ["de"] = "Hallo",
+                    ["en"] = "Hello",
+                    ["custom"] = "Custom"
+                }
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Get content.
@@ -64,34 +69,42 @@ public class ContentLanguageTests(ContentFixture fixture) : IClassFixture<Conten
     public async Task Should_provide_etag_based_on_headers()
     {
         // STEP 1: Create content.
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Localized = new Dictionary<string, string?>
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
             {
-                ["de"] = "Hallo",
-                ["en"] = "Hello"
-            }
-        }, ContentCreateOptions.AsPublish);
+                Localized = new Dictionary<string, string?>
+                {
+                    ["de"] = "Hallo",
+                    ["en"] = "Hello"
+                }
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Get content.
         var (etag1, _) = await GetEtagAsync(content.Id, []);
 
-        var (etag2, _) = await GetEtagAsync(content.Id, new Dictionary<string, string>
-        {
-            ["X-Flatten"] = "1"
-        });
+        var (etag2, _) = await GetEtagAsync(
+            content.Id,
+            new Dictionary<string, string>
+            {
+                ["X-Flatten"] = "1"
+            });
 
-        var (etag3, _) = await GetEtagAsync(content.Id, new Dictionary<string, string>
-        {
-            ["X-Languages"] = "en"
-        });
+        var (etag3, _) = await GetEtagAsync(
+            content.Id,
+            new Dictionary<string, string>
+            {
+                ["X-Languages"] = "en"
+            });
 
-        var (etag4, _) = await GetEtagAsync(content.Id, new Dictionary<string, string>
-        {
-            ["X-Languages"] = "en",
-            ["X-Flatten"] = "1"
-        });
+        var (etag4, _) = await GetEtagAsync(
+            content.Id,
+            new Dictionary<string, string>
+            {
+                ["X-Languages"] = "en",
+                ["X-Flatten"] = "1"
+            });
 
         static void AssertValue(string? value, string? not = null)
         {

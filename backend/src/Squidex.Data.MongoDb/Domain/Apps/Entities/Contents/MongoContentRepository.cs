@@ -106,10 +106,10 @@ public partial class MongoContentRepository(
         return GetCollection(scope).QueryAsync(app, schema, q, ct);
     }
 
-    public Task<Content?> FindContentAsync(App app, Schema schema, DomainId id, SearchScope scope,
+    public Task<Content?> FindContentAsync(App app, Schema schema, DomainId id, IReadOnlySet<string>? fields, SearchScope scope,
         CancellationToken ct = default)
     {
-        return GetCollection(scope).FindContentAsync(schema, id, ct);
+        return GetCollection(scope).FindContentAsync(schema, id, fields, ct);
     }
 
     public Task<IReadOnlyList<ContentIdStatus>> QueryIdsAsync(App app, HashSet<DomainId> ids, SearchScope scope,
