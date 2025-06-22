@@ -150,7 +150,7 @@ public static class ValidationExtensions
                 operation.Components,
                 operation.Resolve<IJsonSerializer>())
             {
-                PreviousData = previousData
+                PreviousData = previousData,
             };
 
         var validationContext = new ValidationContext(rootContext).Optimized(optimize).AsPublishing(published);

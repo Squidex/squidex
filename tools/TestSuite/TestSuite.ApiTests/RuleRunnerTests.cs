@@ -100,23 +100,25 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
         // Create a test content.
         var referencedContents = app.Contents<TestEntity, TestEntityData>(schemaName);
 
-        var referencedContent = await referencedContents.CreateAsync(new TestEntityData
-        {
-            String = contentString
-        });
+        var referencedContent = await referencedContents.CreateAsync(
+            new TestEntityData
+            {
+                String = contentString
+            });
 
         var parentSchema = await TestEntityWithReferences.CreateSchemaAsync(app.Schemas, schemaNameRef);
 
         // Create a test content that references the other schema.
         var parentContents = app.Contents<TestEntityWithReferences, TestEntityWithReferencesData>(schemaNameRef);
 
-        await parentContents.CreateAsync(new TestEntityWithReferencesData
-        {
-            References =
-            [
-                referencedContent.Id
-            ],
-        });
+        await parentContents.CreateAsync(
+            new TestEntityWithReferencesData
+            {
+                References =
+                [
+                    referencedContent.Id
+                ],
+            });
 
 
         // STEP 2: Create rule.
@@ -173,13 +175,15 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
         var updatedString = Guid.NewGuid().ToString();
         var updateEvent = "ReferenceUpdated";
 
-        await referencedContents.UpdateAsync(referencedContent.Id, new TestEntityData
-        {
-            String = updatedString
-        });
+        await referencedContents.UpdateAsync(
+            referencedContent.Id,
+            new TestEntityData
+            {
+                String = updatedString
+            });
 
 
-        // Get requests.
+        // STEP 4: Get requests.
         var request = await webhookCatcher.PollAsync(sessionId, x => x.IsPost() && x.HasContent(updatedString) && x.HasContent(updateEvent));
 
         AssertRequest(request);
@@ -668,10 +672,11 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
         // Create a test content.
         var contents = app.Contents<TestEntity, TestEntityData>(schemaName);
 
-        await contents.CreateAsync(new TestEntityData
-        {
-            String = contentString
-        });
+        await contents.CreateAsync(
+            new TestEntityData
+            {
+                String = contentString
+            });
     }
 
     private static async Task<AssetDto> CreateAssetAsync(ISquidexClient app)

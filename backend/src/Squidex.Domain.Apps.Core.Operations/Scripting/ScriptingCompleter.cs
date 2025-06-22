@@ -233,7 +233,6 @@ public sealed partial class ScriptingCompleter(IEnumerable<IScriptDescriptor> de
 
             AddObject("ctx", FieldDescriptions.FieldRuleContext, () =>
             {
-
                 Add(JsonType.String, "action",
                     FieldDescriptions.UserAppRole, ["Create", "Update"]);
             });
@@ -251,7 +250,7 @@ public sealed partial class ScriptingCompleter(IEnumerable<IScriptDescriptor> de
             return Build();
         }
 
-        private IReadOnlyList<ScriptingValue> Build()
+        private List<ScriptingValue> Build()
         {
             return result.Values.OrderBy(x => x.Path).ToList();
         }

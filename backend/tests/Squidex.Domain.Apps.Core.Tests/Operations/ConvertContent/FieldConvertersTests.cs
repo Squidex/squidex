@@ -129,6 +129,41 @@ public class FieldConvertersTests
     }
 
     [Fact]
+    public void Should_remove_non_included_fields()
+    {
+        var field1 = Fields.Number(1, "number1", Partitioning.Language);
+        var field2 = Fields.Number(2, "number2", Partitioning.Language);
+
+        var schema =
+            new Schema { Name = "my-schema" }
+                .AddField(field1)
+                .AddField(field2);
+
+        var source =
+            new ContentData()
+                .AddField(field1.Name,
+                    new ContentFieldData()
+                        .AddLocalized("en", 1))
+                .AddField(field2.Name,
+                    new ContentFieldData()
+                        .AddLocalized("en", JsonValue.Null)
+                        .AddLocalized("de", 1));
+
+        var actual =
+            new ContentConverter(ResolvedComponents.Empty, schema)
+                .Add(new ExcludeOtherFields(HashSet.Of(field1.Name)))
+                .Convert(source);
+
+        var expected =
+            new ContentData()
+                .AddField(field1.Name,
+                    new ContentFieldData()
+                        .AddLocalized("en", 1));
+
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
     public void Should_not_remove_hidden_fields()
     {
         var field1 = Fields.Number(1, "number1", Partitioning.Language);

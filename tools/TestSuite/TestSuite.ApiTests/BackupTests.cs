@@ -134,10 +134,11 @@ public class BackupTests(ClientFixture fixture) : IClassFixture<ClientFixture>
 
         var contents = app.Contents<TestEntity, TestEntityData>(schemaName);
 
-        await contents.CreateAsync(new TestEntityData
-        {
-            Number = 1
-        });
+        await contents.CreateAsync(
+            new TestEntityData
+            {
+                Number = 1
+            });
 
 
         // Upload a test asset

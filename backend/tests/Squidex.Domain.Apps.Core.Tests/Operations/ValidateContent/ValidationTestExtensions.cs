@@ -142,7 +142,7 @@ public static class ValidationTestExtensions
             components ?? ResolvedComponents.Empty,
             TestUtils.DefaultSerializer)
         {
-            PreviousData = previousData
+            PreviousData = previousData,
         };
 
         var context =

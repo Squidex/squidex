@@ -22,7 +22,6 @@ public class ContentQueryServiceTests : GivenContext
     private readonly IContentEnricher contentEnricher = A.Fake<IContentEnricher>();
     private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
     private readonly IContentLoader contentVersionLoader = A.Fake<IContentLoader>();
-    private readonly ContentData contentData = [];
     private readonly ContentQueryParser queryParser = A.Fake<ContentQueryParser>();
     private readonly ContentQueryService sut;
 
@@ -59,11 +58,9 @@ public class ContentQueryServiceTests : GivenContext
     [Fact]
     public async Task Should_get_schema_from_guid_string()
     {
-        var input = SchemaId.Id.ToString();
-
         var requestContext = SetupContext();
 
-        var actual = await sut.GetSchemaOrThrowAsync(requestContext, input, CancellationToken);
+        var actual = await sut.GetSchemaOrThrowAsync(requestContext, SchemaId.Id.ToString(), CancellationToken);
 
         Assert.Equal(Schema, actual);
     }
@@ -71,11 +68,9 @@ public class ContentQueryServiceTests : GivenContext
     [Fact]
     public async Task Should_get_schema_from_name()
     {
-        var input = SchemaId.Name;
-
         var requestContext = SetupContext();
 
-        var actual = await sut.GetSchemaOrThrowAsync(requestContext, input, CancellationToken);
+        var actual = await sut.GetSchemaOrThrowAsync(requestContext, SchemaId.Name, CancellationToken);
 
         Assert.Equal(Schema, actual);
     }
@@ -96,21 +91,19 @@ public class ContentQueryServiceTests : GivenContext
         var requestContext = SetupContext(allowSchema: false);
 
         var content = CreateContent() as Content;
-
-        A.CallTo(() => contentRepository.FindContentAsync(App, Schema, content.Id, A<SearchScope>._, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.FindContentAsync(App, Schema, content.Id, null, A<SearchScope>._, A<CancellationToken>._))
             .Returns(content);
 
         await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.FindAsync(requestContext, SchemaId.Name, content.Id, ct: CancellationToken));
     }
 
     [Fact]
-    public async Task Should_return_null_if_content_by_id_dannot_be_found()
+    public async Task Should_return_null_if_content_by_id_cannot_be_found()
     {
         var requestContext = SetupContext();
 
         var content = CreateContent();
-
-        A.CallTo(() => contentRepository.FindContentAsync(App, Schema, content.Id, A<SearchScope>._, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.FindContentAsync(App, Schema, content.Id, A<IReadOnlySet<string>>._, A<SearchScope>._, A<CancellationToken>._))
             .Returns<Content?>(null);
 
         var actual = await sut.FindAsync(requestContext, SchemaId.Name, content.Id, ct: CancellationToken);
@@ -124,8 +117,7 @@ public class ContentQueryServiceTests : GivenContext
         var requestContext = SetupContext();
 
         var content = CreateContent();
-
-        A.CallTo(() => contentRepository.FindContentAsync(App, Schema, SchemaId.Id, SearchScope.Published, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.FindContentAsync(App, Schema, SchemaId.Id, A<IReadOnlySet<string>>._, SearchScope.Published, A<CancellationToken>._))
             .Returns(content);
 
         var actual = await sut.FindAsync(requestContext, SchemaId.Name, DomainId.Create("_schemaId_"), ct: CancellationToken);
@@ -143,8 +135,7 @@ public class ContentQueryServiceTests : GivenContext
         var requestContext = SetupContext(isFrontend, isUnpublished: unpublished);
 
         var content = CreateContent();
-
-        A.CallTo(() => contentRepository.FindContentAsync(App, Schema, content.Id, scope, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.FindContentAsync(App, Schema, content.Id, A<IReadOnlySet<string>>._, scope, A<CancellationToken>._))
             .Returns(content);
 
         var actual = await sut.FindAsync(requestContext, SchemaId.Name, content.Id, ct: CancellationToken);
@@ -158,7 +149,6 @@ public class ContentQueryServiceTests : GivenContext
         var requestContext = SetupContext();
 
         var content = CreateContent();
-
         A.CallTo(() => contentVersionLoader.GetAsync(AppId.Id, content.Id, 13, A<CancellationToken>._))
             .Returns(content);
 

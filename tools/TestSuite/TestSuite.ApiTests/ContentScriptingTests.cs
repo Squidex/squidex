@@ -37,10 +37,11 @@ public class ContentScriptingTests(CreatedAppFixture fixture) : IClassFixture<Cr
         // STEP 2: Create content.
         var contents = _.Client.Contents<TestEntity, TestEntityData>(schemaName);
 
-        var content = await contents.CreateAsync(new TestEntityData
-        {
-            Number = 13
-        });
+        var content = await contents.CreateAsync(
+            new TestEntityData
+            {
+                Number = 13
+            });
 
         Assert.Equal(26, content.Data.Number);
     }
@@ -62,10 +63,12 @@ public class ContentScriptingTests(CreatedAppFixture fixture) : IClassFixture<Cr
         // STEP 2: Create content.
         var contents = _.Client.Contents<TestEntity, TestEntityData>(schemaName);
 
-        var content = await contents.CreateAsync(new TestEntityData
-        {
-            Number = 13
-        }, ContentCreateOptions.AsPublish);
+        var content = await contents.CreateAsync(
+            new TestEntityData
+            {
+                Number = 13
+            },
+            ContentCreateOptions.AsPublish);
 
         Assert.Equal(26, content.Data.Number);
     }
@@ -89,10 +92,12 @@ public class ContentScriptingTests(CreatedAppFixture fixture) : IClassFixture<Cr
         // STEP 2: Create content.
         var contents = _.Client.Contents<TestEntity, TestEntityData>(schemaName);
 
-        var content = await contents.CreateAsync(new TestEntityData
-        {
-            Number = 99
-        }, ContentCreateOptions.AsPublish);
+        var content = await contents.CreateAsync(
+            new TestEntityData
+            {
+                Number = 99
+            },
+            ContentCreateOptions.AsPublish);
 
         Assert.Equal(19, content.Data.Number);
     }
@@ -114,26 +119,27 @@ public class ContentScriptingTests(CreatedAppFixture fixture) : IClassFixture<Cr
         // STEP 2: Create content with a value that triggers the schema.
         var contents = _.Client.Contents<TestEntity, TestEntityData>(schemaName);
 
-        var results = await contents.BulkUpdateAsync(new BulkUpdate
-        {
-            DoNotScript = false,
-            DoNotValidate = false,
-            Jobs =
-            [
-                new BulkUpdateJob
-                {
-                    Type = BulkUpdateType.Upsert,
-                    Data = new
+        var results = await contents.BulkUpdateAsync(
+            new BulkUpdate
+            {
+                DoNotScript = false,
+                DoNotValidate = false,
+                Jobs =
+                [
+                    new BulkUpdateJob
                     {
-                        number = new
+                        Type = BulkUpdateType.Upsert,
+                        Data = new
                         {
-                            iv = 99
+                            number = new
+                            {
+                                iv = 99
+                            }
                         }
-                    }
-                },
-            ],
-            Publish = true
-        });
+                    },
+                ],
+                Publish = true
+            });
 
         Assert.Single(results);
         Assert.Null(results[0].Error);
@@ -162,26 +168,27 @@ public class ContentScriptingTests(CreatedAppFixture fixture) : IClassFixture<Cr
         // STEP 1: Create content with a value that triggers the schema.
         var contents = _.Client.Contents<TestEntity, TestEntityData>(schemaName);
 
-        var results = await contents.BulkUpdateAsync(new BulkUpdate
-        {
-            DoNotScript = true,
-            DoNotValidate = false,
-            Jobs =
-            [
-                new BulkUpdateJob
-                {
-                    Type = BulkUpdateType.Upsert,
-                    Data = new
+        var results = await contents.BulkUpdateAsync(
+            new BulkUpdate
+            {
+                DoNotScript = true,
+                DoNotValidate = false,
+                Jobs =
+                [
+                    new BulkUpdateJob
                     {
-                        number = new
+                        Type = BulkUpdateType.Upsert,
+                        Data = new
                         {
-                            iv = 99
+                            number = new
+                            {
+                                iv = 99
+                            }
                         }
-                    }
-                },
-            ],
-            Publish = true
-        });
+                    },
+                ],
+                Publish = true
+            });
 
         Assert.Single(results);
         Assert.Null(results[0].Error);

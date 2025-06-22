@@ -21,17 +21,20 @@ public class ContentReferencesTests(ContentReferencesFixture fixture) : IClassFi
     public async Task Should_not_deliver_unpublished_references()
     {
         // STEP 1: Create a referenced content.
-        var contentA_1 = await _.Contents.CreateAsync(new TestEntityWithReferencesData
-        {
-            References = null
-        });
+        var contentA_1 = await _.Contents.CreateAsync(
+            new TestEntityWithReferencesData
+            {
+                References = null
+            });
 
 
         // STEP 2: Create a content with a reference.
-        var contentB_1 = await _.Contents.CreateAsync(new TestEntityWithReferencesData
-        {
-            References = [contentA_1.Id]
-        }, ContentCreateOptions.AsPublish);
+        var contentB_1 = await _.Contents.CreateAsync(
+            new TestEntityWithReferencesData
+            {
+                References = [contentA_1.Id]
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 3: Query new item.
@@ -41,10 +44,12 @@ public class ContentReferencesTests(ContentReferencesFixture fixture) : IClassFi
 
 
         // STEP 4: Publish reference.
-        await _.Contents.ChangeStatusAsync(contentA_1.Id, new ChangeStatus
-        {
-            Status = "Published"
-        });
+        await _.Contents.ChangeStatusAsync(
+            contentA_1.Id,
+            new ChangeStatus
+            {
+                Status = "Published"
+            });
 
 
         // STEP 5: Query new item again.
@@ -57,17 +62,21 @@ public class ContentReferencesTests(ContentReferencesFixture fixture) : IClassFi
     public async Task Should_not_delete_when_referenced()
     {
         // STEP 1: Create a referenced content.
-        var contentA_1 = await _.Contents.CreateAsync(new TestEntityWithReferencesData
-        {
-            References = null
-        }, ContentCreateOptions.AsPublish);
+        var contentA_1 = await _.Contents.CreateAsync(
+            new TestEntityWithReferencesData
+            {
+                References = null
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Create a content with a reference.
-        await _.Contents.CreateAsync(new TestEntityWithReferencesData
-        {
-            References = [contentA_1.Id]
-        }, ContentCreateOptions.AsPublish);
+        await _.Contents.CreateAsync(
+            new TestEntityWithReferencesData
+            {
+                References = [contentA_1.Id]
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 3: Try to delete with referrer check.
@@ -87,89 +96,103 @@ public class ContentReferencesTests(ContentReferencesFixture fixture) : IClassFi
     public async Task Should_not_unpublish_when_referenced()
     {
         // STEP 1: Create a published referenced content.
-        var contentA_1 = await _.Contents.CreateAsync(new TestEntityWithReferencesData
-        {
-            References = null
-        }, ContentCreateOptions.AsPublish);
+        var contentA_1 = await _.Contents.CreateAsync(
+            new TestEntityWithReferencesData
+            {
+                References = null
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Create a content with a reference.
-        await _.Contents.CreateAsync(new TestEntityWithReferencesData
-        {
-            References = [contentA_1.Id]
-        }, ContentCreateOptions.AsPublish);
+        await _.Contents.CreateAsync(
+            new TestEntityWithReferencesData
+            {
+                References = [contentA_1.Id]
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 3: Try to ThrowsAnyAsync with referrer check.
         await Assert.ThrowsAnyAsync<SquidexException>(() =>
         {
-            return _.Contents.ChangeStatusAsync(contentA_1.Id, new ChangeStatus
-            {
-                Status = "Draft",
-                // Ensure that the flag is true.
-                CheckReferrers = true
-            });
+            return _.Contents.ChangeStatusAsync(
+                contentA_1.Id,
+                new ChangeStatus
+                {
+                    Status = "Draft",
+                    // Ensure that the flag is true.
+                    CheckReferrers = true
+                });
         });
 
 
         // STEP 4: Delete without referrer check.
-        await _.Contents.ChangeStatusAsync(contentA_1.Id, new ChangeStatus
-        {
-            Status = "Draft",
-            // It is the default anyway, just to make it more explicit.
-            CheckReferrers = false
-        });
+        await _.Contents.ChangeStatusAsync(
+            contentA_1.Id,
+            new ChangeStatus
+            {
+                Status = "Draft",
+                // It is the default anyway, just to make it more explicit.
+                CheckReferrers = false
+            });
     }
 
     [Fact]
     public async Task Should_not_delete_with_bulk_when_referenced()
     {
         // STEP 1: Create a referenced content.
-        var contentA_1 = await _.Contents.CreateAsync(new TestEntityWithReferencesData
-        {
-            References = null
-        }, ContentCreateOptions.AsPublish);
+        var contentA_1 = await _.Contents.CreateAsync(
+            new TestEntityWithReferencesData
+            {
+                References = null
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Create a content with a reference.
-        await _.Contents.CreateAsync(new TestEntityWithReferencesData
-        {
-            References = [contentA_1.Id]
-        }, ContentCreateOptions.AsPublish);
+        await _.Contents.CreateAsync(
+            new TestEntityWithReferencesData
+            {
+                References = [contentA_1.Id]
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 3: Try to delete with referrer check.
-        var result1 = await _.Contents.BulkUpdateAsync(new BulkUpdate
-        {
-            Jobs =
-            [
-                new BulkUpdateJob
-                {
-                    Id = contentA_1.Id,
-                    Type = BulkUpdateType.Delete,
-                    Status = "Draft"
-                },
-            ],
-            CheckReferrers = true
-        });
+        var result1 = await _.Contents.BulkUpdateAsync(
+            new BulkUpdate
+            {
+                Jobs =
+                [
+                    new BulkUpdateJob
+                    {
+                        Id = contentA_1.Id,
+                        Type = BulkUpdateType.Delete,
+                        Status = "Draft"
+                    },
+                ],
+                CheckReferrers = true
+            });
 
         Assert.NotNull(result1[0].Error);
 
 
         // STEP 4: Delete without referrer check.
-        var result2 = await _.Contents.BulkUpdateAsync(new BulkUpdate
-        {
-            Jobs =
-            [
-                new BulkUpdateJob
-                {
-                    Id = contentA_1.Id,
-                    Type = BulkUpdateType.Delete,
-                    Status = "Draft"
-                },
-            ],
-            CheckReferrers = false
-        });
+        var result2 = await _.Contents.BulkUpdateAsync(
+            new BulkUpdate
+            {
+                Jobs =
+                [
+                    new BulkUpdateJob
+                    {
+                        Id = contentA_1.Id,
+                        Type = BulkUpdateType.Delete,
+                        Status = "Draft"
+                    },
+                ],
+                CheckReferrers = false
+            });
 
         Assert.Null(result2[0].Error);
     }
@@ -178,51 +201,57 @@ public class ContentReferencesTests(ContentReferencesFixture fixture) : IClassFi
     public async Task Should_not_unpublish_with_bulk_when_referenced()
     {
         // STEP 1: Create a published referenced content.
-        var contentA_1 = await _.Contents.CreateAsync(new TestEntityWithReferencesData
-        {
-            References = null
-        }, ContentCreateOptions.AsPublish);
+        var contentA_1 = await _.Contents.CreateAsync(
+            new TestEntityWithReferencesData
+            {
+                References = null
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Create a published content with a reference.
-        await _.Contents.CreateAsync(new TestEntityWithReferencesData
-        {
-            References = [contentA_1.Id]
-        }, ContentCreateOptions.AsPublish);
+        await _.Contents.CreateAsync(
+            new TestEntityWithReferencesData
+            {
+                References = [contentA_1.Id]
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 3: Try to delete with referrer check.
-        var result1 = await _.Contents.BulkUpdateAsync(new BulkUpdate
-        {
-            Jobs =
-            [
-                new BulkUpdateJob
-                {
-                    Id = contentA_1.Id,
-                    Type = BulkUpdateType.ChangeStatus,
-                    Status = "Draft"
-                },
-            ],
-            CheckReferrers = true
-        });
+        var result1 = await _.Contents.BulkUpdateAsync(
+            new BulkUpdate
+            {
+                Jobs =
+                [
+                    new BulkUpdateJob
+                    {
+                        Id = contentA_1.Id,
+                        Type = BulkUpdateType.ChangeStatus,
+                        Status = "Draft"
+                    },
+                ],
+                CheckReferrers = true
+            });
 
         Assert.NotNull(result1[0].Error);
 
 
         // STEP 4: Delete without referrer check.
-        var result2 = await _.Contents.BulkUpdateAsync(new BulkUpdate
-        {
-            Jobs =
-            [
-                new BulkUpdateJob
-                {
-                    Id = contentA_1.Id,
-                    Type = BulkUpdateType.ChangeStatus,
-                    Status = "Draft"
-                },
-            ],
-            CheckReferrers = false
-        });
+        var result2 = await _.Contents.BulkUpdateAsync(
+            new BulkUpdate
+            {
+                Jobs =
+                [
+                    new BulkUpdateJob
+                    {
+                        Id = contentA_1.Id,
+                        Type = BulkUpdateType.ChangeStatus,
+                        Status = "Draft"
+                    },
+                ],
+                CheckReferrers = false
+            });
 
         Assert.Null(result2[0].Error);
     }
