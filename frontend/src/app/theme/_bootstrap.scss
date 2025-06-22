@@ -379,8 +379,8 @@ a {
             cursor: pointer;
             font-size: 1.5rem;
             font-weight: normal;
-            margin-right: .5rem;
-            margin-bottom: .5rem;
+            margin-right: .75rem;
+            margin-bottom: 1rem;
             text-align: center;
             width: 4.5rem;
         }
@@ -560,7 +560,13 @@ $icon-size: 4.5rem;
     }
 
     &-text {
-        font-size: .9rem;
+        font-size: $font-small;
+        margin-top: 0;
+        margin-bottom: 1rem;
+    }
+
+    label {
+        font-size: $font-size-base;
     }
 
     .btn-radio {

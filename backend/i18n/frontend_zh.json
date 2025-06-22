@@ -852,6 +852,7 @@
   "schemas.field.allowedValues": "允许的值",
   "schemas.field.createEnum": "Generate GraphQL Enum.",
   "schemas.field.createEnumHint": "Generate a GraphQL enumeration for this field. The input format is not compatible with a string anymore and can be a breaking change for your client.",
+  "schemas.field.createOnly": "Immutable (cannot be changed)",
   "schemas.field.defaultValue": "Default Value",
   "schemas.field.defaultValues": "默认值",
   "schemas.field.defaultValuesHint": "设置每种语言的默认值并覆盖默认值属性（如果已定义）。仅在真正需要时才使用它。",

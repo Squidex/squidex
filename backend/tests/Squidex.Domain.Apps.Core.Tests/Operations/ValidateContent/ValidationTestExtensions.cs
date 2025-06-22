@@ -25,15 +25,18 @@ public static class ValidationTestExtensions
     private static readonly NamedId<DomainId> AppId = NamedId.Of(DomainId.NewGuid(), "my-app");
     private static readonly NamedId<DomainId> SchemaId = NamedId.Of(DomainId.NewGuid(), "my-schema");
 
-    public static async ValueTask ValidateAsync(this IValidator validator, object? value, IList<string> errors,
+    public static async ValueTask ValidateAsync(this IValidator validator,
+        object? value,
+        IList<string> errors,
         Schema? schema = null,
         ValidationMode mode = ValidationMode.Default,
         ValidationUpdater? updater = null,
         ValidationAction action = ValidationAction.Upsert,
         ResolvedComponents? components = null,
-        DomainId? contentId = null)
+        DomainId? contentId = null,
+        ContentData? previousData = null)
     {
-        var context = CreateContext(schema, mode, updater, action, components, contentId);
+        var context = CreateContext(schema, mode, updater, action, components, contentId, previousData);
 
         validator.Validate(value, context);
 
@@ -42,16 +45,19 @@ public static class ValidationTestExtensions
         AddErrors(context.Root, errors);
     }
 
-    public static async ValueTask ValidateAsync(this IField field, object? value, IList<string> errors,
+    public static async ValueTask ValidateAsync(this IField field,
+        object? value,
+        IList<string> errors,
         Schema? schema = null,
         ValidationMode mode = ValidationMode.Default,
         ValidationUpdater? updater = null,
         IValidatorsFactory? factory = null,
         ValidationAction action = ValidationAction.Upsert,
         ResolvedComponents? components = null,
-        DomainId? contentId = null)
+        DomainId? contentId = null,
+        ContentData? previousData = null)
     {
-        var context = CreateContext(schema, mode, updater, action, components, contentId);
+        var context = CreateContext(schema, mode, updater, action, components, contentId, previousData);
 
         new ValidatorBuilder(factory, context).ValueValidator(field)
             .Validate(value, context);
@@ -61,16 +67,19 @@ public static class ValidationTestExtensions
         AddErrors(context.Root, errors);
     }
 
-    public static async Task ValidatePartialAsync(this ContentData data, PartitionResolver partitionResolver, IList<ValidationError> errors,
+    public static async Task ValidatePartialAsync(this ContentData data,
+        PartitionResolver partitionResolver,
+        IList<ValidationError> errors,
         Schema? schema = null,
         ValidationMode mode = ValidationMode.Default,
         ValidationUpdater? updater = null,
         IValidatorsFactory? factory = null,
         ValidationAction action = ValidationAction.Upsert,
         ResolvedComponents? components = null,
-        DomainId? contentId = null)
+        DomainId? contentId = null,
+        ContentData? previousData = null)
     {
-        var context = CreateContext(schema, mode, updater, action, components, contentId);
+        var context = CreateContext(schema, mode, updater, action, components, contentId, previousData);
 
         await new ValidatorBuilder(factory, context).ContentValidator(partitionResolver)
             .ValidateInputPartialAsync(data);
@@ -78,16 +87,19 @@ public static class ValidationTestExtensions
         errors.AddRange(context.Root.Errors);
     }
 
-    public static async Task ValidateAsync(this ContentData data, PartitionResolver partitionResolver, IList<ValidationError> errors,
+    public static async Task ValidateAsync(this ContentData data,
+        PartitionResolver partitionResolver,
+        IList<ValidationError> errors,
         Schema? schema = null,
         ValidationMode mode = ValidationMode.Default,
         ValidationUpdater? updater = null,
         IValidatorsFactory? factory = null,
         ValidationAction action = ValidationAction.Upsert,
         ResolvedComponents? components = null,
-        DomainId? contentId = null)
+        DomainId? contentId = null,
+        ContentData? previousData = null)
     {
-        var context = CreateContext(schema, mode, updater, action, components, contentId);
+        var context = CreateContext(schema, mode, updater, action, components, contentId, previousData);
 
         await new ValidatorBuilder(factory, context).ContentValidator(partitionResolver)
             .ValidateInputAsync(data);
@@ -116,9 +128,10 @@ public static class ValidationTestExtensions
         Schema? schema,
         ValidationMode mode,
         ValidationUpdater? updater,
-        ValidationAction action = ValidationAction.Upsert,
-        ResolvedComponents? components = null,
-        DomainId? contentId = null)
+        ValidationAction action,
+        ResolvedComponents? components,
+        DomainId? contentId,
+        ContentData? previousData)
     {
         schema ??= new Schema();
 
@@ -127,7 +140,10 @@ public static class ValidationTestExtensions
             schema with { Id = SchemaId.Id, Name = SchemaId.Name },
             contentId ?? DomainId.NewGuid(),
             components ?? ResolvedComponents.Empty,
-            TestUtils.DefaultSerializer);
+            TestUtils.DefaultSerializer)
+        {
+            PreviousData = previousData
+        };
 
         var context =
             new ValidationContext(rootContext)

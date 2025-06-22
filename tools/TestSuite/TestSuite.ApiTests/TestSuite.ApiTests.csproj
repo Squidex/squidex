@@ -10,18 +10,18 @@
     <PackageReference Include="FluentAssertions" Version="6.12.2" />
     <PackageReference Include="GraphQL.Client" Version="6.1.0" />
     <PackageReference Include="GraphQL.Client.Serializer.Newtonsoft" Version="6.1.0" />
-    <PackageReference Include="Meziantou.Analyzer" Version="2.0.179">
+    <PackageReference Include="Meziantou.Analyzer" Version="2.0.202">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
-    <PackageReference Include="NSwag.Core" Version="14.1.0" />
-    <PackageReference Include="Squidex.Assets" Version="7.2.0" />
-    <PackageReference Include="Squidex.Assets.ImageSharp" Version="7.2.0" />
+    <PackageReference Include="NSwag.Core" Version="14.4.0" />
+    <PackageReference Include="Squidex.Assets" Version="7.24.0" />
+    <PackageReference Include="Squidex.Assets.ImageSharp" Version="7.24.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
-    <PackageReference Include="Verify.Xunit" Version="28.3.1" />
-    <PackageReference Include="xunit" Version="2.9.2" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
+    <PackageReference Include="Verify.Xunit" Version="30.4.0" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.1">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers</IncludeAssets>
     </PackageReference>

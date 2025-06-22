@@ -11,12 +11,14 @@
             Properties: {
               IsRequired: false,
               IsRequiredOnPublish: false,
-              IsHalfWidth: false
+              IsHalfWidth: false,
+              IsCreateOnly: false
             },
             RawProperties: {
               IsRequired: false,
               IsRequiredOnPublish: false,
-              IsHalfWidth: false
+              IsHalfWidth: false,
+              IsCreateOnly: false
             },
             Id: 1,
             Name: array,
@@ -34,12 +36,14 @@
             Properties: {
               IsRequired: false,
               IsRequiredOnPublish: false,
-              IsHalfWidth: false
+              IsHalfWidth: false,
+              IsCreateOnly: false
             },
             RawProperties: {
               IsRequired: false,
               IsRequiredOnPublish: false,
-              IsHalfWidth: false
+              IsHalfWidth: false,
+              IsCreateOnly: false
             },
             Id: 1,
             Name: array,
@@ -57,12 +61,14 @@
             Properties: {
               IsRequired: false,
               IsRequiredOnPublish: false,
-              IsHalfWidth: false
+              IsHalfWidth: false,
+              IsCreateOnly: false
             },
             RawProperties: {
               IsRequired: false,
               IsRequiredOnPublish: false,
-              IsHalfWidth: false
+              IsHalfWidth: false,
+              IsCreateOnly: false
             },
             Id: 1,
             Name: array,
@@ -86,12 +92,14 @@
           Properties: {
             IsRequired: false,
             IsRequiredOnPublish: false,
-            IsHalfWidth: false
+            IsHalfWidth: false,
+            IsCreateOnly: false
           },
           RawProperties: {
             IsRequired: false,
             IsRequiredOnPublish: false,
-            IsHalfWidth: false
+            IsHalfWidth: false,
+            IsCreateOnly: false
           },
           Id: 1,
           Name: array,
@@ -109,12 +117,14 @@
           Properties: {
             IsRequired: false,
             IsRequiredOnPublish: false,
-            IsHalfWidth: false
+            IsHalfWidth: false,
+            IsCreateOnly: false
           },
           RawProperties: {
             IsRequired: false,
             IsRequiredOnPublish: false,
-            IsHalfWidth: false
+            IsHalfWidth: false,
+            IsCreateOnly: false
           },
           Id: 1,
           Name: array,
@@ -132,12 +142,14 @@
           Properties: {
             IsRequired: false,
             IsRequiredOnPublish: false,
-            IsHalfWidth: false
+            IsHalfWidth: false,
+            IsCreateOnly: false
           },
           RawProperties: {
             IsRequired: false,
             IsRequiredOnPublish: false,
-            IsHalfWidth: false
+            IsHalfWidth: false,
+            IsCreateOnly: false
           },
           Id: 1,
           Name: array,

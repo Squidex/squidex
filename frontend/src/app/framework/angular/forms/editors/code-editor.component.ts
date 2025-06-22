@@ -15,6 +15,8 @@ export const SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => CodeEditorComponent), multi: true,
 };
 
+type Editor = AceAjax.Editor & { completers?: AceAjax.Completer[]; completer?: { showDocTooltip: (item: any) => void } };
+
 @Component({
     selector: 'sqx-code-editor',
     styleUrls: ['./code-editor.component.scss'],
@@ -26,7 +28,7 @@ export const SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
 })
 export class CodeEditorComponent extends StatefulControlComponent<{}, any> implements AfterViewInit, FocusComponent {
     private aceModes?: ModeList;
-    private aceEditor?: AceAjax.Editor;
+    private aceEditor?: Editor;
     private aceTools = false;
     private valueChanged = new Subject();
     private value = '';
@@ -165,37 +167,43 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, any> imple
         this.onDisabled(this.snapshot.isDisabled);
 
         if (this.aceTools) {
-            const previous = (this.aceEditor as any)['completers'] as AceAjax.Completer[];
+            const originalCompleter = this.aceEditor.completer!;
+            const originalShowDocTooltip = originalCompleter.showDocTooltip;
+            originalCompleter.showDocTooltip = item => {
+                requestAnimationFrame(() => {
+                    originalShowDocTooltip.apply(originalCompleter, [item]);
+                });
+            };
 
-            (this.aceEditor as any)['completers'] = [
-                previous?.[0], {
-                    getCompletions: (editor: any, session: any, pos: any, prefix: any, callback: any) => {
-                        callback(null, this.completions);
-                    },
-                    getDocTooltip: (item: AceAjax.Completion) => {
-                        const source = item as unknown as ScriptCompletion;
+            const completer: AceAjax.Completer = {
+                getCompletions: (editor: any, session: any, pos: any, prefix: any, callback: any) => {
+                    callback(null, this.completions);
+                },
+                getDocTooltip: (item: AceAjax.Completion) => {
+                    const source = item as unknown as ScriptCompletion;
 
-                        if (source.path && source.description) {
-                            item.docHTML = `<b>${item.value}</b><hr></hr>${source.description}`;
+                    if (source.path && source.description) {
+                        item.docHTML = `<b>${item.value}</b><hr></hr>${source.description}`;
 
-                            if (source.allowedValues) {
-                                item.docHTML += '<div class="mt-2 mb-2">Allowed Values:<ul>';
+                        if (source.allowedValues) {
+                            item.docHTML += '<div class="mt-3 mb-0">Allowed Values:<ul class="mt-2 mb-2">';
 
-                                for (const value of source.allowedValues) {
-                                    item.docHTML += `<li><code>${value}</code></li>`;
-                                }
-
-                                item.docHTML += '</ul></div>';
+                            for (const value of source.allowedValues) {
+                                item.docHTML += `<li><code>${value}</code></li>`;
                             }
 
-                            if (source.deprecationReason) {
-                                item.docHTML += `<div class="mt-2 mb-2"><strong>Deprecated</strong>: ${source.deprecationReason}</div>`;
-                            }
+                            item.docHTML += '</ul></div>';
                         }
-                    },
-                    identifierRegexps: [/[a-zA-Z_0-9\$\-\.\u00A2-\u2000\u2070-\uFFFF]/],
-                } as AceAjax.Completer,
-            ];
+
+                        if (source.deprecationReason) {
+                            item.docHTML += `<div class="mt-2 mb-2"><strong>Deprecated</strong>: ${source.deprecationReason}</div>`;
+                        }
+                    }
+                },
+            };
+
+            const previous = this.aceEditor.completers || [];
+            this.aceEditor.completers = [...previous, completer];
         }
         this.aceEditor.on('blur', () => {
             this.changeValue();

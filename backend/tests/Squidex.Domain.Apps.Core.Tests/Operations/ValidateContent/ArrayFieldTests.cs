@@ -79,7 +79,6 @@ public class ArrayFieldTests : IClassFixture<TranslationsFixture>
     public async Task Should_add_error_if_items_are_required_and_empty()
     {
         var sut = Field(new ArrayFieldProperties { IsRequired = true });
-
         await sut.ValidateAsync(CreateValue(), errors);
 
         errors.Should().BeEquivalentTo(
@@ -90,7 +89,6 @@ public class ArrayFieldTests : IClassFixture<TranslationsFixture>
     public async Task Should_add_error_if_value_is_not_valid()
     {
         var sut = Field(new ArrayFieldProperties());
-
         await sut.ValidateAsync(JsonValue.Create("invalid"), errors);
 
         errors.Should().BeEquivalentTo(

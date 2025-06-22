@@ -231,6 +231,13 @@ public sealed partial class ScriptingCompleter(IEnumerable<IScriptDescriptor> de
                     FieldDescriptions.UserAppRole);
             });
 
+            AddObject("ctx", FieldDescriptions.FieldRuleContext, () =>
+            {
+
+                Add(JsonType.String, "action",
+                    FieldDescriptions.UserAppRole, ["Create", "Update"]);
+            });
+
             AddObject("data", FieldDescriptions.ContentData, () =>
             {
                 AddData();

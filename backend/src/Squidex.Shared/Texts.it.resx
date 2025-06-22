@@ -544,6 +544,9 @@
   <data name="contents.validation.charactersBetween" xml:space="preserve">
     <value>Deve essere tra {min} e {max} carattere(i).</value>
   </data>
+  <data name="contents.validation.createOnly" xml:space="preserve">
+    <value>Field cannot be changed after creation.</value>
+  </data>
   <data name="contents.validation.duplicates" xml:space="preserve">
     <value>Non può avere valori duplicati.</value>
   </data>

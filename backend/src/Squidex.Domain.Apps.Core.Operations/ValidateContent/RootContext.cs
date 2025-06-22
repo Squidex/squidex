@@ -7,6 +7,7 @@
 
 using System.Collections.Concurrent;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
@@ -29,6 +30,8 @@ public sealed class RootContext(App app, Schema schema, DomainId contentId, Reso
     public Schema Schema { get; } = schema;
 
     public ResolvedComponents Components { get; } = components;
+
+    public ContentData? PreviousData { get; init; }
 
     public IEnumerable<ValidationError> Errors
     {

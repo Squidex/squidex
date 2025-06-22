@@ -3026,6 +3026,8 @@ export abstract class FieldPropertiesDto implements IFieldPropertiesDto {
     readonly isRequiredOnPublish?: boolean;
     /** Indicates if the field should be rendered with half width only. */
     readonly isHalfWidth?: boolean;
+    /** Indicates if the field can only be created and not modified. */
+    readonly isCreateOnly?: boolean;
     /** Optional url to the editor. */
     readonly editorUrl?: string | undefined;
     /** Tags for automation processes. */
@@ -3064,6 +3066,7 @@ export abstract class FieldPropertiesDto implements IFieldPropertiesDto {
         (<any>this).isRequired = _data["isRequired"];
         (<any>this).isRequiredOnPublish = _data["isRequiredOnPublish"];
         (<any>this).isHalfWidth = _data["isHalfWidth"];
+        (<any>this).isCreateOnly = _data["isCreateOnly"];
         (<any>this).editorUrl = _data["editorUrl"];
         if (Array.isArray(_data["tags"])) {
             (<any>this).tags = [] as any;
@@ -3129,6 +3132,7 @@ export abstract class FieldPropertiesDto implements IFieldPropertiesDto {
         data["isRequired"] = this.isRequired;
         data["isRequiredOnPublish"] = this.isRequiredOnPublish;
         data["isHalfWidth"] = this.isHalfWidth;
+        data["isCreateOnly"] = this.isCreateOnly;
         data["editorUrl"] = this.editorUrl;
         if (Array.isArray(this.tags)) {
             data["tags"] = [];
@@ -3174,6 +3178,8 @@ export interface IFieldPropertiesDto {
     readonly isRequiredOnPublish?: boolean;
     /** Indicates if the field should be rendered with half width only. */
     readonly isHalfWidth?: boolean;
+    /** Indicates if the field can only be created and not modified. */
+    readonly isCreateOnly?: boolean;
     /** Optional url to the editor. */
     readonly editorUrl?: string | undefined;
     /** Tags for automation processes. */

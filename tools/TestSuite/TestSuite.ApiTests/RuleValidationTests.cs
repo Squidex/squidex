@@ -45,7 +45,7 @@ public class RuleValidationTests(CreatedAppFixture fixture) : IClassFixture<Crea
     {
         var trigger = new UsageRuleTriggerDto { Limit = 500, NumDays = 5 };
 
-        await _.Client.Rules.ValidateRuleAsync(trigger);
+        await _.Client.Rules.ValidateTriggerAsync(trigger);
     }
 
     [Fact]
@@ -55,7 +55,7 @@ public class RuleValidationTests(CreatedAppFixture fixture) : IClassFixture<Crea
 
         var ex = await Assert.ThrowsAnyAsync<SquidexException>(async () =>
         {
-            await _.Client.Rules.ValidateRuleAsync(trigger);
+            await _.Client.Rules.ValidateTriggerAsync(trigger);
         });
 
         Assert.Equal(400, ex.StatusCode);

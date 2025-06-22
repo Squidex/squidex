@@ -10,7 +10,7 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { EMPTY, Observable, shareReplay } from 'rxjs';
 import { TranslatePipe } from '@app/framework';
-import { CodeEditorComponent, ConfigureFieldRulesForm, ConfirmClickDirective, ControlErrorsComponent, FIELD_RULE_ACTIONS, SchemaDto, SchemasService, SchemasState, ScriptCompletions } from '@app/shared';
+import { CodeEditorComponent, ConfigureFieldRulesForm, ConfirmClickDirective, ControlErrorsComponent, FIELD_RULE_ACTIONS, FieldPropertiesDto, SchemaDto, SchemasService, SchemasState, ScriptCompletions } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-field-rules-form',
@@ -32,7 +32,7 @@ export class SchemaFieldRulesFormComponent implements  OnInit {
 
     public editForm = new ConfigureFieldRulesForm();
 
-    public fieldNames!: ReadonlyArray<string>;
+    public fieldOptions: ReadonlyArray<{ label: string; value: string }> = [];
     public fieldActions = FIELD_RULE_ACTIONS;
     public fieldCompletions: Observable<ScriptCompletions> = EMPTY;
 
@@ -49,21 +49,39 @@ export class SchemaFieldRulesFormComponent implements  OnInit {
     }
 
     public ngOnChanges() {
-        const fieldNames: string[] = [];
+        const fieldNames = new Set<string>();
+        const fieldTags = new Set<string>();
+
+        const addField = (name: string, properties: FieldPropertiesDto) => {
+            fieldNames.add(name);
+
+            if (properties.tags) {
+                for (const tag of properties.tags) {
+                    fieldTags.add(tag);
+                }
+            }
+        };
 
         for (const field of this.schema.fields) {
             if (field.properties.isContentField) {
-                fieldNames.push(field.name);
+                addField(field.name, field.properties);
 
                 for (const nestedField of field.nested || []) {
                     if (nestedField.properties.isContentField) {
-                        fieldNames.push(`${field.name}.${nestedField.name}`);
+                        addField(`${field.name}.${nestedField.name}`, nestedField.properties);
                     }
                 }
             }
         }
 
-        this.fieldNames = fieldNames.sort();
+        this.fieldOptions = [
+            ...[...fieldNames]
+                .sorted()
+                .map(value => ({ label: `field: ${value}`, value })),
+            ...[...fieldTags]
+                .sorted()
+                .map(value => ({ label: `tag: ${value}`, value: `tag:${value}` })),
+        ];
 
         this.isEditable = this.schema.canUpdateUrls;
 
@@ -72,7 +90,7 @@ export class SchemaFieldRulesFormComponent implements  OnInit {
     }
 
     public add() {
-        this.editForm.add(this.fieldNames);
+        this.editForm.add(this.fieldOptions[0].value);
     }
 
     public saveSchema() {

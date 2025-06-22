@@ -29,7 +29,7 @@ public sealed class AggregateValidator(IEnumerable<IValidator>? validators) : IV
         }
         catch
         {
-            context.AddError(context.Path, T.Get("contents.validation.error"));
+            context.AddError(T.Get("contents.validation.error"));
         }
     }
 }

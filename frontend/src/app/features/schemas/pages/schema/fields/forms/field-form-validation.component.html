@@ -20,6 +20,17 @@
             </div>
         </div>
     </div>
+
+    <div class="form-group row mb-3">
+        <div class="col-9 offset-3">
+            <div class="form-check">
+                <input class="form-check-input" id="{{ field.fieldId }}_fieldCreateOnly" formControlName="isCreateOnly" type="checkbox" />
+                <label class="form-check-label" for="{{ field.fieldId }}_fieldCreateOnly">
+                    {{ "schemas.field.createOnly" | sqxTranslate }}
+                </label>
+            </div>
+        </div>
+    </div>
 </div>
 
 @switch (field.rawProperties.fieldType) {

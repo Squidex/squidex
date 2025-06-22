@@ -13,7 +13,8 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject;
 
-public sealed class ContentOperation(IServiceProvider serviceProvider, Func<WriteContent> snapshot) : OperationContextBase<ContentCommand, WriteContent>(serviceProvider, snapshot)
+public sealed class ContentOperation(IServiceProvider serviceProvider, Func<WriteContent> snapshot)
+    : OperationContextBase<ContentCommand, WriteContent>(serviceProvider, snapshot)
 {
     public Schema Schema { get; init; }
 

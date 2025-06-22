@@ -13,14 +13,16 @@ public sealed class UniqueValuesValidator<TValue> : IValidator
 {
     public void Validate(object? value, ValidationContext context)
     {
-        if (value is IEnumerable<TValue> items && items.Any())
+        if (value is not IEnumerable<TValue> items || !items.Any())
         {
-            var itemsArray = items.ToArray();
+            return;
+        }
 
-            if (itemsArray.Length != itemsArray.Distinct().Count())
-            {
-                context.AddError(context.Path, T.Get("contents.validation.duplicates"));
-            }
+        var itemsArray = items.ToArray();
+
+        if (itemsArray.Length != itemsArray.Distinct().Count())
+        {
+            context.AddError(T.Get("contents.validation.duplicates"));
         }
     }
 }
