@@ -426,6 +426,9 @@
   <data name="RichTextFieldValue" xml:space="preserve">
     <value>The raw value.</value>
   </data>
+  <data name="FieldRuleContext" xml:space="preserve">
+    <value>The context object.</value>
+  </data>
   <data name="SchemaId" xml:space="preserve">
     <value>The ID of the schema.</value>
   </data>
@@ -476,5 +479,8 @@
   </data>
   <data name="UsersClaimsValue" xml:space="preserve">
     <value>The list of additional properties that have the name 'name'.</value>
+  </data>
+  <data name="FieldRuleAction" xml:space="preserve">
+    <value>The type of action that is performed.</value>
   </data>
 </root>

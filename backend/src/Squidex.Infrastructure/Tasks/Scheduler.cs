@@ -8,7 +8,7 @@
 namespace Squidex.Infrastructure.Tasks;
 
 #pragma warning disable MA0048 // File name must match type name
-public delegate Task SchedulerTask(CancellationToken ct);
+public delegate ValueTask SchedulerTask(CancellationToken ct);
 #pragma warning restore MA0048 // File name must match type name
 
 public sealed class Scheduler

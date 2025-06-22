@@ -23,45 +23,47 @@ public sealed class ObjectValidator<TValue>(IDictionary<string, (bool IsOptional
             value = DefaultValue;
         }
 
-        if (value is IReadOnlyDictionary<string, TValue> values)
+        if (value is not IReadOnlyDictionary<string, TValue> values)
         {
-            foreach (var fieldData in values)
-            {
-                var name = fieldData.Key;
+            return;
+        }
 
-                if (!fields.ContainsKey(name))
+        foreach (var fieldData in values)
+        {
+            var name = fieldData.Key;
+
+            if (!fields.ContainsKey(name))
+            {
+                context.AddError(T.Get("contents.validation.unknownField", new { fieldType }), context.Path.Enqueue(name));
+            }
+        }
+
+        foreach (var (name, field) in fields)
+        {
+            var fieldValue = Undefined.Value;
+
+            if (!values.TryGetValue(name, out var nestedValue))
+            {
+                // If the original value was unset, we have to validate the children for required values.
+                if (isPartial && !originalValue.IsUnset())
                 {
-                    context.AddError(context.Path.Enqueue(name), T.Get("contents.validation.unknownField", new { fieldType }));
+                    continue;
                 }
             }
-
-            foreach (var (name, field) in fields)
+            else
             {
-                var fieldValue = Undefined.Value;
-
-                if (!values.TryGetValue(name, out var nestedValue))
-                {
-                    // If the original value was unset, we have to validate the children for required values.
-                    if (isPartial && !originalValue.IsUnset())
-                    {
-                        continue;
-                    }
-                }
-                else
-                {
-                    fieldValue = nestedValue!;
-                }
-
-                // Use a special null values for unsets so we can treat them as null for required validators.
-                if (Updates.IsUnset(fieldValue))
-                {
-                    fieldValue = Undefined.Unset;
-                }
-
-                var fieldContext = context.Nested(name, field.IsOptional);
-
-                field.Validator.Validate(fieldValue, fieldContext);
+                fieldValue = nestedValue!;
             }
+
+            // Use a special null values for unsets so we can treat them as null for required validators.
+            if (Updates.IsUnset(fieldValue))
+            {
+                fieldValue = Undefined.Unset;
+            }
+
+            var fieldContext = context.Nested(name, field.IsOptional);
+
+            field.Validator.Validate(fieldValue, fieldContext);
         }
     }
 }

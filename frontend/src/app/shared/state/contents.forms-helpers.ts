@@ -16,7 +16,7 @@ import { CompiledRules, RuleContext, RulesProvider } from './contents.form-rules
 
 export type TranslationStatuses = { [language: string]: number };
 
-export type AnyFieldDto = FieldDto | NestedFieldDto;
+export type AnyFieldDto = NestedFieldDto;
 
 export function contentsTranslationStatus(datas: any[], schema: SchemaDto, languages: ReadonlyArray<Language>) {
     const result: TranslationStatuses = {};
@@ -100,7 +100,7 @@ export abstract class Hidden {
 
 export type FieldGroup<T = FieldDto> = { separator?: T; fields: T[]; id: string };
 
-export function groupFields<T extends FieldDto | NestedFieldDto>(fields: ReadonlyArray<T>, keepEmpty = false): FieldGroup<T>[] {
+export function groupFields<T extends AnyFieldDto>(fields: ReadonlyArray<T>, keepEmpty = false): FieldGroup<T>[] {
     const result: FieldGroup<T>[] = [];
 
     let currentSeparator: T | undefined;
@@ -170,22 +170,37 @@ export class PartitionConfig {
     }
 }
 
-export type AbstractContentFormState = {
+export type AbstractContentFormState = Readonly<{
     isDisabled?: boolean;
     isHidden?: boolean;
     isRequired?: boolean;
-};
+}>;
 
-export interface FormGlobals {
+export type FormGlobals = Readonly<{
     partitions: PartitionConfig;
+    remoteValidator?: ValidatorFn;
     schema: SchemaDto;
     schemas: { [id: string ]: SchemaDto };
-    remoteValidator?: ValidatorFn;
-}
+}>;
 
-export abstract class AbstractContentForm<T extends FieldDto | NestedFieldDto, TForm extends AbstractControl> extends Hidden {
+export type ControlArgs<T = AnyFieldDto> = Readonly<{
+    field: T;
+    globals: FormGlobals;
+    isOptional: boolean;
+    partition: string;
+    path: string;
+    rules: RulesProvider;
+}>;
+
+export abstract class AbstractContentForm<T extends AnyFieldDto, TForm extends AbstractControl> extends Hidden {
     private readonly collapsed$ = new BehaviorSubject<boolean | null>(null);
     private readonly ruleSet: CompiledRules;
+
+    public readonly field: T;
+    public readonly globals: FormGlobals;
+    public readonly isOptional: boolean;
+    public readonly partition: string;
+    public readonly path: string;
 
     public get collapsed() {
         return this.collapsed$.value;
@@ -196,20 +211,28 @@ export abstract class AbstractContentForm<T extends FieldDto | NestedFieldDto, T
     }
 
     protected constructor(
-        public readonly globals: FormGlobals,
-        public readonly field: T,
-        public readonly fieldPath: string,
+        public readonly args: ControlArgs<T>,
         public readonly form: TForm,
-        public readonly isOptional: boolean,
-        public readonly rules: RulesProvider,
     ) {
         super();
-
-        this.ruleSet = rules.getRules(this);
+        this.field = args.field;
+        this.globals = args.globals;
+        this.isOptional = args.isOptional;
+        this.partition = args.partition;
+        this.path = args.path;
+        this.ruleSet = args.rules.getRules(args);
     }
 
-    public path(relative: string) {
-        return `${this.fieldPath}.${relative}`;
+    public relativePath(relative: string) {
+        return `${this.path}.${relative}`;
+    }
+
+    public setValue(value: any) {
+        this.form.reset(value);
+    }
+
+    public unset() {
+        this.form.setValue(undefined);
     }
 
     public collapse() {
@@ -250,14 +273,6 @@ export abstract class AbstractContentForm<T extends FieldDto | NestedFieldDto, T
         }
 
         this.updateCustomState(context, itemData, state);
-    }
-
-    public setValue(value: any) {
-        this.form.reset(value);
-    }
-
-    public unset() {
-        this.form.setValue(undefined);
     }
 
     protected updateCustomState(_context: RuleContext, _itemData: any, _state: AbstractContentFormState): void {

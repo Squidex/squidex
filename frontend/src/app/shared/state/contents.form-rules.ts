@@ -9,10 +9,10 @@
 /* eslint-disable no-useless-return */
 
 import { Types } from '@app/framework';
-import { FieldRuleDto, SchemaDto } from './../model';
+import { FieldDto, FieldRuleDto, NestedFieldDto, SchemaDto } from './../model';
 
 export type RuleContext = { data: any; user?: any };
-export type RuleForm = { fieldPath: string };
+export type RuleForm = { path: string; field: FieldDto | NestedFieldDto };
 
 export interface CompiledRules {
     get rules(): ReadonlyArray<CompiledRule>;
@@ -24,12 +24,13 @@ export interface RulesProvider {
     getRules(form: RuleForm): CompiledRules;
 }
 
+const EMPTY_RULES_ARRAY: CompiledRule[] = [];
+const EMPTY_RULES_STATIC = { rules: EMPTY_RULES_ARRAY };
+const TAG_PREFIX = 'tag:';
+
 export class CompiledRule {
     private readonly function: Function;
-
-    public get field() {
-        return this.rule.field;
-    }
+    private readonly evaluator: (path: string, field: FieldDto | NestedFieldDto) => boolean;
 
     public get action() {
         return this.rule.action;
@@ -39,11 +40,33 @@ export class CompiledRule {
         private readonly rule: FieldRuleDto,
         private readonly useItemData: boolean,
     ) {
-        try {
-            this.function = new Function(`return function(user, ctx, data, itemData) { return ${rule.condition} }`)();
-        } catch {
-            this.function = () => false;
+        if (rule.field.startsWith(TAG_PREFIX)) {
+            const tag = rule.field.substring(TAG_PREFIX.length).trim();
+
+            this.evaluator = (_, field) => {
+                const tags = field.properties?.tags;
+
+                return Types.isArray(tags) && tags.indexOf(tag) >= 0;
+            };
+        } else {
+            this.evaluator = (path, _) => {
+                return this.rule.field === path;
+            };
         }
+
+        if (!rule.condition) {
+            this.function = () => true;
+        } else {
+            try {
+                this.function = new Function(`return function(user, ctx, data, itemData) { return ${rule.condition} }`)();
+            } catch {
+                this.function = () => false;
+            }
+        }
+    }
+
+    public isApplied(path: string, field: FieldDto | NestedFieldDto) {
+        return this.evaluator(path, field);
     }
 
     public eval(context: RuleContext, itemData: any) {
@@ -56,10 +79,8 @@ export class CompiledRule {
         }
     }
 }
-const EMPTY_RULES: CompiledRule[] = [];
-const EMPTY_RULES_STATIC = { rules: EMPTY_RULES };
 
-class ComponentRules implements ComponentRules {
+class ComponentRules implements CompiledRules {
     private previouSchema?: SchemaDto;
     private compiledRules: ReadonlyArray<CompiledRule> = [];
 
@@ -68,9 +89,9 @@ class ComponentRules implements ComponentRules {
 
         if (schema !== this.previouSchema) {
             if (schema) {
-                this.compiledRules = Types.fastMerge(this.parentRules.getRules(this.form).rules, this.getRelativeRules(this.form, schema));
+                this.compiledRules = fastMerge(this.parentRules.getRules(this.form).rules, this.getRelativeRules(this.form, schema));
             } else {
-                this.compiledRules = EMPTY_RULES;
+                this.compiledRules = EMPTY_RULES_ARRAY;
             }
         }
 
@@ -89,13 +110,13 @@ class ComponentRules implements ComponentRules {
         const rules = this.parentRules.compileRules(schema);
 
         if (rules.length === 0) {
-            return EMPTY_RULES;
+            return EMPTY_RULES_ARRAY;
         }
 
-        const pathField = form.fieldPath.substring(this.parentPath.length + 1);
-        const pathSimple = getSimplePath(pathField);
+        const pathNormal = form.path.substring(this.parentPath.length + 1);
+        const pathSimple = getSimplePath(pathNormal);
 
-        return rules.filter(x => x.field === pathField || x.field === pathSimple);
+        return rules.filter(x => x.isApplied(pathNormal, form.field) || x.isApplied(pathSimple, form.field));
     }
 }
 
@@ -118,15 +139,15 @@ export class ComponentRulesProvider implements RulesProvider {
 
 export class RootRulesProvider implements RulesProvider {
     private readonly rulesCache: { [id: string]: ReadonlyArray<CompiledRule> } = {};
-    private readonly rules: ReadonlyArray<CompiledRule>;
+    private readonly rulesRoot: ReadonlyArray<CompiledRule>;
 
     constructor(schema: SchemaDto) {
-        this.rules = this.compileRules(schema);
+        this.rulesRoot = this.compileRules(schema);
     }
 
     public compileRules(schema: SchemaDto) {
         if (!schema) {
-            return EMPTY_RULES;
+            return EMPTY_RULES_ARRAY;
         }
 
         let result = this.rulesCache[schema.id];
@@ -141,16 +162,16 @@ export class RootRulesProvider implements RulesProvider {
     }
 
     public getRules(form: RuleForm) {
-        const allRules = this.rules;
+        const allRules = this.rulesRoot;
 
         if (allRules.length === 0) {
             return EMPTY_RULES_STATIC;
         }
 
-        const pathField = form.fieldPath;
-        const pathSimple = getSimplePath(pathField);
+        const pathNormal = form.path;
+        const pathSimple = getSimplePath(pathNormal);
 
-        const rules = allRules.filter(x => x.field === pathField || x.field === pathSimple);
+        const rules = allRules.filter(x => x.isApplied(pathNormal, form.field) || x.isApplied(pathSimple, form.field));
 
         return { rules };
     }
@@ -164,4 +185,16 @@ function getSimplePath(path: string) {
     }
 
     return parts.join('.');
+}
+
+function fastMerge<T>(lhs: ReadonlyArray<T>, rhs: ReadonlyArray<T>) {
+    if (rhs.length === 0) {
+        return lhs;
+    }
+
+    if (lhs.length === 0) {
+        return rhs;
+    }
+
+    return [...lhs, ...rhs];
 }

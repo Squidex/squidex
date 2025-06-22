@@ -24,6 +24,10 @@
                     }
                 }
 
+                @if (workflowsState.canCreate | async) {
+                    <sqx-workflow-add-form />
+                }
+
                 @if (schemasSource && (workflowsState.isLoaded | async) && (workflowsState.workflows | async); as workflows) {
                     @for (workflow of workflows; track workflow.id) {
                         <sqx-workflow [roles]="roles" [schemasSource]="schemasSource" [workflow]="workflow" />
@@ -31,10 +35,6 @@
                         <div class="table-items-row table-items-row-summary table-items-row-empty">
                             {{ "workflows.empty" | sqxTranslate }}
                         </div>
-                    }
-
-                    @if (workflowsState.canCreate | async) {
-                        <sqx-workflow-add-form />
                     }
                 }
             </ng-container>

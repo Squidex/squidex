@@ -23,17 +23,18 @@ public sealed class CollectionItemValidator : IValidator
 
     public void Validate(object? value, ValidationContext context)
     {
-        if (value is ICollection { Count: > 0 } items)
+        if (value is not ICollection { Count: > 0 } items)
         {
-            var itemIndex = 1;
+            return;
+        }
 
-            foreach (var item in items)
-            {
-                var itemContext = context.Nested($"[{itemIndex}]");
+        var itemIndex = 1;
+        foreach (var item in items)
+        {
+            var itemContext = context.Nested($"[{itemIndex}]");
 
-                itemValidator.Validate(item, itemContext);
-                itemIndex++;
-            }
+            itemValidator.Validate(item, itemContext);
+            itemIndex++;
         }
     }
 }

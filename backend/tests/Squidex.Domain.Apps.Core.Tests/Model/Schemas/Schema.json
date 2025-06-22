@@ -28,7 +28,8 @@
                 "editor": "Input",
                 "isRequired": true,
                 "isRequiredOnPublish": true,
-                "isHalfWidth": false
+                "isHalfWidth": false,
+                "isCreateOnly": false
             }
         },
         {
@@ -52,7 +53,8 @@
                 ],
                 "isRequired": false,
                 "isRequiredOnPublish": false,
-                "isHalfWidth": false
+                "isHalfWidth": false,
+                "isCreateOnly": false
             }
         },
         {
@@ -72,7 +74,8 @@
                 "editor": "Checkbox",
                 "isRequired": false,
                 "isRequiredOnPublish": false,
-                "isHalfWidth": false
+                "isHalfWidth": false,
+                "isCreateOnly": false
             }
         },
         {
@@ -90,7 +93,8 @@
                 ],
                 "isRequired": false,
                 "isRequiredOnPublish": false,
-                "isHalfWidth": false
+                "isHalfWidth": false,
+                "isCreateOnly": false
             }
         },
         {
@@ -109,7 +113,8 @@
                 ],
                 "isRequired": false,
                 "isRequiredOnPublish": false,
-                "isHalfWidth": false
+                "isHalfWidth": false,
+                "isCreateOnly": false
             }
         },
         {
@@ -126,7 +131,8 @@
                 "editor": "DateTime",
                 "isRequired": true,
                 "isRequiredOnPublish": true,
-                "isHalfWidth": false
+                "isHalfWidth": false,
+                "isCreateOnly": false
             }
         },
         {
@@ -141,7 +147,8 @@
                 "editor": "Map",
                 "isRequired": false,
                 "isRequiredOnPublish": false,
-                "isHalfWidth": true
+                "isHalfWidth": true,
+                "isCreateOnly": false
             }
         },
         {
@@ -155,7 +162,8 @@
                 "$type": "JsonField",
                 "isRequired": false,
                 "isRequiredOnPublish": false,
-                "isHalfWidth": false
+                "isHalfWidth": false,
+                "isCreateOnly": false
             }
         },
         {
@@ -173,6 +181,7 @@
                 "isRequired": false,
                 "isRequiredOnPublish": false,
                 "isHalfWidth": false,
+                "isCreateOnly": false,
                 "tags": [
                     "1",
                     "2",
@@ -199,7 +208,8 @@
                 ],
                 "isRequired": false,
                 "isRequiredOnPublish": false,
-                "isHalfWidth": false
+                "isHalfWidth": false,
+                "isCreateOnly": false
             }
         },
         {
@@ -228,7 +238,8 @@
                 "normalization": "None",
                 "isRequired": false,
                 "isRequiredOnPublish": false,
-                "isHalfWidth": false
+                "isHalfWidth": false,
+                "isCreateOnly": false
             }
         },
         {
@@ -243,7 +254,8 @@
                 "calculatedDefaultValue": "EmptyArray",
                 "isRequired": false,
                 "isRequiredOnPublish": false,
-                "isHalfWidth": false
+                "isHalfWidth": false,
+                "isCreateOnly": false
             },
             "children": [
                 {
@@ -262,7 +274,8 @@
                         "editor": "Input",
                         "isRequired": false,
                         "isRequiredOnPublish": false,
-                        "isHalfWidth": false
+                        "isHalfWidth": false,
+                        "isCreateOnly": false
                     }
                 }
             ]
@@ -279,7 +292,8 @@
                 "editor": "Separator",
                 "isRequired": false,
                 "isRequiredOnPublish": false,
-                "isHalfWidth": false
+                "isHalfWidth": false,
+                "isCreateOnly": true
             }
         }
     ],

@@ -15,7 +15,7 @@ public class RequiredValidator : IValidator
     {
         if (value.IsNullOrUndefined() && !context.IsOptional)
         {
-            context.AddError(context.Path, T.Get("contents.validation.required"));
+            context.AddError(T.Get("contents.validation.required"), context.Path);
         }
     }
 }

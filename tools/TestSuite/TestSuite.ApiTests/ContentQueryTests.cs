@@ -144,7 +144,7 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
             return Task.CompletedTask;
         });
 
-        Assert.Equal(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }, values.Order().ToArray());
+        Assert.Equal([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], values.Order().ToArray());
     }
 
     [Fact]
@@ -158,7 +158,7 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
             return Task.CompletedTask;
         });
 
-        Assert.Equal(new[] { 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 }, values.Order().ToArray());
+        Assert.Equal([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], values.Order().ToArray());
     }
 
     [Fact]
@@ -633,8 +633,8 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
         var items1 = results.ElementAt(0).Data.Items;
         var items2 = results.ElementAt(1).Data.Items;
 
-        Assert.Equal(new[] { 4, 5, 6 }, items1.Select(x => x.Data.Number).ToArray());
-        Assert.Equal(new[] { 5, 6 }, items2.Select(x => x.Data.Number).ToArray());
+        Assert.Equal([4, 5, 6], items1.Select(x => x.Data.Number).ToArray());
+        Assert.Equal([5, 6], items2.Select(x => x.Data.Number).ToArray());
     }
 
     [Fact]
@@ -662,7 +662,7 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<QueryResult>(query);
         var items = result.Items;
 
-        Assert.Equal(new[] { 4, 5, 6 }, items.Select(x => x.Data.Number).ToArray());
+        Assert.Equal([4, 5, 6], items.Select(x => x.Data.Number).ToArray());
     }
 
     [Fact]
@@ -690,7 +690,7 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
         var result = await _.Client.SharedDynamicContents.GraphQlGetAsync<QueryResult>(query);
         var items = result.Items;
 
-        Assert.Equal(new[] { 4, 5, 6 }, items.Select(x => x.Data.Number).ToArray());
+        Assert.Equal([4, 5, 6], items.Select(x => x.Data.Number).ToArray());
     }
 
     [Fact]
@@ -714,7 +714,7 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JObject>(query);
         var items = result["queryMyReadsContents"];
 
-        Assert.Equal(new[] { 4, 5, 6 }, items?.Select(x => x["data"]?["number"]?["iv"]?.Value<int>() ?? -1).ToArray());
+        Assert.Equal([4, 5, 6], items?.Select(x => x["data"]?["number"]?["iv"]?.Value<int>() ?? -1).ToArray() ?? []);
     }
 
     [Fact]

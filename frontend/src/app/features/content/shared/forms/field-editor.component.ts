@@ -135,7 +135,7 @@ export class FieldEditorComponent {
         }
 
         if (changes.formModel || changes.comments) {
-            this.annotations = this.comments?.getAnnotations(this.formModel.fieldPath);
+            this.annotations = this.comments?.getAnnotations(this.formModel.path);
         }
     }
 
@@ -161,7 +161,7 @@ export class FieldEditorComponent {
     }
 
     public annotationCreate(annotation: AnnotationSelection) {
-        this.messageBus.emit(new AnnotationCreate(this.formModel.fieldPath, annotation));
+        this.messageBus.emit(new AnnotationCreate(this.formModel.path, annotation));
     }
 
     public annotationsSelect(annotation: ReadonlyArray<string>) {
@@ -169,7 +169,7 @@ export class FieldEditorComponent {
     }
 
     public annotationsUpdate(annotations: ReadonlyArray<Annotation>) {
-        this.comments?.updateAnnotations(this.formModel.fieldPath, annotations);
+        this.comments?.updateAnnotations(this.formModel.path, annotations);
     }
 
     public unset() {
