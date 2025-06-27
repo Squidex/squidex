@@ -9,7 +9,7 @@
     Steps: {
       Guid_2: {
         Step: {
-          Url: http://squidex.io
+          Url: http://squidex.io/
         },
         IgnoreError: false
       }
