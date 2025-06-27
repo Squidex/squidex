@@ -92,17 +92,19 @@ public sealed class GraphQLTests(GraphQLFixture fixture) : IClassFixture<GraphQL
     public async Task Should_query_json()
     {
         // STEP 1: Create a content with JSON.
-        var content_0 = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Json = JToken.FromObject(new
+        var content_0 = await _.Contents.CreateAsync(
+            new TestEntityData
             {
-                value = 1,
-                obj = new
+                Json = JToken.FromObject(new
                 {
-                    value = 2
-                }
-            })
-        }, ContentCreateOptions.AsPublish);
+                    value = 1,
+                    obj = new
+                    {
+                        value = 2
+                    }
+                })
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Query this content.

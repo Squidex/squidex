@@ -82,7 +82,7 @@ public sealed class AddDefaultValues(PartitionResolver partitionResolver, IClock
 
     private void Enrich(IField field, Dictionary<string, JsonValue> fieldData, string key)
     {
-        if (fieldData.TryGetValue(key, out _) || (field.RawProperties.IsRequired && IgnoreRequiredFields))
+        if (fieldData.ContainsKey(key) || (field.RawProperties.IsRequired && IgnoreRequiredFields))
         {
             return;
         }

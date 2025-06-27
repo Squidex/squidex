@@ -27,18 +27,18 @@ public sealed partial class EFContentRepository<TContext, TContentContext>(
 {
     private readonly DynamicTables<TContext, TContentContext> dynamicTables = new DynamicTables<TContext, TContentContext>(dbContextFactory, dbContentContextFactory);
 
-    public async Task<Content?> FindContentAsync(App app, Schema schema, DomainId id, SearchScope scope,
+    public async Task<Content?> FindContentAsync(App app, Schema schema, DomainId id, IReadOnlySet<string>? fields, SearchScope scope,
         CancellationToken ct = default)
     {
         using (Telemetry.Activities.StartActivity("EFContentRepository/FindContentAsync"))
         {
             return scope == SearchScope.All ?
-                await FindContentAsync<EFContentCompleteEntity>(app.Id, schema.Id, id, ct) :
-                await FindContentAsync<EFContentPublishedEntity>(app.Id, schema.Id, id, ct);
+                await FindContentAsync<EFContentCompleteEntity>(app.Id, schema.Id, id, fields, ct) :
+                await FindContentAsync<EFContentPublishedEntity>(app.Id, schema.Id, id, fields, ct);
         }
     }
 
-    public async Task<Content?> FindContentAsync<T>(DomainId appId, DomainId schemaId, DomainId id,
+    public async Task<Content?> FindContentAsync<T>(DomainId appId, DomainId schemaId, DomainId id, IReadOnlySet<string>? fields,
         CancellationToken ct = default) where T : EFContentEntity
     {
         await using var dbContext = await CreateDbContextAsync(ct);
@@ -48,6 +48,11 @@ public sealed partial class EFContentRepository<TContext, TContentContext>(
                 .Where(x => x.DocumentId == DomainId.Combine(appId, id))
                 .Where(x => x.IndexedSchemaId == schemaId)
                 .FirstOrDefaultAsync(ct);
+
+        if (fields?.Count > 0)
+        {
+            entity?.Data.LimitFields(fields);
+        }
 
         return entity;
     }

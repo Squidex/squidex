@@ -177,8 +177,7 @@ public class ScriptingCompleterTests
         var actual = sut.FieldRule(dataSchema);
 
         AssertCompletion(actual,
-            new[]
-            {
+            [
                 "ctx",
                 "ctx.action",
                 "data",
@@ -191,7 +190,7 @@ public class ScriptingCompleterTests
                 "user.email",
                 "user.id",
                 "user.role",
-            });
+            ]);
     }
 
     [Fact]
@@ -200,15 +199,14 @@ public class ScriptingCompleterTests
         var actual = sut.PreviewUrl(dataSchema);
 
         AssertCompletion(actual,
-            new[]
-            {
+            [
                 "accessToken",
                 "data",
                 "data['my-field']",
                 "data['my-field'].iv",
                 "id",
                 "version",
-            });
+            ]);
     }
 
     [Fact]
@@ -356,8 +354,7 @@ public class ScriptingCompleterTests
     private static void AssertUsageTrigger(IReadOnlyList<ScriptingValue> actual)
     {
         AssertCompletion(actual,
-            new[]
-            {
+            [
                 "event",
                 "event.appId",
                 "event.appId.id",
@@ -367,7 +364,7 @@ public class ScriptingCompleterTests
                 "event.name",
                 "event.timestamp",
                 "event.version",
-            });
+            ]);
     }
 
     private static void AssertCompletion(IReadOnlyList<ScriptingValue> actual, params string[][] expected)

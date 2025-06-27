@@ -164,12 +164,39 @@ public abstract class ContentRepositoryTests : GivenContext
     }
 
     [Fact]
+    public async Task Should_find_by_id()
+    {
+        var sut = await CreateAndPrepareSutAsync();
+
+        var contentId = await sut.StreamAll(app.Id, [schema.Id], default).Select(x => x.Id).FirstOrDefaultAsync();
+        var content = await sut.FindContentAsync(app, schema, contentId, null, SearchScope.All);
+
+        // ID is not predicable, therefore the weak assertion.
+        Assert.NotNull(content);
+    }
+
+    [Fact]
+    public async Task Should_find_by_id_with_limited_fields()
+    {
+        var sut = await CreateAndPrepareSutAsync();
+
+        var contentId = await sut.StreamAll(app.Id, [schema.Id], default).Select(x => x.Id).FirstOrDefaultAsync();
+        var content = await sut.FindContentAsync(app, schema, contentId, HashSet.Of("field1"), SearchScope.All);
+
+        // Only check that the we only go one field.
+        Assert.NotNull(content);
+        Assert.Single(content.Data);
+        Assert.Contains("field1", content.Data);
+    }
+
+    [Fact]
     public async Task Should_stream_all_with_schema()
     {
         var sut = await CreateAndPrepareSutAsync();
 
         var count = await sut.StreamAll(AppIds[0].Id, [schema.Id], SearchScope.All).CountAsync();
 
+        // IDs is not predicable, therefore the weak assertion.
         Assert.Equal(NumValues, count);
     }
 
@@ -180,6 +207,7 @@ public abstract class ContentRepositoryTests : GivenContext
 
         var count = await sut.StreamAll(AppIds[0].Id, null, SearchScope.All).CountAsync();
 
+        // IDs is not predicable, therefore the weak assertion.
         Assert.Equal(NumValues * SchemaIds.Length, count);
     }
 
@@ -190,6 +218,7 @@ public abstract class ContentRepositoryTests : GivenContext
 
         var count = await sut.StreamAll(AppIds[0].Id, [], SearchScope.All).CountAsync();
 
+        // IDs is not predicable, therefore the weak assertion.
         Assert.Equal(0, count);
     }
 
@@ -289,6 +318,21 @@ public abstract class ContentRepositoryTests : GivenContext
     }
 
     [Fact]
+    public async Task Should_query_with_fields()
+    {
+        var query = new ClrQuery();
+
+        var contents = await QueryAsync(query, fields: HashSet.Of("field1"));
+
+        // We have a concrete query, so we expect an actual result.
+        Assert.All(contents, content =>
+        {
+            Assert.Single(content.Data);
+            Assert.Contains("field1", content.Data);
+        });
+    }
+
+    [Fact]
     public async Task Should_query_with_large_skip()
     {
         var query = new ClrQuery
@@ -378,6 +422,7 @@ public abstract class ContentRepositoryTests : GivenContext
         int skip = 0,
         DomainId reference = default,
         DomainId referencing = default,
+        HashSet<string>? fields = null,
         bool withTotal = false)
     {
         clrQuery.Take = top;
@@ -396,6 +441,7 @@ public abstract class ContentRepositoryTests : GivenContext
 
         var q =
             Q.Empty
+                .WithFields(fields)
                 .WithoutTotal(!withTotal)
                 .WithQuery(clrQuery)
                 .WithReference(reference)

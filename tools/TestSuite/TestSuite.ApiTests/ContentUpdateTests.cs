@@ -25,17 +25,20 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
     public async Task Should_return_published_content()
     {
         // STEP 1: Create the item unpublished.
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Number = 1
-        });
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                Number = 1
+            });
 
 
         // STEP 2: Publish the item.
-        await _.Contents.ChangeStatusAsync(content.Id, new ChangeStatus
-        {
-            Status = "Published"
-        });
+        await _.Contents.ChangeStatusAsync(
+            content.Id,
+            new ChangeStatus
+            {
+                Status = "Published"
+            });
 
 
         // STEP 3: Retrieve the item.
@@ -46,17 +49,21 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
     public async Task Should_not_return_archived_content()
     {
         // STEP 1: Create the item published.
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Number = 1
-        }, ContentCreateOptions.AsPublish);
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                Number = 1
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Archive the item.
-        await _.Contents.ChangeStatusAsync(content.Id, new ChangeStatus
-        {
-            Status = "Archived"
-        });
+        await _.Contents.ChangeStatusAsync(
+            content.Id,
+            new ChangeStatus
+            {
+                Status = "Archived"
+            });
 
 
         // STEP 3. Get a 404 for the item because it is not published anymore.
@@ -70,21 +77,27 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
     public async Task Should_not_return_unpublished_content()
     {
         // STEP 1: Create the item unpublished.
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Number = 1
-        });
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                Number = 1
+            });
 
 
         // STEP 2: Change the status to publiushed and then to draft.
-        await _.Contents.ChangeStatusAsync(content.Id, new ChangeStatus
-        {
-            Status = "Published"
-        });
-        await _.Contents.ChangeStatusAsync(content.Id, new ChangeStatus
-        {
-            Status = "Draft"
-        });
+        await _.Contents.ChangeStatusAsync(
+            content.Id,
+            new ChangeStatus
+            {
+                Status = "Published"
+            });
+
+        await _.Contents.ChangeStatusAsync(
+            content.Id,
+            new ChangeStatus
+            {
+                Status = "Draft"
+            });
 
 
         // STEP 3. Get a 404 for the item because it is not published anymore.
@@ -100,10 +113,12 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         const string text = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.88 Safari/537.36";
 
         // STEP 1: Create a content item with a text that caused a bug before.
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            String = text
-        }, ContentCreateOptions.AsPublish);
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                String = text
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Get the item and ensure that the text is the same.
@@ -118,13 +133,15 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
     public async Task Should_create_null_localized_text()
     {
         // STEP 1: Create a content item with a text that caused a bug before.
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Localized = new Dictionary<string, string?>
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
             {
-                ["en"] = null
-            }
-        }, ContentCreateOptions.AsPublish);
+                Localized = new Dictionary<string, string?>
+                {
+                    ["en"] = null
+                }
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Get the item and ensure that the text is the same.
@@ -139,13 +156,15 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
     public async Task Should_create_json_with_dot()
     {
         // STEP 1: Create a content item with a text that caused a bug before.
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Json = new JObject
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
             {
-                ["field.with.dot"] = 42
-            }
-        }, ContentCreateOptions.AsPublish);
+                Json = new JObject
+                {
+                    ["field.with.dot"] = 42
+                }
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Get the item and ensure that the text is the same.
@@ -160,10 +179,12 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
     public async Task Should_create_default_text()
     {
         // STEP 1: Create a content item with a text that caused a bug before.
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Localized = []
-        }, ContentCreateOptions.AsPublish);
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                Localized = []
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Get the item and ensure that the text is the same.
@@ -176,10 +197,11 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
     public async Task Should_create_non_published_content()
     {
         // STEP 1: Create the item unpublished.
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Number = 1
-        });
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                Number = 1
+            });
 
 
         // STEP 2. Get a 404 for the item because it is not published.
@@ -195,10 +217,12 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
     public async Task Should_create_published_content()
     {
         // STEP 1: Create the item published.
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Number = 1
-        }, ContentCreateOptions.AsPublish);
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                Number = 1
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Get the item.
@@ -211,10 +235,12 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
     public async Task Should_create_draft_version()
     {
         // STEP 1: Create a new item.
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Number = 1
-        }, ContentCreateOptions.AsPublish);
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                Number = 1
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Create draft.
@@ -222,10 +248,12 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
 
 
         // STEP 3: Update the item and ensure that the data has not changed.
-        await _.Contents.PatchAsync(content.Id, new TestEntityData
-        {
-            Number = 2
-        });
+        await _.Contents.PatchAsync(
+            content.Id,
+            new TestEntityData
+            {
+                Number = 2
+            });
 
         var updated_1 = await _.Contents.GetAsync(content.Id);
 
@@ -239,10 +267,12 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
 
 
         // STEP 5: Publish draft and ensure that it has been updated.
-        await _.Contents.ChangeStatusAsync(content.Id, new ChangeStatus
-        {
-            Status = "Published"
-        });
+        await _.Contents.ChangeStatusAsync(
+            content.Id,
+            new ChangeStatus
+            {
+                Status = "Published"
+            });
 
         var updated_2 = await _.Contents.GetAsync(content.Id);
 
@@ -255,12 +285,12 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var id = $"custom-{Guid.NewGuid()}";
 
         // STEP 1: Create a new item with a custom id.
-        var options = new ContentCreateOptions { Id = id, Publish = true };
-
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Number = 1
-        }, options);
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                Number = 1
+            },
+            new ContentCreateOptions { Id = id, Publish = true });
 
         Assert.Equal(id, content.Id);
     }
@@ -271,12 +301,12 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var id = $"custom-{Guid.NewGuid()}";
 
         // STEP 1: Create a new item with a custom id.
-        var options = new ContentCreateOptions { Id = id, Publish = true };
-
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Number = 1
-        }, options);
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                Number = 1
+            },
+            new ContentCreateOptions { Id = id, Publish = true });
 
         Assert.Equal(id, content.Id);
 
@@ -284,10 +314,12 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         // STEP 2: Create a new item with a custom id.
         var ex = await Assert.ThrowsAnyAsync<SquidexException>(() =>
         {
-            return _.Contents.CreateAsync(new TestEntityData
-            {
-                Number = 1
-            }, options);
+            return _.Contents.CreateAsync(
+                new TestEntityData
+                {
+                    Number = 1
+                },
+                new ContentCreateOptions { Id = id, Publish = true });
         });
 
         Assert.Equal(409, ex.StatusCode);
@@ -299,28 +331,35 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var id = $"custom-{Guid.NewGuid()}";
 
         // STEP 1: Upsert a new item with a custom id.
-        var content = await _.Contents.UpsertAsync(id, new TestEntityData
-        {
-            Number = 1
-        }, ContentUpsertOptions.AsPublish);
+        var content = await _.Contents.UpsertAsync(
+            id,
+            new TestEntityData
+            {
+                Number = 1
+            },
+            ContentUpsertOptions.AsPublish);
 
         Assert.Equal(id, content.Id);
 
 
         // STEP 2: Make an update with the upsert endpoint.
-        content = await _.Contents.UpsertAsync(id, new TestEntityData
-        {
-            Number = 2
-        });
+        content = await _.Contents.UpsertAsync(
+            id,
+            new TestEntityData
+            {
+                Number = 2
+            });
 
         Assert.Equal(2, content.Data.Number);
 
 
         // STEP 3: Make an update with the update endpoint.
-        content = await _.Contents.UpdateAsync(id, new TestEntityData
-        {
-            Number = 3
-        });
+        content = await _.Contents.UpdateAsync(
+            id,
+            new TestEntityData
+            {
+                Number = 3
+            });
 
         Assert.Equal(3, content.Data.Number);
     }
@@ -357,17 +396,22 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
     public async Task Should_update_content(ContentStrategies.Update strategy)
     {
         // STEP 1: Create a new item.
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            String = "2"
-        }, ContentCreateOptions.AsPublish);
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                String = "2"
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Update with selected strategy.
-        await _.Client.UpdateAsync(content, new TestEntityData
-        {
-            Number = 200
-        }, strategy);
+        await _.Client.UpdateAsync(
+            content,
+            new TestEntityData
+            {
+                Number = 200
+            },
+            strategy);
 
         var updated = await _.Contents.GetAsync(content.Id);
 
@@ -381,14 +425,17 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
     public async Task Should_update_content_with_script()
     {
         // STEP 1: Create a new item.
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Number = 100
-        }, ContentCreateOptions.AsPublish);
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                Number = 100
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Update content with script.
-        await _.Client.DynamicContents(_.SchemaName).UpdateAsync(content.Id,
+        await _.Client.DynamicContents(_.SchemaName).UpdateAsync(
+            content.Id,
             new DynamicData
             {
                 [TestEntityData.NumberField] = new JObject
@@ -412,12 +459,14 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
     public async Task Should_unset_field_with_patch()
     {
         // STEP 1: Create a new item.
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            String = "Hello",
-            // Not relevant for the test, but required in the schema.
-            Number = 100
-        }, ContentCreateOptions.AsPublish);
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                String = "Hello",
+                // Not relevant for the test, but required in the schema.
+                Number = 100
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Update content with script.
@@ -439,12 +488,14 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
     public async Task Should_unset_field_value_with_patch()
     {
         // STEP 1: Create a new item.
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            String = "Hello",
-            // Not relevant for the test, but required in the schema.
-            Number = 100
-        }, ContentCreateOptions.AsPublish);
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                String = "Hello",
+                // Not relevant for the test, but required in the schema.
+                Number = 100
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Update content with script.
@@ -475,17 +526,22 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
     public async Task Should_update_content_to_null(ContentStrategies.Update strategy)
     {
         // STEP 1: Create a new item.
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            String = "initial"
-        }, ContentCreateOptions.AsPublish);
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                String = "initial"
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Update with selected strategy.
-        await _.Client.UpdateAsync(content, new TestEntityData
-        {
-            String = null
-        }, strategy);
+        await _.Client.UpdateAsync(
+            content,
+            new TestEntityData
+            {
+                String = null
+            },
+            strategy);
 
         var updated = await _.Contents.GetAsync(content.Id);
 
@@ -502,17 +558,22 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
     public async Task Should_patch_content(ContentStrategies.Patch strategy)
     {
         // STEP 1: Create a new item.
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            String = "initial"
-        }, ContentCreateOptions.AsPublish);
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                String = "initial"
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Patch with selected strategy.
-        await _.Client.PatchAsync(content, new TestEntityData
-        {
-            Number = 200
-        }, strategy);
+        await _.Client.PatchAsync(
+            content,
+            new TestEntityData
+            {
+                Number = 200
+            },
+            strategy);
 
         var updated = await _.Contents.GetAsync(content.Id);
 
@@ -526,10 +587,12 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
     public async Task Should_patch_content_with_script()
     {
         // STEP 1: Create a new item.
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Number = 100
-        }, ContentCreateOptions.AsPublish);
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                Number = 100
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Patch content with script.
@@ -563,17 +626,22 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
     public async Task Should_patch_id_data_value(ContentStrategies.Patch strategy)
     {
         // STEP 1: Create a new item.
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Id = "id1"
-        }, ContentCreateOptions.AsPublish);
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                Id = "id1"
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Patch with selected strategy.
-        await _.Client.PatchAsync(content, new TestEntityData
-        {
-            Id = "id2"
-        }, strategy);
+        await _.Client.PatchAsync(
+            content,
+            new TestEntityData
+            {
+                Id = "id2"
+            },
+            strategy);
 
         var updated = await _.Contents.GetAsync(content.Id);
 
@@ -590,17 +658,22 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
     public async Task Should_patch_content_to_null(ContentStrategies.Patch strategy)
     {
         // STEP 1: Create a new item.
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            String = "initial"
-        }, ContentCreateOptions.AsPublish);
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                String = "initial"
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Patch with selected strategy.
-        await _.Client.PatchAsync(content, new
-        {
-            @string = new { iv = (string?)null }
-        }, strategy);
+        await _.Client.PatchAsync(
+            content,
+            new
+            {
+                @string = new { iv = (string?)null }
+            },
+            strategy);
 
         var updated = await _.Contents.GetAsync(content.Id);
 
@@ -615,10 +688,12 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
     public async Task Should_delete_content(ContentStrategies.Deletion strategy)
     {
         // STEP 1: Create a new item.
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Number = 2
-        }, ContentCreateOptions.AsPublish);
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                Number = 2
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Delete with selected strategy.
@@ -649,12 +724,12 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var id = $"custom-{Guid.NewGuid()}";
 
         // STEP 1: Create a new item with a custom id.
-        var options = new ContentCreateOptions { Id = id, Publish = true };
-
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Number = 1
-        }, options);
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                Number = 1
+            },
+            new ContentCreateOptions { Id = id, Publish = true });
 
         Assert.Equal(id, content.Id);
 
@@ -677,10 +752,12 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
     public async Task Should_recreate_deleted_content(ContentStrategies.Deletion strategy)
     {
         // STEP 1: Create a new item.
-        var content_1 = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Number = 2
-        }, ContentCreateOptions.AsPublish);
+        var content_1 = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                Number = 2
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Delete with selected strategy.
@@ -688,12 +765,12 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
 
 
         // STEP 3: Recreate the item with the same id.
-        var createOptions = new ContentCreateOptions { Id = content_1.Id, Publish = true };
-
-        var content_2 = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Number = 2
-        }, createOptions);
+        var content_2 = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                Number = 2
+            },
+            new ContentCreateOptions { Id = content_1.Id, Publish = true });
 
         Assert.Equal(Status.Published, content_2.Status);
 
@@ -714,10 +791,12 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
     public async Task Should_recreate_deleted_content_with_upsert(ContentStrategies.Deletion strategy)
     {
         // STEP 1: Create a new item.
-        var content_1 = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Number = 2
-        }, ContentCreateOptions.AsPublish);
+        var content_1 = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                Number = 2
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Delete with selected strategy.
@@ -725,10 +804,13 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
 
 
         // STEP 3: Recreate the item with the same id.
-        var content_2 = await _.Contents.UpsertAsync(content_1.Id, new TestEntityData
-        {
-            Number = 2
-        }, ContentUpsertOptions.AsPublish);
+        var content_2 = await _.Contents.UpsertAsync(
+            content_1.Id,
+            new TestEntityData
+            {
+                Number = 2
+            },
+            ContentUpsertOptions.AsPublish);
 
         Assert.Equal(Status.Published, content_2.Status);
     }
@@ -745,10 +827,12 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         // STEP 1: Create a new item with a custom id.
         var options = new ContentCreateOptions { Id = id, Publish = true };
 
-        var content_1 = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Number = 1
-        }, options);
+        var content_1 = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                Number = 1
+            },
+            options);
 
 
         // STEP 2: Permanently delete content with custom id.
@@ -756,10 +840,12 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
 
 
         // STEP 3: Create a new item with same custom id.
-        var content_2 = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Number = 2
-        }, options);
+        var content_2 = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                Number = 2
+            },
+            options);
 
         Assert.Equal(2, content_2.Data.Number);
 
@@ -801,13 +887,15 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
 
 
         // STEP 3: Update content.
-        var content_2 = await client.UpdateAsync("_schemaId_", new DynamicData
-        {
-            ["my-field"] = new JObject
+        var content_2 = await client.UpdateAsync(
+            "_schemaId_",
+            new DynamicData
             {
-                ["iv"] = "singleton"
-            }
-        });
+                ["my-field"] = new JObject
+                {
+                    ["iv"] = "singleton"
+                }
+            });
 
         Assert.Equal("singleton", content_2.Data["my-field"]["iv"]);
 
@@ -818,17 +906,21 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
     public async Task Should_get_content_by_version()
     {
         // STEP 1: Create a new item.
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Number = 1
-        }, ContentCreateOptions.AsPublish);
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                Number = 1
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Update content.
-        content = await _.Contents.UpdateAsync(content.Id, new TestEntityData
-        {
-            Number = 2
-        });
+        content = await _.Contents.UpdateAsync(
+            content.Id,
+            new TestEntityData
+            {
+                Number = 2
+            });
 
 
         // STEP 3: Get current version.
@@ -855,10 +947,12 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
     public async Task Should_update_content_in_parallel()
     {
         // STEP 1: Create a new item.
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Number = 2
-        }, ContentCreateOptions.AsPublish);
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                Number = 2
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 3: Make parallel updates.
@@ -866,10 +960,13 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         {
             try
             {
-                await _.Contents.UpdateAsync(content.Id, new TestEntityData
-                {
-                    Number = i
-                }, ct: ct);
+                await _.Contents.UpdateAsync(
+                    content.Id,
+                    new TestEntityData
+                    {
+                        Number = i
+                    },
+                    ct: ct);
             }
             catch (SquidexException ex) when (ex.StatusCode is 409 or 412)
             {
@@ -879,10 +976,12 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
 
 
         // STEP 3: Make an normal update to ensure nothing is corrupt.
-        await _.Contents.UpdateAsync(content.Id, new TestEntityData
-        {
-            Number = 2
-        });
+        await _.Contents.UpdateAsync(
+            content.Id,
+            new TestEntityData
+            {
+                Number = 2
+            });
 
         var updated = await _.Contents.GetAsync(content.Id);
 
@@ -893,10 +992,12 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
     public async Task Should_upsert_content_in_parallel()
     {
         // STEP 1: Create a new item.
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Number = 2
-        }, ContentCreateOptions.AsPublish);
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                Number = 2
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 3: Make parallel upserts.
@@ -904,10 +1005,13 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         {
             try
             {
-                await _.Contents.UpsertAsync(content.Id, new TestEntityData
-                {
-                    Number = i
-                }, ct: ct);
+                await _.Contents.UpsertAsync(
+                    content.Id,
+                    new TestEntityData
+                    {
+                        Number = i
+                    },
+                    ct: ct);
             }
             catch (SquidexException ex) when (ex.StatusCode is 409 or 412)
             {
@@ -917,10 +1021,12 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
 
 
         // STEP 3: Make an normal update to ensure nothing is corrupt.
-        await _.Contents.UpdateAsync(content.Id, new TestEntityData
-        {
-            Number = 2
-        });
+        await _.Contents.UpdateAsync(
+            content.Id,
+            new TestEntityData
+            {
+                Number = 2
+            });
 
         var updated = await _.Contents.GetAsync(content.Id);
 
@@ -1118,92 +1224,94 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var prefix = Guid.NewGuid().ToString();
 
         // STEP 1: Create contents.
-        var result_0 = await _.Contents.BulkUpdateAsync(new BulkUpdate
-        {
-            Jobs =
-            [
-                new BulkUpdateJob
-                {
-                    Data = new Dictionary<string, object>
+        var result_0 = await _.Contents.BulkUpdateAsync(
+            new BulkUpdate
+            {
+                Jobs =
+                [
+                    new BulkUpdateJob
                     {
-                        [TestEntityData.StringField] = new
+                        Data = new Dictionary<string, object>
                         {
-                            iv = $"{prefix}_1"
-                        },
-                        [TestEntityData.NumberField] = new
-                        {
-                            iv = 1
+                            [TestEntityData.StringField] = new
+                            {
+                                iv = $"{prefix}_1"
+                            },
+                            [TestEntityData.NumberField] = new
+                            {
+                                iv = 1
+                            }
                         }
-                    }
-                },
-                new BulkUpdateJob
-                {
-                    Data = new Dictionary<string, object>
+                    },
+                    new BulkUpdateJob
                     {
-                        [TestEntityData.StringField] = new
+                        Data = new Dictionary<string, object>
                         {
-                            iv = $"{prefix}_2"
-                        },
-                        [TestEntityData.NumberField] = new
-                        {
-                            iv = 2
+                            [TestEntityData.StringField] = new
+                            {
+                                iv = $"{prefix}_2"
+                            },
+                            [TestEntityData.NumberField] = new
+                            {
+                                iv = 2
+                            }
                         }
-                    }
-                },
-            ],
-            Publish = true
-        });
+                    },
+                ],
+                Publish = true
+            });
 
         result_0 = result_0.OrderBy(x => x.JobIndex).ToList();
 
 
         // STEP 2: Update contents by filter.
-        var result_1 = await _.Contents.BulkUpdateAsync(new BulkUpdate
-        {
-            Jobs =
-            [
-                new BulkUpdateJob
-                {
-                    Query = new
+        var result_1 = await _.Contents.BulkUpdateAsync(
+            new BulkUpdate
+            {
+                Jobs =
+                [
+                    new BulkUpdateJob
                     {
-                        Filter = new
+                        Query = new
                         {
-                            path = $"data.{TestEntityData.StringField}.iv",
-                            op = "eq",
-                            value = $"{prefix}_1"
-                        }
+                            Filter = new
+                            {
+                                path = $"data.{TestEntityData.StringField}.iv",
+                                op = "eq",
+                                value = $"{prefix}_1"
+                            }
+                        },
+                        Data = new Dictionary<string, object>
+                        {
+                            [TestEntityData.StringField] = new
+                            {
+                                iv = $"{prefix}_1_x"
+                            }
+                        },
+                        Type = BulkUpdateType.Patch
                     },
-                    Data = new Dictionary<string, object>
+                    new BulkUpdateJob
                     {
-                        [TestEntityData.StringField] = new
+                        Query = new
                         {
-                            iv = $"{prefix}_1_x"
-                        }
-                    },
-                    Type = BulkUpdateType.Patch
-                },
-                new BulkUpdateJob
-                {
-                    Query = new
-                    {
-                        Filter = new
+                            Filter = new
+                            {
+                                path = $"data.{TestEntityData.StringField}.iv",
+                                op = "eq",
+                                value = $"{prefix}_2"
+                            }
+                        },
+                        Data = new Dictionary<string, object>
                         {
-                            path = $"data.{TestEntityData.StringField}.iv",
-                            op = "eq",
-                            value = $"{prefix}_2"
-                        }
+                            [TestEntityData.StringField] = new
+                            {
+                                iv = $"{prefix}_2_y"
+                            }
+                        },
+                        Type = BulkUpdateType.Patch
                     },
-                    Data = new Dictionary<string, object>
-                    {
-                        [TestEntityData.StringField] = new
-                        {
-                            iv = $"{prefix}_2_y"
-                        }
-                    },
-                    Type = BulkUpdateType.Patch
-                },
-            ]
-        });
+                ]
+            });
 
         result_1.OrderBy(x => x.JobIndex).Should().BeEquivalentTo(
         [
@@ -1221,10 +1329,11 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
 
 
         // STEP 2: Get contents.
-        var contents = await _.Contents.GetAsync(new ContentQuery
-        {
-            Ids = result_0.Select(x => x.ContentId).ToHashSet()
-        });
+        var contents = await _.Contents.GetAsync(
+            new ContentQuery
+            {
+                Ids = result_0.Select(x => x.ContentId).ToHashSet()
+            });
 
         var content0 = contents.Items.Find(x => x.Id == result_0[0].ContentId);
         var content1 = contents.Items.Find(x => x.Id == result_0[1].ContentId);
@@ -1237,10 +1346,12 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
     public async Task Should_prevent_update()
     {
         // STEP 1: Create a new item.
-        var content = await _.Contents.CreateAsync(new TestEntityData
-        {
-            Immutable = "v1"
-        }, ContentCreateOptions.AsPublish);
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                Immutable = "v1"
+            },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Update content, but do not change immutable.
@@ -1256,5 +1367,23 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
 
         Assert.Equal(400, ex.StatusCode);
         Assert.Contains("Validation error: immutable.iv: Field cannot be changed", ex.ToString());
+    }
+
+    [Fact]
+    public async Task Should_create_content_and_only_return_subset_of_fields()
+    {
+        // STEP 1: Create a new item.
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData
+            {
+                String = "Hello",
+                // No included in results.
+                Number = 42,
+            },
+            ContentCreateOptions.AsPublish,
+            QueryContext.Default.WithFields(TestEntityData.StringField));
+
+
+        Assert.Equal(0, content.Data.Number);
     }
 }

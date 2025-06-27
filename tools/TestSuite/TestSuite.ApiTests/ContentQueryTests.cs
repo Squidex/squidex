@@ -40,7 +40,35 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
 
         var items_0 = await _.Client.DynamicContents(_.SchemaName).GetAsync(context: context);
 
-        Assert.True(items_0.Items.TrueForAll(x => x.Data.Count == 1));
+        Assert.True(items_0.Items.TrueForAll(x => x.Data.Count == 1 && x.Data.ContainsKey(TestEntityData.StringField)));
+    }
+
+
+    [Fact]
+    public async Task Should_find_one()
+    {
+        var all = await _.Client.DynamicContents(_.SchemaName).GetAsync();
+
+        var content = await _.Client.DynamicContents(_.SchemaName).GetAsync(all.Items[0].Id);
+
+        Assert.NotNull(content);
+    }
+
+
+    [Fact]
+    public async Task Should_find_one_with_fields()
+    {
+        var all = await _.Client.DynamicContents(_.SchemaName).GetAsync();
+
+        var context =
+            QueryContext.Default
+                .WithFields($"data.{TestEntityData.StringField}");
+
+        var content = await _.Client.DynamicContents(_.SchemaName).GetAsync(all.Items[0].Id, context);
+
+        Assert.NotNull(content);
+        Assert.Single(content.Data);
+        Assert.Contains(TestEntityData.StringField, content.Data);
     }
 
     [Fact]
@@ -455,13 +483,15 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
         try
         {
             // STEP 1: Create a content item with a text that caused a bug before.
-            content = await _.Contents.CreateAsync(new TestEntityData
-            {
-                Json = new JObject
+            content = await _.Contents.CreateAsync(
+                new TestEntityData
                 {
-                    ["search.field.with.dot"] = 42
-                }
-            }, ContentCreateOptions.AsPublish);
+                    Json = new JObject
+                    {
+                        ["search.field.with.dot"] = 42
+                    }
+                },
+                ContentCreateOptions.AsPublish);
 
 
             // STEP 2: Get the item and ensure that the text is the same.
