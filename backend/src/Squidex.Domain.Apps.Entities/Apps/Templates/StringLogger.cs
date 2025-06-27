@@ -104,9 +104,7 @@ public sealed class StringLogger : ILogger, ILogLine
     private void AddToLine(string message)
     {
         startedLine += message;
-
         lines.Add(startedLine);
-
         startedLine = string.Empty;
     }
 

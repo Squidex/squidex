@@ -24,7 +24,7 @@
 }
 
 @mixin build-text-button($color) {
-    color: $color !important;
+    color: $color;
 
     &:disabled,
     &.disabled {
@@ -39,12 +39,9 @@
     }
 
     &:active,
+    &.active,
     &:hover {
-        color: color.adjust($color, $lightness: -15%);
-    }
-
-    &:active {
-        border-color: transparent !important;
+        color: color.adjust($color, $lightness: -25%);
     }
 }
 

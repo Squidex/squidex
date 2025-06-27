@@ -34,16 +34,16 @@ public sealed record WebhookFlowStep : FlowStep, IConvertibleToAction
     [LocalizedRequired]
     [Display(Name = "Url", Description = "The URL to the webhook.")]
     [Expression]
-    public Uri Url { get; set; }
+    public string Url { get; set; }
 
-    [Expression(ExpressionFallback.Envelope)]
     [Display(Name = "Payload (Optional)", Description = "Leave it empty to use the full event as body.")]
     [Editor(FlowStepEditor.TextArea)]
+    [Expression(ExpressionFallback.Envelope)]
     public string? Payload { get; set; }
 
-    [Expression]
     [Display(Name = "Headers (Optional)", Description = "The message headers in the format '[Key]=[Value]', one entry per line.")]
     [Editor(FlowStepEditor.TextArea)]
+    [Expression]
     public string? Headers { get; set; }
 
     [Display(Name = "Payload Type", Description = "The mime type of the payload.")]
