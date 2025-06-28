@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ApiUrlConfig, ControlErrorsComponent, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, ModalDialogComponent, TooltipDirective, TransformInputDirective, TranslatePipe } from '@app/framework';
+import { ApiUrlConfig, ControlErrorsComponent, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, MarkdownDirective, ModalDialogComponent, TooltipDirective, TransformInputDirective, TranslatePipe } from '@app/framework';
 import { AppsState, CreateAppDto, CreateAppForm, TemplateDto } from '@app/shared/internal';
 
 @Component({
@@ -24,6 +24,7 @@ import { AppsState, CreateAppDto, CreateAppForm, TemplateDto } from '@app/shared
         FormErrorComponent,
         FormHintComponent,
         FormsModule,
+        MarkdownDirective,
         ModalDialogComponent,
         ReactiveFormsModule,
         TooltipDirective,
@@ -38,6 +39,9 @@ export class AppFormComponent {
     @Input()
     public template?: TemplateDto;
 
+    @Input({ required: true })
+    public templates: TemplateDto[] = [];
+
     public createForm = new CreateAppForm();
 
     constructor(
@@ -48,6 +52,10 @@ export class AppFormComponent {
 
     public emitClose() {
         this.dialogClose.emit();
+    }
+
+    public selectTemplate(template?: TemplateDto) {
+        this.template = template;
     }
 
     public createApp() {

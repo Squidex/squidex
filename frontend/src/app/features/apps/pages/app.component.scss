@@ -5,10 +5,73 @@
     @include absolute(1rem, 1rem);
 }
 
-.card-body {
-    position: relative;
-}
+.card {
+    @include hover-visible('.deeplinks', inline);
 
-.card-title {
-    padding-right: 2rem;
+    &-title {
+        padding-right: 2rem;
+    }
+
+    &-body {
+        position: relative;
+    }
+
+    &-right {
+        overflow: hidden;
+    }
+
+    &-image {
+        text-align: center;
+
+        img {
+            height: 6rem;
+        }
+    }
+
+    &-text {
+        font-size: $font-small;
+
+        a {
+            text-decoration: none;
+
+            &:hover {
+                text-decoration: underline;
+            }
+        }
+    }
+
+    &-title {
+        @include truncate;
+        color: $color-title;
+        margin-bottom: 0;
+        margin-top: 0;
+    }
+
+    &-template {
+        .card-body {
+            min-height: 15.5rem;
+        }
+
+        .card-title {
+            margin-bottom: .75rem;
+            margin-top: 1rem;
+        }
+    }
+
+    &-href {
+        cursor: pointer;
+
+        &:active,
+        &:focus {
+            text-decoration: none;
+        }
+
+        &:focus {
+            outline: none;
+        }
+
+        &:hover {
+            @include box-shadow-outer(0, 3px, 16px, .2);
+        }
+    }
 }

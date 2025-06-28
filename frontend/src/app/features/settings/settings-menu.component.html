@@ -53,10 +53,6 @@
 
     <li class="nav-item nav-heading">{{ "common.more" | sqxTranslate }}</li>
 
-    <li class="nav-item" sqxTourStep="templates">
-        <a class="nav-link" routerLink="templates" routerLinkActive="active"> <i class="icon-download"></i> {{ "common.templates" | sqxTranslate }} </a>
-    </li>
-
     @if (app.canReadJobs) {
         <li class="nav-item" sqxTourStep="jobs">
             <a class="nav-link" routerLink="jobs" routerLinkActive="active"> <i class="icon-backups"></i> {{ "common.jobsBackups" | sqxTranslate }} </a>

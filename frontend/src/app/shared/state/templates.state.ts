@@ -27,6 +27,9 @@ export class TemplatesState extends State<Snapshot> {
     public templates =
         this.project(x => x.templates);
 
+    public starters =
+        this.project(x => x.templates.filter(x => x.isStarter));
+
     public isLoaded =
         this.project(x => x.isLoaded === true);
 

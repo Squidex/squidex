@@ -1,2 +1,31 @@
+@use 'sass:color';
 @import 'mixins';
 @import 'vars';
+
+.card-image {
+    width: 30%;
+}
+
+.card-title {
+    margin: .25rem 0;
+}
+
+.col-info {
+    background-color: color.adjust($color-background, $lightness: 2%);
+    border-radius: 0;
+    border-left: 1px solid $color-border;
+    padding: 1.5rem 2rem;
+    width: 18rem;
+}
+
+.col-left {
+    padding: 1.5rem 2rem;
+}
+
+.help {
+    ::ng-deep {
+        h1 {
+            display: none;
+        }
+    }
+}

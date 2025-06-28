@@ -1,5 +1,5 @@
 <form [formGroup]="createForm.form" (ngSubmit)="createApp()">
-    <sqx-modal-dialog (dialogClose)="emitClose()" tourId="appForm">
+    <sqx-modal-dialog (dialogClose)="emitClose()" flexBody="true" [size]="templates.length > 0 ? 'lg' : 'md'" tourId="appForm">
         <ng-container title>
             @if (template) {
                 {{ "apps.createWithTemplate" | sqxTranslate: { template: template.title } }}
@@ -8,18 +8,74 @@
             }
         </ng-container>
         <ng-container content>
-            <sqx-form-error [error]="createForm.error | async" />
-            <div class="form-group mt-2">
-                <label for="appName">
-                    {{ "common.name" | sqxTranslate }} <small class="hint">({{ "common.requiredHint" | sqxTranslate }})</small>
-                </label>
-                <sqx-control-errors for="name" />
-                <input class="form-control" id="name" autocomplete="off" formControlName="name" sqxFocusOnInit sqxTransformInput="LowerCase" />
-                <sqx-form-hint> {{ "apps.appNameHint" | sqxTranslate }} </sqx-form-hint>
-            </div>
+            <div class="row g-0">
+                <div class="col col-left">
+                    <div class="card-body">
+                        <sqx-form-error [error]="createForm.error | async" />
+                        <div class="form-group mt-2">
+                            <label for="appName">
+                                {{ "common.name" | sqxTranslate }} <small class="hint">({{ "common.requiredHint" | sqxTranslate }})</small>
+                            </label>
+                            <sqx-control-errors for="name" />
+                            <input class="form-control" id="name" autocomplete="off" formControlName="name" sqxFocusOnInit sqxTransformInput="LowerCase" />
+                            <sqx-form-hint> {{ "apps.appNameHint" | sqxTranslate }} </sqx-form-hint>
+                        </div>
 
-            <div class="form-group">
-                <sqx-form-alert marginBottom="0" marginTop="2"> {{ "apps.appNameWarning" | sqxTranslate }} </sqx-form-alert>
+                        <div class="form-group">
+                            <sqx-form-alert marginBottom="0" marginTop="2"> {{ "apps.appNameWarning" | sqxTranslate }} </sqx-form-alert>
+                        </div>
+
+                        @if (templates.length > 0) {
+                            <h4 class="mt-6">{{ "apps.selectAppTemplate" | sqxTranslate }}</h4>
+
+                            <div class="grid" style="--bs-gap: 0.5rem 0.5rem">
+                                <div
+                                    class="g-col-6 g-col-xl-4 card card-template card-href"
+                                    [class.border-primary]="!template"
+                                    (click)="selectTemplate()"
+                                    data-testid="new-app"
+                                    sqxTourStep="addApp">
+                                    <div class="card-body">
+                                        <div class="card-image"><img src="./images/add-app.svg" /></div>
+
+                                        <h5 class="card-title mt-3">{{ "apps.createBlankApp" | sqxTranslate }}</h5>
+                                        <sqx-form-hint> {{ "apps.createBlankAppDescription" | sqxTranslate }} </sqx-form-hint>
+                                    </div>
+                                </div>
+
+                                @for (availableTemplate of templates; track availableTemplate) {
+                                    <div
+                                        class="g-col-6 g-col-xl-4 card card-template card-href"
+                                        [class.border-primary]="availableTemplate === template"
+                                        (click)="selectTemplate(availableTemplate)">
+                                        <div class="card-body">
+                                            <div class="card-image">
+                                                @if (availableTemplate.logo) {
+                                                    <img [src]="availableTemplate.logo" />
+                                                } @else {
+                                                    <img src="./images/add-template.svg" />
+                                                }
+                                            </div>
+
+                                            <h5 class="card-title mt-3">{{ availableTemplate.title }}</h5>
+                                            <sqx-form-hint> {{ availableTemplate.description }} </sqx-form-hint>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        }
+                    </div>
+                </div>
+                @if (templates.length > 0) {
+                    <div class="col-info d-none d-lg-block">
+                        <sqx-form-hint> {{ "apps.appExplanation" | sqxTranslate }} </sqx-form-hint>
+
+                        @if (template) {
+                            <h4 class="mt-4">{{ "apps.template" | sqxTranslate }}</h4>
+                            <div class="help" inline="false" [sqxMarkdown]="template.details"></div>
+                        }
+                    </div>
+                }
             </div>
         </ng-container>
         <ng-container footer>

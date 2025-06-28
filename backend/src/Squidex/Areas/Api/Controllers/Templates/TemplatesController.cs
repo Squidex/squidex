@@ -22,14 +22,15 @@ public sealed class TemplatesController(ICommandBus commandBus, TemplatesClient 
     /// <summary>
     /// Get all templates.
     /// </summary>
+    /// <param name="includeDetails">Also include the details.</param>
     /// <response code="200">Templates returned.</response>
     [HttpGet]
     [Route("templates/")]
     [ProducesResponseType(typeof(TemplatesDto), StatusCodes.Status200OK)]
     [ApiPermission]
-    public async Task<IActionResult> GetTemplates()
+    public async Task<IActionResult> GetTemplates([FromQuery] bool includeDetails)
     {
-        var templates = await templatesClient.GetTemplatesAsync(HttpContext.RequestAborted);
+        var templates = await templatesClient.GetTemplatesAsync(includeDetails, HttpContext.RequestAborted);
 
         var response = TemplatesDto.FromDomain(templates, Resources);
 

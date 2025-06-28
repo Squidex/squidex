@@ -29,9 +29,19 @@ public sealed class TemplateDto : Resource
     public string Description { get; set; }
 
     /// <summary>
+    /// The details of the template.
+    /// </summary>
+    public string Details { get; set; }
+
+    /// <summary>
     /// True, if the template is a starter.
     /// </summary>
     public bool IsStarter { get; set; }
+
+    /// <summary>
+    /// The optional logo.
+    /// </summary>
+    public string? Logo { get; set; }
 
     public static TemplateDto FromDomain(Template template, Resources resources)
     {

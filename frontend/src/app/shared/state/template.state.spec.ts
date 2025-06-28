@@ -7,7 +7,7 @@
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { DialogService, TemplatesDto, TemplatesService, TemplatesState } from '@app/shared/internal';
+import { DialogService, TemplateDto, TemplatesDto, TemplatesService, TemplatesState } from '@app/shared/internal';
 import { createTemplate } from '../services/templates.service.spec';
 
 describe('TemplatesState', () => {
@@ -41,6 +41,20 @@ describe('TemplatesState', () => {
             expect(templatesState.snapshot.isLoading).toBeFalsy();
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
+        });
+
+        it('should provide starters', () => {
+            templatesService.setup(x => x.getTemplates())
+                .returns(() => of(new TemplatesDto({ items: [template1, template2], _links: {} }))).verifiable();
+
+            templatesState.load().subscribe();
+
+            let starters: TemplateDto[] = [];
+            templatesState.starters.subscribe(x => {
+                starters = x;
+            });
+
+            expect(starters).toEqual([template2]);
         });
 
         it('should reset loading state if loading failed', () => {

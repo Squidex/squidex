@@ -1,10 +1,10 @@
 <div class="card card-href card-app" [routerLink]="['/app', app.name]">
     <div class="card-body" sqxTourStep="app">
-        <div class="row g-0">
+        <div class="row g-4">
             <div class="col-auto card-left"><sqx-avatar [identifier]="app.name" [image]="app.image" /></div>
 
             <div class="col card-right">
-                <h3 class="card-title">{{ app.displayName }}</h3>
+                <h3 class="card-title mb-1">{{ app.displayName }}</h3>
 
                 <div class="card-text card-links truncate">
                     <a [routerLink]="['/app', app.name]" sqxStopClick>{{ "common.edit" | sqxTranslate }}</a>

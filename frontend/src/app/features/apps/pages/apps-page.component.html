@@ -1,67 +1,65 @@
 <sqx-title message="i18n:apps.listPageTitle" />
-@if (authState.userChanges | async; as user) {
-    <div class="panel-container page">
-        <div class="apps-section">
-            <h1 class="apps-title">{{ "apps.welcomeTitle" | sqxTranslate: { user: user.displayName } }}</h1>
 
-            <div class="subtext">{{ "apps.welcomeSubtitle" | sqxTranslate }}</div>
+@if (authState.userChanges | async; as user) {
+    <div class="panel-container page flex-grow d-flex flex-grow flex-column justify-content-between" style="flex-grow: 1">
+        <div class="apps">
+            <div class="apps-section">
+                <div class="row align-items-center">
+                    <div class="col">
+                        <h1 class="apps-title">{{ "apps.welcomeTitle" | sqxTranslate: { user: user.displayName } }}</h1>
+
+                        <div class="subtext">{{ "apps.welcomeSubtitle" | sqxTranslate }}</div>
+                    </div>
+
+                    @if ((uiState.settings | async)?.canCreateApps) {
+                        <div class="col-auto">
+                            <button class="btn btn-block btn-success" (click)="addAppDialog.show()" type="button">
+                                <i class="icon-plus"></i> {{ "apps.appsButtonCreate" | sqxTranslate }}
+                            </button>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            @if (groupedApps | async; as groups) {
+                <div class="apps-section" sqxTourStep="allApps">
+                    @for (group of groups; track trackByGroup($index, group)) {
+                        <div class="team">
+                            @if (group.team) {
+                                <div class="team-header"><sqx-team (leave)="leaveTeam($event)" [team]="group.team" /></div>
+                            }
+
+                            <div class="team-body row g-2" [class.padded]="group.team">
+                                @for (app of group.apps; track app.id) {
+                                    <div class="col-12 col-md-6 col-lg-4">
+                                        <sqx-app [app]="app" (leave)="leaveApp($event)" />
+                                    </div>
+                                } @empty {
+                                    <small class="team-empty"> {{ "teams.empty" | sqxTranslate }} </small>
+                                }
+                            </div>
+                        </div>
+                    } @empty {
+                        <div class="empty">
+                            <h3 class="empty-headline">{{ "apps.empty" | sqxTranslate }}</h3>
+                        </div>
+                    }
+                </div>
+            }
         </div>
 
-        @if (groupedApps | async; as groups) {
-            <div class="apps-section" sqxTourStep="allApps">
-                @for (group of groups; track trackByGroup($index, group)) {
-                    <div class="team">
-                        @if (group.team) {
-                            <div class="team-header"><sqx-team (leave)="leaveTeam($event)" [team]="group.team" /></div>
-                        }
-
-                        <div class="team-body" [class.padded]="group.team">
-                            @for (app of group.apps; track app.id) {
-                                <sqx-app [app]="app" (leave)="leaveApp($event)" />
-                            } @empty {
-                                <small class="team-empty"> {{ "teams.empty" | sqxTranslate }} </small>
-                            }
-                        </div>
-                    </div>
-                } @empty {
-                    <div class="empty">
-                        <h3 class="empty-headline">{{ "apps.empty" | sqxTranslate }}</h3>
-                    </div>
-                }
-            </div>
-        }
-
-        @if ((uiState.settings | async)?.canCreateApps) {
+        @if (generalInfo) {
             <div class="apps-section">
-                <div class="card card-template card-href" (click)="createNewApp()" data-testid="new-app" sqxTourStep="addApp">
-                    <div class="card-body">
-                        <div class="card-image"><img src="./images/add-app.svg" /></div>
-
-                        <h3 class="card-title">{{ "apps.createBlankApp" | sqxTranslate }}</h3>
-                        <sqx-form-hint> {{ "apps.createBlankAppDescription" | sqxTranslate }} </sqx-form-hint>
-                    </div>
-                </div>
-
-                @for (template of templates | async; track template) {
-                    <div class="card card-template card-href" (click)="createNewApp(template)">
-                        <div class="card-body">
-                            <div class="card-image"><img src="./images/add-template.svg" /></div>
-
-                            <h3 class="card-title">{{ template.title }}</h3>
-                            <sqx-form-hint> {{ template.description }} </sqx-form-hint>
-                        </div>
-                    </div>
-                }
-            </div>
-        }
-
-        @if (info) {
-            <div class="apps-section">
-                <small class="info">{{ info }}</small>
+                <small class="info">{{ generalInfo }}</small>
             </div>
         }
     </div>
 }
-<sqx-app-form (dialogClose)="addAppDialog.hide()" *sqxModal="addAppDialog" [template]="addAppTemplate" />
+
 <sqx-onboarding-dialog (dialogClose)="onboardingDialog.hide()" *sqxModal="onboardingDialog" />
+
+@if (starters | async; as templates) {
+    <sqx-app-form (dialogClose)="addAppDialog.hide()" *sqxModal="addAppDialog" [template]="addAppTemplate" [templates]="templates" />
+}
+
 <sqx-news-dialog (dialogClose)="newsDialog.hide()" [features]="newsFeatures!" *sqxModal="newsDialog" />
