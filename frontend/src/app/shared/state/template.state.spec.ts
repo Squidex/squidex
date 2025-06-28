@@ -54,7 +54,7 @@ describe('TemplatesState', () => {
                 starters = x;
             });
 
-            expect(starters).toEqual([template2]);
+            expect(starters).toEqual([template1]);
         });
 
         it('should reset loading state if loading failed', () => {

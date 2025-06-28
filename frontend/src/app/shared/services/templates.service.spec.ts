@@ -88,6 +88,7 @@ describe('TemplatesService', () => {
             return {
                 name: `name${key}`,
                 title: `Title ${key}`,
+                details: '',
                 description: `Description ${key}`,
                 isStarter: id % 2 === 0,
                 _links: {
@@ -114,8 +115,8 @@ export function createTemplate(id: number, suffix = '') {
     return new TemplateDto({
         name: `name${key}`,
         title: `Title ${key}`,
-        description: `Description ${key}`,
         details: '',
+        description: `Description ${key}`,
         isStarter: id % 2 === 0,
         _links: {
             self: new ResourceLinkDto({ method: 'GET', href: `/templates/name${key}` }),
