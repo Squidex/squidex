@@ -43,13 +43,13 @@
 
     // Small triangle under the error tooltip with the border trick.
     &::after {
-        @include absolute(null, null, -.75rem, .625rem);
-        @include caret-bottom($color-theme-error, .4rem);
+        @include absolute(null, null, -.5rem, .25rem);
+        @include caret-bottom($color-theme-error, .3rem);
     }
 
     // The tooltip rectangle itself.
     & {
-        @include absolute(null, null, .4rem, 0);
+        @include absolute(null, null, .2rem, 0);
         background: $color-theme-error;
         border: 0;
         border-radius: .5 * $border-radius;
@@ -243,11 +243,16 @@
     & ~ .hidden {
         margin-bottom: 0;
     }
+
+    & label {
+        margin-bottom: .125rem;;
+    }
 }
 
 .col-form-label {
     font-size: 90%;
 }
+
 label {
     & {
         font-size: 90%;

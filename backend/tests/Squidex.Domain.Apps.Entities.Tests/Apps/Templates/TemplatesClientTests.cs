@@ -45,7 +45,7 @@ public class TemplatesClientTests
         var templates = await sut.GetTemplatesAsync();
 
         Assert.NotEmpty(templates);
-        Assert.Contains(templates, x => x.IsStarter);
+        Assert.Contains(templates, x => x.IsStarter && !string.IsNullOrWhiteSpace(x.Logo));
     }
 
     [Fact]

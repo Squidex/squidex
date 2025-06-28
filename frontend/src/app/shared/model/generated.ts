@@ -1005,8 +1005,12 @@ export class TemplateDto extends ResourceDto implements ITemplateDto {
     readonly title!: string;
     /** The description of the template. */
     readonly description!: string;
+    /** The details of the template. */
+    readonly details!: string;
     /** True, if the template is a starter. */
     readonly isStarter!: boolean;
+    /** The optional logo. */
+    readonly logo?: string | undefined;
 
     constructor(data?: ITemplateDto) {
         super(data);
@@ -1017,7 +1021,9 @@ export class TemplateDto extends ResourceDto implements ITemplateDto {
         (<any>this).name = _data["name"];
         (<any>this).title = _data["title"];
         (<any>this).description = _data["description"];
+        (<any>this).details = _data["details"];
         (<any>this).isStarter = _data["isStarter"];
+        (<any>this).logo = _data["logo"];
         this.cleanup(this);
         return this;
     }
@@ -1033,7 +1039,9 @@ export class TemplateDto extends ResourceDto implements ITemplateDto {
         data["name"] = this.name;
         data["title"] = this.title;
         data["description"] = this.description;
+        data["details"] = this.details;
         data["isStarter"] = this.isStarter;
+        data["logo"] = this.logo;
         super.toJSON(data);
         this.cleanup(data);
         return data;
@@ -1047,8 +1055,12 @@ export interface ITemplateDto extends IResourceDto {
     readonly title: string;
     /** The description of the template. */
     readonly description: string;
+    /** The details of the template. */
+    readonly details: string;
     /** True, if the template is a starter. */
     readonly isStarter: boolean;
+    /** The optional logo. */
+    readonly logo?: string | undefined;
 }
 
 export class TemplateDetailsDto extends ResourceDto implements ITemplateDetailsDto {

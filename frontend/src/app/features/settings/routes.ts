@@ -16,7 +16,6 @@ import { MorePageComponent } from './pages/more/more-page.component';
 import { PlansPageComponent } from './pages/plans/plans-page.component';
 import { RolesPageComponent } from './pages/roles/roles-page.component';
 import { SettingsPageComponent } from './pages/settings/settings-page.component';
-import { TemplatesPageComponent } from './pages/templates/templates-page.component';
 import { WorkflowsPageComponent } from './pages/workflows/workflows-page.component';
 import { SettingsAreaComponent } from './settings-area.component';
 
@@ -138,19 +137,6 @@ export const SETTINGS_ROUTES: Routes = [
                         component: HelpComponent,
                         data: {
                             helpPage: '05-integrated/settings',
-                        },
-                    },
-                ],
-            },
-            {
-                path: 'templates',
-                component: TemplatesPageComponent,
-                children: [
-                    {
-                        path: 'help',
-                        component: HelpComponent,
-                        data: {
-                            helpPage: '05-integrated/templates',
                         },
                     },
                 ],

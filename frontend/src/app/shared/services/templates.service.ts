@@ -23,7 +23,7 @@ export class TemplatesService {
     }
 
     public getTemplates(): Observable<TemplatesDto> {
-        const url = this.apiUrl.buildUrl('api/templates');
+        const url = this.apiUrl.buildUrl('api/templates?includeDetails=true');
 
         return this.http.get<any>(url).pipe(
             map(body => {

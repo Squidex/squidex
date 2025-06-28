@@ -92,5 +92,9 @@
         </nav>
     }
 </ul>
-<sqx-app-form (dialogClose)="addAppDialog.hide()" *sqxModal="addAppDialog" />
+
+@if (starters | async; as templates) {
+    <sqx-app-form (dialogClose)="addAppDialog.hide()" *sqxModal="addAppDialog" [templates]="templates" />
+}
+
 <sqx-team-form (dialogClose)="addTeamDialog.hide()" *sqxModal="addTeamDialog" />

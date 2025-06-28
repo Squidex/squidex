@@ -36,7 +36,7 @@ describe('TemplatesService', () => {
                 templates = result;
             });
 
-            const req = httpMock.expectOne('http://service/p/api/templates');
+            const req = httpMock.expectOne('http://service/p/api/templates?includeDetails=true');
 
             expect(req.request.method).toEqual('GET');
             expect(req.request.headers.get('If-Match')).toBeNull();
@@ -88,6 +88,7 @@ describe('TemplatesService', () => {
             return {
                 name: `name${key}`,
                 title: `Title ${key}`,
+                details: '',
                 description: `Description ${key}`,
                 isStarter: id % 2 === 0,
                 _links: {
@@ -114,6 +115,7 @@ export function createTemplate(id: number, suffix = '') {
     return new TemplateDto({
         name: `name${key}`,
         title: `Title ${key}`,
+        details: '',
         description: `Description ${key}`,
         isStarter: id % 2 === 0,
         _links: {

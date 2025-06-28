@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { combineLatest } from 'rxjs';
 import { map, take } from 'rxjs/operators';
-import { AppDto, AppFormComponent, AppsState, AuthService, DialogModel, FeatureDto, FormHintComponent, LocalStoreService, ModalDirective, NewsService, Settings, TeamDto, TeamsState, TemplateDto, TemplatesState, TitleComponent, TourState, TourStepDirective, TranslatePipe, UIOptions, UIState } from '@app/shared';
+import { AppDto, AppFormComponent, AppsState, AuthService, DialogModel, FeatureDto, LocalStoreService, ModalDirective, NewsService, Settings, TeamDto, TeamsState, TemplateDto, TemplatesState, TitleComponent, TourState, TourStepDirective, TranslatePipe, UIOptions, UIState } from '@app/shared';
 import { AppComponent } from './app.component';
 import { NewsDialogComponent } from './news-dialog.component';
 import { OnboardingDialogComponent } from './onboarding-dialog.component';
@@ -25,7 +25,6 @@ type GroupedApps = { team?: TeamDto; apps: AppDto[] };
         AppComponent,
         AppFormComponent,
         AsyncPipe,
-        FormHintComponent,
         ModalDirective,
         NewsDialogComponent,
         OnboardingDialogComponent,
@@ -44,11 +43,9 @@ export class AppsPageComponent implements OnInit {
     public newsFeatures?: ReadonlyArray<FeatureDto>;
     public newsDialog = new DialogModel();
 
-    public info = '';
+    public generalInfo = '';
 
-    public templates =
-        this.templatesState.templates.pipe(
-            map(x => x.filter(t => t.isStarter)));
+    public starters = this.templatesState.starters;
 
     public groupedApps =
         combineLatest([
@@ -86,7 +83,7 @@ export class AppsPageComponent implements OnInit {
         private readonly uiOptions: UIOptions,
     ) {
         if (uiOptions.value.showInfo) {
-            this.info = uiOptions.value.info;
+            this.generalInfo = uiOptions.value.info;
         }
     }
 
