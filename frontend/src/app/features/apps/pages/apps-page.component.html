@@ -13,7 +13,7 @@
 
                     @if ((uiState.settings | async)?.canCreateApps) {
                         <div class="col-auto">
-                            <button class="btn btn-block btn-success" (click)="addAppDialog.show()" type="button">
+                            <button class="btn btn-block btn-success" (click)="addAppDialog.show()" data-testid="new-app" sqxTourStep="addApp" type="button">
                                 <i class="icon-plus"></i> {{ "apps.appsButtonCreate" | sqxTranslate }}
                             </button>
                         </div>
