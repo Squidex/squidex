@@ -18,7 +18,7 @@
         "test-file-path": "backend/tests/Squidex.Domain.Apps.Entities.Tests/Apps/DefaultAppLogStoreTests.cs"
       }
     ],
-    "test-command": "cd backend && dotnet test --filter \"Category!=Dependencies & Category!=TestContainer\" --configuration Release --collect:\"XPlat Code Coverage\" --settings coverlet.runsettings.xml --results-directory TestResults --logger trx",
+    "test-command": "cd backend && dotnet test --filter 'Category!=Dependencies & Category!=TestContainer' --configuration Release --collect:'XPlat Code Coverage' --settings coverlet.runsettings.xml --results-directory TestResults --logger trx",
     "coverage-type": "cobertura",
     "code-coverage-report-path": "backend/TestResults/*/coverage.cobertura.xml",
     "desired-coverage": 80,
