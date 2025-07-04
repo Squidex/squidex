@@ -262,7 +262,7 @@ public sealed class RulesController(
     /// <response code="400">Rule trigger not valid.</response>
     /// <response code="404">Rule or app not found.</response>
     [HttpPost]
-    [Route("apps/{app}/rules/validate/trigger/")]
+    [Route("apps/{app}/rules/validate/trigger/", Order = -1)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ApiPermission]
     [ApiCosts(0)]
@@ -286,7 +286,7 @@ public sealed class RulesController(
     /// <response code="400">Rule step not valid.</response>
     /// <response code="404">Rule or app not found.</response>
     [HttpPost]
-    [Route("apps/{app}/rules/validate/step/")]
+    [Route("apps/{app}/rules/validate/step/", Order = -1)]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ApiPermission]
     [ApiCosts(0)]

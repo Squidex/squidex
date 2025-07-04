@@ -22,6 +22,7 @@ using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Json;
 using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates;
@@ -30,6 +31,7 @@ public sealed class TemplateCommandMiddleware(
     TemplatesClient templatesClient,
     IOptions<TemplatesOptions> templateOptions,
     IUrlGenerator urlGenerator,
+    IJsonSerializer jsonSerializer,
     ISemanticLog log)
     : ICommandMiddleware
 {
@@ -63,7 +65,7 @@ public sealed class TemplateCommandMiddleware(
             return;
         }
 
-        using (var cliLog = new StringLogger())
+        using (var cliLog = new StringLogger(jsonSerializer))
         {
             try
             {

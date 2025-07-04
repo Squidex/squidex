@@ -191,9 +191,13 @@ public sealed class JintScriptEngine(IMemoryCache cache, IOptions<JintScriptOpti
         {
             case ArgumentException:
                 return BuildException("common.jsParseError", inner.Message);
+            case ParseErrorException:
+                return BuildException("common.jsError", inner.Message);
+            case ScriptPreparationException:
+                return BuildException("common.jsError", inner.Message);
             case JavaScriptException:
                 return BuildException("common.jsError", inner.Message);
-            case ParseErrorException:
+            case JintException:
                 return BuildException("common.jsError", inner.Message);
             case DomainException:
                 return inner;
