@@ -18,16 +18,15 @@
     </ng-container>
 
     <ng-container details>
-        @if (state) {
-            <ul class="nav nav-tabs2 mt-2">
-                @if (stepInfo.properties.length > 0) {
-                    <li class="nav-item">
-                        <a class="nav-link" [class.active]="attemptIndex === -1" (click)="selectAttempt(-1)">
-                            {{ "common.properties" | sqxTranslate }}
-                        </a>
-                    </li>
-                }
-
+        <ul class="nav nav-tabs2 mt-2">
+            @if (stepInfo.properties.length > 0) {
+                <li class="nav-item">
+                    <a class="nav-link" [class.active]="attemptIndex === -1" (click)="selectAttempt(-1)">
+                        {{ "common.properties" | sqxTranslate }}
+                    </a>
+                </li>
+            }
+            @if (state) {
                 @for (attempt of state.attempts; let i = $index; track i) {
                     <li class="nav-item">
                         <a class="nav-link" [class.active]="attemptIndex === i" (click)="selectAttempt(i)">
@@ -38,17 +37,17 @@
                         </a>
                     </li>
                 }
-            </ul>
-
-            @if (attemptIndex === -1) {
-                <div class="details">
-                    @for (property of stepInfo.properties; track property.name) {
-                        <sqx-state-step-property [property]="property" [value]="$any(stepDefinition)[property.name]" />
-                    }
-                </div>
-            } @else if (state.attempts[attemptIndex]) {
-                <div class="details"><sqx-state-attempt [attempt]="state.attempts[attemptIndex]" /></div>
             }
+        </ul>
+
+        @if (attemptIndex === -1) {
+            <div class="details">
+                @for (property of stepInfo.properties; track property.name) {
+                    <sqx-state-step-property [property]="property" [value]="$any(stepDefinition)[property.name]" />
+                }
+            </div>
+        } @else if (state && state.attempts[attemptIndex]) {
+            <div class="details"><sqx-state-attempt [attempt]="state.attempts[attemptIndex]" /></div>
         }
     </ng-container>
 </sqx-history-step>

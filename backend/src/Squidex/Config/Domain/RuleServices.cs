@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Jint;
 using Migrations.OldTriggers;
 using Squidex.Domain.Apps.Core.HandleRules;
 using Squidex.Domain.Apps.Core.HandleRules.Extensions;
@@ -118,6 +119,7 @@ public static class RuleServices
             .As<IFlowExecutionCallback<FlowEventContext>>();
 
         services.AddFlows<FlowEventContext>(config);
+
         services.AddCronJobs<CronJobContext>(config, m =>
         {
             m.UpdateInterval = TimeSpan.FromSeconds(1);
