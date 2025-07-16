@@ -30,7 +30,7 @@
 
                             <div class="grid" style="--bs-gap: 0.5rem 0.5rem">
                                 <div
-                                    class="g-col-6 g-col-xl-4 card card-template card-href"
+                                    class="g-col-6 card card-template card-href"
                                     [class.border-primary]="!template"
                                     (click)="selectTemplate()"
                                     data-testid="new-app"
@@ -45,7 +45,7 @@
 
                                 @for (availableTemplate of templates; track availableTemplate) {
                                     <div
-                                        class="g-col-6 g-col-xl-4 card card-template card-href"
+                                        class="g-col-6 card card-template card-href"
                                         [class.border-primary]="availableTemplate === template"
                                         (click)="selectTemplate(availableTemplate)">
                                         <div class="card-body">
