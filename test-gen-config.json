@@ -21,6 +21,6 @@
     "code-coverage-report-path": "backend/TestResults/*/coverage.cobertura.xml",
     "desired-coverage": 80,
     "max-iterations": 1,
-    "max-number-of-test-cases": 8
+    "max-number-of-test-cases": 6
   }
 }
