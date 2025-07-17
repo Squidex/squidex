@@ -4,9 +4,9 @@ WORKDIR /app
 
 # Copy solution and project files for backend
 COPY backend/*.sln ./backend/
-COPY backend/src/*/*.csproj ./backend/src/*/
-COPY backend/tests/*/*.csproj ./backend/tests/*/
-COPY backend/extensions/*/*.csproj ./backend/extensions/*/
+COPY backend/src/ ./backend/src/
+COPY backend/tests/ ./backend/tests/
+COPY backend/extensions/ ./backend/extensions/
 
 # Restore dependencies for backend only
 RUN cd backend && dotnet restore
