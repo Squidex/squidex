@@ -13,6 +13,7 @@ using Squidex.Domain.Apps.Core.GenerateFilters;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities;
+using Squidex.Domain.Apps.Entities.Apps.Templates;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Schemas.Commands;
 using Squidex.Infrastructure;
@@ -31,6 +32,7 @@ public sealed class SchemasController(
     ICommandBus commandBus,
     IContentWorkflow workflow,
     IAppProvider appProvider,
+    SchemaAIGenerator schemaAIGenerator,
     ScriptingCompleter scriptingCompleter)
     : ApiController(commandBus)
 {
@@ -103,6 +105,34 @@ public sealed class SchemasController(
         var response = await InvokeCommandAsync(command);
 
         return CreatedAtAction(nameof(GetSchema), new { app, schema = request.Name }, response);
+    }
+
+    /// <summary>
+    /// Generate a new schema.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <param name="request">The schema object that needs to be added to the app.</param>
+    /// <response code="201">Schema created.</response>
+    /// <response code="400">Schema request not valid.</response>
+    /// <response code="409">Schema name already in use.</response>
+    [HttpPost]
+    [Route("apps/{app}/schemas/generate")]
+    [ProducesResponseType(typeof(GenerateSchemaResponseDto), StatusCodes.Status201Created)]
+    [ApiPermissionOrAnonymous(PermissionIds.AppSchemasCreate)]
+    [ApiCosts(1)]
+    public async Task<IActionResult> PostSchemaGenerate(string app, [FromBody] GenerateSchemaDto request)
+    {
+        var result =
+            await schemaAIGenerator.ExecuteAsync(
+                App,
+                request.Prompt,
+                request.NumberOfContentItems,
+                request.Execute,
+                HttpContext.RequestAborted);
+
+        var response = GenerateSchemaResponseDto.FromDomain(result);
+
+        return Ok(response);
     }
 
     /// <summary>

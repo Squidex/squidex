@@ -27,7 +27,7 @@ public class SubscriptionPublisherTests
 
     public SubscriptionPublisherTests()
     {
-        sut = new SubscriptionPublisher(subscriptionService, Enumerable.Empty<ISubscriptionEventCreator>());
+        sut = new SubscriptionPublisher(subscriptionService, []);
     }
 
     [Fact]

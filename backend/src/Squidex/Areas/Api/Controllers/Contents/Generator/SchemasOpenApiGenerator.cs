@@ -59,8 +59,8 @@ public sealed class SchemasOpenApiGenerator(
 
         var context =
             new DocumentProcessorContext(document,
-                Enumerable.Empty<Type>(),
-                Enumerable.Empty<Type>(),
+                [],
+                [],
                 schemaResolver,
                 openApiGenerator,
                 openApiSettings);

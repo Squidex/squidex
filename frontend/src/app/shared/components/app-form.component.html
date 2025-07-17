@@ -16,7 +16,7 @@
                             <label for="appName">
                                 {{ "common.name" | sqxTranslate }} <small class="hint">({{ "common.requiredHint" | sqxTranslate }})</small>
                             </label>
-                            <sqx-control-errors for="name" />
+                            <sqx-control-errors for="name" [submitCount]="createForm.submitCount | async" />
                             <input class="form-control" id="name" autocomplete="off" formControlName="name" sqxFocusOnInit sqxTransformInput="LowerCase" />
                             <sqx-form-hint> {{ "apps.appNameHint" | sqxTranslate }} </sqx-form-hint>
                         </div>
@@ -30,35 +30,45 @@
 
                             <div class="grid" style="--bs-gap: 0.5rem 0.5rem">
                                 <div
-                                    class="g-col-6 g-col-xl-4 card card-template card-href"
+                                    class="g-col-12 g-col-md-6 card card-template card-href"
                                     [class.border-primary]="!template"
                                     (click)="selectTemplate()"
                                     data-testid="new-app"
                                     sqxTourStep="addApp">
                                     <div class="card-body">
-                                        <div class="card-image"><img src="./images/add-app.svg" /></div>
-
-                                        <h5 class="card-title mt-3">{{ "apps.createBlankApp" | sqxTranslate }}</h5>
-                                        <sqx-form-hint> {{ "apps.createBlankAppDescription" | sqxTranslate }} </sqx-form-hint>
+                                        <div class="row">
+                                            <div class="col-auto col-md-12">
+                                                <div class="card-image"><img src="./images/add-app.svg" /></div>
+                                            </div>
+                                            <div class="col">
+                                                <h5 class="card-title mt-md-3">{{ "apps.createBlankApp" | sqxTranslate }}</h5>
+                                                <sqx-form-hint> {{ "apps.createBlankAppDescription" | sqxTranslate }} </sqx-form-hint>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
 
                                 @for (availableTemplate of templates; track availableTemplate) {
                                     <div
-                                        class="g-col-6 g-col-xl-4 card card-template card-href"
+                                        class="g-col-12 g-col-md-6 card card-template card-href"
                                         [class.border-primary]="availableTemplate === template"
                                         (click)="selectTemplate(availableTemplate)">
                                         <div class="card-body">
-                                            <div class="card-image">
-                                                @if (availableTemplate.logo) {
-                                                    <img [src]="availableTemplate.logo" />
-                                                } @else {
-                                                    <img src="./images/add-template.svg" />
-                                                }
+                                            <div class="row">
+                                                <div class="col-auto col-md-12">
+                                                    <div class="card-image">
+                                                        @if (availableTemplate.logo) {
+                                                            <img [src]="availableTemplate.logo" />
+                                                        } @else {
+                                                            <img src="./images/add-template.svg" />
+                                                        }
+                                                    </div>
+                                                </div>
+                                                <div class="col">
+                                                    <h5 class="card-title mt-md-3">{{ availableTemplate.title }}</h5>
+                                                    <sqx-form-hint> {{ availableTemplate.description }} </sqx-form-hint>
+                                                </div>
                                             </div>
-
-                                            <h5 class="card-title mt-3">{{ availableTemplate.title }}</h5>
-                                            <sqx-form-hint> {{ availableTemplate.description }} </sqx-form-hint>
                                         </div>
                                     </div>
                                 }

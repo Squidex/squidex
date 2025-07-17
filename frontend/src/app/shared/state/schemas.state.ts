@@ -360,6 +360,14 @@ export class SchemasState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
+    public add(schema: SchemaDto) {
+        this.next(s => {
+            const schemas = [...s.schemas, schema].sortByString(x => x.displayName);
+
+            return { ...s, schemas };
+        }, 'Created');
+    }
+
     private replaceSchema(schema: SchemaDto, oldVersion?: Version, updateText?: string) {
         if (!oldVersion || oldVersion !== schema.version) {
             if (updateText) {

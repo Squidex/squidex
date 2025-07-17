@@ -105,7 +105,7 @@ public sealed class ContentValidator
         return new ObjectValidator<ContentFieldData>(fieldValidators, isPartial, "field");
     }
 
-    private IValidator CreateFieldValidator(IRootField field, bool isPartial)
+    private IValidator CreateFieldValidator(RootField field, bool isPartial)
     {
         var valueValidator = CreateValueValidator(field);
 

@@ -37,6 +37,9 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
     public for!: string | AbstractControl;
 
     @Input()
+    public submitCount: null | number | undefined;
+
+    @Input()
     public fieldName: string | null | undefined;
 
     public get isTouched() {
@@ -100,7 +103,10 @@ export class ControlErrorsComponent extends StatefulComponent<State> implements 
     private createMessages() {
         const errorMessages: string[] = [];
 
-        if (this.control && this.control.invalid && this.isTouched && this.control.errors) {
+        const submitCount = this.submitCount;
+        const submitted = !Types.isNumber(submitCount) || submitCount > 0;
+
+        if (this.control && this.control.invalid && this.isTouched && this.control.errors && submitted) {
             for (const [key, error] of Object.entries(this.control.errors)) {
                 const message = formatError(this.localizer, this.controlDisplayName, key, error, this.control.value);
 

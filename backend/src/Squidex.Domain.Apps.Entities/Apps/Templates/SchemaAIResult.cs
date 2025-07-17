@@ -5,11 +5,10 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Infrastructure.Collections;
 
-public sealed class SchemasOptions
-{
-    public bool DeletePermanent { get; set; }
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
-    public string? GeneratePrompt { get; set; }
-}
+namespace Squidex.Domain.Apps.Entities.Apps.Templates;
+
+public sealed record SchemaAIResult(ReadonlyList<string> Log, string? SchemaName);

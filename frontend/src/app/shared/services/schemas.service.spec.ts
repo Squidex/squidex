@@ -8,7 +8,7 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { AddFieldDto, ApiUrlConfig, ArrayFieldPropertiesDto, AssetsFieldPropertiesDto, BooleanFieldPropertiesDto, ChangeCategoryDto, ComponentFieldPropertiesDto, ComponentsFieldPropertiesDto, ConfigureFieldRulesDto, ConfigureUIFieldsDto, createProperties, CreateSchemaDto, DateTime, DateTimeFieldPropertiesDto, FieldDto, FieldRuleDto, GeolocationFieldPropertiesDto, JsonFieldPropertiesDto, NestedFieldDto, NumberFieldPropertiesDto, ReferencesFieldPropertiesDto, Resource, ResourceLinkDto, SchemaDto, SchemaPropertiesDto, SchemaScriptsDto, SchemasDto, SchemasService, ScriptCompletions, StringFieldPropertiesDto, SynchronizeSchemaDto, TagsFieldPropertiesDto, UpdateFieldDto, UpdateSchemaDto, VersionTag } from '@app/shared/internal';
+import { AddFieldDto, ApiUrlConfig, ArrayFieldPropertiesDto, AssetsFieldPropertiesDto, BooleanFieldPropertiesDto, ChangeCategoryDto, ComponentFieldPropertiesDto, ComponentsFieldPropertiesDto, ConfigureFieldRulesDto, ConfigureUIFieldsDto, createProperties, CreateSchemaDto, DateTime, DateTimeFieldPropertiesDto, FieldDto, FieldRuleDto, GenerateSchemaDto, GenerateSchemaResponseDto, GeolocationFieldPropertiesDto, JsonFieldPropertiesDto, NestedFieldDto, NumberFieldPropertiesDto, ReferencesFieldPropertiesDto, Resource, ResourceLinkDto, SchemaDto, SchemaPropertiesDto, SchemaScriptsDto, SchemasDto, SchemasService, ScriptCompletions, StringFieldPropertiesDto, SynchronizeSchemaDto, TagsFieldPropertiesDto, UpdateFieldDto, UpdateSchemaDto, VersionTag } from '@app/shared/internal';
 
 describe('SchemasService', () => {
     const version = new VersionTag('1');
@@ -102,6 +102,25 @@ describe('SchemasService', () => {
             req.flush(schemaResponse(12));
 
             expect(schema!).toEqual(createSchema(12));
+        }));
+
+    it('should make post request to generate schema',
+        inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+            const dto = new GenerateSchemaDto({ prompt: 'prompt', execute: true, numberOfContentItems: 1 });
+
+            let schema: GenerateSchemaResponseDto;
+            schemasService.generateSchema('my-app', dto).subscribe(result => {
+                schema = result;
+            });
+
+            const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/generate');
+
+            expect(req.request.method).toEqual('POST');
+            expect(req.request.headers.get('If-Match')).toBeNull();
+
+            req.flush({ log: [], schemaName: 'schema' });
+
+            expect(schema!).toEqual(new GenerateSchemaResponseDto({ log: [], schemaName: 'schema' }));
         }));
 
     it('should make put request to update schema',

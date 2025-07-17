@@ -49,6 +49,9 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, any> imple
     @Input()
     public valueMode: 'String' | 'Json' | 'JsonString' = 'String';
 
+    @Input({ transform: booleanAttribute })
+    public disableTools = false;
+
     @Input({ transform: numberAttribute })
     public maxLines: number | undefined;
 
@@ -96,7 +99,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, any> imple
             this.setMode();
         }
 
-        if (changes.height || changes.maxLines || changes.minLines || changes.singleLine || changes.snippets) {
+        if (changes.disabled || changes.height || changes.maxLines || changes.minLines || changes.singleLine || changes.snippets) {
             this.setOptions();
         }
 
@@ -166,7 +169,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, any> imple
         this.setWordWrap();
         this.onDisabled(this.snapshot.isDisabled);
 
-        if (this.aceTools) {
+        if (this.aceTools && !this.disableTools) {
             const originalCompleter = this.aceEditor.completer!;
             const originalShowDocTooltip = originalCompleter.showDocTooltip;
             originalCompleter.showDocTooltip = item => {
@@ -205,9 +208,9 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, any> imple
             const previous = this.aceEditor.completers || [];
             this.aceEditor.completers = [...previous, completer];
         }
+
         this.aceEditor.on('blur', () => {
             this.changeValue();
-
             this.callTouched();
         });
 
@@ -310,7 +313,12 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, any> imple
             minLines,
             printMargin: !this.singleLine,
             showGutter: !this.singleLine,
+            useWorker: !this.snapshot.isDisabled,
         });
+
+        if (this.snapshot.isDisabled) {
+            this.aceEditor.getSession().setAnnotations([]);
+        }
 
         this.aceEditor.commands.bindKey('Enter|Shift-Enter', this.singleLine ? 'null' : undefined as any);
     }

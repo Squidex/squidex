@@ -6,9 +6,10 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ApiUrlConfig, AppsState, CodeEditorComponent, ControlErrorsComponent, CreateSchemaForm, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, ModalDialogComponent, SchemaDto, SchemasState, TooltipDirective, TransformInputDirective, TranslatePipe } from '@app/shared';
+import { switchMap } from 'rxjs';
+import { ApiUrlConfig, AppsState, CodeEditorComponent, ControlErrorsComponent, CreateSchemaForm, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, GenerateSchemaDto, GenerateSchemaForm, LoaderComponent, ModalDialogComponent, SchemaDto, SchemasService, SchemasState, TooltipDirective, TransformInputDirective, TranslatePipe, UIOptions } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-form',
@@ -23,6 +24,7 @@ import { ApiUrlConfig, AppsState, CodeEditorComponent, ControlErrorsComponent, C
         FormErrorComponent,
         FormHintComponent,
         FormsModule,
+        LoaderComponent,
         ModalDialogComponent,
         ReactiveFormsModule,
         TooltipDirective,
@@ -31,6 +33,8 @@ import { ApiUrlConfig, AppsState, CodeEditorComponent, ControlErrorsComponent, C
     ],
 })
 export class SchemaFormComponent implements OnInit {
+    public readonly hasChatBot = inject(UIOptions).value.canUseChatBot;
+
     @Output()
     public create = new EventEmitter<SchemaDto>();
 
@@ -38,29 +42,40 @@ export class SchemaFormComponent implements OnInit {
     public dialogClose = new EventEmitter();
 
     @Input()
-    public import: any;
+    public source: any;
 
     public createForm = new CreateSchemaForm();
+    public generateForm = new GenerateSchemaForm();
+    public generateLog: string = '';
 
-    public showImport = false;
+    public selectedTab = 0;
+
+    public get actualForm() {
+        return this.selectedTab === 2 ? this.generateForm : this.createForm;
+    }
 
     constructor(
         public readonly apiUrl: ApiUrlConfig,
         public readonly appsState: AppsState,
         public readonly schemasState: SchemasState,
+        private readonly schemasService: SchemasService,
     ) {
     }
 
     public ngOnInit() {
-        this.createForm.load({ type: 'Default', ...this.import, name: '' });
+        this.createForm.load({ type: 'Default', ...this.source, name: '' });
 
-        this.showImport = !!this.import;
+        if (this.source) {
+            this.selectedTab = 1;
+        }
     }
 
-    public toggleImport() {
-        this.showImport = !this.showImport;
+    public selectTab(tab: number) {
+        this.selectedTab = tab;
+        this.source = null;
 
-        return false;
+        const { type, name } = this.createForm.form.value;
+        this.createForm.load({ type, name });
     }
 
     public emitCreate(value: SchemaDto) {
@@ -72,6 +87,58 @@ export class SchemaFormComponent implements OnInit {
     }
 
     public createSchema() {
+        if (this.selectedTab === 2) {
+            this.generateCore();
+        } else {
+            this.createCore();
+        }
+    }
+
+    public generatePreview() {
+        const value = this.generateForm.submit();
+        if (!value) {
+            return;
+        }
+
+        this.generateLog = '';
+
+        const dto = new GenerateSchemaDto({ ...value, numberOfContentItems: 20, execute: false });
+        this.schemasService.generateSchema(this.appsState.appName, dto)
+            .subscribe({
+                next: dto => {
+                    this.generateLog = dto.log.join('\n');
+                    this.generateForm.submitCompleted({ noReset: true });
+                },
+                error: error => {
+                    this.generateForm.submitFailed(error);
+                },
+            });
+    }
+
+    private generateCore() {
+        const value = this.generateForm.submit();
+        if (!value || !this.generateLog) {
+            return;
+        }
+
+        const dto = new GenerateSchemaDto({ ...value, numberOfContentItems: 20, execute: true });
+        this.schemasService.generateSchema(this.appsState.appName, dto)
+            .pipe(
+                switchMap(p => this.schemasService.getSchema(this.appsState.appName, p.schemaName!)),
+            )
+            .subscribe({
+                next: dto => {
+                    this.schemasState.add(dto);
+                    this.emitCreate(dto);
+                },
+                error: error => {
+                    this.createForm.submitFailed(error);
+                },
+            });
+
+    }
+
+    public createCore() {
         const value = this.createForm.submit();
         if (!value) {
             return;

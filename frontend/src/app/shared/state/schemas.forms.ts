@@ -53,7 +53,17 @@ export class CreateSchemaForm extends Form<ExtendedFormGroup, CreateSchemaDto> {
     public transformSubmit(value: any) {
         const { name, type, importing, initialCategory } = value;
 
-        return new CreateSchemaDto({ name, type, category: initialCategory, ...importing });
+        return CreateSchemaDto.fromJSON({ name, type, category: initialCategory, ...importing });
+    }
+}
+
+export class GenerateSchemaForm extends Form<ExtendedFormGroup, { prompt: string }> {
+    constructor() {
+        super(new ExtendedFormGroup({
+            prompt: new UntypedFormControl('', [
+                Validators.required,
+            ]),
+        }));
     }
 }
 

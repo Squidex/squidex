@@ -6,12 +6,14 @@
 // ==========================================================================
 
 using System.Globalization;
+using Newtonsoft.Json;
 using Squidex.CLI.Commands.Implementation;
 using Squidex.Infrastructure;
 using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates;
 
+// Use newtonsoft JSON because the CLI still deals with this library and uses JTokens.
 public sealed class StringLogger : ILogger, ILogLine
 {
     private const int MaxActionLength = 40;
@@ -21,16 +23,18 @@ public sealed class StringLogger : ILogger, ILogLine
 
     public bool CanWriteToSameLine => false;
 
+    public List<string> Lines => lines;
+
     public void Flush(ISemanticLog log, string template)
     {
-        var mesage = string.Join('\n', lines);
+        var mesage = string.Join('\n', Lines);
 
         log.LogInformation(w => w
             .WriteProperty("message", $"CLI executed or template {template}.")
             .WriteProperty("template", template)
             .WriteArray("steps", a =>
             {
-                foreach (var line in lines)
+                foreach (var line in Lines)
                 {
                     a.WriteValue(line);
                 }
@@ -83,17 +87,22 @@ public sealed class StringLogger : ILogger, ILogLine
 
     public void WriteLine()
     {
-        lines.Add(string.Empty);
+        Lines.Add(string.Empty);
     }
 
     public void WriteLine(string message)
     {
-        lines.Add(message);
+        Lines.Add(message);
     }
 
     public void WriteLine(string message, params object?[] args)
     {
-        lines.Add(string.Format(CultureInfo.InvariantCulture, message, args));
+        Lines.Add(string.Format(CultureInfo.InvariantCulture, message, args));
+    }
+
+    public void WriteJson(object message)
+    {
+        Lines.Add(JsonConvert.SerializeObject(message, Formatting.Indented));
     }
 
     private void AddToErrors(string reason)
@@ -104,7 +113,7 @@ public sealed class StringLogger : ILogger, ILogLine
     private void AddToLine(string message)
     {
         startedLine += message;
-        lines.Add(startedLine);
+        Lines.Add(startedLine);
         startedLine = string.Empty;
     }
 

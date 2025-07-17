@@ -27,6 +27,7 @@
     <ProjectReference Include="..\Squidex.Shared\Squidex.Shared.csproj" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="ConsoleTables" Version="2.7.0" />
     <PackageReference Include="CsvHelper" Version="33.0.1" />
     <PackageReference Include="FFMpegCore" Version="5.1.0" />
     <PackageReference Include="GraphQL" Version="8.2.1" />
@@ -40,7 +41,7 @@
     <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.3.0" />
     <PackageReference Include="Notifo.SDK" Version="1.7.5" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
-    <PackageReference Include="Squidex.CLI.Core" Version="13.8.0" />
+    <PackageReference Include="Squidex.CLI.Core" Version="13.12.0" />
     <PackageReference Include="YDotNet" Version="0.4.3" />
     <PackageReference Include="YDotNet.Extensions" Version="0.4.3" />
     <PackageReference Include="YDotNet.Server" Version="0.4.3" />

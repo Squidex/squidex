@@ -48,12 +48,12 @@ internal sealed class CompositeUniqueValidator(string contentTag, IContentReposi
             var found = await contentRepository.QueryIdsAsync(context.Root.App, context.Root.Schema, filter, SearchScope.All);
             if (found.Any(x => x.Id != context.Root.ContentId))
             {
-                context.AddError("A content with the same values already exist.", Enumerable.Empty<string>());
+                context.AddError("A content with the same values already exist.", []);
             }
         }
     }
 
-    private static ClrValue? TryGetValue(IRootField field, ContentData data)
+    private static ClrValue? TryGetValue(RootField field, ContentData data)
     {
         var value = JsonValue.Null;
 

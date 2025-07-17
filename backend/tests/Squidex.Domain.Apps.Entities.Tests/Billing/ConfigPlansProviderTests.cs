@@ -58,7 +58,7 @@ public class ConfigPlansProviderTests
     [InlineData("my-plan")]
     public void Should_return_infinite_if_nothing_configured(string? planId)
     {
-        var sut = new ConfigPlansProvider(Enumerable.Empty<Plan>());
+        var sut = new ConfigPlansProvider([]);
 
         var actual = sut.GetActualPlan(planId);
 
@@ -78,7 +78,7 @@ public class ConfigPlansProviderTests
     [Fact]
     public void Should_return_infinite_plan_for_free_plan_if_not_found()
     {
-        var sut = new ConfigPlansProvider(Enumerable.Empty<Plan>());
+        var sut = new ConfigPlansProvider([]);
 
         var plan = sut.GetFreePlan();
 

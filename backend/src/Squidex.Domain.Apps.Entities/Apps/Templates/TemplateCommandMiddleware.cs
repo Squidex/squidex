@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.Extensions.Options;
 using Squidex.CLI.Commands.Implementation;
 using Squidex.CLI.Commands.Implementation.FileSystem;
 using Squidex.CLI.Commands.Implementation.Sync;
@@ -16,25 +15,20 @@ using Squidex.CLI.Commands.Implementation.Sync.Contents;
 using Squidex.CLI.Commands.Implementation.Sync.Rules;
 using Squidex.CLI.Commands.Implementation.Sync.Schemas;
 using Squidex.CLI.Commands.Implementation.Sync.Workflows;
-using Squidex.CLI.Configuration;
-using Squidex.ClientLibrary;
-using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Json;
 using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates;
 
 public sealed class TemplateCommandMiddleware(
-    TemplatesClient templatesClient,
-    IOptions<TemplatesOptions> templateOptions,
-    IUrlGenerator urlGenerator,
+    TemplatesClient client,
+    SessionFactory sessionFactory,
     ISemanticLog log)
     : ICommandMiddleware
 {
-    private readonly TemplatesOptions templateOptions = templateOptions.Value;
-
     public async Task HandleAsync(CommandContext context, NextDelegate next,
         CancellationToken ct)
     {
@@ -53,7 +47,7 @@ public sealed class TemplateCommandMiddleware(
             return;
         }
 
-        var repository = await templatesClient.GetRepositoryUrl(template);
+        var repository = await client.GetRepositoryUrl(template);
 
         if (string.IsNullOrEmpty(repository))
         {
@@ -63,17 +57,16 @@ public sealed class TemplateCommandMiddleware(
             return;
         }
 
-        using (var cliLog = new StringLogger())
+        var cliLog = new StringLogger();
+        try
         {
-            try
+            var session = sessionFactory.CreateSession(app);
+
+            var syncService = await CreateSyncServiceAsync(repository, session);
+            var syncOptions = new SyncOptions();
+
+            var targets = new ISynchronizer[]
             {
-                var session = CreateSession(app);
-
-                var syncService = await CreateSyncServiceAsync(repository, session);
-                var syncOptions = new SyncOptions();
-
-                var targets = new ISynchronizer[]
-                {
                     new AppSynchronizer(cliLog),
                     new AssetFoldersSynchronizer(cliLog),
                     new AssetsSynchronizer(cliLog),
@@ -81,17 +74,16 @@ public sealed class TemplateCommandMiddleware(
                     new SchemasSynchronizer(cliLog),
                     new WorkflowsSynchronizer(cliLog),
                     new ContentsSynchronizer(cliLog),
-                };
+            };
 
-                foreach (var target in targets)
-                {
-                    await target.ImportAsync(syncService, syncOptions, session);
-                }
-            }
-            finally
+            foreach (var target in targets)
             {
-                cliLog.Flush(log, template);
+                await target.ImportAsync(syncService, syncOptions, session);
             }
+        }
+        finally
+        {
+            cliLog.Flush(log, template);
         }
     }
 
@@ -100,28 +92,5 @@ public sealed class TemplateCommandMiddleware(
         var fs = await FileSystems.CreateAsync(repository);
 
         return new SyncService(fs, session);
-    }
-
-    private ISession CreateSession(App app)
-    {
-        var client = app.Clients.First();
-
-        var url = templateOptions.LocalUrl;
-
-        if (string.IsNullOrEmpty(url))
-        {
-            url = urlGenerator.Root();
-        }
-
-        return new Session(
-            new DirectoryInfo(Path.GetTempPath()),
-            new SquidexClient(new SquidexOptions
-            {
-                IgnoreSelfSignedCertificates = true,
-                AppName = app.Name,
-                ClientId = $"{app.Name}:{client.Key}",
-                ClientSecret = client.Value.Secret,
-                Url = url,
-            }));
     }
 }

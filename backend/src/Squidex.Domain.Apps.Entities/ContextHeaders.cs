@@ -133,6 +133,6 @@ public static class ContextHeaders
             return value.Split(Separators, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).Distinct();
         }
 
-        return Enumerable.Empty<string>();
+        return [];
     }
 }

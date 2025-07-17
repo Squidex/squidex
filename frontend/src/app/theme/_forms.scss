@@ -85,9 +85,12 @@
     }
 
     &-close {
-        @include absolute(0, 0, auto, auto);
-        display: none;
+        @include absolute(.125rem, .125rem, auto, auto);
         padding: .5rem;
+        
+        & {
+            display: none;
+        }
     }
 
     &-error {

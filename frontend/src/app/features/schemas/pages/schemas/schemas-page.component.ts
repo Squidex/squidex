@@ -54,7 +54,7 @@ export class SchemasPageComponent implements OnInit {
             return getCategoryTree(schemas, categories, filter);
         });
 
-    public import: any;
+    public source: any;
 
     constructor(
         public readonly schemasState: SchemasState,
@@ -68,7 +68,7 @@ export class SchemasPageComponent implements OnInit {
         this.subscriptions.add(
             this.messageBus.of(SchemaCloning)
                 .subscribe(event => {
-                    this.import = event.schema;
+                    this.source = event.schema;
 
                     this.addSchemaDialog.show();
                 }));
@@ -105,8 +105,8 @@ export class SchemasPageComponent implements OnInit {
         this.addSchemaDialog.hide();
     }
 
-    public createSchema(importing: any = null) {
-        this.import = importing;
+    public createSchema(source: any = null) {
+        this.source = source;
 
         this.addSchemaDialog.show();
     }

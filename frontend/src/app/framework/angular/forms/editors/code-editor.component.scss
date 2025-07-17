@@ -28,11 +28,6 @@
         }
     }
 
-    .ace_active-line,
-    .ace_gutter-active-line {
-        background: none !important;
-    }
-
     .ace_gutter-active-line {
         background: color.adjust($color-border, $lightness: -5%) !important;
     }

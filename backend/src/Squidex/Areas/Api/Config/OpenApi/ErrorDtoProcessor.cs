@@ -43,7 +43,7 @@ public sealed class ErrorDtoProcessor : IOperationProcessor
                 .OfType<XElement>()
                 .Where(x => x.Name == "response")
                 .Where(x => x.Attribute("code") != null)
-                ?? Enumerable.Empty<XElement>();
+                ?? [];
 
         foreach (var response in responses)
         {

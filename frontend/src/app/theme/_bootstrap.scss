@@ -75,6 +75,12 @@
     ul {
         margin: 0;
     }
+
+    &-dismissible {
+        .btn-close {
+            @include absolute(.25rem, .25rem, auto, auto);
+        }
+    }
 }
 
 .alert-hint {

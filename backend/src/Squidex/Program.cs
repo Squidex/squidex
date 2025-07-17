@@ -25,7 +25,7 @@ public static class Program
             })
             .ConfigureAppConfiguration((hostContext, builder) =>
             {
-                builder.ConfigureForSquidex();
+                builder.ConfigureForSquidex(hostContext.HostingEnvironment);
             })
             .ConfigureServices((context, services) =>
             {

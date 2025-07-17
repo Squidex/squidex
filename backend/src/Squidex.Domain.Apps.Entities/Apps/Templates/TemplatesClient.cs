@@ -5,14 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.CodeDom;
 using System.Text.RegularExpressions;
 using Markdig;
 using Markdig.Renderers.Normalize;
 using Markdig.Syntax;
 using Markdig.Syntax.Inlines;
 using Microsoft.Extensions.Options;
-using Squidex.ClientLibrary;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates;

@@ -26,7 +26,7 @@ public abstract class HandlerTestBase<TState> : GivenContext
         get => persistenceFactory;
     }
 
-    public IEnumerable<Envelope<IEvent>> LastEvents { get; private set; } = Enumerable.Empty<Envelope<IEvent>>();
+    public IEnumerable<Envelope<IEvent>> LastEvents { get; private set; } = [];
 
     protected HandlerTestBase()
     {
@@ -41,7 +41,7 @@ public abstract class HandlerTestBase<TState> : GivenContext
             .Invokes((IReadOnlyList<Envelope<IEvent>> events, CancellationToken _) => LastEvents = events);
 
         A.CallTo(() => persistence.DeleteAsync(CancellationToken))
-            .Invokes(() => LastEvents = Enumerable.Empty<Envelope<IEvent>>());
+            .Invokes(() => LastEvents = []);
 #pragma warning restore MA0056 // Do not call overridable members in constructor
     }
 
