@@ -139,6 +139,296 @@ public class DefaultAppLogStoreTests : GivenContext
     }
 
 /*
+/*
+FAILED TEST: **Analysis:**  
+The test run failed due to **C# syntax errors** and a **missing `NSubstitute` dependency** in the file `DefaultAppLogStoreTests.cs`. The syntax errors include missing semicolons, invalid tokens, and malformed code blocks, preventing successful compilation.
+
+**Recommended Fixes:**  
+1. **Add `NSubstitute` NuGet package** to the test project (`Squidex.Domain.Apps.Entities.Tests.csproj`):
+   ```xml
+   <PackageReference Include="NSubstitute" Version="x.x.x" />
+   ```
+2. **Fix syntax errors**:
+   - Add missing semicolons (`;`) at the end of statements.
+   - Correct misplaced or missing braces `{}` to ensure valid method and class structure.
+   - Ensure all method declarations and class members are properly formatted.
+
+    [Fact]
+    public async Task Should_write_malformed_timestamp_without_exception()
+    {
+        var timeFrom = SystemClock.Instance.GetCurrentInstant();
+        var timeTo = timeFrom.Plus(Duration.FromDays(4));
+    
+        var request = new Request
+        {
+            Timestamp = new Instant(1234567890L),
+            Properties = new Dictionary<string, string>()
+        };
+    
+        A.CallTo(() => requestLogStore.QueryAllAsync(AppId.Id.ToString(), timeFrom, timeTo, CancellationToken.None))
+            .Returns(new[] { request }.ToAsyncEnumerable());
+    
+        var stream = new MemoryStream();
+    
+        await sut.ReadLogAsync(AppId.Id, timeFrom, timeTo, stream, CancellationToken.None);
+        stream.Position = 0;
+    
+        using (var reader = new StreamReader(stream))
+        {
+            var header = await reader.ReadLineAsync();
+            var dataLine = await reader.ReadLineAsync();
+    
+            Assert.NotNull(header);
+            Assert.NotNull(dataLine);
+        }
+    }
+
+*/
+/*
+FAILED TEST: **Analysis:**  
+The test run failed due to **C# syntax errors** and a **missing `NSubstitute` dependency** in the file `DefaultAppLogStoreTests.cs`. The syntax errors include missing semicolons, invalid tokens, and malformed code blocks, preventing successful compilation.
+
+**Recommended Fixes:**  
+1. **Add `NSubstitute` NuGet package** to the test project (`Squidex.Domain.Apps.Entities.Tests.csproj`):
+   ```xml
+   <PackageReference Include="NSubstitute" Version="x.x.x" />
+   ```
+2. **Fix syntax errors**:
+   - Add missing semicolons (`;`) at the end of statements.
+   - Correct malformed code blocks by ensuring proper brace `{}` placement and valid method/class structure.
+
+    [Fact]
+    public async Task Should_add_max_values_to_request()
+    {
+        Request? recordedRequest = null;
+    
+        A.CallTo(() => requestLogStore.IsEnabled)
+            .Returns(true);
+    
+        A.CallTo(() => requestLogStore.LogAsync(A<Request>._, A<CancellationToken>._))
+            .Invokes(x => recordedRequest = x.GetArgument<Request>(0)!);
+    
+        var request = new RequestLog
+        {
+            Bytes = long.MaxValue,
+            CacheHits = long.MaxValue,
+            CacheTTL = long.MaxValue,
+            Costs = double.MaxValue,
+            ElapsedMs = double.MaxValue,
+            StatusCode = int.MaxValue,
+            Timestamp = default
+        };
+    
+        await sut.LogAsync(AppId.Id, request, CancellationToken.None);
+    
+        Assert.NotNull(recordedRequest);
+    
+        Assert.Contains(DefaultAppLogStore.FieldBytes, recordedRequest.Properties);
+        Assert.Contains(DefaultAppLogStore.FieldCacheHits, recordedRequest.Properties);
+        Assert.Contains(DefaultAppLogStore.FieldCacheTTL, recordedRequest.Properties);
+        Assert.Contains(DefaultAppLogStore.FieldCosts, recordedRequest.Properties);
+        Assert.Contains(DefaultAppLogStore.FieldRequestElapsedMs, recordedRequest.Properties);
+        Assert.Contains(DefaultAppLogStore.FieldStatusCode, recordedRequest.Properties);
+    }
+
+*/
+/*
+FAILED TEST: **Analysis:**  
+The test run failed due to **C# syntax errors** and a **missing `NSubstitute` dependency** in the file `DefaultAppLogStoreTests.cs`. The syntax errors include missing semicolons, invalid tokens, and malformed code blocks, preventing successful compilation.
+
+**Recommended Fixes:**  
+1. **Add `NSubstitute` NuGet package** to the test project (`Squidex.Domain.Apps.Entities.Tests.csproj`):
+   ```xml
+   <PackageReference Include="NSubstitute" Version="x.x.x" />
+   ```
+2. **Fix syntax errors**:
+   - Add missing semicolons (`;`) at the end of statements.
+   - Correct malformed code blocks by ensuring proper brace `{}` placement and valid method/class structure.
+
+    [Fact]
+    public async Task Should_return_null_for_invalid_data_in_GetDouble_and_GetLong()
+    {
+        var timeFrom = SystemClock.Instance.GetCurrentInstant();
+        var timeTo = timeFrom.Plus(Duration.FromDays(4));
+    
+        var request = new Request
+        {
+            Properties = new Dictionary<string, string>
+            {
+                { DefaultAppLogStore.FieldRequestElapsedMs, "not a number" },
+                { DefaultAppLogStore.FieldCosts, "invalid" },
+                { DefaultAppLogStore.FieldBytes, "abc" },
+                { DefaultAppLogStore.FieldCacheHits, "xyz" },
+                { DefaultAppLogStore.FieldCacheTTL, "123.45" },
+                { DefaultAppLogStore.FieldStatusCode, "not a long" }
+            }
+        };
+    
+        A.CallTo(() => requestLogStore.QueryAllAsync(AppId.Id.ToString(), timeFrom, timeTo, CancellationToken.None))
+            .Returns(new[] { request }.ToAsyncEnumerable());
+    
+        var stream = new MemoryStream();
+    
+        await sut.ReadLogAsync(AppId.Id, timeFrom, timeTo, stream, CancellationToken.None);
+        stream.Position = 0;
+    
+        using (var reader = new StreamReader(stream))
+        {
+            var header = await reader.ReadLineAsync();
+            var dataLine = await reader.ReadLineAsync();
+    
+            Assert.NotNull(header);
+            Assert.NotNull(dataLine);
+        }
+    }
+
+*/
+/*
+FAILED TEST: The test run failed due to **C# syntax errors** and a **missing `NSubstitute` dependency** in the file `DefaultAppLogStoreTests.cs`.
+
+### Root Cause:
+1. **Missing Dependency**:
+   - The `NSubstitute` namespace is missing, causing `CS0246` errors.
+2. **Syntax Errors**:
+   - Missing semicolons (`;`).
+   - Malformed code blocks with misplaced or missing braces `{}`.
+   - Invalid token usage and incorrect method declarations.
+
+### Recommended Fixes:
+1. **Add `NSubstitute` NuGet Package**:
+   ```xml
+   <PackageReference Include="NSubstitute" Version="x.x.x" />
+   ```
+   to `Squidex.Domain.Apps.Entities.Tests.csproj`.
+
+2. **Fix Syntax Errors**:
+   - Add missing semicolons at the end of statements.
+   - Correct misplaced or missing braces `{}` to ensure valid method and class structure.
+   - Ensure all method declarations and class members are properly formatted.
+
+    [Fact]
+    public async Task Should_not_add_non_numeric_values_to_request()
+    {
+        Request? recordedRequest = null;
+    
+        A.CallTo(() => requestLogStore.IsEnabled)
+            .Returns(true);
+    
+        A.CallTo(() => requestLogStore.LogAsync(A<Request>._, A<CancellationToken>._))
+            .Invokes(x => recordedRequest = x.GetArgument<Request>(0)!);
+    
+        var request = new RequestLog
+        {
+            Bytes = "not a number",
+            CacheHits = "invalid",
+            CacheTTL = "abc",
+            Costs = "xyz",
+            ElapsedMs = "120.5",
+            StatusCode = "not a long",
+            Timestamp = default
+        };
+    
+        await sut.LogAsync(AppId.Id, request, CancellationToken.None);
+    
+        Assert.NotNull(recordedRequest);
+    
+        Assert.DoesNotContain(DefaultAppLogStore.FieldBytes, recordedRequest.Properties);
+        Assert.DoesNotContain(DefaultAppLogStore.FieldCacheHits, recordedRequest.Properties);
+        Assert.DoesNotContain(DefaultAppLogStore.FieldCacheTTL, recordedRequest.Properties);
+        Assert.DoesNotContain(DefaultAppLogStore.FieldCosts, recordedRequest.Properties);
+        Assert.DoesNotContain(DefaultAppLogStore.FieldRequestElapsedMs, recordedRequest.Properties);
+        Assert.DoesNotContain(DefaultAppLogStore.FieldStatusCode, recordedRequest.Properties);
+    }
+
+*/
+/*
+FAILED TEST: **Analysis:**  
+The test run failed due to **C# syntax errors** and a **missing `NSubstitute` dependency** in the file `DefaultAppLogStoreTests.cs`. The syntax errors include missing semicolons, invalid tokens, and malformed code blocks, preventing successful compilation. The missing `NSubstitute` package is required for mocking in the tests.
+
+**Recommended Fixes:**  
+1. **Add `NSubstitute` NuGet package** to the test project:
+   ```xml
+   <PackageReference Include="NSubstitute" Version="x.x.x" />
+   ```
+2. **Fix syntax errors**:
+   - Add missing semicolons (`;`) at the end of statements.
+   - Correct malformed code blocks by ensuring proper brace `{}` placement and valid method/class structure.
+
+    [Fact]
+    public async Task Should_write_only_header_when_no_logs_found()
+    {
+        var timeFrom = SystemClock.Instance.GetCurrentInstant();
+        var timeTo = timeFrom.Plus(Duration.FromDays(4));
+    
+        A.CallTo(() => requestLogStore.QueryAllAsync(AppId.Id.ToString(), timeFrom, timeTo, CancellationToken.None))
+            .Returns(Enumerable.Empty<Request>().ToAsyncEnumerable());
+    
+        var stream = new MemoryStream();
+    
+        await sut.ReadLogAsync(AppId.Id, timeFrom, timeTo, stream, CancellationToken.None);
+        stream.Position = 0;
+    
+        var lines = 0;
+        using (var reader = new StreamReader(stream))
+        {
+            while (await reader.ReadLineAsync() != null)
+            {
+                lines++;
+            }
+        }
+    
+        Assert.Equal(1, lines);
+    }
+
+*/
+/*
+FAILED TEST: **Analysis:**  
+The test run failed due to a **missing `NSubstitute` dependency** and **C# syntax errors** in the file `DefaultAppLogStoreTests.cs`, preventing successful compilation.
+
+**Recommended Fixes:**  
+1. Add the `NSubstitute` NuGet package to the test project:
+   ```xml
+   <PackageReference Include="NSubstitute" Version="x.x.x" />
+   ```
+2. Fix syntax errors:
+   - Add missing semicolons (`;`) at the end of statements.
+   - Correct malformed code blocks by ensuring proper brace `{}` placement and valid method/class structure.
+
+    [Fact]
+    public async Task Should_not_add_null_or_empty_string_fields_to_request()
+    {
+        Request? recordedRequest = null;
+    
+        A.CallTo(() => requestLogStore.IsEnabled)
+            .Returns(true);
+    
+        A.CallTo(() => requestLogStore.LogAsync(A<Request>._, A<CancellationToken>._))
+            .Invokes(x => recordedRequest = x.GetArgument<Request>(0)!);
+    
+        var request = new RequestLog
+        {
+            UserClientId = null,
+            UserId = string.Empty,
+            RequestPath = null,
+            RequestMethod = null,
+            CacheServer = null,
+            CacheStatus = string.Empty,
+            Timestamp = default
+        };
+    
+        await sut.LogAsync(AppId.Id, request, CancellationToken.None);
+    
+        Assert.NotNull(recordedRequest);
+    
+        Assert.DoesNotContain(DefaultAppLogStore.FieldAuthClientId, recordedRequest.Properties);
+        Assert.DoesNotContain(DefaultAppLogStore.FieldAuthUserId, recordedRequest.Properties);
+        Assert.DoesNotContain(DefaultAppLogStore.FieldRequestPath, recordedRequest.Properties);
+        Assert.DoesNotContain(DefaultAppLogStore.FieldRequestMethod, recordedRequest.Properties);
+        Assert.DoesNotContain(DefaultAppLogStore.FieldCacheServer, recordedRequest.Properties);
+        Assert.DoesNotContain(DefaultAppLogStore.FieldCacheStatus, recordedRequest.Properties);
+    }
+
+*/
 FAILED TEST: **Analysis:**  
 The test run failed due to a **missing `NSubstitute` dependency** and **incorrect C# syntax** in the test file `DefaultAppLogStoreTests.cs`. The compiler cannot resolve the `NSubstitute` namespace, and there are multiple syntax issues such as missing semicolons and malformed code blocks.
 
