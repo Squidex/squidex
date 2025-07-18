@@ -1,0 +1,52 @@
+services:
+  db_postgres:
+    image: ghcr.io/ferretdb/postgres-documentdb:17-0.105.0-ferretdb-2.4.0
+    restart: on-failure
+    environment:
+      - POSTGRES_USER=username
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=postgres
+    volumes:
+      - ./data:/var/lib/postgresql/data
+
+  db_ferretdb:
+    image: ghcr.io/ferretdb/ferretdb:2.4.0
+    restart: on-failure
+    ports:
+      - 27017:27017
+    environment:
+      - FERRETDB_POSTGRESQL_URL=postgres://username:password@db_postgres:5432/postgres
+
+  squidex_ferretdb:
+    extends:
+      file: docker-compose-base.yml
+      service: squidex_base
+    environment:
+      - ASSETS__RESIZERURL=http://resizer
+      - EVENTSTORE__MONGODB__CONFIGURATION=mongodb://username:password@db_ferretdb/
+      - STORE__MONGODB__CONFIGURATION=mongodb://username:password@db_ferretdb/
+      - URLS__BASEURL=http://localhost:8080
+    depends_on:
+      db_ferretdb:
+        condition: service_healthy
+
+  proxy_ferretdb:
+    image: squidex/caddy-proxy-path:2.6.2
+    ports:
+      - "8080:8080"
+    environment:
+      - SITE_ADDRESS=http://localhost:8080
+      - SITE_PATH=*
+      - SITE_SERVER="squidex_ferretdb:5000"
+    depends_on:
+      - squidex_ferretdb
+    restart: unless-stopped
+
+  webhookcatcher:
+    image: tarampampam/webhook-tester:2
+    command: serve --port 1026
+    ports:
+      - "1026:1026"
+
+volumes:
+  ferretdb_data:

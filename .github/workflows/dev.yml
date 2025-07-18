@@ -147,6 +147,8 @@ jobs:
             compose: docker-compose-postgres.yml
           - name: sqlserver
             compose: docker-compose-sqlserver.yml
+          - name: ferretdb
+            compose: docker-compose-ferretdb.yml
 
     steps:
       - name: Prepare - Checkout
