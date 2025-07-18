@@ -26,11 +26,11 @@ public sealed class TestEntityWithReferences : Content<TestEntityWithReferencesD
                     Name = TestEntityWithReferencesData.ReferencesField,
                     Properties = new ReferencesFieldPropertiesDto
                     {
-                        IsRequired = false
-                    }
+                        IsRequired = false,
+                    },
                 },
             ],
-            IsPublished = true
+            IsPublished = true,
         });
 
         return schema;

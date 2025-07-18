@@ -30,40 +30,40 @@ public sealed class TestEntity : Content<TestEntityData>
                     Name = TestEntityData.NumberField,
                     Properties = new NumberFieldPropertiesDto
                     {
-                        IsRequired = true
-                    }
+                        IsRequired = true,
+                    },
                 },
                 new UpsertSchemaFieldDto
                 {
                     Name = TestEntityData.StringField,
                     Properties = new StringFieldPropertiesDto
                     {
-                        IsRequired = false
-                    }
+                        IsRequired = false,
+                    },
                 },
                 new UpsertSchemaFieldDto
                 {
                     Name = TestEntityData.SearchableField,
                     Properties = new StringFieldPropertiesDto
                     {
-                        IsRequired = false
-                    }
+                        IsRequired = false,
+                    },
                 },
                 new UpsertSchemaFieldDto
                 {
                     Name = TestEntityData.GeoField,
                     Properties = new GeolocationFieldPropertiesDto
                     {
-                        IsRequired = false
-                    }
+                        IsRequired = false,
+                    },
                 },
                 new UpsertSchemaFieldDto
                 {
                     Name = TestEntityData.JsonField,
                     Properties = new JsonFieldPropertiesDto
                     {
-                        IsRequired = false
-                    }
+                        IsRequired = false,
+                    },
                 },
                 new UpsertSchemaFieldDto
                 {
@@ -71,28 +71,28 @@ public sealed class TestEntity : Content<TestEntityData>
                     Partitioning = "language",
                     Properties = new StringFieldPropertiesDto
                     {
-                        DefaultValue = "default"
-                    }
+                        DefaultValue = "default",
+                    },
                 },
                 new UpsertSchemaFieldDto
                 {
                     Name = TestEntityData.IdField,
                     Properties = new StringFieldPropertiesDto
                     {
-                        IsRequired = false
-                    }
+                        IsRequired = false,
+                    },
                 },
                 new UpsertSchemaFieldDto
                 {
                     Name = TestEntityData.ImmutableField,
                     Properties = new StringFieldPropertiesDto
                     {
-                        IsCreateOnly = true
-                    }
+                        IsCreateOnly = true,
+                    },
                 },
             ],
             Scripts = scripts,
-            IsPublished = true
+            IsPublished = true,
         });
 
         return schema;
@@ -108,10 +108,10 @@ public sealed class TestEntity : Content<TestEntityData>
                 nested0 = index,
                 nested1 = new
                 {
-                    nested2 = index
-                }
+                    nested2 = index,
+                },
             }),
-            String = index.ToString(CultureInfo.InvariantCulture)
+            String = index.ToString(CultureInfo.InvariantCulture),
         };
 
         if (index % 2 == 0)
@@ -122,8 +122,8 @@ public sealed class TestEntity : Content<TestEntityData>
                 coordinates = new[]
                 {
                     index,
-                    index
-                }
+                    index,
+                },
             };
         }
         else

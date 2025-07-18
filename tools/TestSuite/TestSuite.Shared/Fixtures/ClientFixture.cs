@@ -45,7 +45,7 @@ public class ClientFixture : IAsyncLifetime
 
         var createRequest = new CreateAppDto
         {
-            Name = name
+            Name = name,
         };
 
         return PostAppAsync(createRequest);
@@ -57,7 +57,7 @@ public class ClientFixture : IAsyncLifetime
 
         var request = new CreateTeamDto
         {
-            Name = name
+            Name = name,
         };
 
         return Client.Teams.PostTeamAsync(request);
@@ -80,7 +80,7 @@ public class ClientFixture : IAsyncLifetime
                     {
                         return new HttpClientHandler
                         {
-                            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
                         };
                     }).Services
                 .BuildServiceProvider();

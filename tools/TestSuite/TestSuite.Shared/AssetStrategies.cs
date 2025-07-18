@@ -32,7 +32,7 @@ public static partial class ContentStrategies
                             Id = asset.Id,
                             Permanent = false,
                         },
-                    ]
+                    ],
                 });
             case Deletion.BulkPermanent:
                 return client.BulkUpdateAssetsAsync(new BulkUpdateAssetsDto
@@ -45,7 +45,7 @@ public static partial class ContentStrategies
                             Id = asset.Id,
                             Permanent = true,
                         },
-                    ]
+                    ],
                 });
             default:
                 return Task.CompletedTask;
@@ -55,7 +55,7 @@ public static partial class ContentStrategies
     public enum Move
     {
         Single,
-        Bulk
+        Bulk,
     }
 
     public static Task MoveAsync(this IAssetsClient client, AssetDto asset, AssetFolderDto folder, Move strategy)
@@ -65,7 +65,7 @@ public static partial class ContentStrategies
             case Move.Single:
                 return client.PutAssetParentAsync(asset.Id, new MoveAssetDto
                 {
-                    ParentId = folder.Id
+                    ParentId = folder.Id,
                 });
             case Move.Bulk:
                 return client.BulkUpdateAssetsAsync(new BulkUpdateAssetsDto
@@ -76,9 +76,9 @@ public static partial class ContentStrategies
                         {
                             Type = BulkUpdateAssetType.Move,
                             Id = asset.Id,
-                            ParentId = folder.Id
+                            ParentId = folder.Id,
                         },
-                    ]
+                    ],
                 });
             default:
                 return Task.CompletedTask;
@@ -88,7 +88,7 @@ public static partial class ContentStrategies
     public enum Annotate
     {
         Single,
-        Bulk
+        Bulk,
     }
 
     public static Task AnnotateAsync(this IAssetsClient client, AssetDto asset, AnnotateAssetDto request, Annotate strategy)
@@ -110,9 +110,9 @@ public static partial class ContentStrategies
                             IsProtected = request.IsProtected,
                             Metadata = request.Metadata,
                             Slug = request.Slug,
-                            Tags = request.Tags
+                            Tags = request.Tags,
                         },
-                    ]
+                    ],
                 });
             default:
                 return Task.CompletedTask;

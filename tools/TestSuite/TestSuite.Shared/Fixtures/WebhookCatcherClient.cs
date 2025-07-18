@@ -73,7 +73,7 @@ public sealed class WebhookCatcherClient
 
         httpClient = new HttpClient
         {
-            BaseAddress = new Uri($"http://{apiHost}:{apiPort}")
+            BaseAddress = new Uri($"http://{apiHost}:{apiPort}"),
         };
     }
 

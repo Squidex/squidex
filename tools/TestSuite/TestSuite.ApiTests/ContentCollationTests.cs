@@ -80,15 +80,15 @@ public class ContentCollationTests(CreatedAppFixture fixture) : IClassFixture<Cr
 
 
         // STEP 2: Get sorted contents.
-        var sorted_1 = await contents.GetAsync(new ContentQuery { OrderBy = $"data/{TestEntityData.StringField}/iv asc" });
-        var sortedNames_1 = sorted_1.Items.Select(x => x.Data.String).ToList();
+        var sortedContent_1 = await contents.GetAsync(new ContentQuery { OrderBy = $"data/{TestEntityData.StringField}/iv asc" });
+        var sortedNames_1 = sortedContent_1.Items.Select(x => x.Data.String).ToList();
 
         Assert.Equal(new string[] { "Lüleburgaz", "Mersin", "İstanbul" }, sortedNames_1);
 
 
         // STEP 3: Get with collation.
-        var sorted_2 = await contents.GetAsync(new ContentQuery { OrderBy = $"data/{TestEntityData.StringField}/iv asc", Collation = "tr" });
-        var sortedNames_2 = sorted_2.Items.Select(x => x.Data.String).ToList();
+        var sortedContent_2 = await contents.GetAsync(new ContentQuery { OrderBy = $"data/{TestEntityData.StringField}/iv asc", Collation = "tr" });
+        var sortedNames_2 = sortedContent_2.Items.Select(x => x.Data.String).ToList();
 
         Assert.Equal(new string[] { "İstanbul", "Lüleburgaz", "Mersin" }, sortedNames_2);
     }

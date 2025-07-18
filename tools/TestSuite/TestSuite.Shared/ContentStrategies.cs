@@ -18,7 +18,7 @@ public static partial class ContentStrategies
         SingleSoft,
         SinglePermanent,
         BulkSoft,
-        BulkPermanent
+        BulkPermanent,
     }
 
     public static Task DeleteAsync(this ISquidexClient client, ContentBase content,
@@ -46,7 +46,7 @@ public static partial class ContentStrategies
                             Id = content.Id,
                             Permanent = false,
                         },
-                    ]
+                    ],
                 });
             case Deletion.BulkPermanent:
                 return GetClient().BulkUpdateAsync(new BulkUpdate
@@ -59,7 +59,7 @@ public static partial class ContentStrategies
                             Id = content.Id,
                             Permanent = true,
                         },
-                    ]
+                    ],
                 });
             default:
                 return Task.CompletedTask;
@@ -73,7 +73,7 @@ public static partial class ContentStrategies
         UpsertBulk,
         Bulk,
         BulkWithSchema,
-        BulkShared
+        BulkShared,
     }
 
     public static Task UpdateAsync(this ISquidexClient client, ContentBase content, object data,
@@ -99,9 +99,9 @@ public static partial class ContentStrategies
                         {
                             Type = BulkUpdateType.Update,
                             Id = content.Id,
-                            Data = data
+                            Data = data,
                         },
-                    ]
+                    ],
                 });
             case Update.UpsertBulk:
                 return GetClient().BulkUpdateAsync(new BulkUpdate
@@ -112,9 +112,9 @@ public static partial class ContentStrategies
                         {
                             Type = BulkUpdateType.Upsert,
                             Id = content.Id,
-                            Data = data
+                            Data = data,
                         },
-                    ]
+                    ],
                 });
             case Update.BulkWithSchema:
                 return GetClient().BulkUpdateAsync(new BulkUpdate
@@ -126,9 +126,9 @@ public static partial class ContentStrategies
                             Type = BulkUpdateType.Update,
                             Id = content.Id,
                             Data = data,
-                            Schema = content.SchemaName
+                            Schema = content.SchemaName,
                         },
-                    ]
+                    ],
                 });
             case Update.BulkShared:
                 return GetSharedClient(client).BulkUpdateAsync(new BulkUpdate
@@ -140,9 +140,9 @@ public static partial class ContentStrategies
                             Type = BulkUpdateType.Update,
                             Id = content.Id,
                             Data = data,
-                            Schema = content.SchemaName
+                            Schema = content.SchemaName,
                         },
-                    ]
+                    ],
                 });
             default:
                 return Task.CompletedTask;
@@ -156,7 +156,7 @@ public static partial class ContentStrategies
         UpsertBulk,
         Bulk,
         BulkWithSchema,
-        BulkShared
+        BulkShared,
     }
 
     public static Task PatchAsync(this ISquidexClient client, ContentBase content, object data,
@@ -183,9 +183,9 @@ public static partial class ContentStrategies
                             Type = BulkUpdateType.Upsert,
                             Id = content.Id,
                             Data = data,
-                            Patch = true
+                            Patch = true,
                         },
-                    ]
+                    ],
                 });
             case Patch.Bulk:
                 return GetClient().BulkUpdateAsync(new BulkUpdate
@@ -198,7 +198,7 @@ public static partial class ContentStrategies
                             Id = content.Id,
                             Data = data,
                         },
-                    ]
+                    ],
                 });
             case Patch.BulkWithSchema:
                 return GetClient().BulkUpdateAsync(new BulkUpdate
@@ -210,9 +210,9 @@ public static partial class ContentStrategies
                             Type = BulkUpdateType.Patch,
                             Id = content.Id,
                             Data = data,
-                            Schema = content.SchemaName
+                            Schema = content.SchemaName,
                         },
-                    ]
+                    ],
                 });
             case Patch.BulkShared:
                 return GetSharedClient(client).BulkUpdateAsync(new BulkUpdate
@@ -224,9 +224,9 @@ public static partial class ContentStrategies
                             Type = BulkUpdateType.Patch,
                             Id = content.Id,
                             Data = data,
-                            Schema = content.SchemaName
+                            Schema = content.SchemaName,
                         },
-                    ]
+                    ],
                 });
             default:
                 return Task.CompletedTask;
@@ -242,7 +242,7 @@ public static partial class ContentStrategies
         BulkWithSchema,
         BulkShared,
         UpsertBulk,
-        UpdateBulk
+        UpdateBulk,
     }
 
     public static Task EnrichDefaultsAsync(this ISquidexClient client, ContentBase content, object data,
@@ -258,14 +258,14 @@ public static partial class ContentStrategies
             case EnrichDefaults.Normal:
                 var createOptions = new ContentEnrichDefaultsOptions
                 {
-                    EnrichRequiredFields = requiredFields
+                    EnrichRequiredFields = requiredFields,
                 };
 
                 return GetClient().EnrichDefaultsAsync(content.Id, createOptions);
             case EnrichDefaults.Update:
                 var updateOptions = new ContentUpdateOptions
                 {
-                    EnrichDefaults = true
+                    EnrichDefaults = true,
                 };
 
                 return GetClient().UpdateAsync(content.Id, data, updateOptions);
@@ -273,7 +273,7 @@ public static partial class ContentStrategies
                 var upsertOptions = new ContentUpsertOptions
                 {
                     EnrichDefaults = true,
-                    EnrichRequiredFields = requiredFields
+                    EnrichRequiredFields = requiredFields,
                 };
 
                 return GetClient().UpsertAsync(content.Id, data, upsertOptions);
@@ -285,10 +285,10 @@ public static partial class ContentStrategies
                         new BulkUpdateJob
                         {
                             Type = BulkUpdateType.EnrichDefaults,
-                            Id = content.Id
+                            Id = content.Id,
                         },
                     ],
-                    EnrichRequiredFields = requiredFields
+                    EnrichRequiredFields = requiredFields,
                 });
             case EnrichDefaults.UpdateBulk:
                 return GetClient().BulkUpdateAsync(new BulkUpdate
@@ -303,7 +303,7 @@ public static partial class ContentStrategies
                             EnrichDefaults = true,
                         },
                     ],
-                    EnrichRequiredFields = requiredFields
+                    EnrichRequiredFields = requiredFields,
                 });
             case EnrichDefaults.UpsertBulk:
                 return GetClient().BulkUpdateAsync(new BulkUpdate
@@ -318,7 +318,7 @@ public static partial class ContentStrategies
                             EnrichDefaults = true,
                         },
                     ],
-                    EnrichRequiredFields = requiredFields
+                    EnrichRequiredFields = requiredFields,
                 });
             case EnrichDefaults.BulkWithSchema:
                 return GetClient().BulkUpdateAsync(new BulkUpdate
@@ -329,10 +329,10 @@ public static partial class ContentStrategies
                         {
                             Type = BulkUpdateType.EnrichDefaults,
                             Id = content.Id,
-                            Schema = content.SchemaName
+                            Schema = content.SchemaName,
                         },
                     ],
-                    EnrichRequiredFields = requiredFields
+                    EnrichRequiredFields = requiredFields,
                 });
             case EnrichDefaults.BulkShared:
                 return GetSharedClient(client).BulkUpdateAsync(new BulkUpdate
@@ -343,10 +343,10 @@ public static partial class ContentStrategies
                         {
                             Type = BulkUpdateType.EnrichDefaults,
                             Id = content.Id,
-                            Schema = content.SchemaName
+                            Schema = content.SchemaName,
                         },
                     ],
-                    EnrichRequiredFields = requiredFields
+                    EnrichRequiredFields = requiredFields,
                 });
             default:
                 return Task.CompletedTask;

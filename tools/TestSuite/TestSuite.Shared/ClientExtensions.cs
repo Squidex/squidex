@@ -370,7 +370,7 @@ public static class ClientExtensions
         var pausingStream = new PauseStream(fileParameter.Data, 0.25);
         var pausingFile = new FileParameter(pausingStream, fileParameter.FileName, fileParameter.ContentType)
         {
-            ContentLength = fileParameter.Data.Length
+            ContentLength = fileParameter.Data.Length,
         };
 
         await using (pausingFile.Data)

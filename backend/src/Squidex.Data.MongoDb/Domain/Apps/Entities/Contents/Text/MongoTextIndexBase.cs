@@ -31,23 +31,48 @@ public abstract class MongoTextIndexBase<T>(IMongoDatabase database, string shar
         public double Score { get; set; }
     }
 
-    protected override Task SetupCollectionAsync(IMongoCollection<MongoTextIndexEntity<T>> collection,
+    protected override async Task SetupCollectionAsync(IMongoCollection<MongoTextIndexEntity<T>> collection,
         CancellationToken ct)
     {
-        return collection.Indexes.CreateManyAsync(
-        [
-            new CreateIndexModel<MongoTextIndexEntity<T>>(
-                Index
-                    .Ascending(x => x.AppId)
-                    .Ascending(x => x.ContentId)),
+        var isFerreDb = await Database.IsFerretDbAsync(ct);
 
-            new CreateIndexModel<MongoTextIndexEntity<T>>(
-                Index
-                    .Ascending(x => x.AppId)
-                    .Ascending(x => x.SchemaId)
-                    .Ascending(x => x.GeoField)
-                    .Geo2DSphere(x => x.GeoObject)),
-        ], ct);
+        if (isFerreDb)
+        {
+            await collection.Indexes.CreateManyAsync(
+            [
+                new CreateIndexModel<MongoTextIndexEntity<T>>(
+                    Index
+                        .Ascending(x => x.AppId)
+                        .Ascending(x => x.ContentId)),
+
+                new CreateIndexModel<MongoTextIndexEntity<T>>(
+                    Index
+                        .Ascending(x => x.AppId)
+                        .Ascending(x => x.SchemaId)
+                        .Ascending(x => x.GeoField)),
+
+                new CreateIndexModel<MongoTextIndexEntity<T>>(
+                    Index
+                        .Geo2DSphere(x => x.GeoObject)),
+            ], ct);
+        }
+        else
+        {
+            await collection.Indexes.CreateManyAsync(
+            [
+                new CreateIndexModel<MongoTextIndexEntity<T>>(
+                    Index
+                        .Ascending(x => x.AppId)
+                        .Ascending(x => x.ContentId)),
+
+                new CreateIndexModel<MongoTextIndexEntity<T>>(
+                    Index
+                        .Ascending(x => x.AppId)
+                        .Ascending(x => x.SchemaId)
+                        .Ascending(x => x.GeoField)
+                        .Geo2DSphere(x => x.GeoObject)),
+            ], ct);
+        }
     }
 
     protected override string CollectionName()

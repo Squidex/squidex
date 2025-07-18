@@ -27,7 +27,7 @@ public class CreatedTeamFixture : ClientFixture
             {
                 var request = new CreateTeamDto
                 {
-                    Name = TeamName
+                    Name = TeamName,
                 };
 
                 Team = await Client.Teams.PostTeamAsync(request);
