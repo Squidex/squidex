@@ -32,7 +32,7 @@ public sealed class AppTests(CreatedAppFixture fixture) : IClassFixture<CreatedA
         // STEP 1: Update app.
         var updateRequest = new UpdateAppDto
         {
-            Label = Guid.NewGuid().ToString()
+            Label = Guid.NewGuid().ToString(),
         };
 
         var app_1 = await _.Client.Apps.PutAppAsync(updateRequest);
@@ -46,7 +46,7 @@ public sealed class AppTests(CreatedAppFixture fixture) : IClassFixture<CreatedA
         // STEP 1: Update app.
         var updateRequest = new UpdateAppDto
         {
-            Description = Guid.NewGuid().ToString()
+            Description = Guid.NewGuid().ToString(),
         };
 
         var app_1 = await _.Client.Apps.PutAppAsync(updateRequest);
@@ -125,12 +125,12 @@ public sealed class AppTests(CreatedAppFixture fixture) : IClassFixture<CreatedA
         {
             Patterns =
             [
-                new PatternDto { Name = "pattern", Regex = ".*" }
+                new PatternDto { Name = "pattern", Regex = ".*" },
             ],
             Editors =
             [
-                new EditorDto { Name = "editor", Url = "http://squidex.io/path/to/editor" }
-            ]
+                new EditorDto { Name = "editor", Url = "http://squidex.io/path/to/editor" },
+            ],
         };
 
         var settings_1 = await _.Client.Apps.PutSettingsAsync(updateRequest);

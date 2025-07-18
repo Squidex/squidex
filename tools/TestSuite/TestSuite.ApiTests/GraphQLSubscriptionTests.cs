@@ -55,7 +55,7 @@ public class GraphQLSubscriptionTests(ContentFixture fixture) : IClassFixture<Co
                     contentChanges {
                         id
                     }
-                }"
+                }",
         };
 
         var contentId = Guid.NewGuid().ToString();
@@ -95,7 +95,7 @@ public class GraphQLSubscriptionTests(ContentFixture fixture) : IClassFixture<Co
                     assetChanges {
                         id
                     }
-                }"
+                }",
         };
 
         var assetId = Guid.NewGuid().ToString();
@@ -128,7 +128,7 @@ public class GraphQLSubscriptionTests(ContentFixture fixture) : IClassFixture<Co
 
         var options = new GraphQLHttpClientOptions
         {
-            EndPoint = new Uri(_.Client.GenerateUrl($"/api/content/{_.AppName}/graphql?access_token={accessToken}")!)
+            EndPoint = new Uri(_.Client.GenerateUrl($"/api/content/{_.AppName}/graphql?access_token={accessToken}")!),
         };
 
         var client = new GraphQLHttpClient(options, new NewtonsoftJsonSerializer());

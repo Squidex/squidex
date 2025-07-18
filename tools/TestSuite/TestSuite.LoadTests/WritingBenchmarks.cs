@@ -31,7 +31,7 @@ public class WritingBenchmarks : IClassFixture<WritingFixture>
             10,
             20,
             50,
-            100
+            100,
         };
 
         int[] loads =
@@ -40,7 +40,7 @@ public class WritingBenchmarks : IClassFixture<WritingFixture>
             10,
             20,
             50,
-            100
+            100,
         };
 
         var data = new TheoryData<int, int>();
@@ -68,7 +68,7 @@ public class WritingBenchmarks : IClassFixture<WritingFixture>
         {
             await _.Contents.CreateAsync(new TestEntityData
             {
-                Number = random.Next()
+                Number = random.Next(),
             }, ContentCreateOptions.AsPublish);
         });
     }

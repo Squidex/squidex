@@ -40,7 +40,7 @@ public class AssetFoldersTests(CreatedAppFixture fixture) : IClassFixture<Create
         // STEP 2: Update folder
         var updateRequest = new RenameAssetFolderDto
         {
-            FolderName = Guid.NewGuid().ToString()
+            FolderName = Guid.NewGuid().ToString(),
         };
 
         var folder_1 = await _.Client.Assets.PutAssetFolderAsync(folder_0.Id, updateRequest);
@@ -61,7 +61,7 @@ public class AssetFoldersTests(CreatedAppFixture fixture) : IClassFixture<Create
         // STEP 2: Update folder
         var moveRequest = new MoveAssetFolderDto
         {
-            ParentId = folder1.Id
+            ParentId = folder1.Id,
         };
 
         var folder2_1 = await _.Client.Assets.PutAssetFolderParentAsync(folder2.Id, moveRequest);
@@ -101,7 +101,7 @@ public class AssetFoldersTests(CreatedAppFixture fixture) : IClassFixture<Create
         // STEP 2: Update folder
         var moveRequest = new MoveAssetFolderDto
         {
-            ParentId = folder2.Id
+            ParentId = folder2.Id,
         };
 
         await Assert.ThrowsAnyAsync<SquidexException>(() => _.Client.Assets.PutAssetFolderParentAsync(folder1.Id, moveRequest));
@@ -156,7 +156,7 @@ public class AssetFoldersTests(CreatedAppFixture fixture) : IClassFixture<Create
         {
             FolderName = name,
             // Create a nested asset folder.
-            ParentId = parentId
+            ParentId = parentId,
         };
 
         var folder = await _.Client.Assets.PostAssetFolderAsync(createRequest);

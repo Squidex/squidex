@@ -57,7 +57,7 @@ public sealed class AppRolesTests(CreatedAppFixture fixture) : IClassFixture<Cre
         // STEP 2: Update role..
         var updateRequest = new UpdateRoleDto
         {
-            Permissions = ["a", "b"]
+            Permissions = ["a", "b"],
         };
 
         var roles_2 = await _.Client.Apps.PutRoleAsync(roleName, updateRequest);
@@ -80,7 +80,7 @@ public sealed class AppRolesTests(CreatedAppFixture fixture) : IClassFixture<Cre
         // STEP 2 Assign client and contributor.
         var createClientRequest = new CreateClientDto
         {
-            Id = client
+            Id = client,
         };
 
         await _.Client.Apps.PostClientAsync(createClientRequest);
@@ -155,7 +155,7 @@ public sealed class AppRolesTests(CreatedAppFixture fixture) : IClassFixture<Cre
             // Test diffferent role names.
             Role = role,
             // Invite must be true, otherwise new users are not created.
-            Invite = true
+            Invite = true,
         };
 
         await _.Client.Apps.PostContributorAsync(assignRequest);
@@ -165,7 +165,7 @@ public sealed class AppRolesTests(CreatedAppFixture fixture) : IClassFixture<Cre
     {
         var updateRequest = new UpdateClientDto
         {
-            Role = role
+            Role = role,
         };
 
         await _.Client.Apps.PutClientAsync(client, updateRequest);
@@ -175,7 +175,7 @@ public sealed class AppRolesTests(CreatedAppFixture fixture) : IClassFixture<Cre
     {
         var createRequest = new AddRoleDto
         {
-            Name = name
+            Name = name,
         };
 
         var roles = await _.Client.Apps.PostRoleAsync(createRequest);

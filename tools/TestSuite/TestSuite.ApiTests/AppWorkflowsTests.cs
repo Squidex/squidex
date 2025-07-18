@@ -57,12 +57,12 @@ public sealed class AppWorkflowsTests(ClientFixture fixture) : IClassFixture<Cli
                 {
                     Transitions = new Dictionary<string, WorkflowTransitionDto>
                     {
-                        ["Published"] = new WorkflowTransitionDto()
-                    }
+                        ["Published"] = new WorkflowTransitionDto(),
+                    },
                 },
                 ["Published"] = new WorkflowStepDto(),
             },
-            Name = workflowName
+            Name = workflowName,
         };
 
         var workflows_2 = await app.Apps.PutWorkflowAsync(workflow.Id, updateRequest);
@@ -98,7 +98,7 @@ public sealed class AppWorkflowsTests(ClientFixture fixture) : IClassFixture<Cli
     {
         var createRequest = new AddWorkflowDto
         {
-            Name = workflowName
+            Name = workflowName,
         };
 
         var workflows = await app.Apps.PostWorkflowAsync(createRequest);

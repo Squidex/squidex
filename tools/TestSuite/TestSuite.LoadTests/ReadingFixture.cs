@@ -28,7 +28,7 @@ public sealed class ReadingFixture : TestSchemaFixtureBase
 
         var current = await Contents.GetAsync(new ContentQuery
         {
-            Top = 0
+            Top = 0,
         });
 
         var countTotal = (int)current.Total;
@@ -44,10 +44,10 @@ public sealed class ReadingFixture : TestSchemaFixtureBase
                     nested0 = index,
                     nested1 = new
                     {
-                        nested2 = index
-                    }
+                        nested2 = index,
+                    },
                 }),
-                String = index.ToString(CultureInfo.InvariantCulture)
+                String = index.ToString(CultureInfo.InvariantCulture),
             };
 
             await Contents.CreateAsync(data, ContentCreateOptions.AsPublish);

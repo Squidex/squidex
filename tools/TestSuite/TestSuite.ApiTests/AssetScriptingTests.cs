@@ -28,7 +28,7 @@ public class AssetScriptingTests(ClientFixture fixture) : IClassFixture<ClientFi
             Create = @"
                 if (ctx.command.mimeType == 'image/jpeg') {
                     disallow('We do not use jpeg anymore.');
-                }"
+                }",
         };
 
         await client.Apps.PutAssetScriptsAsync(scriptRequest);
@@ -52,7 +52,7 @@ public class AssetScriptingTests(ClientFixture fixture) : IClassFixture<ClientFi
                 ctx.command.metadata['key1'] = 'value1';
                 ctx.command.metadata['key2'] = 'value2';
                 ctx.command.tags.add('tag1');
-                ctx.command.tags.add('tag2');"
+                ctx.command.tags.add('tag2');",
         };
 
         await client.Apps.PutAssetScriptsAsync(scriptRequest);
@@ -78,7 +78,7 @@ public class AssetScriptingTests(ClientFixture fixture) : IClassFixture<ClientFi
             Update = @"
                 if (ctx.command.mimeType == 'image/jpeg') {
                     disallow('We do not use jpeg anymore.');
-                }"
+                }",
         };
 
         await client.Apps.PutAssetScriptsAsync(scriptRequest);
@@ -104,7 +104,7 @@ public class AssetScriptingTests(ClientFixture fixture) : IClassFixture<ClientFi
         {
             Update = @"
                 ctx.command.metadata['key1'] = 'value1';
-                ctx.command.metadata['key2'] = 'value2';"
+                ctx.command.metadata['key2'] = 'value2';",
         };
 
         await client.Apps.PutAssetScriptsAsync(scriptRequest);
@@ -132,7 +132,7 @@ public class AssetScriptingTests(ClientFixture fixture) : IClassFixture<ClientFi
             Query = @"
                 if (ctx.asset.mimeType == 'image/jpeg') {
                     disallow('We do not use jpeg anymore.');
-                }"
+                }",
         };
 
         await client.Apps.PutAssetScriptsAsync(scriptRequest);

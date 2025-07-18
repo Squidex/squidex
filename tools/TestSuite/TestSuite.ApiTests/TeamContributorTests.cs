@@ -27,7 +27,7 @@ public class TeamContributorTests(ClientFixture fixture) : IClassFixture<ClientF
         // STEP 1:  Do not invite contributors when flag is false.
         var createRequest = new AssignContributorDto
         {
-            ContributorId = "test@squidex.io"
+            ContributorId = "test@squidex.io",
         };
 
         var ex = await Assert.ThrowsAnyAsync<SquidexException>(() =>
@@ -111,7 +111,7 @@ public class TeamContributorTests(ClientFixture fixture) : IClassFixture<ClientF
             // Invite must be true, otherwise new users are not created.
             Invite = true,
             // This is the only allowed role for teams.
-            Role = "Owner"
+            Role = "Owner",
         };
 
         var contributors = await _.Client.Teams.PostContributorAsync(teamId, createInviteRequest);

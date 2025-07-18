@@ -64,7 +64,7 @@ public class RuleValidationTests(CreatedAppFixture fixture) : IClassFixture<Crea
     [Fact]
     public async Task Should_validate_valid_step()
     {
-        var trigger = new WebhookFlowStepDto { Url = new Uri("https://squidex.io") };
+        var trigger = new WebhookFlowStepDto { Url = "https://squidex.io" };
 
         await _.Client.Rules.ValidateStepAsync(trigger);
     }

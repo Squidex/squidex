@@ -33,7 +33,7 @@ public class ContentCleanupTests(CreatedAppFixture fixture) : IClassFixture<Crea
         var content_1 = await contents.CreateAsync(
             new TestEntityData
             {
-                String = "hello"
+                String = "hello",
             });
 
         Assert.Equal("hello", content_1.Data.String);
@@ -48,7 +48,7 @@ public class ContentCleanupTests(CreatedAppFixture fixture) : IClassFixture<Crea
             content_1.Id,
             new ChangeStatus
             {
-                Status = "Published"
+                Status = "Published",
             });
 
         // Should not return deleted field.
@@ -68,7 +68,7 @@ public class ContentCleanupTests(CreatedAppFixture fixture) : IClassFixture<Crea
         var contentA_1 = await contents.CreateAsync(
             new TestEntityWithReferencesData
             {
-                References = null
+                References = null,
             });
 
 
@@ -76,7 +76,7 @@ public class ContentCleanupTests(CreatedAppFixture fixture) : IClassFixture<Crea
         var contentB_1 = await contents.CreateAsync(
             new TestEntityWithReferencesData
             {
-                References = [contentA_1.Id]
+                References = [contentA_1.Id],
             });
 
 
@@ -88,7 +88,7 @@ public class ContentCleanupTests(CreatedAppFixture fixture) : IClassFixture<Crea
         var contentB_2 = await contents.ChangeStatusAsync(contentB_1.Id,
             new ChangeStatus
             {
-                Status = "Published"
+                Status = "Published",
             });
 
         // Should not return deleted field.

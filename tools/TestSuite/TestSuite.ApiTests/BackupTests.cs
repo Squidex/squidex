@@ -62,7 +62,7 @@ public class BackupTests(ClientFixture fixture) : IClassFixture<ClientFixture>
         {
             Url = uri,
             // Choose a new app name, because the old one is deleted.
-            Name = appNameRestore
+            Name = appNameRestore,
         };
 
         await _.Client.Backups.PostRestoreJobAsync(restoreRequest);
@@ -115,7 +115,7 @@ public class BackupTests(ClientFixture fixture) : IClassFixture<ClientFixture>
         {
             Url = uri,
             // Restore the old app name, because it has been deleted anyway.
-            Name = appName
+            Name = appName,
         };
 
         await app.Backups.PostRestoreJobAsync(restoreRequest);
@@ -137,7 +137,7 @@ public class BackupTests(ClientFixture fixture) : IClassFixture<ClientFixture>
         await contents.CreateAsync(
             new TestEntityData
             {
-                Number = 1
+                Number = 1,
             });
 
 
@@ -155,7 +155,7 @@ public class BackupTests(ClientFixture fixture) : IClassFixture<ClientFixture>
         // Create a workflow
         var workflowRequest = new AddWorkflowDto
         {
-            Name = "workflow"
+            Name = "workflow",
         };
 
         await app.Apps.PostWorkflowAsync(workflowRequest);
@@ -164,7 +164,7 @@ public class BackupTests(ClientFixture fixture) : IClassFixture<ClientFixture>
         // Create a language
         var languageRequest = new AddLanguageDto
         {
-            Language = "de"
+            Language = "de",
         };
 
         await app.Apps.PostLanguageAsync(languageRequest);
