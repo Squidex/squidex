@@ -58,7 +58,7 @@ dotnet_diagnostic.MA0004.severity = none
 dotnet_diagnostic.MA0006.severity = none
 
 # MA0007: Add a comma after the last value
-dotnet_diagnostic.MA0007.severity = none
+dotnet_diagnostic.MA0007.severity = warning
 
 # MA0008: Add StructLayoutAttribute
 dotnet_diagnostic.MA0008.severity = none    
@@ -182,6 +182,9 @@ dotnet_diagnostic.SA1615.severity = none
 
 # SA1623: Property summary documentation should match accessors
 dotnet_diagnostic.SA1623.severity = none
+
+# SYSLIB1045: Convert to 'GeneratedRegexAttribute'.
+dotnet_diagnostic.SYSLIB1045.severity = none
 
 # xUnit1033: Test classes decorated with 'Xunit.IClassFixture<TFixture>' or 'Xunit.ICollectionFixture<TFixture>' should add a constructor argument of type TFixture
 dotnet_diagnostic.xUnit1033.severity = none

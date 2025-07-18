@@ -38,7 +38,7 @@ public class SearchTests(ContentFixture fixture) : IClassFixture<ContentFixture>
 
         var createRequest = new CreateSchemaDto
         {
-            Name = schemaName
+            Name = schemaName,
         };
 
         await _.Client.Schemas.PostSchemaAsync(createRequest);
@@ -59,7 +59,7 @@ public class SearchTests(ContentFixture fixture) : IClassFixture<ContentFixture>
 
         var createRequest = new TestEntityData
         {
-            String = contentString
+            String = contentString,
         };
 
         await _.Contents.CreateAsync(createRequest, ContentCreateOptions.AsPublish);

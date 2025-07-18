@@ -35,8 +35,8 @@ public sealed class ContentQueryFixture : TestSchemaFixtureBase
                 {
                     nested1 = new
                     {
-                        nested2 = index
-                    }
+                        nested2 = index,
+                    },
                 }),
                 Geo = GeoJson.Point(
                     index + 100,
@@ -45,7 +45,7 @@ public sealed class ContentQueryFixture : TestSchemaFixtureBase
                 Searchable = $"text{index}",
                 Localized = new Dictionary<string, string?>
                 {
-                    ["en"] = index.ToString(CultureInfo.InvariantCulture)
+                    ["en"] = index.ToString(CultureInfo.InvariantCulture),
                 },
                 String = index.ToString(CultureInfo.InvariantCulture),
             };

@@ -250,8 +250,8 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
                     Tags =
                     [
                         randomTag1,
-                        randomTag2
-                    ]
+                        randomTag2,
+                    ],
                 };
 
                 await _.Client.Assets.PutAssetAsync(asset_1.Id, randomMetadataRequest, ct);
@@ -272,8 +272,8 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
             Tags =
             [
                 tag1,
-                tag2
-            ]
+                tag2,
+            ],
         };
 
         var asset_2 = await _.Client.Assets.PutAssetAsync(asset_1.Id, metadataRequest);
@@ -305,7 +305,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
         // STEP 2: Annotate file name.
         var fileNameRequest = new AnnotateAssetDto
         {
-            FileName = "My Image"
+            FileName = "My Image",
         };
 
         await _.Client.Assets.AnnotateAsync(asset_1, fileNameRequest, strategy);
@@ -333,8 +333,8 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
             Metadata = new Dictionary<string, object>
             {
                 ["pw"] = 100L,
-                ["ph"] = 20L
-            }
+                ["ph"] = 20L,
+            },
         };
 
         await _.Client.Assets.AnnotateAsync(asset_1, metadataRequest, strategy);
@@ -359,7 +359,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
         // STEP 2: Annotate slug.
         var slugRequest = new AnnotateAssetDto
         {
-            Slug = "my-image"
+            Slug = "my-image",
         };
 
         await _.Client.Assets.AnnotateAsync(asset_1, slugRequest, strategy);
@@ -387,8 +387,8 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
             Tags =
             [
                 "tag1",
-                "tag2"
-            ]
+                "tag2",
+            ],
         };
 
         await _.Client.Assets.AnnotateAsync(asset_1, tagsRequest, strategy);
@@ -423,7 +423,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
         // STEP 4: Protect asset.
         var protectRequest = new AnnotateAssetDto
         {
-            IsProtected = true
+            IsProtected = true,
         };
 
         await _.Client.Assets.AnnotateAsync(asset_1, protectRequest, strategy);
@@ -484,7 +484,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
         // STEP 1: Create folder.
         var folderRequest = new CreateAssetFolderDto
         {
-            FolderName = "folder"
+            FolderName = "folder",
         };
 
         var folder = await app.Assets.PostAssetFolderAsync(folderRequest);
@@ -510,7 +510,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
             Query = $@"
                 if (ctx.assetId === '{asset_1.Id}') {{
                     disallow();
-                }}"
+                }}",
         };
 
         await app.Apps.PutAssetScriptsAsync(scriptsRequest);
@@ -541,7 +541,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
         // STEP 1: Create folder.
         var folderRequest = new CreateAssetFolderDto
         {
-            FolderName = "folder"
+            FolderName = "folder",
         };
 
         var folder = await app.Assets.PostAssetFolderAsync(folderRequest);
@@ -561,7 +561,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
                     getAssetBlurHash(ctx.asset, function (hash) {
                         ctx.command.metadata['blurHash'] = hash;
                     });
-                }"
+                }",
         };
 
         await app.Apps.PutAssetScriptsAsync(scriptsRequest);
@@ -592,7 +592,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
         var assets_1 = await _.Client.Assets.GetAssetsAsync(
             new AssetQuery
             {
-                Filter = "metadata/pixelWidth eq 600"
+                Filter = "metadata/pixelWidth eq 600",
             });
 
         Assert.Contains(assets_1.Items, x => x.Id == asset_1.Id);
@@ -605,7 +605,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
             asset_1.Id,
             new AnnotateAssetDto
             {
-                Metadata = asset_1.Metadata
+                Metadata = asset_1.Metadata,
             });
 
 
@@ -613,7 +613,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
         var assets_2 = await _.Client.Assets.GetAssetsAsync(
             new AssetQuery
             {
-                Filter = "metadata/custom eq 'foo'"
+                Filter = "metadata/custom eq 'foo'",
             });
 
         Assert.Contains(assets_2.Items, x => x.Id == asset_1.Id);
@@ -630,7 +630,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
         var assets_1 = await _.Client.Assets.GetAssetsAsync(
             new AssetQuery
             {
-                ParentId = Guid.Empty.ToString()
+                ParentId = Guid.Empty.ToString(),
             });
 
         Assert.Contains(assets_1.Items, x => x.Id == asset_1.Id);
@@ -642,7 +642,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
         // STEP 1: Create asset folder.
         var folderRequest = new CreateAssetFolderDto
         {
-            FolderName = "sub"
+            FolderName = "sub",
         };
 
         var folder = await _.Client.Assets.PostAssetFolderAsync(folderRequest);
@@ -656,7 +656,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
         var assets_1 = await _.Client.Assets.GetAssetsAsync(
             new AssetQuery
             {
-                ParentId = folder.Id
+                ParentId = folder.Id,
             });
 
         Assert.Single(assets_1.Items, x => x.Id == asset_1.Id);
@@ -668,7 +668,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
         // STEP 1: Create asset folder.
         var createRequest1 = new CreateAssetFolderDto
         {
-            FolderName = "folder1"
+            FolderName = "folder1",
         };
 
         var folder_1 = await _.Client.Assets.PostAssetFolderAsync(createRequest1);
@@ -679,7 +679,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
         {
             FolderName = "subfolder",
             // Reference the parent folder by Id, so it must exist first.
-            ParentId = folder_1.Id
+            ParentId = folder_1.Id,
         };
 
         var folder_2 = await _.Client.Assets.PostAssetFolderAsync(createRequest2);
@@ -736,7 +736,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
         var deleted = await _.Client.Assets.GetAssetsAsync(
             new AssetQuery
             {
-                Filter = "isDeleted eq true"
+                Filter = "isDeleted eq true",
             });
 
         var permanent = strategy is ContentStrategies.Deletion.SinglePermanent or ContentStrategies.Deletion.BulkPermanent;
@@ -791,8 +791,8 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
                         path = "isDeleted",
                         op = "eq",
                         value = true,
-                    }
-                }
+                    },
+                },
             });
 
         Assert.NotEmpty(assets.Items);
@@ -825,7 +825,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
         // STEP 2: Rename tag.
         var renameRequest = new RenameTagDto
         {
-            TagName = "pngs"
+            TagName = "pngs",
         };
 
         await client.Assets.PutTagAsync("type/png", renameRequest);

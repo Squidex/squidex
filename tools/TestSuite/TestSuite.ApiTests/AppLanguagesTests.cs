@@ -70,9 +70,9 @@ public sealed class AppLanguagesTests(ClientFixture fixture) : IClassFixture<Cli
         {
             Fallback =
             [
-                "it"
+                "it",
             ],
-            IsOptional = true
+            IsOptional = true,
         };
 
         var languages_2 = await app.Apps.PutLanguageAsync("de", updateRequest);
@@ -101,9 +101,9 @@ public sealed class AppLanguagesTests(ClientFixture fixture) : IClassFixture<Cli
         {
             Fallback =
             [
-                "de"
+                "de",
             ],
-            IsOptional = true
+            IsOptional = true,
         };
 
         await app.Apps.PutLanguageAsync("it", updateRequest);
@@ -112,7 +112,7 @@ public sealed class AppLanguagesTests(ClientFixture fixture) : IClassFixture<Cli
         // STEP 3: Change master language to Italian.
         var masterRequest = new UpdateLanguageDto
         {
-            IsMaster = true
+            IsMaster = true,
         };
 
         var languages_4 = await app.Apps.PutLanguageAsync("it", masterRequest);
@@ -150,9 +150,9 @@ public sealed class AppLanguagesTests(ClientFixture fixture) : IClassFixture<Cli
         {
             Fallback =
             [
-                "de"
+                "de",
             ],
-            IsOptional = true
+            IsOptional = true,
         };
 
         await app.Apps.PutLanguageAsync("it", updateRequest);
@@ -173,7 +173,7 @@ public sealed class AppLanguagesTests(ClientFixture fixture) : IClassFixture<Cli
     {
         var createRequest = new AddLanguageDto
         {
-            Language = code
+            Language = code,
         };
 
         await app.Apps.PostLanguageAsync(createRequest);

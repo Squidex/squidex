@@ -425,7 +425,7 @@ public static class ClientExtensions
 
     public static async Task<AssetDto> UploadRandomFileAsync(this IAssetsClient client, int size, string? parentId = null, string? id = null)
     {
-        using (var stream = RandomAsset(size))
+        await using (var stream = RandomAsset(size))
         {
             var upload = new FileParameter(stream, RandomName(".txt"), "text/csv");
 

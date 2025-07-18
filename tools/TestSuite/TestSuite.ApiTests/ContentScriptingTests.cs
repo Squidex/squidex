@@ -27,7 +27,7 @@ public class ContentScriptingTests(CreatedAppFixture fixture) : IClassFixture<Cr
         {
             Create = @$"
                     ctx.data.{TestEntityData.NumberField}.iv *= 2;
-                    replace()"
+                    replace()",
         };
 
         // STEP 1: Create a schema.
@@ -40,7 +40,7 @@ public class ContentScriptingTests(CreatedAppFixture fixture) : IClassFixture<Cr
         var content = await contents.CreateAsync(
             new TestEntityData
             {
-                Number = 13
+                Number = 13,
             });
 
         Assert.Equal(26, content.Data.Number);
@@ -66,7 +66,7 @@ public class ContentScriptingTests(CreatedAppFixture fixture) : IClassFixture<Cr
         var content = await contents.CreateAsync(
             new TestEntityData
             {
-                Number = 13
+                Number = 13,
             },
             ContentCreateOptions.AsPublish);
 
@@ -95,7 +95,7 @@ public class ContentScriptingTests(CreatedAppFixture fixture) : IClassFixture<Cr
         var content = await contents.CreateAsync(
             new TestEntityData
             {
-                Number = 99
+                Number = 99,
             },
             ContentCreateOptions.AsPublish);
 
@@ -110,7 +110,7 @@ public class ContentScriptingTests(CreatedAppFixture fixture) : IClassFixture<Cr
         {
             Create = @$"
                     ctx.data.{TestEntityData.NumberField}.iv = incrementCounter('${schemaName}');
-                    replace()"
+                    replace()",
         };
 
         await TestEntity.CreateSchemaAsync(_.Client.Schemas, schemaName, scripts);
@@ -133,12 +133,12 @@ public class ContentScriptingTests(CreatedAppFixture fixture) : IClassFixture<Cr
                         {
                             number = new
                             {
-                                iv = 99
-                            }
-                        }
+                                iv = 99,
+                            },
+                        },
                     },
                 ],
-                Publish = true
+                Publish = true,
             });
 
         Assert.Single(results);
@@ -159,7 +159,7 @@ public class ContentScriptingTests(CreatedAppFixture fixture) : IClassFixture<Cr
         {
             Create = @$"
                     ctx.data.{TestEntityData.NumberField}.iv = incrementCounter('${schemaName}');
-                    replace()"
+                    replace()",
         };
 
         await TestEntity.CreateSchemaAsync(_.Client.Schemas, schemaName, scripts);
@@ -182,12 +182,12 @@ public class ContentScriptingTests(CreatedAppFixture fixture) : IClassFixture<Cr
                         {
                             number = new
                             {
-                                iv = 99
-                            }
-                        }
+                                iv = 99,
+                            },
+                        },
                     },
                 ],
-                Publish = true
+                Publish = true,
             });
 
         Assert.Single(results);

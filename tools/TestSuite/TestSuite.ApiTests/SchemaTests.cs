@@ -26,7 +26,7 @@ public class SchemaTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFi
         // STEP 1: Create schema.
         var createRequest = new CreateSchemaDto
         {
-            Name = schemaName
+            Name = schemaName,
         };
 
         var schema = await _.Client.Schemas.PostSchemaAsync(createRequest);
@@ -48,7 +48,7 @@ public class SchemaTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFi
         // STEP 1: Create schema.
         var createRequest = new CreateSchemaDto
         {
-            Name = schemaName
+            Name = schemaName,
         };
 
         var schema = await _.Client.Schemas.PostSchemaAsync(createRequest);
@@ -73,7 +73,7 @@ public class SchemaTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFi
             // Use the new property to create a singleton.
             Type = SchemaType.Singleton,
             // Must be pusblished to query content.
-            IsPublished = true
+            IsPublished = true,
         };
 
         var schema = await _.Client.Schemas.PostSchemaAsync(createRequest);
@@ -108,7 +108,7 @@ public class SchemaTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFi
             // Use the old property to create a singleton.
             IsSingleton = true,
             // Must be pusblished to query content.
-            IsPublished = true
+            IsPublished = true,
         };
 
         var schema = await _.Client.Schemas.PostSchemaAsync(createRequest);
@@ -148,8 +148,8 @@ public class SchemaTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFi
                     Partitioning = "invariant",
                     Properties = new ReferencesFieldPropertiesDto
                     {
-                        Editor = ReferencesFieldEditor.Checkboxes
-                    }
+                        Editor = ReferencesFieldEditor.Checkboxes,
+                    },
                 },
                 new UpsertSchemaFieldDto
                 {
@@ -158,10 +158,10 @@ public class SchemaTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFi
                     Properties = new TagsFieldPropertiesDto
                     {
                         Editor = TagsFieldEditor.Checkboxes,
-                        AllowedValues = ["value1"]
-                    }
+                        AllowedValues = ["value1"],
+                    },
                 },
-            ]
+            ],
         };
 
         var schema = await _.Client.Schemas.PostSchemaAsync(createRequest);
@@ -176,7 +176,7 @@ public class SchemaTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFi
         // STEP 1: Create schema.
         var createRequest = new CreateSchemaDto
         {
-            Name = schemaName
+            Name = schemaName,
         };
 
         var schema = await _.Client.Schemas.PostSchemaAsync(createRequest);
@@ -200,7 +200,7 @@ public class SchemaTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFi
         // STEP 1: Create schema.
         var createRequest = new CreateSchemaDto
         {
-            Name = schemaName
+            Name = schemaName,
         };
 
         var schema = await _.Client.Schemas.PostSchemaAsync(createRequest);

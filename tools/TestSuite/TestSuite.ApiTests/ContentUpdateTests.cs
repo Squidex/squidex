@@ -28,7 +28,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var content = await _.Contents.CreateAsync(
             new TestEntityData
             {
-                Number = 1
+                Number = 1,
             });
 
 
@@ -37,7 +37,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             content.Id,
             new ChangeStatus
             {
-                Status = "Published"
+                Status = "Published",
             });
 
 
@@ -52,7 +52,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var content = await _.Contents.CreateAsync(
             new TestEntityData
             {
-                Number = 1
+                Number = 1,
             },
             ContentCreateOptions.AsPublish);
 
@@ -62,7 +62,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             content.Id,
             new ChangeStatus
             {
-                Status = "Archived"
+                Status = "Archived",
             });
 
 
@@ -80,7 +80,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var content = await _.Contents.CreateAsync(
             new TestEntityData
             {
-                Number = 1
+                Number = 1,
             });
 
 
@@ -89,14 +89,14 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             content.Id,
             new ChangeStatus
             {
-                Status = "Published"
+                Status = "Published",
             });
 
         await _.Contents.ChangeStatusAsync(
             content.Id,
             new ChangeStatus
             {
-                Status = "Draft"
+                Status = "Draft",
             });
 
 
@@ -116,7 +116,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var content = await _.Contents.CreateAsync(
             new TestEntityData
             {
-                String = text
+                String = text,
             },
             ContentCreateOptions.AsPublish);
 
@@ -138,8 +138,8 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             {
                 Localized = new Dictionary<string, string?>
                 {
-                    ["en"] = null
-                }
+                    ["en"] = null,
+                },
             },
             ContentCreateOptions.AsPublish);
 
@@ -161,8 +161,8 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             {
                 Json = new JObject
                 {
-                    ["field.with.dot"] = 42
-                }
+                    ["field.with.dot"] = 42,
+                },
             },
             ContentCreateOptions.AsPublish);
 
@@ -182,7 +182,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var content = await _.Contents.CreateAsync(
             new TestEntityData
             {
-                Localized = []
+                Localized = [],
             },
             ContentCreateOptions.AsPublish);
 
@@ -200,7 +200,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var content = await _.Contents.CreateAsync(
             new TestEntityData
             {
-                Number = 1
+                Number = 1,
             });
 
 
@@ -220,7 +220,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var content = await _.Contents.CreateAsync(
             new TestEntityData
             {
-                Number = 1
+                Number = 1,
             },
             ContentCreateOptions.AsPublish);
 
@@ -238,7 +238,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var content = await _.Contents.CreateAsync(
             new TestEntityData
             {
-                Number = 1
+                Number = 1,
             },
             ContentCreateOptions.AsPublish);
 
@@ -252,7 +252,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             content.Id,
             new TestEntityData
             {
-                Number = 2
+                Number = 2,
             });
 
         var updated_1 = await _.Contents.GetAsync(content.Id);
@@ -271,7 +271,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             content.Id,
             new ChangeStatus
             {
-                Status = "Published"
+                Status = "Published",
             });
 
         var updated_2 = await _.Contents.GetAsync(content.Id);
@@ -288,7 +288,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var content = await _.Contents.CreateAsync(
             new TestEntityData
             {
-                Number = 1
+                Number = 1,
             },
             new ContentCreateOptions { Id = id, Publish = true });
 
@@ -304,7 +304,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var content = await _.Contents.CreateAsync(
             new TestEntityData
             {
-                Number = 1
+                Number = 1,
             },
             new ContentCreateOptions { Id = id, Publish = true });
 
@@ -317,7 +317,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             return _.Contents.CreateAsync(
                 new TestEntityData
                 {
-                    Number = 1
+                    Number = 1,
                 },
                 new ContentCreateOptions { Id = id, Publish = true });
         });
@@ -335,7 +335,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             id,
             new TestEntityData
             {
-                Number = 1
+                Number = 1,
             },
             ContentUpsertOptions.AsPublish);
 
@@ -347,7 +347,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             id,
             new TestEntityData
             {
-                Number = 2
+                Number = 2,
             });
 
         Assert.Equal(2, content.Data.Number);
@@ -358,7 +358,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             id,
             new TestEntityData
             {
-                Number = 3
+                Number = 3,
             });
 
         Assert.Equal(3, content.Data.Number);
@@ -399,7 +399,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var content = await _.Contents.CreateAsync(
             new TestEntityData
             {
-                String = "2"
+                String = "2",
             },
             ContentCreateOptions.AsPublish);
 
@@ -409,7 +409,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             content,
             new TestEntityData
             {
-                Number = 200
+                Number = 200,
             },
             strategy);
 
@@ -428,7 +428,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var content = await _.Contents.CreateAsync(
             new TestEntityData
             {
-                Number = 100
+                Number = 100,
             },
             ContentCreateOptions.AsPublish);
 
@@ -442,9 +442,9 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
                 {
                     ["iv"] = new JObject
                     {
-                        ["$update"] = "$data.number.iv + 42"
-                    }
-                }
+                        ["$update"] = "$data.number.iv + 42",
+                    },
+                },
             });
 
         var updated = await _.Contents.GetAsync(content.Id);
@@ -464,7 +464,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             {
                 String = "Hello",
                 // Not relevant for the test, but required in the schema.
-                Number = 100
+                Number = 100,
             },
             ContentCreateOptions.AsPublish);
 
@@ -475,8 +475,8 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             {
                 [TestEntityData.StringField] = new JObject
                 {
-                    ["$unset"] = true
-                }
+                    ["$unset"] = true,
+                },
             });
 
         var updated = await _.Contents.GetAsync(content.Id);
@@ -493,7 +493,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             {
                 String = "Hello",
                 // Not relevant for the test, but required in the schema.
-                Number = 100
+                Number = 100,
             },
             ContentCreateOptions.AsPublish);
 
@@ -506,9 +506,9 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
                 {
                     ["iv"] = new JObject
                     {
-                        ["$unset"] = true
-                    }
-                }
+                        ["$unset"] = true,
+                    },
+                },
             });
 
         var updated = await _.Contents.GetAsync(content.Id);
@@ -529,7 +529,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var content = await _.Contents.CreateAsync(
             new TestEntityData
             {
-                String = "initial"
+                String = "initial",
             },
             ContentCreateOptions.AsPublish);
 
@@ -539,7 +539,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             content,
             new TestEntityData
             {
-                String = null
+                String = null,
             },
             strategy);
 
@@ -561,7 +561,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var content = await _.Contents.CreateAsync(
             new TestEntityData
             {
-                String = "initial"
+                String = "initial",
             },
             ContentCreateOptions.AsPublish);
 
@@ -571,7 +571,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             content,
             new TestEntityData
             {
-                Number = 200
+                Number = 200,
             },
             strategy);
 
@@ -590,7 +590,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var content = await _.Contents.CreateAsync(
             new TestEntityData
             {
-                Number = 100
+                Number = 100,
             },
             ContentCreateOptions.AsPublish);
 
@@ -603,9 +603,9 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
                 {
                     ["iv"] = new JObject
                     {
-                        ["$update"] = "$data.number.iv + 42"
-                    }
-                }
+                        ["$update"] = "$data.number.iv + 42",
+                    },
+                },
             });
 
         var updated = await _.Contents.GetAsync(content.Id);
@@ -629,7 +629,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var content = await _.Contents.CreateAsync(
             new TestEntityData
             {
-                Id = "id1"
+                Id = "id1",
             },
             ContentCreateOptions.AsPublish);
 
@@ -639,7 +639,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             content,
             new TestEntityData
             {
-                Id = "id2"
+                Id = "id2",
             },
             strategy);
 
@@ -661,7 +661,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var content = await _.Contents.CreateAsync(
             new TestEntityData
             {
-                String = "initial"
+                String = "initial",
             },
             ContentCreateOptions.AsPublish);
 
@@ -671,7 +671,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             content,
             new
             {
-                @string = new { iv = (string?)null }
+                @string = new { iv = (string?)null },
             },
             strategy);
 
@@ -691,7 +691,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var content = await _.Contents.CreateAsync(
             new TestEntityData
             {
-                Number = 2
+                Number = 2,
             },
             ContentCreateOptions.AsPublish);
 
@@ -727,7 +727,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var content = await _.Contents.CreateAsync(
             new TestEntityData
             {
-                Number = 1
+                Number = 1,
             },
             new ContentCreateOptions { Id = id, Publish = true });
 
@@ -755,7 +755,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var content_1 = await _.Contents.CreateAsync(
             new TestEntityData
             {
-                Number = 2
+                Number = 2,
             },
             ContentCreateOptions.AsPublish);
 
@@ -768,7 +768,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var content_2 = await _.Contents.CreateAsync(
             new TestEntityData
             {
-                Number = 2
+                Number = 2,
             },
             new ContentCreateOptions { Id = content_1.Id, Publish = true });
 
@@ -794,7 +794,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var content_1 = await _.Contents.CreateAsync(
             new TestEntityData
             {
-                Number = 2
+                Number = 2,
             },
             ContentCreateOptions.AsPublish);
 
@@ -808,7 +808,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             content_1.Id,
             new TestEntityData
             {
-                Number = 2
+                Number = 2,
             },
             ContentUpsertOptions.AsPublish);
 
@@ -830,7 +830,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var content_1 = await _.Contents.CreateAsync(
             new TestEntityData
             {
-                Number = 1
+                Number = 1,
             },
             options);
 
@@ -843,7 +843,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var content_2 = await _.Contents.CreateAsync(
             new TestEntityData
             {
-                Number = 2
+                Number = 2,
             },
             options);
 
@@ -870,9 +870,9 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
                 new UpsertSchemaFieldDto
                 {
                     Name = "my-field",
-                    Properties = new StringFieldPropertiesDto()
+                    Properties = new StringFieldPropertiesDto(),
                 },
-            ]
+            ],
         };
 
         await _.Client.Schemas.PostSchemaAsync(createRequest);
@@ -893,8 +893,8 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             {
                 ["my-field"] = new JObject
                 {
-                    ["iv"] = "singleton"
-                }
+                    ["iv"] = "singleton",
+                },
             });
 
         Assert.Equal("singleton", content_2.Data["my-field"]["iv"]);
@@ -909,7 +909,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var content = await _.Contents.CreateAsync(
             new TestEntityData
             {
-                Number = 1
+                Number = 1,
             },
             ContentCreateOptions.AsPublish);
 
@@ -919,7 +919,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             content.Id,
             new TestEntityData
             {
-                Number = 2
+                Number = 2,
             });
 
 
@@ -950,7 +950,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var content = await _.Contents.CreateAsync(
             new TestEntityData
             {
-                Number = 2
+                Number = 2,
             },
             ContentCreateOptions.AsPublish);
 
@@ -964,7 +964,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
                     content.Id,
                     new TestEntityData
                     {
-                        Number = i
+                        Number = i,
                     },
                     ct: ct);
             }
@@ -980,7 +980,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             content.Id,
             new TestEntityData
             {
-                Number = 2
+                Number = 2,
             });
 
         var updated = await _.Contents.GetAsync(content.Id);
@@ -995,7 +995,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var content = await _.Contents.CreateAsync(
             new TestEntityData
             {
-                Number = 2
+                Number = 2,
             },
             ContentCreateOptions.AsPublish);
 
@@ -1009,7 +1009,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
                     content.Id,
                     new TestEntityData
                     {
-                        Number = i
+                        Number = i,
                     },
                     ct: ct);
             }
@@ -1025,7 +1025,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             content.Id,
             new TestEntityData
             {
-                Number = 2
+                Number = 2,
             });
 
         var updated = await _.Contents.GetAsync(content.Id);
@@ -1050,7 +1050,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var schemaRequest = new CreateSchemaDto
         {
             Name = schemaName,
-            IsPublished = true
+            IsPublished = true,
         };
 
         await _.Client.Schemas.PostSchemaAsync(schemaRequest);
@@ -1071,8 +1071,8 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             Properties = new StringFieldPropertiesDto
             {
                 DefaultValue = "Hello Squidex",
-                IsRequired = false
-            }
+                IsRequired = false,
+            },
         };
 
         await _.Client.Schemas.PostFieldAsync(schemaName, fieldRequest);
@@ -1106,7 +1106,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var schemaRequest = new CreateSchemaDto
         {
             Name = schemaName,
-            IsPublished = true
+            IsPublished = true,
         };
 
         await _.Client.Schemas.PostSchemaAsync(schemaRequest);
@@ -1128,8 +1128,8 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             Properties = new StringFieldPropertiesDto
             {
                 DefaultValue = "Hello Squidex",
-                IsRequired = false
-            }
+                IsRequired = false,
+            },
         };
 
         var fieldRequest2 = new AddFieldDto
@@ -1138,8 +1138,8 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             Properties = new StringFieldPropertiesDto
             {
                 DefaultValue = "Hello Required",
-                IsRequired = true
-            }
+                IsRequired = true,
+            },
         };
 
         await _.Client.Schemas.PostFieldAsync(schemaName, fieldRequest1);
@@ -1175,7 +1175,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var schemaRequest = new CreateSchemaDto
         {
             Name = schemaName,
-            IsPublished = true
+            IsPublished = true,
         };
 
         await _.Client.Schemas.PostSchemaAsync(schemaRequest);
@@ -1197,8 +1197,8 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             Properties = new StringFieldPropertiesDto
             {
                 DefaultValue = "Hello Required",
-                IsRequired = true
-            }
+                IsRequired = true,
+            },
         };
         await _.Client.Schemas.PostFieldAsync(schemaName, fieldRequest);
 
@@ -1235,13 +1235,13 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
                         {
                             [TestEntityData.StringField] = new
                             {
-                                iv = $"{prefix}_1"
+                                iv = $"{prefix}_1",
                             },
                             [TestEntityData.NumberField] = new
                             {
-                                iv = 1
-                            }
-                        }
+                                iv = 1,
+                            },
+                        },
                     },
                     new BulkUpdateJob
                     {
@@ -1249,16 +1249,16 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
                         {
                             [TestEntityData.StringField] = new
                             {
-                                iv = $"{prefix}_2"
+                                iv = $"{prefix}_2",
                             },
                             [TestEntityData.NumberField] = new
                             {
-                                iv = 2
-                            }
-                        }
+                                iv = 2,
+                            },
+                        },
                     },
                 ],
-                Publish = true
+                Publish = true,
             });
 
         result_0 = result_0.OrderBy(x => x.JobIndex).ToList();
@@ -1278,17 +1278,17 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
                             {
                                 path = $"data.{TestEntityData.StringField}.iv",
                                 op = "eq",
-                                value = $"{prefix}_1"
-                            }
+                                value = $"{prefix}_1",
+                            },
                         },
                         Data = new Dictionary<string, object>
                         {
                             [TestEntityData.StringField] = new
                             {
-                                iv = $"{prefix}_1_x"
-                            }
+                                iv = $"{prefix}_1_x",
+                            },
                         },
-                        Type = BulkUpdateType.Patch
+                        Type = BulkUpdateType.Patch,
                     },
                     new BulkUpdateJob
                     {
@@ -1298,19 +1298,19 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
                             {
                                 path = $"data.{TestEntityData.StringField}.iv",
                                 op = "eq",
-                                value = $"{prefix}_2"
-                            }
+                                value = $"{prefix}_2",
+                            },
                         },
                         Data = new Dictionary<string, object>
                         {
                             [TestEntityData.StringField] = new
                             {
-                                iv = $"{prefix}_2_y"
-                            }
+                                iv = $"{prefix}_2_y",
+                            },
                         },
-                        Type = BulkUpdateType.Patch
+                        Type = BulkUpdateType.Patch,
                     },
-                ]
+                ],
             });
 
         result_1.OrderBy(x => x.JobIndex).Should().BeEquivalentTo(
@@ -1318,12 +1318,12 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
             new BulkResult
             {
                 ContentId = result_0[0].ContentId,
-                JobIndex = 0
+                JobIndex = 0,
             },
             new BulkResult
             {
                 ContentId = result_0[1].ContentId,
-                JobIndex = 1
+                JobIndex = 1,
             },
         ]);
 
@@ -1332,7 +1332,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var contents = await _.Contents.GetAsync(
             new ContentQuery
             {
-                Ids = result_0.Select(x => x.ContentId).ToHashSet()
+                Ids = result_0.Select(x => x.ContentId).ToHashSet(),
             });
 
         var content0 = contents.Items.Find(x => x.Id == result_0[0].ContentId);
@@ -1349,7 +1349,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var content = await _.Contents.CreateAsync(
             new TestEntityData
             {
-                Immutable = "v1"
+                Immutable = "v1",
             },
             ContentCreateOptions.AsPublish);
 
@@ -1366,7 +1366,7 @@ public class ContentUpdateTests(ContentFixture fixture) : IClassFixture<ContentF
         var ex = await Assert.ThrowsAsync<SquidexException<ErrorDto>>(() => _.Contents.UpdateAsync(content));
 
         Assert.Equal(400, ex.StatusCode);
-        Assert.Contains("Validation error: immutable.iv: Field cannot be changed", ex.ToString());
+        Assert.Contains("Validation error: immutable.iv: Field cannot be changed", ex.ToString(), StringComparison.Ordinal);
     }
 
     [Fact]

@@ -25,12 +25,12 @@
     <PackageReference Include="MongoDB.Driver.GridFS" Version="2.30.0" />
     <PackageReference Include="NodaTime.Serialization.SystemTextJson" Version="1.3.0" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
-    <PackageReference Include="Squidex.AI.Mongo" Version="7.25.0" />
-    <PackageReference Include="Squidex.Assets.Mongo" Version="7.25.0" />
-    <PackageReference Include="Squidex.Events.Mongo" Version="7.25.0" />
-    <PackageReference Include="Squidex.Flows.Mongo" Version="7.25.0" />
-    <PackageReference Include="Squidex.Hosting" Version="7.25.0" />
-    <PackageReference Include="Squidex.Messaging.Mongo" Version="7.25.0" />
+    <PackageReference Include="Squidex.AI.Mongo" Version="7.26.0" />
+    <PackageReference Include="Squidex.Assets.Mongo" Version="7.26.0" />
+    <PackageReference Include="Squidex.Events.Mongo" Version="7.26.0" />
+    <PackageReference Include="Squidex.Flows.Mongo" Version="7.26.0" />
+    <PackageReference Include="Squidex.Hosting" Version="7.26.0" />
+    <PackageReference Include="Squidex.Messaging.Mongo" Version="7.26.0" />
     <PackageReference Include="Squidex.OpenIddict.MongoDb" Version="5.8.4" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />

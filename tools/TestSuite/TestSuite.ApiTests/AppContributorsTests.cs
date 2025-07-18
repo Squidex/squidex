@@ -27,7 +27,7 @@ public sealed class AppContributorsTests(ClientFixture fixture) : IClassFixture<
         // STEP 1:  Do not invite contributors when flag is false.
         var createRequest = new AssignContributorDto
         {
-            ContributorId = "test@squidex.io"
+            ContributorId = "test@squidex.io",
         };
 
         var ex = await Assert.ThrowsAnyAsync<SquidexException>(() =>
@@ -72,7 +72,7 @@ public sealed class AppContributorsTests(ClientFixture fixture) : IClassFixture<
         {
             ContributorId = contributor.ContributorId,
             // Test update of role.
-            Role = "Owner"
+            Role = "Owner",
         };
 
         var contributors_2 = await app.Apps.PostContributorAsync(updateRequest);
@@ -132,7 +132,7 @@ public sealed class AppContributorsTests(ClientFixture fixture) : IClassFixture<
             // Invite must be true, otherwise new users are not created.
             Invite = true,
             // The initial role or editor otherwise.
-            Role = role
+            Role = role,
         };
 
         var contributors = await app.Apps.PostContributorAsync(createInviteRequest);

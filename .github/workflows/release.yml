@@ -277,7 +277,7 @@ jobs:
           path: ./CHANGELOG.md
 
       - name: Release - Publish Binaries
-        uses: ncipollo/release-action@v1.16.0
+        uses: ncipollo/release-action@v1.18.0
         with:
           allowUpdates: true
           artifactErrorsFailBuild: true

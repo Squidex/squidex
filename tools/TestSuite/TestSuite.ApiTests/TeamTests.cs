@@ -24,7 +24,7 @@ public class TeamTests(CreatedTeamFixture fixture) : IClassFixture<CreatedTeamFi
         // STEP 1: Update app.
         var updateRequest = new UpdateTeamDto
         {
-            Name = Guid.NewGuid().ToString()
+            Name = Guid.NewGuid().ToString(),
         };
 
         var app_1 = await _.Client.Teams.PutTeamAsync(_.TeamId, updateRequest);
@@ -42,7 +42,7 @@ public class TeamTests(CreatedTeamFixture fixture) : IClassFixture<CreatedTeamFi
         // STEP 1: Assign app to team.
         var transferRequest = new TransferToTeamDto
         {
-            TeamId = _.TeamId
+            TeamId = _.TeamId,
         };
 
         var app_1 = await client.Apps.PutAppTeamAsync(transferRequest);
@@ -60,7 +60,7 @@ public class TeamTests(CreatedTeamFixture fixture) : IClassFixture<CreatedTeamFi
         // STEP 1: Assign app to team.
         var transferRequest = new TransferToTeamDto
         {
-            TeamId = _.TeamId
+            TeamId = _.TeamId,
         };
 
         var app_1 = await client.Apps.PutAppTeamAsync(transferRequest);
@@ -71,7 +71,7 @@ public class TeamTests(CreatedTeamFixture fixture) : IClassFixture<CreatedTeamFi
         // STEP 2: Remove app from team.
         var untransferRequest = new TransferToTeamDto
         {
-            TeamId = null
+            TeamId = null,
         };
 
         var app_2 = await client.Apps.PutAppTeamAsync(untransferRequest);
@@ -94,7 +94,7 @@ public class TeamTests(CreatedTeamFixture fixture) : IClassFixture<CreatedTeamFi
         // STEP 1: Assign scheme.
         var request = new AuthSchemeValueDto
         {
-            Scheme = scheme
+            Scheme = scheme,
         };
 
         var scheme_0 = await _.Client.Teams.PutTeamAuthAsync(_.TeamId, request);
@@ -123,7 +123,7 @@ public class TeamTests(CreatedTeamFixture fixture) : IClassFixture<CreatedTeamFi
         // STEP 0: Assign scheme.
         var request1 = new AuthSchemeValueDto
         {
-            Scheme = scheme
+            Scheme = scheme,
         };
 
         await _.Client.Teams.PutTeamAuthAsync(_.TeamId, request1);
@@ -132,7 +132,7 @@ public class TeamTests(CreatedTeamFixture fixture) : IClassFixture<CreatedTeamFi
         // STEP 1: Unassign scheme.
         var request2 = new AuthSchemeValueDto
         {
-            Scheme = null
+            Scheme = null,
         };
 
         var scheme_0 = await _.Client.Teams.PutTeamAuthAsync(_.TeamId, request2);

@@ -43,15 +43,15 @@ public class RuleTests(ClientFixture fixture) : IClassFixture<ClientFixture>
                             Method = WebhookMethod.POST,
                             Payload = null,
                             PayloadType = null,
-                            Url = new Uri("http://squidex.io")
-                        }
-                    }
-                }
+                            Url = "http://squidex.io",
+                        },
+                    },
+                },
             },
             Trigger = new ContentChangedRuleTriggerDto
             {
-                HandleAll = true
-            }
+                HandleAll = true,
+            },
         };
 
         var rule = await app.Rules.PostRuleAsync(createRule);
@@ -76,12 +76,12 @@ public class RuleTests(ClientFixture fixture) : IClassFixture<ClientFixture>
                 Method = WebhookMethod.POST,
                 Payload = null,
                 PayloadType = null,
-                Url = new Uri("http://squidex.io")
+                Url = new Uri("http://squidex.io"),
             },
             Trigger = new ContentChangedRuleTriggerDto
             {
-                HandleAll = true
-            }
+                HandleAll = true,
+            },
         };
 
         var rule = await app.Rules.PostRuleAsync(createRule);
@@ -112,15 +112,15 @@ public class RuleTests(ClientFixture fixture) : IClassFixture<ClientFixture>
                             Method = WebhookMethod.POST,
                             Payload = null,
                             PayloadType = null,
-                            Url = new Uri("http://squidex.io")
-                        }
-                    }
-                }
+                            Url = "http://squidex.io",
+                        },
+                    },
+                },
             },
             Trigger = new ContentChangedRuleTriggerDto
             {
-                HandleAll = true
-            }
+                HandleAll = true,
+            },
         };
 
         var rule_0 = await app.Rules.PostRuleAsync(createRequest);
@@ -129,7 +129,7 @@ public class RuleTests(ClientFixture fixture) : IClassFixture<ClientFixture>
         // STEP 2: Update rule.
         var updateRequest = new UpdateRuleDto
         {
-            Name = ruleName
+            Name = ruleName,
         };
 
         var rule_1 = await app.Rules.PutRuleAsync(rule_0.Id, updateRequest);
@@ -160,15 +160,15 @@ public class RuleTests(ClientFixture fixture) : IClassFixture<ClientFixture>
                             Method = WebhookMethod.POST,
                             Payload = null,
                             PayloadType = null,
-                            Url = new Uri("http://squidex.io")
-                        }
-                    }
-                }
+                            Url = "http://squidex.io",
+                        },
+                    },
+                },
             },
             Trigger = new ContentChangedRuleTriggerDto
             {
-                HandleAll = true
-            }
+                HandleAll = true,
+            },
         };
 
         var rule = await app.Rules.PostRuleAsync(createRequest);

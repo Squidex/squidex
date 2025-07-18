@@ -27,8 +27,8 @@ public class ContentLanguageTests(ContentFixture fixture) : IClassFixture<Conten
                 Localized = new Dictionary<string, string?>
                 {
                     ["de"] = "Hallo",
-                    ["en"] = "Hello"
-                }
+                    ["en"] = "Hello",
+                },
             },
             ContentCreateOptions.AsPublish,
             QueryContext.Default.WithLanguages("de"));
@@ -51,8 +51,8 @@ public class ContentLanguageTests(ContentFixture fixture) : IClassFixture<Conten
                 {
                     ["de"] = "Hallo",
                     ["en"] = "Hello",
-                    ["custom"] = "Custom"
-                }
+                    ["custom"] = "Custom",
+                },
             },
             ContentCreateOptions.AsPublish);
 
@@ -75,8 +75,8 @@ public class ContentLanguageTests(ContentFixture fixture) : IClassFixture<Conten
                 Localized = new Dictionary<string, string?>
                 {
                     ["de"] = "Hallo",
-                    ["en"] = "Hello"
-                }
+                    ["en"] = "Hello",
+                },
             },
             ContentCreateOptions.AsPublish);
 
@@ -88,14 +88,14 @@ public class ContentLanguageTests(ContentFixture fixture) : IClassFixture<Conten
             content.Id,
             new Dictionary<string, string>
             {
-                ["X-Flatten"] = "1"
+                ["X-Flatten"] = "1",
             });
 
         var (etag3, _) = await GetEtagAsync(
             content.Id,
             new Dictionary<string, string>
             {
-                ["X-Languages"] = "en"
+                ["X-Languages"] = "en",
             });
 
         var (etag4, _) = await GetEtagAsync(
@@ -103,7 +103,7 @@ public class ContentLanguageTests(ContentFixture fixture) : IClassFixture<Conten
             new Dictionary<string, string>
             {
                 ["X-Languages"] = "en",
-                ["X-Flatten"] = "1"
+                ["X-Flatten"] = "1",
             });
 
         static void AssertValue(string? value, string? not = null)

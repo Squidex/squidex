@@ -46,10 +46,10 @@ public class ContentCollationTests(CreatedAppFixture fixture) : IClassFixture<Cr
                 new UpsertSchemaFieldDto
                 {
                     Name = SimpleEntityData.StringField,
-                    Properties = new StringFieldPropertiesDto()
+                    Properties = new StringFieldPropertiesDto(),
                 },
             ],
-            IsPublished = true
+            IsPublished = true,
         };
 
         await _.Client.Schemas.PostSchemaAsync(schemaRequest);
@@ -60,21 +60,21 @@ public class ContentCollationTests(CreatedAppFixture fixture) : IClassFixture<Cr
         await contents.CreateAsync(
             new SimpleEntityData
             {
-                String = "İstanbul"
+                String = "İstanbul",
             },
             ContentCreateOptions.AsPublish);
 
         await contents.CreateAsync(
             new SimpleEntityData
             {
-                String = "Mersin"
+                String = "Mersin",
             },
             ContentCreateOptions.AsPublish);
 
         await contents.CreateAsync(
             new SimpleEntityData
             {
-                String = "Lüleburgaz"
+                String = "Lüleburgaz",
             },
             ContentCreateOptions.AsPublish);
 
