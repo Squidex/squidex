@@ -6,15 +6,14 @@
 // ==========================================================================
 
 using System.Globalization;
-using Newtonsoft.Json;
 using Squidex.CLI.Commands.Implementation;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Json;
 using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates;
 
-// Use newtonsoft JSON because the CLI still deals with this library and uses JTokens.
-public sealed class StringLogger : ILogger, ILogLine
+public sealed class StringLogger(IJsonSerializer jsonSerializer) : ILogger, ILogLine
 {
     private const int MaxActionLength = 40;
     private readonly List<string> lines = [];
@@ -23,18 +22,16 @@ public sealed class StringLogger : ILogger, ILogLine
 
     public bool CanWriteToSameLine => false;
 
-    public List<string> Lines => lines;
-
     public void Flush(ISemanticLog log, string template)
     {
-        var mesage = string.Join('\n', Lines);
+        var mesage = string.Join('\n', lines);
 
         log.LogInformation(w => w
             .WriteProperty("message", $"CLI executed or template {template}.")
             .WriteProperty("template", template)
             .WriteArray("steps", a =>
             {
-                foreach (var line in Lines)
+                foreach (var line in lines)
                 {
                     a.WriteValue(line);
                 }
@@ -87,22 +84,22 @@ public sealed class StringLogger : ILogger, ILogLine
 
     public void WriteLine()
     {
-        Lines.Add(string.Empty);
+        lines.Add(string.Empty);
     }
 
     public void WriteLine(string message)
     {
-        Lines.Add(message);
+        lines.Add(message);
     }
 
     public void WriteLine(string message, params object?[] args)
     {
-        Lines.Add(string.Format(CultureInfo.InvariantCulture, message, args));
+        lines.Add(string.Format(CultureInfo.InvariantCulture, message, args));
     }
 
     public void WriteJson(object message)
     {
-        Lines.Add(JsonConvert.SerializeObject(message, Formatting.Indented));
+        lines.Add(jsonSerializer.Serialize(message, true));
     }
 
     private void AddToErrors(string reason)
@@ -113,7 +110,7 @@ public sealed class StringLogger : ILogger, ILogLine
     private void AddToLine(string message)
     {
         startedLine += message;
-        Lines.Add(startedLine);
+        lines.Add(startedLine);
         startedLine = string.Empty;
     }
 

@@ -180,7 +180,7 @@ export class RulesService {
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return this.http.request(link.method, url, { body: {} }).pipe(
+        return this.http.request<any>(link.method, url, { body: {} }).pipe(
             pretifyError('i18n:rules.triggerFailed'));
     }
 
