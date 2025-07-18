@@ -50,17 +50,17 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
                     {
                         Step = new WebhookFlowStepDto
                         {
-                            Url = new Uri(url),
+                            Url = url,
                             // Also test the secret in this case.
-                            SharedSecret = secret
-                        }
-                    }
-                }
+                            SharedSecret = secret,
+                        },
+                    },
+                },
             },
             Trigger = new ContentChangedRuleTriggerDto
             {
-                HandleAll = true
-            }
+                HandleAll = true,
+            },
         };
 
         var rule = await app.Rules.PostRuleAsync(createRule);
@@ -103,7 +103,7 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
         var referencedContent = await referencedContents.CreateAsync(
             new TestEntityData
             {
-                String = contentString
+                String = contentString,
             });
 
         var parentSchema = await TestEntityWithReferences.CreateSchemaAsync(app.Schemas, schemaNameRef);
@@ -116,7 +116,7 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
             {
                 References =
                 [
-                    referencedContent.Id
+                    referencedContent.Id,
                 ],
             });
 
@@ -142,12 +142,12 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
                                     complete(payload);
                                 }});
                             )",
-                            Url = new Uri(url),
+                            Url = url,
                             // Also test the secret in this case.
-                            SharedSecret = secret
-                        }
-                    }
-                }
+                            SharedSecret = secret,
+                        },
+                    },
+                },
             },
             Trigger = new ContentChangedRuleTriggerDto
             {
@@ -155,17 +155,17 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
                 [
                     new SchemaCondition
                     {
-                        SchemaId = parentSchema.Id
+                        SchemaId = parentSchema.Id,
                     },
                 ],
                 ReferencedSchemas =
                 [
                     new SchemaCondition
                     {
-                        SchemaId = referencedSchema.Id
+                        SchemaId = referencedSchema.Id,
                     },
-                ]
-            }
+                ],
+            },
         };
 
         var rule = await app.Rules.PostRuleAsync(createRule);
@@ -179,7 +179,7 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
             referencedContent.Id,
             new TestEntityData
             {
-                String = updatedString
+                String = updatedString,
             });
 
 
@@ -222,15 +222,15 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
                         {
                             Script = $@"
                                 postJSON('{url}', {{ schemaName: event.schemaId.Name }}, function () {{}})
-                            "
-                        }
-                    }
-                }
+                            ",
+                        },
+                    },
+                },
             },
             Trigger = new ContentChangedRuleTriggerDto
             {
-                HandleAll = true
-            }
+                HandleAll = true,
+            },
         };
 
         var rule = await app.Rules.PostRuleAsync(createRule);
@@ -276,14 +276,14 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
                     {
                         Step = new WebhookFlowStepDto
                         {
-                            Url = new Uri(url),
+                            Url = url,
                             // Also test the secret in this case.
-                            SharedSecret = secret
-                        }
-                    }
-                }
+                            SharedSecret = secret,
+                        },
+                    },
+                },
             },
-            Trigger = new AssetChangedRuleTriggerDto()
+            Trigger = new AssetChangedRuleTriggerDto(),
         };
 
         var rule = await app.Rules.PostRuleAsync(createRule);
@@ -335,12 +335,12 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
 
                                     updateAsset(event, metadata);
                                 });
-                                "
-                        }
-                    }
-                }
+                                ",
+                        },
+                    },
+                },
             },
-            Trigger = new AssetChangedRuleTriggerDto()
+            Trigger = new AssetChangedRuleTriggerDto(),
         };
 
         var rule = await app.Rules.PostRuleAsync(createRule);
@@ -378,14 +378,14 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
                     {
                         Step = new WebhookFlowStepDto
                         {
-                            Url = new Uri(url),
+                            Url = url,
                             // Also test the secret in this case.
-                            SharedSecret = secret
-                        }
-                    }
-                }
+                            SharedSecret = secret,
+                        },
+                    },
+                },
             },
-            Trigger = new SchemaChangedRuleTriggerDto()
+            Trigger = new SchemaChangedRuleTriggerDto(),
         };
 
         var rule = await app.Rules.PostRuleAsync(createRule);
@@ -431,14 +431,14 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
                     {
                         Step = new WebhookFlowStepDto
                         {
-                            Url = new Uri(url),
+                            Url = url,
                             // Also test the secret in this case.
-                            SharedSecret = secret
-                        }
-                    }
-                }
+                            SharedSecret = secret,
+                        },
+                    },
+                },
             },
-            Trigger = new ManualRuleTriggerDto()
+            Trigger = new ManualRuleTriggerDto(),
         };
 
         var rule = await app.Rules.PostRuleAsync(createRule);
@@ -486,17 +486,17 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
                     {
                         Step = new WebhookFlowStepDto
                         {
-                            Url = new Uri(url),
+                            Url = url,
                             // Also test the secret in this case.
-                            SharedSecret = secret
-                        }
-                    }
-                }
+                            SharedSecret = secret,
+                        },
+                    },
+                },
             },
             Trigger = new ContentChangedRuleTriggerDto
             {
-                HandleAll = true
-            }
+                HandleAll = true,
+            },
         };
 
         var rule = await app.Rules.PostRuleAsync(createRule);
@@ -544,12 +544,12 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
                                 console.log('Hello Log');
                                 console.warn('Hello warn');
 
-                            "
-                        }
-                    }
-                }
+                            ",
+                        },
+                    },
+                },
             },
-            Trigger = new ManualRuleTriggerDto()
+            Trigger = new ManualRuleTriggerDto(),
         };
 
         var rule = await app.Rules.PostRuleAsync(createRule);
@@ -596,8 +596,8 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
                                     Condition = "event.value.testValue == 2",
                                     NextStepId = stepId3,
                                 },
-                            ]
-                        }
+                            ],
+                        },
                     },
                     [stepId2.ToString()] = new FlowStepDefinitionDto
                     {
@@ -606,8 +606,8 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
                             Script = @"
                                 console.info('Hello from Branch1');
 
-                            "
-                        }
+                            ",
+                        },
                     },
                     [stepId3.ToString()] = new FlowStepDefinitionDto
                     {
@@ -616,12 +616,12 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
                             Script = @"
                                 console.info('Hello from Branch2');
 
-                            "
-                        }
-                    }
-                }
+                            ",
+                        },
+                    },
+                },
             },
-            Trigger = new ManualRuleTriggerDto()
+            Trigger = new ManualRuleTriggerDto(),
         };
 
         var rule = await app.Rules.PostRuleAsync(createRule);
@@ -632,8 +632,8 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
         {
             Value = new Dictionary<string, int>
             {
-                ["testValue"] = 1
-            }
+                ["testValue"] = 1,
+            },
         });
 
         var @event1 = await app.Rules.PollEventAsync(rule.Id, x => x.FlowState.Status == FlowExecutionStatus.Completed);
@@ -651,8 +651,8 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
         {
             Value = new Dictionary<string, int>
             {
-                ["testValue"] = 2
-            }
+                ["testValue"] = 2,
+            },
         });
 
         var @event2 = await app.Rules.PollEventAsync(rule.Id, x => x.FlowState.Status == FlowExecutionStatus.Completed && x.Id != event1!.Id);
@@ -675,7 +675,7 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
         await contents.CreateAsync(
             new TestEntityData
             {
-                String = contentString
+                String = contentString,
             });
     }
 

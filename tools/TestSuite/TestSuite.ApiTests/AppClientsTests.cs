@@ -57,7 +57,7 @@ public sealed class AppClientsTests(ClientFixture fixture) : IClassFixture<Clien
             AllowAnonymous = true,
             ApiCallsLimit = 100,
             ApiTrafficLimit = 200,
-            Role = "Owner"
+            Role = "Owner",
         };
 
         var clients_2 = await app.Apps.PutClientAsync(client.Id, updateNameRequest);
@@ -99,7 +99,7 @@ public sealed class AppClientsTests(ClientFixture fixture) : IClassFixture<Clien
     {
         var createRequest = new CreateClientDto
         {
-            Id = id
+            Id = id,
         };
 
         var clients = await app.Apps.PostClientAsync(createRequest);

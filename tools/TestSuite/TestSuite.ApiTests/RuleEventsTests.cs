@@ -105,10 +105,10 @@ public class RuleEventsTests(ClientFixture fixture) : IClassFixture<ClientFixtur
                             Method = WebhookMethod.POST,
                             Payload = null,
                             PayloadType = null,
-                            Url = new Uri("http://squidex.io")
-                        }
-                    }
-                }
+                            Url = "http://squidex.io",
+                        },
+                    },
+                },
             },
             Trigger = new ManualRuleTriggerDto(),
         };

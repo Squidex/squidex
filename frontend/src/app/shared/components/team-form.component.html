@@ -7,7 +7,7 @@
                 <label for="teamName">
                     {{ "common.name" | sqxTranslate }} <small class="hint">({{ "common.requiredHint" | sqxTranslate }})</small>
                 </label>
-                <sqx-control-errors for="name" />
+                <sqx-control-errors for="name" [submitCount]="createForm.submitCount | async" />
                 <input class="form-control" id="name" autocomplete="off" formControlName="name" sqxFocusOnInit sqxTransformInput="LowerCase" />
                 <sqx-form-hint> {{ "teams.teamNameHint" | sqxTranslate }} </sqx-form-hint>
             </div>

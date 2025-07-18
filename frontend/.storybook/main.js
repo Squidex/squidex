@@ -8,17 +8,15 @@
 const CopyPlugin = require('copy-webpack-plugin');
 
 class FilterSassWarningsPlugin {
-    apply(compiler) {
-      compiler.hooks.done.tap('FilterSassWarningsPlugin', (stats) => {
-        stats.compilation.warnings = stats.compilation.warnings.filter(
-          (warning) => {
-            const message = warning.message || warning.toString();
-            return !message.includes('sass-loader');
-          }
-        );
+  apply(compiler) {
+    compiler.hooks.done.tap('FilterSassWarningsPlugin', (stats) => {
+      stats.compilation.warnings = stats.compilation.warnings.filter(warning => {
+        const message = warning.message || warning.toString();
+        return !message.includes('sass-loader');
       });
-    }
+    });
   }
+}
 
 module.exports = {
   stories: ["../src/**/*.stories.@(js|jsx|ts|tsx)"],

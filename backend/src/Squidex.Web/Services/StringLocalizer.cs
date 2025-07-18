@@ -82,7 +82,7 @@ public sealed class StringLocalizer : IStringLocalizer, IStringLocalizerFactory
 
     public IEnumerable<LocalizedString> GetAllStrings(bool includeParentCultures)
     {
-        return Enumerable.Empty<LocalizedString>();
+        return [];
     }
 
     public IStringLocalizer WithCulture(CultureInfo culture)

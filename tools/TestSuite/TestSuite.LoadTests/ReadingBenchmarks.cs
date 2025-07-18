@@ -35,7 +35,7 @@ public class ReadingBenchmarks : IClassFixture<CreatedAppFixture>
             10,
             20,
             50,
-            100
+            100,
         };
 
         int[] loads =
@@ -46,7 +46,7 @@ public class ReadingBenchmarks : IClassFixture<CreatedAppFixture>
             20,
             50,
             100,
-            1000
+            1000,
         };
 
         var data = new TheoryData<int, int>();

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.CLI.Commands.Implementation.AI;
 using Squidex.Domain.Apps.Core.ValidateContent;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.Templates;
@@ -103,5 +104,14 @@ public static class ContentsServices
 
         services.AddSingletonAs<TemplatesClient>()
             .AsSelf();
+
+        services.AddSingletonAs<SessionFactory>()
+            .AsSelf();
+
+        services.AddSingletonAs<SchemaAIGenerator>()
+            .AsSelf();
+
+        services.AddSingletonAs<AIQueryCache>()
+            .As<IQueryCache>();
     }
 }

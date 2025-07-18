@@ -1,116 +1,169 @@
-<form [formGroup]="createForm.form" (ngSubmit)="createSchema()">
-    <sqx-modal-dialog (dialogClose)="emitClose()" tourId="schemaForm">
+<form [formGroup]="actualForm.form" (ngSubmit)="createSchema()">
+    <sqx-modal-dialog (dialogClose)="emitClose()" hasTabs="true" size="lg" tourId="schemaForm">
         <ng-container title>
-            @if (import) {
+            @if (source) {
                 {{ "schemas.clone" | sqxTranslate }}
             } @else {
                 {{ "schemas.create" | sqxTranslate }}
             }
         </ng-container>
-        <ng-container content>
-            <sqx-form-error [error]="createForm.error | async" />
-            <div class="form-group">
-                <label for="name">
-                    {{ "common.name" | sqxTranslate }} <small class="hint">({{ "common.requiredHint" | sqxTranslate }})</small>
-                </label>
-                <sqx-control-errors for="name" />
-                <input class="form-control" id="name" autocomplete="off" formControlName="name" sqxFocusOnInit sqxTransformInput="LowerCase" />
-                <sqx-form-hint> {{ "schemas.schemaNameHint" | sqxTranslate }} </sqx-form-hint>
-            </div>
+        <ng-container tabs>
+            <div class="row align-items-center">
+                <div class="col">
+                    <ul class="nav nav-tabs2">
+                        <li class="nav-item">
+                            <a class="nav-link" [class.active]="selectedTab === 0" (click)="selectTab(0)">
+                                {{ "schemas.createCustom" | sqxTranslate }}
+                            </a>
+                        </li>
 
-            <div class="form-group mt-4">
-                <div class="row">
-                    <div class="col-6 type">
-                        <label>
-                            <input class="radio-input" formControlName="type" name="type" type="radio" [value]="'Default'" />
-                            <div class="row g-0">
-                                <div class="col-auto">
-                                    <div class="btn-radio" [class.active]="createForm.form.controls['type'].value === 'Default'">
-                                        <i class="icon-multiple-content"></i>
-                                    </div>
-                                </div>
+                        <li class="nav-item">
+                            <a class="nav-link" [class.active]="selectedTab === 1" (click)="selectTab(1)">
+                                {{ "schemas.createFromJson" | sqxTranslate }}
+                            </a>
+                        </li>
 
-                                <div class="col">
-                                    <div class="type-title">{{ "schemas.modeMultiple" | sqxTranslate }}</div>
-
-                                    <div class="type-text text-muted">{{ "schemas.modeMultipleDescription" | sqxTranslate }}</div>
-                                </div>
-                            </div>
-                        </label>
-                    </div>
-
-                    <div class="col-6 type">
-                        <label>
-                            <input class="radio-input" formControlName="type" name="type" type="radio" [value]="'Singleton'" />
-                            <div class="row g-0">
-                                <div class="col-auto">
-                                    <div class="btn-radio" [class.active]="createForm.form.controls['type'].value === 'Singleton'">
-                                        <i class="icon-single-content"></i>
-                                    </div>
-                                </div>
-
-                                <div class="col">
-                                    <div class="type-title">{{ "schemas.modeSingle" | sqxTranslate }}</div>
-
-                                    <div class="type-text text-muted">{{ "schemas.modeSingleDescription" | sqxTranslate }}</div>
-                                </div>
-                            </div>
-                        </label>
-                    </div>
-
-                    <div class="col-6 type">
-                        <label>
-                            <input class="radio-input" formControlName="type" name="type" type="radio" [value]="'Component'" />
-                            <div class="row g-0">
-                                <div class="col-auto">
-                                    <div class="btn-radio" [class.active]="createForm.form.controls['type'].value === 'Component'">
-                                        <i class="icon-component"></i>
-                                    </div>
-                                </div>
-
-                                <div class="col">
-                                    <div class="type-title">{{ "schemas.modeComponent" | sqxTranslate }}</div>
-
-                                    <div class="type-text text-muted">{{ "schemas.modeComponentDescription" | sqxTranslate }}</div>
-                                </div>
-                            </div>
-                        </label>
-                    </div>
+                        @if (hasChatBot) {
+                            <li class="nav-item">
+                                <a class="nav-link" [class.active]="selectedTab === 2" (click)="selectTab(2)">
+                                    {{ "schemas.createAI" | sqxTranslate }}
+                                    <span class="badge rounded-pill badge-primary">New</span>
+                                </a>
+                            </li>
+                        }
+                    </ul>
                 </div>
             </div>
-            <sqx-form-alert> {{ "schemas.nameWarning" | sqxTranslate }} </sqx-form-alert>
-            @if (schemasState.categoryNames | async; as categories) {
-                @if (categories.length > 0) {
-                    <div class="form-group">
-                        <label for="category">{{ "common.category" | sqxTranslate }}</label>
-                        <select class="form-select" id="category" formControlName="initialCategory">
-                            <option></option>
+        </ng-container>
+        <ng-container content>
+            <sqx-form-error [error]="actualForm.error | async" />
 
-                            @for (category of categories; track category) {
-                                <option [ngValue]="category">{{ category }}</option>
-                            }
-                        </select>
-                    </div>
-                }
+            @if (selectedTab !== 2) {
+                <div class="form-group">
+                    <label for="name">
+                        {{ "common.name" | sqxTranslate }} <small class="hint">({{ "common.requiredHint" | sqxTranslate }})</small>
+                    </label>
+                    <sqx-control-errors for="name" [submitCount]="createForm.submitCount | async" />
+                    <input class="form-control" id="name" autocomplete="off" formControlName="name" sqxFocusOnInit sqxTransformInput="LowerCase" />
+                    <sqx-form-hint> {{ "schemas.schemaNameHint" | sqxTranslate }} </sqx-form-hint>
+                </div>
+
+                <sqx-form-alert> {{ "schemas.nameWarning" | sqxTranslate }} </sqx-form-alert>
             }
 
-            <div class="form-group">
-                <button class="btn btn-sm btn-text-secondary" [class.hidden]="showImport" (click)="toggleImport()" type="button">
-                    {{ "schemas.import" | sqxTranslate }}
-                </button>
-                <button class="btn btn-sm btn-text-secondary force" [class.hidden]="!showImport" (click)="toggleImport()" type="button">
-                    {{ "common.hide" | sqxTranslate }}
-                </button>
-                @if (showImport) {
-                    <sqx-code-editor formControlName="importing" [height]="250" valueMode="Json" />
+            @if (selectedTab === 0) {
+                <div class="form-group mt-4">
+                    <div class="row">
+                        <div class="col-12 col-md-4 type">
+                            <label>
+                                <input class="radio-input" formControlName="type" name="type" type="radio" [value]="'Default'" />
+                                <div class="row flex-nowrap g-0">
+                                    <div class="col-auto">
+                                        <div class="btn-radio" [class.active]="createForm.form.controls['type'].value === 'Default'">
+                                            <i class="icon-multiple-content"></i>
+                                        </div>
+                                    </div>
+
+                                    <div class="col">
+                                        <div class="type-title">{{ "schemas.modeMultiple" | sqxTranslate }}</div>
+
+                                        <div class="type-text text-muted">{{ "schemas.modeMultipleDescription" | sqxTranslate }}</div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="col-12 col-md-4 type">
+                            <label>
+                                <input class="radio-input" formControlName="type" name="type" type="radio" [value]="'Singleton'" />
+                                <div class="row flex-nowrap g-0">
+                                    <div class="col-auto">
+                                        <div class="btn-radio" [class.active]="createForm.form.controls['type'].value === 'Singleton'">
+                                            <i class="icon-single-content"></i>
+                                        </div>
+                                    </div>
+
+                                    <div class="col">
+                                        <div class="type-title">{{ "schemas.modeSingle" | sqxTranslate }}</div>
+
+                                        <div class="type-text text-muted">{{ "schemas.modeSingleDescription" | sqxTranslate }}</div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+
+                        <div class="col-12 col-md-4 type">
+                            <label>
+                                <input class="radio-input" formControlName="type" name="type" type="radio" [value]="'Component'" />
+                                <div class="row flex-nowrap g-0">
+                                    <div class="col-auto">
+                                        <div class="btn-radio" [class.active]="createForm.form.controls['type'].value === 'Component'">
+                                            <i class="icon-component"></i>
+                                        </div>
+                                    </div>
+
+                                    <div class="col">
+                                        <div class="type-title">{{ "schemas.modeComponent" | sqxTranslate }}</div>
+
+                                        <div class="type-text text-muted">{{ "schemas.modeComponentDescription" | sqxTranslate }}</div>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+
+                @if (schemasState.categoryNames | async; as categories) {
+                    @if (categories.length > 0) {
+                        <div class="form-group">
+                            <label for="category">{{ "common.category" | sqxTranslate }}</label>
+                            <select class="form-select" id="category" formControlName="initialCategory">
+                                <option></option>
+
+                                @for (category of categories; track category) {
+                                    <option [ngValue]="category">{{ category }}</option>
+                                }
+                            </select>
+                        </div>
+                    }
                 }
-            </div>
+            } @else if (selectedTab === 1) {
+                <sqx-code-editor formControlName="importing" [height]="1000" valueMode="Json" />
+            } @else if (selectedTab === 2) {
+                <div class="row g-2 form-group">
+                    <div class="col">
+                        <label for="prompt">
+                            {{ "common.prompt" | sqxTranslate }} <small class="hint">({{ "common.requiredHint" | sqxTranslate }})</small>
+                        </label>
+                        <sqx-control-errors for="prompt" />
+                        <input class="form-control" id="prompt" autocomplete="off" formControlName="prompt" sqxFocusOnInit />
+                        <sqx-form-hint> {{ "schemas.promptHint" | sqxTranslate }} </sqx-form-hint>
+                    </div>
+                    <div class="col-auto">
+                        <label>&nbsp;</label>
+                        <div>
+                            <button class="btn btn-primary" (click)="generatePreview()" [disabled]="generateForm.submitting | async" type="button">
+                                @if (generateForm.submitting | async) {
+                                    <sqx-loader color="white" size="12" />
+                                }
+
+                                {{ "common.generate" | sqxTranslate }}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <sqx-form-alert> {{ "schemas.promptExample" | sqxTranslate }} </sqx-form-alert>
+
+                <sqx-code-editor disabled="true" [height]="1000" [ngModel]="generateLog" [ngModelOptions]="{ standalone: true }" />
+            }
         </ng-container>
         <ng-container footer>
             <button class="btn btn-text-secondary" (click)="dialogClose.emit()" type="button">
                 {{ "common.cancel" | sqxTranslate }}
             </button>
-            <button class="btn btn-success" type="submit">{{ "common.create" | sqxTranslate }}</button>
+            <button class="btn btn-success" [disabled]="selectedTab === 2 && !generateLog" type="submit">
+                {{ "common.create" | sqxTranslate }}
+            </button>
         </ng-container>
     </sqx-modal-dialog>
 </form>

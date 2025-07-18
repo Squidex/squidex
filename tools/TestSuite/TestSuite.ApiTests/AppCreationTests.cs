@@ -113,7 +113,7 @@ public class AppCreationTests(ClientFixture fixture) : IClassFixture<ClientFixtu
         {
             Name = appName,
             // The template is just referenced by the name.
-            Template = template.Name
+            Template = template.Name,
         };
 
         var (app, _) = await _.PostAppAsync(createRequest);

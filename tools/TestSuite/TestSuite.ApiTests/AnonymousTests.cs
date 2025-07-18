@@ -33,7 +33,7 @@ public class AnonymousTests(ClientFixture fixture) : IClassFixture<ClientFixture
         // STEP 2: Make the client anonymous.
         var clientRequest = new UpdateClientDto
         {
-            AllowAnonymous = true
+            AllowAnonymous = true,
         };
 
         await app.Apps.PutClientAsync("default", clientRequest);
@@ -65,7 +65,7 @@ public class AnonymousTests(ClientFixture fixture) : IClassFixture<ClientFixture
         // STEP 2: Make the client anonymous.
         var clientRequest = new UpdateClientDto
         {
-            AllowAnonymous = true
+            AllowAnonymous = true,
         };
 
         await app.Apps.PutClientAsync("default", clientRequest);
@@ -76,7 +76,7 @@ public class AnonymousTests(ClientFixture fixture) : IClassFixture<ClientFixture
         {
             Name = "my-content",
             // Schema must be published to create content.
-            IsPublished = true
+            IsPublished = true,
         };
 
         await app.Schemas.PostSchemaAsync(schemaRequest);

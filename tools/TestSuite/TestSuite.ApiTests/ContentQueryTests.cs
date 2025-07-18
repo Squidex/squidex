@@ -140,8 +140,8 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
                 {
                     new
                     {
-                        path = "data.number.iv"
-                    }
+                        path = "data.number.iv",
+                    },
                 },
                 filter = new
                 {
@@ -149,10 +149,10 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
                     {
                         path = "id",
                         op = "eq",
-                        value = x.Id
-                    }).ToArray()
-                }
-            }
+                        value = x.Id,
+                    }).ToArray(),
+                },
+            },
         };
 
         var items_1 = await _.Contents.GetAsync(q_1);
@@ -210,10 +210,10 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
                 {
                     new
                     {
-                        path = "data.number.iv"
-                    }
-                }
-            }
+                        path = "data.number.iv",
+                    },
+                },
+            },
         };
 
         var items = await _.Contents.GetAsync(q);
@@ -238,8 +238,8 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
         {
             JsonQuery = new
             {
-                random = 5
-            }
+                random = 5,
+            },
         };
 
         var items = await _.Contents.GetAsync(q);
@@ -268,11 +268,11 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
                 {
                     new
                     {
-                        path = "data.number.iv"
-                    }
+                        path = "data.number.iv",
+                    },
                 },
-                skip = 5
-            }
+                skip = 5,
+            },
         };
 
         var items = await _.Contents.GetAsync(q);
@@ -302,11 +302,11 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
                 {
                     new
                     {
-                        path = "data.number.iv"
-                    }
+                        path = "data.number.iv",
+                    },
                 },
-                top = 5
-            }
+                top = 5,
+            },
         };
 
         var items = await _.Contents.GetAsync(q);
@@ -335,8 +335,8 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
                 {
                     new
                     {
-                        path = "data.number.iv"
-                    }
+                        path = "data.number.iv",
+                    },
                 },
                 filter = new
                 {
@@ -346,17 +346,17 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
                         {
                             path = "data.number.iv",
                             op = "gt",
-                            value = 3
+                            value = 3,
                         },
                         new
                         {
                             path = "data.number.iv",
                             op = "lt",
-                            value = 7
-                        }
-                    }
-                }
-            }
+                            value = 7,
+                        },
+                    },
+                },
+            },
         };
 
         var items = await _.Contents.GetAsync(q);
@@ -375,8 +375,8 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
                 {
                     new
                     {
-                        path = "data.json.iv.nested1.nested2"
-                    }
+                        path = "data.json.iv.nested1.nested2",
+                    },
                 },
                 filter = new
                 {
@@ -386,17 +386,17 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
                         {
                             path = "data.json.iv.nested1.nested2",
                             op = "gt",
-                            value = 3
+                            value = 3,
                         },
                         new
                         {
                             path = "data.json.iv.nested1.nested2",
                             op = "lt",
-                            value = 7
-                        }
-                    }
-                }
-            }
+                            value = 7,
+                        },
+                    },
+                },
+            },
         };
 
         var items = await _.Contents.GetAsync(q);
@@ -421,8 +421,8 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
         {
             JsonQuery = new
             {
-                fullText = "text2"
-            }
+                fullText = "text2",
+            },
         };
 
         var items = await _.Contents.PollAsync(q, x => true);
@@ -455,10 +455,10 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
                     {
                         longitude = 103,
                         latitude = 3,
-                        distance = 1000
-                    }
-                }
-            }
+                        distance = 1000,
+                    },
+                },
+            },
         };
 
         var items = await _.Contents.PollAsync(q, x => true);
@@ -488,8 +488,8 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
                 {
                     Json = new JObject
                     {
-                        ["search.field.with.dot"] = 42
-                    }
+                        ["search.field.with.dot"] = 42,
+                    },
                 },
                 ContentCreateOptions.AsPublish);
 
@@ -507,11 +507,11 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
                             {
                                 path = "data.json.iv.search\\.field\\.with\\.dot",
                                 op = "eq",
-                                value = 42
-                            }
-                        }
-                    }
-                }
+                                value = 42,
+                            },
+                        },
+                    },
+                },
             };
 
             var queried = await _.Contents.GetAsync(q);
@@ -542,10 +542,10 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
                     {
                         longitude = 104,
                         latitude = 4,
-                        distance = 1000
-                    }
-                }
-            }
+                        distance = 1000,
+                    },
+                },
+            },
         };
 
         var items = await _.Contents.PollAsync(q, x => true);
@@ -572,7 +572,7 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
                                 }
                             }
                         }
-                    }"
+                    }",
         };
 
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JObject>(query);
@@ -604,10 +604,10 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
                 {
                     number = new
                     {
-                        iv = 998
-                    }
-                }
-            }
+                        iv = 998,
+                    },
+                },
+            },
         };
 
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JObject>(query);
@@ -635,8 +635,8 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
                     }",
             variables = new
             {
-                filter = @"data/number/iv gt 3 and data/number/iv lt 7"
-            }
+                filter = @"data/number/iv gt 3 and data/number/iv lt 7",
+            },
         };
 
         var query2 = new
@@ -654,8 +654,8 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
                     }",
             variables = new
             {
-                filter = @"data/number/iv gt 4 and data/number/iv lt 7"
-            }
+                filter = @"data/number/iv gt 4 and data/number/iv lt 7",
+            },
         };
 
         var results = await _.Client.SharedDynamicContents.GraphQlAsync<QueryResult>([query1, query2]);
@@ -685,8 +685,8 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
                     }",
             variables = new
             {
-                filter = @"data/number/iv gt 3 and data/number/iv lt 7"
-            }
+                filter = @"data/number/iv gt 3 and data/number/iv lt 7",
+            },
         };
 
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<QueryResult>(query);
@@ -713,8 +713,8 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
                     }",
             variables = new
             {
-                filter = @"data/number/iv gt 3 and data/number/iv lt 7"
-            }
+                filter = @"data/number/iv gt 3 and data/number/iv lt 7",
+            },
         };
 
         var result = await _.Client.SharedDynamicContents.GraphQlGetAsync<QueryResult>(query);
@@ -738,7 +738,7 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
                         }
                       }
                     }
-                }"
+                }",
         };
 
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JObject>(query);
@@ -765,8 +765,8 @@ public class ContentQueryTests(ContentQueryFixture fixture) : IClassFixture<Cont
                     }",
             variables = new
             {
-                search = @"The answer is 42"
-            }
+                search = @"The answer is 42",
+            },
         };
 
         await _.Client.SharedDynamicContents.GraphQlAsync<QueryResult>(query);

@@ -98,7 +98,7 @@ public sealed record FilterSchema(FilterSchemaType Type)
             }
             else
             {
-                return Enumerable.Empty<FilterField>();
+                return [];
             }
         }).SelectMany(x => x);
 

@@ -48,21 +48,16 @@ public sealed class DefaultDomainObjectCache : IDomainObjectCache
             return typed;
         }
 
-        var buffer = await distributedCache.GetAsync(cacheKey, ct);
-
-        if (buffer == null)
+        var cached = await distributedCache.GetAsync(cacheKey, ct);
+        if (cached == null)
         {
             return default!;
         }
 
         try
         {
-            using (var stream = new MemoryStream(buffer))
-            {
-                var result = serializer.Deserialize<T>(stream);
-
-                return result;
-            }
+            using var stream = new MemoryStream(cached);
+            return serializer.Deserialize<T>(stream);
         }
         catch
         {
@@ -83,12 +78,10 @@ public sealed class DefaultDomainObjectCache : IDomainObjectCache
         cache.Set(cacheKey, snapshot, cacheOptions.AbsoluteExpirationRelativeToNow!.Value);
         try
         {
-            using (var stream = DefaultPools.MemoryStream.GetStream())
-            {
-                serializer.Serialize(snapshot, stream);
+            using var stream = DefaultPools.MemoryStream.GetStream();
+            serializer.Serialize(snapshot, stream);
 
-                await distributedCache.SetAsync(cacheKey, stream.ToArray(), cacheOptions, ct);
-            }
+            await distributedCache.SetAsync(cacheKey, stream.ToArray(), cacheOptions, ct);
         }
         catch
         {

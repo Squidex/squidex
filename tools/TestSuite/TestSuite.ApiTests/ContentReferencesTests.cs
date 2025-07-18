@@ -24,7 +24,7 @@ public class ContentReferencesTests(ContentReferencesFixture fixture) : IClassFi
         var contentA_1 = await _.Contents.CreateAsync(
             new TestEntityWithReferencesData
             {
-                References = null
+                References = null,
             });
 
 
@@ -32,7 +32,7 @@ public class ContentReferencesTests(ContentReferencesFixture fixture) : IClassFi
         var contentB_1 = await _.Contents.CreateAsync(
             new TestEntityWithReferencesData
             {
-                References = [contentA_1.Id]
+                References = [contentA_1.Id],
             },
             ContentCreateOptions.AsPublish);
 
@@ -48,7 +48,7 @@ public class ContentReferencesTests(ContentReferencesFixture fixture) : IClassFi
             contentA_1.Id,
             new ChangeStatus
             {
-                Status = "Published"
+                Status = "Published",
             });
 
 
@@ -65,7 +65,7 @@ public class ContentReferencesTests(ContentReferencesFixture fixture) : IClassFi
         var contentA_1 = await _.Contents.CreateAsync(
             new TestEntityWithReferencesData
             {
-                References = null
+                References = null,
             },
             ContentCreateOptions.AsPublish);
 
@@ -74,7 +74,7 @@ public class ContentReferencesTests(ContentReferencesFixture fixture) : IClassFi
         await _.Contents.CreateAsync(
             new TestEntityWithReferencesData
             {
-                References = [contentA_1.Id]
+                References = [contentA_1.Id],
             },
             ContentCreateOptions.AsPublish);
 
@@ -99,7 +99,7 @@ public class ContentReferencesTests(ContentReferencesFixture fixture) : IClassFi
         var contentA_1 = await _.Contents.CreateAsync(
             new TestEntityWithReferencesData
             {
-                References = null
+                References = null,
             },
             ContentCreateOptions.AsPublish);
 
@@ -108,7 +108,7 @@ public class ContentReferencesTests(ContentReferencesFixture fixture) : IClassFi
         await _.Contents.CreateAsync(
             new TestEntityWithReferencesData
             {
-                References = [contentA_1.Id]
+                References = [contentA_1.Id],
             },
             ContentCreateOptions.AsPublish);
 
@@ -122,7 +122,7 @@ public class ContentReferencesTests(ContentReferencesFixture fixture) : IClassFi
                 {
                     Status = "Draft",
                     // Ensure that the flag is true.
-                    CheckReferrers = true
+                    CheckReferrers = true,
                 });
         });
 
@@ -134,7 +134,7 @@ public class ContentReferencesTests(ContentReferencesFixture fixture) : IClassFi
             {
                 Status = "Draft",
                 // It is the default anyway, just to make it more explicit.
-                CheckReferrers = false
+                CheckReferrers = false,
             });
     }
 
@@ -145,7 +145,7 @@ public class ContentReferencesTests(ContentReferencesFixture fixture) : IClassFi
         var contentA_1 = await _.Contents.CreateAsync(
             new TestEntityWithReferencesData
             {
-                References = null
+                References = null,
             },
             ContentCreateOptions.AsPublish);
 
@@ -154,7 +154,7 @@ public class ContentReferencesTests(ContentReferencesFixture fixture) : IClassFi
         await _.Contents.CreateAsync(
             new TestEntityWithReferencesData
             {
-                References = [contentA_1.Id]
+                References = [contentA_1.Id],
             },
             ContentCreateOptions.AsPublish);
 
@@ -169,10 +169,10 @@ public class ContentReferencesTests(ContentReferencesFixture fixture) : IClassFi
                     {
                         Id = contentA_1.Id,
                         Type = BulkUpdateType.Delete,
-                        Status = "Draft"
+                        Status = "Draft",
                     },
                 ],
-                CheckReferrers = true
+                CheckReferrers = true,
             });
 
         Assert.NotNull(result1[0].Error);
@@ -188,10 +188,10 @@ public class ContentReferencesTests(ContentReferencesFixture fixture) : IClassFi
                     {
                         Id = contentA_1.Id,
                         Type = BulkUpdateType.Delete,
-                        Status = "Draft"
+                        Status = "Draft",
                     },
                 ],
-                CheckReferrers = false
+                CheckReferrers = false,
             });
 
         Assert.Null(result2[0].Error);
@@ -204,7 +204,7 @@ public class ContentReferencesTests(ContentReferencesFixture fixture) : IClassFi
         var contentA_1 = await _.Contents.CreateAsync(
             new TestEntityWithReferencesData
             {
-                References = null
+                References = null,
             },
             ContentCreateOptions.AsPublish);
 
@@ -213,7 +213,7 @@ public class ContentReferencesTests(ContentReferencesFixture fixture) : IClassFi
         await _.Contents.CreateAsync(
             new TestEntityWithReferencesData
             {
-                References = [contentA_1.Id]
+                References = [contentA_1.Id],
             },
             ContentCreateOptions.AsPublish);
 
@@ -228,10 +228,10 @@ public class ContentReferencesTests(ContentReferencesFixture fixture) : IClassFi
                     {
                         Id = contentA_1.Id,
                         Type = BulkUpdateType.ChangeStatus,
-                        Status = "Draft"
+                        Status = "Draft",
                     },
                 ],
-                CheckReferrers = true
+                CheckReferrers = true,
             });
 
         Assert.NotNull(result1[0].Error);
@@ -247,10 +247,10 @@ public class ContentReferencesTests(ContentReferencesFixture fixture) : IClassFi
                     {
                         Id = contentA_1.Id,
                         Type = BulkUpdateType.ChangeStatus,
-                        Status = "Draft"
+                        Status = "Draft",
                     },
                 ],
-                CheckReferrers = false
+                CheckReferrers = false,
             });
 
         Assert.Null(result2[0].Error);

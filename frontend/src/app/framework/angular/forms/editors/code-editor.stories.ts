@@ -36,6 +36,7 @@ export default {
                     [disabled]="disabled"
                     [height]="height"
                     [maxLines]="maxLines"
+                    [mode]="mode"
                     (ngModelChange)="change($event)"
                     [ngModel]="ngModel"
                     [singleLine]="singleLine"
@@ -83,6 +84,23 @@ export const Completions: Story = {
         height: 200,
         completion: COMPLETIONS,
     },
+};
+
+export const InvalidJson: Story = {
+    args: {
+        height: 200,
+        ngModel: 'Invalid JSON\n{ \"Hello\": 42 }',
+        mode: 'ace/mode/javascript',
+    } as any,
+};
+
+export const InvalidJsonWithoutAnnotations: Story = {
+    args: {
+        height: 200,
+        ngModel: 'Invalid JSON\n{ \"Hello\": 42 }',
+        mode: 'ace/mode/javascript',
+        disabled: true,
+    } as any,
 };
 
 export const SingleLine: Story = {

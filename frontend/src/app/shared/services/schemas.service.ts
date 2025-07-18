@@ -10,7 +10,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlConfig, HTTP, pretifyError, Resource, ScriptCompletions, Versioned, VersionOrTag } from '@app/framework';
-import { AddFieldDto, ChangeCategoryDto, ConfigureFieldRulesDto, ConfigureUIFieldsDto, CreateSchemaDto, SchemaDto, SchemasDto, SynchronizeSchemaDto, UpdateFieldDto, UpdateSchemaDto } from './../model';
+import { AddFieldDto, ChangeCategoryDto, ConfigureFieldRulesDto, ConfigureUIFieldsDto, CreateSchemaDto, GenerateSchemaDto, GenerateSchemaResponseDto, SchemaDto, SchemasDto, SynchronizeSchemaDto, UpdateFieldDto, UpdateSchemaDto } from './../model';
 import { QueryModel } from './query';
 
 @Injectable({
@@ -49,6 +49,16 @@ export class SchemasService {
         return HTTP.postVersioned(this.http, url, dto.toJSON()).pipe(
             map(({ payload }) => {
                 return SchemaDto.fromJSON(payload.body);
+            }),
+            pretifyError('i18n:schemas.createFailed'));
+    }
+
+    public generateSchema(appName: string, dto: GenerateSchemaDto): Observable<GenerateSchemaResponseDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/schemas/generate`);
+
+        return HTTP.postVersioned(this.http, url, dto.toJSON()).pipe(
+            map(({ payload }) => {
+                return GenerateSchemaResponseDto.fromJSON(payload.body);
             }),
             pretifyError('i18n:schemas.createFailed'));
     }

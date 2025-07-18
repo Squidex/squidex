@@ -101,7 +101,7 @@ public class ContentEnricherTests : GivenContext
     {
         var source = CreateContent();
 
-        var sut = new ContentEnricher(Enumerable.Empty<IContentEnricherStep>(), AppProvider);
+        var sut = new ContentEnricher([], AppProvider);
 
         var actual = await sut.EnrichAsync(source, true, ApiContext, CancellationToken);
 
@@ -113,7 +113,7 @@ public class ContentEnricherTests : GivenContext
     {
         var source = CreateContent();
 
-        var sut = new ContentEnricher(Enumerable.Empty<IContentEnricherStep>(), AppProvider);
+        var sut = new ContentEnricher([], AppProvider);
 
         var actual = await sut.EnrichAsync(source, false, ApiContext, CancellationToken);
 

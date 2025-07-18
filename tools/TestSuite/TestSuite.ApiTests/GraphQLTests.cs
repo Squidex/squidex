@@ -73,7 +73,7 @@ public sealed class GraphQLTests(GraphQLFixture fixture) : IClassFixture<GraphQL
             variables = new
             {
                 id = asset.Id,
-            }
+            },
         };
 
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
@@ -100,9 +100,9 @@ public sealed class GraphQLTests(GraphQLFixture fixture) : IClassFixture<GraphQL
                     value = 1,
                     obj = new
                     {
-                        value = 2
-                    }
-                })
+                        value = 2,
+                    },
+                }),
             },
             ContentCreateOptions.AsPublish);
 
@@ -121,7 +121,7 @@ public sealed class GraphQLTests(GraphQLFixture fixture) : IClassFixture<GraphQL
             variables = new
             {
                 id = content_0.Id,
-            }
+            },
         };
 
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
@@ -148,15 +148,15 @@ public sealed class GraphQLTests(GraphQLFixture fixture) : IClassFixture<GraphQL
                             }
                         }
                     }
-                }"
+                }",
         };
 
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
 
         var cities = result?["cities"]?.ToObject<List<City>>();
 
-        cities.Should().BeEquivalentTo(new List<City>
-        {
+        cities.Should().BeEquivalentTo(
+        [
             new City
             {
                 Data = new CityData
@@ -164,20 +164,20 @@ public sealed class GraphQLTests(GraphQLFixture fixture) : IClassFixture<GraphQL
                     Name = "Leipzig",
                     TopLocation = new LocationData
                     {
-                        Name = "Leipzig Top Location"
+                        Name = "Leipzig Top Location",
                     },
                     Locations =
                     [
                         new LocationData
                         {
-                            Name = "Leipzig Location 1"
+                            Name = "Leipzig Location 1",
                         },
                         new LocationData
                         {
-                            Name = "Leipzig Location 2"
+                            Name = "Leipzig Location 2",
                         },
                     ],
-                }
+                },
             },
             new City
             {
@@ -186,22 +186,22 @@ public sealed class GraphQLTests(GraphQLFixture fixture) : IClassFixture<GraphQL
                     Name = "Munich",
                     TopLocation = new LocationData
                     {
-                        Name = "Munich Top Location"
+                        Name = "Munich Top Location",
                     },
                     Locations =
                     [
                         new LocationData
                         {
-                            Name = "Munich Location 1"
+                            Name = "Munich Location 1",
                         },
                         new LocationData
                         {
-                            Name = "Munich Location 2"
+                            Name = "Munich Location 2",
                         },
                     ],
-                }
-            }
-        });
+                },
+            },
+        ]);
     }
 
     [Fact]
@@ -226,7 +226,7 @@ public sealed class GraphQLTests(GraphQLFixture fixture) : IClassFixture<GraphQL
                             }
                         }
                     }
-                }"
+                }",
         };
 
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
@@ -262,7 +262,7 @@ public sealed class GraphQLTests(GraphQLFixture fixture) : IClassFixture<GraphQL
                             }
                         }
                     }
-                }"
+                }",
         };
 
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
@@ -299,7 +299,7 @@ public sealed class GraphQLTests(GraphQLFixture fixture) : IClassFixture<GraphQL
                             }
                         }
                     }
-                }"
+                }",
         };
 
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
@@ -328,7 +328,7 @@ public sealed class GraphQLTests(GraphQLFixture fixture) : IClassFixture<GraphQL
                             }
                         }
                     }
-                }"
+                }",
         };
 
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
@@ -356,7 +356,7 @@ public sealed class GraphQLTests(GraphQLFixture fixture) : IClassFixture<GraphQL
                             }
                         }
                     }
-                }"
+                }",
         };
 
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
@@ -380,7 +380,7 @@ public sealed class GraphQLTests(GraphQLFixture fixture) : IClassFixture<GraphQL
                     cities: queryCitiesContents {
                         data__dynamic
                     }
-                }"
+                }",
         };
 
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
@@ -403,7 +403,7 @@ public sealed class GraphQLTests(GraphQLFixture fixture) : IClassFixture<GraphQL
                     queryCitiesContents {
                         id
                     }
-                }"
+                }",
         };
 
         var url = _.Client.GenerateUrl($"api/content/{_.AppName}/graphql/batch");
@@ -445,8 +445,8 @@ public sealed class GraphQLTests(GraphQLFixture fixture) : IClassFixture<GraphQL
                 }",
             variables = new
             {
-                ids
-            }
+                ids,
+            },
         };
 
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
@@ -485,7 +485,7 @@ public sealed class GraphQLTests(GraphQLFixture fixture) : IClassFixture<GraphQL
             {
                 id1 = allCities.Items[0].Id,
                 id2 = allCities.Items[1].Id,
-            }
+            },
         };
 
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
@@ -507,7 +507,7 @@ public sealed class GraphQLTests(GraphQLFixture fixture) : IClassFixture<GraphQL
                     queryCitiesContents {
                         id
                     }
-                }"
+                }",
         };
 
         // Create the request manually to check the headers.
@@ -526,7 +526,7 @@ public sealed class GraphQLTests(GraphQLFixture fixture) : IClassFixture<GraphQL
             "X-NoResolveLanguages",
             "X-ResolveFlow",
             "X-ResolveUrls",
-            "X-Unpublished"
+            "X-Unpublished",
         }, httpResponse.Headers.Vary.Order().ToArray());
     }
 }

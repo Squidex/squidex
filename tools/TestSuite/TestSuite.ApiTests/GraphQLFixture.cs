@@ -71,10 +71,10 @@ public sealed class GraphQLFixture : ContentFixture
                 new UpsertSchemaFieldDto
                 {
                     Name = "name",
-                    Properties = new StringFieldPropertiesDto()
+                    Properties = new StringFieldPropertiesDto(),
                 },
             ],
-            Type = SchemaType.Component
+            Type = SchemaType.Component,
         };
 
         var locationsId = await CreateSchemaAsync(createLocationRequest);
@@ -89,7 +89,7 @@ public sealed class GraphQLFixture : ContentFixture
                 new UpsertSchemaFieldDto
                 {
                     Name = "name",
-                    Properties = new StringFieldPropertiesDto()
+                    Properties = new StringFieldPropertiesDto(),
                 },
                 new UpsertSchemaFieldDto
                 {
@@ -98,9 +98,9 @@ public sealed class GraphQLFixture : ContentFixture
                     {
                         SchemaIds =
                         [
-                            locationsId
-                        ]
-                    }
+                            locationsId,
+                        ],
+                    },
                 },
                 new UpsertSchemaFieldDto
                 {
@@ -109,12 +109,12 @@ public sealed class GraphQLFixture : ContentFixture
                     {
                         SchemaIds =
                         [
-                            locationsId
-                        ]
-                    }
+                            locationsId,
+                        ],
+                    },
                 },
             ],
-            IsPublished = true
+            IsPublished = true,
         };
 
         var citiesId = await CreateSchemaAsync(createCitiesRequest);
@@ -129,18 +129,18 @@ public sealed class GraphQLFixture : ContentFixture
                 new UpsertSchemaFieldDto
                 {
                     Name = "name",
-                    Properties = new StringFieldPropertiesDto()
+                    Properties = new StringFieldPropertiesDto(),
                 },
                 new UpsertSchemaFieldDto
                 {
                     Name = "cities",
                     Properties = new ReferencesFieldPropertiesDto
                     {
-                        SchemaIds = [citiesId]
-                    }
+                        SchemaIds = [citiesId],
+                    },
                 },
             ],
-            IsPublished = true
+            IsPublished = true,
         };
 
         var statesId = await CreateSchemaAsync(createStatesRequest);
@@ -155,18 +155,18 @@ public sealed class GraphQLFixture : ContentFixture
                 new UpsertSchemaFieldDto
                 {
                     Name = "name",
-                    Properties = new StringFieldPropertiesDto()
+                    Properties = new StringFieldPropertiesDto(),
                 },
                 new UpsertSchemaFieldDto
                 {
                     Name = "states",
                     Properties = new ReferencesFieldPropertiesDto
                     {
-                        SchemaIds = [statesId]
-                    }
+                        SchemaIds = [statesId],
+                    },
                 },
             ],
-            IsPublished = true
+            IsPublished = true,
         };
 
         await CreateSchemaAsync(createCountriesRequest);
@@ -187,14 +187,14 @@ public sealed class GraphQLFixture : ContentFixture
             {
                 name = new
                 {
-                    iv = name
+                    iv = name,
                 },
                 topLocation = new
                 {
                     iv = new
                     {
-                        name = $"{name} Top Location"
-                    }
+                        name = $"{name} Top Location",
+                    },
                 },
                 locations = new
                 {
@@ -207,9 +207,9 @@ public sealed class GraphQLFixture : ContentFixture
                         new
                         {
                             name = $"{name} Location 2",
-                        }
-                    }
-                }
+                        },
+                    },
+                },
             };
 
             var city = await Cities.CreateAsync(cityData, ContentCreateOptions.AsPublish);
@@ -223,12 +223,12 @@ public sealed class GraphQLFixture : ContentFixture
             {
                 name = new
                 {
-                    iv = name
+                    iv = name,
                 },
                 cities = new
                 {
-                    iv = new[] { cityId }
-                }
+                    iv = new[] { cityId },
+                },
             };
 
             var state = await States.CreateAsync(stateData, ContentCreateOptions.AsPublish);
@@ -251,12 +251,12 @@ public sealed class GraphQLFixture : ContentFixture
         {
             name = new
             {
-                iv = "Germany"
+                iv = "Germany",
             },
             states = new
             {
-                iv = new[] { saxonyState, bavariaState }
-            }
+                iv = new[] { saxonyState, bavariaState },
+            },
         };
 
         await Countries.CreateAsync(countryData, ContentCreateOptions.AsPublish);

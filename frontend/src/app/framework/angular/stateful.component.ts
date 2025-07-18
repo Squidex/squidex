@@ -69,7 +69,6 @@ export abstract class StatefulControlComponent<T extends {}, TValue> extends Sta
 
     public setDisabledState(isDisabled: boolean) {
         this.next({ isDisabled } as any);
-
         this.onDisabled(this.snapshot.isDisabled);
     }
 

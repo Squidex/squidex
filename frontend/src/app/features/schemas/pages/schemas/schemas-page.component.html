@@ -41,5 +41,5 @@
         </form>
     </ng-container>
 </sqx-layout>
-<sqx-schema-form (create)="redirectSchema($event)" (dialogClose)="addSchemaDialog.hide()" [import]="import" *sqxModal="addSchemaDialog" />
+<sqx-schema-form (create)="redirectSchema($event)" (dialogClose)="addSchemaDialog.hide()" [source]="source" *sqxModal="addSchemaDialog" />
 <router-outlet />

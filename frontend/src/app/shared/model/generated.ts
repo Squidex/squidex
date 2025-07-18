@@ -5724,6 +5724,154 @@ export interface IUpsertSchemaNestedFieldDto {
     readonly properties: FieldPropertiesDto;
 }
 
+export class GenerateSchemaResponseDto implements IGenerateSchemaResponseDto {
+    /** Uses the cache values because the actual object is frozen. */
+    private readonly cachedValues: { [key: string]: any } = {};
+    /** The status log. */
+    readonly log!: string[];
+    /** The name of the created schema. */
+    readonly schemaName!: string;
+
+    constructor(data?: IGenerateSchemaResponseDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data: any) {
+        if (Array.isArray(_data["log"])) {
+            (<any>this).log = [] as any;
+            for (let item of _data["log"])
+                (<any>this).log!.push(item);
+        }
+        (<any>this).schemaName = _data["schemaName"];
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): GenerateSchemaResponseDto {
+        const result = new GenerateSchemaResponseDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        if (Array.isArray(this.log)) {
+            data["log"] = [];
+            for (let item of this.log)
+                data["log"].push(item);
+        }
+        data["schemaName"] = this.schemaName;
+        this.cleanup(data);
+        return data;
+    }
+
+    protected cleanup(target: any) {
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
+    }
+
+    protected compute<T>(key: string, action: () => T): T {
+        if (!this.cachedValues.hasOwnProperty(key)) {
+            const value = action();
+            this.cachedValues[key] = value;
+            return value;
+        } else {
+            return this.cachedValues[key] as any;
+        }
+    }
+}
+
+export interface IGenerateSchemaResponseDto {
+    /** The status log. */
+    readonly log: string[];
+    /** The name of the created schema. */
+    readonly schemaName: string;
+}
+
+export class GenerateSchemaDto implements IGenerateSchemaDto {
+    /** Uses the cache values because the actual object is frozen. */
+    private readonly cachedValues: { [key: string]: any } = {};
+    /** The prompt to generate. */
+    readonly prompt!: string;
+    /** Indicates if the schema should actually be generated. */
+    readonly execute!: boolean;
+    /** The number of content items to generate. */
+    readonly numberOfContentItems!: number;
+
+    constructor(data?: IGenerateSchemaDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data: any) {
+        (<any>this).prompt = _data["prompt"];
+        (<any>this).execute = _data["execute"];
+        (<any>this).numberOfContentItems = _data["numberOfContentItems"];
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): GenerateSchemaDto {
+        const result = new GenerateSchemaDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["prompt"] = this.prompt;
+        data["execute"] = this.execute;
+        data["numberOfContentItems"] = this.numberOfContentItems;
+        this.cleanup(data);
+        return data;
+    }
+
+    protected cleanup(target: any) {
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
+    }
+
+    protected compute<T>(key: string, action: () => T): T {
+        if (!this.cachedValues.hasOwnProperty(key)) {
+            const value = action();
+            this.cachedValues[key] = value;
+            return value;
+        } else {
+            return this.cachedValues[key] as any;
+        }
+    }
+}
+
+export interface IGenerateSchemaDto {
+    /** The prompt to generate. */
+    readonly prompt: string;
+    /** Indicates if the schema should actually be generated. */
+    readonly execute: boolean;
+    /** The number of content items to generate. */
+    readonly numberOfContentItems: number;
+}
+
 export class UpdateSchemaDto implements IUpdateSchemaDto {
     /** Uses the cache values because the actual object is frozen. */
     private readonly cachedValues: { [key: string]: any } = {};
@@ -9811,14 +9959,15 @@ export interface IFlowExecutionStepStateDto {
     readonly attempts: FlowExecutionStepAttemptDto[];
 }
 
-export type FlowExecutionStatus = "Pending" | "Scheduled" | "Completed" | "Failed" | "Running";
+export type FlowExecutionStatus = "Pending" | "Scheduled" | "Completed" | "Failed" | "Running" | "Cancelled";
 
 export const FlowExecutionStatusValues: ReadonlyArray<FlowExecutionStatus> = [
 	"Pending",
 	"Scheduled",
 	"Completed",
 	"Failed",
-	"Running"
+	"Running",
+	"Cancelled"
 ];
 
 export class FlowExecutionStepAttemptDto implements IFlowExecutionStepAttemptDto {
