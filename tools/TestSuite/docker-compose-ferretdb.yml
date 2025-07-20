@@ -22,8 +22,8 @@ services:
       file: docker-compose-base.yml
       service: squidex_base
     environment:
-      - ASSETS__RESIZERURL=http://resizer
       - EVENTSTORE__MONGODB__CONFIGURATION=mongodb://username:password@db_ferretdb/
+      - STORE__TYPE=MongoDb
       - STORE__MONGODB__CONFIGURATION=mongodb://username:password@db_ferretdb/
       - URLS__BASEURL=http://localhost:8080
     depends_on:

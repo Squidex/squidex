@@ -5,6 +5,7 @@ services:
     environment:
       - ASPNETCORE_URLS=http://+:5000
       - CLUSTERING__RANDOMNAME=true
+      - EVENTSTORE__TYPE=MongoDb
       - EVENTSTORE__MONGODB__CONFIGURATION=mongodb://db_mongo
       - GRAPHQL__CACHEDURATION=00:00:00
       - IDENTITY__ADMINCLIENTID=root
@@ -16,6 +17,7 @@ services:
       - RULES__RULESCACHEDURATION=00:00:00
       - SCRIPTING__TIMEOUTEXECUTION=00:00:10
       - SCRIPTING__TIMEOUTSCRIPT=00:00:10
+      - STORE__TYPE=MongoDb
       - STORE__MONGODB__CONFIGURATION=mongodb://db_mongo
       - TEMPLATES__LOCALURL=http://localhost:5000
       - UI__HIDENEWS=true
