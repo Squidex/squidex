@@ -138,12 +138,17 @@ jobs:
         include:
           - name: mysql
             compose: docker-compose-mysql.yml
+            optional: false
           - name: postgres
             compose: docker-compose-postgres.yml
+            optional: false
           - name: sqlserver
             compose: docker-compose-sqlserver.yml
+            optional: false
           - name: ferretdb
             compose: docker-compose-ferretdb.yml
+            optional: true
+    continue-on-error: ${{ matrix.optional == true }}
 
     steps:
       - name: Prepare - Checkout
