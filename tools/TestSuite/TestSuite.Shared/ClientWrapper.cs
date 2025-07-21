@@ -33,7 +33,7 @@ public sealed class ClientWrapper
                     {
                         return new HttpClientHandler
                         {
-                            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator
+                            ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
                         };
                     }).Services
                 .BuildServiceProvider();

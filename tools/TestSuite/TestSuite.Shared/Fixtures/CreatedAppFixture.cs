@@ -21,7 +21,7 @@ public class CreatedAppFixture : ClientFixture
             {
                 var createRequest = new AddLanguageDto
                 {
-                    Language = name
+                    Language = name,
                 };
 
                 await Client.Apps.PostLanguageAsync(createRequest);
@@ -41,7 +41,7 @@ public class CreatedAppFixture : ClientFixture
             {
                 var createRequest = new CreateAppDto
                 {
-                    Name = AppName
+                    Name = AppName,
                 };
 
                 await Client.Apps.PostAppAsync(createRequest);
