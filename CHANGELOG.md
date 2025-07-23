@@ -4,6 +4,27 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.21.0] - 2024-07-23
+
+### Added
+
+* **Backend**: Support for FerretDB (and probably CosmosDB and DocumentDB)
+* **UI**: Generate Schemas with AI support.
+
+### Changes
+
+* **Contents**: New inline filter for contents.
+* **Contents**: Support `X-Fields` for all endpoints.
+* **UI**: A few small UI improvements.
+* **UI**: Updated angular to current version.
+* **UI**: New dialog to create apps.
+
+### Fixed
+
+* **Rules**: Fix prepare step and error handling for scripts.
+* **Rules**: Change Url properties of steps to strings.
+* **Rules**: Show the status of cancelled events properly.
+
 ## [7.20.0] - 2025-05-29
 
 ### Changed
