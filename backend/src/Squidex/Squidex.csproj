@@ -60,17 +60,17 @@
     <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.9.0" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
     <PackageReference Include="ReportGenerator" Version="5.4.1" PrivateAssets="all" />
-    <PackageReference Include="Squidex.Assets.Azure" Version="7.27.0" />
-    <PackageReference Include="Squidex.Assets.GoogleCloud" Version="7.27.0" />
-    <PackageReference Include="Squidex.Assets.FTP" Version="7.27.0" />
-    <PackageReference Include="Squidex.Assets.ImageSharp" Version="7.27.0" />
-    <PackageReference Include="Squidex.Assets.S3" Version="7.27.0" />
-    <PackageReference Include="Squidex.Assets.TusAdapter" Version="7.27.0" />
+    <PackageReference Include="Squidex.Assets.Azure" Version="7.28.0" />
+    <PackageReference Include="Squidex.Assets.GoogleCloud" Version="7.28.0" />
+    <PackageReference Include="Squidex.Assets.FTP" Version="7.28.0" />
+    <PackageReference Include="Squidex.Assets.ImageSharp" Version="7.28.0" />
+    <PackageReference Include="Squidex.Assets.S3" Version="7.28.0" />
+    <PackageReference Include="Squidex.Assets.TusAdapter" Version="7.28.0" />
     <PackageReference Include="Squidex.ClientLibrary" Version="21.8.0" />
-    <PackageReference Include="Squidex.Events.GetEventStore" Version="7.27.0" />
-    <PackageReference Include="Squidex.Hosting" Version="7.27.0" />
-    <PackageReference Include="Squidex.Messaging.All" Version="7.27.0" />
-    <PackageReference Include="Squidex.Messaging.Subscriptions" Version="7.27.0" />
+    <PackageReference Include="Squidex.Events.GetEventStore" Version="7.28.0" />
+    <PackageReference Include="Squidex.Hosting" Version="7.28.0" />
+    <PackageReference Include="Squidex.Messaging.All" Version="7.28.0" />
+    <PackageReference Include="Squidex.Messaging.Subscriptions" Version="7.28.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="YDotNet" Version="0.4.3" />
     <PackageReference Include="YDotNet.Native" Version="0.4.3" />
@@ -84,11 +84,11 @@
   </ItemGroup>
 
   <ItemGroup Condition="'$(IncludeMagick)' == 'true'">
-    <PackageReference Include="Squidex.Assets.ImageMagick" Version="7.27.0" />
+    <PackageReference Include="Squidex.Assets.ImageMagick" Version="7.28.0" />
   </ItemGroup>
 
   <ItemGroup Condition="'$(IncludeKafka)' == 'true'">
-    <PackageReference Include="Squidex.Messaging.Kafka" Version="7.27.0" />
+    <PackageReference Include="Squidex.Messaging.Kafka" Version="7.28.0" />
   </ItemGroup>
 
   <PropertyGroup>

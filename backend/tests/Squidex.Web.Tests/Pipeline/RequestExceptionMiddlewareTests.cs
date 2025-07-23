@@ -140,7 +140,6 @@ public class RequestExceptionMiddlewareTests
         var failingNext = new RequestDelegate(context =>
         {
             context.Response.StatusCode = 412;
-
             return Task.CompletedTask;
         });
 
@@ -162,7 +161,6 @@ public class RequestExceptionMiddlewareTests
         var failingNext = new RequestDelegate(context =>
         {
             context.Response.StatusCode = 412;
-
             return Task.CompletedTask;
         });
 

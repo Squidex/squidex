@@ -10,6 +10,7 @@ using System.Security;
 using System.Text;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Squidex.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.Validation;
@@ -39,7 +40,6 @@ public static class ApiExceptionConverter
         var error = new ErrorDto { StatusCode = statusCode };
 
         Enrich(httpContext, error);
-
         return (error, null);
     }
 
@@ -50,7 +50,6 @@ public static class ApiExceptionConverter
         var error = CreateError(problem.Status ?? 500, problem.Title);
 
         Enrich(httpContext, error);
-
         return (error, null);
     }
 
@@ -61,7 +60,6 @@ public static class ApiExceptionConverter
         var result = CreateError(exception);
 
         Enrich(httpContext, result.Error);
-
         return result;
     }
 
@@ -105,6 +103,9 @@ public static class ApiExceptionConverter
 
             case DomainException ex:
                 return (CreateError(400, ex.Message, ex.ErrorCode), GetInner(exception));
+
+            case EventStoreConcurrencyException ex:
+                return (CreateError(409, ex.Message, "CONCURRENCY_EXCEPTION"), ex);
 
             case OperationCanceledException:
                 return (CreateError(408), null);
