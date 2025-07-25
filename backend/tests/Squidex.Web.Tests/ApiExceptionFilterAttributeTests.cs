@@ -13,6 +13,7 @@ using Microsoft.AspNetCore.Mvc.Abstractions;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Logging;
+using Squidex.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
 
@@ -135,6 +136,19 @@ public class ApiExceptionFilterAttributeTests
 
         A.CallTo(log)
             .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public void Should_generate_409_for_ventStoreConcurrencyException()
+    {
+        var context = Error(new EventStoreConcurrencyException("1"));
+
+        sut.OnException(context);
+
+        Validate(409, context.Result, context.Exception, "CONCURRENCY_EXCEPTION");
+
+        A.CallTo(log)
+            .MustHaveHappened();
     }
 
     [Fact]
