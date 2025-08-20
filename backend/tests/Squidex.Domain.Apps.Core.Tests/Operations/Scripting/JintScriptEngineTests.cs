@@ -698,4 +698,29 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
 
         Assert.Equal(100, ((AssetMetadata)vars["metadata"]!).GetInt32(KnownMetadataKeys.PixelWidth));
     }
+
+    [Fact]
+    public async Task Should_run_with_promises()
+    {
+        var vars = new DataScriptVars();
+
+        const string script = @"
+                function asyncMethod() {
+                    return new Promise((resolve, reject) => {
+                        getJSON('http://cloud.squidex.io/healthz', (data) => {
+                            resolve(data);
+                        }, {}, true);
+                    });
+                }
+
+                (async () => {
+                    await asyncMethod();
+                    complete(42)
+                })()
+            ";
+
+        var result = await sut.ExecuteAsync(vars, script, contentOptions);
+
+        Assert.Equal(42.0, result.Value);
+    }
 }

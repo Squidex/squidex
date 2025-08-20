@@ -64,10 +64,7 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
 
     public override JsValue Evaluate(Prepared<Script> script)
     {
-        lock (Engine)
-        {
-            return Engine.Evaluate(script);
-        }
+        return Engine.Evaluate(script);
     }
 
     public override void Schedule(Func<IScheduler, CancellationToken, Task> action)
@@ -83,7 +80,6 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
             try
             {
                 await action(this, cancellationToken);
-
                 TryComplete();
             }
             catch (Exception ex)
