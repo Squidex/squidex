@@ -411,7 +411,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                     const error = errors[0].error!;
 
                     if (errors.length >= contents.length) {
-                        throw error;
+                        throw error.toError();
                     } else {
                         this.dialogs.notifyError(error.toError());
                     }
