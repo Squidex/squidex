@@ -406,14 +406,9 @@ export abstract class ContentsStateBase extends State<Snapshot> {
             }),
             tap(results => {
                 const errors = results.filter(x => !!x.error);
-
                 if (errors.length > 0) {
-                    const error = errors[0].error!;
-
-                    if (errors.length >= contents.length) {
-                        throw error;
-                    } else {
-                        this.dialogs.notifyError(error.toError());
+                    for (let error of errors) {
+                        this.dialogs.notifyError(error.error!.toError());
                     }
                 }
             }));
