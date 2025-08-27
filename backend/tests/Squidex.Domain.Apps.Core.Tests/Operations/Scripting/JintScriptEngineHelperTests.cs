@@ -805,11 +805,67 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script));
     }
 
-    private MockupHttpHandler SetupRequest(HttpStatusCode statusCode = HttpStatusCode.OK)
+    [Theory]
+    [InlineData("patchJSON")]
+    [InlineData("postJSON")]
+    [InlineData("putJSON")]
+    [InlineData("deleteJSON")]
+    [InlineData("getJSON")]
+    public async Task Should_handle_successful_response_with_empty_body_when_error_ignore_flag_is_true(string input)
+    {
+        var httpHandler = SetupRequest(HttpStatusCode.NoContent, new StringContent(string.Empty, Encoding.UTF8, "text/plain"));
+
+        var vars = new ScriptVars
+        {
+        };
+
+        string script = $@"
+                var url = 'http://squidex.io/';
+                var hasRequestBodyMethods = ['patchJSON', 'postJSON', 'putJSON']
+
+                if (hasRequestBodyMethods.indexOf('{input}') != -1) {{
+                    {input}(url, {{}}, function(actual) {{
+                        complete(actual);
+                    }}, undefined, true);
+                }}
+                else {{
+                    {input}(url, function(actual) {{
+                        complete(actual);
+                    }}, undefined, true);
+                }}
+            ";
+
+        var actual = await sut.ExecuteAsync(vars, script);
+
+        var methodMap = new Dictionary<string, HttpMethod>()
+        {
+            { "patchJSON", HttpMethod.Patch },
+            { "postJSON", HttpMethod.Post },
+            { "putJSON", HttpMethod.Put },
+            { "deleteJSON", HttpMethod.Delete },
+            { "getJSON", HttpMethod.Get },
+        };
+
+        httpHandler.ShouldBeUrl("http://squidex.io/");
+        httpHandler.ShouldBeMethod(methodMap[input]);
+
+        var expectedResult =
+            JsonValue.Object()
+                .Add("statusCode", 204)
+                .Add("headers",
+                    JsonValue.Object()
+                        .Add("Content-Type", "text/plain; charset=utf-8")
+                        .Add("Content-Length", "0"))
+                .Add("body", string.Empty);
+
+        Assert.Equal(expectedResult, actual);
+    }
+
+    private MockupHttpHandler SetupRequest(HttpStatusCode statusCode = HttpStatusCode.OK, StringContent? responseContent = null)
     {
         var httpResponse = new HttpResponseMessage(statusCode)
         {
-            Content = new StringContent("{ \"key\": 42 }", Encoding.UTF8, "application/json"),
+            Content = responseContent ?? new StringContent("{ \"key\": 42 }", Encoding.UTF8, "application/json"),
         };
 
         var httpHandler = new MockupHttpHandler(httpResponse);
