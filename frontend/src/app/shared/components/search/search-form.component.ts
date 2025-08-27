@@ -8,9 +8,9 @@
 import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output, Type } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BooleanValue, BootstrapClasses, EMPTY_FILTER_MODEL, FieldComponent, FilterField, Input as FilterInput, FilterModel, FilterOptions, NumberValue, StringValue } from 'ngx-inline-filter';
+import { BooleanValue, BootstrapClasses, EMPTY_FILTER_MODEL, FieldComponent, FilterField, Input as FilterInput, FilterModel, FilterOptions, NumberValue, SelectValue, StringValue } from 'ngx-inline-filter';
 import { Observable } from 'rxjs';
-import { ControlErrorsComponent, DateTimeEditorComponent, DropdownComponent, FocusOnInitDirective, HighlightPipe, LocalizerService, ModalDialogComponent, ModalDirective, ShortcutComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/framework';
+import { ControlErrorsComponent, DateTimeEditorComponent, DropdownComponent, FocusOnInitDirective, HighlightPipe, LocalizerService, ModalDialogComponent, ModalDirective, ShortcutComponent, TooltipDirective, TourStepDirective, TranslatePipe, Types } from '@app/framework';
 import { AppLanguageDto, ContributorsState, DialogModel, Queries, Query, QueryModel, sanitize, SaveQueryForm, TypedSimpleChanges } from '@app/shared/internal';
 import { UserDtoPicture } from '../pipes';
 import { ReferenceInputComponent } from '../references/reference-input.component';
@@ -170,6 +170,9 @@ export class SearchFormComponent {
                 args = { editor: 'Status', statuses: model.statuses };
             } else if (type === 'String' && extra?.editor === 'User') {
                 args = { editor: 'User' };
+            } else if (type === 'String' && Types.isArrayOfString(extra?.options)) {
+                args = (extra.options as string[]).map(value => ({ value, label: value }));
+                component = SelectValue;
             } else if (type === 'String' && !extra) {
                 component = StringValue;
             } else if (type === 'StringArray' && extra?.schemaIds) {
