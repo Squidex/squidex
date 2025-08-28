@@ -29,6 +29,7 @@ public sealed class JintScriptEngine(IMemoryCache cache, IOptions<JintScriptOpti
     private readonly CacheParser parser = new CacheParser(cache);
     private readonly TimeSpan timeoutScript = options.Value.TimeoutScript;
     private readonly TimeSpan timeoutExecution = options.Value.TimeoutExecution;
+    private readonly TimeSpan timeoutPromise = options.Value.TimeoutPromise;
 
     public async Task<JsonValue> ExecuteAsync(ScriptVars vars, string script, ScriptOptions options = default,
         CancellationToken ct = default)
@@ -150,6 +151,7 @@ public sealed class JintScriptEngine(IMemoryCache cache, IOptions<JintScriptOpti
 
             if (!Debugger.IsAttached)
             {
+                engineOptions.Constraints.PromiseTimeout = timeoutPromise;
                 engineOptions.TimeoutInterval(timeoutScript);
                 engineOptions.CancellationToken(ct);
             }
