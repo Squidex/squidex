@@ -109,6 +109,11 @@ public static class JsonMapper
             return number;
         }
 
+        if (value.IsPromise())
+        {
+            return Map(value.UnwrapIfPromise());
+        }
+
         if (value is JsArray a)
         {
             var result = new JsonArray((int)a.Length);
