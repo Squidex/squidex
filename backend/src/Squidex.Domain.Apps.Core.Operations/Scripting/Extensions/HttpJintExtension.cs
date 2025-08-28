@@ -78,10 +78,10 @@ public sealed class HttpJintExtension(IHttpClientFactory httpClientFactory) : IJ
 
                 JsValue responseObject;
 
-                if (ignoreError && !response.IsSuccessStatusCode)
-                {
-                    var responseString = await response.Content.ReadAsStringAsync(ct);
+                var responseString = await response.Content.ReadAsStringAsync(ct);
 
+                if (ignoreError && (!response.IsSuccessStatusCode || string.IsNullOrEmpty(responseString)))
+                {
                     responseObject = JsValue.FromObject(context.Engine, new Dictionary<string, object?>
                     {
                         ["statusCode"] = (int)response.StatusCode,
@@ -96,7 +96,7 @@ public sealed class HttpJintExtension(IHttpClientFactory httpClientFactory) : IJ
                 }
                 else
                 {
-                    responseObject = await ParseResponseAsync(context, response, ct);
+                    responseObject = ParseResponse(context, responseString, ct);
                 }
 
                 scheduler.Run(callback, responseObject);
@@ -156,11 +156,9 @@ public sealed class HttpJintExtension(IHttpClientFactory httpClientFactory) : IJ
         return request;
     }
 
-    private static async Task<JsValue> ParseResponseAsync(ScriptExecutionContext context, HttpResponseMessage response,
+    private static JsValue ParseResponse(ScriptExecutionContext context, string responseString,
         CancellationToken ct)
     {
-        var responseString = await response.Content.ReadAsStringAsync(ct);
-
         ct.ThrowIfCancellationRequested();
 
         var jsonParser = new JsonParser(context.Engine);
