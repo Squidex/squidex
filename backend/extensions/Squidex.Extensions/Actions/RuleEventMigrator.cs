@@ -24,7 +24,7 @@ public sealed class RuleEventMigrator(TypeRegistry typeRegistry, IJsonSerializer
         typeRegistry.GetName<IEvent>(typeof(RuleUpdated)),
     ];
 
-    public string? ProcessEvent(string type, string json)
+    public string? MigrateEvent(string type, string json)
     {
         if (!migratedEvents.Contains(type))
         {

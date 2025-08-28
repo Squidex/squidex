@@ -9,5 +9,5 @@ namespace Squidex.Domain.Apps.Entities.Backup;
 
 public interface IEventMigrator
 {
-    string? ProcessEvent(string type, string json);
+    string? MigrateEvent(string type, string json);
 }

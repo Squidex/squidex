@@ -121,7 +121,7 @@ public sealed class BackupReader : DisposableObjectBase, IBackupReader
 
                 foreach (var migrator in eventMigrators)
                 {
-                    var migrated = migrator.ProcessEvent(storedEvent.Data.Type, storedEvent.Data.Payload);
+                    var migrated = migrator.MigrateEvent(storedEvent.Data.Type, storedEvent.Data.Payload);
                     if (migrated != null)
                     {
                         storedEvent = storedEvent with

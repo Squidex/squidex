@@ -61,7 +61,7 @@ public class RuleEventMigratorTests
 
         var json = serializer.Serialize(@event, true);
 
-        var result = sut.ProcessEvent(typeRegistryMigrator.GetName<IEvent>(@event.GetType()), json);
+        var result = sut.MigrateEvent(typeRegistryMigrator.GetName<IEvent>(@event.GetType()), json);
 
         Assert.Null(result);
     }
@@ -85,7 +85,7 @@ public class RuleEventMigratorTests
 
         var json = serializer.Serialize(@event, true);
 
-        var resultJson = sut.ProcessEvent(typeRegistryMigrator.GetName<IEvent>(@event.GetType()), json);
+        var resultJson = sut.MigrateEvent(typeRegistryMigrator.GetName<IEvent>(@event.GetType()), json);
         var resultEvent = serializer.Deserialize<RuleCreated>(resultJson!);
 
         resultEvent.Should().BeEquivalentTo(
@@ -126,7 +126,7 @@ public class RuleEventMigratorTests
 
         var json = serializer.Serialize(@event, true);
 
-        var result = sut.ProcessEvent(typeRegistryMigrator.GetName<IEvent>(@event.GetType()), json);
+        var result = sut.MigrateEvent(typeRegistryMigrator.GetName<IEvent>(@event.GetType()), json);
 
         Assert.Null(result);
     }
@@ -150,7 +150,7 @@ public class RuleEventMigratorTests
 
         var json = serializer.Serialize(@event, true);
 
-        var resultJson = sut.ProcessEvent(typeRegistryMigrator.GetName<IEvent>(@event.GetType()), json);
+        var resultJson = sut.MigrateEvent(typeRegistryMigrator.GetName<IEvent>(@event.GetType()), json);
         var resultEvent = serializer.Deserialize<RuleCreated>(resultJson!);
 
         resultEvent.Should().BeEquivalentTo(

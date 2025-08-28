@@ -35,6 +35,9 @@ public class BackupReaderWriterTests
         typeRegistry.Add<IEvent, MyEvent>("MyEvent");
 
         eventFormatter = new DefaultEventFormatter(typeRegistry, serializer);
+
+        A.CallTo(() => eventMigrator.MigrateEvent(A<string>._, A<string>._))
+            .Returns(null);
     }
 
     [Fact]
