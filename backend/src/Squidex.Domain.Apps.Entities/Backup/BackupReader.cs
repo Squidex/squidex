@@ -100,6 +100,7 @@ public sealed class BackupReader : DisposableObjectBase, IBackupReader
     public async IAsyncEnumerable<(string Stream, Envelope<IEvent> Event)> ReadEventsAsync(
         IEventStreamNames eventStreamNames,
         IEventFormatter eventFormatter,
+        IEnumerable<IEventMigrator> eventMigrators,
         [EnumeratorCancellation] CancellationToken ct = default)
     {
         Guard.NotNull(eventFormatter);
@@ -117,6 +118,19 @@ public sealed class BackupReader : DisposableObjectBase, IBackupReader
             await using (var stream = entry.Open())
             {
                 var storedEvent = serializer.Deserialize<CompatibleStoredEvent>(stream).ToStoredEvent();
+
+                foreach (var migrator in eventMigrators)
+                {
+                    var migrated = migrator.ProcessEvent(storedEvent.Data.Type, storedEvent.Data.Payload);
+                    if (migrated != null)
+                    {
+                        storedEvent = storedEvent with
+                        {
+                            Data = storedEvent.Data with { Payload = migrated },
+                        };
+                        break;
+                    }
+                }
 
                 var eventStream = storedEvent.StreamName;
                 var eventEnvelope = eventFormatter.Parse(storedEvent);

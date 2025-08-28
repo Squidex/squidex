@@ -20,6 +20,7 @@ public class BackupReaderWriterTests
 {
     private readonly IEventFormatter eventFormatter;
     private readonly IEventStreamNames eventStreamNames = A.Fake<IEventStreamNames>();
+    private readonly IEventMigrator eventMigrator = A.Fake<IEventMigrator>();
     private readonly IJsonSerializer serializer = TestUtils.DefaultSerializer;
     private readonly TypeRegistry typeRegistry = new TypeRegistry();
 
@@ -63,16 +64,15 @@ public class BackupReaderWriterTests
     [Fact]
     public async Task Should_return_true_if_file_exists()
     {
-        var file = "File.json";
-
-        var value = Guid.NewGuid();
+        var fileName = "File.json";
+        var fileData = Guid.NewGuid();
 
         await TestReaderWriterAsync(BackupVersion.V1, async writer =>
         {
-            await WriteJsonGuidAsync(writer, file, value);
+            await WriteJsonGuidAsync(writer, fileName, fileData);
         }, async reader =>
         {
-            var hasFile = await reader.HasFileAsync(file);
+            var hasFile = await reader.HasFileAsync(fileName);
 
             Assert.True(hasFile);
         });
@@ -81,16 +81,15 @@ public class BackupReaderWriterTests
     [Fact]
     public async Task Should_return_file_if_file_does_not_exist()
     {
-        var file = "File.json";
-
-        var value = Guid.NewGuid();
+        var fileName = "File.json";
+        var fileData = Guid.NewGuid();
 
         await TestReaderWriterAsync(BackupVersion.V1, async writer =>
         {
             await Task.Yield();
         }, async reader =>
         {
-            var hasFile = await reader.HasFileAsync(file);
+            var hasFile = await reader.HasFileAsync(fileName);
 
             Assert.False(hasFile);
         });
@@ -99,36 +98,34 @@ public class BackupReaderWriterTests
     [Fact]
     public async Task Should_read_and_write_json_async()
     {
-        var file = "File.json";
-
-        var value = Guid.NewGuid();
+        var fileName = "File.json";
+        var fileData = Guid.NewGuid();
 
         await TestReaderWriterAsync(BackupVersion.V1, async writer =>
         {
-            await WriteJsonGuidAsync(writer, file, value);
+            await WriteJsonGuidAsync(writer, fileName, fileData);
         }, async reader =>
         {
-            var read = await ReadJsonGuidAsync(reader, file);
+            var read = await ReadJsonGuidAsync(reader, fileName);
 
-            Assert.Equal(value, read);
+            Assert.Equal(fileData, read);
         });
     }
 
     [Fact]
     public async Task Should_read_and_write_blob_async()
     {
-        var file = "File.json";
-
-        var value = Guid.NewGuid();
+        var fileName = "File.json";
+        var fileData = Guid.NewGuid();
 
         await TestReaderWriterAsync(BackupVersion.V1, async writer =>
         {
-            await WriteGuidAsync(writer, file, value);
+            await WriteGuidAsync(writer, fileName, fileData);
         }, async reader =>
         {
-            var read = await ReadGuidAsync(reader, file);
+            var read = await ReadGuidAsync(reader, fileName);
 
-            Assert.Equal(value, read);
+            Assert.Equal(fileData, read);
         });
     }
 
@@ -178,7 +175,6 @@ public class BackupReaderWriterTests
         for (var i = 0; i < 200; i++)
         {
             var @event = new MyEvent();
-
             var envelope = Envelope.Create(@event);
 
             envelope.Headers.Add("Id", @event.Id.ToString());
@@ -211,7 +207,7 @@ public class BackupReaderWriterTests
         {
             var targetEvents = new List<(string Stream, Envelope<IEvent> Event)>();
 
-            await foreach (var @event in reader.ReadEventsAsync(eventStreamNames, eventFormatter))
+            await foreach (var @event in reader.ReadEventsAsync(eventStreamNames, eventFormatter, [eventMigrator]))
             {
                 var index = int.Parse(@event.Event.Headers["Index"].ToString(), NumberStyles.Integer, CultureInfo.InvariantCulture);
 

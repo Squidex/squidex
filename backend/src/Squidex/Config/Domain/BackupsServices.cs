@@ -5,12 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Migrations.Migrations;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Schemas;
+using Squidex.Flows;
+using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Config.Domain;
 
@@ -49,5 +52,8 @@ public static class BackupsServices
 
         services.AddTransientAs<RestoreJob>()
             .AsSelf();
+
+        services.AddTransientAs<OldRuleEventMigrator>()
+            .As<IEventMigrator>();
     }
 }

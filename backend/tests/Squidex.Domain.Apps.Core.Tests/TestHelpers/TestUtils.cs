@@ -73,12 +73,22 @@ public static class TestUtils
 
     public static IJsonSerializer CreateSerializer(Action<JsonSerializerOptions>? configure = null)
     {
-        var serializerSettings = DefaultOptions(configure);
+        return CreateSerializer(TypeRegistry, configure);
+    }
+
+    public static IJsonSerializer CreateSerializer(TypeRegistry typeRegistry, Action<JsonSerializerOptions>? configure = null)
+    {
+        var serializerSettings = DefaultOptions(typeRegistry, configure);
 
         return new SystemJsonSerializer(serializerSettings);
     }
 
     public static JsonSerializerOptions DefaultOptions(Action<JsonSerializerOptions>? configure = null)
+    {
+        return DefaultOptions(TypeRegistry, configure);
+    }
+
+    public static JsonSerializerOptions DefaultOptions(TypeRegistry typeRegistry, Action<JsonSerializerOptions>? configure = null)
     {
         var options = new JsonSerializerOptions(JsonSerializerDefaults.Web);
 
@@ -89,10 +99,10 @@ public static class TestUtils
         options.Converters.Add(new GeoJsonConverterFactory());
         options.Converters.Add(new HeaderValueConverter());
         options.Converters.Add(new JsonValueConverter());
-        options.Converters.Add(new PolymorphicConverter<FieldProperties>(TypeRegistry));
-        options.Converters.Add(new PolymorphicConverter<FlowStep>(TypeRegistry));
-        options.Converters.Add(new PolymorphicConverter<IEvent>(TypeRegistry));
-        options.Converters.Add(new PolymorphicConverter<RuleTrigger>(TypeRegistry));
+        options.Converters.Add(new PolymorphicConverter<FieldProperties>(typeRegistry));
+        options.Converters.Add(new PolymorphicConverter<FlowStep>(typeRegistry));
+        options.Converters.Add(new PolymorphicConverter<IEvent>(typeRegistry));
+        options.Converters.Add(new PolymorphicConverter<RuleTrigger>(typeRegistry));
         options.Converters.Add(new ReadonlyDictionaryConverterFactory());
         options.Converters.Add(new ReadonlyListConverterFactory());
         options.Converters.Add(new StringConverter<CompareOperator>());
@@ -117,11 +127,11 @@ public static class TestUtils
         options.Converters.Add(new JsonStringEnumConverter());
         options.IncludeFields = true;
         options.TypeInfoResolver = new DefaultJsonTypeInfoResolver()
-            .WithAddedModifier(PolymorphicConverter<None>.Modifier(TypeRegistry))
+            .WithAddedModifier(PolymorphicConverter<None>.Modifier(typeRegistry))
             .WithAddedModifier(JsonIgnoreReadonlyProperties.Modifier<Entity>())
             .WithAddedModifier(JsonRenameAttribute.Modifier);
 #pragma warning disable CS0618 // Type or member is obsolete
-        options.Converters.Add(new PolymorphicConverter<RuleAction>(TypeRegistry));
+        options.Converters.Add(new PolymorphicConverter<RuleAction>(typeRegistry));
 #pragma warning restore CS0618 // Type or member is obsolete
         configure?.Invoke(options);
 

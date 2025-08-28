@@ -16,6 +16,11 @@ public interface IBackupHandler
 
     int Order => 0;
 
+    public string ProcessEvent(string type, string json)
+    {
+        return json;
+    }
+
     public Task<bool> RestoreEventAsync(Envelope<IEvent> @event, RestoreContext context,
         CancellationToken ct)
     {

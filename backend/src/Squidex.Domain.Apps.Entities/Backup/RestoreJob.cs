@@ -31,6 +31,7 @@ public sealed class RestoreJob(
     IEventFormatter eventFormatter,
     IEventStore eventStore,
     IEventStreamNames eventStreamNames,
+    IEnumerable<IEventMigrator> eventMigrators,
     IUserResolver userResolver,
     ILogger<RestoreJob> log)
     : IJobRunner
@@ -171,6 +172,10 @@ public sealed class RestoreJob(
             log.LogError(ex, "Backup with job id {backupId} from URL '{url}' failed.", context.Job.Id, state.Url);
             throw;
         }
+        finally
+        {
+            state.Reader?.Dispose();
+        }
     }
 
     private async Task AssignContributorAsync(JobRunContext run, State state)
@@ -275,11 +280,6 @@ public sealed class RestoreJob(
                 activity?.SetTag("totalCommits", commits.Count);
                 activity?.SetTag("totalEvents", commits.Sum(x => x.Events.Count));
 
-                if (commits.Any(x => x.StreamName.Contains("46b2fb05-3438-4b99-8c1d-bac8925a33dd")))
-                {
-                    Debugger.Break();
-                }
-
                 await eventStore.AppendUnsafeAsync(commits, ct);
             }
 
@@ -293,7 +293,7 @@ public sealed class RestoreJob(
     private async IAsyncEnumerable<(string Stream, long Offset, Envelope<IEvent> Event)> HandleEventsAsync(JobRunContext run, State state,
         [EnumeratorCancellation] CancellationToken ct)
     {
-        var @events = state.Reader.ReadEventsAsync(eventStreamNames, eventFormatter, ct);
+        var @events = state.Reader.ReadEventsAsync(eventStreamNames, eventFormatter, eventMigrators, ct);
 
         await foreach (var (stream, @event) in events.WithCancellation(ct))
         {

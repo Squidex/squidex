@@ -28,5 +28,6 @@ public interface IBackupReader : IDisposable
     IAsyncEnumerable<(string Stream, Envelope<IEvent> Event)> ReadEventsAsync(
         IEventStreamNames eventStreamNames,
         IEventFormatter eventFormatter,
+        IEnumerable<IEventMigrator> eventMigrators,
         CancellationToken ct = default);
 }
