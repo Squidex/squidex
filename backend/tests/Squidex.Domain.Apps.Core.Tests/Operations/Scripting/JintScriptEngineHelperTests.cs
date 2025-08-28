@@ -819,7 +819,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         {
         };
 
-        string script = $@"
+        var script = $@"
                 var url = 'http://squidex.io/';
                 var hasRequestBodyMethods = ['patchJSON', 'postJSON', 'putJSON']
 
