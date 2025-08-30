@@ -12,4 +12,6 @@ public sealed class JintScriptOptions
     public TimeSpan TimeoutScript { get; set; } = TimeSpan.FromMilliseconds(200);
 
     public TimeSpan TimeoutExecution { get; set; } = TimeSpan.FromMilliseconds(4000);
+
+    public TimeSpan TimeoutPromise { get; set; } = TimeSpan.FromMilliseconds(4000);
 }

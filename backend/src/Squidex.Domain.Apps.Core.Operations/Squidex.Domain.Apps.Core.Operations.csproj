@@ -20,7 +20,7 @@
   <ItemGroup>
     <PackageReference Include="Fluid.Core" Version="2.12.0" />
     <PackageReference Include="GeoJSON.Net" Version="1.4.1" />
-    <PackageReference Include="Jint" Version="4.1.0" />
+    <PackageReference Include="Jint" Version="4.4.1" />
     <PackageReference Include="Meziantou.Analyzer" Version="2.0.179">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
