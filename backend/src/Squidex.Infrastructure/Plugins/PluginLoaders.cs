@@ -23,7 +23,6 @@ public static class PluginLoaders
                 return PluginLoader.CreateFromAssemblyFile(candidate.FullName, config =>
                 {
                     config.PreferSharedTypes = true;
-
                     config.SharedAssemblies.AddRange(sharedAssemblies);
                 });
             }
