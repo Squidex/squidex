@@ -23,9 +23,9 @@
 }
 
 <div class="row profile-section-sm">
-    <div class="col profile-picture-col">
-        <img class="profile-picture" src="api/users/{Model.Id}/picture/?q={@Guid.NewGuid()}" />
-    </div>
+  <div class="col profile-picture-col">
+    <img class="profile-picture" src="api/users/@Model.Id/picture/?q={@Guid.NewGuid()}"/>
+  </div>
     <div class="col">
         <form id="pictureForm" class="profile-picture-form" asp-controller="Profile" asp-action="UploadPicture" method="post" enctype="multipart/form-data">
             @Html.AntiForgeryToken()
@@ -33,7 +33,7 @@
             <span class="btn btn-secondary" id="pictureButton">
                 <span>@T.Get("users.profile.uploadPicture")</span>
 
-                <input class="profile-picture-input" name="file" type="file" id="pictureInput" />
+                <input class="profile-picture-input" name="files" type="file" id="pictureInput" />
             </span>
         </form>
     </div>

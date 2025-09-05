@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
+using Squidex.Areas.Api.Controllers;
 using Squidex.Assets;
 using Squidex.Config;
 using Squidex.Domain.Users;
@@ -152,6 +153,11 @@ public sealed class ProfileController(
         {
             throw new ValidationException(T.Get("validation.onlyOneFile"));
         }
+
+        var uploadModel = new UploadModel() { File = files[0] };
+        var file = await uploadModel.ToFileAsync(HttpContext, null);
+
+        await UploadResizedAsync(file, id, ct);
 
         var update = new UserValues
         {
