@@ -861,6 +861,46 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         Assert.Equal(expectedResult, actual);
     }
 
+    [Fact]
+    public async Task Should_make_request_async()
+    {
+        var httpHandler = SetupRequest();
+        var vars = new ScriptVars
+        {
+        };
+
+        const string script = @"
+                requestAsync('http://squidex.io/', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: {
+                        key: 42
+                    }
+                }, function(actual) {
+                    complete(actual);
+                });
+            ";
+
+        var actual = await sut.ExecuteAsync(vars, script);
+
+        httpHandler.ShouldBeUrl("http://squidex.io/");
+        httpHandler.ShouldBeMethod(HttpMethod.Post);
+        httpHandler.ShouldBeBody("{\"key\":42}", "application/json");
+
+        var expectedResult =
+            JsonValue.Object()
+                .Add("statusCode", 200)
+                .Add("headers",
+                    JsonValue.Object()
+                        .Add("Content-Type", "application/json; charset=utf-8")
+                        .Add("Content-Length", "13"))
+                .Add("body", "{ \"key\": 42 }");
+
+        Assert.Equal(expectedResult, actual);
+    }
+
     private MockupHttpHandler SetupRequest(HttpStatusCode statusCode = HttpStatusCode.OK, StringContent? responseContent = null)
     {
         var httpResponse = new HttpResponseMessage(statusCode)

@@ -12,7 +12,6 @@ using Jint.Native.Json;
 using Jint.Native.Object;
 using Jint.Runtime;
 using Squidex.Domain.Apps.Core.Properties;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Scripting.Extensions;
 
@@ -20,6 +19,14 @@ public sealed class HttpJintExtension(IHttpClientFactory httpClientFactory) : IJ
 {
     private delegate void HttpJsonDelegate(string url, Action<JsValue> callback, JsValue? headers = null, bool ignoreError = false);
     private delegate void HttpJsonWithBodyDelegate(string url, JsValue body, Action<JsValue> callback, JsValue? headers = null, bool ignoreError = false);
+    private delegate void HttpRequestDelegate(string url, JsValue requestInit, Action<JsValue> callback);
+
+    private sealed class HttpRequestWrapper
+    {
+        public HttpMethod Method { get; set; }
+        public JsValue Headers { get; set; }
+        public JsValue Body { get; set; }
+    }
 
     public void ExtendAsync(ScriptExecutionContext context)
     {
@@ -28,6 +35,18 @@ public sealed class HttpJintExtension(IHttpClientFactory httpClientFactory) : IJ
         AddBodyMethod(context, HttpMethod.Put, "putJSON");
         AddMethod(context, HttpMethod.Delete, "deleteJSON");
         AddMethod(context, HttpMethod.Get, "getJSON");
+        AddMethod(context, "requestAsync");
+    }
+
+    private void AddMethod(ScriptExecutionContext context, string name)
+    {
+        var action = new HttpRequestDelegate((url, requestInit, callback) =>
+        {
+            var httpRequest = ParseHttpRequest(requestInit);
+            Request(context, httpRequest.Method, url, httpRequest.Body, callback, httpRequest.Headers, true, true);
+        });
+
+        context.Engine.SetValue(name, action);
     }
 
     private void AddMethod(ScriptExecutionContext context, HttpMethod method, string name)
@@ -50,7 +69,7 @@ public sealed class HttpJintExtension(IHttpClientFactory httpClientFactory) : IJ
         context.Engine.SetValue(name, action);
     }
 
-    private void Request(ScriptExecutionContext context, HttpMethod method, string url, JsValue? body, Action<JsValue> callback, JsValue? headers, bool ignoreError)
+    private void Request(ScriptExecutionContext context, HttpMethod method, string url, JsValue? body, Action<JsValue> callback, JsValue? headers, bool ignoreError, bool forceRawResponse = false)
     {
         if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
         {
@@ -80,7 +99,7 @@ public sealed class HttpJintExtension(IHttpClientFactory httpClientFactory) : IJ
 
                 var responseString = await response.Content.ReadAsStringAsync(ct);
 
-                if (ignoreError && (!response.IsSuccessStatusCode || string.IsNullOrEmpty(responseString)))
+                if (ignoreError && (forceRawResponse || !response.IsSuccessStatusCode || string.IsNullOrEmpty(responseString)))
                 {
                     responseObject = JsValue.FromObject(context.Engine, new Dictionary<string, object?>
                     {
@@ -190,6 +209,9 @@ public sealed class HttpJintExtension(IHttpClientFactory httpClientFactory) : IJ
 
         describe(JsonType.Function, "deleteJSON(url, callback, headers?, ignoreError?)",
             Resources.ScriptingDeleteJson);
+
+        describe(JsonType.Function, "requestAsync(url, requestInit, callback)",
+            Resources.ScriptingRequestAsync);
     }
 
     private static IEnumerable<(string, string)> GetNonEmptyProperties(JsValue? source)
@@ -208,5 +230,32 @@ public sealed class HttpJintExtension(IHttpClientFactory httpClientFactory) : IJ
                 yield return (name, value);
             }
         }
+    }
+
+    private static HttpRequestWrapper ParseHttpRequest(JsValue? source)
+    {
+        if (source?.IsObject() != true || source.AsObject() is not ObjectInstance obj)
+        {
+            throw new JavaScriptException("Object is not an object.");
+        }
+
+        var method = obj.TryGetValue("method", out var methodJsValue) && methodJsValue.IsString()
+            ? methodJsValue.AsString().ToUpperInvariant() switch
+            {
+                "PATCH" => HttpMethod.Patch,
+                "POST" => HttpMethod.Post,
+                "PUT" => HttpMethod.Put,
+                "DELETE" => HttpMethod.Delete,
+                "GET" => HttpMethod.Get,
+                _ => throw new JavaScriptException($"Invalid HTTP method: '{methodJsValue.AsString()}'"),
+            }
+            : throw new JavaScriptException("Missing or invalid required property 'method'.");
+
+        return new HttpRequestWrapper()
+        {
+            Method = method,
+            Headers = obj["headers"],
+            Body = obj["body"],
+        };
     }
 }
