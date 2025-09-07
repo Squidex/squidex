@@ -903,14 +903,14 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
 
     [Theory]
     [InlineData("text/plain")]
-    [InlineData("text/html")]
+    [InlineData("text/xml")]
     [InlineData("application/xml")]
     public async Task Should_make_request_text_body_async(string input)
     {
         var (body, contentLength) = input switch
         {
             "text/plain" => ("test", "test".Length),
-            "text/html" => ("<html></html>", "<html></html>".Length),
+            "text/xml" => ("<html></html>", "<html></html>".Length),
             "application/xml" => ("<person gender=\"female\"></person>", "<person gender=\"female\"></person>".Length),
             _ => (string.Empty, 0),
         };
