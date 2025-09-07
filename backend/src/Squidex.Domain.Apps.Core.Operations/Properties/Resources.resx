@@ -204,7 +204,7 @@
   <data name="ScriptingWordCount" xml:space="preserve">
     <value>Counts the number of words in a text. Useful in combination with html2Text or markdown2Text.</value>
   </data>
-  <data name="ScriptingRequestAsync" xml:space="preserve">
-    <value>Makes a request to the defined URL. requestInit dictionary is used to configure the requestAsync call, allowing you to specify the HTTP method, headers, and body. The response is received via a callback.</value>
+  <data name="ScriptingRequest" xml:space="preserve">
+    <value>Makes a request to the defined URL. requestInit dictionary is used to configure the request call, allowing you to specify the url, method, headers, body. The response is received via a callback.</value>
   </data>
 </root>

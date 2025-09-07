@@ -219,9 +219,9 @@ namespace Squidex.Domain.Apps.Core.Properties {
             }
         }
         
-        internal static string ScriptingRequestAsync {
+        internal static string ScriptingRequest {
             get {
-                return ResourceManager.GetString("ScriptingRequestAsync", resourceCulture);
+                return ResourceManager.GetString("ScriptingRequest", resourceCulture);
             }
         }
     }

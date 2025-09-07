@@ -19,7 +19,7 @@ public sealed class HttpJintExtension(IHttpClientFactory httpClientFactory) : IJ
 {
     private delegate void HttpJsonDelegate(string url, Action<JsValue> callback, JsValue? headers = null, bool ignoreError = false);
     private delegate void HttpJsonWithBodyDelegate(string url, JsValue body, Action<JsValue> callback, JsValue? headers = null, bool ignoreError = false);
-    private delegate void HttpRequestDelegate(string url, JsValue requestInit, Action<JsValue> callback);
+    private delegate void HttpRequestDelegate(JsValue requestInit, Action<JsValue> callback);
 
     public void ExtendAsync(ScriptExecutionContext context)
     {
@@ -28,15 +28,15 @@ public sealed class HttpJintExtension(IHttpClientFactory httpClientFactory) : IJ
         AddBodyMethod(context, HttpMethod.Put, "putJSON");
         AddMethod(context, HttpMethod.Delete, "deleteJSON");
         AddMethod(context, HttpMethod.Get, "getJSON");
-        AddMethod(context, "requestAsync");
+        AddMethod(context, "request");
     }
 
     private void AddMethod(ScriptExecutionContext context, string name)
     {
-        var action = new HttpRequestDelegate((url, requestInit, callback) =>
+        var action = new HttpRequestDelegate((requestInit, callback) =>
         {
             var httpRequest = ParseRequestInit(requestInit);
-            Request(context, httpRequest.Method, url, httpRequest.Body, callback, httpRequest.Headers, true, true);
+            Request(context, httpRequest.Method, httpRequest.Url, httpRequest.Body, callback, httpRequest.Headers, true, true);
         });
 
         context.Engine.SetValue(name, action);
@@ -214,8 +214,8 @@ public sealed class HttpJintExtension(IHttpClientFactory httpClientFactory) : IJ
         describe(JsonType.Function, "deleteJSON(url, callback, headers?, ignoreError?)",
             Resources.ScriptingDeleteJson);
 
-        describe(JsonType.Function, "requestAsync(url, requestInit, callback)",
-            Resources.ScriptingRequestAsync);
+        describe(JsonType.Function, "request(requestInit, callback)",
+            Resources.ScriptingRequest);
     }
 
     private static IEnumerable<(string, string)> GetNonEmptyProperties(JsValue? source)
@@ -236,11 +236,21 @@ public sealed class HttpJintExtension(IHttpClientFactory httpClientFactory) : IJ
         }
     }
 
-    private static (HttpMethod Method, JsValue Headers, JsValue Body) ParseRequestInit(JsValue? requestInit)
+    private static (string Url, HttpMethod Method, JsValue Headers, JsValue Body) ParseRequestInit(JsValue? requestInit)
     {
         if (requestInit?.IsObject() != true || requestInit.AsObject() is not ObjectInstance obj)
         {
             throw new JavaScriptException("RequestInit is not an object.");
+        }
+
+        if (!obj.TryGetValue("url", out var urlJsValue))
+        {
+            throw new JavaScriptException("Missing required property 'url'.");
+        }
+
+        if (!urlJsValue.IsString())
+        {
+            throw new JavaScriptException("URL property must be a string.");
         }
 
         if (!obj.TryGetValue("method", out var methodJsValue))
@@ -253,6 +263,7 @@ public sealed class HttpJintExtension(IHttpClientFactory httpClientFactory) : IJ
             throw new JavaScriptException("Method property must be a string.");
         }
 
+        var url = urlJsValue.AsString();
         var method = methodJsValue.AsString().ToUpperInvariant() switch
         {
             "PATCH" => HttpMethod.Patch,
@@ -264,6 +275,7 @@ public sealed class HttpJintExtension(IHttpClientFactory httpClientFactory) : IJ
         };
 
         return (
+            Url: url,
             Method: method,
             Headers: obj["headers"],
             Body: obj["body"]

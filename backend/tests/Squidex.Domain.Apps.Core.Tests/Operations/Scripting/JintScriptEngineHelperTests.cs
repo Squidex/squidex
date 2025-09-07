@@ -862,7 +862,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     }
 
     [Fact]
-    public async Task Should_make_request_async()
+    public async Task Should_make_request()
     {
         var httpHandler = SetupRequest();
         var vars = new ScriptVars
@@ -870,7 +870,8 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         };
 
         const string script = @"
-                requestAsync('http://squidex.io/', {
+                request({
+                    url: 'http://squidex.io/',
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -905,7 +906,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     [InlineData("text/plain")]
     [InlineData("text/xml")]
     [InlineData("application/xml")]
-    public async Task Should_make_request_text_body_async(string input)
+    public async Task Should_make_request_text_body(string input)
     {
         var (body, contentLength) = input switch
         {
@@ -921,7 +922,8 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         };
 
         var script = $@"
-                requestAsync('http://squidex.io/', {{
+                request({{
+                    url: 'http://squidex.io/',
                     method: 'POST',
                     headers: {{
                         'Content-Type': '{input}'
@@ -953,14 +955,15 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     [InlineData("text/plain")]
     [InlineData("text/xml")]
     [InlineData("application/xml")]
-    public async Task Should_throw_exception_if_request_async_body_is_not_string(string input)
+    public async Task Should_throw_exception_if_request_body_is_not_string(string input)
     {
         var vars = new ScriptVars
         {
         };
 
         var script = $@"
-                requestAsync('http://squidex.io/', {{
+                request({{
+                    url: 'http://squidex.io/',
                     method: 'POST',
                     headers: {{
                         'Content-Type': '{input}'
