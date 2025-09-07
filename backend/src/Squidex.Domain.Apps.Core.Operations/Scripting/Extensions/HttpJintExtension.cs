@@ -21,13 +21,6 @@ public sealed class HttpJintExtension(IHttpClientFactory httpClientFactory) : IJ
     private delegate void HttpJsonWithBodyDelegate(string url, JsValue body, Action<JsValue> callback, JsValue? headers = null, bool ignoreError = false);
     private delegate void HttpRequestDelegate(string url, JsValue requestInit, Action<JsValue> callback);
 
-    private sealed class HttpRequestWrapper
-    {
-        public HttpMethod Method { get; set; }
-        public JsValue Headers { get; set; }
-        public JsValue Body { get; set; }
-    }
-
     public void ExtendAsync(ScriptExecutionContext context)
     {
         AddBodyMethod(context, HttpMethod.Patch, "patchJSON");
@@ -232,30 +225,37 @@ public sealed class HttpJintExtension(IHttpClientFactory httpClientFactory) : IJ
         }
     }
 
-    private static HttpRequestWrapper ParseHttpRequest(JsValue? source)
+    private static (HttpMethod Method, JsValue Headers, JsValue Body) ParseHttpRequest(JsValue? source)
     {
         if (source?.IsObject() != true || source.AsObject() is not ObjectInstance obj)
         {
             throw new JavaScriptException("Object is not an object.");
         }
 
-        var method = obj.TryGetValue("method", out var methodJsValue) && methodJsValue.IsString()
-            ? methodJsValue.AsString().ToUpperInvariant() switch
-            {
-                "PATCH" => HttpMethod.Patch,
-                "POST" => HttpMethod.Post,
-                "PUT" => HttpMethod.Put,
-                "DELETE" => HttpMethod.Delete,
-                "GET" => HttpMethod.Get,
-                _ => throw new JavaScriptException($"Invalid HTTP method: '{methodJsValue.AsString()}'"),
-            }
-            : throw new JavaScriptException("Missing or invalid required property 'method'.");
-
-        return new HttpRequestWrapper()
+        if (!obj.TryGetValue("method", out var methodJsValue))
         {
-            Method = method,
-            Headers = obj["headers"],
-            Body = obj["body"],
+            throw new JavaScriptException("Missing required property 'method'.");
+        }
+
+        if (!methodJsValue.IsString())
+        {
+            throw new JavaScriptException("Method property must be a string.");
+        }
+
+        var method = methodJsValue.AsString().ToUpperInvariant() switch
+        {
+            "PATCH" => HttpMethod.Patch,
+            "POST" => HttpMethod.Post,
+            "PUT" => HttpMethod.Put,
+            "DELETE" => HttpMethod.Delete,
+            "GET" => HttpMethod.Get,
+            _ => throw new JavaScriptException($"Invalid HTTP method: '{methodJsValue.AsString()}'"),
         };
+
+        return (
+            Method: method,
+            Headers: obj["headers"],
+            Body: obj["body"]
+        );
     }
 }
