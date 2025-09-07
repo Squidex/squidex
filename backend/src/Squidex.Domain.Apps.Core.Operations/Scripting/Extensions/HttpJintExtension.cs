@@ -35,7 +35,7 @@ public sealed class HttpJintExtension(IHttpClientFactory httpClientFactory) : IJ
     {
         var action = new HttpRequestDelegate((url, requestInit, callback) =>
         {
-            var httpRequest = ParseHttpRequest(requestInit);
+            var httpRequest = ParseRequestInit(requestInit);
             Request(context, httpRequest.Method, url, httpRequest.Body, callback, httpRequest.Headers, true, true);
         });
 
@@ -236,11 +236,11 @@ public sealed class HttpJintExtension(IHttpClientFactory httpClientFactory) : IJ
         }
     }
 
-    private static (HttpMethod Method, JsValue Headers, JsValue Body) ParseHttpRequest(JsValue? source)
+    private static (HttpMethod Method, JsValue Headers, JsValue Body) ParseRequestInit(JsValue? requestInit)
     {
-        if (source?.IsObject() != true || source.AsObject() is not ObjectInstance obj)
+        if (requestInit?.IsObject() != true || requestInit.AsObject() is not ObjectInstance obj)
         {
-            throw new JavaScriptException("Object is not an object.");
+            throw new JavaScriptException("RequestInit is not an object.");
         }
 
         if (!obj.TryGetValue("method", out var methodJsValue))
