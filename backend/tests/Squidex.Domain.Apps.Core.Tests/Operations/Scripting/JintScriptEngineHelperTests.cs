@@ -951,7 +951,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
 
     [Theory]
     [InlineData("text/plain")]
-    [InlineData("text/html")]
+    [InlineData("text/xml")]
     [InlineData("application/xml")]
     public async Task Should_throw_exception_if_request_async_body_is_not_string(string input)
     {
