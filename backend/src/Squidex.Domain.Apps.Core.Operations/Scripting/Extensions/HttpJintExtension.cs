@@ -153,6 +153,17 @@ public sealed class HttpJintExtension(IHttpClientFactory httpClientFactory) : IJ
 
                 request.Content = new FormUrlEncodedContent(formValues);
             }
+            else if (string.Equals(contentType, "text/plain", StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(contentType, "text/xml", StringComparison.OrdinalIgnoreCase) ||
+                     string.Equals(contentType, "application/xml", StringComparison.OrdinalIgnoreCase))
+            {
+                if (!body.IsString())
+                {
+                    throw new JavaScriptException("Body is not a string.");
+                }
+
+                request.Content = new StringContent(body.AsString(), Encoding.UTF8, contentType);
+            }
             else
             {
                 var jsonWriter = new JsonSerializer(context.Engine);
