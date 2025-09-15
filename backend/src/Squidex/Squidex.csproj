@@ -149,6 +149,7 @@
     <EmbeddedResource Include="..\..\i18n\frontend_pt.json" Link="Areas\Frontend\Resources\frontend_pt.json" />
     <EmbeddedResource Include="..\..\i18n\frontend_zh.json" Link="Areas\Frontend\Resources\frontend_zh.json" />
     <EmbeddedResource Include="..\..\i18n\frontend_fr.json" Link="Areas\Frontend\Resources\frontend_fr.json" />
+    <EmbeddedResource Include="..\..\i18n\frontend_de.json" Link="Areas\Frontend\Resources\frontend_de.json" />
   </ItemGroup>
 
   <ItemGroup>
