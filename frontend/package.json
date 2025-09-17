@@ -24,7 +24,7 @@
     "@angular/localize": "19.2.14",
     "@angular/platform-browser": "19.2.14",
     "@angular/platform-browser-dynamic": "19.2.14",
-    "@angular/platform-server": "19.2.14",
+    "@angular/platform-server": "19.2.15",
     "@angular/router": "19.2.14",
     "@egjs/hammerjs": "2.0.17",
     "@floating-ui/dom": "^1.7.1",
