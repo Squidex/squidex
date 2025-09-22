@@ -72,6 +72,8 @@ public sealed class ScriptContent(IScriptEngine scriptEngine) : IContentEnricher
             DataOld = default,
             Status = content.Status,
             StatusOld = default,
+            Created = content.Created,
+            LastModified = content.LastModified,
         };
 
         vars.CopyFrom(sharedVars);

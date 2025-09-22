@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Security.Claims;
+using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 
@@ -101,6 +102,18 @@ public sealed class ContentScriptVars : DataScriptVars
     public override ContentData? Data
     {
         get => GetValue<ContentData?>();
+        set => SetInitial(value);
+    }
+
+    [FieldDescription(nameof(FieldDescriptions.EntityCreated))]
+    public Instant Created
+    {
+        set => SetInitial(value);
+    }
+
+    [FieldDescription(nameof(FieldDescriptions.EntityLastModified))]
+    public Instant LastModified
+    {
         set => SetInitial(value);
     }
 }

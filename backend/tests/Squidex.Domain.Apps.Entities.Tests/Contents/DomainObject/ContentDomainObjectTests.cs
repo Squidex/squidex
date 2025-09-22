@@ -807,6 +807,44 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
         await VerifySutAsync(actual);
     }
 
+    [Fact]
+    public async Task Script_should_have_access_to_timestamp_variables()
+    {
+        var testCreated = SystemClock.Instance.GetCurrentInstant();
+        var testLastModified = testCreated.Plus(Duration.FromMinutes(5));
+
+        var capturedVars = new List<DataScriptVars>();
+
+        A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, A<string>._, ScriptOptions(), CancellationToken))
+            .ReturnsLazily(x =>
+            {
+                var vars = x.GetArgument<DataScriptVars>(0)!;
+                capturedVars.Add(vars);
+                return Task.FromResult(vars.Data!);
+            });
+
+        var command = new CreateContent { Data = data };
+
+        await PublishAsync(command);
+
+        // Verify that script variables contain the timestamp fields
+        Assert.Single(capturedVars);
+        var scriptVars = capturedVars[0];
+
+        Assert.True(scriptVars.ContainsKey("created"));
+        Assert.True(scriptVars.ContainsKey("lastModified"));
+        Assert.IsType<Instant>(scriptVars["created"]);
+        Assert.IsType<Instant>(scriptVars["lastModified"]);
+
+        // Verify that timestamps are reasonable (not default values)
+        var created = (Instant)scriptVars["created"]!;
+        var lastModified = (Instant)scriptVars["lastModified"]!;
+
+        Assert.True(created > Instant.MinValue);
+        Assert.True(lastModified > Instant.MinValue);
+        Assert.True(lastModified >= created); // lastModified should be >= created
+    }
+
     private Task ExecuteCreateAsync()
     {
         return PublishAsync(new CreateContent { Data = data });
@@ -860,7 +898,11 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
             Equals(x["dataOld"], oldData) &&
             Equals(x["status"], newStatus) &&
             Equals(x["statusOld"], oldStatus) &&
-            Equals(x["user"], ApiContext.UserPrincipal);
+            Equals(x["user"], ApiContext.UserPrincipal) &&
+            x.ContainsKey("created") &&
+            x.ContainsKey("lastModified") &&
+            x["created"] is Instant &&
+            x["lastModified"] is Instant;
     }
 
     private T CreateContentEvent<T>(T @event) where T : ContentEvent

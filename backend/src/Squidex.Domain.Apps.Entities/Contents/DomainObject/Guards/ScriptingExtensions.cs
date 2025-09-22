@@ -158,6 +158,8 @@ public static class ScriptingExtensions
         vars.SchemaId = operation.Schema.Id;
         vars.SchemaName = operation.Schema.Name;
         vars.User = operation.User;
+        vars.Created = operation.Snapshot.Created;
+        vars.LastModified = operation.Snapshot.LastModified;
 
         return vars;
     }
