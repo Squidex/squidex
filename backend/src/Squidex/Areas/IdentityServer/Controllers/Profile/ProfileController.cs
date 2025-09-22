@@ -123,7 +123,7 @@ public sealed class ProfileController(
 
     [HttpPost]
     [Route("account/profile/upload-picture/")]
-    public Task<IActionResult> UploadPicture(List<IFormFile> files)
+    public Task<IActionResult> UploadPicture([FromForm(Name = "file")] List<IFormFile> files)
     {
         return MakeChangeAsync((id, ct) => UpdatePictureAsync(files, id, ct),
             T.Get("users.profile.uploadPictureDone"), None.Value);
@@ -148,23 +148,41 @@ public sealed class ProfileController(
     private async Task UpdatePictureAsync(List<IFormFile> files, string id,
         CancellationToken ct)
     {
-        if (files.Count != 1)
-        {
-            throw new ValidationException(T.Get("validation.onlyOneFile"));
-        }
-
         var update = new UserValues
         {
             PictureUrl = SquidexClaimTypes.PictureUrlStore,
         };
 
+        await UploadResizedAsync(files, id, ct);
         await userService.UpdateAsync(id, update, ct: ct);
     }
 
-    private async Task UploadResizedAsync(IAssetFile file, string id,
+    private async Task UploadResizedAsync(List<IFormFile> files, string id,
         CancellationToken ct)
     {
-        await using var assetResized = TempAssetFile.Create(file);
+        if (files.Count != 1)
+        {
+            throw new ValidationException(T.Get("validation.onlyOneFile"));
+        }
+
+        var file = files[0];
+        if (string.IsNullOrWhiteSpace(file.ContentType))
+        {
+            throw new ValidationException(T.Get("common.httpContentTypeNotDefined"));
+        }
+
+        if (string.IsNullOrWhiteSpace(file.FileName))
+        {
+            throw new ValidationException(T.Get("common.httpFileNameNotDefined"));
+        }
+
+        var assetFile = new DelegateAssetFile(
+            file.FileName,
+            file.ContentType,
+            file.Length,
+            file.OpenReadStream);
+
+        await using var assetResized = TempAssetFile.Create(assetFile);
 
         var resizeOptions = new ResizeOptions
         {
@@ -174,13 +192,9 @@ public sealed class ProfileController(
 
         try
         {
-            await using (var originalStream = file.OpenRead())
-            {
-                await using (var resizeStream = assetResized.OpenWrite())
-                {
-                    await assetGenerator.CreateThumbnailAsync(originalStream, file.MimeType, resizeStream, resizeOptions, ct);
-                }
-            }
+            await using var streamOriginal = assetFile.OpenRead();
+            await using var streamResized = assetResized.OpenWrite();
+            await assetGenerator.CreateThumbnailAsync(streamOriginal, assetFile.MimeType, streamResized, resizeOptions, ct);
         }
         catch
         {

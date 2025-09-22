@@ -42,6 +42,7 @@ export * from './utils/math-helper';
 export * from './utils/modal-view';
 export * from './utils/picasso';
 export * from './utils/rxjs-extensions';
+export * from './utils/slug';
 export * from './utils/string-helper';
 export * from './utils/tag-values';
 export * from './utils/text-measurer';

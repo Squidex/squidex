@@ -155,6 +155,10 @@ public static class ScriptingExtensions
         vars.AppId = operation.App.Id;
         vars.AppName = operation.App.Name;
         vars.ContentId = operation.CommandId;
+        vars.Created = operation.Snapshot.Created;
+        vars.CreatedBy = operation.Snapshot.CreatedBy;
+        vars.LastModified = operation.Snapshot.LastModified;
+        vars.LastModifiedBy = operation.Snapshot.LastModifiedBy;
         vars.SchemaId = operation.Schema.Id;
         vars.SchemaName = operation.Schema.Name;
         vars.User = operation.User;

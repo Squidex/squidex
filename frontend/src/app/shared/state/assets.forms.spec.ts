@@ -58,6 +58,16 @@ describe('AnnotateAssetForm', () => {
         expect(slug).toBe('my-new-file.png');
     });
 
+    it('should create slug from file with dots', () => {
+        form.form.get('fileName')!.setValue('My.New.File');
+
+        form.generateSlug(asset);
+
+        const slug = form.form.get('slug')!.value;
+
+        expect(slug).toBe('my.new.file.png');
+    });
+
     it('should convert metadata if loading', () => {
         form.load(asset);
 
