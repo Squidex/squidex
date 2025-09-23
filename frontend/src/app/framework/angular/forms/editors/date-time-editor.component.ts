@@ -137,7 +137,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<State, str
     }
 
     public updateValue(source: string) {
-        this.update(DateTime.tryParseISO(source), this.snapshot.isLocal, true);
+        this.update(DateTime.tryParseISO(source, !this.snapshot.isLocal), this.snapshot.isLocal, true);
         return false;
     }
 

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Security.Claims;
+using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 
@@ -93,6 +94,30 @@ public sealed class ContentScriptVars : DataScriptVars
 
     [FieldDescription(nameof(FieldDescriptions.ContentDataOld))]
     public ContentData? OldData
+    {
+        set => SetInitial(value);
+    }
+
+    [FieldDescription(nameof(FieldDescriptions.EntityLastModified))]
+    public Instant LastModified
+    {
+        set => SetInitial(value);
+    }
+
+    [FieldDescription(nameof(FieldDescriptions.EntityLastModifiedBy))]
+    public RefToken LastModifiedBy
+    {
+        set => SetInitial(value);
+    }
+
+    [FieldDescription(nameof(FieldDescriptions.EntityCreated))]
+    public Instant Created 
+    {
+        set => SetInitial(value);
+    }
+
+    [FieldDescription(nameof(FieldDescriptions.EntityCreatedBy))]
+    public RefToken CreatedBy
     {
         set => SetInitial(value);
     }
