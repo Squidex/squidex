@@ -861,6 +861,124 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         Assert.Equal(expectedResult, actual);
     }
 
+    [Fact]
+    public async Task Should_make_request()
+    {
+        var httpHandler = SetupRequest();
+        var vars = new ScriptVars
+        {
+        };
+
+        const string script = @"
+                request({
+                    url: 'http://squidex.io/',
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: {
+                        key: 42
+                    }
+                }, function(actual) {
+                    complete(actual);
+                });
+            ";
+
+        var actual = await sut.ExecuteAsync(vars, script);
+
+        httpHandler.ShouldBeUrl("http://squidex.io/");
+        httpHandler.ShouldBeMethod(HttpMethod.Post);
+        httpHandler.ShouldBeBody("{\"key\":42}", "application/json");
+
+        var expectedResult =
+            JsonValue.Object()
+                .Add("statusCode", 200)
+                .Add("headers",
+                    JsonValue.Object()
+                        .Add("Content-Type", "application/json; charset=utf-8")
+                        .Add("Content-Length", "13"))
+                .Add("body", "{ \"key\": 42 }");
+
+        Assert.Equal(expectedResult, actual);
+    }
+
+    [Theory]
+    [InlineData("text/plain")]
+    [InlineData("text/xml")]
+    [InlineData("application/xml")]
+    public async Task Should_make_request_text_body(string input)
+    {
+        var (body, contentLength) = input switch
+        {
+            "text/plain" => ("test", "test".Length),
+            "text/xml" => ("<html></html>", "<html></html>".Length),
+            "application/xml" => ("<person gender=\"female\"></person>", "<person gender=\"female\"></person>".Length),
+            _ => (string.Empty, 0),
+        };
+
+        var httpHandler = SetupRequest(HttpStatusCode.OK, new StringContent(body, Encoding.UTF8, input));
+        var vars = new ScriptVars
+        {
+        };
+
+        var script = $@"
+                request({{
+                    url: 'http://squidex.io/',
+                    method: 'POST',
+                    headers: {{
+                        'Content-Type': '{input}'
+                    }},
+                    body: '{body}'
+                }}, function(actual) {{
+                    complete(actual);
+                }});
+            ";
+
+        var actual = await sut.ExecuteAsync(vars, script);
+
+        httpHandler.ShouldBeUrl("http://squidex.io/");
+        httpHandler.ShouldBeMethod(HttpMethod.Post);
+        httpHandler.ShouldBeBody(body, input);
+
+        var expectedResult =
+            JsonValue.Object()
+                .Add("statusCode", 200)
+                .Add("headers",  JsonValue.Object()
+                    .Add("Content-Type", $"{input}; charset=utf-8")
+                    .Add("Content-Length", $"{contentLength}"))
+                .Add("body", body);
+
+        Assert.Equal(expectedResult, actual);
+    }
+
+    [Theory]
+    [InlineData("text/plain")]
+    [InlineData("text/xml")]
+    [InlineData("application/xml")]
+    public async Task Should_throw_exception_if_request_body_is_not_string(string input)
+    {
+        var vars = new ScriptVars
+        {
+        };
+
+        var script = $@"
+                request({{
+                    url: 'http://squidex.io/',
+                    method: 'POST',
+                    headers: {{
+                        'Content-Type': '{input}'
+                    }},
+                    body: {{
+                        test: 1
+                    }}
+                }}, function(actual) {{
+                    complete(actual);
+                }});
+            ";
+
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script));
+    }
+
     private MockupHttpHandler SetupRequest(HttpStatusCode statusCode = HttpStatusCode.OK, StringContent? responseContent = null)
     {
         var httpResponse = new HttpResponseMessage(statusCode)
