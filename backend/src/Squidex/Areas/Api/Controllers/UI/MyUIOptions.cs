@@ -56,6 +56,9 @@ public sealed record MyUIOptions
     [JsonPropertyName("collaborationService")]
     public string CollaborationService { get; set; }
 
+    [JsonPropertyName("disable")]
+    public bool Disable { get; set; }
+
     public sealed class MapOptions
     {
         [JsonPropertyName("type")]

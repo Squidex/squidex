@@ -7,6 +7,7 @@
 
 using Microsoft.Extensions.FileProviders;
 using Microsoft.Net.Http.Headers;
+using Squidex.Areas.Api.Controllers.UI;
 using Squidex.Areas.Frontend.Middlewares;
 using Squidex.Hosting.Web;
 using Squidex.Pipeline.Squid;
@@ -17,8 +18,14 @@ namespace Squidex.Areas.Frontend;
 
 public static class Startup
 {
-    public static void UseFrontend(this IApplicationBuilder app)
+    public static void UseFrontend(this IApplicationBuilder app, IConfiguration config)
     {
+        var uiOptions = config.GetSection("ui").Get<MyUIOptions>();
+        if (uiOptions is { Disable: true })
+        {
+            return;
+        }
+
         var environment = app.ApplicationServices.GetRequiredService<IWebHostEnvironment>();
 
         var fileProvider = environment.WebRootFileProvider;
