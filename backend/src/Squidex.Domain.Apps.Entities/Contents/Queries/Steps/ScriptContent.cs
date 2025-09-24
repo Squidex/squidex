@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Google.LongRunning;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Shared;
 
@@ -68,8 +69,12 @@ public sealed class ScriptContent(IScriptEngine scriptEngine) : IContentEnricher
         var vars = new ContentScriptVars
         {
             ContentId = content.Id,
+            Created = content.Created,
+            CreatedBy = content.CreatedBy,
             Data = content.Data,
             DataOld = default,
+            LastModified = content.LastModified,
+            LastModifiedBy = content.LastModifiedBy,
             Status = content.Status,
             StatusOld = default,
         };

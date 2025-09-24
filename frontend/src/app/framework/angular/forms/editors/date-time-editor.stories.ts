@@ -59,16 +59,21 @@ export default {
     render: args => ({
         props: args,
         template: `
-            <sqx-date-time-editor 
-                [disabled]="disabled"
-                [hideClear]="hideClear"
-                [hideDateButtons]="hideDateButtons"
-                [hideDateTimeModeButton]="hideDateTimeModeButton"
-                [mode]="mode"
-                (ngModelChange)="change($event)"
-                [ngModel]="ngModel"
-                [size]="size">
-            </sqx-date-time-editor>
+            <div>
+                <sqx-date-time-editor 
+                    [disabled]="disabled"
+                    [hideClear]="hideClear"
+                    [hideDateButtons]="hideDateButtons"
+                    [hideDateTimeModeButton]="hideDateTimeModeButton"
+                    [mode]="mode"
+                    (ngModelChange)="ngModel = $event; change($event)"
+                    [ngModel]="ngModel"
+                    [size]="size">
+                </sqx-date-time-editor>
+                <div style="margin-bottom: 0.5rem; font-family: monospace; color: #555;">
+                    ngModel: {{ ngModel }}
+                </div>
+            </div>
         `,
     }),
     decorators: [

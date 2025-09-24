@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import slugify from 'slugify';
 import { MathHelper } from './math-helper';
+import { generateSlug } from './slug';
 
 const IMAGE_REGEX = /!\[(?<alt>[^\]]*)\]\((?<url>.*?)([\s]["\s]*(?<name>[^")]*)["\s]*)?\)/;
 const IMAGES_REGEX = /!\[(?<alt>[^\]]*)\]\((?<url>.*?)([\s]["\s]*(?<name>[^")]*)["\s]*)?\)/g;
@@ -74,7 +74,7 @@ const IMAGE_EXTENSIONS = ['.avif', '.jpeg', '.jpg', '.png', '.webp'];
 function toImage(image: { url: string; name?: string; alt?: string }): MarkdownImage {
     let name = image.name || image.alt || 'image';
 
-    name = slugify(name, { lower: true, trim: true });
+    name = generateSlug(name);
 
     if (!IMAGE_EXTENSIONS.find(ex => name.endsWith(ex))) {
         name += '.webp';

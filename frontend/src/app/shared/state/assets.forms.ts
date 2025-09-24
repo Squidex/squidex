@@ -6,8 +6,7 @@
  */
 
 import { UntypedFormControl, Validators } from '@angular/forms';
-import slugify from 'slugify';
-import { ExtendedFormGroup, Form, TemplatedFormArray, Types } from '@app/framework';
+import { ExtendedFormGroup, Form, generateSlug, TemplatedFormArray, Types } from '@app/framework';
 import { AnnotateAssetDto, AssetDto, AssetFolderDto, MoveAssetDto, RenameAssetFolderDto, RenameTagDto, UpdateAssetScriptsDto } from '../model';
 
 export class AnnotateAssetForm extends Form<ExtendedFormGroup, AnnotateAssetDto, AssetDto> {
@@ -144,7 +143,7 @@ export class AnnotateAssetForm extends Form<ExtendedFormGroup, AnnotateAssetDto,
         const fileName = this.form.controls['fileName'].value;
 
         if (fileName) {
-            let slug = slugify(fileName, { lower: true });
+            let slug = generateSlug(fileName, { allowed: ['.'] });
 
             if (asset.fileName) {
                 const index = asset.fileName.lastIndexOf('.');

@@ -150,52 +150,55 @@ public sealed class UsersController(
         try
         {
             var entity = await userResolver.FindByIdAsync(id, HttpContext.RequestAborted);
-
-            if (entity != null)
+            if (entity == null)
             {
-                if (entity.Claims.IsPictureUrlStored())
+                return new FileStreamResult(new MemoryStream(AvatarBytes), "image/png");
+            }
+
+            if (entity.Claims.IsPictureUrlStored())
+            {
+                var callback = new FileCallback(async (body, range, ct) =>
                 {
-                    var callback = new FileCallback(async (body, range, ct) =>
+                    try
                     {
-                        try
-                        {
-                            await userPictureStore.DownloadAsync(entity.Id, body, ct);
-                        }
-                        catch
-                        {
-                            await body.WriteAsync(AvatarBytes, ct);
-                        }
-                    });
-
-                    return new FileCallbackResult("image/png", callback);
-                }
-
-                var httpClient = httpClientFactory.CreateClient("Users");
-
-                var url = entity.Claims.PictureNormalizedUrl();
-
-                if (!string.IsNullOrWhiteSpace(url))
-                {
-                    var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, HttpContext.RequestAborted);
-
-                    if (response.IsSuccessStatusCode)
-                    {
-                        var contentType = response.Content.Headers.ContentType?.ToString()!;
-                        var contentStream = await response.Content.ReadAsStreamAsync(HttpContext.RequestAborted);
-
-                        var etag = response.Headers.ETag;
-
-                        var result = new FileStreamResult(contentStream, contentType);
-
-                        if (!string.IsNullOrWhiteSpace(etag?.Tag))
-                        {
-                            result.EntityTag = new EntityTagHeaderValue(etag.Tag, etag.IsWeak);
-                        }
-
-                        return result;
+                        await userPictureStore.DownloadAsync(entity.Id, body, ct);
                     }
+                    catch
+                    {
+                        await body.WriteAsync(AvatarBytes, ct);
+                    }
+                });
+
+                return new FileCallbackResult("image/png", callback);
+            }
+
+            var httpClient = httpClientFactory.CreateClient("Users");
+
+            var url = entity.Claims.PictureNormalizedUrl();
+
+            if (!string.IsNullOrWhiteSpace(url))
+            {
+                var response = await httpClient.GetAsync(url, HttpCompletionOption.ResponseHeadersRead, HttpContext.RequestAborted);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    var contentType = response.Content.Headers.ContentType?.ToString()!;
+                    var contentStream = await response.Content.ReadAsStreamAsync(HttpContext.RequestAborted);
+
+                    var etag = response.Headers.ETag;
+
+                    var result = new FileStreamResult(contentStream, contentType);
+
+                    if (!string.IsNullOrWhiteSpace(etag?.Tag))
+                    {
+                        result.EntityTag = new EntityTagHeaderValue(etag.Tag, etag.IsWeak);
+                    }
+
+                    return result;
                 }
             }
+
+            return new FileStreamResult(new MemoryStream(AvatarBytes), "image/png");
         }
         catch (Exception ex)
         {

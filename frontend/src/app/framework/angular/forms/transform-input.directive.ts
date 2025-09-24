@@ -7,15 +7,13 @@
 
 import { Directive, ElementRef, forwardRef, HostListener, Input, Renderer2 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import slugify from 'slugify';
-import { Types } from '@app/framework/internal';
+import { generateSlug, Types } from '@app/framework/internal';
 
 type Transform = (value: string) => string;
 
 export const TransformNoop: Transform = value => value;
 export const TransformLowerCase: Transform = value => value.toLowerCase();
-export const TransformSlugify: Transform = value => slugify(value, { lower: true, trim: false });
-export const TransformSlugifyCased: Transform = value => slugify(value, { lower: false, trim: false });
+export const TransformSlugify: Transform = value => generateSlug(value, { preserveTrailingDash: true });
 export const TransformUpperCase: Transform = value => value.toUpperCase();
 
 export const SQX_TRANSFORM_INPUT_VALUE_ACCESSOR: any = {
@@ -40,8 +38,6 @@ export class TransformInputDirective implements ControlValueAccessor {
                 this.transformer = TransformLowerCase;
             } else if (value === 'Slugify') {
                 this.transform = TransformSlugify;
-            } else if (value === 'SlugifyCased') {
-                this.transform = TransformSlugifyCased;
             } else if (value === 'UpperCase') {
                 this.transform = TransformUpperCase;
             }
