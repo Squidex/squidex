@@ -805,11 +805,185 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script));
     }
 
-    private MockupHttpHandler SetupRequest(HttpStatusCode statusCode = HttpStatusCode.OK)
+    [Theory]
+    [InlineData("patchJSON")]
+    [InlineData("postJSON")]
+    [InlineData("putJSON")]
+    [InlineData("deleteJSON")]
+    [InlineData("getJSON")]
+    public async Task Should_handle_successful_response_with_empty_body_when_error_ignore_flag_is_true(string input)
+    {
+        var httpHandler = SetupRequest(HttpStatusCode.NoContent, new StringContent(string.Empty, Encoding.UTF8, "text/plain"));
+
+        var vars = new ScriptVars
+        {
+        };
+
+        var script = $@"
+                var url = 'http://squidex.io/';
+                var hasRequestBodyMethods = ['patchJSON', 'postJSON', 'putJSON']
+
+                if (hasRequestBodyMethods.indexOf('{input}') != -1) {{
+                    {input}(url, {{}}, function(actual) {{
+                        complete(actual);
+                    }}, undefined, true);
+                }}
+                else {{
+                    {input}(url, function(actual) {{
+                        complete(actual);
+                    }}, undefined, true);
+                }}
+            ";
+
+        var actual = await sut.ExecuteAsync(vars, script);
+
+        var methodMap = new Dictionary<string, HttpMethod>()
+        {
+            { "patchJSON", HttpMethod.Patch },
+            { "postJSON", HttpMethod.Post },
+            { "putJSON", HttpMethod.Put },
+            { "deleteJSON", HttpMethod.Delete },
+            { "getJSON", HttpMethod.Get },
+        };
+
+        httpHandler.ShouldBeUrl("http://squidex.io/");
+        httpHandler.ShouldBeMethod(methodMap[input]);
+
+        var expectedResult =
+            JsonValue.Object()
+                .Add("statusCode", 204)
+                .Add("headers",
+                    JsonValue.Object()
+                        .Add("Content-Type", "text/plain; charset=utf-8")
+                        .Add("Content-Length", "0"))
+                .Add("body", string.Empty);
+
+        Assert.Equal(expectedResult, actual);
+    }
+
+    [Fact]
+    public async Task Should_make_request()
+    {
+        var httpHandler = SetupRequest();
+        var vars = new ScriptVars
+        {
+        };
+
+        const string script = @"
+                request({
+                    url: 'http://squidex.io/',
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: {
+                        key: 42
+                    }
+                }, function(actual) {
+                    complete(actual);
+                });
+            ";
+
+        var actual = await sut.ExecuteAsync(vars, script);
+
+        httpHandler.ShouldBeUrl("http://squidex.io/");
+        httpHandler.ShouldBeMethod(HttpMethod.Post);
+        httpHandler.ShouldBeBody("{\"key\":42}", "application/json");
+
+        var expectedResult =
+            JsonValue.Object()
+                .Add("statusCode", 200)
+                .Add("headers",
+                    JsonValue.Object()
+                        .Add("Content-Type", "application/json; charset=utf-8")
+                        .Add("Content-Length", "13"))
+                .Add("body", "{ \"key\": 42 }");
+
+        Assert.Equal(expectedResult, actual);
+    }
+
+    [Theory]
+    [InlineData("text/plain")]
+    [InlineData("text/xml")]
+    [InlineData("application/xml")]
+    public async Task Should_make_request_text_body(string input)
+    {
+        var (body, contentLength) = input switch
+        {
+            "text/plain" => ("test", "test".Length),
+            "text/xml" => ("<html></html>", "<html></html>".Length),
+            "application/xml" => ("<person gender=\"female\"></person>", "<person gender=\"female\"></person>".Length),
+            _ => (string.Empty, 0),
+        };
+
+        var httpHandler = SetupRequest(HttpStatusCode.OK, new StringContent(body, Encoding.UTF8, input));
+        var vars = new ScriptVars
+        {
+        };
+
+        var script = $@"
+                request({{
+                    url: 'http://squidex.io/',
+                    method: 'POST',
+                    headers: {{
+                        'Content-Type': '{input}'
+                    }},
+                    body: '{body}'
+                }}, function(actual) {{
+                    complete(actual);
+                }});
+            ";
+
+        var actual = await sut.ExecuteAsync(vars, script);
+
+        httpHandler.ShouldBeUrl("http://squidex.io/");
+        httpHandler.ShouldBeMethod(HttpMethod.Post);
+        httpHandler.ShouldBeBody(body, input);
+
+        var expectedResult =
+            JsonValue.Object()
+                .Add("statusCode", 200)
+                .Add("headers",  JsonValue.Object()
+                    .Add("Content-Type", $"{input}; charset=utf-8")
+                    .Add("Content-Length", $"{contentLength}"))
+                .Add("body", body);
+
+        Assert.Equal(expectedResult, actual);
+    }
+
+    [Theory]
+    [InlineData("text/plain")]
+    [InlineData("text/xml")]
+    [InlineData("application/xml")]
+    public async Task Should_throw_exception_if_request_body_is_not_string(string input)
+    {
+        var vars = new ScriptVars
+        {
+        };
+
+        var script = $@"
+                request({{
+                    url: 'http://squidex.io/',
+                    method: 'POST',
+                    headers: {{
+                        'Content-Type': '{input}'
+                    }},
+                    body: {{
+                        test: 1
+                    }}
+                }}, function(actual) {{
+                    complete(actual);
+                }});
+            ";
+
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script));
+    }
+
+    private MockupHttpHandler SetupRequest(HttpStatusCode statusCode = HttpStatusCode.OK, StringContent? responseContent = null)
     {
         var httpResponse = new HttpResponseMessage(statusCode)
         {
-            Content = new StringContent("{ \"key\": 42 }", Encoding.UTF8, "application/json"),
+            Content = responseContent ?? new StringContent("{ \"key\": 42 }", Encoding.UTF8, "application/json"),
         };
 
         var httpHandler = new MockupHttpHandler(httpResponse);

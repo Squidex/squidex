@@ -19,8 +19,14 @@ namespace Squidex.Config.Domain;
 
 public static class FontendServices
 {
-    public static void AddSquidexFrontend(this IServiceCollection services)
+    public static void AddSquidexFrontend(this IServiceCollection services, IConfiguration config)
     {
+        var uiOptions = config.GetSection("ui").Get<MyUIOptions>();
+        if (uiOptions is { Disable: true })
+        {
+            return;
+        }
+
         services.Configure<MyUIOptions>((services, options) =>
         {
             var jsonOptions = services.GetRequiredService<JsonSerializerOptions>();

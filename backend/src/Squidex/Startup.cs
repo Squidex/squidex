@@ -43,7 +43,7 @@ public sealed class Startup(IConfiguration config)
         services.AddSquidexContents(config);
         services.AddSquidexControllerServices(config);
         services.AddSquidexEventSourcing(config);
-        services.AddSquidexFrontend();
+        services.AddSquidexFrontend(config);
         services.AddSquidexGraphQL();
         services.AddSquidexHealthChecks(config);
         services.AddSquidexHistory(config);
@@ -119,7 +119,7 @@ public sealed class Startup(IConfiguration config)
             builder.Use404();
         });
 
-        app.UseFrontend();
+        app.UseFrontend(config);
         app.UsePlugins();
     }
 }
