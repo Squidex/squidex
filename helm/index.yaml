@@ -1,69 +1,186 @@
 apiVersion: v1
 entries:
   squidex:
-    - name: squidex
-      appVersion: 5.9.0
-      description: Squidex CMS
-      home: https://squidex.io/
-      keywords:
-        - asp-net
-        - asp-net-core
-        - cms
-        - csharp
-        - headless-cms
-        - mongodb
-      sources:
-        - https://github.com/Squidex/squidex
-      type: application
-      dependencies:
-        - name: mongodb-replicaset
-          version: 3.9.6
-          repository: https://kubernetes-charts.storage.googleapis.com/
-          condition: mongodb-replicaset.enabled
-      versions:
-        - version: 1.3.0
-          urls:
-            - squidex-1.3.0.tgz
-
+  - apiVersion: v2
+    appVersion: 5.9.0
+    created: "2025-10-02T14:22:58.39868+02:00"
+    dependencies:
+    - condition: mongodb-replicaset.enabled
+      name: mongodb-replicaset
+      repository: https://kubernetes-charts.storage.googleapis.com/
+      version: 3.9.6
+    description: Squidex CMS
+    digest: 566b4d063d2717e00fc04b35bf594869dc9e5398bb08da13b542a5497dd4dc19
+    home: https://squidex.io/
+    keywords:
+    - cms
+    - headless-cms
+    - mongodb
+    - csharp
+    - asp-net-core
+    - asp-net
+    name: squidex
+    sources:
+    - https://github.com/Squidex/squidex
+    type: application
+    urls:
+    - squidex-1.3.0.tgz
+    version: 1.3.0
   squidex7:
-    - name: squidex7
-      appVersion: 7.15.0
-      description: Squidex CMS v7.0 and newer
-      home: https://squidex.io/
-      icon: https://raw.githubusercontent.com/Squidex/squidex/master/media/logo-squared.png
-      keywords:
-        - asp-net
-        - asp-net-core
-        - cms
-        - csharp
-        - headless-cms
-        - mongodb
-      sources:
-        - https://github.com/Squidex/squidex
-      type: application
-      dependencies:
-        - name: mongodb-replicaset
-          version: 3.9.6
-          repository: https://kubernetes-charts.storage.googleapis.com/
-          condition: mongodb-replicaset.enabled
-      versions:
-        - version: 1.0.0
-          urls:
-            - squidex7-1.0.0.tgz
-        - version: 1.0.1
-          urls:
-            - squidex7-1.0.1.tgz
-        - version: 1.0.2
-          urls:
-            - squidex7-1.0.2.tgz
-        - version: 1.0.3
-          urls:
-            - squidex7-1.0.3.tgz
-        - version: 2.0.0
-          urls:
-            - squidex7-2.0.0.tgz
-        - version: 2.0.1
-          urls:
-            - squidex7-2.0.1.tgz
-
-generated: "2025-10-02T12:00:00Z"
+  - apiVersion: v2
+    appVersion: 7.18.0
+    created: "2025-10-02T14:22:58.4474332+02:00"
+    dependencies:
+    - condition: mongodb.enabled
+      name: mongodb
+      repository: https://charts.bitnami.com/bitnami
+      version: 16.5.1
+    description: Squidex CMS v7.0 and newer
+    digest: 43629c59eb51582e869984ea51a0180c0146f83c0fca65d484ca8d86acf45888
+    home: https://squidex.io/
+    icon: https://raw.githubusercontent.com/Squidex/squidex/master/media/logo-squared.png
+    keywords:
+    - cms
+    - headless-cms
+    - mongodb
+    - csharp
+    - asp-net-core
+    - asp-net
+    name: squidex7
+    sources:
+    - https://github.com/Squidex/squidex
+    type: application
+    urls:
+    - squidex7-2.0.1.tgz
+    version: 2.0.1
+  - apiVersion: v2
+    appVersion: 7.18.0
+    created: "2025-10-02T14:22:58.4402059+02:00"
+    dependencies:
+    - condition: mongodb.enabled
+      name: mongodb
+      repository: https://charts.bitnami.com/bitnami
+      version: 16.5.1
+    description: Squidex CMS v7.0 and newer
+    digest: cd09ec711e78f164c1e9af6d90b5dcc265f3e90fdda2a6399bcb4664a53ed8af
+    home: https://squidex.io/
+    icon: https://raw.githubusercontent.com/Squidex/squidex/master/media/logo-squared.png
+    keywords:
+    - cms
+    - headless-cms
+    - mongodb
+    - csharp
+    - asp-net-core
+    - asp-net
+    name: squidex7
+    sources:
+    - https://github.com/Squidex/squidex
+    type: application
+    urls:
+    - squidex7-2.0.0.tgz
+    version: 2.0.0
+  - apiVersion: v2
+    appVersion: 7.15.0
+    created: "2025-10-02T14:22:58.4282308+02:00"
+    dependencies:
+    - condition: mongodb-replicaset.enabled
+      name: mongodb-replicaset
+      repository: https://kubernetes-charts.storage.googleapis.com/
+      version: 3.9.6
+    description: Squidex CMS v7.0 and newer
+    digest: fafdbe2f77e0ba51040ea75178b0d050618369ae92d0f9ba4f70a4a572607a29
+    home: https://squidex.io/
+    icon: https://raw.githubusercontent.com/Squidex/squidex/master/media/logo-squared.png
+    keywords:
+    - cms
+    - headless-cms
+    - mongodb
+    - csharp
+    - asp-net-core
+    - asp-net
+    name: squidex7
+    sources:
+    - https://github.com/Squidex/squidex
+    type: application
+    urls:
+    - squidex7-1.0.3.tgz
+    version: 1.0.3
+  - apiVersion: v2
+    appVersion: 7.15.0
+    created: "2025-10-02T14:22:58.4209061+02:00"
+    dependencies:
+    - condition: mongodb-replicaset.enabled
+      name: mongodb-replicaset
+      repository: https://kubernetes-charts.storage.googleapis.com/
+      version: 3.9.6
+    description: Squidex CMS v7.0 and newer
+    digest: e42c42132163bb997c4a936cc0b67165673fd6ce0ceaa93fb2e6a4874f5bdf02
+    home: https://squidex.io/
+    icon: https://raw.githubusercontent.com/Squidex/squidex/master/media/logo-squared.png
+    keywords:
+    - cms
+    - headless-cms
+    - mongodb
+    - csharp
+    - asp-net-core
+    - asp-net
+    name: squidex7
+    sources:
+    - https://github.com/Squidex/squidex
+    type: application
+    urls:
+    - squidex7-1.0.2.tgz
+    version: 1.0.2
+  - apiVersion: v2
+    appVersion: 7.0.2
+    created: "2025-10-02T14:22:58.4135705+02:00"
+    dependencies:
+    - condition: mongodb-replicaset.enabled
+      name: mongodb-replicaset
+      repository: https://kubernetes-charts.storage.googleapis.com/
+      version: 3.9.6
+    description: Squidex CMS v7.0 and newer
+    digest: a29f2b69295ec47ab8298011c714b60816ae4d4cc558fd352a955a6fd6cb1596
+    home: https://squidex.io/
+    icon: https://raw.githubusercontent.com/Squidex/squidex/master/media/logo-squared.png
+    keywords:
+    - cms
+    - headless-cms
+    - mongodb
+    - csharp
+    - asp-net-core
+    - asp-net
+    name: squidex7
+    sources:
+    - https://github.com/Squidex/squidex
+    type: application
+    urls:
+    - squidex7-1.0.1.tgz
+    version: 1.0.1
+  - apiVersion: v2
+    appVersion: 7.0.2
+    created: "2025-10-02T14:22:58.4063175+02:00"
+    dependencies:
+    - condition: mongodb-replicaset.enabled
+      name: mongodb-replicaset
+      repository: https://kubernetes-charts.storage.googleapis.com/
+      version: 3.9.6
+    description: Squidex CMS
+    digest: 9cc4c40f4a5825a33835fa8f0fc4c40389f2da96b247a9425dd999b90ee1457f
+    home: https://squidex.io/
+    icon: https://raw.githubusercontent.com/Squidex/squidex/master/media/logo-squared.png
+    keywords:
+    - cms
+    - headless-cms
+    - mongodb
+    - csharp
+    - asp-net-core
+    - asp-net
+    name: squidex7
+    sources:
+    - https://github.com/Squidex/squidex
+    type: application
+    urls:
+    - squidex7-1.0.0.tgz
+    version: 1.0.0
+generated: "2025-10-02T14:22:58.3893643+02:00"
