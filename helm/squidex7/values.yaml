@@ -411,6 +411,9 @@ mongodb:
     ##
     size: 10Gi
 
+  image:
+    repository: bitnamilegacy/mongodb
+
   ## @skip mongodb.arbiter
   arbiter:
     ## @skip mongodb.arbiter.enabled
