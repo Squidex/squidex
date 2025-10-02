@@ -5,7 +5,7 @@ name: squidex7
 icon: https://raw.githubusercontent.com/Squidex/squidex/master/media/logo-squared.png
 description: Squidex CMS v7.0 and newer
 
-version: 2.0.1
+version: 2.0.2
 appVersion: "7.18.0"
 
 home: https://squidex.io/
@@ -23,6 +23,6 @@ sources:
 
 dependencies:
   - name: mongodb
-    version: 16.5.1
+    version: 16.5.45
     repository: https://charts.bitnami.com/bitnami
     condition: mongodb.enabled
