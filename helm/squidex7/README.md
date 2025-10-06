@@ -62,7 +62,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | `deployment.annotations`                           | Annotations to add to the deployment.                                | `nil`             |
 | `deployment.command`                               | Command to run in the container.                                     | `nil`             |
 | `deployment.args`                                  | Arguments to pass to the container.                                  | `nil`             |
-| `networkPolicy.enabled`                            | Enable network policies.                                             | `true`            |
+| `networkPolicy.enabled`                            | Enable network policies.                                             | `false`            |
 | `image.repository`                                 | Squidex image registry.                                              | `squidex/squidex` |
 | `image.pullPolicy`                                 | Squidex image pull policy.                                           | `IfNotPresent`    |
 | `resources`                                        | Resource requests and limits.                                        | `{}`              |
@@ -118,7 +118,7 @@ The command removes all the Kubernetes components associated with the chart and 
 | `env.URLS__BASEURL`                                  | Set the base url of your application, to generate correct urls in background process.                             | `https://squidex.local/`     |
 | `env.URLS__ENFORCEHTTPS`                             | Set it to true to redirect the user from http to https permanently.                                               | `false`                      |
 | `env.ASPNETCORE_URLS`                                | An override to ensure that kestrel starts on a non-privileged port.                                               | `http://+:8080`              |
-| `autoscaling.enabled`                                | Enable autoscaling for the deployment.                                                                            | `true`                       |
+| `autoscaling.enabled`                                | Enable autoscaling for the deployment.                                                                            | `false`                      |
 | `autoscaling.maxReplicas`                            | Maximum number of replicas.                                                                                       | `6`                          |
 | `autoscaling.minReplicas`                            | Minimum number of replicas.                                                                                       | `3`                          |
 | `autoscaling.targetCPUUtilizationPercentage`         | Target CPU utilization percentage.                                                                                | `85`                         |
