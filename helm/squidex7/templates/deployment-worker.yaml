@@ -9,7 +9,10 @@ spec:
   replicas: 1
   revisionHistoryLimit: {{ .Values.deployment.revisionHistoryLimit }}
   strategy:
-    {{- toYaml .Values.deployment.strategy | nindent 4 }}
+    rollingUpdate:
+      maxSurge: 0
+      maxUnavailable: 1
+    type: RollingUpdate
   selector:
     matchLabels:
       {{- include "squidex.selectors" . | indent 6 }}
