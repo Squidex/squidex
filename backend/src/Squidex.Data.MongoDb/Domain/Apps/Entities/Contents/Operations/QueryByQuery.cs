@@ -147,7 +147,7 @@ internal sealed class QueryByQuery(MongoCountCollection countCollection) : Opera
         var filters = new List<FilterDefinition<MongoContentEntity>>
         {
             Filter.Gt(x => x.LastModified, default),
-            Filter.Gt(x => x.Id, default),
+            Filter.Gt(x => x.Id, DomainId.Create(string.Empty)),
             Filter.Eq(x => x.IndexedAppId, appId),
             Filter.In(x => x.IndexedSchemaId, schemaIds),
         };

@@ -187,7 +187,7 @@ internal sealed class QueryInDedicatedCollection(IMongoClient mongoClient, strin
         var filters = new List<FilterDefinition<MongoContentEntity>>
         {
             Filter.Gt(x => x.LastModified, default),
-            Filter.Gt(x => x.Id, default),
+            Filter.Gt(x => x.Id, DomainId.Create(string.Empty)),
         };
 
         if (query?.Filter?.HasField(Field.Of<MongoContentEntity>(x => nameof(x.IsDeleted))) != true)

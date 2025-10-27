@@ -63,7 +63,7 @@ public sealed class QueryAsStream : OperationBase
         var filters = new List<FilterDefinition<MongoContentEntity>>
         {
             Filter.Gt(x => x.LastModified, default),
-            Filter.Gt(x => x.Id, default),
+            Filter.Gt(x => x.Id, DomainId.Create(string.Empty)),
             Filter.Eq(x => x.IndexedAppId, appId),
         };
 
