@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, Component, ElementRef, EventEmitter, Input, numberAttribute, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { AbstractContentForm, AnnotationCreate, AnnotationsSelect, AnyFieldDto, AppLanguageDto, ChatDialogComponent, CheckboxGroupComponent, CodeEditorComponent, ColorPickerComponent, CommentsState, ConfirmClickDirective, ControlErrorsComponent, DateTimeEditorComponent, DialogModel, disabled$, EditContentForm, FormHintComponent, GeolocationEditorComponent, hasNoValue$, HTTP, IndeterminateValueDirective, MarkdownDirective, MathHelper, MessageBus, ModalDirective, RadioGroupComponent, ReferenceInputComponent, RichEditorComponent, StarsComponent, TagEditorComponent, ToggleComponent, TooltipDirective, TransformInputDirective, TypedSimpleChanges, Types } from '@app/shared';
+import { AbstractContentForm, AnnotationCreate, AnnotationsSelect, AnyFieldDto, AppLanguageDto, ChatDialogComponent, CheckboxGroupComponent, CodeEditorComponent, ColorPickerComponent, CommentsState, ConfirmClickDirective, ControlErrorsComponent, DateTimeEditorComponent, DialogModel, disabled$, EditContentForm, FormHintComponent, GeolocationEditorComponent, hasNoValue$, HTTP, IndeterminateValueDirective, MarkdownDirective, MathHelper, MessageBus, ModalDirective, RadioGroupComponent, ReferenceInputComponent, ReferencesFieldPropertiesDto, RichEditorComponent, StarsComponent, TagEditorComponent, ToggleComponent, TooltipDirective, TransformInputDirective, TypedSimpleChanges, Types } from '@app/shared';
 import { ReferenceDropdownComponent } from '../references/reference-dropdown.component';
 import { ReferencesCheckboxesComponent } from '../references/references-checkboxes.component';
 import { ReferencesEditorComponent } from '../references/references-editor.component';
@@ -121,6 +121,10 @@ export class FieldEditorComponent {
 
     public get isString() {
         return this.field?.properties.fieldType === 'String';
+    }
+
+    public get schemaIds() {
+        return Types.is(this.field.properties, ReferencesFieldPropertiesDto) ? this.field.properties.schemaIds : undefined;
     }
 
     constructor(

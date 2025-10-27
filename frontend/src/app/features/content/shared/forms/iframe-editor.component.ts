@@ -228,11 +228,11 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
                 if (correlationId) {
                     let schemaIds: ReadonlyArray<string> | undefined = undefined;
 
-                    if (this.schemaIds && this.schemaIds.length > 0) {
-                        schemaIds = this.schemaIds;
-                    } else if (Types.isArrayOfString(schemas) && schemas.length > 0) {
+                    if (Types.isArrayOfString(schemas) && schemas.length > 0) {
                         schemaIds = schemas;
-                    }
+                    } if (this.schemaIds && this.schemaIds.length > 0) {
+                        schemaIds = this.schemaIds;
+                    } 
 
                     this.contentsQuery = query;
                     this.contentsCorrelationId = correlationId;

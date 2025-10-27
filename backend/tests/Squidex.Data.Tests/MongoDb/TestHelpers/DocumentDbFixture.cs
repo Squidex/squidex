@@ -34,7 +34,7 @@ public class DocumentDbFixture
             TestConfig.Configuration.GetValue<string>("documentDb:configuration")
         );
 
-        var cert = new X509Certificate2(@"C:\Users\mail2\Downloads\global-bundle.pem");
+        var cert = new X509Certificate2(TestConfig.Configuration.GetValue<string>("documentDb:keyFile")!);
 
         settings.RetryWrites = false;
         settings.RetryReads = false;
