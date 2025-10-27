@@ -68,7 +68,7 @@ public record AlgoliaFlowStep : FlowStep, IConvertibleToAction
     {
         var @event = ((FlowEventContext)executionContext.Context).Event;
 
-        if (!@event.ShouldDelete(executionContext, Delete))
+        if (@event.ShouldDelete(executionContext, Delete))
         {
             Document = null;
             return default;

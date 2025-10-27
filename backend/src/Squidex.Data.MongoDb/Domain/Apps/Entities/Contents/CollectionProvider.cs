@@ -41,7 +41,7 @@ internal class CollectionProvider(IMongoClient mongoClient, string prefixDatabas
                         .Ascending(x => x.IndexedSchemaId)
                         .Ascending(x => x.IsDeleted)
                         .Descending(x => x.LastModified)),
-                ]);
+            ]);
 
         return schemaCollection;
     }

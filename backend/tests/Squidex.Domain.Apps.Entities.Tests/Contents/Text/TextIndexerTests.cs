@@ -311,16 +311,16 @@ public abstract class TextIndexerTests : GivenContext
     [Fact]
     public async Task Should_delete_documents_from_index()
     {
-        await CreateTextAsync(Ids1[0], "iv", "Version1_1");
-        await CreateTextAsync(Ids2[0], "iv", "Version2_1");
+        await CreateTextAsync(Ids1[0], "iv", "Text1");
+        await CreateTextAsync(Ids2[0], "iv", "Text2");
 
-        await SearchText(expected: Ids1, text: "Version1_1");
-        await SearchText(expected: Ids2, text: "Version2_1");
+        await SearchText(expected: Ids1, text: "Text1");
+        await SearchText(expected: Ids2, text: "Text2");
 
         await DeleteAsync(Ids1[0]);
 
-        await SearchText(expected: null, text: "Version1_1");
-        await SearchText(expected: Ids2, text: "Version2_1");
+        await SearchText(expected: null, text: "Text1");
+        await SearchText(expected: Ids2, text: "Text2");
     }
 
     [Fact]

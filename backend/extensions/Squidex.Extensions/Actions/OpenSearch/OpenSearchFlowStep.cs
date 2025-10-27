@@ -76,30 +76,28 @@ public sealed record OpenSearchFlowStep : FlowStep, IConvertibleToAction
 
         if (@event.ShouldDelete(executionContext, Delete))
         {
-            OpenSearchContent content;
-            try
-            {
-                content = executionContext.DeserializeJson<OpenSearchContent>(Document!);
-            }
-            catch (Exception ex)
-            {
-                content = new OpenSearchContent
-                {
-                    More = new Dictionary<string, object>
-                    {
-                        ["error"] = $"Invalid JSON: {ex.Message}",
-                    },
-                };
-            }
-
-            Document = executionContext.SerializeJson(content);
-        }
-        else
-        {
             Document = null;
+            return default;
         }
 
-        return base.PrepareAsync(executionContext, ct);
+        OpenSearchContent content;
+        try
+        {
+            content = executionContext.DeserializeJson<OpenSearchContent>(Document!);
+        }
+        catch (Exception ex)
+        {
+            content = new OpenSearchContent
+            {
+                More = new Dictionary<string, object>
+                {
+                    ["error"] = $"Invalid JSON: {ex.Message}",
+                },
+            };
+        }
+
+        Document = executionContext.SerializeJson(content);
+        return default;
     }
 
     public override async ValueTask<FlowStepResult> ExecuteAsync(FlowExecutionContext executionContext,

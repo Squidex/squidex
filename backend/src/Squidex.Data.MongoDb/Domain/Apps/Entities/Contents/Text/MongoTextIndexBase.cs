@@ -114,7 +114,9 @@ public abstract class MongoTextIndexBase<T>(IMongoDatabase database, string shar
         catch (MongoBulkWriteException ex)
         {
             // Ignore invalid geo data when writing content. Our insert is unordered anyway.
-            if (ex.WriteErrors.Any(error => error.Code != MongoDbErrorCodes.Errror16755_InvalidGeoData))
+            if (!ex.WriteErrors.All(e =>
+                MongoDbErrorCodes.IsInvalidGeoData(e) ||
+                MongoDbErrorCodes.IsInvalidDocumentDbGeoData(e)))
             {
                 throw;
             }
