@@ -228,6 +228,14 @@ public static class ServiceExtensions
                     shardKey => ActivatorUtilities.CreateInstance<AtlasTextIndex>(c, shardKey));
             }).AsOptional<ITextIndex>().As<IDeleter>();
         }
+        else if (config.GetValue<bool>("store:mongoDb:dpcumentDb"))
+        {
+            services.AddSingletonAs(c =>
+            {
+                return new MongoShardedTextIndex<string>(GetSharding(config, "store:mongoDB:textShardCount"),
+                    shardKey => ActivatorUtilities.CreateInstance<DocumentDbTextIndex>(c, shardKey));
+            }).AsOptional<ITextIndex>().As<IDeleter>();
+        }
         else
         {
             services.AddSingletonAs(c =>

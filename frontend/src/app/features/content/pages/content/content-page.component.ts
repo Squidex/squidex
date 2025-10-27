@@ -368,7 +368,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
     public loadVersion(version: number | null, compare: boolean) {
         const content = this.content;
 
-        if (!content || version === null || version != content.version) {
+        if (!content || version === null || version === content.version) {
             this.contentFormCompare = null;
             this.contentVersion = null;
             this.loadContent(content?.data || {}, true);

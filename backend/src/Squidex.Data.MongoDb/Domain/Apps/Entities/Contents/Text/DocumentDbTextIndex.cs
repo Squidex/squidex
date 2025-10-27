@@ -6,13 +6,16 @@
 // ==========================================================================
 
 using MongoDB.Driver;
+using MongoDB.Driver.GeoJsonObjectModel;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.ObjectPool;
+using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
-public sealed class MongoTextIndex(IMongoDatabase database, string shardKey) 
-    : MongoTextIndexBase<List<MongoTextIndexEntityText>>(database, shardKey, new CommandFactory<List<MongoTextIndexEntityText>>(BuildTexts))
+public sealed class DocumentDbTextIndex(IMongoDatabase database, string shardKey)
+    : MongoTextIndexBase<string>(database, shardKey, new CommandFactory<string>(BuildTexts))
 {
     private record struct SearchOperation
     {
@@ -27,15 +30,54 @@ public sealed class MongoTextIndex(IMongoDatabase database, string shardKey)
         required public SearchScope SearchScope { get; init; }
     }
 
-    protected override async Task SetupCollectionAsync(IMongoCollection<MongoTextIndexEntity<List<MongoTextIndexEntityText>>> collection,
+    protected override async Task SetupCollectionAsync(IMongoCollection<MongoTextIndexEntity<string>> collection,
         CancellationToken ct)
     {
-        await base.SetupCollectionAsync(collection, ct);
-
         await collection.Indexes.CreateOneAsync(
-            new CreateIndexModel<MongoTextIndexEntity<List<MongoTextIndexEntityText>>>(
-                Index.Ascending(x => x.AppId).Text("t.t")),
+            new CreateIndexModel<MongoTextIndexEntity<string>>(
+                Index.Text(x => x.Texts)),
             cancellationToken: ct);
+
+
+        await collection.Indexes.CreateManyAsync(
+        [
+            new CreateIndexModel<MongoTextIndexEntity<string>>(
+                    Index
+                        .Ascending(x => x.AppId)
+                        .Ascending(x => x.ContentId)),
+
+                new CreateIndexModel<MongoTextIndexEntity<string>>(
+                    Index
+                        .Ascending(x => x.AppId)
+                        .Ascending(x => x.SchemaId)
+                        .Ascending(x => x.GeoField)
+                        .Geo2DSphere(x => x.GeoObject)),
+            ], ct);
+    }
+
+    public override async Task<List<DomainId>?> SearchAsync(App app, GeoQuery query, SearchScope scope,
+        CancellationToken ct = default)
+    {
+        Guard.NotNull(app);
+        Guard.NotNull(query);
+
+        var point = new GeoJsonPoint<GeoJson2DCoordinates>(new GeoJson2DCoordinates(query.Longitude, query.Latitude));
+
+        // Use the filter in the correct order to leverage the index in the best way.
+        var findFilter =
+            Filter.And(
+                Filter.Eq(x => x.AppId, app.Id),
+                Filter.Eq(x => x.SchemaId, query.SchemaId),
+                Filter.Eq(x => x.GeoField, query.Field),
+                Filter.NearSphere(x => x.GeoObject, point, query.Radius),
+                FilterByScope(scope));
+
+        var byGeo =
+            await GetCollection(scope).Find(findFilter).Limit(query.Take)
+                .Project<MongoTextResult>(Projection.Include(x => x.ContentId))
+                .ToListAsync(ct);
+
+        return byGeo.Select(x => x.ContentId).ToList();
     }
 
     public override async Task<List<DomainId>?> SearchAsync(App app, TextQuery query, SearchScope scope,
@@ -86,7 +128,7 @@ public sealed class MongoTextIndex(IMongoDatabase database, string shardKey)
         var filter =
             Filter.And(
                 Filter.Eq(x => x.AppId, search.App.Id),
-                Filter.Text(search.SearchTerms, "none"),
+                Filter.Text(search.SearchTerms),
                 Filter.In(x => x.SchemaId, schemaIds),
                 FilterByScope(search.SearchScope));
 
@@ -99,13 +141,13 @@ public sealed class MongoTextIndex(IMongoDatabase database, string shardKey)
         var filter =
             Filter.And(
                 Filter.Eq(x => x.AppId, search.App.Id),
-                Filter.Text(search.SearchTerms, "none"),
+                Filter.Text(search.SearchTerms),
                 FilterByScope(search.SearchScope));
 
         return SearchAsync(search, filter, factor, ct);
     }
 
-    private async Task SearchAsync(SearchOperation search, FilterDefinition<MongoTextIndexEntity<List<MongoTextIndexEntityText>>> filter, double factor,
+    private async Task SearchAsync(SearchOperation search, FilterDefinition<MongoTextIndexEntity<string>> filter, double factor,
         CancellationToken ct)
     {
         var byText =
@@ -116,9 +158,22 @@ public sealed class MongoTextIndex(IMongoDatabase database, string shardKey)
         search.Results.AddRange(byText.Select(x => (x.ContentId, x.Score * factor)));
     }
 
-    private static List<MongoTextIndexEntityText> BuildTexts(Dictionary<string, string> source)
+    private static string BuildTexts(Dictionary<string, string> source)
     {
-        // Use a custom tokenizer to leverage stop words from multiple languages.
-        return source.Select(x => MongoTextIndexEntityText.FromText(Tokenizer.Terms(x.Value, x.Key))).ToList();
+        var sb = DefaultPools.StringBuilder.Get();
+        try
+        {
+            foreach (var (key, value) in source)
+            {
+                sb.Append(' ');
+                sb.Append(Tokenizer.Terms(value, key));
+            }
+
+            return sb.ToString();
+        }
+        finally
+        {
+            DefaultPools.StringBuilder.Return(sb);
+        }
     }
 }

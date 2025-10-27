@@ -59,7 +59,7 @@ public sealed record TypesenseFlowStep : FlowStep, IConvertibleToAction
     {
         var @event = ((FlowEventContext)executionContext.Context).Event;
 
-        if (!@event.ShouldDelete(executionContext, Delete))
+        if (@event.ShouldDelete(executionContext, Delete))
         {
             Document = null;
             return default;
@@ -84,8 +84,7 @@ public sealed record TypesenseFlowStep : FlowStep, IConvertibleToAction
         }
 
         Document = executionContext.SerializeJson(content);
-
-        return base.PrepareAsync(executionContext, ct);
+        return default;
     }
 
     public override async ValueTask<FlowStepResult> ExecuteAsync(FlowExecutionContext executionContext,

@@ -17,7 +17,8 @@ using LuceneQueryAnalyzer = Lucene.Net.QueryParsers.Classic.QueryParser;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
-public sealed class AtlasTextIndex(IMongoDatabase database, IHttpClientFactory atlasClient, IOptions<AtlasOptions> atlasOptions, string shardKey) : MongoTextIndexBase<Dictionary<string, string>>(database, shardKey, new CommandFactory<Dictionary<string, string>>(BuildTexts))
+public sealed class AtlasTextIndex(IMongoDatabase database, IHttpClientFactory atlasClient, IOptions<AtlasOptions> atlasOptions, string shardKey)
+    : MongoTextIndexBase<Dictionary<string, string>>(database, shardKey, new CommandFactory<Dictionary<string, string>>(BuildTexts))
 {
     private static readonly LuceneQueryVisitor QueryVisitor = new LuceneQueryVisitor(AtlasIndexDefinition.GetFieldPath);
     private static readonly LuceneQueryAnalyzer QueryParser =

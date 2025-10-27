@@ -68,6 +68,31 @@ public class RuleQueueWriterTests : GivenContext
     }
 
     [Fact]
+    public async Task Should_not_enqueue_result_with_skip_reason()
+    {
+        var result = new JobResult
+        {
+            SkipReason = SkipReason.FromRule,
+            EnrichedEvent = new EnrichedManualEvent(),
+            EnrichmentError = null,
+            Job = new CreateFlowInstanceRequest<FlowEventContext>
+            {
+                Context = new FlowEventContext(),
+                Definition = new FlowDefinition(),
+                DefinitionId = Guid.NewGuid().ToString(),
+                OwnerId = Guid.NewGuid().ToString(),
+            },
+            Rule = CreateRule(),
+        };
+
+        await sut.WriteAsync(AppId.Id, result);
+        await sut.FlushAsync();
+
+        A.CallTo(() => flowManager.EnqueueAsync(A<CreateFlowInstanceRequest<FlowEventContext>[]>._, default))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
     public async Task Should_enqueue_success()
     {
         var result = new JobResult
@@ -118,7 +143,7 @@ public class RuleQueueWriterTests : GivenContext
     {
         var result = new JobResult
         {
-            SkipReason = SkipReason.Disabled,
+            SkipReason = default,
             EnrichedEvent = new EnrichedManualEvent(),
             EnrichmentError = null,
             Job = new CreateFlowInstanceRequest<FlowEventContext>
