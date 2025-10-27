@@ -26,7 +26,9 @@ public sealed class RuleQueueWriter(IFlowManager<FlowEventContext> flowManager, 
         Guard.NotNull(result);
 
         // We do not want to handle events without a job in the normal flow.
-        if (result.Job == null || result.Rule == null || result.SkipReason != SkipReason.None)
+        if (result.Job == null ||
+            result.Rule == null ||
+            result.SkipReason is not(SkipReason.None or SkipReason.Disabled))
         {
             return false;
         }

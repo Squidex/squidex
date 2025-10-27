@@ -116,6 +116,29 @@ public class RuleQueueWriterTests : GivenContext
     }
 
     [Fact]
+    public async Task Should_enqueue_disabled()
+    {
+        var result = new JobResult
+        {
+            SkipReason = SkipReason.Disabled,
+            EnrichedEvent = new EnrichedManualEvent(),
+            EnrichmentError = null,
+            Job = new CreateFlowInstanceRequest<FlowEventContext>
+            {
+                Context = new FlowEventContext(),
+                Definition = new FlowDefinition(),
+                DefinitionId = Guid.NewGuid().ToString(),
+                OwnerId = Guid.NewGuid().ToString(),
+            },
+            Rule = CreateRule(),
+        };
+
+        var writes = await EnqueueAndFlushAsync(result);
+
+        Assert.Equal(new[] { result.Job.Value }, writes);
+    }
+
+    [Fact]
     public async Task Should_write_batched()
     {
         var result = new JobResult
