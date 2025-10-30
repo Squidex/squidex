@@ -130,8 +130,7 @@ public sealed record ElasticSearchFlowStep : FlowStep, IConvertibleToAction
                     throw response.OriginalException;
                 }
 
-                var serializer = executionContext.Resolve<IJsonSerializer>();
-                executionContext.Log(message, serializer.Serialize(response, true));
+                executionContext.Log(message, response.Body);
             }
 
             var client = await Clients.GetClientAsync((Host, Username, Password));
