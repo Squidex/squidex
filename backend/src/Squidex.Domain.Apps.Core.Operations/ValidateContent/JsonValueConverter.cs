@@ -98,7 +98,7 @@ public sealed class JsonValueConverter : IFieldPropertiesVisitor<(object? Result
             return (args.Value, null);
         }
 
-        if (RichTextNode.TryCreate(args.Value, out var node))
+        if (RichTextNode.TryCreate(args.Value, SquidexRichText.Options, out var node))
         {
             return (node.ToText(), null);
         }

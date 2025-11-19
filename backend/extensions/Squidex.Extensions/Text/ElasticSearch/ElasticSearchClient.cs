@@ -11,7 +11,7 @@ namespace Squidex.Extensions.Text.ElasticSearch;
 
 public sealed class ElasticSearchClient : IElasticSearchClient
 {
-    private readonly IElasticLowLevelClient elasticSearch;
+    private readonly ElasticLowLevelClient elasticSearch;
 
     public ElasticSearchClient(string configurationString)
     {

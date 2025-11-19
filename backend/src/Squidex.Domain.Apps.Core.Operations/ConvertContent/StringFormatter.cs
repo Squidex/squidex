@@ -106,7 +106,7 @@ public sealed class StringFormatter : IFieldPropertiesVisitor<string, StringForm
 
     public string Visit(RichTextFieldProperties properties, Args args)
     {
-        return RichTextNode.Create(args.Value).ToText(100);
+        return RichTextNode.Create(args.Value, SquidexRichText.Options).ToText(100);
     }
 
     public string Visit(StringFieldProperties properties, Args args)

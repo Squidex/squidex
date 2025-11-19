@@ -232,6 +232,10 @@ export class ContentDto extends generated.ContentDto {
         return this.compute('canPublish', () => this.statusUpdates.find(x => x.status === 'Published'));
     }
 
+    public get canClone() {
+        return this.compute('canClone', () => hasAnyLink(this._links, 'clone'));
+    }
+
     public get canDelete() {
         return this.compute('canDelete', () => hasAnyLink(this._links, 'update'));
     }

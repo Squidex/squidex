@@ -3,34 +3,8 @@
         <sqx-focus-marker [controlId]="formModel.path">
             @if (!(formModel.hiddenChanges | async)) {
                 <div class="table-items-row table-items-row-summary" [class.field-invalid]="isInvalid | async">
-                    <div class="languages-container">
-                        <div class="languages-buttons">
-                            <div class="languages-inner">
-                                <sqx-field-languages
-                                    [formModel]="formModel"
-                                    [language]="language"
-                                    (languageChange)="languageChange.emit($event)"
-                                    [languages]="languages"
-                                    [showAllControls]="showAllControls"
-                                    (showAllControlsChange)="changeShowAllControls($event)" />
-                                <sqx-field-copy-button [formModel]="formModel" [languages]="languages" />
-                                @if (isTranslatable) {
-                                    <button
-                                        class="btn btn-sm btn-outline-secondary force no-focus-shadow ms-1"
-                                        (click)="translate()"
-                                        [disabled]="formModel.field.isDisabled"
-                                        tabindex="-1"
-                                        title="i18n:contents.autotranslate"
-                                        type="button">
-                                        <i class="icon-translate"></i>
-                                    </button>
-                                }
-                            </div>
-                        </div>
-                    </div>
-
                     @if (showAllControls) {
-                        @for (language of languages; track language) {
+                        @for (language of languages; track language; let i = $index) {
                             <div class="form-group">
                                 <sqx-field-editor
                                     [comments]="commentsState"
@@ -41,8 +15,21 @@
                                     [formModel]="formModel.get(language)"
                                     [hasChatBot]="hasChatBot"
                                     [isComparing]="!!formModelCompare"
+                                    [isCollapsed]="isCollapsed"
                                     [language]="language"
-                                    [languages]="languages" />
+                                    [languages]="languages">
+                                    <ng-container beforeButtons>
+                                        @if (i === 0) {
+                                            <ng-container *ngTemplateOutlet="sharedButtons" />
+                                        }
+                                    </ng-container>
+
+                                    <ng-container afterButtons>
+                                        @if (i === 0) {                                        
+                                            <ng-container *ngTemplateOutlet="toggleButton" />
+                                        }
+                                    </ng-container>
+                                </sqx-field-editor>
                             </div>
                         }
                     } @else {
@@ -54,8 +41,16 @@
                             [formModel]="getControl()"
                             [hasChatBot]="hasChatBot"
                             [isComparing]="!!formModelCompare"
+                            [isCollapsed]="isCollapsed"
                             [language]="language"
-                            [languages]="languages" />
+                            [languages]="languages">
+                            <ng-container beforeButtons>
+                                <ng-container *ngTemplateOutlet="sharedButtons" />
+                            </ng-container>
+                            <ng-container afterButtons>
+                                <ng-container *ngTemplateOutlet="toggleButton" />
+                            </ng-container>
+                        </sqx-field-editor>
                     }
                 </div>
             }
@@ -76,20 +71,6 @@
 
             @if (!(formModelCompare!.hiddenChanges | async)) {
                 <div class="table-items-row table-items-row-summary">
-                    <div class="languages-container">
-                        <div class="languages-buttons-compare">
-                            <div class="languages-inner">
-                                <sqx-field-languages
-                                    [formModel]="formModelCompare!"
-                                    [language]="language"
-                                    (languageChange)="languageChange.emit($event)"
-                                    [languages]="languages"
-                                    [showAllControls]="showAllControls"
-                                    (showAllControlsChange)="changeShowAllControls($event)" />
-                            </div>
-                        </div>
-                    </div>
-
                     @if (showAllControls) {
                         @for (language of languages; track language) {
                             <div class="form-group">
@@ -101,6 +82,7 @@
                                     [formModel]="formModelCompare.get(language)"
                                     [hasChatBot]="hasChatBot"
                                     [isComparing]="!!formModelCompare"
+                                    [isCollapsed]="isCollapsed"
                                     [language]="language"
                                     [languages]="languages" />
                             </div>
@@ -113,6 +95,7 @@
                             [formModel]="getControlCompare()!"
                             [hasChatBot]="hasChatBot"
                             [isComparing]="!!formModelCompare"
+                            [isCollapsed]="isCollapsed"
                             [language]="language"
                             [languages]="languages" />
                     }
@@ -121,3 +104,32 @@
         </div>
     }
 </div>
+
+<ng-template #sharedButtons>
+    <sqx-field-languages
+        [formModel]="formModel"
+        [language]="language"
+        (languageChange)="languageChange.emit($event)"
+        [languages]="languages"
+        [showAllControls]="showAllControls"
+        (showAllControlsChange)="changeShowAllControls($event)" />
+    <sqx-field-copy-button [formModel]="formModel" [languages]="languages" />
+    @if (isTranslatable) {
+        <button
+            class="btn btn-sm btn-outline-secondary force no-focus-shadow"
+            (click)="translate()"
+            [disabled]="formModel.field.isDisabled"
+            tabindex="-1"
+            title="i18n:contents.autotranslate"
+            type="button">
+            <i class="icon-translate"></i>
+        </button>
+    }
+</ng-template>
+
+<ng-template #toggleButton>
+    <button class="btn btn-sm btn-square btn-outline-secondary" (click)="toggle()" type="button"
+    title="i18n:contents.arrayCollapseItem">
+        <i [class.icon-minus2]="!isCollapsed" [class.icon-plus2]="isCollapsed"></i>
+    </button>
+</ng-template>

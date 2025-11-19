@@ -64,7 +64,7 @@
                         (languageChange)="changeLanguage($event)"
                         [languages]="languages"
                         [percents]="contentForm.translationStatus | async" />
-                    @if (content.canDelete && schema.type !== "Singleton") {
+                    @if (content.canDelete || content.canClone) {
                         <button
                             class="btn btn-outline-secondary ms-2"
                             #buttonOptions
@@ -74,14 +74,23 @@
                             <i class="icon-dots"></i>
                         </button>
                         <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="dropdown; closeAlways: true">
-                            <a
-                                class="dropdown-item dropdown-item-delete"
-                                confirmRememberKey="deleteContent"
-                                confirmText="i18n:contents.deleteConfirmText"
-                                confirmTitle="i18n:contents.deleteConfirmTitle"
-                                (sqxConfirmClick)="delete()">
-                                {{ "common.delete" | sqxTranslate }}
-                            </a>
+                            @if (content.canClone) {
+                                <a (click)="clone()"
+                                    class="dropdown-item">
+                                    {{ "common.clone" | sqxTranslate }}
+                                </a>
+                            }
+
+                            @if (content.canDelete) {
+                                <a
+                                    class="dropdown-item dropdown-item-delete"
+                                    confirmRememberKey="deleteContent"
+                                    confirmText="i18n:contents.deleteConfirmText"
+                                    confirmTitle="i18n:contents.deleteConfirmTitle"
+                                    (sqxConfirmClick)="delete()">
+                                    {{ "common.delete" | sqxTranslate }}
+                                </a>
+                            }
                         </sqx-dropdown-menu>
                     }
 

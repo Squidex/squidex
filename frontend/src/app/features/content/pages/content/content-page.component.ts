@@ -400,6 +400,12 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
         this.contentForm.setEnabled(!this.content || this.content.canUpdate);
     }
 
+    public clone() {
+        this.tempService.put(this.content!.data);
+
+        this.router.navigate(['../new'], { relativeTo: this.route });
+    }
+
     public changeShowIdInput(value: boolean) {
         this.localStore.setBoolean(Settings.Local.CONTENT_ID_INPUT, value);
 

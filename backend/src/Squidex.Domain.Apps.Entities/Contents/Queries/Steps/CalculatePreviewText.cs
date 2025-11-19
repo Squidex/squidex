@@ -28,7 +28,7 @@ public sealed class CalculatePreviewText : IContentEnricherStep
         }
     }
 
-    private void AddTexts(Schema schema, RichTextNode node, IEnumerable<EnrichedContent> contents)
+    private static void AddTexts(Schema schema, RichTextNode node, IEnumerable<EnrichedContent> contents)
     {
         foreach (var content in contents)
         {
@@ -46,7 +46,7 @@ public sealed class CalculatePreviewText : IContentEnricherStep
                 foreach (var (partitionKey, partitionValue) in fieldData)
                 {
                     // Only handle the content if the text is valid.
-                    if (node.TryUse(partitionValue))
+                    if (node.TryUse(partitionValue, false, SquidexRichText.Options))
                     {
                         fieldReference[partitionKey] = node.ToText(100);
                     }

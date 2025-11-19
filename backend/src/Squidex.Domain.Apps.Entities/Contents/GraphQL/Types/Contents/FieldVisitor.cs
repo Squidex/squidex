@@ -104,7 +104,7 @@ internal sealed class FieldVisitor(Builder builder) : IFieldVisitor<FieldGraphSc
         switch (value.Value)
         {
             case JsonObject obj:
-                return RichTextNode.Create(obj);
+                return RichTextNode.Create(obj, SquidexRichText.Options);
             default:
                 ThrowHelper.NotSupportedException();
                 return default!;

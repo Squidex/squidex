@@ -37,10 +37,12 @@
         position: relative;
     }
 
-    .btn-clear {
-        i {
-            font-size: $font-smallest;
-        }
+    .btn-clear i {
+        font-size: $font-smallest;
+    }
+
+    .btn {
+        width: 2rem;
     }
 }
 

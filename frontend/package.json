@@ -11,7 +11,8 @@
     "test:coverage": "ng test --no-watch --code-coverage --browsers=ChromeHeadlessNoSandbox",
     "watch": "ng build --watch --configuration development",
     "storybook": "ng run squidex:storybook",
-    "storybook-build": "ng run squidex:build-storybook"
+    "storybook-build": "ng run squidex:build-storybook",
+    "generate": "dotnet run --project generator/Generator/Generator.csproj"
   },
   "private": true,
   "dependencies": {

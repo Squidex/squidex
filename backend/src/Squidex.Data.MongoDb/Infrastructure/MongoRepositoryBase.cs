@@ -95,8 +95,7 @@ public abstract class MongoRepositoryBase<T> : MongoBase<T>, IInitializable
         {
             var databaseName = Database.DatabaseNamespace.DatabaseName;
 
-            var error = new ConfigurationError($"MongoDb connection failed to connect to database {databaseName}.");
-
+            var error = new ConfigurationError($"MongoDb connection failed to connect to database {databaseName}: {ex.Message}.");
             throw new ConfigurationException(error, ex);
         }
     }

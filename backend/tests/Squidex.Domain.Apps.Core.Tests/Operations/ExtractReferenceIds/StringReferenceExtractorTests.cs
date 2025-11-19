@@ -65,7 +65,7 @@ public class StringReferenceExtractorTests
                             .Add("attrs", JsonValue.Object()
                                 .Add("href", href))))));
 
-        var ids = sut.GetEmbeddedContentIds(RichTextNode.Create(source));
+        var ids = sut.GetEmbeddedContentIds(RichTextNode.Create(source, SquidexRichText.Options));
 
         Assert.Contains(DomainId.Create("my_content-42"), ids.ToList());
     }
@@ -101,8 +101,26 @@ public class StringReferenceExtractorTests
                     .Add("attrs", JsonValue.Object()
                         .Add("src", src))));
 
-        var ids = sut.GetEmbeddedAssetIds(RichTextNode.Create(source));
+        var ids = sut.GetEmbeddedAssetIds(RichTextNode.Create(source, SquidexRichText.Options));
 
         Assert.Contains(DomainId.Create("my_asset-42"), ids.ToList());
+    }
+
+    [Fact]
+    public void Should_extract_content_id_from_mark()
+    {
+        var id = DomainId.NewGuid();
+
+        var source = JsonValue.Object()
+            .Add("type", "paragraph")
+            .Add("content", JsonValue.Array(
+                JsonValue.Object()
+                    .Add("type", "contentLink")
+                    .Add("attrs", JsonValue.Object()
+                        .Add("contentId", id))));
+
+        var ids = sut.GetEmbeddedContentIds(RichTextNode.Create(source, SquidexRichText.Options));
+
+        Assert.Contains(id, ids.ToList());
     }
 }

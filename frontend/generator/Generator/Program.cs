@@ -8,9 +8,6 @@ namespace Generator;
 
 internal partial class Program
 {
-    private static readonly Regex RegexComputed = new Regex("return this\\.compute\\('(?<Name>[^']*)',");
-    private static readonly Regex RegexProperty = new Regex("public get (?<Name>[^(]*)\\(\\) {");
-
     static async Task Main(string[] args)
     {
         var cacheFile = "cache.json";
@@ -24,7 +21,8 @@ internal partial class Program
             File.WriteAllText(cacheFile, schemaText);
         }
 
-        var codePath = GetCodePath();
+        var (rootPath, codePath) = GetCodePath();
+        Console.WriteLine($"Using root folder {rootPath}");
 
         var document = await OpenApiDocument.FromJsonAsync(File.ReadAllText(cacheFile));
 
@@ -112,7 +110,7 @@ internal partial class Program
             }
         }
 
-        var extensionFile = Path.Combine(codePath, @"..\\..\\src\\app\\shared\\model\\custom.ts");
+        var extensionFile = Path.Combine(rootPath, @"src\\app\\shared\\model\\custom.ts");
         var extensionCode = File.ReadAllText(extensionFile);
 
         var classes =
@@ -131,7 +129,7 @@ internal partial class Program
         settings.TypeScriptGeneratorSettings.ExtensionCode = extensionCode;
         settings.TypeScriptGeneratorSettings.GenerateConstructorInterface = true;
         settings.TypeScriptGeneratorSettings.InlineNamedDictionaries = true;
-        settings.TypeScriptGeneratorSettings.TemplateDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Templates");
+        settings.TypeScriptGeneratorSettings.TemplateDirectory = Path.Combine(codePath, "Templates");
 
         var generator = new TypeScriptClientGenerator(document, settings);
 
@@ -143,29 +141,30 @@ internal partial class Program
         code = code.Replace(": Date |", ": DateTime |");
         code = code.Replace("DtoDto", "Dto");
 
-        var targetFolder = Path.Combine(codePath, @"..\\..\\src\\app\\shared\\model\\generated.ts");
+        var targetFolder = Path.Combine(rootPath, @"src\\app\\shared\\model\\generated.ts");
 
         ValidateComputed(code);
 
         File.WriteAllText(targetFolder, code);
+        Console.WriteLine("Code Generation completed");
     }
 
-    [GeneratedRegex("class (?<ClassName>[^\\)]*) extends generated\\.")]
-    private static partial Regex ClassNameRegex();
-
-    private static string GetCodePath()
+    private static (string RootPath, string CodePath) GetCodePath()
     {
         var folder = new DirectoryInfo(Directory.GetCurrentDirectory());
 
-        while (true)
+        while (folder != null)
         {
-            if (folder.Name.Equals("Generator"))
+            var subFolders = folder.GetDirectories();
+            if (subFolders.Any(x => x.Name == "src"))
             {
-                return folder.FullName;
+                return (folder.FullName, Path.Combine(folder.FullName, "generator/Generator"));
             }
 
-            folder = folder.Parent!;
+            folder = folder.Parent;
         }
+
+        throw new InvalidOperationException("Cannot find code folder.");
     }
 
     private static void ValidateComputed(string code)
@@ -182,7 +181,7 @@ internal partial class Program
 
     private static void ValidateLine(string[] lines, string line, int index)
     {
-        var computed = RegexComputed.Match(line);
+        var computed = ComputedRegex().Match(line);
         if (!computed.Success)
         {
             return;
@@ -191,7 +190,7 @@ internal partial class Program
         var cacheKey = computed.Groups["Name"].Value;
 
         var previousLine = lines[index - 1];
-        var property = RegexProperty.Match(previousLine);
+        var property = PropertyRegex().Match(previousLine);
         if (!property.Success)
         {
             Console.WriteLine($"Line {index}: Cannot find property for computed '{cacheKey}'");
@@ -204,4 +203,13 @@ internal partial class Program
             Console.WriteLine($"Line {index}: Invalid cache key '{cacheKey}' for property '{propertyName}'");
         }
     }
+
+    [GeneratedRegex("return this\\.compute\\('(?<Name>[^']*)',")]
+    private static partial Regex ComputedRegex();
+
+    [GeneratedRegex("class (?<ClassName>[^\\)]*) extends generated\\.")]
+    private static partial Regex ClassNameRegex();
+
+    [GeneratedRegex("public get (?<Name>[^(]*)\\(\\) {")]
+    private static partial Regex PropertyRegex();
 }
