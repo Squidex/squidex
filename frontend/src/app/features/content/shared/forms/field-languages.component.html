@@ -1,16 +1,16 @@
-@if (formModel.field.isLocalizable && languages.length > 1) {
-    @if (!formModel.field.properties.isComplexUI) {
-        <button class="btn btn-sm btn-outline-secondary force no-focus-shadow" (click)="toggleShowAllControls()" type="button">
-            @if (showAllControls) {
-                <span>{{ "contents.languageModeSingle" | sqxTranslate }}</span>
-            } @else {
-                <span>{{ "contents.languageModeAll" | sqxTranslate }}</span>
-            }
-        </button>
-    }
-
-    @if (formModel.field.properties.isComplexUI || !showAllControls) {
-        <div class="button-container ms-1">
+<div class="d-flex gap-1">
+    @if (formModel.field.isLocalizable && languages.length > 1) {
+        @if (!formModel.field.properties.isComplexUI) {
+            <button class="btn btn-sm btn-outline-secondary force no-focus-shadow" (click)="toggleShowAllControls()" type="button">
+                @if (showAllControls) {
+                    <span>{{ "contents.languageModeSingle" | sqxTranslate }}</span>
+                } @else {
+                    <span>{{ "contents.languageModeAll" | sqxTranslate }}</span>
+                }
+            </button>
+        }
+    
+        @if (formModel.field.properties.isComplexUI || !showAllControls) {
             <sqx-language-selector
                 [exists]="formModel.translationStatus | async"
                 hintAfter="120000"
@@ -21,6 +21,6 @@
                 [languages]="languages"
                 size="sm"
                 sqxTourStep="languages" />
-        </div>
+        }
     }
-}
+</div>

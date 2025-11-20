@@ -19,7 +19,7 @@ public class RichTextTests
     {
         var json = TestUtils.DefaultSerializer.Deserialize<JsonValue>(File.ReadAllText("Model/Contents/ComplexText.json"));
 
-        node.TryUse(json);
+        node.TryUse(json, false, SquidexRichText.Options);
     }
 
     [Fact]

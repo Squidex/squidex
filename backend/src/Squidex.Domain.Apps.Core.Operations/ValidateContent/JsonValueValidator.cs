@@ -97,7 +97,7 @@ public sealed class JsonValueValidator : IFieldPropertiesVisitor<bool, JsonValue
 
     public bool Visit(RichTextFieldProperties properties, Args args)
     {
-        return args.Value.Type == JsonValueType.Null || RichTextNode.TryCreate(args.Value, out _);
+        return args.Value.Type == JsonValueType.Null || RichTextNode.TryCreate(args.Value, SquidexRichText.Options, out _);
     }
 
     public bool Visit(StringFieldProperties properties, Args args)

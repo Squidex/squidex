@@ -155,15 +155,13 @@ public sealed class ContentDto : Resource
 
     private ContentDto CreateLinksAsync(EnrichedContent content, Resources resources, string schema)
     {
-        var app = resources.App;
-
-        var values = new { app, schema, id = Id };
+        var values = new { app = resources.App, schema, id = Id };
 
         AddSelfLink(resources.Url<ContentsController>(x => nameof(x.GetContent), values));
 
         if (Version > 0)
         {
-            var versioned = new { app, schema, values.id, version = Version - 1 };
+            var versioned = new { app = resources.App, schema, values.id, version = Version - 1 };
 
             AddGetLink("previous",
                 resources.Url<ContentsController>(x => nameof(x.GetContentVersion), versioned));
@@ -203,6 +201,12 @@ public sealed class ContentDto : Resource
         {
             AddDeleteLink("delete",
                 resources.Url<ContentsController>(x => nameof(x.DeleteContent), values));
+        }
+
+        if (!content.IsSingleton && resources.CanCreateContent(schema))
+        {
+            AddPostLink("clone",
+                resources.Url<ContentsController>(x => nameof(x.PostContent), values));
         }
 
         if (content.CanUpdate && resources.CanUpdateContent(schema))

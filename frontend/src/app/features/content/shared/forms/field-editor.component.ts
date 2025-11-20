@@ -91,6 +91,9 @@ export class FieldEditorComponent {
     @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
+    @Input({ required: true })
+    public isCollapsed = false;
+
     @Input({ transform: numberAttribute })
     public index: number | null | undefined;
 
@@ -179,7 +182,6 @@ export class FieldEditorComponent {
     public unset() {
         this.formModel.unset();
     }
-
     public setValue(content: string | HTTP.UploadFile | null | undefined) {
         this.chatDialog.hide();
 

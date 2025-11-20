@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Text.RegularExpressions;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Squidex.Text.RichText.Model;
 
@@ -81,7 +82,7 @@ public sealed class StringReferenceExtractor
             if (node.Type == NodeType.Text)
             {
                 IMark? mark = null;
-                while ((mark = node.GetNextMark()) != null)
+                while ((mark = node.GetNextMark(SquidexRichText.Options)) != null)
                 {
                     if (mark.Type == MarkType.Link)
                     {
@@ -91,8 +92,19 @@ public sealed class StringReferenceExtractor
                     }
                 }
             }
+            else if (node.Type == SquidexRichText.NodeTypes.ContentLink)
+            {
+                var contentId = node.GetStringAttr("contentId");
+                if (!string.IsNullOrWhiteSpace(contentId))
+                {
+                    result.Add(DomainId.Create(contentId));
+                }
+            }
 
-            node.IterateContent((result, patterns), static (node, s, _, _) => Visit(node, s.result, s.patterns));
+            node.IterateContent(
+                (result, patterns),
+                SquidexRichText.Options,
+                static (node, s, _, _) => Visit(node, s.result, s.patterns));
         }
 
         Visit(node, result, contentsPatterns);
@@ -117,7 +129,10 @@ public sealed class StringReferenceExtractor
                 result.AddRange(GetEmbeddedIds(src, patterns));
             }
 
-            node.IterateContent((result, patterns), static (node, s, _, _) => Visit(node, s.result, s.patterns));
+            node.IterateContent(
+                (result, patterns),
+                SquidexRichText.Options,
+                static (node, s, _, _) => Visit(node, s.result, s.patterns));
         }
 
         Visit(node, result, assetsPatterns);

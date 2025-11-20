@@ -14,12 +14,10 @@ internal sealed class RichTextMark : IMark
 {
     private JsonObject? attrs;
 
-    public MarkType Type { get; private set; }
+    public string Type { get; private set; } = string.Empty;
 
-    public bool TryUse(JsonValue source)
+    public bool TryUse(JsonValue source, RichTextOptions options)
     {
-        Type = MarkType.Undefined;
-
         attrs = null;
 
         if (source.Value is not JsonObject obj)
@@ -32,7 +30,7 @@ internal sealed class RichTextMark : IMark
         {
             switch (key)
             {
-                case "type" when value.TryGetEnum<MarkType>(out var type):
+                case "type" when value.Value is string type && options.IsSupportedMarkType(type):
                     Type = type;
                     break;
                 case "attrs" when value.Value is JsonObject attrs:
@@ -41,8 +39,7 @@ internal sealed class RichTextMark : IMark
             }
         }
 
-        isValid &= Type != MarkType.Undefined;
-
+        isValid &= !string.IsNullOrWhiteSpace(Type);
         return isValid;
     }
 

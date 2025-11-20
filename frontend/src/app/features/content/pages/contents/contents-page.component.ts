@@ -223,7 +223,6 @@ export class ContentsPageComponent implements OnInit {
         this.contentsService.getContent(this.contentsState.appName, this.contentsState.schemaName, content.id)
             .subscribe(currentContent => {
                 this.tempService.put(currentContent.data);
-
                 this.router.navigate(['new'], { relativeTo: this.route });
             });
     }

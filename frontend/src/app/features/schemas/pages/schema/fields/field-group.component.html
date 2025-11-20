@@ -4,7 +4,7 @@
         <sqx-field [field]="$any(fieldGroup.separator)" [languages]="languages" [parent]="parent" plain="true" [schema]="schema" [settings]="settings">
             <div class="d-flex align-items-center">
                 <ng-content></ng-content>
-                <button class="btn btn-sm btn-text-secondary ms-2" (click)="toggle()" type="button">
+                <button class="btn btn-sm btn-square btn-text-secondary ms-2" (click)="toggle()" type="button">
                     <i [class.icon-caret-down]="!snapshot.isCollapsed" [class.icon-caret-right]="snapshot.isCollapsed"></i>
                 </button>
             </div>

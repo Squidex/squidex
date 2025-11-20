@@ -1,37 +1,47 @@
 @if (formModel) {
-    <div class="field" [class.expanded]="isExpanded">
-        <fieldset class="buttons-container" [disabled]="isDisabled | async">
-            <div class="buttons">
-                <button
-                    class="btn btn-sm btn-outline-secondary force no-focus-shadow"
-                    (click)="chatDialog.show()"
-                    [disabled]="!hasChatBot || !isString"
-                    tabindex="-1"
-                    type="button">
-                    AI
-                </button>
-                <button
-                    class="btn btn-sm btn-outline-secondary force no-focus-shadow ms-1"
-                    (click)="toggleExpanded()"
-                    tabindex="-1"
-                    title="i18n:contents.fieldFullscreen"
-                    type="button">
-                    <i class="icon-fullscreen"></i>
-                </button>
-                <button
-                    class="btn btn-sm btn-outline-secondary btn-clear force no-focus-shadow ms-1"
-                    confirmRememberKey="unsetValue"
-                    confirmText="i18n:contents.unsetValueConfirmText"
-                    confirmTitle="i18n:contents.unsetValueConfirmTitle"
-                    [disabled]="isEmpty | async"
-                    (sqxConfirmClick)="unset()"
-                    tabindex="-1"
-                    title="i18n:contents.unsetValue"
-                    type="button">
-                    <i class="icon-close"></i>
-                </button>
+    <div class="field" [class.expanded]="isExpanded && !isCollapsed">
+        <div class="buttons-container">
+            <div class="buttons d-flex gap-1">
+                <fieldset class="d-flex gap-1" [disabled]="(isDisabled | async) || isCollapsed">
+                    <ng-content select="[beforeButtons]"></ng-content>
+    
+                    @if (isString) {
+                        <button
+                            class="btn btn-sm btn-outline-secondary force no-focus-shadow"
+                            (click)="chatDialog.show()"
+                            [disabled]="!hasChatBot || isCollapsed"
+                            tabindex="-1"
+                            type="button">
+                            AI
+                        </button>
+                    }
+    
+                    <button
+                        class="btn btn-sm btn-outline-secondary force no-focus-shadow"
+                        (click)="toggleExpanded()"
+                        [disabled]="isCollapsed"
+                        tabindex="-1"
+                        title="i18n:contents.fieldFullscreen"
+                        type="button">
+                        <i class="icon-fullscreen"></i>
+                    </button>
+                    <button
+                        class="btn btn-sm btn-outline-secondary btn-clear force no-focus-shadow"
+                        confirmRememberKey="unsetValue"
+                        confirmText="i18n:contents.unsetValueConfirmText"
+                        confirmTitle="i18n:contents.unsetValueConfirmTitle"
+                        [disabled]="isEmpty | async"
+                        (sqxConfirmClick)="unset()"
+                        tabindex="-1"
+                        title="i18n:contents.unsetValue"
+                        type="button">
+                        <i class="icon-close"></i>
+                    </button>
+                </fieldset>
+
+                <ng-content select="[afterButtons]"></ng-content>
             </div>
-        </fieldset>
+        </div>
         <label class="mb-1">
             {{ field.displayName }} {{ displaySuffix }} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
         </label>
@@ -43,7 +53,7 @@
             <sqx-control-errors [fieldName]="field.displayName" [for]="$any(fieldForm)" />
         }
 
-        <div>
+        <div [class.hidden]="isCollapsed">
             @if (field.properties.editorUrl) {
                 <sqx-iframe-editor
                     #editor

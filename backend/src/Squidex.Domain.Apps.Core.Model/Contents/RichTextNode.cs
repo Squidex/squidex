@@ -20,7 +20,7 @@ public sealed class RichTextNode : INode
     internal struct State
     {
         public JsonObject? Root;
-        public NodeType Type;
+        public string Type;
         public JsonArray? Marks;
         public JsonObject? Attrs;
         public JsonArray? Content;
@@ -28,7 +28,7 @@ public sealed class RichTextNode : INode
         public int MarkIndex;
     }
 
-    public NodeType Type
+    public string Type
     {
         get => currentState.Type;
     }
@@ -43,11 +43,11 @@ public sealed class RichTextNode : INode
         get => currentState.Text;
     }
 
-    public static bool TryCreate(JsonValue source, out RichTextNode node)
+    public static bool TryCreate(JsonValue source, RichTextOptions options, out RichTextNode node)
     {
         var candidate = new RichTextNode();
 
-        if (candidate.TryUse(source, true))
+        if (candidate.TryUse(source, true, options))
         {
             node = candidate;
             return true;
@@ -57,17 +57,17 @@ public sealed class RichTextNode : INode
         return false;
     }
 
-    public static RichTextNode Create(JsonValue source)
+    public static RichTextNode Create(JsonValue source, RichTextOptions options)
     {
         var node = new RichTextNode();
 
         // We assume that we have made the validation before.
-        node.TryUse(source, false);
+        node.TryUse(source, false, options);
 
         return node;
     }
 
-    public bool TryUse(JsonValue source, bool recursive = false)
+    public bool TryUse(JsonValue source, bool recursive, RichTextOptions options)
     {
         State state = default;
 
@@ -84,7 +84,7 @@ public sealed class RichTextNode : INode
         {
             switch (key)
             {
-                case "type" when value.TryGetEnum<NodeType>(out var type):
+                case "type" when value.Value is string type && options.IsSupportedNodeType(type):
                     state.Type = type;
                     break;
                 case "attrs" when value.Value is JsonObject attrs:
@@ -103,17 +103,16 @@ public sealed class RichTextNode : INode
         }
 
         currentState = state;
-
-        isValid &= Type != NodeType.Undefined;
+        isValid &= !string.IsNullOrWhiteSpace(Type);
 
         if (isValid && recursive)
         {
             if (state.Content != null)
             {
-                foreach (var content in state.Content)
+                foreach (var contentObj in state.Content)
                 {
                     // We have already validated this before.
-                    isValid &= TryUse((JsonObject)content.Value!, recursive);
+                    isValid &= TryUse((JsonObject)contentObj.Value!, recursive, options);
                 }
             }
 
@@ -122,13 +121,12 @@ public sealed class RichTextNode : INode
                 foreach (var markObj in state.Marks)
                 {
                     // We have already validated this before.
-                    isValid &= mark.TryUse((JsonObject)markObj.Value!);
+                    isValid &= mark.TryUse((JsonObject)markObj.Value!, options);
                 }
             }
         }
 
         currentState = state;
-
         return isValid;
     }
 
@@ -142,7 +140,7 @@ public sealed class RichTextNode : INode
         return currentState.Attrs.GetStringAttr(name, defaultValue);
     }
 
-    public IMark? GetNextMark()
+    public IMark? GetNextMark(RichTextOptions options)
     {
         if (currentState.Marks == null || currentState.MarkIndex >= currentState.Marks.Count)
         {
@@ -150,11 +148,11 @@ public sealed class RichTextNode : INode
         }
 
         // We have already validated this before.
-        mark.TryUse((JsonObject)currentState.Marks[currentState.MarkIndex++].Value!);
+        mark.TryUse((JsonObject)currentState.Marks[currentState.MarkIndex++].Value!, options);
         return mark;
     }
 
-    public void IterateContent<T>(T state, Action<INode, T, bool, bool> action)
+    public void IterateContent<T>(T state, RichTextOptions options, Action<INode, T, bool, bool> action)
     {
         var prevState = currentState;
 
@@ -170,7 +168,7 @@ public sealed class RichTextNode : INode
             var isLast = i == prevState.Content.Count - 1;
 
             // We have already validated this before.
-            TryUse((JsonObject)item.Value!, false);
+            TryUse((JsonObject)item.Value!, false, options);
             action(this, state, isFirst, isLast);
             i++;
         }

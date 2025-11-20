@@ -12,6 +12,9 @@
   Id: Guid_1,
   Version: 1,
   Links: {
+    clone: {
+      Method: POST
+    },
     delete: {
       Method: DELETE
     },
