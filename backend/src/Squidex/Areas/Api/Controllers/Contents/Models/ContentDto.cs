@@ -205,7 +205,7 @@ public sealed class ContentDto : Resource
 
         if (!content.IsSingleton && resources.CanCreateContent(schema))
         {
-            AddPatchLink("clone",
+            AddPostLink("clone",
                 resources.Url<ContentsController>(x => nameof(x.PostContent), values));
         }
 

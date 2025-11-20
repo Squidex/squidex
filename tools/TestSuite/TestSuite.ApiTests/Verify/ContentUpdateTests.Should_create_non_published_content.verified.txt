@@ -12,6 +12,9 @@
   EditingStatus: Draft,
   Id: Guid_1,
   Links: {
+    clone: {
+      Method: POST
+    },
     delete: {
       Method: DELETE
     },
