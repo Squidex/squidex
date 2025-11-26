@@ -25,12 +25,12 @@ public sealed class AllContentsByPostDto
     public DomainId[]? Ids { get; set; }
 
     /// <summary>
-    /// The start of the schedule.
+    /// The start time of the scheduled content period (see scheduledTo).
     /// </summary>
     public Instant? ScheduledFrom { get; set; }
 
     /// <summary>
-    /// The end of the schedule.
+    /// The end time of the scheduled content period (see scheduledFrom).
     /// </summary>
     public Instant? ScheduledTo { get; set; }
 

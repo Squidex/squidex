@@ -82,21 +82,19 @@ internal sealed class OperationBuilder(OperationsBuilder operations, OpenApiOper
 
     public OperationBuilder HasQueryOptions(bool supportSearch)
     {
-        operation.AddQuery(true);
-
+        operation.AddQuery(supportSearch);
         return this;
     }
 
     public OperationBuilder Deprecated()
     {
         operation.IsDeprecated = true;
-
         return this;
     }
 
-    public OperationBuilder HasQuery(string name, JsonObjectType type, string description)
+    public OperationBuilder HasQuery(string name, JsonObjectType type, string description, string? format = null)
     {
-        var jsonSchema = new JsonSchema { Type = type };
+        var jsonSchema = new JsonSchema { Type = type, Format = format };
 
         return AddParameter(name, jsonSchema, OpenApiParameterKind.Query, description);
     }

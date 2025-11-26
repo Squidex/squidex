@@ -142,7 +142,7 @@ public sealed class ContentsSharedController(
     [AcceptHeader.Unpublished]
     public async Task<IActionResult> GetAllContents(string app, AllContentsByGetDto query)
     {
-        var contents = await contentQuery.QueryAsync(Context, (query ?? new AllContentsByGetDto()).ToQuery(Request), HttpContext.RequestAborted);
+        var contents = await contentQuery.QueryAsync(Context, query?.ToQuery(Request) ?? Q.Empty, HttpContext.RequestAborted);
 
         var response = Deferred.AsyncResponse(() =>
         {

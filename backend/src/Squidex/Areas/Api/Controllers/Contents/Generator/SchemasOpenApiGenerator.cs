@@ -79,7 +79,11 @@ public sealed class SchemasOpenApiGenerator(
             .RequirePermission(PermissionIds.AppContentsReadOwn)
             .Operation("Query")
             .OperationSummary("Query contents across all schemas.")
-            .HasQuery("ids", JsonObjectType.String, "Comma-separated list of content IDs.")
+            .HasQueryOptions(true)
+            .HasQuery("referencing",  JsonObjectType.String, "The ID of the referencing content item.")
+            .HasQuery("references", JsonObjectType.String, "The ID of the reference content item.")
+            .HasQuery("scheduledFrom", JsonObjectType.String, "The start time of the scheduled content period (see scheduledTo)", JsonFormatStrings.DateTime)
+            .HasQuery("scheduledTo", JsonObjectType.String, " The end time of the scheduled content period (see scheduledFrom).", JsonFormatStrings.DateTime)
             .Responds(200, "Content items retrieved.", builder.ContentsSchema)
             .Responds(400, "Query not valid.");
 

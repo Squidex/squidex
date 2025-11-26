@@ -25,15 +25,35 @@ public sealed class AllContentsByGetDto
     public string? Ids { get; set; }
 
     /// <summary>
-    /// The start of the schedule.
+    /// The start time of the scheduled content period (see scheduleTo).
     /// </summary>
     [FromQuery(Name = "scheduleFrom")]
+    [Obsolete("Renamed to 'scheduledFrom'")]
+    public Instant? ScheduleFrom
+    {
+        set => ScheduledFrom = value;
+    }
+
+    /// <summary>
+    /// The start time of the scheduled content period (see scheduleFrom).
+    /// </summary>
+    [FromQuery(Name = "scheduleTo")]
+    [Obsolete("Renamed to 'scheduledTo'")]
+    public Instant? ScheduleTo
+    {
+        set => ScheduledTo = value;
+    }
+
+    /// <summary>
+    /// The start time of the scheduled content period (see scheduledTo).
+    /// </summary>
+    [FromQuery(Name = "scheduledFrom")]
     public Instant? ScheduledFrom { get; set; }
 
     /// <summary>
-    /// The end of the schedule.
+    /// The end time of the scheduled content period (see scheduledFrom).
     /// </summary>
-    [FromQuery(Name = "scheduleTo")]
+    [FromQuery(Name = "scheduledTo")]
     public Instant? ScheduledTo { get; set; }
 
     /// <summary>
