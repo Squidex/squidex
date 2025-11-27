@@ -10,7 +10,6 @@ using MongoDB.Driver.GeoJsonObjectModel;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.ObjectPool;
-using Squidex.Infrastructure.Translations;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
@@ -38,21 +37,19 @@ public sealed class DocumentDbTextIndex(IMongoDatabase database, string shardKey
                 Index.Text(x => x.Texts)),
             cancellationToken: ct);
 
-
         await collection.Indexes.CreateManyAsync(
         [
             new CreateIndexModel<MongoTextIndexEntity<string>>(
-                    Index
-                        .Ascending(x => x.AppId)
-                        .Ascending(x => x.ContentId)),
-
-                new CreateIndexModel<MongoTextIndexEntity<string>>(
-                    Index
-                        .Ascending(x => x.AppId)
-                        .Ascending(x => x.SchemaId)
-                        .Ascending(x => x.GeoField)
-                        .Geo2DSphere(x => x.GeoObject)),
-            ], ct);
+                Index
+                    .Ascending(x => x.AppId)
+                    .Ascending(x => x.ContentId)),
+            new CreateIndexModel<MongoTextIndexEntity<string>>(
+                Index
+                    .Ascending(x => x.AppId)
+                    .Ascending(x => x.SchemaId)
+                    .Ascending(x => x.GeoField)
+                    .Geo2DSphere(x => x.GeoObject)),
+        ], ct);
     }
 
     public override async Task<List<DomainId>?> SearchAsync(App app, GeoQuery query, SearchScope scope,

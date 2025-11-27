@@ -34,13 +34,14 @@ public class DocumentDbFixture
             TestConfig.Configuration.GetValue<string>("documentDb:configuration")
         );
 
-        var cert = new X509Certificate2(TestConfig.Configuration.GetValue<string>("documentDb:keyFile")!);
+        var certPath = TestConfig.Configuration.GetValue<string>("documentDb:keyFile")!;
+        var certFile = new X509Certificate2(certPath);
 
         settings.RetryWrites = false;
         settings.RetryReads = false;
         settings.SslSettings = new SslSettings
         {
-            ClientCertificates = [cert],
+            ClientCertificates = [certFile],
             CheckCertificateRevocation = false,
             ServerCertificateValidationCallback = (sender, certificate, chain, errors) => true,
         };

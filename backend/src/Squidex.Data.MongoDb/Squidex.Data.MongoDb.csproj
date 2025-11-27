@@ -31,7 +31,7 @@
     <PackageReference Include="Squidex.Flows.Mongo" Version="7.33.0" />
     <PackageReference Include="Squidex.Hosting" Version="7.33.0" />
     <PackageReference Include="Squidex.Messaging.Mongo" Version="7.33.0" />
-    <PackageReference Include="Squidex.OpenIddict.MongoDb" Version="5.8.4" />
+    <PackageReference Include="Squidex.OpenIddict.MongoDb" Version="5.8.5" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="System.ValueTuple" Version="4.5.0" />
     <PackageReference Include="YDotNet.Server.MongoDB" Version="0.4.3" />

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Net;
+using System.Security.Cryptography.X509Certificates;
 using System.Text.Json;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Caching.Distributed;
@@ -63,14 +64,13 @@ public static class ServiceExtensions
 {
     public static void AddSquidexMongoEventStore(this IServiceCollection services, IConfiguration config)
     {
-        var mongoConfiguration = config.GetRequiredValue("eventStore:mongoDb:configuration");
         var mongoDatabaseName = config.GetRequiredValue("eventStore:mongoDb:database");
 
         services.AddMongoEventStore(config);
         services.AddSingletonAs(c =>
         {
             var options = c.GetRequiredService<IOptions<MongoEventStoreOptions>>();
-            var mongoClient = GetMongoClient(mongoConfiguration);
+            var mongoClient = GetMongoClient(config, "eventStore:mongoDb");
             var mongoDatabase = mongoClient.GetDatabase(mongoDatabaseName);
 
             return new MongoEventStore(mongoDatabase, options);
@@ -80,13 +80,12 @@ public static class ServiceExtensions
 
     public static void AddSquidexMongoAssetStore(this IServiceCollection services, IConfiguration config)
     {
-        var mongoConfiguration = config.GetRequiredValue("assetStore:mongoDb:configuration");
         var mongoDatabaseName = config.GetRequiredValue("assetStore:mongoDb:database");
         var mongoGridFsBucketName = config.GetRequiredValue("assetStore:mongoDb:bucket");
 
         services.AddMongoAssetStore(c =>
         {
-            var mongoClient = GetMongoClient(mongoConfiguration);
+            var mongoClient = GetMongoClient(config, "assetStore:mongoDb");
             var mongoDatabase = mongoClient.GetDatabase(mongoDatabaseName);
 
             return new GridFSBucket<string>(mongoDatabase, new GridFSBucketOptions
@@ -98,7 +97,6 @@ public static class ServiceExtensions
 
     public static void AddSquidexMongoStore(this IServiceCollection services, IConfiguration config)
     {
-        var mongoConfiguration = config.GetRequiredValue("store:mongoDb:configuration")!;
         var mongoDatabaseName = config.GetRequiredValue("store:mongoDb:database")!;
         var mongoContentDatabaseName = config.GetOptionalValue("store:mongoDb:contentDatabase", mongoDatabaseName)!;
 
@@ -107,7 +105,7 @@ public static class ServiceExtensions
             return GetDatabase(c, mongoDatabaseName);
         });
 
-        services.AddSingletonAs(c => GetMongoClient(mongoConfiguration))
+        services.AddSingletonAs(c => GetMongoClient(config, "store:mongoDb"))
             .As<IMongoClient>();
 
         services.AddSingletonAs(c => GetDatabase(c, mongoDatabaseName))
@@ -289,12 +287,28 @@ public static class ServiceExtensions
             .As<IMigration>();
     }
 
-    private static IMongoClient GetMongoClient(string configuration)
+    private static IMongoClient GetMongoClient(IConfiguration config, string prefix)
     {
-        return Singletons<IMongoClient>.GetOrAdd(configuration, connectionString =>
+        var mongoConfiguration = config.GetRequiredValue($"{prefix}:configuration")!;
+        var mongoCertificate = config.GetValue<string>($"{prefix}:certificate");
+        var cacheKey = $"{mongoConfiguration}_{mongoCertificate}";
+
+        return Singletons<IMongoClient>.GetOrAdd(cacheKey, _ =>
         {
-            return MongoClientFactory.Create(connectionString, settings =>
+            return MongoClientFactory.Create(mongoConfiguration, settings =>
             {
+                if (!string.IsNullOrWhiteSpace(mongoCertificate))
+                {
+                    var certFile = new X509Certificate2(mongoCertificate);
+
+                    settings.SslSettings = new SslSettings
+                    {
+                        ClientCertificates = [certFile],
+                        CheckCertificateRevocation = false,
+                        ServerCertificateValidationCallback = (sender, certificate, chain, errors) => true,
+                    };
+                }
+
                 settings.ClusterConfigurator = builder =>
                 {
                     builder.Subscribe(new DiagnosticsActivityEventSubscriber());
