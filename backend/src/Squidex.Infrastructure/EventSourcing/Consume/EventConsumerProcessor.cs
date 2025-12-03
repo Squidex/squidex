@@ -21,6 +21,7 @@ public class EventConsumerProcessor : IEventSubscriber<ParsedEvents>
     private readonly IEventStore eventStore;
     private readonly ILogger<EventConsumerProcessor> log;
     private readonly AsyncLock asyncLock = new AsyncLock();
+    private readonly RetryWindow logWindow = new RetryWindow(TimeSpan.FromSeconds(10), 0);
     private IEventSubscription? currentSubscription;
 
     public EventConsumerState State
@@ -73,9 +74,9 @@ public class EventConsumerProcessor : IEventSubscriber<ParsedEvents>
         }
     }
 
-    public virtual async ValueTask OnNextAsync(IEventSubscription subscription, ParsedEvents @event)
+    public virtual ValueTask OnNextAsync(IEventSubscription subscription, ParsedEvents @event)
     {
-        await UpdateAsync(async () =>
+        return UpdateAsync(async () =>
         {
             if (!ReferenceEquals(subscription, currentSubscription))
             {
@@ -83,14 +84,13 @@ public class EventConsumerProcessor : IEventSubscriber<ParsedEvents>
             }
 
             await DispatchAsync(@event.Events);
-
             State = State.Handled(@event.Position, @event.Events.Count);
         }, State.Position);
     }
 
-    public virtual async ValueTask OnErrorAsync(IEventSubscription subscription, Exception exception)
+    public virtual ValueTask OnErrorAsync(IEventSubscription subscription, Exception exception)
     {
-        await UpdateAsync(() =>
+        return UpdateAsync(() =>
         {
             if (!ReferenceEquals(subscription, currentSubscription))
             {
@@ -98,12 +98,16 @@ public class EventConsumerProcessor : IEventSubscriber<ParsedEvents>
             }
 
             Unsubscribe();
-
             State = State.Stopped(exception);
+
+            if (logWindow.CanRetryAfterFailure())
+            {
+                log.LogError(exception, "Failed to handle event.");
+            }
         }, State.Position);
     }
 
-    public virtual Task ActivateAsync()
+    public virtual ValueTask ActivateAsync()
     {
         return UpdateAsync(() =>
         {
@@ -120,7 +124,7 @@ public class EventConsumerProcessor : IEventSubscriber<ParsedEvents>
         }, State.Position);
     }
 
-    public virtual Task StartAsync()
+    public virtual ValueTask StartAsync()
     {
         return UpdateAsync(() =>
         {
@@ -130,12 +134,11 @@ public class EventConsumerProcessor : IEventSubscriber<ParsedEvents>
             }
 
             Subscribe();
-
             State = State.Started();
         }, State.Position);
     }
 
-    public virtual Task StopAsync()
+    public virtual ValueTask StopAsync()
     {
         return UpdateAsync(() =>
         {
@@ -145,7 +148,6 @@ public class EventConsumerProcessor : IEventSubscriber<ParsedEvents>
             }
 
             Unsubscribe();
-
             State = State.Stopped();
         }, State.Position);
     }
@@ -164,7 +166,6 @@ public class EventConsumerProcessor : IEventSubscriber<ParsedEvents>
             await ClearAsync();
 
             State = EventConsumerState.Initial;
-
             Subscribe();
         }, State.Position);
     }
@@ -177,7 +178,7 @@ public class EventConsumerProcessor : IEventSubscriber<ParsedEvents>
         }
     }
 
-    private Task UpdateAsync(Action action, string? position, [CallerMemberName] string? caller = null)
+    private ValueTask UpdateAsync(Action action, string? position, [CallerMemberName] string? caller = null)
     {
         return UpdateAsync(() =>
         {
@@ -187,7 +188,7 @@ public class EventConsumerProcessor : IEventSubscriber<ParsedEvents>
         }, position, caller);
     }
 
-    private async Task UpdateAsync(Func<Task> action, string? position, [CallerMemberName] string? caller = null)
+    private async ValueTask UpdateAsync(Func<Task> action, string? position, [CallerMemberName] string? caller = null)
     {
         // We do not want to deal with concurrency in this class, therefore we just use a lock.
         using (await asyncLock.EnterAsync())
