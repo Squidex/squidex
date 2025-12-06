@@ -226,7 +226,7 @@ public static class ServiceExtensions
                     shardKey => ActivatorUtilities.CreateInstance<AtlasTextIndex>(c, shardKey));
             }).AsOptional<ITextIndex>().As<IDeleter>();
         }
-        else if (config.GetValue<bool>("store:mongoDb:documentDb"))
+        else if (config.GetValue<MongoDerivate>("store:mongoDb:derivate") == MongoDerivate.DocumentDB)
         {
             services.AddSingletonAs(c =>
             {
