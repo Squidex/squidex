@@ -137,7 +137,6 @@ internal sealed class Persistence<T>(
         foreach (var @event in events)
         {
             var newVersion = versionEvents + 1;
-
             if (@event.EventStreamNumber != newVersion)
             {
                 ThrowHelper.InvalidOperationException("Events must follow the snapshot version in consecutive order with no gaps.");
@@ -146,7 +145,6 @@ internal sealed class Persistence<T>(
             if (!isStopped)
             {
                 var parsedEvent = eventFormatter.ParseIfKnown(@event);
-
                 if (applyEvent != null && parsedEvent != null)
                 {
                     isStopped = !applyEvent(parsedEvent);
@@ -161,14 +159,12 @@ internal sealed class Persistence<T>(
         CancellationToken ct = default)
     {
         var oldVersion = versionSnapshot;
-
         if (oldVersion == EtagVersion.Empty && UseEventSourcing)
         {
             oldVersion = versionEvents - 1;
         }
 
         var newVersion = UseEventSourcing ? versionEvents : oldVersion + 1;
-
         if (newVersion == versionSnapshot)
         {
             return;

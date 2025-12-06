@@ -89,7 +89,7 @@ export class SearchFormComponent {
                 ...BootstrapClasses,
                 buttonAdd: 'btn btn-success',
                 buttonAddOutline: 'btn btn-outline-success btn-sm',
-                buttonDefault: () => 'btn',
+                buttonDefault: (active: boolean) => `btn ${active ? 'fw-bold' : ''}`,
                 buttonLogical: active => `btn btn-sm btn-secondary btn-toggle ${active ? 'btn-primary' : ''}`,
                 dropdown: 'bg-white',
                 dropdownItem: active => `control-dropdown-item control-dropdown-item-selectable separated ${active ? 'active' : ''}`,

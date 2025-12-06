@@ -13,7 +13,7 @@ using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.Scripting;
 
-public class ScriptVars : IReadOnlyDictionary<string, object?>
+public class ScriptVars : IDictionary<string, object?>
 {
     private readonly Dictionary<string, object?> values = new Dictionary<string, object?>(StringComparer.OrdinalIgnoreCase);
     private readonly HashSet<string> lockedKeys = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
@@ -33,6 +33,18 @@ public class ScriptVars : IReadOnlyDictionary<string, object?>
         get => values.Count;
     }
 
+    ICollection<string> IDictionary<string, object?>.Keys
+    {
+        get => values.Keys;
+    }
+
+    ICollection<object?> IDictionary<string, object?>.Values
+    {
+        get => values.Values;
+    }
+
+    public bool IsReadOnly => throw new NotImplementedException();
+
     public object? this[string key]
     {
         get
@@ -44,6 +56,12 @@ public class ScriptVars : IReadOnlyDictionary<string, object?>
         {
             Set(key, value);
         }
+    }
+
+    public void CopyTo(KeyValuePair<string, object?>[] array, int arrayIndex)
+    { 
+        Guard.NotNull(array);
+        ((IDictionary)values).CopyTo(array, arrayIndex);
     }
 
     public void CopyFrom(ScriptVars vars)
@@ -129,6 +147,11 @@ public class ScriptVars : IReadOnlyDictionary<string, object?>
         return values.ContainsKey(key);
     }
 
+    public bool Contains(KeyValuePair<string, object?> item)
+    {
+        return values.Contains(item);
+    }
+
     IEnumerator<KeyValuePair<string, object?>> IEnumerable<KeyValuePair<string, object?>>.GetEnumerator()
     {
         return values.GetEnumerator();
@@ -137,5 +160,30 @@ public class ScriptVars : IReadOnlyDictionary<string, object?>
     IEnumerator IEnumerable.GetEnumerator()
     {
         return values.GetEnumerator();
+    }
+
+    public void Add(string key, object? value)
+    {
+        throw new NotSupportedException();
+    }
+
+    public void Add(KeyValuePair<string, object?> item)
+    {
+        throw new NotSupportedException();
+    }
+
+    public bool Remove(string key)
+    {
+        throw new NotSupportedException();
+    }
+
+    public bool Remove(KeyValuePair<string, object?> item)
+    {
+        throw new NotSupportedException();
+    }
+
+    public void Clear()
+    {
+        throw new NotSupportedException();
     }
 }
