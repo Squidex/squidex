@@ -24,10 +24,10 @@ services:
       service: squidex_base
     environment:
       - EVENTSTORE__MONGODB__CONFIGURATION=mongodb://username:password@db_ferretdb/
-      - EVENTSTORE__MONGODB__DERIVATE=ferretDb
+      - EVENTSTORE__MONGODB__DERIVATE=FerretDb
       - STORE__TYPE=MongoDb
       - STORE__MONGODB__CONFIGURATION=mongodb://username:password@db_ferretdb/
-      - STORE__MONGODB__DERIVATE=ferretDb
+      - STORE__MONGODB__DERIVATE=FerretDb
       - URLS__BASEURL=http://localhost:8080
     depends_on:
       db_ferretdb:

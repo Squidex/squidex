@@ -202,8 +202,9 @@ public static class ServiceExtensions
                 shardKey => ActivatorUtilities.CreateInstance<MongoContentRepository>(c, shardKey, contentDatabase));
         }).As<IContentRepository>().As<ISnapshotStore<WriteContent>>().As<IDeleter>();
 
-        var atlasOptions = config.GetSection("store:mongoDb:atlas").Get<AtlasOptions>() ?? new ();
+        var derivate = config.GetValue<MongoDerivate>("store:mongoDb:derivate");
 
+        var atlasOptions = config.GetSection("store:mongoDb:atlas").Get<AtlasOptions>() ?? new ();
         if (atlasOptions.IsConfigured() && atlasOptions.FullTextEnabled)
         {
             services.Configure<AtlasOptions>(config.GetSection("store:mongoDb:atlas"));
