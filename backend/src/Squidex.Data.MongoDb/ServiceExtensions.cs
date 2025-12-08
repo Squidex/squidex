@@ -202,8 +202,9 @@ public static class ServiceExtensions
                 shardKey => ActivatorUtilities.CreateInstance<MongoContentRepository>(c, shardKey, contentDatabase));
         }).As<IContentRepository>().As<ISnapshotStore<WriteContent>>().As<IDeleter>();
 
-        var atlasOptions = config.GetSection("store:mongoDb:atlas").Get<AtlasOptions>() ?? new ();
+        var derivate = config.GetValue<MongoDerivate>("store:mongoDb:derivate");
 
+        var atlasOptions = config.GetSection("store:mongoDb:atlas").Get<AtlasOptions>() ?? new ();
         if (atlasOptions.IsConfigured() && atlasOptions.FullTextEnabled)
         {
             services.Configure<AtlasOptions>(config.GetSection("store:mongoDb:atlas"));
@@ -226,7 +227,7 @@ public static class ServiceExtensions
                     shardKey => ActivatorUtilities.CreateInstance<AtlasTextIndex>(c, shardKey));
             }).AsOptional<ITextIndex>().As<IDeleter>();
         }
-        else if (config.GetValue<bool>("store:mongoDb:documentDb"))
+        else if (config.GetValue<MongoDerivate>("store:mongoDb:derivate") == MongoDerivate.DocumentDB)
         {
             services.AddSingletonAs(c =>
             {

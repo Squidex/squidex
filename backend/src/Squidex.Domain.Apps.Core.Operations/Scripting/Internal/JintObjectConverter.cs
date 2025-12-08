@@ -45,6 +45,9 @@ public sealed class JintObjectConverter : IObjectConverter
             case ClaimsPrincipal principal:
                 result = JintUser.Create(engine, principal);
                 return true;
+            case ScriptVars vars:
+                result = ObjectWrapper.Create(engine, vars);
+                return true;
             case JsonValue jsonValue:
                 result = JsonMapper.Map(jsonValue, engine);
                 return true;
