@@ -654,6 +654,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
         Assert.Equal(113.0, vars["shared"]);
     }
 
+    [Trait("Category", "Dependencies")]
     [Theory]
     [InlineData(0)]
     [InlineData(1)]
