@@ -41,6 +41,12 @@ export class FormRowComponent {
     public label?: string;
 
     @Input()
+    public unit?: string;
+
+    @Input({ transform: booleanAttribute })
+    public showUnit = false;
+
+    @Input()
     public submitCount: null | number | undefined;
 
     @Input()
@@ -51,6 +57,9 @@ export class FormRowComponent {
 
     @Input()
     public alert?: string;
+
+    @Input({ transform: booleanAttribute })
+    public hideError = false;
 
     @Input({ transform: booleanAttribute })
     public check = false;
@@ -69,6 +78,10 @@ export class FormRowComponent {
     public class = '';
 
     protected fieldName = '';
+
+    protected get hasUnit() {
+        return !!this.unit || this.showUnit;
+    }
 
     public ngOnChanges() {
         let name = '';

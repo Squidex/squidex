@@ -1,0 +1,7 @@
+@import 'mixins';
+@import 'vars';
+
+.col-unit {
+    @include force-width(5rem);
+    padding-left: .5rem;
+}

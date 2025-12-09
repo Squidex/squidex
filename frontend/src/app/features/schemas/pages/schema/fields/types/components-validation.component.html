@@ -1,42 +1,35 @@
 <div [formGroup]="fieldForm">
-    <div class="form-group row">
-        <label class="col-3 col-form-label">{{ "schemas.fieldTypes.references.count" | sqxTranslate }}</label>
-        <div class="col-9">
-            <div class="row g-0">
-                <div class="col">
-                    <input
-                        class="form-control"
-                        formControlName="minItems"
-                        placeholder="{{ 'schemas.fieldTypes.references.countMin' | sqxTranslate }}"
-                        type="number" />
-                </div>
+    <sqx-form-row for="minItems" hideError label="schemas.fieldTypes.references.count" [prefix]="field.fieldId">
+        <div class="row g-0">
+            <div class="col">
+                <input
+                    class="form-control"
+                    formControlName="minItems"
+                    placeholder="{{ 'schemas.fieldTypes.references.countMin' | sqxTranslate }}"
+                    type="number" />
+            </div>
 
-                <div class="col-auto"><label class="col-form-label minmax">-</label></div>
+            <div class="col-auto"><label class="col-form-label minmax">-</label></div>
 
-                <div class="col">
-                    <input
-                        class="form-control"
-                        formControlName="maxItems"
-                        placeholder="{{ 'schemas.fieldTypes.references.countMax' | sqxTranslate }}"
-                        type="number" />
-                </div>
+            <div class="col">
+                <input
+                    class="form-control"
+                    formControlName="maxItems"
+                    placeholder="{{ 'schemas.fieldTypes.references.countMax' | sqxTranslate }}"
+                    type="number" />
             </div>
         </div>
-    </div>
+    </sqx-form-row>
 
-    <div class="form-group row">
-        <label class="col-3 col-form-label" for="{{ field.fieldId }}_fieldSchemaIds">{{ "common.schemas" | sqxTranslate }}</label>
-        <div class="col-9">
-            <sqx-tag-editor
-                formControlName="schemaIds"
-                [itemConverter]="(schemasSource.converter | async)!"
-                [itemsSource]="(schemasSource.converter | async)?.suggestions"
-                placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" />
-        </div>
-    </div>
+    <sqx-form-row for="schemaIds" label="common.schemas" [prefix]="field.fieldId">
+        <sqx-tag-editor
+            formControlName="schemaIds"
+            [itemConverter]="(schemasSource.converter | async)!"
+            [itemsSource]="(schemasSource.converter | async)?.suggestions"
+            placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" />
+    </sqx-form-row>
 
-    <div class="form-group row">
-        <label class="col-3 col-form-label">{{ "schemas.fieldTypes.array.uniqueFields" | sqxTranslate }}</label>
-        <div class="col-9"><sqx-tag-editor formControlName="uniqueFields" /></div>
-    </div>
+    <sqx-form-row for="uniqueFields" label="schemas.fieldTypes.array.uniqueFields" [prefix]="field.fieldId">
+        <sqx-tag-editor formControlName="uniqueFields" />
+    </sqx-form-row>
 </div>

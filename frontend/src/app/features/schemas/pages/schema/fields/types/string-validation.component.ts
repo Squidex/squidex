@@ -50,8 +50,8 @@ export class StringValidationComponent  {
     @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
-    @Input({ transform: booleanAttribute })
-    public isLocalizable?: boolean | null;
+    @Input({ required: true, transform: booleanAttribute })
+    public isLocalizable!: boolean;
 
     public showPatternMessage?: Observable<boolean>;
     public showPatternSuggestions?: Observable<boolean>;

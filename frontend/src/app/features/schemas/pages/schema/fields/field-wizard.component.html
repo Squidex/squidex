@@ -21,7 +21,8 @@
         } @else {
             <form [formGroup]="addFieldForm.form" (ngSubmit)="addField('Close')">
                 <sqx-form-error [error]="addFieldForm.error | async" />
-                <div class="form-group">
+
+                <sqx-form-row for="type" hideError>
                     <div class="row">
                         @for (fieldType of fieldTypes; track fieldType) {
                             <div class="col-4 type">
@@ -44,7 +45,7 @@
                             </div>
                         }
                     </div>
-                </div>
+                </sqx-form-row>
 
                 <sqx-form-row for="name" [submitCount]="addFieldForm.submitCount | async" vertical>
                     <input

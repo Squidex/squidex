@@ -1,45 +1,33 @@
 <div [formGroup]="fieldForm">
-    <div class="form-group row">
-        <label class="col-3 col-form-label">{{ "schemas.fieldTypes.dateTime.rangeMin" | sqxTranslate }}</label>
-        <div class="col-9"><sqx-date-time-editor formControlName="minValue" mode="DateTime" /></div>
-    </div>
+    <sqx-form-row for="minValue" label="schemas.fieldTypes.dateTime.rangeMin" [prefix]="field.fieldId">
+        <sqx-date-time-editor formControlName="minValue" mode="DateTime" />
+    </sqx-form-row>
 
-    <div class="form-group row">
-        <label class="col-3 col-form-label">{{ "schemas.fieldTypes.dateTime.rangeMax" | sqxTranslate }}</label>
-        <div class="col-9"><sqx-date-time-editor formControlName="maxValue" mode="DateTime" /></div>
-    </div>
+    <sqx-form-row for="maxValue" label="schemas.fieldTypes.dateTime.rangeMax" [prefix]="field.fieldId">
+        <sqx-date-time-editor formControlName="maxValue" mode="DateTime" />
+    </sqx-form-row>
 
     @if (showDefaultValues | async) {
-        <div class="form-group row">
-            <label class="col-3 col-form-label">{{ "schemas.fieldTypes.dateTime.defaultMode" | sqxTranslate }}</label>
-            <div class="col-3">
-                <select class="form-select" formControlName="calculatedDefaultValue">
-                    <option></option>
+        <sqx-form-row for="calculatedDefaultValue" label="schemas.fieldTypes.dateTime.defaultMode" [prefix]="field.fieldId">
+            <select class="form-select" formControlName="calculatedDefaultValue">
+                <option></option>
 
-                    @for (value of calculatedDefaultValues; track value) {
-                        <option [ngValue]="value">{{ value }}</option>
-                    }
-                </select>
-            </div>
-        </div>
+                @for (value of calculatedDefaultValues; track value) {
+                    <option [ngValue]="value">{{ value }}</option>
+                }
+            </select>
+        </sqx-form-row>
 
         @if (showDefaultValue | async) {
-            <div class="form-group row">
-                <label class="col-3 col-form-label">{{ "schemas.field.defaultValue" | sqxTranslate }}</label>
-                <div class="col-9"><sqx-date-time-editor formControlName="defaultValue" mode="DateTime" /></div>
-            </div>
+            <sqx-form-row for="defaultValue" label="schemas.field.defaultValue" [prefix]="field.fieldId">
+                <sqx-date-time-editor formControlName="defaultValue" mode="DateTime" />
+            </sqx-form-row>
         }
 
         @if (isLocalizable) {
-            <div class="form-group row">
-                <label class="col-3 col-form-label" for="{{ field.fieldId }}_fieldDefaultValues">
-                    {{ "schemas.field.defaultValues" | sqxTranslate }}
-                </label>
-                <div class="col-9">
-                    <sqx-localized-input id="{{ field.fieldId }}_fieldDefaultValues" formControlName="defaultValues" [languages]="languages" type="datetime" />
-                    <sqx-form-hint> {{ "schemas.field.defaultValuesHint" | sqxTranslate }} </sqx-form-hint>
-                </div>
-            </div>
+            <sqx-form-row for="defaultValues" hint="schemas.field.defaultValuesHint" label="schemas.field.defaultValues" [prefix]="field.fieldId">
+                <sqx-localized-input id="{{ field.fieldId }}_fieldDefaultValues" formControlName="defaultValues" [languages]="languages" type="datetime" />
+            </sqx-form-row>
         }
     }
 </div>

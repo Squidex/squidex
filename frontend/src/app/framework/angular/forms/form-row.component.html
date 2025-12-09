@@ -8,16 +8,32 @@
 }
 
 <div [class.col-9]="!vertical" [class.offset-3]="!vertical && check">
-    <sqx-control-errors [for]="for" [submitCount]="submitCount" />
-    <div [class.form-check]="check">
-        <ng-content></ng-content>
+    @if (!hideError) {
+        <sqx-control-errors [for]="for" [submitCount]="submitCount" />
+    }
+
+    <div [class.form-check]="check" [class.row]="hasUnit" [class.g-0]="hasUnit">
+        <div [class.col]="hasUnit">
+            <ng-content></ng-content>
+        </div>
+
+        @if (hasUnit) {
+            <div class="col col-unit">
+                @if (unit) {
+                    <label class="col-form-label">{{ unit | sqxTranslate }}</label>
+                } @else {
+                    &nbsp;
+                }
+            </div>
+        }
+
         @if (check) {
             <label class="form-check-label" for="{{ fieldName }}"> {{ label | sqxTranslate }} </label>
         }
     </div>
 
     @if (hint) {
-        <sqx-form-hint> <span inline="true" optional="true" [sqxMarkdown]="hint | sqxTranslate"></span> </sqx-form-hint>
+        <sqx-form-hint> <span inline="true" [sqxMarkdown]="hint | sqxTranslate"></span> </sqx-form-hint>
     }
 
     @if (alert) {

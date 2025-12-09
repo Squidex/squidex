@@ -15,22 +15,11 @@
         <input class="form-control" id="{{ field.fieldId }}_previewFormat" formControlName="previewFormat" />
     </sqx-form-row>
 
-    <sqx-form-row
-        for="previewFormat"
-        hint="schemas.fieldTypes.assets.resolveHint"
-        label="schemas.fieldTypes.assets.resolve"
-        check
-        [prefix]="field.fieldId">
-                <input class="form-check-input" id="{{ field.fieldId }}_fieldResolveFirst" formControlName="resolveFirst" type="checkbox" />
+    <sqx-form-row check for="previewFormat" hint="schemas.fieldTypes.assets.resolveHint" label="schemas.fieldTypes.assets.resolve" [prefix]="field.fieldId">
+        <input class="form-check-input" id="{{ field.fieldId }}_fieldResolveFirst" formControlName="resolveFirst" type="checkbox" />
     </sqx-form-row>
-    
-    <div class="form-group row">
-        <label class="col-3 col-form-label" for="{{ field.fieldId }}_folderId">
-            {{ "schemas.fieldTypes.assets.folderId" | sqxTranslate }}
-        </label>
-        <div class="col-9">
-            <sqx-asset-folder-dropdown formControlName="folderId" />
-            <sqx-form-hint> {{ "schemas.fieldTypes.assets.folderIdHint" | sqxTranslate }} </sqx-form-hint>
-        </div>
-    </div>
+
+    <sqx-form-row for="folderId" hint="schemas.fieldTypes.assets.folderIdHint" label="schemas.fieldTypes.assets.folderId" [prefix]="field.fieldId">
+        <sqx-asset-folder-dropdown formControlName="folderId" />
+    </sqx-form-row>
 </div>
