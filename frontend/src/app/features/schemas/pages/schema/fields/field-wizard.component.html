@@ -46,8 +46,7 @@
                     </div>
                 </div>
 
-                <div class="form-group">
-                    <sqx-control-errors for="name" [submitCount]="addFieldForm.submitCount | async" />
+                <sqx-form-row for="name" [submitCount]="addFieldForm.submitCount | async" vertical>
                     <input
                         class="form-control"
                         #nameInput
@@ -55,17 +54,14 @@
                         maxlength="40"
                         placeholder="{{ 'schemas.field.namePlaceholder' | sqxTranslate }}"
                         sqxFocusOnInit />
-                </div>
+                </sqx-form-row>
 
                 @if (schema.type !== "Component" && !parent && (addFieldForm.isContentField | async)) {
-                    <div class="form-group">
-                        <div class="form-check">
-                            <input class="form-check-input" id="isLocalizable" formControlName="isLocalizable" type="checkbox" />
-                            <label class="form-check-label" for="isLocalizable"> {{ "schemas.field.localizable" | sqxTranslate }} </label>
-                        </div>
-                        <sqx-form-hint> {{ "schemas.field.localizableHint" | sqxTranslate }} </sqx-form-hint>
-                    </div>
+                    <sqx-form-row check for="isLocalizable" hint="schemas.field.localizableHint" label="schemas.field.localizable" vertical>
+                        <input class="form-check-input" id="isLocalizable" formControlName="isLocalizable" type="checkbox" />
+                    </sqx-form-row>
                 }
+
                 <sqx-form-alert class="mt-4"> {{ "schemas.nameWarning" | sqxTranslate }} </sqx-form-alert>
             </form>
         }

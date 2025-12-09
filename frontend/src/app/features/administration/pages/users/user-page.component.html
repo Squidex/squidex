@@ -21,46 +21,34 @@
         </ng-container>
         <ng-container>
             <sqx-form-error [error]="userForm.error | async" />
-            <div class="form-group">
-                <label for="email">
-                    {{ "common.email" | sqxTranslate }} <small class="hint">({{ "common.requiredHint" | sqxTranslate }})</small>
-                </label>
-                <sqx-control-errors for="email" />
+            <sqx-form-row for="email" label="common.email" required vertical>
                 <input class="form-control" id="email" autocomplete="off" formControlName="email" maxlength="100" type="email" />
-            </div>
+            </sqx-form-row>
 
-            <div class="form-group">
-                <label for="displayName">
-                    {{ "common.displayName" | sqxTranslate }} <small class="hint">({{ "common.requiredHint" | sqxTranslate }})</small>
-                </label>
-                <sqx-control-errors for="displayName" />
+            <sqx-form-row for="displayName" label="common.displayName" required vertical>
                 <input class="form-control" id="displayName" autocomplete="off" formControlName="displayName" maxlength="100" spellcheck="false" />
-            </div>
+            </sqx-form-row>
 
             <div class="form-group form-group-section">
-                <div class="form-group">
-                    <label for="password">{{ "common.password" | sqxTranslate }}</label>
-                    <sqx-control-errors for="password" />
+                <sqx-form-row for="password" label="common.password" vertical>
                     <input class="form-control" id="password" autocomplete="off" formControlName="password" maxlength="100" type="password" />
-                </div>
+                </sqx-form-row>
 
-                <div class="form-group">
-                    <label for="password">{{ "common.passwordConfirm" | sqxTranslate }}</label>
-                    <sqx-control-errors for="passwordConfirm" />
+                <sqx-form-row for="passwordConfirm" label="common.passwordConfirm" vertical>
                     <input class="form-control" id="passwordConfirm" autocomplete="off" formControlName="passwordConfirm" maxlength="100" type="password" />
-                </div>
+                </sqx-form-row>
             </div>
 
             <div class="form-group form-group-section">
-                <label for="permissions">{{ "common.permissions" | sqxTranslate }}</label>
-                <sqx-control-errors for="permissions" />
-                <textarea
-                    class="form-control"
-                    id="permissions"
-                    autocomplete="off"
-                    formControlName="permissions"
-                    placeholder="{{ 'common.separateByLine' | sqxTranslate }}"
-                    spellcheck="false"></textarea>
+                <sqx-form-row for="permissions" label="common.permissions" vertical>
+                    <textarea
+                        class="form-control"
+                        id="permissions"
+                        autocomplete="off"
+                        formControlName="permissions"
+                        placeholder="{{ 'common.separateByLine' | sqxTranslate }}"
+                        spellcheck="false"></textarea>
+                </sqx-form-row>
             </div>
         </ng-container>
     </sqx-layout>

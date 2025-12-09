@@ -1,0 +1,26 @@
+@if (!check) {
+    <label [class.col-3]="!vertical" [class.col-form-label]="!vertical" for="{{ fieldName }}">
+        {{ label | sqxTranslate }}
+        @if (required) {
+            <small class="hint">({{ "common.requiredHint" | sqxTranslate }})</small>
+        }
+    </label>
+}
+
+<div [class.col-9]="!vertical" [class.offset-3]="!vertical && check">
+    <sqx-control-errors [for]="for" [submitCount]="submitCount" />
+    <div [class.form-check]="check">
+        <ng-content></ng-content>
+        @if (check) {
+            <label class="form-check-label" for="{{ fieldName }}"> {{ label | sqxTranslate }} </label>
+        }
+    </div>
+
+    @if (hint) {
+        <sqx-form-hint> <span inline="true" optional="true" [sqxMarkdown]="hint | sqxTranslate"></span> </sqx-form-hint>
+    }
+
+    @if (alert) {
+        <sqx-form-alert> {{ alert | sqxTranslate }} </sqx-form-alert>
+    }
+</div>

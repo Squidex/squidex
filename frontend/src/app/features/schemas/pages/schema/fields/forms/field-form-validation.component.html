@@ -1,36 +1,13 @@
-<div [formGroup]="fieldForm">
-    <div class="form-group row mb-3">
-        <div class="col-9 offset-3">
-            <div class="form-check">
-                <input class="form-check-input" id="{{ field.fieldId }}_fieldRequired" formControlName="isRequired" type="checkbox" />
-                <label class="form-check-label" for="{{ field.fieldId }}_fieldRequired">
-                    {{ "schemas.field.required" | sqxTranslate }}
-                </label>
-            </div>
-        </div>
-    </div>
-
-    <div class="form-group row mb-3">
-        <div class="col-9 offset-3">
-            <div class="form-check">
-                <input class="form-check-input" id="{{ field.fieldId }}_fieldRequiredOnPublish" formControlName="isRequiredOnPublish" type="checkbox" />
-                <label class="form-check-label" for="{{ field.fieldId }}_fieldRequiredOnPublish">
-                    {{ "schemas.field.requiredOnPublish" | sqxTranslate }}
-                </label>
-            </div>
-        </div>
-    </div>
-
-    <div class="form-group row mb-3">
-        <div class="col-9 offset-3">
-            <div class="form-check">
-                <input class="form-check-input" id="{{ field.fieldId }}_fieldCreateOnly" formControlName="isCreateOnly" type="checkbox" />
-                <label class="form-check-label" for="{{ field.fieldId }}_fieldCreateOnly">
-                    {{ "schemas.field.createOnly" | sqxTranslate }}
-                </label>
-            </div>
-        </div>
-    </div>
+<div [formGroup]="fieldForm" class="mb-3">
+    <sqx-form-row check for="isRequired" label="schemas.field.required" [prefix]="field.fieldId">
+        <input class="form-check-input" id="{{ field.fieldId }}_fieldRequired" formControlName="isRequired" type="checkbox" />
+    </sqx-form-row>
+    <sqx-form-row check for="isRequiredOnPublish" label="schemas.field.requiredOnPublish" [prefix]="field.fieldId">
+        <input class="form-check-input" id="{{ field.fieldId }}_fieldRequiredOnPublish" formControlName="isRequiredOnPublish" type="checkbox" />
+    </sqx-form-row>
+    <sqx-form-row check for="isCreateOnly" label="schemas.field.createOnly" [prefix]="field.fieldId">
+        <input class="form-check-input" id="{{ field.fieldId }}_fieldCreateOnly" formControlName="isCreateOnly" type="checkbox" />
+    </sqx-form-row>
 </div>
 
 @switch (field.rawProperties.fieldType) {

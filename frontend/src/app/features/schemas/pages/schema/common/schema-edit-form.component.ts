@@ -8,16 +8,14 @@
 
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ControlErrorsComponent, EditSchemaForm, FormAlertComponent, FormHintComponent, SchemaDto, SchemasState, TagEditorComponent, TranslatePipe } from '@app/shared';
+import { EditSchemaForm, FormRowComponent, SchemaDto, SchemasState, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-edit-form',
     styleUrls: ['./schema-edit-form.component.scss'],
     templateUrl: './schema-edit-form.component.html',
     imports: [
-        ControlErrorsComponent,
-        FormAlertComponent,
-        FormHintComponent,
+        FormRowComponent,
         FormsModule,
         ReactiveFormsModule,
         TagEditorComponent,

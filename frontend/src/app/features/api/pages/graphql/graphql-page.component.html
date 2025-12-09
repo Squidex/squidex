@@ -10,8 +10,7 @@
     <ng-container title> {{ "api.selectClient" | sqxTranslate }} </ng-container>
     <ng-container content>
         <sqx-form-hint> {{ "api.selectClientDescription" | sqxTranslate }} </sqx-form-hint>
-        <div class="form-group">
-            <label for="client">{{ "common.client" | sqxTranslate }}</label>
+        <sqx-form-row for="client" label="common.client" vertical>
             <select class="form-control" id="client" [ngModel]="clientSelected" (ngModelChange)="selectClient($event)">
                 <option [ngValue]="null">{{ "api.noClient" | sqxTranslate }}</option>
 
@@ -19,7 +18,7 @@
                     <option [ngValue]="client">{{ client.id }}</option>
                 }
             </select>
-        </div>
+        </sqx-form-row>
     </ng-container>
     <ng-container footer>
         <button class="btn btn-text-secondary" (click)="clientsDialog.hide()" type="button">{{ "common.close" | sqxTranslate }}</button>
