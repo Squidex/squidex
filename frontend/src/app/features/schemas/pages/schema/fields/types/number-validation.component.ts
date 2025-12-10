@@ -8,14 +8,13 @@
 
 import { booleanAttribute, Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { AppLanguageDto, FieldDto, FormHintComponent, FormRowComponent, LocalizedInputComponent, NumberFieldPropertiesDto, SchemaDto, TranslatePipe, Types } from '@app/shared';
+import { AppLanguageDto, FieldDto, FormRowComponent, LocalizedInputComponent, NumberFieldPropertiesDto, SchemaDto, TranslatePipe, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-number-validation',
     styleUrls: ['number-validation.component.scss'],
     templateUrl: 'number-validation.component.html',
     imports: [
-        FormHintComponent,
         FormRowComponent,
         FormsModule,
         LocalizedInputComponent,

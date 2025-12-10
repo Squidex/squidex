@@ -25,66 +25,47 @@
     <ng-container content>
         @if (contentSelected && contentSelected.scheduleJob) {
             <div>
-                <div class="form-group row">
-                    <label class="col-4 col-form-label">{{ "common.id" | sqxTranslate }}</label>
-                    <div class="col-8">
-                        <div class="input-group">
-                            <input class="form-control" id="id" #inputId name="id" readonly value="{{ contentSelected.id }}" />
-                            <button class="btn btn-outline-secondary" [sqxCopy]="inputId" type="button">
-                                <i class="icon-copy"></i>
-                            </button>
-                        </div>
+                <sqx-form-row for="id" hideError label="common.id" labelSize="lg">
+                    <div class="input-group">
+                        <input class="form-control" id="id" #inputId name="id" readonly value="{{ contentSelected.id }}" />
+                        <button class="btn btn-outline-secondary" [sqxCopy]="inputId" type="button">
+                            <i class="icon-copy"></i>
+                        </button>
                     </div>
-                </div>
+                </sqx-form-row>
 
-                <div class="form-group form-group-aligned row">
-                    <label class="col-4 col-form-label">{{ "common.content" | sqxTranslate }}</label>
-                    <div class="col-8">
-                        <a class="truncate" [routerLink]="['../', contentSelected.schemaName, contentSelected.id]">
-                            {{ createContentName(contentSelected) }}
-                        </a>
-                    </div>
-                </div>
+                <sqx-form-row centered for="id" hideError label="common.content" labelSize="lg">
+                    <a class="truncate" [routerLink]="['../', contentSelected.schemaName, contentSelected.id]">
+                        {{ createContentName(contentSelected) }}
+                    </a>
+                </sqx-form-row>
 
-                <div class="form-group form-group-aligned row">
-                    <label class="col-4 col-form-label">{{ "common.schema" | sqxTranslate }}</label>
-                    <div class="col-8">
-                        <a class="truncate" [routerLink]="['../', contentSelected.schemaName]"> {{ contentSelected.schemaDisplayName }} </a>
-                    </div>
-                </div>
+                <sqx-form-row centered for="id" hideError label="common.schema" labelSize="lg">
+                    <a class="truncate" [routerLink]="['../', contentSelected.schemaName]"> {{ contentSelected.schemaDisplayName }} </a>
+                </sqx-form-row>
 
-                <div class="form-group form-group-aligned row">
-                    <label class="col-4 col-form-label">{{ "common.status" | sqxTranslate }}</label>
-                    <div class="col-8">
-                        <sqx-content-status layout="text" small="true" [status]="contentSelected.status" [statusColor]="contentSelected.statusColor" />
-                    </div>
-                </div>
+                <sqx-form-row centered for="id" hideError label="common.status" labelSize="lg">
+                    <sqx-content-status layout="text" small="true" [status]="contentSelected.status" [statusColor]="contentSelected.statusColor" />
+                </sqx-form-row>
 
                 <hr />
 
-                <div class="form-group form-group-aligned row">
-                    <label class="col-4 col-form-label">{{ "contents.scheduledToLabel" | sqxTranslate }}</label>
-                    <div class="col-8">
-                        <sqx-content-status
-                            layout="text"
-                            small="true"
-                            [status]="contentSelected.scheduleJob.status"
-                            [statusColor]="contentSelected.scheduleJob.color" />
-                    </div>
-                </div>
+                <sqx-form-row centered for="id" hideError label="contents.scheduledToLabel" labelSize="lg">
+                    <sqx-content-status
+                        layout="text"
+                        small="true"
+                        [status]="contentSelected.scheduleJob.status"
+                        [statusColor]="contentSelected.scheduleJob.color" />
+                </sqx-form-row>
 
-                <div class="form-group form-group-aligned row">
-                    <label class="col-4 col-form-label">{{ "contents.scheduledAt" | sqxTranslate }}</label>
-                    <div class="col-8">{{ contentSelected.scheduleJob.dueTime | sqxFullDateTime }}</div>
-                </div>
+                <sqx-form-row centered for="id" hideError label="contents.scheduledAt" labelSize="lg">
+                    {{ contentSelected.scheduleJob.dueTime | sqxFullDateTime }}
+                </sqx-form-row>
 
-                <div class="form-group form-group-aligned row">
-                    <label class="col-4 col-form-label">{{ "contents.scheduledBy" | sqxTranslate }}</label>
-                    <div class="col-8">
-                        <img class="user-picture" [src]="contentSelected.scheduleJob.scheduledBy | sqxUserPictureRef" />
-                        {{ contentSelected.scheduleJob.scheduledBy | sqxUserNameRef }}
-                    </div>
-                </div>
+                <sqx-form-row centered for="id" hideError label="contents.scheduledBy" labelSize="lg">
+                    <img class="user-picture" [src]="contentSelected.scheduleJob.scheduledBy | sqxUserPictureRef" />
+                    {{ contentSelected.scheduleJob.scheduledBy | sqxUserNameRef }}
+                </sqx-form-row>
 
                 @if (contentSelected.canCancelStatus) {
                     <hr />

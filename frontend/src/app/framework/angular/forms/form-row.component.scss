@@ -5,3 +5,12 @@
     @include force-width(5rem);
     padding-left: .5rem;
 }
+
+.form-group-aligned {
+    align-items: center;
+
+    .col-form-label {
+        padding-bottom: 0;
+        padding-top: 0;
+    }
+}

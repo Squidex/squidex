@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { Component, EventEmitter, inject, Input, OnInit, Output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { switchMap } from 'rxjs';
-import { ApiUrlConfig, AppsState, CodeEditorComponent, ControlErrorsComponent, CreateSchemaForm, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, GenerateSchemaDto, GenerateSchemaForm, LoaderComponent, ModalDialogComponent, SchemaDto, SchemasService, SchemasState, TooltipDirective, TransformInputDirective, TranslatePipe, UIOptions } from '@app/shared';
+import { ApiUrlConfig, AppsState, CodeEditorComponent, ControlErrorsComponent, CreateSchemaForm, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, FormRowComponent, GenerateSchemaDto, GenerateSchemaForm, LoaderComponent, ModalDialogComponent, SchemaDto, SchemasService, SchemasState, TooltipDirective, TransformInputDirective, TranslatePipe, UIOptions } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-form',
@@ -23,6 +23,7 @@ import { ApiUrlConfig, AppsState, CodeEditorComponent, ControlErrorsComponent, C
         FormAlertComponent,
         FormErrorComponent,
         FormHintComponent,
+        FormRowComponent,
         FormsModule,
         LoaderComponent,
         ModalDialogComponent,

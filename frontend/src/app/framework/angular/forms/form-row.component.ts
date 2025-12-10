@@ -24,6 +24,7 @@ import { FormHintComponent } from './form-hint.component';
         'class': 'form-group',
         '[class.d-block]': 'vertical',
         '[class.row]': '!vertical',
+        '[class.form-group-aligned]': 'centered',
     },
     imports: [
         ControlErrorsComponent,
@@ -58,11 +59,17 @@ export class FormRowComponent {
     @Input()
     public alert?: string;
 
+    @Input()
+    public labelSize: 'md' | 'lg' = 'md';
+
     @Input({ transform: booleanAttribute })
     public hideError = false;
 
     @Input({ transform: booleanAttribute })
     public check = false;
+
+    @Input({ transform: booleanAttribute })
+    public centered = false;
 
     @Input({ transform: booleanAttribute })
     public vertical = false;
@@ -81,6 +88,33 @@ export class FormRowComponent {
 
     protected get hasUnit() {
         return !!this.unit || this.showUnit;
+    }
+
+    protected get labelClass() {
+        if (this.vertical) {
+            return '';
+        }
+
+        const w = this.labelSize === 'md' ? 3 : 4;
+        return `col-${w} col-form-label`;
+    }
+
+    protected get offsetClass() {
+        if (this.vertical || !this.check) {
+            return '';
+        }
+
+        const w = this.labelSize === 'md' ? 3 : 4;
+        return `offset-${w}`;
+    }
+
+    protected get mainClass() {
+        if (this.vertical) {
+            return '';
+        }
+
+        const w = this.labelSize === 'md' ? 9 : 8;
+        return `col-${w} ${this.offsetClass}`;
     }
 
     public ngOnChanges() {

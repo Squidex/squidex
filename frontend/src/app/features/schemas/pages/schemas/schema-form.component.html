@@ -39,14 +39,15 @@
             <sqx-form-error [error]="actualForm.error | async" />
 
             @if (selectedTab !== 2) {
-                <div class="form-group">
-                    <label for="name">
-                        {{ "common.name" | sqxTranslate }} <small class="hint">({{ "common.requiredHint" | sqxTranslate }})</small>
-                    </label>
-                    <sqx-control-errors for="name" [submitCount]="createForm.submitCount | async" />
+                <sqx-form-row
+                    for="name"
+                    hint="schemas.schemaNameHint"
+                    label="common.requiredHint"
+                    required
+                    [submitCount]="createForm.submitCount | async"
+                    vertical>
                     <input class="form-control" id="name" autocomplete="off" formControlName="name" sqxFocusOnInit sqxTransformInput="LowerCase" />
-                    <sqx-form-hint> {{ "schemas.schemaNameHint" | sqxTranslate }} </sqx-form-hint>
-                </div>
+                </sqx-form-row>
 
                 <sqx-form-alert> {{ "schemas.nameWarning" | sqxTranslate }} </sqx-form-alert>
             }
@@ -115,8 +116,7 @@
 
                 @if (schemasState.categoryNames | async; as categories) {
                     @if (categories.length > 0) {
-                        <div class="form-group">
-                            <label for="category">{{ "common.category" | sqxTranslate }}</label>
+                        <sqx-form-row for="category" label="common.category">
                             <select class="form-select" id="category" formControlName="initialCategory">
                                 <option></option>
 
@@ -124,7 +124,7 @@
                                     <option [ngValue]="category">{{ category }}</option>
                                 }
                             </select>
-                        </div>
+                        </sqx-form-row>
                     }
                 }
             } @else if (selectedTab === 1) {

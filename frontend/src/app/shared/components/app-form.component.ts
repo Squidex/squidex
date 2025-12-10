@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ApiUrlConfig, ControlErrorsComponent, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, MarkdownDirective, ModalDialogComponent, TooltipDirective, TransformInputDirective, TranslatePipe } from '@app/framework';
+import { ApiUrlConfig, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, FormRowComponent, MarkdownDirective, ModalDialogComponent, TooltipDirective, TransformInputDirective, TranslatePipe } from '@app/framework';
 import { AppsState, CreateAppDto, CreateAppForm, TemplateDto } from '@app/shared/internal';
 
 @Component({
@@ -18,11 +18,11 @@ import { AppsState, CreateAppDto, CreateAppForm, TemplateDto } from '@app/shared
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AsyncPipe,
-        ControlErrorsComponent,
         FocusOnInitDirective,
         FormAlertComponent,
         FormErrorComponent,
         FormHintComponent,
+        FormRowComponent,
         FormsModule,
         MarkdownDirective,
         ModalDialogComponent,

@@ -19,12 +19,12 @@
         </div>
     </sqx-form-row>
 
-    <sqx-form-row for="defaultValue" hideError label="schemas.field.defaultValue" [prefix]="field.fieldId">
+    <sqx-form-row for="defaultValue" label="schemas.field.defaultValue" [prefix]="field.fieldId">
         <input class="form-control" id="{{ field.fieldId }}_fieldDefaultValue" formControlName="defaultValue" type="number" />
     </sqx-form-row>
 
     @if (isLocalizable) {
-        <sqx-form-row for="defaultValues" hideError label="schemas.field.defaultValues" [prefix]="field.fieldId">
+            <sqx-form-row for="defaultValues" hint="schemas.field.defaultValuesHint" label="schemas.field.defaultValues" [prefix]="field.fieldId">
             <sqx-localized-input id="{{ field.fieldId }}_fieldDefaultValues" formControlName="defaultValues" [languages]="languages" type="number" />
         </sqx-form-row>
     }

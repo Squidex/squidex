@@ -1,5 +1,5 @@
 @if (!check) {
-    <label [class.col-3]="!vertical" [class.col-form-label]="!vertical" for="{{ fieldName }}">
+    <label [class]="labelClass" for="{{ fieldName }}">
         {{ label | sqxTranslate }}
         @if (required) {
             <small class="hint">({{ "common.requiredHint" | sqxTranslate }})</small>
@@ -7,7 +7,7 @@
     </label>
 }
 
-<div [class.col-9]="!vertical" [class.offset-3]="!vertical && check">
+<div [class]="mainClass">
     @if (!hideError) {
         <sqx-control-errors [for]="for" [submitCount]="submitCount" />
     }

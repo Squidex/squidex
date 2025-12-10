@@ -62,33 +62,26 @@
             <div class="table-items-row-details-tab">
                 @if (selectedTab === 0) {
                     <sqx-form-error [error]="error" />
-                    <div class="form-group row">
-                        <label class="col-form-label" for="{{ workflowView.dto.id }}_name">{{ "common.name" | sqxTranslate }}</label>
-                        <div class="col">
-                            <input
-                                class="form-control"
-                                id="{{ workflowView.dto.id }}_name"
-                                [disabled]="!isEditable"
-                                [ngModel]="workflowView.dto.name"
-                                (ngModelChange)="rename($event)"
-                                [ngModelOptions]="onBlur" />
-                            <sqx-form-hint> {{ "workflows.workflowNameHint" | sqxTranslate }} </sqx-form-hint>
-                        </div>
-                    </div>
 
-                    <div class="form-group row">
-                        <label class="col-form-label" for="{{ workflowView.dto.id }}_schemas">{{ "common.schemas" | sqxTranslate }}</label>
-                        <div class="col">
-                            <sqx-tag-editor
-                                [disabled]="!isEditable"
-                                [itemConverter]="(schemasSource.converter | async)!"
-                                [itemsSource]="(schemasSource.normalConverter | async)?.suggestions"
-                                [ngModel]="workflowView.dto.schemaIds"
-                                (ngModelChange)="changeSchemaIds($event)"
-                                placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" />
-                            <sqx-form-hint> {{ "workflows.schemasHint" | sqxTranslate }} </sqx-form-hint>
-                        </div>
-                    </div>
+                    <sqx-form-row for="name" hint="workflows.workflowNameHint" label="common.name" [prefix]="workflowView.dto.id" vertical>
+                        <input
+                            class="form-control"
+                            id="{{ workflowView.dto.id }}_name"
+                            [disabled]="!isEditable"
+                            [ngModel]="workflowView.dto.name"
+                            (ngModelChange)="rename($event)"
+                            [ngModelOptions]="onBlur" />
+                    </sqx-form-row>
+
+                    <sqx-form-row for="name" hint="workflows.schemasHint" label="common.schemas" [prefix]="workflowView.dto.id" vertical>
+                        <sqx-tag-editor
+                            [disabled]="!isEditable"
+                            [itemConverter]="(schemasSource.converter | async)!"
+                            [itemsSource]="(schemasSource.normalConverter | async)?.suggestions"
+                            [ngModel]="workflowView.dto.schemaIds"
+                            (ngModelChange)="changeSchemaIds($event)"
+                            placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" />
+                    </sqx-form-row>
 
                     @for (step of workflowView.steps; track step.name) {
                         <sqx-workflow-step
