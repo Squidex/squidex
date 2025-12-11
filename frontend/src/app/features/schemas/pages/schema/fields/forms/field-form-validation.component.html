@@ -1,12 +1,14 @@
 <div [formGroup]="fieldForm" class="mb-3">
-    <sqx-form-row check for="isRequired" label="schemas.field.required" [prefix]="field.fieldId">
-        <input class="form-check-input" id="{{ field.fieldId }}_fieldRequired" formControlName="isRequired" type="checkbox" />
+    <sqx-form-row #requiredRow check for="isRequired" label="schemas.field.required" [prefix]="field.fieldId">
+        <input class="form-check-input" [id]="requiredRow.fieldName" formControlName="isRequired" type="checkbox" />
     </sqx-form-row>
-    <sqx-form-row check for="isRequiredOnPublish" label="schemas.field.requiredOnPublish" [prefix]="field.fieldId">
-        <input class="form-check-input" id="{{ field.fieldId }}_fieldRequiredOnPublish" formControlName="isRequiredOnPublish" type="checkbox" />
+
+    <sqx-form-row #requiredOnPublishRow check for="isRequiredOnPublish" label="schemas.field.requiredOnPublish" [prefix]="field.fieldId">
+        <input class="form-check-input" [id]="requiredOnPublishRow.fieldName" formControlName="isRequiredOnPublish" type="checkbox" />
     </sqx-form-row>
-    <sqx-form-row check for="isCreateOnly" label="schemas.field.createOnly" [prefix]="field.fieldId">
-        <input class="form-check-input" id="{{ field.fieldId }}_fieldCreateOnly" formControlName="isCreateOnly" type="checkbox" />
+
+    <sqx-form-row #createOnlyRow check for="isCreateOnly" label="schemas.field.createOnly" [prefix]="field.fieldId">
+        <input class="form-check-input" [id]="createOnlyRow.fieldName" formControlName="isCreateOnly" type="checkbox" />
     </sqx-form-row>
 </div>
 

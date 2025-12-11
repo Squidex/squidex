@@ -84,7 +84,7 @@ export class FormRowComponent {
     @HostBinding('class')
     public class = '';
 
-    protected fieldName = '';
+    public fieldName = '';
 
     protected get hasUnit() {
         return !!this.unit || this.showUnit;

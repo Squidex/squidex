@@ -21,15 +21,16 @@
         </div>
     </sqx-form-row>
 
-    <sqx-form-row for="schemaIds" label="common.schemas" [prefix]="field.fieldId">
+    <sqx-form-row #schemaIdsRow for="schemaIds" label="common.schemas" [prefix]="field.fieldId">
         <sqx-tag-editor
+            [id]="schemaIdsRow.fieldName"
             formControlName="schemaIds"
             [itemConverter]="(schemasSource.converter | async)!"
             [itemsSource]="(schemasSource.converter | async)?.suggestions"
             placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" />
     </sqx-form-row>
 
-    <sqx-form-row for="uniqueFields" label="schemas.fieldTypes.array.uniqueFields" [prefix]="field.fieldId">
-        <sqx-tag-editor formControlName="uniqueFields" />
+    <sqx-form-row #uniqueFieldsRow for="uniqueFields" label="schemas.fieldTypes.array.uniqueFields" [prefix]="field.fieldId">
+        <sqx-tag-editor [id]="uniqueFieldsRow.fieldName" formControlName="uniqueFields" />
     </sqx-form-row>
 </div>

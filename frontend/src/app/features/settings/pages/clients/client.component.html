@@ -28,9 +28,9 @@
 
     <div class="card-body">
         <div class="container">
-            <sqx-form-row for="clientId" hideError label="common.clientId" [prefix]="client.id">
+            <sqx-form-row #clientIdRow for="clientId" hideError label="common.clientId" [prefix]="client.id">
                 <div class="input-group">
-                    <input class="form-control" id="{{ client.id }}_clientId" #clientId readonly value="{{ appsState.appName }}:{{ client.id }}" />
+                    <input class="form-control" [id]="clientIdRow.fieldName" #clientId readonly value="{{ appsState.appName }}:{{ client.id }}" />
                     <button
                         class="btn btn-outline-secondary"
                         attr.aria-label="{{ 'clients.copyClientId' | sqxTranslate }}"
@@ -42,9 +42,9 @@
                 </div>
             </sqx-form-row>
 
-            <sqx-form-row for="clientSecret" hideError label="common.clientSecret" [prefix]="client.id">
+            <sqx-form-row #clientSecretRow for="clientSecret" hideError label="common.clientSecret" [prefix]="client.id">
                 <div class="input-group">
-                    <input class="form-control" id="{{ client.id }}_clientSecret" #inputSecret readonly [value]="client.secret" />
+                    <input class="form-control" [id]="clientSecretRow.fieldName" #inputSecret readonly [value]="client.secret" />
                     <button
                         class="btn btn-outline-secondary"
                         attr.aria-label="{{ 'clients.copyClientSecret' | sqxTranslate }}"
@@ -56,10 +56,10 @@
                 </div>
             </sqx-form-row>
 
-            <sqx-form-row  for="role" hideError label="common.role" [prefix]="client.id">
+            <sqx-form-row #roleRow for="role" hideError label="common.role" [prefix]="client.id">
                 <select
                     class="form-select"
-                    id="{{ client.id }}_role"
+                    [id]="roleRow.fieldName"
                     [disabled]="!client.canUpdate"
                     [ngModel]="client.role"
                     (ngModelChange)="updateRole($event)">
@@ -69,22 +69,22 @@
                 </select>
             </sqx-form-row>
 
-            <sqx-form-row check for="allowAnonymous" hints="clients.allowAnonymousHint" label="clients.allowAnonymous" [prefix]="client.id">
+            <sqx-form-row #allowAnonymousRow check for="allowAnonymous" hints="clients.allowAnonymousHint" label="clients.allowAnonymous" [prefix]="client.id">
                 <input
                     class="form-check-input"
-                    id="{{ client.id }}_allowAnonymous"
+                    [id]="allowAnonymousRow.fieldName"
                     [disabled]="!client.canUpdate"
                     [ngModel]="client.allowAnonymous"
                     (ngModelChange)="updateAllowAnonymous($event)"
                     type="checkbox" />
             </sqx-form-row>
 
-            <sqx-form-row for="apiCallsLimit" hideError hint="clients.apiCallsLimitHint" label="clients.apiCallsLimit" [prefix]="client.id">
+            <sqx-form-row #apiCallsLimitRow for="apiCallsLimit" hideError hint="clients.apiCallsLimitHint" label="clients.apiCallsLimit" [prefix]="client.id">
                 <div class="row gx-2">
                     <div class="col">
                         <input
                             class="form-control"
-                            id="{{ client.id }}_apiCallsLimit"
+                            [id]="apiCallsLimitRow.fieldName"
                             [disabled]="!client.canUpdate"
                             min="0"
                             [(ngModel)]="apiCallsLimit"

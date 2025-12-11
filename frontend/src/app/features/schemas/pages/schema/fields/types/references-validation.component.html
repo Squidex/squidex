@@ -1,14 +1,15 @@
 <div [formGroup]="fieldForm">
-    <sqx-form-row for="schemaIds" label="common.schemas" [prefix]="field.fieldId">
+    <sqx-form-row #schemaIdsRow for="schemaIds" label="common.schemas" [prefix]="field.fieldId">
         <sqx-tag-editor
+            [id]="schemaIdsRow.fieldName"
             formControlName="schemaIds"
             [itemConverter]="(schemasSource.normalConverter | async)!"
             [itemsSource]="(schemasSource.normalConverter | async)?.suggestions"
             placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" />
     </sqx-form-row>
 
-    <sqx-form-row check for="allowDuplicates" label="schemas.fieldTypes.assets.allowDuplicates" [prefix]="field.fieldId">
-        <input class="form-check-input" id="{{ field.fieldId }}_fieldAllowDuplicates" formControlName="allowDuplicates" type="checkbox" />
+    <sqx-form-row #allowDuplicates check for="allowDuplicates" label="schemas.fieldTypes.assets.allowDuplicates" [prefix]="field.fieldId">
+        <input class="form-check-input" [id]="allowDuplicates.fieldName" formControlName="allowDuplicates" type="checkbox" />
     </sqx-form-row>
 
     <sqx-form-row for="countMin" hideError="true" label="schemas.fieldTypes.references.count" [prefix]="field.fieldId">
@@ -32,17 +33,17 @@
             </div>
         </div>
     </sqx-form-row>
-    <sqx-form-row check for="mustBePublished" label="schemas.fieldTypes.references.mustBePublished" [prefix]="field.fieldId">
-        <input class="form-check-input" id="{{ field.fieldId }}_fieldMustBePublished" formControlName="mustBePublished" type="checkbox" />
+    <sqx-form-row #mustBePublishedRow check for="mustBePublished" label="schemas.fieldTypes.references.mustBePublished" [prefix]="field.fieldId">
+        <input class="form-check-input" [id]="mustBePublishedRow.fieldName" formControlName="mustBePublished" type="checkbox" />
     </sqx-form-row>
 
-    <sqx-form-row for="defaultValue" label="schemas.field.defaultValue" [prefix]="field.fieldId">
-        <sqx-tag-editor formControlName="defaultValue" />
+    <sqx-form-row #defaultValueRow for="defaultValue" label="schemas.field.defaultValue" [prefix]="field.fieldId">
+        <sqx-tag-editor [id]="defaultValueRow.fieldName" formControlName="defaultValue" />
     </sqx-form-row>
 
     @if (isLocalizable) {
-        <sqx-form-row for="defaultValues" hint="schemas.field.defaultValuesHint" label="schemas.field.defaultValues" [prefix]="field.fieldId">
-            <sqx-localized-input formControlName="defaultValues" [languages]="languages" type="tags" />
+        <sqx-form-row #defaultValuesRow for="defaultValues" hint="schemas.field.defaultValuesHint" label="schemas.field.defaultValues" [prefix]="field.fieldId">
+            <sqx-localized-input [id]="defaultValuesRow.fieldName" formControlName="defaultValues" [languages]="languages" type="tags" />
         </sqx-form-row>
     }
 </div>

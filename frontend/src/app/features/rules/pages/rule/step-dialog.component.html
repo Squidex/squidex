@@ -31,7 +31,7 @@
                             @switch (property.editor) {
                                 @case ("Text") {
                                     @if (property.isFormattable) {
-                                        <sqx-formattable-input [formControlName]="property.name" type="Text" />
+                                        <sqx-formattable-input [id]="property.name" [formControlName]="property.name" type="Text" />
                                     } @else {
                                         <input class="form-control" id="{{ property.name }}" [formControlName]="property.name" />
                                     }
@@ -39,7 +39,11 @@
 
                                 @case ("TextArea") {
                                     @if (property.isFormattable) {
-                                        <sqx-formattable-input [completion]="scriptCompletions" [formControlName]="property.name" type="Code" />
+                                        <sqx-formattable-input
+                                            [id]="property.name"
+                                            [completion]="scriptCompletions"
+                                            [formControlName]="property.name"
+                                            type="Code" />
                                     } @else {
                                         <textarea class="form-control" id="{{ property.name }}" [formControlName]="property.name"></textarea>
                                     }
@@ -57,7 +61,7 @@
                                 }
 
                                 @case ("Dropdown") {
-                                    <select class="form-select" [formControlName]="property.name">
+                                    <select class="form-select" [id]="property.name" [formControlName]="property.name">
                                         @if (!property.isRequired) {
                                             <option></option>
                                         }

@@ -147,7 +147,7 @@
 
                         @if (annotateTags | async; as tags) {
                             <sqx-form-row for="tags" label="common.tags" vertical>
-                                <sqx-tag-editor allowDuplicates="false" formControlName="tags" [itemsSource]="tags" undefinedWhenEmpty="false" />
+                                <sqx-tag-editor id="tags" allowDuplicates="false" formControlName="tags" [itemsSource]="tags" undefinedWhenEmpty="false" />
                             </sqx-form-row>
                         }
 

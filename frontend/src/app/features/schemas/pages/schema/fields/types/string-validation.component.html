@@ -1,7 +1,7 @@
 <div [formGroup]="fieldForm">
     @if (showUnique) {
-        <sqx-form-row for="placeholder" hint="schemas.field.placeholderHint" label="schemas.field.placeholder" [prefix]="field.fieldId">
-            <input class="form-control" id="{{ field.fieldId }}_fieldPlaceholder" formControlName="placeholder" maxlength="100" />
+        <sqx-form-row #placeholderRow for="placeholder" hint="schemas.field.placeholderHint" label="schemas.field.placeholder" [prefix]="field.fieldId">
+            <input class="form-control" [id]="placeholderRow.fieldName" formControlName="placeholder" maxlength="100" />
         </sqx-form-row>
     }
 
@@ -27,10 +27,10 @@
         </div>
     </sqx-form-row>
 
-    <sqx-form-row for="pattern" [hint]="patternName" label="common.pattern" [prefix]="field.fieldId">
+    <sqx-form-row #patternRow for="pattern" [hint]="patternName" label="common.pattern" [prefix]="field.fieldId">
         <input
             class="form-control"
-            id="{{ field.fieldId }}_fieldPattern"
+            [id]="patternRow.fieldName"
             #inputPattern
             autocapitalize="off"
             autocomplete="off"
@@ -54,8 +54,8 @@
     </sqx-form-row>
 
     @if (showPatternMessage | async) {
-        <sqx-form-row for="patternMessage" label="schemas.fieldTypes.string.patternMessage" [prefix]="field.fieldId">
-            <input class="form-control" id="{{ field.fieldId }}_fieldPatternMessage" formControlName="patternMessage" />
+        <sqx-form-row #patternMessageRow for="patternMessage" label="schemas.fieldTypes.string.patternMessage" [prefix]="field.fieldId">
+            <input class="form-control" [id]="patternMessageRow.fieldName" formControlName="patternMessage" />
         </sqx-form-row>
     }
 
@@ -105,13 +105,13 @@
         </div>
     </sqx-form-row>
 
-    <sqx-form-row for="defaultValue" label="schemas.field.defaultValue" [prefix]="field.fieldId">
-        <input class="form-control" id="{{ field.fieldId }}_fieldDefaultValue" formControlName="defaultValue" />
+    <sqx-form-row #defaultValueRow for="defaultValue" label="schemas.field.defaultValue" [prefix]="field.fieldId">
+        <input class="form-control" [id]="defaultValueRow.fieldName" formControlName="defaultValue" />
     </sqx-form-row>
 
     @if (isLocalizable) {
-        <sqx-form-row for="defaultValues" hint="schemas.field.defaultValuesHint" label="schemas.field.defaultValues" [prefix]="field.fieldId">
-            <sqx-localized-input id="{{ field.fieldId }}_fieldDefaultValues" formControlName="defaultValues" [languages]="languages" />
+        <sqx-form-row #defaultValuesRow for="defaultValues" hint="schemas.field.defaultValuesHint" label="schemas.field.defaultValues" [prefix]="field.fieldId">
+            <sqx-localized-input [id]="defaultValuesRow.fieldName" formControlName="defaultValues" [languages]="languages" />
         </sqx-form-row>
     }
 </div>

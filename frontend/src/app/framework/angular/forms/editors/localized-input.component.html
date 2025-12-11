@@ -32,15 +32,15 @@
     }
 
     @case ("tags") {
-        <sqx-tag-editor (editorBlur)="callTouched()" [ngModel]="currentValue" (ngModelChange)="setValue($event)" />
+        <sqx-tag-editor [id]="id" (editorBlur)="callTouched()" [ngModel]="currentValue" (ngModelChange)="setValue($event)" />
     }
 
     @case ("datetime") {
-        <sqx-date-time-editor (editorBlur)="callTouched()" mode="DateTime" [ngModel]="currentValue" (ngModelChange)="setValue($event)" />
+        <sqx-date-time-editor [id]="id" (editorBlur)="callTouched()" mode="DateTime" [ngModel]="currentValue" (ngModelChange)="setValue($event)" />
     }
 
     @case ("date") {
-        <sqx-date-time-editor (editorBlur)="callTouched()" mode="Date" [ngModel]="currentValue" (ngModelChange)="setValue($event)" />
+        <sqx-date-time-editor [id]="id" (editorBlur)="callTouched()" mode="Date" [ngModel]="currentValue" (ngModelChange)="setValue($event)" />
     }
 
     @case ("boolean") {

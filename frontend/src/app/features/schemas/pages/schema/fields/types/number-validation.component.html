@@ -1,7 +1,7 @@
 <div [formGroup]="fieldForm">
     @if (showUnique) {
-        <sqx-form-row check for="isUnique" label="schemas.field.unique" [prefix]="field.fieldId">
-            <input class="form-check-input" id="{{ field.fieldId }}_fieldUnique" formControlName="isUnique" type="checkbox" />
+        <sqx-form-row #isUniqueRow check for="isUnique" label="schemas.field.unique" [prefix]="field.fieldId">
+            <input class="form-check-input" [id]="isUniqueRow.fieldName" formControlName="isUnique" type="checkbox" />
         </sqx-form-row>
     }
 
@@ -19,13 +19,13 @@
         </div>
     </sqx-form-row>
 
-    <sqx-form-row for="defaultValue" label="schemas.field.defaultValue" [prefix]="field.fieldId">
-        <input class="form-control" id="{{ field.fieldId }}_fieldDefaultValue" formControlName="defaultValue" type="number" />
+    <sqx-form-row #defaultValueRow for="defaultValue" label="schemas.field.defaultValue" [prefix]="field.fieldId">
+        <input class="form-control" [id]="defaultValueRow.fieldName" formControlName="defaultValue" type="number" />
     </sqx-form-row>
 
     @if (isLocalizable) {
-            <sqx-form-row for="defaultValues" hint="schemas.field.defaultValuesHint" label="schemas.field.defaultValues" [prefix]="field.fieldId">
-            <sqx-localized-input id="{{ field.fieldId }}_fieldDefaultValues" formControlName="defaultValues" [languages]="languages" type="number" />
+        <sqx-form-row #defaultValuesRow for="defaultValues" hint="schemas.field.defaultValuesHint" label="schemas.field.defaultValues" [prefix]="field.fieldId">
+            <sqx-localized-input [id]="defaultValuesRow.fieldName" formControlName="defaultValues" [languages]="languages" type="number" />
         </sqx-form-row>
     }
 </div>

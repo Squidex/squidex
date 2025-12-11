@@ -55,6 +55,9 @@ export class DateTimeEditorComponent extends StatefulControlComponent<State, str
     @Input()
     public mode: 'DateTime' | 'Date' = 'Date';
 
+    @Input()
+    public id = '';
+
     @Input({ transform: booleanAttribute })
     public hideClear?: boolean | null;
 

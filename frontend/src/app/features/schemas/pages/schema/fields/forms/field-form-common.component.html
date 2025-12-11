@@ -1,19 +1,19 @@
 <div [formGroup]="fieldForm">
-    <sqx-form-row for="name" hint="schemas.field.nameHint" label="common.name" [prefix]="field.fieldId">
-        <input class="form-control" id="{{ field.fieldId }}_name" [ngModel]="field.name" [ngModelOptions]="{ standalone: true }" readonly />
+    <sqx-form-row #nameRow for="name" hint="schemas.field.nameHint" label="common.name" [prefix]="field.fieldId">
+        <input class="form-control" [id]="nameRow.fieldName" [ngModel]="field.name" [ngModelOptions]="{ standalone: true }" readonly />
     </sqx-form-row>
 
-    <sqx-form-row for="label" hint="schemas.field.labelHint" label="common.label" [prefix]="field.fieldId">
-        <input class="form-control" id="{{ field.fieldId }}_fieldLabel" formControlName="label" maxlength="100" />
+    <sqx-form-row #labelRow for="label" hint="schemas.field.labelHint" label="common.label" [prefix]="field.fieldId">
+        <input class="form-control" [id]="labelRow.fieldName" formControlName="label" maxlength="100" />
     </sqx-form-row>
 
-    <sqx-form-row for="hints" hint="schemas.field.hintsHint" label="common.hints" [prefix]="field.fieldId">
-        <input class="form-control" id="{{ field.fieldId }}_fieldHints" formControlName="hints" maxlength="1000" />
+    <sqx-form-row #hintsRow for="hints" hint="schemas.field.hintsHint" label="common.hints" [prefix]="field.fieldId">
+        <input class="form-control" [id]="hintsRow.fieldName" formControlName="hints" maxlength="1000" />
     </sqx-form-row>
 
     @if (field.properties.isContentField) {
-        <sqx-form-row for="tags" hint="schemas.field.tagsHint" label="common.tags" [prefix]="field.fieldId">
-            <sqx-tag-editor id="schemaTags" formControlName="tags" />
+        <sqx-form-row #tagsRow for="tags" hint="schemas.field.tagsHint" label="common.tags" [prefix]="field.fieldId">
+            <sqx-tag-editor [id]="tagsRow.fieldName" formControlName="tags" />
         </sqx-form-row>
     }
 </div>

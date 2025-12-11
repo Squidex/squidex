@@ -63,18 +63,19 @@
                 @if (selectedTab === 0) {
                     <sqx-form-error [error]="error" />
 
-                    <sqx-form-row for="name" hint="workflows.workflowNameHint" label="common.name" [prefix]="workflowView.dto.id" vertical>
+                    <sqx-form-row #nameRow for="name" hint="workflows.workflowNameHint" label="common.name" [prefix]="workflowView.dto.id" vertical>
                         <input
                             class="form-control"
-                            id="{{ workflowView.dto.id }}_name"
+                            [id]="nameRow.fieldName"
                             [disabled]="!isEditable"
                             [ngModel]="workflowView.dto.name"
                             (ngModelChange)="rename($event)"
                             [ngModelOptions]="onBlur" />
                     </sqx-form-row>
 
-                    <sqx-form-row for="name" hint="workflows.schemasHint" label="common.schemas" [prefix]="workflowView.dto.id" vertical>
+                    <sqx-form-row #schemaIdsRow for="schemaIds" hint="workflows.schemasHint" label="common.schemas" [prefix]="workflowView.dto.id" vertical>
                         <sqx-tag-editor
+                            [id]="schemaIdsRow.fieldName"
                             [disabled]="!isEditable"
                             [itemConverter]="(schemasSource.converter | async)!"
                             [itemsSource]="(schemasSource.normalConverter | async)?.suggestions"

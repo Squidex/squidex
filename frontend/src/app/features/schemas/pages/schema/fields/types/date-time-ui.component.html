@@ -1,10 +1,10 @@
 <div [formGroup]="fieldForm">
-    <sqx-form-row for="placeholder" hint="schemas.field.placeholderHint" label="schemas.field.placeholder" [prefix]="field.fieldId">
-        <input class="form-control" id="{{ field.fieldId }}_fieldPlaceholder" formControlName="placeholder" maxlength="100" />
+    <sqx-form-row #placeholderRow for="placeholder" hint="schemas.field.placeholderHint" label="schemas.field.placeholder" [prefix]="field.fieldId">
+        <input class="form-control" [id]="placeholderRow.fieldName" formControlName="placeholder" maxlength="100" />
     </sqx-form-row>
 
-    <sqx-form-row for="format" hint="schemas.fieldTypes.dateTime.formatHint" label="schemas.fieldTypes.dateTime.format" [prefix]="field.fieldId">
-        <input class="form-control" id="{{ field.fieldId }}_fieldFormat" formControlName="format" maxlength="100" />
+    <sqx-form-row #formatRow for="format" hint="schemas.fieldTypes.dateTime.formatHint" label="schemas.fieldTypes.dateTime.format" [prefix]="field.fieldId">
+        <input class="form-control" [id]="formatRow.fieldName" formControlName="format" maxlength="100" />
     </sqx-form-row>
 
     <sqx-form-row for="editor" label="schemas.field.editor" [prefix]="field.fieldId">

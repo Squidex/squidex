@@ -13,13 +13,13 @@
         </div>
     </sqx-form-row>
 
-    <sqx-form-row for="defaultValue" label="schemas.field.defaultValue" [prefix]="field.fieldId">
-        <sqx-tag-editor formControlName="defaultValue" />
+    <sqx-form-row #defaultValueRow for="defaultValue" label="schemas.field.defaultValue" [prefix]="field.fieldId">
+        <sqx-tag-editor [id]="defaultValueRow.fieldName" formControlName="defaultValue" />
     </sqx-form-row>
 
     @if (isLocalizable) {
-        <sqx-form-row for="defaultValues" hint="schemas.field.defaultValuesHint" label="schemas.field.defaultValues" [prefix]="field.fieldId">
-            <sqx-localized-input formControlName="defaultValues" [languages]="languages" type="tags" />
+        <sqx-form-row #defaultValuesRow for="defaultValues" hint="schemas.field.defaultValuesHint" label="schemas.field.defaultValues" [prefix]="field.fieldId">
+            <sqx-localized-input [id]="defaultValuesRow.fieldName" formControlName="defaultValues" [languages]="languages" type="tags" />
         </sqx-form-row>
     }
 </div>

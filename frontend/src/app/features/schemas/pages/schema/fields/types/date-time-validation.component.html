@@ -19,14 +19,19 @@
         </sqx-form-row>
 
         @if (showDefaultValue | async) {
-            <sqx-form-row for="defaultValue" label="schemas.field.defaultValue" [prefix]="field.fieldId">
-                <sqx-date-time-editor formControlName="defaultValue" mode="DateTime" />
+            <sqx-form-row #defaultValueRow for="defaultValue" label="schemas.field.defaultValue" [prefix]="field.fieldId">
+                <sqx-date-time-editor [id]="defaultValueRow.fieldName" formControlName="defaultValue" mode="DateTime" />
             </sqx-form-row>
         }
 
         @if (isLocalizable) {
-            <sqx-form-row for="defaultValues" hint="schemas.field.defaultValuesHint" label="schemas.field.defaultValues" [prefix]="field.fieldId">
-                <sqx-localized-input id="{{ field.fieldId }}_fieldDefaultValues" formControlName="defaultValues" [languages]="languages" type="datetime" />
+            <sqx-form-row
+                #defaultValueRows
+                for="defaultValues"
+                hint="schemas.field.defaultValuesHint"
+                label="schemas.field.defaultValues"
+                [prefix]="field.fieldId">
+                <sqx-localized-input [id]="defaultValueRows.fieldName" formControlName="defaultValues" [languages]="languages" type="datetime" />
             </sqx-form-row>
         }
     }

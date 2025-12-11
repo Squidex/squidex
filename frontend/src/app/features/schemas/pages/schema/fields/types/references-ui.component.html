@@ -10,16 +10,17 @@
 
     @if (field.properties.isContentField) {
         <sqx-form-row
+            #isContentFieldRow
             check
             for="resolveReference"
             hint="schemas.fieldTypes.references.resolveHint"
             label="schemas.fieldTypes.references.resolve"
             [prefix]="field.fieldId">
-            <input class="form-check-input" id="{{ field.fieldId }}_fieldResolveReference" formControlName="resolveReference" type="checkbox" />
+            <input class="form-check-input" [id]="isContentFieldRow.fieldName" formControlName="resolveReference" type="checkbox" />
         </sqx-form-row>
     }
 
-    <sqx-form-row for="query" hint="schemas.fieldTypes.references.queryHint" label="schemas.fieldTypes.references.query" [prefix]="field.fieldId">
-        <input class="form-control" id="{{ field.fieldId }}_query" formControlName="query" type="text" />
+    <sqx-form-row #queryRow for="query" hint="schemas.fieldTypes.references.queryHint" label="schemas.fieldTypes.references.query" [prefix]="field.fieldId">
+        <input class="form-control" [id]="queryRow.fieldName" formControlName="query" type="text" />
     </sqx-form-row>
 </div>

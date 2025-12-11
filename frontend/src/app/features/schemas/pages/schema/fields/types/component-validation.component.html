@@ -1,6 +1,7 @@
 <div [formGroup]="fieldForm">
     <sqx-form-row for="schemaIds" label="common.schemas" [prefix]="field.fieldId">
         <sqx-tag-editor
+            id="schemaIds"
             formControlName="schemaIds"
             [itemConverter]="(schemasSource.converter | async)!"
             [itemsSource]="(schemasSource.converter | async)?.suggestions"

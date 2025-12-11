@@ -34,23 +34,23 @@
                     </div>
                 </sqx-form-row>
 
-                <sqx-form-row centered for="id" hideError label="common.content" labelSize="lg">
+                <sqx-form-row centered for="content" hideError label="common.content" labelSize="lg">
                     <a class="truncate" [routerLink]="['../', contentSelected.schemaName, contentSelected.id]">
                         {{ createContentName(contentSelected) }}
                     </a>
                 </sqx-form-row>
 
-                <sqx-form-row centered for="id" hideError label="common.schema" labelSize="lg">
+                <sqx-form-row centered for="schema" hideError label="common.schema" labelSize="lg">
                     <a class="truncate" [routerLink]="['../', contentSelected.schemaName]"> {{ contentSelected.schemaDisplayName }} </a>
                 </sqx-form-row>
 
-                <sqx-form-row centered for="id" hideError label="common.status" labelSize="lg">
+                <sqx-form-row centered for="status" hideError label="common.status" labelSize="lg">
                     <sqx-content-status layout="text" small="true" [status]="contentSelected.status" [statusColor]="contentSelected.statusColor" />
                 </sqx-form-row>
 
                 <hr />
 
-                <sqx-form-row centered for="id" hideError label="contents.scheduledToLabel" labelSize="lg">
+                <sqx-form-row centered for="scheduledTo" hideError label="contents.scheduledToLabel" labelSize="lg">
                     <sqx-content-status
                         layout="text"
                         small="true"
@@ -58,11 +58,11 @@
                         [statusColor]="contentSelected.scheduleJob.color" />
                 </sqx-form-row>
 
-                <sqx-form-row centered for="id" hideError label="contents.scheduledAt" labelSize="lg">
+                <sqx-form-row centered for="scheduledAt" hideError label="contents.scheduledAt" labelSize="lg">
                     {{ contentSelected.scheduleJob.dueTime | sqxFullDateTime }}
                 </sqx-form-row>
 
-                <sqx-form-row centered for="id" hideError label="contents.scheduledBy" labelSize="lg">
+                <sqx-form-row centered for="scheduledBy" hideError label="contents.scheduledBy" labelSize="lg">
                     <img class="user-picture" [src]="contentSelected.scheduleJob.scheduledBy | sqxUserPictureRef" />
                     {{ contentSelected.scheduleJob.scheduledBy | sqxUserNameRef }}
                 </sqx-form-row>
