@@ -8,14 +8,14 @@
 
 import { booleanAttribute, Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { AppLanguageDto, FieldDto, FormHintComponent, LocalizedInputComponent, TagEditorComponent, TagsFieldPropertiesDto, TranslatePipe } from '@app/shared';
+import { AppLanguageDto, FieldDto, FormRowComponent, LocalizedInputComponent, TagEditorComponent, TagsFieldPropertiesDto, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-tags-validation',
     styleUrls: ['tags-validation.component.scss'],
     templateUrl: 'tags-validation.component.html',
     imports: [
-        FormHintComponent,
+        FormRowComponent,
         FormsModule,
         LocalizedInputComponent,
         ReactiveFormsModule,
@@ -36,6 +36,6 @@ export class TagsValidationComponent {
     @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
-    @Input({ transform: booleanAttribute })
-    public isLocalizable?: boolean | null;
+    @Input({ required: true, transform: booleanAttribute })
+    public isLocalizable!: boolean;
 }

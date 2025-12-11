@@ -1,11 +1,8 @@
 <div [formGroup]="fieldForm">
-    <div class="form-group row">
-        <label class="col-3 col-form-label">{{ "schemas.field.editor" | sqxTranslate }}</label>
-        <div class="col-9">
-            <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'Map'">
-                <input class="radio-input" formControlName="editor" name="editor" type="radio" value="Map" />
-                <i class="icon-control-Map"></i> <span class="radio-label">Map</span>
-            </label>
-        </div>
-    </div>
+    <sqx-form-row for="editor" label="schemas.field.editor" [prefix]="field.fieldId">
+        <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === 'Map'">
+            <input class="radio-input" formControlName="editor" name="editor" type="radio" value="Map" />
+            <i class="icon-control-Map"></i> <span class="radio-label">Map</span>
+        </label>
+    </sqx-form-row>
 </div>

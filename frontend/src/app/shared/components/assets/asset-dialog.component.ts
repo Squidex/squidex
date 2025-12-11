@@ -12,7 +12,7 @@ import { RouterLink } from '@angular/router';
 import { NgxDocViewerModule } from 'ngx-doc-viewer';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
-import { ConfirmClickDirective, ControlErrorsComponent, CopyDirective, DialogService, FormErrorComponent, FormHintComponent, HTTP, ModalDialogComponent, ProgressBarComponent, switchMapCached, TagEditorComponent, TooltipDirective, TransformInputDirective, TranslatePipe, Types, VideoPlayerComponent } from '@app/framework';
+import { ConfirmClickDirective, ControlErrorsComponent, CopyDirective, DialogService, FormErrorComponent, FormRowComponent, HTTP, ModalDialogComponent, ProgressBarComponent, switchMapCached, TagEditorComponent, TooltipDirective, TransformInputDirective, TranslatePipe, Types, VideoPlayerComponent } from '@app/framework';
 import { AnnotateAssetDto, AnnotateAssetForm, AppsState, AssetDto, AssetPathItem, AssetsService, AssetsState, AssetUploaderState, AuthService, MoveAssetDto, MoveAssetForm, ROOT_ITEM, UploadCanceled } from '@app/shared/internal';
 import { AssetFolderDropdownComponent } from './asset-folder-dropdown.component';
 import { AssetHistoryComponent } from './asset-history.component';
@@ -38,7 +38,7 @@ import { AssetPreviewUrlPipe, AssetUrlPipe, PreviewableType } from './pipes';
         ControlErrorsComponent,
         CopyDirective,
         FormErrorComponent,
-        FormHintComponent,
+        FormRowComponent,
         FormsModule,
         ImageCropperComponent,
         ImageFocusPointComponent,

@@ -8,7 +8,7 @@
 
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { FieldDto, FormHintComponent, SchemaDto, TranslatePipe } from '@app/shared';
+import { FieldDto, FormRowComponent, SchemaDto } from '@app/shared';
 import { ArrayUIComponent } from '../types/array-ui.component';
 import { AssetsUIComponent } from '../types/assets-ui.component';
 import { BooleanUIComponent } from '../types/boolean-ui.component';
@@ -34,7 +34,7 @@ import { TagsUIComponent } from '../types/tags-ui.component';
         ComponentUIComponent,
         ComponentsUIComponent,
         DateTimeUIComponent,
-        FormHintComponent,
+        FormRowComponent,
         FormsModule,
         GeolocationUIComponent,
         JsonUIComponent,
@@ -44,7 +44,6 @@ import { TagsUIComponent } from '../types/tags-ui.component';
         ReferencesUIComponent,
         StringUIComponent,
         TagsUIComponent,
-        TranslatePipe,
     ],
 })
 export class FieldFormUIComponent {

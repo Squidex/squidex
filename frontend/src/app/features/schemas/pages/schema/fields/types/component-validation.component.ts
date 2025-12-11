@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { FieldDto, ReferencesFieldPropertiesDto, SchemaTagSource, TagEditorComponent, TranslatePipe } from '@app/shared';
+import { FieldDto, FormRowComponent, ReferencesFieldPropertiesDto, SchemaTagSource, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-component-validation',
@@ -16,6 +16,7 @@ import { FieldDto, ReferencesFieldPropertiesDto, SchemaTagSource, TagEditorCompo
     templateUrl: 'component-validation.component.html',
     imports: [
         AsyncPipe,
+        FormRowComponent,
         FormsModule,
         ReactiveFormsModule,
         TagEditorComponent,

@@ -1,4 +1,4 @@
-@if (languages.length > 1) {
+@if (languages.length > 1 || showAlways) {
     @if (languages.length > 3 || percents) {
         <button
             class="btn btn-outline-secondary btn-{{ size }} dropdown-toggle"

@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ControlErrorsComponent, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/framework';
+import { FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormRowComponent, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AssetFolderDto, AssetsState, RenameAssetFolderForm } from '@app/shared/internal';
 
 @Component({
@@ -17,10 +17,10 @@ import { AssetFolderDto, AssetsState, RenameAssetFolderForm } from '@app/shared/
     templateUrl: './asset-folder-dialog.component.html',
     imports: [
         AsyncPipe,
-        ControlErrorsComponent,
         FocusOnInitDirective,
         FormAlertComponent,
         FormErrorComponent,
+        FormRowComponent,
         FormsModule,
         ModalDialogComponent,
         ReactiveFormsModule,

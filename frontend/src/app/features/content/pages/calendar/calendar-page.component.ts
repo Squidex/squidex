@@ -9,7 +9,7 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { AppLanguageDto, AppsState, ConfirmClickDirective, ContentDto, ContentsService, ContentStatusComponent, CopyDirective, DateTime, DialogModel, FullDateTimePipe, getContentValue, LanguagesState, LayoutComponent, LocalizerService, ModalDialogComponent, ModalDirective, ResourceLoaderService, TitleComponent, TooltipDirective, TranslatePipe, UserNameRefPipe, UserPictureRefPipe } from '@app/shared';
+import { AppLanguageDto, AppsState, ConfirmClickDirective, ContentDto, ContentsService, ContentStatusComponent, CopyDirective, DateTime, DialogModel, FormRowComponent, FullDateTimePipe, getContentValue, LanguagesState, LayoutComponent, LocalizerService, ModalDialogComponent, ModalDirective, ResourceLoaderService, TitleComponent, TooltipDirective, TranslatePipe, UserNameRefPipe, UserPictureRefPipe } from '@app/shared';
 
 declare const tui: any;
 
@@ -23,6 +23,7 @@ type ViewMode = 'day' | 'week' | 'month';
         ConfirmClickDirective,
         ContentStatusComponent,
         CopyDirective,
+        FormRowComponent,
         FormsModule,
         FullDateTimePipe,
         LayoutComponent,

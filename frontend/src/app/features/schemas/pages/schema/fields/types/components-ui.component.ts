@@ -8,7 +8,7 @@
 
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { FieldDto, ReferencesFieldPropertiesDto, TranslatePipe } from '@app/shared';
+import { FieldDto, FormRowComponent, ReferencesFieldPropertiesDto } from '@app/shared';
 
 const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['EmptyArray', 'Null'];
 
@@ -17,9 +17,9 @@ const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['EmptyArray', 'Null'];
     styleUrls: ['components-ui.component.scss'],
     templateUrl: 'components-ui.component.html',
     imports: [
+        FormRowComponent,
         FormsModule,
         ReactiveFormsModule,
-        TranslatePipe,
     ],
 })
 export class ComponentsUIComponent {

@@ -1,31 +1,19 @@
 <div [formGroup]="fieldForm">
-    <div class="form-group row">
-        <label class="col-3 col-form-label">{{ "schemas.fieldTypes.array.count" | sqxTranslate }}</label>
-        <div class="col-9">
-            <div class="row g-0">
-                <div class="col">
-                    <input
-                        class="form-control"
-                        formControlName="minItems"
-                        placeholder="{{ 'schemas.fieldTypes.array.countMin' | sqxTranslate }}"
-                        type="number" />
-                </div>
+    <sqx-form-row for="minItems" label="schemas.fieldTypes.array.count" [prefix]="field.fieldId">
+        <div class="row g-0">
+            <div class="col">
+                <input class="form-control" formControlName="minItems" placeholder="{{ 'schemas.fieldTypes.array.countMin' | sqxTranslate }}" type="number" />
+            </div>
 
-                <div class="col-auto"><label class="col-form-label minmax">-</label></div>
+            <div class="col-auto"><label class="col-form-label minmax">-</label></div>
 
-                <div class="col">
-                    <input
-                        class="form-control"
-                        formControlName="maxItems"
-                        placeholder="{{ 'schemas.fieldTypes.array.countMax' | sqxTranslate }}"
-                        type="number" />
-                </div>
+            <div class="col">
+                <input class="form-control" formControlName="maxItems" placeholder="{{ 'schemas.fieldTypes.array.countMax' | sqxTranslate }}" type="number" />
             </div>
         </div>
-    </div>
+    </sqx-form-row>
 
-    <div class="form-group row">
-        <label class="col-3 col-form-label">{{ "schemas.fieldTypes.array.uniqueFields" | sqxTranslate }}</label>
-        <div class="col-9"><sqx-tag-editor formControlName="uniqueFields" /></div>
-    </div>
+    <sqx-form-row #uniqueFieldsRow for="uniqueFields" label="schemas.fieldTypes.array.uniqueFields" [prefix]="field.fieldId">
+        <sqx-tag-editor [id]="uniqueFieldsRow.fieldName" formControlName="uniqueFields" />
+    </sqx-form-row>
 </div>

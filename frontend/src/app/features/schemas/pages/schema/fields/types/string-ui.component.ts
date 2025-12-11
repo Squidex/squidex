@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { AssetFolderDropdownComponent, FieldDto, FormHintComponent, SchemaTagSource, StringFieldEditorValues, StringFieldPropertiesDto, Subscriptions, TagEditorComponent, TranslatePipe, TypedSimpleChanges, valueProjection$ } from '@app/shared';
+import { AssetFolderDropdownComponent, FieldDto, FormRowComponent, SchemaTagSource, StringFieldEditorValues, StringFieldPropertiesDto, Subscriptions, TagEditorComponent, TranslatePipe, TypedSimpleChanges, valueProjection$ } from '@app/shared';
 
 @Component({
     selector: 'sqx-string-ui',
@@ -18,7 +18,7 @@ import { AssetFolderDropdownComponent, FieldDto, FormHintComponent, SchemaTagSou
     imports: [
         AssetFolderDropdownComponent,
         AsyncPipe,
-        FormHintComponent,
+        FormRowComponent,
         FormsModule,
         ReactiveFormsModule,
         TagEditorComponent,

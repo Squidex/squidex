@@ -7,7 +7,7 @@
 
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { CodeComponent, ControlErrorsComponent, FormHintComponent, TranslatePipe, TriggerForm } from '@app/shared';
+import { CodeComponent, FormHintComponent, FormRowComponent, TranslatePipe, TriggerForm } from '@app/shared';
 
 @Component({
     selector: 'sqx-asset-changed-trigger',
@@ -15,8 +15,8 @@ import { CodeComponent, ControlErrorsComponent, FormHintComponent, TranslatePipe
     templateUrl: './asset-changed-trigger.component.html',
     imports: [
         CodeComponent,
-        ControlErrorsComponent,
         FormHintComponent,
+        FormRowComponent,
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,

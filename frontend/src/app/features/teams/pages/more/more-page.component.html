@@ -8,12 +8,10 @@
                     <div class="card mb-4">
                         <div class="card-body">
                             <sqx-form-error [error]="updateForm.error | async" />
-                            <div class="form-group">
-                                <label for="name">{{ "common.name" | sqxTranslate }}</label>
-                                <sqx-control-errors for="name" />
+
+                            <sqx-form-row for="name" hint="teams.teamNameHint" label="common.name" vertical>
                                 <input class="form-control" id="name" formControlName="name" maxlength="100" />
-                                <sqx-form-hint> {{ "teams.teamNameHint" | sqxTranslate }} </sqx-form-hint>
-                            </div>
+                            </sqx-form-row>
                         </div>
 
                         <div class="card-footer">

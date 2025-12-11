@@ -35,6 +35,7 @@ export * from './angular/forms/extended-form-group';
 export * from './angular/forms/file-drop.directive';
 export * from './angular/forms/focus-on-init.directive';
 export * from './angular/forms/form-alert.component';
+export * from './angular/forms/form-row.component';
 export * from './angular/forms/form-error.component';
 export * from './angular/forms/form-hint.component';
 export * from './angular/forms/forms-helper';

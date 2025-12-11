@@ -8,22 +8,18 @@
                     <div class="card mb-4">
                         <div class="card-body">
                             <sqx-form-error [error]="updateForm.error | async" />
-                            <div class="form-group">
-                                <label for="email">{{ "common.name" | sqxTranslate }}</label>
+
+                            <sqx-form-row for="name" label="common.name" vertical>
                                 <input class="form-control" readonly [value]="app.name" />
-                            </div>
+                            </sqx-form-row>
 
-                            <div class="form-group">
-                                <label for="label">{{ "common.label" | sqxTranslate }}</label>
-                                <sqx-control-errors for="label" />
+                            <sqx-form-row for="label" label="common.label" vertical>
                                 <input class="form-control" id="label" formControlName="label" maxlength="100" />
-                            </div>
+                            </sqx-form-row>
 
-                            <div class="form-group">
-                                <label for="description">{{ "common.description" | sqxTranslate }}</label>
-                                <sqx-control-errors for="description" />
+                            <sqx-form-row for="description" label="common.description" vertical>
                                 <input class="form-control" id="description" formControlName="description" maxlength="100" />
-                            </div>
+                            </sqx-form-row>
                         </div>
 
                         <div class="card-footer">

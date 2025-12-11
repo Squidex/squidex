@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { FieldDto, FloatConverter, FormHintComponent, NumberFieldEditorValues, NumberFieldPropertiesDto, Subscriptions, TagEditorComponent, TranslatePipe, TypedSimpleChanges, valueProjection$ } from '@app/shared';
+import { FieldDto, FloatConverter, FormRowComponent, NumberFieldEditorValues, NumberFieldPropertiesDto, Subscriptions, TagEditorComponent, TypedSimpleChanges, valueProjection$ } from '@app/shared';
 
 @Component({
     selector: 'sqx-number-ui',
@@ -17,11 +17,10 @@ import { FieldDto, FloatConverter, FormHintComponent, NumberFieldEditorValues, N
     templateUrl: 'number-ui.component.html',
     imports: [
         AsyncPipe,
-        FormHintComponent,
+        FormRowComponent,
         FormsModule,
         ReactiveFormsModule,
         TagEditorComponent,
-        TranslatePipe,
     ],
 })
 export class NumberUIComponent  {

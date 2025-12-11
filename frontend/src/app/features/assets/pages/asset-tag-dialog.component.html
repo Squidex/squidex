@@ -3,13 +3,9 @@
         <ng-container title> {{ "common.renameTag" | sqxTranslate }} </ng-container>
         <ng-container content>
             <sqx-form-error [error]="editForm.error | async" />
-            <div class="form-group">
-                <label for="tagName">
-                    {{ "common.name" | sqxTranslate }} <small class="hint">({{ "common.requiredHint" | sqxTranslate }})</small>
-                </label>
-                <sqx-control-errors for="tagName" />
+            <sqx-form-row for="tagName" label="common.name" vertical required>
                 <input class="form-control" id="tagName" autocomplete="off" formControlName="tagName" sqxFocusOnInit />
-            </div>
+            </sqx-form-row>
         </ng-container>
         <ng-container footer>
             <button class="btn btn-text-secondary" (click)="emitClose()" type="button">{{ "common.cancel" | sqxTranslate }}</button>

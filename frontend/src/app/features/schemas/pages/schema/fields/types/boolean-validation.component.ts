@@ -9,19 +9,18 @@
 import { booleanAttribute, Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { AppLanguageDto, BooleanFieldPropertiesDto, FieldDto, FormHintComponent, hasNoValue$, IndeterminateValueDirective, LocalizedInputComponent, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { AppLanguageDto, BooleanFieldPropertiesDto, FieldDto, FormRowComponent, hasNoValue$, IndeterminateValueDirective, LocalizedInputComponent, TypedSimpleChanges } from '@app/shared';
 
 @Component({
     selector: 'sqx-boolean-validation',
     styleUrls: ['boolean-validation.component.scss'],
     templateUrl: 'boolean-validation.component.html',
     imports: [
-        FormHintComponent,
+        FormRowComponent,
         FormsModule,
         IndeterminateValueDirective,
         LocalizedInputComponent,
         ReactiveFormsModule,
-        TranslatePipe,
     ],
 })
 export class BooleanValidationComponent {
@@ -37,8 +36,8 @@ export class BooleanValidationComponent {
     @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
-    @Input({ transform: booleanAttribute })
-    public isLocalizable?: boolean | null;
+    @Input({ required: true, transform: booleanAttribute })
+    public isLocalizable!: boolean;
 
     public showDefaultValue?: Observable<boolean>;
 

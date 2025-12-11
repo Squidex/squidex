@@ -10,111 +10,92 @@
         <ng-container content>
             @if (currentStep) {
                 <div class="form-horizontal" [formGroup]="currentStep.form">
-                    <div class="form-group row">
-                        <label class="col-3 col-form-label" for="stepName">{{ "common.name" | sqxTranslate }}</label>
-                        <div class="col-9">
-                            <input class="form-control" id="stepName" maxlength="40" [(ngModel)]="stepName" [ngModelOptions]="{ standalone: true }" />
-                            <sqx-form-hint> {{ "rules.stepNameHint" | sqxTranslate }} </sqx-form-hint>
-                        </div>
-                    </div>
+                    <sqx-form-row for="stepName" hint="rules.stepNameHint" label="common.name">
+                        <input class="form-control" id="stepName" maxlength="40" [(ngModel)]="stepName" [ngModelOptions]="{ standalone: true }" />
+                    </sqx-form-row>
 
-                    <div class="form-group row">
-                        <div class="col-9 offset-3">
-                            <div class="form-check">
-                                <input
-                                    class="form-check-input"
-                                    id="stepIgnore"
-                                    [(ngModel)]="stepIgnoreError"
-                                    [ngModelOptions]="{ standalone: true }"
-                                    type="checkbox" />
-                                <label class="form-check-label" for="stepIgnore"> {{ "rules.stepIgnoreError" | sqxTranslate }} </label>
-                            </div>
-                            <sqx-form-hint> {{ "rules.stepIgnoreErrorHint" | sqxTranslate }} </sqx-form-hint>
-                        </div>
-                    </div>
+                    <sqx-form-row check for="stepIgnore" hint="rules.stepIgnoreErrorHint" label="rules.stepIgnoreError">
+                        <input class="form-check-input" id="stepIgnore" [(ngModel)]="stepIgnoreError" [ngModelOptions]="{ standalone: true }" type="checkbox" />
+                    </sqx-form-row>
 
                     <hr />
 
                     <sqx-form-error [error]="currentStep.error | async" />
 
                     @for (property of currentStep.editableProperties; track property.name) {
-                        <div class="form-group row">
-                            <label class="col-3 col-form-label" [for]="property.name">
-                                @if (property.editor !== "Checkbox") {
-                                    {{ property.display }}
-                                }
-
-                                @if (property.isRequired) {
-                                    <small class="hint">&nbsp;*</small>
-                                }
-                            </label>
-                            <div class="col-9">
-                                <sqx-control-errors [for]="property.name" />
-                                @switch (property.editor) {
-                                    @case ("Text") {
-                                        @if (property.isFormattable) {
-                                            <sqx-formattable-input [formControlName]="property.name" type="Text" />
-                                        } @else {
-                                            <input class="form-control" id="{{ property.name }}" [formControlName]="property.name" />
-                                        }
-                                    }
-
-                                    @case ("TextArea") {
-                                        @if (property.isFormattable) {
-                                            <sqx-formattable-input [completion]="scriptCompletions" [formControlName]="property.name" type="Code" />
-                                        } @else {
-                                            <textarea class="form-control" id="{{ property.name }}" [formControlName]="property.name"></textarea>
-                                        }
-                                    }
-
-                                    @case ("Javascript") {
-                                        <sqx-code-editor [completion]="scriptCompletions" [formControlName]="property.name" [height]="350" />
-                                    }
-
-                                    @case ("Checkbox") {
-                                        <div class="form-check">
-                                            <input class="form-check-input" id="{{ property.name }}" [formControlName]="property.name" type="checkbox" />
-                                            <label class="form-check-label" for="{{ property.name }}"> {{ property.display }} </label>
-                                        </div>
-                                    }
-
-                                    @case ("Dropdown") {
-                                        <select class="form-select" [formControlName]="property.name">
-                                            @if (!property.isRequired) {
-                                                <option></option>
-                                            }
-
-                                            @for (option of property.options; track option) {
-                                                <option [ngValue]="option">{{ option }}</option>
-                                            }
-                                        </select>
-                                    }
-
-                                    @case ("Branches") {
-                                        <sqx-branches-input [control]="currentStep.branch(property.name)" [isEditable]="isEditable" />
-                                    }
-
-                                    @default {
-                                        <input
-                                            class="form-control"
-                                            id="{{ property.name }}"
-                                            [formControlName]="property.name"
-                                            type="{{ property.editor | lowercase }}" />
-                                    }
-                                }
-                                <sqx-form-hint>
-                                    <span inline="true" [sqxMarkdown]="property.description"></span>
+                        <sqx-form-row
+                            [check]="property.editor === 'Checkbox'"
+                            [for]="property.name"
+                            [label]="property.display"
+                            [required]="property.isRequired">
+                            @switch (property.editor) {
+                                @case ("Text") {
                                     @if (property.isFormattable) {
-                                        <div>
-                                            {{ "rules.advancedFormattingHint" | sqxTranslate }}:
-                                            <a href="https://docs.squidex.io/concepts/rules#3-formatting" sqxExternalLink tabindex="-1">
-                                                {{ "common.documentation" | sqxTranslate }}
-                                            </a>
-                                        </div>
+                                        <sqx-formattable-input [id]="property.name" [formControlName]="property.name" type="Text" />
+                                    } @else {
+                                        <input class="form-control" id="{{ property.name }}" [formControlName]="property.name" />
                                     }
-                                </sqx-form-hint>
-                            </div>
-                        </div>
+                                }
+
+                                @case ("TextArea") {
+                                    @if (property.isFormattable) {
+                                        <sqx-formattable-input
+                                            [id]="property.name"
+                                            [completion]="scriptCompletions"
+                                            [formControlName]="property.name"
+                                            type="Code" />
+                                    } @else {
+                                        <textarea class="form-control" id="{{ property.name }}" [formControlName]="property.name"></textarea>
+                                    }
+                                }
+
+                                @case ("Javascript") {
+                                    <sqx-code-editor [completion]="scriptCompletions" [formControlName]="property.name" [height]="350" />
+                                }
+
+                                @case ("Checkbox") {
+                                    <div class="form-check">
+                                        <input class="form-check-input" id="{{ property.name }}" [formControlName]="property.name" type="checkbox" />
+                                        <label class="form-check-label" for="{{ property.name }}"> {{ property.display }} </label>
+                                    </div>
+                                }
+
+                                @case ("Dropdown") {
+                                    <select class="form-select" [id]="property.name" [formControlName]="property.name">
+                                        @if (!property.isRequired) {
+                                            <option></option>
+                                        }
+
+                                        @for (option of property.options; track option) {
+                                            <option [ngValue]="option">{{ option }}</option>
+                                        }
+                                    </select>
+                                }
+
+                                @case ("Branches") {
+                                    <sqx-branches-input [control]="currentStep.branch(property.name)" [isEditable]="isEditable" />
+                                }
+
+                                @default {
+                                    <input
+                                        class="form-control"
+                                        id="{{ property.name }}"
+                                        [formControlName]="property.name"
+                                        type="{{ property.editor | lowercase }}" />
+                                }
+                            }
+                            <sqx-form-hint>
+                                <span inline="true" [sqxMarkdown]="property.description"></span>
+                                @if (property.isFormattable) {
+                                    <div>
+                                        {{ "rules.advancedFormattingHint" | sqxTranslate }}:
+                                        <a href="https://docs.squidex.io/concepts/rules#3-formatting" sqxExternalLink tabindex="-1">
+                                            {{ "common.documentation" | sqxTranslate }}
+                                        </a>
+                                    </div>
+                                }
+                            </sqx-form-hint>
+                        </sqx-form-row>
                     }
                 </div>
             } @else {

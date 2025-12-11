@@ -8,15 +8,15 @@
 
 import { booleanAttribute, Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { AppLanguageDto, AssetsFieldPropertiesDto, FieldDto, FormHintComponent, LocalizedInputComponent, TagEditorComponent, TranslatePipe } from '@app/shared';
+import { AppLanguageDto, AssetsFieldPropertiesDto, FieldDto, FormRowComponent, LocalizedInputComponent, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-assets-validation',
     styleUrls: ['assets-validation.component.scss'],
     templateUrl: 'assets-validation.component.html',
     imports: [
-        FormHintComponent,
         FormsModule,
+        FormRowComponent,
         LocalizedInputComponent,
         ReactiveFormsModule,
         TagEditorComponent,
@@ -36,6 +36,6 @@ export class AssetsValidationComponent {
     @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
-    @Input({ transform: booleanAttribute })
-    public isLocalizable?: boolean | null;
+    @Input({ required: true, transform: booleanAttribute })
+    public isLocalizable!: boolean;
 }

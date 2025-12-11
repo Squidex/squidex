@@ -9,7 +9,7 @@ import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/d
 
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AppLanguageDto, ConfirmClickDirective, EditLanguageForm, FormHintComponent, LanguageDto, LanguagesState, sorted, TranslatePipe, UpdateLanguageDto } from '@app/shared';
+import { AppLanguageDto, ConfirmClickDirective, EditLanguageForm, FormRowComponent, LanguageDto, LanguagesState, sorted, TranslatePipe, UpdateLanguageDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-language',
@@ -20,7 +20,7 @@ import { AppLanguageDto, ConfirmClickDirective, EditLanguageForm, FormHintCompon
         CdkDragHandle,
         CdkDropList,
         ConfirmClickDirective,
-        FormHintComponent,
+        FormRowComponent,
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,

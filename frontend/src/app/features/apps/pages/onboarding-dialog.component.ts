@@ -8,7 +8,7 @@
 
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { fadeAnimation, MarkdownDirective, ModalDialogComponent, slideAnimation, TourState, TranslatePipe, UsersService } from '@app/shared';
+import { fadeAnimation, FormRowComponent, MarkdownDirective, ModalDialogComponent, slideAnimation, TourState, TranslatePipe, UsersService } from '@app/shared';
 
 @Component({
     selector: 'sqx-onboarding-dialog',
@@ -18,6 +18,7 @@ import { fadeAnimation, MarkdownDirective, ModalDialogComponent, slideAnimation,
         fadeAnimation, slideAnimation,
     ],
     imports: [
+        FormRowComponent,
         FormsModule,
         MarkdownDirective,
         ModalDialogComponent,

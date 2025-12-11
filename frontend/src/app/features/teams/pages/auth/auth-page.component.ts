@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { ApiUrlConfig, ControlErrorsComponent, CopyDirective, defined, FormErrorComponent, FormHintComponent, LayoutComponent, ListViewComponent, SidebarMenuDirective, Subscriptions, TeamsState, ToggleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { ApiUrlConfig, CopyDirective, defined, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, SidebarMenuDirective, Subscriptions, TeamsState, ToggleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { TeamAuthState, UpdateTeamAuthForm } from '../../internal';
 
 @Component({
@@ -18,10 +18,10 @@ import { TeamAuthState, UpdateTeamAuthForm } from '../../internal';
     templateUrl: './auth-page.component.html',
     imports: [
         AsyncPipe,
-        ControlErrorsComponent,
         CopyDirective,
         FormErrorComponent,
         FormHintComponent,
+        FormRowComponent,
         FormsModule,
         LayoutComponent,
         ListViewComponent,

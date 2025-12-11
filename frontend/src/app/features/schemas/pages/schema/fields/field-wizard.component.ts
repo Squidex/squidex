@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, ElementRef, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AddFieldForm, AppSettingsDto, ControlErrorsComponent, createProperties, DropdownMenuComponent, EditFieldForm, FieldDto, fieldTypes, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormHintComponent, LanguagesState, ModalDialogComponent, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, SchemasState, TooltipDirective, TranslatePipe, Types, UpdateFieldDto } from '@app/shared';
+import { AddFieldForm, AppSettingsDto, createProperties, DropdownMenuComponent, EditFieldForm, FieldDto, fieldTypes, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormRowComponent, LanguagesState, ModalDialogComponent, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, SchemasState, TooltipDirective, TranslatePipe, Types, UpdateFieldDto } from '@app/shared';
 import { FieldFormComponent } from './forms/field-form.component';
 
 
@@ -20,13 +20,12 @@ type SaveNavigationMode = 'Close' | 'Add' | 'Edit';
     templateUrl: './field-wizard.component.html',
     imports: [
         AsyncPipe,
-        ControlErrorsComponent,
         DropdownMenuComponent,
         FieldFormComponent,
         FocusOnInitDirective,
         FormAlertComponent,
         FormErrorComponent,
-        FormHintComponent,
+        FormRowComponent,
         FormsModule,
         ModalDialogComponent,
         ModalDirective,

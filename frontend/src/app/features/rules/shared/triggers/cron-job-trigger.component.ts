@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AppsState, CodeComponent, ControlErrorsComponent, FormHintComponent, RulesService, TranslatePipe, TriggerForm } from '@app/shared';
+import { AppsState, CodeComponent, FormHintComponent, FormRowComponent, RulesService, TranslatePipe, TriggerForm } from '@app/shared';
 
 @Component({
     selector: 'sqx-cron-job-trigger',
@@ -17,8 +17,8 @@ import { AppsState, CodeComponent, ControlErrorsComponent, FormHintComponent, Ru
     imports: [
         AsyncPipe,
         CodeComponent,
-        ControlErrorsComponent,
         FormHintComponent,
+        FormRowComponent,
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,

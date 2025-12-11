@@ -8,7 +8,7 @@
 
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { ArrayFieldPropertiesDto, FieldDto, TranslatePipe } from '@app/shared';
+import { ArrayFieldPropertiesDto, FieldDto, FormRowComponent } from '@app/shared';
 
 const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['EmptyArray', 'Null'];
 
@@ -17,9 +17,9 @@ const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['EmptyArray', 'Null'];
     styleUrls: ['array-ui.component.scss'],
     templateUrl: 'array-ui.component.html',
     imports: [
+        FormRowComponent,
         FormsModule,
         ReactiveFormsModule,
-        TranslatePipe,
     ],
 })
 export class ArrayUIComponent {

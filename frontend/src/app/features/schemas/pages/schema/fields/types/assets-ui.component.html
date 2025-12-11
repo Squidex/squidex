@@ -1,53 +1,37 @@
 <div [formGroup]="fieldForm">
-    <div class="form-group row">
-        <label class="col-3 col-form-label" for="{{ field.fieldId }}_previewMode">
-            {{ "schemas.fieldTypes.assets.previewMode" | sqxTranslate }}
-        </label>
-        <div class="col-9">
-            <select class="form-select" id="{{ field.fieldId }}_previewMode" formControlName="previewMode">
-                <option value="ImageAndFileName">{{ "schemas.fieldTypes.assets.previewImageAndFileName" | sqxTranslate }}</option>
+    <sqx-form-row
+        #previewRow
+        for="previewMode"
+        hint="schemas.fieldTypes.assets.previewModeHint"
+        label="schemas.fieldTypes.assets.previewMode"
+        [prefix]="field.fieldId">
+        <select class="form-select" [id]="previewRow.fieldName" formControlName="previewMode">
+            <option value="ImageAndFileName">{{ "schemas.fieldTypes.assets.previewImageAndFileName" | sqxTranslate }}</option>
+            <option value="Image">{{ "schemas.fieldTypes.assets.previewImage" | sqxTranslate }}</option>
+            <option value="FileName">{{ "schemas.fieldTypes.assets.previewFileName" | sqxTranslate }}</option>
+        </select>
+    </sqx-form-row>
 
-                <option value="Image">{{ "schemas.fieldTypes.assets.previewImage" | sqxTranslate }}</option>
+    <sqx-form-row
+        #previewFormatRow
+        for="previewFormat"
+        hint="schemas.fieldTypes.assets.previewFormatHint"
+        label="schemas.fieldTypes.assets.previewFormat"
+        [prefix]="field.fieldId">
+        <input class="form-control" [id]="previewFormatRow.fieldName" formControlName="previewFormat" />
+    </sqx-form-row>
 
-                <option value="FileName">{{ "schemas.fieldTypes.assets.previewFileName" | sqxTranslate }}</option>
-            </select>
-            <sqx-form-hint> {{ "schemas.fieldTypes.assets.previewModeHint" | sqxTranslate }} </sqx-form-hint>
-        </div>
-    </div>
+    <sqx-form-row
+        #resolveFirstRow
+        check
+        for="resolveFirst"
+        hint="schemas.fieldTypes.assets.resolveHint"
+        label="schemas.fieldTypes.assets.resolve"
+        [prefix]="field.fieldId">
+        <input class="form-check-input" [id]="resolveFirstRow.fieldName" formControlName="resolveFirst" type="checkbox" />
+    </sqx-form-row>
 
-    <div class="form-group row">
-        <label class="col-3 col-form-label" for="{{ field.fieldId }}_previewFormat">
-            {{ "schemas.fieldTypes.assets.previewFormat" | sqxTranslate }}
-        </label>
-        <div class="col-9">
-            <input class="form-control" id="{{ field.fieldId }}_previewFormat" formControlName="previewFormat" />
-            <sqx-form-hint>
-                <span inline="true" [sqxMarkdown]="'schemas.fieldTypes.assets.previewFormatHint' | sqxTranslate"></span>
-            </sqx-form-hint>
-        </div>
-    </div>
-
-    <div class="form-group row">
-        <div class="col-9 offset-3">
-            <div class="form-check">
-                <input class="form-check-input" id="{{ field.fieldId }}_fieldResolveFirst" formControlName="resolveFirst" type="checkbox" />
-                <label class="form-check-label" for="{{ field.fieldId }}_fieldResolveFirst">
-                    {{ "schemas.fieldTypes.assets.resolve" | sqxTranslate }}
-                </label>
-            </div>
-            <sqx-form-hint>
-                <span inline="true" [sqxMarkdown]="'schemas.fieldTypes.assets.resolveHint' | sqxTranslate"></span>
-            </sqx-form-hint>
-        </div>
-    </div>
-
-    <div class="form-group row">
-        <label class="col-3 col-form-label" for="{{ field.fieldId }}_folderId">
-            {{ "schemas.fieldTypes.assets.folderId" | sqxTranslate }}
-        </label>
-        <div class="col-9">
-            <sqx-asset-folder-dropdown formControlName="folderId" />
-            <sqx-form-hint> {{ "schemas.fieldTypes.assets.folderIdHint" | sqxTranslate }} </sqx-form-hint>
-        </div>
-    </div>
+    <sqx-form-row for="folderId" hint="schemas.fieldTypes.assets.folderIdHint" label="schemas.fieldTypes.assets.folderId" [prefix]="field.fieldId">
+        <sqx-asset-folder-dropdown formControlName="folderId" />
+    </sqx-form-row>
 </div>

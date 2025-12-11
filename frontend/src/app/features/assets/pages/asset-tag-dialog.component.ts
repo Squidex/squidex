@@ -8,8 +8,8 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { ControlErrorsComponent, FocusOnInitDirective, FormErrorComponent, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/shared';
-import { AssetsState, RenameAssetTagForm } from '@app/shared/internal';
+import { FocusOnInitDirective, FormErrorComponent, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/shared';
+import { AssetsState, FormRowComponent, RenameAssetTagForm } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-asset-tag-dialog',
@@ -17,9 +17,9 @@ import { AssetsState, RenameAssetTagForm } from '@app/shared/internal';
     templateUrl: './asset-tag-dialog.component.html',
     imports: [
         AsyncPipe,
-        ControlErrorsComponent,
         FocusOnInitDirective,
         FormErrorComponent,
+        FormRowComponent,
         FormsModule,
         ModalDialogComponent,
         ReactiveFormsModule,

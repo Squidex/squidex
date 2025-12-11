@@ -6,7 +6,7 @@
                 <span inline="true" [sqxMarkdown]="'schemas.indexes.hint' | sqxTranslate" trusted="true"></span>
             </sqx-form-hint>
             @for (form of createForm.controls; track form; let i = $index) {
-                <div class="form-group row gx-2" attr.data-testid="pattern_{{ form.get('name')?.value }}" [formGroup]="form">
+                <div class="form-group row gx-2" [formGroup]="form">
                     <div class="col">
                         <sqx-control-errors for="name" />
                         <select class="form-select" formControlName="name">

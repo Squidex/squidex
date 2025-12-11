@@ -8,18 +8,17 @@
 
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { FieldDto, FormHintComponent, TagEditorComponent, TagsFieldEditorValues, TagsFieldPropertiesDto, TranslatePipe } from '@app/shared';
+import { FieldDto, FormRowComponent, TagEditorComponent, TagsFieldEditorValues, TagsFieldPropertiesDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-tags-ui',
     styleUrls: ['tags-ui.component.scss'],
     templateUrl: 'tags-ui.component.html',
     imports: [
-        FormHintComponent,
+        FormRowComponent,
         FormsModule,
         ReactiveFormsModule,
         TagEditorComponent,
-        TranslatePipe,
     ],
 })
 export class TagsUIComponent {

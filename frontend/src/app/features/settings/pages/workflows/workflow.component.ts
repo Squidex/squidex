@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { ConfirmClickDirective, ErrorDto, FormErrorComponent, FormHintComponent, MathHelper, SchemaTagSource, TagEditorComponent, TranslatePipe, WorkflowDto, WorkflowsState, WorkflowView } from '@app/shared';
+import { ConfirmClickDirective, ErrorDto, FormErrorComponent, FormRowComponent, MathHelper, SchemaTagSource, TagEditorComponent, TranslatePipe, WorkflowDto, WorkflowsState, WorkflowView } from '@app/shared';
 import { WorkflowDiagramComponent } from './workflow-diagram.component';
 import { WorkflowStepComponent } from './workflow-step.component';
 
@@ -20,7 +20,7 @@ import { WorkflowStepComponent } from './workflow-step.component';
         AsyncPipe,
         ConfirmClickDirective,
         FormErrorComponent,
-        FormHintComponent,
+        FormRowComponent,
         FormsModule,
         TagEditorComponent,
         TranslatePipe,

@@ -7,7 +7,7 @@
 
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { CodeComponent, ControlErrorsComponent, FormHintComponent, TranslatePipe, TriggerForm } from '@app/shared';
+import { CodeComponent, FormHintComponent, FormRowComponent, TranslatePipe, TriggerForm } from '@app/shared';
 
 @Component({
     selector: 'sqx-comment-trigger',
@@ -15,8 +15,8 @@ import { CodeComponent, ControlErrorsComponent, FormHintComponent, TranslatePipe
     templateUrl: './comment-trigger.component.html',
     imports: [
         CodeComponent,
-        ControlErrorsComponent,
         FormHintComponent,
+        FormRowComponent,
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,

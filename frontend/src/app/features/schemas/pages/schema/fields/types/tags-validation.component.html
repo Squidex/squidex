@@ -1,41 +1,25 @@
 <div [formGroup]="fieldForm">
-    <div class="form-group row">
-        <label class="col-3 col-form-label">{{ "schemas.fieldTypes.tags.count" | sqxTranslate }}</label>
-        <div class="col-9">
-            <div class="row g-0">
-                <div class="col">
-                    <input
-                        class="form-control"
-                        formControlName="minItems"
-                        placeholder="{{ 'schemas.fieldTypes.tags.countMin' | sqxTranslate }}"
-                        type="number" />
-                </div>
+    <sqx-form-row for="minItems" hideError label="schemas.fieldTypes.tags.count" [prefix]="field.fieldId">
+        <div class="row g-0">
+            <div class="col">
+                <input class="form-control" formControlName="minItems" placeholder="{{ 'schemas.fieldTypes.tags.countMin' | sqxTranslate }}" type="number" />
+            </div>
 
-                <div class="col-auto"><label class="col-form-label minmax">-</label></div>
+            <div class="col-auto"><label class="col-form-label minmax">-</label></div>
 
-                <div class="col">
-                    <input
-                        class="form-control"
-                        formControlName="maxItems"
-                        placeholder="{{ 'schemas.fieldTypes.tags.countMax' | sqxTranslate }}"
-                        type="number" />
-                </div>
+            <div class="col">
+                <input class="form-control" formControlName="maxItems" placeholder="{{ 'schemas.fieldTypes.tags.countMax' | sqxTranslate }}" type="number" />
             </div>
         </div>
-    </div>
+    </sqx-form-row>
 
-    <div class="form-group row">
-        <label class="col-3 col-form-label">{{ "schemas.field.defaultValue" | sqxTranslate }}</label>
-        <div class="col-9"><sqx-tag-editor formControlName="defaultValue" /></div>
-    </div>
+    <sqx-form-row #defaultValueRow for="defaultValue" label="schemas.field.defaultValue" [prefix]="field.fieldId">
+        <sqx-tag-editor [id]="defaultValueRow.fieldName" formControlName="defaultValue" />
+    </sqx-form-row>
 
     @if (isLocalizable) {
-        <div class="form-group row">
-            <label class="col-3 col-form-label">{{ "schemas.field.defaultValues" | sqxTranslate }}</label>
-            <div class="col-9">
-                <sqx-localized-input formControlName="defaultValues" [languages]="languages" type="tags" />
-                <sqx-form-hint> {{ "schemas.field.defaultValuesHint" | sqxTranslate }} </sqx-form-hint>
-            </div>
-        </div>
+        <sqx-form-row #defaultValuesRow for="defaultValues" hint="schemas.field.defaultValuesHint" label="schemas.field.defaultValues" [prefix]="field.fieldId">
+            <sqx-localized-input [id]="defaultValuesRow.fieldName" formControlName="defaultValues" [languages]="languages" type="tags" />
+        </sqx-form-row>
     }
 </div>

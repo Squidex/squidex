@@ -85,8 +85,8 @@
                 @case (0) {
                     <div class="metadata">
                         <sqx-form-error [error]="annotateForm.error | async" />
-                        <div class="form-group g-0">
-                            <label for="id">{{ "common.folder" | sqxTranslate }}</label>
+
+                        <sqx-form-row for="folder" hideError label="common.folder" vertical>
                             <div class="path">
                                 @if (isMoving) {
                                     <form [formGroup]="moveForm.form" (ngSubmit)="moveAsset()">
@@ -114,53 +114,44 @@
                                     </div>
                                 }
                             </div>
-                        </div>
+                        </sqx-form-row>
 
-                        <div class="form-group">
-                            <label for="id">{{ "common.id" | sqxTranslate }}</label>
+                        <sqx-form-row for="id" hideError label="common.id" vertical>
                             <div class="input-group">
                                 <input class="form-control" id="id" #inputId name="id" readonly value="{{ asset.id }}" />
                                 <button class="btn btn-outline-secondary" [sqxCopy]="inputId" type="button">
                                     <i class="icon-copy"></i>
                                 </button>
                             </div>
-                        </div>
+                        </sqx-form-row>
 
-                        <div class="form-group">
-                            <label for="url">{{ "common.url" | sqxTranslate }}</label>
+                        <sqx-form-row for="url" hideError label="common.url" vertical>
                             <div class="input-group">
                                 <input class="form-control" id="url" #inputUrl name="url" readonly value="{{ asset | sqxAssetUrl: asset.version : false }}" />
                                 <button class="btn btn-outline-secondary" [sqxCopy]="inputUrl" type="button">
                                     <i class="icon-copy"></i>
                                 </button>
                             </div>
-                        </div>
+                        </sqx-form-row>
 
-                        <div class="form-group">
-                            <label for="fileName">{{ "common.name" | sqxTranslate }}</label>
-                            <sqx-control-errors for="fileName" />
+                        <sqx-form-row for="fileName" label="common.name" required vertical>
                             <input class="form-control" id="fileName" formControlName="fileName" spellcheck="false" />
-                        </div>
+                        </sqx-form-row>
 
-                        <div class="form-group">
-                            <label for="slug">{{ "common.slug" | sqxTranslate }}</label>
-                            <sqx-control-errors for="slug" />
+                        <sqx-form-row for="slug" label="common.slug" required vertical>
                             <input class="form-control slug" id="slug" formControlName="slug" spellcheck="false" sqxTransformInput="Slugify" />
                             <button class="btn btn-text-secondary btn-sm slug-generate" (click)="generateSlug()" type="button">
                                 {{ "common.generate" | sqxTranslate }}
                             </button>
-                        </div>
+                        </sqx-form-row>
 
                         @if (annotateTags | async; as tags) {
-                            <div class="form-group">
-                                <label>{{ "common.tags" | sqxTranslate }}</label>
-                                <sqx-control-errors for="tags" />
-                                <sqx-tag-editor allowDuplicates="false" formControlName="tags" [itemsSource]="tags" undefinedWhenEmpty="false" />
-                            </div>
+                            <sqx-form-row for="tags" label="common.tags" vertical>
+                                <sqx-tag-editor id="tags" allowDuplicates="false" formControlName="tags" [itemsSource]="tags" undefinedWhenEmpty="false" />
+                            </sqx-form-row>
                         }
 
-                        <div class="form-group">
-                            <label>{{ "assets.metadata" | sqxTranslate }}</label>
+                        <sqx-form-row for="metadata" hideError label="assets.metadata" vertical>
                             @for (form of annotateForm.metadataControls; track form; let i = $index) {
                                 <div class="metadata-row row g-0" [formGroup]="form">
                                     <div class="col col-name pe-1">
@@ -193,22 +184,20 @@
                                 </div>
                             }
 
-                            <div class="form-group">
+                            <div>
                                 <button class="btn btn-success" (click)="annotateForm.metadata.add()" [disabled]="!isEditable" type="button">
                                     {{ "assets.metadataAdd" | sqxTranslate }}
                                 </button>
                             </div>
-                        </div>
+                        </sqx-form-row>
 
-                        <div class="form-group form-check">
+                        <sqx-form-row check for="isProtected" hideError hint="assets.protectedHint" label="assets.protected" vertical>
                             <input class="form-check-input" id="isProtected" formControlName="isProtected" type="checkbox" />
-                            <label class="form-check-label" for="isProtected">{{ "assets.protected" | sqxTranslate }}</label>
-                            <sqx-form-hint> {{ "assets.protectedHint" | sqxTranslate }} </sqx-form-hint>
-                        </div>
+                        </sqx-form-row>
 
                         <hr />
 
-                        <div class="form-group">
+                        <div>
                             <a [routerLink]="['../content/__references', asset.id]" target="_blank">
                                 {{ "assets.viewReferences" | sqxTranslate }}
                             </a>

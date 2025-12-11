@@ -19,6 +19,7 @@
         <input
             class="form-control form-date"
             #dateInput
+            [attr.id]="id"
             (blur)="callTouched()"
             [class.with-buttons]="isDateTimeMode && shouldShowDateTimeModeButton"
             [class.with-clear]="!hideClear"

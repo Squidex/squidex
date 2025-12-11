@@ -8,17 +8,16 @@
 
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { FieldDto, FormHintComponent, ReferencesFieldEditorValues, ReferencesFieldPropertiesDto, TranslatePipe } from '@app/shared';
+import { FieldDto, FormRowComponent, ReferencesFieldEditorValues, ReferencesFieldPropertiesDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-references-ui',
     styleUrls: ['references-ui.component.scss'],
     templateUrl: 'references-ui.component.html',
     imports: [
-        FormHintComponent,
+        FormRowComponent,
         FormsModule,
         ReactiveFormsModule,
-        TranslatePipe,
     ],
 })
 export class ReferencesUIComponent {

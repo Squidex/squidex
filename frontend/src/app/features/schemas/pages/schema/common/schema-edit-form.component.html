@@ -3,67 +3,41 @@
 
     <div class="card">
         <div class="card-body">
-            <div class="form-group">
-                <label for="name">{{ "common.name" | sqxTranslate }}</label>
+            <sqx-form-row for="name" label="common.name" vertical>
                 <input class="form-control" id="name" [ngModel]="schema.name" [ngModelOptions]="{ standalone: true }" readonly />
-            </div>
-
-            <div class="form-group">
-                <label for="label">{{ "common.label" | sqxTranslate }}</label>
-                <sqx-control-errors for="label" />
+            </sqx-form-row>
+            
+            <sqx-form-row for="label" label="common.label" vertical hint="schemas.schemaLabelHint">
                 <input class="form-control" id="label" formControlName="label" />
-                <sqx-form-hint> {{ "schemas.schemaLabelHint" | sqxTranslate }} </sqx-form-hint>
-            </div>
+            </sqx-form-row>
 
-            <div class="form-group">
-                <label for="hints">{{ "common.hints" | sqxTranslate }}</label>
-                <sqx-control-errors for="hints" />
+            <sqx-form-row for="hints" label="common.hints" vertical hint="schemas.schemaHintsHint">
                 <textarea class="form-control" id="hints" formControlName="hints" rows="4"></textarea>
-                <sqx-form-hint> {{ "schemas.schemaHintsHint" | sqxTranslate }} </sqx-form-hint>
-            </div>
+            </sqx-form-row>
 
-            <div class="form-group">
-                <label for="hints">{{ "schemas.contentsSidebarUrl" | sqxTranslate }}</label>
-                <sqx-control-errors for="contentsSidebarUrl" />
+            <sqx-form-row for="contentsSidebarUrl" label="schemas.contentsSidebarUrl" vertical hint="schemas.contentsSidebarUrlHint">
                 <input class="form-control" id="contentsSidebarUrl" formControlName="contentsSidebarUrl" type="url" />
-                <sqx-form-hint> {{ "schemas.contentsSidebarUrlHint" | sqxTranslate }} </sqx-form-hint>
-            </div>
+            </sqx-form-row>
 
-            <div class="form-group">
-                <label for="hints">{{ "schemas.contentSidebarUrl" | sqxTranslate }}</label>
-                <sqx-control-errors for="contentSidebarUrl" />
+            <sqx-form-row for="contentSidebarUrl" label="schemas.contentSidebarUrl" vertical hint="schemas.contentSidebarUrlHint">
                 <input class="form-control" id="contentSidebarUrl" formControlName="contentSidebarUrl" type="url" />
-                <sqx-form-hint> {{ "schemas.contentSidebarUrlHint" | sqxTranslate }} </sqx-form-hint>
-            </div>
+            </sqx-form-row>
 
-            <div class="form-group">
-                <label for="hints">{{ "schemas.contentEditorUrl" | sqxTranslate }}</label>
-                <sqx-control-errors for="contentEditorUrl" />
+            <sqx-form-row for="contentEditorUrl" label="schemas.contentEditorUrl" vertical hint="schemas.contentEditorUrlHint">
                 <input class="form-control" id="contentEditorUrl" formControlName="contentEditorUrl" type="url" />
-                <sqx-form-hint> {{ "schemas.contentEditorUrlHint" | sqxTranslate }} </sqx-form-hint>
-            </div>
+            </sqx-form-row>
 
-            <div class="form-group">
-                <label for="hints">{{ "schemas.contentsListUrl" | sqxTranslate }}</label>
-                <sqx-control-errors for="contentsListUrl" />
+            <sqx-form-row for="contentsListUrl" label="schemas.contentsListUrl" vertical hint="schemas.contentsListUrlHint">
                 <input class="form-control" id="contentsListUrl" formControlName="contentsListUrl" type="url" />
-                <sqx-form-hint> {{ "schemas.contentsListUrlHint" | sqxTranslate }} </sqx-form-hint>
-            </div>
+            </sqx-form-row>
 
-            <div class="form-group">
-                <label for="tags">{{ "common.tags" | sqxTranslate }}</label>
-                <sqx-control-errors for="tags" />
+            <sqx-form-row for="tags" label="common.tags" vertical hint="schemas.schemaTagsHint">
                 <sqx-tag-editor id="tags" formControlName="tags" />
-                <sqx-form-hint> {{ "schemas.schemaTagsHint" | sqxTranslate }} </sqx-form-hint>
-            </div>
+            </sqx-form-row>
 
-            <div class="form-group">
-                <div class="form-check">
+            <sqx-form-row for="validateOnPublish" label="schemas.validateOnPublish" check vertical hint="schemas.validateOnPublishHint" alert="schemas.validateOnPublishHint">
                     <input class="form-check-input" id="validateOnPublish" formControlName="validateOnPublish" type="checkbox" />
-                    <label class="form-check-label" for="validateOnPublish"> {{ "schemas.validateOnPublish" | sqxTranslate }} </label>
-                </div>
-                <sqx-form-alert> {{ "schemas.validateOnPublishHint" | sqxTranslate }} </sqx-form-alert>
-            </div>
+            </sqx-form-row>
         </div>
 
         <div class="card-footer">

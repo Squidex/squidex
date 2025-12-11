@@ -8,14 +8,14 @@
 
 import { booleanAttribute, Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { AppLanguageDto, FieldDto, FormHintComponent, LocalizedInputComponent, NumberFieldPropertiesDto, SchemaDto, TranslatePipe, Types } from '@app/shared';
+import { AppLanguageDto, FieldDto, FormRowComponent, LocalizedInputComponent, NumberFieldPropertiesDto, SchemaDto, TranslatePipe, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-number-validation',
     styleUrls: ['number-validation.component.scss'],
     templateUrl: 'number-validation.component.html',
     imports: [
-        FormHintComponent,
+        FormRowComponent,
         FormsModule,
         LocalizedInputComponent,
         ReactiveFormsModule,
@@ -38,8 +38,8 @@ export class NumberValidationComponent {
     @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
-    @Input({ transform: booleanAttribute })
-    public isLocalizable?: boolean | null;
+    @Input({ required: true, transform: booleanAttribute })
+    public isLocalizable!: boolean;
 
     public get showUnique() {
         return Types.is(this.field, FieldDto) && !this.field.isLocalizable && this.schema.type !== 'Component';

@@ -1,5 +1,5 @@
 @for (form of branchesControls; track form; let i = $index) {
-    <div class="form-group row gx-2" attr.data-testid="pattern_{{ form.get('name')?.value }}" [formGroup]="form">
+    <div class="form-group row gx-2" [formGroup]="form">
         <div class="col">
             <sqx-control-errors for="condition" />
             <input class="form-control" formControlName="condition" maxlength="1000" placeholder="{{ 'common.condition' | sqxTranslate }}" />

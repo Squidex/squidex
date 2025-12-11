@@ -7,7 +7,7 @@
 
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { CodeEditorComponent, FieldDto, FormHintComponent, JsonFieldPropertiesDto, TranslatePipe } from '@app/shared';
+import { CodeEditorComponent, FieldDto, FormRowComponent, JsonFieldPropertiesDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-json-more',
@@ -15,10 +15,9 @@ import { CodeEditorComponent, FieldDto, FormHintComponent, JsonFieldPropertiesDt
     templateUrl: 'json-more.component.html',
     imports: [
         CodeEditorComponent,
-        FormHintComponent,
+        FormRowComponent,
         FormsModule,
         ReactiveFormsModule,
-        TranslatePipe,
     ],
 })
 export class JsonMoreComponent {

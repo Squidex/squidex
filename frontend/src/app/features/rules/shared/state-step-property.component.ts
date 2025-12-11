@@ -8,7 +8,7 @@
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CodeEditorComponent, RuleElementPropertyDto, Types } from '@app/shared';
+import { CodeEditorComponent, FormRowComponent, RuleElementPropertyDto, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-state-step-property',
@@ -17,6 +17,7 @@ import { CodeEditorComponent, RuleElementPropertyDto, Types } from '@app/shared'
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeEditorComponent,
+        FormRowComponent,
         FormsModule,
     ],
 })

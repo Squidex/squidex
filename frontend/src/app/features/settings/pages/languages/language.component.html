@@ -51,100 +51,76 @@
 
                 <div class="table-items-row-details-tab">
                     @if (isEditable || fallbackLanguages.length > 0) {
-                        <div class="form-group row">
-                            <label class="col-3 col-form-label fallback-label" for="{{ language.iso2Code }}_fallback">{{
-                                "common.fallback" | sqxTranslate
-                            }}</label>
-                            <div class="col-9">
-                                @if (fallbackLanguages.length > 0) {
-                                    <div
-                                        class="fallback-languages"
-                                        cdkDropList
-                                        [cdkDropListData]="$any(fallbackLanguages)"
-                                        [cdkDropListDisabled]="!isEditable"
-                                        (cdkDropListDropped)="sort($event)">
-                                        @for (language of fallbackLanguages; track language) {
-                                            <div class="fallback-language table-drag" cdkDrag cdkDragLockAxis="y">
-                                                <div class="row g-0">
-                                                    @if (isEditable) {
-                                                        <div class="col-auto">
-                                                            <i class="icon-drag2 drag-handle me-1" cdkDragHandle></i>
-                                                        </div>
-                                                    }
+                        <sqx-form-row for="fallback" hideError label="common.fallback" [prefix]="language.iso2Code">
+                            @if (fallbackLanguages.length > 0) {
+                                <div
+                                    class="fallback-languages"
+                                    cdkDropList
+                                    [cdkDropListData]="$any(fallbackLanguages)"
+                                    [cdkDropListDisabled]="!isEditable"
+                                    (cdkDropListDropped)="sort($event)">
+                                    @for (language of fallbackLanguages; track language) {
+                                        <div class="fallback-language table-drag" cdkDrag cdkDragLockAxis="y">
+                                            <div class="row g-0">
+                                                @if (isEditable) {
+                                                    <div class="col-auto">
+                                                        <i class="icon-drag2 drag-handle me-1" cdkDragHandle></i>
+                                                    </div>
+                                                }
 
-                                                    <div class="col">{{ language.englishName }}</div>
+                                                <div class="col">{{ language.englishName }}</div>
 
-                                                    @if (isEditable) {
-                                                        <div class="col-auto">
-                                                            <button
-                                                                class="btn btn-text-secondary btn-sm"
-                                                                (click)="removeFallbackLanguage(language)"
-                                                                type="button">
-                                                                <i class="icon-close"></i>
-                                                            </button>
-                                                        </div>
-                                                    }
-                                                </div>
-                                            </div>
-                                        }
-                                    </div>
-                                }
-
-                                @if (otherLanguage && isEditable) {
-                                    <form class="form fallback-form" (ngSubmit)="addFallbackLanguage()">
-                                        <div class="row gx-2">
-                                            <div class="col">
-                                                <select
-                                                    class="form-select fallback-select"
-                                                    id="{{ language.iso2Code }}_fallback"
-                                                    name="otherLanguage"
-                                                    [(ngModel)]="otherLanguage">
-                                                    @for (otherLanguage of fallbackLanguagesNew; track language.iso2Code) {
-                                                        <option [ngValue]="otherLanguage">
-                                                            {{ otherLanguage.englishName || otherLanguage.iso2Code }}
-                                                        </option>
-                                                    }
-                                                </select>
-                                            </div>
-
-                                            <div class="col-auto">
-                                                <button class="btn btn-success" type="submit">
-                                                    {{ "languages.add" | sqxTranslate }}
-                                                </button>
+                                                @if (isEditable) {
+                                                    <div class="col-auto">
+                                                        <button class="btn btn-text-secondary btn-sm" (click)="removeFallbackLanguage(language)" type="button">
+                                                            <i class="icon-close"></i>
+                                                        </button>
+                                                    </div>
+                                                }
                                             </div>
                                         </div>
-                                    </form>
-                                }
-                            </div>
-                        </div>
+                                    }
+                                </div>
+                            }
+
+                            @if (otherLanguage && isEditable) {
+                                <form class="form fallback-form" (ngSubmit)="addFallbackLanguage()">
+                                    <div class="row gx-2">
+                                        <div class="col">
+                                            <select
+                                                class="form-select fallback-select"
+                                                id="{{ language.iso2Code }}_fallback"
+                                                name="otherLanguage"
+                                                [(ngModel)]="otherLanguage">
+                                                @for (otherLanguage of fallbackLanguagesNew; track language.iso2Code) {
+                                                    <option [ngValue]="otherLanguage">
+                                                        {{ otherLanguage.englishName || otherLanguage.iso2Code }}
+                                                    </option>
+                                                }
+                                            </select>
+                                        </div>
+
+                                        <div class="col-auto">
+                                            <button class="btn btn-success" type="submit">
+                                                {{ "languages.add" | sqxTranslate }}
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            }
+                        </sqx-form-row>
                     }
 
                     @if (!language.isMaster) {
-                        <div class="form-group row">
-                            <div class="col offset-3 col-9">
-                                <div class="form-check">
-                                    <input class="form-check-input" id="{{ language.iso2Code }}_isMaster" formControlName="isMaster" type="checkbox" />
-                                    <label class="form-check-label" for="{{ language.iso2Code }}_isMaster">
-                                        {{ "languages.master" | sqxTranslate }}
-                                    </label>
-                                </div>
-                                <sqx-form-hint> {{ "languages.masterHint" | sqxTranslate }} </sqx-form-hint>
-                            </div>
-                        </div>
+                        <sqx-form-row check for="isMaster" hint="languages.masterHint" label="languages.master" [prefix]="language.iso2Code">
+                            <input class="form-check-input" id="{{ language.iso2Code }}_isMaster" formControlName="isMaster" type="checkbox" />
+                        </sqx-form-row>
                     }
 
                     @if (!language.isMaster) {
-                        <div class="form-group row">
-                            <div class="col offset-3 col-9">
-                                <div class="form-check">
-                                    <input class="form-check-input" id="{{ language.iso2Code }}_isOptional" formControlName="isOptional" type="checkbox" />
-                                    <label class="form-check-label" for="{{ language.iso2Code }}_isOptional">
-                                        {{ "languages.optional" | sqxTranslate }}
-                                    </label>
-                                </div>
-                                <sqx-form-hint> {{ "languages.optionalHint" | sqxTranslate }} </sqx-form-hint>
-                            </div>
-                        </div>
+                        <sqx-form-row check for="isOptional" hint="languages.optionalHint" label="languages.optional" [prefix]="language.iso2Code">
+                            <input class="form-check-input" id="{{ language.iso2Code }}_isOptional" formControlName="isOptional" type="checkbox" />
+                        </sqx-form-row>
                     }
                 </div>
             </form>

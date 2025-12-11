@@ -8,18 +8,16 @@
 
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { DateTimeFieldEditorValues, DateTimeFieldPropertiesDto, FieldDto, FloatConverter, FormHintComponent, MarkdownDirective, TranslatePipe } from '@app/shared';
+import { DateTimeFieldEditorValues, DateTimeFieldPropertiesDto, FieldDto, FloatConverter, FormRowComponent } from '@app/shared';
 
 @Component({
     selector: 'sqx-date-time-ui',
     styleUrls: ['date-time-ui.component.scss'],
     templateUrl: 'date-time-ui.component.html',
     imports: [
-        FormHintComponent,
+        FormRowComponent,
         FormsModule,
-        MarkdownDirective,
         ReactiveFormsModule,
-        TranslatePipe,
     ],
 })
 export class DateTimeUIComponent {

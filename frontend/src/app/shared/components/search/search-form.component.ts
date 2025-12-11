@@ -10,7 +10,7 @@ import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Inp
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BooleanValue, BootstrapClasses, EMPTY_FILTER_MODEL, FieldComponent, FilterField, Input as FilterInput, FilterModel, FilterOptions, NumberValue, SelectValue, StringValue } from 'ngx-inline-filter';
 import { Observable } from 'rxjs';
-import { ControlErrorsComponent, DateTimeEditorComponent, DropdownComponent, FocusOnInitDirective, HighlightPipe, LocalizerService, ModalDialogComponent, ModalDirective, ShortcutComponent, TooltipDirective, TourStepDirective, TranslatePipe, Types } from '@app/framework';
+import { DateTimeEditorComponent, DropdownComponent, FocusOnInitDirective, FormRowComponent, HighlightPipe, LocalizerService, ModalDialogComponent, ModalDirective, ShortcutComponent, TooltipDirective, TourStepDirective, TranslatePipe, Types } from '@app/framework';
 import { AppLanguageDto, ContributorsState, DialogModel, Queries, Query, QueryModel, sanitize, SaveQueryForm, TypedSimpleChanges } from '@app/shared/internal';
 import { UserDtoPicture } from '../pipes';
 import { ReferenceInputComponent } from '../references/reference-input.component';
@@ -23,11 +23,11 @@ import { TourHintDirective } from '../tour-hint.directive';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AsyncPipe,
-        ControlErrorsComponent,
         DateTimeEditorComponent,
         DropdownComponent,
         FilterInput,
         FocusOnInitDirective,
+        FormRowComponent,
         FormsModule,
         HighlightPipe,
         ModalDialogComponent,
