@@ -6,9 +6,9 @@
  */
 
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { action } from '@storybook/addon-actions';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { LocalizerService, ResizeService } from '@app/framework/internal';
+import { MenuItemComponent } from './menu-item.component';
 import { MenuComponent } from './menu.component';
 import { RootViewComponent } from './modals/root-view.component';
 
@@ -30,20 +30,11 @@ export default {
             control: 'boolean',
         },
     },
-    render: args => ({
-        props: args,
-        template: `
-            <sqx-root-view>
-                <div style="width: 400px; padding: 10px; border: 1px solid #ddd;">
-                    <sqx-menu [alignment]="alignment" [items]="items" [small]="small" />
-                </div>
-            </sqx-root-view>
-        `,
-    }),
     decorators: [
         moduleMetadata({
             imports: [
                 BrowserAnimationsModule,
+                MenuItemComponent,
                 RootViewComponent,
             ],
             providers: [
@@ -60,48 +51,80 @@ export default {
 type Story = StoryObj<MenuComponent>;
 
 export const Simple: Story = {
-    args: {
-        items: [{
-            key: 'item1',
-            label: 'Menu Item1',
-            onClick: action('Item1'),
-        }, {
-            key: 'item2',
-            icon: 'close',
-            label: 'Menu Item2',
-            onClick: action('Item2'),
-        }, {
-            key: 'item3',
-            icon: 'close',
-            onClick: action('Item3'),
-            isDisabled: true,
-        }],
-    },
+    render: args => ({
+        props: args,
+        template: `
+            <sqx-root-view>
+                <div style="width: 400px; padding: 10px; border: 1px solid #ddd;">
+                    <sqx-menu [alignment]="alignment" [items]="items" [small]="small">
+                        <sqx-menu-item label="Menu Item1" />
+                        <sqx-menu-item label="Menu Item2" icon="close" />
+                        <sqx-menu-item label="Menu Item3" disabled />
+                    </sqx-menu>
+                </div>
+            </sqx-root-view>
+        `,
+    }),
 };
 
 export const Overlap: Story = {
-    args: {
-        items: [{
-            key: 'item1',
-            label: 'Menu Item1',
-            onClick: action('Item1'),
-        }, {
-            key: 'item2',
-            label: 'Menu Item2',
-            onClick: action('Item2'),
-            showAlways: true,
-        }, {
-            key: 'item3',
-            label: 'Menu Item3',
-            onClick: action('Item3'),
-        }, {
-            key: 'item4',
-            label: 'Menu Item4',
-            onClick: action('Item4'),
-        }, {
-            key: 'item5',
-            label: 'Menu Item5',
-            onClick: action('Item5'),
-        }],
-    },
+    render: args => ({
+        props: args,
+        template: `
+            <sqx-root-view>
+                <div style="width: 400px; padding: 10px; border: 1px solid #ddd;">
+                    <sqx-menu [alignment]="alignment" [items]="items" [small]="small">
+                        <sqx-menu-item label="Menu Item1" />
+                        <sqx-menu-item label="Menu Item2" icon="close" />
+                        <sqx-menu-item label="Menu Item3" disabled />
+                        <sqx-menu-item label="Menu Item4" />
+                        <sqx-menu-item label="Menu Item5" />
+                    </sqx-menu>
+                </div>
+            </sqx-root-view>
+        `,
+    }),
+};
+
+export const Custom: Story = {
+    render: args => ({
+        props: args,
+        template: `
+            <sqx-root-view>
+                <div style="width: 500px; padding: 10px; border: 1px solid #ddd;">
+                    <sqx-menu [alignment]="alignment" [items]="items" [small]="small">
+                        <sqx-menu-item label="Menu Item1" />
+
+                        <button class="btn btn-primary">Custom 1</button>
+                        <button class="btn btn-primary">Custom 2</button>
+
+                        <sqx-menu-item label="Menu Item2" />
+                    </sqx-menu>
+                </div>
+            </sqx-root-view>
+        `,
+    }),
+};
+
+export const CustomOverlap: Story = {
+    render: args => ({
+        props: args,
+        template: `
+            <sqx-root-view>
+                <div style="width: 400px; padding: 10px; border: 1px solid #ddd;">
+                    <sqx-menu [alignment]="alignment" [items]="items" [small]="small">
+                        <sqx-menu-item label="Menu Item1" />
+                        <sqx-menu-item label="Menu Item2" icon="close" />
+                        <sqx-menu-item label="Menu Item3" disabled />
+
+                        <button class="btn btn-primary">Custom 1</button>
+                        <button class="btn btn-primary">Custom 2</button>
+
+                        <sqx-menu-item label="Menu Item4" />
+                        <sqx-menu-item label="Menu Item5" />
+                    </sqx-menu>
+                </div>
+            </sqx-root-view>
+        `,
+    }),
 };

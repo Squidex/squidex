@@ -11,11 +11,42 @@
                     }
                 </div>
             </div>
+
             <div class="col-8 buttons">
-                <sqx-menu alignment="right" [items]="allMenuItems" [showCustom]="menuShowCustom" small>
+                <sqx-menu alignment="right" small>
                     <fieldset class="d-flex gap-1" [disabled]="(isDisabled | async) || isCollapsed">
-                        <ng-content select="[beforeButtons]"></ng-content>
+                        <ng-content></ng-content>
                     </fieldset>
+
+                    @if (isString) {
+                        <sqx-menu-item
+                            [disabled]="(isDisabled | async) || isCollapsed || !hasChatBot"
+                            label="AI"
+                            menuLabel="i18n:contents.fieldAIMenu"
+                            small
+                            tabIndex="-1" />
+                    }
+
+                    <sqx-menu-item
+                        (action)="this.toggleExpanded()"
+                        [disabled]="(isDisabled | async) || isCollapsed"
+                        icon="fullscreen"
+                        menuLabel="i18n:contents.fieldFullscreenMenu"
+                        small
+                        tabIndex="-1"
+                        tooltip="i18n:contents.fieldFullscreen" />
+
+                    <sqx-menu-item
+                        (action)="this.unset()"
+                        confirmRememberKey="unsetValue"
+                        confirmText="i18n:contents.unsetValueConfirmText"
+                        confirmTitle="i18n:contents.unsetValueConfirmTitle"
+                        [disabled]="(isDisabled | async) || isCollapsed || (isEmpty | async)"
+                        icon="close"
+                        menuLabel="i18n:contents.unsetValue"
+                        small
+                        tabIndex="-1"
+                        tooltip="i18n:contents.unsetValue" />
                 </sqx-menu>
             </div>
         </div>

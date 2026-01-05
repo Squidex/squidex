@@ -8,8 +8,8 @@
 import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, Component, ElementRef, EventEmitter, Input, numberAttribute, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { BehaviorSubject, Observable } from 'rxjs';
-import { AbstractContentForm, AnnotationCreate, AnnotationsSelect, AnyFieldDto, AppLanguageDto, ChatDialogComponent, CheckboxGroupComponent, CodeEditorComponent, ColorPickerComponent, CommentsState, ControlErrorsComponent, DateTimeEditorComponent, DialogModel, disabled$, EditContentForm, FormHintComponent, GeolocationEditorComponent, hasNoValue$, HTTP, IndeterminateValueDirective, isValidValue, MarkdownDirective, MathHelper, MenuComponent, MenuItem, MessageBus, ModalDirective, RadioGroupComponent, ReferenceInputComponent, ReferencesFieldPropertiesDto, RichEditorComponent, StarsComponent, Subscriptions, TagEditorComponent, ToggleComponent, TransformInputDirective, TypedSimpleChanges, Types } from '@app/shared';
+import { Observable } from 'rxjs';
+import { AbstractContentForm, AnnotationCreate, AnnotationsSelect, AnyFieldDto, AppLanguageDto, ChatDialogComponent, CheckboxGroupComponent, CodeEditorComponent, ColorPickerComponent, CommentsState, ControlErrorsComponent, DateTimeEditorComponent, DialogModel, disabled$, EditContentForm, FormHintComponent, GeolocationEditorComponent, hasNoValue$, HTTP, IndeterminateValueDirective, MarkdownDirective, MathHelper, MenuComponent, MenuItemComponent, MessageBus, ModalDirective, RadioGroupComponent, ReferenceInputComponent, ReferencesFieldPropertiesDto, RichEditorComponent, StarsComponent, TagEditorComponent, ToggleComponent, TransformInputDirective, TypedSimpleChanges, Types } from '@app/shared';
 import { ReferenceDropdownComponent } from '../references/reference-dropdown.component';
 import { ReferencesCheckboxesComponent } from '../references/references-checkboxes.component';
 import { ReferencesEditorComponent } from '../references/references-editor.component';
@@ -44,6 +44,7 @@ import { StockPhotoEditorComponent } from './stock-photo-editor.component';
         MarkdownDirective,
         ModalDirective,
         MenuComponent,
+        MenuItemComponent,
         RadioGroupComponent,
         ReactiveFormsModule,
         ReferenceDropdownComponent,
@@ -61,12 +62,6 @@ import { StockPhotoEditorComponent } from './stock-photo-editor.component';
     ],
 })
 export class FieldEditorComponent {
-    private readonly subscriptions = new Subscriptions();
-    private readonly isDisabledClear$ = new BehaviorSubject(true);
-    private readonly isDisabledAI$ = new BehaviorSubject(true);
-    private readonly isDisabledFullscreen$ = new BehaviorSubject(true);
-    private readonly isVisibleAI$ = new BehaviorSubject(false);
-
     public readonly uniqueId = MathHelper.guid();
 
     @Output()
@@ -89,12 +84,6 @@ export class FieldEditorComponent {
 
     @Input({ required: true })
     public formModel!: AbstractContentForm<AnyFieldDto, AbstractControl>;
-
-    @Input({ required: true, transform: booleanAttribute })
-    public menuShowCustom = true;
-
-    @Input({ required: true })
-    public menuItems: MenuItem[] = [];
 
     @Input({ required: true })
     public language!: AppLanguageDto;
@@ -131,44 +120,13 @@ export class FieldEditorComponent {
         return this.formModel.form;
     }
 
+    public get isString() {
+        return this.field.properties.fieldType === 'String';
+    }
+
     public get schemaIds() {
         return Types.is(this.field.properties, ReferencesFieldPropertiesDto) ? this.field.properties.schemaIds : undefined;
     }
-
-    public readonly defaultMenuItems: MenuItem[] = [
-        {
-            key: 'chat',
-            isDisabled: this.isDisabledAI$,
-            isVisible: this.isVisibleAI$,
-            menuLabel: 'i18n:contents.fieldAIMenu',
-            label: 'AI',
-            onClick: () => this.chatDialog.show(),
-            tabIndex: -1,
-        },
-        {
-            key: 'fullscreen',
-            icon: 'fullscreen',
-            isDisabled: this.isDisabledFullscreen$,
-            menuLabel: 'i18n:contents.fieldFullscreenMenu',
-            onClick: () => this.toggleExpanded(),
-            tabIndex: -1,
-            tooltip: 'i18n:contents.fieldFullscreen',
-        },
-        {
-            key: 'unset',
-            confirmRememberKey: 'unsetValue',
-            confirmText:'i18n:contents.unsetValueConfirmText',
-            confirmTitle:'i18n:contents.unsetValueConfirmTitle',
-            icon: 'close',
-            isDisabled: this.isDisabledClear$,
-            menuLabel: 'i18n:contents.unsetValue',
-            onClick: () => this.unset(),
-            tabIndex: -1,
-            tooltip: 'i18n:contents.unsetValue',
-        },
-    ];
-
-    public allMenuItems: MenuItem[] = this.defaultMenuItems;
 
     constructor(
         private readonly messageBus: MessageBus,
@@ -179,30 +137,11 @@ export class FieldEditorComponent {
         if (changes.formModel) {
             this.isDisabled = disabled$(this.formModel.form);
             this.isEmpty = hasNoValue$(this.formModel.form);
-
-            this.subscriptions.unsubscribeAll();
-            this.subscriptions.add(this.isDisabled.subscribe(this.updateMenu));
-            this.subscriptions.add(this.isEmpty.subscribe(this.updateMenu));
         }
 
         if (changes.formModel || changes.comments) {
             this.annotations = this.comments?.getAnnotations(this.formModel.path);
         }
-
-        if (changes.menuItems) {
-            this.allMenuItems = [this.defaultMenuItems[0], ...this.menuItems, ...this.defaultMenuItems.slice(1)];
-        }
-
-        this.updateMenu();
-    }
-
-    private updateMenu() {
-        const isDisabled = this.formModel.form.disabled;
-
-        this.isDisabledAI$.next(isDisabled || this.isCollapsed || !this.hasChatBot );
-        this.isDisabledClear$.next(isDisabled || this.isCollapsed || isValidValue(this.formModel.form.value));
-        this.isDisabledFullscreen$.next(isDisabled || this.isCollapsed);
-        this.isVisibleAI$.next(this.field.properties.fieldType === 'String');
     }
 
     public reset() {

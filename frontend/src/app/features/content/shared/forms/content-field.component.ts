@@ -7,8 +7,8 @@
 
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
 import { booleanAttribute, Component, EventEmitter, HostBinding, inject, Input, numberAttribute, Optional, Output } from '@angular/core';
-import { BehaviorSubject, map, Observable } from 'rxjs';
-import { AppLanguageDto, AppsState, changed$, CommentsState, disabled$, EditContentForm, FieldForm, FocusMarkerComponent, invalid$, LocalStoreService, MenuItem, SchemaDto, Settings, TooltipDirective, TranslateDto, TranslationsService, TypedSimpleChanges, UIOptions } from '@app/shared';
+import { Observable } from 'rxjs';
+import { AppLanguageDto, AppsState, changed$, CommentsState, disabled$, EditContentForm, FieldForm, FocusMarkerComponent, invalid$, LocalStoreService, MenuItemComponent, SchemaDto, Settings, TranslateDto, TranslationsService, TypedSimpleChanges, UIOptions } from '@app/shared';
 import { FieldCopyButtonComponent } from './field-copy-button.component';
 import { FieldEditorComponent } from './field-editor.component';
 import { FieldLanguagesComponent } from './field-languages.component';
@@ -23,8 +23,8 @@ import { FieldLanguagesComponent } from './field-languages.component';
         FieldEditorComponent,
         FieldLanguagesComponent,
         FocusMarkerComponent,
+        MenuItemComponent,
         NgTemplateOutlet,
-        TooltipDirective,
     ],
 })
 export class ContentFieldComponent {
@@ -65,8 +65,7 @@ export class ContentFieldComponent {
 
     public isDifferent?: Observable<boolean>;
     public isInvalid?: Observable<boolean>;
-    public isCollapsed = new BehaviorSubject(false);
-    public isNotCollapsed = this.isCollapsed.pipe(map(x => !x));
+    public isCollapsed = false;
     public isDisabled?: Observable<boolean>;
 
     public readonly hasTranslator = inject(UIOptions).value.canUseTranslator;
@@ -88,23 +87,6 @@ export class ContentFieldComponent {
     public get isTranslatable() {
         return this.formModel.field.properties.fieldType === 'String' && this.hasTranslator && this.isLocalizable && this.languages.length > 1;
     }
-
-    public readonly menuItems: MenuItem[] = [{
-        key: 'collapse',
-        icon: 'minus2',
-        isVisible: this.isNotCollapsed,
-        menuLabel: 'i18n:common.collapse',
-        onClick: () => this.toggle(),
-        tooltip: 'i18n:contents.arrayCollapseItem',
-    }, {
-        key: 'expand',
-        icon: 'plus2',
-        isVisible: this.isCollapsed,
-        menuLabel: 'i18n:common.expand',
-        onClick: () => this.toggle(),
-        tooltip: 'i18n:contents.arrayCollapseItem',
-    }];
-
     constructor(
         @Optional() public readonly commentsState: CommentsState,
         private readonly appsState: AppsState,
@@ -211,6 +193,6 @@ export class ContentFieldComponent {
     }
 
     public toggle() {
-        this.isCollapsed.next(!this.isCollapsed.value);
+        this.isCollapsed = !this.isCollapsed;
     }
 }

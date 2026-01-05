@@ -1,17 +1,24 @@
 @import 'mixins';
 @import 'vars';
 
-.invisible {
-    position: absolute;
-    pointer-events: none;
+:host ::ng-deep {
+    .overflown-left {
+        sqx-menu-item {
+            order: 5;
+            visibility: hidden;
+        }
+    }
+    
+    .overflown-right {
+        sqx-menu-item {
+            order: -5;
+            visibility: hidden;
+        }
+    }
 }
 
 .btn-sm {
     i {
         font-size: $font-smallest;
     }
-}
-
-.custom:empty {
-    display: none;
 }

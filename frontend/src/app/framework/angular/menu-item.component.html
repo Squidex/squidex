@@ -1,0 +1,30 @@
+<ng-template #dropdownTemplate>
+    <a
+        class="dropdown-item"
+        [attr.disabled]="disabled"
+        [class.disabled]="disabled"
+        [confirmRememberKey]="confirmRememberKey"
+        [confirmText]="confirmText | sqxTranslate"
+        [confirmTitle]="confirmTitle | sqxTranslate"
+        (sqxConfirmClick)="action.emit()"
+        [title]="tooltip | sqxTranslate">
+        {{ menuLabel || label | sqxTranslate }}
+    </a>
+</ng-template>
+
+<button
+    class="btn btn-outline-secondary"
+    [class.btn-sm]="small"
+    [confirmRememberKey]="confirmRememberKey"
+    [confirmText]="confirmText | sqxTranslate"
+    [confirmTitle]="confirmTitle | sqxTranslate"
+    [disabled]="disabled"
+    (sqxConfirmClick)="action.emit()"
+    [tabIndex]="tabIndex"
+    [title]="tooltip | sqxTranslate">
+    @if (icon) {
+        <i class="icon-{{ icon }}"></i>
+    }
+
+    {{ label | sqxTranslate }}
+</button>
