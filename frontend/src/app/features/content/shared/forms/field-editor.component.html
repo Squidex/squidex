@@ -1,53 +1,24 @@
 @if (formModel) {
     <div class="field" [class.expanded]="isExpanded && !isCollapsed">
-        <div class="buttons-container">
-            <div class="buttons d-flex gap-1">
-                <fieldset class="d-flex gap-1" [disabled]="(isDisabled | async) || isCollapsed">
-                    <ng-content select="[beforeButtons]"></ng-content>
-    
-                    @if (isString) {
-                        <button
-                            class="btn btn-sm btn-outline-secondary force no-focus-shadow"
-                            (click)="chatDialog.show()"
-                            [disabled]="!hasChatBot || isCollapsed"
-                            tabindex="-1"
-                            type="button">
-                            AI
-                        </button>
+        <div class="row">
+            <div class="col-4">
+                <div class="truncate">
+                    <label class="mb-1">
+                        {{ field.displayName }} {{ displaySuffix }} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
+                    </label>
+                    @if (field.isDisabled) {
+                        <small class="field-disabled ps-1">Disabled</small>
                     }
-    
-                    <button
-                        class="btn btn-sm btn-outline-secondary force no-focus-shadow"
-                        (click)="toggleExpanded()"
-                        [disabled]="isCollapsed"
-                        tabindex="-1"
-                        title="i18n:contents.fieldFullscreen"
-                        type="button">
-                        <i class="icon-fullscreen"></i>
-                    </button>
-                    <button
-                        class="btn btn-sm btn-outline-secondary btn-clear force no-focus-shadow"
-                        confirmRememberKey="unsetValue"
-                        confirmText="i18n:contents.unsetValueConfirmText"
-                        confirmTitle="i18n:contents.unsetValueConfirmTitle"
-                        [disabled]="isEmpty | async"
-                        (sqxConfirmClick)="unset()"
-                        tabindex="-1"
-                        title="i18n:contents.unsetValue"
-                        type="button">
-                        <i class="icon-close"></i>
-                    </button>
-                </fieldset>
-
-                <ng-content select="[afterButtons]"></ng-content>
+                </div>
+            </div>
+            <div class="col-8 buttons">
+                <sqx-menu alignment="right" [items]="allMenuItems" [showCustom]="menuShowCustom" small>
+                    <fieldset class="d-flex gap-1" [disabled]="(isDisabled | async) || isCollapsed">
+                        <ng-content select="[beforeButtons]"></ng-content>
+                    </fieldset>
+                </sqx-menu>
             </div>
         </div>
-        <label class="mb-1">
-            {{ field.displayName }} {{ displaySuffix }} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
-        </label>
-        @if (field.isDisabled) {
-            <small class="field-disabled ps-1">Disabled</small>
-        }
 
         @if (form) {
             <sqx-control-errors [fieldName]="field.displayName" [for]="$any(fieldForm)" />

@@ -27,22 +27,11 @@
 }
 
 .buttons {
-    & {
-        @include absolute(100%, 0);
-        margin: 0;
-        margin-top: -9px;
-    }
+    margin: 0;
+    margin-top: -9px;
 
-    &-container {
-        position: relative;
-    }
-
-    .btn-clear i {
-        font-size: $font-smallest;
-    }
-
-    .btn {
-        width: 2rem;
+    sqx-menu {
+        max-width: 100%;
     }
 }
 

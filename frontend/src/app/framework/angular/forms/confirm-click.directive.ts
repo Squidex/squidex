@@ -20,7 +20,7 @@ export class ConfirmClickDirective {
     public confirmText: string | undefined | null;
 
     @Input()
-    public confirmRememberKey = '';
+    public confirmRememberKey: string | undefined | null;
 
     @Input({ transform: booleanAttribute })
     public confirmRequired?: boolean | null = true;
@@ -48,7 +48,8 @@ export class ConfirmClickDirective {
 
             this.beforeClick.emit();
 
-            this.dialogs.confirm(this.confirmTitle, this.confirmText, this.confirmRememberKey).pipe(take(1))
+            const rememberKey = this.confirmRememberKey || '';
+            this.dialogs.confirm(this.confirmTitle, this.confirmText, rememberKey).pipe(take(1))
                 .subscribe(confirmed => {
                     if (confirmed) {
                         for (const destination of destinations) {

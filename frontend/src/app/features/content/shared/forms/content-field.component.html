@@ -14,19 +14,15 @@
                                     [formLevel]="formLevel"
                                     [formModel]="formModel.get(language)"
                                     [hasChatBot]="hasChatBot"
+                                    [isCollapsed]="(isCollapsed | async)!"
                                     [isComparing]="!!formModelCompare"
-                                    [isCollapsed]="isCollapsed"
                                     [language]="language"
-                                    [languages]="languages">
+                                    [languages]="languages"
+                                    [menuItems]="i === 0 ? menuItems : []"
+                                    [menuShowCustom]="isLocalizable && i === 0">
                                     <ng-container beforeButtons>
-                                        @if (i === 0) {
+                                        @if (isLocalizable && i === 0) {
                                             <ng-container *ngTemplateOutlet="sharedButtons" />
-                                        }
-                                    </ng-container>
-
-                                    <ng-container afterButtons>
-                                        @if (i === 0) {                                        
-                                            <ng-container *ngTemplateOutlet="toggleButton" />
                                         }
                                     </ng-container>
                                 </sqx-field-editor>
@@ -40,15 +36,16 @@
                             [formLevel]="formLevel"
                             [formModel]="getControl()"
                             [hasChatBot]="hasChatBot"
+                            [isCollapsed]="(isCollapsed | async)!"
                             [isComparing]="!!formModelCompare"
-                            [isCollapsed]="isCollapsed"
                             [language]="language"
-                            [languages]="languages">
+                            [languages]="languages"
+                            [menuItems]="menuItems"
+                            [menuShowCustom]="isLocalizable">
                             <ng-container beforeButtons>
-                                <ng-container *ngTemplateOutlet="sharedButtons" />
-                            </ng-container>
-                            <ng-container afterButtons>
-                                <ng-container *ngTemplateOutlet="toggleButton" />
+                                @if (isLocalizable) {
+                                    <ng-container *ngTemplateOutlet="sharedButtons" />
+                                }
                             </ng-container>
                         </sqx-field-editor>
                     }
@@ -81,10 +78,12 @@
                                     [formLevel]="formLevel"
                                     [formModel]="formModelCompare.get(language)"
                                     [hasChatBot]="hasChatBot"
+                                    [isCollapsed]="(isCollapsed | async)!"
                                     [isComparing]="!!formModelCompare"
-                                    [isCollapsed]="isCollapsed"
                                     [language]="language"
-                                    [languages]="languages" />
+                                    [languages]="languages"
+                                    [menuItems]="[]"
+                                    [menuShowCustom]="false" />
                             </div>
                         }
                     } @else {
@@ -94,10 +93,12 @@
                             [formLevel]="formLevel"
                             [formModel]="getControlCompare()!"
                             [hasChatBot]="hasChatBot"
+                            [isCollapsed]="(isCollapsed | async)!"
                             [isComparing]="!!formModelCompare"
-                            [isCollapsed]="isCollapsed"
                             [language]="language"
-                            [languages]="languages" />
+                            [languages]="languages"
+                            [menuItems]="[]"
+                            [menuShowCustom]="false" />
                     }
                 </div>
             }
@@ -125,11 +126,4 @@
             <i class="icon-translate"></i>
         </button>
     }
-</ng-template>
-
-<ng-template #toggleButton>
-    <button class="btn btn-sm btn-square btn-outline-secondary" (click)="toggle()" type="button"
-    title="i18n:contents.arrayCollapseItem">
-        <i [class.icon-minus2]="!isCollapsed" [class.icon-plus2]="isCollapsed"></i>
-    </button>
 </ng-template>

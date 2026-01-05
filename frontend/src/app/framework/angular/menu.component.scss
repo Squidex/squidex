@@ -1,0 +1,17 @@
+@import 'mixins';
+@import 'vars';
+
+.invisible {
+    position: absolute;
+    pointer-events: none;
+}
+
+.btn-sm {
+    i {
+        font-size: $font-smallest;
+    }
+}
+
+.custom:empty {
+    display: none;
+}

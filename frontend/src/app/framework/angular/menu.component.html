@@ -1,0 +1,92 @@
+<div class="d-flex flex-nowrap relative" #container [class.gap-1]="small" [class.gap-2]="!small" [class.justify-content-end]="isRightAligned">
+    <div class="custom" #custom>
+        @if (showCustom) {
+            <ng-content></ng-content>
+        }
+    </div>
+
+    @if (isOverlapping() && (hasVisibleAlwaysItems | async)) {
+        <div class="d-flex flex-nowrap" [class.gap-1]="small" [class.gap-2]="!small" [class.order-1]="isRightAligned">
+            @for (item of itemsNormalized; track item) {
+                @if (item.showAlways && (item.isVisible | async)) {
+                    <button
+                        class="btn btn-outline-secondary"
+                        [class.btn-sm]="small"
+                        [confirmRememberKey]="item.confirmRememberKey"
+                        [confirmText]="item.confirmText | sqxTranslate"
+                        [confirmTitle]="item.confirmTitle | sqxTranslate"
+                        [disabled]="item.isDisabled | async"
+                        (sqxConfirmClick)="item.onClick()"
+                        [tabIndex]="item.tabIndex"
+                        [title]="item.tooltip | sqxTranslate">
+                        @if (item.icon) {
+                            <i class="icon-{{ item.icon }}"></i>
+                        }
+
+                        {{ item.label | sqxTranslate }}
+                    </button>
+                }
+            }
+        </div>
+    }
+
+    @if (isOverlapping() && (hasVisibleDropdownItems | async)) {
+        <button
+            class="btn btn-text-secondary"
+            #buttonOptions
+            attr.aria-label="{{ 'common.options' | sqxTranslate }}"
+            [class.btn-sm]="small"
+            [class.order-1]="isRightAligned"
+            (click)="itemsDropdown.toggle()"
+            [disabled]="hasOnlyDisabledDropdownItems | async"
+            sqxStopClick
+            type="button">
+            <i class="icon-dots"></i>
+        </button>
+
+        <sqx-dropdown-menu
+            [position]="isRightAligned ? 'bottom-end' : 'bottom-start'"
+            scrollY="true"
+            [sqxAnchoredTo]="buttonOptions"
+            *sqxModal="itemsDropdown; closeAlways: true">
+            @for (item of itemsNormalized; track item) {
+                @if ((item.label || item.menuLabel) && (item.isVisible | async)) {
+                    <a
+                        class="dropdown-item"
+                        [attr.disabled]="item.isDisabled | async"
+                        [class.disabled]="item.isDisabled | async"
+                        [confirmRememberKey]="item.confirmRememberKey"
+                        [confirmText]="item.confirmText | sqxTranslate"
+                        [confirmTitle]="item.confirmTitle | sqxTranslate"
+                        (sqxConfirmClick)="item.onClick()"
+                        [title]="item.tooltip | sqxTranslate">
+                        {{ item.menuLabel || item.label | sqxTranslate }}
+                    </a>
+                }
+            }
+        </sqx-dropdown-menu>
+    }
+
+    <div class="d-flex flex-nowrap" #menu [class.gap-1]="small" [class.gap-2]="!small" [class.invisible]="isOverlapping()">
+        @for (item of itemsNormalized; track item) {
+            @if (item.isVisible | async) {
+                <button
+                    class="btn btn-outline-secondary"
+                    [class.btn-sm]="small"
+                    [confirmRememberKey]="item.confirmRememberKey"
+                    [confirmText]="item.confirmText | sqxTranslate"
+                    [confirmTitle]="item.confirmTitle | sqxTranslate"
+                    [disabled]="item.isDisabled | async"
+                    (sqxConfirmClick)="item.onClick()"
+                    [tabIndex]="item.tabIndex"
+                    [title]="item.tooltip | sqxTranslate">
+                    @if (item.icon) {
+                        <i class="icon-{{ item.icon }}"></i>
+                    }
+
+                    {{ item.label | sqxTranslate }}
+                </button>
+            }
+        }
+    </div>
+</div>
