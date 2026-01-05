@@ -1,0 +1,42 @@
+@if (!check) {
+    <label [class]="labelClass" for="{{ fieldName }}">
+        {{ label | sqxTranslate }}
+        @if (required) {
+            <small class="hint">({{ "common.requiredHint" | sqxTranslate }})</small>
+        }
+    </label>
+}
+
+<div [class]="mainClass">
+    @if (!hideError) {
+        <sqx-control-errors [for]="for" [submitCount]="submitCount" />
+    }
+
+    <div [class.form-check]="check" [class.row]="hasUnit" [class.g-0]="hasUnit">
+        <div [class.col]="hasUnit">
+            <ng-content></ng-content>
+        </div>
+
+        @if (hasUnit) {
+            <div class="col col-unit">
+                @if (unit) {
+                    <label class="col-form-label">{{ unit | sqxTranslate }}</label>
+                } @else {
+                    &nbsp;
+                }
+            </div>
+        }
+
+        @if (check) {
+            <label class="form-check-label" for="{{ fieldName }}"> {{ label | sqxTranslate }} </label>
+        }
+    </div>
+
+    @if (hint) {
+        <sqx-form-hint> <span inline="true" [sqxMarkdown]="hint | sqxTranslate"></span> </sqx-form-hint>
+    }
+
+    @if (alert) {
+        <sqx-form-alert> {{ alert | sqxTranslate }} </sqx-form-alert>
+    }
+</div>

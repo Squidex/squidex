@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { AppLanguageDto, DateTimeEditorComponent, DateTimeFieldPropertiesDto, FieldDto, FormHintComponent, hasNoValue$, LocalizedInputComponent, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { AppLanguageDto, DateTimeEditorComponent, DateTimeFieldPropertiesDto, FieldDto, FormRowComponent, hasNoValue$, LocalizedInputComponent, TypedSimpleChanges, valueProjection$ } from '@app/shared';
 
 const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['Now', 'Today'];
 
@@ -20,11 +20,10 @@ const CALCULATED_DEFAULT_VALUES: ReadonlyArray<string> = ['Now', 'Today'];
     imports: [
         AsyncPipe,
         DateTimeEditorComponent,
-        FormHintComponent,
+        FormRowComponent,
         FormsModule,
         LocalizedInputComponent,
         ReactiveFormsModule,
-        TranslatePipe,
     ],
 })
 export class DateTimeValidationComponent {
@@ -40,8 +39,8 @@ export class DateTimeValidationComponent {
     @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
-    @Input({ transform: booleanAttribute })
-    public isLocalizable?: boolean | null;
+    @Input({ required: true, transform: booleanAttribute })
+    public isLocalizable!: boolean;
 
     public showDefaultValues?: Observable<boolean>;
     public showDefaultValue?: Observable<boolean>;
@@ -51,7 +50,7 @@ export class DateTimeValidationComponent {
     public ngOnChanges(changes: TypedSimpleChanges<this>) {
         if (changes.fieldForm) {
             this.showDefaultValues =
-                hasNoValue$(this.fieldForm.controls['isRequired']);
+                valueProjection$(this.fieldForm.controls['isRequired'], x => x !== true);
 
             this.showDefaultValue =
                 hasNoValue$(this.fieldForm.controls['calculatedDefaultValue']);

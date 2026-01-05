@@ -7,7 +7,7 @@
 
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { AssetFolderDropdownComponent, AssetsFieldPropertiesDto, FieldDto, FormHintComponent, MarkdownDirective, TranslatePipe } from '@app/shared';
+import { AssetFolderDropdownComponent, AssetsFieldPropertiesDto, FieldDto, FormRowComponent, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-assets-ui',
@@ -15,9 +15,8 @@ import { AssetFolderDropdownComponent, AssetsFieldPropertiesDto, FieldDto, FormH
     templateUrl: 'assets-ui.component.html',
     imports: [
         AssetFolderDropdownComponent,
-        FormHintComponent,
+        FormRowComponent,
         FormsModule,
-        MarkdownDirective,
         ReactiveFormsModule,
         TranslatePipe,
     ],

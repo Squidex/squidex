@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { AppDto, AppsState, AvatarComponent, ConfirmClickDirective, ControlErrorsComponent, defined, DialogService, FileDropDirective, FormErrorComponent, FormHintComponent, LayoutComponent, ListViewComponent, ProgressBarComponent, SidebarMenuDirective, Subscriptions, TeamsState, TooltipDirective, TourStepDirective, TransferAppForm, TranslatePipe, Types, UpdateAppForm } from '@app/shared';
+import { AppDto, AppsState, AvatarComponent, ConfirmClickDirective, defined, DialogService, FileDropDirective, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, ProgressBarComponent, SidebarMenuDirective, Subscriptions, TeamsState, TooltipDirective, TourStepDirective, TransferAppForm, TranslatePipe, Types, UpdateAppForm } from '@app/shared';
 
 @Component({
     selector: 'sqx-more-page',
@@ -19,10 +19,10 @@ import { AppDto, AppsState, AvatarComponent, ConfirmClickDirective, ControlError
         AsyncPipe,
         AvatarComponent,
         ConfirmClickDirective,
-        ControlErrorsComponent,
         FileDropDirective,
         FormErrorComponent,
         FormHintComponent,
+        FormRowComponent,
         FormsModule,
         LayoutComponent,
         ListViewComponent,

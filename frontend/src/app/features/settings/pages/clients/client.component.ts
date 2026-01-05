@@ -8,7 +8,7 @@
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AppsState, ClientDto, ClientsState, ConfirmClickDirective, CopyDirective, DialogModel, EditableTitleComponent, FormHintComponent, ModalDirective, RoleDto, TooltipDirective, TourStepDirective, TranslatePipe, TypedSimpleChanges, UpdateClientDto } from '@app/shared';
+import { AppsState, ClientDto, ClientsState, ConfirmClickDirective, CopyDirective, DialogModel, EditableTitleComponent, FormRowComponent, ModalDirective, RoleDto, TooltipDirective, TourStepDirective, TranslatePipe, TypedSimpleChanges, UpdateClientDto } from '@app/shared';
 import { ClientConnectFormComponent } from './client-connect-form.component';
 
 @Component({
@@ -21,7 +21,7 @@ import { ClientConnectFormComponent } from './client-connect-form.component';
         ConfirmClickDirective,
         CopyDirective,
         EditableTitleComponent,
-        FormHintComponent,
+        FormRowComponent,
         FormsModule,
         ModalDirective,
         TooltipDirective,

@@ -39,14 +39,9 @@
             <sqx-form-error [error]="actualForm.error | async" />
 
             @if (selectedTab !== 2) {
-                <div class="form-group">
-                    <label for="name">
-                        {{ "common.name" | sqxTranslate }} <small class="hint">({{ "common.requiredHint" | sqxTranslate }})</small>
-                    </label>
-                    <sqx-control-errors for="name" [submitCount]="createForm.submitCount | async" />
+                <sqx-form-row for="name" hint="schemas.schemaNameHint" label="common.name" required [submitCount]="createForm.submitCount | async" vertical>
                     <input class="form-control" id="name" autocomplete="off" formControlName="name" sqxFocusOnInit sqxTransformInput="LowerCase" />
-                    <sqx-form-hint> {{ "schemas.schemaNameHint" | sqxTranslate }} </sqx-form-hint>
-                </div>
+                </sqx-form-row>
 
                 <sqx-form-alert> {{ "schemas.nameWarning" | sqxTranslate }} </sqx-form-alert>
             }
@@ -115,8 +110,7 @@
 
                 @if (schemasState.categoryNames | async; as categories) {
                     @if (categories.length > 0) {
-                        <div class="form-group">
-                            <label for="category">{{ "common.category" | sqxTranslate }}</label>
+                        <sqx-form-row for="category" label="common.category">
                             <select class="form-select" id="category" formControlName="initialCategory">
                                 <option></option>
 
@@ -124,34 +118,32 @@
                                     <option [ngValue]="category">{{ category }}</option>
                                 }
                             </select>
-                        </div>
+                        </sqx-form-row>
                     }
                 }
             } @else if (selectedTab === 1) {
                 <sqx-code-editor formControlName="importing" height="auto" minLines="50" valueMode="Json" />
             } @else if (selectedTab === 2) {
-                <div class="row g-2 form-group">
-                    <div class="col">
-                        <label for="prompt">
-                            {{ "common.prompt" | sqxTranslate }} <small class="hint">({{ "common.requiredHint" | sqxTranslate }})</small>
-                        </label>
-                        <sqx-control-errors for="prompt" />
-                        <input class="form-control" id="prompt" autocomplete="off" formControlName="prompt" sqxFocusOnInit />
-                        <sqx-form-hint> {{ "schemas.promptHint" | sqxTranslate }} </sqx-form-hint>
-                    </div>
-                    <div class="col-auto">
-                        <label>&nbsp;</label>
-                        <div>
-                            <button class="btn btn-primary" (click)="generatePreview()" [disabled]="generateForm.submitting | async" type="button">
-                                @if (generateForm.submitting | async) {
-                                    <sqx-loader color="white" size="12" />
-                                }
+                <sqx-form-row for="prompt" label="common.prompt">
+                    <div class="row g-2 form-group">
+                        <div class="col">
+                            <sqx-form-hint> {{ "schemas.promptHint" | sqxTranslate }} </sqx-form-hint>
+                        </div>
+                        <div class="col-auto">
+                            <label>&nbsp;</label>
+                            <div>
+                                <button class="btn btn-primary" (click)="generatePreview()" [disabled]="generateForm.submitting | async" type="button">
+                                    @if (generateForm.submitting | async) {
+                                        <sqx-loader color="white" size="12" />
+                                    }
 
-                                {{ "common.generate" | sqxTranslate }}
-                            </button>
+                                    {{ "common.generate" | sqxTranslate }}
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
+                </sqx-form-row>
+                
                 <sqx-form-alert> {{ "schemas.promptExample" | sqxTranslate }} </sqx-form-alert>
 
                 <sqx-code-editor disabled="true" [height]="1000" [ngModel]="generateLog" [ngModelOptions]="{ standalone: true }" />

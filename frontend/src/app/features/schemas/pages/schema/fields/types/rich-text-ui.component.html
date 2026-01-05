@@ -1,30 +1,18 @@
 <div [formGroup]="fieldForm">
-    <div class="form-group row">
-        <label class="col-3 col-form-label">{{ "schemas.fieldTypes.string.classNames" | sqxTranslate }}</label>
-        <div class="col-9">
-            <sqx-tag-editor formControlName="classNames" />
-            <sqx-form-hint> {{ "schemas.fieldTypes.string.classNamesHint" | sqxTranslate }} </sqx-form-hint>
-        </div>
-    </div>
+    <sqx-form-row #classNamesRow for="classNames" hint="schemas.fieldTypes.string.classNamesHint" label="schemas.fieldTypes.string.classNames" [prefix]="field.fieldId">
+        <sqx-tag-editor [id]="classNamesRow.fieldName" formControlName="classNames" />
+    </sqx-form-row>
 
-    <div class="form-group row">
-        <label class="col-3 col-form-label" for="{{ field.fieldId }}_folderId">
-            {{ "schemas.fieldTypes.string.folderId" | sqxTranslate }}
-        </label>
-        <div class="col-9">
-            <sqx-asset-folder-dropdown formControlName="folderId" />
-            <sqx-form-hint> {{ "schemas.fieldTypes.string.folderIdHint" | sqxTranslate }} </sqx-form-hint>
-        </div>
-    </div>
+    <sqx-form-row for="folderId" hint="schemas.fieldTypes.string.folderIdHint" label="schemas.fieldTypes.string.folderId" [prefix]="field.fieldId">
+        <sqx-asset-folder-dropdown formControlName="folderId" />
+    </sqx-form-row>
 
-    <div class="form-group row">
-        <label class="col-3 col-form-label" for="{{ field.fieldId }}_fieldSchemaIds">{{ "common.schemas" | sqxTranslate }}</label>
-        <div class="col-9">
-            <sqx-tag-editor
-                formControlName="schemaIds"
-                [itemConverter]="(schemasSource.normalConverter | async)!"
-                [itemsSource]="(schemasSource.normalConverter | async)?.suggestions"
-                placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" />
-        </div>
-    </div>
+    <sqx-form-row #schemaIdsRow for="schemaIds" label="common.schemas" [prefix]="field.fieldId">
+        <sqx-tag-editor
+            [id]="schemaIdsRow.fieldName"
+            formControlName="schemaIds"
+            [itemConverter]="(schemasSource.normalConverter | async)!"
+            [itemsSource]="(schemasSource.normalConverter | async)?.suggestions"
+            placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" />
+    </sqx-form-row>
 </div>

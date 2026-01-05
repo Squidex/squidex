@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { AppLanguageDto, AppSettingsDto, DropdownMenuComponent, FieldDto, FormHintComponent, hasNoValue$, hasValue$, LocalizedInputComponent, ModalDirective, ModalModel, ModalPlacementDirective, PatternDto, SchemaDto, StringContentTypeValues, StringFieldPropertiesDto, Subscriptions, TranslatePipe, TypedSimpleChanges, Types, value$ } from '@app/shared';
+import { AppLanguageDto, AppSettingsDto, DropdownMenuComponent, FieldDto, FormRowComponent, hasNoValue$, hasValue$, LocalizedInputComponent, ModalDirective, ModalModel, ModalPlacementDirective, PatternDto, SchemaDto, StringContentTypeValues, StringFieldPropertiesDto, Subscriptions, TranslatePipe, TypedSimpleChanges, Types, value$ } from '@app/shared';
 
 @Component({
     selector: 'sqx-string-validation',
@@ -18,7 +18,7 @@ import { AppLanguageDto, AppSettingsDto, DropdownMenuComponent, FieldDto, FormHi
     imports: [
         AsyncPipe,
         DropdownMenuComponent,
-        FormHintComponent,
+        FormRowComponent,
         FormsModule,
         LocalizedInputComponent,
         ModalDirective,
@@ -50,8 +50,8 @@ export class StringValidationComponent  {
     @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
-    @Input({ transform: booleanAttribute })
-    public isLocalizable?: boolean | null;
+    @Input({ required: true, transform: booleanAttribute })
+    public isLocalizable!: boolean;
 
     public showPatternMessage?: Observable<boolean>;
     public showPatternSuggestions?: Observable<boolean>;

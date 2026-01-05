@@ -1,11 +1,7 @@
-<div [formGroup]="fieldForm">
-    <div class="form-group row mb-3">
-        <label class="col-3 col-form-label" for="{{ field.fieldId }}_editorUrl">{{ "schemas.field.editorUrl" | sqxTranslate }}</label>
-        <div class="col-9">
-            <input class="form-control" id="{{ field.fieldId }}_editorUrl" formControlName="editorUrl" type="url" />
-            <sqx-form-hint> {{ "schemas.field.editorUrlHint" | sqxTranslate }} </sqx-form-hint>
-        </div>
-    </div>
+<div class="mb-3" [formGroup]="fieldForm">
+    <sqx-form-row #editorUrlRow for="editorUrl" hints="schemas.field.editorUrlHint" label="schemas.field.editorUrl" [prefix]="field.fieldId">
+        <input class="form-control" [id]="editorUrlRow.fieldName" formControlName="editorUrl" type="url" />
+    </sqx-form-row>
 </div>
 
 @switch (field.rawProperties.fieldType) {
@@ -62,16 +58,8 @@
     }
 }
 
-<div [formGroup]="fieldForm">
-    <div class="form-group row mt-3">
-        <div class="col-9 offset-3">
-            <div class="form-check">
-                <input class="form-check-input" id="{{ field.fieldId }}_fieldHalfWidth" formControlName="isHalfWidth" type="checkbox" />
-                <label class="form-check-label" for="{{ field.fieldId }}_fieldHalfWidth">
-                    {{ "schemas.field.halfWidth" | sqxTranslate }}
-                </label>
-            </div>
-            <sqx-form-hint> {{ "schemas.field.halfWidthHint" | sqxTranslate }} </sqx-form-hint>
-        </div>
-    </div>
+<div class="mt-3" [formGroup]="fieldForm">
+    <sqx-form-row #isHalfWidthRow check for="isHalfWidth" hint="schemas.field.halfWidthHint" label="schemas.field.halfWidth" [prefix]="field.fieldId">
+        <input class="form-check-input" [id]="isHalfWidthRow.fieldName" formControlName="isHalfWidth" type="checkbox" />
+    </sqx-form-row>
 </div>

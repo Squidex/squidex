@@ -1,12 +1,9 @@
 <div [formGroup]="fieldForm">
-    <div class="form-group row">
-        <label class="col-3 col-form-label">{{ "schemas.field.defaultValue" | sqxTranslate }}</label>
-        <div class="col-3">
-            <select class="form-select" formControlName="calculatedDefaultValue">
-                @for (value of calculatedDefaultValues; track value) {
-                    <option [ngValue]="value">{{ value }}</option>
-                }
-            </select>
-        </div>
-    </div>
+    <sqx-form-row for="calculatedDefaultValue" label="schemas.field.defaultValue" [prefix]="field.fieldId">
+        <select class="form-select" formControlName="calculatedDefaultValue">
+            @for (value of calculatedDefaultValues; track value) {
+                <option [ngValue]="value">{{ value }}</option>
+            }
+        </select>
+    </sqx-form-row>
 </div>

@@ -1,37 +1,26 @@
 <div [formGroup]="fieldForm">
-    <div class="form-group row">
-        <label class="col-3 col-form-label">{{ "schemas.field.editor" | sqxTranslate }}</label>
-        <div class="col-9">
-            @for (editor of editors; track editor) {
-                <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === editor">
-                    <input class="radio-input" formControlName="editor" name="editor" type="radio" [value]="editor" />
-                    <i class="icon-control-{{ editor }}"></i> <span class="radio-label">{{ editor }}</span>
-                </label>
-            }
-        </div>
-    </div>
+    <sqx-form-row for="editor" label="schemas.field.editor" [prefix]="field.fieldId">
+        @for (editor of editors; track editor) {
+            <label class="btn btn-radio" [class.active]="fieldForm.controls['editor'].value === editor">
+                <input class="radio-input" formControlName="editor" name="editor" type="radio" [value]="editor" />
+                <i class="icon-control-{{ editor }}"></i> <span class="radio-label">{{ editor }}</span>
+            </label>
+        }
+    </sqx-form-row>
 
     @if (field.properties.isContentField) {
-        <div class="form-group row">
-            <div class="col-9 offset-3">
-                <div class="form-check">
-                    <input class="form-check-input" id="{{ field.fieldId }}_fieldResolveReference" formControlName="resolveReference" type="checkbox" />
-                    <label class="form-check-label" for="{{ field.fieldId }}_fieldResolveReference">
-                        {{ "schemas.fieldTypes.references.resolve" | sqxTranslate }}
-                    </label>
-                </div>
-                <sqx-form-hint> {{ "schemas.fieldTypes.references.resolveHint" | sqxTranslate }} </sqx-form-hint>
-            </div>
-        </div>
+        <sqx-form-row
+            #isContentFieldRow
+            check
+            for="resolveReference"
+            hint="schemas.fieldTypes.references.resolveHint"
+            label="schemas.fieldTypes.references.resolve"
+            [prefix]="field.fieldId">
+            <input class="form-check-input" [id]="isContentFieldRow.fieldName" formControlName="resolveReference" type="checkbox" />
+        </sqx-form-row>
     }
 
-    <div class="form-group row">
-        <label class="col-3 col-form-label" for="{{ field.fieldId }}_query">
-            {{ "schemas.fieldTypes.references.query" | sqxTranslate }}
-        </label>
-        <div class="col-9">
-            <input class="form-control" id="{{ field.fieldId }}_query" formControlName="query" type="text" />
-            <sqx-form-hint> {{ "schemas.fieldTypes.references.queryHint" | sqxTranslate }} </sqx-form-hint>
-        </div>
-    </div>
+    <sqx-form-row #queryRow for="query" hint="schemas.fieldTypes.references.queryHint" label="schemas.fieldTypes.references.query" [prefix]="field.fieldId">
+        <input class="form-control" [id]="queryRow.fieldName" formControlName="query" type="text" />
+    </sqx-form-row>
 </div>

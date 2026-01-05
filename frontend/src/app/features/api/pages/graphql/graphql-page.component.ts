@@ -12,7 +12,7 @@ import { createGraphiQLFetcher } from '@graphiql/toolkit';
 import { GraphiQL } from 'graphiql';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
-import { ApiUrlConfig, AppsState, AuthService, ClientDto, ClientsService, ClientsState, DialogModel, FormHintComponent, LayoutComponent, MessageBus, ModalDialogComponent, ModalDirective, QueryExecuted, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, Types } from '@app/shared';
+import { ApiUrlConfig, AppsState, AuthService, ClientDto, ClientsService, ClientsState, DialogModel, FormHintComponent, FormRowComponent, LayoutComponent, MessageBus, ModalDialogComponent, ModalDirective, QueryExecuted, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-graphql-page',
@@ -22,6 +22,7 @@ import { ApiUrlConfig, AppsState, AuthService, ClientDto, ClientsService, Client
         AsyncPipe,
         FormHintComponent,
         FormsModule,
+        FormRowComponent,
         LayoutComponent,
         ModalDialogComponent,
         ModalDirective,

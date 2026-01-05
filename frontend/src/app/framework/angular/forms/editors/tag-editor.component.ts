@@ -80,6 +80,9 @@ export class TagEditorComponent extends StatefulControlComponent<State, Readonly
     public editorBlur = new EventEmitter();
 
     @Input()
+    public id = '';
+
+    @Input()
     public itemConverter = StringConverter.INSTANCE;
 
     @Input({ transform: booleanAttribute })

@@ -8,7 +8,7 @@
 import { AsyncPipe, LowerCasePipe } from '@angular/common';
 import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AppsState, CodeEditorComponent, ControlErrorsComponent, DynamicFlowStepDefinitionDto, EntriesPipe, FormErrorComponent, FormHintComponent, MarkdownDirective, ModalDialogComponent, RuleElementDto, RulesService, ScriptCompletions, StepForm, TranslatePipe, TypedSimpleChanges } from '@app/shared';
+import { AppsState, CodeEditorComponent, DynamicFlowStepDefinitionDto, EntriesPipe, FormErrorComponent, FormHintComponent, FormRowComponent, MarkdownDirective, ModalDialogComponent, RuleElementDto, RulesService, ScriptCompletions, StepForm, TranslatePipe, TypedSimpleChanges } from '@app/shared';
 import { BranchesInputComponent } from '../../shared/actions/branches-input.component';
 import { FormattableInputComponent } from '../../shared/actions/formattable-input.component';
 import { RuleElementComponent } from '../../shared/rule-element.component';
@@ -21,11 +21,11 @@ import { RuleElementComponent } from '../../shared/rule-element.component';
         AsyncPipe,
         BranchesInputComponent,
         CodeEditorComponent,
-        ControlErrorsComponent,
         EntriesPipe,
         FormattableInputComponent,
         FormErrorComponent,
         FormHintComponent,
+        FormRowComponent,
         FormsModule,
         LowerCasePipe,
         MarkdownDirective,

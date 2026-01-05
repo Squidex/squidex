@@ -81,7 +81,7 @@ export class TeamAuthState extends State<Snapshot> {
     }
 
     public update(scheme: AuthSchemeDto | undefined): Observable<AuthSchemeDto | undefined | null> {
-        return this.teamService.putTeamAuth(this.teamId, new AuthSchemeValueDto({ scheme }), this.version).pipe(
+        return this.teamService.putTeamAuth(this.teamId, AuthSchemeValueDto.fromJSON({ scheme }), this.version).pipe(
             tap(({ version, payload }) => {
                 this.next({
                     ...payload,
