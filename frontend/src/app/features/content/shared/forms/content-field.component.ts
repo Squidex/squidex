@@ -8,7 +8,7 @@
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
 import { booleanAttribute, Component, EventEmitter, HostBinding, inject, Input, numberAttribute, Optional, Output } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AppLanguageDto, AppsState, changed$, CommentsState, disabled$, EditContentForm, FieldForm, FocusMarkerComponent, invalid$, LocalStoreService, SchemaDto, Settings, TooltipDirective, TranslateDto, TranslationsService, TypedSimpleChanges, UIOptions } from '@app/shared';
+import { AppLanguageDto, AppsState, changed$, CommentsState, disabled$, EditContentForm, FieldForm, FocusMarkerComponent, invalid$, LocalStoreService, MenuItemComponent, SchemaDto, Settings, TranslateDto, TranslationsService, TypedSimpleChanges, UIOptions } from '@app/shared';
 import { FieldCopyButtonComponent } from './field-copy-button.component';
 import { FieldEditorComponent } from './field-editor.component';
 import { FieldLanguagesComponent } from './field-languages.component';
@@ -23,8 +23,8 @@ import { FieldLanguagesComponent } from './field-languages.component';
         FieldEditorComponent,
         FieldLanguagesComponent,
         FocusMarkerComponent,
+        MenuItemComponent,
         NgTemplateOutlet,
-        TooltipDirective,
     ],
 })
 export class ContentFieldComponent {
@@ -80,10 +80,13 @@ export class ContentFieldComponent {
         return this.formModel.field.properties.isHalfWidth && !this.isCompact && !this.formCompare;
     }
 
-    public get isTranslatable() {
-        return this.formModel.field.properties.fieldType === 'String' && this.hasTranslator && this.formModel.field.isLocalizable && this.languages.length > 1;
+    public get isLocalizable() {
+        return this.formModel.field.isLocalizable;
     }
 
+    public get isTranslatable() {
+        return this.formModel.field.properties.fieldType === 'String' && this.hasTranslator && this.isLocalizable && this.languages.length > 1;
+    }
     constructor(
         @Optional() public readonly commentsState: CommentsState,
         private readonly appsState: AppsState,

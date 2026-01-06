@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, Component, ElementRef, EventEmitter, Input, numberAttribute, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable } from 'rxjs';
-import { AbstractContentForm, AnnotationCreate, AnnotationsSelect, AnyFieldDto, AppLanguageDto, ChatDialogComponent, CheckboxGroupComponent, CodeEditorComponent, ColorPickerComponent, CommentsState, ConfirmClickDirective, ControlErrorsComponent, DateTimeEditorComponent, DialogModel, disabled$, EditContentForm, FormHintComponent, GeolocationEditorComponent, hasNoValue$, HTTP, IndeterminateValueDirective, MarkdownDirective, MathHelper, MessageBus, ModalDirective, RadioGroupComponent, ReferenceInputComponent, ReferencesFieldPropertiesDto, RichEditorComponent, StarsComponent, TagEditorComponent, ToggleComponent, TooltipDirective, TransformInputDirective, TypedSimpleChanges, Types } from '@app/shared';
+import { AbstractContentForm, AnnotationCreate, AnnotationsSelect, AnyFieldDto, AppLanguageDto, ChatDialogComponent, CheckboxGroupComponent, CodeEditorComponent, ColorPickerComponent, CommentsState, ControlErrorsComponent, DateTimeEditorComponent, DialogModel, disabled$, EditContentForm, FormHintComponent, GeolocationEditorComponent, hasNoValue$, HTTP, IndeterminateValueDirective, MarkdownDirective, MathHelper, MenuComponent, MenuItemComponent, MessageBus, ModalDirective, RadioGroupComponent, ReferenceInputComponent, ReferencesFieldPropertiesDto, RichEditorComponent, StarsComponent, TagEditorComponent, ToggleComponent, TransformInputDirective, TypedSimpleChanges, Types } from '@app/shared';
 import { ReferenceDropdownComponent } from '../references/reference-dropdown.component';
 import { ReferencesCheckboxesComponent } from '../references/references-checkboxes.component';
 import { ReferencesEditorComponent } from '../references/references-editor.component';
@@ -34,7 +34,6 @@ import { StockPhotoEditorComponent } from './stock-photo-editor.component';
         CodeEditorComponent,
         ColorPickerComponent,
         ComponentComponent,
-        ConfirmClickDirective,
         ControlErrorsComponent,
         DateTimeEditorComponent,
         FormHintComponent,
@@ -44,6 +43,8 @@ import { StockPhotoEditorComponent } from './stock-photo-editor.component';
         IndeterminateValueDirective,
         MarkdownDirective,
         ModalDirective,
+        MenuComponent,
+        MenuItemComponent,
         RadioGroupComponent,
         ReactiveFormsModule,
         ReferenceDropdownComponent,
@@ -57,7 +58,6 @@ import { StockPhotoEditorComponent } from './stock-photo-editor.component';
         StockPhotoEditorComponent,
         TagEditorComponent,
         ToggleComponent,
-        TooltipDirective,
         TransformInputDirective,
     ],
 })
@@ -106,12 +106,10 @@ export class FieldEditorComponent {
     @ViewChild('editor', { static: false })
     public editor!: ElementRef;
 
-    public isEmpty?: Observable<boolean>;
+    public isDisabled!: Observable<boolean>;
+    public isEmpty!: Observable<boolean>;
     public isExpanded = false;
-    public isDisabled?: Observable<boolean>;
-
     public chatDialog = new DialogModel();
-
     public annotations?: Observable<ReadonlyArray<Annotation>>;
 
     public get field() {
@@ -123,7 +121,7 @@ export class FieldEditorComponent {
     }
 
     public get isString() {
-        return this.field?.properties.fieldType === 'String';
+        return this.field.properties.fieldType === 'String';
     }
 
     public get schemaIds() {
@@ -137,8 +135,8 @@ export class FieldEditorComponent {
 
     public ngOnChanges(changes: TypedSimpleChanges<this>) {
         if (changes.formModel) {
-            this.isEmpty = hasNoValue$(this.formModel.form);
             this.isDisabled = disabled$(this.formModel.form);
+            this.isEmpty = hasNoValue$(this.formModel.form);
         }
 
         if (changes.formModel || changes.comments) {
@@ -182,6 +180,7 @@ export class FieldEditorComponent {
     public unset() {
         this.formModel.unset();
     }
+
     public setValue(content: string | HTTP.UploadFile | null | undefined) {
         this.chatDialog.hide();
 

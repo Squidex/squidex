@@ -60,6 +60,8 @@ export * from './angular/list-view.component';
 export * from './angular/loader.component';
 export * from './angular/long-hover.directive';
 export * from './angular/markdown.directive';
+export * from './angular/menu.component';
+export * from './angular/menu-item.component';
 export * from './angular/modals/dialog-renderer.component';
 export * from './angular/modals/modal-dialog.component';
 export * from './angular/modals/modal-placement.directive';

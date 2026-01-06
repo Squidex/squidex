@@ -1,0 +1,24 @@
+@import 'mixins';
+@import 'vars';
+
+:host ::ng-deep {
+    .overflown-left {
+        sqx-menu-item {
+            order: 5;
+            visibility: hidden;
+        }
+    }
+    
+    .overflown-right {
+        sqx-menu-item {
+            order: -5;
+            visibility: hidden;
+        }
+    }
+}
+
+.btn-sm {
+    i {
+        font-size: $font-smallest;
+    }
+}

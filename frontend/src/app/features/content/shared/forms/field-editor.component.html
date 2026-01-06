@@ -1,53 +1,55 @@
 @if (formModel) {
     <div class="field" [class.expanded]="isExpanded && !isCollapsed">
-        <div class="buttons-container">
-            <div class="buttons d-flex gap-1">
-                <fieldset class="d-flex gap-1" [disabled]="(isDisabled | async) || isCollapsed">
-                    <ng-content select="[beforeButtons]"></ng-content>
-    
-                    @if (isString) {
-                        <button
-                            class="btn btn-sm btn-outline-secondary force no-focus-shadow"
-                            (click)="chatDialog.show()"
-                            [disabled]="!hasChatBot || isCollapsed"
-                            tabindex="-1"
-                            type="button">
-                            AI
-                        </button>
+        <div class="row">
+            <div class="col-4">
+                <div class="truncate">
+                    <label class="mb-1">
+                        {{ field.displayName }} {{ displaySuffix }} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
+                    </label>
+                    @if (field.isDisabled) {
+                        <small class="field-disabled ps-1">Disabled</small>
                     }
-    
-                    <button
-                        class="btn btn-sm btn-outline-secondary force no-focus-shadow"
-                        (click)="toggleExpanded()"
-                        [disabled]="isCollapsed"
-                        tabindex="-1"
-                        title="i18n:contents.fieldFullscreen"
-                        type="button">
-                        <i class="icon-fullscreen"></i>
-                    </button>
-                    <button
-                        class="btn btn-sm btn-outline-secondary btn-clear force no-focus-shadow"
+                </div>
+            </div>
+
+            <div class="col-8 buttons">
+                <sqx-menu alignment="right" small>
+                    <fieldset class="d-flex gap-1" [disabled]="(isDisabled | async) || isCollapsed">
+                        <ng-content></ng-content>
+                    </fieldset>
+
+                    @if (isString) {
+                        <sqx-menu-item
+                            [disabled]="(isDisabled | async) || isCollapsed || !hasChatBot"
+                            label="AI"
+                            menuLabel="i18n:contents.fieldAIMenu"
+                            small
+                            tabIndex="-1" />
+                    }
+
+                    <sqx-menu-item
+                        (action)="this.toggleExpanded()"
+                        [disabled]="(isDisabled | async) || isCollapsed"
+                        icon="fullscreen"
+                        menuLabel="i18n:contents.fieldFullscreenMenu"
+                        small
+                        tabIndex="-1"
+                        tooltip="i18n:contents.fieldFullscreen" />
+
+                    <sqx-menu-item
+                        (action)="this.unset()"
                         confirmRememberKey="unsetValue"
                         confirmText="i18n:contents.unsetValueConfirmText"
                         confirmTitle="i18n:contents.unsetValueConfirmTitle"
-                        [disabled]="isEmpty | async"
-                        (sqxConfirmClick)="unset()"
-                        tabindex="-1"
-                        title="i18n:contents.unsetValue"
-                        type="button">
-                        <i class="icon-close"></i>
-                    </button>
-                </fieldset>
-
-                <ng-content select="[afterButtons]"></ng-content>
+                        [disabled]="(isDisabled | async) || isCollapsed || (isEmpty | async)"
+                        icon="close"
+                        menuLabel="i18n:contents.unsetValue"
+                        small
+                        tabIndex="-1"
+                        tooltip="i18n:contents.unsetValue" />
+                </sqx-menu>
             </div>
         </div>
-        <label class="mb-1">
-            {{ field.displayName }} {{ displaySuffix }} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
-        </label>
-        @if (field.isDisabled) {
-            <small class="field-disabled ps-1">Disabled</small>
-        }
 
         @if (form) {
             <sqx-control-errors [fieldName]="field.displayName" [for]="$any(fieldForm)" />

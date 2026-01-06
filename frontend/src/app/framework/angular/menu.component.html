@@ -1,0 +1,29 @@
+<div class="d-flex flex-nowrap relative" #container [class.gap-1]="small" [class.gap-2]="!small" [class.justify-content-end]="isRightAligned">
+    @if (overflowMenuItems) {
+        <button
+            class="btn btn-text-secondary"
+            #buttonOptions
+            attr.aria-label="{{ 'common.options' | sqxTranslate }}"
+            [class.btn-sm]="small"
+            [class.order-1]="isRightAligned"
+            (click)="overflowDropdown.toggle()"
+            sqxStopClick
+            type="button">
+            <i class="icon-dots"></i>
+        </button>
+
+        <sqx-dropdown-menu
+            [position]="isRightAligned ? 'bottom-end' : 'bottom-start'"
+            scrollY="true"
+            [sqxAnchoredTo]="buttonOptions"
+            *sqxModal="overflowDropdown; closeAlways: true">
+            @for (item of overflowMenuItems; track item) {
+                <ng-container *ngTemplateOutlet="item.template"></ng-container>
+            }
+        </sqx-dropdown-menu>
+    }
+
+    <div class="d-flex flex-nowrap" #menu [class.gap-1]="small" [class.gap-2]="!small" [class.overflown-right]="!!overflowMenuItems && isRightAligned" [class.overflown-left]="!!overflowMenuItems && !isRightAligned">
+        <ng-content />
+    </div>
+</div>
