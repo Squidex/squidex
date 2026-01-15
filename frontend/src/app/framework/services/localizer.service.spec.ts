@@ -17,9 +17,9 @@ describe('LocalizerService', () => {
     };
 
     it('should instantiate', () => {
-        const titleService = new LocalizerService(translations);
+        const localizer = new LocalizerService(translations);
 
-        expect(titleService).toBeDefined();
+        expect(localizer).toBeDefined();
     });
 
     it('should return key if not found', () => {
