@@ -7,13 +7,14 @@
 
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { FieldDto, RichTextFieldPropertiesDto, TranslatePipe } from '@app/shared';
+import { FieldDto, FormRowComponent, RichTextFieldPropertiesDto, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-rich-text-validation',
     styleUrls: ['rich-text-validation.component.scss'],
     templateUrl: 'rich-text-validation.component.html',
     imports: [
+        FormRowComponent,
         FormsModule,
         ReactiveFormsModule,
         TranslatePipe,

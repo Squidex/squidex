@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { AppLanguageDto, FieldDto, FormHintComponent, LocalizedInputComponent, ReferencesFieldPropertiesDto, SchemaTagSource, TagEditorComponent, TranslatePipe } from '@app/shared';
+import { AppLanguageDto, FieldDto, FormRowComponent, LocalizedInputComponent, ReferencesFieldPropertiesDto, SchemaTagSource, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-references-validation',
@@ -16,7 +16,7 @@ import { AppLanguageDto, FieldDto, FormHintComponent, LocalizedInputComponent, R
     templateUrl: 'references-validation.component.html',
     imports: [
         AsyncPipe,
-        FormHintComponent,
+        FormRowComponent,
         FormsModule,
         LocalizedInputComponent,
         ReactiveFormsModule,
@@ -37,8 +37,8 @@ export class ReferencesValidationComponent {
     @Input({ required: true })
     public languages!: ReadonlyArray<AppLanguageDto>;
 
-    @Input({ transform: booleanAttribute })
-    public isLocalizable?: boolean | null;
+    @Input({ required: true, transform: booleanAttribute })
+    public isLocalizable!: boolean;
 
     constructor(
         public readonly schemasSource: SchemaTagSource,

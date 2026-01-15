@@ -8,17 +8,16 @@
 
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { BooleanFieldEditorValues, BooleanFieldPropertiesDto, FieldDto, FormHintComponent, TranslatePipe } from '@app/shared';
+import { BooleanFieldEditorValues, BooleanFieldPropertiesDto, FieldDto, FormRowComponent } from '@app/shared';
 
 @Component({
     selector: 'sqx-boolean-ui',
     styleUrls: ['boolean-ui.component.scss'],
     templateUrl: 'boolean-ui.component.html',
     imports: [
-        FormHintComponent,
+        FormRowComponent,
         FormsModule,
         ReactiveFormsModule,
-        TranslatePipe,
     ],
 })
 export class BooleanUIComponent {

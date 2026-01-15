@@ -28,89 +28,78 @@
 
     <div class="card-body">
         <div class="container">
-            <div class="form-group row">
-                <label class="col-3 col-form-label" for="{{ client.id }}_clientId"> {{ "common.clientId" | sqxTranslate }} </label>
-                <div class="col">
-                    <div class="input-group">
-                        <input class="form-control" id="{{ client.id }}_clientId" #clientId readonly value="{{ appsState.appName }}:{{ client.id }}" />
-                        <button
-                            class="btn btn-outline-secondary"
-                            attr.aria-label="{{ 'clients.copyClientId' | sqxTranslate }}"
-                            [sqxCopy]="clientId"
-                            title="i18n:clients.copyClientId"
-                            type="button">
-                            <i class="icon-copy"></i>
-                        </button>
-                    </div>
+            <sqx-form-row #clientIdRow for="clientId" hideError label="common.clientId" [prefix]="client.id">
+                <div class="input-group">
+                    <input class="form-control" [id]="clientIdRow.fieldName" #clientId readonly value="{{ appsState.appName }}:{{ client.id }}" />
+                    <button
+                        class="btn btn-outline-secondary"
+                        attr.aria-label="{{ 'clients.copyClientId' | sqxTranslate }}"
+                        [sqxCopy]="clientId"
+                        title="i18n:clients.copyClientId"
+                        type="button">
+                        <i class="icon-copy"></i>
+                    </button>
                 </div>
-            </div>
+            </sqx-form-row>
 
-            <div class="form-group row">
-                <label class="col-3 col-form-label" for="{{ client.id }}_clientSecret"> {{ "common.clientSecret" | sqxTranslate }} </label>
-
-                <div class="col">
-                    <div class="input-group">
-                        <input class="form-control" id="{{ client.id }}_clientSecret" #inputSecret readonly [value]="client.secret" />
-                        <button
-                            class="btn btn-outline-secondary"
-                            attr.aria-label="{{ 'clients.copyClientSecret' | sqxTranslate }}"
-                            [sqxCopy]="inputSecret"
-                            title="i18n:clients.copyClientSecret"
-                            type="button">
-                            <i class="icon-copy"></i>
-                        </button>
-                    </div>
+            <sqx-form-row #clientSecretRow for="clientSecret" hideError label="common.clientSecret" [prefix]="client.id">
+                <div class="input-group">
+                    <input class="form-control" [id]="clientSecretRow.fieldName" #inputSecret readonly [value]="client.secret" />
+                    <button
+                        class="btn btn-outline-secondary"
+                        attr.aria-label="{{ 'clients.copyClientSecret' | sqxTranslate }}"
+                        [sqxCopy]="inputSecret"
+                        title="i18n:clients.copyClientSecret"
+                        type="button">
+                        <i class="icon-copy"></i>
+                    </button>
                 </div>
-            </div>
+            </sqx-form-row>
 
-            <div class="form-group row">
-                <label class="col-3 col-form-label"> {{ "common.role" | sqxTranslate }} </label>
-                <div class="col">
-                    <select class="form-select" [disabled]="!client.canUpdate" [ngModel]="client.role" (ngModelChange)="updateRole($event)">
-                        @for (role of clientRoles; track role.name) {
-                            <option [ngValue]="role.name">{{ role.name }}</option>
-                        }
-                    </select>
-                </div>
-            </div>
+            <sqx-form-row #roleRow for="role" hideError label="common.role" [prefix]="client.id">
+                <select
+                    class="form-select"
+                    [id]="roleRow.fieldName"
+                    [disabled]="!client.canUpdate"
+                    [ngModel]="client.role"
+                    (ngModelChange)="updateRole($event)">
+                    @for (role of clientRoles; track role.name) {
+                        <option [ngValue]="role.name">{{ role.name }}</option>
+                    }
+                </select>
+            </sqx-form-row>
 
-            <div class="form-group row">
-                <div class="col offset-3">
-                    <div class="form-check">
+            <sqx-form-row #allowAnonymousRow check for="allowAnonymous" hints="clients.allowAnonymousHint" label="clients.allowAnonymous" [prefix]="client.id">
+                <input
+                    class="form-check-input"
+                    [id]="allowAnonymousRow.fieldName"
+                    [disabled]="!client.canUpdate"
+                    [ngModel]="client.allowAnonymous"
+                    (ngModelChange)="updateAllowAnonymous($event)"
+                    type="checkbox" />
+            </sqx-form-row>
+
+            <sqx-form-row #apiCallsLimitRow for="apiCallsLimit" hideError hint="clients.apiCallsLimitHint" label="clients.apiCallsLimit" [prefix]="client.id">
+                <div class="row gx-2">
+                    <div class="col">
                         <input
-                            class="form-check-input"
-                            id="{{ client.id }}_allowAnonymous"
+                            class="form-control"
+                            [id]="apiCallsLimitRow.fieldName"
                             [disabled]="!client.canUpdate"
-                            [ngModel]="client.allowAnonymous"
-                            (ngModelChange)="updateAllowAnonymous($event)"
-                            type="checkbox" />
-                        <label class="form-check-label" for="{{ client.id }}_allowAnonymous">
-                            {{ "clients.allowAnonymous" | sqxTranslate }}
-                        </label>
+                            min="0"
+                            [(ngModel)]="apiCallsLimit"
+                            type="number" />
                     </div>
-                    <sqx-form-hint> {{ "clients.allowAnonymousHint" | sqxTranslate }} </sqx-form-hint>
-                </div>
-            </div>
 
-            <div class="form-group row">
-                <label class="col-3 col-form-label"> {{ "clients.apiCallsLimit" | sqxTranslate }} </label>
-                <div class="col">
-                    <div class="row gx-2">
-                        <div class="col">
-                            <input class="form-control" [disabled]="!client.canUpdate" min="0" [(ngModel)]="apiCallsLimit" type="number" />
-                            <sqx-form-hint> {{ "clients.apiCallsLimitHint" | sqxTranslate }} </sqx-form-hint>
+                    @if (client.canUpdate) {
+                        <div class="col-auto">
+                            <button class="btn btn-outline-secondary" (click)="updateApiCallsLimit(apiCallsLimit)">
+                                {{ "common.save" | sqxTranslate }}
+                            </button>
                         </div>
-
-                        @if (client.canUpdate) {
-                            <div class="col-auto">
-                                <button class="btn btn-outline-secondary" (click)="updateApiCallsLimit(apiCallsLimit)">
-                                    {{ "common.save" | sqxTranslate }}
-                                </button>
-                            </div>
-                        }
-                    </div>
+                    }
                 </div>
-            </div>
+            </sqx-form-row>
         </div>
     </div>
 </div>

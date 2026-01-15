@@ -38,6 +38,9 @@ export class LanguageSelectorComponent implements  OnInit {
     public languages: ReadonlyArray<Language> = [];
 
     @Input({ transform: booleanAttribute })
+    public showAlways = false;
+
+    @Input({ transform: booleanAttribute })
     public exists?: { [language: string]: boolean } | null;
 
     @Input({ transform: numberAttribute })
