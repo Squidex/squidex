@@ -19,7 +19,6 @@ export class ErrorValidator {
         }
 
         const path = getControlPath(control, true);
-
         if (!path) {
             return null;
         }
@@ -27,14 +26,12 @@ export class ErrorValidator {
         const value = control.value;
 
         const current = this.errorsCache[path];
-
         if (current && current.value !== value) {
             this.errorsCache[path] = { value };
             return null;
         }
 
         const errors: string[] = [];
-
         if (this.errorSource.details) {
             for (const details of this.errorSource.details) {
                 for (const property of details.properties) {

@@ -6,7 +6,7 @@
  */
 
 import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
-import { BehaviorSubject, Observable } from 'rxjs';
+import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
 import { debounceTimeSafe, ExtendedFormGroup, Form, FormArrayTemplate, TemplatedFormArray, Types, value$ } from '@app/framework';
 import { FormGroupTemplate, TemplatedFormGroup } from '@app/framework/angular/forms/templated-form-group';
@@ -168,20 +168,33 @@ export class EditContentForm extends Form<ExtendedFormGroup, any> {
 
     protected enable() {
         this.form.enable({ onlySelf: true });
-
         this.updateState(this.value);
     }
 
     public setContext(context?: any) {
         this.context = context;
-
         this.updateState(this.value);
     }
 
     public submitCompleted(options?: { newValue?: any; noReset?: boolean }) {
         super.submitCompleted(options);
-
         this.updateInitialData();
+    }
+
+    private updateInitial(data?: any) {
+        for (const [key, field] of Object.entries(this.fields)) {
+            field.updateInitial(Types.isObject(data) ? data[key] : undefined);
+        }
+    }
+
+    private updateValue(value: any) {
+        this.valueChange$.next(value);
+        this.updateState(value);
+    }
+
+    private updateInitialData() {
+        this.initialData = this.form.value;
+        this.updateInitial(this.initialData);
     }
 
     private updateState(data: any) {
@@ -195,24 +208,18 @@ export class EditContentForm extends Form<ExtendedFormGroup, any> {
             section.updateHidden();
         }
     }
-
-    private updateValue(value: any) {
-        this.valueChange$.next(value);
-
-        this.updateState(value);
-    }
-
-    private updateInitialData() {
-        this.initialData = this.form.value;
-    }
 }
 
 export class FieldForm extends AbstractContentForm<FieldDto, UntypedFormGroup> {
     private readonly partitions: { [partition: string]: FieldItemForm } = {};
+    private readonly initialValue$ = new Subject<any>();
     private isRequired: boolean;
 
     public readonly translationStatus =
         value$(this.form).pipe(map(x => fieldTranslationStatus(x)));
+
+    public readonly hasChanges =
+        combineLatest([this.initialValue$, value$(this.form)]).pipe(map(([lhs, rhs]) => !Types.equals(lhs, rhs)));
 
     constructor(args: ControlArgs<FieldDto>) {
         super(args, FieldForm.buildForm());
@@ -271,6 +278,10 @@ export class FieldForm extends AbstractContentForm<FieldDto, UntypedFormGroup> {
         for (const partition of Object.values(this.partitions)) {
             partition.updateState(context, itemData, state);
         }
+    }
+
+    public updateInitial(data: any) {
+        this.initialValue$.next(data);
     }
 
     private static buildForm() {

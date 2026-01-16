@@ -20,6 +20,21 @@
     position: relative;
 }
 
+.change-marker-host {
+    position: relative;
+    overflow-x: visible;
+    overflow-y: visible;
+}
+
+.change-marker {
+    @include absolute(-.5rem, null, null, 1rem);
+    background: $color-white;
+    border: 1px solid $color-border;
+    border-radius: $border-radius;
+    font-size: $font-smallest;
+    padding: .125rem .5rem;
+}
+
 .field {
     &-required {
         color: $color-theme-error;

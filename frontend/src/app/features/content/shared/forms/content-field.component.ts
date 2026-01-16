@@ -8,7 +8,7 @@
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
 import { booleanAttribute, Component, EventEmitter, HostBinding, inject, Input, numberAttribute, Optional, Output } from '@angular/core';
 import { Observable } from 'rxjs';
-import { AppLanguageDto, AppsState, changed$, CommentsState, disabled$, EditContentForm, FieldForm, FocusMarkerComponent, invalid$, LocalStoreService, MenuItemComponent, SchemaDto, Settings, TranslateDto, TranslationsService, TypedSimpleChanges, UIOptions } from '@app/shared';
+import { AppLanguageDto, AppsState, changed$, CommentsState, disabled$, EditContentForm, FieldForm, FocusMarkerComponent, invalid$, LocalStoreService, MenuItemComponent, SchemaDto, Settings, TranslateDto, TranslatePipe, TranslationsService, TypedSimpleChanges, UIOptions } from '@app/shared';
 import { FieldCopyButtonComponent } from './field-copy-button.component';
 import { FieldEditorComponent } from './field-editor.component';
 import { FieldLanguagesComponent } from './field-languages.component';
@@ -25,6 +25,7 @@ import { FieldLanguagesComponent } from './field-languages.component';
         FocusMarkerComponent,
         MenuItemComponent,
         NgTemplateOutlet,
+        TranslatePipe,
     ],
 })
 export class ContentFieldComponent {
