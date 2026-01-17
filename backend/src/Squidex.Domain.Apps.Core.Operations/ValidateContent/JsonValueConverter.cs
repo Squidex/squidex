@@ -155,6 +155,23 @@ public sealed class JsonValueConverter : IFieldPropertiesVisitor<(object? Result
         }
     }
 
+    public (object? Result, JsonError? Error) Visit(UserInfoFieldProperties properties, Args args)
+    {
+        var result = UserInfoValue.TryParse(args.Value, out var value);
+
+        switch (result)
+        {
+            case UserInfoParseResult.InvalidApiKey:
+                return (null, new JsonError(T.Get("contents.invalidUserInfoApiKey")));
+            case UserInfoParseResult.InvalidRole:
+                return (null, new JsonError(T.Get("contents.invalidUserInfoRole")));
+            case UserInfoParseResult.InvalidValue:
+                return (null, new JsonError(T.Get("contents.invalidUserInfo")));
+            default:
+                return (value, null);
+        }
+    }
+
     private static (object? Result, JsonError? Error) ConvertToIdList(JsonValue value)
     {
         if (value.Value is JsonArray a)

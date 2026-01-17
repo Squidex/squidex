@@ -124,6 +124,11 @@ internal sealed class FilterVisitor : IFieldVisitor<FilterSchema?, FilterVisitor
         return null;
     }
 
+    public FilterSchema? Visit(IField<UserInfoFieldProperties> field, Args args)
+    {
+        return FilterSchema.Any;
+    }
+
     public FilterSchema? Visit(IField<ComponentFieldProperties> field, Args args)
     {
         if (args.Level >= MaxDepth)

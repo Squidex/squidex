@@ -316,6 +316,16 @@ public class DefaultValueFactoryTests
         Assert.Equal(new JsonArray(), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
     }
 
+    [Fact]
+    public void Should_get_default_value_from_userinfo_field()
+    {
+        var field =
+            Fields.UserInfo(1, "1", Partitioning.Invariant,
+                new UserInfoFieldProperties());
+
+        Assert.IsType<JsonObject>(DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
+    }
+
     private Instant FutureDays(int days)
     {
         return now.WithoutMs().Plus(Duration.FromDays(days));

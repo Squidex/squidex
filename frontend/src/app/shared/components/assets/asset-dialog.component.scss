@@ -1,10 +1,6 @@
 @import 'mixins';
 @import 'vars';
 
-.form-group {
-    position: relative;
-}
-
 .editor {
     @include absolute(0, 0, 0, 0);
 
@@ -39,6 +35,10 @@
     &:last-child {
         margin: 0;
     }
+}
+
+.form-group {
+    position: relative;
 }
 
 .slug {

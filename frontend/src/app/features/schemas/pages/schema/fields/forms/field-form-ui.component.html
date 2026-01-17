@@ -56,6 +56,10 @@
     @case ("Tags") {
         <sqx-tags-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
     }
+
+    @case ("UserInfo") {
+        <sqx-user-info-ui [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
+    }
 }
 
 <div class="mt-3" [formGroup]="fieldForm">

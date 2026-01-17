@@ -94,4 +94,9 @@ internal sealed class DefaultValueChecker : IFieldPropertiesVisitor<bool, None>
     {
         return false;
     }
+
+    public bool Visit(UserInfoFieldProperties properties, None args)
+    {
+        return true;
+    }
 }

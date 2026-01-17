@@ -115,4 +115,9 @@ internal sealed class FieldInputVisitor(Builder builder) : IFieldVisitor<IGraphT
     {
         return null;
     }
+
+    public IGraphType? Visit(IField<UserInfoFieldProperties> field, FieldInfo args)
+    {
+        return Scalars.Json;
+    }
 }

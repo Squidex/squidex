@@ -489,6 +489,22 @@ describe('TagsField', () => {
     });
 });
 
+describe('UserInfoField', () => {
+    const field = createField({ properties: createProperties('UserInfo') });
+
+    it('should create validators', () => {
+        expect(FieldsValidators.create(field, false).length).toBe(0);
+    });
+
+    it('should format to user constant', () => {
+        expect(FieldFormatter.format(field, null)).toBe('User');
+    });
+
+    it('should return default value as null', () => {
+        expect(FieldDefaultValue.get(field, 'iv')).toBeNull();
+    });
+});
+
 function isUtc() {
     return new Date().getTimezoneOffset() === 0;
 }

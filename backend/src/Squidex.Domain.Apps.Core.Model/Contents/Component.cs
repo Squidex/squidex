@@ -53,7 +53,6 @@ public sealed record Component(string Type, JsonObject Data, Schema Schema)
         }
 
         discriminator = s;
-
         return true;
     }
 }

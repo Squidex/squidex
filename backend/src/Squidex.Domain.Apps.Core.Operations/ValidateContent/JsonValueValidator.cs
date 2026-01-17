@@ -75,9 +75,7 @@ public sealed class JsonValueValidator : IFieldPropertiesVisitor<bool, JsonValue
 
     public bool Visit(GeolocationFieldProperties properties, Args args)
     {
-        var result = GeoJsonValue.TryParse(args.Value, args.Serializer, out _);
-
-        return result == GeoJsonParseResult.Success;
+        return GeoJsonValue.TryParse(args.Value, args.Serializer, out _) == GeoJsonParseResult.Success;
     }
 
     public bool Visit(JsonFieldProperties properties, Args args)
@@ -113,6 +111,11 @@ public sealed class JsonValueValidator : IFieldPropertiesVisitor<bool, JsonValue
     public bool Visit(UIFieldProperties properties, Args args)
     {
         return true;
+    }
+
+    public bool Visit(UserInfoFieldProperties properties, Args args)
+    {
+        return UserInfoValue.TryParse(args.Value, out _) == UserInfoParseResult.Success;
     }
 
     private static bool IsValidStringList(JsonValue value)

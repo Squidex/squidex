@@ -45,7 +45,7 @@ public sealed record ArrayField : RootField<ArrayFieldProperties>, IArrayField
     }
 
     [Pure]
-    public ArrayField AddField(NestedField field)
+    public ArrayField AddUserInfo(NestedField field)
     {
         return Updatefields(f => f.Add(field));
     }

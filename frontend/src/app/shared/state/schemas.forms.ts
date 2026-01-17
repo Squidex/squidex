@@ -393,6 +393,10 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
     public visitUI() {
         return undefined;
     }
+
+    public visitUserInfo() {
+        return undefined;
+    }
 }
 
 export class EditSchemaForm extends Form<ExtendedFormGroup, UpdateSchemaDto, SchemaPropertiesDto> {

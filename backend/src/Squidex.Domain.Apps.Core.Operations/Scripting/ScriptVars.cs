@@ -59,7 +59,7 @@ public class ScriptVars : IDictionary<string, object?>
     }
 
     public void CopyTo(KeyValuePair<string, object?>[] array, int arrayIndex)
-    { 
+    {
         Guard.NotNull(array);
         ((IDictionary)values).CopyTo(array, arrayIndex);
     }

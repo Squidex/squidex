@@ -37,7 +37,7 @@ public partial class SchemaDomainObject
                 {
                     var field = e.Properties.CreateNestedField(e.FieldId.Id, e.Name);
 
-                    newSnapshot = newSnapshot.UpdateField(e.ParentFieldId.Id, x => ((ArrayField)x).AddField(field));
+                    newSnapshot = newSnapshot.UpdateField(e.ParentFieldId.Id, x => ((ArrayField)x).AddUserInfo(field));
                 }
                 else
                 {

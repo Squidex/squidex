@@ -1,4 +1,4 @@
-<div [formGroup]="fieldForm" class="mb-3">
+<div class="mb-3" [formGroup]="fieldForm">
     <sqx-form-row #requiredRow check for="isRequired" label="schemas.field.required" [prefix]="field.fieldId">
         <input class="form-check-input" [id]="requiredRow.fieldName" formControlName="isRequired" type="checkbox" />
     </sqx-form-row>
@@ -101,5 +101,9 @@
             [isLocalizable]="isLocalizable"
             [languages]="languages"
             [properties]="field.rawProperties" />
+    }
+
+    @case ("UserInfo") {
+        <sqx-user-info-validation [field]="field" [fieldForm]="fieldForm" [properties]="field.rawProperties" />
     }
 }

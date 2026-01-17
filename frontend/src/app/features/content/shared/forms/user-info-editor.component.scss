@@ -1,0 +1,24 @@
+@import 'mixins';
+@import 'vars';
+
+.form {
+    border: 1px solid $color-border;
+    border-radius: $border-radius;
+    padding: 1.5rem;
+}
+
+.form-group {
+    position: relative;
+}
+
+.key {
+    padding-right: 6rem;
+}
+
+.key-generate {
+    @include absolute(auto, 10px, 3px, auto);
+
+    &:focus {
+        box-shadow: none;
+    }
+}

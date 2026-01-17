@@ -111,7 +111,7 @@ public sealed class ContentScriptVars : DataScriptVars
     }
 
     [FieldDescription(nameof(FieldDescriptions.EntityCreated))]
-    public Instant Created 
+    public Instant Created
     {
         set => SetInitial(value);
     }

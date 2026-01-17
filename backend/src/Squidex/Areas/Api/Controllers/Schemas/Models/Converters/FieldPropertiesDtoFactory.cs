@@ -93,4 +93,9 @@ internal sealed class FieldPropertiesDtoFactory : IFieldPropertiesVisitor<FieldP
     {
         return UIFieldPropertiesDto.FromDomain(fieldProperties);
     }
+
+    public FieldPropertiesDto Visit(UserInfoFieldProperties fieldProperties, None args)
+    {
+        return UserInfoFieldPropertiesDto.FromDomain(fieldProperties);
+    }
 }

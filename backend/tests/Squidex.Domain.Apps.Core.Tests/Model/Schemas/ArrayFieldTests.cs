@@ -20,7 +20,7 @@ public class ArrayfieldTests
     {
         var field = CreateField(1);
 
-        var parent_1 = parent_0.AddField(field);
+        var parent_1 = parent_0.AddUserInfo(field);
 
         Assert.Empty(parent_0.Fields);
         Assert.Equal(field, parent_1.FieldsById[1]);
@@ -29,7 +29,7 @@ public class ArrayfieldTests
     [Fact]
     public void Should_throw_exception_if_adding_field_with_name_that_already_exists()
     {
-        var parent_1 = parent_0.AddField(CreateField(1));
+        var parent_1 = parent_0.AddUserInfo(CreateField(1));
 
         Assert.Throws<ArgumentException>(() => parent_1.AddNumber(2, "myField1"));
     }
@@ -37,7 +37,7 @@ public class ArrayfieldTests
     [Fact]
     public void Should_throw_exception_if_adding_field_with_id_that_already_exists()
     {
-        var parent_1 = parent_0.AddField(CreateField(1));
+        var parent_1 = parent_0.AddUserInfo(CreateField(1));
 
         Assert.Throws<ArgumentException>(() => parent_1.AddNumber(1, "myField2"));
     }
@@ -45,7 +45,7 @@ public class ArrayfieldTests
     [Fact]
     public void Should_hide_field()
     {
-        var parent_1 = parent_0.AddField(CreateField(1));
+        var parent_1 = parent_0.AddUserInfo(CreateField(1));
 
         var parent_2 = parent_1.UpdateField(1, f => f.Hide());
         var parent_3 = parent_2.UpdateField(1, f => f.Hide());
@@ -67,7 +67,7 @@ public class ArrayfieldTests
     [Fact]
     public void Should_show_field()
     {
-        var parent_1 = parent_0.AddField(CreateField(1));
+        var parent_1 = parent_0.AddUserInfo(CreateField(1));
 
         var parent_2 = parent_1.UpdateField(1, f => f.Hide());
         var parent_3 = parent_2.UpdateField(1, f => f.Show());
@@ -90,7 +90,7 @@ public class ArrayfieldTests
     [Fact]
     public void Should_disable_field()
     {
-        var parent_1 = parent_0.AddField(CreateField(1));
+        var parent_1 = parent_0.AddUserInfo(CreateField(1));
 
         var parent_2 = parent_1.UpdateField(1, f => f.Disable());
         var parent_3 = parent_2.UpdateField(1, f => f.Disable());
@@ -112,7 +112,7 @@ public class ArrayfieldTests
     [Fact]
     public void Should_enable_field()
     {
-        var parent_1 = parent_0.AddField(CreateField(1));
+        var parent_1 = parent_0.AddUserInfo(CreateField(1));
 
         var parent_2 = parent_1.UpdateField(1, f => f.Disable());
         var parent_3 = parent_2.UpdateField(1, f => f.Enable());
@@ -144,7 +144,7 @@ public class ArrayfieldTests
             MinValue = 10,
         };
 
-        var parent_1 = parent_0.AddField(CreateField(1));
+        var parent_1 = parent_0.AddUserInfo(CreateField(1));
         var parent_2 = parent_1.UpdateField(1, f => f.Update(properties1));
         var parent_3 = parent_2.UpdateField(1, f => f.Update(properties2));
 
@@ -157,7 +157,7 @@ public class ArrayfieldTests
     [Fact]
     public void Should_throw_exception_if_updating_with_invalid_properties_type()
     {
-        var parent_1 = parent_0.AddField(CreateField(1));
+        var parent_1 = parent_0.AddUserInfo(CreateField(1));
 
         Assert.Throws<ArgumentException>(() => parent_1.UpdateField(1, f => f.Update(new StringFieldProperties())));
     }
@@ -173,7 +173,7 @@ public class ArrayfieldTests
     [Fact]
     public void Should_delete_field()
     {
-        var parent_1 = parent_0.AddField(CreateField(1));
+        var parent_1 = parent_0.AddUserInfo(CreateField(1));
         var parent_2 = parent_1.DeleteField(1);
         var parent_3 = parent_2.DeleteField(1);
 
@@ -197,9 +197,9 @@ public class ArrayfieldTests
         var field2 = CreateField(2);
         var field3 = CreateField(3);
 
-        var parent_1 = parent_0.AddField(field1);
-        var parent_2 = parent_1.AddField(field2);
-        var parent_3 = parent_2.AddField(field3);
+        var parent_1 = parent_0.AddUserInfo(field1);
+        var parent_2 = parent_1.AddUserInfo(field2);
+        var parent_3 = parent_2.AddUserInfo(field3);
         var parent_4 = parent_3.ReorderFields([3, 2, 1]);
         var parent_5 = parent_4.ReorderFields([3, 2, 1]);
 
@@ -214,8 +214,8 @@ public class ArrayfieldTests
         var field1 = CreateField(1);
         var field2 = CreateField(2);
 
-        var parent_1 = parent_0.AddField(field1);
-        var parent_2 = parent_1.AddField(field2);
+        var parent_1 = parent_0.AddUserInfo(field1);
+        var parent_2 = parent_1.AddUserInfo(field2);
 
         Assert.Throws<ArgumentException>(() => parent_2.ReorderFields([1]));
     }
@@ -226,8 +226,8 @@ public class ArrayfieldTests
         var field1 = CreateField(1);
         var field2 = CreateField(2);
 
-        var parent_1 = parent_0.AddField(field1);
-        var parent_2 = parent_1.AddField(field2);
+        var parent_1 = parent_0.AddUserInfo(field1);
+        var parent_2 = parent_1.AddUserInfo(field2);
 
         Assert.Throws<ArgumentException>(() => parent_2.ReorderFields([1, 4]));
     }

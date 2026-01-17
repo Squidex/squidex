@@ -354,6 +354,10 @@
                     @case ("UI") {
                         <h4 class="ui-separator">{{ field.displayName }}</h4>
                     }
+
+                    @case ("UserInfo") {
+                        <sqx-user-info-editor [formControl]="$any(fieldForm)" [formId]="formModel.path" />
+                    }
                 }
             }
         </div>

@@ -88,7 +88,6 @@ public sealed class AddDefaultValues(PartitionResolver partitionResolver, IClock
         }
 
         var defaultValue = DefaultValueFactory.CreateDefaultValue(field, GetNow(), key);
-
         if (defaultValue == default)
         {
             return;

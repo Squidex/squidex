@@ -1,7 +1,7 @@
-<div class="row gx-1" [class.disabled]="snapshot.isDisabled">
+<div class="row gx-1 header" [class.disabled]="snapshot.isDisabled">
     <div class="col">
         <div
-            class="btn btn-outline-secondary btn-dashed btn-block btn-add"
+            class="btn btn-outline-secondary btn-dashed btn-block btn-add mb-1"
             (click)="fileInput.click()"
             [sqxDropDisabled]="snapshot.isDisabled"
             (sqxDropFile)="addFiles($event)">
@@ -11,7 +11,7 @@
     </div>
 
     <div class="col">
-        <button class="btn btn-outline-secondary btn-dashed btn-block btn-add" (click)="assetsDialog.show()" type="button">
+        <button class="btn btn-outline-secondary btn-dashed btn-block btn-add mb-1" (click)="assetsDialog.show()" type="button">
             {{ "contents.assetsSelect" | sqxTranslate }}
         </button>
     </div>

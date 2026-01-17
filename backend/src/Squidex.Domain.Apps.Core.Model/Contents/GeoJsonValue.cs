@@ -41,7 +41,6 @@ public static class GeoJsonValue
             }
 
             geoJSON = new Point(new Coordinate(lon, lat));
-
             return GeoJsonParseResult.Success;
         }
 

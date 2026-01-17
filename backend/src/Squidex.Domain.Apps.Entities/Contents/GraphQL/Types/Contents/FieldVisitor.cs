@@ -266,6 +266,11 @@ internal sealed class FieldVisitor(Builder builder) : IFieldVisitor<FieldGraphSc
         return default;
     }
 
+    public FieldGraphSchema Visit(IField<UserInfoFieldProperties> field, FieldInfo args)
+    {
+        return new (Scalars.Json, JsonPath, ContentActions.Json.Arguments);
+    }
+
     private IGraphType? ResolveReferences(FieldInfo fieldInfo, ReadonlyList<DomainId>? schemaIds)
     {
         IGraphType? contentType = null;

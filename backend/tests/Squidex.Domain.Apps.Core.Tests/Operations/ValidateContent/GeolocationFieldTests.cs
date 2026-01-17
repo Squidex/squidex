@@ -62,6 +62,17 @@ public class GeolocationFieldTests : IClassFixture<TranslationsFixture>
     }
 
     [Fact]
+    public async Task Should_add_error_if_geolocation_is_not_an_object()
+    {
+        var sut = Field(new GeolocationFieldProperties { IsRequired = true });
+
+        await sut.ValidateAsync(JsonValue.True, errors);
+
+        errors.Should().BeEquivalentTo(
+            ["Invalid json type, expected latitude/longitude object."]);
+    }
+
+    [Fact]
     public async Task Should_add_error_if_geolocation_has_invalid_latitude()
     {
         var sut = Field(new GeolocationFieldProperties { IsRequired = true });

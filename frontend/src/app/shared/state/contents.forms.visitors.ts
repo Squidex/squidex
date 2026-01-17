@@ -7,7 +7,7 @@
 
 import { ValidatorFn, Validators } from '@angular/forms';
 import { DateTime, Types, ValidatorsEx } from '@app/framework';
-import { AppLanguageDto, ContentDto, FieldDto, NestedFieldDto } from '../model';
+import { AppLanguageDto, ContentDto, FieldDto, NestedFieldDto, UserInfoFieldPropertiesDto } from '../model';
 import { ArrayFieldPropertiesDto, AssetsFieldPropertiesDto, BooleanFieldPropertiesDto, ComponentFieldPropertiesDto, ComponentsFieldPropertiesDto, DateTimeFieldPropertiesDto, fieldInvariant, FieldPropertiesVisitor, GeolocationFieldPropertiesDto, JsonFieldPropertiesDto, NumberFieldPropertiesDto, ReferencesFieldPropertiesDto, RichTextFieldPropertiesDto, StringFieldPropertiesDto, TagsFieldPropertiesDto, UIFieldPropertiesDto } from '../model';
 
 export class HtmlValue {
@@ -276,6 +276,10 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
         return this.value;
     }
 
+    public visitUserInfo(_: UserInfoFieldPropertiesDto): string {
+        return 'User';
+    }
+
     private formatArray(singularName: string, pluralName: string) {
         if (!Types.isArray(this.value)) {
             return `0 ${pluralName}`;
@@ -448,6 +452,10 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
     public visitUI(_: UIFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
         return [];
     }
+
+    public visitUserInfo(_: UserInfoFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
+        return [];
+    }
 }
 
 export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
@@ -530,6 +538,10 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
     }
 
     public visitUI(_: UIFieldPropertiesDto): any {
+        return null;
+    }
+
+    public visitUserInfo(_: UserInfoFieldPropertiesDto): any {
         return null;
     }
 

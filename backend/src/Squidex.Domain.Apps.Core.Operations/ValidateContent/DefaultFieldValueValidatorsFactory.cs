@@ -263,6 +263,16 @@ internal sealed class DefaultFieldValueValidatorsFactory : IFieldVisitor<IEnumer
         }
     }
 
+    public IEnumerable<IValidator> Visit(IField<UserInfoFieldProperties> field, Args args)
+    {
+        var properties = field.Properties;
+
+        if (IsRequired(properties, args.Context, out _))
+        {
+            yield return new RequiredValidator();
+        }
+    }
+
     private static bool IsRequired(FieldProperties properties, ValidationContext context, out bool result)
     {
         var isRequired = properties.IsRequired;
@@ -277,7 +287,7 @@ internal sealed class DefaultFieldValueValidatorsFactory : IFieldVisitor<IEnumer
         return isRequired;
     }
 
-    private static IValidator ComponentValidator(ValidatorFactory factory)
+    private static ComponentValidator ComponentValidator(ValidatorFactory factory)
     {
         return new ComponentValidator(schema =>
         {

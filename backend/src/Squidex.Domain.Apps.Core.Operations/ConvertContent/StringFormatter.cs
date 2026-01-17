@@ -94,6 +94,11 @@ public sealed class StringFormatter : IFieldPropertiesVisitor<string, StringForm
         return "<Json />";
     }
 
+    public string Visit(UserInfoFieldProperties properties, Args args)
+    {
+        return "[User]";
+    }
+
     public string Visit(NumberFieldProperties properties, Args args)
     {
         return args.Value.ToString();

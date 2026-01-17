@@ -100,6 +100,11 @@ internal sealed class ReferencesCleaner : IFieldPropertiesVisitor<JsonValue, Ref
         return args.Value;
     }
 
+    public JsonValue Visit(UserInfoFieldProperties properties, Args args)
+    {
+        return args.Value;
+    }
+
     private static JsonValue CleanIds(Args args)
     {
         if (args.Value.Value is JsonArray array)

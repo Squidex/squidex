@@ -7,6 +7,7 @@
 
 using System.Globalization;
 using NodaTime;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Json.Objects;
 
@@ -116,6 +117,11 @@ public sealed class DefaultValueFactory : IFieldPropertiesVisitor<JsonValue, Def
     public JsonValue Visit(UIFieldProperties properties, Args args)
     {
         return JsonValue.Null;
+    }
+
+    public JsonValue Visit(UserInfoFieldProperties properties, Args args)
+    {
+        return UserInfoValue.CreateDefault();
     }
 
     public JsonValue Visit(DateTimeFieldProperties properties, Args args)

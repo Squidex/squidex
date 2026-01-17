@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { EMPTY, Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, shareSubscribed, State, VersionTag } from '@app/framework';
 import { AddRoleDto, RoleDto, RolesDto, UpdateRoleDto } from '../model';
@@ -62,6 +62,14 @@ export class RolesState extends State<Snapshot> {
         super({ roles: [], version: VersionTag.EMPTY });
 
         debug(this, 'roles');
+    }
+
+    public loadIfNotLoaded(): Observable<any> {
+        if (this.snapshot.isLoaded) {
+            return EMPTY;
+        }
+
+        return this.loadInternal(false);
     }
 
     public load(isReload = false): Observable<any> {

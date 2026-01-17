@@ -22,6 +22,7 @@ import { ReferencesUIComponent } from '../types/references-ui.component';
 import { RichTextUIComponent } from '../types/rich-text-ui.component';
 import { StringUIComponent } from '../types/string-ui.component';
 import { TagsUIComponent } from '../types/tags-ui.component';
+import { UserInfoUIComponent } from '../types/user-info-ui.component';
 
 @Component({
     selector: 'sqx-field-form-ui',
@@ -44,6 +45,7 @@ import { TagsUIComponent } from '../types/tags-ui.component';
         ReferencesUIComponent,
         StringUIComponent,
         TagsUIComponent,
+        UserInfoUIComponent,
     ],
 })
 export class FieldFormUIComponent {
