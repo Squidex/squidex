@@ -17400,7 +17400,14 @@
           },
           {
             "type": "object",
-            "additionalProperties": false
+            "additionalProperties": false,
+            "properties": {
+              "defaultRole": {
+                "type": "string",
+                "description": "The role to create a default value.",
+                "nullable": true
+              }
+            }
           }
         ]
       },

@@ -15,7 +15,8 @@ using Squidex.Infrastructure.Json;
 
 namespace Squidex.Extensions.Text.ElasticSearch;
 
-public sealed partial class ElasticSearchTextIndex(IElasticSearchClient elasticClient, string indexName, IJsonSerializer jsonSerializer) : ITextIndex, IInitializable
+public sealed partial class ElasticSearchTextIndex(IElasticSearchClient elasticClient, string indexName, IJsonSerializer jsonSerializer)
+    : ITextIndex, IInitializable
 {
     private static readonly Regex RegexLanguageNormal = BuildLanguageRegexNormal();
     private static readonly Regex RegexLanguageStart = BuildLanguageRegexStart();
@@ -198,13 +199,62 @@ public sealed partial class ElasticSearchTextIndex(IElasticSearchClient elasticC
         return await SearchAsync(elasticQuery, ct);
     }
 
+    public async Task<UserInfoResult?> FindUserInfo(App app, ApiKeyQuery query, SearchScope scope,
+        CancellationToken ct = default)
+    {
+        Guard.NotNull(app);
+        Guard.NotNull(query);
+
+        var serveField = GetServeField(scope);
+
+        var elasticQuery = new
+        {
+            query = new
+            {
+                @bool = new
+                {
+                    filter = new object[]
+                    {
+                        new
+                        {
+                            term = new Dictionary<string, string>
+                            {
+                                [serveField] = "true",
+                            },
+                        },
+                        new
+                        {
+                            term = new Dictionary<string, string>
+                            {
+                                ["userInfoApiKey.keyword"] = query.ApiKey,
+                            },
+                        },
+                    },
+                },
+            },
+            _source = new[]
+            {
+                "contentId",
+                "userInfoApiKey",
+                "userInfoRole",
+            },
+            size = 1,
+        };
+
+        var hits = await elasticClient.SearchAsync(indexName, elasticQuery, ct);
+        var hit = hits.FirstOrDefault();
+
+        return hit != null ?
+            new UserInfoResult(DomainId.Create(hit["_source"]["contentId"]), hit["_source"]["userInfoRole"]) :
+            null;
+    }
+
     private async Task<List<DomainId>> SearchAsync(object query,
         CancellationToken ct)
     {
         var hits = await elasticClient.SearchAsync(indexName, query, ct);
 
         var ids = new List<DomainId>();
-
         foreach (var item in hits)
         {
             ids.Add(DomainId.Create(item["_source"]["contentId"]));

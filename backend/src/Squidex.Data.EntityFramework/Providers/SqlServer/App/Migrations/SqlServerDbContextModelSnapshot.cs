@@ -18,7 +18,7 @@ namespace Squidex.Providers.SqlServer.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.14")
+                .HasAnnotation("ProductVersion", "8.0.16")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
@@ -848,7 +848,7 @@ namespace Squidex.Providers.SqlServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Geos", (string)null);
+                    b.ToTable("Geos");
                 });
 
             modelBuilder.Entity("Squidex.Domain.Apps.Entities.Contents.Text.EFTextIndexTextEntity", b =>
@@ -887,7 +887,54 @@ namespace Squidex.Providers.SqlServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Texts", (string)null);
+                    b.ToTable("Texts");
+                });
+
+            modelBuilder.Entity("Squidex.Domain.Apps.Entities.Contents.Text.EFTextIndexUserInfoEntity", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(400)
+                        .HasColumnType("nvarchar(400)");
+
+                    b.Property<string>("AppId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("ContentId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("SchemaId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<bool>("ServeAll")
+                        .HasColumnType("bit");
+
+                    b.Property<bool>("ServePublished")
+                        .HasColumnType("bit");
+
+                    b.Property<byte>("Stage")
+                        .HasColumnType("tinyint");
+
+                    b.Property<string>("UserInfoApiKey")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.Property<string>("UserInfoRole")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("nvarchar(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserInfoApiKey");
+
+                    b.ToTable("UserInfos");
                 });
 
             modelBuilder.Entity("Squidex.Domain.Apps.Entities.Contents.Text.State.TextContentState", b =>
@@ -1049,7 +1096,6 @@ namespace Squidex.Providers.SqlServer.Migrations
             modelBuilder.Entity("Squidex.Events.EntityFramework.EFEventCommit", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("EventStream")
@@ -1121,7 +1167,6 @@ namespace Squidex.Providers.SqlServer.Migrations
             modelBuilder.Entity("Squidex.Flows.EntityFramework.EFFlowStateEntity", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<DateTimeOffset>("Created")

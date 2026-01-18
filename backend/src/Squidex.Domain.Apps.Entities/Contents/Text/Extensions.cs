@@ -41,6 +41,30 @@ public static class Extensions
         return result;
     }
 
+    public static List<UserInfoValue>? ToUserInfos(this ContentData data)
+    {
+        List<UserInfoValue>? result = null;
+
+        foreach (var (field, value) in data)
+        {
+            if (value != null)
+            {
+                foreach (var (key, jsonValue) in value)
+                {
+                    UserInfoValue.TryParse(jsonValue, out var userInfo);
+
+                    if (userInfo != null)
+                    {
+                        result ??= [];
+                        result.Add(userInfo);
+                    }
+                }
+            }
+        }
+
+        return result;
+    }
+
     public static Dictionary<string, string>? ToTexts(this ContentData data)
     {
         Dictionary<string, string>? result = null;

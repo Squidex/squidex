@@ -14,7 +14,8 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
-public abstract class MongoTextIndexBase<T>(IMongoDatabase database, string shardKey, CommandFactory<T> factory) : MongoRepositoryBase<MongoTextIndexEntity<T>>(database), ITextIndex, IDeleter where T : class
+public abstract class MongoTextIndexBase<T>(IMongoDatabase database, string shardKey, CommandFactory<T> factory)
+    : MongoRepositoryBase<MongoTextIndexEntity<T>>(database), ITextIndex, IDeleter where T : class
 {
     protected sealed class MongoTextResult
     {
@@ -29,6 +30,25 @@ public abstract class MongoTextIndexBase<T>(IMongoDatabase database, string shar
         [BsonIgnoreIfDefault]
         [BsonElement("score")]
         public double Score { get; set; }
+    }
+
+    protected sealed class MongoApiKeyResult
+    {
+        [BsonId]
+        [BsonElement]
+        public ObjectId Id { get; set; }
+
+        [BsonRequired]
+        [BsonElement("c")]
+        public DomainId ContentId { get; set; }
+
+        [BsonIgnoreIfNull]
+        [BsonElement("k")]
+        public string UserInfoApiKey { get; set; }
+
+        [BsonIgnoreIfNull]
+        [BsonElement("r")]
+        public string UserInfoRole { get; set; }
     }
 
     protected override async Task SetupCollectionAsync(IMongoCollection<MongoTextIndexEntity<T>> collection,
@@ -54,6 +74,11 @@ public abstract class MongoTextIndexBase<T>(IMongoDatabase database, string shar
                 new CreateIndexModel<MongoTextIndexEntity<T>>(
                     Index
                         .Geo2DSphere(x => x.GeoObject)),
+
+                new CreateIndexModel<MongoTextIndexEntity<T>>(
+                    Index
+                        .Geo2DSphere(x => x.UserInfoApiKey),
+                    new CreateIndexOptions { Sparse = true }),
             ], ct);
         }
         else
@@ -121,6 +146,27 @@ public abstract class MongoTextIndexBase<T>(IMongoDatabase database, string shar
                 throw;
             }
         }
+    }
+
+    public async Task<UserInfoResult?> FindUserInfo(App app, ApiKeyQuery query, SearchScope scope,
+        CancellationToken ct = default)
+    {
+        Guard.NotNull(app);
+        Guard.NotNull(query);
+
+        // Use the filter in the correct order to leverage the index in the best way.
+        var findFilter =
+            Filter.And(
+                Filter.Eq(x => x.AppId, app.Id),
+                Filter.Eq(x => x.UserInfoApiKey, query.ApiKey),
+                FilterByScope(scope));
+
+        var byApiKey =
+            await GetCollection(scope).Find(findFilter).Limit(1)
+                .Project<MongoApiKeyResult>(Projection.Include(x => x.ContentId).Include(x => x.UserInfoRole))
+                .FirstOrDefaultAsync(ct);
+
+        return byApiKey != null ? new UserInfoResult(byApiKey.ContentId, byApiKey.UserInfoRole) : null;
     }
 
     public virtual async Task<List<DomainId>?> SearchAsync(App app, GeoQuery query, SearchScope scope,

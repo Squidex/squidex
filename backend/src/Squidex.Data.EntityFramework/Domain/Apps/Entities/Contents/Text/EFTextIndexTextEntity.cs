@@ -6,13 +6,16 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
+[Table("Texts")]
 public sealed class EFTextIndexTextEntity
 {
     [Key]
+    [MaxLength(400)]
     required public string Id { get; set; }
 
     public DomainId AppId { get; set; }

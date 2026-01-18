@@ -97,6 +97,6 @@ internal sealed class DefaultValueChecker : IFieldPropertiesVisitor<bool, None>
 
     public bool Visit(UserInfoFieldProperties properties, None args)
     {
-        return true;
+        return !string.IsNullOrWhiteSpace(properties.DefaultRole);
     }
 }

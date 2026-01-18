@@ -4660,6 +4660,8 @@ export const UIFieldEditorValues: ReadonlyArray<UIFieldEditor> = [
 ];
 
 export class UserInfoFieldPropertiesDto extends FieldPropertiesDto implements IUserInfoFieldPropertiesDto {
+    /** The role to create a default value. */
+    readonly defaultRole?: string | undefined;
 
     public get isComplexUI() {
         return true;
@@ -4684,6 +4686,7 @@ export class UserInfoFieldPropertiesDto extends FieldPropertiesDto implements IU
 
     init(_data: any) {
         super.init(_data);
+        (<any>this).defaultRole = _data["defaultRole"];
         this.cleanup(this);
         return this;
     }
@@ -4696,6 +4699,7 @@ export class UserInfoFieldPropertiesDto extends FieldPropertiesDto implements IU
 
     toJSON(data?: any) {
         data = typeof data === 'object' ? data : {}; 
+        data["defaultRole"] = this.defaultRole;
         super.toJSON(data);
         this.cleanup(data);
         return data;
@@ -4703,6 +4707,8 @@ export class UserInfoFieldPropertiesDto extends FieldPropertiesDto implements IU
 }
 
 export interface IUserInfoFieldPropertiesDto extends IFieldPropertiesDto {
+    /** The role to create a default value. */
+    readonly defaultRole?: string | undefined;
 }
 
 export class NestedFieldDto extends ResourceDto implements INestedFieldDto {

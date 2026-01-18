@@ -9,6 +9,8 @@ namespace Squidex.Domain.Apps.Core.Schemas;
 
 public record class UserInfoFieldProperties : FieldProperties
 {
+    public string? DefaultRole { get; init; }
+
     public override T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args)
     {
         return visitor.Visit(this, args);

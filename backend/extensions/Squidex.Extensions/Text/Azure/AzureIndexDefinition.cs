@@ -116,6 +116,14 @@ public static class AzureIndexDefinition
             {
                 IsFilterable = true,
             },
+            new SimpleField("userInfoApiKey", SearchFieldDataType.String)
+            {
+                IsFilterable = true,
+            },
+            new SimpleField("userInfoField", SearchFieldDataType.String)
+            {
+                IsFilterable = true,
+            },
         };
 
         foreach (var (field, analyzer) in FieldAnalyzers.Values)

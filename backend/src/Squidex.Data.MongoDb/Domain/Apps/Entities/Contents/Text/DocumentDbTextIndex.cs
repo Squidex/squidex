@@ -14,7 +14,8 @@ using Squidex.Infrastructure.ObjectPool;
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
 public sealed class DocumentDbTextIndex(IMongoDatabase database, string shardKey)
-    : MongoTextIndexBase<string>(database, shardKey, new CommandFactory<string>(BuildTexts))
+    : MongoTextIndexBase<string>(database, shardKey,
+        new CommandFactory<string>(BuildTexts))
 {
     private record struct SearchOperation
     {

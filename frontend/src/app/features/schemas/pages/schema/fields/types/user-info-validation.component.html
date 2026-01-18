@@ -1,0 +1,14 @@
+<div [formGroup]="fieldForm">
+    <sqx-form-row
+        #roleRow
+        for="defaultRole"
+        hint="schemas.fieldTypes.userInfo.defaultRoleHint"
+        label="schemas.fieldTypes.userInfo.defaultRole"
+        [prefix]="field.fieldId">
+        <select class="form-select" [id]="roleRow.formId" autocomplete="off" formControlName="defaultRole">
+            @for (role of rolesState.roles | async; track role.name) {
+                <option [ngValue]="role.name">{{ role.name }}</option>
+            }
+        </select>
+    </sqx-form-row>
+</div>

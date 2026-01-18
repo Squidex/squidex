@@ -14,11 +14,15 @@ namespace Squidex.Domain.Apps.Core.Contents;
 
 public sealed record UserInfoValue(string ApiKey, string Role)
 {
-    public static JsonValue CreateDefault()
+    public static JsonValue CreateDefault(string role)
     {
-        return JsonValue.Object()
-            .Add("apiKey", Guid.NewGuid().ToString().ToSha256Base64())
-            .Add("role", "user");
+        var apiKey =
+            Guid.NewGuid().ToString().ToSha256Base64()
+                .Replace("+", string.Empty, StringComparison.Ordinal)
+                .Replace("/", string.Empty, StringComparison.Ordinal)
+                .TrimEnd('=');
+
+        return JsonValue.Object().Add("apiKey", apiKey).Add("role", role);
     }
 
     public static UserInfoParseResult TryParse(JsonValue value, out UserInfoValue? userInfo)

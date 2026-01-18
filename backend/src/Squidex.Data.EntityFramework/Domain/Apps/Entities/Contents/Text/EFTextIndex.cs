@@ -53,6 +53,9 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
 
         await dbContext.Set<EFTextIndexGeoEntity>().Where(x => x.AppId == app.Id)
             .ExecuteDeleteAsync(ct);
+
+        await dbContext.Set<EFTextIndexUserInfoEntity>().Where(x => x.AppId == app.Id)
+            .ExecuteDeleteAsync(ct);
     }
 
     async Task IDeleter.DeleteSchemaAsync(App app, Schema schema,
@@ -64,6 +67,9 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
             .ExecuteDeleteAsync(ct);
 
         await dbContext.Set<EFTextIndexGeoEntity>().Where(x => x.AppId == app.Id && x.SchemaId == schema.Id)
+            .ExecuteDeleteAsync(ct);
+
+        await dbContext.Set<EFTextIndexUserInfoEntity>().Where(x => x.AppId == app.Id && x.SchemaId == schema.Id)
             .ExecuteDeleteAsync(ct);
     }
 
@@ -151,38 +157,63 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
         return search.Results.OrderByDescending(x => x.Score).Select(x => x.Id).Distinct().ToList();
     }
 
-    private static Task SearchBySchemaAsync(TContext context, SearchOperation search, IEnumerable<DomainId> schemaIds, double factor,
+    public async Task<UserInfoResult?> FindUserInfo(App app, ApiKeyQuery query, SearchScope scope,
+        CancellationToken ct = default)
+    {
+        Guard.NotNull(app);
+        Guard.NotNull(query);
+
+        await using var dbContext = await CreateDbContextAsync(ct);
+
+        var queryBuilder =
+            dbContext.Query<EFTextIndexTextEntity>()
+                .Where(ClrFilter.Eq("AppId", app.Id))
+                .Where(ClrFilter.Eq("UserInfoApikey", query.ApiKey))
+                .WhereScope(scope);
+
+        var (sql, parameters) = queryBuilder.Compile();
+
+        var entity =
+            await dbContext.Set<EFTextIndexUserInfoEntity>().FromSqlRaw(sql, parameters)
+                .FirstOrDefaultAsync(ct);
+
+        return entity != null ?
+            new UserInfoResult(entity.ContentId, entity.UserInfoApiKey) :
+            null;
+    }
+
+    private static Task SearchBySchemaAsync(TContext dbContext, SearchOperation search, IEnumerable<DomainId> schemaIds, double factor,
         CancellationToken ct = default)
     {
         var queryBuilder =
-            context.Query<EFTextIndexTextEntity>()
+            dbContext.Query<EFTextIndexTextEntity>()
                 .Where(ClrFilter.Eq("AppId", search.App.Id))
                 .Where(ClrFilter.In("SchemaId", schemaIds.ToList()))
                 .WhereMatch("Texts", search.SearchTerms)
                 .WhereScope(search.SearchScope);
 
-        return SearchAsync(context, search, queryBuilder, factor, ct);
+        return SearchAsync(dbContext, search, queryBuilder, factor, ct);
     }
 
-    private static Task SearchByAppAsync(TContext context, SearchOperation search, double factor,
+    private static Task SearchByAppAsync(TContext dbContext, SearchOperation search, double factor,
         CancellationToken ct = default)
     {
         var queryBuilder =
-            context.Query<EFTextIndexTextEntity>()
+            dbContext.Query<EFTextIndexTextEntity>()
                 .Where(ClrFilter.Eq("AppId", search.App.Id))
                 .WhereMatch("Texts", search.SearchTerms)
                 .WhereScope(search.SearchScope);
 
-        return SearchAsync(context, search, queryBuilder, factor, ct);
+        return SearchAsync(dbContext, search, queryBuilder, factor, ct);
     }
 
-    private static async Task SearchAsync(TContext context, SearchOperation search, SqlQueryBuilder queryBuilder, double factor,
+    private static async Task SearchAsync(TContext dbContext, SearchOperation search, SqlQueryBuilder queryBuilder, double factor,
         CancellationToken ct)
     {
         var (sql, parameters) = queryBuilder.Compile();
 
         var ids =
-            await context.Set<EFTextIndexTextEntity>().FromSqlRaw(sql, parameters)
+            await dbContext.Set<EFTextIndexTextEntity>().FromSqlRaw(sql, parameters)
                 .Select(x => x.ContentId)
                 .ToListAsync(ct);
 
@@ -196,6 +227,7 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
 
         var insertsText = new List<EFTextIndexTextEntity>();
         var insertsGeo = new List<EFTextIndexGeoEntity>();
+        var insertsUser = new List<EFTextIndexUserInfoEntity>();
 
         foreach (var batch in commands.Batch(1000))
         {
@@ -264,6 +296,24 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
                             }
                         }
 
+                        foreach (var userInfo in upsert.UserInfos.OrEmpty())
+                        {
+                            var entity = new EFTextIndexUserInfoEntity
+                            {
+                                Id = id,
+                                AppId = appId,
+                                ContentId = contentId,
+                                UserInfoApiKey = userInfo.ApiKey,
+                                UserInfoRole = userInfo.Role,
+                                SchemaId = upsert.SchemaId.Id,
+                                ServeAll = upsert.ServeAll,
+                                ServePublished = upsert.ServePublished,
+                                Stage = upsert.Stage,
+                            };
+
+                            insertsUser.Add(entity);
+                        }
+
                         break;
                     case DeleteIndexEntry:
                         await dbContext.Set<EFTextIndexTextEntity>()
@@ -271,6 +321,10 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
                             .ExecuteDeleteAsync(ct);
 
                         await dbContext.Set<EFTextIndexGeoEntity>()
+                            .Where(x => x.Id == id)
+                            .ExecuteDeleteAsync(ct);
+
+                        await dbContext.Set<EFTextIndexUserInfoEntity>()
                             .Where(x => x.Id == id)
                             .ExecuteDeleteAsync(ct);
                         break;
@@ -288,6 +342,13 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
                                 .SetProperty(x => x.ServeAll, update.ServeAll)
                                 .SetProperty(x => x.ServePublished, update.ServePublished),
                                 ct);
+
+                        await dbContext.Set<EFTextIndexUserInfoEntity>()
+                            .Where(x => x.Id == id)
+                            .ExecuteUpdateAsync(u => u
+                                .SetProperty(x => x.ServeAll, update.ServeAll)
+                                .SetProperty(x => x.ServePublished, update.ServePublished),
+                                ct);
                         break;
                 }
             }
@@ -295,6 +356,7 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
 
         await dbContext.BulkUpsertAsync(insertsText, ct);
         await dbContext.BulkUpsertAsync(insertsGeo, ct);
+        await dbContext.BulkUpsertAsync(insertsUser, ct);
     }
 
     private Task<TContext> CreateDbContextAsync(CancellationToken ct)

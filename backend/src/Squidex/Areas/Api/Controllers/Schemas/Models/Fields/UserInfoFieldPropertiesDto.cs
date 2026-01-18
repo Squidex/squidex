@@ -14,6 +14,11 @@ namespace Squidex.Areas.Api.Controllers.Schemas.Models.Fields;
 [OpenApiRequest]
 public sealed class UserInfoFieldPropertiesDto : FieldPropertiesDto
 {
+    /// <summary>
+    /// The role to create a default value.
+    /// </summary>
+    public string? DefaultRole { get; init; }
+
     public static UserInfoFieldPropertiesDto FromDomain(UserInfoFieldProperties fieldProperties)
     {
         return SimpleMapper.Map(fieldProperties, new UserInfoFieldPropertiesDto());

@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using OpenIddict.Validation.AspNetCore;
 using Squidex.Hosting;
 using Squidex.Web;
+using Squidex.Web.Pipeline;
 using static OpenIddict.Abstractions.OpenIddictConstants;
 
 namespace Squidex.Config.Authentication;
@@ -19,8 +20,9 @@ public static class IdentityServerServices
 {
     public static AuthenticationBuilder AddSquidexIdentityServerAuthentication(this AuthenticationBuilder authBuilder, MyIdentityOptions identityOptions, IConfiguration config)
     {
-        var useCustomAuthorityUrl = !string.IsNullOrWhiteSpace(identityOptions.AuthorityUrl);
+        var defaultScheme = OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
 
+        var useCustomAuthorityUrl = !string.IsNullOrWhiteSpace(identityOptions.AuthorityUrl);
         if (useCustomAuthorityUrl)
         {
             const string ExternalIdentityServerSchema = nameof(ExternalIdentityServerSchema);
@@ -34,21 +36,23 @@ public static class IdentityServerServices
                 options.Scope.Add(Constants.ScopeApi);
             });
 
-            authBuilder.AddPolicyScheme(Constants.ApiSecurityScheme, Constants.ApiSecurityScheme, options =>
-            {
-                options.ForwardDefaultSelector = context => ExternalIdentityServerSchema;
-            });
+            defaultScheme = ExternalIdentityServerSchema;
         }
-        else
-        {
-            authBuilder.AddPolicyScheme(Constants.ApiSecurityScheme, Constants.ApiSecurityScheme, options =>
+
+        authBuilder.AddPolicyScheme(Constants.ApiSecurityScheme, null, options =>
             {
-                options.ForwardDefaultSelector = _ => OpenIddictValidationAspNetCoreDefaults.AuthenticationScheme;
+                options.ForwardDefaultSelector = context =>
+                {
+                    if (ApiKeyHandler.IsApiKey(context.Request, out _))
+                    {
+                        return ApiKeyDefaults.AuthenticationScheme;
+                    }
+
+                    return defaultScheme;
+                };
             });
-        }
 
         authBuilder.AddOpenIdConnect();
-
         authBuilder.Services.AddOptions<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme)
             .Configure<IUrlGenerator>((options, urlGenerator) =>
             {

@@ -500,8 +500,14 @@ describe('UserInfoField', () => {
         expect(FieldFormatter.format(field, null)).toBe('User');
     });
 
-    it('should return default value as null', () => {
+    it('should return default value as null if _role is not defined', () => {
         expect(FieldDefaultValue.get(field, 'iv')).toBeNull();
+    });
+
+    it('should return default value from properties', () => {
+        const field2 = createField({ properties: createProperties('UserInfo', { defaultRole: 'Reader' }) });
+
+        expect(FieldDefaultValue.get(field2, 'iv').role).toEqual('Reader');
     });
 });
 

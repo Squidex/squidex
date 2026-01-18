@@ -124,11 +124,11 @@ public class GraphQLSubscriptionTests(ContentFixture fixture) : IClassFixture<Co
 
     private async Task<GraphQLHttpClient> CreateClient()
     {
-        var accessToken = await _.Client.Options.Authenticator.GetBearerTokenAsync(_.AppName, default);
+        var accessToken = await _.Client.Options.Authenticator.GetAuthTokenAsync(_.AppName, default);
 
         var options = new GraphQLHttpClientOptions
         {
-            EndPoint = new Uri(_.Client.GenerateUrl($"/api/content/{_.AppName}/graphql?access_token={accessToken}")!),
+            EndPoint = new Uri(_.Client.GenerateUrl($"/api/content/{_.AppName}/graphql?access_token={accessToken.HeaderValue}")!),
         };
 
         var client = new GraphQLHttpClient(options, new NewtonsoftJsonSerializer());

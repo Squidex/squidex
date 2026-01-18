@@ -81,6 +81,28 @@ public static class CommandFactory
             }
         }
 
+        if (upsert.UserInfos != null)
+        {
+            foreach (var userInfo in upsert.UserInfos)
+            {
+                var userInfoApiKey = userInfo.ApiKey;
+                var userInfoRole = userInfo.Role;
+
+                AddArgs(new
+                {
+                    appId = upsert.UniqueContentId.AppId.ToString(),
+                    appName = string.Empty,
+                    contentId = upsert.UniqueContentId.ContentId.ToString(),
+                    schemaId = upsert.SchemaId.Id.ToString(),
+                    schemaName = upsert.SchemaId.Name,
+                    serveAll = upsert.ServeAll,
+                    servePublished = upsert.ServePublished,
+                    userInfoApiKey,
+                    userInfoRole,
+                });
+            }
+        }
+
         if (upsert.Texts is { Count: > 0 })
         {
             var texts = new Dictionary<string, string>();

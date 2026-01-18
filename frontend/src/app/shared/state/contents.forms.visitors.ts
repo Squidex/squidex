@@ -541,7 +541,11 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
         return null;
     }
 
-    public visitUserInfo(_: UserInfoFieldPropertiesDto): any {
+    public visitUserInfo(properties: UserInfoFieldPropertiesDto): any {
+        if (!!properties.defaultRole) {
+            return { apiKey: generateApiKey(), role: properties.defaultRole };
+        }
+
         return null;
     }
 
@@ -552,4 +556,17 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
 
         return value;
     }
+}
+
+export function generateApiKey() {
+    const uuid = crypto.randomUUID();
+
+    const base64 = btoa(uuid);
+
+    const cleaned = base64
+        .replace(/\+/g, '')
+        .replace(/\//g, '')
+        .replace(/=+$/, '');
+
+    return cleaned;
 }

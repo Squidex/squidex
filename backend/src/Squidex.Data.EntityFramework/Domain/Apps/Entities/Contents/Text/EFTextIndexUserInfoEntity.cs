@@ -7,13 +7,14 @@
 
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using NetTopologySuite.Geometries;
+using Microsoft.EntityFrameworkCore;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
-[Table("Geos")]
-public sealed class EFTextIndexGeoEntity
+[Table("UserInfos")]
+[Index(nameof(UserInfoApiKey))]
+public sealed class EFTextIndexUserInfoEntity
 {
     [Key]
     [MaxLength(400)]
@@ -31,8 +32,9 @@ public sealed class EFTextIndexGeoEntity
 
     public bool ServePublished { get; set; }
 
-    [MaxLength(255)]
-    public string GeoField { get; set; }
+    [MaxLength(256)]
+    public string UserInfoApiKey { get; set; }
 
-    public Geometry GeoObject { get; set; }
+    [MaxLength(256)]
+    public string UserInfoRole { get; set; }
 }

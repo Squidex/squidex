@@ -6,7 +6,9 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Authentication;
+using OpenIddict.Validation.AspNetCore;
 using Squidex.Hosting.Web;
+using Squidex.Web.Pipeline;
 
 namespace Squidex.Config.Authentication;
 
@@ -18,6 +20,7 @@ public static class AuthenticationServices
 
         services.AddAuthentication()
             .AddSquidexCookies(config)
+            .AddApiKey()
             .AddSquidexExternalGithubAuthentication(identityOptions)
             .AddSquidexExternalGoogleAuthentication(identityOptions)
             .AddSquidexExternalMicrosoftAuthentication(identityOptions)

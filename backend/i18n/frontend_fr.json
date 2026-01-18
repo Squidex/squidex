@@ -986,6 +986,8 @@
   "schemas.fieldTypes.tags.description": "Format spécial pour les balises.",
   "schemas.fieldTypes.ui.description": "Séparateur pour l'édition de l'interface utilisateur.",
   "schemas.fieldTypes.user.description": "User Credentials for custom Auth.",
+  "schemas.fieldTypes.userInfo.defaultRole": "Default Role",
+  "schemas.fieldTypes.userInfo.defaultRoleHint": "The default role. If a value is set a user info with a random API Key will be generated.",
   "schemas.hideFieldFailed": "Impossible de masquer le champ. Veuillez recharger.",
   "schemas.import": "Calendrier d'importation",
   "schemas.indexes.addIndex": "Add Index",

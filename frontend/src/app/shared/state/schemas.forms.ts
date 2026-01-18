@@ -386,15 +386,15 @@ export class EditFieldFormVisitor implements FieldPropertiesVisitor<any> {
         this.config['minItems'] = new UntypedFormControl(undefined);
     }
 
+    public visitUserInfo() {
+        this.config['defaultRole'] = new UntypedFormControl(undefined);
+    }
+
     public visitGeolocation() {
         return undefined;
     }
 
     public visitUI() {
-        return undefined;
-    }
-
-    public visitUserInfo() {
         return undefined;
     }
 }

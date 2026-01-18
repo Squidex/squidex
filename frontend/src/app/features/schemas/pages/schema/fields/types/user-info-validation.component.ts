@@ -5,16 +5,23 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, Input } from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
-import { FieldDto, UserInfoFieldPropertiesDto } from '@app/shared';
+import { AsyncPipe } from '@angular/common';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
+import { FieldDto, FormRowComponent, RolesState, UserInfoFieldPropertiesDto } from '@app/shared';
 
 @Component({
     selector: 'sqx-user-info-validation',
     styleUrls: ['user-info-validation.component.scss'],
     templateUrl: 'user-info-validation.component.html',
+    imports: [
+        AsyncPipe,
+        FormRowComponent,
+        FormsModule,
+        ReactiveFormsModule,
+    ],
 })
-export class UserInfoValidationComponent {
+export class UserInfoValidationComponent implements OnInit {
     @Input({ required: true })
     public fieldForm!: UntypedFormGroup;
 
@@ -23,4 +30,13 @@ export class UserInfoValidationComponent {
 
     @Input({ required: true })
     public properties!: UserInfoFieldPropertiesDto;
+
+    constructor(
+        public readonly rolesState: RolesState,
+    ) {
+    }
+
+    public ngOnInit() {
+        this.rolesState.loadIfNotLoaded();
+    }
 }

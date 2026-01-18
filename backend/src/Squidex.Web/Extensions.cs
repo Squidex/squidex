@@ -12,6 +12,14 @@ namespace Squidex.Web;
 
 public static class Extensions
 {
+    public static (string? UserId, string? App, string? Role) GetUserInfo(this ClaimsPrincipal principal)
+    {
+        return (
+            principal.FindFirst(ClaimTypes.NameIdentifier)?.Value,
+            principal.FindFirst(Constants.ClaimTypeApp)?.Value,
+            principal.FindFirst(Constants.ClaimTypeRole)?.Value);
+    }
+
     public static string? GetClientId(this ClaimsPrincipal principal)
     {
         var clientId = principal.FindFirst(OpenIdClaims.ClientId)?.Value;

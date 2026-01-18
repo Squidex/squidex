@@ -986,6 +986,8 @@
   "schemas.fieldTypes.tags.description": "Formato speciale per i tag.",
   "schemas.fieldTypes.ui.description": "Separatore per il pannello delle modifiche della UI.",
   "schemas.fieldTypes.user.description": "User Credentials for custom Auth.",
+  "schemas.fieldTypes.userInfo.defaultRole": "Default Role",
+  "schemas.fieldTypes.userInfo.defaultRoleHint": "The default role. If a value is set a user info with a random API Key will be generated.",
   "schemas.hideFieldFailed": "Non è stato possibile nascondere il campo. Per favore ricarica.",
   "schemas.import": "Importa uno schema",
   "schemas.indexes.addIndex": "Add Index",

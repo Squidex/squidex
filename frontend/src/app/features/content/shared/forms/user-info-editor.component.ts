@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input, OnInit } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl, Validators } from '@angular/forms';
-import { ExtendedFormGroup, FormRowComponent, RolesState, StatefulControlComponent, Subscriptions, TranslatePipe, Types, value$ } from '@app/shared';
+import { ExtendedFormGroup, FormRowComponent, generateApiKey, RolesState, StatefulControlComponent, Subscriptions, TranslatePipe, Types, value$ } from '@app/shared';
 
 export const SQX_USER_INFO_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UserInfoEditorComponent), multi: true,
@@ -82,26 +82,8 @@ export class UserInfoEditorComponent extends StatefulControlComponent<any, UserI
     }
 
     public async generateApiKey() {
-        const apiKey = await generateApiKey();
+        const apiKey = generateApiKey();
 
         this.form.patchValue({ apiKey });
     }
-}
-
-async function generateApiKey() {
-  const uuid = crypto.randomUUID();
-
-  const data = new TextEncoder().encode(uuid);
-
-  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-
-  const base64 = btoa(String.fromCharCode(...hashArray));
-
-  const cleaned = base64
-    .replace(/\+/g, '')
-    .replace(/\//g, '')
-    .replace(/=+$/, '');
-
-  return cleaned;
 }

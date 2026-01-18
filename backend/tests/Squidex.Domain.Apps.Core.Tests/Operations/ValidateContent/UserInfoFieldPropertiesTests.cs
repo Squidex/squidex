@@ -5,12 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using FakeItEasy;
-using NetTopologySuite.Algorithm;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure.Json.Objects;
-using System;
 
 namespace Squidex.Domain.Apps.Core.Operations.ValidateContent;
 

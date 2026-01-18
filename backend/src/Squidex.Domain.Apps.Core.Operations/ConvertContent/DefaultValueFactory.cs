@@ -121,7 +121,12 @@ public sealed class DefaultValueFactory : IFieldPropertiesVisitor<JsonValue, Def
 
     public JsonValue Visit(UserInfoFieldProperties properties, Args args)
     {
-        return UserInfoValue.CreateDefault();
+        if (!string.IsNullOrWhiteSpace(properties.DefaultRole))
+        {
+            return UserInfoValue.CreateDefault(properties.DefaultRole);
+        }
+
+        return JsonValue.Null;
     }
 
     public JsonValue Visit(DateTimeFieldProperties properties, Args args)
