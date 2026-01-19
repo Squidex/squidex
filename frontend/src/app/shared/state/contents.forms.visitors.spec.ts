@@ -496,11 +496,15 @@ describe('UserInfoField', () => {
         expect(FieldsValidators.create(field, false).length).toBe(0);
     });
 
-    it('should format to user constant', () => {
-        expect(FieldFormatter.format(field, null)).toBe('User');
+    it('should format to empty string if null', () => {
+        expect(FieldFormatter.format(field, null)).toBe('');
     });
 
-    it('should return default value as null if _role is not defined', () => {
+    it('should format to user constant', () => {
+        expect(FieldFormatter.format(field, {})).toBe('User');
+    });
+
+    it('should return default value as null if role is not defined', () => {
         expect(FieldDefaultValue.get(field, 'iv')).toBeNull();
     });
 
