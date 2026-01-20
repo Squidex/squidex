@@ -12,7 +12,7 @@
         <sqx-control-errors [for]="for" [submitCount]="submitCount" />
     }
 
-    <div [class.form-check]="check" [class.row]="hasUnit" [class.g-0]="hasUnit">
+    <div [class.form-check]="check" [class.g-0]="hasUnit" [class.row]="hasUnit">
         <div [class.col]="hasUnit">
             <ng-content></ng-content>
         </div>
@@ -33,7 +33,7 @@
     </div>
 
     @if (hint) {
-        <sqx-form-hint> <span inline="true" [sqxMarkdown]="hint | sqxTranslate"></span> </sqx-form-hint>
+        <sqx-form-hint> <span [sqxMarkdown]="hint | sqxTranslate"></span> </sqx-form-hint>
     }
 
     @if (alert) {

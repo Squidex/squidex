@@ -524,6 +524,7 @@
   "contents.unsetValueConfirmTitle": "Voulez-vous annuler la valeur\u00A0?",
   "contents.updated": "Contenu mis à jour avec succès.",
   "contents.updateFailed": "Échec de la mise à jour du contenu. Veuillez recharger.",
+  "contents.userInfo.instructions": "Connect as this user with the following header. The first part of the value is the app name.\n\nDo not miss the colon and remember the assign a restrictive role.",
   "contents.validate": "Valider",
   "contents.validationHint": "N'oubliez pas de vérifier toutes les langues lorsque vous voyez des erreurs de validation.",
   "contents.versionCompare": "Comparer",

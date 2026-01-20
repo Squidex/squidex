@@ -524,6 +524,7 @@
   "contents.unsetValueConfirmTitle": "Do you want to unset the value?",
   "contents.updated": "Content updated successfully.",
   "contents.updateFailed": "Failed to update content. Please reload.",
+  "contents.userInfo.instructions": "Connect as this user with the following header. The first part of the value is the app name.\n\nDo not miss the colon and remember the assign a restrictive role.",
   "contents.validate": "Validate",
   "contents.validationHint": "Please remember to check all languages when you see validation errors.",
   "contents.versionCompare": "Compare",

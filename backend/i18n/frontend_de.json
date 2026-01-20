@@ -524,6 +524,7 @@
   "contents.unsetValueConfirmTitle": "Möchten Sie den Wert zurücksetzen?",
   "contents.updated": "Inhalt erfolgreich aktualisiert.",
   "contents.updateFailed": "Fehler beim Aktualisieren des Inhalts. Bitte neu laden.",
+  "contents.userInfo.instructions": "Connect as this user with the following header. The first part of the value is the app name.\n\nDo not miss the colon and remember the assign a restrictive role.",
   "contents.validate": "Validieren",
   "contents.validationHint": "Bitte denken Sie daran, alle Sprachen zu überprüfen, wenn Sie Validierungsfehler sehen.",
   "contents.versionCompare": "Vergleichen",

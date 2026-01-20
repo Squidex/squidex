@@ -15,4 +15,17 @@
             }
         </select>
     </sqx-form-row>
+
+    <sqx-form-row for="none">
+        <sqx-form-hint> <span inline="false" [sqxMarkdown]="'contents.userInfo.instructions' | sqxTranslate"></span> </sqx-form-hint>
+        <sqx-code>
+            <div ngPreserveWhitespaces>Authorization: ApiKey {{ rolesState.appName }}:{{ apiKey | async }}</div>
+        </sqx-code>
+        <sqx-form-hint>
+          {{ 'common.or' | sqxTranslate }}
+        </sqx-form-hint>
+        <sqx-code>
+            <div ngPreserveWhitespaces>ApiKey: {{ rolesState.appName }}:{{ apiKey | async }}</div>
+        </sqx-code>
+    </sqx-form-row>
 </div>

@@ -25,7 +25,7 @@
             @case ("Start") {
                 <h3>{{ "clients.connectWizard.step1Title" | sqxTranslate }}</h3>
                 <sqx-form-hint>
-                    <span inline="true" [sqxMarkdown]="'clients.connectWizard.postManDocs' | sqxTranslate" trusted="true"></span>
+                    <span [sqxMarkdown]="'clients.connectWizard.postManDocs' | sqxTranslate" trusted="true"></span>
                 </sqx-form-hint>
                 <div class="section">
                     <div class="option" (click)="go('HTTP')">

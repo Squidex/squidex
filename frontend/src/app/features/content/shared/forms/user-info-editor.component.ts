@@ -8,7 +8,8 @@
 import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input, OnInit } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl, Validators } from '@angular/forms';
-import { ExtendedFormGroup, FormRowComponent, generateApiKey, RolesState, StatefulControlComponent, Subscriptions, TranslatePipe, Types, value$ } from '@app/shared';
+import { map } from 'rxjs';
+import { CodeComponent, ExtendedFormGroup, FormHintComponent, FormRowComponent, generateApiKey, MarkdownDirective, RolesState, StatefulControlComponent, Subscriptions, TranslatePipe, Types, value$ } from '@app/shared';
 
 export const SQX_USER_INFO_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UserInfoEditorComponent), multi: true,
@@ -26,7 +27,10 @@ type UserInfo = { apiKey: string; role: string };
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AsyncPipe,
+        CodeComponent,
         FormsModule,
+        FormHintComponent,
+        MarkdownDirective,
         ReactiveFormsModule,
         FormRowComponent,
         TranslatePipe,
@@ -43,7 +47,7 @@ export class UserInfoEditorComponent extends StatefulControlComponent<any, UserI
         this.setDisabledState(value === true);
     }
 
-    public form = new ExtendedFormGroup({
+    public readonly form = new ExtendedFormGroup({
         apiKey: new UntypedFormControl('',
             Validators.required,
         ),
@@ -51,6 +55,10 @@ export class UserInfoEditorComponent extends StatefulControlComponent<any, UserI
             Validators.required,
         ),
     });
+
+    public readonly apiKey =
+      value$(this.form.get('apiKey')!)
+        .pipe(map(x => x || 'NONE'));
 
     constructor(
         public readonly rolesState: RolesState,
@@ -62,7 +70,7 @@ export class UserInfoEditorComponent extends StatefulControlComponent<any, UserI
                 if (this.form.valid) {
                     this.callChange(value);
                 } else {
-                    this.callChange(undefined);
+                    this.callChange(null);
                 }
 
                 this.callTouched();
@@ -75,7 +83,7 @@ export class UserInfoEditorComponent extends StatefulControlComponent<any, UserI
 
     public writeValue(obj: UserInfo | undefined | null) {
         if (Types.isObject(obj)) {
-            this.form.setValue(obj);
+            this.form.setValue(obj, { emitEvent: true });
         } else {
             this.form.reset();
         }

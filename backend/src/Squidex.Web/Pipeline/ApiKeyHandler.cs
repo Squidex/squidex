@@ -30,6 +30,7 @@ public sealed class ApiKeyHandler(
     private const string ApiKeyPrefix = "ApiKey ";
     private const string ApiKeyHeader = "ApiKey";
     private const string ApiKeyHeaderX = "X-ApiKey";
+    private const string ApiKeyQuery = "api_key";
 
     protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
     {
@@ -115,6 +116,13 @@ public sealed class ApiKeyHandler(
         if (!string.IsNullOrWhiteSpace(apiKeyHeaderX))
         {
             apiKey = apiKeyHeaderX;
+            return true;
+        }
+
+        string? apiKeyQuery = request.Query[ApiKeyQuery];
+        if (!string.IsNullOrWhiteSpace(apiKeyQuery))
+        {
+            apiKey = apiKeyQuery;
             return true;
         }
 

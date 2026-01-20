@@ -17,9 +17,9 @@
             </div>
 
             <div class="col">
-                <h5 inline="true" [sqxMarkdown]="currentStep.title | sqxTranslate"></h5>
+                <h5 [sqxMarkdown]="currentStep.title | sqxTranslate"></h5>
 
-                <div [sqxMarkdown]="currentStep.content | sqxTranslate" inline="false"></div>
+                <div inline="false" [sqxMarkdown]="currentStep.content | sqxTranslate"></div>
             </div>
 
             <div class="col-auto"><button class="btn btn-sm btn-close" (click)="tourService.end()" type="button"></button></div>

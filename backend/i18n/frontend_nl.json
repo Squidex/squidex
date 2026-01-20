@@ -524,6 +524,7 @@
   "contents.unsetValueConfirmTitle": "Weet je zeker dat je de waarde leeg wilt maken?",
   "contents.updated": "Inhoud succesvol bijgewerkt.",
   "contents.updateFailed": "Bijwerken van inhoud is mislukt. Laad opnieuw.",
+  "contents.userInfo.instructions": "Connect as this user with the following header. The first part of the value is the app name.\n\nDo not miss the colon and remember the assign a restrictive role.",
   "contents.validate": "Valideren",
   "contents.validationHint": "Denk eraan om alle talen te controleren wanneer je validatiefouten ziet.",
   "contents.versionCompare": "Vergelijk",

@@ -524,6 +524,7 @@
   "contents.unsetValueConfirmTitle": "你想取消设置吗？",
   "contents.updated": "内容更新成功。",
   "contents.updateFailed": "更新内容失败，请重新加载。",
+  "contents.userInfo.instructions": "Connect as this user with the following header. The first part of the value is the app name.\n\nDo not miss the colon and remember the assign a restrictive role.",
   "contents.validate": "验证",
   "contents.validationHint": "当您看到验证错误时，请记住检查所有语言。",
   "contents.versionCompare": "比较",
