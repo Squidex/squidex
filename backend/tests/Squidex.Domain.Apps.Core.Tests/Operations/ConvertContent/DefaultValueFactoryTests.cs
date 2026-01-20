@@ -333,7 +333,7 @@ public class DefaultValueFactoryTests
             Fields.UserInfo(1, "1", Partitioning.Invariant,
                 new UserInfoFieldProperties { DefaultRole = "myRole" });
 
-        Assert.IsType<JsonObject>(DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
+        Assert.IsType<JsonObject>(DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code).Value);
     }
 
     private Instant FutureDays(int days)
