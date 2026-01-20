@@ -17,6 +17,8 @@ public abstract class EFTextIndexTests<TContext>(ISqlFixture<TContext> fixture) 
 {
     public override bool SupportsQuerySyntax => false;
 
+    public override bool SupportsGeo => true;
+
     public override async Task<ITextIndex> CreateSutAsync()
     {
         var sut = new EFTextIndex<TContext>(fixture.DbContextFactory);

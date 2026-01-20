@@ -117,11 +117,6 @@ public abstract class TextIndexerTests : GivenContext
     [Fact]
     public async Task Should_search_by_userinfo()
     {
-        if (!SupportsGeo)
-        {
-            return;
-        }
-
         var field = Guid.NewGuid().ToString();
 
         // With same ApiKey

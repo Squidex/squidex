@@ -97,15 +97,20 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
             SRID = 4326,
         };
 
-        // The distance must be converted to decrees (in contrast to MongoDB, which uses radian).
-        var degrees = query.Radius / 111320;
+
+        var distance = query.Radius;
+        if (dbContext.Database.IsNpgsql())
+        {
+            // The distance must be converted to decrees (in contrast to MongoDB, which uses radian).
+            distance = query.Radius / 111320;
+        }
 
         var ids =
             await dbContext.Set<EFTextIndexGeoEntity>()
                 .Where(x => x.AppId == app.Id)
                 .Where(x => x.SchemaId == query.SchemaId)
                 .Where(x => x.GeoField == query.Field)
-                .Where(x => x.GeoObject.Distance(point) < degrees)
+                .Where(x => x.GeoObject.Distance(point) < distance)
                 .WhereScope(scope)
                 .Select(x => x.ContentId)
                 .ToListAsync(ct);
@@ -166,9 +171,9 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
         await using var dbContext = await CreateDbContextAsync(ct);
 
         var queryBuilder =
-            dbContext.Query<EFTextIndexTextEntity>()
+            dbContext.Query<EFTextIndexUserInfoEntity>()
                 .Where(ClrFilter.Eq("AppId", app.Id))
-                .Where(ClrFilter.Eq("UserInfoApikey", query.ApiKey))
+                .Where(ClrFilter.Eq("UserInfoApiKey", query.ApiKey))
                 .WhereScope(scope);
 
         var (sql, parameters) = queryBuilder.Compile();
