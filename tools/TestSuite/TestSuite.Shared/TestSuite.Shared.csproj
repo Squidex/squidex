@@ -18,8 +18,8 @@
     <PackageReference Include="Microsoft.Extensions.Configuration.Json" Version="8.0.0" />
     <PackageReference Include="RefactoringEssentials" Version="5.6.0" PrivateAssets="all" />
     <PackageReference Include="Squidex.Assets" Version="7.37.0" />
-    <PackageReference Include="Squidex.ClientLibrary" Version="22.1.0" />
-    <PackageReference Include="Squidex.ClientLibrary.ServiceExtensions" Version="22.1.0" />
+    <PackageReference Include="Squidex.ClientLibrary" Version="22.2.0" />
+    <PackageReference Include="Squidex.ClientLibrary.ServiceExtensions" Version="22.2.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="Verify" Version="30.4.0" />
     <PackageReference Include="xunit" Version="2.9.3" />
