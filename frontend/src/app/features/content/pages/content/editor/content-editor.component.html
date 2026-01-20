@@ -12,11 +12,11 @@
                 </div>
 
                 @if (isDeleted) {
-                    <div inline="true" [sqxMarkdown]="'contents.versionViewingDeleted' | sqxTranslate: { version: contentVersion }"></div>
+                    <div [sqxMarkdown]="'contents.versionViewingDeleted' | sqxTranslate: { version: contentVersion }"></div>
                 }
 
                 @if (!isDeleted) {
-                    <div inline="true" [sqxMarkdown]="'contents.versionViewing' | sqxTranslate: { version: contentVersion }"></div>
+                    <div [sqxMarkdown]="'contents.versionViewing' | sqxTranslate: { version: contentVersion }"></div>
                 }
             </div>
         }

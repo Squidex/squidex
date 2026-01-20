@@ -20,6 +20,7 @@ import { AssetsEditorComponent } from './assets-editor.component';
 import { ComponentComponent } from './component.component';
 import { IFrameEditorComponent } from './iframe-editor.component';
 import { StockPhotoEditorComponent } from './stock-photo-editor.component';
+import { UserInfoEditorComponent } from './user-info-editor.component';
 
 @Component({
     selector: 'sqx-field-editor',
@@ -42,9 +43,9 @@ import { StockPhotoEditorComponent } from './stock-photo-editor.component';
         IFrameEditorComponent,
         IndeterminateValueDirective,
         MarkdownDirective,
-        ModalDirective,
         MenuComponent,
         MenuItemComponent,
+        ModalDirective,
         RadioGroupComponent,
         ReactiveFormsModule,
         ReferenceDropdownComponent,
@@ -59,6 +60,7 @@ import { StockPhotoEditorComponent } from './stock-photo-editor.component';
         TagEditorComponent,
         ToggleComponent,
         TransformInputDirective,
+        UserInfoEditorComponent,
     ],
 })
 export class FieldEditorComponent {

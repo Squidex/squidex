@@ -123,20 +123,52 @@ public sealed class AzureTextIndex : IInitializable, ITextIndex
         CancellationToken ct = default)
     {
         var searchField = GetServeField(scope);
+        var searchFilter = $"{string.Join(" or ", schemaIds.Select(x => $"schemaId eq '{x}'"))} and {searchField} eq true";
 
-        var filter = $"{string.Join(" or ", schemaIds.Select(x => $"schemaId eq '{x}'"))} and {searchField} eq true";
-
-        return SearchAsync(result, text, filter, take, factor, ct);
+        return SearchAsync(result, text, searchFilter, take, factor, ct);
     }
 
     private Task SearchByAppAsync(List<(DomainId, double)> result, string text, App app, SearchScope scope, int take, double factor,
         CancellationToken ct = default)
     {
         var searchField = GetServeField(scope);
+        var searchFilter = $"appId eq '{app.Id}' and {searchField} eq true";
 
-        var filter = $"appId eq '{app.Id}' and {searchField} eq true";
+        return SearchAsync(result, text, searchFilter, take, factor, ct);
+    }
 
-        return SearchAsync(result, text, filter, take, factor, ct);
+    public async Task<UserInfoResult?> FindUserInfo(App app, ApiKeyQuery query, SearchScope scope,
+        CancellationToken ct = default)
+    {
+        Guard.NotNull(app);
+        Guard.NotNull(query);
+
+        var searchField = GetServeField(scope);
+        var searchFilter = $"appId eq '{app.Id}' and {searchField} eq true and userApiKey eq '{query.ApiKey}'";
+        var searchOptions = new SearchOptions
+        {
+            Filter = searchFilter,
+        };
+
+        searchOptions.Select.Add("contentId");
+        searchOptions.Select.Add("userInfoApiKey");
+        searchOptions.Select.Add("userInfoRole");
+        searchOptions.Size = 1;
+        searchOptions.QueryType = SearchQueryType.Full;
+
+        var results = await searchClient.SearchAsync<SearchDocument>(searchFilter, searchOptions, ct);
+
+        await foreach (var item in results.Value.GetResultsAsync().WithCancellation(ct))
+        {
+            if (item != null)
+            {
+                var id = DomainId.Create(item.Document["contentId"].ToString()!);
+
+                return new UserInfoResult(id, item.Document["userInfoRole"].ToString()!);
+            }
+        }
+
+        return null;
     }
 
     private async Task SearchAsync(List<(DomainId, double)> result, string text, string filter, int take, double factor,

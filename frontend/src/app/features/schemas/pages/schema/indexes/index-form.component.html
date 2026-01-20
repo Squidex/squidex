@@ -3,7 +3,7 @@
         <ng-container title> {{ "schemas.indexes.addTitle" | sqxTranslate }} </ng-container>
         <ng-container content>
             <sqx-form-hint>
-                <span inline="true" [sqxMarkdown]="'schemas.indexes.hint' | sqxTranslate" trusted="true"></span>
+                <span [sqxMarkdown]="'schemas.indexes.hint' | sqxTranslate" trusted="true"></span>
             </sqx-form-hint>
             @for (form of createForm.controls; track form; let i = $index) {
                 <div class="form-group row gx-2" [formGroup]="form">

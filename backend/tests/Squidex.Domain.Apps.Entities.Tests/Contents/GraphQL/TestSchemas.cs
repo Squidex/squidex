@@ -136,6 +136,8 @@ public static class TestSchemas
                 new StringFieldProperties { IsEmbeddable = true, SchemaIds = ReadonlyList.Create(Reference1.Id, Reference2.Id) })
             .AddRichText(18, "my-richtext", Partitioning.Invariant,
                 new RichTextFieldProperties { SchemaIds = ReadonlyList.Create(Reference1.Id, Reference2.Id) })
+            .AddUserInfo(19, "my-user-info", Partitioning.Invariant,
+                new UserInfoFieldProperties())
             .AddArray(100, "my-array", Partitioning.Invariant, f => f
                 .AddBoolean(121, "nested-boolean",
                     new BooleanFieldProperties())

@@ -28,7 +28,6 @@ public sealed class AppResolver(IAppProvider appProvider) : IAsyncActionFilter
         if (context.RouteData.Values.TryGetValue("app", out var appValue))
         {
             var appName = appValue?.ToString();
-
             if (string.IsNullOrWhiteSpace(appName))
             {
                 context.Result = new NotFoundResult();
@@ -51,10 +50,14 @@ public sealed class AppResolver(IAppProvider appProvider) : IAsyncActionFilter
             string? clientId = null;
 
             var (role, permissions) = FindByOpenIdSubject(app, user, isFrontend);
-
             if (permissions == null)
             {
                 (clientId, role, permissions) = FindByOpenIdClient(app, user, isFrontend);
+            }
+
+            if (permissions == null)
+            {
+                (role, permissions) = FindByUserInfo(app, user, isFrontend);
             }
 
             if (permissions == null)
@@ -125,7 +128,6 @@ public sealed class AppResolver(IAppProvider appProvider) : IAsyncActionFilter
     private static (string?, string?, PermissionSet?) FindByOpenIdClient(App app, ClaimsPrincipal user, bool isFrontend)
     {
         var (appName, clientId) = user.GetClient();
-
         if (app.Name != appName || clientId == null)
         {
             return default;
@@ -139,10 +141,25 @@ public sealed class AppResolver(IAppProvider appProvider) : IAsyncActionFilter
         return default;
     }
 
+    private static (string?, PermissionSet?) FindByUserInfo(App app, ClaimsPrincipal user, bool isFrontend)
+    {
+        var (_, appName, roleName) = user.GetUserInfo();
+        if (app.Name != appName || roleName == null)
+        {
+            return default;
+        }
+
+        if (app.TryGetRole(roleName, isFrontend, out var role))
+        {
+            return (role.Name, role.Permissions);
+        }
+
+        return default;
+    }
+
     private static (string?, string?, PermissionSet?) FindAnonymousClient(App app, bool isFrontend)
     {
         var client = app.Clients.FirstOrDefault(x => x.Value.AllowAnonymous);
-
         if (client.Value == null)
         {
             return default;
@@ -159,7 +176,6 @@ public sealed class AppResolver(IAppProvider appProvider) : IAsyncActionFilter
     private static (string?, PermissionSet?) FindByOpenIdSubject(App app, ClaimsPrincipal user, bool isFrontend)
     {
         var subjectId = user.OpenIdSubject();
-
         if (subjectId == null)
         {
             return default;

@@ -12,7 +12,8 @@ using Squidex.Infrastructure.States;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
-public sealed class MongoShardedTextIndex<T>(IShardingStrategy sharding, Func<string, MongoTextIndexBase<T>> factory) : ShardedService<DomainId, MongoTextIndexBase<T>>(sharding, factory), ITextIndex, IDeleter where T : class
+public sealed class MongoShardedTextIndex<T>(IShardingStrategy sharding, Func<string, MongoTextIndexBase<T>> factory)
+    : ShardedService<DomainId, MongoTextIndexBase<T>>(sharding, factory), ITextIndex, IDeleter where T : class
 {
     public async Task ClearAsync(
         CancellationToken ct = default)
@@ -43,6 +44,12 @@ public sealed class MongoShardedTextIndex<T>(IShardingStrategy sharding, Func<st
         CancellationToken ct = default)
     {
         return Shard(app.Id).SearchAsync(app, query, scope, ct);
+    }
+
+    public Task<UserInfoResult?> FindUserInfo(App app, ApiKeyQuery query, SearchScope scope,
+        CancellationToken ct = default)
+    {
+        return Shard(app.Id).FindUserInfo(app, query, scope, ct);
     }
 
     async Task IDeleter.DeleteAppAsync(App app,

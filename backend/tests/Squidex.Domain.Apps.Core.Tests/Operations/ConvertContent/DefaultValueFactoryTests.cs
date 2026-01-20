@@ -316,6 +316,26 @@ public class DefaultValueFactoryTests
         Assert.Equal(new JsonArray(), DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
     }
 
+    [Fact]
+    public void Should_get_default_value_from_userinfo_field_if_role_is_not_set()
+    {
+        var field =
+            Fields.UserInfo(1, "1", Partitioning.Invariant,
+                new UserInfoFieldProperties());
+
+        Assert.Equal(JsonValue.Null, DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code));
+    }
+
+    [Fact]
+    public void Should_get_default_value_from_userinfo_field_if_role_is_set()
+    {
+        var field =
+            Fields.UserInfo(1, "1", Partitioning.Invariant,
+                new UserInfoFieldProperties { DefaultRole = "myRole" });
+
+        Assert.IsType<JsonObject>(DefaultValueFactory.CreateDefaultValue(field, now, language.Iso2Code).Value);
+    }
+
     private Instant FutureDays(int days)
     {
         return now.WithoutMs().Plus(Duration.FromDays(days));

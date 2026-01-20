@@ -115,6 +115,24 @@ public abstract class TextIndexerTests : GivenContext
     }
 
     [Fact]
+    public async Task Should_search_by_userinfo()
+    {
+        var field = Guid.NewGuid().ToString();
+
+        // With same ApiKey
+        await CreateUserInfoAsync(Ids1[0], field, "Key1", "Role1");
+
+        // Other ApiKey
+        await CreateUserInfoAsync(Ids2[0], field, "Key2", "Role2");
+
+        // With same ApiKey
+        await SearchApiKey(Ids1[0], "Key1");
+
+        // Wrong ApiKey
+        await SearchApiKey(null, "Key3");
+    }
+
+    [Fact]
     public async Task Should_search_by_app()
     {
         await CreateTextAsync(Ids1[0], "iv", "Hello");
@@ -356,6 +374,13 @@ public abstract class TextIndexerTests : GivenContext
         return UpdateAsync(id, new ContentCreated { Data = data });
     }
 
+    protected Task CreateUserInfoAsync(DomainId id, string field, string apiKey, string role)
+    {
+        var data = UserInfoData(field, apiKey, role);
+
+        return UpdateAsync(id, new ContentCreated { Data = data });
+    }
+
     protected Task UpdateTextAsync(DomainId id, string language, string text)
     {
         var data = TextData(language, text);
@@ -422,6 +447,14 @@ public abstract class TextIndexerTests : GivenContext
                     .AddInvariant(JsonValue.Object().Add("latitude", latitude).Add("longitude", longitude)));
     }
 
+    private static ContentData UserInfoData(string field, string apiKey, string role)
+    {
+        return new ContentData()
+            .AddField(field,
+                new ContentFieldData()
+                    .AddInvariant(JsonValue.Object().Add("apiKey", apiKey).Add("role", role)));
+    }
+
     private static ContentData GeoJsonData(string field, double latitude, double longitude)
     {
         return new ContentData()
@@ -435,18 +468,34 @@ public abstract class TextIndexerTests : GivenContext
                                 .Add(latitude))));
     }
 
-    protected async Task SearchGeo(List<DomainId>? expected, string field, double latitude, double longitude, SearchScope target = SearchScope.All)
+    protected async Task SearchApiKey(
+        DomainId? expected,
+        string apiKey,
+        SearchScope target = SearchScope.All)
     {
-        var query = new GeoQuery(SchemaId.Id, field, latitude, longitude, 1000, 1000)
-        {
-            SchemaId = SchemaId.Id,
-        };
+        var query = new ApiKeyQuery(apiKey);
+
+        var actual = await SearchAsync(i => i.FindUserInfo(App, query, target, default), x => x?.ContentId == expected);
+        Assert.Equal(expected, actual?.ContentId);
+    }
+
+    protected async Task SearchGeo(
+        List<DomainId>? expected,
+        string field,
+        double latitude,
+        double longitude,
+        SearchScope target = SearchScope.All)
+    {
+        var query = new GeoQuery(SchemaId.Id, field, latitude, longitude, 1000, 1000);
 
         var actual = await SearchAsync(i => i.SearchAsync(App, query, target, default), x => IsExpected(x, expected));
         AssertIds(actual, expected);
     }
 
-    protected async Task SearchText(List<DomainId>? expected, string text, SearchScope target = SearchScope.All)
+    protected async Task SearchText(
+        List<DomainId>? expected,
+        string text,
+        SearchScope target = SearchScope.All)
     {
         var query = new TextQuery(text, 1000)
         {

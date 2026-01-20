@@ -257,6 +257,21 @@ internal sealed class JsonTypeVisitor : IFieldVisitor<JsonSchemaProperty?, JsonT
         return null;
     }
 
+    public JsonSchemaProperty? Visit(IField<UserInfoFieldProperties> field, Args args)
+    {
+        var scheme = JsonTypeBuilder.Object();
+
+        scheme.Properties.Add(
+            "apiKey",
+            JsonTypeBuilder.StringProperty(FieldDescriptions.UserInfoApiKey, true));
+
+        scheme.Properties.Add(
+            "role",
+            JsonTypeBuilder.StringProperty(FieldDescriptions.UserInfoRole, true));
+
+        return JsonTypeBuilder.ObjectProperty(scheme);
+    }
+
     private static void BuildComponent(JsonSchema jsonSchema, ReadonlyList<DomainId>? schemaIds, Args args)
     {
         if (args.WithComponents)

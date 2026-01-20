@@ -80,6 +80,37 @@ public sealed class CommandFactory<T>(Func<Dictionary<string, string>, T> textBu
                         }));
             }
         }
+
+        if (upsert.UserInfos?.Count > 0)
+        {
+            if (!upsert.IsNew)
+            {
+                writes.Add(
+                    new DeleteManyModel<MongoTextIndexEntity<T>>(
+                        Filter.And(
+                            FilterByCommand(upsert),
+                            Filter.Exists(x => x.UserInfoApiKey),
+                            Filter.Exists(x => x.UserInfoRole))));
+            }
+
+            foreach (var userInfo in upsert.UserInfos)
+            {
+                writes.Add(
+                    new InsertOneModel<MongoTextIndexEntity<T>>(
+                        new MongoTextIndexEntity<T>
+                        {
+                            Id = ObjectId.GenerateNewId(),
+                            AppId = upsert.UniqueContentId.AppId,
+                            ContentId = upsert.UniqueContentId.ContentId,
+                            UserInfoApiKey = userInfo.ApiKey,
+                            UserInfoRole = userInfo.Role,
+                            SchemaId = upsert.SchemaId.Id,
+                            ServeAll = upsert.ServeAll,
+                            ServePublished = upsert.ServePublished,
+                            Stage = upsert.Stage,
+                        }));
+            }
+        }
     }
 
     private T? BuildTexts(UpsertIndexEntry upsert)

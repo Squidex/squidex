@@ -6,14 +6,17 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using NetTopologySuite.Geometries;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
+[Table("Geos")]
 public sealed class EFTextIndexGeoEntity
 {
     [Key]
+    [MaxLength(400)]
     required public string Id { get; set; }
 
     public DomainId AppId { get; set; }
@@ -28,6 +31,7 @@ public sealed class EFTextIndexGeoEntity
 
     public bool ServePublished { get; set; }
 
+    [MaxLength(255)]
     public string GeoField { get; set; }
 
     public Geometry GeoObject { get; set; }

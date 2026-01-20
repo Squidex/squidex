@@ -36,4 +36,6 @@ public interface IFieldPropertiesVisitor<out T, in TArgs>
     T Visit(TagsFieldProperties properties, TArgs args);
 
     T Visit(UIFieldProperties properties, TArgs args);
+
+    T Visit(UserInfoFieldProperties properties, TArgs args);
 }

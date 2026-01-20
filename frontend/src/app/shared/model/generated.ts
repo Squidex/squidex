@@ -3132,6 +3132,9 @@ export abstract class FieldPropertiesDto implements IFieldPropertiesDto {
         if (data["fieldType"] === "UI") {
             return new UIFieldPropertiesDto().init(data);
         }
+        if (data["fieldType"] === "UserInfo") {
+            return new UserInfoFieldPropertiesDto().init(data);
+        }
         throw new Error("The abstract class 'FieldPropertiesDto' cannot be instantiated.");
     }
 
@@ -4655,6 +4658,58 @@ export type UIFieldEditor = "Separator";
 export const UIFieldEditorValues: ReadonlyArray<UIFieldEditor> = [
 	"Separator"
 ];
+
+export class UserInfoFieldPropertiesDto extends FieldPropertiesDto implements IUserInfoFieldPropertiesDto {
+    /** The role to create a default value. */
+    readonly defaultRole?: string | undefined;
+
+    public get isComplexUI() {
+        return true;
+    }
+
+    public get isSortable() {
+        return false;
+    }
+
+    public get isContentField() {
+        return true;
+    }
+
+    public accept<T>(visitor: FieldPropertiesVisitor<T>): T {
+        return visitor.visitUserInfo(this);
+    }
+
+    constructor(data?: IUserInfoFieldPropertiesDto) {
+        super(data);
+        (<any>this).fieldType = "UserInfo";
+    }
+
+    init(_data: any) {
+        super.init(_data);
+        (<any>this).defaultRole = _data["defaultRole"];
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): UserInfoFieldPropertiesDto {
+        const result = new UserInfoFieldPropertiesDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["defaultRole"] = this.defaultRole;
+        super.toJSON(data);
+        this.cleanup(data);
+        return data;
+    }
+}
+
+export interface IUserInfoFieldPropertiesDto extends IFieldPropertiesDto {
+    /** The role to create a default value. */
+    readonly defaultRole?: string | undefined;
+}
 
 export class NestedFieldDto extends ResourceDto implements INestedFieldDto {
     /** The ID of the field. */
@@ -12507,9 +12562,9 @@ export class AllContentsByPostDto implements IAllContentsByPostDto {
     private readonly cachedValues: { [key: string]: any } = {};
     /** The list of ids to query. */
     readonly ids?: string[] | undefined;
-    /** The start of the schedule. */
+    /** The start time of the scheduled content period (see scheduledTo). */
     readonly scheduledFrom?: DateTime | undefined;
-    /** The end of the schedule. */
+    /** The end time of the scheduled content period (see scheduledFrom). */
     readonly scheduledTo?: DateTime | undefined;
     /** The ID of the referencing content item. */
     readonly referencing?: string | undefined;
@@ -12593,9 +12648,9 @@ export class AllContentsByPostDto implements IAllContentsByPostDto {
 export interface IAllContentsByPostDto {
     /** The list of ids to query. */
     readonly ids?: string[] | undefined;
-    /** The start of the schedule. */
+    /** The start time of the scheduled content period (see scheduledTo). */
     readonly scheduledFrom?: DateTime | undefined;
-    /** The end of the schedule. */
+    /** The end time of the scheduled content period (see scheduledFrom). */
     readonly scheduledTo?: DateTime | undefined;
     /** The ID of the referencing content item. */
     readonly referencing?: string | undefined;

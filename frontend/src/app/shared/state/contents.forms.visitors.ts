@@ -7,7 +7,7 @@
 
 import { ValidatorFn, Validators } from '@angular/forms';
 import { DateTime, Types, ValidatorsEx } from '@app/framework';
-import { AppLanguageDto, ContentDto, FieldDto, NestedFieldDto } from '../model';
+import { AppLanguageDto, ContentDto, FieldDto, NestedFieldDto, UserInfoFieldPropertiesDto } from '../model';
 import { ArrayFieldPropertiesDto, AssetsFieldPropertiesDto, BooleanFieldPropertiesDto, ComponentFieldPropertiesDto, ComponentsFieldPropertiesDto, DateTimeFieldPropertiesDto, fieldInvariant, FieldPropertiesVisitor, GeolocationFieldPropertiesDto, JsonFieldPropertiesDto, NumberFieldPropertiesDto, ReferencesFieldPropertiesDto, RichTextFieldPropertiesDto, StringFieldPropertiesDto, TagsFieldPropertiesDto, UIFieldPropertiesDto } from '../model';
 
 export class HtmlValue {
@@ -276,6 +276,10 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
         return this.value;
     }
 
+    public visitUserInfo(_: UserInfoFieldPropertiesDto): string {
+        return 'User';
+    }
+
     private formatArray(singularName: string, pluralName: string) {
         if (!Types.isArray(this.value)) {
             return `0 ${pluralName}`;
@@ -448,6 +452,10 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
     public visitUI(_: UIFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
         return [];
     }
+
+    public visitUserInfo(_: UserInfoFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
+        return [];
+    }
 }
 
 export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
@@ -533,6 +541,14 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
         return null;
     }
 
+    public visitUserInfo(properties: UserInfoFieldPropertiesDto): any {
+        if (!!properties.defaultRole) {
+            return { apiKey: generateApiKey(), role: properties.defaultRole };
+        }
+
+        return null;
+    }
+
     private getValue(value: any, values?: any) {
         if (values && values.hasOwnProperty(this.partitionKey)) {
             return values[this.partitionKey];
@@ -540,4 +556,17 @@ export class FieldDefaultValue implements FieldPropertiesVisitor<any> {
 
         return value;
     }
+}
+
+export function generateApiKey() {
+    const uuid = crypto.randomUUID();
+
+    const base64 = btoa(uuid);
+
+    const cleaned = base64
+        .replace(/\+/g, '')
+        .replace(/\//g, '')
+        .replace(/=+$/, '');
+
+    return cleaned;
 }

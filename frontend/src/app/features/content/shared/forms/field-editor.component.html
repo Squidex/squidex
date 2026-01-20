@@ -354,12 +354,16 @@
                     @case ("UI") {
                         <h4 class="ui-separator">{{ field.displayName }}</h4>
                     }
+
+                    @case ("UserInfo") {
+                        <sqx-user-info-editor [formControl]="$any(fieldForm)" [formId]="formModel.path" />
+                    }
                 }
             }
         </div>
 
         @if (field.properties.hints && field.properties.hints.length > 0) {
-            <sqx-form-hint> <span inline="true" optional="true" [sqxMarkdown]="field.properties.hints"></span> </sqx-form-hint>
+            <sqx-form-hint> <span optional="true" [sqxMarkdown]="field.properties.hints"></span> </sqx-form-hint>
         }
     </div>
 }

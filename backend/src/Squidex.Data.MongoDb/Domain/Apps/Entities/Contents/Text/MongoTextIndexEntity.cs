@@ -8,6 +8,7 @@
 using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 using NetTopologySuite.Geometries;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
@@ -48,6 +49,14 @@ public sealed class MongoTextIndexEntity<T>
     [BsonIgnoreIfNull]
     [BsonElement("t")]
     public T Texts { get; set; }
+
+    [BsonIgnoreIfNull]
+    [BsonElement("k")]
+    public string? UserInfoApiKey { get; set; }
+
+    [BsonIgnoreIfNull]
+    [BsonElement("r")]
+    public string? UserInfoRole { get; set; }
 
     [BsonIgnoreIfNull]
     [BsonElement("g")]

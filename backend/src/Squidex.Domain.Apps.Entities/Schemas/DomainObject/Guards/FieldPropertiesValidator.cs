@@ -316,6 +316,11 @@ public sealed class FieldPropertiesValidator : IFieldPropertiesVisitor<IEnumerab
         }
     }
 
+    public IEnumerable<ValidationError> Visit(UserInfoFieldProperties properties, None args)
+    {
+        yield break;
+    }
+
     private static bool IsMaxGreaterThanMin<T>(T? min, T? max) where T : struct, IComparable
     {
         return max.HasValue && min.HasValue && min.Value.CompareTo(max.Value) < 0;

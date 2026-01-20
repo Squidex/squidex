@@ -32,6 +32,10 @@ public static class Constants
 
     public const string ScopeApi = "squidex-api";
 
+    public const string ClaimTypeApp = "app/name";
+
+    public const string ClaimTypeRole = "app/role";
+
     public static readonly string ClientFrontendId = DefaultClients.Frontend;
 
     public static readonly string ClientInternalId = "squidex-internal";

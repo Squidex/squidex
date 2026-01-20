@@ -85,7 +85,7 @@
                                 }
                             }
                             <sqx-form-hint>
-                                <span inline="true" [sqxMarkdown]="property.description"></span>
+                                <span [sqxMarkdown]="property.description"></span>
                                 @if (property.isFormattable) {
                                     <div>
                                         {{ "rules.advancedFormattingHint" | sqxTranslate }}:

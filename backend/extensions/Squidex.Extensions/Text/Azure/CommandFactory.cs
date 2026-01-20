@@ -70,6 +70,28 @@ public static class CommandFactory
             }
         }
 
+        if (upsert.UserInfos != null)
+        {
+            foreach (var userInfo in upsert.UserInfos)
+            {
+                var geoDocument = new SearchDocument
+                {
+                    ["docId"] = upsert.ToDocId(),
+                    ["appId"] = upsert.UniqueContentId.AppId.ToString(),
+                    ["appName"] = string.Empty,
+                    ["contentId"] = upsert.UniqueContentId.ContentId.ToString(),
+                    ["schemaId"] = upsert.SchemaId.Id.ToString(),
+                    ["schemaName"] = upsert.SchemaId.Name,
+                    ["serveAll"] = upsert.ServeAll,
+                    ["servePublished"] = upsert.ServePublished,
+                    ["userInfoApiKey"] = userInfo,
+                    ["userInfoRole"] = userInfo.Role,
+                };
+
+                batch.Add(IndexDocumentsAction.MergeOrUpload(geoDocument));
+            }
+        }
+
         if (upsert.Texts is { Count: > 0 })
         {
             var document = new SearchDocument

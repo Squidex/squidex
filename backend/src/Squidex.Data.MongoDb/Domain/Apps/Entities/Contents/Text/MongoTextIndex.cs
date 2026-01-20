@@ -11,8 +11,9 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
-public sealed class MongoTextIndex(IMongoDatabase database, string shardKey) 
-    : MongoTextIndexBase<List<MongoTextIndexEntityText>>(database, shardKey, new CommandFactory<List<MongoTextIndexEntityText>>(BuildTexts))
+public sealed class MongoTextIndex(IMongoDatabase database, string shardKey)
+    : MongoTextIndexBase<List<MongoTextIndexEntityText>>(database, shardKey,
+        new CommandFactory<List<MongoTextIndexEntityText>>(BuildTexts))
 {
     private record struct SearchOperation
     {

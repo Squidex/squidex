@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using NetTopologySuite.Geometries;
+using Squidex.Domain.Apps.Core.Contents;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
@@ -14,6 +15,8 @@ public sealed class UpsertIndexEntry : IndexCommand
     public Dictionary<string, Geometry>? GeoObjects { get; set; }
 
     public Dictionary<string, string>? Texts { get; set; }
+
+    public List<UserInfoValue>? UserInfos { get; set; }
 
     public bool ServeAll { get; set; }
 

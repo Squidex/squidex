@@ -1,0 +1,31 @@
+<div class="form" [formGroup]="form">
+    <sqx-form-row #apiKeyRow for="apiKey" label="common.apiKey" [prefix]="formId" required>
+        <div class="form-group">
+            <input class="form-control key" [id]="apiKeyRow.formId" autocomplete="off" formControlName="apiKey" />
+            <button class="btn btn-text-secondary btn-sm key-generate" (click)="generateApiKey()" type="button">
+                {{ "common.generate" | sqxTranslate }}
+            </button>
+        </div>
+    </sqx-form-row>
+
+    <sqx-form-row #roleRow for="role" label="common.role" [prefix]="formId" required>
+        <select class="form-select" [id]="roleRow.formId" autocomplete="off" formControlName="role">
+            @for (role of rolesState.roles | async; track role.name) {
+                <option [ngValue]="role.name">{{ role.name }}</option>
+            }
+        </select>
+    </sqx-form-row>
+
+    <sqx-form-row for="none">
+        <sqx-form-hint> <span inline="false" [sqxMarkdown]="'contents.userInfo.instructions' | sqxTranslate"></span> </sqx-form-hint>
+        <sqx-code>
+            <div ngPreserveWhitespaces>Authorization: ApiKey {{ rolesState.appName }}:{{ apiKey | async }}</div>
+        </sqx-code>
+        <sqx-form-hint>
+          {{ 'common.or' | sqxTranslate }}
+        </sqx-form-hint>
+        <sqx-code>
+            <div ngPreserveWhitespaces>ApiKey: {{ rolesState.appName }}:{{ apiKey | async }}</div>
+        </sqx-code>
+    </sqx-form-row>
+</div>

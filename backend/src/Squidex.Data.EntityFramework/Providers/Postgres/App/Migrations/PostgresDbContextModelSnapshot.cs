@@ -18,7 +18,7 @@ namespace Squidex.Providers.Postgres.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.14")
+                .HasAnnotation("ProductVersion", "8.0.16")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "postgis");
@@ -846,7 +846,7 @@ namespace Squidex.Providers.Postgres.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Geos", (string)null);
+                    b.ToTable("Geos");
                 });
 
             modelBuilder.Entity("Squidex.Domain.Apps.Entities.Contents.Text.EFTextIndexTextEntity", b =>
@@ -885,7 +885,54 @@ namespace Squidex.Providers.Postgres.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Texts", (string)null);
+                    b.ToTable("Texts");
+                });
+
+            modelBuilder.Entity("Squidex.Domain.Apps.Entities.Contents.Text.EFTextIndexUserInfoEntity", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(400)
+                        .HasColumnType("character varying(400)");
+
+                    b.Property<string>("AppId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("ContentId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("SchemaId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<bool>("ServeAll")
+                        .HasColumnType("boolean");
+
+                    b.Property<bool>("ServePublished")
+                        .HasColumnType("boolean");
+
+                    b.Property<byte>("Stage")
+                        .HasColumnType("smallint");
+
+                    b.Property<string>("UserInfoApiKey")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.Property<string>("UserInfoRole")
+                        .IsRequired()
+                        .HasMaxLength(256)
+                        .HasColumnType("character varying(256)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserInfoApiKey");
+
+                    b.ToTable("UserInfos");
                 });
 
             modelBuilder.Entity("Squidex.Domain.Apps.Entities.Contents.Text.State.TextContentState", b =>
@@ -1047,7 +1094,6 @@ namespace Squidex.Providers.Postgres.Migrations
             modelBuilder.Entity("Squidex.Events.EntityFramework.EFEventCommit", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<string>("EventStream")
@@ -1119,7 +1165,6 @@ namespace Squidex.Providers.Postgres.Migrations
             modelBuilder.Entity("Squidex.Flows.EntityFramework.EFFlowStateEntity", b =>
                 {
                     b.Property<Guid>("Id")
-                        .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
                     b.Property<DateTimeOffset>("Created")

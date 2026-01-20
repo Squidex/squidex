@@ -106,6 +106,7 @@ public sealed class TextIndexingProcess(
                     ServeAll = true,
                     ServePublished = false,
                     Texts = data.ToTexts(),
+                    UserInfos = data.ToUserInfos(),
                 });
 
             states[state.UniqueContentId] = state;

@@ -105,6 +105,10 @@ public static class ElasticSearchIndexDefinition
                 {
                     type = "geo_point",
                 },
+                ["userInfoApiKey"] = new
+                {
+                    type = "text",
+                },
             },
         };
 

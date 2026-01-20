@@ -964,3 +964,21 @@ export class UIFieldPropertiesDto extends generated.UIFieldPropertiesDto {
         return visitor.visitUI(this);
     }
 }
+
+export class UserInfoFieldPropertiesDto extends generated.UserInfoFieldPropertiesDto {
+    public get isComplexUI() {
+        return true;
+    }
+
+    public get isSortable() {
+        return false;
+    }
+
+    public get isContentField() {
+        return true;
+    }
+
+    public accept<T>(visitor: FieldPropertiesVisitor<T>): T {
+        return visitor.visitUserInfo(this);
+    }
+}

@@ -502,6 +502,15 @@
   <data name="contents.invalidString" xml:space="preserve">
     <value>Type json non valide, chaîne attendue.</value>
   </data>
+  <data name="contents.invalidUserInfo" xml:space="preserve">
+    <value>Invalid json type, expected apiKey+role object.</value>
+  </data>
+  <data name="contents.invalidUserInfoApiKey" xml:space="preserve">
+    <value>ApiKey must be defined.</value>
+  </data>
+  <data name="contents.invalidUserInfoRole" xml:space="preserve">
+    <value>Role must be defined.</value>
+  </data>
   <data name="contents.listReferences" xml:space="preserve">
     <value>{count} Les références)</value>
   </data>

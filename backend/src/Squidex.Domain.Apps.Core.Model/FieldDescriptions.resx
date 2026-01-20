@@ -483,4 +483,10 @@
   <data name="FieldRuleAction" xml:space="preserve">
     <value>The type of action that is performed.</value>
   </data>
+  <data name="UserInfoApiKey" xml:space="preserve">
+    <value>The API key for authentication.</value>
+  </data>
+  <data name="UserInfoRole" xml:space="preserve">
+    <value>The user role.</value>
+  </data>
 </root>

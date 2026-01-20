@@ -22,6 +22,7 @@ import { ReferencesValidationComponent } from '../types/references-validation.co
 import { RichTextValidationComponent } from '../types/rich-text-validation.component';
 import { StringValidationComponent } from '../types/string-validation.component';
 import { TagsValidationComponent } from '../types/tags-validation.component';
+import { UserInfoValidationComponent } from '../types/user-info-validation.component';
 
 @Component({
     selector: 'sqx-field-form-validation',
@@ -44,6 +45,7 @@ import { TagsValidationComponent } from '../types/tags-validation.component';
         RichTextValidationComponent,
         StringValidationComponent,
         TagsValidationComponent,
+        UserInfoValidationComponent,
     ],
 })
 export class FieldFormValidationComponent {

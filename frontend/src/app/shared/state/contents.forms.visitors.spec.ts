@@ -489,6 +489,32 @@ describe('TagsField', () => {
     });
 });
 
+describe('UserInfoField', () => {
+    const field = createField({ properties: createProperties('UserInfo') });
+
+    it('should create validators', () => {
+        expect(FieldsValidators.create(field, false).length).toBe(0);
+    });
+
+    it('should format to empty string if null', () => {
+        expect(FieldFormatter.format(field, null)).toBe('');
+    });
+
+    it('should format to user constant', () => {
+        expect(FieldFormatter.format(field, {})).toBe('User');
+    });
+
+    it('should return default value as null if role is not defined', () => {
+        expect(FieldDefaultValue.get(field, 'iv')).toBeNull();
+    });
+
+    it('should return default value from properties', () => {
+        const field2 = createField({ properties: createProperties('UserInfo', { defaultRole: 'Reader' }) });
+
+        expect(FieldDefaultValue.get(field2, 'iv').role).toEqual('Reader');
+    });
+});
+
 function isUtc() {
     return new Date().getTimezoneOffset() === 0;
 }

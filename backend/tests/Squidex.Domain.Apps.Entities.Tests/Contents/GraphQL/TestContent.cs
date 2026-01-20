@@ -136,6 +136,9 @@ public static class TestContent
                   text
                 }
               }
+              myUserInfo {
+                iv 
+              }
             }";
 
     public const string AllFlatFields = @"
@@ -225,6 +228,7 @@ public static class TestContent
                 markdown
                 text
               }
+              myUserInfo
             }";
 
     public static EnrichedContent Create(DomainId id, ContentData? data = null)
@@ -340,7 +344,12 @@ public static class TestContent
                             .Add("content", JsonValue.Array(
                                 JsonValue.Object()
                                     .Add("type", "text")
-                                    .Add("text", "Rich Text")))));
+                                    .Add("text", "Rich Text")))))
+                .AddField("my-user-info",
+                    new ContentFieldData()
+                        .AddInvariant(JsonValue.Object()
+                            .Add("apiKey", "MyKey")
+                            .Add("role", "MyRole")));
 
         var content = new EnrichedContent
         {
@@ -621,6 +630,10 @@ public static class TestContent
                     },
                 },
             },
+            ["myUserInfo"] = new
+            {
+                iv = new { apiKey = "MyKey", role = "MyRole" },
+            },
         };
 
         return actual;
@@ -814,6 +827,10 @@ public static class TestContent
                     text = "Rich Text",
                 },
             },
+            ["myUserInfo"] = new
+            {
+                iv = new { apiKey = "MyKey", role = "MyRole" },
+            },
         };
 
         return actual;
@@ -956,6 +973,7 @@ public static class TestContent
                 markdown = "# Rich Text",
                 text = "Rich Text",
             },
+            ["myUserInfo"] = new { apiKey = "MyKey", role = "MyRole" },
         };
 
         return actual;

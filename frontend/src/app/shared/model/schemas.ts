@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ArrayFieldPropertiesDto, AssetsFieldPropertiesDto, BooleanFieldPropertiesDto, ComponentFieldPropertiesDto, ComponentsFieldPropertiesDto, DateTimeFieldPropertiesDto, FieldDto, FieldPropertiesDto, FieldRuleAction, GeolocationFieldPropertiesDto, JsonFieldPropertiesDto, NumberFieldPropertiesDto, ReferencesFieldPropertiesDto, RichTextFieldPropertiesDto, StringFieldPropertiesDto, TagsFieldPropertiesDto, UIFieldPropertiesDto } from './generated';
+import { ArrayFieldPropertiesDto, AssetsFieldPropertiesDto, BooleanFieldPropertiesDto, ComponentFieldPropertiesDto, ComponentsFieldPropertiesDto, DateTimeFieldPropertiesDto, FieldDto, FieldPropertiesDto, FieldRuleAction, GeolocationFieldPropertiesDto, JsonFieldPropertiesDto, NumberFieldPropertiesDto, ReferencesFieldPropertiesDto, RichTextFieldPropertiesDto, StringFieldPropertiesDto, TagsFieldPropertiesDto, UIFieldPropertiesDto, UserInfoFieldPropertiesDto } from './generated';
 
 export type FieldType =
     'Array' |
@@ -21,7 +21,8 @@ export type FieldType =
     'RichText' |
     'String' |
     'Tags' |
-    'UI';
+    'UI' |
+    'UserInfo';
 
 export const fieldTypes: ReadonlyArray<{ type: FieldType; description: string }> = [
     {
@@ -66,6 +67,9 @@ export const fieldTypes: ReadonlyArray<{ type: FieldType; description: string }>
     }, {
         type: 'UI',
         description: 'i18n:schemas.fieldTypes.ui.description',
+    }, {
+        type: 'UserInfo',
+        description: 'i18n:schemas.fieldTypes.user.description',
     },
 ];
 
@@ -117,6 +121,9 @@ export function createProperties(fieldType: FieldType, values?: any): FieldPrope
         case 'UI':
             properties = new UIFieldPropertiesDto(values);
             break;
+        case 'UserInfo':
+            properties = new UserInfoFieldPropertiesDto(values);
+            break;
         default:
             throw new Error(`Unknown field type ${fieldType}.`);
     }
@@ -152,6 +159,8 @@ export interface FieldPropertiesVisitor<T> {
     visitTags(properties: TagsFieldPropertiesDto): T;
 
     visitUI(properties: UIFieldPropertiesDto): T;
+
+    visitUserInfo(properties: UserInfoFieldPropertiesDto): T;
 }
 
 export const META_FIELDS = {

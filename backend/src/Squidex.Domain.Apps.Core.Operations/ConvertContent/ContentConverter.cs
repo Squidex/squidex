@@ -67,7 +67,6 @@ public sealed class ContentConverter(ResolvedComponents components, Schema schem
 
             // Some conversions are faster to do upfront, e.g. to remove hidden fields.
             var newData = ConvertField(field, fieldData);
-
             if (newData == null)
             {
                 continue;
@@ -98,7 +97,6 @@ public sealed class ContentConverter(ResolvedComponents components, Schema schem
         foreach (var converter in fieldConverters)
         {
             var newData = converter.ConvertFieldBefore(field, data);
-
             if (newData == null)
             {
                 return null;
@@ -115,7 +113,6 @@ public sealed class ContentConverter(ResolvedComponents components, Schema schem
         foreach (var converter in fieldConverters)
         {
             var newData = converter.ConvertFieldAfter(field, data);
-
             if (newData == null)
             {
                 return null;
@@ -157,7 +154,6 @@ public sealed class ContentConverter(ResolvedComponents components, Schema schem
             var oldValue = array[i];
 
             var (removed, newValue) = ConvertArrayItem(field, oldValue);
-
             if (removed)
             {
                 array.RemoveAt(i);
@@ -184,7 +180,6 @@ public sealed class ContentConverter(ResolvedComponents components, Schema schem
             var oldValue = array[i];
 
             var (removed, newValue) = ConvertComponent(oldValue, parent);
-
             if (removed)
             {
                 array.RemoveAt(i);

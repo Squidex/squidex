@@ -1132,6 +1132,24 @@ namespace Squidex.Domain.Apps.Core {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to The API key for authentication..
+        /// </summary>
+        public static string UserInfoApiKey {
+            get {
+                return ResourceManager.GetString("UserInfoApiKey", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to The user role..
+        /// </summary>
+        public static string UserInfoRole {
+            get {
+                return ResourceManager.GetString("UserInfoRole", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to True when this user is a client, which is typically the case when the request is made from the API..
         /// </summary>
         public static string UserIsClient {
