@@ -97,7 +97,6 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
             SRID = 4326,
         };
 
-
         var distance = query.Radius;
         if (dbContext.Database.IsNpgsql())
         {
@@ -183,7 +182,7 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
                 .FirstOrDefaultAsync(ct);
 
         return entity != null ?
-            new UserInfoResult(entity.ContentId, entity.UserInfoApiKey) :
+            new UserInfoResult(entity.ContentId, entity.UserInfoRole) :
             null;
     }
 
