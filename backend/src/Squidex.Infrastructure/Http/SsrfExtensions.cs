@@ -16,6 +16,8 @@ public static class SsrfExtensions
 {
     public static IHttpClientBuilder EnableSsrfProtection(this IHttpClientBuilder builder )
     {
+        builder.Services.AddSingleton<SsrfProtectionHandler>();
+
         builder.AddHttpMessageHandler<SsrfProtectionHandler>();
         builder.ConfigurePrimaryHttpMessageHandler(services =>
         {
@@ -39,6 +41,11 @@ public static class SsrfExtensions
         {
             var host = context.DnsEndPoint.Host;
 
+            if (options.IsWhitelistedHost(host))
+            {
+                return await CreateSockedAsync(context, cancellationToken);
+            }
+
             // Re-validate DNS to prevent DNS rebinding attacks
             var addresses = await Dns.GetHostAddressesAsync(host, cancellationToken);
 
@@ -50,10 +57,16 @@ public static class SsrfExtensions
                 }
             }
 
-            var socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
-            await socket.ConnectAsync(context.DnsEndPoint, cancellationToken);
-
-            return new NetworkStream(socket, ownsSocket: true);
+            return await CreateSockedAsync(context, cancellationToken);
         };
+    }
+
+    private static async Task<NetworkStream> CreateSockedAsync(SocketsHttpConnectionContext context,
+        CancellationToken ct)
+    {
+        var socket = new Socket(SocketType.Stream, ProtocolType.Tcp);
+        await socket.ConnectAsync(context.DnsEndPoint, ct);
+
+        return new NetworkStream(socket, ownsSocket: true);
     }
 }

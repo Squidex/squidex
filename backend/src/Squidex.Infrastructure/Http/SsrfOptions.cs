@@ -9,8 +9,13 @@ using System.Net;
 
 namespace Squidex.Infrastructure.Http;
 
-public class SsrfOptions
+public sealed class SsrfOptions
 {
+    public HashSet<string> WhitelistedHosts { get; set; } =
+        new HashSet<string>(
+            [],
+            StringComparer.OrdinalIgnoreCase);
+
     public HashSet<string> AllowedSchemes { get; set; } =
         new HashSet<string>(
             ["http", "https"],
@@ -18,9 +23,15 @@ public class SsrfOptions
 
     public HashSet<IPAddress> BlockedIpAddresses { get; set; } =
         new HashSet<IPAddress>(
-            [IPAddress.Parse("169.254.169.254")]);
+            [IPAddress.Parse("169.254.169.254")],
+            EqualityComparer<IPAddress>.Default);
 
     public bool AllowAutoRedirect { get; set; }
 
     public bool EnableDnsRebindingProtection { get; set; } = true;
+
+    public bool IsWhitelistedHost(string host)
+    {
+        return WhitelistedHosts.Contains(host) || WhitelistedHosts.Contains("*");
+    }
 }

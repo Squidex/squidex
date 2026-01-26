@@ -28,6 +28,12 @@ public class SsrfProtectionHandler(IOptions<SsrfOptions> options) : DelegatingHa
         }
 
         var host = request.RequestUri.Host;
+
+        if (options.Value.IsWhitelistedHost(host))
+        {
+            return await base.SendAsync(request, cancellationToken);
+        }
+
         try
         {
             var addresses = await Dns.GetHostAddressesAsync(host, cancellationToken);

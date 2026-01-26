@@ -91,6 +91,26 @@ public class SsrfProtectionHandlerTests
     }
 
     [Fact]
+    public async Task Should_not_block_request_to_localhost_if_whitelisted()
+    {
+        options.WhitelistedHosts.Add("localhost");
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "http://localhost");
+
+        await sut.SendAsync(request, CancellationToken.None);
+    }
+
+    [Fact]
+    public async Task Should_not_block_request_to_localhost_if_all_hosts_are_whitelisted()
+    {
+        options.WhitelistedHosts.Add("*");
+
+        var request = new HttpRequestMessage(HttpMethod.Get, "http://localhost");
+
+        await sut.SendAsync(request, CancellationToken.None);
+    }
+
+    [Fact]
     public async Task Should_allow_custom_scheme_when_configured()
     {
         options.AllowedSchemes.Add("custom");
