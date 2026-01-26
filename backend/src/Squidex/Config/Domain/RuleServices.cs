@@ -23,6 +23,7 @@ using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Flows.Internal.Execution;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Http;
 using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Config.Domain;
@@ -33,6 +34,9 @@ public static class RuleServices
     {
         services.Configure<RulesOptions>(config,
             "rules");
+
+        services.Configure<SsrfOptions>(config,
+            "ssrf");
 
         services.AddSingletonAs<EventEnricher>()
             .As<IEventEnricher>();

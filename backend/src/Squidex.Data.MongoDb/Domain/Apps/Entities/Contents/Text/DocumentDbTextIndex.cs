@@ -8,13 +8,14 @@
 using MongoDB.Driver;
 using MongoDB.Driver.GeoJsonObjectModel;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Events.Mongo;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.ObjectPool;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
 public sealed class DocumentDbTextIndex(IMongoDatabase database, string shardKey)
-    : MongoTextIndexBase<string>(database, shardKey,
+    : MongoTextIndexBase<string>(database, shardKey, MongoDerivate.DocumentDB,
         new CommandFactory<string>(BuildTexts))
 {
     private record struct SearchOperation

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.Contents.Text;
+using Squidex.Events.Mongo;
 using Squidex.MongoDb.TestHelpers;
 
 namespace Squidex.MongoDb.Domain.Contents.Text;
@@ -20,7 +21,7 @@ public class MongoTextIndexTests(MongoFixture fixture) : TextIndexerTests
 
     public override async Task<ITextIndex> CreateSutAsync()
     {
-        var sut = new MongoTextIndex(fixture.Database, string.Empty);
+        var sut = new MongoTextIndex(fixture.Database, string.Empty, MongoDerivate.MongoDB);
 
         await sut.InitializeAsync(default);
         return sut;

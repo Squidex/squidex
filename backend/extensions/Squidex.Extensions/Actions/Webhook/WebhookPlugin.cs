@@ -7,6 +7,7 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Infrastructure.Http;
 using Squidex.Infrastructure.Plugins;
 
 namespace Squidex.Extensions.Actions.Webhook;
@@ -15,6 +16,9 @@ public sealed class WebhookPlugin : IPlugin
 {
     public void ConfigureServices(IServiceCollection services, IConfiguration config)
     {
+        services.AddHttpClient("FlowClient")
+            .EnableSsrfProtection();
+
         services.AddFlowStep<WebhookFlowStep>();
 #pragma warning disable CS0618 // Type or member is obsolete
         services.AddRuleAction<WebhookAction>();

@@ -227,7 +227,7 @@ public static class ServiceExtensions
                     shardKey => ActivatorUtilities.CreateInstance<AtlasTextIndex>(c, shardKey));
             }).AsOptional<ITextIndex>().As<IDeleter>();
         }
-        else if (config.GetValue<MongoDerivate>("store:mongoDb:derivate") == MongoDerivate.DocumentDB)
+        else if (derivate == MongoDerivate.DocumentDB)
         {
             services.AddSingletonAs(c =>
             {
@@ -240,7 +240,7 @@ public static class ServiceExtensions
             services.AddSingletonAs(c =>
             {
                 return new MongoShardedTextIndex<List<MongoTextIndexEntityText>>(GetSharding(config, "store:mongoDB:textShardCount"),
-                    shardKey => ActivatorUtilities.CreateInstance<MongoTextIndex>(c, shardKey));
+                    shardKey => ActivatorUtilities.CreateInstance<MongoTextIndex>(c, shardKey, derivate));
             }).AsOptional<ITextIndex>().As<IDeleter>();
         }
 
