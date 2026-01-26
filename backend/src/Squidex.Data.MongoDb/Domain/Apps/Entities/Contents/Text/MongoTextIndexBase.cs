@@ -76,11 +76,7 @@ public abstract class MongoTextIndexBase<T>(IMongoDatabase database, string shar
 
                 new CreateIndexModel<MongoTextIndexEntity<T>>(
                     Index
-<<<<<<< HEAD
                         .Ascending(x => x.UserInfoApiKey),
-=======
-                        .Geo2DSphere(x => x.UserInfoApiKey),
->>>>>>> 223687424482a619acc2c98195fe1fb4295c6a22
                     new CreateIndexOptions { Sparse = true }),
             ], ct);
         }
