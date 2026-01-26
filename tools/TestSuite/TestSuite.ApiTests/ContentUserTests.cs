@@ -21,6 +21,7 @@ public sealed class ContentUserTests(CreatedAppFixture fixture) : IClassFixture<
     public CreatedAppFixture _ { get; } = fixture;
 
     [Fact]
+    [Trait("Category", "FerretExcluded")]
     public async Task Should_login_with_user_credentials()
     {
         var apiKey = Guid.NewGuid().ToString();
