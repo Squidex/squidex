@@ -55,7 +55,7 @@ public abstract class MongoTextIndexBase<T>(IMongoDatabase database, string shar
     protected override async Task SetupCollectionAsync(IMongoCollection<MongoTextIndexEntity<T>> collection,
         CancellationToken ct)
     {
-        if (derivate == MongoDerivate.MongoDB)
+        if (derivate == MongoDerivate.FerretDB)
         {
             await collection.Indexes.CreateManyAsync(
             [
