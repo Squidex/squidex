@@ -7,12 +7,13 @@
 
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Events.Mongo;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
-public sealed class MongoTextIndex(IMongoDatabase database, string shardKey)
-    : MongoTextIndexBase<List<MongoTextIndexEntityText>>(database, shardKey,
+public sealed class MongoTextIndex(IMongoDatabase database, string shardKey, MongoDerivate derivate)
+    : MongoTextIndexBase<List<MongoTextIndexEntityText>>(database, shardKey, derivate,
         new CommandFactory<List<MongoTextIndexEntityText>>(BuildTexts))
 {
     private record struct SearchOperation

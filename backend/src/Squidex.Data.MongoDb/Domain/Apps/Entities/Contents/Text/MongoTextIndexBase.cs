@@ -10,11 +10,12 @@ using MongoDB.Bson.Serialization.Attributes;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Events.Mongo;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
-public abstract class MongoTextIndexBase<T>(IMongoDatabase database, string shardKey, CommandFactory<T> factory)
+public abstract class MongoTextIndexBase<T>(IMongoDatabase database, string shardKey, MongoDerivate derivate, CommandFactory<T> factory)
     : MongoRepositoryBase<MongoTextIndexEntity<T>>(database), ITextIndex, IDeleter where T : class
 {
     protected sealed class MongoTextResult
@@ -54,9 +55,7 @@ public abstract class MongoTextIndexBase<T>(IMongoDatabase database, string shar
     protected override async Task SetupCollectionAsync(IMongoCollection<MongoTextIndexEntity<T>> collection,
         CancellationToken ct)
     {
-        var isFerreDb = await Database.IsFerretDbAsync(ct);
-
-        if (isFerreDb)
+        if (derivate == MongoDerivate.FerretDB)
         {
             await collection.Indexes.CreateManyAsync(
             [
@@ -77,7 +76,7 @@ public abstract class MongoTextIndexBase<T>(IMongoDatabase database, string shar
 
                 new CreateIndexModel<MongoTextIndexEntity<T>>(
                     Index
-                        .Geo2DSphere(x => x.UserInfoApiKey),
+                        .Ascending(x => x.UserInfoApiKey),
                     new CreateIndexOptions { Sparse = true }),
             ], ct);
         }
@@ -96,6 +95,11 @@ public abstract class MongoTextIndexBase<T>(IMongoDatabase database, string shar
                         .Ascending(x => x.SchemaId)
                         .Ascending(x => x.GeoField)
                         .Geo2DSphere(x => x.GeoObject)),
+
+                new CreateIndexModel<MongoTextIndexEntity<T>>(
+                    Index
+                        .Ascending(x => x.UserInfoApiKey),
+                    new CreateIndexOptions { Sparse = true }),
             ], ct);
         }
     }

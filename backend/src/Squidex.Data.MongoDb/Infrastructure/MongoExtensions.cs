@@ -221,21 +221,6 @@ public static class MongoExtensions
         return result;
     }
 
-    public static async Task<bool> IsFerretDbAsync(this IMongoDatabase database,
-        CancellationToken ct = default)
-    {
-        var command =
-            new BsonDocumentCommand<BsonDocument>(new BsonDocument
-            {
-                { "buildInfo", 1 },
-            });
-
-        var document = await database.RunCommandAsync(command, cancellationToken: ct);
-
-        var isFerretDB = document.Any(x => x.Name.Contains("ferret", StringComparison.OrdinalIgnoreCase));
-        return isFerretDB;
-    }
-
     public static async Task<List<T>> ToListRandomAsync<T>(this IFindFluent<T, T> find, IMongoCollection<T> collection, long take,
         CancellationToken ct = default)
     {
