@@ -16,7 +16,7 @@ public static class SsrfExtensions
 {
     public static IHttpClientBuilder EnableSsrfProtection(this IHttpClientBuilder builder )
     {
-        builder.Services.AddSingleton<SsrfProtectionHandler>();
+        builder.Services.AddTransient<SsrfProtectionHandler>();
 
         builder.AddHttpMessageHandler<SsrfProtectionHandler>();
         builder.ConfigurePrimaryHttpMessageHandler(services =>
