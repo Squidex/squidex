@@ -10,7 +10,7 @@
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
     "module": "es2020",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noUnusedLocals": true,

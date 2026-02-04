@@ -86,13 +86,11 @@ export default {
     }),
     decorators: [
         moduleMetadata({
-            declarations: [
-                TestComponent,
-            ],
             imports: [
                 BrowserAnimationsModule,
                 FormsModule,
                 RootViewComponent,
+                TestComponent,
             ],
             providers: [
                 {

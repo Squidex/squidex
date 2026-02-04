@@ -11,9 +11,7 @@ import { IResourceDto, ResourceLinkDto, UIService, UIState, UsersService } from 
 import { TestValues } from './_test-helpers';
 
 describe('UIState', () => {
-    const {
-        app,
-    } = TestValues;
+    const { app, } = TestValues;
 
     const common = {
         key: 'xx',

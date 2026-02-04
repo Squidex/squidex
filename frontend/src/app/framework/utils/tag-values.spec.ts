@@ -201,7 +201,7 @@ describe('TagValue', () => {
         [
             { input: undefined },
             { input: null },
-            { input: ''},
+            { input: '' },
         ].forEach(x => {
             it(`should not return tag value if value is <${x.input}>`, () => {
                 const result = FloatConverter.INSTANCE.convertValue(x.input!);

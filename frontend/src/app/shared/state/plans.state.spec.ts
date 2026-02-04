@@ -11,13 +11,7 @@ import { DialogService, PlanChangedDto, PlanDto, PlansDto, PlansService, PlansSt
 import { TestValues } from './_test-helpers';
 
 describe('PlansState', () => {
-    const {
-        app,
-        appsState,
-        creator,
-        newVersion,
-        version,
-    } = TestValues;
+    const { app, appsState, creator, newVersion, version, } = TestValues;
 
     const oldPlans = new PlansDto({
         currentPlanId: 'free',
@@ -116,8 +110,6 @@ describe('PlansState', () => {
                 .returns(() => of(versioned(version, oldPlans))).verifiable();
 
             plansState.load(true).subscribe();
-
-            expect().nothing();
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });

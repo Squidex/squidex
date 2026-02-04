@@ -7,7 +7,7 @@
 
 import { AsyncPipe } from '@angular/common';
 import { AfterViewInit, Component, NgZone, OnInit, Renderer2, ViewChild } from '@angular/core';
-import { GridsterComponent, GridsterConfig, GridsterItem, GridsterItemComponent, GridType } from 'angular-gridster2';
+import { Gridster, GridsterConfig, GridsterItem, GridsterItemConfig, GridType } from 'angular-gridster2';
 import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCardComponent, ApiTrafficCardComponent, ApiTrafficSummaryCardComponent, AssetUploadsCountCardComponent, AssetUploadsSizeCardComponent, AssetUploadsSizeSummaryCardComponent, AuthService, CallsUsageDto, CurrentStorageDto, DateTime, defined, fadeAnimation, IFrameCardComponent, LocalStoreService, MarkdownDirective, RandomCatCardComponent, RandomDogCardComponent, Settings, StorageUsagePerDateDto, Subscriptions, SupportCardComponent, switchSafe, TeamsState, TitleComponent, TranslatePipe, UsagesService } from '@app/shared';
 import { AppsCardComponent } from './cards/apps-card.component';
 
@@ -29,8 +29,8 @@ import { AppsCardComponent } from './cards/apps-card.component';
         AssetUploadsSizeCardComponent,
         AssetUploadsSizeSummaryCardComponent,
         AsyncPipe,
-        GridsterComponent,
-        GridsterItemComponent,
+        Gridster,
+        GridsterItem,
         IFrameCardComponent,
         MarkdownDirective,
         RandomCatCardComponent,
@@ -44,7 +44,7 @@ export class DashboardPageComponent implements AfterViewInit, OnInit {
     private readonly subscriptions = new Subscriptions();
 
     @ViewChild('grid')
-    public grid!: GridsterComponent;
+    public grid!: Gridster;
 
     public selectedTeam = this.teamsState.selectedTeam.pipe(defined());
 
@@ -56,7 +56,7 @@ export class DashboardPageComponent implements AfterViewInit, OnInit {
 
     public callsUsage?: CallsUsageDto;
 
-    public gridConfig: GridsterItem[] = DEFAULT_CONFIG;
+    public gridConfig: GridsterItemConfig[] = DEFAULT_CONFIG;
     public gridOptions = DEFAULT_OPTIONS;
     public gridDefault = DEFAULT_CONFIG;
     public gridOptionals = OPTIONAL_CARDS;
@@ -121,18 +121,16 @@ export class DashboardPageComponent implements AfterViewInit, OnInit {
 
     public changeIsStacked(value: boolean) {
         this.localStore.setBoolean(Settings.Local.DASHBOARD_CHART_STACKED, value);
-
         this.isStacked = value;
     }
 
-    public changeConfig(config: GridsterItem[]) {
+    public changeConfig(config: GridsterItemConfig[]) {
         this.gridConfig = config;
-
         this.grid?.updateGrid();
     }
 }
 
-const DEFAULT_CONFIG: GridsterItem[] = [
+const DEFAULT_CONFIG: GridsterItemConfig[] = [
     // Row 1
     { cols: 1, rows: 1, x: 0, y: 0, name: 'i18n:dashboard.trafficSummaryCard', type: 'api-traffic-summary' },
     { cols: 2, rows: 1, x: 1, y: 0, name: 'i18n:dashboard.appsCard', type: 'apps' },

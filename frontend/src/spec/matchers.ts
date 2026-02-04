@@ -5,30 +5,55 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-export const customMatchers: jasmine.CustomMatcherFactories = {
-    toEqualIgnoringProps: (util) => {
+import { expect } from 'vitest';
+
+interface CustomMatchers<R = unknown> {
+    toEqualIgnoringProps(expected: any, propsToIgnore?: string[]): R;
+}
+
+declare module 'vitest' {
+    interface Assertion<T = any> extends CustomMatchers<T> {}
+    interface AsymmetricMatchersContaining extends CustomMatchers {}
+}
+
+expect.extend({
+    toEqualIgnoringProps(
+        actual: any,
+        expected: any,
+        propsToIgnore: string[] = [],
+    ) {
+        propsToIgnore.push('cachedValues');
+
+        const omit = (obj: any) =>
+            Object.fromEntries(
+                Object.entries(obj).filter(
+                    ([key, value]) =>
+                        value !== undefined && !propsToIgnore.includes(key),
+                ),
+            );
+
+        const actualFiltered = omit(actual);
+        const expectedFiltered = omit(expected);
+
+        const { isNot } = this;
+        const pass = this.equals(actualFiltered, expectedFiltered);
+
         return {
-            compare: (actual: any, expected: any, propsToIgnore: string[] = []) => {
-                propsToIgnore.push('cachedValues');
-
-                const omit = (obj: any) =>
-                    Object.fromEntries(
-                        Object.entries(obj).filter(([key, value]) => value !== undefined && !propsToIgnore.includes(key)),
-                    );
-
-                const diffBuilder = new (jasmine as any)['DiffBuilder']({ prettyPrinter: util.pp });
-
-                const result = {} as jasmine.CustomMatcherResult;
-                result.pass = (util as any)['equals'](
-                    omit(actual),
-                    omit(expected),
-                    diffBuilder,
+            pass,
+            message: () => {
+                const hint = this.utils.matcherHint(
+                    'toEqualIgnoringProps',
+                    undefined,
+                    undefined,
+                    { isNot },
                 );
 
-                result.message = diffBuilder.getMessage();
+                const diff = pass
+                    ? ''
+                    : this.utils.diff(expectedFiltered, actualFiltered);
 
-                return result;
+                return `${hint}\n\n${diff}`;
             },
         };
     },
-};
+});

@@ -30,7 +30,10 @@ describe('TemplatedFormGroup', () => {
         formArray = new TemplatedFormGroup(formTemplate);
     });
 
-    type Test = [ (value: any) => void, string];
+    type Test = [
+        (value: any) => void,
+        string
+    ];
 
     const methods: Test[] = [
         [x => formArray.setValue(x), 'setValue'],

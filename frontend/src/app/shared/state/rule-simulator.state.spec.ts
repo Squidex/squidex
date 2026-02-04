@@ -13,10 +13,7 @@ import { TestValues } from './_test-helpers';
 import { RuleSimulatorState } from './rule-simulator.state';
 
 describe('RuleSimulatorState', () => {
-    const {
-        app,
-        appsState,
-    } = TestValues;
+    const { app, appsState, } = TestValues;
 
     const oldSimulatedRuleEvents = new SimulatedRuleEventsDto({
         total: 200,
@@ -55,7 +52,7 @@ describe('RuleSimulatorState', () => {
     });
 
     it('should load simulated rule events by flow and trigger', () => {
-        rulesService.setup(x => x.postSimulatedEvents(app,  It.isAny()))
+        rulesService.setup(x => x.postSimulatedEvents(app, It.isAny()))
             .returns(() => of(oldSimulatedRuleEvents));
 
         ruleSimulatorState.setRule({}, {});
@@ -81,8 +78,6 @@ describe('RuleSimulatorState', () => {
 
     it('should not load simulated rule events if no rule selected', () => {
         ruleSimulatorState.load().subscribe();
-
-        expect().nothing();
 
         rulesService.verify(x => x.getSimulatedEvents(app, It.isAnyString()), Times.never());
     });

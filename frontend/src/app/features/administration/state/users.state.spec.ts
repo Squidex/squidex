@@ -63,8 +63,6 @@ describe('UsersState', () => {
 
             usersState.load(true).subscribe();
 
-            expect().nothing();
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
 
@@ -73,8 +71,6 @@ describe('UsersState', () => {
                 .returns(() => of(new UsersDto({ items: [], total: 200, _links: {} }))).verifiable();
 
             usersState.page({ page: 1, pageSize: 10 }).subscribe();
-
-            expect().nothing();
         });
 
         it('should load with query if searching', () => {
@@ -204,7 +200,7 @@ describe('UsersState', () => {
 
     describe('Selection', () => {
         beforeEach(() => {
-                usersService.setup(x => x.getUsers(10, 0, undefined))
+            usersService.setup(x => x.getUsers(10, 0, undefined))
                 .returns(() => of(new UsersDto({ items: [user1, user2], total: 200, _links: {} }))).verifiable(Times.atLeastOnce());
 
             usersState.load().subscribe();

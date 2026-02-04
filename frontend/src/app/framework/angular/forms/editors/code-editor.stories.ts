@@ -6,7 +6,6 @@
  */
 
 import { FormsModule } from '@angular/forms';
-import { action } from '@storybook/addon-actions';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { CodeEditorComponent, ScriptCompletions } from '@app/framework';
 
@@ -131,6 +130,5 @@ export const SingleLine: Story = {
     }),
     args: {
         singleLine: true,
-        ngModelChange: action('ngModelChange'),
     } as any,
 };

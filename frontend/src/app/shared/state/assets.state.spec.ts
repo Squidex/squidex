@@ -13,11 +13,7 @@ import { createAsset, createAssetFolder } from '../services/assets.service.spec'
 import { TestValues } from './_test-helpers';
 
 describe('AssetsState', () => {
-    const {
-        app,
-        appsState,
-        newVersion,
-    } = TestValues;
+    const { app, appsState, newVersion, } = TestValues;
 
     const asset1 = createAsset(1, ['tag1', 'shared']);
     const asset2 = createAsset(2, ['tag2', 'shared']);
@@ -71,8 +67,6 @@ describe('AssetsState', () => {
 
             assetsState.load(true).subscribe();
 
-            expect().nothing();
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
 
@@ -82,14 +76,12 @@ describe('AssetsState', () => {
 
             assetsState.load(true, false).subscribe();
 
-            expect().nothing();
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
 
         it('should load without tags if tag untoggled', () => {
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, tags: ['tag1'], noSlowTotal: true }))
-            .returns(() => of(new AssetsDto({ items: [], total: 0, _links: {} }))).verifiable();
+                .returns(() => of(new AssetsDto({ items: [], total: 0, _links: {} }))).verifiable();
 
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: MathHelper.EMPTY_GUID, noSlowTotal: true }))
                 .returns(() => of(new AssetsDto({ items: [], total: 0, _links: {} }))).verifiable();
@@ -111,24 +103,20 @@ describe('AssetsState', () => {
 
         it('should load with new pagination if paging', () => {
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 30, parentId: MathHelper.EMPTY_GUID, noSlowTotal: true }))
-            .returns(() => of(new AssetsDto({ items: [], total: 200, _links: {} }))).verifiable();
+                .returns(() => of(new AssetsDto({ items: [], total: 200, _links: {} }))).verifiable();
 
             assetsState.page({ page: 1, pageSize: 30 }).subscribe();
-
-            expect().nothing();
         });
 
         it('should skip page size if loaded before', () => {
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 0, parentId: MathHelper.EMPTY_GUID, noSlowTotal: true }))
-            .returns(() => of(new AssetsDto({ items: [asset1, asset2], total: 200, _links: {} }))).verifiable();
+                .returns(() => of(new AssetsDto({ items: [asset1, asset2], total: 200, _links: {} }))).verifiable();
 
             assetsService.setup(x => x.getAssets(app, { take: 30, skip: 30, parentId: MathHelper.EMPTY_GUID, noSlowTotal: true, noTotal: true }))
                 .returns(() => of(new AssetsDto({ items: [], total: 200, _links: {} }))).verifiable();
 
             assetsState.load().subscribe();
             assetsState.page({ page: 1, pageSize: 30 }).subscribe();
-
-            expect().nothing();
         });
     });
 
@@ -141,8 +129,6 @@ describe('AssetsState', () => {
                 .returns(() => of(new AssetsDto({ items: [], total: 200, _links: {} }))).verifiable();
 
             assetsState.navigate('123').subscribe();
-
-            expect().nothing();
         });
     });
 

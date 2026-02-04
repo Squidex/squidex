@@ -12,10 +12,7 @@ import { createJob } from '../services/jobs.service.spec';
 import { TestValues } from './_test-helpers';
 
 describe('JobsState', () => {
-    const {
-        app,
-        appsState,
-    } = TestValues;
+    const { app, appsState, } = TestValues;
 
     const job1 = createJob(12);
     const job2 = createJob(13);
@@ -64,8 +61,6 @@ describe('JobsState', () => {
 
             jobsState.load(true, false).subscribe();
 
-            expect().nothing();
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
 
@@ -75,8 +70,6 @@ describe('JobsState', () => {
 
             jobsState.load(true, false).pipe(onErrorResumeNextWith()).subscribe();
 
-            expect().nothing();
-
             dialogs.verify(x => x.notifyError(It.isAny()), Times.once());
         });
 
@@ -85,8 +78,6 @@ describe('JobsState', () => {
                 .returns(() => throwError(() => 'Service Error'));
 
             jobsState.load(true, true).pipe(onErrorResumeNextWith()).subscribe();
-
-            expect().nothing();
 
             dialogs.verify(x => x.notifyError(It.isAny()), Times.never());
         });

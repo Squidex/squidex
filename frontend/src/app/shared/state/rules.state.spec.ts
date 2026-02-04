@@ -13,11 +13,7 @@ import { TestValues } from './_test-helpers';
 import { FlowView, RulesState } from './rules.state';
 
 describe('RulesState', () => {
-    const {
-        app,
-        appsState,
-        newVersion,
-    } = TestValues;
+    const { app, appsState, newVersion, } = TestValues;
 
     const rule1 = createRule(1);
     const rule2 = createRule(2);
@@ -75,8 +71,6 @@ describe('RulesState', () => {
                 .returns(() => of(new DynamicRulesDto(({ items: [rule1, rule2], _links: {} })))).verifiable();
 
             rulesState.load(true).subscribe();
-
-            expect().nothing();
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
@@ -180,8 +174,6 @@ describe('RulesState', () => {
                 .returns(() => of(true)).verifiable();
 
             rulesState.runCancel().subscribe();
-
-            expect().nothing();
         });
     });
 
@@ -251,15 +243,13 @@ describe('FlowView', () => {
 
         expect(cleanup(flow.dto.toJSON())).toEqual({
             initialStepId: null!,
-            steps: {
-            },
+            steps: {},
         });
     });
 
     it('should add step to flow', () => {
-        const flow =
-            new FlowView(dto, idGenerator)
-                .add({ step: { stepType: 'Action' } });
+        const flow = new FlowView(dto, idGenerator)
+            .add({ step: { stepType: 'Action' } });
 
         expect(cleanup(flow.dto.toJSON())).toEqual({
             initialStepId: '1',
@@ -270,10 +260,9 @@ describe('FlowView', () => {
     });
 
     it('should add second step to flow after step', () => {
-        const flow =
-            new FlowView(dto, idGenerator)
-                .add({ step: { stepType: 'Action1' } })
-                .add({ step: { stepType: 'Action2' } }, '1');
+        const flow = new FlowView(dto, idGenerator)
+            .add({ step: { stepType: 'Action1' } })
+            .add({ step: { stepType: 'Action2' } }, '1');
 
         expect(cleanup(flow.dto.toJSON())).toEqual({
             initialStepId: '1',
@@ -285,10 +274,9 @@ describe('FlowView', () => {
     });
 
     it('should add second step to flow', () => {
-        const flow =
-            new FlowView(dto, idGenerator)
-                .add({ step: { stepType: 'Action1' } })
-                .add({ step: { stepType: 'Action2' } });
+        const flow = new FlowView(dto, idGenerator)
+            .add({ step: { stepType: 'Action1' } })
+            .add({ step: { stepType: 'Action2' } });
 
         expect(cleanup(flow.dto.toJSON())).toEqual({
             initialStepId: '2',
@@ -300,10 +288,9 @@ describe('FlowView', () => {
     });
 
     it('should add step to if-else', () => {
-        const flow =
-            new FlowView(dto, idGenerator)
-                .add({ step: { stepType: 'If', branches: [] } })
-                .add({ step: { stepType: 'Action' } }, undefined, '1');
+        const flow = new FlowView(dto, idGenerator)
+            .add({ step: { stepType: 'If', branches: [] } })
+            .add({ step: { stepType: 'Action' } }, undefined, '1');
 
         expect(cleanup(flow.dto.toJSON())).toEqual({
             initialStepId: '1',
@@ -315,18 +302,17 @@ describe('FlowView', () => {
     });
 
     it('should add step to If-branch', () => {
-        const flow =
-            new FlowView(dto, idGenerator)
-                .add({
-                    step: {
-                        stepType: 'If',
-                        branches: [
-                            { condition: 'Condition1' },
-                            { condition: 'Condition2' },
-                        ],
-                    },
-                })
-                .add({ step: { stepType: 'Action' } }, undefined, '1', 1);
+        const flow = new FlowView(dto, idGenerator)
+            .add({
+            step: {
+                stepType: 'If',
+                branches: [
+                    { condition: 'Condition1' },
+                    { condition: 'Condition2' },
+                ],
+            },
+        })
+            .add({ step: { stepType: 'Action' } }, undefined, '1', 1);
 
         expect(cleanup(flow.dto.toJSON())).toEqual({
             initialStepId: '1',
@@ -346,11 +332,10 @@ describe('FlowView', () => {
     });
 
     it('should add If-step to middle', () => {
-        const flow =
-            new FlowView(dto, idGenerator)
-                .add({ step: { stepType: 'Action' } })
-                .add({ step: { stepType: 'Action' } }, '1')
-                .add({ step: { stepType: 'If' } }, '1');
+        const flow = new FlowView(dto, idGenerator)
+            .add({ step: { stepType: 'Action' } })
+            .add({ step: { stepType: 'Action' } }, '1')
+            .add({ step: { stepType: 'If' } }, '1');
 
         expect(cleanup(flow.dto.toJSON())).toEqual({
             initialStepId: '1',
@@ -362,9 +347,8 @@ describe('FlowView', () => {
     });
 
     it('should return same flow if step to add after does not exist', () => {
-        const flow =
-            new FlowView(dto, idGenerator)
-                .add({ step: { stepType: 'Action1' } });
+        const flow = new FlowView(dto, idGenerator)
+            .add({ step: { stepType: 'Action1' } });
 
         const updated = flow.add({ step: { stepType: 'Action2' } }, '3');
 
@@ -372,9 +356,8 @@ describe('FlowView', () => {
     });
 
     it('should return same flow if step to add to does not exist', () => {
-        const flow =
-            new FlowView(dto, idGenerator)
-                .add({ step: { stepType: 'Action1' } });
+        const flow = new FlowView(dto, idGenerator)
+            .add({ step: { stepType: 'Action1' } });
 
         const updated = flow.add({ step: { stepType: 'Action2' } }, undefined, '3');
 
@@ -382,9 +365,8 @@ describe('FlowView', () => {
     });
 
     it('should return same flow if step to add is not an If-step', () => {
-        const flow =
-            new FlowView(dto, idGenerator)
-                .add({ step: { stepType: 'Action1' } });
+        const flow = new FlowView(dto, idGenerator)
+            .add({ step: { stepType: 'Action1' } });
 
         const updated = flow.add({ step: { stepType: 'Action2' } }, undefined, '1');
 
@@ -392,9 +374,8 @@ describe('FlowView', () => {
     });
 
     it('should return same flow if step to add has no matching branch', () => {
-        const flow =
-            new FlowView(dto, idGenerator)
-                .add({ step: { stepType: 'If', branches: [] } });
+        const flow = new FlowView(dto, idGenerator)
+            .add({ step: { stepType: 'If', branches: [] } });
 
         const updated = flow.add({ step: { stepType: 'Action2' } }, undefined, '1', 2);
 
@@ -402,9 +383,8 @@ describe('FlowView', () => {
     });
 
     it('should return same flow if step to add is adder after If-step', () => {
-        const flow =
-            new FlowView(dto, idGenerator)
-                .add({ step: { stepType: 'If', branches: [] } });
+        const flow = new FlowView(dto, idGenerator)
+            .add({ step: { stepType: 'If', branches: [] } });
 
         const updated = flow.add({ step: { stepType: 'Action2' } }, '1');
 
@@ -412,24 +392,21 @@ describe('FlowView', () => {
     });
 
     it('should remove only start step', () => {
-        const flow =
-            new FlowView(dto, idGenerator)
-                .add({ step: { stepType: 'Action' } })
-                .remove('1');
+        const flow = new FlowView(dto, idGenerator)
+            .add({ step: { stepType: 'Action' } })
+            .remove('1');
 
         expect(cleanup(flow.dto.toJSON())).toEqual({
             initialStepId: null,
-            steps: {
-            },
+            steps: {},
         });
     });
 
     it('should remove start step', () => {
-        const flow =
-            new FlowView(dto, idGenerator)
-                .add({ step: { stepType: 'Action1' } })
-                .add({ step: { stepType: 'Action2' } }, '1')
-                .remove('1');
+        const flow = new FlowView(dto, idGenerator)
+            .add({ step: { stepType: 'Action1' } })
+            .add({ step: { stepType: 'Action2' } }, '1')
+            .remove('1');
 
         expect(cleanup(flow.dto.toJSON())).toEqual({
             initialStepId: '2',
@@ -440,11 +417,10 @@ describe('FlowView', () => {
     });
 
     it('should remove last step', () => {
-        const flow =
-            new FlowView(dto, idGenerator)
-                .add({ step: { stepType: 'Action1' } })
-                .add({ step: { stepType: 'Action2' } }, '1')
-                .remove('2');
+        const flow = new FlowView(dto, idGenerator)
+            .add({ step: { stepType: 'Action1' } })
+            .add({ step: { stepType: 'Action2' } }, '1')
+            .remove('2');
 
         expect(cleanup(flow.dto.toJSON())).toEqual({
             initialStepId: '1',
@@ -455,12 +431,11 @@ describe('FlowView', () => {
     });
 
     it('should remove middle step', () => {
-        const flow =
-            new FlowView(dto, idGenerator)
-                .add({ step: { stepType: 'Action1' } })
-                .add({ step: { stepType: 'Action2' } }, '1')
-                .add({ step: { stepType: 'Action3' } }, '2')
-                .remove('2');
+        const flow = new FlowView(dto, idGenerator)
+            .add({ step: { stepType: 'Action1' } })
+            .add({ step: { stepType: 'Action2' } }, '1')
+            .add({ step: { stepType: 'Action3' } }, '2')
+            .remove('2');
 
         expect(cleanup(flow.dto.toJSON())).toEqual({
             initialStepId: '1',
@@ -472,65 +447,61 @@ describe('FlowView', () => {
     });
 
     it('should remove from if-else', () => {
-        const flow =
-            new FlowView(dto, idGenerator)
-                .add({ step: { stepType: 'If', branches: [{}] } })
-                .add({ step: { stepType: 'Action' } }, undefined, '1', 1)
-                .remove('2', '1', 1);
+        const flow = new FlowView(dto, idGenerator)
+            .add({ step: { stepType: 'If', branches: [{}] } })
+            .add({ step: { stepType: 'Action' } }, undefined, '1', 1)
+            .remove('2', '1', 1);
 
         expect(cleanup(flow.dto.toJSON())).toEqual({
             initialStepId: '1',
             steps: {
-                '1': { step:  { stepType: 'If', branches: [{}] } },
+                '1': { step: { stepType: 'If', branches: [{}] } },
             },
         });
     });
 
     it('should remove from If-branch', () => {
-        const flow =
-            new FlowView(dto, idGenerator)
-                .add({ step: { stepType: 'If', branches: [{}] } })
-                .add({ step: { stepType: 'Action' } }, undefined, '1')
-                .remove('2', '1');
+        const flow = new FlowView(dto, idGenerator)
+            .add({ step: { stepType: 'If', branches: [{}] } })
+            .add({ step: { stepType: 'Action' } }, undefined, '1')
+            .remove('2', '1');
 
         expect(cleanup(flow.dto.toJSON())).toEqual({
             initialStepId: '1',
             steps: {
-                '1': { step:  { stepType: 'If', branches: [{}] } },
+                '1': { step: { stepType: 'If', branches: [{}] } },
             },
         });
     });
 
     it('should remove If-step', () => {
-        const flow =
-            new FlowView(dto, idGenerator)
-                .add({ step: { stepType: 'Action0' } })
-                .add({
-                    step: {
-                        stepType: 'If',
-                        branches: [
-                            { condition: 'Condition1' },
-                            { condition: 'Condition2' },
-                        ],
-                    },
-                }, '1')
-                .add({ step: { stepType: 'Action1' } }, undefined, '2', 0)
-                .add({ step: { stepType: 'Action2' } }, undefined, '2', 1)
-                .add({ step: { stepType: 'Action3' } }, undefined, '2', 2)
-                .remove('2');
+        const flow = new FlowView(dto, idGenerator)
+            .add({ step: { stepType: 'Action0' } })
+            .add({
+            step: {
+                stepType: 'If',
+                branches: [
+                    { condition: 'Condition1' },
+                    { condition: 'Condition2' },
+                ],
+            },
+        }, '1')
+            .add({ step: { stepType: 'Action1' } }, undefined, '2', 0)
+            .add({ step: { stepType: 'Action2' } }, undefined, '2', 1)
+            .add({ step: { stepType: 'Action3' } }, undefined, '2', 2)
+            .remove('2');
 
         expect(cleanup(flow.dto.toJSON())).toEqual({
             initialStepId: '1',
             steps: {
-                '1': { step:  { stepType: 'Action0' } },
+                '1': { step: { stepType: 'Action0' } },
             },
         });
     });
 
     it('should return same flow if step not found', () => {
-        const flow =
-            new FlowView(dto, idGenerator)
-                .add({ step: { stepType: 'Action1' } });
+        const flow = new FlowView(dto, idGenerator)
+            .add({ step: { stepType: 'Action1' } });
 
         const updated = flow.remove('3');
 
@@ -538,9 +509,8 @@ describe('FlowView', () => {
     });
 
     it('should return same flow if step to remove from does not exist', () => {
-        const flow =
-            new FlowView(dto, idGenerator)
-                .add({ step: { stepType: 'Action1' } });
+        const flow = new FlowView(dto, idGenerator)
+            .add({ step: { stepType: 'Action1' } });
 
         const updated = flow.remove('1', '3');
 
@@ -548,10 +518,9 @@ describe('FlowView', () => {
     });
 
     it('should return same flow if step to remove from is not an If-step', () => {
-        const flow =
-            new FlowView(dto, idGenerator)
-                .add({ step: { stepType: 'Action1' } })
-                .add({ step: { stepType: 'Action2' } }, '1');
+        const flow = new FlowView(dto, idGenerator)
+            .add({ step: { stepType: 'Action1' } })
+            .add({ step: { stepType: 'Action2' } }, '1');
 
         const updated = flow.remove('1', '2');
 
@@ -559,10 +528,9 @@ describe('FlowView', () => {
     });
 
     it('should return same flow if step to remove from has no matching branch', () => {
-        const flow =
-            new FlowView(dto, idGenerator)
-                .add({ step: { stepType: 'If', branches: [] } })
-                .add({ step: { stepType: 'Action2' } }, '1');
+        const flow = new FlowView(dto, idGenerator)
+            .add({ step: { stepType: 'If', branches: [] } })
+            .add({ step: { stepType: 'Action2' } }, '1');
 
         const updated = flow.remove('1', '2', 2);
 
@@ -570,10 +538,9 @@ describe('FlowView', () => {
     });
 
     it('should return same flow if step to remove from has no child', () => {
-        const flow =
-            new FlowView(dto, idGenerator)
-                .add({ step: { stepType: 'If', branches: [] } })
-                .add({ step: { stepType: 'Action2' } }, '1');
+        const flow = new FlowView(dto, idGenerator)
+            .add({ step: { stepType: 'If', branches: [] } })
+            .add({ step: { stepType: 'Action2' } }, '1');
 
         const updated = flow.remove('1', '2', 0);
 
@@ -581,11 +548,10 @@ describe('FlowView', () => {
     });
 
     it('should update step', () => {
-        const flow =
-            new FlowView(dto, idGenerator)
-                .add({ step: { stepType: 'Delay1' } })
-                .add({ step: { stepType: 'Delay2' } }, '1')
-                .update('1', { step: { stepType: 'Delay1_2' }, ignoreError: true });
+        const flow = new FlowView(dto, idGenerator)
+            .add({ step: { stepType: 'Delay1' } })
+            .add({ step: { stepType: 'Delay2' } }, '1')
+            .update('1', { step: { stepType: 'Delay1_2' }, ignoreError: true });
 
         expect(cleanup(flow.dto.toJSON())).toEqual({
             initialStepId: '1',
@@ -597,10 +563,9 @@ describe('FlowView', () => {
     });
 
     it('should return same flow if step to update does not exist', () => {
-        const flow =
-            new FlowView(dto, idGenerator)
-                .add({ step: { stepType: 'Delay1' } })
-                .add({ step: { stepType: 'Delay2' } }, '1');
+        const flow = new FlowView(dto, idGenerator)
+            .add({ step: { stepType: 'Delay1' } })
+            .add({ step: { stepType: 'Delay2' } }, '1');
 
         const updated = flow.update('3', { step: { stepType: 'Delay3' } });
 
@@ -608,21 +573,20 @@ describe('FlowView', () => {
     });
 
     it('should get branches', () => {
-        const flow =
-            new FlowView(dto, idGenerator)
-                .add({ step: { stepType: 'Action0' } })
-                .add({
-                    step: {
-                        stepType: 'If',
-                        branches: [
-                            { condition: 'Condition1' },
-                            { condition: 'Condition2' },
-                        ],
-                    },
-                }, '1')
-                .add({ step: { stepType: 'Action1' } }, undefined, '2', 0)
-                .add({ step: { stepType: 'Action2' } }, undefined, '2', 1)
-                .add({ step: { stepType: 'Action3' } }, undefined, '2', 2);
+        const flow = new FlowView(dto, idGenerator)
+            .add({ step: { stepType: 'Action0' } })
+            .add({
+            step: {
+                stepType: 'If',
+                branches: [
+                    { condition: 'Condition1' },
+                    { condition: 'Condition2' },
+                ],
+            },
+        }, '1')
+            .add({ step: { stepType: 'Action1' } }, undefined, '2', 0)
+            .add({ step: { stepType: 'Action2' } }, undefined, '2', 1)
+            .add({ step: { stepType: 'Action3' } }, undefined, '2', 2);
 
         expect(cleanup(flow.getBranches()) as any).toEqual([
             {
@@ -702,21 +666,20 @@ describe('FlowView', () => {
     });
 
     it('should get flat items', () => {
-        const flow =
-            new FlowView(dto, idGenerator)
-                .add({ step: { stepType: 'Action0' } })
-                .add({
-                    step: {
-                        stepType: 'If',
-                        branches: [
-                            { condition: 'Condition1' },
-                            { condition: 'Condition2' },
-                        ],
-                    },
-                }, '1')
-                .add({ step: { stepType: 'Action1' } }, undefined, '2', 0)
-                .add({ step: { stepType: 'Action2' } }, undefined, '2', 1)
-                .add({ step: { stepType: 'Action3' } }, undefined, '2', 2);
+        const flow = new FlowView(dto, idGenerator)
+            .add({ step: { stepType: 'Action0' } })
+            .add({
+            step: {
+                stepType: 'If',
+                branches: [
+                    { condition: 'Condition1' },
+                    { condition: 'Condition2' },
+                ],
+            },
+        }, '1')
+            .add({ step: { stepType: 'Action1' } }, undefined, '2', 0)
+            .add({ step: { stepType: 'Action2' } }, undefined, '2', 1)
+            .add({ step: { stepType: 'Action3' } }, undefined, '2', 2);
 
         expect(cleanup(flow.getAllItems())).toEqual([
             {
@@ -774,7 +737,8 @@ function cleanup<T>(value: T) {
         for (const item of value) {
             cleanup(item);
         }
-    } else {
+    }
+    else {
         for (const [key, nested] of Object.entries(value as any)) {
             if (nested === value) {
                 continue;
@@ -790,7 +754,8 @@ function cleanup<T>(value: T) {
 
             if (Types.isNull(nested) || Types.isUndefined(nested)) {
                 delete (value as any)[key];
-            } else {
+            }
+            else {
                 cleanup(nested);
             }
         }

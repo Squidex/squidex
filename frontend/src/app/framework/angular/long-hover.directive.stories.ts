@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { action } from '@storybook/addon-actions';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { LongHoverDirective } from '@app/framework';
 
@@ -45,16 +44,12 @@ type Story = StoryObj<LongHoverDirective>;
 
 export const Default: Story = {
     args: {
-        hover: action('Hover'),
         selector: '',
-        cancelled: action('Cancelled'),
     },
 };
 
 export const Selector: Story = {
     args: {
-        hover: action('Hover'),
         selector: 'button',
-        cancelled: action('Cancelled'),
     },
 };

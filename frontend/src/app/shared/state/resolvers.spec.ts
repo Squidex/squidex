@@ -15,10 +15,7 @@ import { TestValues } from './_test-helpers';
 import { ResolveContents } from './resolvers';
 
 describe('ResolveContents', () => {
-    const {
-        app,
-        appsState,
-    } = TestValues;
+    const { app, appsState, } = TestValues;
 
     const uiOptions = new UIOptions({
         referencesDropdownItemCount: 100,
@@ -42,13 +39,19 @@ describe('ResolveContents', () => {
         });
     });
 
-    it('should not resolve contents immediately', () => {
+    it('should not resolve contents immediately', async () => {
         const ids = ['id1', 'id2'];
 
         contentsService.setup(x => x.getAllContents(app, { ids }))
             .returns(() => of({ items: [contents[0], contents[1]] } as any));
 
-        return expectAsync(firstValueFrom(contentsResolver.resolveMany(ids))).toBePending();
+        const promise = firstValueFrom(contentsResolver.resolveMany(ids));
+        const result = await Promise.race([
+          promise.then(() => 'resolved'),
+          new Promise(resolve => setTimeout(() => resolve('pending'), 1))
+        ]);
+
+        expect(result).toBe('pending');
     });
 
     it('should resolve content from one request after delay', async () => {
@@ -84,7 +87,7 @@ describe('ResolveContents', () => {
         contentsService.setup(x => x.getAllContents(app, { ids }))
             .returns(() => throwError(() => new Error('error')));
 
-        return expectAsync(firstValueFrom(contentsResolver.resolveMany(ids))).toBeRejected();
+        return expect(firstValueFrom(contentsResolver.resolveMany(ids))).rejects.toThrow();
     });
 
     it('should batch results', async () => {

@@ -60,8 +60,6 @@ describe('EventConsumersState', () => {
 
             eventConsumersState.load(true).subscribe();
 
-            expect().nothing();
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
 
@@ -70,8 +68,6 @@ describe('EventConsumersState', () => {
                 .returns(() => throwError(() => 'Service Error')).verifiable();
 
             eventConsumersState.load(true, false).pipe(onErrorResumeNextWith()).subscribe();
-
-            expect().nothing();
 
             dialogs.verify(x => x.notifyError(It.isAny()), Times.once());
         });

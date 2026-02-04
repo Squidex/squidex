@@ -14,8 +14,8 @@ describe('Pager', () => {
         pager.paging = { page: 0, pageSize: 10, count: 0, total: 0 };
         pager.ngOnChanges();
 
-        expect(pager.canGoNext).toBeFalse();
-        expect(pager.canGoPrev).toBeFalse();
+        expect(pager.canGoNext).toBe(false);
+        expect(pager.canGoPrev).toBe(false);
 
         expect(pager.itemFirst).toEqual(0);
         expect(pager.itemLast).toEqual(0);
@@ -27,8 +27,8 @@ describe('Pager', () => {
         pager.paging = { page: 0, pageSize: 10, count: 10, total: 100 };
         pager.ngOnChanges();
 
-        expect(pager.canGoNext).toBeTrue();
-        expect(pager.canGoPrev).toBeFalse();
+        expect(pager.canGoNext).toBe(true);
+        expect(pager.canGoPrev).toBe(false);
 
         expect(pager.itemFirst).toEqual(1);
         expect(pager.itemLast).toEqual(10);
@@ -40,8 +40,8 @@ describe('Pager', () => {
         pager.paging = { page: 4, pageSize: 10, count: 10, total: 100 };
         pager.ngOnChanges();
 
-        expect(pager.canGoNext).toBeTrue();
-        expect(pager.canGoPrev).toBeTrue();
+        expect(pager.canGoNext).toBe(true);
+        expect(pager.canGoPrev).toBe(true);
 
         expect(pager.itemFirst).toEqual(41);
         expect(pager.itemLast).toEqual(50);
@@ -53,8 +53,8 @@ describe('Pager', () => {
         pager.paging = { page: 9, pageSize: 10, count: 10, total: 100 };
         pager.ngOnChanges();
 
-        expect(pager.canGoNext).toBeFalse();
-        expect(pager.canGoPrev).toBeTrue();
+        expect(pager.canGoNext).toBe(false);
+        expect(pager.canGoPrev).toBe(true);
 
         expect(pager.itemFirst).toEqual(91);
         expect(pager.itemLast).toEqual(100);
@@ -66,8 +66,8 @@ describe('Pager', () => {
         pager.paging = { page: 9, pageSize: 10, count: 4, total: 100 };
         pager.ngOnChanges();
 
-        expect(pager.canGoNext).toBeFalse();
-        expect(pager.canGoPrev).toBeTrue();
+        expect(pager.canGoNext).toBe(false);
+        expect(pager.canGoPrev).toBe(true);
 
         expect(pager.itemFirst).toEqual(91);
         expect(pager.itemLast).toEqual(94);
@@ -79,8 +79,8 @@ describe('Pager', () => {
         pager.paging = { page: 9, pageSize: 10, count: 9, total: 100 };
         pager.ngOnChanges();
 
-        expect(pager.canGoNext).toBeFalse();
-        expect(pager.canGoPrev).toBeTrue();
+        expect(pager.canGoNext).toBe(false);
+        expect(pager.canGoPrev).toBe(true);
 
         expect(pager.itemFirst).toEqual(91);
         expect(pager.itemLast).toEqual(99);
@@ -92,8 +92,8 @@ describe('Pager', () => {
         pager.paging = { page: 9, pageSize: 10, count: 10, total: -1 };
         pager.ngOnChanges();
 
-        expect(pager.canGoNext).toBeTrue();
-        expect(pager.canGoPrev).toBeTrue();
+        expect(pager.canGoNext).toBe(true);
+        expect(pager.canGoPrev).toBe(true);
 
         expect(pager.itemFirst).toEqual(91);
         expect(pager.itemLast).toEqual(100);
@@ -105,8 +105,8 @@ describe('Pager', () => {
         pager.paging = { page: 9, pageSize: 10, count: 5, total: -1 };
         pager.ngOnChanges();
 
-        expect(pager.canGoNext).toBeFalse();
-        expect(pager.canGoPrev).toBeTrue();
+        expect(pager.canGoNext).toBe(false);
+        expect(pager.canGoPrev).toBe(true);
 
         expect(pager.itemFirst).toEqual(91);
         expect(pager.itemLast).toEqual(95);

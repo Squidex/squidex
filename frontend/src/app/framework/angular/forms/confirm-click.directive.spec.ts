@@ -34,7 +34,7 @@ describe('ConfirmClickDirective', () => {
 
         confirmClickDirective.onClick(new Event('click'));
 
-        expect(invoked).toBeTrue();
+        expect(invoked).toBe(true);
 
         dialogs.verify(x => x.confirm(It.isAnyString(), It.isAnyString(), It.isAny()), Times.never());
     });
@@ -55,7 +55,7 @@ describe('ConfirmClickDirective', () => {
 
         confirmClickDirective.onClick(new Event('click'));
 
-        expect(invoked).toBeTrue();
+        expect(invoked).toBe(true);
     });
 
     it('Should invoke action when unsubscribed in between', () => {
@@ -78,7 +78,7 @@ describe('ConfirmClickDirective', () => {
 
         confirmClickDirective.onClick(new Event('click'));
 
-        expect(invoked).toBeTrue();
+        expect(invoked).toBe(true);
     });
 
     it('Should not invoke action when not confirmed', () => {
@@ -97,7 +97,7 @@ describe('ConfirmClickDirective', () => {
 
         confirmClickDirective.onClick(new Event('click'));
 
-        expect(invoked).toBeFalse();
+        expect(invoked).toBe(false);
     });
 
     it('Should invoke action when unsubscribed before', () => {
@@ -116,7 +116,7 @@ describe('ConfirmClickDirective', () => {
 
         confirmClickDirective.onClick(new Event('click'));
 
-        expect(invoked).toBeFalse();
+        expect(invoked).toBe(false);
     });
 
     it('Should not confirm when text is empty', () => {
@@ -125,8 +125,6 @@ describe('ConfirmClickDirective', () => {
 
         confirmClickDirective.confirmTitle = 'confirmTitle';
         confirmClickDirective.onClick(new Event('click'));
-
-        expect().nothing();
 
         dialogs.verify(x => x.confirm(It.isAnyString(), It.isAnyString(), It.isAny()), Times.never());
     });
@@ -137,8 +135,6 @@ describe('ConfirmClickDirective', () => {
 
         confirmClickDirective.confirmText = 'confirmText';
         confirmClickDirective.onClick(new Event('click'));
-
-        expect().nothing();
 
         dialogs.verify(x => x.confirm(It.isAnyString(), It.isAnyString(), It.isAny()), Times.never());
     });

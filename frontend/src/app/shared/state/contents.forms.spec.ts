@@ -14,11 +14,7 @@ import { TestValues } from './_test-helpers';
 import { ComponentForm, FieldArrayForm } from './contents.forms';
 import { contentsTranslationStatus, contentTranslationStatus, fieldTranslationStatus, PartitionConfig } from './contents.forms-helpers';
 
-const {
-    createField,
-    createNestedField,
-    createSchema,
-} = TestValues;
+const { createField, createNestedField, createSchema, } = TestValues;
 
 describe('TranslationStatus', () => {
     const languages = [
@@ -62,8 +58,8 @@ describe('TranslationStatus', () => {
     it('should create content status for schema without localized field', () => {
         const schema = {
             fields: [{
-                isLocalizable: false,
-            }],
+                    isLocalizable: false,
+                }],
         } as any;
 
         const result = contentTranslationStatus({}, schema, languages as any);
@@ -78,8 +74,8 @@ describe('TranslationStatus', () => {
     it('should create content status for schema with localized field', () => {
         const schema = {
             fields: [{
-                isLocalizable: true,
-            }],
+                    isLocalizable: true,
+                }],
         } as any;
 
         const result = contentTranslationStatus({}, schema, languages as any);
@@ -94,14 +90,14 @@ describe('TranslationStatus', () => {
     it('should create content status for schema with mixed fields', () => {
         const schema = {
             fields: [{
-                name: 'field1', isLocalizable: true,
-            }, {
-                name: 'field2', isLocalizable: true,
-            }, {
-                name: 'field3', isLocalizable: true,
-            }, {
-                name: 'field4',
-            }],
+                    name: 'field1', isLocalizable: true,
+                }, {
+                    name: 'field2', isLocalizable: true,
+                }, {
+                    name: 'field3', isLocalizable: true,
+                }, {
+                    name: 'field4',
+                }],
         } as any;
 
         const data = {
@@ -130,14 +126,14 @@ describe('TranslationStatus', () => {
     it('should create contents status', () => {
         const schema = {
             fields: [{
-                name: 'field1', isLocalizable: true,
-            }, {
-                name: 'field2', isLocalizable: true,
-            }, {
-                name: 'field3', isLocalizable: true,
-            }, {
-                name: 'field4',
-            }],
+                    name: 'field1', isLocalizable: true,
+                }, {
+                    name: 'field2', isLocalizable: true,
+                }, {
+                    name: 'field3', isLocalizable: true,
+                }, {
+                    name: 'field4',
+                }],
         } as any;
 
         const data1 = {
@@ -477,19 +473,19 @@ describe('ContentForm', () => {
     ];
 
     const complexSchema = createSchema({ fields: [
-        createField({ id: 1, properties: createProperties('String'), partitioning: 'invariant' }),
-        createField({ id: 2, properties: createProperties('String'), isDisabled: true }),
-        createField({ id: 3, properties: createProperties('String', { isRequired: true }) }),
-        createField({
-            id: 4,
-            properties: createProperties('Array'),
-            nested: [
-                createNestedField({ id: 41, properties: createProperties('String') }),
-                createNestedField({ id: 42, properties: createProperties('String', { defaultValue: 'Default' }), isDisabled: true }),
-            ],
-            partitioning: 'invariant',
-        }),
-    ] });
+            createField({ id: 1, properties: createProperties('String'), partitioning: 'invariant' }),
+            createField({ id: 2, properties: createProperties('String'), isDisabled: true }),
+            createField({ id: 3, properties: createProperties('String', { isRequired: true }) }),
+            createField({
+                id: 4,
+                properties: createProperties('Array'),
+                nested: [
+                    createNestedField({ id: 41, properties: createProperties('String') }),
+                    createNestedField({ id: 42, properties: createProperties('String', { defaultValue: 'Default' }), isDisabled: true }),
+                ],
+                partitioning: 'invariant',
+            }),
+        ] });
 
     describe('should resolve partitions', () => {
         const partitions = new PartitionConfig(languages);
@@ -713,12 +709,12 @@ describe('ContentForm', () => {
             contentForm.load({
                 field4: {
                     iv: [{
-                        nested41: 120,
-                        nested42: 120,
-                    }, {
-                        nested41: 99,
-                        nested42: 99,
-                    }],
+                            nested41: 120,
+                            nested42: 120,
+                        }, {
+                            nested41: 99,
+                            nested42: 99,
+                        }],
                 },
             });
 
@@ -746,12 +742,12 @@ describe('ContentForm', () => {
             contentForm.load({
                 field4: {
                     iv: [{
-                        nested41: 120,
-                        nested42: 120,
-                    }, {
-                        nested41: 99,
-                        nested42: 99,
-                    }],
+                            nested41: 120,
+                            nested42: 120,
+                        }, {
+                            nested41: 99,
+                            nested42: 99,
+                        }],
                 },
             });
 
@@ -779,12 +775,12 @@ describe('ContentForm', () => {
             contentForm.load({
                 field4: {
                     en: [{
-                        nested41: 120,
-                        nested42: 120,
-                    }, {
-                        nested41: 99,
-                        nested42: 99,
-                    }],
+                            nested41: 120,
+                            nested42: 120,
+                        }, {
+                            nested41: 99,
+                            nested42: 99,
+                        }],
                 },
             });
 
@@ -819,12 +815,12 @@ describe('ContentForm', () => {
             contentForm.load({
                 field4: {
                     iv: [{
-                        schemaId: componentId,
-                        field1: 120,
-                    }, {
-                        schemaId: componentId,
-                        field1: 99,
-                    }],
+                            schemaId: componentId,
+                            field1: 120,
+                        }, {
+                            schemaId: componentId,
+                            field1: 99,
+                        }],
                 },
             });
 
@@ -947,10 +943,10 @@ describe('ContentForm', () => {
             expect(contentForm.value).toEqual({
                 field4: {
                     iv: [{
-                        schemaId: componentId,
-                        field11: 'Initial',
-                        field12: 12,
-                    }],
+                            schemaId: componentId,
+                            field11: 'Initial',
+                            field12: 12,
+                        }],
                 },
             });
         });
@@ -1030,7 +1026,8 @@ describe('ContentForm', () => {
             const component = createSchema({
                 id: 1,
                 fields: [
-                    createField({ id: 11, properties: createProperties('String'), partitioning: 'invariant' })],
+                    createField({ id: 11, properties: createProperties('String'), partitioning: 'invariant' })
+                ],
             });
 
             const contentForm = createForm([
@@ -1061,8 +1058,8 @@ describe('ContentForm', () => {
             contentForm.load({
                 field4: {
                     iv: [{
-                        nested41: 'Text',
-                    }],
+                            nested41: 'Text',
+                        }],
                 },
             });
 
@@ -1149,10 +1146,10 @@ describe('ContentForm', () => {
             contentForm.load({
                 field4: {
                     iv: [{
-                        nested41: 'Text1',
-                    }, {
-                        nested41: 'Text2',
-                    }],
+                            nested41: 'Text1',
+                        }, {
+                            nested41: 'Text2',
+                        }],
                 },
             });
 
@@ -1164,7 +1161,11 @@ describe('ContentForm', () => {
             expect(array.items.length).toBe(length);
         }
 
-        function expectForm(parent: AbstractControl, path: string, test: { invalid?: boolean; disabled?: boolean; value?: any } & Record<string, any>) {
+        function expectForm(parent: AbstractControl, path: string, test: {
+            invalid?: boolean;
+            disabled?: boolean;
+            value?: any;
+        } & Record<string, any>) {
             const form = parent.get(path) as Record<string, any>;
 
             if (form) {
@@ -1173,11 +1174,12 @@ describe('ContentForm', () => {
                         const valueActual = form[key];
                         const valueExpected = test[key];
 
-                        expect(valueActual).withContext(`Expected ${key} of ${path} to be <${valueExpected}>, but found <${valueActual}>.`).toEqual(valueExpected);
+                        expect(valueActual, `Expected ${key} of ${path} to be <${valueExpected}>, but found <${valueActual}>.`).toEqual(valueExpected);
                     }
                 }
-            } else {
-                expect(form).withContext(`Expected to find form ${path}, but form not found.`).not.toBeNull();
+            }
+            else {
+                expect(form, `Expected to find form ${path}, but form not found.`).not.toBeNull();
             }
         }
     });
@@ -1287,8 +1289,9 @@ describe('ContentForm', () => {
         });
     });
 
-    function createForm(fields: FieldDto[], fieldRules: FieldRuleDto[] = [], schemas: { [id: string]: SchemaDto } = {}) {
-        return new EditContentForm(languages,
-            createSchema({ fields, fieldRules }), schemas, {}, 0);
+    function createForm(fields: FieldDto[], fieldRules: FieldRuleDto[] = [], schemas: {
+        [id: string]: SchemaDto;
+    } = {}) {
+        return new EditContentForm(languages, createSchema({ fields, fieldRules }), schemas, {}, 0);
     }
 });

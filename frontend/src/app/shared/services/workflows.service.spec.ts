@@ -18,120 +18,115 @@ describe('WorkflowsService', () => {
 
     beforeEach(() => {
         TestBed.configureTestingModule({
-    imports: [],
-    providers: [
-        provideHttpClient(withInterceptorsFromDi()),
-        provideHttpClientTesting(),
-        WorkflowsService,
-        { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
-    ],
-});
+            imports: [],
+            providers: [
+                provideHttpClient(withInterceptorsFromDi()),
+                provideHttpClientTesting(),
+                WorkflowsService,
+                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
+            ],
+        });
     });
 
     afterEach(inject([HttpTestingController], (httpMock: HttpTestingController) => {
         httpMock.verify();
     }));
 
-    it('should make a get request to get app workflows',
-        inject([WorkflowsService, HttpTestingController], (workflowsService: WorkflowsService, httpMock: HttpTestingController) => {
-            let workflows: Versioned<WorkflowsDto>;
-            workflowsService.getWorkflows('my-app').subscribe(result => {
-                workflows = result;
-            });
+    it('should make a get request to get app workflows', inject([WorkflowsService, HttpTestingController], (workflowsService: WorkflowsService, httpMock: HttpTestingController) => {
+        let workflows: Versioned<WorkflowsDto>;
+        workflowsService.getWorkflows('my-app').subscribe(result => {
+            workflows = result;
+        });
 
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows');
 
-            expect(req.request.method).toEqual('GET');
-            expect(req.request.headers.get('If-Match')).toBeNull();
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBeNull();
 
-            req.flush(workflowsResponse('1', '2'),
-                {
-                    headers: {
-                        etag: '2',
-                    },
-                });
+        req.flush(workflowsResponse('1', '2'), {
+            headers: {
+                etag: '2',
+            },
+        });
 
-            expect(workflows!).toEqual({ payload: createWorkflows('1', '2'), version: new VersionTag('2') });
-        }));
+        expect(workflows!).toEqual({ payload: createWorkflows('1', '2'), version: new VersionTag('2') });
+    }));
 
-    it('should make a post request to create a workflow',
-        inject([WorkflowsService, HttpTestingController], (workflowsService: WorkflowsService, httpMock: HttpTestingController) => {
-            const dto = new AddWorkflowDto({ name: 'New' });
+    it('should make a post request to create a workflow', inject([WorkflowsService, HttpTestingController], (workflowsService: WorkflowsService, httpMock: HttpTestingController) => {
+        const dto = new AddWorkflowDto({ name: 'New' });
 
-            let workflows: Versioned<WorkflowsDto>;
-            workflowsService.postWorkflow('my-app', dto, version).subscribe(result => {
-                workflows = result;
-            });
+        let workflows: Versioned<WorkflowsDto>;
+        workflowsService.postWorkflow('my-app', dto, version).subscribe(result => {
+            workflows = result;
+        });
 
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows');
 
-            expect(req.request.method).toEqual('POST');
-            expect(req.request.headers.get('If-Match')).toEqual(version.value);
+        expect(req.request.method).toEqual('POST');
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-            req.flush(workflowsResponse('1', '2'), {
-                headers: {
-                    etag: '2',
-                },
-            });
+        req.flush(workflowsResponse('1', '2'), {
+            headers: {
+                etag: '2',
+            },
+        });
 
-            expect(workflows!).toEqual({ payload: createWorkflows('1', '2'), version: new VersionTag('2') });
-        }));
+        expect(workflows!).toEqual({ payload: createWorkflows('1', '2'), version: new VersionTag('2') });
+    }));
 
-    it('should make a put request to update a workflow',
-        inject([WorkflowsService, HttpTestingController], (workflowsService: WorkflowsService, httpMock: HttpTestingController) => {
-            const dto = new UpdateWorkflowDto({ initial: 'A', steps: {} });
+    it('should make a put request to update a workflow', inject([WorkflowsService, HttpTestingController], (workflowsService: WorkflowsService, httpMock: HttpTestingController) => {
+        const dto = new UpdateWorkflowDto({ initial: 'A', steps: {} });
 
-            const resource: Resource = {
-                _links: {
-                    update: { method: 'PUT', href: '/api/apps/my-app/workflows/123' },
-                },
-            };
+        const resource: Resource = {
+            _links: {
+                update: { method: 'PUT', href: '/api/apps/my-app/workflows/123' },
+            },
+        };
 
-            let workflows: Versioned<WorkflowsDto>;
-            workflowsService.putWorkflow('my-app', resource, dto, version).subscribe(result => {
-                workflows = result;
-            });
+        let workflows: Versioned<WorkflowsDto>;
+        workflowsService.putWorkflow('my-app', resource, dto, version).subscribe(result => {
+            workflows = result;
+        });
 
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows/123');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows/123');
 
-            expect(req.request.method).toEqual('PUT');
-            expect(req.request.headers.get('If-Match')).toEqual(version.value);
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-            req.flush(workflowsResponse('1', '2'), {
-                headers: {
-                    etag: '2',
-                },
-            });
+        req.flush(workflowsResponse('1', '2'), {
+            headers: {
+                etag: '2',
+            },
+        });
 
-            expect(workflows!).toEqual({ payload: createWorkflows('1', '2'), version: new VersionTag('2') });
-        }));
+        expect(workflows!).toEqual({ payload: createWorkflows('1', '2'), version: new VersionTag('2') });
+    }));
 
-    it('should make a delete request to delete a workflow',
-        inject([WorkflowsService, HttpTestingController], (workflowsService: WorkflowsService, httpMock: HttpTestingController) => {
-            const resource: Resource = {
-                _links: {
-                    delete: { method: 'DELETE', href: '/api/apps/my-app/workflows/123' },
-                },
-            };
+    it('should make a delete request to delete a workflow', inject([WorkflowsService, HttpTestingController], (workflowsService: WorkflowsService, httpMock: HttpTestingController) => {
+        const resource: Resource = {
+            _links: {
+                delete: { method: 'DELETE', href: '/api/apps/my-app/workflows/123' },
+            },
+        };
 
-            let workflows: Versioned<WorkflowsDto>;
-            workflowsService.deleteWorkflow('my-app', resource, version).subscribe(result => {
-                workflows = result;
-            });
+        let workflows: Versioned<WorkflowsDto>;
+        workflowsService.deleteWorkflow('my-app', resource, version).subscribe(result => {
+            workflows = result;
+        });
 
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows/123');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/workflows/123');
 
-            expect(req.request.method).toEqual('DELETE');
-            expect(req.request.headers.get('If-Match')).toEqual(version.value);
+        expect(req.request.method).toEqual('DELETE');
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
 
-            req.flush(workflowsResponse('1', '2'), {
-                headers: {
-                    etag: '2',
-                },
-            });
+        req.flush(workflowsResponse('1', '2'), {
+            headers: {
+                etag: '2',
+            },
+        });
 
-            expect(workflows!).toEqual({ payload: createWorkflows('1', '2'), version: new VersionTag('2') });
-        }));
+        expect(workflows!).toEqual({ payload: createWorkflows('1', '2'), version: new VersionTag('2') });
+    }));
 
     function workflowsResponse(...names: string[]) {
         return {

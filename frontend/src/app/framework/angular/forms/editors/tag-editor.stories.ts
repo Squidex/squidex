@@ -27,6 +27,7 @@ const TRANSLATIONS = {
             </sqx-tag-editor>
         </sqx-root-view>
     `,
+    standalone: true,
 })
 class TestComponent {
     public itemsSource: string[] = [];
@@ -77,12 +78,10 @@ export default {
     }),
     decorators: [
         moduleMetadata({
-            declarations: [
-                TestComponent,
-            ],
             imports: [
                 FormsModule,
                 RootViewComponent,
+                TestComponent,
             ],
             providers: [
                 {

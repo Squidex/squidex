@@ -72,8 +72,6 @@ describe('TemplatesState', () => {
 
             templatesState.load(true).subscribe();
 
-            expect().nothing();
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
     });

@@ -52,7 +52,7 @@ export class FileDropDirective {
 
     @HostListener('dragend', ['$event'])
     @HostListener('dragleave', ['$event'])
-    public onDragEnd(event: DragDropEvent) {
+    public onDragEnd(event: DragEvent) {
         const hasFile = this.hasAllowedFile(event.dataTransfer);
 
         if (hasFile) {
@@ -61,7 +61,7 @@ export class FileDropDirective {
     }
 
     @HostListener('dragenter', ['$event'])
-    public onDragEnter(event: DragDropEvent) {
+    public onDragEnter(event: DragEvent) {
         const hasFile = this.hasAllowedFile(event.dataTransfer);
 
         if (hasFile) {
@@ -70,7 +70,7 @@ export class FileDropDirective {
     }
 
     @HostListener('dragover', ['$event'])
-    public onDragOver(event: DragDropEvent) {
+    public onDragOver(event: DragEvent) {
         const isFiles = hasFiles(event.dataTransfer);
 
         if (isFiles) {
@@ -79,7 +79,7 @@ export class FileDropDirective {
     }
 
     @HostListener('drop', ['$event'])
-    public async onDrop(event: DragDropEvent) {
+    public async onDrop(event: DragEvent) {
         if (hasFiles(event.dataTransfer)) {
             this.stopDrag(event);
 
@@ -96,7 +96,7 @@ export class FileDropDirective {
         event.stopPropagation();
     }
 
-    private stopDrag(event: DragDropEvent) {
+    private stopDrag(event: DragEvent) {
         this.dragEnd(0);
         this.stopEvent(event);
     }
@@ -202,7 +202,7 @@ export class FileDropDirective {
     }
 }
 
-function hasFiles(dataTransfer: DataTransfer): boolean {
+function hasFiles(dataTransfer: DataTransfer | null): boolean {
     if (!dataTransfer || !dataTransfer.types) {
         return false;
     }
@@ -270,8 +270,4 @@ function getFiles(dataTransfer: DataTransfer) {
     }
 
     return result;
-}
-
-interface DragDropEvent extends MouseEvent {
-    readonly dataTransfer: DataTransfer;
 }

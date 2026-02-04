@@ -15,191 +15,179 @@ import { ApiUrlConfig, UIService, UISettingsDto } from '@app/shared/internal';
 describe('UIService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
-    imports: [],
-    providers: [
-        provideHttpClient(withInterceptorsFromDi()),
-        provideHttpClientTesting(),
-        UIService,
-        { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
-    ],
-});
+            imports: [],
+            providers: [
+                provideHttpClient(withInterceptorsFromDi()),
+                provideHttpClientTesting(),
+                UIService,
+                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
+            ],
+        });
     });
 
     afterEach(inject([HttpTestingController], (httpMock: HttpTestingController) => {
         httpMock.verify();
     }));
 
-    it('should make get request to get common settings',
-        inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
-            let settings: UISettingsDto;
+    it('should make get request to get common settings', inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
+        let settings: UISettingsDto;
 
-            uiService.getCommonSettings().subscribe(result => {
-                settings = result;
-            });
+        uiService.getCommonSettings().subscribe(result => {
+            settings = result;
+        });
 
-            const response: UISettingsDto = { canCreateApps: true };
+        const response: UISettingsDto = { canCreateApps: true };
 
-            const req = httpMock.expectOne('http://service/p/api/ui/settings');
+        const req = httpMock.expectOne('http://service/p/api/ui/settings');
 
-            expect(req.request.method).toEqual('GET');
-            expect(req.request.headers.get('If-Match')).toBeNull();
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBeNull();
 
-            req.flush(response);
+        req.flush(response);
 
-            expect(settings!).toEqual(response);
-        }));
+        expect(settings!).toEqual(response);
+    }));
 
-    it('should return default common settings if error occurs',
-        inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
-            let settings: {};
+    it('should return default common settings if error occurs', inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
+        let settings: {};
 
-            uiService.getCommonSettings().subscribe(result => {
-                settings = result;
-            });
+        uiService.getCommonSettings().subscribe(result => {
+            settings = result;
+        });
 
-            const req = httpMock.expectOne('http://service/p/api/ui/settings');
+        const req = httpMock.expectOne('http://service/p/api/ui/settings');
 
-            expect(req.request.method).toEqual('GET');
-            expect(req.request.headers.get('If-Match')).toBeNull();
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBeNull();
 
-            req.error(new ErrorEvent('500'));
+        req.error(new ErrorEvent('500'));
 
-            expect(settings!).toEqual({ mapType: 'OSM', mapKey: '', canCreateApps: true });
-        }));
+        expect(settings!).toEqual({ mapType: 'OSM', mapKey: '', canCreateApps: true });
+    }));
 
-    it('should make get request to get shared app settings',
-        inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
-            let settings: {};
+    it('should make get request to get shared app settings', inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
+        let settings: {};
 
-            uiService.getAppSharedSettings('my-app').subscribe(result => {
-                settings = result;
-            });
+        uiService.getAppSharedSettings('my-app').subscribe(result => {
+            settings = result;
+        });
 
-            const response = { mapType: 'OSM', mapKey: '' };
+        const response = { mapType: 'OSM', mapKey: '' };
 
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/ui/settings');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/ui/settings');
 
-            expect(req.request.method).toEqual('GET');
-            expect(req.request.headers.get('If-Match')).toBeNull();
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBeNull();
 
-            req.flush(response);
+        req.flush(response);
 
-            expect(settings!).toEqual(response);
-        }));
+        expect(settings!).toEqual(response);
+    }));
 
-    it('should return default shared app settings if error occurs',
-        inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
-            let settings: {};
+    it('should return default shared app settings if error occurs', inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
+        let settings: {};
 
-            uiService.getAppSharedSettings('my-app').subscribe(result => {
-                settings = result;
-            });
+        uiService.getAppSharedSettings('my-app').subscribe(result => {
+            settings = result;
+        });
 
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/ui/settings');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/ui/settings');
 
-            expect(req.request.method).toEqual('GET');
-            expect(req.request.headers.get('If-Match')).toBeNull();
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBeNull();
 
-            req.error(new ErrorEvent('500'));
+        req.error(new ErrorEvent('500'));
 
-            expect(settings!).toBeDefined();
-        }));
+        expect(settings!).toBeDefined();
+    }));
 
-    it('should make get request to get user app settings',
-        inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
-            let settings: {};
+    it('should make get request to get user app settings', inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
+        let settings: {};
 
-            uiService.getAppUserSettings('my-app').subscribe(result => {
-                settings = result;
-            });
+        uiService.getAppUserSettings('my-app').subscribe(result => {
+            settings = result;
+        });
 
-            const response = { mapType: 'OSM', mapKey: '' };
+        const response = { mapType: 'OSM', mapKey: '' };
 
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/ui/settings/me');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/ui/settings/me');
 
-            expect(req.request.method).toEqual('GET');
-            expect(req.request.headers.get('If-Match')).toBeNull();
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBeNull();
 
-            req.flush(response);
+        req.flush(response);
 
-            expect(settings!).toEqual(response);
-        }));
+        expect(settings!).toEqual(response);
+    }));
 
-    it('should return default user app settings if error occurs',
-        inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
-            let settings: {};
+    it('should return default user app settings if error occurs', inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
+        let settings: {};
 
-            uiService.getAppUserSettings('my-app').subscribe(result => {
-                settings = result;
-            });
+        uiService.getAppUserSettings('my-app').subscribe(result => {
+            settings = result;
+        });
 
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/ui/settings/me');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/ui/settings/me');
 
-            expect(req.request.method).toEqual('GET');
-            expect(req.request.headers.get('If-Match')).toBeNull();
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBeNull();
 
-            req.error(new ErrorEvent('500'));
+        req.error(new ErrorEvent('500'));
 
-            expect(settings!).toBeDefined();
-        }));
+        expect(settings!).toBeDefined();
+    }));
 
-    it('should make put request to set common value',
-        inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
-            uiService.putCommonSetting('root.nested', 123).subscribe();
+    it('should make put request to set common value', inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
+        uiService.putCommonSetting('root.nested', 123).subscribe();
 
-            const req = httpMock.expectOne('http://service/p/api/ui/settings/root.nested');
+        const req = httpMock.expectOne('http://service/p/api/ui/settings/root.nested');
 
-            expect(req.request.method).toEqual('PUT');
-            expect(req.request.headers.get('If-Match')).toBeNull();
-        }));
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+    }));
 
-    it('should make put request to set shared app value',
-        inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
-            uiService.putAppSharedSetting('my-app', 'root.nested', 123).subscribe();
+    it('should make put request to set shared app value', inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
+        uiService.putAppSharedSetting('my-app', 'root.nested', 123).subscribe();
 
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/ui/settings/root.nested');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/ui/settings/root.nested');
 
-            expect(req.request.method).toEqual('PUT');
-            expect(req.request.headers.get('If-Match')).toBeNull();
-        }));
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+    }));
 
-    it('should make put request to set user app value',
-        inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
-            uiService.putAppUserSetting('my-app', 'root.nested', 123).subscribe();
+    it('should make put request to set user app value', inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
+        uiService.putAppUserSetting('my-app', 'root.nested', 123).subscribe();
 
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/ui/settings/me/root.nested');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/ui/settings/me/root.nested');
 
-            expect(req.request.method).toEqual('PUT');
-            expect(req.request.headers.get('If-Match')).toBeNull();
-        }));
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+    }));
 
-    it('should make delete request to remove common value',
-        inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
-            uiService.deleteCommonSetting('root.nested').subscribe();
+    it('should make delete request to remove common value', inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
+        uiService.deleteCommonSetting('root.nested').subscribe();
 
-            const req = httpMock.expectOne('http://service/p/api/ui/settings/root.nested');
+        const req = httpMock.expectOne('http://service/p/api/ui/settings/root.nested');
 
-            expect(req.request.method).toEqual('DELETE');
-            expect(req.request.headers.get('If-Match')).toBeNull();
-        }));
+        expect(req.request.method).toEqual('DELETE');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+    }));
 
-    it('should make delete request to remove shared app value',
-        inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
-            uiService.deleteAppSharedSetting('my-app', 'root.nested').subscribe();
+    it('should make delete request to remove shared app value', inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
+        uiService.deleteAppSharedSetting('my-app', 'root.nested').subscribe();
 
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/ui/settings/root.nested');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/ui/settings/root.nested');
 
-            expect(req.request.method).toEqual('DELETE');
-            expect(req.request.headers.get('If-Match')).toBeNull();
-        }));
+        expect(req.request.method).toEqual('DELETE');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+    }));
 
-    it('should make delete request to remove user app value',
-        inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
-            uiService.deleteAppUserSetting('my-app', 'root.nested').subscribe();
+    it('should make delete request to remove user app value', inject([UIService, HttpTestingController], (uiService: UIService, httpMock: HttpTestingController) => {
+        uiService.deleteAppUserSetting('my-app', 'root.nested').subscribe();
 
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/ui/settings/me/root.nested');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/ui/settings/me/root.nested');
 
-            expect(req.request.method).toEqual('DELETE');
-            expect(req.request.headers.get('If-Match')).toBeNull();
-        }));
+        expect(req.request.method).toEqual('DELETE');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+    }));
 });

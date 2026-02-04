@@ -139,15 +139,15 @@ describe('ArrayExtensions', () => {
     it('should return true if array include item', () => {
         const array_0 = [0, 1, 2];
 
-        expect(array_0.includes(0)).toBeTrue();
-        expect(array_0.includes(1)).toBeTrue();
+        expect(array_0.includes(0)).toBe(true);
+        expect(array_0.includes(1)).toBe(true);
     });
 
     it('should return false if array does not include item', () => {
         const array_0 = [0, 1, 2];
 
-        expect(array_0.includes(3)).toBeFalse();
-        expect(array_0.includes(4)).toBeFalse();
+        expect(array_0.includes(3)).toBe(false);
+        expect(array_0.includes(4)).toBe(false);
     });
 
     it('should convert to map', () => {

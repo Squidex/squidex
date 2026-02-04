@@ -12,10 +12,7 @@ import { createAsset } from '../services/assets.service.spec';
 import { TestValues } from './_test-helpers';
 
 describe('AssetUploaderState', () => {
-    const {
-        app,
-        appsState,
-    } = TestValues;
+    const { app, appsState, } = TestValues;
 
     let assetsService: IMock<AssetsService>;
     let dialogs: IMock<DialogService>;

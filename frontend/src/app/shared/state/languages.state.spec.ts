@@ -12,12 +12,7 @@ import { createLanguages } from '../services/app-languages.service.spec';
 import { TestValues } from './_test-helpers';
 
 describe('LanguagesState', () => {
-    const {
-        app,
-        appsState,
-        newVersion,
-        version,
-    } = TestValues;
+    const { app, appsState, newVersion, version, } = TestValues;
 
     const languageDE = new LanguageDto({ iso2Code: 'de', englishName: 'German' });
     const languageEN = new LanguageDto({ iso2Code: 'en', englishName: 'English' });
@@ -85,8 +80,6 @@ describe('LanguagesState', () => {
 
         it('should show notification on load if reload is true', () => {
             languagesState.load(true).subscribe();
-
-            expect().nothing();
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });

@@ -8,8 +8,10 @@
 import { NgZone } from '@angular/core';
 import { MessageBus } from './message-bus.service';
 
-class Event1 {}
-class Event2 {}
+class Event1 {
+}
+class Event2 {
+}
 
 describe('MessageBus', () => {
     const zone = {

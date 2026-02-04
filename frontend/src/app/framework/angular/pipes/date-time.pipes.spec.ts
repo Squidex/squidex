@@ -13,12 +13,12 @@ const dateTime = DateTime.parseISO(dateSource, false);
 const dateString = dateTime.toISOString();
 
 const TestCases = [{
-    value: dateString,
-    name: 'String',
-}, {
-    value: dateTime,
-    name: 'DateTime',
-}];
+        value: dateString,
+        name: 'String',
+    }, {
+        value: dateTime,
+        name: 'DateTime',
+    }];
 
 describe('DurationPipe', () => {
     beforeEach(() => {

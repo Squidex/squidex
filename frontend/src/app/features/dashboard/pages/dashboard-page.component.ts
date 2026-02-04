@@ -7,7 +7,7 @@
 
 import { AsyncPipe } from '@angular/common';
 import { AfterViewInit, Component, NgZone, OnInit, Renderer2, ViewChild } from '@angular/core';
-import { GridsterComponent, GridsterConfig, GridsterItem, GridsterItemComponent, GridType } from 'angular-gridster2';
+import { Gridster, GridsterConfig, GridsterItem, GridsterItemConfig, GridType } from 'angular-gridster2';
 import { ApiCallsCardComponent, ApiCallsSummaryCardComponent, ApiPerformanceCardComponent, ApiTrafficCardComponent, ApiTrafficSummaryCardComponent, AppsState, AssetUploadsCountCardComponent, AssetUploadsSizeCardComponent, AssetUploadsSizeSummaryCardComponent, AuthService, CallsUsageDto, CurrentStorageDto, DateTime, defined, fadeAnimation, IFrameCardComponent, LocalStoreService, MarkdownDirective, RandomCatCardComponent, RandomDogCardComponent, Settings, StorageUsagePerDateDto, Subscriptions, SupportCardComponent, switchSafe, TitleComponent, TourStepDirective, TranslatePipe, UsagesService } from '@app/shared';
 import { ApiCardComponent } from './cards/api-card.component';
 import { ContentSummaryCardComponent } from './cards/content-summary-card.component';
@@ -37,8 +37,8 @@ import { DashboardConfigComponent } from './dashboard-config.component';
         ContentSummaryCardComponent,
         DashboardConfigComponent,
         GithubCardComponent,
-        GridsterComponent,
-        GridsterItemComponent,
+        Gridster,
+        GridsterItem,
         HistoryCardComponent,
         IFrameCardComponent,
         MarkdownDirective,
@@ -55,7 +55,7 @@ export class DashboardPageComponent implements AfterViewInit, OnInit {
     private readonly subscriptions = new Subscriptions();
 
     @ViewChild('grid')
-    public grid!: GridsterComponent;
+    public grid!: Gridster;
 
     public selectedApp = this.appsState.selectedApp.pipe(defined());
 
@@ -67,7 +67,7 @@ export class DashboardPageComponent implements AfterViewInit, OnInit {
 
     public callsUsage?: CallsUsageDto;
 
-    public gridConfig?: GridsterItem[];
+    public gridConfig?: GridsterItemConfig[];
     public gridConfigAvailable = [...DEFAULT_CELLS, ...ADDITIONAL_CELLS];
     public gridConfigDefaults = DEFAULT_CELLS;
     public gridOptions = DEFAULT_OPTIONS;
@@ -136,14 +136,14 @@ export class DashboardPageComponent implements AfterViewInit, OnInit {
         this.isStacked = value;
     }
 
-    public changeConfig(config: GridsterItem[]) {
+    public changeConfig(config: GridsterItemConfig[]) {
         this.gridConfig = config;
 
         this.grid?.updateGrid();
     }
 }
 
-const DEFAULT_CELLS: GridsterItem[] = [
+const DEFAULT_CELLS: GridsterItemConfig[] = [
     // Row 1
     { cols: 1, rows: 1, x: 0, y: 0, name: 'i18n:dashboard.schemasCard', type: 'schemas' },
     { cols: 1, rows: 1, x: 1, y: 0, name: 'i18n:dashboard.apiDocumentationCard', type: 'api' },

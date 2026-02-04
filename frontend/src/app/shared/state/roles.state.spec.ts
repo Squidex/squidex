@@ -12,12 +12,7 @@ import { createRoles } from '../services/roles.service.spec';
 import { TestValues } from './_test-helpers';
 
 describe('RolesState', () => {
-    const {
-        app,
-        appsState,
-        newVersion,
-        version,
-    } = TestValues;
+    const { app, appsState, newVersion, version, } = TestValues;
 
     const oldRoles = createRoles(1, 2);
 
@@ -61,8 +56,6 @@ describe('RolesState', () => {
                 .returns(() => of(versioned(version, oldRoles))).verifiable();
 
             rolesState.load(true).subscribe();
-
-            expect().nothing();
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });

@@ -26,15 +26,11 @@ describe('ShortcutComponent', () => {
     it('should init without keys', () => {
         shortcutComponent.keys = null!;
         shortcutComponent.ngOnInit();
-
-        expect().nothing();
     });
 
     it('should destroy without keys', () => {
         shortcutComponent.keys = null!;
         shortcutComponent.ngOnDestroy();
-
-        expect().nothing();
     });
 
     it('should raise event if triggered', () => {

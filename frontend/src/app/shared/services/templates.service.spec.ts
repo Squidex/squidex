@@ -14,99 +14,97 @@ import { ResourceLinkDto } from '../model';
 describe('TemplatesService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
-    imports: [],
-    providers: [
-        provideHttpClient(withInterceptorsFromDi()),
-        provideHttpClientTesting(),
-        TemplatesService,
-        { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
-    ],
-});
+            imports: [],
+            providers: [
+                provideHttpClient(withInterceptorsFromDi()),
+                provideHttpClientTesting(),
+                TemplatesService,
+                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
+            ],
+        });
     });
 
     afterEach(inject([HttpTestingController], (httpMock: HttpTestingController) => {
         httpMock.verify();
     }));
 
-    it('should make get request to get templates',
-        inject([TemplatesService, HttpTestingController], (templatesService: TemplatesService, httpMock: HttpTestingController) => {
-            let templates: TemplatesDto;
+    it('should make get request to get templates', inject([TemplatesService, HttpTestingController], (templatesService: TemplatesService, httpMock: HttpTestingController) => {
+        let templates: TemplatesDto;
 
-            templatesService.getTemplates().subscribe(result => {
-                templates = result;
-            });
+        templatesService.getTemplates().subscribe(result => {
+            templates = result;
+        });
 
-            const req = httpMock.expectOne('http://service/p/api/templates?includeDetails=true');
+        const req = httpMock.expectOne('http://service/p/api/templates?includeDetails=true');
 
-            expect(req.request.method).toEqual('GET');
-            expect(req.request.headers.get('If-Match')).toBeNull();
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBeNull();
 
-            req.flush({
-                items: [
-                    templateResponse(1),
-                    templateResponse(2),
-                ],
-                _links: {},
-            });
+        req.flush({
+            items: [
+                templateResponse(1),
+                templateResponse(2),
+            ],
+            _links: {},
+        });
 
-            expect(templates!).toEqual(new TemplatesDto({
-                items: [
-                    createTemplate(1),
-                    createTemplate(2),
-                ],
-                _links: {},
-            }));
+        expect(templates!).toEqual(new TemplatesDto({
+            items: [
+                createTemplate(1),
+                createTemplate(2),
+            ],
+            _links: {},
         }));
+    }));
 
-    it('should make get request to get template',
-        inject([TemplatesService, HttpTestingController], (templatesService: TemplatesService, httpMock: HttpTestingController) => {
-            let template: TemplateDetailsDto;
+    it('should make get request to get template', inject([TemplatesService, HttpTestingController], (templatesService: TemplatesService, httpMock: HttpTestingController) => {
+        let template: TemplateDetailsDto;
 
-            const resource: Resource = {
-                _links: {
-                    self: { method: 'GET', href: '/api/templates/my-template' },
-                },
-            };
+        const resource: Resource = {
+            _links: {
+                self: { method: 'GET', href: '/api/templates/my-template' },
+            },
+        };
 
-            templatesService.getTemplate(resource).subscribe(result => {
-                template = result;
-            });
+        templatesService.getTemplate(resource).subscribe(result => {
+            template = result;
+        });
 
-            const req = httpMock.expectOne('http://service/p/api/templates/my-template');
+        const req = httpMock.expectOne('http://service/p/api/templates/my-template');
 
-            expect(req.request.method).toEqual('GET');
-            expect(req.request.headers.get('If-Match')).toBeNull();
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBeNull();
 
-            req.flush(templateDetailsResponse(1));
+        req.flush(templateDetailsResponse(1));
 
-            expect(template!).toEqual(createTemplateDetails(1));
-        }));
+        expect(template!).toEqual(createTemplateDetails(1));
+    }));
 
-        function templateResponse(id: number, suffix = '') {
-            const key = `${id}${suffix}`;
+    function templateResponse(id: number, suffix = '') {
+        const key = `${id}${suffix}`;
 
-            return {
-                name: `name${key}`,
-                title: `Title ${key}`,
-                details: '',
-                description: `Description ${key}`,
-                isStarter: id % 2 === 0,
-                _links: {
-                    self: { method: 'GET', href: `/templates/name${key}` },
-                },
-            };
-        }
+        return {
+            name: `name${key}`,
+            title: `Title ${key}`,
+            details: '',
+            description: `Description ${key}`,
+            isStarter: id % 2 === 0,
+            _links: {
+                self: { method: 'GET', href: `/templates/name${key}` },
+            },
+        };
+    }
 
-        function templateDetailsResponse(id: number, suffix = '') {
-            const key = `${id}${suffix}`;
+    function templateDetailsResponse(id: number, suffix = '') {
+        const key = `${id}${suffix}`;
 
-            return {
-                details: `Details ${key}`,
-                _links: {
-                    self: { method: 'GET', href: `/templates/name${id}` },
-                },
-            };
-        }
+        return {
+            details: `Details ${key}`,
+            _links: {
+                self: { method: 'GET', href: `/templates/name${id}` },
+            },
+        };
+    }
 });
 
 export function createTemplate(id: number, suffix = '') {
