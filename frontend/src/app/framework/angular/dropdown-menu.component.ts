@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input } from '@angular/core';
-import { fadeAnimation } from './animations';
 
 @Component({
     selector: 'sqx-dropdown-menu',
@@ -14,18 +13,12 @@ import { fadeAnimation } from './animations';
     templateUrl: './dropdown-menu.component.html',
     host: {
         class: 'dropdown-menu',
+        ['animate.enter']: 'fade-in',
+        ['animate.leave']: 'fade-out',
     },
-    animations: [
-        fadeAnimation,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DropdownMenuComponent {
-    @HostBinding('@fade')
-    public get fade() {
-        return true;
-    }
-
     @HostBinding('class')
     @Input()
     public class?: string;

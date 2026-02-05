@@ -7,7 +7,6 @@
 
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { DropdownComponent, LocalizerService, RootViewComponent } from '@app/framework';
 
@@ -87,7 +86,6 @@ export default {
     decorators: [
         moduleMetadata({
             imports: [
-                BrowserAnimationsModule,
                 FormsModule,
                 RootViewComponent,
                 TestComponent,

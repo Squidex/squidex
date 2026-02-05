@@ -1,5 +1,5 @@
 @if (errorMessages && errorMessages.length > 0) {
-    <div class="errors-container" @fade>
+    <div class="errors-container" animate.enter="fade-in" animate.leave="fade-out">
         <div class="errors">
             @for (message of errorMessages; track message) {
                 {{ message }}

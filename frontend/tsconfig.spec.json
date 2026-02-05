@@ -6,6 +6,7 @@
     "types": ["vitest/globals", "vitest/importMeta", "vite/client", "vitest", "node", "ace"]
   },
   "include": [
+    "**/*.stories.*",
     "src/**/*.spec.ts",
     "src/**/*.spec.tsx",
     "src/**/*.d.ts",

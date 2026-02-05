@@ -36,6 +36,9 @@ module.exports = {
                 "type": "attribute"
             }
         ],
+        "@angular-eslint/prefer-inject": [
+            "off"
+        ],
         "@angular-eslint/use-lifecycle-interface": [
             "off"
         ],

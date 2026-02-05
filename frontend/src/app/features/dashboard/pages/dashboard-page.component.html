@@ -1,8 +1,8 @@
 <sqx-title message="i18n:dashboard.pageTitle" />
 @if (selectedApp | async; as app) {
-    <div class="dashboard" @fade>
+    <div class="dashboard" animate.enter="fade-in" animate.leave="fade-out">
         @if (!isScrolled) {
-            <div class="dashboard-summary" @fade sqxTourStep="appDashboard">
+            <div class="dashboard-summary" animate.enter="fade-in" animate.leave="fade-out" sqxTourStep="appDashboard">
                 <h1 class="dashboard-title">{{ "dashboard.welcomeTitle" | sqxTranslate: { user: user } }}</h1>
 
                 <div class="subtext" [sqxMarkdown]="'dashboard.welcomeText' | sqxTranslate: { app: app.displayName }"></div>
@@ -24,7 +24,7 @@
                             <sqx-github-card />
                         }
 
-                        @case ("api-calls") {
+                        @case ("api-calls") {animate.enter="fade-in" animate.leave="fade-out"
                             <sqx-api-calls-card [app]="app" [usage]="callsUsage" />
                         }
 

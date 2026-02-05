@@ -9,7 +9,7 @@
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { timer } from 'rxjs';
-import { DialogModel, DialogRequest, DialogService, fadeAnimation, Notification, StatefulComponent, Subscriptions, Tooltip } from '@app/framework/internal';
+import { DialogModel, DialogRequest, DialogService, Notification, StatefulComponent, Subscriptions, Tooltip } from '@app/framework/internal';
 import { FocusOnInitDirective } from '../forms/focus-on-init.directive';
 import { MarkdownDirective } from '../markdown.directive';
 import { TranslatePipe } from '../pipes/translate.pipe';
@@ -33,9 +33,6 @@ interface State {
     selector: 'sqx-dialog-renderer',
     styleUrls: ['./dialog-renderer.component.scss'],
     templateUrl: './dialog-renderer.component.html',
-    animations: [
-        fadeAnimation,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FocusOnInitDirective,

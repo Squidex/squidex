@@ -6,7 +6,6 @@
  */
 
 import { Component, inject, Input } from '@angular/core';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { ConfirmClickDirective, DialogRendererComponent, DialogService, ErrorDto, LocalizerService, RootViewComponent, TooltipDirective } from '@app/framework';
 
@@ -57,7 +56,6 @@ export default {
     decorators: [
         moduleMetadata({
             imports: [
-                BrowserAnimationsModule,
                 ConfirmClickDirective,
                 RootViewComponent,
                 TestComponent,

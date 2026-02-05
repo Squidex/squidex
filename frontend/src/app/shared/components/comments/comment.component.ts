@@ -9,7 +9,7 @@
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { AutocompleteComponent, AutocompleteSource, bounceAnimation, ConfirmClickDirective, FromNowPipe, MarkdownDirective, NOOP_DATASOURCE, ScrollActiveDirective, TooltipDirective, TranslatePipe } from '@app/framework';
+import { AutocompleteComponent, AutocompleteSource, ConfirmClickDirective, FromNowPipe, MarkdownDirective, NOOP_DATASOURCE, ScrollActiveDirective, TooltipDirective, TranslatePipe } from '@app/framework';
 import { CommentItem, CommentsState, DialogService, Keys, StatefulComponent, UpsertCommentForm } from '@app/shared/internal';
 import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
 
@@ -22,9 +22,6 @@ interface State {
     styleUrls: ['./comment.component.scss'],
     templateUrl: './comment.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
-    animations: [
-        bounceAnimation,
-    ],
     imports: [
         AutocompleteComponent,
         ConfirmClickDirective,

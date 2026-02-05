@@ -2,9 +2,11 @@
     <div [class.col-12]="!formModelCompare" [class.col-6]="formModelCompare">
         <sqx-focus-marker [controlId]="formModel.path">
             @if (!(formModel.hiddenChanges | async)) {
-                <div class="table-items-row table-items-row-summary change-marker-host" [class.field-invalid]="isInvalid | async">
+                <div class="table-items-row table-items-row-summary" [class.field-invalid]="isInvalid | async">
                     @if (formModel.hasChanges | async) {
-                        <div class="change-marker">{{ "contents.pendingChangesTitle" | sqxTranslate }}</div>
+                        <div class="change-marker-host">
+                            <div class="change-marker">{{ "contents.pendingChangesTitle" | sqxTranslate }}</div>
+                        </div>
                     }
 
                     @if (showAllControls) {

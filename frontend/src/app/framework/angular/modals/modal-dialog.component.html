@@ -1,4 +1,4 @@
-<div class="modal" @fade data-testid="dialog">
+<div class="modal" animate.enter="fade-in" animate.leave="fade-out" data-testid="dialog">
     <div class="modal-dialog modal-{{ size }}" [class.modal-fh]="fullHeight">
         <div class="modal-content" [sqxTourStep]="tourId">
             @if (showHeader) {
