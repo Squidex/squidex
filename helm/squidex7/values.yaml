@@ -354,6 +354,13 @@ env:
   ##
   ASPNETCORE_URLS: http://+:8080
 
+# Bind secrets and configmaps directly into env as object name strings. Useful for managing sensitive data such as connection strings without exposing them to helm values
+extraSecrets: []
+extraConfigMaps: []
+
+extraVolumes: []
+extraVolumeMounts: []
+
 ## @param autoscaling.enabled Enable autoscaling for the deployment.
 autoscaling:
   enabled: false
