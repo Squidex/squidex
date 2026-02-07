@@ -37,7 +37,7 @@ export interface TaskDefinition {
     steps: StepDefinition[];
 
     // Indicates that the task has been completed.
-    onComplete: Observable<any>;
+    onComplete(): Observable<any>;
 
     // The task, this depends on.
     dependsOn: string | null;
@@ -72,14 +72,14 @@ export function buildTasks() {
             isAsync: true,
             position: 'right-start',
         }],
-        onComplete: (() => {
+        onComplete: () => {
             const appsState = inject(AppsState);
 
             return appsState.changes.pipe(
                 filter(change =>
                     change.snapshot.apps.length > 0),
                 take(1));
-        })(),
+        },
     }, {
         id: 'createSchema',
         title: 'i18n:tour.createSchema.title',
@@ -138,14 +138,14 @@ export function buildTasks() {
             scrollContainer: '.panel-container',
             position: 'left-start',
         }],
-        onComplete: (() => {
+        onComplete: () => {
             const schemasState = inject(SchemasState);
 
             return schemasState.changes.pipe(
                 filter(change =>
                     change.snapshot.schemas.find(s => s.fields.length > 0 && s.isPublished) !== undefined),
                 take(1));
-        })(),
+        },
     }, {
         id: 'createContent',
         title: 'i18n:tour.createContent.title',
@@ -190,7 +190,7 @@ export function buildTasks() {
             isAsync: true,
             position: 'left-start',
         }],
-        onComplete: (() => {
+        onComplete: () => {
             const contentsState = inject(ContentsState);
 
             return contentsState.changes.pipe(
@@ -198,7 +198,7 @@ export function buildTasks() {
                     change.snapshot.contents.find(s => s.status === 'Published') !== undefined ||
                     change.snapshot.selectedContent?.status === 'Published'),
                 take(1));
-        })(),
+        },
     }, {
         id: 'createAsset',
         title: 'i18n:tour.createAsset.title',
@@ -227,14 +227,14 @@ export function buildTasks() {
             position: 'left-start',
             endOnCondition: waitForElement('.panel2.minimized .right'),
         }],
-        onComplete: (() => {
+        onComplete: () => {
             const assetsState = inject(AssetsState);
 
             return assetsState.changes.pipe(
                 filter(change =>
                     change.snapshot.assets.length > 0),
                 take(1));
-        })(),
+        },
     }, {
         id: 'checkClient',
         title: 'i18n:tour.checkClient.title',
@@ -267,11 +267,11 @@ export function buildTasks() {
             content: 'i18n:tour.checkClient.connectContent',
             nextOnAnchorClick: true,
         }],
-        onComplete: (() => {
+        onComplete: () => {
             const messageBus = inject(MessageBus);
 
             return messageBus.of(ClientTourStated).pipe(take(1));
-        })(),
+        },
     }, {
         id: 'testGraphQL',
         title: 'i18n:tour.testGraphQL.title',
@@ -300,11 +300,11 @@ export function buildTasks() {
             content: 'i18n:tour.testGraphQL.queryContent',
             enableBackdrop: false,
         }],
-        onComplete: (() => {
+        onComplete: () => {
             const messageBus = inject(MessageBus);
 
             return messageBus.of(QueryExecuted).pipe(take(1));
-        })(),
+        },
     }];
 
     const defaults: StepDefinition = {

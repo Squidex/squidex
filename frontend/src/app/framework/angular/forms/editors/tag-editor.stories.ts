@@ -17,6 +17,7 @@ const TRANSLATIONS = {
 
 @Component({
     selector: 'sqx-tag-editor-test',
+    imports: [RootViewComponent, TagEditorComponent],
     template: `
         <sqx-root-view>
             <sqx-tag-editor 

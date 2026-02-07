@@ -8,7 +8,7 @@
     "ng": "ng",
     "start": "ng serve",
     "test": "ng test",
-    "test:coverage": "ng test --no-watch --code-coverage --browsers=ChromeHeadlessNoSandbox",
+    "test:coverage": "ng test --no-watch",
     "watch": "ng build --watch --configuration development",
     "storybook": "ng run squidex:storybook",
     "storybook-build": "ng run squidex:build-storybook",

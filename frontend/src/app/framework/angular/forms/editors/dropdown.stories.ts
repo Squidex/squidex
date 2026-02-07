@@ -17,10 +17,10 @@ const TRANSLATIONS = {
 
 @Component({
     selector: 'sqx-dropdown-test',
+    imports: [RootViewComponent, DropdownComponent],
     template: `
         <sqx-root-view>
-            <sqx-dropdown 
-                [allowOpen]="true" 
+            <sqx-dropdown
                 [items]="items"
                 [itemsLoading]="itemsLoading"
                 (dropdownOpen)="load()">

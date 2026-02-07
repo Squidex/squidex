@@ -17,10 +17,7 @@ type TestMode = 'ErrorText' | 'ErrorDetails' | 'Info';
         <button class="btn btn-primary" (click)="test()">
             Show {{ mode }}
         </button>
-    `,
-    imports: [
-        DialogRendererComponent,
-    ],
+    `
 })
 class TestComponent {
     public readonly dialogs = inject(DialogService);
