@@ -170,6 +170,9 @@
           "defaultConfiguration": "development"
         },
         "test": {
+          "builder": "@angular/build:unit-test"
+        },
+        "test_ci": {
           "builder": "@angular/build:unit-test",
           "options": {
             "runnerConfig": true
