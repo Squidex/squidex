@@ -13,7 +13,7 @@ ARG SQUIDEX__BUILD__ARGS
 
 RUN echo "ARGS IS $SQUIDEX__BUILD__ARGS" 
 
-WORKDIR /src
+WORKDIR /build
 
 # Copy nuget project files.
 COPY backend/Directory.Build.props ./
@@ -57,7 +57,7 @@ RUN dotnet tool install --tool-path /tools dotnet-dump \
 #
 FROM squidex/frontend-build:22.19 AS frontend
 
-WORKDIR /src
+WORKDIR /build
 
 ENV CONTINUOUS_INTEGRATION=1
 
