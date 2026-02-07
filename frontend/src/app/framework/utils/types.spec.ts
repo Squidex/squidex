@@ -85,7 +85,7 @@ describe('Types', () => {
     });
 
     it('should make function check', () => {
-        expect(Types.isFunction(() => { /* NOOP */ })).toBeTruthy();
+        expect(Types.isFunction(() => { })).toBeTruthy();
 
         expect(Types.isFunction([])).toBeFalsy();
     });
@@ -293,8 +293,6 @@ describe('Types', () => {
 });
 
 class MyClass {
-    constructor(
-        public readonly value: number,
-    ) {
+    constructor(public readonly value: number) {
     }
 }

@@ -25,21 +25,21 @@ describe('ExtendedFormArray', () => {
 
 describe('UndefinableFormArray', () => {
     const tests = [{
-        name: 'undefined (on)',
-        undefinable: true,
-        valueExpected: undefined,
-        valueActual: undefined,
-    }, {
-        name: 'defined (on)',
-        undefinable: true,
-        valueExpected: [1],
-        valueActual: [1],
-    }, {
-        name: 'defined (off)',
-        undefinable: false,
-        valueExpected: [1],
-        valueActual: [1],
-    }];
+            name: 'undefined (on)',
+            undefinable: true,
+            valueExpected: undefined,
+            valueActual: undefined,
+        }, {
+            name: 'defined (on)',
+            undefinable: true,
+            valueExpected: [1],
+            valueActual: [1],
+        }, {
+            name: 'defined (off)',
+            undefinable: false,
+            valueExpected: [1],
+            valueActual: [1],
+        }];
 
     it('should initialize with undefined', () => {
         const control = new UndefinableFormArray();

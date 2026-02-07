@@ -6,7 +6,7 @@
 }
 
 .card {
-    @include hover-visible('.deeplinks', inline);
+    @include hover-visible('.deeplinks', flex);
 
     &-title {
         padding-right: 2rem;
@@ -74,4 +74,8 @@
             @include box-shadow-outer(0, 3px, 16px, .2);
         }
     }
+}
+
+.separator:last-child {
+  display: none;
 }

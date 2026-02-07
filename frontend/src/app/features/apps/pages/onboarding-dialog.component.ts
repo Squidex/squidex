@@ -8,15 +8,12 @@
 
 import { Component, EventEmitter, Output } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { fadeAnimation, FormRowComponent, MarkdownDirective, ModalDialogComponent, slideAnimation, TourState, TranslatePipe, UsersService } from '@app/shared';
+import { FormRowComponent, MarkdownDirective, ModalDialogComponent, TourState, TranslatePipe, UsersService } from '@app/shared';
 
 @Component({
     selector: 'sqx-onboarding-dialog',
     styleUrls: ['./onboarding-dialog.component.scss'],
     templateUrl: './onboarding-dialog.component.html',
-    animations: [
-        fadeAnimation, slideAnimation,
-    ],
     imports: [
         FormRowComponent,
         FormsModule,

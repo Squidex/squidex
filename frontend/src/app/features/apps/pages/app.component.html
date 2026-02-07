@@ -6,14 +6,27 @@
             <div class="col card-right">
                 <h3 class="card-title mb-1">{{ app.displayName }}</h3>
 
-                <div class="card-text card-links truncate">
+                <div class="card-text card-links truncate d-flex gap-2">
                     <a [routerLink]="['/app', app.name]" sqxStopClick>{{ "common.edit" | sqxTranslate }}</a>
-                    <span class="deeplinks">
-                        &nbsp;|
-                        <a [routerLink]="['/app', app.name, 'content']" sqxStopClick>{{ "common.content" | sqxTranslate }}</a> &middot;
-                        <a [routerLink]="['/app', app.name, 'assets']" sqxStopClick>{{ "common.assets" | sqxTranslate }}</a> &middot;
-                        <a [routerLink]="['/app', app.name, 'settings']" sqxStopClick>{{ "common.settings" | sqxTranslate }}</a>
-                    </span>
+                    @if (canShowContents || canShowAssets || canShowSettings) {
+                        <span class="deeplinks gap-2">
+                            |
+                            @if (canShowContents) {
+                                <a [routerLink]="['/app', app.name, 'content']" sqxStopClick>{{ "common.content" | sqxTranslate }}</a>
+                                <span class="separator">&middot;</span>
+                            }
+
+                            @if (canShowAssets) {
+                                <a [routerLink]="['/app', app.name, 'assets']" sqxStopClick>{{ "common.assets" | sqxTranslate }}</a>
+                                <span class="separator">&middot;</span>
+                            }
+
+                            @if (canShowSettings) {
+                                <a [routerLink]="['/app', app.name, 'settings']" sqxStopClick>{{ "common.settings" | sqxTranslate }}</a>
+                                <span class="separator">&middot;</span>
+                            }
+                        </span>
+                    }
                 </div>
 
                 @if (app.description) {

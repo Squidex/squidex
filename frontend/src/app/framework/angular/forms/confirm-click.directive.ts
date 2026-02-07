@@ -43,7 +43,6 @@ export class ConfirmClickDirective {
             this.confirmTitle.length > 0 &&
             this.confirmText &&
             this.confirmText.length > 0) {
-            // eslint-disable-next-line deprecation/deprecation
             const destinations = this.clickConfirmed.observers?.map(x => (x as Subscriber<any>)['destination']) || [];
 
             this.beforeClick.emit();

@@ -49,6 +49,5 @@ export function calculateFileSize(value: number, factor = 1024) {
         u++;
     }
 
-    // eslint-disable-next-line prefer-template
     return (u ? `${value.toFixed(1)} ` : value) + ' kMGTPEZY'[u] + 'B';
 }

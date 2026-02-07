@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-/* eslint-disable no-inner-declarations */
-
 import { HttpClient, HttpErrorResponse, HttpEvent, HttpHeaders, HttpRequest, HttpResponse } from '@angular/common/http';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { ErrorDto, getActualVersion, Types, Versioned, VersionOrTag, VersionTag } from '@app/framework/internal';
@@ -130,7 +128,7 @@ export function parseError(response: HttpErrorResponse, fallback: string) {
     } else if (Types.isString(error)) {
         try {
             parsed = JSON.parse(error);
-        } catch (e) {
+        } catch {
             parsed = undefined;
         }
     }

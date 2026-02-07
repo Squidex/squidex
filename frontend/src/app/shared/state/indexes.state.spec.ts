@@ -12,10 +12,7 @@ import { createIndex } from '../services/indexes.service.spec';
 import { TestValues } from './_test-helpers';
 
 describe('IndexesState', () => {
-    const {
-        app,
-        appsState,
-    } = TestValues;
+    const { app, appsState } = TestValues;
 
     const index1 = createIndex(12);
     const index2 = createIndex(13);
@@ -69,8 +66,6 @@ describe('IndexesState', () => {
 
             indexesState.load(true, false).subscribe();
 
-            expect().nothing();
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
 
@@ -80,8 +75,6 @@ describe('IndexesState', () => {
 
             indexesState.load(true, false).pipe(onErrorResumeNextWith()).subscribe();
 
-            expect().nothing();
-
             dialogs.verify(x => x.notifyError(It.isAny()), Times.once());
         });
 
@@ -90,8 +83,6 @@ describe('IndexesState', () => {
                 .returns(() => throwError(() => 'Service Error'));
 
             indexesState.load(true, true).pipe(onErrorResumeNextWith()).subscribe();
-
-            expect().nothing();
 
             dialogs.verify(x => x.notifyError(It.isAny()), Times.never());
         });

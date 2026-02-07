@@ -236,7 +236,7 @@ describe('Router2State', () => {
                 state2: { squidex: true, cms: true },
             });
 
-            expect(routeExtras!.replaceUrl).toBeTrue();
+            expect(routeExtras!.replaceUrl).toBe(true);
             expect(routeExtras!.queryParamsHandling).toBe('merge');
             expect(routeExtras!.queryParams).toEqual({ state1: 'hello', state2: 'squidex,cms' });
 
@@ -259,7 +259,7 @@ describe('Router2State', () => {
                 state2: { squidex: true, cms: true },
             });
 
-            expect(routeExtras!.replaceUrl).toBeTrue();
+            expect(routeExtras!.replaceUrl).toBe(true);
             expect(routeExtras!.queryParamsHandling).toBe('merge');
             expect(routeExtras!.queryParams).toEqual({ state1: 'hello', state2: 'squidex,cms' });
 

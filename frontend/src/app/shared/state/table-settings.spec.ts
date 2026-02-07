@@ -14,18 +14,14 @@ import { TestValues } from './_test-helpers';
 describe('TableSettings', () => {
     let uiState: IMock<UIState>;
 
-    const {
-        createSchema,
-        createField,
-    } = TestValues;
+    const { createSchema, createField } = TestValues;
 
-    const schema =
-        createSchema({
-            name: 'my-schema',
-            fields: [
-                createField({ id: 1, properties: createProperties('String') }),
-            ],
-        });
+    const schema = createSchema({
+        name: 'my-schema',
+        fields: [
+            createField({ id: 1, properties: createProperties('String') }),
+        ],
+    });
 
     beforeEach(() => {
         uiState = Mock.ofType<UIState>();
@@ -109,8 +105,6 @@ describe('TableSettings', () => {
             tableSettings.updateFields(test.fields, true);
 
             uiState.verify(x => x.removeAppUser('schemas.my-schema.config'), Times.once());
-
-            expect().nothing();
         });
     });
 
@@ -142,8 +136,6 @@ describe('TableSettings', () => {
         tableSettings.updateFields(config, true);
 
         uiState.verify(x => x.setAppUser('schemas.my-schema.config', { ...EMPTY, fields: [META_FIELDS.version.name] }), Times.once());
-
-        expect().nothing();
     });
 
     it('should remove config if fields are saved', () => {
@@ -155,8 +147,6 @@ describe('TableSettings', () => {
         tableSettings.updateFields([], true);
 
         uiState.verify(x => x.removeAppUser('schemas.my-schema.config'), Times.once());
-
-        expect().nothing();
     });
 
     it('should update config if fields are only updated', () => {
@@ -170,8 +160,6 @@ describe('TableSettings', () => {
         tableSettings.updateFields(config, false);
 
         uiState.verify(x => x.setAppUser('schemas.my-schema.config', It.isAny()), Times.never());
-
-        expect().nothing();
     });
 
     it('should update config if sizes are saved', () => {

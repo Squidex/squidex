@@ -7,9 +7,12 @@
     "src/main.ts"
   ],
   "include": [
+    "**/*.stories.*",
+    "src/**/*.ts",
     "src/**/*.d.ts"
   ],
   "exclude": [
-    "**/*.stories.*"
+    "src/**/*.spec.ts",
+    "src/**/*.spec.tsx",
   ]
 }

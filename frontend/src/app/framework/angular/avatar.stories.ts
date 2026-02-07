@@ -38,7 +38,7 @@ export const Empty: Story = {
 
 export const Image = {
     args: {
-        image: 'https://via.placeholder.com/50',
+        image: 'https://placehold.co/400',
     },
 };
 

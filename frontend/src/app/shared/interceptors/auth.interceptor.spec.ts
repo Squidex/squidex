@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-/* eslint-disable deprecation/deprecation */
+
 
 import { Location } from '@angular/common';
 import { HttpErrorResponse, HttpEventType, HttpHeaders, HttpRequest } from '@angular/common/http';
@@ -166,8 +166,6 @@ describe('AuthInterceptor', () => {
                 return throwError(() => ({ status } as HttpErrorResponse));
             }), { defaultValue: null });
 
-            expect().nothing();
-
             router.verify(x => x.navigate(['/forbidden'], { replaceUrl: true }), Times.once());
         });
     });
@@ -179,18 +177,16 @@ describe('AuthInterceptor', () => {
             authService.setup(x => x.userChanges)
                 .returns(() => of(<any>{ authorization: 'token1' }));
 
-                const initialRequest = new HttpRequest('GET', 'http://service/p/apps', {
-                    headers: undefined,
-                });
+            const initialRequest = new HttpRequest('GET', 'http://service/p/apps', {
+                headers: undefined,
+            });
 
-                const invokedRequest: HttpRequest<any>[] = [];
-                await firstValueFrom(authInterceptor(initialRequest, request => {
-                    invokedRequest.push(request);
+            const invokedRequest: HttpRequest<any>[] = [];
+            await firstValueFrom(authInterceptor(initialRequest, request => {
+                invokedRequest.push(request);
 
-                    return throwError(() => ({ status } as HttpErrorResponse));
-                }).pipe(onErrorResumeNextWith()), { defaultValue: null });
-
-            expect().nothing();
+                return throwError(() => ({ status } as HttpErrorResponse));
+            }).pipe(onErrorResumeNextWith()), { defaultValue: null });
 
             authService.verify(x => x.logoutRedirect('/my-path'), Times.never());
         });

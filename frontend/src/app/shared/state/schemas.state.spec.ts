@@ -6,19 +6,15 @@
  */
 
 import { firstValueFrom, of, onErrorResumeNextWith, throwError } from 'rxjs';
-import { customMatchers } from 'src/spec/matchers';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { AddFieldDto, ChangeCategoryDto, ConfigureFieldRulesDto, ConfigureUIFieldsDto, CreateSchemaDto, DialogService, SchemaDto, SchemasDto, SchemasService, SynchronizeSchemaDto, UpdateFieldDto, UpdateSchemaDto, versioned } from '@app/shared/internal';
 import { createSchema } from '../services/schemas.service.spec';
 import { TestValues } from './_test-helpers';
 import { getCategoryTree, SchemasState } from './schemas.state';
+import 'src/spec/matchers';
 
 describe('SchemasState', () => {
-    const {
-        app,
-        appsState,
-        newVersion,
-    } = TestValues;
+    const { app, appsState, newVersion } = TestValues;
 
     const schema1 = createSchema(1);
     const schema2 = createSchema(2);
@@ -34,10 +30,6 @@ describe('SchemasState', () => {
     let dialogs: IMock<DialogService>;
     let schemasService: IMock<SchemasService>;
     let schemasState: SchemasState;
-
-    beforeAll(function () {
-        jasmine.addMatchers(customMatchers);
-    });
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
@@ -92,8 +84,6 @@ describe('SchemasState', () => {
 
             schemasState.load(true).subscribe();
 
-            expect().nothing();
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
 
@@ -104,8 +94,6 @@ describe('SchemasState', () => {
             schemasState.load(true).subscribe();
             schemasState.loadIfNotLoaded().subscribe();
 
-            expect().nothing();
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
 
@@ -115,8 +103,6 @@ describe('SchemasState', () => {
 
             schemasState.load(true).subscribe();
             schemasState.loadIfNotLoaded().subscribe();
-
-            expect().nothing();
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
@@ -149,8 +135,6 @@ describe('SchemasState', () => {
 
             schemasState.select(schema1.name).subscribe();
             schemasState.select(schema1.name).subscribe();
-
-            expect().nothing();
         });
 
         it('should return schema on select and reload always', async () => {
@@ -195,7 +179,7 @@ describe('SchemasState', () => {
         it('should update schema if schema category changed', () => {
             const updated = createSchema(1, '_new');
 
-            const request = new ChangeCategoryDto({  name: 'my-new-category' });
+            const request = new ChangeCategoryDto({ name: 'my-new-category' });
 
             schemasService.setup(x => x.putCategory(app, schema1, It.isValue(request), schema1.version))
                 .returns(() => of(updated)).verifiable();
@@ -228,7 +212,7 @@ describe('SchemasState', () => {
             it('should update schema and selected schema if schema category changed', () => {
                 const updated = createSchema(1, '_new');
 
-                const request = new ChangeCategoryDto({  name: 'my-new-category' });
+                const request = new ChangeCategoryDto({ name: 'my-new-category' });
 
                 schemasService.setup(x => x.putCategory(app, schema1, It.isValue(request), schema1.version))
                     .returns(() => of(updated)).verifiable();
@@ -702,14 +686,14 @@ describe('SchemasState', () => {
                     countSchemasInSubtree: 2,
                     countSchemasInSubtreeFiltered: 2,
                     categories: [{
-                        displayName: 'B',
-                        name: 'A/B',
-                        schemas: [schemaAB],
-                        schemasFiltered: [schemaAB],
-                        countSchemasInSubtree: 1,
-                        countSchemasInSubtreeFiltered: 1,
-                        categories: [],
-                    }],
+                            displayName: 'B',
+                            name: 'A/B',
+                            schemas: [schemaAB],
+                            schemasFiltered: [schemaAB],
+                            countSchemasInSubtree: 1,
+                            countSchemasInSubtreeFiltered: 1,
+                            categories: [],
+                        }],
                 }, {
                     displayName: 'schema-category1',
                     name: 'schema-category1',
@@ -756,14 +740,14 @@ describe('SchemasState', () => {
                     countSchemasInSubtree: 0,
                     countSchemasInSubtreeFiltered: 0,
                     categories: [{
-                        displayName: 'B',
-                        name: 'A/B',
-                        schemas: [],
-                        schemasFiltered: [],
-                        countSchemasInSubtree: 0,
-                        countSchemasInSubtreeFiltered: 0,
-                        categories: [],
-                    }],
+                            displayName: 'B',
+                            name: 'A/B',
+                            schemas: [],
+                            schemasFiltered: [],
+                            countSchemasInSubtree: 0,
+                            countSchemasInSubtreeFiltered: 0,
+                            categories: [],
+                        }],
                 }, {
                     displayName: 'schema-category1',
                     name: 'schema-category1',
@@ -818,14 +802,14 @@ describe('SchemasState', () => {
                 countSchemasInSubtree: 2,
                 countSchemasInSubtreeFiltered: 1,
                 categories: [{
-                    displayName: 'B',
-                    name: 'A/B',
-                    schemas: [schemaAB],
-                    schemasFiltered: [schemaAB],
-                    countSchemasInSubtree: 1,
-                    countSchemasInSubtreeFiltered: 1,
-                    categories: [],
-                }],
+                        displayName: 'B',
+                        name: 'A/B',
+                        schemas: [schemaAB],
+                        schemasFiltered: [schemaAB],
+                        countSchemasInSubtree: 1,
+                        countSchemasInSubtreeFiltered: 1,
+                        categories: [],
+                    }],
             }, {
                 displayName: 'schema-category1',
                 name: 'schema-category1',

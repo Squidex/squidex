@@ -12,12 +12,7 @@ import { createWorkflows } from '../services/workflows.service.spec';
 import { TestValues } from './_test-helpers';
 
 describe('WorkflowsState', () => {
-    const {
-        app,
-        appsState,
-        newVersion,
-        version,
-    } = TestValues;
+    const { app, appsState, newVersion, version } = TestValues;
 
     const oldWorkflows = createWorkflows('1', '2');
 
@@ -65,8 +60,6 @@ describe('WorkflowsState', () => {
                 .returns(() => of(versioned(version, oldWorkflows))).verifiable();
 
             workflowsState.load(true).subscribe();
-
-            expect().nothing();
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
@@ -135,15 +128,13 @@ describe('WorkflowView', () => {
 
         expect(workflow.toUpdate().toJSON()).toEqual({
             initial: null,
-            steps: {
-            },
+            steps: {},
         });
     });
 
     it('should add step to workflow', () => {
-        const workflow =
-            new WorkflowView(dto)
-                .setStep('Draft', { color: '#00ff00' });
+        const workflow = new WorkflowView(dto)
+            .setStep('Draft', { color: '#00ff00' });
 
         expect(workflow.toUpdate().toJSON()).toEqual({
             initial: 'Draft',
@@ -154,10 +145,9 @@ describe('WorkflowView', () => {
     });
 
     it('should override settings if step already exists', () => {
-        const workflow =
-            new WorkflowView(dto)
-                .setStep('1', { color: '#00ff00', noUpdate: true })
-                .setStep('1', { color: 'red' });
+        const workflow = new WorkflowView(dto)
+            .setStep('1', { color: '#00ff00', noUpdate: true })
+            .setStep('1', { color: 'red' });
 
         expect(workflow.toUpdate().toJSON()).toEqual({
             initial: '1',
@@ -168,10 +158,9 @@ describe('WorkflowView', () => {
     });
 
     it('should sort steps case invariant', () => {
-        const workflow =
-            new WorkflowView(dto)
-                .setStep('Z')
-                .setStep('a');
+        const workflow = new WorkflowView(dto)
+            .setStep('Z')
+            .setStep('a');
 
         expect(workflow.steps).toEqual([
             { name: 'a', values: {}, isLocked: false },
@@ -180,9 +169,8 @@ describe('WorkflowView', () => {
     });
 
     it('should return same workflow if step to remove is locked', () => {
-        const workflow =
-            new WorkflowView(dto)
-                .setStep('Published', { color: '#00ff00' });
+        const workflow = new WorkflowView(dto)
+            .setStep('Published', { color: '#00ff00' });
 
         const updated = workflow.removeStep('Published');
 
@@ -190,9 +178,8 @@ describe('WorkflowView', () => {
     });
 
     it('should return same workflow if step to remove not found', () => {
-        const workflow =
-            new WorkflowView(dto)
-                .setStep('1');
+        const workflow = new WorkflowView(dto)
+            .setStep('1');
 
         const updated = workflow.removeStep('3');
 
@@ -200,15 +187,14 @@ describe('WorkflowView', () => {
     });
 
     it('should remove step', () => {
-        const workflow =
-            new WorkflowView(dto)
-                .setStep('1', { color: '#00ff00' })
-                .setStep('2', { color: '#ff0000' })
-                .setStep('3', { color: '#0000ff' })
-                .setTransition('1', '2', { expression: '1 === 2' })
-                .setTransition('1', '3', { expression: '1 === 3' })
-                .setTransition('2', '3', { expression: '2 === 3' })
-                .removeStep('1');
+        const workflow = new WorkflowView(dto)
+            .setStep('1', { color: '#00ff00' })
+            .setStep('2', { color: '#ff0000' })
+            .setStep('3', { color: '#0000ff' })
+            .setTransition('1', '2', { expression: '1 === 2' })
+            .setTransition('1', '3', { expression: '1 === 3' })
+            .setTransition('2', '3', { expression: '2 === 3' })
+            .removeStep('1');
 
         expect(workflow.toUpdate().toJSON()).toEqual({
             initial: '2',
@@ -225,12 +211,11 @@ describe('WorkflowView', () => {
     });
 
     it('should make first non-locked step the initial step if initial removed', () => {
-        const workflow =
-            new WorkflowView(dto)
-                .setStep('1')
-                .setStep('Published')
-                .setStep('Public')
-                .removeStep('1');
+        const workflow = new WorkflowView(dto)
+            .setStep('1')
+            .setStep('Published')
+            .setStep('Public')
+            .removeStep('1');
 
         expect(workflow.toUpdate().toJSON()).toEqual({
             initial: 'Public',
@@ -242,28 +227,25 @@ describe('WorkflowView', () => {
     });
 
     it('should unset initial step if initial removed', () => {
-        const workflow =
-            new WorkflowView(dto)
-                .setStep('1')
-                .removeStep('1');
+        const workflow = new WorkflowView(dto)
+            .setStep('1')
+            .removeStep('1');
 
         expect(workflow.toUpdate().toJSON()).toEqual({
             initial: null,
-            steps: {
-            },
+            steps: {},
         });
     });
 
     it('should rename step', () => {
-        const workflow =
-            new WorkflowView(dto)
-                .setStep('1', { color: '#00ff00' })
-                .setStep('2', { color: '#ff0000' })
-                .setStep('3', { color: '#0000ff' })
-                .setTransition('1', '2', { expression: '1 === 2' })
-                .setTransition('2', '1', { expression: '2 === 1' })
-                .setTransition('2', '3', { expression: '2 === 3' })
-                .renameStep('1', 'a');
+        const workflow = new WorkflowView(dto)
+            .setStep('1', { color: '#00ff00' })
+            .setStep('2', { color: '#ff0000' })
+            .setStep('3', { color: '#0000ff' })
+            .setTransition('1', '2', { expression: '1 === 2' })
+            .setTransition('2', '1', { expression: '2 === 1' })
+            .setTransition('2', '3', { expression: '2 === 3' })
+            .renameStep('1', 'a');
 
         expect(workflow.toUpdate().toJSON()).toEqual({
             initial: '1',
@@ -287,12 +269,11 @@ describe('WorkflowView', () => {
     });
 
     it('should add transitions to workflow', () => {
-        const workflow =
-            new WorkflowView(dto)
-                .setStep('1')
-                .setStep('2')
-                .setTransition('1', '2', { expression: '1 === 2' })
-                .setTransition('2', '1', { expression: '2 === 1' });
+        const workflow = new WorkflowView(dto)
+            .setStep('1')
+            .setStep('2')
+            .setTransition('1', '2', { expression: '1 === 2' })
+            .setTransition('2', '1', { expression: '2 === 1' });
 
         expect(workflow.toUpdate().toJSON()).toEqual({
             initial: '1',
@@ -312,13 +293,12 @@ describe('WorkflowView', () => {
     });
 
     it('should remove transition from workflow', () => {
-        const workflow =
-            new WorkflowView(dto)
-                .setStep('1')
-                .setStep('2')
-                .setTransition('1', '2', { expression: '1 === 2' })
-                .setTransition('2', '1', { expression: '2 === 1' })
-                .removeTransition('1', '2');
+        const workflow = new WorkflowView(dto)
+            .setStep('1')
+            .setStep('2')
+            .setTransition('1', '2', { expression: '1 === 2' })
+            .setTransition('2', '1', { expression: '2 === 1' })
+            .removeTransition('1', '2');
 
         expect(workflow.toUpdate().toJSON()).toEqual({
             initial: '1',
@@ -334,12 +314,11 @@ describe('WorkflowView', () => {
     });
 
     it('should override settings if transition already exists', () => {
-        const workflow =
-            new WorkflowView(dto)
-                .setStep('1')
-                .setStep('2')
-                .setTransition('2', '1', { expression: '2 === 1', roles: ['Role'] })
-                .setTransition('2', '1', { expression: '2 !== 1' });
+        const workflow = new WorkflowView(dto)
+            .setStep('1')
+            .setStep('2')
+            .setTransition('2', '1', { expression: '2 === 1', roles: ['Role'] })
+            .setTransition('2', '1', { expression: '2 !== 1' });
 
         expect(workflow.toUpdate().toJSON()).toEqual({
             initial: '1',
@@ -355,11 +334,10 @@ describe('WorkflowView', () => {
     });
 
     it('should return same workflow if transition to update not found by from step', () => {
-        const workflow =
-            new WorkflowView(dto)
-                .setStep('1')
-                .setStep('2')
-                .setTransition('1', '2');
+        const workflow = new WorkflowView(dto)
+            .setStep('1')
+            .setStep('2')
+            .setTransition('1', '2');
 
         const updated = workflow.setTransition('3', '2', { roles: ['Role'] });
 
@@ -367,11 +345,10 @@ describe('WorkflowView', () => {
     });
 
     it('should return same workflow if transition has invalid steps', () => {
-        const workflow =
-            new WorkflowView(dto)
-                .setStep('1')
-                .setStep('2')
-                .setTransition('1', '2');
+        const workflow = new WorkflowView(dto)
+            .setStep('1')
+            .setStep('2')
+            .setTransition('1', '2');
 
         const updated = workflow.setTransition('1', '3', { roles: ['Role'] });
 
@@ -379,11 +356,10 @@ describe('WorkflowView', () => {
     });
 
     it('should return same workflow if transition to remove not', () => {
-        const workflow =
-            new WorkflowView(dto)
-                .setStep('1')
-                .setStep('2')
-                .setTransition('1', '2');
+        const workflow = new WorkflowView(dto)
+            .setStep('1')
+            .setStep('2')
+            .setTransition('1', '2');
 
         const updated = workflow.removeTransition('1', '3');
 
@@ -391,10 +367,9 @@ describe('WorkflowView', () => {
     });
 
     it('should return same workflow if step to make initial is locked', () => {
-        const workflow =
-            new WorkflowView(dto)
-                .setStep('1')
-                .setStep('Published', { color: '#00ff00' });
+        const workflow = new WorkflowView(dto)
+            .setStep('1')
+            .setStep('Published', { color: '#00ff00' });
 
         const updated = workflow.setInitial('Published');
 
@@ -402,11 +377,10 @@ describe('WorkflowView', () => {
     });
 
     it('should set initial step', () => {
-        const workflow =
-            new WorkflowView(dto)
-                .setStep('1')
-                .setStep('2')
-                .setInitial('2');
+        const workflow = new WorkflowView(dto)
+            .setStep('1')
+            .setStep('2')
+            .setInitial('2');
 
         expect(workflow.toUpdate().toJSON()).toEqual({
             initial: '2',
@@ -418,27 +392,23 @@ describe('WorkflowView', () => {
     });
 
     it('should rename workflow', () => {
-        const workflow =
-            new WorkflowView(dto)
-                .changeName('name');
+        const workflow = new WorkflowView(dto)
+            .changeName('name');
 
         expect(workflow.toUpdate().toJSON()).toEqual({
             initial: null,
-            steps: {
-            },
+            steps: {},
             name: 'name',
         });
     });
 
     it('should update schemaIds', () => {
-        const workflow =
-            new WorkflowView(dto)
-                .changeSchemaIds(['1', '2']);
+        const workflow = new WorkflowView(dto)
+            .changeSchemaIds(['1', '2']);
 
         expect(workflow.toUpdate().toJSON()).toEqual({
             initial: null,
-            steps: {
-            },
+            steps: {},
             schemaIds: ['1', '2'],
         });
     });

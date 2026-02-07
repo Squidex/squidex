@@ -9,13 +9,12 @@ import { APP_BASE_HREF } from '@angular/common';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { enableProdMode, ErrorHandler } from '@angular/core';
 import { bootstrapApplication } from '@angular/platform-browser';
-import { provideAnimations } from '@angular/platform-browser/animations';
 import { ActivatedRouteSnapshot, BaseRouteReuseStrategy, provideRouter, RouteReuseStrategy } from '@angular/router';
 import { provideCharts, withDefaultRegisterables } from 'ng2-charts';
-import { TourService as BaseTourService } from 'ngx-ui-tour-core';
-import { APP_ROUTES } from '@app/app.routes';
+import { TourService as BaseTourService, UI_TOUR_OPTIONS } from 'ngx-ui-tour-core';
 import { ApiUrlConfig, authInterceptor, buildTasks, cachingInterceptor, DateHelper, GlobalErrorHandler, loadingInterceptor, LocalizerService, TASK_CONFIGURATION, TitlesConfig, TourService, UIOptions } from '@app/shared';
 import { AppComponent } from './app/app.component';
+import { APP_ROUTES } from './app/app.routes';
 import { environment } from './environments/environment';
 
 const options = (window as any)['options'] || {};
@@ -90,9 +89,10 @@ if (environment.production) {
     enableProdMode();
 }
 
+const TASKS = buildTasks();
+
 bootstrapApplication(AppComponent, {
     providers: [
-        provideAnimations(),
         provideCharts(withDefaultRegisterables()),
         provideHttpClient(
             withInterceptors([
@@ -125,6 +125,10 @@ bootstrapApplication(AppComponent, {
         {
             provide: APP_BASE_HREF,
             useValue: basePath(),
+        },
+        {
+          provide: UI_TOUR_OPTIONS,
+          useValue: TASKS.defaults,
         },
         {
             provide: BaseTourService,

@@ -112,7 +112,7 @@ export class DateTimeEditorComponent extends StatefulControlComponent<State, str
         let value: DateTime | null;
         try {
             value = DateTime.parseISO(obj, false);
-        } catch (ex) {
+        } catch {
             value = null;
         }
 

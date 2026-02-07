@@ -25,8 +25,8 @@ describe('ToolbarService', () => {
             buttonsTriggered++;
         });
 
-        toolbarService.addButton(undefined, 'button1', () => {});
-        toolbarService.addButton(undefined, 'button2', () => {});
+        toolbarService.addButton(undefined, 'button1', () => { });
+        toolbarService.addButton(undefined, 'button2', () => { });
 
         expect(buttons!.length).toBe(2);
         expect(buttonsTriggered).toEqual(3);
@@ -43,8 +43,8 @@ describe('ToolbarService', () => {
             buttonsTriggered++;
         });
 
-        toolbarService.addButton(undefined, 'button1', () => {});
-        toolbarService.addButton(undefined, 'button1', () => {}, { disabled: true });
+        toolbarService.addButton(undefined, 'button1', () => { });
+        toolbarService.addButton(undefined, 'button1', () => { }, { disabled: true });
 
         expect(buttons!.length).toBe(1);
         expect(buttonsTriggered).toEqual(3);
@@ -61,7 +61,7 @@ describe('ToolbarService', () => {
             buttonsTriggered++;
         });
 
-        const action = () => {};
+        const action = () => { };
 
         toolbarService.addButton(undefined, 'button1', action);
         toolbarService.addButton(undefined, 'button1', action);
@@ -84,8 +84,8 @@ describe('ToolbarService', () => {
             buttonsTriggered++;
         });
 
-        toolbarService.addButton(owner1, 'button1', () => {});
-        toolbarService.addButton(owner2, 'button2', () => {});
+        toolbarService.addButton(owner1, 'button1', () => { });
+        toolbarService.addButton(owner2, 'button2', () => { });
         toolbarService.remove(owner1);
 
         expect(buttons!.length).toBe(1);
@@ -103,8 +103,8 @@ describe('ToolbarService', () => {
             buttonsTriggered++;
         });
 
-        toolbarService.addButton(undefined, 'button1', () => {});
-        toolbarService.addButton(undefined, 'button2', () => {});
+        toolbarService.addButton(undefined, 'button1', () => { });
+        toolbarService.addButton(undefined, 'button2', () => { });
         toolbarService.removeAll();
 
         expect(buttons!.length).toBe(0);

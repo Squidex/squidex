@@ -177,7 +177,7 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
             } else {
                 return parsed.toStringFormat(properties.format ?? 'Ppp');
             }
-        } catch (ex) {
+        } catch {
             return this.value;
         }
     }

@@ -77,76 +77,74 @@ describe('formatHistoryMessage', () => {
 describe('HistoryService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
-    imports: [],
-    providers: [
-        provideHttpClient(withInterceptorsFromDi()),
-        provideHttpClientTesting(),
-        HistoryService,
-        { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
-    ],
-});
+            imports: [],
+            providers: [
+                provideHttpClient(withInterceptorsFromDi()),
+                provideHttpClientTesting(),
+                HistoryService,
+                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
+            ],
+        });
     });
 
     afterEach(inject([HttpTestingController], (httpMock: HttpTestingController) => {
         httpMock.verify();
     }));
 
-    it('should make get request to get history events',
-        inject([HistoryService, HttpTestingController], (historyService: HistoryService, httpMock: HttpTestingController) => {
-            let events: ReadonlyArray<HistoryEventDto>;
+    it('should make get request to get history events', inject([HistoryService, HttpTestingController], (historyService: HistoryService, httpMock: HttpTestingController) => {
+        let events: ReadonlyArray<HistoryEventDto>;
 
-            historyService.getHistory('my-app', 'settings.contributors').subscribe(result => {
-                events = result;
-            });
+        historyService.getHistory('my-app', 'settings.contributors').subscribe(result => {
+            events = result;
+        });
 
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/history?channel=settings.contributors');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/history?channel=settings.contributors');
 
-            expect(req.request.method).toEqual('GET');
-            expect(req.request.headers.get('If-Match')).toBeNull();
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBeNull();
 
-            req.flush(historyResponse());
+        req.flush(historyResponse());
 
-            expect(events!).toEqual(createHistory());
-        }));
+        expect(events!).toEqual(createHistory());
+    }));
 
-    it('should make get request to get history events for a team',
-        inject([HistoryService, HttpTestingController], (historyService: HistoryService, httpMock: HttpTestingController) => {
-            let events: ReadonlyArray<HistoryEventDto>;
+    it('should make get request to get history events for a team', inject([HistoryService, HttpTestingController], (historyService: HistoryService, httpMock: HttpTestingController) => {
+        let events: ReadonlyArray<HistoryEventDto>;
 
-            historyService.getHistoryForTeam('my-team', 'settings.contributors').subscribe(result => {
-                events = result;
-            });
+        historyService.getHistoryForTeam('my-team', 'settings.contributors').subscribe(result => {
+            events = result;
+        });
 
-            const req = httpMock.expectOne('http://service/p/api/teams/my-team/history?channel=settings.contributors');
+        const req = httpMock.expectOne('http://service/p/api/teams/my-team/history?channel=settings.contributors');
 
-            expect(req.request.method).toEqual('GET');
-            expect(req.request.headers.get('If-Match')).toBeNull();
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBeNull();
 
-            req.flush(historyResponse());
+        req.flush(historyResponse());
 
-            expect(events!).toEqual(createHistory());
-        }));
+        expect(events!).toEqual(createHistory());
+    }));
 
-        function historyResponse() {
-            return [
-                {
-                    actor: 'User1',
-                    created: '2016-12-12T10:10',
-                    eventId: '1',
-                    eventType: 'Type 1',
-                    message: 'Message 1',
-                    version: 2,
-                },
-                {
-                    actor: 'User2',
-                    created: '2016-12-13T10:10',
-                    eventId: '2',
-                    eventType: 'Type 2',
-                    message: 'Message 2',
-                    version: 3,
-                },
-            ];
-        }
+    function historyResponse() {
+        return [
+            {
+                actor: 'User1',
+                created: '2016-12-12T10:10',
+                eventId: '1',
+                eventType: 'Type 1',
+                message: 'Message 1',
+                version: 2,
+            },
+            {
+                actor: 'User2',
+                created: '2016-12-13T10:10',
+                eventId: '2',
+                eventType: 'Type 2',
+                message: 'Message 2',
+                version: 3,
+            },
+        ];
+    }
 });
 
 export function createHistory() {

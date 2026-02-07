@@ -5,9 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-/* eslint-disable no-useless-escape */
-/* eslint-disable no-bitwise */
-
 import { Types } from './types';
 
 interface ColorDefinition {
@@ -65,7 +62,7 @@ export module MathHelper {
 
     const CRC32_TABLE: ReadonlyArray<number> = createCrc32Table();
 
-    // eslint-disable-next-line no-inner-declarations
+
     function createCrc32Table() {
         const crc: number[] = [];
 

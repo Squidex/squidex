@@ -232,7 +232,7 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
                         schemaIds = schemas;
                     } if (this.schemaIds && this.schemaIds.length > 0) {
                         schemaIds = this.schemaIds;
-                    } 
+                    }
 
                     this.contentsQuery = query;
                     this.contentsCorrelationId = correlationId;

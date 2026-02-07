@@ -7,7 +7,6 @@
 
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { DropdownComponent, LocalizerService, RootViewComponent } from '@app/framework';
 
@@ -18,10 +17,10 @@ const TRANSLATIONS = {
 
 @Component({
     selector: 'sqx-dropdown-test',
+    imports: [RootViewComponent, DropdownComponent],
     template: `
         <sqx-root-view>
-            <sqx-dropdown 
-                [allowOpen]="true" 
+            <sqx-dropdown
                 [items]="items"
                 [itemsLoading]="itemsLoading"
                 (dropdownOpen)="load()">
@@ -86,13 +85,10 @@ export default {
     }),
     decorators: [
         moduleMetadata({
-            declarations: [
-                TestComponent,
-            ],
             imports: [
-                BrowserAnimationsModule,
                 FormsModule,
                 RootViewComponent,
+                TestComponent,
             ],
             providers: [
                 {

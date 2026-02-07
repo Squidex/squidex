@@ -6,31 +6,22 @@
  */
 
 import { of, onErrorResumeNextWith, throwError } from 'rxjs';
-import { customMatchers } from 'src/spec/matchers';
 import { IMock, It, Mock, Times } from 'typemoq';
 import { DialogService, UpdateAssetScriptsDto, versioned } from '@app/shared/internal';
 import { AppsService } from '../services/apps.service';
 import { createAssetScripts } from '../services/apps.service.spec';
 import { TestValues } from './_test-helpers';
 import { AssetScriptsState } from './asset-scripts.state';
+import 'src/spec/matchers';
 
 describe('AssetScriptsState', () => {
-    const {
-        app,
-        appsState,
-        newVersion,
-        version,
-    } = TestValues;
+    const { app, appsState, newVersion, version } = TestValues;
 
     const oldScripts = createAssetScripts(1);
 
     let dialogs: IMock<DialogService>;
     let appsService: IMock<AppsService>;
     let assetScriptsState: AssetScriptsState;
-
-    beforeAll(function () {
-        jasmine.addMatchers(customMatchers);
-    });
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
@@ -72,8 +63,6 @@ describe('AssetScriptsState', () => {
                 .returns(() => of(versioned(version, oldScripts))).verifiable();
 
             assetScriptsState.load(true).subscribe();
-
-            expect().nothing();
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });

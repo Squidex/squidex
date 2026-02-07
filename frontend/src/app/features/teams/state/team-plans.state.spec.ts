@@ -12,13 +12,7 @@ import { DialogService, PlanChangedDto, PlanDto, PlansDto, versioned } from '@ap
 import { TeamPlansService, TeamPlansState } from '../internal';
 
 describe('TeamPlansState', () => {
-    const {
-        creator,
-        newVersion,
-        team,
-        teamsState,
-        version,
-    } = TestValues;
+    const { creator, newVersion, team, teamsState, version } = TestValues;
 
     const oldPlans = new PlansDto({
         currentPlanId: 'free',
@@ -117,8 +111,6 @@ describe('TeamPlansState', () => {
                 .returns(() => of(versioned(version, oldPlans))).verifiable();
 
             plansState.load(true).subscribe();
-
-            expect().nothing();
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });

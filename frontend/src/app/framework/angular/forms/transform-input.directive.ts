@@ -52,12 +52,16 @@ export class TransformInputDirective implements ControlValueAccessor {
     ) {
     }
 
-    @HostListener('input', ['$event.target.value'])
-    public onChange(value: any) {
-        const normalizedValue = this.transformValue(value);
+    @HostListener('input', ['$event'])
+    public onChange(event: Event): void {
+        const target = event.target as HTMLInputElement;
+        if (target?.value === undefined) {
+            return;
+        }
+
+        const normalizedValue = this.transformValue(target.value);
 
         this.renderer.setProperty(this.element.nativeElement, 'value', normalizedValue);
-
         this.callChange(normalizedValue);
     }
 

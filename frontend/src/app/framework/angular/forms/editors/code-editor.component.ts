@@ -241,7 +241,7 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, any> imple
             if (isValid) {
                 try {
                     newValueOut = JSON.parse(newValueText);
-                } catch (e) {
+                } catch {
                     newValueOut = null;
                     newValueText = '';
                 }

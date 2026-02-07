@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { inject, Inject, Injectable } from '@angular/core';
+import { EnvironmentInjector, inject, Inject, Injectable, runInInjectionContext } from '@angular/core';
 import { filter, skip, take } from 'rxjs';
 import { debug, State, TourService, UIOptions } from '@app/framework';
 import { TASK_CONFIGURATION, TaskConfiguration, TaskDefinition } from './tour.tasks';
@@ -34,6 +34,7 @@ interface Snapshot {
     providedIn: 'root',
 })
 export class TourState extends State<Snapshot> {
+    private readonly injector = inject(EnvironmentInjector);
     private readonly isDisabled = inject(UIOptions).value.hideOnboarding;
 
     public completedTasks =
@@ -67,7 +68,7 @@ export class TourState extends State<Snapshot> {
                 this.next({ ...change, status: change.status || 'Ready' }, LoadedEvent);
 
                 for (const tasks of definition.tasks) {
-                    tasks.onComplete.subscribe(() => {
+                    runInInjectionContext(this.injector, tasks.onComplete).subscribe(() => {
                         this.next(state => ({
                             ...state,
                             completedTasks: { ...state.completedTasks || {}, [tasks.id]: true },
@@ -75,8 +76,6 @@ export class TourState extends State<Snapshot> {
                     });
                 }
             });
-
-            this.tourService.setDefaults(this.definition.defaults);
     }
 
     public complete() {

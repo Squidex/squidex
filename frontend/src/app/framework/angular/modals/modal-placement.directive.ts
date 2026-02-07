@@ -158,7 +158,7 @@ export class ModalPlacementDirective implements AfterViewInit, OnDestroy {
                 if (this.adjustHeight) {
                     const height = rects.reference.height + 2 * this.spaceY;
 
-                    this.renderer.setStyle(modalRef, 'width', `${height}px`);
+                    this.renderer.setStyle(modalRef, 'height', `${height}px`);
                 }
             },
         }));

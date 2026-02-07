@@ -6,8 +6,8 @@
         <a class="header-right modal-close force" (click)="cancel()">{{ "tour.skip" | sqxTranslate }}</a>
         @if (step === 0) {
             <div class="onboarding-step">
-                <img class="header-left" @fade src="./images/logo-white-small.png" />
-                <div class="onboarding-enter-leave text-center" @slide>
+                <img class="header-left" animate.enter="fade-in" animate.leave="fade-out" src="./images/logo-white-small.png" />
+                <div class="onboarding-enter-leave text-center" animate.enter="slide-left-in" animate.leave="slide-left-out">
                     <h1>
                         {{ "tour.welcome" | sqxTranslate }} <span class="header-focus">{{ "tour.welcomeProduct" | sqxTranslate }}</span>
                     </h1>
@@ -23,14 +23,14 @@
 
         @if (step === 1) {
             <div>
-                <img class="header-left" @fade src="./images/logo-white-small.png" />
-                <div class="onboarding-enter-leave" @slide>
+                <img class="header-left" animate.enter="fade-in" animate.leave="fade-out" src="./images/logo-white-small.png" />
+                <div class="onboarding-enter-leave" animate.enter="slide-left-in" animate.leave="slide-left-out">
                     <form [formGroup]="answersForm" (ngSubmit)="submitAnswers()">
                         <h2>{{ "tour.stepDataTitle" | sqxTranslate }}</h2>
 
                         <div [sqxMarkdown]="'tour.stepDataText' | sqxTranslate"></div>
 
-                        <sqx-form-row for="companyRole" label="tour.stepDataCompanyRole" class="mt-4">
+                        <sqx-form-row class="mt-4" for="companyRole" label="tour.stepDataCompanyRole" vertical="true">
                             <select class="form-select" id="companyRole" formControlName="companyRole">
                                 <option [ngValue]="'RoleEmployee'">{{ "tour.roleEmployee" | sqxTranslate }}</option>
                                 <option [ngValue]="'RoleBusinessOwner'">{{ "tour.roleBusinessOwner" | sqxTranslate }}</option>
@@ -41,7 +41,7 @@
                             </select>
                         </sqx-form-row>
 
-                        <sqx-form-row for="companySize" label="tour.stepDataCompanySize">
+                        <sqx-form-row for="companySize" label="tour.stepDataCompanySize" vertical="true">
                             <select class="form-select" id="companySize" formControlName="companySize">
                                 <option [ngValue]="'SizeSingle'">{{ "tour.sizeSingle" | sqxTranslate }}</option>
                                 <option [ngValue]="'SizeSmall'">{{ "tour.sizeSmall" | sqxTranslate }}</option>
@@ -51,7 +51,7 @@
                             </select>
                         </sqx-form-row>
 
-                        <sqx-form-row for="project" label="tour.stepDataProject">
+                        <sqx-form-row for="project" label="tour.stepDataProject" vertical="true">
                             <select class="form-select" id="project" formControlName="project">
                                 <option [ngValue]="'ProjectNewsMagazine'">{{ "tour.projectNewsMagazine" | sqxTranslate }}</option>
                                 <option [ngValue]="'ProjectPersonalBlog'">{{ "tour.projectPersonalBlog" | sqxTranslate }}</option>
@@ -71,8 +71,8 @@
 
         @if (step === 2) {
             <div class="onboarding-step">
-                <img class="header-left" @fade src="./images/logo-white-small.png" />
-                <div class="onboarding-enter-leave text-center" @slide>
+                <img class="header-left" animate.enter="fade-in" animate.leave="fade-out" src="./images/logo-white-small.png" />
+                <div class="onboarding-enter-leave text-center" animate.enter="slide-left-in" animate.leave="slide-left-out">
                     <h2>{{ "tour.stepTourTitle" | sqxTranslate }}</h2>
 
                     <div [sqxMarkdown]="'tour.stepTourText' | sqxTranslate"></div>

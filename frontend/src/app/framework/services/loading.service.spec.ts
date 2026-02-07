@@ -61,7 +61,7 @@ describe('LoadingService', () => {
         expect(state).toBeTruthy();
     });
 
-    it('should not unset from loaded delayed', (cb) => {
+    it('should not unset from loaded delayed', async () => {
         const loadingService = new LoadingService(<any>{ events });
 
         let state = false;
@@ -75,11 +75,11 @@ describe('LoadingService', () => {
         setTimeout(() => {
             expect(state).toBeFalsy();
 
-            cb();
+
         }, 400);
     });
 
-    it('should not unset from loaded delayed on navigation event', (cb) => {
+    it('should not unset from loaded delayed on navigation event', async () => {
         const loadingService = new LoadingService(<any>{ events });
 
         let state = false;
@@ -93,11 +93,11 @@ describe('LoadingService', () => {
         setTimeout(() => {
             expect(state).toBeFalsy();
 
-            cb();
+
         }, 400);
     });
 
-    it('should set back to loaded after several completions', (cb) => {
+    it('should set back to loaded after several completions', async () => {
         const loadingService = new LoadingService(<any>{ events });
 
         let state = false;
@@ -113,7 +113,7 @@ describe('LoadingService', () => {
         setTimeout(() => {
             expect(state).toBeTruthy();
 
-            cb();
+
         }, 400);
     });
 });

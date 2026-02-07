@@ -1,8 +1,8 @@
 <sqx-title message="i18n:dashboard.pageTitle" />
 @if (selectedTeam | async; as team) {
-    <div class="dashboard" @fade>
+    <div class="dashboard" animate.enter="fade-in" animate.leave="fade-out">
         @if (!isScrolled) {
-            <div class="dashboard-summary" @fade>
+            <div class="dashboard-summary" animate.enter="fade-in" animate.leave="fade-out">
                 <h1 class="dashboard-title">{{ "dashboard.welcomeTitle" | sqxTranslate: { user: user } }}</h1>
 
                 <div class="subtext" [sqxMarkdown]="'dashboard.welcomeTextTeam' | sqxTranslate: { team: team.name }"></div>

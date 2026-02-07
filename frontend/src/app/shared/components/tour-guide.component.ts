@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
 import { ScrollActiveDirective, TranslatePipe } from '@app/framework';
-import { fadeAnimation, StatefulComponent, Subscriptions, TaskSnapshot, TourService, TourState } from '@app/shared/internal';
+import { StatefulComponent, Subscriptions, TaskSnapshot, TourService, TourState } from '@app/shared/internal';
 
 interface State {
     // The when the section is collapsed.
@@ -19,9 +19,6 @@ interface State {
     selector: 'sqx-tour-guide',
     styleUrls: ['./tour-guide.component.scss'],
     templateUrl: './tour-guide.component.html',
-    animations: [
-        fadeAnimation,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AsyncPipe,
