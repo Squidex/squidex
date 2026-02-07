@@ -13,7 +13,7 @@ import { createAsset, createAssetFolder } from '../services/assets.service.spec'
 import { TestValues } from './_test-helpers';
 
 describe('AssetsState', () => {
-    const { app, appsState, newVersion, } = TestValues;
+    const { app, appsState, newVersion } = TestValues;
 
     const asset1 = createAsset(1, ['tag1', 'shared']);
     const asset2 = createAsset(2, ['tag2', 'shared']);

@@ -12,7 +12,7 @@ describe('generateSlug', () => {
         const cases: Array<[
             string,
             string,
-            string
+            string,
         ]> = [
             ['Hello World', '-', 'hello-world'],
             ['Hello/World', '-', 'hello-world'],
@@ -33,7 +33,7 @@ describe('generateSlug', () => {
     describe('Should replace multi-char diacritics', () => {
         const cases: Array<[
             string,
-            string
+            string,
         ]> = [
             ['ö', 'oe'],
             ['ü', 'ue'],
@@ -50,7 +50,7 @@ describe('generateSlug', () => {
     describe('Should not replace multi-char diacritics', () => {
         const cases: Array<[
             string,
-            string
+            string,
         ]> = [
             ['ö', 'o'],
             ['ü', 'u'],
@@ -67,7 +67,7 @@ describe('generateSlug', () => {
     describe('Should replace single-char diacritics', () => {
         const cases: Array<[
             string,
-            string
+            string,
         ]> = [
             ['Físh', 'fish'],
             ['źish', 'zish'],
@@ -88,7 +88,7 @@ describe('generateSlug', () => {
         const cases: Array<[
             string,
             string,
-            string
+            string,
         ]> = [
             ['Hello my&World ', '_', 'hello_my&world'],
             ['Hello my&World-', '_', 'hello_my&world'],

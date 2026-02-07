@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-/* eslint-disable import/no-cycle */
-
 import { AfterViewInit, Directive, ElementRef, HostListener, Renderer2 } from '@angular/core';
 import { LayoutComponent } from './layout.component';
 

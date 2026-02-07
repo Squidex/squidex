@@ -112,9 +112,8 @@ export class TooltipDirective implements OnDestroy {
     private unsetAttribute() {
         try {
             this.renderer.setProperty(this.target, 'title', '');
-
             return true;
-        } catch (ex) {
+        } catch  {
             return false;
         }
     }

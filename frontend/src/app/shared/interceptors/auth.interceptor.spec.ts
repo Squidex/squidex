@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-/* eslint-disable deprecation/deprecation */
+
 
 import { Location } from '@angular/common';
 import { HttpErrorResponse, HttpEventType, HttpHeaders, HttpRequest } from '@angular/common/http';

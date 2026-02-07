@@ -13,7 +13,7 @@ import { createContributors } from '../services/contributors.service.spec';
 import { TestValues } from './_test-helpers';
 
 describe('ContributorsState', () => {
-    const { app, appsState, newVersion, version, } = TestValues;
+    const { app, appsState, newVersion, version } = TestValues;
 
     const allIds: number[] = [];
 

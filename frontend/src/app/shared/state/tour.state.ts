@@ -75,8 +75,6 @@ export class TourState extends State<Snapshot> {
                     });
                 }
             });
-
-            this.tourService.setDefaults(this.definition.defaults);
     }
 
     public complete() {

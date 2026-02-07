@@ -12,7 +12,7 @@ import { createRoles } from '../services/roles.service.spec';
 import { TestValues } from './_test-helpers';
 
 describe('RolesState', () => {
-    const { app, appsState, newVersion, version, } = TestValues;
+    const { app, appsState, newVersion, version } = TestValues;
 
     const oldRoles = createRoles(1, 2);
 

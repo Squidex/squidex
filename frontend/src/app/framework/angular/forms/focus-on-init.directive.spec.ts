@@ -37,7 +37,7 @@ describe('FocusOnInitDirective', () => {
             expect(isFocusCalled).toBeTruthy();
             expect(isSelectCalled).toBeFalsy();
 
-            ;
+
         }, 200);
     });
 
@@ -50,7 +50,7 @@ describe('FocusOnInitDirective', () => {
             expect(isFocusCalled).toBeTruthy();
             expect(isSelectCalled).toBeTruthy();
 
-            ;
+
         }, 200);
     });
 });

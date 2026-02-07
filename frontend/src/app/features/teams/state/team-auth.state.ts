@@ -21,9 +21,7 @@ interface Snapshot extends LoadingState {
     version: VersionTag;
 }
 
-@Injectable({
-    providedIn: 'any',
-})
+@Injectable()
 export class TeamAuthState extends State<Snapshot> {
     public scheme =
         this.project(x => x.scheme);

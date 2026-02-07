@@ -15,14 +15,14 @@ import { AssetScriptsState } from './asset-scripts.state';
 import 'src/spec/matchers';
 
 describe('AssetScriptsState', () => {
-    const { app, appsState, newVersion, version, } = TestValues;
+    const { app, appsState, newVersion, version } = TestValues;
 
     const oldScripts = createAssetScripts(1);
 
     let dialogs: IMock<DialogService>;
     let appsService: IMock<AppsService>;
     let assetScriptsState: AssetScriptsState;
-  
+
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
 

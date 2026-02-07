@@ -139,7 +139,7 @@ export class FileDropDirective {
                 const webkitEntry = item.webkitGetAsEntry();
 
                 if (webkitEntry && webkitEntry.isDirectory) {
-                    // eslint-disable-next-line no-await-in-loop
+
                     await this.traverseWebkitTree(webkitEntry, files);
                 }
             }
@@ -163,7 +163,7 @@ export class FileDropDirective {
             const entries = await getFilesPromise(item);
 
             for (const entry of entries) {
-                // eslint-disable-next-line no-await-in-loop
+
                 await this.traverseWebkitTree(entry, files);
             }
         }

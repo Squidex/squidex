@@ -49,7 +49,7 @@ export class AnnotateAssetForm extends Form<ExtendedFormGroup, AnnotateAssetDto,
             if (raw) {
                 try {
                     parsed = JSON.parse(raw);
-                } catch (ex) {
+                } catch {
                     parsed = raw;
                 }
             }

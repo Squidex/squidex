@@ -149,7 +149,7 @@ export function deserializeQuery(raw?: string): Query | undefined {
                 query = { fullText: raw };
             }
         }
-    } catch (ex) {
+    } catch {
         query = undefined;
     }
 

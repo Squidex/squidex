@@ -13,7 +13,7 @@ import { TestValues } from './_test-helpers';
 import { RuleSimulatorState } from './rule-simulator.state';
 
 describe('RuleSimulatorState', () => {
-    const { app, appsState, } = TestValues;
+    const { app, appsState } = TestValues;
 
     const oldSimulatedRuleEvents = new SimulatedRuleEventsDto({
         total: 200,

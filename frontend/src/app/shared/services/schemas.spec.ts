@@ -8,7 +8,7 @@
 import { createProperties, META_FIELDS, SchemaPropertiesDto } from '@app/shared/internal';
 import { TestValues } from '../state/_test-helpers';
 
-const { createField, createSchema, } = TestValues;
+const { createField, createSchema } = TestValues;
 
 describe('SchemaDto', () => {
     const field1 = createField({ properties: createProperties('Array'), id: 1 });

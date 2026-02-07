@@ -14,7 +14,7 @@ import { TestValues } from './_test-helpers';
 describe('TableSettings', () => {
     let uiState: IMock<UIState>;
 
-    const { createSchema, createField, } = TestValues;
+    const { createSchema, createField } = TestValues;
 
     const schema = createSchema({
         name: 'my-schema',

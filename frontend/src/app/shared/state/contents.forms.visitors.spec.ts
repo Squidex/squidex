@@ -9,7 +9,7 @@ import { DateHelper } from '@app/framework';
 import { createProperties, DateTime, FieldDefaultValue, FieldFormatter, FieldsValidators, HtmlValue } from '@app/shared/internal';
 import { TestValues } from './_test-helpers';
 
-const { createField, } = TestValues;
+const { createField } = TestValues;
 
 const now = DateTime.parseISO('2017-10-12T16:30:10Z');
 

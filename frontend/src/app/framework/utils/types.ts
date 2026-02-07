@@ -124,7 +124,7 @@ export module Types {
     }
 
     export function equals(lhs: any, rhs: any, lazyString = false) {
-        // eslint-disable-next-line no-self-compare
+
         if (lhs === rhs || (lhs !== lhs && rhs !== rhs)) {
             return true;
         }

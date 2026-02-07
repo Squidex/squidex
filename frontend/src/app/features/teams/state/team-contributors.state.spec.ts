@@ -14,7 +14,7 @@ import { AssignContributorDto, ContributorDto, ContributorsDto, DialogService, E
 import { TeamContributorsService, TeamContributorsState } from '../internal';
 
 describe('TeamContributorsState', () => {
-    const { team, teamsState, newVersion, version, } = TestValues;
+    const { team, teamsState, newVersion, version } = TestValues;
 
     const allIds: number[] = [];
 

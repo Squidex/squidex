@@ -12,7 +12,7 @@ import { createJob } from '../services/jobs.service.spec';
 import { TestValues } from './_test-helpers';
 
 describe('JobsState', () => {
-    const { app, appsState, } = TestValues;
+    const { app, appsState } = TestValues;
 
     const job1 = createJob(12);
     const job2 = createJob(13);

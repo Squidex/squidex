@@ -12,7 +12,7 @@ import { AuthSchemeDto, AuthSchemeResponseDto, DialogService, ResourceLinkDto, T
 import { TeamAuthState } from '../internal';
 
 describe('TeamAuthState', () => {
-    const { newVersion, team, teamsState, version, } = TestValues;
+    const { newVersion, team, teamsState, version } = TestValues;
 
     const scheme = new AuthSchemeDto({
         domain: 'squidex.io',

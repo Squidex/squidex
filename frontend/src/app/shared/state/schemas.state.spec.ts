@@ -14,7 +14,7 @@ import { getCategoryTree, SchemasState } from './schemas.state';
 import 'src/spec/matchers';
 
 describe('SchemasState', () => {
-    const { app, appsState, newVersion, } = TestValues;
+    const { app, appsState, newVersion } = TestValues;
 
     const schema1 = createSchema(1);
     const schema2 = createSchema(2);

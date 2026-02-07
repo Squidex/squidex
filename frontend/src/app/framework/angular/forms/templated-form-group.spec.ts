@@ -32,7 +32,7 @@ describe('TemplatedFormGroup', () => {
 
     type Test = [
         (value: any) => void,
-        string
+        string,
     ];
 
     const methods: Test[] = [

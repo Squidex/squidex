@@ -12,7 +12,7 @@ import { createClients } from '../services/clients.service.spec';
 import { TestValues } from './_test-helpers';
 
 describe('ClientsState', () => {
-    const { app, appsState, newVersion, version, } = TestValues;
+    const { app, appsState, newVersion, version } = TestValues;
 
     const oldClients = createClients(1, 2);
 

@@ -14,7 +14,7 @@ import { TestValues } from './_test-helpers';
 import { ComponentForm, FieldArrayForm } from './contents.forms';
 import { contentsTranslationStatus, contentTranslationStatus, fieldTranslationStatus, PartitionConfig } from './contents.forms-helpers';
 
-const { createField, createNestedField, createSchema, } = TestValues;
+const { createField, createNestedField, createSchema } = TestValues;
 
 describe('TranslationStatus', () => {
     const languages = [
@@ -1026,7 +1026,7 @@ describe('ContentForm', () => {
             const component = createSchema({
                 id: 1,
                 fields: [
-                    createField({ id: 11, properties: createProperties('String'), partitioning: 'invariant' })
+                    createField({ id: 11, properties: createProperties('String'), partitioning: 'invariant' }),
                 ],
             });
 
@@ -1177,8 +1177,7 @@ describe('ContentForm', () => {
                         expect(valueActual, `Expected ${key} of ${path} to be <${valueExpected}>, but found <${valueActual}>.`).toEqual(valueExpected);
                     }
                 }
-            }
-            else {
+            } else {
                 expect(form, `Expected to find form ${path}, but form not found.`).not.toBeNull();
             }
         }

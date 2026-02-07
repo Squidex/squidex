@@ -13,7 +13,7 @@ import { TestValues } from './_test-helpers';
 import { FlowView, RulesState } from './rules.state';
 
 describe('RulesState', () => {
-    const { app, appsState, newVersion, } = TestValues;
+    const { app, appsState, newVersion } = TestValues;
 
     const rule1 = createRule(1);
     const rule2 = createRule(2);
@@ -737,8 +737,7 @@ function cleanup<T>(value: T) {
         for (const item of value) {
             cleanup(item);
         }
-    }
-    else {
+    } else {
         for (const [key, nested] of Object.entries(value as any)) {
             if (nested === value) {
                 continue;
@@ -754,8 +753,7 @@ function cleanup<T>(value: T) {
 
             if (Types.isNull(nested) || Types.isUndefined(nested)) {
                 delete (value as any)[key];
-            }
-            else {
+            } else {
                 cleanup(nested);
             }
         }

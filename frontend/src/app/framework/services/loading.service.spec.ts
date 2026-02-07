@@ -75,7 +75,7 @@ describe('LoadingService', () => {
         setTimeout(() => {
             expect(state).toBeFalsy();
 
-            ;
+
         }, 400);
     });
 
@@ -93,7 +93,7 @@ describe('LoadingService', () => {
         setTimeout(() => {
             expect(state).toBeFalsy();
 
-            ;
+
         }, 400);
     });
 
@@ -113,7 +113,7 @@ describe('LoadingService', () => {
         setTimeout(() => {
             expect(state).toBeTruthy();
 
-            ;
+
         }, 400);
     });
 });

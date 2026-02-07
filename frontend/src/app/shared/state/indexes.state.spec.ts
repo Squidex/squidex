@@ -12,7 +12,7 @@ import { createIndex } from '../services/indexes.service.spec';
 import { TestValues } from './_test-helpers';
 
 describe('IndexesState', () => {
-    const { app, appsState, } = TestValues;
+    const { app, appsState } = TestValues;
 
     const index1 = createIndex(12);
     const index2 = createIndex(13);

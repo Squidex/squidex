@@ -25,9 +25,7 @@ interface Snapshot extends ListState<string> {
     canCreate?: boolean;
 }
 
-@Injectable({
-    providedIn: 'any',
-})
+@Injectable()
 export class TeamContributorsState extends State<Snapshot> {
     public contributors =
         this.project(x => x.contributors);

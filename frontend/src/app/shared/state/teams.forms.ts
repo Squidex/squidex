@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-/* eslint-disable no-useless-escape */
-
 import { UntypedFormControl, Validators } from '@angular/forms';
 import { ExtendedFormGroup, Form } from '@app/framework';
 import { CreateTeamDto, TeamDto, UpdateTeamDto } from '../model';

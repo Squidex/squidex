@@ -11,7 +11,7 @@ import { DialogService, PlanChangedDto, PlanDto, PlansDto, PlansService, PlansSt
 import { TestValues } from './_test-helpers';
 
 describe('PlansState', () => {
-    const { app, appsState, creator, newVersion, version, } = TestValues;
+    const { app, appsState, creator, newVersion, version } = TestValues;
 
     const oldPlans = new PlansDto({
         currentPlanId: 'free',

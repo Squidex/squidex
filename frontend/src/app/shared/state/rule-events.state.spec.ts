@@ -12,7 +12,7 @@ import { createRuleEvent } from '../services/rules.service.spec';
 import { TestValues } from './_test-helpers';
 
 describe('RuleEventsState', () => {
-    const { app, appsState, } = TestValues;
+    const { app, appsState } = TestValues;
 
     const oldRuleEvents = new RuleEventsDto({
         total: 200,

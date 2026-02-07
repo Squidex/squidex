@@ -23,7 +23,7 @@ export abstract class StatefulComponent<T extends {} = object> extends State<T> 
                 try {
                     this.changeDetector.detectChanges();
                 } catch {
-                    return;
+                  /* NOOP */
                 }
             });
     }

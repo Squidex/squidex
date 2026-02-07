@@ -15,7 +15,7 @@ import { TestValues } from './_test-helpers';
 import { ResolveContents } from './resolvers';
 
 describe('ResolveContents', () => {
-    const { app, appsState, } = TestValues;
+    const { app, appsState } = TestValues;
 
     const uiOptions = new UIOptions({
         referencesDropdownItemCount: 100,
@@ -48,7 +48,7 @@ describe('ResolveContents', () => {
         const promise = firstValueFrom(contentsResolver.resolveMany(ids));
         const result = await Promise.race([
           promise.then(() => 'resolved'),
-          new Promise(resolve => setTimeout(() => resolve('pending'), 1))
+          new Promise(resolve => setTimeout(() => resolve('pending'), 1)),
         ]);
 
         expect(result).toBe('pending');

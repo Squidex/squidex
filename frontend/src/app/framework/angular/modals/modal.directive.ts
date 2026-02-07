@@ -183,7 +183,7 @@ export class ModalDirective<T = unknown> implements OnDestroy {
             }
 
             return false;
-        } catch (ex) {
+        } catch {
             return false;
         }
     }

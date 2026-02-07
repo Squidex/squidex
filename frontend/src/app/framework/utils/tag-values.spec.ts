@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/object-curly-spacing */
 /*
  * Squidex Headless CMS
  *

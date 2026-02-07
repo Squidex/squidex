@@ -66,7 +66,7 @@ export module ValidatorsEx {
             if (v) {
                 try {
                     DateTime.parseISO(v);
-                } catch (e) {
+                } catch {
                     return { validdatetime: false };
                 }
             }

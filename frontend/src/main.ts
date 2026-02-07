@@ -89,6 +89,8 @@ if (environment.production) {
     enableProdMode();
 }
 
+const TASKS = buildTasks();
+
 bootstrapApplication(AppComponent, {
     providers: [
         provideCharts(withDefaultRegisterables()),
@@ -126,7 +128,7 @@ bootstrapApplication(AppComponent, {
         },
         {
           provide: UI_TOUR_OPTIONS,
-          useValue: {},
+          useValue: TASKS.defaults,
         },
         {
             provide: BaseTourService,

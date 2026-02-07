@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-/* eslint-disable no-template-curly-in-string */
-
 import { DateTime } from './date-time';
 import { interpolate } from './interpolator';
 
