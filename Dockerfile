@@ -71,7 +71,7 @@ COPY frontend .
 
 # Build Frontend
 RUN npm run lint \
- && npm run test:coverage \
+ && npm run test:coverage --no-file-parallelism \
  && npm run build
 
 RUN cp -a build /build/
