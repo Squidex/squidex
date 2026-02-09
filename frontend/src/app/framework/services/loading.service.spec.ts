@@ -63,45 +63,37 @@ describe('LoadingService', () => {
 
     it('should not unset from loaded delayed', async () => {
         const loadingService = new LoadingService(<any>{ events });
+        loadingService.scheduler = action => action();
 
         let state = false;
-
         loadingService.loading.subscribe(v => {
             state = v;
         });
         loadingService.startLoading('1');
         loadingService.completeLoading('1');
 
-        setTimeout(() => {
-            expect(state).toBeFalsy();
-
-
-        }, 400);
+        expect(state).toBeFalsy();
     });
 
     it('should not unset from loaded delayed on navigation event', async () => {
         const loadingService = new LoadingService(<any>{ events });
+        loadingService.scheduler = action => action();
 
         let state = false;
-
         loadingService.loading.subscribe(v => {
             state = v;
         });
         events.next(new NavigationStart(0, ''));
         events.next(new NavigationError(0, '', 0));
 
-        setTimeout(() => {
-            expect(state).toBeFalsy();
-
-
-        }, 400);
+        expect(state).toBeFalsy();
     });
 
     it('should set back to loaded after several completions', async () => {
         const loadingService = new LoadingService(<any>{ events });
+        loadingService.scheduler = action => action();
 
         let state = false;
-
         loadingService.loading.subscribe(v => {
             state = v;
         });
@@ -110,10 +102,6 @@ describe('LoadingService', () => {
         loadingService.completeLoading('1');
         loadingService.startLoading('2');
 
-        setTimeout(() => {
-            expect(state).toBeTruthy();
-
-
-        }, 400);
+        expect(state).toBeTruthy();
     });
 });

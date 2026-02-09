@@ -22,6 +22,10 @@ export class LoadingService implements OnDestroy {
         return this.loading$.pipe(map(x => x > 0));
     }
 
+    public scheduler: ((action: (() => void)) => void) = action => {
+        setTimeout(action, 250);
+    };
+
     constructor(router: Router) {
         this.routerSubscription =
             router.events.subscribe(event => {
@@ -54,13 +58,13 @@ export class LoadingService implements OnDestroy {
         if (this.loadingOperations[key]) {
             delete this.loadingOperations[key];
 
-            setTimeout(() => {
+            this.scheduler(() => {
                 const value = this.loading$.value;
 
                 if (value > 0) {
                     this.loading$.next(value - 1);
                 }
-            }, 250);
+            });
         }
     }
 }
