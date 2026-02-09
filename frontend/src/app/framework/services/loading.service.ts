@@ -23,7 +23,7 @@ export class LoadingService implements OnDestroy {
     }
 
     public scheduler: ((action: (() => void)) => void) = action => {
-        setTimeout(action, 250);
+        setTimeout(action, 200);
     };
 
     constructor(router: Router) {

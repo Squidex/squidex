@@ -22,9 +22,9 @@ describe('LoadingService', () => {
 
     it('should set to loaded', () => {
         const loadingService = new LoadingService(<any>{ events });
+        loadingService.scheduler = action => action();
 
         let state = false;
-
         loadingService.loading.subscribe(v => {
             state = v;
         });
@@ -35,9 +35,9 @@ describe('LoadingService', () => {
 
     it('should set to loaded on navigation start', () => {
         const loadingService = new LoadingService(<any>{ events });
+        loadingService.scheduler = action => action();
 
         let state = false;
-
         loadingService.loading.subscribe(v => {
             state = v;
         });
@@ -51,7 +51,6 @@ describe('LoadingService', () => {
         const loadingService = new LoadingService(<any>{ events });
 
         let state = false;
-
         loadingService.loading.subscribe(v => {
             state = v;
         });
@@ -94,6 +93,7 @@ describe('LoadingService', () => {
         loadingService.scheduler = action => action();
 
         let state = false;
+
         loadingService.loading.subscribe(v => {
             state = v;
         });
