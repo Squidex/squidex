@@ -98,8 +98,6 @@
     "@typescript-eslint/parser": "^8.54.0",
     "copy-webpack-plugin": "^13.0.1",
     "eslint": "^9.39.2",
-    "eslint-config-airbnb-typescript": "18.0.0",
-    "eslint-plugin-deprecation": "^3.0.0",
     "eslint-plugin-import": "2.32.0",
     "eslint-plugin-jsx-a11y": "6.10.2",
     "eslint-plugin-storybook": "^10.2.7",
@@ -113,7 +111,7 @@
     "stylelint-scss": "7.0.0",
     "typescript": "5.9.3",
     "vite-tsconfig-paths": "^6.0.5",
-    "vitest": "^4.0.18"
+    "vitest": "^4.0.8"
   },
   "overrides": {
     "ng2-charts": {
