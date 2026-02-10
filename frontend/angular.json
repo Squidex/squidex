@@ -170,7 +170,12 @@
           "defaultConfiguration": "development"
         },
         "test": {
-          "builder": "@angular/build:unit-test"
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "tsConfig": "./tsconfig.spec.json",
+            "runnerConfig": "vitest.config.js",
+            "setupFiles": ["./src/test-setup.ts"]
+          }
         },
         "storybook": {
           "builder": "@storybook/angular:start-storybook",

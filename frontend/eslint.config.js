@@ -4,7 +4,6 @@ const {
 
 const globals = require("globals");
 const tsParser = require("@typescript-eslint/parser");
-const deprecation = require("eslint-plugin-deprecation");
 const importPlugin = require("eslint-plugin-import");
 const typescriptEslint = require("@typescript-eslint/eslint-plugin");
 
@@ -42,7 +41,6 @@ module.exports = defineConfig([{
   ),
 
   plugins: {
-    deprecation,
     import: importPlugin,
     "@typescript-eslint": typescriptEslint,
   },

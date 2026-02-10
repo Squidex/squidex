@@ -18,6 +18,10 @@ export class FocusOnInitDirective implements AfterViewInit {
     @Input({ alias: 'sqxFocusOnInit', transform: booleanAttribute })
     public enabled = true;
 
+    public scheduler: ((action: (() => void)) => void) = action => {
+        setTimeout(action, 200);
+    };
+
     constructor(
         private readonly element: ElementRef<HTMLElement>,
     ) {
@@ -28,7 +32,7 @@ export class FocusOnInitDirective implements AfterViewInit {
             return;
         }
 
-        setTimeout(() => {
+        this.scheduler(() => {
             if (Types.isFunction(this.element.nativeElement.focus)) {
                 this.element.nativeElement.focus();
             }
@@ -40,6 +44,6 @@ export class FocusOnInitDirective implements AfterViewInit {
                     input.select();
                 }
             }
-        }, 100);
+        });
     }
 }
