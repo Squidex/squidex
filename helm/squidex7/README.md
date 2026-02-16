@@ -140,7 +140,10 @@ The command removes all the Kubernetes components associated with the chart and 
 | `mongodb.persistence.storageClass` | The storage class for the persistent volume claim.         | `""`                |
 | `mongodb.persistence.accessModes`  | Persistent volume access modes.                            | `["ReadWriteOnce"]` |
 | `mongodb.persistence.size`         | Persistent volume size.                                    | `10Gi`              |
-
+| `extraSecrets`                     | Extra secrets, bound as `envFrom`                          | `[]`                |
+| `extraConfigMaps`                  | Extra configMaps, bound as `envFrom`                       | `[]`                |
+| `extraVolumes`                     | Extra volumes bound to the pod                             | `[]`                |
+| `extraVolumeMounts`                | Extra volumes mounted into the main container              | `[]`                |
 
 Parameters are generated with: https://github.com/bitnami-labs/readme-generator-for-helm#configuration-file
 
