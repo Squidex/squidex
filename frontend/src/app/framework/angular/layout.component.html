@@ -63,14 +63,14 @@
                             <ng-container *ngTemplateOutlet="menuTemplate"></ng-container>
                         </div>
                     </div>
-                    <button class="btn panel2-collapse" attr.aria-label="{{ 'common.expand' | sqxTranslate }}" (click)="toggle()" sqxStopClick>
-                        @if (displayMode === 'Collapsed' && expandedWidth > 0) {
+                    <button class="btn panel2-collapse" attr.aria-label="{{ 'common.togglePanel' | sqxTranslate }}" (click)="toggle()" sqxStopClick>
+                        @if (displayMode === "Collapsed" && expandedWidth > 0) {
                             <i class="icon-angle-right"></i>
-                        } @else if (displayMode === 'Collapsed') {
+                        } @else if (displayMode === "Collapsed") {
                             <i class="icon-angle-right"></i>
-                        } @else if (displayMode === 'Normal') {
+                        } @else if (displayMode === "Normal") {
                             <i class="icon-angle-left"></i>
-                        }  @else if (displayMode === 'Expanded') {
+                        } @else if (displayMode === "Expanded") {
                             <i class="icon-angle-left"></i>
                         }
                     </button>
