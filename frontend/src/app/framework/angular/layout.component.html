@@ -39,7 +39,12 @@
     }
 
     @if (layout === "left") {
-        <div class="panel2-slice left" [class.collapsed]="isCollapsed" (click)="expand($event)" [style.maxWidth]="desiredWidth" [style.minWidth]="desiredWidth">
+        <div
+            class="panel2-slice left"
+            [class.collapsed]="displayMode === 'Collapsed'"
+            (click)="switchToNormalFromDiv($event)"
+            [style.maxWidth]="desiredWidth"
+            [style.minWidth]="desiredWidth">
             @if (!hideHeader) {
                 <div class="panel2-header left">
                     <div class="panel2-header-inner left">
@@ -58,9 +63,18 @@
                             <ng-container *ngTemplateOutlet="menuTemplate"></ng-container>
                         </div>
                     </div>
-                    <button class="btn panel2-collapse" attr.aria-label="{{ 'common.collapse' | sqxTranslate }}" (click)="toggle()" sqxStopClick>
-                        <i class="icon-angle-left"></i>
+                    <button class="btn panel2-collapse" attr.aria-label="{{ 'common.expand' | sqxTranslate }}" (click)="toggle()" sqxStopClick>
+                        @if (displayMode === 'Collapsed' && expandedWidth > 0) {
+                            <i class="icon-angle-right"></i>
+                        } @else if (displayMode === 'Collapsed') {
+                            <i class="icon-angle-right"></i>
+                        } @else if (displayMode === 'Normal') {
+                            <i class="icon-angle-left"></i>
+                        }  @else if (displayMode === 'Expanded') {
+                            <i class="icon-angle-left"></i>
+                        }
                     </button>
+
                     <div class="panel2-sidebar-title">{{ titleCollapsed || titleText | sqxTranslate }}</div>
                 </div>
             }
@@ -130,6 +144,6 @@
     <ng-template #titleTemplate> <ng-content select="[title]"></ng-content> </ng-template>
 
     <ng-template #menuTemplate> <ng-content select="[menu]"></ng-content> </ng-template>
-    
+
     <ng-template #headerTemplate> <ng-content select="[header]"></ng-content> </ng-template>
 </div>
