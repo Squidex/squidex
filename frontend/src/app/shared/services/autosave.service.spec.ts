@@ -22,15 +22,11 @@ describe('AutoSaveService', () => {
     it('should remove unsaved created content', () => {
         autoSaveService.remove({ schemaId: '1', schemaVersion: 2 });
 
-        expect().nothing();
-
         localStore.verify(x => x.remove('autosave.1-2'), Times.once());
     });
 
     it('should remove unsaved edited content', () => {
         autoSaveService.remove({ schemaId: '1', schemaVersion: 2, contentId: '3' });
-
-        expect().nothing();
 
         localStore.verify(x => x.remove('autosave.1-2.3'), Times.once());
     });
@@ -38,15 +34,11 @@ describe('AutoSaveService', () => {
     it('should not remove content if key is not defined', () => {
         autoSaveService.remove(null!);
 
-        expect().nothing();
-
         localStore.verify(x => x.remove(It.isAnyString()), Times.never());
     });
 
     it('should save unsaved created content', () => {
         autoSaveService.set({ schemaId: '1', schemaVersion: 2 }, { text: 'Hello' });
-
-        expect().nothing();
 
         localStore.verify(x => x.set('autosave.1-2', '{"text":"Hello"}'), Times.once());
     });
@@ -54,23 +46,17 @@ describe('AutoSaveService', () => {
     it('should save unsaved edited content', () => {
         autoSaveService.set({ schemaId: '1', schemaVersion: 2, contentId: '3' }, { text: 'Hello' });
 
-        expect().nothing();
-
         localStore.verify(x => x.set('autosave.1-2.3', '{"text":"Hello"}'), Times.once());
     });
 
     it('should not save content if key is not defined', () => {
         autoSaveService.set(null!, { text: 'Hello' });
 
-        expect().nothing();
-
         localStore.verify(x => x.set(It.isAnyString(), It.isAnyString()), Times.never());
     });
 
     it('should not save content if content is not defined', () => {
         autoSaveService.set({ schemaId: '1', schemaVersion: 2 }, null!);
-
-        expect().nothing();
 
         localStore.verify(x => x.set(It.isAnyString(), It.isAnyString()), Times.never());
     });

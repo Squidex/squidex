@@ -10,7 +10,7 @@
     "forceConsistentCasingInFileNames": true,
     "importHelpers": true,
     "module": "es2020",
-    "moduleResolution": "node",
+    "moduleResolution": "bundler",
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
     "noUnusedLocals": true,
@@ -32,10 +32,17 @@
     },
     "useDefineForClassFields": false
   },
+  "files": [],
+  "include": [],
   "angularCompilerOptions": {
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
     "strictTemplates": true
-  }
+  },
+  "references": [{
+    "path": "./tsconfig.app.json",
+  }, {
+    "path": "./tsconfig.spec.json",
+  }]
 }

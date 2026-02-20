@@ -8,7 +8,7 @@
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { AppDto, AvatarComponent, ConfirmClickDirective, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, StopClickDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { AppDto, AvatarComponent, ConfirmClickDirective, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, Settings, StopClickDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-app',
@@ -35,4 +35,16 @@ export class AppComponent {
     public leave = new EventEmitter<AppDto>();
 
     public dropdown = new ModalModel();
+
+    public get canShowContents() {
+        return this.app.canAccessContent;
+    }
+
+    public get canShowAssets() {
+        return this.app.canReadAssets && this.app.roleProperties[Settings.AppProperties.HIDE_ASSETS] !== true;
+    }
+
+    public get canShowSettings() {
+        return this.app.roleProperties[Settings.AppProperties.HIDE_SETTINGS] !== true;
+    }
 }

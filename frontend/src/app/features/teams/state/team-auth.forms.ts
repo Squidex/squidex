@@ -5,8 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-/* eslint-disable no-useless-escape */
-
 import { UntypedFormControl, Validators } from '@angular/forms';
 import { map, shareReplay } from 'rxjs/operators';
 import { ExtendedFormGroup, Form, value$ } from '@app/framework';

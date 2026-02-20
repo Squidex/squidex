@@ -5,9 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-/* eslint-disable @typescript-eslint/no-implied-eval */
-/* eslint-disable no-useless-return */
-
 import { AbstractControl, ValidatorFn } from '@angular/forms';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
@@ -276,7 +273,7 @@ export abstract class AbstractContentForm<T extends AnyFieldDto, TForm extends A
     }
 
     protected updateCustomState(_context: RuleContext, _itemData: any, _state: AbstractContentFormState): void {
-        return;
+
     }
 }
 

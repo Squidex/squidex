@@ -3,8 +3,7 @@
 
 .table-items-row {
     border-left-width: 4px;
-    overflow-x: hidden;
-    overflow-y: hidden;
+    padding-bottom: 1.5rem;
     padding-top: 1.125rem;
 }
 
@@ -22,12 +21,10 @@
 
 .change-marker-host {
     position: relative;
-    overflow-x: visible;
-    overflow-y: visible;
 }
 
 .change-marker {
-    @include absolute(-.5rem, null, null, 1rem);
+    @include absolute(-1.5rem, null, null, 0);
     background: $color-white;
     border: 1px solid $color-border;
     border-radius: $border-radius;

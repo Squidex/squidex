@@ -6,7 +6,6 @@
  */
 
 import { Component, inject, Input } from '@angular/core';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { ConfirmClickDirective, DialogRendererComponent, DialogService, ErrorDto, LocalizerService, RootViewComponent, TooltipDirective } from '@app/framework';
 
@@ -18,10 +17,7 @@ type TestMode = 'ErrorText' | 'ErrorDetails' | 'Info';
         <button class="btn btn-primary" (click)="test()">
             Show {{ mode }}
         </button>
-    `,
-    imports: [
-        DialogRendererComponent,
-    ],
+    `
 })
 class TestComponent {
     public readonly dialogs = inject(DialogService);
@@ -57,7 +53,6 @@ export default {
     decorators: [
         moduleMetadata({
             imports: [
-                BrowserAnimationsModule,
                 ConfirmClickDirective,
                 RootViewComponent,
                 TestComponent,

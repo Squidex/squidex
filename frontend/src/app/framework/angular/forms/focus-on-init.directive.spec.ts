@@ -28,29 +28,23 @@ describe('FocusOnInitDirective', () => {
         isSelectCalled = false;
     });
 
-    it('should call focus on element if init', (cb) => {
+    it('should call focus on element if init', async () => {
         const directive = new FocusOnInitDirective(element);
+        directive.scheduler = action => action();
         directive.select = false;
         directive.ngAfterViewInit();
 
-        setTimeout(() => {
-            expect(isFocusCalled).toBeTruthy();
-            expect(isSelectCalled).toBeFalsy();
-
-            cb();
-        }, 200);
+        expect(isFocusCalled).toBeTruthy();
+        expect(isSelectCalled).toBeFalsy();
     });
 
-    it('should call select on element if init', (cb) => {
+    it('should call select on element if init', async () => {
         const directive = new FocusOnInitDirective(element);
+        directive.scheduler = action => action();
         directive.select = true;
         directive.ngAfterViewInit();
 
-        setTimeout(() => {
-            expect(isFocusCalled).toBeTruthy();
-            expect(isSelectCalled).toBeTruthy();
-
-            cb();
-        }, 200);
+        expect(isFocusCalled).toBeTruthy();
+        expect(isSelectCalled).toBeTruthy();
     });
 });

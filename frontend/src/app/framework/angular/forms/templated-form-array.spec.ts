@@ -36,7 +36,10 @@ describe('TemplatedFormArray', () => {
         formArray = new TemplatedFormArray(formTemplate);
     });
 
-    type Test = [ (value: any) => void, string];
+    type Test = [
+        (value: any) => void,
+        string,
+    ];
 
     const methods: Test[] = [
         [x => formArray.setValue(x), 'setValue'],
@@ -47,10 +50,10 @@ describe('TemplatedFormArray', () => {
     methods.forEach(([method, name]) => {
         it(`Should call template to construct items for ${name}`, () => {
             const value1 = [{
-                value: 1,
-            }, {
-                value: 2,
-            }];
+                    value: 1,
+                }, {
+                    value: 2,
+                }];
 
             method(value1);
 
@@ -59,20 +62,20 @@ describe('TemplatedFormArray', () => {
 
         it(`Should call template to remove items for ${name}`, () => {
             const value1 = [{
-                value: 1,
-            }, {
-                value: 2,
-            }, {
-                value: 3,
-            }, {
-                value: 4,
-            }];
+                    value: 1,
+                }, {
+                    value: 2,
+                }, {
+                    value: 3,
+                }, {
+                    value: 4,
+                }];
 
             const value2 = [{
-                value: 1,
-            }, {
-                value: 2,
-            }];
+                    value: 1,
+                }, {
+                    value: 2,
+                }];
 
             method(value1);
             method(value2);
@@ -84,10 +87,10 @@ describe('TemplatedFormArray', () => {
 
         it(`Should call template to clear items with undefined for ${name}`, () => {
             const value1 = [{
-                value: 1,
-            }, {
-                value: 2,
-            }];
+                    value: 1,
+                }, {
+                    value: 2,
+                }];
 
             method(value1);
             method(undefined);
@@ -99,10 +102,10 @@ describe('TemplatedFormArray', () => {
 
         it(`Should call template to clear items with empty array for ${name}`, () => {
             const value1 = [{
-                value: 1,
-            }, {
-                value: 2,
-            }];
+                    value: 1,
+                }, {
+                    value: 2,
+                }];
 
             method(value1);
             method([]);
@@ -118,10 +121,10 @@ describe('TemplatedFormArray', () => {
         formArray.add();
 
         expect(formArray.value).toEqual([{
-            value: null,
-        }, {
-            value: null,
-        }]);
+                value: null,
+            }, {
+                value: null,
+            }]);
     });
 
     it('should call template when cleared', () => {

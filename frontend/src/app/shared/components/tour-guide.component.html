@@ -1,7 +1,7 @@
 @if ((tourState.status | async) === "Started") {
     <div class="tour">
         @if (!snapshot.isCollapsed) {
-            <div class="card" @fade>
+            <div class="card" animate.enter="fade-in" animate.leave="fade-out">
                 <div class="card-header">
                     <div class="row align-items-center">
                         <div class="col">{{ "tour.guide-title" | sqxTranslate }}</div>

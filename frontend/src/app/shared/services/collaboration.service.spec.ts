@@ -30,7 +30,7 @@ describe('CollaborationService', () => {
         });
 
         collaborationService.providerFactory = (_, doc) => {
-            collaborationProvider = { awareness: new Awareness(doc), doc, destroy: () => {} };
+            collaborationProvider = { awareness: new Awareness(doc), doc, destroy: () => { } };
 
             return collaborationProvider;
         };
@@ -99,7 +99,7 @@ describe('CollaborationService', () => {
             state.add(2);
         });
 
-        expect(items).toEqual([ 1, 2]);
+        expect(items).toEqual([1, 2]);
     });
 
     it('should replace in array', () => {
@@ -115,7 +115,7 @@ describe('CollaborationService', () => {
             state.set(0, 42);
         });
 
-        expect(items).toEqual([ 42, 2]);
+        expect(items).toEqual([42, 2]);
     });
 
     it('should remove from array', () => {
@@ -131,7 +131,7 @@ describe('CollaborationService', () => {
             state.remove(0);
         });
 
-        expect(items).toEqual([ 2]);
+        expect(items).toEqual([2]);
     });
 
     it('should provide one awareness per user', () => {

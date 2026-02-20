@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-export * from './angular/animations';
 export * from './angular/drag-helper';
 export * from './angular/routers/router-utils';
 export * from './angular/stateful.component';

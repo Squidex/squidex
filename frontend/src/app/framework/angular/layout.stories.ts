@@ -145,7 +145,7 @@ export const Complex: Story = {
         template: `
             <sqx-root-view>
                 <div sqxLayoutContainer>
-                    <sqx-layout titleText="Left" layout="left" width="15">
+                    <sqx-layout titleText="Left" layout="left" width="15" expandedWidth="30">
                         <div>
                             <sqx-list-view>
                                 <div class="card">

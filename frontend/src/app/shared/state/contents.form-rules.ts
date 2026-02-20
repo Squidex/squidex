@@ -6,7 +6,7 @@
  */
 
 /* eslint-disable @typescript-eslint/no-implied-eval */
-/* eslint-disable no-useless-return */
+
 
 import { Types } from '@app/framework';
 import { FieldDto, FieldRuleDto, NestedFieldDto, SchemaDto } from './../model';

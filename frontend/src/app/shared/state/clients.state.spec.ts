@@ -12,12 +12,7 @@ import { createClients } from '../services/clients.service.spec';
 import { TestValues } from './_test-helpers';
 
 describe('ClientsState', () => {
-    const {
-        app,
-        appsState,
-        newVersion,
-        version,
-    } = TestValues;
+    const { app, appsState, newVersion, version } = TestValues;
 
     const oldClients = createClients(1, 2);
 
@@ -65,8 +60,6 @@ describe('ClientsState', () => {
                 .returns(() => of(versioned(version, oldClients))).verifiable();
 
             clientsState.load(true).subscribe();
-
-            expect().nothing();
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });

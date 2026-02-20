@@ -16,8 +16,6 @@ import { AppsState } from './apps.state';
 import { SavedQuery } from './queries';
 import { SchemasState } from './schemas.state';
 
-/* eslint-disable @typescript-eslint/no-throw-literal */
-
 interface Snapshot extends ListState<Query> {
     // The current contents.
     contents: ReadonlyArray<ContentDto>;

@@ -1,6 +1,6 @@
 <div
     class="comment row g-0"
-    [@bounce]="commentItem.isSelected"
+    [class.bounce]="commentItem.isSelected"
     [class.reply]="commentItem.comment.replyTo"
     [class.selected]="commentItem.isSelected"
     [sqxScrollActive]="true"

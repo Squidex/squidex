@@ -92,13 +92,9 @@ describe('MarkdownDirective', () => {
 
     function verifyTextRender(text: string) {
         renderer.verify(x => x.setProperty(It.isAny(), 'textContent', text), Times.once());
-
-        expect().nothing();
     }
 
     function verifyHtmlRender(text: string) {
         renderer.verify(x => x.setProperty(It.isAny(), 'innerHTML', text), Times.once());
-
-        expect().nothing();
     }
 });

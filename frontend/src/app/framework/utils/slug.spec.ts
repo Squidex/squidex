@@ -9,7 +9,11 @@ import { generateSlug } from './slug';
 
 describe('generateSlug', () => {
     describe('Should replace special characters with separator', () => {
-        const cases: Array<[string, string, string]> = [
+        const cases: Array<[
+            string,
+            string,
+            string,
+        ]> = [
             ['Hello World', '-', 'hello-world'],
             ['Hello/World', '-', 'hello-world'],
             ['Hello World', '_', 'hello_world'],
@@ -27,7 +31,10 @@ describe('generateSlug', () => {
     });
 
     describe('Should replace multi-char diacritics', () => {
-        const cases: Array<[string, string]> = [
+        const cases: Array<[
+            string,
+            string,
+        ]> = [
             ['ö', 'oe'],
             ['ü', 'ue'],
             ['ä', 'ae'],
@@ -41,7 +48,10 @@ describe('generateSlug', () => {
     });
 
     describe('Should not replace multi-char diacritics', () => {
-        const cases: Array<[string, string]> = [
+        const cases: Array<[
+            string,
+            string,
+        ]> = [
             ['ö', 'o'],
             ['ü', 'u'],
             ['ä', 'a'],
@@ -55,7 +65,10 @@ describe('generateSlug', () => {
     });
 
     describe('Should replace single-char diacritics', () => {
-        const cases: Array<[string, string]> = [
+        const cases: Array<[
+            string,
+            string,
+        ]> = [
             ['Físh', 'fish'],
             ['źish', 'zish'],
             ['żish', 'zish'],
@@ -72,7 +85,11 @@ describe('generateSlug', () => {
     });
 
     describe('Should keep characters', () => {
-        const cases: Array<[string, string, string]> = [
+        const cases: Array<[
+            string,
+            string,
+            string,
+        ]> = [
             ['Hello my&World ', '_', 'hello_my&world'],
             ['Hello my&World-', '_', 'hello_my&world'],
             ['Hello my/World_', '_', 'hello_my/world'],

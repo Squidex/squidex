@@ -12,10 +12,7 @@ import { createRuleEvent } from '../services/rules.service.spec';
 import { TestValues } from './_test-helpers';
 
 describe('RuleEventsState', () => {
-    const {
-        app,
-        appsState,
-    } = TestValues;
+    const { app, appsState } = TestValues;
 
     const oldRuleEvents = new RuleEventsDto({
         total: 200,
@@ -62,8 +59,6 @@ describe('RuleEventsState', () => {
     it('should show notification on load if reload is true', () => {
         ruleEventsState.load(true).subscribe();
 
-        expect().nothing();
-
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
     });
 
@@ -73,31 +68,25 @@ describe('RuleEventsState', () => {
 
         ruleEventsState.page({ page: 1, pageSize: 30 }).subscribe();
 
-        expect().nothing();
-
         rulesService.verify(x => x.getEvents(app, 30, 30, undefined), Times.once());
         rulesService.verify(x => x.getEvents(app, 30, 0, undefined), Times.once());
     });
 
     it('should load with rule id if filtered', () => {
         rulesService.setup(x => x.getEvents(app, 30, 0, '12'))
-        .returns(() => of(new RuleEventsDto({ items: [], total: 200, _links: {} })));
+            .returns(() => of(new RuleEventsDto({ items: [], total: 200, _links: {} })));
 
         ruleEventsState.filterByRule('12').subscribe();
-
-        expect().nothing();
 
         rulesService.verify(x => x.getEvents(app, 30, 0, '12'), Times.once());
     });
 
     it('should not load again if rule id has not changed', () => {
         rulesService.setup(x => x.getEvents(app, 30, 0, '12'))
-        .returns(() => of(new RuleEventsDto({ items: [], total: 200, _links: {} })));
+            .returns(() => of(new RuleEventsDto({ items: [], total: 200, _links: {} })));
 
         ruleEventsState.filterByRule('12').subscribe();
         ruleEventsState.filterByRule('12').subscribe();
-
-        expect().nothing();
 
         rulesService.verify(x => x.getEvents(app, 30, 0, '12'), Times.once());
     });
@@ -108,8 +97,6 @@ describe('RuleEventsState', () => {
 
         ruleEventsState.enqueue(oldRuleEvents.items[0]).subscribe();
 
-        expect().nothing();
-
         rulesService.verify(x => x.enqueueEvent(app, oldRuleEvents.items[0]), Times.once());
     });
 
@@ -119,8 +106,6 @@ describe('RuleEventsState', () => {
 
         ruleEventsState.cancel(oldRuleEvents.items[0]).subscribe();
 
-        expect().nothing();
-
         rulesService.verify(x => x.cancelEvents(app, oldRuleEvents.items[0]), Times.once());
     });
 
@@ -129,8 +114,6 @@ describe('RuleEventsState', () => {
             .returns(() => of({}));
 
         ruleEventsState.cancelAll().subscribe();
-
-        expect().nothing();
 
         rulesService.verify(x => x.cancelEvents(app, It.isAny()), Times.once());
     });

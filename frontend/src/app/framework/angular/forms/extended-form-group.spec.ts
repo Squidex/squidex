@@ -25,21 +25,21 @@ describe('ExtendedFormGroup', () => {
 
 describe('UndefinableFormGroup', () => {
     const tests = [{
-        name: 'undefined (on)',
-        undefinable: true,
-        valueExpected: undefined,
-        valueActual: undefined,
-    }, {
-        name: 'defined (on)',
-        undefinable: true,
-        valueExpected: { field: 1 },
-        valueActual: { field: 1 },
-    }, {
-        name: 'defined (off)',
-        undefinable: false,
-        valueExpected: { field: 1 },
-        valueActual: { field: 1 },
-    }];
+            name: 'undefined (on)',
+            undefinable: true,
+            valueExpected: undefined,
+            valueActual: undefined,
+        }, {
+            name: 'defined (on)',
+            undefinable: true,
+            valueExpected: { field: 1 },
+            valueActual: { field: 1 },
+        }, {
+            name: 'defined (off)',
+            undefinable: false,
+            valueExpected: { field: 1 },
+            valueActual: { field: 1 },
+        }];
 
     it('should initialize with undefined', () => {
         const control = new UndefinableFormGroup();

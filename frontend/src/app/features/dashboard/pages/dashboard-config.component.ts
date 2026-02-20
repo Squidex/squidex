@@ -8,7 +8,7 @@
 
 import { booleanAttribute, Component, EventEmitter, Input, Output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { GridsterItem } from 'angular-gridster2';
+import { GridsterItemConfig } from 'angular-gridster2';
 import { take } from 'rxjs/operators';
 import { AppDto, AppsState, AuthService, CodeEditorComponent, ConfirmClickDirective, DialogModel, DialogService, DropdownMenuComponent, LocalizerService, ModalDialogComponent, ModalDirective, ModalModel, ModalPlacementDirective, TooltipDirective, TranslatePipe, TypedSimpleChanges, Types, UIState } from '@app/shared';
 
@@ -33,24 +33,24 @@ export class DashboardConfigComponent {
     public app!: AppDto;
 
     @Input({ required: true })
-    public config!: GridsterItem[];
+    public config!: GridsterItemConfig[];
 
     @Input()
-    public configDefaults!: GridsterItem[];
+    public configDefaults!: GridsterItemConfig[];
 
     @Input()
-    public configAvailable!: GridsterItem[];
+    public configAvailable!: GridsterItemConfig[];
 
     @Input({ transform: booleanAttribute })
     public needsAttention?: boolean | null;
 
     @Output()
-    public configChange = new EventEmitter<GridsterItem[]>();
+    public configChange = new EventEmitter<GridsterItemConfig[]>();
 
-    public configOptions: ReadonlyArray<GridsterItem> = [];
+    public configOptions: ReadonlyArray<GridsterItemConfig> = [];
 
     public expertDialog = new DialogModel();
-    public expertConfig?: GridsterItem[];
+    public expertConfig?: GridsterItemConfig[];
 
     public dropdownModal = new ModalModel();
 
@@ -113,7 +113,7 @@ export class DashboardConfigComponent {
         this.dialogs.notifyInfo('i18n:dashboard.configSaved');
     }
 
-    public addOrRemove(item: GridsterItem) {
+    public addOrRemove(item: GridsterItemConfig) {
         const current = this.config.find(x => x.type === item.type);
 
         if (current) {
@@ -133,7 +133,7 @@ export class DashboardConfigComponent {
         }
     }
 
-    public isSelected(item: GridsterItem) {
+    public isSelected(item: GridsterItemConfig) {
         return this.config.find(x => x.type === item.type);
     }
 }

@@ -91,10 +91,8 @@ describe('MarkdownTransform', () => {
     it('should transform multiple images', async () => {
         const md = `
 # Header 1
-
 ![Alt1](https://squidex.io/image1.png "Picture1")
 ![Alt2](https://squidex.io/image2.png "Picture2")
-
 ## Header 2
 `;
 
@@ -102,10 +100,8 @@ describe('MarkdownTransform', () => {
 
         expect(result).toEqual(`
 # Header 1
-
 ![Alt1](https://squidex.io/image1.png?transformed "Picture1")
 ![Alt2](https://squidex.io/image2.png?transformed "Picture2")
-
 ## Header 2
 `);
     });

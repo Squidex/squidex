@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { LocalizerService, ResizeService } from '@app/framework/internal';
 import { MenuItemComponent } from './menu-item.component';
@@ -33,7 +32,6 @@ export default {
     decorators: [
         moduleMetadata({
             imports: [
-                BrowserAnimationsModule,
                 MenuItemComponent,
                 RootViewComponent,
             ],

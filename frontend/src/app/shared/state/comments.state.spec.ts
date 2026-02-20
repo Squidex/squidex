@@ -147,7 +147,7 @@ describe('CommentsState', () => {
             items = result;
         });
 
-        commentsState.updateAnnotations('2', [{  id: '2', from: 13, to: 52 }]);
+        commentsState.updateAnnotations('2', [{ id: '2', from: 13, to: 52 }]);
 
         expect(items).toEqual([
             { id: '1', editorId: '1', from: 11, to: 12 } as any,

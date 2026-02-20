@@ -13,12 +13,7 @@ import { createContributors } from '../services/contributors.service.spec';
 import { TestValues } from './_test-helpers';
 
 describe('ContributorsState', () => {
-    const {
-        app,
-        appsState,
-        newVersion,
-        version,
-    } = TestValues;
+    const { app, appsState, newVersion, version } = TestValues;
 
     const allIds: number[] = [];
 
@@ -72,8 +67,6 @@ describe('ContributorsState', () => {
         it('should not load if already loaded', () => {
             contributorsState.load(true).subscribe();
             contributorsState.loadIfNotLoaded().subscribe();
-
-            expect().nothing();
         });
 
         it('should only show current page of contributors', () => {
@@ -123,8 +116,6 @@ describe('ContributorsState', () => {
         it('should show notification on load if reload is true', () => {
             contributorsState.load(true).subscribe();
 
-            expect().nothing();
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
     });
@@ -155,13 +146,11 @@ describe('ContributorsState', () => {
 
             let error: ErrorDto;
 
-            contributorsState.assign(request).pipe(
-                catchError(err => {
-                    error = err;
+            contributorsState.assign(request).pipe(catchError(err => {
+                error = err;
 
-                    return EMPTY;
-                }),
-            ).subscribe();
+                return EMPTY;
+            })).subscribe();
 
             expect(error!.message).toBe('i18n:contributors.userNotFound');
         });
@@ -174,13 +163,11 @@ describe('ContributorsState', () => {
 
             let error: ErrorDto;
 
-            contributorsState.assign(request).pipe(
-                catchError(err => {
-                    error = err;
+            contributorsState.assign(request).pipe(catchError(err => {
+                error = err;
 
-                    return EMPTY;
-                }),
-            ).subscribe();
+                return EMPTY;
+            })).subscribe();
 
             expect(error!.message).toBe('500');
         });

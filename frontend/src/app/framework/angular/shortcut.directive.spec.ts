@@ -23,15 +23,11 @@ describe('ShortcutDirective', () => {
     it('should init without keys', () => {
         shortcutDirective.shortcut = null!;
         shortcutDirective.ngOnInit();
-
-        expect().nothing();
     });
 
     it('should destroy without keys', () => {
         shortcutDirective.shortcut = null!;
         shortcutDirective.ngOnDestroy();
-
-        expect().nothing();
     });
 
     it('should raise event if triggered', () => {

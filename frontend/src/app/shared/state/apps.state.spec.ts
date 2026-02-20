@@ -57,16 +57,12 @@ describe('AppsState', () => {
         appsState.loadSettings();
 
         appsService.verify(x => x.getSettings(app1.name), Times.exactly(2));
-
-        expect().nothing();
     });
 
     it('should not load settings if no app selected', () => {
         appsState.loadSettings();
 
         appsService.verify(x => x.getSettings(app1.name), Times.never());
-
-        expect().nothing();
     });
 
     it('should return null on select if unselecting app', async () => {

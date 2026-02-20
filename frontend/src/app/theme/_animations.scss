@@ -1,0 +1,107 @@
+.bounce {
+    animation: bounce 150ms;
+}
+
+@keyframes bounce {
+  0% {
+      transform: translateX(0);
+  }
+  50% {
+      transform: translateX(-10px);
+  }
+  100% {
+      transform: translateX(0);
+  }
+}
+
+.slide-left-in {
+    animation: slide-left-in .4s ease-in-out;
+}
+
+@keyframes slide-left-in {
+  from {
+      transform: translateX(-100%);
+  }
+  to {
+      transform: translateX(0);
+  }
+}
+
+.slide-left-out {
+    animation: slide-left-out .4s ease-in-out;
+}
+
+@keyframes slide-left-out {
+  from {
+      transform: translateX(0);
+  }
+  to {
+      transform: translateX(-100%);
+  }
+}
+
+.fade-in {
+    animation: fade-in .3s linear;
+}
+
+@keyframes fade-in {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
+
+.fade-out {
+    animation: fade-out .3s linear;
+}
+
+@keyframes fade-out {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+.spin {
+    animation: spin 3s infinite linear;
+}
+
+@keyframes spin2 {
+    50% {
+        transform: rotate(180deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.spin2 {
+    animation: spin2 1s infinite linear;
+}
+
+@keyframes spin {
+    20% {
+        transform: rotate(0deg);
+    }
+
+    30% {
+        transform: rotate(180deg);
+    }
+
+    70% {
+        transform: rotate(180deg);
+    }
+
+    80% {
+        transform: rotate(360deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}

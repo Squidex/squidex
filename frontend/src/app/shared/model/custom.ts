@@ -1,6 +1,6 @@
 /* eslint-disable sort-imports */
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-import { hasAnyLink, DateTime, StringHelper, Types, ApiUrlConfig, ErrorDto } from '@app/framework';
+
+import { hasAnyLink, StringHelper, Types, ApiUrlConfig, ErrorDto } from '@app/framework';
 import * as generated from './generated';
 import { FieldPropertiesVisitor, META_FIELDS, tableField, tableFields } from './schemas';
 

@@ -22,7 +22,7 @@ export class LocalStoreService {
     public get(key: string): string | null {
         try {
             return this.store.getItem(key);
-        } catch (e) {
+        } catch {
             return this.fallback[key];
         }
     }
@@ -52,7 +52,7 @@ export class LocalStoreService {
     public set(key: string, value: string) {
         try {
             this.store.setItem(key, value);
-        } catch (e) {
+        } catch {
             this.fallback[key] = value;
         }
     }
@@ -72,7 +72,7 @@ export class LocalStoreService {
     public remove(key: string) {
         try {
             this.store.removeItem(key);
-        } catch (e) {
+        } catch {
             delete this.fallback[key];
         }
     }

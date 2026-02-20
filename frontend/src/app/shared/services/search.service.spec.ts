@@ -14,43 +14,42 @@ import { ResourceLinkDto } from './../model';
 describe('SearchService', () => {
     beforeEach(() => {
         TestBed.configureTestingModule({
-    imports: [],
-    providers: [
-        provideHttpClient(withInterceptorsFromDi()),
-        provideHttpClientTesting(),
-        SearchService,
-        { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
-    ],
-});
+            imports: [],
+            providers: [
+                provideHttpClient(withInterceptorsFromDi()),
+                provideHttpClientTesting(),
+                SearchService,
+                { provide: ApiUrlConfig, useValue: new ApiUrlConfig('http://service/p/') },
+            ],
+        });
     });
 
     afterEach(inject([HttpTestingController], (httpMock: HttpTestingController) => {
         httpMock.verify();
     }));
 
-    it('should make get request to get search results',
-        inject([SearchService, HttpTestingController], (searchService: SearchService, httpMock: HttpTestingController) => {
-            let results: ReadonlyArray<SearchResultDto>;
+    it('should make get request to get search results', inject([SearchService, HttpTestingController], (searchService: SearchService, httpMock: HttpTestingController) => {
+        let results: ReadonlyArray<SearchResultDto>;
 
-            searchService.getResults('my-app', 'my-query').subscribe(result => {
-                results = result;
-            });
+        searchService.getResults('my-app', 'my-query').subscribe(result => {
+            results = result;
+        });
 
-            const req = httpMock.expectOne('http://service/p/api/apps/my-app/search?query=my-query');
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/search?query=my-query');
 
-            expect(req.request.method).toEqual('GET');
-            expect(req.request.headers.get('If-Match')).toBeNull();
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBeNull();
 
-            req.flush([
-                searchResultResponse(1),
-                searchResultResponse(2),
-            ]);
+        req.flush([
+            searchResultResponse(1),
+            searchResultResponse(2),
+        ]);
 
-            expect(results!).toEqual([
-                createSearchResult(1),
-                createSearchResult(2),
-            ]);
-        }));
+        expect(results!).toEqual([
+            createSearchResult(1),
+            createSearchResult(2),
+        ]);
+    }));
 
     function searchResultResponse(id: number) {
         return {

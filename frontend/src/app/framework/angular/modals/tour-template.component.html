@@ -1,6 +1,6 @@
 <div
     class="tour-step"
-    @fade
+    animate.enter="fade-in" animate.leave="fade-out"
     [class.d-none]="!isVisible"
     offset="4"
     [position]="currentStep.position || 'bottom-start'"

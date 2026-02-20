@@ -12,12 +12,7 @@ import { AuthSchemeDto, AuthSchemeResponseDto, DialogService, ResourceLinkDto, T
 import { TeamAuthState } from '../internal';
 
 describe('TeamAuthState', () => {
-    const {
-        newVersion,
-        team,
-        teamsState,
-        version,
-    } = TestValues;
+    const { newVersion, team, teamsState, version } = TestValues;
 
     const scheme = new AuthSchemeDto({
         domain: 'squidex.io',
@@ -71,8 +66,6 @@ describe('TeamAuthState', () => {
                 .returns(() => of(versioned(newVersion, createAuthResponse(scheme)))).verifiable();
 
             authState.load(true).subscribe();
-
-            expect().nothing();
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });

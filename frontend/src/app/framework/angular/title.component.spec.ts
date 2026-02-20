@@ -40,8 +40,6 @@ describe('TitleComponent', () => {
         titleComponent.message = 'title1';
         titleComponent.ngOnChanges();
 
-        expect().nothing();
-
         titleService.verify(x => x.push('title1', undefined, 'my-url'), Times.once());
     });
 
@@ -52,8 +50,6 @@ describe('TitleComponent', () => {
         titleComponent.message = 'title2';
         titleComponent.ngOnChanges();
 
-        expect().nothing();
-
         titleService.verify(x => x.push('title2', 0, 'my-url'), Times.once());
     });
 
@@ -62,8 +58,6 @@ describe('TitleComponent', () => {
         titleComponent.ngOnChanges();
         titleComponent.ngOnDestroy();
 
-        expect().nothing();
-
         titleService.verify(x => x.pop(), Times.once());
     });
 
@@ -71,8 +65,6 @@ describe('TitleComponent', () => {
         titleComponent.message = undefined!;
         titleComponent.ngOnChanges();
         titleComponent.ngOnDestroy();
-
-        expect().nothing();
 
         titleService.verify(x => x.pop(), Times.never());
     });
