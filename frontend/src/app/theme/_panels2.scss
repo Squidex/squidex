@@ -90,8 +90,6 @@
             }
 
             &.collapsed {
-                @include force-width-important(3.25rem);
-
                 .panel2-sidebar-title {
                     opacity: 1;
                 }
@@ -102,10 +100,6 @@
 
                 .panel2-header-inner {
                     display: none;
-                }
-
-                .panel2-collapse {
-                    transform: rotate(180deg);
                 }
 
                 & {
@@ -119,14 +113,6 @@
             background-color: $color-white;
             border: 0;
             border-left: 1px solid $color-border;
-
-            &.collapsed {
-                width: 3rem !important;
-
-                .panel2-collapse {
-                    transform: rotate(180deg);
-                }
-            }
         }
 
         &.main {

@@ -1,6 +1,6 @@
 <sqx-title message="i18n:contents.schemasPageTitle" />
 @if (!isEmbedded) {
-    <sqx-layout layout="left" overflow="true" padding="true" titleCollapsed="i18n:common.schemas" white="true" width="18">
+    <sqx-layout expandedWidth="32" layout="left" overflow="true" padding="true" titleCollapsed="i18n:common.schemas" white="true" width="18">
         <ng-container menu>
             <div class="search-form">
                 <input class="form-control" [formControl]="schemasFilter" placeholder="{{ 'contents.searchSchemasPlaceholder' | sqxTranslate }}" />

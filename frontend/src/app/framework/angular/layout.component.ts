@@ -14,6 +14,8 @@ import { TranslatePipe } from './pipes/translate.pipe';
 import { StopClickDirective } from './stop-click.directive';
 import { SidebarMenuDirective } from './template.directive';
 
+type DisplayMode = 'Normal' | 'Expanded' | 'Collapsed';
+
 @Component({
     selector: 'sqx-layout',
     styleUrls: ['./layout.component.scss'],
@@ -74,21 +76,56 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     @Input({ transform: booleanAttribute })
     public customHeader = false;
 
+    @Input({ transform: numberAttribute })
+    public expandedWidth = -1;
+
+    @Input({ transform: numberAttribute })
+    public collapsedWidth = 3;
+
     @ViewChild('panel', { static: false })
     public panel!: ElementRef<HTMLElement>;
 
     @ContentChild(SidebarMenuDirective)
     public sidebarMenuTemplate?: SidebarMenuDirective;
 
-    public isCollapsed = false;
+    public displayMode: DisplayMode = 'Normal';
+
     public isMinimized = false;
 
     public get desiredInnerWidth() {
-        return this.innerWidth <= 0 ? '100%' : `${this.innerWidth}rem`;
+        if (this.innerWidth > 0) {
+          return `${this.innerWidth}rem`;
+        }
+
+        return '100%';
     }
 
     public get desiredWidth() {
-        return this.width <= 0 ? '100%' : `${this.width}rem`;
+        if (this.actualWidth >= 0) {
+            return `${this.actualWidth}rem`;
+        }
+
+        return '100%';
+    }
+
+    public get actualWidth() {
+        const { displayMode, layout, expandedWidth, collapsedWidth, width } = this;
+
+        if (layout === 'left') {
+            if (displayMode === 'Expanded' && expandedWidth > 0) {
+                return expandedWidth
+            }
+
+            if (displayMode === 'Collapsed' && collapsedWidth > 0) {
+                return collapsedWidth
+            }
+        } else if (layout === 'right') {
+            if (displayMode === 'Collapsed' || this.isMinimized) {
+                return 0;
+            }
+        }
+
+        return width;
     }
 
     public get isViewInit() {
@@ -128,7 +165,6 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
 
     public ngAfterViewInit() {
         this.isViewInitField = true;
-
         this.container.invalidate();
     }
 
@@ -137,15 +173,17 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
             return this.width;
         }
 
-        const isMinimized = availableWidth < 1200 && numberOfLayouts > 1;
-
-        if (isMinimized !== this.isMinimized) {
-            this.isCollapsed = !this.isMinimized;
-            this.isMinimized = isMinimized;
+        const isCollapsed = availableWidth < 1200 && numberOfLayouts > 1;
+        if (this.isMinimized !== isCollapsed) {
+            this.isMinimized = isCollapsed;
             this.changeDetector.detectChanges();
         }
 
-        return this.isMinimized || this.isCollapsed ? (this.layout === 'left' ? 3 : 0) : this.width;
+        if (this.layout === 'left' && isCollapsed) {
+            return this.collapsedWidth;
+        }
+
+        return this.actualWidth;
     }
 
     public measure(size: string) {
@@ -156,7 +194,6 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
         this.widthPrevious = size;
 
         const element = this.panel.nativeElement;
-
         if (!element) {
             return;
         }
@@ -187,20 +224,30 @@ export class LayoutComponent implements OnInit, OnDestroy, AfterViewInit {
     }
 
     public toggle() {
-        this.setCollapsed(!this.isCollapsed);
+        if (this.displayMode === 'Collapsed') {
+            if (this.expandedWidth > 0) {
+                this.setDisplayMode('Expanded');
+            } else {
+                this.setDisplayMode('Normal')
+            }
+        } else if (this.displayMode === 'Expanded') {
+            this.setDisplayMode('Normal');
+        } else {
+            this.setDisplayMode('Collapsed');
+        }
     }
 
-    public expand(event: MouseEvent) {
+    public switchToNormalFromDiv(event: MouseEvent) {
         if ((event.target as any)?.['nodeName'] !== 'DIV') {
             return;
         }
 
-        this.setCollapsed(false);
+        this.setDisplayMode('Normal');
     }
 
-    private setCollapsed(isCollapsed: boolean) {
-        if (this.isCollapsed !== isCollapsed) {
-            this.isCollapsed = isCollapsed;
+    private setDisplayMode(mode: DisplayMode) {
+        if (this.displayMode !== mode) {
+            this.displayMode = mode;
             this.container.invalidate();
         }
     }
