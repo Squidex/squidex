@@ -24,10 +24,10 @@
         }
 
         <div class="dropdown-divider"></div>
-        <a class="dropdown-item" (click)="startExpertMode()"> {{ "common.expertMode" | sqxTranslate }} </a>
-        <a class="dropdown-item" (click)="saveConfig()"> {{ "common.save" | sqxTranslate }} </a>
+        <button class="dropdown-item" (click)="startExpertMode()"> {{ "common.expertMode" | sqxTranslate }} </button>
+        <button class="dropdown-item" (click)="saveConfig()"> {{ "common.save" | sqxTranslate }} </button>
         <div class="dropdown-divider"></div>
-        <a
+        <button
             class="dropdown-item dropdown-item-delete"
             (beforeClick)="dropdownModal.hide()"
             confirmRememberKey="resetConfig"
@@ -35,7 +35,7 @@
             confirmTitle="i18n:dashboard.resetConfigConfirmTitle"
             (sqxConfirmClick)="resetConfig()">
             {{ "common.reset" | sqxTranslate }}
-        </a>
+        </button>
     </sqx-dropdown-menu>
     <sqx-modal-dialog (dialogClose)="expertDialog.hide()" fullHeight="true" size="lg" *sqxModal="expertDialog">
         <ng-container title> {{ "dashboard.editConfig" | sqxTranslate }} </ng-container>

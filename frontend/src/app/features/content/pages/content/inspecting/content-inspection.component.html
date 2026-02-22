@@ -3,21 +3,21 @@
     @if (mode | async; as currentMode) {
         <ul class="nav nav-tabs2">
             <li class="nav-item">
-                <a class="nav-link" [class.active]="currentMode === 'Content'" (click)="setMode('Content')">
+                <button class="nav-link" [class.active]="currentMode === 'Content'" (click)="setMode('Content')">
                     {{ "contents.inspectContent" | sqxTranslate }}
-                </a>
+                </button>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" [class.active]="currentMode === 'Data'" (click)="setMode('Data')">
+                <button class="nav-link" [class.active]="currentMode === 'Data'" (click)="setMode('Data')">
                     {{ "contents.inspectData" | sqxTranslate }}
-                </a>
+                </button>
             </li>
 
             <li class="nav-item">
-                <a class="nav-link" [class.active]="currentMode === 'FlatData'" (click)="setMode('FlatData')">
+                <button class="nav-link" [class.active]="currentMode === 'FlatData'" (click)="setMode('FlatData')">
                     {{ "contents.inspectFlatData" | sqxTranslate }}
-                </a>
+                </button>
             </li>
         </ul>
     }

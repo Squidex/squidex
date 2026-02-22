@@ -37,15 +37,15 @@
             <div class="table-items-row-details-tabs clearfix">
                 <ul class="nav nav-tabs2">
                     <li class="nav-item">
-                        <a class="nav-link" [class.active]="selectedTab === 0" (click)="selectTab(0)">
+                        <button class="nav-link" [class.active]="selectedTab === 0" (click)="selectTab(0)">
                             {{ "workflows.tabEdit" | sqxTranslate }}
-                        </a>
+                        </button>
                     </li>
 
                     <li class="nav-item">
-                        <a class="nav-link" [class.active]="selectedTab === 1" (click)="selectTab(1)">
+                        <button class="nav-link" [class.active]="selectedTab === 1" (click)="selectTab(1)">
                             {{ "workflows.tabVisualize" | sqxTranslate }}
-                        </a>
+                        </button>
                     </li>
                 </ul>
 

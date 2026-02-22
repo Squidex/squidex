@@ -1,5 +1,5 @@
 <ng-template #dropdownTemplate>
-    <a
+    <button
         class="dropdown-item"
         [attr.disabled]="disabled"
         [class.disabled]="disabled"
@@ -9,7 +9,7 @@
         (sqxConfirmClick)="action.emit()"
         [title]="tooltip | sqxTranslate">
         {{ menuLabel || label | sqxTranslate }}
-    </a>
+    </button>
 </ng-template>
 
 <button

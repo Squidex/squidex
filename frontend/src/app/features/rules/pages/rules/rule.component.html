@@ -22,54 +22,54 @@
                 </button>
                 <sqx-dropdown-menu position="bottom-end" scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="dropdown; closeAlways: true">
                     @if (rule.canUpdate) {
-                        <a class="dropdown-item" [routerLink]="rule.id"> {{ "common.edit" | sqxTranslate }} </a>
+                        <button class="dropdown-item" [routerLink]="rule.id">{{ "common.edit" | sqxTranslate }}</button>
                     }
 
                     @if (rule.canEnable) {
-                        <a class="dropdown-item" (click)="enable()"> {{ "common.enable" | sqxTranslate }} </a>
+                        <button class="dropdown-item" (click)="enable()">{{ "common.enable" | sqxTranslate }}</button>
                     }
 
                     @if (rule.canDisable) {
-                        <a class="dropdown-item" (click)="disable()"> {{ "common.disable" | sqxTranslate }} </a>
+                        <button class="dropdown-item" (click)="disable()">{{ "common.disable" | sqxTranslate }}</button>
                     }
 
                     <div class="dropdown-divider"></div>
 
                     @if (rule.canRun || rule.canRunFromSnapshots) {
                         @if (rule.canRun) {
-                            <a
+                            <button
                                 class="dropdown-item"
                                 confirmRememberKey="runRule"
                                 confirmText="i18n:rules.runRuleConfirmText"
                                 confirmTitle="i18n:rules.runRuleConfirmTitle"
                                 (sqxConfirmClick)="run()">
                                 {{ "rules.run" | sqxTranslate }}
-                            </a>
+                            </button>
                         }
 
                         @if (rule.canRunFromSnapshots) {
-                            <a
+                            <button
                                 class="dropdown-item"
                                 confirmRememberKey="runRuleFromSnapshots"
                                 confirmText="i18n:rules.runRuleConfirmText"
                                 confirmTitle="i18n:rules.runRuleConfirmTitle"
                                 (sqxConfirmClick)="runFromSnapshots()">
                                 {{ "rules.runFromSnapshots" | sqxTranslate }}
-                            </a>
+                            </button>
                         }
 
                         <div class="dropdown-divider"></div>
                     }
 
                     @if (rule.canDelete) {
-                        <a
+                        <button
                             class="dropdown-item dropdown-item-delete"
                             confirmRememberKey="deleteRule"
                             confirmText="i18n:rules.deleteConfirmText"
                             confirmTitle="i18n:rules.deleteConfirmTitle"
                             (sqxConfirmClick)="delete()">
                             {{ "common.delete" | sqxTranslate }}
-                        </a>
+                        </button>
                     }
                 </sqx-dropdown-menu>
             </div>

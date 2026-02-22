@@ -5,6 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { CdkTrapFocus  } from '@angular/cdk/a11y';
 import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input } from '@angular/core';
 
 @Component({
@@ -16,6 +17,9 @@ import { ChangeDetectionStrategy, Component, ElementRef, HostBinding, Input } fr
         ['animate.enter']: 'fade-in',
         ['animate.leave']: 'fade-out',
     },
+    hostDirectives: [
+        CdkTrapFocus ,
+    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class DropdownMenuComponent {

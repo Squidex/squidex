@@ -4,9 +4,9 @@
         <ng-container title>
             <div class="d-flex align-items-center">
                 @if (schema.type !== "Singleton") {
-                    <a class="btn btn-text-secondary" aria-labelledby="content-back" (click)="back()">
+                    <button class="btn btn-text-secondary" aria-labelledby="content-back" (click)="back()">
                         <span id="content-back" hidden>{{ "common.back" | sqxTranslate }}</span> <i class="icon-angle-left"></i>
-                    </a>
+                    </button>
                 }
 
                 @if (content) {
@@ -75,21 +75,20 @@
                         </button>
                         <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="dropdown; closeAlways: true">
                             @if (content.canClone) {
-                                <a (click)="clone()"
-                                    class="dropdown-item">
+                                <button class="dropdown-item" (click)="clone()">
                                     {{ "common.clone" | sqxTranslate }}
-                                </a>
+                                </button>
                             }
 
                             @if (content.canDelete) {
-                                <a
+                                <button
                                     class="dropdown-item dropdown-item-delete"
                                     confirmRememberKey="deleteContent"
                                     confirmText="i18n:contents.deleteConfirmText"
                                     confirmTitle="i18n:contents.deleteConfirmTitle"
                                     (sqxConfirmClick)="delete()">
                                     {{ "common.delete" | sqxTranslate }}
-                                </a>
+                                </button>
                             }
                         </sqx-dropdown-menu>
                     }
@@ -134,8 +133,8 @@
                                     scrollY="true"
                                     [sqxAnchoredTo]="buttonSave"
                                     *sqxModal="saveOnlyDropdown; closeAlways: true">
-                                    <a class="dropdown-item" (click)="saveAsDraft('Add')"> {{ "common.saveAdd" | sqxTranslate }} </a>
-                                    <a class="dropdown-item" (click)="saveAsDraft('Close')"> {{ "common.saveClose" | sqxTranslate }} </a>
+                                    <button class="dropdown-item" (click)="saveAsDraft('Add')">{{ "common.saveAdd" | sqxTranslate }}</button>
+                                    <button class="dropdown-item" (click)="saveAsDraft('Close')">{{ "common.saveClose" | sqxTranslate }}</button>
                                 </sqx-dropdown-menu>
                             </div>
                         }
@@ -158,12 +157,12 @@
                                     scrollY="true"
                                     [sqxAnchoredTo]="buttonSave"
                                     *sqxModal="savePublishDropdown; closeAlways: true">
-                                    <a class="dropdown-item" (click)="saveAndPublish('Add')">
+                                    <button class="dropdown-item" (click)="saveAndPublish('Add')">
                                         {{ "contents.saveAndPublishAdd" | sqxTranslate }}
-                                    </a>
-                                    <a class="dropdown-item" (click)="saveAndPublish('Close')">
+                                    </button>
+                                    <button class="dropdown-item" (click)="saveAndPublish('Close')">
                                         {{ "contents.saveAndPublishClose" | sqxTranslate }}
-                                    </a>
+                                    </button>
                                 </sqx-dropdown-menu>
                             </div>
                         }

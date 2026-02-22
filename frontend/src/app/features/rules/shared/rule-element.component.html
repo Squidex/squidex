@@ -8,7 +8,7 @@
             [title]="label || elementInfo.title">
             <sqx-rule-icon [elementInfo]="elementInfo" [size]="size" />
             @if (showRemove) {
-                <a
+                <button
                     class="btn btn-sm rounded-full btn-outline-danger"
                     confirmText="i18n:rules.removeElementText"
                     confirmTitle="i18n:rules.removeElementTitle"
@@ -16,7 +16,7 @@
                     sqxStopClick=""
                     type="button">
                     <i class="icon-bin2"></i>
-                </a>
+                </button>
             }
         </div>
     </div>

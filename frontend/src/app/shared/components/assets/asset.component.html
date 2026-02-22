@@ -25,9 +25,9 @@
 
                         <div class="overlay-menu">
                             @if (!isDisabled) {
-                                <a class="file-edit ms-2" attr.aria-label="{{ 'common.edit' | sqxTranslate }}" (click)="emitEdit()">
+                                <button class="file-edit ms-2" attr.aria-label="{{ 'common.edit' | sqxTranslate }}" (click)="emitEdit()">
                                     <i class="icon-pencil"></i>
-                                </a>
+                                </button>
                             }
                             <a
                                 class="file-download ms-2"
@@ -38,11 +38,11 @@
                                 <i class="icon-download"></i>
                             </a>
                             @if (folderIcon) {
-                                <a class="file-folder ms-2" (click)="selectFolder.emit(asset.parentId)"> <i class="icon-folder"></i> </a>
+                                <button class="file-folder ms-2" (click)="selectFolder.emit(asset.parentId)"><i class="icon-folder"></i></button>
                             }
 
                             @if (!isDisabled && !removeMode && asset.canDelete) {
-                                <a
+                                <button
                                     class="file-delete ms-2"
                                     attr.aria-label="{{ 'common.delete' | sqxTranslate }}"
                                     confirmRememberKey="deleteAsset"
@@ -50,11 +50,11 @@
                                     confirmTitle="i18n:assets.deleteConfirmTitle"
                                     (sqxConfirmClick)="delete.emit()">
                                     <i class="icon-delete"></i>
-                                </a>
+                                </button>
                             }
 
                             @if (!isDisabled && removeMode) {
-                                <a
+                                <button
                                     class="file-delete ms-2"
                                     attr.aria-label="{{ 'common.remove' | sqxTranslate }}"
                                     confirmRememberKey="removeAsset"
@@ -62,7 +62,7 @@
                                     confirmTitle="i18n:assets.removeConfirmTitle"
                                     (sqxConfirmClick)="remove.emit()">
                                     <i class="icon-close"></i>
-                                </a>
+                                </button>
                             }
                         </div>
 

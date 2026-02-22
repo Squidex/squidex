@@ -8,7 +8,7 @@
         @if (contentVersion) {
             <div class="alert alert-danger">
                 <div class="float-end">
-                    <a (click)="loadLatest.emit()">{{ "contents.viewLatest" | sqxTranslate }}</a>
+                    <button (click)="loadLatest.emit()">{{ "contents.viewLatest" | sqxTranslate }}</button>
                 </div>
 
                 @if (isDeleted) {

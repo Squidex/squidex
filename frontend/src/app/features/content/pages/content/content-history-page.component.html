@@ -36,15 +36,15 @@
                     <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="dropdownNew; closeAlways: true">
                         @if (content.statusUpdates.length > 0) {
                             @for (info of content.statusUpdates; track info) {
-                                <a class="dropdown-item" (click)="changeStatus(info.status)">
+                                <button class="dropdown-item" (click)="changeStatus(info.status)">
                                     {{ "common.statusChangeTo" | sqxTranslate }}
                                     <i class="icon-circle icon-sm" [style.color]="info.color"></i> {{ info.status }}
-                                </a>
+                                </button>
                             }
 
                             <div class="dropdown-divider"></div>
                         }
-                        <a
+                        <button
                             class="dropdown-item dropdown-item-delete"
                             [class.disabled]="!content.canDraftDelete"
                             confirmRememberKey="deleteDraft"
@@ -52,9 +52,9 @@
                             confirmTitle="i18n:contents.deleteConfirmTitle"
                             (sqxConfirmClick)="deleteDraft()">
                             {{ "contents.versionDelete" | sqxTranslate }}
-                        </a>
+                        </button>
                         <div class="dropdown-divider"></div>
-                        <a
+                        <button
                             class="dropdown-item dropdown-item-delete"
                             [class.disabled]="!content.canDelete"
                             confirmRememberKey="deleteContent"
@@ -62,7 +62,7 @@
                             confirmTitle="i18n:contents.deleteConfirmTitle"
                             (sqxConfirmClick)="delete()">
                             {{ "common.delete" | sqxTranslate }}
-                        </a>
+                        </button>
                     </sqx-dropdown-menu>
                 }
             </div>
@@ -88,15 +88,15 @@
                     <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="dropdown; closeAlways: true">
                         @if (content.statusUpdates.length > 0) {
                             @for (info of content.statusUpdates; track info) {
-                                <a class="dropdown-item" (click)="changeStatus(info.status)">
+                                <button class="dropdown-item" (click)="changeStatus(info.status)">
                                     {{ "common.statusChangeTo" | sqxTranslate }}
                                     <sqx-content-status layout="text" small="true" [status]="info.status" [statusColor]="info.color" />
-                                </a>
+                                </button>
                             }
 
                             <div class="dropdown-divider"></div>
                         }
-                        <a
+                        <button
                             class="dropdown-item dropdown-item-delete"
                             [class.disabled]="!content.canCancelStatus"
                             confirmRememberKey="cancelStatus"
@@ -104,9 +104,9 @@
                             confirmTitle="i18n:contents.cancelStatusConfirmTitle"
                             (sqxConfirmClick)="cancelStatus()">
                             {{ "contents.cancelStatus" | sqxTranslate }}
-                        </a>
+                        </button>
                         <div class="dropdown-divider"></div>
-                        <a
+                        <button
                             class="dropdown-item dropdown-item-delete"
                             [class.disabled]="!content.canDelete"
                             confirmRememberKey="deleteContent"
@@ -114,7 +114,7 @@
                             confirmTitle="i18n:contents.deleteConfirmTitle"
                             (sqxConfirmClick)="delete()">
                             {{ "common.delete" | sqxTranslate }}
-                        </a>
+                        </button>
                     </sqx-dropdown-menu>
                 </div>
             } @else {

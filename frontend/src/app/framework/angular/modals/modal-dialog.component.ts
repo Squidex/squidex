@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
+import { CdkTrapFocus  } from '@angular/cdk/a11y';
 import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, Renderer2, ViewChild } from '@angular/core';
 import { TranslatePipe } from '../pipes/translate.pipe';
 import { ShortcutComponent } from '../shortcut.component';
@@ -17,6 +17,7 @@ import { TourStepDirective } from './tour-step.directive';
     templateUrl: './modal-dialog.component.html',
     changeDetection: ChangeDetectionStrategy.Default,
     imports: [
+        CdkTrapFocus,
         ShortcutComponent,
         TranslatePipe,
         TourStepDirective,

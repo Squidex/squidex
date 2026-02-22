@@ -1,8 +1,13 @@
 @import 'mixins';
 @import 'vars';
 
-a {
+button {
+    color: $color-text;
     text-align: left;
     text-decoration: none;
-    color: $color-text;
+    text-transform: uppercase;
+
+    &:hover {
+        text-decoration: none;
+    }
 }
