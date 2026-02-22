@@ -18,7 +18,7 @@ export class RulesPage {
     }
 
     public async addRule() {
-        await this.page.getByRole('button', { name: /New Rule/ }).click();
+        await this.page.getByRole('link', { name: /New Rule/ }).click();
     }
 
     public async getRuleCard(name: string) {
