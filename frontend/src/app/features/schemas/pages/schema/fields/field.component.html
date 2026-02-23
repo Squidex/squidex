@@ -56,36 +56,36 @@
                     <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="dropdown; closeAlways: true">
                         @if (field.properties.isContentField) {
                             @if (field.canEnable) {
-                                <a class="dropdown-item" (click)="enableField()"> {{ "schemas.field.enable" | sqxTranslate }} </a>
+                                <button class="dropdown-item" (click)="enableField()">{{ "schemas.field.enable" | sqxTranslate }}</button>
                             }
 
                             @if (field.canDisable) {
-                                <a class="dropdown-item" (click)="disableField()"> {{ "schemas.field.disable" | sqxTranslate }} </a>
+                                <button class="dropdown-item" (click)="disableField()">{{ "schemas.field.disable" | sqxTranslate }}</button>
                             }
 
                             @if (field.canHide) {
-                                <a class="dropdown-item" (click)="hideField()"> {{ "schemas.field.hide" | sqxTranslate }} </a>
+                                <button class="dropdown-item" (click)="hideField()">{{ "schemas.field.hide" | sqxTranslate }}</button>
                             }
 
                             @if (field.canShow) {
-                                <a class="dropdown-item" (click)="showField()"> {{ "schemas.field.show" | sqxTranslate }} </a>
+                                <button class="dropdown-item" (click)="showField()">{{ "schemas.field.show" | sqxTranslate }}</button>
                             }
                         }
 
                         @if (field.canLock) {
                             <div class="dropdown-divider"></div>
-                            <a
+                            <button
                                 class="dropdown-item"
                                 confirmRememberKey="lockField"
                                 confirmText="i18n:schemas.field.lockConfirmText"
                                 confirmTitle="i18n:schemas.field.lockConfirmTitle"
                                 (sqxConfirmClick)="lockField()">
                                 {{ "schemas.field.lock" | sqxTranslate }}
-                            </a>
+                            </button>
                         }
                         <ng-container>
                             <div class="dropdown-divider"></div>
-                            <a
+                            <button
                                 class="dropdown-item dropdown-item-delete"
                                 [class.disabled]="!field.canDelete"
                                 confirmRememberKey="deleteField"
@@ -93,7 +93,7 @@
                                 confirmTitle="i18n:schemas.field.deleteConfirmTitle"
                                 (sqxConfirmClick)="deleteField()">
                                 {{ "common.delete" | sqxTranslate }}
-                            </a>
+                            </button>
                         </ng-container>
                     </sqx-dropdown-menu>
                 </div>

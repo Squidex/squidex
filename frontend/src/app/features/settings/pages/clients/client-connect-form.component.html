@@ -11,7 +11,9 @@
                     </li>
                 } @else {
                     <li class="breadcrumb-item done">
-                        <a class="force" (click)="go('Start')"> <i class="icon-checkmark"></i> {{ "clients.connectWizard.step1Title" | sqxTranslate }} </a>
+                        <button class="btn-inline-link" (click)="go('Start')">
+                            <i class="icon-checkmark"></i> {{ "clients.connectWizard.step1Title" | sqxTranslate }}
+                        </button>
                     </li>
                 }
 

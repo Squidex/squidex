@@ -1,5 +1,5 @@
 @if (sortable) {
-    <a class="pointer truncate" (click)="sort()">
+    <button class="btn-inline-link truncate" (click)="sort()">
         <span class="truncate">
             @if (order === "ascending") {
                 <i class="icon-caret-up"></i>
@@ -10,7 +10,7 @@
             }
             {{ text | sqxTranslate }}
         </span>
-    </a>
+    </button>
 } @else {
     <span class="truncate">{{ text | sqxTranslate }}</span>
 }

@@ -3,9 +3,9 @@
         {{ "dashboard.apiCallsCard" | sqxTranslate }}
         @if (app) {
             <div class="float-end">
-                <a class="force" (click)="downloadLog(app)">
+                <button class="btn-inline-link" (click)="downloadLog(app)">
                     <small>{{ "dashboard.downloadLog" | sqxTranslate }}</small>
-                </a>
+                </button>
             </div>
         }
     </div>

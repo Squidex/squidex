@@ -1,25 +1,25 @@
 <div class="table-items-row-details-tabs clearfix">
     <ul class="nav nav-tabs2">
         <li class="nav-item">
-            <a class="nav-link" [class.active]="selectedTab === 0" (click)="selectTab(0)">
+            <button class="nav-link" [class.active]="selectedTab === 0" (click)="selectTab(0)">
                 {{ "schemas.field.tabCommon" | sqxTranslate }}
-            </a>
+            </button>
         </li>
 
         <li class="nav-item" [class.hidden]="!field.properties.isContentField">
-            <a class="nav-link" [class.active]="selectedTab === 1" (click)="selectTab(1)">
+            <button class="nav-link" [class.active]="selectedTab === 1" (click)="selectTab(1)">
                 {{ "schemas.field.tabValidation" | sqxTranslate }}
-            </a>
+            </button>
         </li>
 
         <li class="nav-item" [class.hidden]="!field.properties.isContentField">
-            <a class="nav-link" [class.active]="selectedTab === 2" (click)="selectTab(2)">
+            <button class="nav-link" [class.active]="selectedTab === 2" (click)="selectTab(2)">
                 {{ "schemas.field.tabEditing" | sqxTranslate }}
-            </a>
+            </button>
         </li>
 
         <li class="nav-item" [class.hidden]="field.properties.fieldType !== 'Json'">
-            <a class="nav-link" [class.active]="selectedTab === 3" (click)="selectTab(3)"> {{ "schemas.field.tabMore" | sqxTranslate }} </a>
+            <button class="nav-link" [class.active]="selectedTab === 3" (click)="selectTab(3)">{{ "schemas.field.tabMore" | sqxTranslate }}</button>
         </li>
     </ul>
 

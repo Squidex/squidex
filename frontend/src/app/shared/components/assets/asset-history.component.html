@@ -16,7 +16,7 @@
                 <div class="event-created">{{ assetEvent.event.created | sqxFromNow }}</div>
 
                 @if (assetEvent.canDownload) {
-                    <a class="event-load force" [href]="asset | sqxAssetUrl: assetEvent.version" sqxExternalLink="noicon">
+                    <a class="event-load btn-inline-link" [href]="asset | sqxAssetUrl: assetEvent.version" sqxExternalLink="noicon">
                         {{ "assets.downloadVersion" | sqxTranslate }}
                     </a>
                 }
