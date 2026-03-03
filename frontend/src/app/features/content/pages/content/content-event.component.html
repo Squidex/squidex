@@ -14,8 +14,8 @@
         <div class="event-created">{{ event.created | sqxFromNow }}</div>
 
         @if (canLoadOrCompare) {
-            <a class="event-load force" (click)="dataLoad.emit()">{{ "contents.loadContent" | sqxTranslate }}</a> &middot;
-            <a class="event-load force" (click)="dataCompare.emit()">{{ "contents.versionCompare" | sqxTranslate }}</a>
+            <button class="event-load btn-inline-link" (click)="dataLoad.emit()">{{ "contents.loadContent" | sqxTranslate }}</button> &middot;
+            <button class="event-load btn-inline-link" (click)="dataCompare.emit()">{{ "contents.versionCompare" | sqxTranslate }}</button>
         }
     </div>
 </div>

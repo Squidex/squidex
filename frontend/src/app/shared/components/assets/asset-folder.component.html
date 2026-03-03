@@ -17,10 +17,10 @@
                     </button>
                     <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="editDropdown; closeAlways: true">
                         @if (canUpdate) {
-                            <a class="dropdown-item" (click)="editDialog.show()"> {{ "common.rename" | sqxTranslate }} </a>
+                            <button class="dropdown-item" (click)="editDialog.show()">{{ "common.rename" | sqxTranslate }}</button>
                             <div class="dropdown-divider"></div>
                         }
-                        <a
+                        <button
                             class="dropdown-item dropdown-item-delete"
                             [class.disabled]="!canDelete"
                             confirmRememberKey="deleteAssetFolder"
@@ -28,7 +28,7 @@
                             confirmTitle="i18n:assets.deleteFolderConfirmTitle"
                             (sqxConfirmClick)="emitDelete()">
                             {{ "common.delete" | sqxTranslate }}
-                        </a>
+                        </button>
                     </sqx-dropdown-menu>
                 }
             </div>

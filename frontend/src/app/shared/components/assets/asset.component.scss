@@ -154,7 +154,10 @@ $list-height: 2.25rem;
     &-menu {
         @include absolute(1rem, 1rem, auto, auto);
 
-        a {
+        button {
+            background: none;
+            border: 0;
+            border-radius: 0;
             color: color.adjust($color-white, $lightness: -10%);
             cursor: pointer;
             font-size: 1.1rem;

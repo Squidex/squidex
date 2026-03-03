@@ -12,23 +12,23 @@
                 <div class="col">
                     <ul class="nav nav-tabs2">
                         <li class="nav-item">
-                            <a class="nav-link" [class.active]="selectedTab === 0" (click)="selectTab(0)">
+                            <button class="nav-link" [class.active]="selectedTab === 0" (click)="selectTab(0)">
                                 {{ "schemas.createCustom" | sqxTranslate }}
-                            </a>
+                            </button>
                         </li>
 
                         <li class="nav-item">
-                            <a class="nav-link" [class.active]="selectedTab === 1" (click)="selectTab(1)">
+                            <button class="nav-link" [class.active]="selectedTab === 1" (click)="selectTab(1)">
                                 {{ "schemas.createFromJson" | sqxTranslate }}
-                            </a>
+                            </button>
                         </li>
 
                         @if (hasChatBot) {
                             <li class="nav-item">
-                                <a class="nav-link" [class.active]="selectedTab === 2" (click)="selectTab(2)">
+                                <button class="nav-link" [class.active]="selectedTab === 2" (click)="selectTab(2)">
                                     {{ "schemas.createAI" | sqxTranslate }}
                                     <span class="badge rounded-pill badge-primary">New</span>
-                                </a>
+                                </button>
                             </li>
                         }
                     </ul>

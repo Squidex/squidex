@@ -1,7 +1,7 @@
 <div class="d-flex gap-1">
     @if (formModel.field.isLocalizable && languages.length > 1) {
         @if (!formModel.field.properties.isComplexUI) {
-            <button class="btn btn-sm btn-outline-secondary force no-focus-shadow" (click)="toggleShowAllControls()" type="button">
+            <button class="btn btn-sm btn-outline-secondary no-focus-shadow" (click)="toggleShowAllControls()" type="button">
                 @if (showAllControls) {
                     <span>{{ "contents.languageModeSingle" | sqxTranslate }}</span>
                 } @else {

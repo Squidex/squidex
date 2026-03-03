@@ -28,7 +28,7 @@
             </button>
             <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonSelect" *sqxModal="schemasDropdown; closeAlways: true">
                 @for (schema of schemasList; track schema) {
-                    <a class="dropdown-item" (click)="setSchema(schema)"> {{ schema.displayName }} </a>
+                    <button class="dropdown-item" (click)="setSchema(schema)">{{ schema.displayName }}</button>
                 }
             </sqx-dropdown-menu>
         }

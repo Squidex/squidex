@@ -46,14 +46,14 @@
                 <i class="icon-dots"></i>
             </button>
             <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="dropdown; closeAlways: true">
-                <a
+                <button
                     class="dropdown-item dropdown-item-delete"
                     confirmRememberKey="leaveApp"
                     confirmText="i18n:apps.leaveConfirmText"
                     confirmTitle="i18n:apps.leaveConfirmTitle"
                     (sqxConfirmClick)="leave.emit(app)">
                     {{ "apps.leave" | sqxTranslate }}
-                </a>
+                </button>
             </sqx-dropdown-menu>
         }
     </div>

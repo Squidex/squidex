@@ -57,6 +57,13 @@
     }
 }
 
+a, button {
+    &:focus-visible:not(.btn) {
+        outline: none;
+        box-shadow: inset 0 0 0 2px $color-theme-brand !important;
+    }
+}
+
 .alert {
     word-break: break-word;
 
@@ -524,6 +531,20 @@ a {
         &:focus {
             box-shadow: none !important;
         }
+    }
+}
+
+.btn-inline-link {
+    background: none;
+    border-radius: 0;
+    border: 0;
+    color: $color-theme-brand;
+    padding: 0;
+
+    &:hover {
+        color: inherit;
+        cursor: pointer;
+        text-decoration: underline;
     }
 }
 
