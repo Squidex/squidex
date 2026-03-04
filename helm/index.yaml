@@ -3,7 +3,7 @@ entries:
   squidex:
   - apiVersion: v2
     appVersion: 5.9.0
-    created: "2026-02-16T12:30:37.319826845-07:00"
+    created: "2026-02-20T10:26:30.547962074-07:00"
     dependencies:
     - condition: mongodb-replicaset.enabled
       name: mongodb-replicaset
@@ -29,7 +29,33 @@ entries:
   squidex7:
   - apiVersion: v2
     appVersion: 7.18.0
-    created: "2026-02-16T12:30:37.389365828-07:00"
+    created: "2026-02-20T10:26:30.63470164-07:00"
+    dependencies:
+    - condition: mongodb.enabled
+      name: mongodb
+      repository: https://charts.bitnami.com/bitnami
+      version: 16.5.45
+    description: Squidex CMS v7.0 and newer
+    digest: e10be16f6e461cd602b1cc00a9cb612d8f8d318940026a1fda7ff650a0720ddb
+    home: https://squidex.io/
+    icon: https://raw.githubusercontent.com/Squidex/squidex/master/media/logo-squared.png
+    keywords:
+    - cms
+    - headless-cms
+    - mongodb
+    - csharp
+    - asp-net-core
+    - asp-net
+    name: squidex7
+    sources:
+    - https://github.com/Squidex/squidex
+    type: application
+    urls:
+    - squidex7-2.1.1.tgz
+    version: 2.1.1
+  - apiVersion: v2
+    appVersion: 7.18.0
+    created: "2026-02-20T10:26:30.622158546-07:00"
     dependencies:
     - condition: mongodb.enabled
       name: mongodb
@@ -55,7 +81,7 @@ entries:
     version: 2.1.0
   - apiVersion: v2
     appVersion: 7.18.0
-    created: "2026-02-16T12:30:37.376323031-07:00"
+    created: "2026-02-20T10:26:30.609293597-07:00"
     dependencies:
     - condition: mongodb.enabled
       name: mongodb
@@ -81,7 +107,7 @@ entries:
     version: 2.0.3
   - apiVersion: v2
     appVersion: 7.18.0
-    created: "2026-02-16T12:30:37.364166426-07:00"
+    created: "2026-02-20T10:26:30.596559635-07:00"
     dependencies:
     - condition: mongodb.enabled
       name: mongodb
@@ -107,7 +133,7 @@ entries:
     version: 2.0.2
   - apiVersion: v2
     appVersion: 7.18.0
-    created: "2026-02-16T12:30:37.351423702-07:00"
+    created: "2026-02-20T10:26:30.583618202-07:00"
     dependencies:
     - condition: mongodb.enabled
       name: mongodb
@@ -133,7 +159,7 @@ entries:
     version: 2.0.1
   - apiVersion: v2
     appVersion: 7.18.0
-    created: "2026-02-16T12:30:37.337207355-07:00"
+    created: "2026-02-20T10:26:30.570287148-07:00"
     dependencies:
     - condition: mongodb.enabled
       name: mongodb
@@ -159,7 +185,7 @@ entries:
     version: 2.0.0
   - apiVersion: v2
     appVersion: 7.15.0
-    created: "2026-02-16T12:30:37.327014592-07:00"
+    created: "2026-02-20T10:26:30.55824258-07:00"
     dependencies:
     - condition: mongodb-replicaset.enabled
       name: mongodb-replicaset
@@ -185,7 +211,7 @@ entries:
     version: 1.0.3
   - apiVersion: v2
     appVersion: 7.15.0
-    created: "2026-02-16T12:30:37.325469565-07:00"
+    created: "2026-02-20T10:26:30.555719321-07:00"
     dependencies:
     - condition: mongodb-replicaset.enabled
       name: mongodb-replicaset
@@ -211,7 +237,7 @@ entries:
     version: 1.0.2
   - apiVersion: v2
     appVersion: 7.0.2
-    created: "2026-02-16T12:30:37.323908358-07:00"
+    created: "2026-02-20T10:26:30.5531889-07:00"
     dependencies:
     - condition: mongodb-replicaset.enabled
       name: mongodb-replicaset
@@ -237,7 +263,7 @@ entries:
     version: 1.0.1
   - apiVersion: v2
     appVersion: 7.0.2
-    created: "2026-02-16T12:30:37.321438477-07:00"
+    created: "2026-02-20T10:26:30.550596822-07:00"
     dependencies:
     - condition: mongodb-replicaset.enabled
       name: mongodb-replicaset
@@ -261,4 +287,4 @@ entries:
     urls:
     - squidex7-1.0.0.tgz
     version: 1.0.0
-generated: "2026-02-16T12:30:37.314929341-07:00"
+generated: "2026-02-20T10:26:30.544981347-07:00"
