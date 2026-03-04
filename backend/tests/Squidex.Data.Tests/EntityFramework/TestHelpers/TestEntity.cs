@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using NetTopologySuite.Geometries;
 
 #pragma warning disable MA0048 // File name must match type name

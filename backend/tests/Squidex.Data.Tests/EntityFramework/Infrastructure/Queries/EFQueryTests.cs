@@ -34,8 +34,8 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
     {
         var dbContext = await CreateDbContextAsync();
 
-        await dbContext.CreateGeoIndexAsync("IDX_GEO", "TestEntity", "Point");
-        await dbContext.CreateTextIndexAsync("IDX_Text", "TestEntity", "FullText");
+        await dbContext.CreateGeoIndexAsync("IDX_GEO", nameof(TestEntity), "Point");
+        await dbContext.CreateTextIndexAsync("IDX_Text", nameof(TestEntity), "FullText");
 
         var set = dbContext.Set<TestEntity>();
         if (await set.AnyAsync())
@@ -61,7 +61,7 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
                     mixed = true;
                     break;
                 case 4:
-                    mixed = new List<object> { i, true };
+                    mixed = new List<object> { i };
                     break;
                 default:
                     mixed = new Dictionary<string, object>();
@@ -499,7 +499,7 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
         var dbContext = await CreateAndPrepareDbContextAsync();
 
         var builder =
-            new TestSqlBuilder(dbContext.Dialect, "TestEntity")
+            new TestSqlBuilder(dbContext.Dialect, nameof(TestEntity))
                 .Count();
 
         var (sql, parameters) = builder.Compile();
@@ -525,7 +525,7 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
         var dbContext = await CreateAndPrepareDbContextAsync();
 
         var queryBuilder =
-            new TestSqlBuilder(dbContext.Dialect, "TestEntity")
+            new TestSqlBuilder(dbContext.Dialect, nameof(TestEntity))
                 .WhereMatch("FullText", "hello");
 
         var (sql, parameters) = queryBuilder.Compile();
@@ -540,7 +540,7 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
         var dbContext = await CreateAndPrepareDbContextAsync();
 
         var queryBuilder =
-            new TestSqlBuilder(dbContext.Dialect, "TestEntity")
+            new TestSqlBuilder(dbContext.Dialect, nameof(TestEntity))
                 .WhereMatch("FullText", "hello world");
 
         var (sql, parameters) = queryBuilder.Compile();
@@ -575,7 +575,7 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
         var dbContext = await CreateAndPrepareDbContextAsync();
 
         var queryBuilder =
-            new TestSqlBuilder(dbContext.Dialect, "TestEntity")
+            new TestSqlBuilder(dbContext.Dialect, nameof(TestEntity))
                 .Limit(query)
                 .Offset(query)
                 .Order(query)
