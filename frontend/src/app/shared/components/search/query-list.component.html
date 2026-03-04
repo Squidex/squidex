@@ -2,7 +2,7 @@
     <ul class="nav nav-light flex-column">
         @for (saved of queries; track saved.name) {
             <li class="nav-item">
-                <button class="nav-link" [class.active]="isSelectedQuery(saved)" (click)="search.emit(saved.query)">
+                <button class="nav-link" [class.active]="isSelectedQuery(saved)" (click)="search.emit(saved.query)" type="button">
                     <div class="row g-0">
                         <div class="col truncate">
                             <i class="icon-circle" [class.hidden]="!saved.color" [style.color]="saved.color"></i>
@@ -11,7 +11,7 @@
 
                         <div class="col-auto">
                             @if (canRemove) {
-                                <button class="btn-sm btn-text-danger btn-remove" (click)="remove.emit(saved)" sqxStopClick>
+                                <button class="btn-sm btn-text-danger btn-remove" (click)="remove.emit(saved)" sqxStopClick type="button">
                                     <i class="icon-close"></i>
                                 </button>
                             }

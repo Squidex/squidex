@@ -61,7 +61,7 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
                     mixed = true;
                     break;
                 case 4:
-                    mixed = new List<object> { i };
+                    mixed = new List<object> { i, true };
                     break;
                 default:
                     mixed = new Dictionary<string, object>();
@@ -334,6 +334,28 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
         var actual = await QueryAsync(new ClrQuery
         {
             Filter = ClrFilter.In("Json.number", new List<int> { 3, 5, 7 }),
+        });
+
+        Assert.Equal([3, 5, 7], actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_with_equal_in_json_array()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Eq("Json.array", 3),
+        });
+
+        Assert.Equal([3], actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_with_many_in_json_array()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.In("Json.array", new List<int> { 3, 5, 7 }),
         });
 
         Assert.Equal([3, 5, 7], actual.Order().ToArray());

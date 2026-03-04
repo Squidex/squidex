@@ -2,7 +2,7 @@
 <sqx-layout layout="main" overflow="true" padding="true" white="true">
     <ng-container title>
         <div class="d-flex align-items-center">
-            <button class="btn btn-text-secondary" attr.aria-label="{{ 'common.back' | sqxTranslate }}" (click)="back()">
+            <button class="btn btn-text-secondary" attr.aria-label="{{ 'common.back' | sqxTranslate }}" (click)="back()" type="button">
                 <i class="icon-angle-left"></i>
             </button>
             <h3 class="title">{{ "common.rule" | sqxTranslate }}</h3>
@@ -18,7 +18,8 @@
                 confirmText="i18n:rules.triggerConfirmText"
                 confirmTitle="i18n:rules.triggerConfirmTitle"
                 [disabled]="!rule?.canTrigger"
-                (sqxConfirmClick)="trigger()">
+                (sqxConfirmClick)="trigger()"
+                type="button">
                 <i class="icon-play-line"></i>
             </button>
         }
@@ -67,7 +68,8 @@
                                 <button
                                     class="btn btn-outline-secondary btn-circle"
                                     attr.aria-label="{{ 'rules.addTrigger' | sqxTranslate }}"
-                                    (click)="triggerDialog.show()">
+                                    (click)="triggerDialog.show()"
+                                    type="button">
                                     <i class="icon-plus"></i>
                                 </button>
                             }

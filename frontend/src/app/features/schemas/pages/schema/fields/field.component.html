@@ -56,19 +56,19 @@
                     <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="dropdown; closeAlways: true">
                         @if (field.properties.isContentField) {
                             @if (field.canEnable) {
-                                <button class="dropdown-item" (click)="enableField()">{{ "schemas.field.enable" | sqxTranslate }}</button>
+                                <button class="dropdown-item" (click)="enableField()" type="button">{{ "schemas.field.enable" | sqxTranslate }}</button>
                             }
 
                             @if (field.canDisable) {
-                                <button class="dropdown-item" (click)="disableField()">{{ "schemas.field.disable" | sqxTranslate }}</button>
+                                <button class="dropdown-item" (click)="disableField()" type="button">{{ "schemas.field.disable" | sqxTranslate }}</button>
                             }
 
                             @if (field.canHide) {
-                                <button class="dropdown-item" (click)="hideField()">{{ "schemas.field.hide" | sqxTranslate }}</button>
+                                <button class="dropdown-item" (click)="hideField()" type="button">{{ "schemas.field.hide" | sqxTranslate }}</button>
                             }
 
                             @if (field.canShow) {
-                                <button class="dropdown-item" (click)="showField()">{{ "schemas.field.show" | sqxTranslate }}</button>
+                                <button class="dropdown-item" (click)="showField()" type="button">{{ "schemas.field.show" | sqxTranslate }}</button>
                             }
                         }
 
@@ -79,7 +79,8 @@
                                 confirmRememberKey="lockField"
                                 confirmText="i18n:schemas.field.lockConfirmText"
                                 confirmTitle="i18n:schemas.field.lockConfirmTitle"
-                                (sqxConfirmClick)="lockField()">
+                                (sqxConfirmClick)="lockField()"
+                                type="button">
                                 {{ "schemas.field.lock" | sqxTranslate }}
                             </button>
                         }
@@ -91,7 +92,8 @@
                                 confirmRememberKey="deleteField"
                                 confirmText="i18n:schemas.field.deleteConfirmText"
                                 confirmTitle="i18n:schemas.field.deleteConfirmTitle"
-                                (sqxConfirmClick)="deleteField()">
+                                (sqxConfirmClick)="deleteField()"
+                                type="button">
                                 {{ "common.delete" | sqxTranslate }}
                             </button>
                         </ng-container>

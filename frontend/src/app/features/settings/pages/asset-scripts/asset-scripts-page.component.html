@@ -11,7 +11,7 @@
                 <ul class="nav nav-tabs2">
                     @for (script of editForm.form.controls | sqxKeys; track script) {
                         <li class="nav-item">
-                            <button class="nav-link" [class.active]="assetScript === script" (click)="selectField(script)">
+                            <button class="nav-link" [class.active]="assetScript === script" (click)="selectField(script)" type="button">
                                 {{ script | sqxScriptName }}
                             </button>
                         </li>

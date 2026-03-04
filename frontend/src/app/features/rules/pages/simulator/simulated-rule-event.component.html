@@ -71,7 +71,7 @@
                             text="i18n:rules.simulation.eventConditionEvaluated" />
 
                         @if (event.flowState) {
-                            <sqx-state-details [availableSteps]="availableSteps" showEvent="false" [state]="event.flowState" [branchItems]="branchItems" />
+                            <sqx-state-details [availableSteps]="availableSteps" [branchItems]="branchItems" showEvent="false" [state]="event.flowState" />
                         }
                     }
                 }

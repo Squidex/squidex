@@ -11,7 +11,7 @@ public sealed class QueryModel
 {
     public static readonly IReadOnlyDictionary<FilterSchemaType, IReadOnlyList<CompareOperator>> DefaultOperators = new Dictionary<FilterSchemaType, IReadOnlyList<CompareOperator>>
     {
-        [FilterSchemaType.Any] = Enum.GetValues(typeof(CompareOperator)).OfType<CompareOperator>().ToList(),
+        [FilterSchemaType.Any] = Enum.GetValues<CompareOperator>().ToList(),
         [FilterSchemaType.Boolean] =
         [
             CompareOperator.Equals,

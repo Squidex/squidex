@@ -11,7 +11,7 @@
                     </li>
                 } @else {
                     <li class="breadcrumb-item done">
-                        <button class="btn-inline-link" (click)="go('Start')">
+                        <button class="btn-inline-link" (click)="go('Start')" type="button">
                             <i class="icon-checkmark"></i> {{ "clients.connectWizard.step1Title" | sqxTranslate }}
                         </button>
                     </li>
@@ -157,7 +157,7 @@
         }
     </ng-container>
     <ng-container footer>
-        <button class="btn btn-text-secondary" (click)="go('Start')" [disabled]="step === 'Start'">
+        <button class="btn btn-text-secondary" (click)="go('Start')" [disabled]="step === 'Start'" type="button">
             {{ "common.back" | sqxTranslate }}
         </button>
     </ng-container>

@@ -144,7 +144,6 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
 
                     for (const content of items) {
                         const index = this.contents.findIndex(x => x.id === content.id);
-
                         if (index >= 0) {
                             this.contents[index] = content;
                         } else {
@@ -153,12 +152,10 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
                     }
 
                     this.isLoadingFailed = false;
-
                     this.resetConverterState(true);
                 },
                 error: () => {
                     this.isLoadingFailed = true;
-
                     this.resetConverterState(false);
                 },
             });
@@ -171,7 +168,6 @@ export class ReferencesTagsComponent extends StatefulControlComponent<State, Rea
 
         if (rebuild) {
             const converter = new ReferencesTagsConverter(this.language, this.contents, this.localizer);
-
             this.next({ converter });
         }
 

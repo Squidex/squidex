@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Text;
 using Npgsql;
 using Squidex.Infrastructure.Queries;
 using Squidex.Providers.Postgres.App;
@@ -71,27 +72,74 @@ public class PostgresDialect : SqlDialect
     {
         if (isJson)
         {
-            var issNumeric = value.ValueType is
+            var sqlPathCast = path.JsonPath(true);
+            var sqlPath = path.JsonPath(false);
+            var sqlOp = FormatOperator(op, value);
+            var sqlRhs = FormatValues(op, value, queryParameters);
+
+            var isBoolean = value.ValueType is ClrValueType.Boolean;
+
+            var isNumeric = value.ValueType is
                 ClrValueType.Single or
                 ClrValueType.Double or
                 ClrValueType.Int32 or
                 ClrValueType.Int64;
-            if (issNumeric)
-            {
-                var sqlOp = FormatOperator(op, value);
-                var sqlRhs = FormatValues(op, value, queryParameters);
 
-                return $"(CASE WHEN jsonb_typeof({path.JsonPath(false)}) = 'number' THEN ({path.JsonPath(true)})::numeric {sqlOp} {sqlRhs} ELSE FALSE END)";
+            string ScalarCondition()
+            {
+                if (isNumeric)
+                {
+                    return $"(CASE WHEN jsonb_typeof({sqlPath}) = 'number' THEN ({sqlPathCast})::numeric {sqlOp} {sqlRhs} ELSE FALSE END)";
+                }
+
+                if (isBoolean)
+                {
+                    return $"(CASE WHEN jsonb_typeof({sqlPath}) = 'boolean' THEN ({sqlPathCast})::boolean {sqlOp} {sqlRhs} ELSE FALSE END)";
+                }
+
+                return base.Where(path, op, value, queryParameters, true);
             }
 
-            var isBoolean = value.ValueType is ClrValueType.Boolean;
-            if (isBoolean)
+            string ToJsonbValue()
             {
-                var sqlOp = FormatOperator(op, value);
-                var sqlRhs = FormatValues(op, value, queryParameters);
+                if (isNumeric)
+                {
+                    return $"to_jsonb({sqlRhs}::numeric)";
+                }
 
-                return $"(CASE WHEN jsonb_typeof({path.JsonPath(false)}) = 'boolean' THEN ({path.JsonPath(true)})::boolean {sqlOp} {sqlRhs} ELSE FALSE END)";
+                if (isBoolean)
+                {
+                    return $"to_jsonb({sqlRhs}::boolean)";
+                }
+
+                return $"to_jsonb({sqlRhs}::text)";
             }
+
+            if (value.IsList && op == CompareOperator.In)
+            {
+                return $"""
+                    CASE WHEN jsonb_typeof({sqlPath}) = 'array'
+                        THEN EXISTS (
+                            SELECT 1
+                            FROM jsonb_array_elements({sqlPath}) AS elem
+                            WHERE jsonb_build_array{sqlRhs} @> elem
+                        )
+                        ELSE {sqlPath} <@ jsonb_build_array{sqlRhs}
+                    END
+                    """;
+            }
+
+            if (op == CompareOperator.Equals)
+            {
+                return $"""
+                    CASE WHEN jsonb_typeof({sqlPath}) = 'array'
+                        THEN {sqlPath} @> jsonb_build_array({ToJsonbValue()})
+                        ELSE {ScalarCondition()}
+                    END
+                    """;
+            }
+
+            return ScalarCondition();
         }
 
         return base.Where(path, op, value, queryParameters, isJson);

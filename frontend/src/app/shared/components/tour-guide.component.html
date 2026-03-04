@@ -7,7 +7,7 @@
                         <div class="col">{{ "tour.guide-title" | sqxTranslate }}</div>
 
                         <div class="col-auto">
-                            <button class="btn btn-simple btn-sm" (click)="toggle()"><i class="icon-angle-down"></i></button>
+                            <button class="btn btn-simple btn-sm" (click)="toggle()" type="button"><i class="icon-angle-down"></i></button>
                         </div>
                     </div>
                 </div>
@@ -36,7 +36,8 @@
                         class="btn btn-outline-secondary btn-block mt-2"
                         (click)="complete()"
                         [sqxScrollActive]="(tourState.pendingTasks | async) === 0"
-                        [sqxScrollContainer]="body">
+                        [sqxScrollContainer]="body"
+                        type="button">
                         {{ "tour.complete" | sqxTranslate }}
                     </button>
                 </div>

@@ -9,7 +9,7 @@
                 <button class="btn btn-secondary dropdown-toggle" (click)="dropdown.toggle()" type="button"></button>
                 <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonGroup" *sqxModal="dropdown; closeAlways: true">
                     @for (name of snapshot.previewNamesMore; track name) {
-                        <button class="dropdown-item" (click)="follow(name)">{{ name }}</button>
+                        <button class="dropdown-item" (click)="follow(name)" type="button">{{ name }}</button>
                     }
                 </sqx-dropdown-menu>
             </div>

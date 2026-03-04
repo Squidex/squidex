@@ -144,7 +144,7 @@ public class SqlDialect
         throw new NotSupportedException();
     }
 
-    protected virtual string FormatValues(CompareOperator op, ClrValue value, SqlParams queryParameters)
+    protected virtual string FormatValues(CompareOperator op, ClrValue value, SqlParams queryParameters, bool withoutBraces = false)
     {
         if (!value.IsList && value.ValueType == ClrValueType.Null)
         {
@@ -170,6 +170,11 @@ public class SqlDialect
 
         if (op == CompareOperator.In)
         {
+            if (withoutBraces)
+            {
+                return string.Join(", ", parameters);
+            }
+
             return $"({string.Join(", ", parameters)})";
         }
 

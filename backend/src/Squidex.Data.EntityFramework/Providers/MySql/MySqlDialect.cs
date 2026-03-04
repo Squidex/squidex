@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Text;
 using MySqlConnector;
 using Squidex.Infrastructure.Queries;
 
@@ -85,7 +86,13 @@ public sealed class MySqlDialect : SqlDialect
             var sqlOrder = FormatOrder(order);
             var sqlPath = path.JsonPath();
 
-            return $"IF(JSON_TYPE(JSON_EXTRACT({sqlPath})) IN ('INTEGER', 'DOUBLE', 'DECIMAL'), CAST(JSON_VALUE({sqlPath}) AS DOUBLE), NULL) {sqlOrder}, JSON_VALUE({sqlPath}) {sqlOrder}";
+            return $"""
+                IF (JSON_TYPE(JSON_EXTRACT({sqlPath})) IN ('INTEGER', 'DOUBLE', 'DECIMAL'),
+                    CAST(JSON_VALUE({sqlPath}) AS DOUBLE),
+                    NULL
+                ) {sqlOrder},
+                JSON_VALUE({sqlPath}) {sqlOrder}
+                """;
         }
 
         return base.OrderBy(path, order, isJson);
@@ -100,15 +107,54 @@ public sealed class MySqlDialect : SqlDialect
     {
         if (isJson)
         {
+            var sqlPath = path.JsonPath();
+            var sqlOp = FormatOperator(op, value);
+            var sqlRhs = FormatValues(op, value, queryParameters);
             var isBoolean = value.ValueType is ClrValueType.Boolean;
-            if (isBoolean)
-            {
-                var sqlPath = path.JsonPath();
-                var sqlOp = FormatOperator(op, value);
-                var sqlRhs = FormatValues(op, value, queryParameters);
 
-                return $"IF(JSON_VALUE({sqlPath}) = 'true', 1, 0) {sqlOp} {sqlRhs}";
+            string ScalarCondition()
+            {
+                if (isBoolean)
+                {
+                    return $"IF(JSON_VALUE({sqlPath}) = 'true', 1, 0) {sqlOp} {sqlRhs}";
+                }
+
+                return base.Where(path, op, value, queryParameters, isJson);
             }
+
+            if (value.IsList && op == CompareOperator.In)
+            {
+                return $"""
+                    IF(
+                        JSON_TYPE(JSON_EXTRACT({sqlPath})) = 'ARRAY',
+                        JSON_OVERLAPS(JSON_EXTRACT({sqlPath}), JSON_ARRAY{sqlRhs}),
+                        JSON_CONTAINS(JSON_ARRAY{sqlRhs}, JSON_EXTRACT({sqlPath}))
+                    )
+                    """;
+            }
+
+            if (op == CompareOperator.Equals)
+            {
+                var valueExpr = value.ValueType switch
+                {
+                    ClrValueType.Boolean =>
+                        $"IF({sqlRhs} = 1, 'true', 'false')",
+                    ClrValueType.String =>
+                        $"JSON_QUOTE({sqlRhs})",
+                    _ =>
+                        $"CAST({sqlRhs} AS JSON)",
+                };
+
+                return $"""
+                    IF(
+                        JSON_TYPE(JSON_EXTRACT({sqlPath})) = 'ARRAY',
+                        JSON_CONTAINS(JSON_EXTRACT({sqlPath}), {valueExpr}),
+                        {ScalarCondition()}
+                    )
+                    """;
+            }
+
+            return ScalarCondition();
         }
 
         return base.Where(path, op, value, queryParameters, isJson);

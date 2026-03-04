@@ -31,35 +31,29 @@ public sealed class SchemaResolver : IAsyncActionFilter
     public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
     {
         var app = context.HttpContext.Features.Get<App>();
-
-        if (app != null)
+        if (app != null && context.RouteData.Values.TryGetValue("schema", out var schemaValue))
         {
-            if (context.RouteData.Values.TryGetValue("schema", out var schemaValue))
+            var schemaIdOrName = schemaValue?.ToString();
+            if (string.IsNullOrWhiteSpace(schemaIdOrName))
             {
-                var schemaIdOrName = schemaValue?.ToString();
-
-                if (string.IsNullOrWhiteSpace(schemaIdOrName))
-                {
-                    context.Result = new NotFoundResult();
-                    return;
-                }
-
-                var schema = await GetSchemaAsync(app.Id, schemaIdOrName, context.HttpContext.User);
-
-                if (schema == null)
-                {
-                    context.Result = new NotFoundResult();
-                    return;
-                }
-
-                if (context.ActionDescriptor.EndpointMetadata.Any(x => x is SchemaMustBePublishedAttribute) && !schema.IsPublished)
-                {
-                    context.Result = new NotFoundResult();
-                    return;
-                }
-
-                context.HttpContext.Features.Set(schema);
+                context.Result = new NotFoundResult();
+                return;
             }
+
+            var schema = await GetSchemaAsync(app.Id, schemaIdOrName, context.HttpContext.User);
+            if (schema == null)
+            {
+                context.Result = new NotFoundResult();
+                return;
+            }
+
+            if (context.ActionDescriptor.EndpointMetadata.Any(x => x is SchemaMustBePublishedAttribute) && !schema.IsPublished)
+            {
+                context.Result = new NotFoundResult();
+                return;
+            }
+
+            context.HttpContext.Features.Set(schema);
         }
 
         await next();

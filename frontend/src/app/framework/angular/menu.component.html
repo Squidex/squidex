@@ -23,7 +23,13 @@
         </sqx-dropdown-menu>
     }
 
-    <div class="d-flex flex-nowrap" #menu [class.gap-1]="small" [class.gap-2]="!small" [class.overflown-right]="!!overflowMenuItems && isRightAligned" [class.overflown-left]="!!overflowMenuItems && !isRightAligned">
+    <div
+        class="d-flex flex-nowrap"
+        #menu
+        [class.gap-1]="small"
+        [class.gap-2]="!small"
+        [class.overflown-left]="!!overflowMenuItems && !isRightAligned"
+        [class.overflown-right]="!!overflowMenuItems && isRightAligned">
         <ng-content />
     </div>
 </div>

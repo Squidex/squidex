@@ -74,7 +74,7 @@
         @if (!editForm) {
             <div>
                 <div class="btn-group ms-2" attr.aria-label="{{ 'schemas.addField' | sqxTranslate }}" role="group">
-                    <button class="btn btn-success" (click)="addField('Close')" shortcut="CTRL + SHIFT + S">
+                    <button class="btn btn-success" (click)="addField('Close')" shortcut="CTRL + SHIFT + S" type="button">
                         {{ "schemas.addFieldAndClose" | sqxTranslate }}
                     </button>
                     <button
@@ -86,8 +86,8 @@
                         <i class="icon-angle-down"></i>
                     </button>
                     <sqx-dropdown-menu position="top-end" scrollY="true" [sqxAnchoredTo]="buttonSave" *sqxModal="addFieldModal; closeAlways: true">
-                        <button class="dropdown-item" (click)="addField('Add')">{{ "schemas.addFieldAndCreate" | sqxTranslate }}</button>
-                        <button class="dropdown-item" (click)="addField('Edit')">{{ "schemas.addFieldAndEdit" | sqxTranslate }}</button>
+                        <button class="dropdown-item" (click)="addField('Add')" type="button">{{ "schemas.addFieldAndCreate" | sqxTranslate }}</button>
+                        <button class="dropdown-item" (click)="addField('Edit')" type="button">{{ "schemas.addFieldAndEdit" | sqxTranslate }}</button>
                     </sqx-dropdown-menu>
                 </div>
             </div>
@@ -96,7 +96,7 @@
         @if (editForm) {
             <div>
                 <div class="btn-group ms-2" attr.aria-label="{{ 'schemas.saveField' | sqxTranslate }}" role="group">
-                    <button class="btn btn-primary" (click)="save('Close')" shortcut="CTRL + SHIFT + S">
+                    <button class="btn btn-primary" (click)="save('Close')" shortcut="CTRL + SHIFT + S" type="button">
                         {{ "schemas.saveFieldAndClose" | sqxTranslate }}
                     </button>
                     <button
@@ -108,7 +108,7 @@
                         <i class="icon-angle-down"></i>
                     </button>
                     <sqx-dropdown-menu position="bottom-end" scrollY="true" [sqxAnchoredTo]="buttonSave" *sqxModal="addFieldModal; closeAlways: true">
-                        <button class="dropdown-item" (click)="save('Add')">{{ "schemas.saveFieldAndNew" | sqxTranslate }}</button>
+                        <button class="dropdown-item" (click)="save('Add')" type="button">{{ "schemas.saveFieldAndNew" | sqxTranslate }}</button>
                     </sqx-dropdown-menu>
                 </div>
             </div>

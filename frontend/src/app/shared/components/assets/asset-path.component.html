@@ -3,7 +3,7 @@
         @if (i > 0) {
             <i class="icon-angle-right"></i>
         }
-        <button class="btn" [class.first]="i === 0" [class.force]="i < path.length - 1 || all" (click)="navigate.emit(item)">
+        <button class="btn" [class.first]="i === 0" [class.force]="i < path.length - 1 || all" (click)="navigate.emit(item)" type="button">
             {{ item.folderName | sqxTranslate }}
         </button>
     } @empty {

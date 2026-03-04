@@ -3,7 +3,7 @@
     <div #graphiQLContainer inner sqxTourStep="graphQLExplorer"></div>
 
     @if (clientsReadable) {
-        <button class="btn btn-simple btn-options" (click)="clientsDialog.show()"><i class="icon-clients"></i></button>
+        <button class="btn btn-simple btn-options" (click)="clientsDialog.show()" type="button"><i class="icon-clients"></i></button>
     }
 </sqx-layout>
 <sqx-modal-dialog (dialogClose)="clientsDialog.hide()" *sqxModal="clientsDialog">
