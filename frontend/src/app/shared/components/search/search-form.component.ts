@@ -157,6 +157,8 @@ export class SearchFormComponent {
             let args;
             let component: Type<FieldComponent<any>> | undefined = undefined;
 
+            let operators = [...model.operators[field.schema.type]];
+
             const { type, extra } = field.schema;
             if (field.schema.type === 'Boolean') {
                 component = BooleanValue;
@@ -176,6 +178,7 @@ export class SearchFormComponent {
             } else if (type === 'String' && !extra) {
                 component = StringValue;
             } else if (type === 'StringArray' && extra?.schemaIds) {
+                operators = ['eq'];
                 args = { editor: 'Reference', schemaIds: extra.schemaIds };
             } else if (type === 'StringArray') {
                 component = StringValue;
@@ -189,7 +192,7 @@ export class SearchFormComponent {
                 defaultValue: null,
                 description: field.description,
                 label: field.path,
-                operators: model.operators[field.schema.type] as any,
+                operators,
                 path: field.path,
             };
 

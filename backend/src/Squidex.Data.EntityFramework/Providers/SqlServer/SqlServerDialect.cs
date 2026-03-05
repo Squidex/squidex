@@ -92,92 +92,62 @@ public sealed class SqlServerDialect : SqlDialect
             var sqlOp = FormatOperator(op, value);
             var sqlRhs = FormatValues(op, value, queryParameters);
 
-            var isNull = value.ValueType is ClrValueType.Null;
-            var isBoolean = value.ValueType is ClrValueType.Boolean;
-            var isNumeric = value.ValueType is
-                ClrValueType.Single or
-                ClrValueType.Double or
-                ClrValueType.Int32 or
-                ClrValueType.Int64;
-
-            string ScalarCondition()
+            string BuildCondition(string path, string queryPath)
             {
+                var isNumeric = value.ValueType is
+                    ClrValueType.Single or
+                    ClrValueType.Double or
+                    ClrValueType.Int32 or
+                    ClrValueType.Int64;
+                if (isNumeric)
+                {
+                    return $"TRY_CAST({path} AS NUMERIC) {sqlOp} {sqlRhs}";
+                }
+
+                var isBoolean = value.ValueType is ClrValueType.Boolean;
+                if (isBoolean)
+                {
+                    return $"IIF({path} = 'true', 1, IIF({path} = 'false', 0, NULL)) {sqlOp} {sqlRhs}";
+                }
+
+                var isString = value.ValueType is
+                    ClrValueType.Instant or
+                    ClrValueType.Guid or
+                    ClrValueType.String;
+                if (isString)
+                {
+                    return $"{path} {sqlOp} {sqlRhs}";
+                }
+
+                var isNull = value.ValueType is ClrValueType.Null;
                 if (isNull)
                 {
                     if (op == CompareOperator.Equals)
                     {
-                        return $"JSON_QUERY({sqlPath}) IS NULL AND JSON_VALUE({sqlPath}) IS NULL";
+                        return $"{queryPath} IS NULL AND {path} IS NULL";
                     }
 
                     if (op == CompareOperator.NotEquals)
                     {
-                        return $"JSON_QUERY({sqlPath}) IS NOT NULL OR JSON_VALUE({sqlPath}) IS NOT NULL";
+                        return $"{queryPath} IS NOT NULL OR {path} IS NOT NULL";
                     }
                 }
 
-                if (isNumeric)
-                {
-                    return $"TRY_CAST(JSON_VALUE({sqlPath}) AS NUMERIC) {sqlOp} {sqlRhs}";
-                }
-
-                if (isBoolean)
-                {
-                    return $"IIF(JSON_VALUE({sqlPath}) = 'true', 1, 0) {sqlOp} {sqlRhs}";
-                }
-
-                return base.Where(path, op, value, queryParameters, isJson);
+                return base.Where(path, op, value, queryParameters, false);
             }
 
-            string ArrayCondition(string field, string op)
-            {
-                if (isNumeric)
-                {
-                    return $"TRY_CAST({field} AS NUMERIC) {op} {sqlRhs}";
-                }
-
-                if (isBoolean)
-                {
-                    return $"IIF({field} = 'true', 1, 0) {op} {sqlRhs}";
-                }
-
-                return $"{field} = {sqlRhs}";
-            }
-
-            if (value.IsList && op == CompareOperator.In)
-            {
-                return $"""
-                    CASE WHEN LEFT(JSON_QUERY({sqlPath}), 1) = '['
-                        THEN (
-                            SELECT COUNT(*)
-                            FROM OPENJSON({sqlPath}) AS field_arr
-                            WHERE {ArrayCondition("field_arr.value", "IN")}
-                        )
-                        ELSE (
-                            SELECT COUNT(*)
-                            WHERE {ScalarCondition()}
-                        )
-                    END > 0
-                    """;
-            }
-
-            if (op == CompareOperator.Equals)
-            {
-                return $"""
-                    CASE WHEN LEFT(JSON_QUERY({sqlPath}), 1) = '['
-                        THEN (
-                            SELECT COUNT(*)
-                            FROM OPENJSON({sqlPath}) AS field_arr
-                            WHERE {ArrayCondition("field_arr.value", "=")}
-                        )
-                        ELSE (
-                            SELECT COUNT(*)
-                            WHERE {ScalarCondition()}
-                        )
-                    END > 0
-                    """;
-            }
-
-            return ScalarCondition();
+            return $"""
+                (
+                    CASE WHEN LEFT(LTRIM(JSON_QUERY({sqlPath})), 1) = '['
+                        THEN CASE WHEN EXISTS (
+                            SELECT 1
+                            FROM OPENJSON({sqlPath}) AS __element
+                            WHERE {BuildCondition("__element.[value]", "__element.[value]")}
+                        ) THEN 1 ELSE 0 END
+                        ELSE CASE WHEN {BuildCondition($"JSON_VALUE({sqlPath})", $"JSON_QUERY({sqlPath})")} THEN 1 ELSE 0 END
+                    END
+                ) = 1
+                """;
         }
 
         return base.Where(path, op, value, queryParameters, isJson);

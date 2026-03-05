@@ -110,51 +110,66 @@ public sealed class MySqlDialect : SqlDialect
             var sqlPath = path.JsonPath();
             var sqlOp = FormatOperator(op, value);
             var sqlRhs = FormatValues(op, value, queryParameters);
-            var isBoolean = value.ValueType is ClrValueType.Boolean;
 
-            string ScalarCondition()
+            string BuildCondition(string path)
             {
-                if (isBoolean)
+                var isNumeric = value.ValueType is
+                    ClrValueType.Single or
+                    ClrValueType.Double or
+                    ClrValueType.Int32 or
+                    ClrValueType.Int64;
+                if (isNumeric)
                 {
-                    return $"IF(JSON_VALUE({sqlPath}) = 'true', 1, 0) {sqlOp} {sqlRhs}";
+                    return $"""
+                        (CASE WHEN JSON_TYPE({path}) IN ('INTEGER', 'DOUBLE', 'DECIMAL')
+                            THEN CAST(JSON_UNQUOTE({path}) AS DECIMAL(65,10)) {sqlOp} {sqlRhs}
+                            ELSE FALSE 
+                        END)
+                        """;
                 }
 
-                return base.Where(path, op, value, queryParameters, isJson);
-            }
-
-            if (value.IsList && op == CompareOperator.In)
-            {
-                return $"""
-                    IF(
-                        JSON_TYPE(JSON_EXTRACT({sqlPath})) = 'ARRAY',
-                        JSON_OVERLAPS(JSON_EXTRACT({sqlPath}), JSON_ARRAY{sqlRhs}),
-                        JSON_CONTAINS(JSON_ARRAY{sqlRhs}, JSON_EXTRACT({sqlPath}))
-                    )
-                    """;
-            }
-
-            if (op == CompareOperator.Equals)
-            {
-                var valueExpr = value.ValueType switch
+                var isBoolean = value.ValueType is ClrValueType.Boolean;
+                if (isBoolean)
                 {
-                    ClrValueType.Boolean =>
-                        $"IF({sqlRhs} = 1, 'true', 'false')",
-                    ClrValueType.String =>
-                        $"JSON_QUOTE({sqlRhs})",
-                    _ =>
-                        $"CAST({sqlRhs} AS JSON)",
-                };
+                    return $"""
+                        (CASE WHEN JSON_TYPE({path}) = 'BOOLEAN'
+                            THEN IF(JSON_UNQUOTE({path}) = 'true', TRUE, FALSE) {sqlOp} {sqlRhs}
+                            ELSE FALSE 
+                        END)
+                        """;
+                }
 
-                return $"""
-                    IF(
-                        JSON_TYPE(JSON_EXTRACT({sqlPath})) = 'ARRAY',
-                        JSON_CONTAINS(JSON_EXTRACT({sqlPath}), {valueExpr}),
-                        {ScalarCondition()}
-                    )
-                    """;
+                var isString = value.ValueType is
+                    ClrValueType.Instant or
+                    ClrValueType.Guid or
+                    ClrValueType.String;
+                if (isString)
+                {
+                    return $"JSON_UNQUOTE({path}) {sqlOp} {sqlRhs}";
+                }
+
+                var isNull = value.ValueType is ClrValueType.Null;
+                if (isNull)
+                {
+                    var nullOp = FormatOperator(op, "null");
+                    return $"COALESCE(JSON_TYPE({path}), 'NULL') {nullOp} 'NULL'";
+                }
+
+                return base.Where(path, op, value, queryParameters, false);
             }
 
-            return ScalarCondition();
+            return $"""
+                CASE WHEN JSON_TYPE(JSON_EXTRACT({sqlPath})) = 'ARRAY'
+                    THEN EXISTS (
+                        SELECT 1
+                        FROM JSON_TABLE(JSON_EXTRACT({sqlPath}), '$[*]' COLUMNS (
+                            __element JSON PATH '$'
+                        )) AS __jt
+                        WHERE {BuildCondition("__element")}
+                    )
+                    ELSE {BuildCondition($"JSON_EXTRACT({sqlPath})")}
+                END
+                """;
         }
 
         return base.Where(path, op, value, queryParameters, isJson);

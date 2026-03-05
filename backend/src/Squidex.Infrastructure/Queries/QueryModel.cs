@@ -117,14 +117,12 @@ public sealed class QueryModel
     public QueryModel Flatten(int maxDepth = 7, bool onlyWithOperators = true)
     {
         var predicate = (Predicate<FilterSchema>?)null;
-
         if (onlyWithOperators)
         {
             predicate = x => Operators.TryGetValue(x.Type, out var operators) && operators.Count > 0;
         }
 
         var flatten = Schema.Flatten(maxDepth, predicate);
-
         if (ReferenceEquals(flatten, Schema))
         {
             return this;

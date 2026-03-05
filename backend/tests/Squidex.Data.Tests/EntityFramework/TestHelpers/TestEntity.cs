@@ -41,13 +41,21 @@ public class TestJson
 
     public long? NumberOrNull { get; set; }
 
+    public long[] NumberArray { get; set; }
+
     public string Text { get; set; }
+
+    public string? TextOrNull { get; set; }
+
+    public string[] TextArray { get; set; }
 
     public bool Boolean { get; set; }
 
     public bool? BooleanOrNull { get; set; }
 
+    public bool[] BooleanArray { get; set; }
+
     public object? Mixed { get; set; }
 
-    public long[] Array { get; set; }
+    public object?[] MixedArray { get; set; }
 }
