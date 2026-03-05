@@ -1777,7 +1777,6 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
                 .Where(query);
 
         var (sql, parameters) = queryBuilder.Compile();
-        File.WriteAllText("D:\\last.json", sql);
         var dbResult = await dbContext.Set<TestEntity>().FromSqlRaw(sql, parameters).ToListAsync();
 
         return dbResult.Select(x => x.Number).Where(x => includeSpecialCase || x != 21).ToList();

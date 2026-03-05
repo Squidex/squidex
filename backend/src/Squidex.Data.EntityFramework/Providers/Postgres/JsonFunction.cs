@@ -19,7 +19,7 @@ public static class JsonFunction
     private const int TypeBoolean = 3;
     private const int TypeNumber = 4;
 
-    private static readonly Dictionary<(int Type, CompareOperator Operator), string> Functions = new()
+    private static readonly Dictionary<(int Type, CompareOperator Operator), string> Functions = new ()
     {
         [(TypeAny, CompareOperator.Empty)] = "jsonb_empty",
         [(TypeAny, CompareOperator.Exists)] = "jsonb_exists",
