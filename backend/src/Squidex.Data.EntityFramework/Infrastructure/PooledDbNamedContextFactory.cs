@@ -7,7 +7,6 @@
 
 using System.Collections.Concurrent;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Internal;
 
 #pragma warning disable EF1001 // Internal EF Core API usage.

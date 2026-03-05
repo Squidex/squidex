@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Microsoft.EntityFrameworkCore;
-using MongoDB.Driver;
 using NetTopologySuite.Geometries;
 using Squidex.EntityFramework.TestHelpers;
 using Squidex.Infrastructure;
@@ -94,6 +93,31 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
             });
         }
 
+        set.Add(new TestEntity
+        {
+            Boolean = false,
+            BooleanOrNull = null,
+            Number = 21,
+            NumberOrNull = null,
+            FullText = string.Empty,
+            Text = string.Empty,
+            Json = new TestJson
+            {
+                Boolean = false,
+                BooleanArray = [],
+                BooleanOrNull = null,
+                Mixed = null,
+                MixedArray = [],
+                Number = 21,
+                NumberArray = [],
+                NumberOrNull = null,
+                Text = string.Empty,
+                TextArray = [],
+                TextOrNull = null,
+            },
+            Point = new Point(0, 0) { SRID = 4326 },
+        });
+
         await dbContext.SaveChangesAsync();
         return dbContext;
     }
@@ -155,7 +179,7 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
             Sort = [new SortNode("Number", SortOrder.Descending)],
         });
 
-        Assert.Equal(Range(15, 11), actual);
+        Assert.Equal(Range(16, 12), actual);
     }
 
     [Fact]
@@ -210,7 +234,7 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
             Sort = [new SortNode("Text", SortOrder.Ascending)],
         });
 
-        Assert.Equal([.. Range(10, 19), 1, 2, 20, .. Range(3, 9)], actual);
+        Assert.Equal([.. Range(10, 19), 1, 20, 2, .. Range(3, 9)], actual);
     }
 
     [Fact]
@@ -232,7 +256,7 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
             Sort = [new SortNode("Json.text", SortOrder.Ascending)],
         });
 
-        Assert.Equal([.. Range(10, 19), 1, 2, 20, .. Range(3, 9)], actual);
+        Assert.Equal([.. Range(10, 19), 1, 20, 2, .. Range(3, 9)], actual);
     }
 
     [Fact]
@@ -416,6 +440,17 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
     }
 
     [Fact]
+    public async Task Should_filter_by_number_in()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.In("Number", new List<int> { 3, 7, 15 }),
+        });
+
+        Assert.Equal([3, 7, 15], actual.Order().ToArray());
+    }
+
+    [Fact]
     public async Task Should_filter_by_number_equal_in_json()
     {
         var actual = await QueryAsync(new ClrQuery
@@ -482,6 +517,17 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
     }
 
     [Fact]
+    public async Task Should_filter_by_number_in_json()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.In("Json.number", new List<int> { 3, 7, 15 }),
+        });
+
+        Assert.Equal([3, 7, 15], actual.Order().ToArray());
+    }
+
+    [Fact]
     public async Task Should_filter_by_number_null_in_nullable_json()
     {
         var actual = await QueryAsync(new ClrQuery
@@ -537,6 +583,28 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
     }
 
     [Fact]
+    public async Task Should_filter_by_number_empty_in_nullable_json()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Empty("Json.numberOrNull"),
+        });
+
+        Assert.Equal(Range(11, 20), actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_by_number_exists_in_nullable_json()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Exists("Json.numberOrNull"),
+        });
+
+        Assert.Equal(Range(1, 10), actual.Order().ToArray());
+    }
+
+    [Fact]
     public async Task Should_filter_by_number_equal_in_mixed_json()
     {
         var actual = await QueryAsync(new ClrQuery
@@ -581,6 +649,17 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
     }
 
     [Fact]
+    public async Task Should_filter_by_number_not_equal_in_json_number_array()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Ne("Json.numberArray", 7),
+        });
+
+        Assert.Equal(AllExept(7), actual.Order().ToArray());
+    }
+
+    [Fact]
     public async Task Should_filter_by_number_greater_than_in_json_number_array()
     {
         var actual = await QueryAsync(new ClrQuery
@@ -603,6 +682,28 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
     }
 
     [Fact]
+    public async Task Should_filter_by_number_less_than_in_json_number_array()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Lt("Json.numberArray", 0),
+        });
+
+        Assert.Empty(actual);
+    }
+
+    [Fact]
+    public async Task Should_filter_by_number_less_than_or_equal_in_json_number_array()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Le("Json.numberArray", 0),
+        });
+
+        Assert.Equal(Range(1, 20), actual.Order().ToArray());
+    }
+
+    [Fact]
     public async Task Should_filter_by_number_in_json_number_array()
     {
         var actual = await QueryAsync(new ClrQuery
@@ -622,6 +723,28 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
         });
 
         Assert.Equal(Range(6, 15), actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_by_number_empty_in_json_number_array()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Empty("Json.numberArray"),
+        }, includeSpecialCase: true);
+
+        Assert.Equal([21], actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_by_number_exists_in_json_number_array()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Exists("Json.numberArray"),
+        });
+
+        Assert.Equal(Range(1, 20), actual.Order().ToArray());
     }
 
     [Fact]
@@ -724,6 +847,17 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
     }
 
     [Fact]
+    public async Task Should_filter_by_string_in()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.In("Text", new List<string> { "Prefix3Suffix", "Prefix7Suffix" }),
+        });
+
+        Assert.Equal([3, 7], actual.Order().ToArray());
+    }
+
+    [Fact]
     public async Task Should_filter_by_string_equal_in_json()
     {
         var actual = await QueryAsync(new ClrQuery
@@ -776,6 +910,39 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
         });
 
         Assert.Equal([5, 15], actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_by_string_in_json()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.In("Json.text", new List<string> { "Prefix3Suffix", "Prefix7Suffix" }),
+        });
+
+        Assert.Equal([3, 7], actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_by_string_empty_in_json()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Empty("Json.text"),
+        }, includeSpecialCase: true);
+
+        Assert.Equal([21], actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_by_string_exists_in_json()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Exists("Json.text"),
+        });
+
+        Assert.Equal(Range(1, 20), actual.Order().ToArray());
     }
 
     [Fact]
@@ -834,6 +1001,28 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
     }
 
     [Fact]
+    public async Task Should_filter_by_string_empty_in_nullable_json()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Empty("Json.textOrNull"),
+        });
+
+        Assert.Equal(Range(11, 20), actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_by_string_exists_in_nullable_json()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Exists("Json.textOrNull"),
+        });
+
+        Assert.Equal(Range(1, 10), actual.Order().ToArray());
+    }
+
+    [Fact]
     public async Task Should_filter_by_string_contains_in_mixed_json()
     {
         var actual = await QueryAsync(new ClrQuery
@@ -885,7 +1074,7 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
             Filter = ClrFilter.Ne("Json.textArray", "X5"),
         });
 
-        Assert.Equal(20, actual.Count);
+        Assert.Equal(19, actual.Count);
     }
 
     [Fact]
@@ -922,6 +1111,39 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
     }
 
     [Fact]
+    public async Task Should_filter_by_string_in_json_text_array()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.In("Json.textArray", new List<string> { "X5", "Y7" }),
+        });
+
+        Assert.Equal([5, 7], actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_by_string_empty_in_json_text_array()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Empty("Json.textArray"),
+        }, includeSpecialCase: true);
+
+        Assert.Equal([21], actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_by_string_exists_in_json_text_array()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Exists("Json.textArray"),
+        });
+
+        Assert.Equal(Range(1, 20), actual.Order().ToArray());
+    }
+
+    [Fact]
     public async Task Should_filter_by_string_contains_in_json_mixed_array()
     {
         var actual = await QueryAsync(new ClrQuery
@@ -941,6 +1163,17 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
         });
 
         Assert.Equal([5], actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_by_string_in_json_mixed_array()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.In("Json.mixedArray", new List<string> { "T5", "T7" }),
+        });
+
+        Assert.Equal([5, 7], actual.Order().ToArray());
     }
 
     [Fact]
@@ -966,6 +1199,17 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
     }
 
     [Fact]
+    public async Task Should_filter_by_boolean_in()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.In("Boolean", new List<bool> { true }),
+        });
+
+        Assert.Equal(Range(11, 20), actual.Order().ToArray());
+    }
+
+    [Fact]
     public async Task Should_filter_by_boolean_true_in_json()
     {
         var actual = await QueryAsync(new ClrQuery
@@ -985,6 +1229,50 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
         });
 
         Assert.Equal(Range(1, 10), actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_by_boolean_not_equal_true_in_json()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Ne("Json.boolean", true),
+        });
+
+        Assert.Equal(Range(1, 10), actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_by_boolean_not_equal_false_in_json()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Ne("Json.boolean", false),
+        });
+
+        Assert.Equal(Range(11, 20), actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_by_boolean_in_json()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.In("Json.boolean", new List<bool> { true }),
+        });
+
+        Assert.Equal(Range(11, 20), actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_by_boolean_in_json_returns_all_when_both_values()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.In("Json.boolean", new List<bool> { true, false }),
+        });
+
+        Assert.Equal(Range(1, 20), actual.Order().ToArray());
     }
 
     [Fact]
@@ -1015,6 +1303,28 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
         var actual = await QueryAsync(new ClrQuery
         {
             Filter = ClrFilter.Eq("Json.booleanOrNull", true),
+        });
+
+        Assert.Equal(Range(11, 20), actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_by_boolean_empty_in_nullable_json()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Empty("Json.booleanOrNull"),
+        });
+
+        Assert.Equal(Range(1, 10), actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_by_boolean_exists_in_nullable_json()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Exists("Json.booleanOrNull"),
         });
 
         Assert.Equal(Range(11, 20), actual.Order().ToArray());
@@ -1065,6 +1375,72 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
     }
 
     [Fact]
+    public async Task Should_filter_by_boolean_not_equal_true_in_json_boolean_array()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Ne("Json.booleanArray", true),
+        });
+
+        Assert.Equal(Range(1, 10), actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_by_boolean_not_equal_false_in_json_boolean_array()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Ne("Json.booleanArray", false),
+        });
+
+        Assert.Equal(Range(16, 20), actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_by_boolean_in_true_in_json_boolean_array()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.In("Json.booleanArray", new List<bool> { true }),
+        });
+
+        Assert.Equal(Range(11, 20), actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_by_boolean_in_false_in_json_boolean_array()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.In("Json.booleanArray", new List<bool> { false }),
+        });
+
+        Assert.Equal(Range(1, 15), actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_by_boolean_empty_in_json_boolean_array()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Empty("Json.booleanArray"),
+        }, includeSpecialCase: true);
+
+        Assert.Equal([21], actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_by_boolean_exists_in_json_boolean_array()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Exists("Json.booleanArray"),
+        });
+
+        Assert.Equal(Range(1, 20), actual.Order().ToArray());
+    }
+
+    [Fact]
     public async Task Should_filter_by_boolean_true_in_json_mixed_array()
     {
         var actual = await QueryAsync(new ClrQuery
@@ -1084,6 +1460,28 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
         });
 
         Assert.Equal(Range(1, 10), actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_by_boolean_not_equal_true_in_json_mixed_array()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Ne("Json.mixedArray", true),
+        });
+
+        Assert.Equal(Range(1, 10), actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_by_boolean_in_json_mixed_array()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.In("Json.mixedArray", new List<bool> { true }),
+        });
+
+        Assert.Equal(Range(11, 20), actual.Order().ToArray());
     }
 
     [Fact]
@@ -1197,6 +1595,28 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
     }
 
     [Fact]
+    public async Task Should_filter_by_empty_in_mixed_json()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Empty("Json.mixed"),
+        }, includeSpecialCase: true);
+
+        Assert.Equal([6, 12, 18, 21], actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_by_exists_in_mixed_json()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Exists("Json.mixed"),
+        }, includeSpecialCase: true);
+
+        Assert.Equal(AllExept(6, 12, 18, 21), actual.Order().ToArray());
+    }
+
+    [Fact]
     public async Task Should_filter_by_null_in_json_mixed_array()
     {
         var actual = await QueryAsync(new ClrQuery
@@ -1215,6 +1635,28 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
             Filter = ClrFilter.Ne("Json.mixedArray", ClrValue.Null),
         });
 
+        Assert.Equal(14, actual.Count);
+    }
+
+    [Fact]
+    public async Task Should_filter_by_empty_in_json_mixed_array()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Empty("Json.mixedArray"),
+        }, includeSpecialCase: true);
+
+        Assert.Equal([21], actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_by_exists_in_json_mixed_array()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Exists("Json.mixedArray"),
+        }, includeSpecialCase: true);
+
         Assert.Equal(20, actual.Count);
     }
 
@@ -1230,7 +1672,7 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
         var (sql, parameters) = builder.Compile();
         var dbResult = await dbContext.Database.SqlQueryRaw<int>(sql, parameters).FirstOrDefaultAsync();
 
-        Assert.Equal(20, dbResult);
+        Assert.Equal(21, dbResult);
     }
 
     [Fact]
@@ -1251,7 +1693,7 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
         var (sql, parameters) = builder.Compile();
         var dbResult = await dbContext.Database.SqlQueryRaw<int>(sql, parameters).FirstOrDefaultAsync();
 
-        Assert.Equal(10, dbResult);
+        Assert.Equal(11, dbResult);
     }
 
     [Fact]
@@ -1266,6 +1708,7 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
     }
 
     [Fact]
+    [Trait("Category", "Slow")]
     public async Task Should_query_full_text()
     {
         var dbContext = await CreateAndPrepareDbContextAsync();
@@ -1281,6 +1724,7 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
     }
 
     [Fact]
+    [Trait("Category", "Slow")]
     public async Task Should_query_full_text_with_space()
     {
         var dbContext = await CreateAndPrepareDbContextAsync();
@@ -1321,7 +1765,7 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
         return result.ToArray();
     }
 
-    private async Task<List<long>> QueryAsync(ClrQuery query)
+    private async Task<List<long>> QueryAsync(ClrQuery query, bool includeSpecialCase = false)
     {
         var dbContext = await CreateAndPrepareDbContextAsync();
 
@@ -1336,7 +1780,7 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
         File.WriteAllText("D:\\last.json", sql);
         var dbResult = await dbContext.Set<TestEntity>().FromSqlRaw(sql, parameters).ToListAsync();
 
-        return dbResult.Select(x => x.Number).ToList();
+        return dbResult.Select(x => x.Number).Where(x => includeSpecialCase || x != 21).ToList();
     }
 
     private static async Task<List<TestEntity>> PollAsync(TContext dbContext, string sql, object[] parameters, int expectedCount)

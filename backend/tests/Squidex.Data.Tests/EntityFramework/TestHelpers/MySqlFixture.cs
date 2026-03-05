@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
+using Squidex.Infrastructure.Queries;
 using Squidex.Providers.MySql;
 using Squidex.Providers.MySql.Content;
 using Testcontainers.MySql;
@@ -63,6 +64,7 @@ public class MySqlFixture(string? reuseId = null) : IAsyncLifetime, ISqlContentF
                 .AddSingleton<ConnectionStringParser, MySqlConnectionStringParser>()
                 .AddSingletonAs<DatabaseCreator<TestDbContextMySql>>().Done()
                 .AddSingleton(TestUtils.DefaultSerializer)
+                .AddSingleton<IInitializable, SqlDialectInitializer<TestDbContextMySql>>()
                 .BuildServiceProvider();
 
         foreach (var service in services.GetRequiredService<IEnumerable<IInitializable>>())

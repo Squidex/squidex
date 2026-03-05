@@ -17,7 +17,14 @@ internal static class Extensions
     {
         sb.Append('`');
         sb.Append(path[0]);
-        sb.Append("`, \'$");
+        sb.Append("`, ");
+        sb.AppendJsonPropertyPath(path);
+        return sb;
+    }
+
+    public static StringBuilder AppendJsonPropertyPath(this StringBuilder sb, PropertyPath path)
+    {
+        sb.Append("\'$");
 
         foreach (var property in path.Skip(1))
         {
@@ -36,6 +43,11 @@ internal static class Extensions
 
         sb.Append('\'');
         return sb;
+    }
+
+    public static string JsonSubPath(this PropertyPath path)
+    {
+        return new StringBuilder().AppendJsonPropertyPath(path).ToString();
     }
 
     public static string JsonPath(this PropertyPath path)

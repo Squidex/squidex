@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Text;
+using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
 using Squidex.Infrastructure.Queries;
 
@@ -17,6 +17,12 @@ public sealed class MySqlDialect : SqlDialect
 
     private MySqlDialect()
     {
+    }
+
+    public override Task InitializeAsync(DbContext dbContext,
+        CancellationToken ct)
+    {
+        return JsonFunction.InitializeAsync(dbContext, ct);
     }
 
     public override bool IsDuplicateIndexException(Exception exception, string name)
@@ -107,69 +113,7 @@ public sealed class MySqlDialect : SqlDialect
     {
         if (isJson)
         {
-            var sqlPath = path.JsonPath();
-            var sqlOp = FormatOperator(op, value);
-            var sqlRhs = FormatValues(op, value, queryParameters);
-
-            string BuildCondition(string path)
-            {
-                var isNumeric = value.ValueType is
-                    ClrValueType.Single or
-                    ClrValueType.Double or
-                    ClrValueType.Int32 or
-                    ClrValueType.Int64;
-                if (isNumeric)
-                {
-                    return $"""
-                        (CASE WHEN JSON_TYPE({path}) IN ('INTEGER', 'DOUBLE', 'DECIMAL')
-                            THEN CAST(JSON_UNQUOTE({path}) AS DECIMAL(65,10)) {sqlOp} {sqlRhs}
-                            ELSE FALSE 
-                        END)
-                        """;
-                }
-
-                var isBoolean = value.ValueType is ClrValueType.Boolean;
-                if (isBoolean)
-                {
-                    return $"""
-                        (CASE WHEN JSON_TYPE({path}) = 'BOOLEAN'
-                            THEN IF(JSON_UNQUOTE({path}) = 'true', TRUE, FALSE) {sqlOp} {sqlRhs}
-                            ELSE FALSE 
-                        END)
-                        """;
-                }
-
-                var isString = value.ValueType is
-                    ClrValueType.Instant or
-                    ClrValueType.Guid or
-                    ClrValueType.String;
-                if (isString)
-                {
-                    return $"JSON_UNQUOTE({path}) {sqlOp} {sqlRhs}";
-                }
-
-                var isNull = value.ValueType is ClrValueType.Null;
-                if (isNull)
-                {
-                    var nullOp = FormatOperator(op, "null");
-                    return $"COALESCE(JSON_TYPE({path}), 'NULL') {nullOp} 'NULL'";
-                }
-
-                return base.Where(path, op, value, queryParameters, false);
-            }
-
-            return $"""
-                CASE WHEN JSON_TYPE(JSON_EXTRACT({sqlPath})) = 'ARRAY'
-                    THEN EXISTS (
-                        SELECT 1
-                        FROM JSON_TABLE(JSON_EXTRACT({sqlPath}), '$[*]' COLUMNS (
-                            __element JSON PATH '$'
-                        )) AS __jt
-                        WHERE {BuildCondition("__element")}
-                    )
-                    ELSE {BuildCondition($"JSON_EXTRACT({sqlPath})")}
-                END
-                """;
+            return JsonFunction.Create(path, op, value, FormatValues(op, value, queryParameters, true));
         }
 
         return base.Where(path, op, value, queryParameters, isJson);

@@ -5,7 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Text;
+using Microsoft.EntityFrameworkCore;
 using Squidex.Infrastructure.Queries;
 using SqlException = Microsoft.Data.SqlClient.SqlException;
 
@@ -17,6 +17,12 @@ public sealed class SqlServerDialect : SqlDialect
 
     private SqlServerDialect()
     {
+    }
+
+    public override Task InitializeAsync(DbContext dbContext,
+        CancellationToken ct)
+    {
+        return JsonFunction.InitializeAsync(dbContext, ct);
     }
 
     public override bool IsDuplicateIndexException(Exception exception, string name)
@@ -88,66 +94,7 @@ public sealed class SqlServerDialect : SqlDialect
     {
         if (isJson)
         {
-            var sqlPath = path.JsonPath();
-            var sqlOp = FormatOperator(op, value);
-            var sqlRhs = FormatValues(op, value, queryParameters);
-
-            string BuildCondition(string path, string queryPath)
-            {
-                var isNumeric = value.ValueType is
-                    ClrValueType.Single or
-                    ClrValueType.Double or
-                    ClrValueType.Int32 or
-                    ClrValueType.Int64;
-                if (isNumeric)
-                {
-                    return $"TRY_CAST({path} AS NUMERIC) {sqlOp} {sqlRhs}";
-                }
-
-                var isBoolean = value.ValueType is ClrValueType.Boolean;
-                if (isBoolean)
-                {
-                    return $"IIF({path} = 'true', 1, IIF({path} = 'false', 0, NULL)) {sqlOp} {sqlRhs}";
-                }
-
-                var isString = value.ValueType is
-                    ClrValueType.Instant or
-                    ClrValueType.Guid or
-                    ClrValueType.String;
-                if (isString)
-                {
-                    return $"{path} {sqlOp} {sqlRhs}";
-                }
-
-                var isNull = value.ValueType is ClrValueType.Null;
-                if (isNull)
-                {
-                    if (op == CompareOperator.Equals)
-                    {
-                        return $"{queryPath} IS NULL AND {path} IS NULL";
-                    }
-
-                    if (op == CompareOperator.NotEquals)
-                    {
-                        return $"{queryPath} IS NOT NULL OR {path} IS NOT NULL";
-                    }
-                }
-
-                return base.Where(path, op, value, queryParameters, false);
-            }
-
-            return $"""
-                (
-                    CASE WHEN LEFT(LTRIM(JSON_QUERY({sqlPath})), 1) = '['
-                        THEN CASE WHEN EXISTS (
-                            SELECT 1
-                            FROM OPENJSON({sqlPath}) AS __element
-                            WHERE {BuildCondition("__element.[value]", "__element.[value]")}
-                        ) THEN 1 ELSE 0 END
-                        ELSE CASE WHEN {BuildCondition($"JSON_VALUE({sqlPath})", $"JSON_QUERY({sqlPath})")} THEN 1 ELSE 0 END
-                    END
-                ) = 1
-                """;
+            return JsonFunction.Create(path, op, value, FormatValues(op, value, queryParameters, true));
         }
 
         return base.Where(path, op, value, queryParameters, isJson);

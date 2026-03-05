@@ -7,6 +7,7 @@
 
 using System.Collections;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 
 namespace Squidex.Infrastructure.Queries;
 
@@ -17,6 +18,12 @@ public class SqlDialect
     public virtual bool IsDuplicateIndexException(Exception exception, string name)
     {
         return false;
+    }
+
+    public virtual Task InitializeAsync(DbContext dbContext,
+        CancellationToken ct)
+    {
+        return Task.CompletedTask;
     }
 
     public virtual string BuildSelectStatement(SqlQuery request)
