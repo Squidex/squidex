@@ -114,7 +114,7 @@
                 </button>
             }
 
-            <button class="btn btn-success" (click)="emitSelect()" [disabled]="selectionCount === 0 || selectionCount > maxItems" type="submit">
+            <button class="btn btn-success" (click)="emitSelect()" [disabled]="selectionCount === 0 || selectionCount > maxItems" type="button" type="submit">
                 {{ "contents.referencesLink" | sqxTranslate: { count: selectionCount } }}
             </button>
         </div>

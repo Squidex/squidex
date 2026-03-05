@@ -1,11 +1,11 @@
 <div class="nav nav-light flex-column">
     <div class="nav-item">
-        <button class="nav-link" [class.active]="isEmpty()" (click)="tagsReset.emit()">{{ "common.tagsAll" | sqxTranslate }}</button>
+        <button class="nav-link" [class.active]="isEmpty()" (click)="tagsReset.emit()" type="button">{{ "common.tagsAll" | sqxTranslate }}</button>
     </div>
 
     @for (tag of tags; track tag.name) {
         <div class="nav-item">
-            <button class="nav-link" [class.active]="isSelected(tag)" (click)="toggle.emit(tag.name)">
+            <button class="nav-link" [class.active]="isSelected(tag)" (click)="toggle.emit(tag.name)" type="button">
                 <div class="row g-0">
                     <div class="col">
                         <span class="truncate">{{ tag.name }}</span>
@@ -15,7 +15,7 @@
                         <div class="badge badge-secondary rounded-pill">{{ tag.count }}</div>
 
                         @if (canRename) {
-                            <button class="btn-sm btn-text-secondary btn-rename" (click)="renameTag(tag)" sqxStopClick>
+                            <button class="btn-sm btn-text-secondary btn-rename" (click)="renameTag(tag)" sqxStopClick type="button">
                                 <i class="icon-pencil"></i>
                             </button>
                         }

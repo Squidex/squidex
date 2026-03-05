@@ -51,7 +51,8 @@
                     confirmRememberKey="leaveApp"
                     confirmText="i18n:apps.leaveConfirmText"
                     confirmTitle="i18n:apps.leaveConfirmTitle"
-                    (sqxConfirmClick)="leave.emit(app)">
+                    (sqxConfirmClick)="leave.emit(app)"
+                    type="button">
                     {{ "apps.leave" | sqxTranslate }}
                 </button>
             </sqx-dropdown-menu>

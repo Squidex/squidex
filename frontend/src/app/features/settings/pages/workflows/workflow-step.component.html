@@ -6,7 +6,8 @@
                 [class.active]="step.name === workflow.dto.initial"
                 [class.enabled]="step.name !== workflow.dto.initial && !step.isLocked"
                 (click)="makeInitial()"
-                [disabled]="step.name === workflow.dto.initial || step.isLocked || disabled">
+                [disabled]="step.name === workflow.dto.initial || step.isLocked || disabled"
+                type="button">
                 @if (!step.isLocked) {
                     <i class="icon-arrow-right text-decent"></i>
                 }
@@ -69,7 +70,7 @@
                 </div>
 
                 <div class="col ps-2">
-                    <button class="btn btn-outline-secondary" (click)="addTransition(openStep.name)"><i class="icon-plus"></i></button>
+                    <button class="btn btn-outline-secondary" (click)="addTransition(openStep.name)" type="button"><i class="icon-plus"></i></button>
                 </div>
             </div>
         }

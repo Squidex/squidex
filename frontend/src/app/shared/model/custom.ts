@@ -586,6 +586,7 @@ export class SchemaDto extends generated.SchemaDto {
     public export(): any {
         const fieldKeys = [
             'fieldId',
+            'cachedValues',
             'parentId',
             'parentFieldId',
             '_links',

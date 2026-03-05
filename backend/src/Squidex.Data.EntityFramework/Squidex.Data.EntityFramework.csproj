@@ -11,6 +11,9 @@
     <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <None Remove="Providers\SqlServer\json_function.sql" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\Squidex.Domain.Apps.Entities\Squidex.Domain.Apps.Entities.csproj" />
     <ProjectReference Include="..\Squidex.Domain.Users\Squidex.Domain.Users.csproj" />
     <ProjectReference Include="..\Squidex.Infrastructure\Squidex.Infrastructure.csproj" />
@@ -54,5 +57,10 @@
   </ItemGroup>
   <ItemGroup>
     <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />
+  </ItemGroup>
+  <ItemGroup>
+    <EmbeddedResource Include="Providers\MySql\json_function.sql" />
+    <EmbeddedResource Include="Providers\Postgres\json_function.sql" />
+    <EmbeddedResource Include="Providers\SqlServer\json_function.sql" />
   </ItemGroup>
 </Project>

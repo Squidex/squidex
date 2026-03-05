@@ -76,7 +76,7 @@
             <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="editOptionsDropdown; closeAlways: true">
                 @if (schemasState.canCreate) {
                     <div class="dropdown-divider"></div>
-                    <button class="dropdown-item" (click)="cloneSchema()">{{ "common.clone" | sqxTranslate }}</button>
+                    <button class="dropdown-item" (click)="cloneSchema()" type="button">{{ "common.clone" | sqxTranslate }}</button>
                 }
                 <ng-container>
                     <div class="dropdown-divider"></div>
@@ -86,7 +86,8 @@
                         confirmRememberKey="deleteSchema"
                         confirmText="i18n:schemas.deleteConfirmText"
                         confirmTitle="i18n:schemas.deleteConfirmTitle"
-                        (sqxConfirmClick)="deleteSchema()">
+                        (sqxConfirmClick)="deleteSchema()"
+                        type="button">
                         {{ "common.delete" | sqxTranslate }}
                     </button>
                 </ng-container>

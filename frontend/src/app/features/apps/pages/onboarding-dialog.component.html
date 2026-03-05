@@ -3,7 +3,7 @@
         <div class="squid d-flex align-items-center justify-content-center"><img src="./images/squid.svg" /></div>
     </ng-container>
     <ng-container content>
-        <button class="header-right modal-close btn-inline-link" (click)="cancel()">{{ "tour.skip" | sqxTranslate }}</button>
+        <button class="header-right modal-close btn-inline-link" (click)="cancel()" type="button">{{ "tour.skip" | sqxTranslate }}</button>
         @if (step === 0) {
             <div class="onboarding-step">
                 <img class="header-left" animate.enter="fade-in" animate.leave="fade-out" src="./images/logo-white-small.png" />
@@ -15,7 +15,7 @@
                     <div inline="false" [sqxMarkdown]="'tour.stepIntroText' | sqxTranslate"></div>
 
                     <div class="mt-4">
-                        <button class="btn btn-success" (click)="next()">{{ "tour.stepIntroNext" | sqxTranslate }}</button>
+                        <button class="btn btn-success" (click)="next()" type="button">{{ "tour.stepIntroNext" | sqxTranslate }}</button>
                     </div>
                 </div>
             </div>
@@ -78,8 +78,8 @@
                     <div [sqxMarkdown]="'tour.stepTourText' | sqxTranslate"></div>
 
                     <div class="mt-4">
-                        <button class="btn btn-success" (click)="start()">{{ "tour.startYes" | sqxTranslate }}</button>
-                        <button class="btn btn-outline-secondary ms-2" (click)="cancel()">
+                        <button class="btn btn-success" (click)="start()" type="button">{{ "tour.startYes" | sqxTranslate }}</button>
+                        <button class="btn btn-outline-secondary ms-2" (click)="cancel()" type="button">
                             {{ "tour.startNo" | sqxTranslate }}
                         </button>
                     </div>

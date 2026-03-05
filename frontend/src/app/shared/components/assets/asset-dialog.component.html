@@ -6,14 +6,14 @@
                 <div class="col">
                     <ul class="nav nav-tabs2">
                         <li class="nav-item">
-                            <button class="nav-link" [class.active]="selectedTab === 0" (click)="selectTab(0)">
+                            <button class="nav-link" [class.active]="selectedTab === 0" (click)="selectTab(0)" type="button">
                                 {{ "assets.tabMetadata" | sqxTranslate }}
                             </button>
                         </li>
 
                         <li class="nav-item">
                             @if (isImage) {
-                                <button class="nav-link" [class.active]="selectedTab === 1" (click)="selectTab(1)">
+                                <button class="nav-link" [class.active]="selectedTab === 1" (click)="selectTab(1)" type="button">
                                     {{ "assets.tabImage" | sqxTranslate }}
                                 </button>
                             }
@@ -21,7 +21,7 @@
 
                         <li class="nav-item">
                             @if (isImage) {
-                                <button class="nav-link" [class.active]="selectedTab === 2" (click)="selectTab(2)">
+                                <button class="nav-link" [class.active]="selectedTab === 2" (click)="selectTab(2)" type="button">
                                     {{ "assets.tabFocusPoint" | sqxTranslate }}
                                 </button>
                             }
@@ -29,7 +29,7 @@
 
                         <li class="nav-item">
                             @if (isDocumentLikely) {
-                                <button class="nav-link" [class.active]="selectedTab === 3" (click)="selectTab(3)">
+                                <button class="nav-link" [class.active]="selectedTab === 3" (click)="selectTab(3)" type="button">
                                     {{ "assets.tabTextEditor" | sqxTranslate }}
                                 </button>
                             }
@@ -37,14 +37,14 @@
 
                         <li class="nav-item">
                             @if (isVideo || (asset | sqxPreviewable)) {
-                                <button class="nav-link" [class.active]="selectedTab === 4" (click)="selectTab(4)">
+                                <button class="nav-link" [class.active]="selectedTab === 4" (click)="selectTab(4)" type="button">
                                     {{ "assets.tabPreview" | sqxTranslate }}
                                 </button>
                             }
                         </li>
 
                         <li class="nav-item">
-                            <button class="nav-link" [class.active]="selectedTab === 5" (click)="selectTab(5)">
+                            <button class="nav-link" [class.active]="selectedTab === 5" (click)="selectTab(5)" type="button">
                                 {{ "assets.tabHistory" | sqxTranslate }}
                             </button>
                         </li>
@@ -60,7 +60,13 @@
                         }
 
                         @case (1) {
-                            <button class="btn btn-primary" [class.invisible]="!isUploadable" (click)="cropImage()" [disabled]="progress > 0" type="button">
+                            <button
+                                class="btn btn-primary"
+                                [class.invisible]="!isUploadable"
+                                (click)="cropImage()"
+                                [disabled]="progress > 0"
+                                type="button"
+                                type="button">
                                 {{ "common.upload" | sqxTranslate }}
                             </button>
                         }

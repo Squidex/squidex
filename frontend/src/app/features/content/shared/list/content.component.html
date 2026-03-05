@@ -22,14 +22,14 @@
         <sqx-dropdown-menu position="bottom-start" scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="dropdown; closeAlways: true">
             <a class="dropdown-item" [routerLink]="link" sqxExternalLink target="_blank"> {{ "common.editInNewTab" | sqxTranslate }} </a>
             @for (info of content.statusUpdates; track info) {
-                <button class="dropdown-item" (click)="statusChange.emit(info.status)">
+                <button class="dropdown-item" (click)="statusChange.emit(info.status)" type="button">
                     {{ "common.statusChangeTo" | sqxTranslate }}
                     <sqx-content-status layout="text" small="true" [status]="info.status" [statusColor]="info.color" />
                 </button>
             }
 
             @if (cloneable) {
-                <button class="dropdown-item" (click)="clone.emit(); dropdown.hide()">{{ "common.clone" | sqxTranslate }}</button>
+                <button class="dropdown-item" (click)="clone.emit(); dropdown.hide()" type="button">{{ "common.clone" | sqxTranslate }}</button>
             }
 
             <div class="dropdown-divider"></div>
@@ -39,7 +39,8 @@
                 confirmRememberKey="deleteContent"
                 confirmText="i18n:contents.deleteConfirmText"
                 confirmTitle="i18n:contents.deleteConfirmTitle"
-                (sqxConfirmClick)="delete.emit()">
+                (sqxConfirmClick)="delete.emit()"
+                type="button">
                 {{ "common.delete" | sqxTranslate }}
             </button>
         </sqx-dropdown-menu>

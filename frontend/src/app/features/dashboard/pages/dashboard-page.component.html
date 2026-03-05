@@ -24,7 +24,8 @@
                             <sqx-github-card />
                         }
 
-                        @case ("api-calls") {animate.enter="fade-in" animate.leave="fade-out"
+                        @case ("api-calls") {
+                            animate.enter="fade-in" animate.leave="fade-out"
                             <sqx-api-calls-card [app]="app" [usage]="callsUsage" />
                         }
 

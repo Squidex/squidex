@@ -3,7 +3,7 @@
         <ng-container title> {{ "common.renameTag" | sqxTranslate }} </ng-container>
         <ng-container content>
             <sqx-form-error [error]="editForm.error | async" />
-            <sqx-form-row for="tagName" label="common.name" vertical required>
+            <sqx-form-row for="tagName" label="common.name" required vertical>
                 <input class="form-control" id="tagName" autocomplete="off" formControlName="tagName" sqxFocusOnInit />
             </sqx-form-row>
         </ng-container>

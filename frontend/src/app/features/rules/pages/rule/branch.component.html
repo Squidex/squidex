@@ -14,7 +14,11 @@
     @if (branchItems.length > 0) {
         @for (item of branchItems; track item.id; let last = $last; let i = $index) {
             <div class="centered">
-                <button class="btn btn-outline-secondary btn-circle-sm" attr.aria-label="{{ 'rules.addStep' | sqxTranslate }}" (click)="add(i - 1)">
+                <button
+                    class="btn btn-outline-secondary btn-circle-sm"
+                    attr.aria-label="{{ 'rules.addStep' | sqxTranslate }}"
+                    (click)="add(i - 1)"
+                    type="button">
                     <i class="icon-plus"></i>
                 </button>
             </div>
@@ -60,7 +64,11 @@
 
             @if (last && item.step.step.stepType !== "If") {
                 <div class="centered">
-                    <button class="btn btn-outline-secondary btn-circle-sm" attr.aria-label="{{ 'rules.addStep' | sqxTranslate }}" (click)="add(i)">
+                    <button
+                        class="btn btn-outline-secondary btn-circle-sm"
+                        attr.aria-label="{{ 'rules.addStep' | sqxTranslate }}"
+                        (click)="add(i)"
+                        type="button">
                         <i class="icon-plus"></i>
                     </button>
                 </div>
@@ -68,7 +76,7 @@
         }
     } @else {
         <div class="centered">
-            <button class="btn btn-outline-secondary btn-circle" attr.aria-label="{{ 'rules.addStep' | sqxTranslate }}" (click)="add()">
+            <button class="btn btn-outline-secondary btn-circle" attr.aria-label="{{ 'rules.addStep' | sqxTranslate }}" (click)="add()" type="button">
                 <i class="icon-plus"></i>
             </button>
         </div>

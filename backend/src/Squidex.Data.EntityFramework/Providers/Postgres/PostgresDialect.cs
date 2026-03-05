@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.EntityFrameworkCore;
 using Npgsql;
 using Squidex.Infrastructure.Queries;
 using Squidex.Providers.Postgres.App;
@@ -17,6 +18,12 @@ public class PostgresDialect : SqlDialect
 
     private PostgresDialect()
     {
+    }
+
+    public override Task InitializeAsync(DbContext dbContext,
+        CancellationToken ct)
+    {
+        return JsonFunction.InitializeAsync(dbContext, ct);
     }
 
     public override bool IsDuplicateIndexException(Exception exception, string name)
@@ -71,27 +78,7 @@ public class PostgresDialect : SqlDialect
     {
         if (isJson)
         {
-            var issNumeric = value.ValueType is
-                ClrValueType.Single or
-                ClrValueType.Double or
-                ClrValueType.Int32 or
-                ClrValueType.Int64;
-            if (issNumeric)
-            {
-                var sqlOp = FormatOperator(op, value);
-                var sqlRhs = FormatValues(op, value, queryParameters);
-
-                return $"(CASE WHEN jsonb_typeof({path.JsonPath(false)}) = 'number' THEN ({path.JsonPath(true)})::numeric {sqlOp} {sqlRhs} ELSE FALSE END)";
-            }
-
-            var isBoolean = value.ValueType is ClrValueType.Boolean;
-            if (isBoolean)
-            {
-                var sqlOp = FormatOperator(op, value);
-                var sqlRhs = FormatValues(op, value, queryParameters);
-
-                return $"(CASE WHEN jsonb_typeof({path.JsonPath(false)}) = 'boolean' THEN ({path.JsonPath(true)})::boolean {sqlOp} {sqlRhs} ELSE FALSE END)";
-            }
+            return JsonFunction.Create(path, op, value, FormatValues(op, value, queryParameters, true));
         }
 
         return base.Where(path, op, value, queryParameters, isJson);
@@ -100,10 +87,14 @@ public class PostgresDialect : SqlDialect
     protected override string FormatField(PropertyPath path, bool isJson)
     {
         var baseField = path[0];
-
         if (isJson && path.Count > 1)
         {
             return path.JsonPath(true);
+        }
+
+        if (baseField == "__element" || baseField.Contains("->", StringComparison.Ordinal))
+        {
+            return baseField;
         }
 
         return $"\"{baseField}\"";

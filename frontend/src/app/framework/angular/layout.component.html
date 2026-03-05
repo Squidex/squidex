@@ -25,7 +25,7 @@
                             <i class="icon-close"></i>
                         </a>
                     } @else {
-                        <button class="btn panel2-collapse"><i class="icon-close"></i></button>
+                        <button class="btn panel2-collapse" type="button"><i class="icon-close"></i></button>
                     }
                 </div>
             }
@@ -63,7 +63,12 @@
                             <ng-container *ngTemplateOutlet="menuTemplate"></ng-container>
                         </div>
                     </div>
-                    <button class="btn panel2-collapse" attr.aria-label="{{ 'common.togglePanel' | sqxTranslate }}" (click)="toggle()" sqxStopClick>
+                    <button
+                        class="btn panel2-collapse"
+                        attr.aria-label="{{ 'common.togglePanel' | sqxTranslate }}"
+                        (click)="toggle()"
+                        sqxStopClick
+                        type="button">
                         @if (displayMode === "Collapsed" && expandedWidth > 0) {
                             <i class="icon-angle-right"></i>
                         } @else if (displayMode === "Collapsed") {

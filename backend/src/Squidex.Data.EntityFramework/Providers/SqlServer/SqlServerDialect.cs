@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.EntityFrameworkCore;
 using Squidex.Infrastructure.Queries;
 using SqlException = Microsoft.Data.SqlClient.SqlException;
 
@@ -16,6 +17,12 @@ public sealed class SqlServerDialect : SqlDialect
 
     private SqlServerDialect()
     {
+    }
+
+    public override Task InitializeAsync(DbContext dbContext,
+        CancellationToken ct)
+    {
+        return JsonFunction.InitializeAsync(dbContext, ct);
     }
 
     public override bool IsDuplicateIndexException(Exception exception, string name)
@@ -87,45 +94,7 @@ public sealed class SqlServerDialect : SqlDialect
     {
         if (isJson)
         {
-            var issNumeric = value.ValueType is
-                ClrValueType.Single or
-                ClrValueType.Double or
-                ClrValueType.Int32 or
-                ClrValueType.Int64;
-            if (issNumeric)
-            {
-                var sqlPath = path.JsonPath();
-                var sqlOp = FormatOperator(op, value);
-                var sqlRhs = FormatValues(op, value, queryParameters);
-
-                return $"TRY_CAST(JSON_VALUE({sqlPath}) AS NUMERIC) {sqlOp} {sqlRhs}";
-            }
-
-            var isBoolean = value.ValueType is ClrValueType.Boolean;
-            if (isBoolean)
-            {
-                var sqlPath = path.JsonPath();
-                var sqlOp = FormatOperator(op, value);
-                var sqlRhs = FormatValues(op, value, queryParameters);
-
-                return $"IIF(JSON_VALUE({sqlPath}) = 'true', 1, 0) {sqlOp} {sqlRhs}";
-            }
-
-            var isNull = value.ValueType is ClrValueType.Null;
-            if (isNull)
-            {
-                var sqlPath = path.JsonPath();
-
-                if (op == CompareOperator.Equals)
-                {
-                    return $"JSON_QUERY({sqlPath}) IS NULL AND JSON_VALUE({sqlPath}) IS NULL";
-                }
-
-                if (op == CompareOperator.NotEquals)
-                {
-                    return $"JSON_QUERY({sqlPath}) IS NOT NULL OR JSON_VALUE({sqlPath}) IS NOT NULL";
-                }
-            }
+            return JsonFunction.Create(path, op, value, FormatValues(op, value, queryParameters, true));
         }
 
         return base.Where(path, op, value, queryParameters, isJson);

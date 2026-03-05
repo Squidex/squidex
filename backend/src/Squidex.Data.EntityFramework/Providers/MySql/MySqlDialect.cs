@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
 using Squidex.Infrastructure.Queries;
 
@@ -16,6 +17,12 @@ public sealed class MySqlDialect : SqlDialect
 
     private MySqlDialect()
     {
+    }
+
+    public override Task InitializeAsync(DbContext dbContext,
+        CancellationToken ct)
+    {
+        return JsonFunction.InitializeAsync(dbContext, ct);
     }
 
     public override bool IsDuplicateIndexException(Exception exception, string name)
@@ -85,7 +92,13 @@ public sealed class MySqlDialect : SqlDialect
             var sqlOrder = FormatOrder(order);
             var sqlPath = path.JsonPath();
 
-            return $"IF(JSON_TYPE(JSON_EXTRACT({sqlPath})) IN ('INTEGER', 'DOUBLE', 'DECIMAL'), CAST(JSON_VALUE({sqlPath}) AS DOUBLE), NULL) {sqlOrder}, JSON_VALUE({sqlPath}) {sqlOrder}";
+            return $"""
+                IF (JSON_TYPE(JSON_EXTRACT({sqlPath})) IN ('INTEGER', 'DOUBLE', 'DECIMAL'),
+                    CAST(JSON_VALUE({sqlPath}) AS DOUBLE),
+                    NULL
+                ) {sqlOrder},
+                JSON_VALUE({sqlPath}) {sqlOrder}
+                """;
         }
 
         return base.OrderBy(path, order, isJson);
@@ -100,15 +113,7 @@ public sealed class MySqlDialect : SqlDialect
     {
         if (isJson)
         {
-            var isBoolean = value.ValueType is ClrValueType.Boolean;
-            if (isBoolean)
-            {
-                var sqlPath = path.JsonPath();
-                var sqlOp = FormatOperator(op, value);
-                var sqlRhs = FormatValues(op, value, queryParameters);
-
-                return $"IF(JSON_VALUE({sqlPath}) = 'true', 1, 0) {sqlOp} {sqlRhs}";
-            }
+            return JsonFunction.Create(path, op, value, FormatValues(op, value, queryParameters, true));
         }
 
         return base.Where(path, op, value, queryParameters, isJson);

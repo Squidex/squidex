@@ -2383,6 +2383,7 @@ export class SchemaDto extends ResourceDto implements ISchemaDto {
     public export(): any {
         const fieldKeys = [
             'fieldId',
+            'cachedValues',
             'parentId',
             'parentFieldId',
             '_links',

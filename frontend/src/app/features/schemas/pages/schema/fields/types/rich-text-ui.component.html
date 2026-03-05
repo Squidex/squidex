@@ -1,5 +1,10 @@
 <div [formGroup]="fieldForm">
-    <sqx-form-row #classNamesRow for="classNames" hint="schemas.fieldTypes.string.classNamesHint" label="schemas.fieldTypes.string.classNames" [prefix]="field.fieldId">
+    <sqx-form-row
+        #classNamesRow
+        for="classNames"
+        hint="schemas.fieldTypes.string.classNamesHint"
+        label="schemas.fieldTypes.string.classNames"
+        [prefix]="field.fieldId">
         <sqx-tag-editor [id]="classNamesRow.fieldName" formControlName="classNames" />
     </sqx-form-row>
 

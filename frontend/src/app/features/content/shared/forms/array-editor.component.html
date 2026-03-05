@@ -90,7 +90,7 @@
                     </button>
                     <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="buttonSelect" *sqxModal="schemasDropdown; closeAlways: true">
                         @for (schema of schemasList; track schema) {
-                            <button class="dropdown-item" (click)="addComponent(schema)">{{ schema.displayName }}</button>
+                            <button class="dropdown-item" (click)="addComponent(schema)" type="button">{{ schema.displayName }}</button>
                         }
                     </sqx-dropdown-menu>
                 }

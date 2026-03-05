@@ -22,15 +22,15 @@
                 </button>
                 <sqx-dropdown-menu position="bottom-end" scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="dropdown; closeAlways: true">
                     @if (rule.canUpdate) {
-                        <button class="dropdown-item" [routerLink]="rule.id">{{ "common.edit" | sqxTranslate }}</button>
+                        <button class="dropdown-item" [routerLink]="rule.id" type="button">{{ "common.edit" | sqxTranslate }}</button>
                     }
 
                     @if (rule.canEnable) {
-                        <button class="dropdown-item" (click)="enable()">{{ "common.enable" | sqxTranslate }}</button>
+                        <button class="dropdown-item" (click)="enable()" type="button">{{ "common.enable" | sqxTranslate }}</button>
                     }
 
                     @if (rule.canDisable) {
-                        <button class="dropdown-item" (click)="disable()">{{ "common.disable" | sqxTranslate }}</button>
+                        <button class="dropdown-item" (click)="disable()" type="button">{{ "common.disable" | sqxTranslate }}</button>
                     }
 
                     <div class="dropdown-divider"></div>
@@ -42,7 +42,8 @@
                                 confirmRememberKey="runRule"
                                 confirmText="i18n:rules.runRuleConfirmText"
                                 confirmTitle="i18n:rules.runRuleConfirmTitle"
-                                (sqxConfirmClick)="run()">
+                                (sqxConfirmClick)="run()"
+                                type="button">
                                 {{ "rules.run" | sqxTranslate }}
                             </button>
                         }
@@ -53,7 +54,8 @@
                                 confirmRememberKey="runRuleFromSnapshots"
                                 confirmText="i18n:rules.runRuleConfirmText"
                                 confirmTitle="i18n:rules.runRuleConfirmTitle"
-                                (sqxConfirmClick)="runFromSnapshots()">
+                                (sqxConfirmClick)="runFromSnapshots()"
+                                type="button">
                                 {{ "rules.runFromSnapshots" | sqxTranslate }}
                             </button>
                         }
@@ -67,7 +69,8 @@
                             confirmRememberKey="deleteRule"
                             confirmText="i18n:rules.deleteConfirmText"
                             confirmTitle="i18n:rules.deleteConfirmTitle"
-                            (sqxConfirmClick)="delete()">
+                            (sqxConfirmClick)="delete()"
+                            type="button">
                             {{ "common.delete" | sqxTranslate }}
                         </button>
                     }
@@ -118,7 +121,8 @@
                         confirmText="i18n:rules.triggerConfirmText"
                         confirmTitle="i18n:rules.triggerConfirmTitle"
                         [disabled]="!rule.canTrigger"
-                        (sqxConfirmClick)="trigger()">
+                        (sqxConfirmClick)="trigger()"
+                        type="button">
                         <i class="icon-play-line"></i>
                     </button>
                 } @else {

@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
+using Squidex.Infrastructure.Queries;
 using Squidex.Providers.Postgres;
 using Squidex.Providers.Postgres.Content;
 using Testcontainers.PostgreSql;
@@ -59,6 +60,7 @@ public class PostgresFixture(string? reuseId) : IAsyncLifetime, ISqlContentFixtu
                 .AddSingleton<ConnectionStringParser, PostgresConnectionStringParser>()
                 .AddSingletonAs<DatabaseCreator<TestDbContextPostgres>>().Done()
                 .AddSingleton(TestUtils.DefaultSerializer)
+                .AddSingleton<IInitializable, SqlDialectInitializer<TestDbContextPostgres>>()
                 .BuildServiceProvider();
 
         foreach (var service in services.GetRequiredService<IEnumerable<IInitializable>>())

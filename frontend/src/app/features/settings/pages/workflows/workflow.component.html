@@ -37,13 +37,13 @@
             <div class="table-items-row-details-tabs clearfix">
                 <ul class="nav nav-tabs2">
                     <li class="nav-item">
-                        <button class="nav-link" [class.active]="selectedTab === 0" (click)="selectTab(0)">
+                        <button class="nav-link" [class.active]="selectedTab === 0" (click)="selectTab(0)" type="button">
                             {{ "workflows.tabEdit" | sqxTranslate }}
                         </button>
                     </li>
 
                     <li class="nav-item">
-                        <button class="nav-link" [class.active]="selectedTab === 1" (click)="selectTab(1)">
+                        <button class="nav-link" [class.active]="selectedTab === 1" (click)="selectTab(1)" type="button">
                             {{ "workflows.tabVisualize" | sqxTranslate }}
                         </button>
                     </li>
@@ -94,7 +94,7 @@
                     }
 
                     @if (workflowView.dto.canUpdate) {
-                        <button class="btn btn-success" (click)="addStep()">{{ "workflows.addStep" | sqxTranslate }}</button>
+                        <button class="btn btn-success" (click)="addStep()" type="button">{{ "workflows.addStep" | sqxTranslate }}</button>
                     }
                 } @else {
                     <sqx-workflow-diagram [workflow]="workflowView" />

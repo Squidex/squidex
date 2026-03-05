@@ -48,7 +48,11 @@
                                         <div>
                                             <sqx-avatar [identifier]="app.name" [image]="app.image" size="150" />
                                             @if (isEditableImage && app.image) {
-                                                <button class="btn btn-danger btn-sm app-image-remove" (click)="removeImage()" title="i18n:apps.removeImage">
+                                                <button
+                                                    class="btn btn-danger btn-sm app-image-remove"
+                                                    (click)="removeImage()"
+                                                    title="i18n:apps.removeImage"
+                                                    type="button">
                                                     <i class="icon-bin2"></i>
                                                 </button>
                                             }

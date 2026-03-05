@@ -21,7 +21,7 @@
         <ul class="nav nav-tabs2 mt-2">
             @if (stepInfo.properties.length > 0) {
                 <li class="nav-item">
-                    <button class="nav-link" [class.active]="attemptIndex === -1" (click)="selectAttempt(-1)">
+                    <button class="nav-link" [class.active]="attemptIndex === -1" (click)="selectAttempt(-1)" type="button">
                         {{ "common.properties" | sqxTranslate }}
                     </button>
                 </li>
@@ -29,7 +29,7 @@
             @if (state) {
                 @for (attempt of state.attempts; let i = $index; track i) {
                     <li class="nav-item">
-                        <button class="nav-link" [class.active]="attemptIndex === i" (click)="selectAttempt(i)">
+                        <button class="nav-link" [class.active]="attemptIndex === i" (click)="selectAttempt(i)" type="button">
                             @if ($first) {
                                 {{ "rules.ruleEvents.attempt" | sqxTranslate }}&nbsp;
                             }

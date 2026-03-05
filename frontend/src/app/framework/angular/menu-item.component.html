@@ -7,7 +7,8 @@
         [confirmText]="confirmText | sqxTranslate"
         [confirmTitle]="confirmTitle | sqxTranslate"
         (sqxConfirmClick)="action.emit()"
-        [title]="tooltip | sqxTranslate">
+        [title]="tooltip | sqxTranslate"
+        type="button">
         {{ menuLabel || label | sqxTranslate }}
     </button>
 </ng-template>
@@ -21,7 +22,8 @@
     [disabled]="disabled"
     (sqxConfirmClick)="action.emit()"
     [tabIndex]="tabIndex"
-    [title]="tooltip | sqxTranslate">
+    [title]="tooltip | sqxTranslate"
+    type="button">
     @if (icon) {
         <i class="icon-{{ icon }}"></i>
     }

@@ -7,6 +7,7 @@
 
 using System.Collections;
 using System.Text;
+using Microsoft.EntityFrameworkCore;
 
 namespace Squidex.Infrastructure.Queries;
 
@@ -17,6 +18,12 @@ public class SqlDialect
     public virtual bool IsDuplicateIndexException(Exception exception, string name)
     {
         return false;
+    }
+
+    public virtual Task InitializeAsync(DbContext dbContext,
+        CancellationToken ct)
+    {
+        return Task.CompletedTask;
     }
 
     public virtual string BuildSelectStatement(SqlQuery request)
@@ -144,7 +151,7 @@ public class SqlDialect
         throw new NotSupportedException();
     }
 
-    protected virtual string FormatValues(CompareOperator op, ClrValue value, SqlParams queryParameters)
+    protected virtual string FormatValues(CompareOperator op, ClrValue value, SqlParams queryParameters, bool withoutBraces = false)
     {
         if (!value.IsList && value.ValueType == ClrValueType.Null)
         {
@@ -170,6 +177,11 @@ public class SqlDialect
 
         if (op == CompareOperator.In)
         {
+            if (withoutBraces)
+            {
+                return string.Join(", ", parameters);
+            }
+
             return $"({string.Join(", ", parameters)})";
         }
 

@@ -1,6 +1,5 @@
-
 @if (text) {
-    <sqx-history-step small="true" [isLast]="isLast && filteredErrors.length === 0">
+    <sqx-history-step [isLast]="isLast && filteredErrors.length === 0" small="true">
         <ng-container summary>
             <div class="col text-sm truncate">
                 {{ text | sqxTranslate }}
@@ -10,7 +9,7 @@
 }
 
 @for (error of filteredErrors; track error; let last = $last) {
-    <sqx-history-step small="true" [isLast]="isLast && last">
+    <sqx-history-step [isLast]="isLast && last" small="true">
         <ng-container summary>
             <div class="col text-sm text-danger truncate">
                 {{ error | sqxTranslate }}

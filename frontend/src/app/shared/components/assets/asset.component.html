@@ -25,7 +25,7 @@
 
                         <div class="overlay-menu">
                             @if (!isDisabled) {
-                                <button class="file-edit ms-2" attr.aria-label="{{ 'common.edit' | sqxTranslate }}" (click)="emitEdit()">
+                                <button class="file-edit ms-2" attr.aria-label="{{ 'common.edit' | sqxTranslate }}" (click)="emitEdit()" type="button">
                                     <i class="icon-pencil"></i>
                                 </button>
                             }
@@ -38,7 +38,7 @@
                                 <i class="icon-download"></i>
                             </a>
                             @if (folderIcon) {
-                                <button class="file-folder ms-2" (click)="selectFolder.emit(asset.parentId)"><i class="icon-folder"></i></button>
+                                <button class="file-folder ms-2" (click)="selectFolder.emit(asset.parentId)" type="button"><i class="icon-folder"></i></button>
                             }
 
                             @if (!isDisabled && !removeMode && asset.canDelete) {
@@ -48,7 +48,8 @@
                                     confirmRememberKey="deleteAsset"
                                     confirmText="i18n:assets.deleteConfirmText"
                                     confirmTitle="i18n:assets.deleteConfirmTitle"
-                                    (sqxConfirmClick)="delete.emit()">
+                                    (sqxConfirmClick)="delete.emit()"
+                                    type="button">
                                     <i class="icon-delete"></i>
                                 </button>
                             }
@@ -60,7 +61,8 @@
                                     confirmRememberKey="removeAsset"
                                     confirmText="i18n:assets.removeConfirmText"
                                     confirmTitle="i18n:assets.removeConfirmTitle"
-                                    (sqxConfirmClick)="remove.emit()">
+                                    (sqxConfirmClick)="remove.emit()"
+                                    type="button">
                                     <i class="icon-close"></i>
                                 </button>
                             }

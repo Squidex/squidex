@@ -13,14 +13,18 @@
     <div class="dropdown-divider"></div>
 
     @if (uiState.canUseAdminResource | async) {
-        <button class="dropdown-item" routerLink="/app/administration">{{ "common.administration" | sqxTranslate }}</button>
+        <button class="dropdown-item" routerLink="/app/administration" type="button">{{ "common.administration" | sqxTranslate }}</button>
     }
     <a class="dropdown-item" href="{{ snapshot.profileUrl }}" sqxExternalLink="noicon"> {{ "profile.title" | sqxTranslate }} </a>
     <div class="dropdown-submenu">
-        <button class="dropdown-item dropdown-toggle" (click)="toggleSubmenu()" sqxStopClick>{{ "common.language" | sqxTranslate }}</button>
+        <button class="dropdown-item dropdown-toggle" (click)="toggleSubmenu()" sqxStopClick type="button">{{ "common.language" | sqxTranslate }}</button>
         <div class="dropdown-menu" [class.open]="snapshot.showSubmenu">
             @for (availableLanguage of languages; track availableLanguage) {
-                <button class="dropdown-item" [class.active]="availableLanguage.iso2Code === language" (click)="changeLanguage(availableLanguage.iso2Code)">
+                <button
+                    class="dropdown-item"
+                    [class.active]="availableLanguage.iso2Code === language"
+                    (click)="changeLanguage(availableLanguage.iso2Code)"
+                    type="button">
                     {{ availableLanguage.localName }}
                 </button>
             }
@@ -28,5 +32,5 @@
     </div>
 
     <div class="dropdown-divider"></div>
-    <button class="dropdown-item" (click)="logout()" sqxExternalLink>{{ "common.logout" | sqxTranslate }}</button>
+    <button class="dropdown-item" (click)="logout()" sqxExternalLink type="button">{{ "common.logout" | sqxTranslate }}</button>
 </sqx-dropdown-menu>

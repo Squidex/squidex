@@ -6,37 +6,43 @@
             <sqx-form-row for="name" label="common.name" vertical>
                 <input class="form-control" id="name" [ngModel]="schema.name" [ngModelOptions]="{ standalone: true }" readonly />
             </sqx-form-row>
-            
-            <sqx-form-row for="label" label="common.label" vertical hint="schemas.schemaLabelHint">
+
+            <sqx-form-row for="label" hint="schemas.schemaLabelHint" label="common.label" vertical>
                 <input class="form-control" id="label" formControlName="label" />
             </sqx-form-row>
 
-            <sqx-form-row for="hints" label="common.hints" vertical hint="schemas.schemaHintsHint">
+            <sqx-form-row for="hints" hint="schemas.schemaHintsHint" label="common.hints" vertical>
                 <textarea class="form-control" id="hints" formControlName="hints" rows="4"></textarea>
             </sqx-form-row>
 
-            <sqx-form-row for="contentsSidebarUrl" label="schemas.contentsSidebarUrl" vertical hint="schemas.contentsSidebarUrlHint">
+            <sqx-form-row for="contentsSidebarUrl" hint="schemas.contentsSidebarUrlHint" label="schemas.contentsSidebarUrl" vertical>
                 <input class="form-control" id="contentsSidebarUrl" formControlName="contentsSidebarUrl" type="url" />
             </sqx-form-row>
 
-            <sqx-form-row for="contentSidebarUrl" label="schemas.contentSidebarUrl" vertical hint="schemas.contentSidebarUrlHint">
+            <sqx-form-row for="contentSidebarUrl" hint="schemas.contentSidebarUrlHint" label="schemas.contentSidebarUrl" vertical>
                 <input class="form-control" id="contentSidebarUrl" formControlName="contentSidebarUrl" type="url" />
             </sqx-form-row>
 
-            <sqx-form-row for="contentEditorUrl" label="schemas.contentEditorUrl" vertical hint="schemas.contentEditorUrlHint">
+            <sqx-form-row for="contentEditorUrl" hint="schemas.contentEditorUrlHint" label="schemas.contentEditorUrl" vertical>
                 <input class="form-control" id="contentEditorUrl" formControlName="contentEditorUrl" type="url" />
             </sqx-form-row>
 
-            <sqx-form-row for="contentsListUrl" label="schemas.contentsListUrl" vertical hint="schemas.contentsListUrlHint">
+            <sqx-form-row for="contentsListUrl" hint="schemas.contentsListUrlHint" label="schemas.contentsListUrl" vertical>
                 <input class="form-control" id="contentsListUrl" formControlName="contentsListUrl" type="url" />
             </sqx-form-row>
 
-            <sqx-form-row for="tags" label="common.tags" vertical hint="schemas.schemaTagsHint">
+            <sqx-form-row for="tags" hint="schemas.schemaTagsHint" label="common.tags" vertical>
                 <sqx-tag-editor id="tags" formControlName="tags" />
             </sqx-form-row>
 
-            <sqx-form-row for="validateOnPublish" label="schemas.validateOnPublish" check vertical hint="schemas.validateOnPublishHint" alert="schemas.validateOnPublishHint">
-                    <input class="form-check-input" id="validateOnPublish" formControlName="validateOnPublish" type="checkbox" />
+            <sqx-form-row
+                alert="schemas.validateOnPublishHint"
+                check
+                for="validateOnPublish"
+                hint="schemas.validateOnPublishHint"
+                label="schemas.validateOnPublish"
+                vertical>
+                <input class="form-check-input" id="validateOnPublish" formControlName="validateOnPublish" type="checkbox" />
             </sqx-form-row>
         </div>
 

@@ -22,7 +22,7 @@
         </div>
 
         @if (planInfo.isSelected) {
-            <button class="btn btn-block btn-text-success plan-selected">&#10003; {{ "plans.selected" | sqxTranslate }}</button>
+            <button class="btn btn-block btn-text-success plan-selected" type="button">&#10003; {{ "plans.selected" | sqxTranslate }}</button>
         }
 
         @if (!planInfo.isSelected) {
@@ -33,7 +33,8 @@
                 [confirmText]="planInfo.plan.confirmText"
                 confirmTitle="i18n:plans.changeConfirmTitle"
                 [disabled]="(plansState.locked | async) !== 'None'"
-                (sqxConfirmClick)="changeMonthly()">
+                (sqxConfirmClick)="changeMonthly()"
+                type="button">
                 {{ "plans.change" | sqxTranslate }}
             </button>
         }
@@ -47,7 +48,7 @@
             </div>
 
             @if (planInfo.isYearlySelected) {
-                <button class="btn btn-block btn-text-success plan-selected">&#10003; {{ "plans.selected" | sqxTranslate }}</button>
+                <button class="btn btn-block btn-text-success plan-selected" type="button">&#10003; {{ "plans.selected" | sqxTranslate }}</button>
             }
 
             @if (!planInfo.isYearlySelected) {
@@ -57,7 +58,8 @@
                     [confirmText]="planInfo.plan.yearlyConfirmText!"
                     confirmTitle="i18n:plans.changeConfirmTitle"
                     [disabled]="(plansState.locked | async) !== 'None'"
-                    (sqxConfirmClick)="changeYearly()">
+                    (sqxConfirmClick)="changeYearly()"
+                    type="button">
                     {{ "plans.change" | sqxTranslate }}
                 </button>
             }

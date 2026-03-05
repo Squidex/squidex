@@ -24,8 +24,8 @@
         }
 
         <div class="dropdown-divider"></div>
-        <button class="dropdown-item" (click)="startExpertMode()"> {{ "common.expertMode" | sqxTranslate }} </button>
-        <button class="dropdown-item" (click)="saveConfig()"> {{ "common.save" | sqxTranslate }} </button>
+        <button class="dropdown-item" (click)="startExpertMode()" type="button">{{ "common.expertMode" | sqxTranslate }}</button>
+        <button class="dropdown-item" (click)="saveConfig()" type="button">{{ "common.save" | sqxTranslate }}</button>
         <div class="dropdown-divider"></div>
         <button
             class="dropdown-item dropdown-item-delete"
@@ -33,7 +33,8 @@
             confirmRememberKey="resetConfig"
             confirmText="i18n:dashboard.resetConfigConfirmText"
             confirmTitle="i18n:dashboard.resetConfigConfirmTitle"
-            (sqxConfirmClick)="resetConfig()">
+            (sqxConfirmClick)="resetConfig()"
+            type="button">
             {{ "common.reset" | sqxTranslate }}
         </button>
     </sqx-dropdown-menu>

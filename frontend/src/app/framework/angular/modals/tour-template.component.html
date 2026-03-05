@@ -1,6 +1,7 @@
 <div
     class="tour-step"
-    animate.enter="fade-in" animate.leave="fade-out"
+    animate.enter="fade-in"
+    animate.leave="fade-out"
     [class.d-none]="!isVisible"
     offset="4"
     [position]="currentStep.position || 'bottom-start'"
@@ -31,13 +32,13 @@
             <div class="d-flex justify-content-between">
                 <div class="d-flex pe-4">
                     @if (hasPrev) {
-                        <button class="btn btn-outline-secondary btn-sm me-2" (click)="tourService.prev()">
+                        <button class="btn btn-outline-secondary btn-sm me-2" (click)="tourService.prev()" type="button">
                             {{ "common.prev" | sqxTranslate }}
                         </button>
                     }
 
                     @if (currentStep.hideAll) {
-                        <button class="btn btn-outline-danger btn-sm" (click)="currentStep.hideAll()">
+                        <button class="btn btn-outline-danger btn-sm" (click)="currentStep.hideAll()" type="button">
                             {{ "tour.tooltipStop" | sqxTranslate }}
                         </button>
                     }
@@ -45,19 +46,19 @@
 
                 <div class="d-flex ps-4">
                     @if (hasNext) {
-                        <button class="btn btn-outline-secondary btn-sm" (click)="tourService.next()">
+                        <button class="btn btn-outline-secondary btn-sm" (click)="tourService.next()" type="button">
                             {{ "common.next" | sqxTranslate }}
                         </button>
                     }
 
                     @if (hasFinish) {
-                        <button class="btn btn-outline-success btn-sm" (click)="tourService.end()">
+                        <button class="btn btn-outline-success btn-sm" (click)="tourService.end()" type="button">
                             {{ "common.finish" | sqxTranslate }}
                         </button>
                     }
 
                     @if (currentStep.hideThis) {
-                        <button class="btn btn-outline-success btn-sm" (click)="currentStep.hideThis()">
+                        <button class="btn btn-outline-success btn-sm" (click)="currentStep.hideThis()" type="button">
                             {{ "tour.tooltipConfirm" | sqxTranslate }}
                         </button>
                     }
