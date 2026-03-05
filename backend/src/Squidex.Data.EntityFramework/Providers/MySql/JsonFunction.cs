@@ -111,11 +111,12 @@ public static class JsonFunction
             return $"{fn}(`{path[0]}`, {path.JsonSubPath()})";
         }
 
+        var arg = formattedValue;
         if (value.IsList)
         {
-            return $"{fn}(`{path[0]}`, {path.JsonSubPath()}, JSON_ARRAY({formattedValue}))";
+            arg = $"JSON_ARRAY({formattedValue})";
         }
 
-        return $"{fn}(`{path[0]}`, {path.JsonSubPath()}, {formattedValue})";
+        return $"{fn}(`{path[0]}`, {path.JsonSubPath()}, {arg})";
     }
 }

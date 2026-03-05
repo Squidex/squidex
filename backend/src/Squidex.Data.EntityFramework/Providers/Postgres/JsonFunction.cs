@@ -101,11 +101,20 @@ public static class JsonFunction
             return $"{fn}({path.JsonPath(false)})";
         }
 
-        if (value.IsList)
+        var arg = formattedValue;
+        if (value.IsList && type == TypeNumber)
         {
-            return $"{fn}({path.JsonPath(false)}, ARRAY[{formattedValue}])";
+            arg = $"ARRAY[{formattedValue}]::numeric[]";
+        }
+        else if (value.IsList)
+        {
+            arg = $"ARRAY[{formattedValue}]";
+        }
+        else if (type == TypeNumber)
+        {
+            arg = $"{formattedValue}::numeric";
         }
 
-        return $"{fn}({path.JsonPath(false)}, {formattedValue})";
+        return $"{fn}({path.JsonPath(false)}, {arg})";
     }
 }

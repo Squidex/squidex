@@ -385,6 +385,17 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
     }
 
     [Fact]
+    public async Task Should_filter_by_number_equal_with_double()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Eq("Number", 7.0),
+        });
+
+        Assert.Equal([7], actual.Order().ToArray());
+    }
+
+    [Fact]
     public async Task Should_filter_by_number_not_equal()
     {
         var actual = await QueryAsync(new ClrQuery

@@ -11,7 +11,6 @@
     <DebugSymbols>True</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <None Remove="Providers\Postgres\json_function.sql" />
     <None Remove="Providers\SqlServer\json_function.sql" />
   </ItemGroup>
   <ItemGroup>
