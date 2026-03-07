@@ -80,6 +80,7 @@ spec:
             - name: CLUSTERING__WORKER
               value: "true"
           
+          {{- if (.Values.mongodb.enabled) }}
           {{- $mongoDefaultConnectionString := printf "mongodb://%s" (include "squidex.mongoDefaultHostname" .) }}
           {{- if (not .Values.env.EVENTSTORE__MONGODB__CONFIGURATION) }}
             - name: "EVENTSTORE__MONGODB__CONFIGURATION"
@@ -95,6 +96,28 @@ spec:
             - name: "ASSETSTORE__MONGODB__CONFIGURATION"
               value: {{ $mongoDefaultConnectionString | quote }}
           {{- end }}
+          {{- end }}
+          {{- if .Values.extraConfigMaps | or .Values.extraSecrets }}
+          envFrom:
+          {{- range $configMap := .Values.extraConfigMaps }}
+          - configMapRef:
+              name: {{ $configMap }}
+          {{- end }}
+          {{- range $secret := .Values.extraSecrets }}
+          - secretRef:
+              name: {{ $secret }}
+          {{- end }}
+          {{- end }}
+        
+          {{- if .Values.extraVolumeMounts }}
+          volumeMounts:
+          {{- toYaml .Values.extraVolumeMounts | nindent 12 }}
+          {{- end }}
+    
+      {{- if .Values.extraVolumes }}
+      volumes:
+      {{- toYaml .Values.extraVolumes | nindent 8 }}
+      {{- end }}  
       nodeSelector:
         {{- toYaml .Values.nodeSelector | nindent 8 }}
       affinity:

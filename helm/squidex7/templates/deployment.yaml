@@ -99,13 +99,13 @@ spec:
               value: {{ $mongoDefaultConnectionString | quote }}
           {{- end }}
           {{- end }}
-          {{- if .Values.additionalConfigMaps | or .Values.additionalSecrets }}
+          {{- if .Values.extraConfigMaps | or .Values.extraSecrets }}
           envFrom:
-          {{- range $configMap := .Values.additionalConfigMaps }}
+          {{- range $configMap := .Values.extraConfigMaps }}
           - configMapRef:
               name: {{ $configMap }}
           {{- end }}
-          {{- range $secret := .Values.additionalSecrets }}
+          {{- range $secret := .Values.extraSecrets }}
           - secretRef:
               name: {{ $secret }}
           {{- end }}
