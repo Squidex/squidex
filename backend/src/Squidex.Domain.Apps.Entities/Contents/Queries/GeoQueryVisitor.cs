@@ -13,17 +13,17 @@ using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries;
 
-internal sealed class GeoQueryTransformer : AsyncTransformVisitor<ClrValue, GeoQueryTransformer.Args>
+internal sealed class GeoQueryVisitor : AsyncTransformVisitor<ClrValue, GeoQueryVisitor.Args>
 {
-    public static readonly GeoQueryTransformer Instance = new GeoQueryTransformer();
+    public static readonly GeoQueryVisitor Instance = new GeoQueryVisitor();
 
     public record struct Args(Context Context, Schema Schema, ITextIndex TextIndex, CancellationToken CancellationToken);
 
-    private GeoQueryTransformer()
+    private GeoQueryVisitor()
     {
     }
 
-    public static async Task<FilterNode<ClrValue>?> TransformAsync(FilterNode<ClrValue> filter, Context context, Schema schema, ITextIndex textIndex,
+    public static async Task<FilterNode<ClrValue>?> VisitAsync(FilterNode<ClrValue> filter, Context context, Schema schema, ITextIndex textIndex,
         CancellationToken ct)
     {
         var args = new Args(context, schema, textIndex, ct);

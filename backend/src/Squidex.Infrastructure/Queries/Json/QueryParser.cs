@@ -36,7 +36,6 @@ public static class QueryParser
         var result = SimpleMapper.Map(query, new ClrQuery());
 
         var errors = new List<string>();
-
         model.ConvertSorting(result, errors);
         model.ConvertFilters(result, errors, query);
 
@@ -56,7 +55,6 @@ public static class QueryParser
         }
 
         var filter = JsonFilterVisitor.Parse(query.Filter, model, errors);
-
         if (filter != null)
         {
             result.Filter = Optimizer<ClrValue>.Optimize(filter);

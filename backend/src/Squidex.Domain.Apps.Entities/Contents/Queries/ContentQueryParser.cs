@@ -34,7 +34,7 @@ public class ContentQueryParser(
     private static readonly TimeSpan CacheTime = TimeSpan.FromMinutes(60);
     private readonly ContentsOptions options = options.Value;
 
-    public virtual async Task<Q> ParseAsync(Context context, Q q, Schema? schema = null,
+    public virtual async Task<Q?> ParseAsync(Context context, Q q, Schema? schema = null,
         CancellationToken ct = default)
     {
         Guard.NotNull(context);
@@ -44,7 +44,11 @@ public class ContentQueryParser(
         {
             var query = await ParseClrQueryAsync(context, q, schema, ct);
 
-            await TransformFilterAsync(query, context, schema, ct);
+            var shouldCancel = await TransformFilterAsync(query, context, schema, ct);
+            if (shouldCancel)
+            {
+                return null;
+            }
 
             WithSorting(query);
             WithPaging(query, q);
@@ -65,24 +69,26 @@ public class ContentQueryParser(
         }
     }
 
-    private async Task TransformFilterAsync(ClrQuery query, Context context, Schema? schema,
+    private async Task<bool> TransformFilterAsync(ClrQuery query, Context context, Schema? schema,
         CancellationToken ct)
     {
         if (query.Filter != null && schema != null)
         {
-            query.Filter = await GeoQueryTransformer.TransformAsync(query.Filter, context, schema, textIndex, ct);
+            query.Filter = await GeoQueryVisitor.VisitAsync(query.Filter, context, schema, textIndex, ct);
         }
 
         if (string.IsNullOrWhiteSpace(query.FullText))
         {
-            return;
+            return false;
         }
 
         if (schema == null)
         {
             ThrowHelper.InvalidOperationException();
-            return;
+            return false;
         }
+
+        var searchFilters = new List<CompareFilter<ClrValue>>();
 
         var textQuery = new TextQuery(query.FullText, 1000)
         {
@@ -90,23 +96,44 @@ public class ContentQueryParser(
         };
 
         var fullTextIds = await textIndex.SearchAsync(context.App, textQuery, context.Scope(), ct);
-        var fullTextFilter = ClrFilter.Eq("id", "__notfound__");
+        if (fullTextIds is not { Count: > 0 } && schema.Properties.SearchFields is not { Count: > 0 })
+        {
+            // Cancel the search. We would not any results.
+            return true;
+        }
 
         if (fullTextIds?.Count > 0)
         {
-            fullTextFilter = ClrFilter.In("id", fullTextIds.Select(x => x.ToString()).ToList());
+            searchFilters.Add(ClrFilter.In("id", fullTextIds.Select(x => x.ToString()).ToList()));
         }
+
+        foreach (var searchField in schema.Properties.SearchFields ?? FieldNames.Empty)
+        {
+            searchFilters.Add(ClrFilter.Contains(searchField, query.FullText));
+        }
+
+        if (searchFilters.Count == 0)
+        {
+            return false;
+        }
+
+        // Just an mini optimization to flatten OR expressions with one element.
+        var searchFilter =
+            searchFilters.Count == 1 ?
+            searchFilters[0] :
+            ClrFilter.Or(searchFilters) as FilterNode<ClrValue>;
 
         if (query.Filter != null)
         {
-            query.Filter = ClrFilter.And(query.Filter, fullTextFilter);
+            query.Filter = ClrFilter.And(query.Filter, searchFilter);
         }
         else
         {
-            query.Filter = fullTextFilter;
+            query.Filter = searchFilter;
         }
 
         query.FullText = null;
+        return false;
     }
 
     private async Task<ClrQuery> ParseClrQueryAsync(Context context, Q q, Schema? schema,

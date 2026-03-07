@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Validation;
 
@@ -53,6 +54,11 @@ public sealed class SchemaPropertiesDto
     /// True to validate the content items on publish.
     /// </summary>
     public bool ValidateOnPublish { get; set; }
+
+    /// <summary>
+    /// The fields for automation processes.
+    /// </summary>
+    public FieldNames? SearchFields { get; init; }
 
     /// <summary>
     /// Tags for automation processes.

@@ -9,7 +9,8 @@ using Microsoft.Extensions.Caching.Memory;
 
 namespace Squidex.Infrastructure.Caching;
 
-public class QueryCache<TKey, T>(IMemoryCache? cacheStore = null, string? cacheKeyPrefix = null) : IQueryCache<TKey, T> where TKey : notnull
+public class QueryCache<TKey, T>(IMemoryCache? cacheStore = null, string? cacheKeyPrefix = null)
+    : IQueryCache<TKey, T> where TKey : notnull
 {
     public void Set(TKey key, T item, TimeSpan cacheDuration)
     {

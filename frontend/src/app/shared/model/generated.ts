@@ -8,7 +8,7 @@
 /* eslint-disable */
 // ReSharper disable InconsistentNaming
 
-import { hasAnyLink, DateTime, StringHelper, Types, ApiUrlConfig, ErrorDto } from '@app/framework';
+import { DateTime, hasAnyLink, StringHelper, Types, ApiUrlConfig, ErrorDto } from '@app/framework';
 import { FieldPropertiesVisitor, META_FIELDS, tableField, tableFields } from './schemas';
 
 export class ServerErrorDto implements IServerErrorDto {
@@ -2607,6 +2607,8 @@ export class SchemaPropertiesDto implements ISchemaPropertiesDto {
     readonly contentsListUrl?: string | undefined;
     /** True to validate the content items on publish. */
     readonly validateOnPublish!: boolean;
+    /** The fields for automation processes. */
+    readonly searchFields?: string[] | undefined;
     /** Tags for automation processes. */
     readonly tags?: string[] | undefined;
 
@@ -2628,6 +2630,11 @@ export class SchemaPropertiesDto implements ISchemaPropertiesDto {
         (<any>this).contentsEditorUrl = _data["contentsEditorUrl"];
         (<any>this).contentsListUrl = _data["contentsListUrl"];
         (<any>this).validateOnPublish = _data["validateOnPublish"];
+        if (Array.isArray(_data["searchFields"])) {
+            (<any>this).searchFields = [] as any;
+            for (let item of _data["searchFields"])
+                (<any>this).searchFields!.push(item);
+        }
         if (Array.isArray(_data["tags"])) {
             (<any>this).tags = [] as any;
             for (let item of _data["tags"])
@@ -2653,6 +2660,11 @@ export class SchemaPropertiesDto implements ISchemaPropertiesDto {
         data["contentsEditorUrl"] = this.contentsEditorUrl;
         data["contentsListUrl"] = this.contentsListUrl;
         data["validateOnPublish"] = this.validateOnPublish;
+        if (Array.isArray(this.searchFields)) {
+            data["searchFields"] = [];
+            for (let item of this.searchFields)
+                data["searchFields"].push(item);
+        }
         if (Array.isArray(this.tags)) {
             data["tags"] = [];
             for (let item of this.tags)
@@ -2701,6 +2713,8 @@ export interface ISchemaPropertiesDto {
     readonly contentsListUrl?: string | undefined;
     /** True to validate the content items on publish. */
     readonly validateOnPublish: boolean;
+    /** The fields for automation processes. */
+    readonly searchFields?: string[] | undefined;
     /** Tags for automation processes. */
     readonly tags?: string[] | undefined;
 }
@@ -5943,6 +5957,8 @@ export class UpdateSchemaDto implements IUpdateSchemaDto {
     readonly contentsListUrl?: string | undefined;
     /** True to validate the content items on publish. */
     readonly validateOnPublish?: boolean;
+    /** The fields for automation processes. */
+    readonly searchFields?: string[] | undefined;
     /** Tags for automation processes. */
     readonly tags?: string[] | undefined;
 
@@ -5962,6 +5978,11 @@ export class UpdateSchemaDto implements IUpdateSchemaDto {
         (<any>this).contentSidebarUrl = _data["contentSidebarUrl"];
         (<any>this).contentsListUrl = _data["contentsListUrl"];
         (<any>this).validateOnPublish = _data["validateOnPublish"];
+        if (Array.isArray(_data["searchFields"])) {
+            (<any>this).searchFields = [] as any;
+            for (let item of _data["searchFields"])
+                (<any>this).searchFields!.push(item);
+        }
         if (Array.isArray(_data["tags"])) {
             (<any>this).tags = [] as any;
             for (let item of _data["tags"])
@@ -5985,6 +6006,11 @@ export class UpdateSchemaDto implements IUpdateSchemaDto {
         data["contentSidebarUrl"] = this.contentSidebarUrl;
         data["contentsListUrl"] = this.contentsListUrl;
         data["validateOnPublish"] = this.validateOnPublish;
+        if (Array.isArray(this.searchFields)) {
+            data["searchFields"] = [];
+            for (let item of this.searchFields)
+                data["searchFields"].push(item);
+        }
         if (Array.isArray(this.tags)) {
             data["tags"] = [];
             for (let item of this.tags)
@@ -6029,6 +6055,8 @@ export interface IUpdateSchemaDto {
     readonly contentsListUrl?: string | undefined;
     /** True to validate the content items on publish. */
     readonly validateOnPublish?: boolean;
+    /** The fields for automation processes. */
+    readonly searchFields?: string[] | undefined;
     /** Tags for automation processes. */
     readonly tags?: string[] | undefined;
 }
@@ -17703,8 +17731,8 @@ export interface FileResponse {
     headers?: { [name: string]: any };
 }
 
- 
- 
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable sort-imports */
 
 
 

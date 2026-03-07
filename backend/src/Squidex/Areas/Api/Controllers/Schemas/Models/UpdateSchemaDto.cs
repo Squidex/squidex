@@ -50,6 +50,11 @@ public sealed class UpdateSchemaDto
     public bool ValidateOnPublish { get; set; }
 
     /// <summary>
+    /// The fields for automation processes.
+    /// </summary>
+    public FieldNames? SearchFields { get; init; }
+
+    /// <summary>
     /// Tags for automation processes.
     /// </summary>
     public ReadonlyList<string>? Tags { get; set; }

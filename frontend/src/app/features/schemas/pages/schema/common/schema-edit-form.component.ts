@@ -8,7 +8,7 @@
 
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { EditSchemaForm, FormRowComponent, SchemaDto, SchemasState, TagEditorComponent, TranslatePipe } from '@app/shared';
+import { AppLanguageDto, EditSchemaForm, FormRowComponent, SchemaDto, SchemasState, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-schema-edit-form',
@@ -26,9 +26,14 @@ export class SchemaEditFormComponent {
     @Input({ required: true })
     public schema!: SchemaDto;
 
-    public fieldForm = new EditSchemaForm();
+    @Input({ required: true })
+    public languages!: ReadonlyArray<AppLanguageDto>;
 
     public isEditable?: boolean | null;
+
+    public schemaForm = new EditSchemaForm();
+
+    public fieldNames: ReadonlyArray<string> = [];
 
     constructor(
         private readonly schemasState: SchemasState,
@@ -38,8 +43,23 @@ export class SchemaEditFormComponent {
     public ngOnChanges() {
         this.isEditable = this.schema.canUpdate;
 
-        this.fieldForm.load(this.schema.properties);
-        this.fieldForm.setEnabled(this.isEditable);
+        this.schemaForm.load(this.schema.properties);
+        this.schemaForm.setEnabled(this.isEditable);
+
+        const fieldNames = new Set<string>();
+        for (const field of this.schema.fields) {
+            if (field.properties.isContentField && field.properties.fieldType === 'String') {
+                if (field.partitioning === 'invariant') {
+                    fieldNames.add(`data.${field.name}.iv`);
+                } else {
+                    for (const language of this.languages) {
+                        fieldNames.add(`data.${field.name}.${language}`);
+                    }
+                }
+            }
+        }
+
+        this.fieldNames = [...fieldNames].sorted();
     }
 
     public saveSchema() {
@@ -47,7 +67,7 @@ export class SchemaEditFormComponent {
             return;
         }
 
-        const value = this.fieldForm.submit();
+        const value = this.schemaForm.submit();
         if (!value) {
             return;
         }
@@ -55,10 +75,10 @@ export class SchemaEditFormComponent {
         this.schemasState.update(this.schema, value)
             .subscribe({
                 next: () => {
-                    this.fieldForm.submitCompleted({ noReset: true });
+                    this.schemaForm.submitCompleted({ noReset: true });
                 },
                 error: error => {
-                    this.fieldForm.submitFailed(error);
+                    this.schemaForm.submitFailed(error);
                 },
             });
     }
