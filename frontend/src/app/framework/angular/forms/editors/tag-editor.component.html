@@ -12,6 +12,7 @@
         [class.suggested]="itemsSorted.length > 0"
         (focus)="focusInput($event)"
         (mousedown)="focusInput($event)"
+        sqxForwardFormClasses
         tabindex="0">
         @for (tag of snapshot.tags; track tag; let i = $index) {
             <span class="item" [class.disabled]="addInput.disabled"> {{ tag }} <i class="icon-close" (click)="remove(i)"></i> </span>

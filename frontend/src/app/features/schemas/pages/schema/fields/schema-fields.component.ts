@@ -6,8 +6,8 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, forwardRef, Input, OnInit } from '@angular/core';
-import { AppsState, DialogModel, FieldDto, fieldTypes, LanguagesState, ModalDirective, SchemaDto, SchemasState, TourStepDirective, TranslatePipe } from '@app/shared';
+import { Component, forwardRef, Input } from '@angular/core';
+import { AppLanguageDto, AppsState, DialogModel, FieldDto, fieldTypes, ModalDirective, SchemaDto, SchemasState, TourStepDirective, TranslatePipe } from '@app/shared';
 import { FieldWizardComponent } from './field-wizard.component';
 import { SortableFieldListComponent } from './sortable-field-list.component';
 
@@ -24,9 +24,12 @@ import { SortableFieldListComponent } from './sortable-field-list.component';
         forwardRef(() => SortableFieldListComponent),
     ],
 })
-export class SchemaFieldsComponent implements OnInit {
+export class SchemaFieldsComponent {
     @Input({ required: true })
     public schema!: SchemaDto;
+
+    @Input({ required: true })
+    public languages!: AppLanguageDto[];
 
     public fieldTypes = fieldTypes;
     public fieldWizard = new DialogModel();
@@ -34,12 +37,7 @@ export class SchemaFieldsComponent implements OnInit {
     constructor(
         public readonly appsState: AppsState,
         public readonly schemasState: SchemasState,
-        public readonly languageState: LanguagesState,
     ) {
-    }
-
-    public ngOnInit() {
-        this.languageState.load();
     }
 
     public sortFields(fields: ReadonlyArray<FieldDto>) {

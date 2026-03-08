@@ -110,6 +110,19 @@ public static class GuardSchema
         });
     }
 
+    public static void CanUpdateSchema(UpdateSchema command)
+    {
+        Guard.NotNull(command);
+
+        Validate.It(e =>
+        {
+            if (command.Properties.SearchFields != null && command.Properties.SearchFields.Count > 3)
+            {
+                e(Not.Between("Size", 1, 3), "Properties.SearchFields");
+            }
+        });
+    }
+
     private static void ValidateUpsert(IUpsertCommand command, AddValidation e)
     {
         if (command.Fields?.Length > 0)

@@ -94,39 +94,41 @@
             </sqx-dropdown-menu>
         </ng-container>
         <ng-container content>
-            @switch (tab) {
-                @case ("ui") {
-                    <sqx-schema-ui-form [schema]="schema" />
-                }
+            @if (languageState.isoLanguages | async; as languages) {
+                @switch (tab) {
+                    @case ("ui") {
+                        <sqx-schema-ui-form [schema]="schema" />
+                    }
 
-                @case ("scripts") {
-                    <sqx-schema-scripts-form [schema]="schema" />
-                }
+                    @case ("scripts") {
+                        <sqx-schema-scripts-form [schema]="schema" />
+                    }
 
-                @case ("json") {
-                    <sqx-schema-export-form [schema]="schema" />
-                }
+                    @case ("json") {
+                        <sqx-schema-export-form [schema]="schema" />
+                    }
 
-                @case ("indexes") {
-                    <sqx-schema-indexes [schema]="schema" />
-                }
+                    @case ("indexes") {
+                        <sqx-schema-indexes [schema]="schema" />
+                    }
 
-                @case ("more") {
-                    <sqx-list-view innerWidth="50rem">
-                        <div>
-                            @if (schema.type !== "Component") {
-                                <sqx-schema-preview-urls-form [schema]="schema" />
-                            }
-                            <sqx-schema-field-rules-form [schema]="schema" />
-                            <sqx-schema-edit-form [schema]="schema" />
-                        </div>
-                    </sqx-list-view>
-                }
+                    @case ("more") {
+                        <sqx-list-view innerWidth="50rem">
+                            <div>
+                                @if (schema.type !== "Component") {
+                                    <sqx-schema-preview-urls-form [schema]="schema" />
+                                }
+                                <sqx-schema-field-rules-form [schema]="schema" />
+                                <sqx-schema-edit-form [languages]="languages" [schema]="schema" />
+                            </div>
+                        </sqx-list-view>
+                    }
 
-                @default {
-                    <sqx-list-view innerWidth="50rem" table="true">
-                        <div><sqx-schema-fields [schema]="schema" /></div>
-                    </sqx-list-view>
+                    @default {
+                        <sqx-list-view innerWidth="50rem" table="true">
+                            <div><sqx-schema-fields [languages]="languages" [schema]="schema" /></div>
+                        </sqx-list-view>
+                    }
                 }
             }
         </ng-container>

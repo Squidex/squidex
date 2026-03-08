@@ -18,6 +18,7 @@ import { TooltipDirective } from '../../modals/tooltip.directive';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { ScrollActiveDirective } from '../../scroll-active.directive';
 import { StopClickDirective } from '../../stop-click.directive';
+import { ForwardFormClassesDirective } from '../forward-form-classes.directive';
 
 export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TagEditorComponent), multi: true,
@@ -49,6 +50,7 @@ interface State {
         DropdownMenuComponent,
         FormsModule,
         LoaderComponent,
+        ForwardFormClassesDirective,
         ModalDirective,
         ModalPlacementDirective,
         ReactiveFormsModule,

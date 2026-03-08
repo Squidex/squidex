@@ -18,6 +18,7 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 import { ScrollActiveDirective } from '../../scroll-active.directive';
 import { TemplateWrapperDirective } from '../../template-wrapper.directive';
 import { FocusOnInitDirective } from '../focus-on-init.directive';
+import { ForwardFormClassesDirective } from '../forward-form-classes.directive';
 
 export const SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DropdownComponent), multi: true,
@@ -49,6 +50,7 @@ interface State {
         DropdownMenuComponent,
         FocusOnInitDirective,
         FormsModule,
+        ForwardFormClassesDirective,
         LoaderComponent,
         ModalDirective,
         ModalPlacementDirective,

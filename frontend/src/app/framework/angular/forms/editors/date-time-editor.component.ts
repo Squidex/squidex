@@ -13,6 +13,7 @@ import { TooltipDirective } from '../../modals/tooltip.directive';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { ResizedDirective } from '../../resized.directive';
 import { FocusComponent } from '../forms-helper';
+import { ForwardFormClassesDirective } from '../forward-form-classes.directive';
 
 export const SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DateTimeEditorComponent), multi: true,
@@ -39,6 +40,7 @@ interface State {
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         FormsModule,
+        ForwardFormClassesDirective,
         ReactiveFormsModule,
         ResizedDirective,
         TooltipDirective,

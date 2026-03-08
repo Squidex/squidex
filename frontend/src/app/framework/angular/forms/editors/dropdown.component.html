@@ -10,7 +10,8 @@
         [disabled]="snapshot.isDisabled"
         (keydown)="onKeyDown($event)"
         [name]="formName"
-        readonly />
+        readonly
+        sqxForwardFormClasses />
     @if (snapshot.selectedItem; as selectedItem) {
         <div class="control-dropdown-item">
             <div class="no-wrap">

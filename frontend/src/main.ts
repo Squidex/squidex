@@ -5,6 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
+import { OVERLAY_DEFAULT_CONFIG } from '@angular/cdk/overlay';
 import { APP_BASE_HREF } from '@angular/common';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { enableProdMode, ErrorHandler } from '@angular/core';
@@ -129,6 +130,10 @@ bootstrapApplication(AppComponent, {
         {
           provide: UI_TOUR_OPTIONS,
           useValue: TASKS.defaults,
+        },
+        {
+            provide: OVERLAY_DEFAULT_CONFIG,
+            useValue: { usePopover: false }
         },
         {
             provide: BaseTourService,

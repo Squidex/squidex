@@ -113,13 +113,16 @@ public sealed class ContentQueryService(
                 q = q with { CreatedBy = context.UserPrincipal.Token() };
             }
 
-            q = await ParseCoreAsync(context, q, schema, ct);
-
-            var contents = await QueryCoreAsync(context, q, schema, ct);
-
-            if (q.Ids is { Count: > 0 })
+            var parsedQuery = await ParseCoreAsync(context, q, schema, ct);
+            if (parsedQuery == null)
             {
-                contents = contents.Sorted(x => x.Id, q.Ids);
+                return ResultList.Empty<EnrichedContent>();
+            }
+
+            var contents = await QueryCoreAsync(context, parsedQuery, schema, ct);
+            if (parsedQuery.Ids is { Count: > 0 })
+            {
+                contents = contents.Sorted(x => x.Id, parsedQuery.Ids);
             }
 
             return await TransformAsync(context, contents, ct);
@@ -147,13 +150,16 @@ public sealed class ContentQueryService(
                 return ResultList.Empty<EnrichedContent>();
             }
 
-            q = await ParseCoreAsync(context, q, null, ct);
-
-            var contents = await QueryCoreAsync(context, q, schemas, ct);
-
-            if (q.Ids is { Count: > 0 })
+            var parsedQuery = await ParseCoreAsync(context, q, null, ct);
+            if (parsedQuery == null)
             {
-                contents = contents.Sorted(x => x.Id, q.Ids);
+                return ResultList.Empty<EnrichedContent>();
+            }
+
+            var contents = await QueryCoreAsync(context, parsedQuery, schemas, ct);
+            if (parsedQuery.Ids is { Count: > 0 })
+            {
+                contents = contents.Sorted(x => x.Id, parsedQuery.Ids);
             }
 
             return await TransformAsync(context, contents, ct);
@@ -228,7 +234,7 @@ public sealed class ContentQueryService(
         return schemas.Where(x => IsAccessible(x) && HasPermission(context, x, PermissionIds.AppContentsReadOwn)).ToList();
     }
 
-    private async Task<Q> ParseCoreAsync(Context context, Q q, Schema? schema,
+    private async Task<Q?> ParseCoreAsync(Context context, Q q, Schema? schema,
         CancellationToken ct)
     {
         using (var combined = CancellationTokenSource.CreateLinkedTokenSource(ct))

@@ -205,6 +205,8 @@ public partial class SchemaDomainObject(DomainId id, IPersistenceFactory<Schema>
             case UpdateSchema update:
                 return ApplyReturn(update, c =>
                 {
+                    GuardSchema.CanUpdateSchema(c);
+
                     Update(c);
 
                     return Snapshot;

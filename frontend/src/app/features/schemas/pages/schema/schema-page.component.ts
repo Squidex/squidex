@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { Component, inject, OnInit } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { map } from 'rxjs/operators';
-import { ConfirmClickDirective, defined, DropdownMenuComponent, LayoutComponent, ListViewComponent, MessageBus, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, SchemasState, SidebarMenuDirective, Subscriptions, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, UIOptions } from '@app/shared';
+import { ConfirmClickDirective, defined, DropdownMenuComponent, LanguagesState, LayoutComponent, ListViewComponent, MessageBus, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, SchemasState, SidebarMenuDirective, Subscriptions, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, UIOptions } from '@app/shared';
 import { SchemaCloning } from '../messages';
 import { SchemaEditFormComponent } from './common/schema-edit-form.component';
 import { SchemaExportFormComponent } from './export/schema-export-form.component';
@@ -62,6 +62,7 @@ export class SchemaPageComponent implements OnInit {
 
     constructor(
         public readonly schemasState: SchemasState,
+        public readonly languageState: LanguagesState,
         private readonly route: ActivatedRoute,
         private readonly router: Router,
         private readonly messageBus: MessageBus,
@@ -69,6 +70,8 @@ export class SchemaPageComponent implements OnInit {
     }
 
     public ngOnInit() {
+        this.languageState.load();
+
         this.subscriptions.add(
             this.schemasState.selectedSchema.pipe(defined())
                 .subscribe(schema => {

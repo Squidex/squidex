@@ -1,4 +1,4 @@
-<form [formGroup]="fieldForm.form" (ngSubmit)="saveSchema()">
+<form [formGroup]="schemaForm.form" (ngSubmit)="saveSchema()">
     <h5>{{ "common.generalSettings" | sqxTranslate }}</h5>
 
     <div class="card">
@@ -31,17 +31,15 @@
                 <input class="form-control" id="contentsListUrl" formControlName="contentsListUrl" type="url" />
             </sqx-form-row>
 
+            <sqx-form-row alert="schemas.searchFieldsHelp" for="searchFields" hint="schemas.searchFieldsHint" label="schemas.searchFields" vertical>
+                <sqx-tag-editor allowOpen="true" id="searchFields" formControlName="searchFields" [itemsSource]="fieldNames" />
+            </sqx-form-row>
+
             <sqx-form-row for="tags" hint="schemas.schemaTagsHint" label="common.tags" vertical>
                 <sqx-tag-editor id="tags" formControlName="tags" />
             </sqx-form-row>
 
-            <sqx-form-row
-                alert="schemas.validateOnPublishHint"
-                check
-                for="validateOnPublish"
-                hint="schemas.validateOnPublishHint"
-                label="schemas.validateOnPublish"
-                vertical>
+            <sqx-form-row check for="validateOnPublish" hint="schemas.validateOnPublishHint" label="schemas.validateOnPublish" vertical>
                 <input class="form-check-input" id="validateOnPublish" formControlName="validateOnPublish" type="checkbox" />
             </sqx-form-row>
         </div>

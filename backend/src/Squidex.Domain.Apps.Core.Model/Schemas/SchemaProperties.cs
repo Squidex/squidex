@@ -15,6 +15,8 @@ public sealed record SchemaProperties : NamedElementPropertiesBase
 
     public ReadonlyList<string>? Tags { get; init; }
 
+    public FieldNames? SearchFields { get; init; }
+
     public string? ContentsSidebarUrl { get; init; }
 
     public string? ContentSidebarUrl { get; init; }

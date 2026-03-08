@@ -37,6 +37,6 @@
     }
 
     @if (alert) {
-        <sqx-form-alert> {{ alert | sqxTranslate }} </sqx-form-alert>
+        <sqx-form-alert> <span [sqxMarkdown]="alert | sqxTranslate" inline="false"></span> </sqx-form-alert>
     }
 </div>

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Azure;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -42,7 +43,7 @@ public class ContentQueryServiceTests : GivenContext
             .Returns([Schema]);
 
         A.CallTo(() => queryParser.ParseAsync(A<Context>._, A<Q>._, A<Schema?>._, CancellationToken))
-            .ReturnsLazily(c => Task.FromResult(c.GetArgument<Q>(1)!));
+            .ReturnsLazily(c => Task.FromResult<Q?>(c.GetArgument<Q>(1)!));
 
         var options = Options.Create(new ContentsOptions());
 
@@ -263,6 +264,34 @@ public class ContentQueryServiceTests : GivenContext
                 A<Q>.That.Matches(x => x.CreatedBy == null), SearchScope.Published,
                 A<CancellationToken>._))
             .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_not_query_contents_from_one_schema_if_query_cannot_be_parsed()
+    {
+        var requestContext = SetupContext(permissionId: PermissionIds.AppContentsRead);
+
+        A.CallTo(() => queryParser.ParseAsync(requestContext, A<Q>._, Schema, CancellationToken))
+            .Returns(Task.FromResult<Q?>(null));
+
+        await sut.QueryAsync(requestContext, SchemaId.Name, Q.Empty, CancellationToken);
+
+        A.CallTo(contentRepository)
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_not_query_contents_from_all_schemas_if_query_cannot_be_parsed()
+    {
+        var requestContext = SetupContext(permissionId: PermissionIds.AppContentsRead);
+
+        A.CallTo(() => queryParser.ParseAsync(requestContext, A<Q>._, null, CancellationToken))
+            .Returns(Task.FromResult<Q?>(null));
+
+        await sut.QueryAsync(requestContext, Q.Empty, CancellationToken);
+
+        A.CallTo(contentRepository)
+            .MustNotHaveHappened();
     }
 
     private void SetupEnricher()

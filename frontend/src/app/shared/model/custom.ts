@@ -1,8 +1,8 @@
-/* eslint-disable sort-imports */
-
-import { hasAnyLink, StringHelper, Types, ApiUrlConfig, ErrorDto } from '@app/framework';
+import { ApiUrlConfig, DateTime, ErrorDto, hasAnyLink, StringHelper, Types } from '@app/framework';
 import * as generated from './generated';
 import { FieldPropertiesVisitor, META_FIELDS, tableField, tableFields } from './schemas';
+
+export const DUMMY = DateTime.now();
 
 export class AppDto extends generated.AppDto {
     public get displayName() {

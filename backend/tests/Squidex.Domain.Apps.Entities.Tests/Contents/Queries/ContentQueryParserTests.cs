@@ -42,7 +42,7 @@ public class ContentQueryParserTests : GivenContext
     {
         var q = await sut.ParseAsync(ApiContext.Clone(b => b.WithNoTotal()), Q.Empty, ct: CancellationToken);
 
-        Assert.True(q.NoTotal);
+        Assert.True(q!.NoTotal);
     }
 
     [Fact]
@@ -68,7 +68,7 @@ public class ContentQueryParserTests : GivenContext
 
         var q = await sut.ParseAsync(ApiContext, query, ct: CancellationToken);
 
-        Assert.Equal("Filter: status == 'Draft'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        Assert.Equal("Filter: status == 'Draft'; Take: 30; Sort: lastModified Descending, id Ascending", q!.Query.ToString());
     }
 
     [Fact]
@@ -78,7 +78,7 @@ public class ContentQueryParserTests : GivenContext
 
         var q = await sut.ParseAsync(ApiContext, query, ct: CancellationToken);
 
-        Assert.Equal("Filter: status == 'Draft'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        Assert.Equal("Filter: status == 'Draft'; Take: 30; Sort: lastModified Descending, id Ascending", q!.Query.ToString());
     }
 
     [Fact]
@@ -88,7 +88,7 @@ public class ContentQueryParserTests : GivenContext
 
         var q = await sut.ParseAsync(ApiContext, query, Schema, CancellationToken);
 
-        Assert.Equal("Filter: status == 'Draft'; Take: 100; Sort: data.firstName.iv Ascending, id Ascending", q.Query.ToString());
+        Assert.Equal("Filter: status == 'Draft'; Take: 100; Sort: data.firstName.iv Ascending, id Ascending", q!.Query.ToString());
     }
 
     [Fact]
@@ -98,7 +98,7 @@ public class ContentQueryParserTests : GivenContext
 
         var q = await sut.ParseAsync(ApiContext, query, Schema, CancellationToken);
 
-        Assert.Equal("Filter: data.firstName.iv == 'ABC'; Take: 200; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        Assert.Equal("Filter: data.firstName.iv == 'ABC'; Take: 200; Sort: lastModified Descending, id Ascending", q!.Query.ToString());
     }
 
     [Fact]
@@ -108,7 +108,7 @@ public class ContentQueryParserTests : GivenContext
 
         var q = await sut.ParseAsync(ApiContext, query, Schema, CancellationToken);
 
-        Assert.Equal("Filter: data.firstName.iv == 'ABC'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        Assert.Equal("Filter: data.firstName.iv == 'ABC'; Take: 30; Sort: lastModified Descending, id Ascending", q!.Query.ToString());
     }
 
     [Fact]
@@ -121,7 +121,7 @@ public class ContentQueryParserTests : GivenContext
 
         var q = await sut.ParseAsync(ApiContext, query, Schema, CancellationToken);
 
-        Assert.Equal("Filter: (data.firstName.iv == 'ABC' && id in ['1', '2']); Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        Assert.Equal("Filter: (data.firstName.iv == 'ABC' && id in ['1', '2']); Take: 30; Sort: lastModified Descending, id Ascending", q!.Query.ToString());
     }
 
     [Fact]
@@ -134,7 +134,7 @@ public class ContentQueryParserTests : GivenContext
 
         var q = await sut.ParseAsync(ApiContext, query, Schema, CancellationToken);
 
-        Assert.Equal("Filter: id in ['1', '2']; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        Assert.Equal("Filter: id in ['1', '2']; Take: 30; Sort: lastModified Descending, id Ascending", q!.Query.ToString());
     }
 
     [Fact]
@@ -147,11 +147,53 @@ public class ContentQueryParserTests : GivenContext
 
         var q = await sut.ParseAsync(ApiContext, query, Schema, CancellationToken);
 
-        Assert.Equal("Filter: id in ['1']; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        Assert.Equal("Filter: id in ['1']; Take: 30; Sort: lastModified Descending, id Ascending", q!.Query.ToString());
     }
 
     [Fact]
-    public async Task Should_convert_full_text_query_to_filter_if_index_returns_null()
+    public async Task Should_merge_results_of_full_text_and_search_Fields()
+    {
+        Schema = Schema with
+        {
+            Properties = Schema.Properties with
+            {
+                SearchFields = FieldNames.Create("a", "b"),
+            },
+        };
+
+        A.CallTo(() => textIndex.SearchAsync(ApiContext.App, A<TextQuery>.That.Matches(x => x.Text == "Hello"), ApiContext.Scope(), CancellationToken))
+            .Returns([DomainId.Create("1")]);
+
+        var query = Q.Empty.WithODataQuery("$search=Hello");
+
+        var q = await sut.ParseAsync(ApiContext, query, Schema, CancellationToken);
+
+        Assert.Equal("Filter: (id in ['1'] || contains(a, 'Hello') || contains(b, 'Hello')); Take: 30; Sort: lastModified Descending, id Ascending", q!.Query.ToString());
+    }
+
+    [Fact]
+    public async Task Should_only_use_search_fields_if_full_text_result_is_empty()
+    {
+        Schema = Schema with
+        {
+            Properties = Schema.Properties with
+            {
+                SearchFields = FieldNames.Create("a", "b"),
+            },
+        };
+
+        A.CallTo(() => textIndex.SearchAsync(ApiContext.App, A<TextQuery>.That.Matches(x => x.Text == "Hello"), ApiContext.Scope(), CancellationToken))
+            .Returns([]);
+
+        var query = Q.Empty.WithODataQuery("$search=Hello");
+
+        var q = await sut.ParseAsync(ApiContext, query, Schema, CancellationToken);
+
+        Assert.Equal("Filter: (contains(a, 'Hello') || contains(b, 'Hello')); Take: 30; Sort: lastModified Descending, id Ascending", q!.Query.ToString());
+    }
+
+    [Fact]
+    public async Task Should_return_null_if_full_index_returns_null()
     {
         A.CallTo(() => textIndex.SearchAsync(ApiContext.App, A<TextQuery>.That.Matches(x => x.Text == "Hello"), ApiContext.Scope(), CancellationToken))
             .Returns(Task.FromResult<List<DomainId>?>(null));
@@ -160,11 +202,11 @@ public class ContentQueryParserTests : GivenContext
 
         var q = await sut.ParseAsync(ApiContext, query, Schema, CancellationToken);
 
-        Assert.Equal("Filter: id == '__notfound__'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        Assert.Null(q);
     }
 
     [Fact]
-    public async Task Should_convert_full_text_query_to_filter_if_index_returns_empty()
+    public async Task Should_return_null_if_full_index_returns_empty()
     {
         A.CallTo(() => textIndex.SearchAsync(ApiContext.App, A<TextQuery>.That.Matches(x => x.Text == "Hello"), ApiContext.Scope(), CancellationToken))
             .Returns([]);
@@ -173,7 +215,7 @@ public class ContentQueryParserTests : GivenContext
 
         var q = await sut.ParseAsync(ApiContext, query, Schema, CancellationToken);
 
-        Assert.Equal("Filter: id == '__notfound__'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        Assert.Null(q);
     }
 
     [Fact]
@@ -186,7 +228,7 @@ public class ContentQueryParserTests : GivenContext
 
         var q = await sut.ParseAsync(ApiContext, query, Schema, CancellationToken);
 
-        Assert.Equal("Filter: id in ['1', '2']; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        Assert.Equal("Filter: id in ['1', '2']; Take: 30; Sort: lastModified Descending, id Ascending", q!.Query.ToString());
     }
 
     [Fact]
@@ -199,7 +241,7 @@ public class ContentQueryParserTests : GivenContext
 
         var q = await sut.ParseAsync(ApiContext, query, Schema, CancellationToken);
 
-        Assert.Equal("Filter: id in ['1']; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        Assert.Equal("Filter: id in ['1']; Take: 30; Sort: lastModified Descending, id Ascending", q!.Query.ToString());
     }
 
     [Fact]
@@ -212,7 +254,7 @@ public class ContentQueryParserTests : GivenContext
 
         var q = await sut.ParseAsync(ApiContext, query, Schema, CancellationToken);
 
-        Assert.Equal("Filter: id == '__notfound__'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        Assert.Equal("Filter: id == '__notfound__'; Take: 30; Sort: lastModified Descending, id Ascending", q!.Query.ToString());
     }
 
     [Fact]
@@ -225,7 +267,7 @@ public class ContentQueryParserTests : GivenContext
 
         var q = await sut.ParseAsync(ApiContext, query, Schema, CancellationToken);
 
-        Assert.Equal("Filter: id == '__notfound__'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        Assert.Equal("Filter: id == '__notfound__'; Take: 30; Sort: lastModified Descending, id Ascending", q!.Query.ToString());
     }
 
     [Theory]
@@ -239,7 +281,7 @@ public class ContentQueryParserTests : GivenContext
 
         var q = await sut.ParseAsync(ApiContext, query, Schema, CancellationToken);
 
-        Assert.Equal("Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        Assert.Equal("Take: 30; Sort: lastModified Descending, id Ascending", q!.Query.ToString());
     }
 
     [Fact]
@@ -249,7 +291,7 @@ public class ContentQueryParserTests : GivenContext
 
         var q = await sut.ParseAsync(ApiContext, query, Schema, CancellationToken);
 
-        Assert.Equal("Take: 3; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        Assert.Equal("Take: 3; Sort: lastModified Descending, id Ascending", q!.Query.ToString());
     }
 
     [Fact]
@@ -259,7 +301,7 @@ public class ContentQueryParserTests : GivenContext
 
         var q = await sut.ParseAsync(ApiContext, query, Schema, CancellationToken);
 
-        Assert.Equal("Take: 20; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        Assert.Equal("Take: 20; Sort: lastModified Descending, id Ascending", q!.Query.ToString());
     }
 
     [Fact]
@@ -269,7 +311,7 @@ public class ContentQueryParserTests : GivenContext
 
         var q = await sut.ParseAsync(ApiContext, query, Schema, CancellationToken);
 
-        Assert.Equal("Skip: 20; Take: 200; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        Assert.Equal("Skip: 20; Take: 200; Sort: lastModified Descending, id Ascending", q!.Query.ToString());
     }
 
     [Fact]
@@ -279,7 +321,7 @@ public class ContentQueryParserTests : GivenContext
 
         var q = await sut.ParseAsync(ApiContext, query, Schema, CancellationToken);
 
-        Assert.Equal("Skip: 20; Take: 200; Sort: id Descending", q.Query.ToString());
+        Assert.Equal("Skip: 20; Take: 200; Sort: id Descending", q!.Query.ToString());
     }
 
     [Fact]
@@ -293,6 +335,6 @@ public class ContentQueryParserTests : GivenContext
 
         var q = await sut.ParseAsync(ApiContext, query, Schema, CancellationToken);
 
-        Assert.Equal("Filter: data.firstName.iv == 'ABC'; Take: 30; Sort: lastModified Descending, id Ascending", q.Query.ToString());
+        Assert.Equal("Filter: data.firstName.iv == 'ABC'; Take: 30; Sort: lastModified Descending, id Ascending", q!.Query.ToString());
     }
 }

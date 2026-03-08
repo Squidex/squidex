@@ -657,6 +657,21 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
         GuardSchema.CanConfigurePreviewUrls(command);
     }
 
+    [Fact]
+    public void CanUpdate_should_throw_exception_if_search_fields_is_too_large()
+    {
+        var command = new UpdateSchema
+        {
+            Properties = new SchemaProperties()
+            {
+                SearchFields = FieldNames.Create("a", "b", "c", "d"),
+            },
+        };
+
+        ValidationAssert.Throws(() => GuardSchema.CanUpdateSchema(command),
+            new ValidationError("Size must be between 1 and 3.", "Properties.SearchFields"));
+    }
+
     private CreateSchema CreateCommand(CreateSchema command)
     {
         command.AppId = AppId;

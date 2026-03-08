@@ -20,6 +20,7 @@ import { ScrollActiveDirective } from '../../scroll-active.directive';
 import { StopClickDirective } from '../../stop-click.directive';
 import { TemplateWrapperDirective } from '../../template-wrapper.directive';
 import { FocusOnInitDirective } from '../focus-on-init.directive';
+import { ForwardFormClassesDirective } from '../forward-form-classes.directive';
 
 export interface AutocompleteSource {
     find(query: string): Observable<ReadonlyArray<any>>;
@@ -77,6 +78,7 @@ const RANGE_LIMIT = 60;
         DropdownMenuComponent,
         FocusOnInitDirective,
         FormsModule,
+        ForwardFormClassesDirective,
         LoaderComponent,
         ModalDirective,
         ModalPlacementDirective,
