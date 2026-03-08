@@ -6,8 +6,8 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, HostBinding, Input } from '@angular/core';
-import { AbstractControl } from '@angular/forms';
+import { booleanAttribute, ChangeDetectionStrategy, Component, HostBinding, Input, Optional, SkipSelf } from '@angular/core';
+import { AbstractControl, FormGroupDirective } from '@angular/forms';
 import { Types } from '@app/framework/internal';
 import { MarkdownDirective } from '../markdown.directive';
 import { TranslatePipe } from '../pipes/translate.pipe';
@@ -26,6 +26,13 @@ import { FormHintComponent } from './form-hint.component';
         '[class.row]': '!vertical',
         '[class.form-group-aligned]': 'centered',
     },
+    viewProviders: [
+        {
+            provide: FormGroupDirective,
+            useFactory: (directive: FormGroupDirective) => directive,
+            deps: [[new Optional(), new SkipSelf(), FormGroupDirective]],
+        },
+    ],
     imports: [
         ControlErrorsComponent,
         FormAlertComponent,

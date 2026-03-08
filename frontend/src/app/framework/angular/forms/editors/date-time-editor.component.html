@@ -28,6 +28,7 @@
             (ngModelChange)="updateValue($event)"
             [ngModelOptions]="{ standalone: true }"
             placeholder="{{ 'common.date' | sqxTranslate }}"
+            sqxForwardFormClasses
             [type]="isDateTimeMode ? 'datetime-local' : 'date'" />
     </div>
 
