@@ -42,7 +42,6 @@ BEGIN
       SELECT 1 FROM jsonb_array_elements(val) AS e WHERE e #>> '{}' = target
     );
   END IF;
-  IF val IS NULL OR jsonb_typeof(val) = 'null' THEN RETURN TRUE; END IF;
   RETURN val #>> '{}' != target;
 END;
 $$;
@@ -187,7 +186,7 @@ BEGIN
       WHERE jsonb_typeof(e) = 'number' AND (e #>> '{}')::numeric = target
     );
   END IF;
-  IF jsonb_typeof(val) != 'number' THEN RETURN TRUE; END IF;
+  IF jsonb_typeof(val) != 'number' THEN RETURN FALSE; END IF;
   RETURN (val #>> '{}')::numeric != target;
 END;
 $$;
@@ -311,7 +310,7 @@ BEGIN
       WHERE jsonb_typeof(e) = 'boolean' AND (e #>> '{}')::boolean = target
     );
   END IF;
-  IF jsonb_typeof(val) != 'boolean' THEN RETURN TRUE; END IF;
+  IF jsonb_typeof(val) != 'boolean' THEN RETURN FALSE; END IF;
   RETURN (val #>> '{}')::boolean != target;
 END;
 $$;

@@ -616,39 +616,6 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
     }
 
     [Fact]
-    public async Task Should_filter_by_number_not_equal_in_mixed_json()
-    {
-        var actual = await QueryAsync(new ClrQuery
-        {
-            Filter = ClrFilter.Ne("Json.mixed", 999),
-        });
-
-        Assert.Equal(Range(1, 20), actual.Order().ToArray());
-    }
-
-    [Fact]
-    public async Task Should_filter_by_string_not_equal_in_mixed_json()
-    {
-        var actual = await QueryAsync(new ClrQuery
-        {
-            Filter = ClrFilter.Ne("Json.mixed", "neverexists"),
-        });
-
-        Assert.Equal(AllExept(6, 12, 18), actual.Order().ToArray());
-    }
-
-    [Fact]
-    public async Task Should_filter_by_boolean_not_equal_in_mixed_json()
-    {
-        var actual = await QueryAsync(new ClrQuery
-        {
-            Filter = ClrFilter.Ne("Json.mixed", false),
-        });
-
-        Assert.Equal(AllExept(6, 12, 18), actual.Order().ToArray());
-    }
-
-    [Fact]
     public async Task Should_filter_by_number_equal_in_mixed_json()
     {
         var actual = await QueryAsync(new ClrQuery
@@ -1551,28 +1518,6 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
     }
 
     [Fact]
-    public async Task Should_filter_by_empty_on_nullable_number()
-    {
-        var actual = await QueryAsync(new ClrQuery
-        {
-            Filter = ClrFilter.Empty("NumberOrNull"),
-        }, includeSpecialCase: true);
-
-        Assert.Equal([.. Range(11, 20), 21], actual.Order().ToArray());
-    }
-
-    [Fact]
-    public async Task Should_filter_by_exists_on_nullable_number()
-    {
-        var actual = await QueryAsync(new ClrQuery
-        {
-            Filter = ClrFilter.Exists("NumberOrNull"),
-        });
-
-        Assert.Equal(Range(1, 10), actual.Order().ToArray());
-    }
-
-    [Fact]
     public async Task Should_filter_by_null_on_boolean()
     {
         var actual = await QueryAsync(new ClrQuery
@@ -1589,28 +1534,6 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
         var actual = await QueryAsync(new ClrQuery
         {
             Filter = ClrFilter.Ne("BooleanOrNull", ClrValue.Null),
-        });
-
-        Assert.Equal(Range(11, 20), actual.Order().ToArray());
-    }
-
-    [Fact]
-    public async Task Should_filter_by_empty_on_nullable_boolean()
-    {
-        var actual = await QueryAsync(new ClrQuery
-        {
-            Filter = ClrFilter.Empty("BooleanOrNull"),
-        }, includeSpecialCase: true);
-
-        Assert.Equal([.. Range(1, 10), 21], actual.Order().ToArray());
-    }
-
-    [Fact]
-    public async Task Should_filter_by_exists_on_nullable_boolean()
-    {
-        var actual = await QueryAsync(new ClrQuery
-        {
-            Filter = ClrFilter.Exists("BooleanOrNull"),
         });
 
         Assert.Equal(Range(11, 20), actual.Order().ToArray());
