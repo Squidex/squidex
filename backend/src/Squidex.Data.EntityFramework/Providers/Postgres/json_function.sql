@@ -27,9 +27,11 @@ RETURNS boolean LANGUAGE plpgsql IMMUTABLE AS $$
 BEGIN
   IF jsonb_typeof(val) = 'array' THEN
     RETURN EXISTS (
-      SELECT 1 FROM jsonb_array_elements(val) AS e WHERE e #>> '{}' = target
+      SELECT 1 FROM jsonb_array_elements(val) AS e
+      WHERE jsonb_typeof(e) = 'string' AND e #>> '{}' = target
     );
   END IF;
+  IF jsonb_typeof(val) != 'string' THEN RETURN FALSE; END IF;
   RETURN val #>> '{}' = target;
 END;
 $$;
@@ -39,9 +41,11 @@ RETURNS boolean LANGUAGE plpgsql IMMUTABLE AS $$
 BEGIN
   IF jsonb_typeof(val) = 'array' THEN
     RETURN NOT EXISTS (
-      SELECT 1 FROM jsonb_array_elements(val) AS e WHERE e #>> '{}' = target
+      SELECT 1 FROM jsonb_array_elements(val) AS e
+      WHERE jsonb_typeof(e) = 'string' AND e #>> '{}' = target
     );
   END IF;
+  IF jsonb_typeof(val) != 'string' THEN RETURN TRUE; END IF;
   RETURN val #>> '{}' != target;
 END;
 $$;
@@ -51,9 +55,11 @@ RETURNS boolean LANGUAGE plpgsql IMMUTABLE AS $$
 BEGIN
   IF jsonb_typeof(val) = 'array' THEN
     RETURN EXISTS (
-      SELECT 1 FROM jsonb_array_elements(val) AS e WHERE e #>> '{}' < target
+      SELECT 1 FROM jsonb_array_elements(val) AS e
+      WHERE jsonb_typeof(e) = 'string' AND e #>> '{}' < target
     );
   END IF;
+  IF jsonb_typeof(val) != 'string' THEN RETURN FALSE; END IF;
   RETURN val #>> '{}' < target;
 END;
 $$;
@@ -63,9 +69,11 @@ RETURNS boolean LANGUAGE plpgsql IMMUTABLE AS $$
 BEGIN
   IF jsonb_typeof(val) = 'array' THEN
     RETURN EXISTS (
-      SELECT 1 FROM jsonb_array_elements(val) AS e WHERE e #>> '{}' <= target
+      SELECT 1 FROM jsonb_array_elements(val) AS e
+      WHERE jsonb_typeof(e) = 'string' AND e #>> '{}' <= target
     );
   END IF;
+  IF jsonb_typeof(val) != 'string' THEN RETURN FALSE; END IF;
   RETURN val #>> '{}' <= target;
 END;
 $$;
@@ -75,9 +83,11 @@ RETURNS boolean LANGUAGE plpgsql IMMUTABLE AS $$
 BEGIN
   IF jsonb_typeof(val) = 'array' THEN
     RETURN EXISTS (
-      SELECT 1 FROM jsonb_array_elements(val) AS e WHERE e #>> '{}' > target
+      SELECT 1 FROM jsonb_array_elements(val) AS e
+      WHERE jsonb_typeof(e) = 'string' AND e #>> '{}' > target
     );
   END IF;
+  IF jsonb_typeof(val) != 'string' THEN RETURN FALSE; END IF;
   RETURN val #>> '{}' > target;
 END;
 $$;
@@ -87,9 +97,11 @@ RETURNS boolean LANGUAGE plpgsql IMMUTABLE AS $$
 BEGIN
   IF jsonb_typeof(val) = 'array' THEN
     RETURN EXISTS (
-      SELECT 1 FROM jsonb_array_elements(val) AS e WHERE e #>> '{}' >= target
+      SELECT 1 FROM jsonb_array_elements(val) AS e
+      WHERE jsonb_typeof(e) = 'string' AND e #>> '{}' >= target
     );
   END IF;
+  IF jsonb_typeof(val) != 'string' THEN RETURN FALSE; END IF;
   RETURN val #>> '{}' >= target;
 END;
 $$;
@@ -100,9 +112,10 @@ BEGIN
   IF jsonb_typeof(val) = 'array' THEN
     RETURN EXISTS (
       SELECT 1 FROM jsonb_array_elements(val) AS e
-      WHERE e #>> '{}' LIKE '%' || target || '%'
+      WHERE jsonb_typeof(e) = 'string' AND e #>> '{}' LIKE '%' || target || '%'
     );
   END IF;
+  IF jsonb_typeof(val) != 'string' THEN RETURN FALSE; END IF;
   RETURN val #>> '{}' LIKE '%' || target || '%';
 END;
 $$;
@@ -113,9 +126,10 @@ BEGIN
   IF jsonb_typeof(val) = 'array' THEN
     RETURN EXISTS (
       SELECT 1 FROM jsonb_array_elements(val) AS e
-      WHERE e #>> '{}' LIKE target || '%'
+      WHERE jsonb_typeof(e) = 'string' AND e #>> '{}' LIKE target || '%'
     );
   END IF;
+  IF jsonb_typeof(val) != 'string' THEN RETURN FALSE; END IF;
   RETURN val #>> '{}' LIKE target || '%';
 END;
 $$;
@@ -126,9 +140,10 @@ BEGIN
   IF jsonb_typeof(val) = 'array' THEN
     RETURN EXISTS (
       SELECT 1 FROM jsonb_array_elements(val) AS e
-      WHERE e #>> '{}' LIKE '%' || target
+      WHERE jsonb_typeof(e) = 'string' AND e #>> '{}' LIKE '%' || target
     );
   END IF;
+  IF jsonb_typeof(val) != 'string' THEN RETURN FALSE; END IF;
   RETURN val #>> '{}' LIKE '%' || target;
 END;
 $$;
@@ -139,9 +154,10 @@ BEGIN
   IF jsonb_typeof(val) = 'array' THEN
     RETURN EXISTS (
       SELECT 1 FROM jsonb_array_elements(val) AS e
-      WHERE e #>> '{}' ~ target
+      WHERE jsonb_typeof(e) = 'string' AND e #>> '{}' ~ target
     );
   END IF;
+  IF jsonb_typeof(val) != 'string' THEN RETURN FALSE; END IF;
   RETURN val #>> '{}' ~ target;
 END;
 $$;
@@ -152,9 +168,10 @@ BEGIN
   IF jsonb_typeof(val) = 'array' THEN
     RETURN EXISTS (
       SELECT 1 FROM jsonb_array_elements(val) AS e
-      WHERE e #>> '{}' = ANY(targets)
+      WHERE jsonb_typeof(e) = 'string' AND e #>> '{}' = ANY(targets)
     );
   END IF;
+  IF jsonb_typeof(val) != 'string' THEN RETURN FALSE; END IF;
   RETURN val #>> '{}' = ANY(targets);
 END;
 $$;
@@ -186,7 +203,7 @@ BEGIN
       WHERE jsonb_typeof(e) = 'number' AND (e #>> '{}')::numeric = target
     );
   END IF;
-  IF jsonb_typeof(val) != 'number' THEN RETURN FALSE; END IF;
+  IF jsonb_typeof(val) != 'number' THEN RETURN TRUE; END IF;
   RETURN (val #>> '{}')::numeric != target;
 END;
 $$;
@@ -310,7 +327,7 @@ BEGIN
       WHERE jsonb_typeof(e) = 'boolean' AND (e #>> '{}')::boolean = target
     );
   END IF;
-  IF jsonb_typeof(val) != 'boolean' THEN RETURN FALSE; END IF;
+  IF jsonb_typeof(val) != 'boolean' THEN RETURN TRUE; END IF;
   RETURN (val #>> '{}')::boolean != target;
 END;
 $$;

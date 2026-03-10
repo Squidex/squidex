@@ -60,11 +60,15 @@ RETURNS BIT
 AS
 BEGIN
   DECLARE @query NVARCHAR(MAX) = JSON_QUERY(@col, @path);
-  IF @query IS NOT NULL
+  IF @query IS NOT NULL AND LEFT(LTRIM(@query), 1) = '['
     RETURN CASE WHEN EXISTS (
       SELECT 1 FROM OPENJSON(@query) AS j WHERE j.[type] = 1 AND j.[value] = @target
     ) THEN 1 ELSE 0 END;
-  RETURN CASE WHEN JSON_VALUE(@col, @path) = @target THEN 1 ELSE 0 END;
+  IF @query IS NOT NULL
+    RETURN 0;
+  RETURN CASE WHEN EXISTS (
+    SELECT 1 FROM OPENJSON(@col, @path) AS j WHERE j.[type] = 1 AND j.[value] = @target
+  ) THEN 1 ELSE 0 END;
 END;;
 
 DROP FUNCTION IF EXISTS dbo.json_text_notequals;;
@@ -73,11 +77,21 @@ RETURNS BIT
 AS
 BEGIN
   DECLARE @query NVARCHAR(MAX) = JSON_QUERY(@col, @path);
-  IF @query IS NOT NULL
+  IF @query IS NOT NULL AND LEFT(LTRIM(@query), 1) = '['
     RETURN CASE WHEN NOT EXISTS (
       SELECT 1 FROM OPENJSON(@query) AS j WHERE j.[type] = 1 AND j.[value] = @target
     ) THEN 1 ELSE 0 END;
-  RETURN CASE WHEN JSON_VALUE(@col, @path) != @target THEN 1 ELSE 0 END;
+  IF @query IS NOT NULL
+    RETURN 1;
+  RETURN CASE
+    WHEN EXISTS (
+      SELECT 1 FROM OPENJSON(@col, @path) AS j WHERE j.[type] = 1 AND j.[value] = @target
+    ) THEN 0
+    WHEN EXISTS (
+      SELECT 1 FROM OPENJSON(@col, @path)
+    ) THEN 1
+    ELSE 0
+  END;
 END;;
 
 DROP FUNCTION IF EXISTS dbo.json_text_lessthan;;
@@ -86,11 +100,15 @@ RETURNS BIT
 AS
 BEGIN
   DECLARE @query NVARCHAR(MAX) = JSON_QUERY(@col, @path);
-  IF @query IS NOT NULL
+  IF @query IS NOT NULL AND LEFT(LTRIM(@query), 1) = '['
     RETURN CASE WHEN EXISTS (
       SELECT 1 FROM OPENJSON(@query) AS j WHERE j.[type] = 1 AND j.[value] < @target
     ) THEN 1 ELSE 0 END;
-  RETURN CASE WHEN JSON_VALUE(@col, @path) < @target THEN 1 ELSE 0 END;
+  IF @query IS NOT NULL
+    RETURN 0;
+  RETURN CASE WHEN EXISTS (
+    SELECT 1 FROM OPENJSON(@col, @path) AS j WHERE j.[type] = 1 AND j.[value] < @target
+  ) THEN 1 ELSE 0 END;
 END;;
 
 DROP FUNCTION IF EXISTS dbo.json_text_lessthanorequal;;
@@ -99,11 +117,15 @@ RETURNS BIT
 AS
 BEGIN
   DECLARE @query NVARCHAR(MAX) = JSON_QUERY(@col, @path);
-  IF @query IS NOT NULL
+  IF @query IS NOT NULL AND LEFT(LTRIM(@query), 1) = '['
     RETURN CASE WHEN EXISTS (
       SELECT 1 FROM OPENJSON(@query) AS j WHERE j.[type] = 1 AND j.[value] <= @target
     ) THEN 1 ELSE 0 END;
-  RETURN CASE WHEN JSON_VALUE(@col, @path) <= @target THEN 1 ELSE 0 END;
+  IF @query IS NOT NULL
+    RETURN 0;
+  RETURN CASE WHEN EXISTS (
+    SELECT 1 FROM OPENJSON(@col, @path) AS j WHERE j.[type] = 1 AND j.[value] <= @target
+  ) THEN 1 ELSE 0 END;
 END;;
 
 DROP FUNCTION IF EXISTS dbo.json_text_greaterthan;;
@@ -112,11 +134,15 @@ RETURNS BIT
 AS
 BEGIN
   DECLARE @query NVARCHAR(MAX) = JSON_QUERY(@col, @path);
-  IF @query IS NOT NULL
+  IF @query IS NOT NULL AND LEFT(LTRIM(@query), 1) = '['
     RETURN CASE WHEN EXISTS (
       SELECT 1 FROM OPENJSON(@query) AS j WHERE j.[type] = 1 AND j.[value] > @target
     ) THEN 1 ELSE 0 END;
-  RETURN CASE WHEN JSON_VALUE(@col, @path) > @target THEN 1 ELSE 0 END;
+  IF @query IS NOT NULL
+    RETURN 0;
+  RETURN CASE WHEN EXISTS (
+    SELECT 1 FROM OPENJSON(@col, @path) AS j WHERE j.[type] = 1 AND j.[value] > @target
+  ) THEN 1 ELSE 0 END;
 END;;
 
 DROP FUNCTION IF EXISTS dbo.json_text_greaterthanorequal;;
@@ -125,11 +151,15 @@ RETURNS BIT
 AS
 BEGIN
   DECLARE @query NVARCHAR(MAX) = JSON_QUERY(@col, @path);
-  IF @query IS NOT NULL
+  IF @query IS NOT NULL AND LEFT(LTRIM(@query), 1) = '['
     RETURN CASE WHEN EXISTS (
       SELECT 1 FROM OPENJSON(@query) AS j WHERE j.[type] = 1 AND j.[value] >= @target
     ) THEN 1 ELSE 0 END;
-  RETURN CASE WHEN JSON_VALUE(@col, @path) >= @target THEN 1 ELSE 0 END;
+  IF @query IS NOT NULL
+    RETURN 0;
+  RETURN CASE WHEN EXISTS (
+    SELECT 1 FROM OPENJSON(@col, @path) AS j WHERE j.[type] = 1 AND j.[value] >= @target
+  ) THEN 1 ELSE 0 END;
 END;;
 
 DROP FUNCTION IF EXISTS dbo.json_text_contains;;
@@ -138,11 +168,15 @@ RETURNS BIT
 AS
 BEGIN
   DECLARE @query NVARCHAR(MAX) = JSON_QUERY(@col, @path);
-  IF @query IS NOT NULL
+  IF @query IS NOT NULL AND LEFT(LTRIM(@query), 1) = '['
     RETURN CASE WHEN EXISTS (
       SELECT 1 FROM OPENJSON(@query) AS j WHERE j.[type] = 1 AND j.[value] LIKE '%' + @target + '%'
     ) THEN 1 ELSE 0 END;
-  RETURN CASE WHEN JSON_VALUE(@col, @path) LIKE '%' + @target + '%' THEN 1 ELSE 0 END;
+  IF @query IS NOT NULL
+    RETURN 0;
+  RETURN CASE WHEN EXISTS (
+    SELECT 1 FROM OPENJSON(@col, @path) AS j WHERE j.[type] = 1 AND j.[value] LIKE '%' + @target + '%'
+  ) THEN 1 ELSE 0 END;
 END;;
 
 DROP FUNCTION IF EXISTS dbo.json_text_startswith;;
@@ -151,11 +185,15 @@ RETURNS BIT
 AS
 BEGIN
   DECLARE @query NVARCHAR(MAX) = JSON_QUERY(@col, @path);
-  IF @query IS NOT NULL
+  IF @query IS NOT NULL AND LEFT(LTRIM(@query), 1) = '['
     RETURN CASE WHEN EXISTS (
       SELECT 1 FROM OPENJSON(@query) AS j WHERE j.[type] = 1 AND j.[value] LIKE @target + '%'
     ) THEN 1 ELSE 0 END;
-  RETURN CASE WHEN JSON_VALUE(@col, @path) LIKE @target + '%' THEN 1 ELSE 0 END;
+  IF @query IS NOT NULL
+    RETURN 0;
+  RETURN CASE WHEN EXISTS (
+    SELECT 1 FROM OPENJSON(@col, @path) AS j WHERE j.[type] = 1 AND j.[value] LIKE @target + '%'
+  ) THEN 1 ELSE 0 END;
 END;;
 
 DROP FUNCTION IF EXISTS dbo.json_text_endswith;;
@@ -164,11 +202,15 @@ RETURNS BIT
 AS
 BEGIN
   DECLARE @query NVARCHAR(MAX) = JSON_QUERY(@col, @path);
-  IF @query IS NOT NULL
+  IF @query IS NOT NULL AND LEFT(LTRIM(@query), 1) = '['
     RETURN CASE WHEN EXISTS (
       SELECT 1 FROM OPENJSON(@query) AS j WHERE j.[type] = 1 AND j.[value] LIKE '%' + @target
     ) THEN 1 ELSE 0 END;
-  RETURN CASE WHEN JSON_VALUE(@col, @path) LIKE '%' + @target THEN 1 ELSE 0 END;
+  IF @query IS NOT NULL
+    RETURN 0;
+  RETURN CASE WHEN EXISTS (
+    SELECT 1 FROM OPENJSON(@col, @path) AS j WHERE j.[type] = 1 AND j.[value] LIKE '%' + @target
+  ) THEN 1 ELSE 0 END;
 END;;
 
 DROP FUNCTION IF EXISTS dbo.json_text_matchs;;
@@ -177,11 +219,15 @@ RETURNS BIT
 AS
 BEGIN
   DECLARE @query NVARCHAR(MAX) = JSON_QUERY(@col, @path);
-  IF @query IS NOT NULL
+  IF @query IS NOT NULL AND LEFT(LTRIM(@query), 1) = '['
     RETURN CASE WHEN EXISTS (
       SELECT 1 FROM OPENJSON(@query) AS j WHERE j.[type] = 1 AND j.[value] LIKE @target
     ) THEN 1 ELSE 0 END;
-  RETURN CASE WHEN JSON_VALUE(@col, @path) LIKE @target THEN 1 ELSE 0 END;
+  IF @query IS NOT NULL
+    RETURN 0;
+  RETURN CASE WHEN EXISTS (
+    SELECT 1 FROM OPENJSON(@col, @path) AS j WHERE j.[type] = 1 AND j.[value] LIKE @target
+  ) THEN 1 ELSE 0 END;
 END;;
 
 
@@ -194,13 +240,19 @@ RETURNS BIT
 AS
 BEGIN
   DECLARE @query NVARCHAR(MAX) = JSON_QUERY(@col, @path);
-  IF @query IS NOT NULL
+  IF @query IS NOT NULL AND LEFT(LTRIM(@query), 1) = '['
     RETURN CASE WHEN EXISTS (
       SELECT 1 FROM OPENJSON(@query) AS j
       WHERE j.[type] = 2
         AND TRY_CAST(j.[value] AS DECIMAL(38, 10)) = @target
     ) THEN 1 ELSE 0 END;
-  RETURN CASE WHEN TRY_CAST(JSON_VALUE(@col, @path) AS DECIMAL(38, 10)) = @target THEN 1 ELSE 0 END;
+  IF @query IS NOT NULL
+    RETURN 0;
+  RETURN CASE WHEN EXISTS (
+    SELECT 1 FROM OPENJSON(@col, @path) AS j
+    WHERE j.[type] = 2
+      AND TRY_CAST(j.[value] AS DECIMAL(38, 10)) = @target
+  ) THEN 1 ELSE 0 END;
 END;;
 
 DROP FUNCTION IF EXISTS dbo.json_number_notequals;;
@@ -209,13 +261,25 @@ RETURNS BIT
 AS
 BEGIN
   DECLARE @query NVARCHAR(MAX) = JSON_QUERY(@col, @path);
-  IF @query IS NOT NULL
+  IF @query IS NOT NULL AND LEFT(LTRIM(@query), 1) = '['
     RETURN CASE WHEN NOT EXISTS (
       SELECT 1 FROM OPENJSON(@query) AS j
       WHERE j.[type] = 2
         AND TRY_CAST(j.[value] AS DECIMAL(38, 10)) = @target
     ) THEN 1 ELSE 0 END;
-  RETURN CASE WHEN TRY_CAST(JSON_VALUE(@col, @path) AS DECIMAL(38, 10)) != @target THEN 1 ELSE 0 END;
+  IF @query IS NOT NULL
+    RETURN 1;
+  RETURN CASE
+    WHEN EXISTS (
+      SELECT 1 FROM OPENJSON(@col, @path) AS j
+      WHERE j.[type] = 2
+        AND TRY_CAST(j.[value] AS DECIMAL(38, 10)) = @target
+    ) THEN 0
+    WHEN EXISTS (
+      SELECT 1 FROM OPENJSON(@col, @path)
+    ) THEN 1
+    ELSE 0
+  END;
 END;;
 
 DROP FUNCTION IF EXISTS dbo.json_number_lessthan;;
@@ -224,13 +288,19 @@ RETURNS BIT
 AS
 BEGIN
   DECLARE @query NVARCHAR(MAX) = JSON_QUERY(@col, @path);
-  IF @query IS NOT NULL
+  IF @query IS NOT NULL AND LEFT(LTRIM(@query), 1) = '['
     RETURN CASE WHEN EXISTS (
       SELECT 1 FROM OPENJSON(@query) AS j
       WHERE j.[type] = 2
         AND TRY_CAST(j.[value] AS DECIMAL(38, 10)) < @target
     ) THEN 1 ELSE 0 END;
-  RETURN CASE WHEN TRY_CAST(JSON_VALUE(@col, @path) AS DECIMAL(38, 10)) < @target THEN 1 ELSE 0 END;
+  IF @query IS NOT NULL
+    RETURN 0;
+  RETURN CASE WHEN EXISTS (
+    SELECT 1 FROM OPENJSON(@col, @path) AS j
+    WHERE j.[type] = 2
+      AND TRY_CAST(j.[value] AS DECIMAL(38, 10)) < @target
+  ) THEN 1 ELSE 0 END;
 END;;
 
 DROP FUNCTION IF EXISTS dbo.json_number_lessthanorequal;;
@@ -239,13 +309,19 @@ RETURNS BIT
 AS
 BEGIN
   DECLARE @query NVARCHAR(MAX) = JSON_QUERY(@col, @path);
-  IF @query IS NOT NULL
+  IF @query IS NOT NULL AND LEFT(LTRIM(@query), 1) = '['
     RETURN CASE WHEN EXISTS (
       SELECT 1 FROM OPENJSON(@query) AS j
       WHERE j.[type] = 2
         AND TRY_CAST(j.[value] AS DECIMAL(38, 10)) <= @target
     ) THEN 1 ELSE 0 END;
-  RETURN CASE WHEN TRY_CAST(JSON_VALUE(@col, @path) AS DECIMAL(38, 10)) <= @target THEN 1 ELSE 0 END;
+  IF @query IS NOT NULL
+    RETURN 0;
+  RETURN CASE WHEN EXISTS (
+    SELECT 1 FROM OPENJSON(@col, @path) AS j
+    WHERE j.[type] = 2
+      AND TRY_CAST(j.[value] AS DECIMAL(38, 10)) <= @target
+  ) THEN 1 ELSE 0 END;
 END;;
 
 DROP FUNCTION IF EXISTS dbo.json_number_greaterthan;;
@@ -254,13 +330,19 @@ RETURNS BIT
 AS
 BEGIN
   DECLARE @query NVARCHAR(MAX) = JSON_QUERY(@col, @path);
-  IF @query IS NOT NULL
+  IF @query IS NOT NULL AND LEFT(LTRIM(@query), 1) = '['
     RETURN CASE WHEN EXISTS (
       SELECT 1 FROM OPENJSON(@query) AS j
       WHERE j.[type] = 2
         AND TRY_CAST(j.[value] AS DECIMAL(38, 10)) > @target
     ) THEN 1 ELSE 0 END;
-  RETURN CASE WHEN TRY_CAST(JSON_VALUE(@col, @path) AS DECIMAL(38, 10)) > @target THEN 1 ELSE 0 END;
+  IF @query IS NOT NULL
+    RETURN 0;
+  RETURN CASE WHEN EXISTS (
+    SELECT 1 FROM OPENJSON(@col, @path) AS j
+    WHERE j.[type] = 2
+      AND TRY_CAST(j.[value] AS DECIMAL(38, 10)) > @target
+  ) THEN 1 ELSE 0 END;
 END;;
 
 DROP FUNCTION IF EXISTS dbo.json_number_greaterthanorequal;;
@@ -269,13 +351,19 @@ RETURNS BIT
 AS
 BEGIN
   DECLARE @query NVARCHAR(MAX) = JSON_QUERY(@col, @path);
-  IF @query IS NOT NULL
+  IF @query IS NOT NULL AND LEFT(LTRIM(@query), 1) = '['
     RETURN CASE WHEN EXISTS (
       SELECT 1 FROM OPENJSON(@query) AS j
       WHERE j.[type] = 2
         AND TRY_CAST(j.[value] AS DECIMAL(38, 10)) >= @target
     ) THEN 1 ELSE 0 END;
-  RETURN CASE WHEN TRY_CAST(JSON_VALUE(@col, @path) AS DECIMAL(38, 10)) >= @target THEN 1 ELSE 0 END;
+  IF @query IS NOT NULL
+    RETURN 0;
+  RETURN CASE WHEN EXISTS (
+    SELECT 1 FROM OPENJSON(@col, @path) AS j
+    WHERE j.[type] = 2
+      AND TRY_CAST(j.[value] AS DECIMAL(38, 10)) >= @target
+  ) THEN 1 ELSE 0 END;
 END;;
 
 
@@ -288,13 +376,19 @@ RETURNS BIT
 AS
 BEGIN
   DECLARE @query NVARCHAR(MAX) = JSON_QUERY(@col, @path);
-  IF @query IS NOT NULL
+  IF @query IS NOT NULL AND LEFT(LTRIM(@query), 1) = '['
     RETURN CASE WHEN EXISTS (
       SELECT 1 FROM OPENJSON(@query) AS j
       WHERE j.[type] = 3
         AND IIF(j.[value] = 'true', 1, IIF(j.[value] = 'false', 0, NULL)) = @target
     ) THEN 1 ELSE 0 END;
-  RETURN CASE WHEN IIF(JSON_VALUE(@col, @path) = 'true', 1, IIF(JSON_VALUE(@col, @path) = 'false', 0, NULL)) = @target THEN 1 ELSE 0 END;
+  IF @query IS NOT NULL
+    RETURN 0;
+  RETURN CASE WHEN EXISTS (
+    SELECT 1 FROM OPENJSON(@col, @path) AS j
+    WHERE j.[type] = 3
+      AND IIF(j.[value] = 'true', 1, IIF(j.[value] = 'false', 0, NULL)) = @target
+  ) THEN 1 ELSE 0 END;
 END;;
 
 DROP FUNCTION IF EXISTS dbo.json_boolean_notequals;;
@@ -303,11 +397,23 @@ RETURNS BIT
 AS
 BEGIN
   DECLARE @query NVARCHAR(MAX) = JSON_QUERY(@col, @path);
-  IF @query IS NOT NULL
+  IF @query IS NOT NULL AND LEFT(LTRIM(@query), 1) = '['
     RETURN CASE WHEN NOT EXISTS (
       SELECT 1 FROM OPENJSON(@query) AS j
       WHERE j.[type] = 3
         AND IIF(j.[value] = 'true', 1, IIF(j.[value] = 'false', 0, NULL)) = @target
     ) THEN 1 ELSE 0 END;
-  RETURN CASE WHEN IIF(JSON_VALUE(@col, @path) = 'true', 1, IIF(JSON_VALUE(@col, @path) = 'false', 0, NULL)) != @target THEN 1 ELSE 0 END;
+  IF @query IS NOT NULL
+    RETURN 1;
+  RETURN CASE
+    WHEN EXISTS (
+      SELECT 1 FROM OPENJSON(@col, @path) AS j
+      WHERE j.[type] = 3
+        AND IIF(j.[value] = 'true', 1, IIF(j.[value] = 'false', 0, NULL)) = @target
+    ) THEN 0
+    WHEN EXISTS (
+      SELECT 1 FROM OPENJSON(@col, @path)
+    ) THEN 1
+    ELSE 0
+  END;
 END;;

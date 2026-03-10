@@ -110,23 +110,26 @@ public static class JsonFunction
             {
                 TypeText =>
                     $"""
-                    (CASE WHEN JSON_QUERY({jsonPath}) IS NOT NULL
+                    (CASE WHEN JSON_QUERY({jsonPath}) IS NOT NULL AND LEFT(LTRIM(JSON_QUERY({jsonPath})), 1) = '['
                         THEN CASE WHEN EXISTS (SELECT 1 FROM OPENJSON(JSON_QUERY({jsonPath})) AS j WHERE j.[type] = 1 AND j.[value] IN ({formattedValue})) THEN 1 ELSE 0 END
-                        ELSE CASE WHEN JSON_VALUE({jsonPath}) IN ({formattedValue}) THEN 1 ELSE 0 END
+                        WHEN JSON_QUERY({jsonPath}) IS NOT NULL THEN 0
+                        ELSE CASE WHEN EXISTS (SELECT 1 FROM OPENJSON({jsonPath}) AS j WHERE j.[type] = 1 AND j.[value] IN ({formattedValue})) THEN 1 ELSE 0 END
                     END) = 1
                     """,
                 TypeNumber =>
                     $"""
-                    (CASE WHEN JSON_QUERY({jsonPath}) IS NOT NULL
+                    (CASE WHEN JSON_QUERY({jsonPath}) IS NOT NULL AND LEFT(LTRIM(JSON_QUERY({jsonPath})), 1) = '['
                         THEN CASE WHEN EXISTS (SELECT 1 FROM OPENJSON(JSON_QUERY({jsonPath})) AS j WHERE j.[type] = 2 AND TRY_CAST(j.[value] AS DECIMAL(38, 10)) IN ({formattedValue})) THEN 1 ELSE 0 END
-                        ELSE CASE WHEN TRY_CAST(JSON_VALUE({jsonPath}) AS DECIMAL(38, 10)) IN ({formattedValue}) THEN 1 ELSE 0 END
+                        WHEN JSON_QUERY({jsonPath}) IS NOT NULL THEN 0
+                        ELSE CASE WHEN EXISTS (SELECT 1 FROM OPENJSON({jsonPath}) AS j WHERE j.[type] = 2 AND TRY_CAST(j.[value] AS DECIMAL(38, 10)) IN ({formattedValue})) THEN 1 ELSE 0 END
                     END) = 1
                     """,
                 TypeBoolean =>
                     $"""
-                    (CASE WHEN JSON_QUERY({jsonPath}) IS NOT NULL
+                    (CASE WHEN JSON_QUERY({jsonPath}) IS NOT NULL AND LEFT(LTRIM(JSON_QUERY({jsonPath})), 1) = '['
                         THEN CASE WHEN EXISTS (SELECT 1 FROM OPENJSON(JSON_QUERY({jsonPath})) AS j WHERE j.[type] = 3 AND IIF(j.[value] = 'true', 1, IIF(j.[value] = 'false', 0, NULL)) IN ({formattedValue})) THEN 1 ELSE 0 END
-                        ELSE CASE WHEN IIF(JSON_VALUE({jsonPath}) = 'true', 1, IIF(JSON_VALUE({jsonPath}) = 'false', 0, NULL)) IN ({formattedValue}) THEN 1 ELSE 0 END
+                        WHEN JSON_QUERY({jsonPath}) IS NOT NULL THEN 0
+                        ELSE CASE WHEN EXISTS (SELECT 1 FROM OPENJSON({jsonPath}) AS j WHERE j.[type] = 3 AND IIF(j.[value] = 'true', 1, IIF(j.[value] = 'false', 0, NULL)) IN ({formattedValue})) THEN 1 ELSE 0 END
                     END) = 1
                     """,
                 _ => throw new NotSupportedException($"No json function for type={type}, operator={op}."),

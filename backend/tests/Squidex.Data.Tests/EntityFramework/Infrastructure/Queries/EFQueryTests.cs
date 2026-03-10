@@ -627,6 +627,17 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
     }
 
     [Fact]
+    public async Task Should_filter_by_number_not_equal_in_mixed_json_with_type_strictness()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Ne("Json.mixed", 8),
+        });
+
+        Assert.Equal(AllExept(8), actual.Order().ToArray());
+    }
+
+    [Fact]
     public async Task Should_filter_by_number_greater_than_in_mixed_json()
     {
         var actual = await QueryAsync(new ClrQuery
@@ -1034,6 +1045,28 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
     }
 
     [Fact]
+    public async Task Should_filter_by_string_equal_in_mixed_json_with_type_strictness()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Eq("Json.mixed", "8"),
+        });
+
+        Assert.Empty(actual);
+    }
+
+    [Fact]
+    public async Task Should_filter_by_string_not_equal_in_mixed_json_with_type_strictness()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Ne("Json.mixed", "8"),
+        });
+
+        Assert.Equal(Range(1, 20), actual.Order().ToArray());
+    }
+
+    [Fact]
     public async Task Should_filter_by_string_contains_in_mixed_json()
     {
         var actual = await QueryAsync(new ClrQuery
@@ -1042,6 +1075,17 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
         });
 
         Assert.Equal([7], actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_by_string_contains_in_mixed_json_with_type_strictness()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Contains("Json.mixed", "true"),
+        });
+
+        Assert.Empty(actual);
     }
 
     [Fact]
@@ -1155,6 +1199,17 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
     }
 
     [Fact]
+    public async Task Should_filter_by_string_equal_in_json_mixed_array_with_type_strictness()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Eq("Json.mixedArray", "7"),
+        });
+
+        Assert.Empty(actual);
+    }
+
+    [Fact]
     public async Task Should_filter_by_string_contains_in_json_mixed_array()
     {
         var actual = await QueryAsync(new ClrQuery
@@ -1163,6 +1218,17 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
         });
 
         Assert.Equal([7, 17], actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_by_string_contains_in_json_mixed_array_with_type_strictness()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Contains("Json.mixedArray", "true"),
+        });
+
+        Assert.Empty(actual);
     }
 
     [Fact]
@@ -1185,6 +1251,17 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
         });
 
         Assert.Equal([5, 7], actual.Order().ToArray());
+    }
+
+    [Fact]
+    public async Task Should_filter_by_string_in_json_mixed_array_with_type_strictness()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.In("Json.mixedArray", new List<string> { "7", "true" }),
+        });
+
+        Assert.Empty(actual);
     }
 
     [Fact]
@@ -1361,6 +1438,17 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
         });
 
         Assert.Empty(actual);
+    }
+
+    [Fact]
+    public async Task Should_filter_by_boolean_not_equal_true_in_mixed_json_with_type_strictness()
+    {
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Ne("Json.mixed", true),
+        });
+
+        Assert.Equal(AllExept(3, 9, 15), actual.Order().ToArray());
     }
 
     [Fact]

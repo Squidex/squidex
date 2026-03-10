@@ -60,9 +60,10 @@ BEGIN
   IF JSON_TYPE(val) = 'ARRAY' THEN
     RETURN EXISTS (
       SELECT 1 FROM JSON_TABLE(val, '$[*]' COLUMNS (elem JSON PATH '$')) AS jt
-      WHERE JSON_UNQUOTE(jt.elem) = target
+      WHERE JSON_TYPE(jt.elem) = 'STRING' AND JSON_UNQUOTE(jt.elem) = target
     );
   END IF;
+  IF JSON_TYPE(val) != 'STRING' THEN RETURN 0; END IF;
   RETURN JSON_UNQUOTE(val) = target;
 END;;
 
@@ -75,9 +76,10 @@ BEGIN
   IF JSON_TYPE(val) = 'ARRAY' THEN
     RETURN NOT EXISTS (
       SELECT 1 FROM JSON_TABLE(val, '$[*]' COLUMNS (elem JSON PATH '$')) AS jt
-      WHERE JSON_UNQUOTE(jt.elem) = target
+      WHERE JSON_TYPE(jt.elem) = 'STRING' AND JSON_UNQUOTE(jt.elem) = target
     );
   END IF;
+  IF JSON_TYPE(val) != 'STRING' THEN RETURN 1; END IF;
   RETURN JSON_UNQUOTE(val) != target;
 END;;
 
@@ -90,9 +92,10 @@ BEGIN
   IF JSON_TYPE(val) = 'ARRAY' THEN
     RETURN EXISTS (
       SELECT 1 FROM JSON_TABLE(val, '$[*]' COLUMNS (elem JSON PATH '$')) AS jt
-      WHERE JSON_UNQUOTE(jt.elem) < target
+      WHERE JSON_TYPE(jt.elem) = 'STRING' AND JSON_UNQUOTE(jt.elem) < target
     );
   END IF;
+  IF JSON_TYPE(val) != 'STRING' THEN RETURN 0; END IF;
   RETURN JSON_UNQUOTE(val) < target;
 END;;
 
@@ -105,9 +108,10 @@ BEGIN
   IF JSON_TYPE(val) = 'ARRAY' THEN
     RETURN EXISTS (
       SELECT 1 FROM JSON_TABLE(val, '$[*]' COLUMNS (elem JSON PATH '$')) AS jt
-      WHERE JSON_UNQUOTE(jt.elem) <= target
+      WHERE JSON_TYPE(jt.elem) = 'STRING' AND JSON_UNQUOTE(jt.elem) <= target
     );
   END IF;
+  IF JSON_TYPE(val) != 'STRING' THEN RETURN 0; END IF;
   RETURN JSON_UNQUOTE(val) <= target;
 END;;
 
@@ -120,9 +124,10 @@ BEGIN
   IF JSON_TYPE(val) = 'ARRAY' THEN
     RETURN EXISTS (
       SELECT 1 FROM JSON_TABLE(val, '$[*]' COLUMNS (elem JSON PATH '$')) AS jt
-      WHERE JSON_UNQUOTE(jt.elem) > target
+      WHERE JSON_TYPE(jt.elem) = 'STRING' AND JSON_UNQUOTE(jt.elem) > target
     );
   END IF;
+  IF JSON_TYPE(val) != 'STRING' THEN RETURN 0; END IF;
   RETURN JSON_UNQUOTE(val) > target;
 END;;
 
@@ -135,9 +140,10 @@ BEGIN
   IF JSON_TYPE(val) = 'ARRAY' THEN
     RETURN EXISTS (
       SELECT 1 FROM JSON_TABLE(val, '$[*]' COLUMNS (elem JSON PATH '$')) AS jt
-      WHERE JSON_UNQUOTE(jt.elem) >= target
+      WHERE JSON_TYPE(jt.elem) = 'STRING' AND JSON_UNQUOTE(jt.elem) >= target
     );
   END IF;
+  IF JSON_TYPE(val) != 'STRING' THEN RETURN 0; END IF;
   RETURN JSON_UNQUOTE(val) >= target;
 END;;
 
@@ -150,9 +156,10 @@ BEGIN
   IF JSON_TYPE(val) = 'ARRAY' THEN
     RETURN EXISTS (
       SELECT 1 FROM JSON_TABLE(val, '$[*]' COLUMNS (elem JSON PATH '$')) AS jt
-      WHERE JSON_UNQUOTE(jt.elem) LIKE CONCAT('%', target, '%')
+      WHERE JSON_TYPE(jt.elem) = 'STRING' AND JSON_UNQUOTE(jt.elem) LIKE CONCAT('%', target, '%')
     );
   END IF;
+  IF JSON_TYPE(val) != 'STRING' THEN RETURN 0; END IF;
   RETURN JSON_UNQUOTE(val) LIKE CONCAT('%', target, '%');
 END;;
 
@@ -165,9 +172,10 @@ BEGIN
   IF JSON_TYPE(val) = 'ARRAY' THEN
     RETURN EXISTS (
       SELECT 1 FROM JSON_TABLE(val, '$[*]' COLUMNS (elem JSON PATH '$')) AS jt
-      WHERE JSON_UNQUOTE(jt.elem) LIKE CONCAT(target, '%')
+      WHERE JSON_TYPE(jt.elem) = 'STRING' AND JSON_UNQUOTE(jt.elem) LIKE CONCAT(target, '%')
     );
   END IF;
+  IF JSON_TYPE(val) != 'STRING' THEN RETURN 0; END IF;
   RETURN JSON_UNQUOTE(val) LIKE CONCAT(target, '%');
 END;;
 
@@ -180,9 +188,10 @@ BEGIN
   IF JSON_TYPE(val) = 'ARRAY' THEN
     RETURN EXISTS (
       SELECT 1 FROM JSON_TABLE(val, '$[*]' COLUMNS (elem JSON PATH '$')) AS jt
-      WHERE JSON_UNQUOTE(jt.elem) LIKE CONCAT('%', target)
+      WHERE JSON_TYPE(jt.elem) = 'STRING' AND JSON_UNQUOTE(jt.elem) LIKE CONCAT('%', target)
     );
   END IF;
+  IF JSON_TYPE(val) != 'STRING' THEN RETURN 0; END IF;
   RETURN JSON_UNQUOTE(val) LIKE CONCAT('%', target);
 END;;
 
@@ -195,9 +204,10 @@ BEGIN
   IF JSON_TYPE(val) = 'ARRAY' THEN
     RETURN EXISTS (
       SELECT 1 FROM JSON_TABLE(val, '$[*]' COLUMNS (elem JSON PATH '$')) AS jt
-      WHERE JSON_UNQUOTE(jt.elem) REGEXP target
+      WHERE JSON_TYPE(jt.elem) = 'STRING' AND JSON_UNQUOTE(jt.elem) REGEXP target
     );
   END IF;
+  IF JSON_TYPE(val) != 'STRING' THEN RETURN 0; END IF;
   RETURN JSON_UNQUOTE(val) REGEXP target;
 END;;
 
@@ -210,9 +220,10 @@ BEGIN
   IF JSON_TYPE(val) = 'ARRAY' THEN
     RETURN EXISTS (
       SELECT 1 FROM JSON_TABLE(val, '$[*]' COLUMNS (elem JSON PATH '$')) AS jt
-      WHERE JSON_CONTAINS(targets, jt.elem)
+      WHERE JSON_TYPE(jt.elem) = 'STRING' AND JSON_CONTAINS(targets, jt.elem)
     );
   END IF;
+  IF JSON_TYPE(val) != 'STRING' THEN RETURN 0; END IF;
   RETURN JSON_CONTAINS(targets, val);
 END;;
 
@@ -252,7 +263,7 @@ BEGIN
             END = target
     );
   END IF;
-  IF JSON_TYPE(val) NOT IN ('INTEGER', 'DOUBLE', 'DECIMAL') THEN RETURN 0; END IF;
+  IF JSON_TYPE(val) NOT IN ('INTEGER', 'DOUBLE', 'DECIMAL') THEN RETURN 1; END IF;
   RETURN CAST(JSON_UNQUOTE(val) AS DECIMAL(65, 10)) != target;
 END;;
 
@@ -381,7 +392,7 @@ BEGIN
       WHERE CASE WHEN JSON_TYPE(jt.elem) = 'BOOLEAN' THEN jt.elem END = target_json
     );
   END IF;
-  IF JSON_TYPE(val) != 'BOOLEAN' THEN RETURN 0; END IF;
+  IF JSON_TYPE(val) != 'BOOLEAN' THEN RETURN 1; END IF;
   RETURN val != target_json;
 END;;
 

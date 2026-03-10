@@ -70,7 +70,6 @@ export class CommentsComponent implements OnInit {
             this.messageBus.of(AnnotationCreateAfterNavigate)
                 .subscribe(message => {
                     this.reference = message;
-
                     this.input.focus();
                 }));
     }

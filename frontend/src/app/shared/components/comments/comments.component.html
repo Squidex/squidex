@@ -1,6 +1,7 @@
 <div class="comments-header">
     <form [formGroup]="commentForm.form" (ngSubmit)="comment()">
         <sqx-autocomplete
+            #input
             autoFocus="true"
             autoSelectFirst="false"
             displayProperty="contributorEmail"
