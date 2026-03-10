@@ -669,7 +669,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
         };
 
         ValidationAssert.Throws(() => GuardSchema.CanUpdateSchema(command),
-            new ValidationError("Size must be between 1 and 3.", "Properties.SearchFields"));
+            new ValidationError("Size must be between 1 and 4.", "Properties.SearchFields"));
     }
 
     private CreateSchema CreateCommand(CreateSchema command)
