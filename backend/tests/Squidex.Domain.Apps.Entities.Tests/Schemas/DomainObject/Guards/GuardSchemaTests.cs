@@ -664,7 +664,7 @@ public class GuardSchemaTests : GivenContext, IClassFixture<TranslationsFixture>
         {
             Properties = new SchemaProperties()
             {
-                SearchFields = FieldNames.Create("a", "b", "c", "d"),
+                SearchFields = FieldNames.Create("a", "b", "c", "d", "e"),
             },
         };
 

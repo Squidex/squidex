@@ -97,8 +97,7 @@ export module Types {
             return true;
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-unnecessary-boolean-literal-compare
-        return Types.isUndefined(value) === true || Types.isNull(value) === true;
+        return Types.isUndefined(value) || Types.isNull(value);
     }
 
     export function clone<T>(lhs: T): T {
@@ -230,5 +229,23 @@ export module Types {
         }
 
         return result;
+    }
+
+    export function fnv1a(value: unknown): string {
+        const text = JSON.stringify(value) ?? String(value);
+
+        let hash = 2166136261;
+        for (let i = 0; i < text.length; i++) {
+            hash ^= text.charCodeAt(i);
+            hash = (hash * 16777619) >>> 0;
+        }
+
+        return hash.toString(16);
+    }
+
+    export function hashWithId(value: unknown, identifier: string): string {
+        const hash = fnv1a(value);
+        const combined = `${identifier}:${hash}`;
+        return btoa(combined);
     }
 }

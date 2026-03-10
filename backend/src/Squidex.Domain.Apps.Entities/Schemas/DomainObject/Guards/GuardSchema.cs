@@ -116,9 +116,9 @@ public static class GuardSchema
 
         Validate.It(e =>
         {
-            if (command.Properties.SearchFields != null && command.Properties.SearchFields.Count > 3)
+            if (command.Properties.SearchFields != null && command.Properties.SearchFields.Count > 4)
             {
-                e(Not.Between("Size", 1, 3), "Properties.SearchFields");
+                e(Not.Between("Size", 1, 4), "Properties.SearchFields");
             }
         });
     }
