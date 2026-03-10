@@ -1049,7 +1049,7 @@
   "schemas.schemaNameValidationMessage": "Naam mag alleen letters, cijfers en streepjes bevatten.",
   "schemas.schemaTagsHint": "Tags om uw schema voor automatiseringsprocessen te annoteren.",
   "schemas.searchFields": "Search Fields",
-  "schemas.searchFieldsHelp": "The normal search uses **full-text search** across the available data.\n\nYou can optionally define **1–3 additional search fields**. These fields are included in the search using a simple **“contains” match**, meaning results are returned when the entered text appears anywhere within those fields.",
+  "schemas.searchFieldsHelp": "The default search uses full-text search (indexed) across all available data. This is fast and powerful, but only matches whole words or stems, so partial terms may return no results.\n\nYou can define up to 4 additional field search fields, which use a simple contains match. This means a result is returned whenever the entered text appears anywhere within that field, making it ideal for catching partial matches the full-text search might miss.\n\nIf you need more than 4 extra fields, use a schema script to combine multiple fields into one.",
   "schemas.searchFieldsHint": "The search fields",
   "schemas.searchPlaceholder": "Zoek schema's ...",
   "schemas.showFieldFailed": "Kan veld niet weergeven. Laad opnieuw.",

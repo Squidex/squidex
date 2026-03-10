@@ -290,6 +290,61 @@ describe('Types', () => {
 
         expect(result).toEqual('Hello, 1, Yes');
     });
+
+    describe('Hashing', () => {
+        it('should hash a string', () => {
+            const result = Types.fnv1a('hello');
+            expect(result).toBe(Types.fnv1a('hello')); // deterministic
+            expect(typeof result).toBe('string');
+        });
+
+        it('should hash a number', () => {
+            expect(Types.fnv1a(42)).toBe(Types.fnv1a(42));
+            expect(Types.fnv1a(42)).not.toBe(Types.fnv1a(43));
+        });
+
+        it('should hash a boolean', () => {
+            expect(Types.fnv1a(true)).toBe(Types.fnv1a(true));
+            expect(Types.fnv1a(true)).not.toBe(Types.fnv1a(false));
+        });
+
+        it('should hash an object', () => {
+            expect(Types.fnv1a({ a: 1 })).toBe(Types.fnv1a({ a: 1 }));
+            expect(Types.fnv1a({ a: 1 })).not.toBe(Types.fnv1a({ a: 2 }));
+        });
+
+        it('should hash an array', () => {
+            expect(Types.fnv1a([1, 2, 3])).toBe(Types.fnv1a([1, 2, 3]));
+            expect(Types.fnv1a([1, 2, 3])).not.toBe(Types.fnv1a([1, 2, 4]));
+        });
+
+        it('should hash null and undefined', () => {
+            expect(typeof Types.fnv1a(null)).toBe('string');
+            expect(typeof Types.fnv1a(undefined)).toBe('string');
+            expect(Types.fnv1a(null)).not.toBe(Types.fnv1a(undefined));
+        });
+
+        it('should return a base64 encoded string with identifier', () => {
+            const result = Types.hashWithId('hello', 'session');
+
+            expect(() => atob(result)).not.toThrow();
+            expect(atob(result)).toMatch(/^session:/);
+        });
+
+        it('should embed the correct hash in the encoded result', () => {
+            const hash = Types.fnv1a('hello');
+
+            expect(atob(Types.hashWithId('hello', 'session'))).toBe(`session:${hash}`);
+        });
+
+        it('should produce different results for different identifiers', () => {
+            expect(Types.hashWithId('hello', 'a')).not.toBe(Types.hashWithId('hello', 'b'));
+        });
+
+        it('should produce different results for different values', () => {
+            expect(Types.hashWithId('hello', 'id')).not.toBe(Types.hashWithId('world', 'id'));
+        });
+    })
 });
 
 class MyClass {

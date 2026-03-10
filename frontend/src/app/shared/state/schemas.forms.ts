@@ -422,7 +422,7 @@ export class EditSchemaForm extends Form<ExtendedFormGroup, UpdateSchemaDto, Sch
                 Validators.nullValidator,
             ),
             searchFields: new UntypedFormControl([],
-                Validators.maxLength(3),
+                Validators.maxLength(4),
             ),
             tags: new UntypedFormControl([],
                 Validators.nullValidator,
