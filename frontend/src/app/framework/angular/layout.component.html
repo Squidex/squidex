@@ -23,9 +23,13 @@
                     @if (route) {
                         <a class="btn panel2-collapse" [queryParamsHandling]="closeQueryParamsHandling" [relativeTo]="route" [routerLink]="['./../']">
                             <i class="icon-close"></i>
+                            <span class="visually-hidden">{{ "common.close" | sqxTranslate }}</span>
                         </a>
                     } @else {
-                        <button class="btn panel2-collapse" type="button"><i class="icon-close"></i></button>
+                        <button class="btn panel2-collapse" type="button">
+                            <i class="icon-close"></i>
+                            <span class="visually-hidden">{{ "common.close" | sqxTranslate }}</span>
+                        </button>
                     }
                 </div>
             }
@@ -133,7 +137,8 @@
                             replaceUrl="true"
                             [routerLink]="['./']">
                             <i class="icon-angle-right"></i>
-                        </a>
+                            <span class="visually-hidden">{{ "common.close" | sqxTranslate }}</span></a
+                        >
                     }
                 </div>
 

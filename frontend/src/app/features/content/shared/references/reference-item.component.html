@@ -46,6 +46,7 @@
             <div class="reference-menu">
                 <button class="btn btn-text-secondary" (click)="clone.emit()" title="{{ 'common.clone' | sqxTranslate }}" type="button">
                     <i class="icon-copy"></i>
+                    <span class="visually-hidden">{{ "common.clone" | sqxTranslate }}</span>
                 </button>
                 @if (canRemove) {
                     <button
@@ -56,10 +57,12 @@
                         (sqxConfirmClick)="delete.emit()"
                         type="button">
                         <i class="icon-close"></i>
+                        <span class="visually-hidden">{{ "common.remove" | sqxTranslate }}</span>
                     </button>
                 }
                 <a class="btn btn-text-secondary" [routerLink]="['../..', content.schemaName, content.id]" target="_blank">
                     <i class="icon-pencil"></i>
+                    <span class="visually-hidden">{{ "common.edit" | sqxTranslate }}</span>
                 </a>
             </div>
         </div>

@@ -42,7 +42,7 @@
                     }
 
                     @if (snapshot.isFailed) {
-                        <span> {{ "chat.failed" | sqxTranslate }} </span>
+                        <span> {{ "chat.failed" | sqxTranslate }}</span>
                     }
 
                     @if (!snapshot.isRunning && !isFirst && type === "Assistant") {

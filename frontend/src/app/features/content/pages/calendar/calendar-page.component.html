@@ -11,9 +11,11 @@
         </select>
         <button class="btn btn-text-secondary btn-navigate ms-2" (click)="goPrev()" [disabled]="isLoading" type="button">
             <i class="icon-caret-left"></i>
+            <span class="visually-hidden">{{ "common.prev" | sqxTranslate }}</span>
         </button>
         <button class="btn btn-text-secondary btn-navigate ms-2" (click)="goNext()" [disabled]="isLoading" type="button">
             <i class="icon-caret-right"></i>
+            <span class="visually-hidden">{{ "common.next" | sqxTranslate }}</span>
         </button>
     </ng-container>
     <ng-container content>
@@ -21,7 +23,7 @@
     </ng-container>
 </sqx-layout>
 <sqx-modal-dialog (dialogClose)="contentDialog.hide()" *sqxModal="contentDialog">
-    <ng-container title> {{ "common.content" | sqxTranslate }} </ng-container>
+    <ng-container title> {{ "common.content" | sqxTranslate }}</ng-container>
     <ng-container content>
         @if (contentSelected && contentSelected.scheduleJob) {
             <div>
@@ -30,6 +32,7 @@
                         <input class="form-control" id="id" #inputId name="id" readonly value="{{ contentSelected.id }}" />
                         <button class="btn btn-outline-secondary" [sqxCopy]="inputId" type="button">
                             <i class="icon-copy"></i>
+                            <span class="visually-hidden">{{ "common.copy" | sqxTranslate }}</span>
                         </button>
                     </div>
                 </sqx-form-row>

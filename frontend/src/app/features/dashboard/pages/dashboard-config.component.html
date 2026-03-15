@@ -39,7 +39,7 @@
         </button>
     </sqx-dropdown-menu>
     <sqx-modal-dialog (dialogClose)="expertDialog.hide()" fullHeight="true" size="lg" *sqxModal="expertDialog">
-        <ng-container title> {{ "dashboard.editConfig" | sqxTranslate }} </ng-container>
+        <ng-container title> {{ "dashboard.editConfig" | sqxTranslate }}</ng-container>
         <ng-container content>
             <div class="json-editor"><sqx-code-editor borderless="true" [(ngModel)]="expertConfig" valueMode="Json" /></div>
         </ng-container>

@@ -1,7 +1,7 @@
 <ng-container>
     <div class="section">
         <h4>{{ "common.schemas" | sqxTranslate }}</h4>
-        <sqx-form-hint> {{ "rules.schemas.hint" | sqxTranslate }} </sqx-form-hint>
+        <sqx-form-hint> {{ "rules.schemas.hint" | sqxTranslate }}</sqx-form-hint>
         @if (!triggerForm.form.controls.handleAll.value) {
             <div>
                 @for (form of schemasForm.controls; track form; let i = $index) {
@@ -22,7 +22,10 @@
                     </div>
 
                     <div class="col-auto">
-                        <button class="btn btn-success" (click)="addSchema()" type="button"><i class="icon-add"></i></button>
+                        <button class="btn btn-success" (click)="addSchema()" type="button">
+                            <i class="icon-add"></i>
+                            <span class="visually-hidden">{{ "rules.schemas.addSchema" | sqxTranslate }}</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -31,14 +34,14 @@
         <div class="form-group" [formGroup]="triggerForm.form">
             <div class="form-check">
                 <input class="form-check-input" id="handleAll" formControlName="handleAll" type="checkbox" />
-                <label class="form-check-label" for="handleAll"> {{ "rules.triggerAll" | sqxTranslate }} </label>
+                <label class="form-check-label" for="handleAll"> {{ "rules.triggerAll" | sqxTranslate }}</label>
             </div>
         </div>
     </div>
 
     <div class="section">
         <h4>{{ "rules.referencedSchemas" | sqxTranslate }}</h4>
-        <sqx-form-hint> {{ "rules.referencedSchemasHint" | sqxTranslate }} </sqx-form-hint>
+        <sqx-form-hint> {{ "rules.referencedSchemasHint" | sqxTranslate }}</sqx-form-hint>
         @for (form of referencedSchemasForm.controls; track form; let i = $index) {
             <div class="mb-2">
                 <sqx-content-changed-schema [form]="$any(form)" (remove)="removeReferencedSchema(i)" [schemas]="schemas" />
@@ -59,14 +62,17 @@
             </div>
 
             <div class="col-auto">
-                <button class="btn btn-success" (click)="addReferencedSchema()" type="button"><i class="icon-add"></i></button>
+                <button class="btn btn-success" (click)="addReferencedSchema()" type="button">
+                    <i class="icon-add"></i>
+                    <span class="visually-hidden">{{ "rules.addReferencedSchema" | sqxTranslate }}</span>
+                </button>
             </div>
         </div>
     </div>
 
     <div class="help">
         <h4>{{ "common.conditions" | sqxTranslate }}</h4>
-        <sqx-form-hint> {{ "rules.conditionHint2" | sqxTranslate }} </sqx-form-hint>
+        <sqx-form-hint> {{ "rules.conditionHint2" | sqxTranslate }}</sqx-form-hint>
         <ul class="help-examples">
             <li class="help-example">
                 {{ "rules.conditions.event" | sqxTranslate }}: <br />

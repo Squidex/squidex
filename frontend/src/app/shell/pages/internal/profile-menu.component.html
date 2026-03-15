@@ -15,7 +15,7 @@
     @if (uiState.canUseAdminResource | async) {
         <button class="dropdown-item" routerLink="/app/administration" type="button">{{ "common.administration" | sqxTranslate }}</button>
     }
-    <a class="dropdown-item" href="{{ snapshot.profileUrl }}" sqxExternalLink="noicon"> {{ "profile.title" | sqxTranslate }} </a>
+    <a class="dropdown-item" href="{{ snapshot.profileUrl }}" sqxExternalLink="noicon"> {{ "profile.title" | sqxTranslate }}</a>
     <div class="dropdown-submenu">
         <button class="dropdown-item dropdown-toggle" (click)="toggleSubmenu()" sqxStopClick type="button">{{ "common.language" | sqxTranslate }}</button>
         <div class="dropdown-menu" [class.open]="snapshot.showSubmenu">

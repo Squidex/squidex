@@ -6,6 +6,7 @@
                 <input class="form-control" id="id" #inputId name="id" readonly value="{{ content.id }}" />
                 <button class="btn btn-outline-secondary" [sqxCopy]="inputId" type="button">
                     <i class="icon-copy"></i>
+                    <span class="visually-hidden">{{ "common.copy" | sqxTranslate }}</span>
                 </button>
             </div>
         </div>

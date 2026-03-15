@@ -13,12 +13,14 @@
         @if (user.canLock) {
             <button class="btn btn-text-secondary" (click)="lock()" sqxStopClick title="i18n:users.lockTooltip" type="button">
                 <i class="icon icon-unlocked"></i>
+                <span class="visually-hidden">{{ "users.lockTooltip" | sqxTranslate }}</span>
             </button>
         }
 
         @if (user.canUnlock) {
             <button class="btn btn-text-secondary" (click)="unlock()" sqxStopClick title="i18n:users.unlockTooltip" type="button">
                 <i class="icon icon-lock"></i>
+                <span class="visually-hidden">{{ "users.unlockTooltip" | sqxTranslate }}</span>
             </button>
         }
         <button
@@ -31,6 +33,7 @@
             sqxStopClick
             type="button">
             <i class="icon-bin2"></i>
+            <span class="visually-hidden">{{ "common.delete" | sqxTranslate }}</span>
         </button>
     </td>
 </tr>

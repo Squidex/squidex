@@ -50,7 +50,7 @@
 </sqx-layout>
 <router-outlet />
 <sqx-modal-dialog (dialogClose)="eventConsumerErrorDialog.hide()" *sqxModal="eventConsumerErrorDialog">
-    <ng-container title> {{ "common.error" | sqxTranslate }} </ng-container>
+    <ng-container title> {{ "common.error" | sqxTranslate }}</ng-container>
     <ng-container content>
         <textarea class="form-control error-message small" readonly>{{ eventConsumerError }}</textarea>
     </ng-container>

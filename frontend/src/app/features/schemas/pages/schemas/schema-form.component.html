@@ -43,7 +43,7 @@
                     <input class="form-control" id="name" autocomplete="off" formControlName="name" sqxFocusOnInit sqxTransformInput="LowerCase" />
                 </sqx-form-row>
 
-                <sqx-form-alert> {{ "schemas.nameWarning" | sqxTranslate }} </sqx-form-alert>
+                <sqx-form-alert> {{ "schemas.nameWarning" | sqxTranslate }}</sqx-form-alert>
             }
 
             @if (selectedTab === 0) {
@@ -127,7 +127,7 @@
                 <sqx-form-row for="prompt" label="common.prompt">
                     <div class="row g-2 form-group">
                         <div class="col">
-                            <sqx-form-hint> {{ "schemas.promptHint" | sqxTranslate }} </sqx-form-hint>
+                            <sqx-form-hint> {{ "schemas.promptHint" | sqxTranslate }}</sqx-form-hint>
                         </div>
                         <div class="col-auto">
                             <label>&nbsp;</label>
@@ -144,7 +144,7 @@
                     </div>
                 </sqx-form-row>
 
-                <sqx-form-alert> {{ "schemas.promptExample" | sqxTranslate }} </sqx-form-alert>
+                <sqx-form-alert> {{ "schemas.promptExample" | sqxTranslate }}</sqx-form-alert>
 
                 <sqx-code-editor disabled="true" [height]="1000" [ngModel]="generateLog" [ngModelOptions]="{ standalone: true }" />
             }

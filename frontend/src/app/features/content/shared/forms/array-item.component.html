@@ -12,12 +12,15 @@
             <div class="col-auto d-flex gap-1 pe-4">
                 <button class="btn btn-text-secondary" (click)="moveTop()" [disabled]="isDisabled || isFirst" title="i18n:contents.arrayMoveTop" type="button">
                     <i class="icon-caret-top"></i>
+                    <span class="visually-hidden">{{ "contents.arrayMoveTop" | sqxTranslate }}</span>
                 </button>
                 <button class="btn btn-text-secondary" (click)="moveUp()" [disabled]="isDisabled || isFirst" title="i18n:contents.arrayMoveUp" type="button">
                     <i class="icon-caret-up"></i>
+                    <span class="visually-hidden">{{ "contents.arrayMoveUp" | sqxTranslate }}</span>
                 </button>
                 <button class="btn btn-text-secondary" (click)="moveDown()" [disabled]="isDisabled || isLast" title="i18n:contents.arrayMoveDown" type="button">
                     <i class="icon-caret-down"></i>
+                    <span class="visually-hidden">{{ "contents.arrayMoveDown" | sqxTranslate }}</span>
                 </button>
                 <button
                     class="btn btn-text-secondary"
@@ -26,6 +29,7 @@
                     title="i18n:contents.arrayMoveBottom"
                     type="button">
                     <i class="icon-caret-bottom"></i>
+                    <span class="visually-hidden">{{ "contents.arrayMoveBottom" | sqxTranslate }}</span>
                 </button>
                 <button
                     class="btn btn-text-secondary"
@@ -34,6 +38,7 @@
                     title="i18n:contents.arrayExpandItem"
                     type="button">
                     <i class="icon-plus2"></i>
+                    <span class="visually-hidden">{{ "contents.arrayExpandItem" | sqxTranslate }}</span>
                 </button>
                 <button
                     class="btn btn-text-secondary"
@@ -42,15 +47,18 @@
                     title="i18n:contents.arrayCollapseItem"
                     type="button">
                     <i class="icon-minus2"></i>
+                    <span class="visually-hidden">{{ "contents.arrayCollapseItem" | sqxTranslate }}</span>
                 </button>
             </div>
 
             <div class="col-auto">
                 <button class="btn btn-text-secondary" (click)="clone.emit()" [disabled]="isDisabled" title="i18n:contents.arrayCloneItem" type="button">
                     <i class="icon-clone"></i>
+                    <span class="visually-hidden">{{ "contents.arrayCloneItem" | sqxTranslate }}</span>
                 </button>
                 <button class="btn btn-text-danger" (click)="itemRemove.emit()" [disabled]="isDisabled" type="button">
                     <i class="icon-bin2"></i>
+                    <span class="visually-hidden">{{ "common.remove" | sqxTranslate }}</span>
                 </button>
             </div>
         </div>
@@ -73,7 +81,7 @@
         }
 
         @if (isInvalidComponent | async) {
-            <sqx-form-hint> {{ "contents.componentInvalid" | sqxTranslate }} </sqx-form-hint>
+            <sqx-form-hint> {{ "contents.componentInvalid" | sqxTranslate }}</sqx-form-hint>
         }
     </div>
 </div>

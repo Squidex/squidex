@@ -9,8 +9,12 @@
             <div class="edit-menu">
                 <button class="btn btn-text-secondary btn-cancel me-2" (click)="cancel()" sqxStopClick type="button">
                     <i class="icon-close"></i>
+                    <span class="visually-hidden">{{ "common.cancel" | sqxTranslate }}</span>
                 </button>
-                <button class="btn btn-success" (click)="save()" sqxStopClick type="button"><i class="icon-checkmark"></i></button>
+                <button class="btn btn-success" (click)="save()" sqxStopClick type="button">
+                    <i class="icon-checkmark"></i>
+                    <span class="visually-hidden">{{ "common.save" | sqxTranslate }}</span>
+                </button>
             </div>
         }
     </td>
@@ -20,7 +24,7 @@
             <i class="icon-dots"></i>
         </button>
         <sqx-dropdown-menu position="bottom-start" scrollY="true" [sqxAnchoredTo]="buttonOptions" *sqxModal="dropdown; closeAlways: true">
-            <a class="dropdown-item" [routerLink]="link" sqxExternalLink target="_blank"> {{ "common.editInNewTab" | sqxTranslate }} </a>
+            <a class="dropdown-item" [routerLink]="link" sqxExternalLink target="_blank"> {{ "common.editInNewTab" | sqxTranslate }}</a>
             @for (info of content.statusUpdates; track info) {
                 <button class="dropdown-item" (click)="statusChange.emit(info.status)" type="button">
                     {{ "common.statusChangeTo" | sqxTranslate }}

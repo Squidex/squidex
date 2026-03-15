@@ -7,7 +7,10 @@
                         <div class="col">{{ "tour.guide-title" | sqxTranslate }}</div>
 
                         <div class="col-auto">
-                            <button class="btn btn-simple btn-sm" (click)="toggle()" type="button"><i class="icon-angle-down"></i></button>
+                            <button class="btn btn-simple btn-sm" (click)="toggle()" type="button">
+                                <i class="icon-angle-down"></i>
+                                <span class="visually-hidden">{{ "common.collapse" | sqxTranslate }}</span>
+                            </button>
                         </div>
                     </div>
                 </div>

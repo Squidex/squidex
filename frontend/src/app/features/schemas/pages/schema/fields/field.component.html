@@ -25,15 +25,15 @@
                 <div class="col-4 flex-nowrap">
                     <div class="float-end">
                         @if (field.isLocked) {
-                            <span class="ms-1 badge rounded-pill badge-danger"> {{ "schemas.field.lockedMarker" | sqxTranslate }} </span>
+                            <span class="ms-1 badge rounded-pill badge-danger"> {{ "schemas.field.lockedMarker" | sqxTranslate }}</span>
                         }
 
                         @if (!field.isDisabled) {
-                            <span class="ms-1 badge rounded-pill badge-success"> {{ "schemas.field.enabledMarker" | sqxTranslate }} </span>
+                            <span class="ms-1 badge rounded-pill badge-success"> {{ "schemas.field.enabledMarker" | sqxTranslate }}</span>
                         }
 
                         @if (field.isDisabled) {
-                            <span class="ms-1 badge rounded-pill badge-danger"> {{ "schemas.field.disabledMarker" | sqxTranslate }} </span>
+                            <span class="ms-1 badge rounded-pill badge-danger"> {{ "schemas.field.disabledMarker" | sqxTranslate }}</span>
                         }
                     </div>
                 </div>

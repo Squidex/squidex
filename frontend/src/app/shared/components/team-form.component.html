@@ -1,6 +1,6 @@
 <form [formGroup]="createForm.form" (ngSubmit)="createTeam()">
     <sqx-modal-dialog (dialogClose)="emitClose()">
-        <ng-container title> {{ "teams.create" | sqxTranslate }} </ng-container>
+        <ng-container title> {{ "teams.create" | sqxTranslate }}</ng-container>
         <ng-container content>
             <sqx-form-error [error]="createForm.error | async" />
 
@@ -8,7 +8,7 @@
                 <input class="form-control" id="name" autocomplete="off" formControlName="name" sqxFocusOnInit sqxTransformInput="LowerCase" />
             </sqx-form-row>
 
-            <sqx-form-alert marginBottom="0" marginTop="2"> {{ "teams.teamNameWarning" | sqxTranslate }} </sqx-form-alert>
+            <sqx-form-alert marginBottom="0" marginTop="2"> {{ "teams.teamNameWarning" | sqxTranslate }}</sqx-form-alert>
         </ng-container>
         <ng-container footer>
             <button class="btn btn-secondary" (click)="emitClose()" type="button">{{ "common.cancel" | sqxTranslate }}</button>

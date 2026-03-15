@@ -1,20 +1,25 @@
 <div class="menu">
     <button class="btn" (click)="rotate(-90)" title="i18n:assets.editor.rotateLeft" type="button">
         <i class="icon-rotate_left"></i>
+        <span class="visually-hidden">{{ "assets.editor.rotateLeft" | sqxTranslate }}</span>
     </button>
     <button class="btn" (click)="rotate(90)" title="i18n:assets.editor.rotateRight" type="button">
         <i class="icon-rotate_right"></i>
+        <span class="visually-hidden">{{ "assets.editor.rotateRight" | sqxTranslate }}</span>
     </button>
     <span class="separator"></span>
     <button class="btn" (click)="flip(false)" title="i18n:assets.editor.flipVertically" type="button">
         <i class="icon-flip"></i>
+        <span class="visually-hidden">{{ "assets.editor.flipVertically" | sqxTranslate }}</span>
     </button>
     <button class="btn rotate 90" (click)="flip(true)" title="i18n:assets.editor.flipHorizontally" type="button">
         <i class="icon-flip"></i>
+        <span class="visually-hidden">{{ "assets.editor.flipHorizontally" | sqxTranslate }}</span>
     </button>
     <span class="separator"></span>
     <button class="btn" (click)="reset()" title="i18n:common.reset" type="button">
         <i class="icon-close"></i>
+        <span class="visually-hidden">{{ "common.reset" | sqxTranslate }}</span>
     </button>
 </div>
 

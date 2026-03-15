@@ -21,6 +21,7 @@
                 (sqxConfirmClick)="trigger()"
                 type="button">
                 <i class="icon-play-line"></i>
+                <span class="visually-hidden">{{ "rules.trigger" | sqxTranslate }}</span>
             </button>
         }
         <button class="btn btn-primary ms-2" (click)="save()" type="button">{{ "common.save" | sqxTranslate }}</button>
@@ -31,9 +32,9 @@
                 <div>
                     <div class="btn btn-outline-secondary btn-enabled">
                         @if (rule.isEnabled) {
-                            <span class="me-2"> {{ "common.enabled" | sqxTranslate }} </span>
+                            <span class="me-2"> {{ "common.enabled" | sqxTranslate }}</span>
                         } @else {
-                            <span class="me-2"> {{ "common.disabled" | sqxTranslate }} </span>
+                            <span class="me-2"> {{ "common.disabled" | sqxTranslate }}</span>
                         }
 
                         <sqx-toggle [ngModel]="rule.isEnabled" (ngModelChange)="changeEnabled($event)" />

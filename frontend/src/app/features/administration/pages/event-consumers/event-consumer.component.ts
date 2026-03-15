@@ -9,7 +9,7 @@
 
 
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
-import { EventConsumerDto, TooltipDirective } from '@app/shared';
+import { EventConsumerDto, TooltipDirective, TranslatePipe } from '@app/shared';
 import { EventConsumersState } from '../../internal';
 
 @Component({
@@ -18,6 +18,7 @@ import { EventConsumersState } from '../../internal';
     templateUrl: './event-consumer.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
+        TranslatePipe,
         TooltipDirective,
     ],
 })

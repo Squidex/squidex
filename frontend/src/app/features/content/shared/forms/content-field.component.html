@@ -61,6 +61,7 @@
                     @if (isDifferent | async) {
                         <button class="btn btn-primary btn-sm field-copy" (click)="copy()" type="button">
                             <i class="icon-arrow_back"></i>
+                            <span class="visually-hidden">{{ "common.copy" | sqxTranslate }}</span>
                         </button>
                     }
                 </div>

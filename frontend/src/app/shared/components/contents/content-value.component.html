@@ -4,7 +4,10 @@
     </div>
 
     @if (isString && fields) {
-        <button class="btn btn-icon" (click)="toggle()" sqxStopClick type="button"><i class="icon-wrap_text"></i></button>
+        <button class="btn btn-icon" (click)="toggle()" sqxStopClick type="button">
+            <i class="icon-wrap_text"></i>
+            <span class="visually-hidden">{{ "contents.wrapText" | sqxTranslate }}</span>
+        </button>
     }
 } @else {
     <div

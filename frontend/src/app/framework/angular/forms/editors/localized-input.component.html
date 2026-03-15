@@ -4,7 +4,10 @@
     </div>
 
     <div class="col-auto">
-        <button class="btn btn-sm btn-secondary" (click)="unset()" [disabled]="isEmpty" type="button"><i class="icon-close"></i></button>
+        <button class="btn btn-sm btn-secondary" (click)="unset()" [disabled]="isEmpty" type="button">
+            <i class="icon-close"></i>
+            <span class="visually-hidden">{{ "common.clear" | sqxTranslate }}</span>
+        </button>
     </div>
 </div>
 

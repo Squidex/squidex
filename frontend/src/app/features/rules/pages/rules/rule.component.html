@@ -124,6 +124,7 @@
                         (sqxConfirmClick)="trigger()"
                         type="button">
                         <i class="icon-play-line"></i>
+                        <span class="visually-hidden">{{ "rules.trigger" | sqxTranslate }}</span>
                     </button>
                 } @else {
                     <sqx-toggle [disabled]="!rule.canDisable && !rule.canEnable" [ngModel]="rule.isEnabled" (ngModelChange)="toggle()" />
@@ -150,7 +151,7 @@
 
             @if (rule.canReadLogs) {
                 <div class="col-auto">
-                    <a [queryParams]="{ ruleId: rule.id }" routerLink="events"> {{ "common.logs" | sqxTranslate }} </a>
+                    <a [queryParams]="{ ruleId: rule.id }" routerLink="events"> {{ "common.logs" | sqxTranslate }}</a>
                     <a class="ms-2" [queryParams]="{ ruleId: rule.id }" routerLink="simulator">
                         {{ "rules.simulator" | sqxTranslate }}
                     </a>

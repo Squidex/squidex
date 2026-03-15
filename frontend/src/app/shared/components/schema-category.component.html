@@ -30,6 +30,7 @@
                         @if (schemaCategory.name) {
                             <button class="btn btn-sm btn-text-secondary btn-remove" (click)="remove.emit(schemaCategory.name)" type="button">
                                 <i class="icon-bin2"></i>
+                                <span class="visually-hidden">{{ "common.delete" | sqxTranslate }}</span>
                             </button>
                         }
                     }

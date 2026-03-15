@@ -39,6 +39,9 @@
     </div>
 
     <div class="col col-button ps-2">
-        <button class="btn btn-text-danger" (click)="remove()" [disabled]="disabled" type="button"><i class="icon-bin2"></i></button>
+        <button class="btn btn-text-danger" (click)="remove()" [disabled]="disabled" type="button">
+            <i class="icon-bin2"></i>
+            <span class="visually-hidden">{{ "common.remove" | sqxTranslate }}</span>
+        </button>
     </div>
 </div>

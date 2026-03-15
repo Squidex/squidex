@@ -1,6 +1,6 @@
 <form (ngSubmit)="createSchema()">
     <sqx-modal-dialog (dialogClose)="dialogClose.emit()" size="md">
-        <ng-container title> {{ "schemas.indexes.addTitle" | sqxTranslate }} </ng-container>
+        <ng-container title> {{ "schemas.indexes.addTitle" | sqxTranslate }}</ng-container>
         <ng-container content>
             <sqx-form-hint>
                 <span [sqxMarkdown]="'schemas.indexes.hint' | sqxTranslate" trusted="true"></span>

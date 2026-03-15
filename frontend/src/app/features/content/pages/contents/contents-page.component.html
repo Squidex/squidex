@@ -6,6 +6,7 @@
                 <sqx-notifo position="bottom-left" topic="apps/{{ contentsState.appId }}/schemas/{{ schema.id }}/contents" />
                 <button class="btn btn-text-secondary" (click)="reload()" shortcut="CTRL + B" title="i18n:contents.refreshTooltip" type="button">
                     <i class="icon-reset"></i>
+                    <span class="visually-hidden">{{ "contents.refreshTooltip" | sqxTranslate }}</span>
                 </button>
             </div>
 

@@ -76,7 +76,7 @@
                 }
 
                 @if (!hasField) {
-                    <sqx-form-hint> {{ "contents.arrayNoFields" | sqxTranslate }} </sqx-form-hint>
+                    <sqx-form-hint> {{ "contents.arrayNoFields" | sqxTranslate }}</sqx-form-hint>
                 }
             } @else {
                 @if (schemasList.length > 1) {
@@ -102,7 +102,7 @@
                 }
 
                 @if (schemasList.length === 0) {
-                    <sqx-form-hint> {{ "contents.componentsNoSchema" | sqxTranslate }} </sqx-form-hint>
+                    <sqx-form-hint> {{ "contents.componentsNoSchema" | sqxTranslate }}</sqx-form-hint>
                 }
             }
         </div>
@@ -126,9 +126,11 @@
             <div class="col-auto d-flex gap1">
                 <button class="btn btn-text-secondary" (click)="expandAll()" title="i18n:contents.arrayExpandAll" type="button">
                     <i class="icon-plus2"></i>
+                    <span class="visually-hidden">{{ "contents.arrayExpandAll" | sqxTranslate }}</span>
                 </button>
                 <button class="btn btn-text-secondary" (click)="collapseAll()" title="i18n:contents.arrayCollapseAll" type="button">
                     <i class="icon-minus2"></i>
+                    <span class="visually-hidden">{{ "contents.arrayCollapseAll" | sqxTranslate }}</span>
                 </button>
             </div>
         }

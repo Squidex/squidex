@@ -3,13 +3,13 @@
         <ul class="nav nav-tabs2">
             <li class="nav-item">
                 <button class="nav-link" [class.active]="selectedTab === 0" (click)="selectTab(0)" type="button">
-                    {{ "schemas.listFields" | sqxTranslate }} <small>({{ fieldsInLists.length }})</small>
+                    {{ "schemas.listFields" | sqxTranslate }}<small>({{ fieldsInLists.length }})</small>
                 </button>
             </li>
 
             <li class="nav-item">
                 <button class="nav-link" [class.active]="selectedTab === 1" (click)="selectTab(1)" type="button">
-                    {{ "schemas.referenceFields" | sqxTranslate }} <small>({{ fieldsInReferences.length }})</small>
+                    {{ "schemas.referenceFields" | sqxTranslate }}<small>({{ fieldsInReferences.length }})</small>
                 </button>
             </li>
         </ul>

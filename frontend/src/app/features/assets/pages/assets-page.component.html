@@ -39,6 +39,7 @@
                 <div class="btn-group">
                     <button class="btn btn-secondary btn-toggle" [class.btn-primary]="listMode" (click)="changeView(true)" [disabled]="listMode" type="button">
                         <i class="icon-list"></i>
+                        <span class="visually-hidden">{{ "assets.listView" | sqxTranslate }}</span>
                     </button>
                     <button
                         class="btn btn-secondary btn-toggle"
@@ -47,6 +48,7 @@
                         [disabled]="!listMode"
                         type="button">
                         <i class="icon-grid"></i>
+                        <span class="visually-hidden">{{ "assets.gridView" | sqxTranslate }}</span>
                     </button>
                 </div>
             </div>

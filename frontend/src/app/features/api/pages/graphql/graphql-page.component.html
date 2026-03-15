@@ -3,13 +3,15 @@
     <div #graphiQLContainer inner sqxTourStep="graphQLExplorer"></div>
 
     @if (clientsReadable) {
-        <button class="btn btn-simple btn-options" (click)="clientsDialog.show()" type="button"><i class="icon-clients"></i></button>
+        <button class="btn btn-simple btn-options" (click)="clientsDialog.show()" type="button">
+            <i class="icon-clients"></i> <span class="visually-hidden">{{ "api.graphqlShowClients" | sqxTranslate }}</span>
+        </button>
     }
 </sqx-layout>
 <sqx-modal-dialog (dialogClose)="clientsDialog.hide()" *sqxModal="clientsDialog">
-    <ng-container title> {{ "api.selectClient" | sqxTranslate }} </ng-container>
+    <ng-container title> {{ "api.selectClient" | sqxTranslate }}</ng-container>
     <ng-container content>
-        <sqx-form-hint> {{ "api.selectClientDescription" | sqxTranslate }} </sqx-form-hint>
+        <sqx-form-hint> {{ "api.selectClientDescription" | sqxTranslate }}</sqx-form-hint>
         <sqx-form-row for="client" label="common.client" vertical>
             <select class="form-control" id="client" [ngModel]="clientSelected" (ngModelChange)="selectClient($event)">
                 <option [ngValue]="null">{{ "api.noClient" | sqxTranslate }}</option>

@@ -30,6 +30,7 @@
                     (sqxConfirmClick)="delete()"
                     type="button">
                     <i class="icon-bin2"></i>
+                    <span class="visually-hidden">{{ "common.delete" | sqxTranslate }}</span>
                 </button>
             </div>
         </div>
@@ -51,7 +52,7 @@
 
                 <div class="table-items-row-details-tab">
                     <h3>{{ "roles.permissions" | sqxTranslate }}</h3>
-                    <sqx-form-hint marginBottom="3"> {{ "roles.permissionsDescription" | sqxTranslate }} </sqx-form-hint>
+                    <sqx-form-hint marginBottom="3"> {{ "roles.permissionsDescription" | sqxTranslate }}</sqx-form-hint>
                     @if (!role.isDefaultRole) {
                         @for (control of editForm.controls; track control; let i = $index) {
                             <div class="row gx-2 mb-1">
@@ -64,13 +65,14 @@
                                     <div class="col-auto">
                                         <button class="btn btn-text-danger" (click)="editForm.form.removeAt(i)" type="button">
                                             <i class="icon-bin2"></i>
+                                            <span class="visually-hidden">{{ "common.remove" | sqxTranslate }}</span>
                                         </button>
                                     </div>
                                 }
                             </div>
                         }
                     } @else {
-                        <sqx-form-alert> {{ descriptions[role.name] | sqxTranslate }} </sqx-form-alert>
+                        <sqx-form-alert> {{ descriptions[role.name] | sqxTranslate }}</sqx-form-alert>
                         <table class="table table-bordered table-fixed">
                             <tbody>
                                 @for (control of editForm.controls; track control; let i = $index) {
@@ -91,6 +93,7 @@
                             <div class="col-auto">
                                 <button class="btn btn-success col-action" (click)="addPermission()" type="button">
                                     <i class="icon-plus"></i>
+                                    <span class="visually-hidden">{{ "roles.addPermission" | sqxTranslate }}</span>
                                 </button>
                             </div>
                         </div>
@@ -99,7 +102,7 @@
                     @if (!role.isDefaultRole) {
                         <div class="mt-4">
                             <h3>{{ "roles.properties" | sqxTranslate }}</h3>
-                            <sqx-form-hint marginBottom="3"> {{ "roles.propertiesDescription" | sqxTranslate }} </sqx-form-hint>
+                            <sqx-form-hint marginBottom="3"> {{ "roles.propertiesDescription" | sqxTranslate }}</sqx-form-hint>
                             <div class="row g-0 rule-section">
                                 @for (property of propertiesSimple; track property.key) {
                                     <div class="form-check col-6">

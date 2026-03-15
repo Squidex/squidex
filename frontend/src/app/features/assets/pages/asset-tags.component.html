@@ -17,6 +17,7 @@
                         @if (canRename) {
                             <button class="btn-sm btn-text-secondary btn-rename" (click)="renameTag(tag)" sqxStopClick type="button">
                                 <i class="icon-pencil"></i>
+                                <span class="visually-hidden">{{ "common.rename" | sqxTranslate }}</span>
                             </button>
                         }
                     </div>

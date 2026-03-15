@@ -15,7 +15,7 @@
                         *sqxModal="modalMenu; onRoot: false">
                         <div class="uploads">
                             @if (uploads.length === 0) {
-                                <small class="uploads-empty text-muted"> {{ "assets.uploaderUploadHere" | sqxTranslate }} </small>
+                                <small class="uploads-empty text-muted"> {{ "assets.uploaderUploadHere" | sqxTranslate }}</small>
                             }
 
                             @for (upload of uploads; track upload.id) {
@@ -47,6 +47,7 @@
                                     <div class="col-auto">
                                         <button class="btn btn-text-secondary" (click)="stopUpload(upload)" type="button">
                                             <i class="icon-close"></i>
+                                            <span class="visually-hidden">{{ "common.copy" | sqxTranslate }}</span>
                                         </button>
                                     </div>
                                 </div>

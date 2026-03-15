@@ -3,7 +3,7 @@
 
     <div class="card mb-4">
         <div class="card-body">
-            <sqx-form-alert> {{ "schemas.previewUrls.help" | sqxTranslate }} </sqx-form-alert>
+            <sqx-form-alert> {{ "schemas.previewUrls.help" | sqxTranslate }}</sqx-form-alert>
             <div class="content">
                 @if (!isEditable && editForm.previewControls.length === 0) {
                     <div class="mt-4">{{ "schemas.previewUrls.empty" | sqxTranslate }}</div>
@@ -35,6 +35,7 @@
                                 (sqxConfirmClick)="editForm.form.removeAt(i)"
                                 type="button">
                                 <i class="icon-bin2"></i>
+                                <span class="visually-hidden">{{ "common.remove" | sqxTranslate }}</span>
                             </button>
                         </div>
                     </div>
@@ -51,7 +52,10 @@
                         </div>
 
                         <div class="col-auto col-options">
-                            <button class="btn btn-success" (click)="editForm.form.add()" type="button"><i class="icon-add"></i></button>
+                            <button class="btn btn-success" (click)="editForm.form.add()" type="button">
+                                <i class="icon-add"></i>
+                                <span class="visually-hidden">{{ "schemas.previewUrls.add" | sqxTranslate }}</span>
+                            </button>
                         </div>
                     </div>
                 }

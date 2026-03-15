@@ -1,6 +1,6 @@
 <form [formGroup]="annotateForm.form" (ngSubmit)="annotateAsset()">
     <sqx-modal-dialog (dialogClose)="dialogClose.emit()" fullHeight="true" hasTabs="true" showFooter="false" size="xl">
-        <ng-container title> {{ "assets.edit" | sqxTranslate }} </ng-container>
+        <ng-container title> {{ "assets.edit" | sqxTranslate }}</ng-container>
         <ng-container tabs>
             <div class="row align-items-center">
                 <div class="col">
@@ -66,6 +66,8 @@
                                 (click)="cropImage()"
                                 [disabled]="progress > 0"
                                 type="button"
+                                type="button"
+                                type="button"
                                 type="button">
                                 {{ "common.upload" | sqxTranslate }}
                             </button>
@@ -127,6 +129,7 @@
                                 <input class="form-control" id="id" #inputId name="id" readonly value="{{ asset.id }}" />
                                 <button class="btn btn-outline-secondary" [sqxCopy]="inputId" type="button">
                                     <i class="icon-copy"></i>
+                                    <span class="visually-hidden">{{ "common.copy" | sqxTranslate }}</span>
                                 </button>
                             </div>
                         </sqx-form-row>
@@ -136,6 +139,7 @@
                                 <input class="form-control" id="url" #inputUrl name="url" readonly value="{{ asset | sqxAssetUrl: asset.version : false }}" />
                                 <button class="btn btn-outline-secondary" [sqxCopy]="inputUrl" type="button">
                                     <i class="icon-copy"></i>
+                                    <span class="visually-hidden">{{ "common.copy" | sqxTranslate }}</span>
                                 </button>
                             </div>
                         </sqx-form-row>
@@ -185,6 +189,7 @@
                                             (sqxConfirmClick)="annotateForm.metadata.removeAt(i)"
                                             type="button">
                                             <i class="icon-bin2"></i>
+                                            <span class="visually-hidden">{{ "common.remove" | sqxTranslate }}</span>
                                         </button>
                                     </div>
                                 </div>

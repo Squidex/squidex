@@ -38,7 +38,10 @@
                                 <i class="icon-download"></i>
                             </a>
                             @if (folderIcon) {
-                                <button class="file-folder ms-2" (click)="selectFolder.emit(asset.parentId)" type="button"><i class="icon-folder"></i></button>
+                                <button class="file-folder ms-2" (click)="selectFolder.emit(asset.parentId)" type="button">
+                                    <i class="icon-folder"></i>
+                                    <span class="visually-hidden">{{ "assets.openFolder" | sqxTranslate }}</span>
+                                </button>
                             }
 
                             @if (!isDisabled && !removeMode && asset.canDelete) {
@@ -153,10 +156,12 @@
                         <td class="col-actions text-end">
                             <a class="btn btn-text-secondary" [href]="asset | sqxAssetUrl: asset.version : false" sqxExternalLink="noicon" sqxStopClick>
                                 <i class="icon-download"></i>
-                            </a>
+                                <span class="visually-hidden">{{ "common.download" | sqxTranslate }}</span></a
+                            >
                             @if (folderIcon) {
                                 <button class="btn btn-text-secondary" (click)="selectFolder.emit(asset.parentId)" type="button">
                                     <i class="icon-folder"></i>
+                                    <span class="visually-hidden">{{ "assets.openFolder" | sqxTranslate }}</span>
                                 </button>
                             }
                         </td>
@@ -173,6 +178,7 @@
                                 (sqxConfirmClick)="delete.emit()"
                                 type="button">
                                 <i class="icon-bin2"></i>
+                                <span class="visually-hidden">{{ "common.delete" | sqxTranslate }}</span>
                             </button>
                         }
 
@@ -186,6 +192,7 @@
                                 (sqxConfirmClick)="remove.emit()"
                                 type="button">
                                 <i class="icon-close"></i>
+                                <span class="visually-hidden">{{ "common.remove" | sqxTranslate }}</span>
                             </button>
                         }
                     </td>

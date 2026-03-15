@@ -26,7 +26,10 @@
         <div class="row gx-2 mt-3 mb-3">
             @if (schema) {
                 <div class="col-auto">
-                    <button class="btn btn-text-secondary" (click)="reload()" type="button"><i class="icon-reset"></i></button>
+                    <button class="btn btn-text-secondary" (click)="reload()" type="button">
+                        <i class="icon-reset"></i>
+                        <span class="visually-hidden">{{ "common.refresh" | sqxTranslate }}</span>
+                    </button>
                 </div>
 
                 <div class="col">
@@ -114,7 +117,14 @@
                 </button>
             }
 
-            <button class="btn btn-success" (click)="emitSelect()" [disabled]="selectionCount === 0 || selectionCount > maxItems" type="button" type="submit">
+            <button
+                class="btn btn-success"
+                (click)="emitSelect()"
+                [disabled]="selectionCount === 0 || selectionCount > maxItems"
+                type="button"
+                type="button"
+                type="button"
+                type="submit">
                 {{ "contents.referencesLink" | sqxTranslate: { count: selectionCount } }}
             </button>
         </div>

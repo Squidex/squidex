@@ -10,7 +10,7 @@
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { AssignContributorDto, ConfirmClickDirective, ContributorDto, ContributorsState, HighlightPipe, RoleDto, TooltipDirective, UserPicturePipe } from '@app/shared';
+import { AssignContributorDto, ConfirmClickDirective, ContributorDto, ContributorsState, HighlightPipe, RoleDto, TooltipDirective, TranslatePipe, UserPicturePipe } from '@app/shared';
 
 @Component({
     selector: '[sqxContributor][roles]',
@@ -22,6 +22,7 @@ import { AssignContributorDto, ConfirmClickDirective, ContributorDto, Contributo
         FormsModule,
         HighlightPipe,
         TooltipDirective,
+        TranslatePipe,
         UserPicturePipe,
     ],
 })

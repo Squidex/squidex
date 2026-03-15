@@ -43,9 +43,11 @@
         <div class="col-auto d-flex gap-1">
             <button class="btn btn-text-secondary" [class.hidden]="!snapshot.isMapHidden" (click)="hideMap(false)" title="i18n:common.mapShow" type="button">
                 <i class="icon-plus2"></i>
+                <span class="visually-hidden">{{ "common.mapShow" | sqxTranslate }}</span>
             </button>
             <button class="btn btn-text-secondary" [class.hidden]="snapshot.isMapHidden" (click)="hideMap(true)" title="i18n:common.mapHide" type="button">
                 <i class="icon-minus2"></i>
+                <span class="visually-hidden">{{ "common.mapHide" | sqxTranslate }}</span>
             </button>
         </div>
     </div>

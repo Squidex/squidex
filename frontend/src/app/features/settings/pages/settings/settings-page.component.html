@@ -11,7 +11,7 @@
     <ng-container>
         <sqx-list-view innerWidth="55rem">
             <h5>{{ "appSettings.patterns.title" | sqxTranslate }}</h5>
-            <sqx-form-hint> {{ "appSettings.patterns.description" | sqxTranslate }} </sqx-form-hint>
+            <sqx-form-hint> {{ "appSettings.patterns.description" | sqxTranslate }}</sqx-form-hint>
             <div class="card card-body mb-4" data-testid="patterns">
                 <div class="content">
                     @if (!isEditable && editForm.patternsControls.length === 0) {
@@ -80,7 +80,7 @@
             </div>
 
             <h5 class="mt-2">{{ "appSettings.editors.title" | sqxTranslate }}</h5>
-            <sqx-form-hint> {{ "appSettings.editors.description" | sqxTranslate }} </sqx-form-hint>
+            <sqx-form-hint> {{ "appSettings.editors.description" | sqxTranslate }}</sqx-form-hint>
             <div class="card card-body mb-4">
                 <div class="content" data-testid="pattern">
                     @if (!isEditable && editForm.editorsControls.length === 0) {
@@ -145,7 +145,7 @@
                 <div class="card-body" [formGroup]="editForm.form">
                     <div class="form-check">
                         <input class="form-check-input" id="hideScheduler" formControlName="hideScheduler" type="checkbox" />
-                        <label class="form-check-label" for="hideScheduler"> {{ "appSettings.hideScheduler" | sqxTranslate }} </label>
+                        <label class="form-check-label" for="hideScheduler"> {{ "appSettings.hideScheduler" | sqxTranslate }}</label>
                     </div>
                 </div>
             </div>

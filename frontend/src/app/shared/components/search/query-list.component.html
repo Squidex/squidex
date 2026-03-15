@@ -13,6 +13,7 @@
                             @if (canRemove) {
                                 <button class="btn-sm btn-text-danger btn-remove" (click)="remove.emit(saved)" sqxStopClick type="button">
                                     <i class="icon-close"></i>
+                                    <span class="visually-hidden">{{ "common.delete" | sqxTranslate }}</span>
                                 </button>
                             }
                         </div>

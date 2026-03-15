@@ -29,6 +29,7 @@
                     href="{{ apiUrl.buildUrl(job.downloadUrl || '') }}"
                     sqxExternalLink="noicon">
                     <i class="icon-download"></i>
+                    <span class="visually-hidden">{{ "common.download" | sqxTranslate }}</span>
                 </a>
                 <button class="btn btn-outline-secondary btn-expand ms-1" [class.expanded]="isExpanded" (click)="toggleExpanded()" type="button">
                     <span class="hidden">{{ "common.settings" | sqxTranslate }}</span> <i class="icon-settings"></i>
@@ -42,6 +43,7 @@
                     (sqxConfirmClick)="delete()"
                     type="button">
                     <i class="icon-bin2"></i>
+                    <span class="visually-hidden">{{ "common.delete" | sqxTranslate }}</span>
                 </button>
             </div>
         </div>
