@@ -50,7 +50,13 @@ export class CommentComponent extends StatefulComponent<State> {
     public canEdit?: boolean | null;
 
     @Input({ transform: booleanAttribute })
+    public canResolve?: boolean | null;
+
+    @Input({ transform: booleanAttribute })
     public confirmDelete?: boolean | null = true;
+
+    @Input({ transform: booleanAttribute })
+    public isSelected?: boolean | null;
 
     @Input({ required: true })
     public commentItem!: CommentItem;
@@ -101,6 +107,14 @@ export class CommentComponent extends StatefulComponent<State> {
 
     public cancelUpdateOrReply() {
         this.next({ mode: 'Normal' });
+    }
+
+    public resolve(isResolved: boolean) {
+        if (!this.canResolve) {
+            return;
+        }
+
+        this.comments.update(this.commentItem.index, { isResolved });
     }
 
     public delete() {

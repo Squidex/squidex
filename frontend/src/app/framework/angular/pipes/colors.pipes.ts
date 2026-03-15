@@ -6,7 +6,7 @@
  */
 
 import { Pipe, PipeTransform } from '@angular/core';
-import { ColorHelper } from '@app/framework/utils/color-helper';
+import { ColorHelper } from '../../utils/color-helper';
 
 @Pipe({
     name: 'sqxDarken',

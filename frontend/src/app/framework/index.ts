@@ -43,6 +43,8 @@ export * from './angular/forms/indeterminate-value.directive';
 export * from './angular/forms/model';
 export * from './angular/forms/progress-bar.component';
 export * from './angular/forms/templated-form-array';
+export * from './angular/forms/templated-form-array';
+export * from './angular/forms/templated-form-group';
 export * from './angular/forms/transform-input.directive';
 export * from './angular/forms/validators';
 export * from './angular/global-error-handler';

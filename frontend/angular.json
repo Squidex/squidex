@@ -178,18 +178,12 @@
           }
         },
         "storybook": {
-          "builder": "@storybook/angular:start-storybook",
+          "builder": "@analogjs/storybook-angular:start-storybook",
           "options": {
             "configDir": ".storybook",
-            "browserTarget": "squidex:build",
             "compodoc": false,
             "port": 6006,
-            "stylePreprocessorOptions": {
-              "includePaths": [
-                "./src/app/theme",
-                "node_modules"
-              ]
-            }
+            "open": false
           }
         },
         "lint": {

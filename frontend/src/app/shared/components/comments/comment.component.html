@@ -1,13 +1,13 @@
 <div
     class="comment row g-0"
-    [class.bounce]="commentItem.isSelected"
+    [class.bounce]="isSelected"
     [class.reply]="commentItem.comment.replyTo"
-    [class.selected]="commentItem.isSelected"
+    [class.selected]="isSelected"
     [sqxScrollActive]="true"
     [sqxScrollContainer]="scrollContainer"
     [sqxScrollOffset]="20">
     @if (snapshot.mode !== "Edit") {
-        <div class="comment-text row g-0" sqxSc [sqxScrollActive]="commentItem.isSelected" [sqxScrollContainer]="scrollContainer" [sqxScrollOffset]="-20">
+        <div class="comment-text row g-0" sqxSc [sqxScrollActive]="isSelected" [sqxScrollContainer]="scrollContainer" [sqxScrollOffset]="-20">
             <div class="col-auto pe-2">
                 <img class="user-picture" [src]="commentItem.comment.user | sqxUserPictureRef" title="{{ commentItem.comment.user | sqxUserNameRef }}" />
             </div>
@@ -29,29 +29,58 @@
                         {{ commentItem.comment.time | sqxFromNow }}
                     </div>
                 </div>
-            </div>
 
-            <div class="actions">
-                @if (canAnswer) {
-                    <button class="btn btn-sm btn-text-secondary" (click)="startReply()" type="button"><i class="icon-enter"></i></button>
-                }
+                <div class="d-flex">
+                    @if (canAnswer) {
+                        <button class="btn btn-sm btn-text-secondary" (click)="startReply()" title="{{ 'i18n.comments.reply' | sqxTranslate }}" type="button">
+                            <i class="icon-enter bold"></i>
+                            <span class="visually-hidden">{{ "i18n:comments.reply" | sqxTranslate }}</span>
+                        </button>
+                    }
 
-                @if (isEditable && canEdit) {
-                    <button class="btn btn-sm btn-text-secondary" (click)="startEdit()" type="button"><i class="icon-pencil"></i></button>
-                }
+                    @if (isEditable && canEdit) {
+                        <button class="btn btn-sm btn-text-secondary" (click)="startEdit()" type="button">
+                            <i class="icon-pencil bold"></i>
+                            <span class="visually-hidden">{{ "i18n:common.edit" | sqxTranslate }}</span>
+                        </button>
+                    }
 
-                @if (isDeletable || canDelete) {
-                    <button
-                        class="btn btn-sm btn-text-danger"
-                        confirmRememberKey="deleteComment"
-                        [confirmRequired]="confirmDelete"
-                        confirmText="i18n:comments.deleteConfirmText"
-                        confirmTitle="i18n:comments.deleteConfirmTitle"
-                        (sqxConfirmClick)="delete()"
-                        type="button">
-                        <i class="icon-bin2"></i>
-                    </button>
-                }
+                    @if (canResolve) {
+                        @if (!commentItem.comment.isResolved) {
+                            <button
+                                class="btn btn-sm btn-text-secondary"
+                                (click)="resolve(true)"
+                                title="{{ 'i18n:comments.resolve' | sqxTranslate }}"
+                                type="button">
+                                <i class="icon-check-circle text-bold"></i>
+                                <span class="visually-hidden">{{ "i18n:comments.resolve" | sqxTranslate }}</span>
+                            </button>
+                        } @else {
+                            <button
+                                class="btn btn-sm btn-text-secondary"
+                                (click)="resolve(false)"
+                                title="{{ 'i18n:comments.unresolve' | sqxTranslate }}"
+                                type="button">
+                                <i class="icon-check-circle-filled text-success"></i>
+                                <span class="visually-hidden">{{ "i18n:comments.unresolve" | sqxTranslate }}</span>
+                            </button>
+                        }
+                    }
+
+                    @if (isDeletable || canDelete) {
+                        <button
+                            class="btn btn-sm btn-text-danger"
+                            confirmRememberKey="deleteComment"
+                            [confirmRequired]="confirmDelete"
+                            confirmText="i18n:comments.deleteConfirmText"
+                            confirmTitle="i18n:comments.deleteConfirmTitle"
+                            (sqxConfirmClick)="delete()"
+                            type="button">
+                            <i class="icon-bin2"></i>
+                            <span class="visually-hidden">{{ "i18n:common.delete" | sqxTranslate }}</span>
+                        </button>
+                    }
+                </div>
             </div>
         </div>
     }

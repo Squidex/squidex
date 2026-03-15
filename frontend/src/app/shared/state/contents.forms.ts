@@ -8,8 +8,7 @@
 import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
-import { debounceTimeSafe, ExtendedFormGroup, Form, FormArrayTemplate, TemplatedFormArray, Types, value$ } from '@app/framework';
-import { FormGroupTemplate, TemplatedFormGroup } from '@app/framework/angular/forms/templated-form-group';
+import { debounceTimeSafe, ExtendedFormGroup, Form, FormArrayTemplate, FormGroupTemplate, TemplatedFormArray, TemplatedFormGroup, Types, value$ } from '@app/framework';
 import { AppLanguageDto, ComponentFieldPropertiesDto, FieldDto, fieldInvariant, LanguageDto, SchemaDto, TableField } from '../model';
 import { ComponentRulesProvider, RootRulesProvider } from './contents.form-rules';
 import { AbstractContentForm, AbstractContentFormState, AnyFieldDto, contentTranslationStatus, ControlArgs, FieldSection, fieldTranslationStatus, FormGlobals, groupFields, PartitionConfig } from './contents.forms-helpers';

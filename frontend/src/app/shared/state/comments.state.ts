@@ -6,7 +6,7 @@
  */
 
 import { Injectable, OnDestroy } from '@angular/core';
-import { BehaviorSubject, combineLatest, distinctUntilChanged, map, Observable, of, Subscription, switchMap } from 'rxjs';
+import { BehaviorSubject, distinctUntilChanged, map, of, Subscription, switchMap } from 'rxjs';
 import { DateTime, MathHelper, Types } from '@app/framework';
 import { CollaborationService, SharedArray } from '../services/collaboration.service';
 
@@ -28,6 +28,9 @@ export interface Comment {
 
     // The ID of the comment.
     id?: string;
+
+    // Indicated whether the comment has been resolved.
+    isResolved?: boolean;
 
     // Indicates whether this comment has been read.
     isRead?: boolean;
@@ -53,6 +56,14 @@ export class CommentsState implements OnDestroy {
 
     public get unreadCountChanges() {
         return this.itemsChanges.pipe(map(x => x.filter(c => !c.isRead).length));
+    }
+
+    public get groupedComments() {
+        return this.itemsChanges.pipe(map(x => groupComments(x, false)));
+    }
+
+    public get groupedUnresolvedComments() {
+        return this.itemsChanges.pipe(map(x => groupComments(x, true)));
     }
 
     constructor(
@@ -172,30 +183,30 @@ export class CommentsState implements OnDestroy {
             }),
             distinctUntilChanged(Types.equals));
     }
-
-    public getGroupedComments(selection: Observable<ReadonlyArray<string>>) {
-        return combineLatest([this.itemsChanges, selection], (comments, selection) => {
-            const result: CommentItem[] = [];
-
-            comments.forEach((comment, index) => {
-                const isSelected = !!comment.id && selection.indexOf(comment.id) >= 0;
-
-                const item = { comment, index, isSelected, replies: [] };
-
-                if (comment.replyTo) {
-                    const replied = result.find(x => x.comment.id === comment.replyTo);
-
-                    if (replied) {
-                        replied.replies.push(item);
-                    }
-                } else {
-                    result.push(item);
-                }
-            });
-
-            return result;
-        });
-    }
 }
 
-export type CommentItem = { comment: Comment; index: number; isSelected: boolean; replies: CommentItem[] };
+function groupComments(comments: ReadonlyArray<Comment>, unresolvedOnly = true) {
+    const result: CommentItem[] = [];
+
+    comments.forEach((comment, index) => {
+        const item = { comment, index, id: comment.id || index.toString(), replies: [] };
+
+        if (comment.replyTo) {
+            const replied = result.find(x => x.comment.id === comment.replyTo);
+
+            if (replied) {
+                replied.replies.push(item);
+            }
+        } else {
+            result.push(item);
+        }
+    });
+
+    if (unresolvedOnly) {
+        return result.filter(x => !x.comment.isResolved);
+    }
+
+    return result;
+}
+
+export type CommentItem = { comment: Comment; index: number; replies: CommentItem[] };

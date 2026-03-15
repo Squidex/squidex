@@ -7,3 +7,12 @@ sqx-comments {
     flex-grow: 1;
     height: 100%;
 }
+
+.nav-tabs2 {
+    @include absolute(auto, auto, 0, 1rem);
+    flex-wrap: nowrap;
+
+    a {
+        padding-bottom: 1.75rem;
+    }
+}

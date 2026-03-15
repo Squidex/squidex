@@ -7,7 +7,6 @@
 
 import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, OnInit } from '@angular/core';
-import { of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { AuthService, CollaborationService, CommentComponent, CommentsState, DropdownMenuComponent, ModalDirective, ModalModel, ModalPlacementDirective, Subscriptions, TranslatePipe } from '@app/shared';
 
@@ -35,7 +34,7 @@ export class NotificationDropdownComponent implements OnInit {
     public modalMenu = new ModalModel();
 
     public commentUser: string;
-    public commentItems = this.commentsState.getGroupedComments(of([]));
+    public commentItems = this.commentsState.groupedUnresolvedComments;
 
     constructor(authService: AuthService,
         public readonly commentsState: CommentsState,

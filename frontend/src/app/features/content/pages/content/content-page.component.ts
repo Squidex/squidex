@@ -20,6 +20,8 @@ import { ContentReferencesComponent } from './references/content-references.comp
 
 type SaveNavigationMode = 'Close' | 'Add' | 'Edit';
 
+type Tab = 'editor' | 'references' | 'referencing' | 'inspect' | 'extension';
+
 @Component({
     selector: 'sqx-content-page',
     styleUrls: ['./content-page.component.scss'],
@@ -71,7 +73,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
 
     public formContext: any;
 
-    public contentTab = this.route.queryParams.pipe(map(x => x['tab'] || 'editor'));
+    public contentTab = this.route.queryParams.pipe(map(x => x['tab'] as Tab || 'editor'));
     public contentId = '';
     public content?: ContentDto | null;
     public contentVersion: Version | null = null;

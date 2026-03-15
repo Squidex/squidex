@@ -8,6 +8,7 @@
     "../src/**/*.spec.ts",
   ],
   "include": [
+    "preview.ts",
     "../src/**/*.d.ts",
     "../src/**/*.stories.ts",
   ],

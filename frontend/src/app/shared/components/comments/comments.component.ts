@@ -6,10 +6,9 @@
  */
 
 import { AsyncPipe } from '@angular/common';
-import { Component, Input, OnInit, ViewChild } from '@angular/core';
+import { booleanAttribute, ChangeDetectorRef, Component, Input, OnInit, ViewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { BehaviorSubject } from 'rxjs';
 import { AutocompleteComponent, Keys, MessageBus, Subscriptions, TranslatePipe } from '@app/framework';
 import { AnnotationCreateAfterNavigate, AnnotationsSelectAfterNavigate, AuthService, CommentsState, UpsertCommentForm } from '@app/shared/internal';
 import { UserPicturePipe } from '../pipes';
@@ -35,23 +34,32 @@ import { ContributorsDataSource } from './data-source';
 })
 export class CommentsComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();
-    private readonly selection = new BehaviorSubject<ReadonlyArray<string>>([]);
+    private selection: ReadonlyArray<string> = [];
     private reference?: AnnotationCreateAfterNavigate;
 
     @ViewChild('input', { static: false })
     public input!: AutocompleteComponent;
 
+    @Input({ transform: booleanAttribute })
+    public resolved = false;
+
     @Input()
     public commentsId = '';
 
     public commentForm = new UpsertCommentForm();
-    public commentsItems = this.commentsState.getGroupedComments(this.selection);
     public commentUser: string;
+
+    public get commentItems() {
+        return this.resolved ?
+            this.commentsState.groupedComments :
+            this.commentsState.groupedUnresolvedComments;
+    }
 
     constructor(authService: AuthService,
         public readonly commentsState: CommentsState,
         public readonly router: Router,
         public readonly contributorsDataSource: ContributorsDataSource,
+        private readonly changeDetector: ChangeDetectorRef,
         private readonly messageBus: MessageBus,
     ) {
         this.commentUser = authService.user!.token;
@@ -63,14 +71,14 @@ export class CommentsComponent implements OnInit {
         this.subscriptions.add(
             this.messageBus.of(AnnotationsSelectAfterNavigate)
                 .subscribe(message => {
-                    this.selection.next(message.annotations);
+                    this.selection = message.annotations;
+                    this.changeDetector.detectChanges();
                 }));
 
         this.subscriptions.add(
             this.messageBus.of(AnnotationCreateAfterNavigate)
                 .subscribe(message => {
                     this.reference = message;
-
                     this.input.focus();
                 }));
     }
@@ -98,5 +106,9 @@ export class CommentsComponent implements OnInit {
         setTimeout(() => {
             this.reference = undefined;
         }, 100);
+    }
+
+    public isSelected(id: string | undefined) {
+        return id && this.selection.includes(id);
     }
 }
