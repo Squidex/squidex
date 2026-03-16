@@ -10,7 +10,7 @@ import { booleanAttribute, ChangeDetectorRef, Component, Input, OnInit, ViewChil
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AutocompleteComponent, Keys, MessageBus, Subscriptions, TranslatePipe } from '@app/framework';
-import { AnnotationCreateAfterNavigate, AnnotationsSelectAfterNavigate, AuthService, CommentsState, UpsertCommentForm } from '@app/shared/internal';
+import { AnnotationCreateAfterNavigate, AnnotationsSelectedAfterNavigate, AuthService, CommentsState, ContentDto, FieldSelected, UpsertCommentForm } from '@app/shared/internal';
 import { UserPicturePipe } from '../pipes';
 import { CommentComponent } from './comment.component';
 import { ContributorsDataSource } from './data-source';
@@ -35,7 +35,6 @@ import { ContributorsDataSource } from './data-source';
 export class CommentsComponent implements OnInit {
     private readonly subscriptions = new Subscriptions();
     private selection: ReadonlyArray<string> = [];
-    private reference?: AnnotationCreateAfterNavigate;
 
     @ViewChild('input', { static: false })
     public input!: AutocompleteComponent;
@@ -44,10 +43,15 @@ export class CommentsComponent implements OnInit {
     public resolved = false;
 
     @Input()
+    public content?: ContentDto | null;
+
+    @Input()
     public commentsId = '';
 
     public commentForm = new UpsertCommentForm();
     public commentUser: string;
+
+    public reference?: AnnotationCreateAfterNavigate;
 
     public get commentItems() {
         return this.resolved ?
@@ -69,9 +73,21 @@ export class CommentsComponent implements OnInit {
         this.contributorsDataSource.loadIfNotLoaded();
 
         this.subscriptions.add(
-            this.messageBus.of(AnnotationsSelectAfterNavigate)
+            this.messageBus.of(FieldSelected)
                 .subscribe(message => {
-                    this.selection = message.annotations;
+                    for (let content of this.commentsState.items) {
+                        if (content.editorId === message.editorId) {
+                            this.selection = [content.id!];
+                        }
+                    }
+
+                    this.changeDetector.detectChanges();
+                }));
+
+        this.subscriptions.add(
+            this.messageBus.of(AnnotationsSelectedAfterNavigate)
+                .subscribe(message => {
+                    this.selection = message.commentIds;
                     this.changeDetector.detectChanges();
                 }));
 
@@ -80,6 +96,7 @@ export class CommentsComponent implements OnInit {
                 .subscribe(message => {
                     this.reference = message;
                     this.input.focus();
+                    this.changeDetector.detectChanges();
                 }));
     }
 

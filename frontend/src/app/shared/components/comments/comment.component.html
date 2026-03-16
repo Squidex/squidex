@@ -2,7 +2,7 @@
     class="comment row g-0"
     [class.bounce]="isSelected"
     [class.reply]="commentItem.comment.replyTo"
-    [class.selected]="isSelected"
+    (click)="select()"
     [sqxScrollActive]="true"
     [sqxScrollContainer]="scrollContainer"
     [sqxScrollOffset]="20">
@@ -22,15 +22,19 @@
 
                     <div [sqxMarkdown]="commentItem.comment.text"></div>
 
-                    <div class="comment-created text-muted">
+                    <div class="comment-created text-muted, truncate">
                         @if (canFollow && commentItem.comment.url) {
                             <a [routerLink]="commentItem.comment.url">{{ "comments.follow" | sqxTranslate }}</a> &nbsp;
                         }
                         {{ commentItem.comment.time | sqxFromNow }}
+
+                        @if (commentItem.comment.editorId) {
+                            <span>, {{ commentItem.comment.editorId }}</span>
+                        }
                     </div>
                 </div>
 
-                <div class="d-flex">
+                <div class="d-flex" sqxStopClick>
                     @if (canAnswer) {
                         <button
                             class="btn btn-sm btn-text-secondary"
@@ -43,7 +47,12 @@
                     }
 
                     @if (isEditable && canEdit) {
-                        <button class="btn btn-sm btn-text-secondary" attr.aria-label="{{ 'common.edit' | sqxTranslate }}" (click)="startEdit()" type="button">
+                        <button
+                            class="btn btn-sm btn-text-secondary"
+                            attr.aria-label="{{ 'common.edit' | sqxTranslate }}"
+                            (click)="startEdit()"
+                            title="{{ 'common.edit' | sqxTranslate }}"
+                            type="button">
                             <i class="icon-pencil bold"></i>
                         </button>
                     }
@@ -72,15 +81,16 @@
 
                     @if (isDeletable || canDelete) {
                         <button
-                            class="btn btn-sm btn-text-danger"
+                            class="btn btn-sm btn-text-secondary"
                             attr.aria-label="{{ 'common.delete' | sqxTranslate }}"
                             confirmRememberKey="deleteComment"
                             [confirmRequired]="confirmDelete"
                             confirmText="i18n:comments.deleteConfirmText"
                             confirmTitle="i18n:comments.deleteConfirmTitle"
                             (sqxConfirmClick)="delete()"
+                            title="{{ 'common.delete' | sqxTranslate }}"
                             type="button">
-                            <i class="icon-bin2"></i>
+                            <i class="icon-bin3"></i>
                         </button>
                     }
                 </div>

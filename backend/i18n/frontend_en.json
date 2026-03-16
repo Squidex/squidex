@@ -197,6 +197,7 @@
   "comments.deleteConfirmText": "Do you really want to delete the comment?",
   "comments.deleteConfirmTitle": "Delete comment",
   "comments.follow": "Follow",
+  "comments.reference": "Reference",
   "comments.reply": "Reply to comment",
   "comments.resolve": "Resolve comment",
   "comments.title": "Comments",

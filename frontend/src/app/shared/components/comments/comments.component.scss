@@ -25,6 +25,14 @@
     }
 }
 
+.reference {
+    align-items: center;
+    display: block;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    padding: .25rem;
+}
+
 .autocomplete-user {
     .user-name {
         margin-left: .25rem;

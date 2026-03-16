@@ -8,8 +8,8 @@
 import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, Component, ElementRef, EventEmitter, Input, numberAttribute, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Observable } from 'rxjs';
-import { AbstractContentForm, AnnotationCreate, AnnotationsSelect, AnyFieldDto, AppLanguageDto, ChatDialogComponent, CheckboxGroupComponent, CodeEditorComponent, ColorPickerComponent, CommentsState, ControlErrorsComponent, DateTimeEditorComponent, DialogModel, disabled$, EditContentForm, FormHintComponent, GeolocationEditorComponent, hasNoValue$, HTTP, IndeterminateValueDirective, MarkdownDirective, MathHelper, MenuComponent, MenuItemComponent, MessageBus, ModalDirective, RadioGroupComponent, ReferenceInputComponent, ReferencesFieldPropertiesDto, RichEditorComponent, StarsComponent, TagEditorComponent, ToggleComponent, TransformInputDirective, TypedSimpleChanges, Types } from '@app/shared';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { AbstractContentForm, AnnotationCreate, AnnotationsSelected, AnyFieldDto, AppLanguageDto, ChatDialogComponent, CheckboxGroupComponent, CodeEditorComponent, ColorPickerComponent, CommentSelected, CommentsState, ControlErrorsComponent, DateTimeEditorComponent, DialogModel, disabled$, EditContentForm, FieldSelected, FormHintComponent, GeolocationEditorComponent, hasNoValue$, HTTP, IndeterminateValueDirective, MarkdownDirective, MathHelper, MenuComponent, MenuItemComponent, MessageBus, ModalDirective, RadioGroupComponent, ReferenceInputComponent, ReferencesFieldPropertiesDto, RichEditorComponent, StarsComponent, Subscriptions, TagEditorComponent, ToggleComponent, TransformInputDirective, TypedSimpleChanges, Types } from '@app/shared';
 import { ReferenceDropdownComponent } from '../references/reference-dropdown.component';
 import { ReferencesCheckboxesComponent } from '../references/references-checkboxes.component';
 import { ReferencesEditorComponent } from '../references/references-editor.component';
@@ -64,7 +64,7 @@ import { UserInfoEditorComponent } from './user-info-editor.component';
     ],
 })
 export class FieldEditorComponent {
-    public readonly uniqueId = MathHelper.guid();
+    private readonly subscriptions = new Subscriptions();
 
     @Output()
     public expandedChange = new EventEmitter();
@@ -105,12 +105,18 @@ export class FieldEditorComponent {
     @Input()
     public displaySuffix = '';
 
+    @ViewChild('root', { static: false })
+    public root!: ElementRef<HTMLElement>;
+
     @ViewChild('editor', { static: false })
     public editor!: ElementRef;
+
+    public readonly uniqueId = MathHelper.guid();
 
     public isDisabled!: Observable<boolean>;
     public isEmpty!: Observable<boolean>;
     public isExpanded = false;
+    public isSelected = new BehaviorSubject<boolean>(false);
     public chatDialog = new DialogModel();
     public annotations?: Observable<ReadonlyArray<Annotation>>;
 
@@ -126,6 +132,10 @@ export class FieldEditorComponent {
         return this.field.properties.fieldType === 'String';
     }
 
+    public get hasComments() {
+        return this.field.properties.hasComments;
+    }
+
     public get schemaIds() {
         return Types.is(this.field.properties, ReferencesFieldPropertiesDto) ? this.field.properties.schemaIds : undefined;
     }
@@ -133,6 +143,22 @@ export class FieldEditorComponent {
     constructor(
         private readonly messageBus: MessageBus,
     ) {
+    }
+
+    public ngOnInit() {
+        this.subscriptions.add(
+            this.messageBus.of(CommentSelected)
+                .subscribe(message => {
+                    const isSelected = message.editorId.indexOf(this.formModel.path) === 0;
+
+                    if (isSelected) {
+                        this.root.nativeElement.scrollIntoView();
+                    }
+
+                    if (isSelected !== this.isSelected.value) {
+                        this.isSelected.next(isSelected);
+                    }
+                }));
     }
 
     public ngOnChanges(changes: TypedSimpleChanges<this>) {
@@ -167,12 +193,16 @@ export class FieldEditorComponent {
         this.isExpanded = !this.isExpanded;
     }
 
-    public annotationCreate(annotation: AnnotationSelection) {
+    public select() {
+        this.messageBus.emit(new FieldSelected(this.formModel.path));
+    }
+
+    public annotationCreate(annotation?: AnnotationSelection) {
         this.messageBus.emit(new AnnotationCreate(this.formModel.path, annotation));
     }
 
     public annotationsSelect(annotation: ReadonlyArray<string>) {
-        this.messageBus.emit(new AnnotationsSelect(annotation));
+        this.messageBus.emit(new AnnotationsSelected(annotation));
     }
 
     public annotationsUpdate(annotations: ReadonlyArray<Annotation>) {

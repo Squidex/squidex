@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { Component } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { map } from 'rxjs/operators';
-import { CommentsComponent, LayoutComponent, TranslatePipe } from '@app/shared';
+import { CommentsComponent, ContentsState, LayoutComponent, TranslatePipe } from '@app/shared';
 
 type Tab = 'unresolved' | 'all';
 
@@ -29,8 +29,11 @@ export class CommentsPageComponent {
     public commentsId = this.route.parent!.params.pipe(map(x => x['contentId']));
     public commentsTab = this.route.queryParams.pipe(map(x => x['commentsTab'] as Tab || 'unresolved'));
 
+    public readonly content = this.contentStates.selectedContent;
+
     constructor(
         private readonly route: ActivatedRoute,
+        private readonly contentStates: ContentsState,
     ) {
     }
 }

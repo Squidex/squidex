@@ -155,23 +155,6 @@ describe('CommentsState', () => {
         ]);
     });
 
-    it('should unset annotations', () => {
-        sharedArray.add({ editorId: '1', id: '1', from: 13, to: 52 } as any);
-        sharedArray.add({ editorId: '1', id: '2' } as any);
-
-        let items: ReadonlyArray<Comment> = [];
-        commentsState.itemsChanges.subscribe(result => {
-            items = result;
-        });
-
-        commentsState.updateAnnotations('1', [{ id: '2', from: 13, to: 52 }]);
-
-        expect(items).toEqual([
-            { id: '1' } as any,
-            { id: '2', editorId: '1', from: 13, to: 52 } as any,
-        ]);
-    });
-
     it('should get annotations', () => {
         sharedArray.add({ editorId: '1', id: '1', from: 11, to: 12 } as any);
         sharedArray.add({ editorId: '2', id: '2', from: 21, to: 22 } as any);
@@ -199,15 +182,13 @@ describe('CommentsState', () => {
     });
 
     it('should get grouped comments', () => {
-        const selection = of<ReadonlyArray<string>>(['1']);
-
         sharedArray.add({ id: '1' } as any);
         sharedArray.add({ id: '2' } as any);
         sharedArray.add({ id: '3', replyTo: '5' } as any);
         sharedArray.add({ id: '4', replyTo: '2' } as any);
 
         let items: ReadonlyArray<CommentItem> = [];
-        commentsState.getGroupedComments(selection).subscribe(result => {
+        commentsState.groupedComments.subscribe(result => {
             items = result;
         });
 
@@ -217,14 +198,44 @@ describe('CommentsState', () => {
                 comment: {
                     id: '1',
                 } as any as Comment,
-                isSelected: true,
                 replies: [],
             }, {
                 index: 1,
                 comment: {
                     id: '2',
                 } as any as Comment,
-                isSelected: false,
+                replies: [
+                    {
+                        index: 3,
+                        comment: {
+                            id: '4',
+                            replyTo: '2',
+                        } as any as Comment,
+                        replies: [],
+                        isSelected: false,
+                    },
+                ],
+            },
+        ]);
+    });
+
+    it('should get grouped comments without resolved', () => {
+        sharedArray.add({ id: '1', isResolved: true  } as any);
+        sharedArray.add({ id: '2'} as any);
+        sharedArray.add({ id: '3', replyTo: '5' } as any);
+        sharedArray.add({ id: '4', replyTo: '2' } as any);
+
+        let items: ReadonlyArray<CommentItem> = [];
+        commentsState.groupedUnresolvedComments.subscribe(result => {
+            items = result;
+        });
+
+        expect(items).toEqual([
+            {
+                index: 1,
+                comment: {
+                    id: '2',
+                } as any as Comment,
                 replies: [
                     {
                         index: 3,

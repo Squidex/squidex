@@ -1,6 +1,18 @@
 <div class="comments-header">
+    @if (reference) {
+        <div class="reference text-sm">
+            {{ 'comments.reference' | sqxTranslate }}:
+
+            {{ reference.editorId }}
+            @if (reference.annotation) {
+                , {{ reference.annotation.from }}-{{ reference.annotation.to }}
+            }
+        </div>
+    }
+
     <form [formGroup]="commentForm.form" (ngSubmit)="comment()">
         <sqx-autocomplete
+            #input
             autoFocus="true"
             autoSelectFirst="false"
             displayProperty="contributorEmail"

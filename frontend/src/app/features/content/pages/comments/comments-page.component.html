@@ -20,6 +20,6 @@
             </ul>
         </ng-container>
 
-        <sqx-comments [commentsId]="commentsId | async" [resolved]="tab === 'all'" />
+        <sqx-comments [content]="content | async" [commentsId]="commentsId | async" [resolved]="tab === 'all'" />
     </sqx-layout>
 }

@@ -50,6 +50,10 @@ export class CommentsState implements OnDestroy {
     private readonly subscription: Subscription;
     private readonly comments = new BehaviorSubject<SharedArray<Comment>>(null!);
 
+    public get items() {
+        return this.comments.value.items;
+    }
+
     public get itemsChanges() {
         return this.comments.pipe(switchMap(x => x.itemsChanges));
     }
@@ -82,7 +86,14 @@ export class CommentsState implements OnDestroy {
 
     public create(user: string, text: string, url: string, optional?: Pick<Comment, 'editorId' | 'from' | 'to' | 'replyTo'>) {
         this.updateInternal(comments => {
-            const comment = { user, text, url, id: MathHelper.guid(), time: DateTime.now().toISOString(), ...optional || {} };
+            const comment = {
+                id: MathHelper.guid(),
+                user,
+                text,
+                url,
+                time: DateTime.now().toISOString(),
+                ...optional || {}
+            };
 
             comments.add(comment);
         });
@@ -134,14 +145,6 @@ export class CommentsState implements OnDestroy {
                     const newComment = { ...comment, ...update };
 
                     comments.set(index, newComment);
-                } else {
-                    const newComment = { ...comment };
-
-                    delete newComment.to;
-                    delete newComment.from;
-                    delete newComment.editorId;
-
-                    comments.set(index, newComment);
                 }
             });
         });
@@ -174,7 +177,8 @@ export class CommentsState implements OnDestroy {
                         comment.editorId === editorId &&
                         comment.from &&
                         comment.to &&
-                        comment.id) {
+                        comment.id &&
+                        comment.isResolved !== true) {
                         annotations.push(comment as never);
                     }
                 }
