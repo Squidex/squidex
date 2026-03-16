@@ -10,13 +10,13 @@
             @if (showRemove) {
                 <button
                     class="btn btn-sm rounded-full btn-outline-danger"
+                    attr.aria-label="{{ 'common.remove' | sqxTranslate }}"
                     confirmText="i18n:rules.removeElementText"
                     confirmTitle="i18n:rules.removeElementTitle"
                     (sqxConfirmClick)="remove.emit()"
                     sqxStopClick=""
                     type="button">
                     <i class="icon-bin2"></i>
-                    <span class="visually-hidden">{{ "common.remove" | sqxTranslate }}</span>
                 </button>
             }
         </div>

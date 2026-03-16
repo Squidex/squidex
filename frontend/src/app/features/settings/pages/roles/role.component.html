@@ -23,6 +23,7 @@
                 </button>
                 <button
                     class="btn btn-text-danger"
+                    attr.aria-label="{{ 'common.delete' | sqxTranslate }}"
                     confirmRememberKey="deleteRole"
                     confirmText="i18n:roles.deleteConfirmText"
                     confirmTitle="i18n:roles.deleteConfirmTitle"
@@ -30,7 +31,6 @@
                     (sqxConfirmClick)="delete()"
                     type="button">
                     <i class="icon-bin2"></i>
-                    <span class="visually-hidden">{{ "common.delete" | sqxTranslate }}</span>
                 </button>
             </div>
         </div>
@@ -63,9 +63,12 @@
 
                                 @if (isEditable) {
                                     <div class="col-auto">
-                                        <button class="btn btn-text-danger" (click)="editForm.form.removeAt(i)" type="button">
+                                        <button
+                                            class="btn btn-text-danger"
+                                            attr.aria-label="{{ 'common.remove' | sqxTranslate }}"
+                                            (click)="editForm.form.removeAt(i)"
+                                            type="button">
                                             <i class="icon-bin2"></i>
-                                            <span class="visually-hidden">{{ "common.remove" | sqxTranslate }}</span>
                                         </button>
                                     </div>
                                 }
@@ -91,9 +94,12 @@
                             </div>
 
                             <div class="col-auto">
-                                <button class="btn btn-success col-action" (click)="addPermission()" type="button">
+                                <button
+                                    class="btn btn-success col-action"
+                                    attr.aria-label="{{ 'roles.addPermission' | sqxTranslate }}"
+                                    (click)="addPermission()"
+                                    type="button">
                                     <i class="icon-plus"></i>
-                                    <span class="visually-hidden">{{ "roles.addPermission" | sqxTranslate }}</span>
                                 </button>
                             </div>
                         </div>

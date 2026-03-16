@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 const fs = require("fs");
 const path = require("path");
 
@@ -18,20 +16,9 @@ class AddButtonTypesStrategy {
 
 class FixIconOnlyInteractivesStrategy {
     #interactiveTagPattern = /<(a|button)(\s[^>]*)?>/gi;
-    #iconPattern = /<i class="icon[^>]*>[\s\S]*?<\/i>/gi;
-    #titleAttributePattern = /\btitle\s*=\s*["']([^"']*)["']/i;
-    #screenReaderPattern = /visually-hidden|sr-only|cdk-visually-hidden|aria-label\s*=|aria-labelledby\s*=/i;
-
-    #resolveTitle(title) {
-        if (title.startsWith("i18n:")) {
-            return `{{ '${title.replace("i18n:", "i18n.")}' | sqxTranslate }}`;
-        }
-        return title;
-    }
-
-    #visuallyHiddenSpan(title) {
-        return `<span class="visually-hidden">${this.#resolveTitle(title)}</span>`;
-    }
+    #visuallyHiddenSpanPattern = /\s*<span\s+class="visually-hidden">([\s\S]*?)<\/span>/i;
+    #nestedInteractiveOpenPattern = /<(a|button)[\s>]/gi;
+    #nestedInteractiveClosePattern = /<\/(a|button)\s*>/gi;
 
     #findClosingTag(html, from, tag) {
         const openingTagPattern = new RegExp(`<${tag}[\\s>]`, "gi");
@@ -60,21 +47,34 @@ class FixIconOnlyInteractivesStrategy {
         return position;
     }
 
-    #lineAndColumn(html, index) {
-        const before = html.slice(0, index);
-        const line = (before.match(/\n/g) || []).length + 1;
-        const column = index - before.lastIndexOf("\n");
-        return { line, column };
+    #isDirectChild(inner, spanIndex) {
+        let depth = 0;
+        let position = 0;
+
+        while (position < spanIndex) {
+            this.#nestedInteractiveOpenPattern.lastIndex = position;
+            this.#nestedInteractiveClosePattern.lastIndex = position;
+            const nextOpening = this.#nestedInteractiveOpenPattern.exec(inner);
+            const nextClosing = this.#nestedInteractiveClosePattern.exec(inner);
+
+            const openingBeforeSpan = nextOpening && nextOpening.index < spanIndex;
+            const closingBeforeSpan = nextClosing && nextClosing.index < spanIndex;
+
+            if (openingBeforeSpan && (!closingBeforeSpan || nextOpening.index < nextClosing.index)) {
+                depth++;
+                position = nextOpening.index + 1;
+            } else if (closingBeforeSpan) {
+                depth--;
+                position = nextClosing.index + 1;
+            } else {
+                break;
+            }
+        }
+
+        return depth === 0;
     }
 
-    #hasOnlyIcons(inner) {
-        this.#iconPattern.lastIndex = 0;
-        const withoutIcons = inner.replace(this.#iconPattern, "").replace(/<[^>]+>/g, "").trim();
-        this.#iconPattern.lastIndex = 0;
-        return withoutIcons.length === 0 && this.#iconPattern.test(inner);
-    }
-
-    fix(html, filePath) {
+    fix(html) {
         const fixes = [];
         let match;
 
@@ -86,29 +86,27 @@ class FixIconOnlyInteractivesStrategy {
             const openEnd = match.index + match[0].length;
             const closeEnd = this.#findClosingTag(html, openEnd, tag);
             const inner = html.slice(openEnd, closeEnd - `</${tag}>`.length);
+            const spanMatch = this.#visuallyHiddenSpanPattern.exec(inner);
 
-            if (!this.#hasOnlyIcons(inner) || this.#screenReaderPattern.test(inner) || this.#screenReaderPattern.test(attributes)) {
+            if (!spanMatch || !this.#isDirectChild(inner, spanMatch.index)) {
                 continue;
             }
 
-            const titleMatch = this.#titleAttributePattern.exec(attributes);
+            const ariaLabel = spanMatch[1].trim().replace(/"/g, "'");
+            const innerWithout = inner.slice(0, spanMatch.index) + inner.slice(spanMatch.index + spanMatch[0].length);
+            const newOpenTag = `<${tag}${attributes} attr.aria-label="${ariaLabel}">`;
 
-            const { line, column } = this.#lineAndColumn(html, match.index);
-
-            if (titleMatch) {
-                fixes.push({ insertAt: openEnd + inner.length, title: titleMatch[1] });
-            } else {
-                fixes.push({ insertAt: openEnd + inner.length, title: null });
-                console.log(`${filePath}:${line}:${column}`);
-            }
+            fixes.push({
+                from: match.index,
+                to: openEnd + inner.length,
+                newOpenTag,
+                newInner: innerWithout,
+            });
         }
 
         let result = html;
-        for (const fix of fixes.sort((a, b) => b.insertAt - a.insertAt)) {
-            const span = fix.title !== null
-                ? this.#visuallyHiddenSpan(fix.title)
-                : this.#visuallyHiddenSpan("{{ 'i18n:TODO' | sqxTranslate }}</span>");
-            result = result.slice(0, fix.insertAt) + span + result.slice(fix.insertAt);
+        for (const fix of fixes.sort((a, b) => b.from - a.from)) {
+            result = result.slice(0, fix.from) + fix.newOpenTag + fix.newInner + result.slice(fix.to);
         }
 
         return result;

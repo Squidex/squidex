@@ -59,9 +59,8 @@
             @if (!(isDisabled | async)) {
                 <div class="copy-button-container">
                     @if (isDifferent | async) {
-                        <button class="btn btn-primary btn-sm field-copy" (click)="copy()" type="button">
+                        <button class="btn btn-primary btn-sm field-copy" attr.aria-label="{{ 'common.copy' | sqxTranslate }}" (click)="copy()" type="button">
                             <i class="icon-arrow_back"></i>
-                            <span class="visually-hidden">{{ "common.copy" | sqxTranslate }}</span>
                         </button>
                     }
                 </div>

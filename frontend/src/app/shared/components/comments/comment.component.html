@@ -32,16 +32,19 @@
 
                 <div class="d-flex">
                     @if (canAnswer) {
-                        <button class="btn btn-sm btn-text-secondary" (click)="startReply()" title="{{ 'comments.reply' | sqxTranslate }}" type="button">
+                        <button
+                            class="btn btn-sm btn-text-secondary"
+                            attr.aria-label="{{ 'comments.reply' | sqxTranslate }}"
+                            (click)="startReply()"
+                            title="{{ 'comments.reply' | sqxTranslate }}"
+                            type="button">
                             <i class="icon-enter bold"></i>
-                            <span class="visually-hidden">{{ "comments.reply" | sqxTranslate }}</span>
                         </button>
                     }
 
                     @if (isEditable && canEdit) {
-                        <button class="btn btn-sm btn-text-secondary" (click)="startEdit()" type="button">
+                        <button class="btn btn-sm btn-text-secondary" attr.aria-label="{{ 'common.edit' | sqxTranslate }}" (click)="startEdit()" type="button">
                             <i class="icon-pencil bold"></i>
-                            <span class="visually-hidden">{{ "common.edit" | sqxTranslate }}</span>
                         </button>
                     }
 
@@ -49,20 +52,20 @@
                         @if (!commentItem.comment.isResolved) {
                             <button
                                 class="btn btn-sm btn-text-secondary"
+                                attr.aria-label="{{ 'comments.resolve' | sqxTranslate }}"
                                 (click)="resolve(true)"
                                 title="{{ 'comments.resolve' | sqxTranslate }}"
                                 type="button">
                                 <i class="icon-check-circle text-bold"></i>
-                                <span class="visually-hidden">{{ "comments.resolve" | sqxTranslate }}</span>
                             </button>
                         } @else {
                             <button
                                 class="btn btn-sm btn-text-secondary"
+                                attr.aria-label="{{ 'comments.unresolve' | sqxTranslate }}"
                                 (click)="resolve(false)"
                                 title="{{ 'comments.unresolve' | sqxTranslate }}"
                                 type="button">
                                 <i class="icon-check-circle-filled text-success"></i>
-                                <span class="visually-hidden">{{ "comments.unresolve" | sqxTranslate }}</span>
                             </button>
                         }
                     }
@@ -70,6 +73,7 @@
                     @if (isDeletable || canDelete) {
                         <button
                             class="btn btn-sm btn-text-danger"
+                            attr.aria-label="{{ 'common.delete' | sqxTranslate }}"
                             confirmRememberKey="deleteComment"
                             [confirmRequired]="confirmDelete"
                             confirmText="i18n:comments.deleteConfirmText"
@@ -77,7 +81,6 @@
                             (sqxConfirmClick)="delete()"
                             type="button">
                             <i class="icon-bin2"></i>
-                            <span class="visually-hidden">{{ "common.delete" | sqxTranslate }}</span>
                         </button>
                     }
                 </div>

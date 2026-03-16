@@ -3,8 +3,8 @@
     <div #graphiQLContainer inner sqxTourStep="graphQLExplorer"></div>
 
     @if (clientsReadable) {
-        <button class="btn btn-simple btn-options" (click)="clientsDialog.show()" type="button">
-            <i class="icon-clients"></i> <span class="visually-hidden">{{ "api.graphqlShowClients" | sqxTranslate }}</span>
+        <button class="btn btn-simple btn-options" attr.aria-label="{{ 'api.graphqlShowClients' | sqxTranslate }}" (click)="clientsDialog.show()" type="button">
+            <i class="icon-clients"></i>
         </button>
     }
 </sqx-layout>

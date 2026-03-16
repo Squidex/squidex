@@ -50,11 +50,11 @@
                                             @if (isEditableImage && app.image) {
                                                 <button
                                                     class="btn btn-danger btn-sm app-image-remove"
+                                                    attr.aria-label="{{ 'apps.removeImage' | sqxTranslate }}"
                                                     (click)="removeImage()"
                                                     title="i18n:apps.removeImage"
                                                     type="button">
                                                     <i class="icon-bin2"></i>
-                                                    <span class="visually-hidden">{{ "apps.removeImage" | sqxTranslate }}</span>
                                                 </button>
                                             }
                                         </div>

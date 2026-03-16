@@ -53,9 +53,12 @@
                                 <sqx-form-row for="redirectUrl" label="teams.auth.redirectUrl">
                                     <div class="input-group">
                                         <input class="form-control" #redirectUri readonly value="{{ urlToRedirect }}" />
-                                        <button class="btn btn-outline-secondary" [sqxCopy]="redirectUri" type="button">
+                                        <button
+                                            class="btn btn-outline-secondary"
+                                            attr.aria-label="{{ 'common.copy' | sqxTranslate }}"
+                                            [sqxCopy]="redirectUri"
+                                            type="button">
                                             <i class="icon-copy"></i>
-                                            <span class="visually-hidden">{{ "common.copy" | sqxTranslate }}</span>
                                         </button>
                                     </div>
                                 </sqx-form-row>

@@ -38,9 +38,12 @@
                                 <i class="icon-download"></i>
                             </a>
                             @if (folderIcon) {
-                                <button class="file-folder ms-2" (click)="selectFolder.emit(asset.parentId)" type="button">
+                                <button
+                                    class="file-folder ms-2"
+                                    attr.aria-label="{{ 'assets.openFolder' | sqxTranslate }}"
+                                    (click)="selectFolder.emit(asset.parentId)"
+                                    type="button">
                                     <i class="icon-folder"></i>
-                                    <span class="visually-hidden">{{ "assets.openFolder" | sqxTranslate }}</span>
                                 </button>
                             }
 
@@ -154,14 +157,21 @@
                         </td>
 
                         <td class="col-actions text-end">
-                            <a class="btn btn-text-secondary" [href]="asset | sqxAssetUrl: asset.version : false" sqxExternalLink="noicon" sqxStopClick>
-                                <i class="icon-download"></i>
-                                <span class="visually-hidden">{{ "common.download" | sqxTranslate }}</span></a
-                            >
+                            <a
+                                class="btn btn-text-secondary"
+                                attr.aria-label="{{ 'common.download' | sqxTranslate }}"
+                                [href]="asset | sqxAssetUrl: asset.version : false"
+                                sqxExternalLink="noicon"
+                                sqxStopClick>
+                                <i class="icon-download"></i
+                            ></a>
                             @if (folderIcon) {
-                                <button class="btn btn-text-secondary" (click)="selectFolder.emit(asset.parentId)" type="button">
+                                <button
+                                    class="btn btn-text-secondary"
+                                    attr.aria-label="{{ 'assets.openFolder' | sqxTranslate }}"
+                                    (click)="selectFolder.emit(asset.parentId)"
+                                    type="button">
                                     <i class="icon-folder"></i>
-                                    <span class="visually-hidden">{{ "assets.openFolder" | sqxTranslate }}</span>
                                 </button>
                             }
                         </td>
@@ -171,6 +181,7 @@
                         @if (!isDisabled && !removeMode && asset.canDelete) {
                             <button
                                 class="btn btn-text-danger"
+                                attr.aria-label="{{ 'common.delete' | sqxTranslate }}"
                                 confirmRememberKey="deleteAsset"
                                 confirmText="i18n:assets.deleteConfirmText"
                                 confirmTitle="i18n:assets.deleteConfirmTitle"
@@ -178,13 +189,13 @@
                                 (sqxConfirmClick)="delete.emit()"
                                 type="button">
                                 <i class="icon-bin2"></i>
-                                <span class="visually-hidden">{{ "common.delete" | sqxTranslate }}</span>
                             </button>
                         }
 
                         @if (!isDisabled && removeMode) {
                             <button
                                 class="btn btn-text-secondary"
+                                attr.aria-label="{{ 'common.remove' | sqxTranslate }}"
                                 confirmRememberKey="removeAsset"
                                 confirmText="i18n:assets.removeConfirmText"
                                 confirmTitle="i18n:assets.removeConfirmTitle"
@@ -192,7 +203,6 @@
                                 (sqxConfirmClick)="remove.emit()"
                                 type="button">
                                 <i class="icon-close"></i>
-                                <span class="visually-hidden">{{ "common.remove" | sqxTranslate }}</span>
                             </button>
                         }
                     </td>

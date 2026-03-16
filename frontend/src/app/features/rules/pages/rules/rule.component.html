@@ -117,6 +117,7 @@
                 @if (rule.canTrigger) {
                     <button
                         class="btn btn-outline-secondary btn-run"
+                        attr.aria-label="{{ 'rules.trigger' | sqxTranslate }}"
                         confirmRememberKey="triggerRule"
                         confirmText="i18n:rules.triggerConfirmText"
                         confirmTitle="i18n:rules.triggerConfirmTitle"
@@ -124,7 +125,6 @@
                         (sqxConfirmClick)="trigger()"
                         type="button">
                         <i class="icon-play-line"></i>
-                        <span class="visually-hidden">{{ "rules.trigger" | sqxTranslate }}</span>
                     </button>
                 } @else {
                     <sqx-toggle [disabled]="!rule.canDisable && !rule.canEnable" [ngModel]="rule.isEnabled" (ngModelChange)="toggle()" />

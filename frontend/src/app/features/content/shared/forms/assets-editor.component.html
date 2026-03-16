@@ -26,21 +26,21 @@
         <div class="btn-group">
             <button
                 class="btn btn-secondary btn-toggle"
+                attr.aria-label="{{ 'contents.assetsListView' | sqxTranslate }}"
                 [class.btn-primary]="snapshot.isListView"
                 (click)="changeView(true)"
                 [disabled]="snapshot.isListView"
                 type="button">
                 <i class="icon-list"></i>
-                <span class="visually-hidden">{{ "contents.assetsListView" | sqxTranslate }}</span>
             </button>
             <button
                 class="btn btn-secondary btn-toggle"
+                attr.aria-label="{{ 'contents.assetsGridView' | sqxTranslate }}"
                 [class.btn-primary]="!snapshot.isListView"
                 (click)="changeView(false)"
                 [disabled]="!snapshot.isListView"
                 type="button">
                 <i class="icon-grid"></i>
-                <span class="visually-hidden">{{ "contents.assetsGridView" | sqxTranslate }}</span>
             </button>
         </div>
     </div>

@@ -22,9 +22,8 @@
                     </div>
 
                     <div class="col-auto">
-                        <button class="btn btn-success" (click)="addSchema()" type="button">
+                        <button class="btn btn-success" attr.aria-label="{{ 'rules.schemas.addSchema' | sqxTranslate }}" (click)="addSchema()" type="button">
                             <i class="icon-add"></i>
-                            <span class="visually-hidden">{{ "rules.schemas.addSchema" | sqxTranslate }}</span>
                         </button>
                     </div>
                 </div>
@@ -62,9 +61,12 @@
             </div>
 
             <div class="col-auto">
-                <button class="btn btn-success" (click)="addReferencedSchema()" type="button">
+                <button
+                    class="btn btn-success"
+                    attr.aria-label="{{ 'rules.addReferencedSchema' | sqxTranslate }}"
+                    (click)="addReferencedSchema()"
+                    type="button">
                     <i class="icon-add"></i>
-                    <span class="visually-hidden">{{ "rules.addReferencedSchema" | sqxTranslate }}</span>
                 </button>
             </div>
         </div>

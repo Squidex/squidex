@@ -7,13 +7,16 @@
 
         @if (isDirty) {
             <div class="edit-menu">
-                <button class="btn btn-text-secondary btn-cancel me-2" (click)="cancel()" sqxStopClick type="button">
+                <button
+                    class="btn btn-text-secondary btn-cancel me-2"
+                    attr.aria-label="{{ 'common.cancel' | sqxTranslate }}"
+                    (click)="cancel()"
+                    sqxStopClick
+                    type="button">
                     <i class="icon-close"></i>
-                    <span class="visually-hidden">{{ "common.cancel" | sqxTranslate }}</span>
                 </button>
-                <button class="btn btn-success" (click)="save()" sqxStopClick type="button">
+                <button class="btn btn-success" attr.aria-label="{{ 'common.save' | sqxTranslate }}" (click)="save()" sqxStopClick type="button">
                     <i class="icon-checkmark"></i>
-                    <span class="visually-hidden">{{ "common.save" | sqxTranslate }}</span>
                 </button>
             </div>
         }

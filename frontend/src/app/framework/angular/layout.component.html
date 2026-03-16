@@ -21,14 +21,17 @@
                     </div>
 
                     @if (route) {
-                        <a class="btn panel2-collapse" [queryParamsHandling]="closeQueryParamsHandling" [relativeTo]="route" [routerLink]="['./../']">
+                        <a
+                            class="btn panel2-collapse"
+                            attr.aria-label="{{ 'common.close' | sqxTranslate }}"
+                            [queryParamsHandling]="closeQueryParamsHandling"
+                            [relativeTo]="route"
+                            [routerLink]="['./../']">
                             <i class="icon-close"></i>
-                            <span class="visually-hidden">{{ "common.close" | sqxTranslate }}</span>
                         </a>
                     } @else {
-                        <button class="btn panel2-collapse" type="button">
+                        <button class="btn panel2-collapse" attr.aria-label="{{ 'common.close' | sqxTranslate }}" type="button">
                             <i class="icon-close"></i>
-                            <span class="visually-hidden">{{ "common.close" | sqxTranslate }}</span>
                         </button>
                     }
                 </div>
@@ -132,13 +135,13 @@
                     @if (firstChild | async) {
                         <a
                             class="btn panel2-collapse"
+                            attr.aria-label="{{ 'common.close' | sqxTranslate }}"
                             [queryParamsHandling]="closeQueryParamsHandling"
                             [relativeTo]="route"
                             replaceUrl="true"
                             [routerLink]="['./']">
-                            <i class="icon-angle-right"></i>
-                            <span class="visually-hidden">{{ "common.close" | sqxTranslate }}</span></a
-                        >
+                            <i class="icon-angle-right"></i
+                        ></a>
                     }
                 </div>
 

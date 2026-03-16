@@ -3,12 +3,17 @@
         <ng-container menu>
             <ul class="nav nav-tabs2">
                 <li class="nav-item">
-                    <a class="nav-link" [class.active]="tab === 'unresolved'" [queryParams]="{ commentsTab: 'unresolved' }" [routerLink]="[]">
+                    <a
+                        class="nav-link"
+                        [class.active]="tab === 'unresolved'"
+                        [queryParams]="{ commentsTab: 'unresolved' }"
+                        queryParamsHandling="merge"
+                        [routerLink]="[]">
                         {{ "comments.unresolved" | sqxTranslate }}
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" [class.active]="tab === 'all'" [queryParams]="{ commentsTab: 'all' }" [routerLink]="[]">
+                    <a class="nav-link" [class.active]="tab === 'all'" [queryParams]="{ commentsTab: 'all' }" queryParamsHandling="merge" [routerLink]="[]">
                         {{ "comments.all" | sqxTranslate }}
                     </a>
                 </li>

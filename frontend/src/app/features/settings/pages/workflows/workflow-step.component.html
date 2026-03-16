@@ -41,9 +41,13 @@
 
         <div class="col-auto">
             @if (!step.isLocked && workflow.steps.length > 2) {
-                <button class="btn btn-text-danger" (click)="remove()" [disabled]="disabled" type="button">
+                <button
+                    class="btn btn-text-danger"
+                    attr.aria-label="{{ 'common.remove' | sqxTranslate }}"
+                    (click)="remove()"
+                    [disabled]="disabled"
+                    type="button">
                     <i class="icon-bin2"></i>
-                    <span class="visually-hidden">{{ "common.remove" | sqxTranslate }}</span>
                 </button>
             }
         </div>
@@ -71,9 +75,12 @@
                 </div>
 
                 <div class="col ps-2">
-                    <button class="btn btn-outline-secondary" (click)="addTransition(openStep.name)" type="button">
+                    <button
+                        class="btn btn-outline-secondary"
+                        attr.aria-label="{{ 'workflows.addTransition' | sqxTranslate }}"
+                        (click)="addTransition(openStep.name)"
+                        type="button">
                         <i class="icon-plus"></i>
-                        <span class="visually-hidden">{{ "workflows.addTransition" | sqxTranslate }}</span>
                     </button>
                 </div>
             </div>

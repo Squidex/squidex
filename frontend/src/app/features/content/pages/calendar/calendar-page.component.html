@@ -9,13 +9,21 @@
 
             <option ngValue="month">{{ "common.monthly" | sqxTranslate }}</option>
         </select>
-        <button class="btn btn-text-secondary btn-navigate ms-2" (click)="goPrev()" [disabled]="isLoading" type="button">
+        <button
+            class="btn btn-text-secondary btn-navigate ms-2"
+            attr.aria-label="{{ 'common.prev' | sqxTranslate }}"
+            (click)="goPrev()"
+            [disabled]="isLoading"
+            type="button">
             <i class="icon-caret-left"></i>
-            <span class="visually-hidden">{{ "common.prev" | sqxTranslate }}</span>
         </button>
-        <button class="btn btn-text-secondary btn-navigate ms-2" (click)="goNext()" [disabled]="isLoading" type="button">
+        <button
+            class="btn btn-text-secondary btn-navigate ms-2"
+            attr.aria-label="{{ 'common.next' | sqxTranslate }}"
+            (click)="goNext()"
+            [disabled]="isLoading"
+            type="button">
             <i class="icon-caret-right"></i>
-            <span class="visually-hidden">{{ "common.next" | sqxTranslate }}</span>
         </button>
     </ng-container>
     <ng-container content>
@@ -30,9 +38,8 @@
                 <sqx-form-row for="id" hideError label="common.id" labelSize="lg">
                     <div class="input-group">
                         <input class="form-control" id="id" #inputId name="id" readonly value="{{ contentSelected.id }}" />
-                        <button class="btn btn-outline-secondary" [sqxCopy]="inputId" type="button">
+                        <button class="btn btn-outline-secondary" attr.aria-label="{{ 'common.copy' | sqxTranslate }}" [sqxCopy]="inputId" type="button">
                             <i class="icon-copy"></i>
-                            <span class="visually-hidden">{{ "common.copy" | sqxTranslate }}</span>
                         </button>
                     </div>
                 </sqx-form-row>

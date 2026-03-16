@@ -16,6 +16,7 @@
     <td class="cell-actions">
         <button
             class="btn btn-text-danger"
+            attr.aria-label="{{ 'common.delete' | sqxTranslate }}"
             confirmRememberKey="removeContributor"
             confirmText="i18n:contributors.deleteConfirmText"
             confirmTitle="i18n:contributors.deleteConfirmTitle"
@@ -23,7 +24,6 @@
             (sqxConfirmClick)="remove()"
             type="button">
             <i class="icon-bin2"></i>
-            <span class="visually-hidden">{{ "common.delete" | sqxTranslate }}</span>
         </button>
     </td>
 </tr>

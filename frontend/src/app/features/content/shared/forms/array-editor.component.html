@@ -124,13 +124,21 @@
 
         @if (items.length > 0) {
             <div class="col-auto d-flex gap1">
-                <button class="btn btn-text-secondary" (click)="expandAll()" title="i18n:contents.arrayExpandAll" type="button">
+                <button
+                    class="btn btn-text-secondary"
+                    attr.aria-label="{{ 'contents.arrayExpandAll' | sqxTranslate }}"
+                    (click)="expandAll()"
+                    title="i18n:contents.arrayExpandAll"
+                    type="button">
                     <i class="icon-plus2"></i>
-                    <span class="visually-hidden">{{ "contents.arrayExpandAll" | sqxTranslate }}</span>
                 </button>
-                <button class="btn btn-text-secondary" (click)="collapseAll()" title="i18n:contents.arrayCollapseAll" type="button">
+                <button
+                    class="btn btn-text-secondary"
+                    attr.aria-label="{{ 'contents.arrayCollapseAll' | sqxTranslate }}"
+                    (click)="collapseAll()"
+                    title="i18n:contents.arrayCollapseAll"
+                    type="button">
                     <i class="icon-minus2"></i>
-                    <span class="visually-hidden">{{ "contents.arrayCollapseAll" | sqxTranslate }}</span>
                 </button>
             </div>
         }

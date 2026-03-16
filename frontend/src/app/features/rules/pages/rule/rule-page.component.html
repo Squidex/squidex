@@ -14,6 +14,7 @@
         @if (isManual) {
             <button
                 class="btn btn-outline-secondary btn-run ms-2"
+                attr.aria-label="{{ 'rules.trigger' | sqxTranslate }}"
                 confirmRememberKey="triggerRule"
                 confirmText="i18n:rules.triggerConfirmText"
                 confirmTitle="i18n:rules.triggerConfirmTitle"
@@ -21,7 +22,6 @@
                 (sqxConfirmClick)="trigger()"
                 type="button">
                 <i class="icon-play-line"></i>
-                <span class="visually-hidden">{{ "rules.trigger" | sqxTranslate }}</span>
             </button>
         }
         <button class="btn btn-primary ms-2" (click)="save()" type="button">{{ "common.save" | sqxTranslate }}</button>

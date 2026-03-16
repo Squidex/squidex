@@ -44,25 +44,32 @@
                 <i class="icon-dots"></i>
             </button>
             <div class="reference-menu">
-                <button class="btn btn-text-secondary" (click)="clone.emit()" title="{{ 'common.clone' | sqxTranslate }}" type="button">
+                <button
+                    class="btn btn-text-secondary"
+                    attr.aria-label="{{ 'common.clone' | sqxTranslate }}"
+                    (click)="clone.emit()"
+                    title="{{ 'common.clone' | sqxTranslate }}"
+                    type="button">
                     <i class="icon-copy"></i>
-                    <span class="visually-hidden">{{ "common.clone" | sqxTranslate }}</span>
                 </button>
                 @if (canRemove) {
                     <button
                         class="btn btn-text-secondary"
+                        attr.aria-label="{{ 'common.remove' | sqxTranslate }}"
                         confirmRememberKey="removeReference"
                         confirmText="i18n:contents.removeConfirmText"
                         confirmTitle="i18n:contents.removeConfirmTitle"
                         (sqxConfirmClick)="delete.emit()"
                         type="button">
                         <i class="icon-close"></i>
-                        <span class="visually-hidden">{{ "common.remove" | sqxTranslate }}</span>
                     </button>
                 }
-                <a class="btn btn-text-secondary" [routerLink]="['../..', content.schemaName, content.id]" target="_blank">
+                <a
+                    class="btn btn-text-secondary"
+                    attr.aria-label="{{ 'common.edit' | sqxTranslate }}"
+                    [routerLink]="['../..', content.schemaName, content.id]"
+                    target="_blank">
                     <i class="icon-pencil"></i>
-                    <span class="visually-hidden">{{ "common.edit" | sqxTranslate }}</span>
                 </a>
             </div>
         </div>

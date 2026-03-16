@@ -68,6 +68,7 @@
                                 type="button"
                                 type="button"
                                 type="button"
+                                type="button"
                                 type="button">
                                 {{ "common.upload" | sqxTranslate }}
                             </button>
@@ -127,9 +128,12 @@
                         <sqx-form-row for="id" hideError label="common.id" vertical>
                             <div class="input-group">
                                 <input class="form-control" id="id" #inputId name="id" readonly value="{{ asset.id }}" />
-                                <button class="btn btn-outline-secondary" [sqxCopy]="inputId" type="button">
+                                <button
+                                    class="btn btn-outline-secondary"
+                                    attr.aria-label="{{ 'common.copy' | sqxTranslate }}"
+                                    [sqxCopy]="inputId"
+                                    type="button">
                                     <i class="icon-copy"></i>
-                                    <span class="visually-hidden">{{ "common.copy" | sqxTranslate }}</span>
                                 </button>
                             </div>
                         </sqx-form-row>
@@ -137,9 +141,12 @@
                         <sqx-form-row for="url" hideError label="common.url" vertical>
                             <div class="input-group">
                                 <input class="form-control" id="url" #inputUrl name="url" readonly value="{{ asset | sqxAssetUrl: asset.version : false }}" />
-                                <button class="btn btn-outline-secondary" [sqxCopy]="inputUrl" type="button">
+                                <button
+                                    class="btn btn-outline-secondary"
+                                    attr.aria-label="{{ 'common.copy' | sqxTranslate }}"
+                                    [sqxCopy]="inputUrl"
+                                    type="button">
                                     <i class="icon-copy"></i>
-                                    <span class="visually-hidden">{{ "common.copy" | sqxTranslate }}</span>
                                 </button>
                             </div>
                         </sqx-form-row>
@@ -182,6 +189,7 @@
                                     <div class="col-auto col-options">
                                         <button
                                             class="btn btn-text-danger"
+                                            attr.aria-label="{{ 'common.remove' | sqxTranslate }}"
                                             confirmRememberKey="removeAssetMetadata"
                                             confirmText="i18n:assets.deleteMetadataConfirmText"
                                             confirmTitle="i18n:assets.deleteMetadataConfirmTitle"
@@ -189,7 +197,6 @@
                                             (sqxConfirmClick)="annotateForm.metadata.removeAt(i)"
                                             type="button">
                                             <i class="icon-bin2"></i>
-                                            <span class="visually-hidden">{{ "common.remove" | sqxTranslate }}</span>
                                         </button>
                                     </div>
                                 </div>

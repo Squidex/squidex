@@ -4,9 +4,8 @@
     </div>
 
     @if (isString && fields) {
-        <button class="btn btn-icon" (click)="toggle()" sqxStopClick type="button">
+        <button class="btn btn-icon" attr.aria-label="{{ 'contents.wrapText' | sqxTranslate }}" (click)="toggle()" sqxStopClick type="button">
             <i class="icon-wrap_text"></i>
-            <span class="visually-hidden">{{ "contents.wrapText" | sqxTranslate }}</span>
         </button>
     }
 } @else {

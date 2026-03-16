@@ -26,9 +26,8 @@
         <div class="row gx-2 mt-3 mb-3">
             @if (schema) {
                 <div class="col-auto">
-                    <button class="btn btn-text-secondary" (click)="reload()" type="button">
+                    <button class="btn btn-text-secondary" attr.aria-label="{{ 'common.refresh' | sqxTranslate }}" (click)="reload()" type="button">
                         <i class="icon-reset"></i>
-                        <span class="visually-hidden">{{ "common.refresh" | sqxTranslate }}</span>
                     </button>
                 </div>
 
@@ -121,6 +120,7 @@
                 class="btn btn-success"
                 (click)="emitSelect()"
                 [disabled]="selectionCount === 0 || selectionCount > maxItems"
+                type="button"
                 type="button"
                 type="button"
                 type="button"

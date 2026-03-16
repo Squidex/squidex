@@ -2,12 +2,12 @@
     <button
         class="btn btn-outline-secondary btn-sm dropdown-toggle"
         #button
+        attr.aria-label="{{ 'common.copy' | sqxTranslate }}"
         (click)="dropdown.toggle()"
         tabindex="-1"
         title="{{ 'common.copy' | sqxTranslate }}"
         type="button">
         <i class="icon-copy"></i>
-        <span class="visually-hidden">{{ </span>
     </button>
     <sqx-dropdown-menu scrollY="true" [sqxAnchoredTo]="button" *sqxModal="dropdown">
         <div class="section d-flex justify-content-end">

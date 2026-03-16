@@ -4,14 +4,14 @@
         <ng-container title>
             <ul class="nav nav-tabs2">
                 <li class="nav-item">
-                    <a class="nav-link" [class.active]="tab === 'fields'" [queryParams]="{ tab: 'fields' }" [routerLink]="[]">
+                    <a class="nav-link" [class.active]="tab === 'fields'" [queryParams]="{ tab: 'fields' }" queryParamsHandling="merge" [routerLink]="[]">
                         {{ "schemas.tabFields" | sqxTranslate }}
                     </a>
                 </li>
 
                 @if (schema.type !== "Component") {
                     <li>
-                        <a class="nav-link" [class.active]="tab === 'ui'" [queryParams]="{ tab: 'ui' }" [routerLink]="[]">
+                        <a class="nav-link" [class.active]="tab === 'ui'" [queryParams]="{ tab: 'ui' }" queryParamsHandling="merge" [routerLink]="[]">
                             {{ "schemas.tabUI" | sqxTranslate }}
                         </a>
                     </li>
@@ -19,28 +19,28 @@
 
                 @if (schema.type !== "Component") {
                     <li>
-                        <a class="nav-link" [class.active]="tab === 'scripts'" [queryParams]="{ tab: 'scripts' }" [routerLink]="[]">
+                        <a class="nav-link" [class.active]="tab === 'scripts'" [queryParams]="{ tab: 'scripts' }" queryParamsHandling="merge" [routerLink]="[]">
                             {{ "schemas.tabScripts" | sqxTranslate }}
                         </a>
                     </li>
                 }
 
                 <li>
-                    <a class="nav-link" [class.active]="tab === 'json'" [queryParams]="{ tab: 'json' }" [routerLink]="[]">
+                    <a class="nav-link" [class.active]="tab === 'json'" [queryParams]="{ tab: 'json' }" queryParamsHandling="merge" [routerLink]="[]">
                         {{ "schemas.tabJson" | sqxTranslate }}
                     </a>
                 </li>
 
                 @if (!hideIndexes) {
                     <li>
-                        <a class="nav-link" [class.active]="tab === 'indexes'" [queryParams]="{ tab: 'indexes' }" [routerLink]="[]">
+                        <a class="nav-link" [class.active]="tab === 'indexes'" [queryParams]="{ tab: 'indexes' }" queryParamsHandling="merge" [routerLink]="[]">
                             {{ "schemas.tabIndexes" | sqxTranslate }}
                         </a>
                     </li>
                 }
 
                 <li>
-                    <a class="nav-link" [class.active]="tab === 'more'" [queryParams]="{ tab: 'more' }" [routerLink]="[]">
+                    <a class="nav-link" [class.active]="tab === 'more'" [queryParams]="{ tab: 'more' }" queryParamsHandling="merge" [routerLink]="[]">
                         {{ "schemas.tabMore" | sqxTranslate }}
                     </a>
                 </li>

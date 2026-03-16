@@ -4,9 +4,14 @@
         <div class="row flex-nowrap flex-grow-1 gx-2 overflow-hidden">
             <div class="col-auto ms-8">
                 <sqx-notifo position="bottom-left" topic="apps/{{ contentsState.appId }}/schemas/{{ schema.id }}/contents" />
-                <button class="btn btn-text-secondary" (click)="reload()" shortcut="CTRL + B" title="i18n:contents.refreshTooltip" type="button">
+                <button
+                    class="btn btn-text-secondary"
+                    attr.aria-label="{{ 'contents.refreshTooltip' | sqxTranslate }}"
+                    (click)="reload()"
+                    shortcut="CTRL + B"
+                    title="i18n:contents.refreshTooltip"
+                    type="button">
                     <i class="icon-reset"></i>
-                    <span class="visually-hidden">{{ "contents.refreshTooltip" | sqxTranslate }}</span>
                 </button>
             </div>
 

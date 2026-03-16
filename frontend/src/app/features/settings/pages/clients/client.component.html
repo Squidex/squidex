@@ -14,6 +14,7 @@
             <div class="col-auto">
                 <button
                     class="btn btn-text-danger"
+                    attr.aria-label="{{ 'common.delete' | sqxTranslate }}"
                     confirmRememberKey="revokeClient"
                     confirmText="i18n:clients.deleteConfirmText"
                     confirmTitle="i18n:clients.deleteConfirmTitle"
@@ -21,7 +22,6 @@
                     (sqxConfirmClick)="revoke()"
                     type="button">
                     <i class="icon-bin2"></i>
-                    <span class="visually-hidden">{{ "common.delete" | sqxTranslate }}</span>
                 </button>
             </div>
         </div>

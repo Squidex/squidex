@@ -45,9 +45,12 @@
                                     </div>
 
                                     <div class="col-auto">
-                                        <button class="btn btn-text-secondary" (click)="stopUpload(upload)" type="button">
+                                        <button
+                                            class="btn btn-text-secondary"
+                                            attr.aria-label="{{ 'common.copy' | sqxTranslate }}"
+                                            (click)="stopUpload(upload)"
+                                            type="button">
                                             <i class="icon-close"></i>
-                                            <span class="visually-hidden">{{ "common.copy" | sqxTranslate }}</span>
                                         </button>
                                     </div>
                                 </div>
