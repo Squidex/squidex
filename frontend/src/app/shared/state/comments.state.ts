@@ -145,6 +145,13 @@ export class CommentsState implements OnDestroy {
                     const newComment = { ...comment, ...update };
 
                     comments.set(index, newComment);
+                } else {
+                    const newComment = { ...comment };
+                    delete newComment.to;
+                    delete newComment.from;
+                    delete newComment.editorId;
+
+                    comments.set(index, newComment);
                 }
             });
         });

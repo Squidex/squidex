@@ -155,6 +155,23 @@ describe('CommentsState', () => {
         ]);
     });
 
+    it('should unset annotations', () => {
+        sharedArray.add({ editorId: '1', id: '1', from: 13, to: 52 } as any);
+        sharedArray.add({ editorId: '1', id: '2' } as any);
+
+        let items: ReadonlyArray<Comment> = [];
+        commentsState.itemsChanges.subscribe(result => {
+            items = result;
+        });
+
+        commentsState.updateAnnotations('1', [{ id: '2', from: 13, to: 52 }]);
+
+        expect(items).toEqual([
+            { id: '1' } as any,
+            { id: '2', editorId: '1', from: 13, to: 52 } as any,
+        ]);
+    });
+
     it('should get annotations', () => {
         sharedArray.add({ editorId: '1', id: '1', from: 11, to: 12 } as any);
         sharedArray.add({ editorId: '2', id: '2', from: 21, to: 22 } as any);

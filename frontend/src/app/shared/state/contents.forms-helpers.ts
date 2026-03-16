@@ -272,9 +272,7 @@ export abstract class AbstractContentForm<T extends AnyFieldDto, TForm extends A
         this.updateCustomState(context, itemData, state);
     }
 
-    protected updateCustomState(_context: RuleContext, _itemData: any, _state: AbstractContentFormState): void {
-
-    }
+    protected updateCustomState(_context: RuleContext, _itemData: any, _state: AbstractContentFormState): void {}
 }
 
 const SELF = { onlySelf: true };

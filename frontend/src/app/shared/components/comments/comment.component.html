@@ -22,11 +22,12 @@
 
                     <div [sqxMarkdown]="commentItem.comment.text"></div>
 
-                    <div class="comment-created text-muted, truncate">
+                    <div class="comment-created d-flex text-muted truncate">
                         @if (canFollow && commentItem.comment.url) {
                             <a [routerLink]="commentItem.comment.url">{{ "comments.follow" | sqxTranslate }}</a> &nbsp;
                         }
-                        {{ commentItem.comment.time | sqxFromNow }}
+
+                        <span>{{ commentItem.comment.time | sqxFromNow }}</span>
 
                         @if (commentItem.comment.editorId) {
                             <span>, {{ commentItem.comment.editorId }}</span>
