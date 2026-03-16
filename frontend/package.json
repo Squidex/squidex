@@ -115,6 +115,9 @@
     "vite-tsconfig-paths": "^6.1.1",
     "vitest": "^4.0.8"
   },
+  "optionalDependencies": {
+    "@rollup/rollup-linux-x64-gnu": "*"
+  },
   "overrides": {
     "ng2-charts": {
       "ng2-charts-schematics": "0.1.7"

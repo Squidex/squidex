@@ -211,18 +211,21 @@ describe('CommentsState', () => {
 
         expect(items).toEqual([
             {
+                id: '1',
                 index: 0,
                 comment: {
                     id: '1',
                 } as any as Comment,
                 replies: [],
             }, {
+                id: '2',
                 index: 1,
                 comment: {
                     id: '2',
                 } as any as Comment,
                 replies: [
                     {
+                        id: '4',
                         index: 3,
                         comment: {
                             id: '4',
@@ -249,12 +252,14 @@ describe('CommentsState', () => {
 
         expect(items).toEqual([
             {
+                id: '2',
                 index: 1,
                 comment: {
                     id: '2',
                 } as any as Comment,
                 replies: [
                     {
+                        id: '4',
                         index: 3,
                         comment: {
                             id: '4',
