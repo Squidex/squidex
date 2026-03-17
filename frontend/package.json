@@ -20,7 +20,7 @@
     "@angular/cdk": "21.1.3",
     "@angular/cdk-experimental": "21.1.3",
     "@angular/common": "21.1.3",
-    "@angular/core": "21.1.3",
+    "@angular/core": "21.2.3",
     "@angular/forms": "21.1.3",
     "@angular/localize": "21.1.3",
     "@angular/platform-browser": "21.1.3",
