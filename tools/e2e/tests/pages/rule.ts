@@ -51,7 +51,7 @@ export class TriggerDialog {
     }
 
     public async add() {
-        await this.root.getByRole('button', { name: 'Add' }).click();
+        await this.root.getByRole('button', { name: 'Add', exact: true }).click();
         await this.root.waitFor({ state: 'detached' });
     }
 
@@ -73,7 +73,7 @@ export class StepDialog {
     }
 
     public async add() {
-        await this.root.getByRole('button', { name: 'Add' }).click();
+        await this.root.getByRole('button', { name: 'Add', exact: true }).click();
         await this.root.waitFor({ state: 'detached' });
     }
 

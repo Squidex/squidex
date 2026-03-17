@@ -31,7 +31,7 @@ export class SettingsPage {
     }
 
     public async addPattern() {
-        await this.page.getByTestId('patterns').getByRole('button', { name: 'Add' }).click();
+        await this.page.getByTestId('patterns').getByRole('button', { name: 'Add', exact: true }).click();
     }
 }
 
