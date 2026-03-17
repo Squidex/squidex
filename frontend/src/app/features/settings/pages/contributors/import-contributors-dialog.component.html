@@ -1,6 +1,6 @@
 <form [formGroup]="importForm.form" (ngSubmit)="detect()">
     <sqx-modal-dialog (dialogClose)="dialogClose.emit()">
-        <ng-container title> {{ "contributors.importTitle" | sqxTranslate }} </ng-container>
+        <ng-container title> {{ "contributors.importTitle" | sqxTranslate }}</ng-container>
         <ng-container content>
             @switch (importStage) {
                 @case ("Start") {

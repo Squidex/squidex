@@ -41,8 +41,13 @@
 
         <div class="col-auto">
             @if (!step.isLocked && workflow.steps.length > 2) {
-                <button class="btn btn-text-danger" (click)="remove()" [disabled]="disabled" type="button">
-                    <i class="icon-bin2"></i>
+                <button
+                    class="btn btn-text-danger"
+                    attr.aria-label="{{ 'common.remove' | sqxTranslate }}"
+                    (click)="remove()"
+                    [disabled]="disabled"
+                    type="button">
+                    <i class="icon-bin3"></i>
                 </button>
             }
         </div>
@@ -70,7 +75,13 @@
                 </div>
 
                 <div class="col ps-2">
-                    <button class="btn btn-outline-secondary" (click)="addTransition(openStep.name)" type="button"><i class="icon-plus"></i></button>
+                    <button
+                        class="btn btn-outline-secondary"
+                        attr.aria-label="{{ 'workflows.addTransition' | sqxTranslate }}"
+                        (click)="addTransition(openStep.name)"
+                        type="button">
+                        <i class="icon-plus"></i>
+                    </button>
                 </div>
             </div>
         }
@@ -143,7 +154,7 @@
                         [ngModel]="step.values.validate"
                         (ngModelChange)="changeValidate($event)"
                         type="checkbox" />
-                    <label class="form-check-label" for="validate_{{ step.name }}"> {{ "workflows.validate" | sqxTranslate }} </label>
+                    <label class="form-check-label" for="validate_{{ step.name }}"> {{ "workflows.validate" | sqxTranslate }}</label>
                 </div>
             </div>
         </div>

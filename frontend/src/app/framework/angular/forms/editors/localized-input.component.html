@@ -4,7 +4,9 @@
     </div>
 
     <div class="col-auto">
-        <button class="btn btn-sm btn-secondary" (click)="unset()" [disabled]="isEmpty" type="button"><i class="icon-close"></i></button>
+        <button class="btn btn-sm btn-secondary" attr.aria-label="{{ 'common.clear' | sqxTranslate }}" (click)="unset()" [disabled]="isEmpty" type="button">
+            <i class="icon-close"></i>
+        </button>
     </div>
 </div>
 

@@ -50,10 +50,11 @@
                                             @if (isEditableImage && app.image) {
                                                 <button
                                                     class="btn btn-danger btn-sm app-image-remove"
+                                                    attr.aria-label="{{ 'apps.removeImage' | sqxTranslate }}"
                                                     (click)="removeImage()"
                                                     title="i18n:apps.removeImage"
                                                     type="button">
-                                                    <i class="icon-bin2"></i>
+                                                    <i class="icon-bin3"></i>
                                                 </button>
                                             }
                                         </div>
@@ -68,7 +69,7 @@
                             </div>
 
                             <div class="col align-self-center">
-                                <sqx-form-hint> {{ "apps.uploadImage" | sqxTranslate }} </sqx-form-hint>
+                                <sqx-form-hint> {{ "apps.uploadImage" | sqxTranslate }}</sqx-form-hint>
                                 <span class="btn btn-success upload-button" [class.disabled]="!isEditableImage" (click)="fileInput.click()">
                                     <span>{{ "apps.uploadImageButton" | sqxTranslate }}</span>
                                     <input
@@ -90,7 +91,7 @@
                         <div class="row pt-2 g-2">
                             <div class="col-6">
                                 <h5>{{ "apps.transferTitle" | sqxTranslate }}</h5>
-                                <sqx-form-hint> {{ "apps.transferWarning" | sqxTranslate }} </sqx-form-hint>
+                                <sqx-form-hint> {{ "apps.transferWarning" | sqxTranslate }}</sqx-form-hint>
                             </div>
 
                             <div class="col">
@@ -116,7 +117,7 @@
                     <div class="row">
                         <div class="col">
                             <h5>{{ "apps.delete" | sqxTranslate }}</h5>
-                            <sqx-form-hint> {{ "apps.deleteWarning" | sqxTranslate }} </sqx-form-hint>
+                            <sqx-form-hint> {{ "apps.deleteWarning" | sqxTranslate }}</sqx-form-hint>
                         </div>
 
                         <div class="col-auto">

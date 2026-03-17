@@ -37,11 +37,18 @@
 
             <div class="col-auto">
                 <div class="btn-group">
-                    <button class="btn btn-secondary btn-toggle" [class.btn-primary]="listMode" (click)="changeView(true)" [disabled]="listMode" type="button">
+                    <button
+                        class="btn btn-secondary btn-toggle"
+                        attr.aria-label="{{ 'assets.listView' | sqxTranslate }}"
+                        [class.btn-primary]="listMode"
+                        (click)="changeView(true)"
+                        [disabled]="listMode"
+                        type="button">
                         <i class="icon-list"></i>
                     </button>
                     <button
                         class="btn btn-secondary btn-toggle"
+                        attr.aria-label="{{ 'assets.gridView' | sqxTranslate }}"
                         [class.btn-primary]="!listMode"
                         (click)="changeView(false)"
                         [disabled]="!listMode"

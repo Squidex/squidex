@@ -1,5 +1,5 @@
 .bounce {
-    animation: bounce 150ms;
+    animation: bounce 350ms ease-in-out;
 }
 
 @keyframes bounce {
@@ -7,7 +7,7 @@
       transform: translateX(0);
   }
   50% {
-      transform: translateX(-10px);
+      transform: translateX(-30px);
   }
   100% {
       transform: translateX(0);

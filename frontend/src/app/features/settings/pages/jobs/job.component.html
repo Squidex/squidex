@@ -25,6 +25,7 @@
             <div class="col-options text-right">
                 <a
                     class="btn btn-text-secondary"
+                    attr.aria-label="{{ 'common.download' | sqxTranslate }}"
                     [class.invisible]="!job.downloadUrl"
                     href="{{ apiUrl.buildUrl(job.downloadUrl || '') }}"
                     sqxExternalLink="noicon">
@@ -35,13 +36,14 @@
                 </button>
                 <button
                     class="btn btn-text-danger ms-1"
+                    attr.aria-label="{{ 'common.delete' | sqxTranslate }}"
                     confirmRememberKey="deleteBackup"
                     confirmText="i18n:jobs.deleteConfirmText"
                     confirmTitle="i18n:jobs.deleteConfirmTitle"
                     [disabled]="!job.canDelete"
                     (sqxConfirmClick)="delete()"
                     type="button">
-                    <i class="icon-bin2"></i>
+                    <i class="icon-bin3"></i>
                 </button>
             </div>
         </div>

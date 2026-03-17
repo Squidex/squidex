@@ -10,17 +10,36 @@
             </div>
 
             <div class="col-auto d-flex gap-1 pe-4">
-                <button class="btn btn-text-secondary" (click)="moveTop()" [disabled]="isDisabled || isFirst" title="i18n:contents.arrayMoveTop" type="button">
+                <button
+                    class="btn btn-text-secondary"
+                    attr.aria-label="{{ 'contents.arrayMoveTop' | sqxTranslate }}"
+                    (click)="moveTop()"
+                    [disabled]="isDisabled || isFirst"
+                    title="i18n:contents.arrayMoveTop"
+                    type="button">
                     <i class="icon-caret-top"></i>
                 </button>
-                <button class="btn btn-text-secondary" (click)="moveUp()" [disabled]="isDisabled || isFirst" title="i18n:contents.arrayMoveUp" type="button">
+                <button
+                    class="btn btn-text-secondary"
+                    attr.aria-label="{{ 'contents.arrayMoveUp' | sqxTranslate }}"
+                    (click)="moveUp()"
+                    [disabled]="isDisabled || isFirst"
+                    title="i18n:contents.arrayMoveUp"
+                    type="button">
                     <i class="icon-caret-up"></i>
                 </button>
-                <button class="btn btn-text-secondary" (click)="moveDown()" [disabled]="isDisabled || isLast" title="i18n:contents.arrayMoveDown" type="button">
+                <button
+                    class="btn btn-text-secondary"
+                    attr.aria-label="{{ 'contents.arrayMoveDown' | sqxTranslate }}"
+                    (click)="moveDown()"
+                    [disabled]="isDisabled || isLast"
+                    title="i18n:contents.arrayMoveDown"
+                    type="button">
                     <i class="icon-caret-down"></i>
                 </button>
                 <button
                     class="btn btn-text-secondary"
+                    attr.aria-label="{{ 'contents.arrayMoveBottom' | sqxTranslate }}"
                     (click)="moveBottom()"
                     [disabled]="isDisabled || isLast"
                     title="i18n:contents.arrayMoveBottom"
@@ -29,6 +48,7 @@
                 </button>
                 <button
                     class="btn btn-text-secondary"
+                    attr.aria-label="{{ 'contents.arrayExpandItem' | sqxTranslate }}"
                     [class.hidden]="!(isCollapsed | async)"
                     (click)="expand()"
                     title="i18n:contents.arrayExpandItem"
@@ -37,6 +57,7 @@
                 </button>
                 <button
                     class="btn btn-text-secondary"
+                    attr.aria-label="{{ 'contents.arrayCollapseItem' | sqxTranslate }}"
                     [class.hidden]="isCollapsed | async"
                     (click)="collapse()"
                     title="i18n:contents.arrayCollapseItem"
@@ -46,11 +67,22 @@
             </div>
 
             <div class="col-auto">
-                <button class="btn btn-text-secondary" (click)="clone.emit()" [disabled]="isDisabled" title="i18n:contents.arrayCloneItem" type="button">
+                <button
+                    class="btn btn-text-secondary"
+                    attr.aria-label="{{ 'contents.arrayCloneItem' | sqxTranslate }}"
+                    (click)="clone.emit()"
+                    [disabled]="isDisabled"
+                    title="i18n:contents.arrayCloneItem"
+                    type="button">
                     <i class="icon-clone"></i>
                 </button>
-                <button class="btn btn-text-danger" (click)="itemRemove.emit()" [disabled]="isDisabled" type="button">
-                    <i class="icon-bin2"></i>
+                <button
+                    class="btn btn-text-danger"
+                    attr.aria-label="{{ 'common.remove' | sqxTranslate }}"
+                    (click)="itemRemove.emit()"
+                    [disabled]="isDisabled"
+                    type="button">
+                    <i class="icon-bin3"></i>
                 </button>
             </div>
         </div>
@@ -73,7 +105,7 @@
         }
 
         @if (isInvalidComponent | async) {
-            <sqx-form-hint> {{ "contents.componentInvalid" | sqxTranslate }} </sqx-form-hint>
+            <sqx-form-hint> {{ "contents.componentInvalid" | sqxTranslate }}</sqx-form-hint>
         }
     </div>
 </div>

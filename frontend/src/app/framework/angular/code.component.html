@@ -1,4 +1,6 @@
 <div class="code-container">
-    <button class="code-copy" [attr.copy]="id" type="button"><i class="icon-copy"></i></button>
+    <button class="code-copy" attr.aria-label="{{ 'common.copy' | sqxTranslate }}" [attr.copy]="id" type="button">
+        <i class="icon-copy"></i>
+    </button>
     <pre class="code" [attr.id]="id"><ng-content></ng-content></pre>
 </div>

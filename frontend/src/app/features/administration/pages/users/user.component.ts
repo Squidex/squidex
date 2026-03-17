@@ -10,7 +10,7 @@
 
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { ConfirmClickDirective, StopClickDirective, TooltipDirective, UserDtoPicture } from '@app/shared';
+import { ConfirmClickDirective, StopClickDirective, TooltipDirective, TranslatePipe, UserDtoPicture } from '@app/shared';
 import { UserDto, UsersState } from '../../internal';
 
 @Component({
@@ -24,6 +24,7 @@ import { UserDto, UsersState } from '../../internal';
         RouterLinkActive,
         StopClickDirective,
         TooltipDirective,
+        TranslatePipe,
         UserDtoPicture,
     ],
 })

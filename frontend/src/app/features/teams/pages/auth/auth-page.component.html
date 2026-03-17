@@ -11,7 +11,7 @@
 
                             <div class="col">
                                 <h5>{{ "teams.auth.use" | sqxTranslate }}</h5>
-                                <sqx-form-hint marginTop="2"> {{ "teams.auth.useHint" | sqxTranslate }} </sqx-form-hint>
+                                <sqx-form-hint marginTop="2"> {{ "teams.auth.useHint" | sqxTranslate }}</sqx-form-hint>
                             </div>
                         </div>
                     </div>
@@ -23,7 +23,7 @@
 
                                 <sqx-form-row for="domain" label="teams.auth.domain">
                                     <input class="form-control" id="domain" formControlName="domain" />
-                                    <sqx-form-hint> {{ "teams.auth.domainHint" | sqxTranslate }} </sqx-form-hint>
+                                    <sqx-form-hint> {{ "teams.auth.domainHint" | sqxTranslate }}</sqx-form-hint>
                                     <sqx-form-hint>
                                         {{ "teams.auth.domainHintEmail" | sqxTranslate }}:
                                         <strong>user&commat;{{ updateForm.domainValue$ | async }}</strong>
@@ -53,7 +53,11 @@
                                 <sqx-form-row for="redirectUrl" label="teams.auth.redirectUrl">
                                     <div class="input-group">
                                         <input class="form-control" #redirectUri readonly value="{{ urlToRedirect }}" />
-                                        <button class="btn btn-outline-secondary" [sqxCopy]="redirectUri" type="button">
+                                        <button
+                                            class="btn btn-outline-secondary"
+                                            attr.aria-label="{{ 'common.copy' | sqxTranslate }}"
+                                            [sqxCopy]="redirectUri"
+                                            type="button">
                                             <i class="icon-copy"></i>
                                         </button>
                                     </div>

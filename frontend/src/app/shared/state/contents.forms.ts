@@ -8,8 +8,7 @@
 import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
 import { BehaviorSubject, combineLatest, Observable, Subject } from 'rxjs';
 import { distinctUntilChanged, map } from 'rxjs/operators';
-import { debounceTimeSafe, ExtendedFormGroup, Form, FormArrayTemplate, TemplatedFormArray, Types, value$ } from '@app/framework';
-import { FormGroupTemplate, TemplatedFormGroup } from '@app/framework/angular/forms/templated-form-group';
+import { debounceTimeSafe, ExtendedFormGroup, Form, FormArrayTemplate, FormGroupTemplate, TemplatedFormArray, TemplatedFormGroup, Types, value$ } from '@app/framework';
 import { AppLanguageDto, ComponentFieldPropertiesDto, FieldDto, fieldInvariant, LanguageDto, SchemaDto, TableField } from '../model';
 import { ComponentRulesProvider, RootRulesProvider } from './contents.form-rules';
 import { AbstractContentForm, AbstractContentFormState, AnyFieldDto, contentTranslationStatus, ControlArgs, FieldSection, fieldTranslationStatus, FormGlobals, groupFields, PartitionConfig } from './contents.forms-helpers';
@@ -213,6 +212,8 @@ export class EditContentForm extends Form<ExtendedFormGroup, any> {
 export class FieldForm extends AbstractContentForm<FieldDto, UntypedFormGroup> {
     private readonly partitions: { [partition: string]: FieldItemForm } = {};
     private readonly initialValue$ = new Subject<any>();
+    private cachedInitial: any;
+    private cachedHash?: string | null;
     private isRequired: boolean;
 
     public readonly translationStatus =
@@ -220,6 +221,10 @@ export class FieldForm extends AbstractContentForm<FieldDto, UntypedFormGroup> {
 
     public readonly hasChanges =
         combineLatest([this.initialValue$, value$(this.form)]).pipe(map(([lhs, rhs]) => !Types.equals(lhs, rhs)));
+
+    public get initialHash() {
+        return (this.cachedHash ??= Types.hashWithId(this.cachedInitial, this.field.name))
+    }
 
     constructor(args: ControlArgs<FieldDto>) {
         super(args, FieldForm.buildForm());
@@ -281,6 +286,8 @@ export class FieldForm extends AbstractContentForm<FieldDto, UntypedFormGroup> {
     }
 
     public updateInitial(data: any) {
+        this.cachedInitial = data;
+        this.cachedInitial = null;
         this.initialValue$.next(data);
     }
 
@@ -332,12 +339,12 @@ export class FieldValueForm extends AbstractContentForm<AnyFieldDto, UntypedForm
 export class FieldArrayForm extends AbstractContentForm<AnyFieldDto, TemplatedFormArray> {
     private readonly item$ = new BehaviorSubject<ReadonlyArray<ObjectFormBase>>([]);
 
-    public get itemChanges(): Observable<ReadonlyArray<ObjectFormBase>> {
-        return this.item$;
-    }
-
     public get items() {
         return this.item$.value;
+    }
+
+    public get itemChanges(): Observable<ReadonlyArray<ObjectFormBase>> {
+        return this.item$;
     }
 
     public set internalItems(value: ReadonlyArray<ObjectFormBase>) {

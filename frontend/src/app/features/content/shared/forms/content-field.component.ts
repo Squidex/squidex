@@ -7,8 +7,8 @@
 
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
 import { booleanAttribute, Component, EventEmitter, HostBinding, inject, Input, numberAttribute, Optional, Output } from '@angular/core';
-import { Observable } from 'rxjs';
-import { AppLanguageDto, AppsState, changed$, CommentsState, disabled$, EditContentForm, FieldForm, FocusMarkerComponent, invalid$, LocalStoreService, MenuItemComponent, SchemaDto, Settings, TranslateDto, TranslatePipe, TranslationsService, TypedSimpleChanges, UIOptions } from '@app/shared';
+import { BehaviorSubject, Observable } from 'rxjs';
+import { AppLanguageDto, AppsState, changed$, CommentSelected, CommentsState, disabled$, EditContentForm, FieldForm, FocusMarkerComponent, invalid$, LocalStoreService, MenuItemComponent, MessageBus, SchemaDto, Settings, Subscriptions, TranslateDto, TranslatePipe, TranslationsService, TypedSimpleChanges, UIOptions } from '@app/shared';
 import { FieldCopyButtonComponent } from './field-copy-button.component';
 import { FieldEditorComponent } from './field-editor.component';
 import { FieldLanguagesComponent } from './field-languages.component';
@@ -29,6 +29,8 @@ import { FieldLanguagesComponent } from './field-languages.component';
     ],
 })
 export class ContentFieldComponent {
+    private readonly subscriptions = new Subscriptions();
+
     @Output()
     public languageChange = new EventEmitter<AppLanguageDto>();
 
@@ -68,6 +70,7 @@ export class ContentFieldComponent {
     public isInvalid?: Observable<boolean>;
     public isCollapsed = false;
     public isDisabled?: Observable<boolean>;
+    public isSelected = new BehaviorSubject<boolean>(false);
 
     public readonly hasTranslator = inject(UIOptions).value.canUseTranslator;
     public readonly hasChatBot = inject(UIOptions).value.canUseChatBot;
@@ -92,8 +95,21 @@ export class ContentFieldComponent {
         @Optional() public readonly commentsState: CommentsState,
         private readonly appsState: AppsState,
         private readonly localStore: LocalStoreService,
+        private readonly messageBus: MessageBus,
         private readonly translations: TranslationsService,
     ) {
+    }
+
+    public ngOnInit() {
+        this.subscriptions.add(
+            this.messageBus.of(CommentSelected)
+                .subscribe(message => {
+                    const isSelected = message.editorId.indexOf(this.formModel.path) === 0;
+
+                    if (isSelected !== this.isSelected.value) {
+                        this.isSelected.next(isSelected);
+                    }
+                }));
     }
 
     public ngOnChanges(changes: TypedSimpleChanges<this>) {

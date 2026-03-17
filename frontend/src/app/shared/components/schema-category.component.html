@@ -28,8 +28,12 @@
                         <span class="badge rounded-pill badge-secondary">{{ schemaCategory.countSchemasInSubtreeFiltered }}</span>
                     } @else {
                         @if (schemaCategory.name) {
-                            <button class="btn btn-sm btn-text-secondary btn-remove" (click)="remove.emit(schemaCategory.name)" type="button">
-                                <i class="icon-bin2"></i>
+                            <button
+                                class="btn btn-sm btn-text-secondary btn-remove"
+                                attr.aria-label="{{ 'common.delete' | sqxTranslate }}"
+                                (click)="remove.emit(schemaCategory.name)"
+                                type="button">
+                                <i class="icon-bin3"></i>
                             </button>
                         }
                     }

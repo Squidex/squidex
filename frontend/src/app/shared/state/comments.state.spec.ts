@@ -199,41 +199,72 @@ describe('CommentsState', () => {
     });
 
     it('should get grouped comments', () => {
-        const selection = of<ReadonlyArray<string>>(['1']);
-
         sharedArray.add({ id: '1' } as any);
         sharedArray.add({ id: '2' } as any);
         sharedArray.add({ id: '3', replyTo: '5' } as any);
         sharedArray.add({ id: '4', replyTo: '2' } as any);
 
         let items: ReadonlyArray<CommentItem> = [];
-        commentsState.getGroupedComments(selection).subscribe(result => {
+        commentsState.groupedComments.subscribe(result => {
             items = result;
         });
 
         expect(items).toEqual([
             {
+                id: '1',
                 index: 0,
                 comment: {
                     id: '1',
                 } as any as Comment,
-                isSelected: true,
                 replies: [],
             }, {
+                id: '2',
                 index: 1,
                 comment: {
                     id: '2',
                 } as any as Comment,
-                isSelected: false,
                 replies: [
                     {
+                        id: '4',
                         index: 3,
                         comment: {
                             id: '4',
                             replyTo: '2',
                         } as any as Comment,
                         replies: [],
-                        isSelected: false,
+                    },
+                ],
+            },
+        ]);
+    });
+
+    it('should get grouped comments without resolved', () => {
+        sharedArray.add({ id: '1', isResolved: true  } as any);
+        sharedArray.add({ id: '2'} as any);
+        sharedArray.add({ id: '3', replyTo: '5' } as any);
+        sharedArray.add({ id: '4', replyTo: '2' } as any);
+
+        let items: ReadonlyArray<CommentItem> = [];
+        commentsState.groupedUnresolvedComments.subscribe(result => {
+            items = result;
+        });
+
+        expect(items).toEqual([
+            {
+                id: '2',
+                index: 1,
+                comment: {
+                    id: '2',
+                } as any as Comment,
+                replies: [
+                    {
+                        id: '4',
+                        index: 3,
+                        comment: {
+                            id: '4',
+                            replyTo: '2',
+                        } as any as Comment,
+                        replies: [],
                     },
                 ],
             },

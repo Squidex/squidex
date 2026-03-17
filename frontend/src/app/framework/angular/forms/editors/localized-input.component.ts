@@ -10,6 +10,7 @@ import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, Input
 import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ModalModel, StatefulControlComponent, Types } from '@app/framework/internal';
 import { Language, LanguageSelectorComponent } from '../../language-selector.component';
+import { TranslatePipe } from '../../pipes/translate.pipe';
 import { IndeterminateValueDirective } from '../indeterminate-value.directive';
 import { DateTimeEditorComponent } from './date-time-editor.component';
 import { TagEditorComponent } from './tag-editor.component';
@@ -39,6 +40,7 @@ interface State {
         IndeterminateValueDirective,
         LanguageSelectorComponent,
         TagEditorComponent,
+        TranslatePipe,
     ],
 })
 export class LocalizedInputComponent extends StatefulControlComponent<State, { [key: string]: any }> {

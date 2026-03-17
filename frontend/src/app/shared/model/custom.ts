@@ -809,6 +809,10 @@ export class FieldPropertiesDto extends generated.FieldPropertiesDto {
         return true;
     }
 
+    public get hasComments() {
+        return false;
+    }
+
     public accept<T>(_visitor: FieldPropertiesVisitor<T>): T {
         throw new Error('NOT IMPLEMENTED');
     }
@@ -919,6 +923,10 @@ export class RichTextFieldPropertiesDto extends generated.RichTextFieldPropertie
         return false;
     }
 
+    public get hasComments() {
+        return true;
+    }
+
     public accept<T>(visitor: FieldPropertiesVisitor<T>): T {
         return visitor.visitRichText(this);
     }
@@ -927,6 +935,10 @@ export class RichTextFieldPropertiesDto extends generated.RichTextFieldPropertie
 export class StringFieldPropertiesDto extends generated.StringFieldPropertiesDto {
     public get isComplexUI() {
         return this.editor !== 'Input' && this.editor !== 'Color' && this.editor !== 'Radio' && this.editor !== 'Slug' && this.editor !== 'TextArea';
+    }
+
+    public get hasComments() {
+        return this.editor === 'RichText' || this.editor === 'Markdown';
     }
 
     public accept<T>(visitor: FieldPropertiesVisitor<T>): T {

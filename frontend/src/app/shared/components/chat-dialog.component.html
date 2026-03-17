@@ -1,5 +1,5 @@
 <sqx-modal-dialog (dialogClose)="contentSelect.emit()" flexBody="true" fullHeight="true" size="lg">
-    <ng-container title> {{ "chat.title" | sqxTranslate }} </ng-container>
+    <ng-container title> {{ "chat.title" | sqxTranslate }}</ng-container>
     <ng-container content>
         <div class="scroll-container" #container>
             @for (item of snapshot.chatItems; track item; let isLast = $last; let isFirst = $first) {

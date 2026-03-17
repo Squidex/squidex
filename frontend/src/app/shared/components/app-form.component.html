@@ -17,7 +17,7 @@
                             <input class="form-control" id="name" autocomplete="off" formControlName="name" sqxFocusOnInit sqxTransformInput="LowerCase" />
                         </sqx-form-row>
 
-                        <sqx-form-alert marginBottom="4" marginTop="2"> {{ "apps.appNameWarning" | sqxTranslate }} </sqx-form-alert>
+                        <sqx-form-alert marginBottom="4" marginTop="2"> {{ "apps.appNameWarning" | sqxTranslate }}</sqx-form-alert>
 
                         @if (templates.length > 0) {
                             <h4 class="mt-6">{{ "apps.selectAppTemplate" | sqxTranslate }}</h4>
@@ -33,7 +33,7 @@
                                         <div class="card-image"><img src="./images/add-app.svg" /></div>
 
                                         <h5 class="card-title mt-3">{{ "apps.createBlankApp" | sqxTranslate }}</h5>
-                                        <sqx-form-hint> {{ "apps.createBlankAppDescription" | sqxTranslate }} </sqx-form-hint>
+                                        <sqx-form-hint> {{ "apps.createBlankAppDescription" | sqxTranslate }}</sqx-form-hint>
                                     </div>
                                 </div>
 
@@ -62,7 +62,7 @@
                 </div>
                 @if (templates.length > 0) {
                     <div class="col-info d-none d-lg-block">
-                        <sqx-form-hint> {{ "apps.appExplanation" | sqxTranslate }} </sqx-form-hint>
+                        <sqx-form-hint> {{ "apps.appExplanation" | sqxTranslate }}</sqx-form-hint>
 
                         @if (template) {
                             <h4 class="mt-4">{{ "apps.template" | sqxTranslate }}</h4>

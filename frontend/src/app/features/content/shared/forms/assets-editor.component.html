@@ -26,6 +26,7 @@
         <div class="btn-group">
             <button
                 class="btn btn-secondary btn-toggle"
+                attr.aria-label="{{ 'contents.assetsListView' | sqxTranslate }}"
                 [class.btn-primary]="snapshot.isListView"
                 (click)="changeView(true)"
                 [disabled]="snapshot.isListView"
@@ -34,6 +35,7 @@
             </button>
             <button
                 class="btn btn-secondary btn-toggle"
+                attr.aria-label="{{ 'contents.assetsGridView' | sqxTranslate }}"
                 [class.btn-primary]="!snapshot.isListView"
                 (click)="changeView(false)"
                 [disabled]="!snapshot.isListView"

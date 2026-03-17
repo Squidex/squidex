@@ -2,6 +2,7 @@
     <button
         class="btn btn-outline-secondary btn-sm dropdown-toggle"
         #button
+        attr.aria-label="{{ 'common.copy' | sqxTranslate }}"
         (click)="dropdown.toggle()"
         tabindex="-1"
         title="{{ 'common.copy' | sqxTranslate }}"

@@ -1,17 +1,6 @@
 @import 'mixins';
 @import 'vars';
 
-/* stylelint-disable no-descending-specificity */
-
-.actions {
-    @include absolute(0, 0, auto, auto);
-    background: $color-white;
-    border: 0;
-    border-radius: 0;
-    display: none;
-    width: auto;
-}
-
 .marker-ref {
     @include text-variable;
 }
@@ -26,24 +15,25 @@
 
 .user-row {
     position: relative;
+    min-width: 0;
 }
 
 .col-text {
     overflow-wrap: break-word;
-    overflow-x: hidden;
+    min-width: 0;
 }
 
 .comment {
     background-color: $color-white;
-    border: 1px solid transparent;
     border-radius: 2px;
+    border: 1px solid transparent;
     font-size: .85rem;
     font-weight: normal;
     line-height: 1.25rem;
-    margin-top: 0;
     margin-bottom: .25rem;
-    padding: .5rem;
+    margin-top: 0;
     padding-top: .375rem;
+    padding: .5rem;
     position: relative;
 
     &.reply {
@@ -52,20 +42,8 @@
         padding-left: 1.5rem;
     }
 
-    &.selected {
-        border-color: $color-theme-brand;
-    }
-
     &-created {
-        font-size: $font-small;
-    }
-
-    &-text {
-        &:hover {
-            .actions {
-                display: block;
-            }
-        }
+        font-size: 95%;
     }
 }
 

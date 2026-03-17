@@ -1,3 +1,25 @@
-<sqx-layout layout="right" titleText="i18n:comments.title" white="true" width="20">
-    <sqx-comments [commentsId]="commentsId | async" />
-</sqx-layout>
+@if (commentsTab | async; as tab) {
+    <sqx-layout layout="right" white="true" width="20">
+        <ng-container menu>
+            <ul class="nav nav-tabs2">
+                <li class="nav-item">
+                    <a
+                        class="nav-link"
+                        [class.active]="tab === 'unresolved'"
+                        [queryParams]="{ commentsTab: 'unresolved' }"
+                        queryParamsHandling="merge"
+                        [routerLink]="[]">
+                        {{ "comments.unresolved" | sqxTranslate }}
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" [class.active]="tab === 'all'" [queryParams]="{ commentsTab: 'all' }" queryParamsHandling="merge" [routerLink]="[]">
+                        {{ "comments.all" | sqxTranslate }}
+                    </a>
+                </li>
+            </ul>
+        </ng-container>
+
+        <sqx-comments [content]="content | async" [commentsId]="commentsId | async" [resolved]="tab === 'all'" />
+    </sqx-layout>
+}

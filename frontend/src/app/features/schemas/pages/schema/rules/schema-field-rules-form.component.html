@@ -40,13 +40,14 @@
                         <div class="col-auto">
                             <button
                                 class="btn btn-text-danger"
+                                attr.aria-label="{{ 'common.remove' | sqxTranslate }}"
                                 confirmRememberKey="deleteFieldRule"
                                 confirmText="i18n:schemas.deleteRuleConfirmText"
                                 confirmTitle="i18n:schemas.deleteRuleConfirmTitle"
                                 [disabled]="!isEditable"
                                 (sqxConfirmClick)="editForm.remove(i)"
                                 type="button">
-                                <i class="icon-bin2"></i>
+                                <i class="icon-bin3"></i>
                             </button>
                         </div>
                     </div>
@@ -71,7 +72,9 @@
                         </div>
 
                         <div class="col-auto">
-                            <button class="btn btn-success" (click)="add()" type="button"><i class="icon-add"></i></button>
+                            <button class="btn btn-success" attr.aria-label="{{ 'schemas.rules.add' | sqxTranslate }}" (click)="add()" type="button">
+                                <i class="icon-add"></i>
+                            </button>
                         </div>
                     </div>
                 }

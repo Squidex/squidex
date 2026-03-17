@@ -3,7 +3,7 @@
 
     <div class="card mb-4">
         <div class="card-body">
-            <sqx-form-alert> {{ "schemas.previewUrls.help" | sqxTranslate }} </sqx-form-alert>
+            <sqx-form-alert> {{ "schemas.previewUrls.help" | sqxTranslate }}</sqx-form-alert>
             <div class="content">
                 @if (!isEditable && editForm.previewControls.length === 0) {
                     <div class="mt-4">{{ "schemas.previewUrls.empty" | sqxTranslate }}</div>
@@ -28,13 +28,14 @@
                         <div class="col-auto">
                             <button
                                 class="btn btn-text-danger"
+                                attr.aria-label="{{ 'common.remove' | sqxTranslate }}"
                                 confirmRememberKey="removePreviewUrl"
                                 confirmText="i18n:schemas.deleteUrlConfirmText"
                                 confirmTitle="i18n:schemas.deleteUrlConfirmTitle"
                                 [disabled]="!isEditable"
                                 (sqxConfirmClick)="editForm.form.removeAt(i)"
                                 type="button">
-                                <i class="icon-bin2"></i>
+                                <i class="icon-bin3"></i>
                             </button>
                         </div>
                     </div>
@@ -51,7 +52,13 @@
                         </div>
 
                         <div class="col-auto col-options">
-                            <button class="btn btn-success" (click)="editForm.form.add()" type="button"><i class="icon-add"></i></button>
+                            <button
+                                class="btn btn-success"
+                                attr.aria-label="{{ 'schemas.previewUrls.add' | sqxTranslate }}"
+                                (click)="editForm.form.add()"
+                                type="button">
+                                <i class="icon-add"></i>
+                            </button>
                         </div>
                     </div>
                 }

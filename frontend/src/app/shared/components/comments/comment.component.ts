@@ -9,8 +9,8 @@
 import { booleanAttribute, ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { AutocompleteComponent, AutocompleteSource, ConfirmClickDirective, FromNowPipe, MarkdownDirective, NOOP_DATASOURCE, ScrollActiveDirective, TooltipDirective, TranslatePipe } from '@app/framework';
-import { CommentItem, CommentsState, DialogService, Keys, StatefulComponent, UpsertCommentForm } from '@app/shared/internal';
+import { AutocompleteComponent, AutocompleteSource, ConfirmClickDirective, FromNowPipe, MarkdownDirective, MessageBus, NOOP_DATASOURCE, ScrollActiveDirective, StopClickDirective, TooltipDirective, TranslatePipe } from '@app/framework';
+import { CommentItem, CommentSelected, CommentsState, DialogService, Keys, StatefulComponent, UpsertCommentForm } from '@app/shared/internal';
 import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
 
 interface State {
@@ -34,6 +34,7 @@ interface State {
         TranslatePipe,
         UserNameRefPipe,
         UserPictureRefPipe,
+        StopClickDirective
     ],
 })
 export class CommentComponent extends StatefulComponent<State> {
@@ -50,7 +51,13 @@ export class CommentComponent extends StatefulComponent<State> {
     public canEdit?: boolean | null;
 
     @Input({ transform: booleanAttribute })
+    public canResolve?: boolean | null;
+
+    @Input({ transform: booleanAttribute })
     public confirmDelete?: boolean | null = true;
+
+    @Input({ transform: booleanAttribute })
+    public isSelected?: boolean | null;
 
     @Input({ required: true })
     public commentItem!: CommentItem;
@@ -79,6 +86,7 @@ export class CommentComponent extends StatefulComponent<State> {
 
     constructor(
         private readonly dialogs: DialogService,
+        private readonly messageBus: MessageBus,
     ) {
         super({});
     }
@@ -88,6 +96,12 @@ export class CommentComponent extends StatefulComponent<State> {
 
         this.isDeletable = isMyComment;
         this.isEditable = isMyComment;
+    }
+
+    public select() {
+        if (this.commentItem.comment.editorId) {
+            this.messageBus.emit(new CommentSelected(this.commentItem.comment.editorId));
+        }
     }
 
     public startEdit() {
@@ -101,6 +115,14 @@ export class CommentComponent extends StatefulComponent<State> {
 
     public cancelUpdateOrReply() {
         this.next({ mode: 'Normal' });
+    }
+
+    public resolve(isResolved: boolean) {
+        if (!this.canResolve) {
+            return;
+        }
+
+        this.comments.update(this.commentItem.index, { isResolved });
     }
 
     public delete() {

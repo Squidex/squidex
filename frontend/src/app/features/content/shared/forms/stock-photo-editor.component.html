@@ -1,8 +1,16 @@
 <div class="input-group">
-    <button class="btn btn-outline-secondary" (click)="reset()" [disabled]="!valueControl.value" type="button">
+    <button
+        class="btn btn-outline-secondary"
+        attr.aria-label="{{ 'common.clear' | sqxTranslate }}"
+        (click)="reset()"
+        [disabled]="!valueControl.value"
+        type="button">
         <i class="icon-close"></i>
     </button>
-    <button class="btn btn-outline-secondary" (click)="searchDialog.show()" type="button"><i class="icon-search"></i></button>
+    <button class="btn btn-outline-secondary" attr.aria-label="{{ 'common.search' | sqxTranslate }}" (click)="searchDialog.show()" type="button">
+        <i class="icon-search"></i>
+    </button>
+
     <input class="form-control" [disabled]="true" [formControl]="valueControl" readonly />
 </div>
 

@@ -14,7 +14,7 @@ export class ClientTourStated {}
 export class AnnotationCreate {
     constructor(
         public readonly editorId: string,
-        public readonly annotation: AnnotationSelection,
+        public readonly annotation?: AnnotationSelection,
     ) {
     }
 }
@@ -22,21 +22,35 @@ export class AnnotationCreate {
 export class AnnotationCreateAfterNavigate {
     constructor(
         public readonly editorId: string,
-        public readonly annotation: AnnotationSelection,
+        public readonly annotation?: AnnotationSelection,
     ) {
     }
 }
 
-export class AnnotationsSelect {
+export class AnnotationsSelected {
     constructor(
-        public readonly annotations: ReadonlyArray<string>,
+        public readonly commentIds: ReadonlyArray<string>,
     ) {
     }
 }
 
-export class AnnotationsSelectAfterNavigate {
+export class AnnotationsSelectedAfterNavigate {
     constructor(
-        public readonly annotations: ReadonlyArray<string>,
+        public readonly commentIds: ReadonlyArray<string>,
+    ) {
+    }
+}
+
+export class FieldSelected {
+    constructor(
+        public readonly editorId: string,
+    ) {
+    }
+}
+
+export class CommentSelected {
+    constructor(
+        public readonly editorId: string,
     ) {
     }
 }

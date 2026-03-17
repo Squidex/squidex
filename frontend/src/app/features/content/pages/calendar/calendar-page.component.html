@@ -9,10 +9,20 @@
 
             <option ngValue="month">{{ "common.monthly" | sqxTranslate }}</option>
         </select>
-        <button class="btn btn-text-secondary btn-navigate ms-2" (click)="goPrev()" [disabled]="isLoading" type="button">
+        <button
+            class="btn btn-text-secondary btn-navigate ms-2"
+            attr.aria-label="{{ 'common.prev' | sqxTranslate }}"
+            (click)="goPrev()"
+            [disabled]="isLoading"
+            type="button">
             <i class="icon-caret-left"></i>
         </button>
-        <button class="btn btn-text-secondary btn-navigate ms-2" (click)="goNext()" [disabled]="isLoading" type="button">
+        <button
+            class="btn btn-text-secondary btn-navigate ms-2"
+            attr.aria-label="{{ 'common.next' | sqxTranslate }}"
+            (click)="goNext()"
+            [disabled]="isLoading"
+            type="button">
             <i class="icon-caret-right"></i>
         </button>
     </ng-container>
@@ -21,14 +31,14 @@
     </ng-container>
 </sqx-layout>
 <sqx-modal-dialog (dialogClose)="contentDialog.hide()" *sqxModal="contentDialog">
-    <ng-container title> {{ "common.content" | sqxTranslate }} </ng-container>
+    <ng-container title> {{ "common.content" | sqxTranslate }}</ng-container>
     <ng-container content>
         @if (contentSelected && contentSelected.scheduleJob) {
             <div>
                 <sqx-form-row for="id" hideError label="common.id" labelSize="lg">
                     <div class="input-group">
                         <input class="form-control" id="id" #inputId name="id" readonly value="{{ contentSelected.id }}" />
-                        <button class="btn btn-outline-secondary" [sqxCopy]="inputId" type="button">
+                        <button class="btn btn-outline-secondary" attr.aria-label="{{ 'common.copy' | sqxTranslate }}" [sqxCopy]="inputId" type="button">
                             <i class="icon-copy"></i>
                         </button>
                     </div>

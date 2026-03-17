@@ -21,11 +21,18 @@
                     </div>
 
                     @if (route) {
-                        <a class="btn panel2-collapse" [queryParamsHandling]="closeQueryParamsHandling" [relativeTo]="route" [routerLink]="['./../']">
+                        <a
+                            class="btn panel2-collapse"
+                            attr.aria-label="{{ 'common.close' | sqxTranslate }}"
+                            [queryParamsHandling]="closeQueryParamsHandling"
+                            [relativeTo]="route"
+                            [routerLink]="['./../']">
                             <i class="icon-close"></i>
                         </a>
                     } @else {
-                        <button class="btn panel2-collapse" type="button"><i class="icon-close"></i></button>
+                        <button class="btn panel2-collapse" attr.aria-label="{{ 'common.close' | sqxTranslate }}" type="button">
+                            <i class="icon-close"></i>
+                        </button>
                     }
                 </div>
             }
@@ -128,12 +135,13 @@
                     @if (firstChild | async) {
                         <a
                             class="btn panel2-collapse"
+                            attr.aria-label="{{ 'common.close' | sqxTranslate }}"
                             [queryParamsHandling]="closeQueryParamsHandling"
                             [relativeTo]="route"
                             replaceUrl="true"
                             [routerLink]="['./']">
-                            <i class="icon-angle-right"></i>
-                        </a>
+                            <i class="icon-angle-right"></i
+                        ></a>
                     }
                 </div>
 

@@ -14,13 +14,14 @@
             <div class="col-auto">
                 <button
                     class="btn btn-text-danger"
+                    attr.aria-label="{{ 'common.delete' | sqxTranslate }}"
                     confirmRememberKey="revokeClient"
                     confirmText="i18n:clients.deleteConfirmText"
                     confirmTitle="i18n:clients.deleteConfirmTitle"
                     [disabled]="!client.canRevoke"
                     (sqxConfirmClick)="revoke()"
                     type="button">
-                    <i class="icon-bin2"></i>
+                    <i class="icon-bin3"></i>
                 </button>
             </div>
         </div>

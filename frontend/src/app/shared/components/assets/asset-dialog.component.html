@@ -1,6 +1,6 @@
 <form [formGroup]="annotateForm.form" (ngSubmit)="annotateAsset()">
     <sqx-modal-dialog (dialogClose)="dialogClose.emit()" fullHeight="true" hasTabs="true" showFooter="false" size="xl">
-        <ng-container title> {{ "assets.edit" | sqxTranslate }} </ng-container>
+        <ng-container title> {{ "assets.edit" | sqxTranslate }}</ng-container>
         <ng-container tabs>
             <div class="row align-items-center">
                 <div class="col">
@@ -66,6 +66,9 @@
                                 (click)="cropImage()"
                                 [disabled]="progress > 0"
                                 type="button"
+                                type="button"
+                                type="button"
+                                type="button"
                                 type="button">
                                 {{ "common.upload" | sqxTranslate }}
                             </button>
@@ -125,7 +128,11 @@
                         <sqx-form-row for="id" hideError label="common.id" vertical>
                             <div class="input-group">
                                 <input class="form-control" id="id" #inputId name="id" readonly value="{{ asset.id }}" />
-                                <button class="btn btn-outline-secondary" [sqxCopy]="inputId" type="button">
+                                <button
+                                    class="btn btn-outline-secondary"
+                                    attr.aria-label="{{ 'common.copy' | sqxTranslate }}"
+                                    [sqxCopy]="inputId"
+                                    type="button">
                                     <i class="icon-copy"></i>
                                 </button>
                             </div>
@@ -134,7 +141,11 @@
                         <sqx-form-row for="url" hideError label="common.url" vertical>
                             <div class="input-group">
                                 <input class="form-control" id="url" #inputUrl name="url" readonly value="{{ asset | sqxAssetUrl: asset.version : false }}" />
-                                <button class="btn btn-outline-secondary" [sqxCopy]="inputUrl" type="button">
+                                <button
+                                    class="btn btn-outline-secondary"
+                                    attr.aria-label="{{ 'common.copy' | sqxTranslate }}"
+                                    [sqxCopy]="inputUrl"
+                                    type="button">
                                     <i class="icon-copy"></i>
                                 </button>
                             </div>
@@ -178,13 +189,14 @@
                                     <div class="col-auto col-options">
                                         <button
                                             class="btn btn-text-danger"
+                                            attr.aria-label="{{ 'common.remove' | sqxTranslate }}"
                                             confirmRememberKey="removeAssetMetadata"
                                             confirmText="i18n:assets.deleteMetadataConfirmText"
                                             confirmTitle="i18n:assets.deleteMetadataConfirmTitle"
                                             [disabled]="!isEditable"
                                             (sqxConfirmClick)="annotateForm.metadata.removeAt(i)"
                                             type="button">
-                                            <i class="icon-bin2"></i>
+                                            <i class="icon-bin3"></i>
                                         </button>
                                     </div>
                                 </div>

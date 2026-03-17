@@ -16,19 +16,34 @@
 
     <td class="cell-actions-lg">
         @if (eventConsumer.canReset) {
-            <button class="btn btn-text-secondary" (click)="reset()" title="i18n:eventConsumers.resetTooltip" type="button">
+            <button
+                class="btn btn-text-secondary"
+                attr.aria-label="{{ 'eventConsumers.resetTooltip' | sqxTranslate }}"
+                (click)="reset()"
+                title="i18n:eventConsumers.resetTooltip"
+                type="button">
                 <i class="icon icon-reset"></i>
             </button>
         }
 
         @if (eventConsumer.canStart) {
-            <button class="btn btn-text-secondary" (click)="start()" title="i18n:eventConsumers.startTooltip" type="button">
+            <button
+                class="btn btn-text-secondary"
+                attr.aria-label="{{ 'eventConsumers.startTooltip' | sqxTranslate }}"
+                (click)="start()"
+                title="i18n:eventConsumers.startTooltip"
+                type="button">
                 <i class="icon icon-play"></i>
             </button>
         }
 
         @if (eventConsumer.canStop) {
-            <button class="btn btn-text-secondary" (click)="stop()" title="i18n:eventConsumers.stopTooltip" type="button">
+            <button
+                class="btn btn-text-secondary"
+                attr.aria-label="{{ 'eventConsumers.stopTooltip' | sqxTranslate }}"
+                (click)="stop()"
+                title="i18n:eventConsumers.stopTooltip"
+                type="button">
                 <i class="icon icon-pause"></i>
             </button>
         }

@@ -28,7 +28,7 @@
         }
 
         @if (check) {
-            <label class="form-check-label" for="{{ fieldName }}"> {{ label | sqxTranslate }} </label>
+            <label class="form-check-label" for="{{ fieldName }}"> {{ label | sqxTranslate }}</label>
         }
     </div>
 
@@ -37,6 +37,6 @@
     }
 
     @if (alert) {
-        <sqx-form-alert> <span [sqxMarkdown]="alert | sqxTranslate" inline="false"></span> </sqx-form-alert>
+        <sqx-form-alert> <span inline="false" [sqxMarkdown]="alert | sqxTranslate"></span> </sqx-form-alert>
     }
 </div>

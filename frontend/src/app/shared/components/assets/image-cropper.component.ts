@@ -7,7 +7,7 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
 import Cropper from 'cropperjs';
-import { TooltipDirective, Types } from '@app/framework';
+import { TooltipDirective, TranslatePipe, Types } from '@app/framework';
 
 @Component({
     selector: 'sqx-image-editor',
@@ -15,6 +15,7 @@ import { TooltipDirective, Types } from '@app/framework';
     templateUrl: './image-cropper.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
+        TranslatePipe,
         TooltipDirective,
     ],
 })

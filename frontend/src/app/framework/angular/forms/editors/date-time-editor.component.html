@@ -55,7 +55,13 @@
     }
 
     @if (!hideClear) {
-        <button class="btn btn-text-secondary btn-clear" [class.invisible]="!hasValue" (click)="reset()" [disabled]="snapshot.isDisabled" type="button">
+        <button
+            class="btn btn-text-secondary btn-clear"
+            attr.aria-label="{{ 'common.clear' | sqxTranslate }}"
+            [class.invisible]="!hasValue"
+            (click)="reset()"
+            [disabled]="snapshot.isDisabled"
+            type="button">
             <i class="icon-close"></i>
         </button>
     }

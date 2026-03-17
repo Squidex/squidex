@@ -1,6 +1,18 @@
 <div class="comments-header">
+    @if (reference) {
+        <div class="reference text-sm">
+            {{ 'comments.reference' | sqxTranslate }}:
+
+            {{ reference.editorId }}
+            @if (reference.annotation) {
+                , {{ reference.annotation.from }}-{{ reference.annotation.to }}
+            }
+        </div>
+    }
+
     <form [formGroup]="commentForm.form" (ngSubmit)="comment()">
         <sqx-autocomplete
+            #input
             autoFocus="true"
             autoSelectFirst="false"
             displayProperty="contributorEmail"
@@ -22,15 +34,17 @@
 </div>
 
 <div class="comments-list" #scrollContainer>
-    @for (comment of commentsItems | async; track comment.index) {
+    @for (comment of commentItems | async; track comment.index) {
         <sqx-comment
             canAnswer="true"
             canEdit="true"
             canFollow="false"
+            canResolve="true"
             [commentItem]="comment"
             [comments]="commentsState"
             [contributors]="contributorsDataSource"
             [currentUrl]="router.url"
+            [isSelected]="isSelected(comment.comment.id)"
             [scrollContainer]="'.comments-list'"
             [userToken]="commentUser" />
     }

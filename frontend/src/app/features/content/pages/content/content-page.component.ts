@@ -11,7 +11,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Observable, of } from 'rxjs';
 import { filter, map, tap } from 'rxjs/operators';
-import { AnnotationCreate, AnnotationCreateAfterNavigate, AnnotationsSelect, AnnotationsSelectAfterNavigate, ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, CollaborationService, CommentsState, ConfirmClickDirective, ContentDto, ContentsState, defined, DialogService, DropdownMenuComponent, EditContentForm, LanguageSelectorComponent, LanguagesState, LayoutComponent, LocalStoreService, MessageBus, ModalDirective, ModalModel, ModalPlacementDirective, NotifoComponent, PreviousUrl, ResolveAssets, ResolveContents, SchemaDto, SchemasState, Settings, ShortcutDirective, SidebarMenuDirective, Subscriptions, TempService, TitleComponent, ToolbarComponent, ToolbarService, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe, Types, Version, WatchingUsersComponent } from '@app/shared';
+import { AnnotationCreate, AnnotationCreateAfterNavigate, AnnotationsSelected, AnnotationsSelectedAfterNavigate, ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, CollaborationService, CommentsState, ConfirmClickDirective, ContentDto, ContentsState, defined, DialogService, DropdownMenuComponent, EditContentForm, LanguageSelectorComponent, LanguagesState, LayoutComponent, LocalStoreService, MessageBus, ModalDirective, ModalModel, ModalPlacementDirective, NotifoComponent, PreviousUrl, ResolveAssets, ResolveContents, SchemaDto, SchemasState, Settings, ShortcutDirective, SidebarMenuDirective, Subscriptions, TempService, TitleComponent, ToolbarComponent, ToolbarService, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe, Types, Version, WatchingUsersComponent } from '@app/shared';
 import { ContentExtensionComponent } from '../../shared/content-extension.component';
 import { PreviewButtonComponent } from '../../shared/preview-button.component';
 import { ContentEditorComponent } from './editor/content-editor.component';
@@ -19,6 +19,8 @@ import { ContentInspectionComponent } from './inspecting/content-inspection.comp
 import { ContentReferencesComponent } from './references/content-references.component';
 
 type SaveNavigationMode = 'Close' | 'Add' | 'Edit';
+
+type Tab = 'editor' | 'references' | 'referencing' | 'inspect' | 'extension';
 
 @Component({
     selector: 'sqx-content-page',
@@ -71,7 +73,7 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
 
     public formContext: any;
 
-    public contentTab = this.route.queryParams.pipe(map(x => x['tab'] || 'editor'));
+    public contentTab = this.route.queryParams.pipe(map(x => x['tab'] as Tab || 'editor'));
     public contentId = '';
     public content?: ContentDto | null;
     public contentVersion: Version | null = null;
@@ -135,14 +137,14 @@ export class ContentPageComponent implements CanComponentDeactivate, OnInit {
                 }));
 
         this.subscriptions.add(
-            this.messageBus.of(AnnotationsSelect)
+            this.messageBus.of(AnnotationsSelected)
                 .subscribe(async message => {
-                    if (message.annotations.length > 0) {
+                    if (message.commentIds.length > 0) {
                         await this.router.navigate(['comments'], { relativeTo: this.route });
                     }
 
                     setTimeout(() => {
-                        this.messageBus.emit(new AnnotationsSelectAfterNavigate(message.annotations));
+                        this.messageBus.emit(new AnnotationsSelectedAfterNavigate(message.commentIds));
                     });
                 }));
 

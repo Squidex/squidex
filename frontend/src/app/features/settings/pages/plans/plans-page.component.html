@@ -11,7 +11,7 @@
             @if ((plansState.isLoaded | async) && (plansState.plans | async); as plans) {
                 @if ((plansState.locked | async) === "NotOwner") {
                     <div class="alert alert-danger">
-                        {{ "plans.notPlanOwner" | sqxTranslate }} {{ "plans.planOwner" | sqxTranslate }}:
+                        {{ "plans.notPlanOwner" | sqxTranslate }}{{ "plans.planOwner" | sqxTranslate }}:
                         <strong className="no-wrap">{{ plansState.planOwner | async | sqxUserName }}</strong>
                     </div>
                 }

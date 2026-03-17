@@ -41,10 +41,22 @@
         </form>
 
         <div class="col-auto d-flex gap-1">
-            <button class="btn btn-text-secondary" [class.hidden]="!snapshot.isMapHidden" (click)="hideMap(false)" title="i18n:common.mapShow" type="button">
+            <button
+                class="btn btn-text-secondary"
+                attr.aria-label="{{ 'common.mapShow' | sqxTranslate }}"
+                [class.hidden]="!snapshot.isMapHidden"
+                (click)="hideMap(false)"
+                title="i18n:common.mapShow"
+                type="button">
                 <i class="icon-plus2"></i>
             </button>
-            <button class="btn btn-text-secondary" [class.hidden]="snapshot.isMapHidden" (click)="hideMap(true)" title="i18n:common.mapHide" type="button">
+            <button
+                class="btn btn-text-secondary"
+                attr.aria-label="{{ 'common.mapHide' | sqxTranslate }}"
+                [class.hidden]="snapshot.isMapHidden"
+                (click)="hideMap(true)"
+                title="i18n:common.mapHide"
+                type="button">
                 <i class="icon-minus2"></i>
             </button>
         </div>

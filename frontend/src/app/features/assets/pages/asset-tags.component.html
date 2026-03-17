@@ -15,7 +15,12 @@
                         <div class="badge badge-secondary rounded-pill">{{ tag.count }}</div>
 
                         @if (canRename) {
-                            <button class="btn-sm btn-text-secondary btn-rename" (click)="renameTag(tag)" sqxStopClick type="button">
+                            <button
+                                class="btn-sm btn-text-secondary btn-rename"
+                                attr.aria-label="{{ 'common.rename' | sqxTranslate }}"
+                                (click)="renameTag(tag)"
+                                sqxStopClick
+                                type="button">
                                 <i class="icon-pencil"></i>
                             </button>
                         }

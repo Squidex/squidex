@@ -14,6 +14,7 @@
         @if (isManual) {
             <button
                 class="btn btn-outline-secondary btn-run ms-2"
+                attr.aria-label="{{ 'rules.trigger' | sqxTranslate }}"
                 confirmRememberKey="triggerRule"
                 confirmText="i18n:rules.triggerConfirmText"
                 confirmTitle="i18n:rules.triggerConfirmTitle"
@@ -31,9 +32,9 @@
                 <div>
                     <div class="btn btn-outline-secondary btn-enabled">
                         @if (rule.isEnabled) {
-                            <span class="me-2"> {{ "common.enabled" | sqxTranslate }} </span>
+                            <span class="me-2"> {{ "common.enabled" | sqxTranslate }}</span>
                         } @else {
-                            <span class="me-2"> {{ "common.disabled" | sqxTranslate }} </span>
+                            <span class="me-2"> {{ "common.disabled" | sqxTranslate }}</span>
                         }
 
                         <sqx-toggle [ngModel]="rule.isEnabled" (ngModelChange)="changeEnabled($event)" />

@@ -19,32 +19,57 @@
                 @if (content && contentTab | async; as tab) {
                     <ul class="nav nav-tabs2">
                         <li class="nav-item">
-                            <a class="nav-link" [class.active]="tab === 'editor'" [queryParams]="{ tab: 'editor' }" [routerLink]="[]">
+                            <a
+                                class="nav-link"
+                                [class.active]="tab === 'editor'"
+                                [queryParams]="{ tab: 'editor' }"
+                                queryParamsHandling="merge"
+                                [routerLink]="[]">
                                 {{ "contents.contentTab.editor" | sqxTranslate }}
                             </a>
                         </li>
 
                         <li>
-                            <a class="nav-link" [class.active]="tab === 'references'" [queryParams]="{ tab: 'references' }" [routerLink]="[]">
+                            <a
+                                class="nav-link"
+                                [class.active]="tab === 'references'"
+                                [queryParams]="{ tab: 'references' }"
+                                queryParamsHandling="merge"
+                                [routerLink]="[]">
                                 {{ "contents.contentTab.references" | sqxTranslate }}
                             </a>
                         </li>
 
                         <li>
-                            <a class="nav-link" [class.active]="tab === 'referencing'" [queryParams]="{ tab: 'referencing' }" [routerLink]="[]">
+                            <a
+                                class="nav-link"
+                                [class.active]="tab === 'referencing'"
+                                [queryParams]="{ tab: 'referencing' }"
+                                queryParamsHandling="merge"
+                                [routerLink]="[]">
                                 {{ "contents.contentTab.referencing" | sqxTranslate }}
                             </a>
                         </li>
 
                         <li>
-                            <a class="nav-link" [class.active]="tab === 'inspect'" [queryParams]="{ tab: 'inspect' }" [routerLink]="[]">
+                            <a
+                                class="nav-link"
+                                [class.active]="tab === 'inspect'"
+                                [queryParams]="{ tab: 'inspect' }"
+                                queryParamsHandling="merge"
+                                [routerLink]="[]">
                                 {{ "contents.contentTab.inspect" | sqxTranslate }}
                             </a>
                         </li>
 
                         @if (schema.properties.contentEditorUrl) {
                             <li>
-                                <a class="nav-link" [class.active]="tab === 'extension'" [queryParams]="{ tab: 'extension' }" [routerLink]="[]">
+                                <a
+                                    class="nav-link"
+                                    [class.active]="tab === 'extension'"
+                                    [queryParams]="{ tab: 'extension' }"
+                                    queryParamsHandling="merge"
+                                    [routerLink]="[]">
                                     {{ "common.extension" | sqxTranslate }}
                                 </a>
                             </li>

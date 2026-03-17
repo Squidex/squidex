@@ -1,9 +1,11 @@
 <sqx-modal-dialog (dialogClose)="emitClose()" flexBody="true" fullHeight="true" hasTabs="false" size="lg">
-    <ng-container title> {{ "assets.selectMany" | sqxTranslate }} </ng-container>
+    <ng-container title> {{ "assets.selectMany" | sqxTranslate }}</ng-container>
     <ng-container tabs>
         <div class="row gx-2 mt-3 mb-3">
             <div class="col-auto">
-                <button class="btn btn-text-secondary" (click)="reload()" type="button"><i class="icon-reset"></i></button>
+                <button class="btn btn-text-secondary" attr.aria-label="{{ 'common.refresh' | sqxTranslate }}" (click)="reload()" type="button">
+                    <i class="icon-reset"></i>
+                </button>
             </div>
 
             <div class="col">
@@ -35,6 +37,7 @@
                 <div class="btn-group" data-toggle="buttons">
                     <button
                         class="btn btn-secondary btn-toggle"
+                        attr.aria-label="{{ 'assets.listView' | sqxTranslate }}"
                         [class.btn-primary]="snapshot.isListView"
                         (click)="changeView(true)"
                         [disabled]="snapshot.isListView"
@@ -43,6 +46,7 @@
                     </button>
                     <button
                         class="btn btn-secondary btn-toggle"
+                        attr.aria-label="{{ 'assets.gridView' | sqxTranslate }}"
                         [class.btn-primary]="!snapshot.isListView"
                         (click)="changeView(false)"
                         [disabled]="!snapshot.isListView"

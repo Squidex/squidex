@@ -2,7 +2,7 @@
     <div [class.col-12]="!formModelCompare" [class.col-6]="formModelCompare">
         <sqx-focus-marker [controlId]="formModel.path">
             @if (!(formModel.hiddenChanges | async)) {
-                <div class="table-items-row table-items-row-summary" [class.field-invalid]="isInvalid | async">
+                <div class="table-items-row table-items-row-summary" [class.bounce]="isSelected | async" [class.field-invalid]="isInvalid | async">
                     @if (formModel.hasChanges | async) {
                         <div class="change-marker-host">
                             <div class="change-marker">{{ "contents.pendingChangesTitle" | sqxTranslate }}</div>
@@ -59,7 +59,7 @@
             @if (!(isDisabled | async)) {
                 <div class="copy-button-container">
                     @if (isDifferent | async) {
-                        <button class="btn btn-primary btn-sm field-copy" (click)="copy()" type="button">
+                        <button class="btn btn-primary btn-sm field-copy" attr.aria-label="{{ 'common.copy' | sqxTranslate }}" (click)="copy()" type="button">
                             <i class="icon-arrow_back"></i>
                         </button>
                     }

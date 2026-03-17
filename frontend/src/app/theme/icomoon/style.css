@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('fonts/icomoon.eot?5rrlgz');
-  src:  url('fonts/icomoon.eot?5rrlgz#iefix') format('embedded-opentype'),
-    url('fonts/icomoon.ttf?5rrlgz') format('truetype'),
-    url('fonts/icomoon.woff?5rrlgz') format('woff'),
-    url('fonts/icomoon.svg?5rrlgz#icomoon') format('svg');
+  src:  url('fonts/icomoon.eot?th15sf');
+  src:  url('fonts/icomoon.eot?th15sf#iefix') format('embedded-opentype'),
+    url('fonts/icomoon.ttf?th15sf') format('truetype'),
+    url('fonts/icomoon.woff?th15sf') format('woff'),
+    url('fonts/icomoon.svg?th15sf#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
   font-display: block;
@@ -25,6 +25,15 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+.icon-check-circle:before {
+  content: "\e999";
+}
+.icon-check-circle-filled:before {
+  content: "\e99a";
+}
+.icon-bin3:before {
+  content: "\e998";
+}
 .icon-minus2:before {
   content: "\e996";
 }
@@ -313,12 +322,6 @@
 .icon-plus:before {
   content: "\e905";
 }
-.icon-check-circle:before {
-  content: "\e906";
-}
-.icon-check-circle-filled:before {
-  content: "\e907";
-}
 .icon-close:before {
   content: "\e908";
 }
@@ -357,9 +360,6 @@
 }
 .icon-bin:before {
   content: "\e912";
-}
-.icon-delete-filled:before {
-  content: "\e913";
 }
 .icon-document-delete:before {
   content: "\e914";

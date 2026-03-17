@@ -8,13 +8,14 @@
     <td class="cell-actions">
         <button
             class="btn btn-text-danger"
+            attr.aria-label="{{ 'common.remove' | sqxTranslate }}"
             confirmRememberKey="removeContributor"
             confirmText="i18n:contributors.deleteConfirmText"
             confirmTitle="i18n:contributors.deleteConfirmTitle"
             [disabled]="!contributor.canRevoke"
             (sqxConfirmClick)="remove()"
             type="button">
-            <i class="icon-bin2"></i>
+            <i class="icon-bin3"></i>
         </button>
     </td>
 </tr>

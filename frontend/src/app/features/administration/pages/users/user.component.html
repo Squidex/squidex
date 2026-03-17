@@ -11,18 +11,31 @@
 
     <td class="cell-actions-lg">
         @if (user.canLock) {
-            <button class="btn btn-text-secondary" (click)="lock()" sqxStopClick title="i18n:users.lockTooltip" type="button">
+            <button
+                class="btn btn-text-secondary"
+                attr.aria-label="{{ 'users.lockTooltip' | sqxTranslate }}"
+                (click)="lock()"
+                sqxStopClick
+                title="i18n:users.lockTooltip"
+                type="button">
                 <i class="icon icon-unlocked"></i>
             </button>
         }
 
         @if (user.canUnlock) {
-            <button class="btn btn-text-secondary" (click)="unlock()" sqxStopClick title="i18n:users.unlockTooltip" type="button">
+            <button
+                class="btn btn-text-secondary"
+                attr.aria-label="{{ 'users.unlockTooltip' | sqxTranslate }}"
+                (click)="unlock()"
+                sqxStopClick
+                title="i18n:users.unlockTooltip"
+                type="button">
                 <i class="icon icon-lock"></i>
             </button>
         }
         <button
             class="btn btn-text-danger"
+            attr.aria-label="{{ 'common.delete' | sqxTranslate }}"
             confirmRememberKey="deleteUser"
             confirmText="i18n:users.deleteConfirmText"
             confirmTitle="i18n:users.deleteConfirmTitle"
@@ -30,7 +43,7 @@
             (sqxConfirmClick)="delete()"
             sqxStopClick
             type="button">
-            <i class="icon-bin2"></i>
+            <i class="icon-bin3"></i>
         </button>
     </td>
 </tr>

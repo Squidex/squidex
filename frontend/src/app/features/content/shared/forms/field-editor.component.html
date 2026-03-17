@@ -1,5 +1,5 @@
 @if (formModel) {
-    <div class="field" [class.expanded]="isExpanded && !isCollapsed">
+    <div class="field" (click)="select()" [class.expanded]="isExpanded && !isCollapsed" #root>
         <div class="row">
             <div class="col-4">
                 <div class="truncate">
@@ -27,8 +27,19 @@
                             tabIndex="-1" />
                     }
 
+                    @if (!hasComments) {
+                        <sqx-menu-item
+                            (action)="annotationCreate()"
+                            [disabled]="isCollapsed || !hasChatBot"
+                            icon="comments"
+                            menuLabel="i18n:contents.comment"
+                            small
+                            tabIndex="-1"
+                            tooltip="i18n:contents.comment" />
+                    }
+
                     <sqx-menu-item
-                        (action)="this.toggleExpanded()"
+                        (action)="toggleExpanded()"
                         [disabled]="(isDisabled | async) || isCollapsed"
                         icon="fullscreen"
                         menuLabel="i18n:contents.fieldFullscreenMenu"
@@ -37,7 +48,7 @@
                         tooltip="i18n:contents.fieldFullscreen" />
 
                     <sqx-menu-item
-                        (action)="this.unset()"
+                        (action)="unset()"
                         confirmRememberKey="unsetValue"
                         confirmText="i18n:contents.unsetValueConfirmText"
                         confirmTitle="i18n:contents.unsetValueConfirmTitle"

@@ -11,7 +11,12 @@
 
                         <div class="col-auto">
                             @if (canRemove) {
-                                <button class="btn-sm btn-text-danger btn-remove" (click)="remove.emit(saved)" sqxStopClick type="button">
+                                <button
+                                    class="btn-sm btn-text-danger btn-remove"
+                                    attr.aria-label="{{ 'common.delete' | sqxTranslate }}"
+                                    (click)="remove.emit(saved)"
+                                    sqxStopClick
+                                    type="button">
                                     <i class="icon-close"></i>
                                 </button>
                             }

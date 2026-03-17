@@ -29,7 +29,7 @@
                     [disabled]="!language.canDelete"
                     (sqxConfirmClick)="remove()"
                     type="button">
-                    <i class="icon-bin2"></i>
+                    <i class="icon-bin3"></i>
                 </button>
             </div>
         </div>
@@ -72,7 +72,11 @@
 
                                                 @if (isEditable) {
                                                     <div class="col-auto">
-                                                        <button class="btn btn-text-secondary btn-sm" (click)="removeFallbackLanguage(language)" type="button">
+                                                        <button
+                                                            class="btn btn-text-secondary btn-sm"
+                                                            attr.aria-label="{{ 'common.remove' | sqxTranslate }}"
+                                                            (click)="removeFallbackLanguage(language)"
+                                                            type="button">
                                                             <i class="icon-close"></i>
                                                         </button>
                                                     </div>

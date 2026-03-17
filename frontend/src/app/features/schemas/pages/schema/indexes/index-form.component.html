@@ -1,6 +1,6 @@
 <form (ngSubmit)="createSchema()">
     <sqx-modal-dialog (dialogClose)="dialogClose.emit()" size="md">
-        <ng-container title> {{ "schemas.indexes.addTitle" | sqxTranslate }} </ng-container>
+        <ng-container title> {{ "schemas.indexes.addTitle" | sqxTranslate }}</ng-container>
         <ng-container content>
             <sqx-form-hint>
                 <span [sqxMarkdown]="'schemas.indexes.hint' | sqxTranslate" trusted="true"></span>
@@ -34,7 +34,7 @@
                             confirmTitle="i18n:schemas.indexes.deleteFieldConfirmTitle"
                             (sqxConfirmClick)="createForm.form.removeAt(i)"
                             type="button">
-                            <i class="icon-bin2"></i>
+                            <i class="icon-bin3"></i>
                         </button>
                     </div>
                 </div>

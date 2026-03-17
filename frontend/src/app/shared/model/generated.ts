@@ -8,7 +8,7 @@
 /* eslint-disable */
 // ReSharper disable InconsistentNaming
 
-import { DateTime, hasAnyLink, StringHelper, Types, ApiUrlConfig, ErrorDto } from '@app/framework';
+import { ApiUrlConfig, DateTime, ErrorDto, hasAnyLink, StringHelper, Types } from '@app/framework';
 import { FieldPropertiesVisitor, META_FIELDS, tableField, tableFields } from './schemas';
 
 export class ServerErrorDto implements IServerErrorDto {
@@ -3072,6 +3072,10 @@ export abstract class FieldPropertiesDto implements IFieldPropertiesDto {
         return true;
     }
 
+    public get hasComments() {
+        return false;
+    }
+
     public accept<T>(_visitor: FieldPropertiesVisitor<T>): T {
         throw new Error('NOT IMPLEMENTED');
     }
@@ -4195,6 +4199,10 @@ export class RichTextFieldPropertiesDto extends FieldPropertiesDto implements IR
         return false;
     }
 
+    public get hasComments() {
+        return true;
+    }
+
     public accept<T>(visitor: FieldPropertiesVisitor<T>): T {
         return visitor.visitRichText(this);
     }
@@ -4323,6 +4331,10 @@ export class StringFieldPropertiesDto extends FieldPropertiesDto implements IStr
 
     public get isComplexUI() {
         return this.editor !== 'Input' && this.editor !== 'Color' && this.editor !== 'Radio' && this.editor !== 'Slug' && this.editor !== 'TextArea';
+    }
+
+    public get hasComments() {
+        return this.editor === 'RichText' || this.editor === 'Markdown';
     }
 
     public accept<T>(visitor: FieldPropertiesVisitor<T>): T {
@@ -17731,8 +17743,7 @@ export interface FileResponse {
     headers?: { [name: string]: any };
 }
 
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable sort-imports */
+export const DUMMY = DateTime.now();
 
 
 

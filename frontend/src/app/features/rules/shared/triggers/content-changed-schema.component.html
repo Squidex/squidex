@@ -20,13 +20,14 @@
     <div class="col-auto">
         <button
             class="btn btn-text-danger"
+            attr.aria-label="{{ 'common.remove' | sqxTranslate }}"
             confirmRememberKey="deleteContentChangedSchema"
             confirmText="i18n:rules.deleteContentChangedSchemaText"
             confirmTitle="i18n:rules.deleteContentChangedSchemaTitle"
             [disabled]="form.disabled"
             (sqxConfirmClick)="remove.emit()"
             type="button">
-            <i class="icon-bin2"></i>
+            <i class="icon-bin3"></i>
         </button>
     </div>
 </div>
