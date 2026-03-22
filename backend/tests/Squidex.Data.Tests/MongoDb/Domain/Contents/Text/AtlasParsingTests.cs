@@ -21,7 +21,7 @@ public class AtlasParsingTests
     private static readonly LuceneQueryVisitor QueryVisitor = new LuceneQueryVisitor();
     private static readonly LuceneQueryAnalyzer QueryParser =
         new LuceneQueryAnalyzer(LuceneVersion.LUCENE_48, "*",
-            new StandardAnalyzer(LuceneVersion.LUCENE_48, CharArraySet.EMPTY_SET));
+            new StandardAnalyzer(LuceneVersion.LUCENE_48, CharArraySet.Empty));
     private static readonly JsonSerializerOptions JsonSerializerOptions = new JsonSerializerOptions
     {
         WriteIndented = true,

@@ -22,7 +22,7 @@ namespace Squidex.EntityFramework.TestHelpers;
 public class MySqlFixture(string? reuseId = null) : IAsyncLifetime, ISqlContentFixture<TestDbContextMySql, MySqlContentDbContext>
 {
     private readonly MySqlContainer mysql =
-        new MySqlBuilder()
+        new MySqlBuilder("mysql:8.0")
             .WithReuse(true)
             .WithLabel("reuse-id", reuseId)
             .WithCommand("--log-bin-trust-function-creators=1", "--local-infile=1")

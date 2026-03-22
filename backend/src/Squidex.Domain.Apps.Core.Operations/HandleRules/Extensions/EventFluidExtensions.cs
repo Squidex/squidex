@@ -35,7 +35,7 @@ public sealed class EventFluidExtensions(IUrlGenerator urlGenerator) : IFluidExt
                 return new StringValue(url);
             }
 
-            return NilValue.Empty;
+            return EmptyValue.Instance;
         }
 
         var value = input.ToObjectValue();
@@ -56,7 +56,7 @@ public sealed class EventFluidExtensions(IUrlGenerator urlGenerator) : IFluidExt
                 }
         }
 
-        return NilValue.Empty;
+        return EmptyValue.Instance;
     }
 
     private ValueTask<FluidValue> AssetContentUrl(FluidValue input, FilterArguments arguments, TemplateContext context)
@@ -70,7 +70,7 @@ public sealed class EventFluidExtensions(IUrlGenerator urlGenerator) : IFluidExt
                 return new StringValue(result);
             }
 
-            return NilValue.Empty;
+            return EmptyValue.Instance;
         }
 
         var value = input.ToObjectValue();
@@ -91,7 +91,7 @@ public sealed class EventFluidExtensions(IUrlGenerator urlGenerator) : IFluidExt
                 }
         }
 
-        return NilValue.Empty;
+        return EmptyValue.Instance;
     }
 
     private ValueTask<FluidValue> AssetContentSlugUrl(FluidValue input, FilterArguments arguments, TemplateContext context)
@@ -105,7 +105,7 @@ public sealed class EventFluidExtensions(IUrlGenerator urlGenerator) : IFluidExt
                 return new StringValue(result);
             }
 
-            return NilValue.Empty;
+            return EmptyValue.Instance;
         }
 
         var value = input.ToObjectValue();
@@ -123,6 +123,6 @@ public sealed class EventFluidExtensions(IUrlGenerator urlGenerator) : IFluidExt
                 }
         }
 
-        return NilValue.Empty;
+        return EmptyValue.Instance;
     }
 }

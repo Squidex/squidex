@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Globalization;
 using NodaTime;
 using NodaTime.Text;
 using Squidex.Events;
@@ -80,7 +81,7 @@ public static class EnvelopeExtensions
 
     public static Envelope<T> SetTimestamp<T>(this Envelope<T> envelope, Instant value) where T : class, IEvent
     {
-        envelope.Headers[CommonHeaders.Timestamp] = value.ToString();
+        envelope.Headers[CommonHeaders.Timestamp] = value.ToString("g", CultureInfo.InvariantCulture);
 
         return envelope;
     }

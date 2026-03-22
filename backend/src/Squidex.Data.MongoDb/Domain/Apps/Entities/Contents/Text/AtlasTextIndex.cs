@@ -25,7 +25,7 @@ public sealed class AtlasTextIndex(IMongoDatabase database, IHttpClientFactory a
     private static readonly LuceneQueryVisitor QueryVisitor = new LuceneQueryVisitor(AtlasIndexDefinition.GetFieldPath);
     private static readonly LuceneQueryAnalyzer QueryParser =
         new LuceneQueryAnalyzer(LuceneVersion.LUCENE_48, "*",
-            new StandardAnalyzer(LuceneVersion.LUCENE_48, CharArraySet.EMPTY_SET));
+            new StandardAnalyzer(LuceneVersion.LUCENE_48, CharArraySet.Empty));
     private readonly AtlasOptions atlasOptions = atlasOptions.Value;
     private string index;
 

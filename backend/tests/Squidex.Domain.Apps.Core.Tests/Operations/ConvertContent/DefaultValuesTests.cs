@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Globalization;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
@@ -71,7 +72,7 @@ public class DefaultValuesTests
                         .AddInvariant(456))
                 .AddField("myDatetime",
                     new ContentFieldData()
-                        .AddInvariant(now.ToString()))
+                        .AddInvariant(now.ToString("g", CultureInfo.InvariantCulture)))
                 .AddField("myBoolean",
                     new ContentFieldData()
                         .AddInvariant(true))
@@ -111,7 +112,7 @@ public class DefaultValuesTests
                         .AddInvariant(456))
                 .AddField("myDatetime",
                     new ContentFieldData()
-                        .AddInvariant(now.ToString()))
+                        .AddInvariant(now.ToString("g", CultureInfo.InvariantCulture)))
                 .AddField("myArray",
                     new ContentFieldData()
                         .AddInvariant(
@@ -151,7 +152,7 @@ public class DefaultValuesTests
                         .AddInvariant(456))
                 .AddField("myDatetime",
                     new ContentFieldData()
-                        .AddInvariant(now.ToString()))
+                        .AddInvariant(now.ToString("g", CultureInfo.InvariantCulture)))
                 .AddField("myBoolean",
                     new ContentFieldData()
                         .AddInvariant(true))
@@ -193,7 +194,7 @@ public class DefaultValuesTests
                         .AddInvariant(456))
                 .AddField("myDatetime",
                     new ContentFieldData()
-                        .AddInvariant(now.ToString()))
+                        .AddInvariant(now.ToString("g", CultureInfo.InvariantCulture)))
                 .AddField("myBoolean",
                     new ContentFieldData()
                         .AddInvariant(true))

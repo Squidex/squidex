@@ -22,8 +22,7 @@ namespace Squidex.EntityFramework.TestHelpers;
 public class PostgresFixture(string? reuseId) : IAsyncLifetime, ISqlContentFixture<TestDbContextPostgres, PostgresContentDbContext>
 {
     private readonly PostgreSqlContainer postgreSql =
-        new PostgreSqlBuilder()
-            .WithImage("postgis/postgis")
+        new PostgreSqlBuilder("postgis/postgis")
             .WithReuse(true)
             .WithLabel("reuse-id", reuseId)
             .Build();

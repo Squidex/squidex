@@ -2,7 +2,7 @@
 # Stage 1, Build Backend
 #
 
-FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:8.0 AS backend
+FROM --platform=$BUILDPLATFORM mcr.microsoft.com/dotnet/sdk:10.0 AS backend
 
 # FFMPEG for tests
 RUN apt-get update \
@@ -79,7 +79,7 @@ RUN cp -a build /build/
 #
 # Stage 3, Build runtime
 #
-FROM mcr.microsoft.com/dotnet/aspnet:8.0-bookworm-slim
+FROM mcr.microsoft.com/dotnet/aspnet:10.0-bookworm-slim
 
 ARG SQUIDEX__RUNTIME__VERSION=7.0.0
 

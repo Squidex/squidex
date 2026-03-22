@@ -18,7 +18,7 @@ namespace Squidex.EntityFramework.Migrations;
 [Trait("Category", "TestContainer")]
 public class MySqlMigrationTests : IAsyncLifetime
 {
-    private readonly MySqlContainer mysql = new MySqlBuilder().Build();
+    private readonly MySqlContainer mysql = new MySqlBuilder("mysql:8.0").Build();
 
     public async Task InitializeAsync()
     {

@@ -35,7 +35,7 @@ public class DocumentDbFixture
         );
 
         var certPath = TestConfig.Configuration.GetValue<string>("documentDb:keyFile")!;
-        var certFile = new X509Certificate2(certPath);
+        var certFile = X509CertificateLoader.LoadCertificateFromFile(certPath);
 
         settings.RetryWrites = false;
         settings.RetryReads = false;

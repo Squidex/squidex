@@ -21,7 +21,7 @@ public sealed class MongoFixtureCollection : ICollectionFixture<MongoFixture>
 public class MongoFixture : IAsyncLifetime
 {
     private readonly MongoDbContainer mongoDb =
-        new MongoDbBuilder()
+        new MongoDbBuilder("mongo:6.0")
             .WithReuse(false)
             .WithLabel("reuse-id", "squidex-mongodb")
             .Build();

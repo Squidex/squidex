@@ -103,7 +103,7 @@ public sealed class DefaultAppLogStore(IRequestLogStore requestLogStore) : IAppL
 
                 await foreach (var request in requestLogStore.QueryAllAsync(appId.ToString(), fromTime, toTime, ct))
                 {
-                    csv.WriteField(request.Timestamp.ToString());
+                    csv.WriteField(request.Timestamp.ToString("g", CultureInfo.InvariantCulture));
                     csv.WriteField(GetString(request, FieldRequestPath));
                     csv.WriteField(GetString(request, FieldRequestMethod));
                     csv.WriteField(GetDouble(request, FieldRequestElapsedMs));

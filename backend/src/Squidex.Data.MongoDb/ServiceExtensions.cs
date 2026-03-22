@@ -300,7 +300,7 @@ public static class ServiceExtensions
             {
                 if (!string.IsNullOrWhiteSpace(mongoCertificate))
                 {
-                    var certFile = new X509Certificate2(mongoCertificate);
+                    var certFile = X509CertificateLoader.LoadCertificateFromFile(mongoCertificate);
 
                     settings.SslSettings = new SslSettings
                     {

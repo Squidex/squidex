@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Immutable;
 using System.Security.Claims;
 using System.Text.Json;
 using OpenIddict.Abstractions;
@@ -34,21 +35,26 @@ public static class ApplicationExtensions
         return application;
     }
 
-    private static JsonElement CreateParameter(IEnumerable<string> values)
+    private static JsonElement CreateParameter(IEnumerable<string?> values)
     {
-        return (JsonElement)new OpenIddictParameter(values.ToArray());
+        return (JsonElement)new OpenIddictParameter(values.ToImmutableArray());
     }
 
     public static IEnumerable<Claim> Claims(this IReadOnlyDictionary<string, JsonElement> properties)
     {
         foreach (var (key, value) in properties)
         {
-            var values = (string[]?)new OpenIddictParameter(value);
+            var values = (ImmutableArray<string?>?)new OpenIddictParameter(value);
 
             if (values != null)
             {
                 foreach (var claimValue in values)
                 {
+                    if (claimValue == null)
+                    {
+                        continue;
+                    }
+
                     if (key == SquidexClaimTypes.DisplayName)
                     {
                         yield return new Claim(OpenIdClaims.Name, claimValue);

@@ -93,7 +93,7 @@ public static class Extensions
             return Task.CompletedTask;
         }
 
-        return dbContext.ExecuteBulkInsertAsync(source, o => { }, new OnConflictOptions<T> { Update = e => e }, ct);
+        return dbContext.ExecuteBulkInsertAsync(source, o => { }, new OnConflictOptions<T> { Update = (lhs, rhs) => lhs }, ct);
     }
 
     public static Task BulkInsertAsync<T>(this DbContext dbContext, List<T> source,
@@ -173,7 +173,7 @@ public static class Extensions
     }
 
     public static async Task UpsertAsync<T>(this DbContext dbContext, T entity, long oldVersion,
-        Func<T, Expression<Func<SetPropertyCalls<T>, SetPropertyCalls<T>>>> update,
+        Func<T, Action<UpdateSettersBuilder<T>>> update,
         CancellationToken ct) where T : class, IVersionedEntity<DomainId>
     {
         var dbSet = dbContext.Set<T>();

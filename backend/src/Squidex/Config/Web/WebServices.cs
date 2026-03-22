@@ -68,9 +68,6 @@ public static class WebServices
         services.AddSingletonAs<HttpContextAccessor>()
             .As<IHttpContextAccessor>();
 
-        services.AddSingletonAs<ActionContextAccessor>()
-            .As<IActionContextAccessor>();
-
         services.Configure<ApiBehaviorOptions>(options =>
         {
             options.SuppressInferBindingSourcesForParameters = true;

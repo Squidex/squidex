@@ -9,7 +9,7 @@ namespace Squidex.Infrastructure;
 
 public abstract class DisposableObjectBase : IDisposable
 {
-    private readonly object disposeLock = new object();
+    private readonly Lock disposeLock = new Lock();
     private bool isDisposed;
 
     public bool IsDisposed => isDisposed;

@@ -5,8 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using EventStore.Client;
-using Squidex.Events.GetEventStore;
 using Squidex.Hosting.Configuration;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
@@ -36,15 +34,6 @@ public static class EventSourcingServices
                 }
 
                 services.AddSquidexEntityFrameworkEventStore(config);
-            },
-            ["GetEventStore"] = () =>
-            {
-                var configuration = config.GetRequiredValue("eventStore:getEventStore:configuration");
-
-                services.AddSingletonAs(_ => EventStoreClientSettings.Create(configuration))
-                    .AsSelf();
-
-                services.AddGetEventStore(config);
             },
         });
 

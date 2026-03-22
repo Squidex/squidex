@@ -275,7 +275,7 @@ public readonly struct JsonValue : IEquatable<JsonValue>
 
     public static JsonValue Create(Instant value)
     {
-        return new JsonValue(value.ToString());
+        return new JsonValue(value.ToString("g", CultureInfo.InvariantCulture));
     }
 
     public static JsonValue Create(double value)

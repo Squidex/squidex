@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Globalization;
 using System.Text.Json;
 using NodaTime;
 
@@ -252,8 +253,8 @@ public class JsonObjectTests
 
         foreach (var json in jsons)
         {
-            Assert.Equal(instant.ToString(), json.Value);
-            Assert.Equal(instant.ToString(), json.AsString);
+            Assert.Equal(instant.ToString("g", CultureInfo.InvariantCulture), json.Value);
+            Assert.Equal(instant.ToString("g", CultureInfo.InvariantCulture), json.AsString);
             Assert.Equal(JsonValueType.String, json.Type);
 
             Assert.Throws<InvalidOperationException>(() => json.AsBoolean);

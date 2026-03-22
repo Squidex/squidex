@@ -186,7 +186,7 @@ public sealed class ConstantWithTypeVisitor : QueryNodeVisitor<ClrValue>
             return Instant.FromDateTimeUtc(DateTime.SpecifyKind(dateTime, DateTimeKind.Utc));
         }
 
-        if (value is Date date)
+        if (value is DateOnly date)
         {
             return Instant.FromUtc(date.Year, date.Month, date.Day, 0, 0);
         }

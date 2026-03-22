@@ -116,7 +116,7 @@ public static partial class VerifySettings
 
             var originalKeyResolver = dictionaryContract.DictionaryKeyResolver!;
 
-            dictionaryContract.DictionaryKeyResolver = (name, original) =>
+            dictionaryContract.DictionaryKeyResolver = (writer, name, original) =>
             {
                 if (original is string id && Guid.TryParse(id, out var guid1))
                 {
@@ -132,7 +132,7 @@ public static partial class VerifySettings
                     return $"Guid_{index}";
                 }
 
-                return originalKeyResolver(name, original);
+                return originalKeyResolver(writer, name, original);
             };
 
             return contract;

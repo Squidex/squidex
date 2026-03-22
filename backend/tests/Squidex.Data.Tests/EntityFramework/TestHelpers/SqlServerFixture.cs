@@ -23,8 +23,7 @@ namespace Squidex.EntityFramework.TestHelpers;
 public class SqlServerFixture(string? reuseId = null) : IAsyncLifetime, ISqlContentFixture<TestDbContextSqlServer, SqlServerContentDbContext>
 {
     private readonly MsSqlContainer sqlServer =
-        new MsSqlBuilder()
-            .WithImage("vibs2006/sql_server_fts")
+        new MsSqlBuilder("vibs2006/sql_server_fts")
             .WithReuse(true)
             .WithLabel("reuse-id", reuseId)
             .Build();

@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text;
 public sealed class ElasticSearchTextIndexFixture : IAsyncLifetime
 {
     private readonly ElasticsearchContainer elastic =
-        new ElasticsearchBuilder()
+        new ElasticsearchBuilder("elasticsearch:8.6.1")
             .WithReuse(true)
             .WithLabel("resuse-id", "elastic-text")
             .Build();

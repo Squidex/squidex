@@ -20,7 +20,7 @@ public class MigratorTests
 
     public sealed class InMemoryStatus : IMigrationStatus
     {
-        private readonly object lockObject = new object();
+        private readonly Lock lockObject = new Lock();
         private int version;
         private bool isLocked;
 

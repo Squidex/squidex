@@ -148,7 +148,7 @@ public class DynamicApplicationStore(IServiceProvider serviceProvider) : InMemor
             Permissions =
             {
                 Permissions.Endpoints.Authorization,
-                Permissions.Endpoints.Logout,
+                Permissions.Endpoints.EndSession,
                 Permissions.Endpoints.Token,
                 Permissions.GrantTypes.AuthorizationCode,
                 Permissions.GrantTypes.RefreshToken,
@@ -175,7 +175,7 @@ public class DynamicApplicationStore(IServiceProvider serviceProvider) : InMemor
             Permissions =
             {
                 Permissions.Endpoints.Authorization,
-                Permissions.Endpoints.Logout,
+                Permissions.Endpoints.EndSession,
                 Permissions.Endpoints.Token,
                 Permissions.GrantTypes.Implicit,
                 Permissions.ResponseTypes.IdToken,

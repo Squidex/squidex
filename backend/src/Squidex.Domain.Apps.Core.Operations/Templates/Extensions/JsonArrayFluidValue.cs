@@ -44,7 +44,7 @@ public sealed class JsonArrayFluidValue(JsonArray value, TemplateOptions options
         return value.ToString()!;
     }
 
-    protected override FluidValue GetValue(string name, TemplateContext context)
+    public override ValueTask<FluidValue> GetValueAsync(string name, TemplateContext context)
     {
         switch (name)
         {
@@ -71,7 +71,7 @@ public sealed class JsonArrayFluidValue(JsonArray value, TemplateOptions options
         return NilValue.Instance;
     }
 
-    protected override FluidValue GetIndex(FluidValue index, TemplateContext context)
+    public override ValueTask<FluidValue> GetIndexAsync(FluidValue index, TemplateContext context)
     {
         var i = (int)index.ToNumberValue();
 

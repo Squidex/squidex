@@ -70,7 +70,7 @@ public sealed class EFTeamRepository<TContext>(IDbContextFactory<TContext> dbCon
         }
     }
 
-    protected override Expression<Func<SetPropertyCalls<EFTeamEntity>, SetPropertyCalls<EFTeamEntity>>> BuildUpdate(EFTeamEntity entity)
+    protected override Action<UpdateSettersBuilder<EFTeamEntity>> BuildUpdate(EFTeamEntity entity)
     {
         return u => u
             .SetProperty(x => x.Document, entity.Document)
