@@ -16,7 +16,7 @@ public sealed class PostgresAppDbContextDesignTimeFactory : IDesignTimeDbContext
 {
     public PostgresAppDbContext CreateDbContext(string[] args)
     {
-        const string ConnectionString = "Server=localhost;Port=54320;Database=test;User=postgres;Password=postgres";
+        const string ConnectionString = "Server=localhost;Port=54320;Database=test;Username=postgres;Password=postgres";
 
         var builder = new DbContextOptionsBuilder<PostgresAppDbContext>()
             .UseNpgsql(ConnectionString, options =>

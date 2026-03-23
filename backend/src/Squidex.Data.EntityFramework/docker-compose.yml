@@ -9,7 +9,7 @@ services:
       - "54320:5432"
 
   migration_mysql:
-    image: mysql
+    image: mysql:8
     environment:
       - MYSQL_DATABASE=test
       - MYSQL_USER=mysql
@@ -23,7 +23,7 @@ services:
   migration_sqlserver:
     image: mcr.microsoft.com/mssql/server:2022-CU14-ubuntu-22.04
     environment:
-      - SA_PASSWORD=sqlserver
+      - SA_PASSWORD=SqlServer2026!?
       - ACCEPT_EULA=Y
     ports:
       - "14330:1433"

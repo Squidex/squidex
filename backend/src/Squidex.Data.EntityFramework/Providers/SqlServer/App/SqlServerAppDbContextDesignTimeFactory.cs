@@ -16,7 +16,7 @@ public sealed class SqlServerAppDbContextDesignTimeFactory : IDesignTimeDbContex
 {
     public SqlServerAppDbContext CreateDbContext(string[] args)
     {
-        const string ConnectionString = "Server=localhost;Port=14330;Database=test;User=sa;Password=sqlserver";
+        const string ConnectionString = "Server=localhost;Port=14330;Database=test;User=sa;Password=SqlServer2026!?";
 
         var builder = new DbContextOptionsBuilder<SqlServerAppDbContext>()
             .UseSqlServer(ConnectionString, options =>

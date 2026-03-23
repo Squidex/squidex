@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using MongoDB.Bson;
+using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using NodaTime.Text;
@@ -228,7 +230,7 @@ public class ContentQueryTests : GivenContext
                 new RenderArgs<MongoContentEntity>(
                     BsonSerializer.SerializerRegistry.GetSerializer<MongoContentEntity>(),
                     BsonSerializer.SerializerRegistry))
-            .ToString();
+                .ToJson(new JsonWriterSettings { OutputMode = JsonOutputMode.Shell });
 
         Assert.Equal(Cleanup(expected, arg), rendered);
     }
@@ -246,7 +248,7 @@ public class ContentQueryTests : GivenContext
                     new RenderArgs<MongoContentEntity>(
                         BsonSerializer.SerializerRegistry.GetSerializer<MongoContentEntity>(),
                         BsonSerializer.SerializerRegistry))
-                    .ToString();
+                    .ToJson(new JsonWriterSettings { OutputMode = JsonOutputMode.Shell });
             });
 
         cursor.QuerySort(new ClrQuery { Sort = sort.ToList() }.AdjustToContentModel(AppId.Id));

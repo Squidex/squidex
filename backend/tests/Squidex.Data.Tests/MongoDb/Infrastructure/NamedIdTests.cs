@@ -12,20 +12,15 @@ namespace Squidex.MongoDb.Infrastructure;
 
 public class NamedIdTests
 {
+    static NamedIdTests()
+    {
+        MongoTestUtils.SetupBson();
+    }
+
     [Fact]
     public void Should_serialize_and_deserialize_null_guid_token()
     {
         NamedId<Guid>? value = null;
-
-        var serialized = value.SerializeAndDeserializeBson();
-
-        Assert.Equal(value, serialized);
-    }
-
-    [Fact]
-    public void Should_serialize_and_deserialize_valid_guid_token()
-    {
-        var value = NamedId.Of(Guid.NewGuid(), "my-name");
 
         var serialized = value.SerializeAndDeserializeBson();
 

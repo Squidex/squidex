@@ -191,8 +191,14 @@ public sealed class ConstantWithTypeVisitor : QueryNodeVisitor<ClrValue>
             return Instant.FromUtc(date.Year, date.Month, date.Day, 0, 0);
         }
 
-        var parseResult = InstantPattern.ExtendedIso.Parse(value.ToString()!);
+#pragma warning disable CS0618 // Type or member is obsolete
+        if (value is Date date2)
+        {
+            return Instant.FromUtc(date2.Year, date2.Month, date2.Day, 0, 0);
+        }
+#pragma warning restore CS0618 // Type or member is obsolete
 
+        var parseResult = InstantPattern.ExtendedIso.Parse(value.ToString()!);
         if (!parseResult.Success)
         {
             throw new ODataException("Datetime is not in a valid format. Use ISO 8601");

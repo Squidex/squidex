@@ -18,7 +18,7 @@ namespace Squidex.Providers.Postgres.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.16")
+                .HasAnnotation("ProductVersion", "10.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.HasPostgresExtension(modelBuilder, "postgis");
@@ -227,7 +227,6 @@ namespace Squidex.Providers.Postgres.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("ApplicationId")
-                        .IsRequired()
                         .HasColumnType("text");
 
                     b.Property<string>("ConcurrencyToken")
@@ -323,7 +322,7 @@ namespace Squidex.Providers.Postgres.Migrations
                     b.ToTable("OpenIddictTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Squidex.AI.Mongo.EFChatEntity", b =>
+            modelBuilder.Entity("Squidex.AI.EntityFramework.EFChatEntity", b =>
                 {
                     b.Property<string>("Id")
                         .HasMaxLength(255)
@@ -1104,7 +1103,7 @@ namespace Squidex.Providers.Postgres.Migrations
                     b.Property<long>("EventStreamOffset")
                         .HasColumnType("bigint");
 
-                    b.Property<string[]>("Events")
+                    b.PrimitiveCollection<string[]>("Events")
                         .IsRequired()
                         .HasColumnType("text[]");
 

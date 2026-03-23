@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using MongoDB.Bson;
+using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using NodaTime;
@@ -343,7 +345,7 @@ public class MongoQueryTests
                 new RenderArgs<TestEntity>(
                     BsonSerializer.SerializerRegistry.GetSerializer<TestEntity>(),
                     BsonSerializer.SerializerRegistry))
-            .ToString();
+            .ToJson(new JsonWriterSettings { OutputMode = JsonOutputMode.Shell });
 
         Assert.Equal(Cleanup(expected, arg), rendered);
     }

@@ -54,7 +54,7 @@ public sealed class JintScriptEngine(IMemoryCache cache, IOptions<JintScriptOpti
                 context.Complete(JsonMapper.Map(value));
             }));
 
-            var result = Execute(context, script);
+            var result = await ExecuteAsync(context, script);
 
             return await context.WaitForCompletionAsync(() => JsonMapper.Map(result));
         }
@@ -102,7 +102,7 @@ public sealed class JintScriptEngine(IMemoryCache cache, IOptions<JintScriptOpti
                 }
             }));
 
-            Execute(context, script);
+            await ExecuteAsync(context, script);
 
             return await context.WaitForCompletionAsync(() => data);
         }
@@ -180,6 +180,13 @@ public sealed class JintScriptEngine(IMemoryCache cache, IOptions<JintScriptOpti
         var parsed = parser.Parse(script);
 
         return context.Evaluate(parsed);
+    }
+
+    private Task<JsValue> ExecuteAsync(ScriptExecutionContext context, string script)
+    {
+        var parsed = parser.Parse(script);
+
+        return context.EvaluateAsync(parsed);
     }
 
     private static Exception MapException(Exception inner)
