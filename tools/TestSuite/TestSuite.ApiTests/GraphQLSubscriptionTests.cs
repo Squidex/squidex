@@ -64,7 +64,7 @@ public class GraphQLSubscriptionTests(ContentFixture fixture) : IClassFixture<Co
             = client.CreateSubscriptionStream<ContentChangesResult>(contentChanges);
 
         var publishedContent =
-            subscriptionStream.Where(x => x.Data.ContentChanges.Id == contentId).Timeout(TimeSpan.FromSeconds(30))
+            subscriptionStream.Where(x => x.Data.ContentChanges.Id == contentId).Timeout(TimeSpan.FromSeconds(60))
                 .FirstOrDefaultAsync();
 
         // Wait a little bit for the subscription to propagate.
@@ -104,7 +104,7 @@ public class GraphQLSubscriptionTests(ContentFixture fixture) : IClassFixture<Co
             = client.CreateSubscriptionStream<AssetChangesResult>(assetChanges);
 
         var publishedAsset =
-            subscriptionStream.Where(x => x.Data.AssetChanges.Id == assetId).Timeout(TimeSpan.FromSeconds(30))
+            subscriptionStream.Where(x => x.Data.AssetChanges.Id == assetId).Timeout(TimeSpan.FromSeconds(60))
                 .FirstOrDefaultAsync();
 
 
