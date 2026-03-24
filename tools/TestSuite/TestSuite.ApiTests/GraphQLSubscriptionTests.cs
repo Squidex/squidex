@@ -17,6 +17,7 @@ namespace TestSuite.ApiTests;
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
 
+[Trait("Category", "NotAutomated")]
 public class GraphQLSubscriptionTests(ContentFixture fixture) : IClassFixture<ContentFixture>
 {
     public ContentFixture _ { get; } = fixture;
@@ -41,7 +42,7 @@ public class GraphQLSubscriptionTests(ContentFixture fixture) : IClassFixture<Co
         public string Id { get; set; }
     }
 
-    [Fact(Skip = "Too flaky")]
+    [Fact]
     public async Task Should_listen_to_content_changes()
     {
         var client = await CreateClient();
