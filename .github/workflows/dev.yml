@@ -52,7 +52,7 @@ jobs:
           echo '{"sdk":{"version": "${{ steps.dotnet.outputs.dotnet-version }}"}}' > ./global.json
 
       - name: Test - TestContainers
-        run: dotnet test backend/Squidex.sln --filter Category=TestContainer
+        run: dotnet test backend/Squidex.slnx --filter Category=TestContainer
 
   test-mongo:
     runs-on: ubuntu-latest
