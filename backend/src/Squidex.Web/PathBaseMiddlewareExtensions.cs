@@ -19,7 +19,7 @@ public static class PathBaseMiddlewareExtensions
         var urlGenerator = app.ApplicationServices.GetRequiredService<IUrlGenerator>();
 
         var configuredBase = urlGenerator.BuildBasePath();
-        if (string.IsNullOrWhiteSpace(configuredBase))
+        if (string.IsNullOrWhiteSpace(configuredBase) || configuredBase == "/")
         {
             return app;
         }
