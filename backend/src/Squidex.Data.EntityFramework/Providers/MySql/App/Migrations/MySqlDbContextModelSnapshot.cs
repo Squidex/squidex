@@ -18,7 +18,7 @@ namespace Squidex.Providers.MySql.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.16")
+                .HasAnnotation("ProductVersion", "10.0.5")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
@@ -226,7 +226,6 @@ namespace Squidex.Providers.MySql.Migrations
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("ApplicationId")
-                        .IsRequired()
                         .HasColumnType("varchar(255)");
 
                     b.Property<string>("ConcurrencyToken")
@@ -322,7 +321,7 @@ namespace Squidex.Providers.MySql.Migrations
                     b.ToTable("OpenIddictTokens", (string)null);
                 });
 
-            modelBuilder.Entity("Squidex.AI.Mongo.EFChatEntity", b =>
+            modelBuilder.Entity("Squidex.AI.EntityFramework.EFChatEntity", b =>
                 {
                     b.Property<string>("Id")
                         .HasMaxLength(255)
@@ -1103,7 +1102,7 @@ namespace Squidex.Providers.MySql.Migrations
                     b.Property<long>("EventStreamOffset")
                         .HasColumnType("bigint");
 
-                    b.Property<string>("Events")
+                    b.PrimitiveCollection<string>("Events")
                         .IsRequired()
                         .HasColumnType("longtext");
 

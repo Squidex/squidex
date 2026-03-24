@@ -5,18 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Operations;
+using Squidex.MongoDb.TestHelpers;
 
 namespace Squidex.MongoDb.Domain.Contents;
 
 public class AdaptionTests
 {
-    static AdaptionTests()
-    {
-        MongoContentEntity.RegisterClassMap();
-    }
-
     [Fact]
     public void Should_adapt_to_meta_field()
     {

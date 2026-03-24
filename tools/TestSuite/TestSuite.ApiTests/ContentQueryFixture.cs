@@ -20,7 +20,7 @@ public sealed class ContentQueryFixture : TestSchemaFixtureBase
     {
     }
 
-    public override async Task InitializeAsync()
+    public override async ValueTask InitializeAsync()
     {
         await base.InitializeAsync();
 
@@ -50,19 +50,19 @@ public sealed class ContentQueryFixture : TestSchemaFixtureBase
                 String = index.ToString(CultureInfo.InvariantCulture),
             };
 
-            await Contents.CreateAsync(data, ContentCreateOptions.AsPublish);
+            await Contents.CreateAsync(data, ContentCreateOptions.AsPublish, ct: TestContext.Current.CancellationToken);
         }
     }
 
-    public override async Task DisposeAsync()
+    public override async ValueTask DisposeAsync()
     {
         await base.DisposeAsync();
 
-        var contents = await Contents.GetAsync();
+        var contents = await Contents.GetAsync(ct: TestContext.Current.CancellationToken);
 
         foreach (var content in contents.Items)
         {
-            await Contents.DeleteAsync(content);
+            await Contents.DeleteAsync(content, ct: TestContext.Current.CancellationToken);
         }
     }
 }

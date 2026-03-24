@@ -122,7 +122,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id), A<CancellationToken>._))
+                A<UpsertContent>.That.Matches(x => ReferenceEquals(x.Data, data) && x.ContentId == id), A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -157,11 +157,11 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == content2.Id && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == content1.Id), A<CancellationToken>._))
+                A<UpsertContent>.That.Matches(x => ReferenceEquals(x.Data, data) && x.ContentId == content1.Id), A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == content2.Id), A<CancellationToken>._))
+                A<UpsertContent>.That.Matches(x => ReferenceEquals(x.Data, data) && x.ContentId == content2.Id), A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -180,7 +180,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id != default && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId != default), A<CancellationToken>._))
+                A<UpsertContent>.That.Matches(x => ReferenceEquals(x.Data, data) && x.ContentId != default), A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -199,7 +199,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id != default && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId != default), A<CancellationToken>._))
+                A<UpsertContent>.That.Matches(x => ReferenceEquals(x.Data, data) && x.ContentId != default), A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -218,7 +218,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id != default && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id), A<CancellationToken>._))
+                A<UpsertContent>.That.Matches(x => ReferenceEquals(x.Data, data) && x.ContentId == id), A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -237,7 +237,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id != default && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<UpsertContent>.That.Matches(x => x.Data == data && x.ContentId == id), A<CancellationToken>._))
+                A<UpsertContent>.That.Matches(x => ReferenceEquals(x.Data, data) && x.ContentId == id), A<CancellationToken>._))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -256,7 +256,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<CreateContent>.That.Matches(x => x.ContentId == id && x.Data == data), A<CancellationToken>._))
+                A<CreateContent>.That.Matches(x => x.ContentId == id && ReferenceEquals(x.Data, data)), A<CancellationToken>._))
             .MustHaveHappened();
     }
 
@@ -293,7 +293,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<UpdateContent>.That.Matches(x => x.ContentId == id && x.Data == data), A<CancellationToken>._))
+                A<UpdateContent>.That.Matches(x => x.ContentId == id && ReferenceEquals(x.Data, data)), A<CancellationToken>._))
             .MustHaveHappened();
     }
 
@@ -367,7 +367,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<PatchContent>.That.Matches(x => x.ContentId == id && x.Data == data), A<CancellationToken>._))
+                A<PatchContent>.That.Matches(x => x.ContentId == id && ReferenceEquals(x.Data, data)), A<CancellationToken>._))
             .MustHaveHappened();
     }
 

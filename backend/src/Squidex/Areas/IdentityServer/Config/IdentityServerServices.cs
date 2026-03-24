@@ -114,10 +114,10 @@ public static class IdentityServerServices
                 builder.UseAspNetCore()
                     .DisableTransportSecurityRequirement()
                     .EnableAuthorizationEndpointPassthrough()
-                    .EnableLogoutEndpointPassthrough()
+                    .EnableEndSessionEndpointPassthrough()
                     .EnableStatusCodePagesIntegration()
                     .EnableTokenEndpointPassthrough()
-                    .EnableUserinfoEndpointPassthrough();
+                    .EnableUserInfoEndpointPassthrough();
 
                 builder.SetAccessTokenLifetime(TimeSpan.FromDays(30));
             })
@@ -164,16 +164,16 @@ public static class IdentityServerServices
             options.IntrospectionEndpointUris.SetEndpoint(
                 BuildUrl("connect/introspect"));
 
-            options.LogoutEndpointUris.SetEndpoint(
+            options.EndSessionEndpointUris.SetEndpoint(
                 BuildUrl("connect/logout"));
 
             options.TokenEndpointUris.SetEndpoint(
                 BuildUrl("connect/token"));
 
-            options.UserinfoEndpointUris.SetEndpoint(
+            options.UserInfoEndpointUris.SetEndpoint(
                 BuildUrl("connect/userinfo"));
 
-            options.CryptographyEndpointUris.SetEndpoint(
+            options.JsonWebKeySetEndpointUris.SetEndpoint(
                 BuildUrl(".well-known/jwks"));
 
             options.ConfigurationEndpointUris.SetEndpoint(

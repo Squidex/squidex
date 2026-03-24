@@ -57,7 +57,7 @@ public sealed partial class MongoAssetRepository : ISnapshotStore<Asset>, IDelet
         {
             var entityJob = job.As(MongoAssetEntity.Create(job));
 
-            await Collection.UpsertVersionedAsync(entityJob, Field.Of<Asset>(x => nameof(x.Version)), ct);
+            await Collection.UpsertVersionedAsync(entityJob, Field.Of<MongoAssetEntity>(x => nameof(x.Version)), ct);
         }
     }
 

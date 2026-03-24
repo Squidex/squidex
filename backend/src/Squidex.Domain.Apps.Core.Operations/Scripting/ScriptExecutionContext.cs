@@ -18,6 +18,8 @@ public abstract class ScriptExecutionContext(Engine engine) : ScriptVars
 
     public abstract JsValue Evaluate(Prepared<Script> script);
 
+    public abstract Task<JsValue> EvaluateAsync(Prepared<Script> script);
+
     public abstract void Schedule(Func<IScheduler, CancellationToken, Task> action);
 }
 
@@ -47,8 +49,7 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
     {
         TryComplete();
 
-        var result = await tcs.Task.WithCancellation(cancellationToken);
-
+        var result = await tcs.Task.WithCancellation(default);
         if (result == null)
         {
             return fallback();
@@ -65,6 +66,11 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
     public override JsValue Evaluate(Prepared<Script> script)
     {
         return Engine.Evaluate(script);
+    }
+
+    public override Task<JsValue> EvaluateAsync(Prepared<Script> script)
+    {
+        return Engine.EvaluateAsync(script, cancellationToken);
     }
 
     public override void Schedule(Func<IScheduler, CancellationToken, Task> action)

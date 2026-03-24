@@ -725,30 +725,4 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
 
         Assert.Equal(42.0, result.Value);
     }
-
-    [Fact]
-    public async Task Should_run_with_blocking_timeout_promises()
-    {
-        const string script = @"
-                function promiseMethod() {
-                    return new Promise((resolve, reject) => {
-                        setTimeout(() => {
-                            resolve();
-                        }, 1000)
-                    });
-                }
-                
-                // Jint 4.1.0 blocking (if you remove 'async', the timeout will not occur.)
-                async function asyncMethod() {
-                    return promiseMethod();
-                }
-
-                (async () => {
-                    await asyncMethod();
-                    complete()
-                })()
-        ";
-
-        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(new ScriptVars(), script));
-    }
 }

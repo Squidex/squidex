@@ -16,7 +16,7 @@ public abstract class TestSchemaWithReferencesFixtureBase(string schemaName) : C
 
     public string SchemaName { get; } = schemaName;
 
-    public override async Task InitializeAsync()
+    public override async ValueTask InitializeAsync()
     {
         await base.InitializeAsync();
 

@@ -9,6 +9,7 @@ using GraphQL;
 using GraphQL.DI;
 using GraphQL.Server.Transports.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Formatters;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.ResponseCompression;
@@ -67,9 +68,6 @@ public static class WebServices
 
         services.AddSingletonAs<HttpContextAccessor>()
             .As<IHttpContextAccessor>();
-
-        services.AddSingletonAs<ActionContextAccessor>()
-            .As<IActionContextAccessor>();
 
         services.Configure<ApiBehaviorOptions>(options =>
         {

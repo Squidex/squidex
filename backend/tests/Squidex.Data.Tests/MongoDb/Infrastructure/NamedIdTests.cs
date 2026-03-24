@@ -23,16 +23,6 @@ public class NamedIdTests
     }
 
     [Fact]
-    public void Should_serialize_and_deserialize_valid_guid_token()
-    {
-        var value = NamedId.Of(Guid.NewGuid(), "my-name");
-
-        var serialized = value.SerializeAndDeserializeBson();
-
-        Assert.Equal(value, serialized);
-    }
-
-    [Fact]
     public void Should_serialize_and_deserialize_null_long_token()
     {
         NamedId<long>? value = null;

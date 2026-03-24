@@ -113,7 +113,7 @@ public sealed partial class EFAssetFolderRepository<TContext> : ISnapshotStore<A
         return dbContextFactory.CreateDbContextAsync(ct);
     }
 
-    private static Expression<Func<SetPropertyCalls<EFAssetFolderEntity>, SetPropertyCalls<EFAssetFolderEntity>>> BuildUpdate(EFAssetFolderEntity entity)
+    private static Action<UpdateSettersBuilder<EFAssetFolderEntity>> BuildUpdate(EFAssetFolderEntity entity)
     {
         return b => b
             .SetProperty(x => x.AppId, entity.AppId)

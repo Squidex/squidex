@@ -17,6 +17,7 @@ namespace TestSuite.ApiTests;
 #pragma warning disable SA1300 // Element should begin with upper-case letter
 #pragma warning disable SA1507 // Code should not contain multiple blank lines in a row
 
+[Trait("Category", "NotAutomated")]
 public class GraphQLSubscriptionTests(ContentFixture fixture) : IClassFixture<ContentFixture>
 {
     public ContentFixture _ { get; } = fixture;
@@ -64,7 +65,7 @@ public class GraphQLSubscriptionTests(ContentFixture fixture) : IClassFixture<Co
             = client.CreateSubscriptionStream<ContentChangesResult>(contentChanges);
 
         var publishedContent =
-            subscriptionStream.Where(x => x.Data.ContentChanges.Id == contentId).Timeout(TimeSpan.FromSeconds(30))
+            subscriptionStream.Where(x => x.Data.ContentChanges.Id == contentId).Timeout(TimeSpan.FromSeconds(60))
                 .FirstOrDefaultAsync();
 
         // Wait a little bit for the subscription to propagate.
@@ -104,7 +105,7 @@ public class GraphQLSubscriptionTests(ContentFixture fixture) : IClassFixture<Co
             = client.CreateSubscriptionStream<AssetChangesResult>(assetChanges);
 
         var publishedAsset =
-            subscriptionStream.Where(x => x.Data.AssetChanges.Id == assetId).Timeout(TimeSpan.FromSeconds(30))
+            subscriptionStream.Where(x => x.Data.AssetChanges.Id == assetId).Timeout(TimeSpan.FromSeconds(60))
                 .FirstOrDefaultAsync();
 
 

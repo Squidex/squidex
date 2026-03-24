@@ -12,11 +12,11 @@ using OpenIddict.Core;
 namespace Squidex.Areas.IdentityServer.Config;
 
 public sealed class ApplicationManager<T>(
-    IOptionsMonitor<OpenIddictCoreOptions> options,
     IOpenIddictApplicationCache<T> cache,
-    IOpenIddictApplicationStoreResolver resolver,
-    ILogger<OpenIddictApplicationManager<T>> logger)
-    : OpenIddictApplicationManager<T>(cache, logger, options, resolver) where T : class
+    ILogger<OpenIddictApplicationManager<T>> logger,
+    IOptionsMonitor<OpenIddictCoreOptions> options,
+    IOpenIddictApplicationStore<T> store)
+    : OpenIddictApplicationManager<T>(cache, logger, options, store) where T : class
 {
     protected override ValueTask<bool> ValidateClientSecretAsync(string secret, string comparand,
         CancellationToken cancellationToken = default)

@@ -106,7 +106,7 @@ public sealed class EFSchemaRepository<TContext>(IDbContextFactory<TContext> dbC
         }
     }
 
-    protected override Expression<Func<SetPropertyCalls<EFSchemaEntity>, SetPropertyCalls<EFSchemaEntity>>> BuildUpdate(EFSchemaEntity entity)
+    protected override Action<UpdateSettersBuilder<EFSchemaEntity>> BuildUpdate(EFSchemaEntity entity)
     {
         return u => u
             .SetProperty(x => x.Document, entity.Document)

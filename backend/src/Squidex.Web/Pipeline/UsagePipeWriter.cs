@@ -13,6 +13,10 @@ public sealed class UsagePipeWriter(PipeWriter inner) : PipeWriter
 {
     private long bytesWritten;
 
+    public override bool CanGetUnflushedBytes => inner.CanGetUnflushedBytes;
+
+    public override long UnflushedBytes => inner.UnflushedBytes;
+
     public long BytesWritten
     {
         get => bytesWritten;

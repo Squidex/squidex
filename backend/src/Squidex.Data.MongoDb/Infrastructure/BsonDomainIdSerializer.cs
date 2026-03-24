@@ -68,16 +68,7 @@ public sealed class BsonDomainIdSerializer : SerializerBase<DomainId>, IBsonPoly
             case BsonType.Binary:
                 if (Guid.TryParse(value.ToString(), out var guid))
                 {
-#pragma warning disable CS0618 // Type or member is obsolete
-                    if (context.Writer.Settings.GuidRepresentation == GuidRepresentation.CSharpLegacy)
-                    {
-                        context.Writer.WriteBinaryData(new BsonBinaryData(guid.ToByteArray(), BsonBinarySubType.UuidLegacy, GuidRepresentation.CSharpLegacy));
-                    }
-                    else
-                    {
-                        context.Writer.WriteBinaryData(new BsonBinaryData(guid, GuidRepresentation.Standard));
-                    }
-#pragma warning restore CS0618 // Type or member is obsolete
+                    context.Writer.WriteBinaryData(new BsonBinaryData(guid, GuidRepresentation.Standard));
                 }
                 else
                 {

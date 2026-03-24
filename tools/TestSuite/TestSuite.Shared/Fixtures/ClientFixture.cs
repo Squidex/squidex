@@ -90,7 +90,7 @@ public class ClientFixture : IAsyncLifetime
         return (client, await client.Apps.PostAppAsync(request));
     }
 
-    public virtual async Task InitializeAsync()
+    public virtual async ValueTask InitializeAsync()
     {
         Squidex = await Factories.CreateAsync(nameof(ClientWrapper), async () =>
         {
@@ -102,8 +102,8 @@ public class ClientFixture : IAsyncLifetime
         });
     }
 
-    public virtual Task DisposeAsync()
+    public virtual ValueTask DisposeAsync()
     {
-        return Task.CompletedTask;
+        return default;
     }
 }

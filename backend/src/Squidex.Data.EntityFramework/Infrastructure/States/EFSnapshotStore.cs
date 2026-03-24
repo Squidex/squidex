@@ -114,7 +114,7 @@ public class EFSnapshotStore<TContext, T, TState>(IDbContextFactory<TContext> db
         return dbContextFactory.CreateDbContextAsync(ct);
     }
 
-    protected virtual Expression<Func<SetPropertyCalls<TState>, SetPropertyCalls<TState>>> BuildUpdate(TState entity)
+    protected virtual Action<UpdateSettersBuilder<TState>> BuildUpdate(TState entity)
     {
         return u => u
             .SetProperty(x => x.Document, entity.Document)

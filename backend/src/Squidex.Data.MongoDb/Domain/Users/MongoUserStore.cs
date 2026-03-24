@@ -8,8 +8,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
 
@@ -35,93 +33,7 @@ public sealed class MongoUserStore(IMongoDatabase database) :
     private const string InternalLoginProvider = "[AspNetUserStore]";
     private const string AuthenticatorKeyTokenName = "AuthenticatorKey";
     private const string RecoveryCodeTokenName = "RecoveryCodes";
-
-    static MongoUserStore()
-    {
-        BsonClassMap.RegisterClassMap<Claim>(cm =>
-        {
-            cm.MapConstructor(typeof(Claim).GetConstructors()
-                .First(x =>
-                {
-                    var parameters = x.GetParameters();
-
-                    return parameters.Length == 2 &&
-                        parameters[0].Name == "type" &&
-                        parameters[0].ParameterType == typeof(string) &&
-                        parameters[1].Name == "value" &&
-                        parameters[1].ParameterType == typeof(string);
-                }))
-                .SetArguments(new[]
-                {
-                    nameof(Claim.Type),
-                    nameof(Claim.Value),
-                });
-
-            cm.MapMember(x => x.Type);
-            cm.MapMember(x => x.Value);
-        });
-
-        BsonClassMap.RegisterClassMap<UserLogin>(cm =>
-        {
-            cm.MapConstructor(typeof(UserLogin).GetConstructors()
-                .First(x =>
-                {
-                    var parameters = x.GetParameters();
-
-                    return parameters.Length == 3;
-                }))
-                .SetArguments(new[]
-                {
-                    nameof(UserLogin.LoginProvider),
-                    nameof(UserLogin.ProviderKey),
-                    nameof(UserLogin.ProviderDisplayName),
-                });
-
-            cm.AutoMap();
-        });
-
-        BsonClassMap.RegisterClassMap<IdentityUserToken<string>>(cm =>
-        {
-            cm.AutoMap();
-
-            cm.UnmapMember(x => x.UserId);
-        });
-
-        BsonClassMap.RegisterClassMap<IdentityUser<string>>(cm =>
-        {
-            cm.AutoMap();
-
-            cm.MapMember(x => x.Id)
-                .SetSerializer(new StringSerializer(BsonType.ObjectId));
-
-            cm.MapMember(x => x.AccessFailedCount)
-                .SetIgnoreIfDefault(true);
-
-            cm.MapMember(x => x.EmailConfirmed)
-                .SetIgnoreIfDefault(true);
-
-            cm.MapMember(x => x.LockoutEnd)
-                .SetElementName("LockoutEndDateUtc").SetIgnoreIfNull(true);
-
-            cm.MapMember(x => x.LockoutEnabled)
-                .SetIgnoreIfDefault(true);
-
-            cm.MapMember(x => x.PasswordHash)
-                .SetIgnoreIfNull(true);
-
-            cm.MapMember(x => x.PhoneNumber)
-                .SetIgnoreIfNull(true);
-
-            cm.MapMember(x => x.PhoneNumberConfirmed)
-                .SetIgnoreIfDefault(true);
-
-            cm.MapMember(x => x.SecurityStamp)
-                .SetIgnoreIfNull(true);
-
-            cm.MapMember(x => x.TwoFactorEnabled)
-                .SetIgnoreIfDefault(true);
-        });
-    }
+    private IMongoCollection<IdentityUser> queryableCollection;
 
     protected override string CollectionName()
     {
@@ -165,7 +77,7 @@ public sealed class MongoUserStore(IMongoDatabase database) :
 
     public IQueryable<IdentityUser> Users
     {
-        get => Collection.AsQueryable();
+        get => (queryableCollection ??= Database.GetCollection<IdentityUser>(CollectionName())).AsQueryable();
     }
 
     public bool IsId(string id)
@@ -181,7 +93,9 @@ public sealed class MongoUserStore(IMongoDatabase database) :
     public async Task<IdentityUser?> FindByIdAsync(string userId,
         CancellationToken cancellationToken)
     {
-        var result = await Collection.Find(x => x.Id == userId).FirstOrDefaultAsync(cancellationToken);
+        var result =
+            await Collection.Find(x => x.Id == userId)
+            .FirstOrDefaultAsync(cancellationToken);
 
         return result;
     }
@@ -189,7 +103,9 @@ public sealed class MongoUserStore(IMongoDatabase database) :
     public async Task<IdentityUser?> FindByEmailAsync(string normalizedEmail,
         CancellationToken cancellationToken)
     {
-        var result = await Collection.Find(x => x.NormalizedEmail == normalizedEmail).FirstOrDefaultAsync(cancellationToken);
+        var result =
+            await Collection.Find(x => x.NormalizedEmail == normalizedEmail)
+            .FirstOrDefaultAsync(cancellationToken);
 
         return result;
     }
@@ -197,7 +113,9 @@ public sealed class MongoUserStore(IMongoDatabase database) :
     public async Task<IdentityUser?> FindByNameAsync(string normalizedUserName,
         CancellationToken cancellationToken)
     {
-        var result = await Collection.Find(x => x.NormalizedEmail == normalizedUserName).FirstOrDefaultAsync(cancellationToken);
+        var result =
+            await Collection.Find(x => x.NormalizedEmail == normalizedUserName)
+            .FirstOrDefaultAsync(cancellationToken);
 
         return result;
     }
@@ -205,7 +123,9 @@ public sealed class MongoUserStore(IMongoDatabase database) :
     public async Task<IdentityUser?> FindByLoginAsync(string loginProvider, string providerKey,
         CancellationToken cancellationToken)
     {
-        var result = await Collection.Find(Filter.ElemMatch(x => x.Logins, BuildFilter(loginProvider, providerKey))).FirstOrDefaultAsync(cancellationToken);
+        var result =
+            await Collection.Find(Filter.ElemMatch(x => x.Logins, BuildFilter(loginProvider, providerKey)))
+            .FirstOrDefaultAsync(cancellationToken);
 
         return result;
     }
@@ -213,7 +133,9 @@ public sealed class MongoUserStore(IMongoDatabase database) :
     public async Task<IList<IdentityUser>> GetUsersForClaimAsync(Claim claim,
         CancellationToken cancellationToken)
     {
-        var result = await Collection.Find(x => x.Claims.Exists(y => y.Type == claim.Type && y.Value == claim.Value)).ToListAsync(cancellationToken);
+        var result =
+            await Collection.Find(x => x.Claims.Exists(y => y.Type == claim.Type && y.Value == claim.Value))
+            .ToListAsync(cancellationToken);
 
         return result.OfType<IdentityUser>().ToList();
     }
@@ -221,7 +143,9 @@ public sealed class MongoUserStore(IMongoDatabase database) :
     public async Task<IList<IdentityUser>> GetUsersInRoleAsync(string roleName,
         CancellationToken cancellationToken)
     {
-        var result = await Collection.Find(x => x.Roles.Contains(roleName)).ToListAsync(cancellationToken);
+        var result =
+            await Collection.Find(x => x.Roles.Contains(roleName))
+            .ToListAsync(cancellationToken);
 
         return result.OfType<IdentityUser>().ToList();
     }
@@ -231,7 +155,8 @@ public sealed class MongoUserStore(IMongoDatabase database) :
     {
         user.Id = ObjectId.GenerateNewId().ToString();
 
-        await Collection.InsertOneAsync((MongoUser)user, null, cancellationToken);
+        await Collection.InsertOneAsync((MongoUser)user, null,
+            cancellationToken);
 
         return IdentityResult.Success;
     }
@@ -239,7 +164,8 @@ public sealed class MongoUserStore(IMongoDatabase database) :
     public async Task<IdentityResult> UpdateAsync(IdentityUser user,
         CancellationToken cancellationToken)
     {
-        await Collection.ReplaceOneAsync(x => x.Id == user.Id, (MongoUser)user, cancellationToken: cancellationToken);
+        await Collection.ReplaceOneAsync(x => x.Id == user.Id, (MongoUser)user,
+            cancellationToken: cancellationToken);
 
         return IdentityResult.Success;
     }
@@ -247,7 +173,8 @@ public sealed class MongoUserStore(IMongoDatabase database) :
     public async Task<IdentityResult> DeleteAsync(IdentityUser user,
         CancellationToken cancellationToken)
     {
-        await Collection.DeleteOneAsync(x => x.Id == user.Id, null, cancellationToken);
+        await Collection.DeleteOneAsync(x => x.Id == user.Id, null,
+            cancellationToken);
 
         return IdentityResult.Success;
     }

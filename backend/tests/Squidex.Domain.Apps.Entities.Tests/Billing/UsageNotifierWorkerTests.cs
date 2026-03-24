@@ -16,7 +16,7 @@ using Squidex.Shared.Users;
 
 namespace Squidex.Domain.Apps.Entities.Billing;
 
-public class UsageNotifierWorkerTest : GivenContext
+public class UsageNotifierWorkerTests : GivenContext
 {
     private readonly TestState<UsageNotifierWorker.State> state = new TestState<UsageNotifierWorker.State>("Default");
     private readonly IClock clock = A.Fake<IClock>();
@@ -25,7 +25,7 @@ public class UsageNotifierWorkerTest : GivenContext
     private readonly UsageNotifierWorker sut;
     private Instant time = SystemClock.Instance.GetCurrentInstant();
 
-    public UsageNotifierWorkerTest()
+    public UsageNotifierWorkerTests()
     {
         A.CallTo(() => clock.GetCurrentInstant())
             .ReturnsLazily(() => time);

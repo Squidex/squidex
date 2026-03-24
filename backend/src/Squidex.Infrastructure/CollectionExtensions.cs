@@ -195,11 +195,6 @@ public static class CollectionExtensions
         }
     }
 
-    public static IEnumerable<T> Shuffle<T>(this IEnumerable<T> enumerable)
-    {
-        return enumerable.OrderBy(x => Random.Shared.Next()).ToList();
-    }
-
     public static IEnumerable<T> OrEmpty<T>(this IEnumerable<T>? source)
     {
         return source ?? [];

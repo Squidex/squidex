@@ -7,6 +7,7 @@
 
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using PhenX.EntityFrameworkCore.BulkInsert.SqlServer;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -23,8 +24,7 @@ namespace Squidex.EntityFramework.TestHelpers;
 public class SqlServerFixture(string? reuseId = null) : IAsyncLifetime, ISqlContentFixture<TestDbContextSqlServer, SqlServerContentDbContext>
 {
     private readonly MsSqlContainer sqlServer =
-        new MsSqlBuilder()
-            .WithImage("vibs2006/sql_server_fts")
+        new MsSqlBuilder("vibs2006/sql_server_fts")
             .WithReuse(true)
             .WithLabel("reuse-id", reuseId)
             .Build();
@@ -37,10 +37,10 @@ public class SqlServerFixture(string? reuseId = null) : IAsyncLifetime, ISqlCont
     public IDbContextNamedFactory<SqlServerContentDbContext> DbContextNamedFactory
         => services.GetRequiredService<IDbContextNamedFactory<SqlServerContentDbContext>>();
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        await sqlServer.StartAsync();
-        await sqlServer.ExecScriptAsync($"create database squidex;");
+        await sqlServer.StartAsync(TestContext.Current.CancellationToken);
+        await sqlServer.ExecScriptAsync($"create database squidex;", TestContext.Current.CancellationToken);
 
         var connectionString = GetConnectionString();
 
@@ -58,6 +58,9 @@ public class SqlServerFixture(string? reuseId = null) : IAsyncLifetime, ISqlCont
                 {
                     builder.UseBulkInsertSqlServer();
                     builder.UseSqlServer(connectionString);
+
+                    builder.ConfigureWarnings(w =>
+                        w.Ignore(RelationalEventId.PendingModelChangesWarning));
                 })
                 .AddSingleton<ConnectionStringParser, SqlServerConnectionStringParser>()
                 .AddSingletonAs<DatabaseCreator<TestDbContextSqlServer>>().Done()
@@ -71,14 +74,14 @@ public class SqlServerFixture(string? reuseId = null) : IAsyncLifetime, ISqlCont
         }
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         foreach (var service in services.GetRequiredService<IEnumerable<IInitializable>>())
         {
             await service.ReleaseAsync(default);
         }
 
-        await sqlServer.StopAsync();
+        await sqlServer.StopAsync(TestContext.Current.CancellationToken);
     }
 
     private string GetConnectionString()

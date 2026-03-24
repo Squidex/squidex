@@ -16,7 +16,7 @@ public abstract class TestSchemaFixtureBase(string schemaName) : CreatedAppFixtu
 
     public string SchemaName { get; } = schemaName;
 
-    public override async Task InitializeAsync()
+    public override async ValueTask InitializeAsync()
     {
         await base.InitializeAsync();
 

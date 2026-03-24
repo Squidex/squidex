@@ -21,7 +21,7 @@ public record MongoAssetFolderEntity : AssetFolder, IVersionedEntity<DomainId>
 
     public static void RegisterClassMap()
     {
-        BsonClassMap.TryRegisterClassMap<MongoAssetFolderEntity>(cm =>
+        BsonClassMap.RegisterClassMap<MongoAssetFolderEntity>(cm =>
         {
             cm.MapProperty(x => x.DocumentId)
                 .SetElementName("_id")
@@ -32,14 +32,12 @@ public record MongoAssetFolderEntity : AssetFolder, IVersionedEntity<DomainId>
                 .SetIsRequired(true);
         });
 
-        BsonClassMap.TryRegisterClassMap<AssetFolder>(cm =>
+        BsonClassMap.RegisterClassMap<AssetFolder>(cm =>
         {
             cm.MapProperty(x => x.FolderName)
                 .SetElementName("fn")
                 .SetIsRequired(true);
         });
-
-        AssetItemClassMap.Register();
     }
 
     public static MongoAssetFolderEntity Create(SnapshotWriteJob<AssetFolder> job)

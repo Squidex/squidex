@@ -108,7 +108,7 @@ public sealed partial class EFAssetRepository<TContext> : ISnapshotStore<Asset>,
         }
     }
 
-    private static Expression<Func<SetPropertyCalls<EFAssetEntity>, SetPropertyCalls<EFAssetEntity>>> BuildUpdate(EFAssetEntity entity)
+    private static Action<UpdateSettersBuilder<EFAssetEntity>> BuildUpdate(EFAssetEntity entity)
     {
         return b => b
             .SetProperty(x => x.AppId, entity.AppId)

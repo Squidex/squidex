@@ -26,6 +26,12 @@ public class DomainIdSerializerTests
         public T Id { get; set; }
     }
 
+    private sealed class GuidEntity
+    {
+        [BsonGuidRepresentation(GuidRepresentation.Standard)]
+        public Guid Id { get; set; }
+    }
+
     private sealed class IdEntity<T>
     {
         public T Id { get; set; }
@@ -54,9 +60,9 @@ public class DomainIdSerializerTests
     [Fact]
     public void Should_deserialize_from_guid_bytes()
     {
-        var source = new IdEntity<Guid> { Id = Guid.NewGuid() };
+        var source = new GuidEntity { Id = Guid.NewGuid() };
 
-        var actual = MongoTestUtils.SerializeAndDeserializeBson<IdEntity<DomainId>, IdEntity<Guid>>(source);
+        var actual = MongoTestUtils.SerializeAndDeserializeBson<IdEntity<DomainId>, GuidEntity>(source);
 
         Assert.Equal(actual.Id.ToString(), source.Id.ToString());
     }

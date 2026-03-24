@@ -9,6 +9,7 @@ using System.Globalization;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 using Squidex.Infrastructure;
 using Squidex.Shared;
 using Squidex.Shared.Identity;
@@ -18,13 +19,29 @@ namespace Squidex.Domain.Users;
 
 public class DefaultUserServiceTests
 {
-    private readonly UserManager<IdentityUser> userManager = A.Fake<UserManager<IdentityUser>>();
+    private readonly UserManager<IdentityUser> userManager;
+    private readonly IServiceProvider serviceProvider = A.Fake<IServiceProvider>();
     private readonly IUserFactory userFactory = A.Fake<IUserFactory>();
     private readonly IUserEvents userEvents = A.Fake<IUserEvents>();
     private readonly DefaultUserService sut;
 
     public DefaultUserServiceTests()
     {
+        A.CallTo(() => serviceProvider.GetService(A<Type>._))
+            .Returns(null);
+
+        userManager = A.Fake<UserManager<IdentityUser>>(x =>
+            x.WithArgumentsForConstructor(() => new UserManager<IdentityUser>(
+                A.Fake<IUserStore<IdentityUser>>(),
+                Options.Create(new IdentityOptions()),
+                A.Fake<IPasswordHasher<IdentityUser>>(),
+                Enumerable.Empty<IUserValidator<IdentityUser>>(),
+                Enumerable.Empty<IPasswordValidator<IdentityUser>>(),
+                A.Fake<ILookupNormalizer>(),
+                new IdentityErrorDescriber(),
+                serviceProvider,
+                A.Fake<ILogger<UserManager<IdentityUser>>>())));
+
         A.CallTo(() => userFactory.IsId(A<string>._))
             .Returns(true);
 

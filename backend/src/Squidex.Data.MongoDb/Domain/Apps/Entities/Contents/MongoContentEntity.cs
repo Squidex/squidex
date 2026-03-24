@@ -34,9 +34,7 @@ public record MongoContentEntity : Content, IVersionedEntity<DomainId>
 
     public static void RegisterClassMap()
     {
-        AppEntityClassMap.Register();
-
-        BsonClassMap.TryRegisterClassMap<MongoContentEntity>(cm =>
+        BsonClassMap.RegisterClassMap<MongoContentEntity>(cm =>
         {
             cm.MapProperty(x => x.DocumentId)
                 .SetElementName("_id")
@@ -71,7 +69,7 @@ public record MongoContentEntity : Content, IVersionedEntity<DomainId>
                 .SetIgnoreIfDefault(true);
         });
 
-        BsonClassMap.TryRegisterClassMap<Content>(cm =>
+        BsonClassMap.RegisterClassMap<Content>(cm =>
         {
             cm.MapProperty(x => x.SchemaId)
                 .SetElementName("si")
@@ -93,8 +91,6 @@ public record MongoContentEntity : Content, IVersionedEntity<DomainId>
                 .SetElementName("sj")
                 .SetIgnoreIfDefault(true);
         });
-
-        EntityClassMap.Register();
     }
 
     public WriteContent ToState()

@@ -11,7 +11,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.Infrastructure;
 using Squidex.MongoDb.TestHelpers;
 
 namespace Squidex.MongoDb.Domain.Contents.Text;
@@ -22,8 +21,6 @@ public sealed class AtlasTextIndexFixture : IAsyncLifetime
 
     public AtlasTextIndexFixture()
     {
-        MongoTestUtils.SetupBson();
-
         var mongoClient = MongoClientFactory.Create(TestConfig.Configuration["atlas:configuration"]!);
         var mongoDatabase = mongoClient.GetDatabase(TestConfig.Configuration["atlas:database"]!);
 
@@ -50,13 +47,13 @@ public sealed class AtlasTextIndexFixture : IAsyncLifetime
         Index = services.GetRequiredService<AtlasTextIndex>();
     }
 
-    public Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        return Index.InitializeAsync(default);
+        await Index.InitializeAsync(default);
     }
 
-    public Task DisposeAsync()
+    public ValueTask DisposeAsync()
     {
-        return Task.CompletedTask;
+        return default;
     }
 }

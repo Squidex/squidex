@@ -123,7 +123,7 @@ public abstract class AssetRepositoryTests : GivenContext
 
     public static readonly TheoryData<DomainId?> ParentIds = new TheoryData<DomainId?>
     {
-        { null },
+        { null as DomainId? },
         { DomainId.Empty },
     };
 

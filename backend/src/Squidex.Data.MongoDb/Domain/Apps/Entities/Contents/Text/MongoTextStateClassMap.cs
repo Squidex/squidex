@@ -6,21 +6,20 @@
 // ==========================================================================
 
 using MongoDB.Bson.Serialization;
-using Squidex.Domain.Apps.Core.Assets;
+using Squidex.Domain.Apps.Entities.Contents.Text.State;
 
-namespace Squidex.Domain.Apps.Entities.Assets;
+namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
-internal static class AssetItemClassMap
+internal static class MongoTextStateClassMap
 {
-    public static void Register()
+    public static void RegisterClassMap()
     {
-        AppEntityClassMap.Register();
-
-        BsonClassMap.TryRegisterClassMap<AssetItem>(cm =>
+        BsonClassMap.RegisterClassMap<TextContentState>(cm =>
         {
-            cm.MapProperty(x => x.ParentId)
-                .SetElementName("pi")
-                .SetIgnoreIfDefault(true);
+            cm.MapIdProperty(x => x.UniqueContentId);
+
+            cm.MapProperty(x => x.State)
+                .SetElementName("s");
         });
     }
 }

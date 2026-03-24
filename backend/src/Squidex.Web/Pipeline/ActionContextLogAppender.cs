@@ -7,12 +7,12 @@
 
 using System.Diagnostics;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
+using Microsoft.AspNetCore.Mvc.Abstractions;
 using Squidex.Log;
 
 namespace Squidex.Web.Pipeline;
 
-public sealed class ActionContextLogAppender(IHttpContextAccessor httpContextAccessor, IActionContextAccessor actionContextAccessor) : ILogAppender
+public sealed class ActionContextLogAppender(IHttpContextAccessor httpContextAccessor) : ILogAppender
 {
     public void Append(IObjectWriter writer, SemanticLogLevel logLevel, Exception? exception)
     {
@@ -23,8 +23,7 @@ public sealed class ActionContextLogAppender(IHttpContextAccessor httpContextAcc
             return;
         }
 
-        var actionContext = actionContextAccessor.ActionContext;
-
+        var actionDescriptor = httpContext.GetEndpoint()?.Metadata.GetMetadata<ActionDescriptor>();
         try
         {
             if (string.IsNullOrEmpty(httpContext?.Request?.Method))
@@ -34,7 +33,7 @@ public sealed class ActionContextLogAppender(IHttpContextAccessor httpContextAcc
 
             var requestId = GetRequestId(httpContext);
 
-            var logContext = (requestId, context: httpContext, actionContext);
+            var logContext = (requestId, context: httpContext, actionDescriptor);
 
             writer.WriteObject("web", logContext, (ctx, w) =>
             {
@@ -42,11 +41,9 @@ public sealed class ActionContextLogAppender(IHttpContextAccessor httpContextAcc
                 w.WriteProperty("requestPath", ctx.context.Request.Path);
                 w.WriteProperty("requestMethod", ctx.context.Request.Method);
 
-                var actionContext = ctx.actionContext;
-
-                if (actionContext != null)
+                if (ctx.actionDescriptor != null)
                 {
-                    w.WriteObject("routeValues", actionContext.ActionDescriptor.RouteValues, (routeValues, r) =>
+                    w.WriteObject("routeValues", ctx.actionDescriptor.RouteValues, (routeValues, r) =>
                     {
                         foreach (var (key, value) in routeValues)
                         {

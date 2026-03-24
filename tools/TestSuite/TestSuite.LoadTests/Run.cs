@@ -8,7 +8,6 @@
 using System.Collections.Concurrent;
 using System.Diagnostics;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace TestSuite.LoadTests;
 

@@ -15,16 +15,16 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text;
 public sealed class ElasticSearchTextIndexFixture : IAsyncLifetime
 {
     private readonly ElasticsearchContainer elastic =
-        new ElasticsearchBuilder()
+        new ElasticsearchBuilder("elasticsearch:8.6.1")
             .WithReuse(true)
             .WithLabel("resuse-id", "elastic-text")
             .Build();
 
     public ElasticSearchTextIndex Index { get; private set; }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        await elastic.StopAsync();
+        await elastic.StartAsync(TestContext.Current.CancellationToken);
 
         Index = new ElasticSearchTextIndex(
             new ElasticSearchClient(elastic.GetConnectionString()),
@@ -34,8 +34,8 @@ public sealed class ElasticSearchTextIndexFixture : IAsyncLifetime
         await Index.InitializeAsync(default);
     }
 
-    public Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
-        return Task.CompletedTask;
+        await elastic.StopAsync(TestContext.Current.CancellationToken);
     }
 }

@@ -21,9 +21,7 @@ public record MongoAssetEntity : Asset, IVersionedEntity<DomainId>
 
     public static void RegisterClassMap()
     {
-        AssetItemClassMap.Register();
-
-        BsonClassMap.TryRegisterClassMap<MongoAssetEntity>(cm =>
+        BsonClassMap.RegisterClassMap<MongoAssetEntity>(cm =>
         {
             cm.MapProperty(x => x.DocumentId)
                 .SetElementName("_id")
@@ -34,7 +32,7 @@ public record MongoAssetEntity : Asset, IVersionedEntity<DomainId>
                 .SetIsRequired(true);
         });
 
-        BsonClassMap.TryRegisterClassMap<Asset>(cm =>
+        BsonClassMap.RegisterClassMap<Asset>(cm =>
         {
             cm.MapProperty(x => x.FileName)
                 .SetElementName("fn")

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using PhenX.EntityFrameworkCore.BulkInsert.MySql;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -22,7 +23,7 @@ namespace Squidex.EntityFramework.TestHelpers;
 public class MySqlFixture(string? reuseId = null) : IAsyncLifetime, ISqlContentFixture<TestDbContextMySql, MySqlContentDbContext>
 {
     private readonly MySqlContainer mysql =
-        new MySqlBuilder()
+        new MySqlBuilder("mysql:8.0")
             .WithReuse(true)
             .WithLabel("reuse-id", reuseId)
             .WithCommand("--log-bin-trust-function-creators=1", "--local-infile=1")
@@ -36,9 +37,9 @@ public class MySqlFixture(string? reuseId = null) : IAsyncLifetime, ISqlContentF
     public IDbContextNamedFactory<MySqlContentDbContext> DbContextNamedFactory
         => services.GetRequiredService<IDbContextNamedFactory<MySqlContentDbContext>>();
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        await mysql.StartAsync();
+        await mysql.StartAsync(TestContext.Current.CancellationToken);
 
         var connectionString = $"{mysql.GetConnectionString()};AllowLoadLocalInfile=true;MaxPoolSize=1000";
 
@@ -60,6 +61,9 @@ public class MySqlFixture(string? reuseId = null) : IAsyncLifetime, ISqlContentF
                     {
                         options.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
                     });
+
+                    builder.ConfigureWarnings(w =>
+                        w.Ignore(RelationalEventId.PendingModelChangesWarning));
                 })
                 .AddSingleton<ConnectionStringParser, MySqlConnectionStringParser>()
                 .AddSingletonAs<DatabaseCreator<TestDbContextMySql>>().Done()
@@ -73,13 +77,13 @@ public class MySqlFixture(string? reuseId = null) : IAsyncLifetime, ISqlContentF
         }
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         foreach (var service in services.GetRequiredService<IEnumerable<IInitializable>>())
         {
             await service.ReleaseAsync(default);
         }
 
-        await mysql.StopAsync();
+        await mysql.StopAsync(TestContext.Current.CancellationToken);
     }
 }

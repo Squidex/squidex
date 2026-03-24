@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using PhenX.EntityFrameworkCore.BulkInsert.PostgreSql;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -22,8 +23,7 @@ namespace Squidex.EntityFramework.TestHelpers;
 public class PostgresFixture(string? reuseId) : IAsyncLifetime, ISqlContentFixture<TestDbContextPostgres, PostgresContentDbContext>
 {
     private readonly PostgreSqlContainer postgreSql =
-        new PostgreSqlBuilder()
-            .WithImage("postgis/postgis")
+        new PostgreSqlBuilder("postgis/postgis")
             .WithReuse(true)
             .WithLabel("reuse-id", reuseId)
             .Build();
@@ -36,9 +36,9 @@ public class PostgresFixture(string? reuseId) : IAsyncLifetime, ISqlContentFixtu
     public IDbContextNamedFactory<PostgresContentDbContext> DbContextNamedFactory
         => services.GetRequiredService<IDbContextNamedFactory<PostgresContentDbContext>>();
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        await postgreSql.StartAsync();
+        await postgreSql.StartAsync(TestContext.Current.CancellationToken);
 
         var connectionString = postgreSql.GetConnectionString();
 
@@ -56,6 +56,9 @@ public class PostgresFixture(string? reuseId) : IAsyncLifetime, ISqlContentFixtu
                 {
                     builder.UseBulkInsertPostgreSql();
                     builder.UseNpgsql(connectionString);
+
+                    builder.ConfigureWarnings(w =>
+                        w.Ignore(RelationalEventId.PendingModelChangesWarning));
                 })
                 .AddSingleton<ConnectionStringParser, PostgresConnectionStringParser>()
                 .AddSingletonAs<DatabaseCreator<TestDbContextPostgres>>().Done()
@@ -69,13 +72,13 @@ public class PostgresFixture(string? reuseId) : IAsyncLifetime, ISqlContentFixtu
         }
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         foreach (var service in services.GetRequiredService<IEnumerable<IInitializable>>())
         {
             await service.ReleaseAsync(default);
         }
 
-        await postgreSql.StopAsync();
+        await postgreSql.StopAsync(TestContext.Current.CancellationToken);
     }
 }

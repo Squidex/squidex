@@ -6,9 +6,6 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Identity;
-using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
 
@@ -16,19 +13,6 @@ namespace Squidex.Domain.Users;
 
 public sealed class MongoRoleStore(IMongoDatabase database) : MongoRepositoryBase<IdentityRole>(database), IRoleStore<IdentityRole>
 {
-    static MongoRoleStore()
-    {
-        BsonClassMap.RegisterClassMap<IdentityRole<string>>(cm =>
-        {
-            cm.AutoMap();
-
-            cm.MapMember(x => x.Id)
-                .SetSerializer(new StringSerializer(BsonType.ObjectId));
-
-            cm.UnmapMember(x => x.ConcurrencyStamp);
-        });
-    }
-
     protected override string CollectionName()
     {
         return "Identity_Roles";

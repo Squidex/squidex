@@ -40,7 +40,7 @@ jobs:
         id: dotnet
         uses: actions/setup-dotnet@v4.3.1
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 10.0.x
 
       # Note: Unless a concrete version is specified in the `global.json` file,
       # the latest .NET version installed on the runner (including preinstalled
@@ -52,7 +52,7 @@ jobs:
           echo '{"sdk":{"version": "${{ steps.dotnet.outputs.dotnet-version }}"}}' > ./global.json
 
       - name: Test - TestContainers
-        run: dotnet test backend/Squidex.sln --filter Category=TestContainer
+        run: dotnet test backend/Squidex.slnx --filter Category=TestContainer
 
   test-mongo:
     runs-on: ubuntu-latest
@@ -67,7 +67,7 @@ jobs:
       - name: Prepare - Setup dotnet
         uses: actions/setup-dotnet@v4.3.1
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 10.0.x
 
       - name: Prepare - Setup Node
         uses: actions/setup-node@v4.4.0
@@ -175,7 +175,7 @@ jobs:
       - name: Prepare - Setup dotnet
         uses: actions/setup-dotnet@v4.3.1
         with:
-          dotnet-version: 8.0.x
+          dotnet-version: 10.0.x
 
       - name: Prepare - Setup Node
         uses: actions/setup-node@v4.4.0

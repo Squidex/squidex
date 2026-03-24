@@ -1,0 +1,5 @@
+<Solution>
+  <Project Path="TestSuite.ApiTests/TestSuite.ApiTests.csproj" />
+  <Project Path="TestSuite.LoadTests/TestSuite.LoadTests.csproj" />
+  <Project Path="TestSuite.Shared/TestSuite.Shared.csproj" />
+</Solution>

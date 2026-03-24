@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Globalization;
 using NodaTime;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -526,7 +527,7 @@ public static class TestContent
             },
             ["myDatetime"] = new
             {
-                iv = content.LastModified.ToString(),
+                iv = content.LastModified.ToString("g", CultureInfo.CurrentCulture),
             },
             ["myReferences"] = new
             {
@@ -694,7 +695,7 @@ public static class TestContent
             },
             ["myDatetime"] = new
             {
-                iv = content.LastModified.ToString(),
+                iv = content.LastModified.ToString("g", CultureInfo.CurrentCulture),
             },
             ["myGeolocation"] = new
             {
@@ -868,7 +869,7 @@ public static class TestContent
             ["myLocalizedString"] = "de-DE",
             ["myNumber"] = 1.0,
             ["myBoolean"] = true,
-            ["myDatetime"] = content.LastModified.ToString(),
+            ["myDatetime"] = content.LastModified.ToString("g", CultureInfo.CurrentCulture),
             ["myGeolocation"] = new
             {
                 latitude = 10,

@@ -1,0 +1,43 @@
+<Solution>
+  <Configurations>
+    <Platform Name="Any CPU" />
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Folder Name="/data/">
+    <Project Path="src/Squidex.Data.EntityFramework/Squidex.Data.EntityFramework.csproj" />
+    <Project Path="src/Squidex.Data.MongoDb/Squidex.Data.MongoDb.csproj" />
+    <Project Path="tests/Squidex.Data.Tests.CodeGenerator/Squidex.Data.Tests.CodeGenerator.csproj" />
+    <Project Path="tests/Squidex.Data.Tests/Squidex.Data.Tests.csproj" />
+  </Folder>
+  <Folder Name="/domain/">
+    <Project Path="src/Squidex.Domain.Apps.Core.Model/Squidex.Domain.Apps.Core.Model.csproj" />
+    <Project Path="src/Squidex.Domain.Apps.Core.Operations/Squidex.Domain.Apps.Core.Operations.csproj" />
+    <Project Path="src/Squidex.Domain.Apps.Entities/Squidex.Domain.Apps.Entities.csproj" />
+    <Project Path="src/Squidex.Domain.Apps.Events/Squidex.Domain.Apps.Events.csproj" />
+    <Project Path="tests/Squidex.Domain.Apps.Core.Tests/Squidex.Domain.Apps.Core.Tests.csproj" />
+    <Project Path="tests/Squidex.Domain.Apps.Entities.Tests/Squidex.Domain.Apps.Entities.Tests.csproj" />
+  </Folder>
+  <Folder Name="/extensions/">
+    <Project Path="extensions/Squidex.Extensions/Squidex.Extensions.csproj" />
+  </Folder>
+  <Folder Name="/infrastructure/">
+    <Project Path="src/Squidex.Infrastructure/Squidex.Infrastructure.csproj" />
+    <Project Path="tests/Squidex.Infrastructure.Tests/Squidex.Infrastructure.Tests.csproj" />
+  </Folder>
+  <Folder Name="/shared/">
+    <Project Path="src/Squidex.Domain.Users/Squidex.Domain.Users.csproj" />
+    <Project Path="src/Squidex.Shared/Squidex.Shared.csproj" />
+    <Project Path="src/Squidex.Web/Squidex.Web.csproj" />
+    <Project Path="tests/Squidex.Domain.Users.Tests/Squidex.Domain.Users.Tests.csproj" />
+    <Project Path="tests/Squidex.Web.Tests/Squidex.Web.Tests.csproj" />
+  </Folder>
+  <Folder Name="/Solution Items/">
+    <File Path="Squidex.ruleset" />
+    <File Path="stylecop.json" />
+  </Folder>
+  <Folder Name="/tools/">
+    <Project Path="src/Migrations/Migrations.csproj" />
+  </Folder>
+  <Project Path="src/Squidex/Squidex.csproj" />
+</Solution>

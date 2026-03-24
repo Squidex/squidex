@@ -5,13 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
-using Squidex.Domain.Apps.Entities.MongoDb;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
@@ -21,19 +19,6 @@ public sealed class MongoTextIndexerState(
     IContentRepository contentRepository)
     : MongoRepositoryBase<TextContentState>(database), ITextIndexerState, IDeleter
 {
-    static MongoTextIndexerState()
-    {
-        BsonUniqueContentIdSerializer.Register();
-
-        BsonClassMap.TryRegisterClassMap<TextContentState>(cm =>
-        {
-            cm.MapIdProperty(x => x.UniqueContentId);
-
-            cm.MapProperty(x => x.State)
-                .SetElementName("s");
-        });
-    }
-
     int IDeleter.Order => -2000;
 
     protected override string CollectionName()

@@ -18,14 +18,14 @@ namespace Squidex.EntityFramework.Migrations;
 [Trait("Category", "TestContainer")]
 public class MySqlMigrationTests : IAsyncLifetime
 {
-    private readonly MySqlContainer mysql = new MySqlBuilder().Build();
+    private readonly MySqlContainer mysql = new MySqlBuilder("mysql:8.0").Build();
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        await mysql.StartAsync();
+        await mysql.StartAsync(TestContext.Current.CancellationToken);
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await mysql.DisposeAsync();
     }

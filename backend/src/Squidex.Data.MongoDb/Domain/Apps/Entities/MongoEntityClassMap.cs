@@ -10,11 +10,11 @@ using Squidex.Infrastructure.Commands;
 
 namespace Squidex.Domain.Apps.Entities;
 
-internal static class EntityClassMap
+internal static class MongoEntityClassMap
 {
-    public static void Register()
+    public static void RegisterClassMap()
     {
-        BsonClassMap.TryRegisterClassMap<Entity>(cm =>
+        BsonClassMap.RegisterClassMap<Entity>(cm =>
         {
             cm.MapProperty(x => x.Id)
                 .SetElementName("id")

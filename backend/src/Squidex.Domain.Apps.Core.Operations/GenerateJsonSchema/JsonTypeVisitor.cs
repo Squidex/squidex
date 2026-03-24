@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Globalization;
 using NJsonSchema;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -140,7 +141,7 @@ internal sealed class JsonTypeVisitor : IFieldVisitor<JsonSchemaProperty?, JsonT
     {
         var property = JsonTypeBuilder.DateTimeProperty();
 
-        property.Default = field.Properties.DefaultValue?.ToString();
+        property.Default = field.Properties.DefaultValue?.ToString("g", CultureInfo.InvariantCulture);
 
         return property;
     }

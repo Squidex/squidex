@@ -19,16 +19,15 @@ namespace Squidex.EntityFramework.Migrations;
 public class PostgresMigrationTests : IAsyncLifetime
 {
     private readonly PostgreSqlContainer postgreSql =
-        new PostgreSqlBuilder()
-            .WithImage("postgis/postgis")
+        new PostgreSqlBuilder("postgis/postgis")
             .Build();
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        await postgreSql.StartAsync();
+        await postgreSql.StartAsync(TestContext.Current.CancellationToken);
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await postgreSql.DisposeAsync();
     }

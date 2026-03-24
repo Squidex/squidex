@@ -168,11 +168,6 @@ public static class MongoExtensions
         var (key, snapshot, _, oldVersion) = job;
         try
         {
-            Expression<Func<T, bool>> filter2 =
-                oldVersion > EtagVersion.Any ?
-                x => x.DocumentId.Equals(key) && x.Version == oldVersion :
-                x => x.DocumentId.Equals(key);
-
             var filter = filters.Eq(x => x.DocumentId, key);
 
             if (oldVersion > EtagVersion.Any)

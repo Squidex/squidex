@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using MongoDB.Bson;
+using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using NodaTime.Text;
@@ -21,12 +23,6 @@ namespace Squidex.MongoDb.Domain.Assets;
 public class AssetQueryTests
 {
     private readonly DomainId appId = DomainId.NewGuid();
-
-    static AssetQueryTests()
-    {
-        MongoAssetEntity.RegisterClassMap();
-        MongoTestUtils.SetupBson();
-    }
 
     [Fact]
     public void Should_throw_exception_for_full_text_search()
@@ -205,7 +201,7 @@ public class AssetQueryTests
                 new RenderArgs<MongoAssetEntity>(
                     BsonSerializer.SerializerRegistry.GetSerializer<MongoAssetEntity>(),
                     BsonSerializer.SerializerRegistry))
-            .ToString();
+            .ToJson(new JsonWriterSettings { OutputMode = JsonOutputMode.Shell });
 
         Assert.Equal(Cleanup(expected, arg), rendered);
     }

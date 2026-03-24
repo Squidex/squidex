@@ -24,14 +24,14 @@ public class MongoSchemasHashTests(MongoFixture fixture) : GivenContext, IAsyncL
 {
     private readonly MongoSchemasHash sut = new MongoSchemasHash(fixture.Database);
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
         await sut.InitializeAsync(default);
     }
 
-    public Task DisposeAsync()
+    public ValueTask DisposeAsync()
     {
-        return Task.CompletedTask;
+        return default;
     }
 
     [Fact]

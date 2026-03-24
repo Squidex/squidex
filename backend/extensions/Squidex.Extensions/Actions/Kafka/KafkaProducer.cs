@@ -96,7 +96,10 @@ public sealed class KafkaProducer
                 break;
         }
 
-        log.Log(level, "Kafka log {name}: {message}.", message.Name, message.Message);
+        if (log.IsEnabled(level))
+        {
+            log.Log(level, "Kafka log {name}: {message}.", message.Name, message.Message);
+        }
     }
 
     private static void LogError(ILogger<KafkaProducer> log, Error error)

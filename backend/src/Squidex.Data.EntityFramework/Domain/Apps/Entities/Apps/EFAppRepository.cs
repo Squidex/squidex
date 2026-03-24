@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Query;
 using Squidex.Domain.Apps.Core.Apps;
@@ -101,7 +100,7 @@ public sealed class EFAppRepository<TContext>(IDbContextFactory<TContext> dbCont
         return byName.Values.ToList();
     }
 
-    protected override Expression<Func<SetPropertyCalls<EFAppEntity>, SetPropertyCalls<EFAppEntity>>> BuildUpdate(EFAppEntity entity)
+    protected override Action<UpdateSettersBuilder<EFAppEntity>> BuildUpdate(EFAppEntity entity)
     {
         return u => u
             .SetProperty(x => x.Document, entity.Document)
