@@ -177,20 +177,6 @@ public static class MongoExtensions
 
             var result = await collection.ReplaceOneAsync(filter, job.Value, UpsertReplace, ct);
 
-            if (result.IsAcknowledged && result.ModifiedCount == 0 && oldVersion > EtagVersion.Any)
-            {
-                var existingVersion =
-                    await collection.Find(filters.Eq("_id", key))
-                        .Project<BsonDocument>(Builders<T>.Projection.Include("_id").Include(versionField))
-                        .FirstOrDefaultAsync(ct);
-
-                var currentVersion = existingVersion != null
-                    ? existingVersion[Field.Of<T>(x => nameof(x.Version))].AsInt64
-                    : EtagVersion.Any;
-
-                throw new InconsistentStateException(currentVersion, oldVersion);
-            }
-
             return result.IsAcknowledged && result.ModifiedCount == 1;
         }
         catch (MongoWriteException ex) when (ex.WriteError?.Category == ServerErrorCategory.DuplicateKey)
