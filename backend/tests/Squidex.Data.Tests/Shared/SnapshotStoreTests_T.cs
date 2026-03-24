@@ -104,6 +104,9 @@ public abstract class SnapshotStoreTests<TEntity>
 
         await sut.WriteAsync(new SnapshotWriteJob<TEntity>(sourceKey, sourceValue, 42));
 
+        var found = await sut.ReadAsync(sourceKey);
+        Assert.Equal(42, found.Version);
+
         var ex = await Assert.ThrowsAsync<InconsistentStateException>(() =>
             sut.WriteAsync(new SnapshotWriteJob<TEntity>(sourceKey, sourceValue, 2, 1)));
 
