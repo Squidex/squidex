@@ -7,6 +7,7 @@
 
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -99,6 +100,9 @@ public static class ServiceExtensions
                         options.MigrationsHistoryTable($"{name}MigrationHistory");
                         options.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
                     });
+
+                    builder.ConfigureWarnings(w =>
+                        w.Ignore(RelationalEventId.PendingModelChangesWarning));
                 });
 
                 services.AddSingleton(typeof(ISnapshotStore<>), typeof(MySqlSnapshotStore<>));
@@ -130,6 +134,9 @@ public static class ServiceExtensions
                     {
                         options.MigrationsHistoryTable($"{name}MigrationHistory");
                     });
+
+                    builder.ConfigureWarnings(w =>
+                        w.Ignore(RelationalEventId.PendingModelChangesWarning));
                 });
 
                 services.AddSingleton(typeof(ISnapshotStore<>), typeof(PostgresSnapshotStore<>));
@@ -161,6 +168,9 @@ public static class ServiceExtensions
                     {
                         options.MigrationsHistoryTable($"{name}MigrationHistory");
                     });
+
+                    builder.ConfigureWarnings(w =>
+                        w.Ignore(RelationalEventId.PendingModelChangesWarning));
                 });
 
                 services.AddSingleton(typeof(ISnapshotStore<>), typeof(SqlServerSnapshotStore<>));
