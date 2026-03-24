@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using PhenX.EntityFrameworkCore.BulkInsert.PostgreSql;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -55,6 +56,9 @@ public class PostgresFixture(string? reuseId) : IAsyncLifetime, ISqlContentFixtu
                 {
                     builder.UseBulkInsertPostgreSql();
                     builder.UseNpgsql(connectionString);
+
+                    builder.ConfigureWarnings(w =>
+                        w.Ignore(RelationalEventId.PendingModelChangesWarning));
                 })
                 .AddSingleton<ConnectionStringParser, PostgresConnectionStringParser>()
                 .AddSingletonAs<DatabaseCreator<TestDbContextPostgres>>().Done()

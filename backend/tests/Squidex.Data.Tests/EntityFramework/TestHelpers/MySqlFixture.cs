@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using PhenX.EntityFrameworkCore.BulkInsert.MySql;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -60,6 +61,9 @@ public class MySqlFixture(string? reuseId = null) : IAsyncLifetime, ISqlContentF
                     {
                         options.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
                     });
+
+                    builder.ConfigureWarnings(w =>
+                        w.Ignore(RelationalEventId.PendingModelChangesWarning));
                 })
                 .AddSingleton<ConnectionStringParser, MySqlConnectionStringParser>()
                 .AddSingletonAs<DatabaseCreator<TestDbContextMySql>>().Done()

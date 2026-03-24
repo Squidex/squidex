@@ -7,6 +7,7 @@
 
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 using Microsoft.Extensions.DependencyInjection;
 using PhenX.EntityFrameworkCore.BulkInsert.SqlServer;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -57,6 +58,9 @@ public class SqlServerFixture(string? reuseId = null) : IAsyncLifetime, ISqlCont
                 {
                     builder.UseBulkInsertSqlServer();
                     builder.UseSqlServer(connectionString);
+
+                    builder.ConfigureWarnings(w =>
+                        w.Ignore(RelationalEventId.PendingModelChangesWarning));
                 })
                 .AddSingleton<ConnectionStringParser, SqlServerConnectionStringParser>()
                 .AddSingletonAs<DatabaseCreator<TestDbContextSqlServer>>().Done()
