@@ -170,7 +170,6 @@ public sealed class Resources(ApiController controller)
         var url = Controller.Url(action, values);
 
         var basePath = Controller.HttpContext.Request.PathBase;
-
         if (url.StartsWith(Controller.HttpContext.Request.PathBase, StringComparison.OrdinalIgnoreCase))
         {
             url = url[basePath.Value!.Length..];
