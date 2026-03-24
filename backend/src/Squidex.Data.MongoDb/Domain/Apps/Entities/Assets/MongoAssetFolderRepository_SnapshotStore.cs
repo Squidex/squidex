@@ -57,7 +57,7 @@ public sealed partial class MongoAssetFolderRepository : ISnapshotStore<AssetFol
         {
             var entityJob = job.As(MongoAssetFolderEntity.Create(job));
 
-            await Collection.UpsertVersionedAsync(entityJob, Field.Of<AssetFolder>(x => nameof(x.Version)), ct);
+            await Collection.UpsertVersionedAsync(entityJob, Field.Of<MongoAssetFolderEntity>(x => nameof(x.Version)), ct);
         }
     }
 
