@@ -21,7 +21,7 @@
     <PackageReference Include="Squidex.ClientLibrary" Version="22.2.0" />
     <PackageReference Include="Squidex.ClientLibrary.ServiceExtensions" Version="22.2.0" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
-    <PackageReference Include="Verify" Version="31.13.5" />
+    <PackageReference Include="Verify" Version="31.12.5" />
     <PackageReference Include="xunit" Version="2.9.3" />
   </ItemGroup>
   <ItemGroup>
