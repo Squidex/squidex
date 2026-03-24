@@ -32,7 +32,7 @@ public sealed class GraphQLFixture : ContentFixture
     {
     }
 
-    public override async Task InitializeAsync()
+    public override async ValueTask InitializeAsync()
     {
         await base.InitializeAsync();
 
@@ -46,7 +46,7 @@ public sealed class GraphQLFixture : ContentFixture
         {
             try
             {
-                var response = await Client.Schemas.PostSchemaAsync(request);
+                var response = await Client.Schemas.PostSchemaAsync(request, TestContext.Current.CancellationToken);
 
                 return response.Id;
             }
@@ -57,7 +57,7 @@ public sealed class GraphQLFixture : ContentFixture
                     throw;
                 }
 
-                var schema = await Client.Schemas.GetSchemaAsync(request.Name);
+                var schema = await Client.Schemas.GetSchemaAsync(request.Name, TestContext.Current.CancellationToken);
 
                 return schema.Id;
             }
@@ -174,7 +174,7 @@ public sealed class GraphQLFixture : ContentFixture
 
     private async Task CreateContentsAsync()
     {
-        var countries = await Countries.GetAsync();
+        var countries = await Countries.GetAsync(ct: TestContext.Current.CancellationToken);
 
         if (countries.Total > 0)
         {
@@ -212,7 +212,7 @@ public sealed class GraphQLFixture : ContentFixture
                 },
             };
 
-            var city = await Cities.CreateAsync(cityData, ContentCreateOptions.AsPublish);
+            var city = await Cities.CreateAsync(cityData, ContentCreateOptions.AsPublish, ct: TestContext.Current.CancellationToken);
 
             return city.Id;
         }
@@ -231,7 +231,7 @@ public sealed class GraphQLFixture : ContentFixture
                 },
             };
 
-            var state = await States.CreateAsync(stateData, ContentCreateOptions.AsPublish);
+            var state = await States.CreateAsync(stateData, ContentCreateOptions.AsPublish, ct: TestContext.Current.CancellationToken);
 
             return state.Id;
         }
@@ -259,6 +259,6 @@ public sealed class GraphQLFixture : ContentFixture
             },
         };
 
-        await Countries.CreateAsync(countryData, ContentCreateOptions.AsPublish);
+        await Countries.CreateAsync(countryData, ContentCreateOptions.AsPublish, ct: TestContext.Current.CancellationToken);
     }
 }

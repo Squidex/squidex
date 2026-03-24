@@ -15,11 +15,6 @@ namespace Squidex.Domain.Apps.Entities.MongoDb.Assets;
 
 public sealed partial class MongoAssetFolderRepository(IMongoDatabase database) : MongoRepositoryBase<MongoAssetFolderEntity>(database), IAssetFolderRepository
 {
-    static MongoAssetFolderRepository()
-    {
-        MongoAssetFolderEntity.RegisterClassMap();
-    }
-
     protected override string CollectionName()
     {
         return "States_AssetFolders2";

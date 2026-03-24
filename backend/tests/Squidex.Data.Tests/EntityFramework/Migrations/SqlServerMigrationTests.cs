@@ -22,12 +22,12 @@ public class SqlServerMigrationTests : IAsyncLifetime
         new MsSqlBuilder("mcr.microsoft.com/mssql/server:2022-CU14-ubuntu-22.04")
             .Build();
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        await sqlServer.StartAsync();
+        await sqlServer.StartAsync(TestContext.Current.CancellationToken);
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await sqlServer.DisposeAsync();
     }

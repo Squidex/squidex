@@ -8,8 +8,6 @@
 using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using MongoDB.Bson;
-using MongoDB.Bson.Serialization;
-using MongoDB.Bson.Serialization.Serializers;
 using MongoDB.Driver;
 using Squidex.Infrastructure;
 
@@ -36,95 +34,6 @@ public sealed class MongoUserStore(IMongoDatabase database) :
     private const string AuthenticatorKeyTokenName = "AuthenticatorKey";
     private const string RecoveryCodeTokenName = "RecoveryCodes";
     private IMongoCollection<IdentityUser> queryableCollection;
-
-    static MongoUserStore()
-    {
-        BsonClassMap.RegisterClassMap<Claim>(cm =>
-        {
-            cm.MapConstructor(typeof(Claim).GetConstructors()
-                .First(x =>
-                {
-                    var parameters = x.GetParameters();
-
-                    return parameters.Length == 2 &&
-                        parameters[0].Name == "type" &&
-                        parameters[0].ParameterType == typeof(string) &&
-                        parameters[1].Name == "value" &&
-                        parameters[1].ParameterType == typeof(string);
-                }))
-                .SetArguments(
-                [
-                    nameof(Claim.Type),
-                    nameof(Claim.Value),
-                ]);
-
-            cm.MapMember(x => x.Type);
-            cm.MapMember(x => x.Value);
-        });
-
-        BsonClassMap.RegisterClassMap<UserLogin>(cm =>
-        {
-            cm.MapConstructor(typeof(UserLogin).GetConstructors()
-                .First(x =>
-                {
-                    var parameters = x.GetParameters();
-
-                    return parameters.Length == 3;
-                }))
-                .SetArguments(
-                [
-                    nameof(UserLogin.LoginProvider),
-                    nameof(UserLogin.ProviderKey),
-                    nameof(UserLogin.ProviderDisplayName),
-                ]);
-
-            cm.AutoMap();
-        });
-
-        BsonClassMap.RegisterClassMap<IdentityUserToken<string>>(cm =>
-        {
-            cm.AutoMap();
-
-            cm.UnmapMember(x => x.UserId);
-        });
-
-        BsonClassMap.RegisterClassMap<IdentityUser<string>>(cm =>
-        {
-            cm.AutoMap();
-
-            cm.MapMember(x => x.Id)
-                .SetSerializer(new StringSerializer(BsonType.ObjectId));
-
-            cm.MapMember(x => x.AccessFailedCount)
-                .SetIgnoreIfDefault(true);
-
-            cm.MapMember(x => x.EmailConfirmed)
-                .SetIgnoreIfDefault(true);
-
-            cm.MapMember(x => x.LockoutEnd)
-                .SetElementName("LockoutEndDateUtc").SetIgnoreIfNull(true);
-
-            cm.MapMember(x => x.LockoutEnabled)
-                .SetIgnoreIfDefault(true);
-
-            cm.MapMember(x => x.PasswordHash)
-                .SetIgnoreIfNull(true);
-
-            cm.MapMember(x => x.PhoneNumber)
-                .SetIgnoreIfNull(true);
-
-            cm.MapMember(x => x.PhoneNumberConfirmed)
-                .SetIgnoreIfDefault(true);
-
-            cm.MapMember(x => x.SecurityStamp)
-                .SetIgnoreIfNull(true);
-
-            cm.MapMember(x => x.TwoFactorEnabled)
-                .SetIgnoreIfDefault(true);
-        });
-
-        BsonSerializer.TryRegisterSerializer(new IdentityUserForwardingSerializer());
-    }
 
     protected override string CollectionName()
     {
@@ -671,30 +580,5 @@ public sealed class MongoUserStore(IMongoDatabase database) :
         return filter.And(
             filter.Eq(x => x.LoginProvider, loginProvider),
             filter.Eq(x => x.ProviderKey, providerKey));
-    }
-
-    private sealed class IdentityUserForwardingSerializer
-        : SerializerBase<IdentityUser>, IBsonDocumentSerializer
-    {
-        private static readonly IBsonSerializer<MongoUser> MongoUserSerializer =
-            BsonSerializer.LookupSerializer<MongoUser>();
-
-        public override IdentityUser Deserialize(BsonDeserializationContext context, BsonDeserializationArgs args)
-        {
-            args.NominalType = typeof(MongoUser);
-            return MongoUserSerializer.Deserialize(context, args);
-        }
-
-        public override void Serialize(BsonSerializationContext context, BsonSerializationArgs args, IdentityUser value)
-        {
-            args.NominalType = typeof(MongoUser);
-            MongoUserSerializer.Serialize(context, args, (MongoUser)value);
-        }
-
-        public bool TryGetMemberSerializationInfo(string memberName, out BsonSerializationInfo serializationInfo)
-        {
-            return ((IBsonDocumentSerializer)MongoUserSerializer)
-                .TryGetMemberSerializationInfo(memberName, out serializationInfo);
-        }
     }
 }

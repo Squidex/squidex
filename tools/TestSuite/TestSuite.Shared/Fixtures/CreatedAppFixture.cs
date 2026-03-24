@@ -11,7 +11,7 @@ namespace TestSuite.Fixtures;
 
 public class CreatedAppFixture : ClientFixture
 {
-    public override async Task InitializeAsync()
+    public override async ValueTask InitializeAsync()
     {
         await base.InitializeAsync();
 

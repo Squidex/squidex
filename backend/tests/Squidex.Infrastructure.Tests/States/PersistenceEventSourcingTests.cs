@@ -19,7 +19,7 @@ public class PersistenceEventSourcingTests
     private readonly IEventStore eventStore = A.Fake<IEventStore>();
     private readonly IEventStreamNames eventStreamNames = A.Fake<IEventStreamNames>();
     private readonly ISnapshotStore<string> snapshotStore = A.Fake<ISnapshotStore<string>>();
-    private readonly IStore<string> sut;
+    private readonly Store<string> sut;
 
     public PersistenceEventSourcingTests()
     {

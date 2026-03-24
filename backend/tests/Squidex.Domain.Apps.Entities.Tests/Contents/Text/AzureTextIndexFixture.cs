@@ -22,13 +22,13 @@ public sealed class AzureTextIndexFixture : IAsyncLifetime
             TestConfig.Configuration["azureText:indexName"]!);
     }
 
-    public Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        return Index.InitializeAsync(default);
+        await Index.InitializeAsync(default);
     }
 
-    public Task DisposeAsync()
+    public ValueTask DisposeAsync()
     {
-        return Task.CompletedTask;
+        return default;
     }
 }

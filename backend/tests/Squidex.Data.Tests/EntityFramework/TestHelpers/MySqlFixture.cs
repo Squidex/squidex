@@ -37,9 +37,9 @@ public class MySqlFixture(string? reuseId = null) : IAsyncLifetime, ISqlContentF
     public IDbContextNamedFactory<MySqlContentDbContext> DbContextNamedFactory
         => services.GetRequiredService<IDbContextNamedFactory<MySqlContentDbContext>>();
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        await mysql.StartAsync();
+        await mysql.StartAsync(TestContext.Current.CancellationToken);
 
         var connectionString = $"{mysql.GetConnectionString()};AllowLoadLocalInfile=true;MaxPoolSize=1000";
 
@@ -77,13 +77,13 @@ public class MySqlFixture(string? reuseId = null) : IAsyncLifetime, ISqlContentF
         }
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         foreach (var service in services.GetRequiredService<IEnumerable<IInitializable>>())
         {
             await service.ReleaseAsync(default);
         }
 
-        await mysql.StopAsync();
+        await mysql.StopAsync(TestContext.Current.CancellationToken);
     }
 }

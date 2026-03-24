@@ -24,13 +24,6 @@ namespace Squidex.MongoDb.Domain.Contents;
 
 public class ContentQueryTests : GivenContext
 {
-    static ContentQueryTests()
-    {
-        MongoContentEntity.RegisterClassMap();
-
-        MongoTestUtils.SetupBson();
-    }
-
     public ContentQueryTests()
     {
         Schema = Schema with { Version = 3 };

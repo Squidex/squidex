@@ -10,13 +10,11 @@ using Squidex.Domain.Apps.Core;
 
 namespace Squidex.Domain.Apps.Entities;
 
-public static class AppEntityClassMap
+public static class MongoAppEntityClassMap
 {
-    public static void Register()
+    public static void RegisterClassMap()
     {
-        EntityClassMap.Register();
-
-        BsonClassMap.TryRegisterClassMap<AppEntity>(cm =>
+        BsonClassMap.RegisterClassMap<AppEntity>(cm =>
         {
             cm.MapProperty(x => x.AppId)
                 .SetElementName("ai")

@@ -36,9 +36,9 @@ public class PostgresFixture(string? reuseId) : IAsyncLifetime, ISqlContentFixtu
     public IDbContextNamedFactory<PostgresContentDbContext> DbContextNamedFactory
         => services.GetRequiredService<IDbContextNamedFactory<PostgresContentDbContext>>();
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        await postgreSql.StartAsync();
+        await postgreSql.StartAsync(TestContext.Current.CancellationToken);
 
         var connectionString = postgreSql.GetConnectionString();
 
@@ -72,13 +72,13 @@ public class PostgresFixture(string? reuseId) : IAsyncLifetime, ISqlContentFixtu
         }
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         foreach (var service in services.GetRequiredService<IEnumerable<IInitializable>>())
         {
             await service.ReleaseAsync(default);
         }
 
-        await postgreSql.StopAsync();
+        await postgreSql.StopAsync(TestContext.Current.CancellationToken);
     }
 }

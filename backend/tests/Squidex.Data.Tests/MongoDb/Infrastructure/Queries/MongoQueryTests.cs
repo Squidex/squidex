@@ -33,11 +33,6 @@ public class MongoQueryTests
         public long Version { get; set; }
     }
 
-    static MongoQueryTests()
-    {
-        MongoTestUtils.SetupBson();
-    }
-
     [Fact]
     public void Should_not_throw_exception_for_invalid_field()
     {

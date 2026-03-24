@@ -9,10 +9,7 @@ using MongoDB.Bson;
 using MongoDB.Bson.IO;
 using MongoDB.Bson.Serialization;
 using MongoDB.Bson.Serialization.Attributes;
-using MongoDB.Bson.Serialization.Serializers;
 using Squidex.Domain.Apps.Core.TestHelpers;
-using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.MongoDb.TestHelpers;
 
@@ -25,22 +22,6 @@ public static class MongoTestUtils
 
         [BsonRequired]
         public T Value2 { get; set; }
-    }
-
-    static MongoTestUtils()
-    {
-        SetupBson();
-    }
-
-    public static void SetupBson()
-    {
-        BsonDefaultConventions.Register();
-        BsonDomainIdSerializer.Register();
-        BsonEscapedDictionarySerializer<JsonValue, JsonObject>.Register();
-        BsonInstantSerializer.Register();
-        BsonJsonConvention.Register(TestUtils.DefaultOptions());
-        BsonJsonValueSerializer.Register();
-        BsonStringSerializer<RefToken>.Register();
     }
 
     public static T SerializeAndDeserializeBson<T>(this T value)

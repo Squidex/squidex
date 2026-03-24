@@ -17,7 +17,7 @@ public class CreatedTeamFixture : ClientFixture
 
     public TeamDto Team { get; private set; }
 
-    public override async Task InitializeAsync()
+    public override async ValueTask InitializeAsync()
     {
         await base.InitializeAsync();
 

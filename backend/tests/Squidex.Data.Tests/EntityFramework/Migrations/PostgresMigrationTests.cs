@@ -22,12 +22,12 @@ public class PostgresMigrationTests : IAsyncLifetime
         new PostgreSqlBuilder("postgis/postgis")
             .Build();
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        await postgreSql.StartAsync();
+        await postgreSql.StartAsync(TestContext.Current.CancellationToken);
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         await postgreSql.DisposeAsync();
     }

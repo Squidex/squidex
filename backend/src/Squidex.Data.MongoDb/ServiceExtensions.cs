@@ -70,7 +70,8 @@ public static class ServiceExtensions
         services.AddSingletonAs(c =>
         {
             var options = c.GetRequiredService<IOptions<MongoEventStoreOptions>>();
-            var mongoClient = GetMongoClient(config, "eventStore:mongoDb");
+
+            var mongoClient = GetMongoClient(config, c.GetRequiredService<JsonSerializerOptions>(), "eventStore:mongoDb");
             var mongoDatabase = mongoClient.GetDatabase(mongoDatabaseName);
 
             return new MongoEventStore(mongoDatabase, options);
@@ -85,7 +86,7 @@ public static class ServiceExtensions
 
         services.AddMongoAssetStore(c =>
         {
-            var mongoClient = GetMongoClient(config, "assetStore:mongoDb");
+            var mongoClient = GetMongoClient(config, c.GetRequiredService<JsonSerializerOptions>(), "assetStore:mongoDb");
             var mongoDatabase = mongoClient.GetDatabase(mongoDatabaseName);
 
             return new GridFSBucket<string>(mongoDatabase, new GridFSBucketOptions
@@ -105,7 +106,7 @@ public static class ServiceExtensions
             return GetDatabase(c, mongoDatabaseName);
         });
 
-        services.AddSingletonAs(c => GetMongoClient(config, "store:mongoDb"))
+        services.AddSingletonAs(c => GetMongoClient(config, c.GetRequiredService<JsonSerializerOptions>(), "store:mongoDb"))
             .As<IMongoClient>();
 
         services.AddSingletonAs(c => GetDatabase(c, mongoDatabaseName))
@@ -288,14 +289,19 @@ public static class ServiceExtensions
             .As<IMigration>();
     }
 
-    private static IMongoClient GetMongoClient(IConfiguration config, string prefix)
+    private static IMongoClient GetMongoClient(IConfiguration config, JsonSerializerOptions serializerOptions, string prefix)
     {
+        var representation = config.GetValue<BsonType>("store:mongoDB:valueRepresentation");
+
         var mongoConfiguration = config.GetRequiredValue($"{prefix}:configuration")!;
         var mongoCertificate = config.GetValue<string>($"{prefix}:certificate");
+
         var cacheKey = $"{mongoConfiguration}_{mongoCertificate}";
 
         return Singletons<IMongoClient>.GetOrAdd(cacheKey, _ =>
         {
+            MongoClientFactory.SetupSerializer(serializerOptions, representation);
+
             return MongoClientFactory.Create(mongoConfiguration, settings =>
             {
                 if (!string.IsNullOrWhiteSpace(mongoCertificate))

@@ -28,8 +28,6 @@ public class DocumentDbFixture
 
     public DocumentDbFixture()
     {
-        MongoTestUtils.SetupBson();
-
         var settings = MongoClientSettings.FromConnectionString(
             TestConfig.Configuration.GetValue<string>("documentDb:configuration")
         );

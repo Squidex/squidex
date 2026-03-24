@@ -30,20 +30,15 @@ public class MongoFixture : IAsyncLifetime
 
     public IMongoDatabase Database => Client.GetDatabase("Test");
 
-    public MongoFixture()
+    public async ValueTask InitializeAsync()
     {
-        MongoTestUtils.SetupBson();
+        await mongoDb.StartAsync(TestContext.Current.CancellationToken);
+
+        Client = MongoClientFactory.Create(mongoDb.GetConnectionString());
     }
 
-    public async Task InitializeAsync()
+    public async ValueTask DisposeAsync()
     {
-        await mongoDb.StartAsync();
-
-        Client = new MongoClient(mongoDb.GetConnectionString());
-    }
-
-    public async Task DisposeAsync()
-    {
-        await mongoDb.StopAsync();
+        await mongoDb.StopAsync(TestContext.Current.CancellationToken);
     }
 }

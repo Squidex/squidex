@@ -12,11 +12,6 @@ namespace Squidex.MongoDb.Infrastructure;
 
 public class NamedIdTests
 {
-    static NamedIdTests()
-    {
-        MongoTestUtils.SetupBson();
-    }
-
     [Fact]
     public void Should_serialize_and_deserialize_null_guid_token()
     {

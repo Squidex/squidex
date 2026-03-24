@@ -87,6 +87,7 @@ public abstract class MongoRepositoryBase<T> : MongoBase<T>, IInitializable
     {
         try
         {
+            Console.WriteLine("AASDASD");
             CreateCollection();
 
             await SetupCollectionAsync(Collection, ct);

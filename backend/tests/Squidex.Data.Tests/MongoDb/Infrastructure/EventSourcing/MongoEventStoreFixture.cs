@@ -8,8 +8,8 @@
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Squidex.Events.Mongo;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.TestHelpers;
+using Squidex.MongoDb.TestHelpers;
 
 #pragma warning disable MA0048 // File name must match type name
 
@@ -37,11 +37,6 @@ public abstract class MongoEventStoreFixture : IAsyncLifetime
 
     public IMongoDatabase Database { get; }
 
-    static MongoEventStoreFixture()
-    {
-        BsonJsonConvention.Register(TestUtils.DefaultOptions());
-    }
-
     protected MongoEventStoreFixture(string connectionString)
     {
         var mongoClient = MongoClientFactory.Create(connectionString);
@@ -52,13 +47,13 @@ public abstract class MongoEventStoreFixture : IAsyncLifetime
         EventStore = new MongoEventStore(mongoDatabase, Options.Create(new MongoEventStoreOptions()));
     }
 
-    public Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        return EventStore.InitializeAsync(default);
+        await EventStore.InitializeAsync(default);
     }
 
-    public Task DisposeAsync()
+    public ValueTask DisposeAsync()
     {
-        return Task.CompletedTask;
+        return default;
     }
 }

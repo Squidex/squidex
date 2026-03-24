@@ -24,11 +24,6 @@ public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAsse
     private readonly MongoCountCollection countCollection;
     private readonly string shardKey;
 
-    static MongoAssetRepository()
-    {
-        MongoAssetEntity.RegisterClassMap();
-    }
-
     public MongoAssetRepository(IMongoDatabase database, ILogger<MongoAssetRepository> log, string shardKey)
         : base(database)
     {

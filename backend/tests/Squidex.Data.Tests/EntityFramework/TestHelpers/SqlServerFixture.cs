@@ -37,10 +37,10 @@ public class SqlServerFixture(string? reuseId = null) : IAsyncLifetime, ISqlCont
     public IDbContextNamedFactory<SqlServerContentDbContext> DbContextNamedFactory
         => services.GetRequiredService<IDbContextNamedFactory<SqlServerContentDbContext>>();
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        await sqlServer.StartAsync();
-        await sqlServer.ExecScriptAsync($"create database squidex;");
+        await sqlServer.StartAsync(TestContext.Current.CancellationToken);
+        await sqlServer.ExecScriptAsync($"create database squidex;", TestContext.Current.CancellationToken);
 
         var connectionString = GetConnectionString();
 
@@ -74,14 +74,14 @@ public class SqlServerFixture(string? reuseId = null) : IAsyncLifetime, ISqlCont
         }
     }
 
-    public async Task DisposeAsync()
+    public async ValueTask DisposeAsync()
     {
         foreach (var service in services.GetRequiredService<IEnumerable<IInitializable>>())
         {
             await service.ReleaseAsync(default);
         }
 
-        await sqlServer.StopAsync();
+        await sqlServer.StopAsync(TestContext.Current.CancellationToken);
     }
 
     private string GetConnectionString()

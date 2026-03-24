@@ -17,16 +17,6 @@ public sealed class MongoHistoryEventRepository(IMongoDatabase database) : Mongo
 {
     static MongoHistoryEventRepository()
     {
-        BsonClassMap.TryRegisterClassMap<HistoryEvent>(cm =>
-        {
-            cm.AutoMap();
-
-            cm.MapProperty(x => x.OwnerId)
-                .SetElementName("AppId");
-
-            cm.MapProperty(x => x.EventType)
-                .SetElementName("Message");
-        });
     }
 
     protected override string CollectionName()

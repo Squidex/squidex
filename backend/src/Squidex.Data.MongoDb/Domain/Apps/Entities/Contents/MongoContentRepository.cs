@@ -49,15 +49,6 @@ public partial class MongoContentRepository(
 
     public bool CanUseTransactions { get; private set; }
 
-    static MongoContentRepository()
-    {
-        BsonEscapedDictionarySerializer<JsonValue, JsonObject>.Register();
-        BsonEscapedDictionarySerializer<JsonValue, ContentFieldData>.Register();
-        BsonEscapedDictionarySerializer<ContentFieldData, ContentData>.Register();
-        BsonStringSerializer<Status>.Register();
-        MongoContentEntity.RegisterClassMap();
-    }
-
     public async Task InitializeAsync(
         CancellationToken ct)
     {

@@ -24,12 +24,6 @@ public class AssetQueryTests
 {
     private readonly DomainId appId = DomainId.NewGuid();
 
-    static AssetQueryTests()
-    {
-        MongoAssetEntity.RegisterClassMap();
-        MongoTestUtils.SetupBson();
-    }
-
     [Fact]
     public void Should_throw_exception_for_full_text_search()
     {
