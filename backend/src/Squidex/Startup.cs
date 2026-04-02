@@ -73,7 +73,7 @@ public sealed class Startup(IConfiguration config)
     {
         app.UseWebSockets();
         app.UseCookiePolicy();
-        app.UseDefaultPathBase();
+        app.UseFallbackPathBase();
         app.UseDefaultForwardRules();
         app.UseSquidexLogging();
         app.UseSquidexLocalization();
