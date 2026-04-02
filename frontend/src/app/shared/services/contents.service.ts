@@ -267,7 +267,7 @@ function buildFullQuery(primary: FullQuery, q?: ContentsByQuery) {
 function buildQueryString(input: { q?: object; odata?: string }) {
     const { odata, q } = input;
 
-    return q ? `?q=${JSON.stringify(q)}` : `?${odata}`;
+    return q ? `?q=${encodeURIComponent(JSON.stringify(q))}` : `?${odata}`;
 }
 
 function buildQuery(q?: ContentsByQuery): { q?: object; odata?: string } {
