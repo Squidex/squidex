@@ -49,7 +49,7 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
     {
         TryComplete();
 
-        var result = await tcs.Task.WithCancellation(default);
+        var result = await tcs.Task.WithCancellation(cancellationToken);
         if (result == null)
         {
             return fallback();
