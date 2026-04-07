@@ -74,9 +74,7 @@ public class EventConsumerProcessor : IEventSubscriber<ParsedEvents>
         }
 
         // Acquire the lock to ensure any in-flight UpdateAsync has fully completed before returning.
-        using (await asyncLock.EnterAsync())
-        {
-        }
+        using var _ = await asyncLock.EnterAsync();
     }
 
     public virtual ValueTask OnNextAsync(IEventSubscription subscription, ParsedEvents @event)
