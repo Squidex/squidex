@@ -48,13 +48,13 @@ public static class ETagExtensions
                 hasher.AppendLong(item.Version);
             }
 
-            return hasher.GetHexStringAndReset();
+            return hasher.GetQuotedHexStringAndReset();
         }
     }
 
     public static string ToEtag<T>(this T entity) where T : Entity
     {
-        return entity.Version.ToString(CultureInfo.InvariantCulture);
+        return $"\"{entity.Version.ToString(CultureInfo.InvariantCulture)}\"";
     }
 
     public static bool TryParseEtagVersion(this HttpContext httpContext, string header, out long version)

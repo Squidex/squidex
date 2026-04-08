@@ -47,7 +47,7 @@ public sealed class AppImageController(
 
         var etag = App.Image.Etag;
 
-        Response.Headers[HeaderNames.ETag] = etag;
+        Response.Headers[HeaderNames.ETag] = $"\"{etag}\"";
 
         var callback = new FileCallback(async (body, range, ct) =>
         {

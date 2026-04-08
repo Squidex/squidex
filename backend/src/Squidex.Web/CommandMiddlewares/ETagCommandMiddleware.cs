@@ -54,6 +54,6 @@ public class ETagCommandMiddleware(IHttpContextAccessor httpContextAccessor) : I
 
     private static void SetResponsEtag(HttpContext httpContext, long version)
     {
-        httpContext.Response.Headers[HeaderNames.ETag] = version.ToString(CultureInfo.InvariantCulture);
+        httpContext.Response.Headers[HeaderNames.ETag] = $"\"{version.ToString(CultureInfo.InvariantCulture)}\"";
     }
 }

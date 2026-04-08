@@ -119,7 +119,7 @@ public sealed class AssetContentController(
             return NotFound();
         }
 
-        Response.Headers[HeaderNames.ETag] = asset.FileVersion.ToString(CultureInfo.InvariantCulture);
+        Response.Headers[HeaderNames.ETag] = $"\"{asset.FileVersion.ToString(CultureInfo.InvariantCulture)}\"";
 
         if (request.CacheDuration > 0)
         {

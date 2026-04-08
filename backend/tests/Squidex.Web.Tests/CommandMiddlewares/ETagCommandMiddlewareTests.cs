@@ -75,7 +75,7 @@ public class ETagCommandMiddlewareTests : GivenContext
 
         await HandleAsync(new CreateContent(), actual);
 
-        Assert.Equal(new StringValues("17"), httpContextAccessor.HttpContext!.Response.Headers[HeaderNames.ETag]);
+        Assert.Equal(new StringValues("\"17\""), httpContextAccessor.HttpContext!.Response.Headers[HeaderNames.ETag]);
     }
 
     [Fact]
@@ -85,7 +85,7 @@ public class ETagCommandMiddlewareTests : GivenContext
 
         await HandleAsync(new CreateContent(), actual);
 
-        Assert.Equal(new StringValues("17"), httpContextAccessor.HttpContext!.Response.Headers[HeaderNames.ETag]);
+        Assert.Equal(new StringValues("\"17\""), httpContextAccessor.HttpContext!.Response.Headers[HeaderNames.ETag]);
     }
 
     private async Task<CommandContext> HandleAsync(ICommand command, object actual)
