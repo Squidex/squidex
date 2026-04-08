@@ -72,6 +72,9 @@ public class EventConsumerProcessor : IEventSubscriber<ParsedEvents>
                 log.LogCritical(ex, "Failed to complete consumer.");
             }
         }
+
+        // Acquire the lock to ensure any in-flight UpdateAsync has fully completed before returning.
+        using var _ = await asyncLock.EnterAsync();
     }
 
     public virtual ValueTask OnNextAsync(IEventSubscription subscription, ParsedEvents @event)
