@@ -4,6 +4,38 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.22.0] - 2026-04-12
+
+### Added
+
+* **Backend**: Search fields. String fields that are added to full text searches with a simple contains search.
+* **Frontend**: Add an option to disable to full frontend UI.
+* **Frontend**: Increase width of left panel via button.
+* **Frontend**: New responsive menu for content fields.
+* **Frontend**: New view to view resolved comments also.
+* **Frontend**: Resolve comments.
+* **Localization**: Add German as another language.
+* **Schemas**: User Info fields that contain api keys for authentication.
+* **Scripting**: Added a flag to ignore http errors.
+* **Scripting**: Added a method to make particular HTTP requests.
+
+### Changes
+
+* **Backend**: Update to .NET 10.
+* **Frontend**: Improved form rows for all forms.
+* **Frontend**: Several accessability fixes, for example using buttons and anchors correctly.
+* **Frontend**: Update of Node and Angular to v21.
+
+### Fixes
+
+* **API**: Seveal fixes to the OpenAPI spec.
+* **Backend**: Resolve path bases correctly.
+* **Content**: Allow zeros as custom IDs.
+* **Content**: Fix fullscreen mode for content fields.
+* **Content**: Fixes to the rich text editor.
+* **Frontend**: Encode JSON query strings correctly.
+* **Frontend**: Several fixes to the query system.
+
 ## [7.21.0] - 2025-07-23
 
 ### Added
