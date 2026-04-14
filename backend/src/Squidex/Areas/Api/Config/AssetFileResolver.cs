@@ -85,7 +85,7 @@ public class AssetFileResolver(IAssetUsageTracker assetUsage, IUsageGate usageGa
 
         try
         {
-            using var httpClient = httpClientFactory.CreateClient();
+            using var httpClient = httpClientFactory.CreateClient("Assets");
             using var httpResponse = await httpClient.GetAsync(fileUrl, ct);
 
             var length = httpResponse.Content.Headers.ContentLength;

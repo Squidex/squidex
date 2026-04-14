@@ -12,7 +12,11 @@ using Squidex.Infrastructure.Json;
 namespace Squidex.Domain.Apps.Entities.Backup;
 
 [ExcludeFromCodeCoverage]
-public sealed class TempFolderBackupArchiveLocation(IJsonSerializer serializer, IHttpClientFactory httpClientFactory) : IBackupArchiveLocation
+public sealed class TempFolderBackupArchiveLocation(
+    IJsonSerializer serializer,
+    IOptions<BackupOptions> options,
+    IHttpClientFactory httpClientFactory) 
+    : IBackupArchiveLocation
 {
     public async Task<IBackupReader> OpenReaderAsync(Uri url, DomainId id,
         CancellationToken ct)
