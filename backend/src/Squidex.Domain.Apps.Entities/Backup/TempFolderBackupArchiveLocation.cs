@@ -6,6 +6,8 @@
 // ==========================================================================
 
 using System.Diagnostics.CodeAnalysis;
+using System.Security;
+using Microsoft.Extensions.Options;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
 
@@ -15,7 +17,7 @@ namespace Squidex.Domain.Apps.Entities.Backup;
 public sealed class TempFolderBackupArchiveLocation(
     IJsonSerializer serializer,
     IOptions<BackupOptions> options,
-    IHttpClientFactory httpClientFactory) 
+    IHttpClientFactory httpClientFactory)
     : IBackupArchiveLocation
 {
     public async Task<IBackupReader> OpenReaderAsync(Uri url, DomainId id,
@@ -25,6 +27,11 @@ public sealed class TempFolderBackupArchiveLocation(
 
         if (string.Equals(url.Scheme, "file", StringComparison.OrdinalIgnoreCase))
         {
+            if (!options.Value.AllowRestoreFromLocalFiles)
+            {
+                throw new SecurityException("Downloading backups from local files not allowed. Permit them with BACKUPS__ALLOWRESTOREFROMLOCALFILES=true");
+            }
+
             stream = new FileStream(url.LocalPath, FileMode.Open, FileAccess.Read);
         }
         else

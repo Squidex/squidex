@@ -37,7 +37,7 @@ public sealed class Startup(IConfiguration config)
         services.AddSquidexApps(config);
         services.AddSquidexAssetInfrastructure(config);
         services.AddSquidexAssets(config);
-        services.AddSquidexBackups();
+        services.AddSquidexBackups(config);
         services.AddSquidexCollaborations(config);
         services.AddSquidexCommands(config);
         services.AddSquidexContents(config);
