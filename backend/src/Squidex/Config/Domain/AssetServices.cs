@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Entities.Assets.Queries.Steps;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Http;
 
 namespace Squidex.Config.Domain;
 
@@ -33,6 +34,9 @@ public static class AssetServices
             services.AddTransientAs<AssetPermanentDeleter>()
                .As<IEventConsumer>();
         }
+
+        services.AddHttpClient("Assets")
+            .EnableSsrfProtection();
 
         services.AddSingletonAs<AssetQueryParser>()
             .AsSelf();

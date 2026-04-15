@@ -21,6 +21,7 @@ using Squidex.Domain.Apps.Entities.Contents.Counter;
 using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Diagnostics;
+using Squidex.Infrastructure.Http;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.UsageTracking;
@@ -45,7 +46,8 @@ public static class InfrastructureServices
         services.Configure<DiagnoserOptions>(config,
             "diagnostics");
 
-        services.AddHttpClient("Jint");
+        services.AddHttpClient("Jint")
+            .EnableSsrfProtection();
 
         services.AddReplicatedCache();
         services.AddAsyncLocalCache();

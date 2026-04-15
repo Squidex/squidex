@@ -8,6 +8,7 @@
 using System.Text.Json;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Domain.Apps.Entities.Contents;
@@ -27,9 +28,12 @@ public static class MongoClientFactory
         // Register the serializers first.
         BsonDomainIdSerializer.Register();
         BsonEscapedDictionarySerializer<JsonValue, JsonObject>.Register();
+        BsonEscapedDictionarySerializer<JsonValue, ContentFieldData>.Register();
+        BsonEscapedDictionarySerializer<ContentFieldData, ContentData>.Register();
         BsonInstantSerializer.Register();
         BsonJsonValueSerializer.Register();
         BsonStringSerializer<RefToken>.Register();
+        BsonStringSerializer<Status>.Register();
         BsonUniqueContentIdSerializer.Register();
         BsonJsonConvention.Register(jsonSerializerOptions, representation);
 

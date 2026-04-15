@@ -12,15 +12,16 @@ using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Flows;
-using Squidex.Infrastructure.Reflection;
 
 namespace Squidex.Config.Domain;
 
 public static class BackupsServices
 {
-    public static void AddSquidexBackups(this IServiceCollection services)
+    public static void AddSquidexBackups(this IServiceCollection services, IConfiguration config)
     {
+        services.Configure<BackupOptions>(config,
+            "backups");
+
         services.AddHttpClient("Backup", options =>
         {
             options.Timeout = TimeSpan.FromHours(1);
