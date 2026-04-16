@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.23.0] - 2026-04-16
+
+### Changed
+
+* **Security**: Added SSRF protection for asset downloads.
+* **Security**: Added SSRF protection for scripting Http clients.
+
+### Fixed
+
+* **Content**: Fix serialization of status fields for contents.
+
 ## [7.22.0] - 2026-04-12
 
 ### Added
