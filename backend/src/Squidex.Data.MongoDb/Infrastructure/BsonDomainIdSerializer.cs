@@ -46,9 +46,14 @@ public sealed class BsonDomainIdSerializer : SerializerBase<DomainId>, IBsonPoly
             case BsonType.Binary:
                 var binary = context.Reader.ReadBinaryData();
 
-                if (binary.SubType is BsonBinarySubType.UuidLegacy or BsonBinarySubType.UuidStandard)
+                if (binary.SubType is BsonBinarySubType.UuidStandard)
                 {
                     return DomainId.Create(binary.ToGuid());
+                }
+
+                if (binary.SubType is BsonBinarySubType.UuidLegacy)
+                {
+                    return DomainId.Create(binary.ToGuid(GuidRepresentation.CSharpLegacy));
                 }
 
                 return DomainId.Create(Encoding.UTF8.GetString(binary.Bytes));
