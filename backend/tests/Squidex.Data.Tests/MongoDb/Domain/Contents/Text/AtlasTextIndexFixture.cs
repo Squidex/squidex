@@ -11,7 +11,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.Domain.Apps.Entities.TestHelpers;
-using Squidex.MongoDb.TestHelpers;
 
 namespace Squidex.MongoDb.Domain.Contents.Text;
 

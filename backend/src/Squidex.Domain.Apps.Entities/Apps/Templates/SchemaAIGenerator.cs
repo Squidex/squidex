@@ -12,7 +12,6 @@ using Squidex.CLI.Commands.Implementation.AI;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Infrastructure.Collections;
-using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates;
 

@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Entities.Contents.Text;
-using Squidex.MongoDb.TestHelpers;
 
 namespace Squidex.MongoDb.Domain.Contents;
 

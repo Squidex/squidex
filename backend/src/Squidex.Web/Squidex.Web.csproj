@@ -16,7 +16,7 @@
     <PackageReference Include="GraphQL" Version="8.8.4" />
     <PackageReference Include="GraphQL.SystemTextJson" Version="8.8.4" />
     <PackageReference Include="GraphQL.Server.Transports.AspNetCore" Version="8.3.3" />
-    <PackageReference Include="Meziantou.Analyzer" Version="3.0.26">
+    <PackageReference Include="Meziantou.Analyzer" Version="3.0.50">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

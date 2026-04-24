@@ -14,7 +14,6 @@ using Squidex.Infrastructure.EventSourcing.Consume;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.TestHelpers;
-using Squidex.MongoDb.TestHelpers;
 
 #pragma warning disable MA0040 // Forward the CancellationToken parameter to methods that take one
 

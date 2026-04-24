@@ -17,7 +17,6 @@ using Squidex.Domain.Apps.Entities.Contents.Operations;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Queries;
-using Squidex.MongoDb.TestHelpers;
 using ClrFilter = Squidex.Infrastructure.Queries.ClrFilter;
 
 namespace Squidex.MongoDb.Domain.Contents;
