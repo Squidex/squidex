@@ -154,7 +154,7 @@ $list-height: 2.25rem;
     &-menu {
         @include absolute(1rem, 1rem, auto, auto);
 
-        button {
+        button, a {
             background: none;
             border: 0;
             border-radius: 0;
