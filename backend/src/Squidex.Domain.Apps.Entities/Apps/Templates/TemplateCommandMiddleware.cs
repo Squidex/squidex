@@ -18,7 +18,6 @@ using Squidex.CLI.Commands.Implementation.Sync.Workflows;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Json;
 using Squidex.Log;
 
 namespace Squidex.Domain.Apps.Entities.Apps.Templates;

@@ -9,7 +9,6 @@ using MongoDB.Bson;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.States;
-using Squidex.MongoDb.TestHelpers;
 
 namespace Squidex.MongoDb.Domain.Contents;
 

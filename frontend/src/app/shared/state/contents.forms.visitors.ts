@@ -285,10 +285,12 @@ export class FieldFormatter implements FieldPropertiesVisitor<FieldValue> {
             return `0 ${pluralName}`;
         }
 
-        if (this.value.length > 1) {
-            return `${this.value.length} ${pluralName}`;
+        const length = Math.max(0, this.value.length);
+
+        if (length > 1) {
+            return `${length} ${pluralName}`;
         } else {
-            return `1 ${singularName}`;
+            return `${length} ${singularName}`;
         }
     }
 }

@@ -6,9 +6,7 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Authentication;
-using OpenIddict.Validation.AspNetCore;
 using Squidex.Hosting.Web;
-using Squidex.Web.Pipeline;
 
 namespace Squidex.Config.Authentication;
 

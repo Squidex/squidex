@@ -8,7 +8,6 @@
 using MongoDB.Bson.Serialization;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Contents;
-using Squidex.MongoDb.TestHelpers;
 using ExtensionSut = Squidex.Domain.Apps.Entities.Contents.Operations.Extensions;
 
 namespace Squidex.MongoDb.Domain.Contents;

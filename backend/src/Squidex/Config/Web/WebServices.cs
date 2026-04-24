@@ -9,8 +9,6 @@ using GraphQL;
 using GraphQL.DI;
 using GraphQL.Server.Transports.AspNetCore;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Formatters;
-using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Microsoft.AspNetCore.ResponseCompression;
 using Microsoft.Extensions.Localization;

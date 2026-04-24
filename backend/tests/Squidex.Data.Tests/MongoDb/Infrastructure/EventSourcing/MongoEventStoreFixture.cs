@@ -9,7 +9,6 @@ using Microsoft.Extensions.Options;
 using MongoDB.Driver;
 using Squidex.Events.Mongo;
 using Squidex.Infrastructure.TestHelpers;
-using Squidex.MongoDb.TestHelpers;
 
 #pragma warning disable MA0048 // File name must match type name
 
