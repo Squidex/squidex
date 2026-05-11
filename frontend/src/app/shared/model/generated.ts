@@ -11544,7 +11544,7 @@ export class ContentDto extends ResourceDto implements IContentDto {
     }
 
     public get canDelete() {
-        return this.compute('canDelete', () => hasAnyLink(this._links, 'update'));
+        return this.compute('canDelete', () => hasAnyLink(this._links, 'delete'));
     }
 
     public get canDraftCreate() {

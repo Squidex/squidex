@@ -175,7 +175,7 @@ public class EventConsumerProcessor : IEventSubscriber<ParsedEvents>
         }, State.Position);
     }
 
-    private async Task DispatchAsync(IReadOnlyList<Envelope<IEvent>> events)
+    private async Task DispatchAsync(List<Envelope<IEvent>> events)
     {
         if (events.Count > 0)
         {
@@ -249,11 +249,8 @@ public class EventConsumerProcessor : IEventSubscriber<ParsedEvents>
 
     private void Unsubscribe()
     {
-        if (currentSubscription != null)
-        {
-            currentSubscription.Dispose();
-            currentSubscription = null;
-        }
+        currentSubscription?.Dispose();
+        currentSubscription = null;
     }
 
     private void Subscribe()

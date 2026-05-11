@@ -237,7 +237,7 @@ export class ContentDto extends generated.ContentDto {
     }
 
     public get canDelete() {
-        return this.compute('canDelete', () => hasAnyLink(this._links, 'update'));
+        return this.compute('canDelete', () => hasAnyLink(this._links, 'delete'));
     }
 
     public get canDraftCreate() {

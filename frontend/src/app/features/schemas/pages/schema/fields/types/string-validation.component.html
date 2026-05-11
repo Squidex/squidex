@@ -1,7 +1,7 @@
 <div [formGroup]="fieldForm">
     @if (showUnique) {
-        <sqx-form-row #placeholderRow for="placeholder" hint="schemas.field.placeholderHint" label="schemas.field.placeholder" [prefix]="field.fieldId">
-            <input class="form-control" [id]="placeholderRow.fieldName" formControlName="placeholder" maxlength="100" />
+        <sqx-form-row #isUniqueRow check for="isUnique" label="schemas.field.unique" [prefix]="field.fieldId">
+            <input class="form-check-input" [id]="isUniqueRow.fieldName" formControlName="isUnique" type="checkbox" />
         </sqx-form-row>
     }
 
