@@ -208,7 +208,7 @@ a {
         }
     }
 
-    a {
+    a, button {
         // Special style for menu item to delete something.
         &.dropdown-item-delete {
             & {
