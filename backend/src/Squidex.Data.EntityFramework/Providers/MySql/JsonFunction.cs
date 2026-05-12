@@ -57,15 +57,8 @@ public static class JsonFunction
         sqlText = sqlText.Replace("}", "}}", StringComparison.Ordinal);
 
         var statements = sqlText.Split(";;", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
-        // We want to filter out the drop statements and multiple function creations are not supported.
         foreach (var statement in statements)
         {
-#if RELEASE
-            if (statement.StartsWith("DROP", StringComparison.Ordinal))
-            {
-                continue;
-            }
-#endif
             await dbContext.Database.ExecuteSqlRawAsync(statement, ct);
         }
     }
