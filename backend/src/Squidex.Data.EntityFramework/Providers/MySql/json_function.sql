@@ -1,8 +1,7 @@
 -- =============================================================================
 -- TYPE-AGNOSTIC
 -- =============================================================================
-DROP FUNCTION IF EXISTS json_empty;;
-CREATE FUNCTION json_empty(col JSON, path VARCHAR(500))
+CREATE OR REPLACE FUNCTION json_empty(col JSON, path VARCHAR(500))
 RETURNS TINYINT(1) DETERMINISTIC
 BEGIN
   DECLARE val JSON;
@@ -14,8 +13,7 @@ BEGIN
   RETURN 0;
 END;;
 
-DROP FUNCTION IF EXISTS json_exists;;
-CREATE FUNCTION json_exists(col JSON, path VARCHAR(500))
+CREATE OR REPLACE FUNCTION json_exists(col JSON, path VARCHAR(500))
 RETURNS TINYINT(1) DETERMINISTIC
 BEGIN
   RETURN NOT json_empty(col, path);
@@ -25,8 +23,7 @@ END;;
 -- =============================================================================
 -- NULL
 -- =============================================================================
-DROP FUNCTION IF EXISTS json_null_equals;;
-CREATE FUNCTION json_null_equals(col JSON, path VARCHAR(500))
+CREATE OR REPLACE FUNCTION json_null_equals(col JSON, path VARCHAR(500))
 RETURNS TINYINT(1) DETERMINISTIC
 BEGIN
   DECLARE val JSON;
@@ -40,8 +37,7 @@ BEGIN
   RETURN COALESCE(JSON_TYPE(val), 'NULL') = 'NULL';
 END;;
 
-DROP FUNCTION IF EXISTS json_null_notequals;;
-CREATE FUNCTION json_null_notequals(col JSON, path VARCHAR(500))
+CREATE OR REPLACE FUNCTION json_null_notequals(col JSON, path VARCHAR(500))
 RETURNS TINYINT(1) DETERMINISTIC
 BEGIN
   RETURN NOT json_null_equals(col, path);
@@ -51,8 +47,7 @@ END;;
 -- =============================================================================
 -- TEXT
 -- =============================================================================
-DROP FUNCTION IF EXISTS json_text_equals;;
-CREATE FUNCTION json_text_equals(col JSON, path VARCHAR(500), target VARCHAR(2000))
+CREATE OR REPLACE FUNCTION json_text_equals(col JSON, path VARCHAR(500), target VARCHAR(2000))
 RETURNS TINYINT(1) DETERMINISTIC
 BEGIN
   DECLARE val JSON;
@@ -66,8 +61,7 @@ BEGIN
   RETURN JSON_UNQUOTE(val) = target;
 END;;
 
-DROP FUNCTION IF EXISTS json_text_notequals;;
-CREATE FUNCTION json_text_notequals(col JSON, path VARCHAR(500), target VARCHAR(2000))
+CREATE OR REPLACE FUNCTION json_text_notequals(col JSON, path VARCHAR(500), target VARCHAR(2000))
 RETURNS TINYINT(1) DETERMINISTIC
 BEGIN
   DECLARE val JSON;
@@ -81,8 +75,7 @@ BEGIN
   RETURN JSON_UNQUOTE(val) != target;
 END;;
 
-DROP FUNCTION IF EXISTS json_text_lessthan;;
-CREATE FUNCTION json_text_lessthan(col JSON, path VARCHAR(500), target VARCHAR(2000))
+CREATE OR REPLACE FUNCTION json_text_lessthan(col JSON, path VARCHAR(500), target VARCHAR(2000))
 RETURNS TINYINT(1) DETERMINISTIC
 BEGIN
   DECLARE val JSON;
@@ -96,8 +89,7 @@ BEGIN
   RETURN JSON_UNQUOTE(val) < target;
 END;;
 
-DROP FUNCTION IF EXISTS json_text_lessthanorequal;;
-CREATE FUNCTION json_text_lessthanorequal(col JSON, path VARCHAR(500), target VARCHAR(2000))
+CREATE OR REPLACE FUNCTION json_text_lessthanorequal(col JSON, path VARCHAR(500), target VARCHAR(2000))
 RETURNS TINYINT(1) DETERMINISTIC
 BEGIN
   DECLARE val JSON;
@@ -111,8 +103,7 @@ BEGIN
   RETURN JSON_UNQUOTE(val) <= target;
 END;;
 
-DROP FUNCTION IF EXISTS json_text_greaterthan;;
-CREATE FUNCTION json_text_greaterthan(col JSON, path VARCHAR(500), target VARCHAR(2000))
+CREATE OR REPLACE FUNCTION json_text_greaterthan(col JSON, path VARCHAR(500), target VARCHAR(2000))
 RETURNS TINYINT(1) DETERMINISTIC
 BEGIN
   DECLARE val JSON;
@@ -126,8 +117,7 @@ BEGIN
   RETURN JSON_UNQUOTE(val) > target;
 END;;
 
-DROP FUNCTION IF EXISTS json_text_greaterthanorequal;;
-CREATE FUNCTION json_text_greaterthanorequal(col JSON, path VARCHAR(500), target VARCHAR(2000))
+CREATE OR REPLACE FUNCTION json_text_greaterthanorequal(col JSON, path VARCHAR(500), target VARCHAR(2000))
 RETURNS TINYINT(1) DETERMINISTIC
 BEGIN
   DECLARE val JSON;
@@ -141,8 +131,7 @@ BEGIN
   RETURN JSON_UNQUOTE(val) >= target;
 END;;
 
-DROP FUNCTION IF EXISTS json_text_contains;;
-CREATE FUNCTION json_text_contains(col JSON, path VARCHAR(500), target VARCHAR(2000))
+CREATE OR REPLACE FUNCTION json_text_contains(col JSON, path VARCHAR(500), target VARCHAR(2000))
 RETURNS TINYINT(1) DETERMINISTIC
 BEGIN
   DECLARE val JSON;
@@ -156,8 +145,7 @@ BEGIN
   RETURN JSON_UNQUOTE(val) LIKE CONCAT('%', target, '%');
 END;;
 
-DROP FUNCTION IF EXISTS json_text_startswith;;
-CREATE FUNCTION json_text_startswith(col JSON, path VARCHAR(500), target VARCHAR(2000))
+CREATE OR REPLACE FUNCTION json_text_startswith(col JSON, path VARCHAR(500), target VARCHAR(2000))
 RETURNS TINYINT(1) DETERMINISTIC
 BEGIN
   DECLARE val JSON;
@@ -171,8 +159,7 @@ BEGIN
   RETURN JSON_UNQUOTE(val) LIKE CONCAT(target, '%');
 END;;
 
-DROP FUNCTION IF EXISTS json_text_endswith;;
-CREATE FUNCTION json_text_endswith(col JSON, path VARCHAR(500), target VARCHAR(2000))
+CREATE OR REPLACE FUNCTION json_text_endswith(col JSON, path VARCHAR(500), target VARCHAR(2000))
 RETURNS TINYINT(1) DETERMINISTIC
 BEGIN
   DECLARE val JSON;
@@ -186,8 +173,7 @@ BEGIN
   RETURN JSON_UNQUOTE(val) LIKE CONCAT('%', target);
 END;;
 
-DROP FUNCTION IF EXISTS json_text_matchs;;
-CREATE FUNCTION json_text_matchs(col JSON, path VARCHAR(500), target VARCHAR(2000))
+CREATE OR REPLACE FUNCTION json_text_matchs(col JSON, path VARCHAR(500), target VARCHAR(2000))
 RETURNS TINYINT(1) DETERMINISTIC
 BEGIN
   DECLARE val JSON;
@@ -201,8 +187,7 @@ BEGIN
   RETURN JSON_UNQUOTE(val) REGEXP target;
 END;;
 
-DROP FUNCTION IF EXISTS json_text_in;;
-CREATE FUNCTION json_text_in(col JSON, path VARCHAR(500), targets JSON)
+CREATE OR REPLACE FUNCTION json_text_in(col JSON, path VARCHAR(500), targets JSON)
 RETURNS TINYINT(1) DETERMINISTIC
 BEGIN
   DECLARE val JSON;
@@ -220,8 +205,7 @@ END;;
 -- =============================================================================
 -- NUMBER
 -- =============================================================================
-DROP FUNCTION IF EXISTS json_number_equals;;
-CREATE FUNCTION json_number_equals(col JSON, path VARCHAR(500), target DECIMAL(65, 10))
+CREATE OR REPLACE FUNCTION json_number_equals(col JSON, path VARCHAR(500), target DECIMAL(65, 10))
 RETURNS TINYINT(1) DETERMINISTIC
 BEGIN
   DECLARE val JSON;
@@ -238,8 +222,7 @@ BEGIN
   RETURN CAST(JSON_UNQUOTE(val) AS DECIMAL(65, 10)) = target;
 END;;
 
-DROP FUNCTION IF EXISTS json_number_notequals;;
-CREATE FUNCTION json_number_notequals(col JSON, path VARCHAR(500), target DECIMAL(65, 10))
+CREATE OR REPLACE FUNCTION json_number_notequals(col JSON, path VARCHAR(500), target DECIMAL(65, 10))
 RETURNS TINYINT(1) DETERMINISTIC
 BEGIN
   DECLARE val JSON;
@@ -256,8 +239,7 @@ BEGIN
   RETURN CAST(JSON_UNQUOTE(val) AS DECIMAL(65, 10)) != target;
 END;;
 
-DROP FUNCTION IF EXISTS json_number_lessthan;;
-CREATE FUNCTION json_number_lessthan(col JSON, path VARCHAR(500), target DECIMAL(65, 10))
+CREATE OR REPLACE FUNCTION json_number_lessthan(col JSON, path VARCHAR(500), target DECIMAL(65, 10))
 RETURNS TINYINT(1) DETERMINISTIC
 BEGIN
   DECLARE val JSON;
@@ -274,8 +256,7 @@ BEGIN
   RETURN CAST(JSON_UNQUOTE(val) AS DECIMAL(65, 10)) < target;
 END;;
 
-DROP FUNCTION IF EXISTS json_number_lessthanorequal;;
-CREATE FUNCTION json_number_lessthanorequal(col JSON, path VARCHAR(500), target DECIMAL(65, 10))
+CREATE OR REPLACE FUNCTION json_number_lessthanorequal(col JSON, path VARCHAR(500), target DECIMAL(65, 10))
 RETURNS TINYINT(1) DETERMINISTIC
 BEGIN
   DECLARE val JSON;
@@ -292,8 +273,7 @@ BEGIN
   RETURN CAST(JSON_UNQUOTE(val) AS DECIMAL(65, 10)) <= target;
 END;;
 
-DROP FUNCTION IF EXISTS json_number_greaterthan;;
-CREATE FUNCTION json_number_greaterthan(col JSON, path VARCHAR(500), target DECIMAL(65, 10))
+CREATE OR REPLACE FUNCTION json_number_greaterthan(col JSON, path VARCHAR(500), target DECIMAL(65, 10))
 RETURNS TINYINT(1) DETERMINISTIC
 BEGIN
   DECLARE val JSON;
@@ -310,8 +290,7 @@ BEGIN
   RETURN CAST(JSON_UNQUOTE(val) AS DECIMAL(65, 10)) > target;
 END;;
 
-DROP FUNCTION IF EXISTS json_number_greaterthanorequal;;
-CREATE FUNCTION json_number_greaterthanorequal(col JSON, path VARCHAR(500), target DECIMAL(65, 10))
+CREATE OR REPLACE FUNCTION json_number_greaterthanorequal(col JSON, path VARCHAR(500), target DECIMAL(65, 10))
 RETURNS TINYINT(1) DETERMINISTIC
 BEGIN
   DECLARE val JSON;
@@ -328,8 +307,7 @@ BEGIN
   RETURN CAST(JSON_UNQUOTE(val) AS DECIMAL(65, 10)) >= target;
 END;;
 
-DROP FUNCTION IF EXISTS json_number_in;;
-CREATE FUNCTION json_number_in(col JSON, path VARCHAR(500), targets JSON)
+CREATE OR REPLACE FUNCTION json_number_in(col JSON, path VARCHAR(500), targets JSON)
 RETURNS TINYINT(1) DETERMINISTIC
 BEGIN
   DECLARE val JSON;
@@ -349,8 +327,7 @@ END;;
 -- =============================================================================
 -- BOOLEAN
 -- =============================================================================
-DROP FUNCTION IF EXISTS json_boolean_equals;;
-CREATE FUNCTION json_boolean_equals(col JSON, path VARCHAR(500), target TINYINT(1))
+CREATE OR REPLACE FUNCTION json_boolean_equals(col JSON, path VARCHAR(500), target TINYINT(1))
 RETURNS TINYINT(1) DETERMINISTIC
 BEGIN
   DECLARE val JSON;
@@ -367,8 +344,7 @@ BEGIN
   RETURN val = target_json;
 END;;
 
-DROP FUNCTION IF EXISTS json_boolean_notequals;;
-CREATE FUNCTION json_boolean_notequals(col JSON, path VARCHAR(500), target TINYINT(1))
+CREATE OR REPLACE FUNCTION json_boolean_notequals(col JSON, path VARCHAR(500), target TINYINT(1))
 RETURNS TINYINT(1) DETERMINISTIC
 BEGIN
   DECLARE val JSON;
@@ -385,8 +361,7 @@ BEGIN
   RETURN val != target_json;
 END;;
 
-DROP FUNCTION IF EXISTS json_boolean_in;;
-CREATE FUNCTION json_boolean_in(col JSON, path VARCHAR(500), targets JSON)
+CREATE OR REPLACE FUNCTION json_boolean_in(col JSON, path VARCHAR(500), targets JSON)
 RETURNS TINYINT(1) DETERMINISTIC
 BEGIN
   DECLARE val JSON;
