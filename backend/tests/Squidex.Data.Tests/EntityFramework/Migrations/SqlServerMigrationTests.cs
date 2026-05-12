@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Data;
+using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -57,6 +59,23 @@ public class SqlServerMigrationTests : IAsyncLifetime
         await using var dbContext = await databaseFactory.CreateDbContextAsync();
 
         var migrations = await dbContext.Database.GetAppliedMigrationsAsync();
+        var result = await ExecuteScalarAsync(dbContext, "SELECT CAST(dbo.json_empty(NULL, '$') AS INT)");
+
         Assert.NotEmpty(migrations);
+        Assert.Equal(1, result);
+    }
+
+    private static async Task<int> ExecuteScalarAsync(DbContext dbContext, string sql)
+    {
+        var connection = dbContext.Database.GetDbConnection();
+        if (connection.State != ConnectionState.Open)
+        {
+            await connection.OpenAsync();
+        }
+
+        await using var command = connection.CreateCommand();
+        command.CommandText = sql;
+
+        return Convert.ToInt32(await command.ExecuteScalarAsync(), CultureInfo.InvariantCulture);
     }
 }
