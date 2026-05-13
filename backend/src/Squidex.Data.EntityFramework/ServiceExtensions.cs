@@ -271,7 +271,6 @@ public static class ServiceExtensions
             .AddEntityFrameworkStore<TContext, CronJobContext>();
 
         services.AddEntityFrameworkAssetKeyValueStore<TContext, TusMetadata>();
-        services.AddSingletonAs<SqlDialectInitializer<TContext>>();
     }
 
     public static void AddSquidexEntityFrameworkEventStore(this IServiceCollection services, IConfiguration config)

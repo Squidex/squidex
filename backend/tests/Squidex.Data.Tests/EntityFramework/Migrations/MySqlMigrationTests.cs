@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Data;
+using System.Globalization;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -18,7 +20,10 @@ namespace Squidex.EntityFramework.Migrations;
 [Trait("Category", "TestContainer")]
 public class MySqlMigrationTests : IAsyncLifetime
 {
-    private readonly MySqlContainer mysql = new MySqlBuilder("mysql:8.0").Build();
+    private readonly MySqlContainer mysql =
+        new MySqlBuilder("mysql:8.0")
+            .WithCommand("--log-bin-trust-function-creators=1")
+            .Build();
 
     public async ValueTask InitializeAsync()
     {
@@ -58,6 +63,23 @@ public class MySqlMigrationTests : IAsyncLifetime
         await using var dbContext = await databaseFactory.CreateDbContextAsync();
 
         var migrations = await dbContext.Database.GetAppliedMigrationsAsync();
+        var result = await ExecuteScalarAsync(dbContext, "SELECT json_empty(NULL, '$')");
+
         Assert.NotEmpty(migrations);
+        Assert.Equal(1, result);
+    }
+
+    private static async Task<int> ExecuteScalarAsync(DbContext dbContext, string sql)
+    {
+        var connection = dbContext.Database.GetDbConnection();
+        if (connection.State != ConnectionState.Open)
+        {
+            await connection.OpenAsync();
+        }
+
+        await using var command = connection.CreateCommand();
+        command.CommandText = sql;
+
+        return Convert.ToInt32(await command.ExecuteScalarAsync(), CultureInfo.InvariantCulture);
     }
 }
