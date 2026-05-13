@@ -12,9 +12,7 @@ using Microsoft.Extensions.DependencyInjection;
 using PhenX.EntityFrameworkCore.BulkInsert.SqlServer;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Hosting;
-using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
-using Squidex.Infrastructure.Queries;
 using Squidex.Providers.SqlServer;
 using Squidex.Providers.SqlServer.Content;
 using Testcontainers.MsSql;
@@ -63,15 +61,16 @@ public class SqlServerFixture(string? reuseId = null) : IAsyncLifetime, ISqlCont
                         w.Ignore(RelationalEventId.PendingModelChangesWarning));
                 })
                 .AddSingleton<ConnectionStringParser, SqlServerConnectionStringParser>()
-                .AddSingletonAs<DatabaseCreator<TestDbContextSqlServer>>().Done()
+                .AddSingleton<DatabaseMigrator<TestDbContextSqlServer>>()
                 .AddSingleton(TestUtils.DefaultSerializer)
-                .AddSingleton<IInitializable, SqlDialectInitializer<TestDbContextSqlServer>>()
                 .BuildServiceProvider();
 
         foreach (var service in services.GetRequiredService<IEnumerable<IInitializable>>())
         {
             await service.InitializeAsync(default);
         }
+
+        await services.GetRequiredService<DatabaseMigrator<TestDbContextSqlServer>>().InitializeAsync(default);
     }
 
     public async ValueTask DisposeAsync()
