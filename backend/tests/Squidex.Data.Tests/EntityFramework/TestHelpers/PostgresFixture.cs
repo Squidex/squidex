@@ -11,6 +11,7 @@ using Microsoft.Extensions.DependencyInjection;
 using PhenX.EntityFrameworkCore.BulkInsert.PostgreSql;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Hosting;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Providers.Postgres;
 using Squidex.Providers.Postgres.Content;
