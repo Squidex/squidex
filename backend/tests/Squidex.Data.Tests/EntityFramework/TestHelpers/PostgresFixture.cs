@@ -54,13 +54,15 @@ public class PostgresFixture(string? reuseId) : IAsyncLifetime, ISqlContentFixtu
                 .AddNamedDbContext<PostgresContentDbContext>((builder, name) =>
                 {
                     builder.UseBulkInsertPostgreSql();
-                    builder.UseNpgsql(connectionString);
+                    builder.UseNpgsql(connectionString, options =>
+                    {
+                        options.MigrationsHistoryTable($"{name}MigrationHistory");
+                    });
 
                     builder.ConfigureWarnings(w =>
                         w.Ignore(RelationalEventId.PendingModelChangesWarning));
                 })
                 .AddSingleton<ConnectionStringParser, PostgresConnectionStringParser>()
-                .AddSingleton<DatabaseMigrator<TestDbContextPostgres>>()
                 .AddSingleton(TestUtils.DefaultSerializer)
                 .BuildServiceProvider();
 
@@ -69,7 +71,12 @@ public class PostgresFixture(string? reuseId) : IAsyncLifetime, ISqlContentFixtu
             await service.InitializeAsync(default);
         }
 
-        await services.GetRequiredService<DatabaseMigrator<TestDbContextPostgres>>().InitializeAsync(default);
+        await using var dbContext = await services.GetRequiredService<IDbContextFactory<TestDbContextPostgres>>().CreateDbContextAsync();
+        await dbContext.Database.EnsureCreatedAsync();
+        if (dbContext is IDbContextWithDialect withDialect)
+        {
+            await withDialect.Dialect.InitializeAsync(dbContext, default);
+        }
     }
 
     public async ValueTask DisposeAsync()

@@ -56,13 +56,15 @@ public class SqlServerFixture(string? reuseId = null) : IAsyncLifetime, ISqlCont
                 .AddNamedDbContext<SqlServerContentDbContext>((builder, name) =>
                 {
                     builder.UseBulkInsertSqlServer();
-                    builder.UseSqlServer(connectionString);
+                    builder.UseSqlServer(connectionString, options =>
+                    {
+                        options.MigrationsHistoryTable($"{name}MigrationHistory");
+                    });
 
                     builder.ConfigureWarnings(w =>
                         w.Ignore(RelationalEventId.PendingModelChangesWarning));
                 })
                 .AddSingleton<ConnectionStringParser, SqlServerConnectionStringParser>()
-                .AddSingleton<DatabaseMigrator<TestDbContextSqlServer>>()
                 .AddSingleton(TestUtils.DefaultSerializer)
                 .BuildServiceProvider();
 
@@ -71,7 +73,12 @@ public class SqlServerFixture(string? reuseId = null) : IAsyncLifetime, ISqlCont
             await service.InitializeAsync(default);
         }
 
-        await services.GetRequiredService<DatabaseMigrator<TestDbContextSqlServer>>().InitializeAsync(default);
+        await using var dbContext = await services.GetRequiredService<IDbContextFactory<TestDbContextSqlServer>>().CreateDbContextAsync();
+        await dbContext.Database.EnsureCreatedAsync();
+        if (dbContext is IDbContextWithDialect withDialect)
+        {
+            await withDialect.Dialect.InitializeAsync(dbContext, default);
+        }
     }
 
     public async ValueTask DisposeAsync()

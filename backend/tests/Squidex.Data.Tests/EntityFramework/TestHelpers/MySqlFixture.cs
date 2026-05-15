@@ -59,13 +59,13 @@ public class MySqlFixture(string? reuseId = null) : IAsyncLifetime, ISqlContentF
                     builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), options =>
                     {
                         options.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
+                        options.MigrationsHistoryTable($"{name}MigrationHistory");
                     });
 
                     builder.ConfigureWarnings(w =>
                         w.Ignore(RelationalEventId.PendingModelChangesWarning));
                 })
                 .AddSingleton<ConnectionStringParser, MySqlConnectionStringParser>()
-                .AddSingleton<DatabaseMigrator<TestDbContextMySql>>()
                 .AddSingleton(TestUtils.DefaultSerializer)
                 .BuildServiceProvider();
 
@@ -74,7 +74,12 @@ public class MySqlFixture(string? reuseId = null) : IAsyncLifetime, ISqlContentF
             await service.InitializeAsync(default);
         }
 
-        await services.GetRequiredService<DatabaseMigrator<TestDbContextMySql>>().InitializeAsync(default);
+        await using var dbContext = await services.GetRequiredService<IDbContextFactory<TestDbContextMySql>>().CreateDbContextAsync();
+        await dbContext.Database.EnsureCreatedAsync();
+        if (dbContext is IDbContextWithDialect withDialect)
+        {
+            await withDialect.Dialect.InitializeAsync(dbContext, default);
+        }
     }
 
     public async ValueTask DisposeAsync()
