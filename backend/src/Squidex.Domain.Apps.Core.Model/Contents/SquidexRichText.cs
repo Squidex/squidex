@@ -14,6 +14,8 @@ public static class SquidexRichText
     public static class NodeTypes
     {
         public const string ContentLink = "contentLink";
+
+        public const string PlainHtml = "plainHtml";
     }
 
     private class ExtendedOptions : RichTextOptions
@@ -40,6 +42,7 @@ public static class SquidexRichText
         [
             ..RichTextOptions.Default.NodeTypes,
             NodeTypes.ContentLink,
+            NodeTypes.PlainHtml,
         ],
         MarkTypes = RichTextOptions.Default.MarkTypes,
     };
