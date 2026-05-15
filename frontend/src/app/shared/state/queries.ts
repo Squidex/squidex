@@ -24,7 +24,7 @@ export interface SavedQuery {
 
 const OLDEST_FIRST: Query = {
     sort: [
-        { path: 'lastModified', order: 'descending' },
+        { path: 'lastModified', order: 'ascending' },
     ],
 };
 
