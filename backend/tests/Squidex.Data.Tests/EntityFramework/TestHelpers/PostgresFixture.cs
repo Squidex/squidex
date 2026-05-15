@@ -13,7 +13,6 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
-using Squidex.Infrastructure.Queries;
 using Squidex.Providers.Postgres;
 using Squidex.Providers.Postgres.Content;
 using Testcontainers.PostgreSql;
@@ -23,7 +22,7 @@ namespace Squidex.EntityFramework.TestHelpers;
 public class PostgresFixture(string? reuseId) : IAsyncLifetime, ISqlContentFixture<TestDbContextPostgres, PostgresContentDbContext>
 {
     private readonly PostgreSqlContainer postgreSql =
-        new PostgreSqlBuilder("postgis/postgis")
+        new PostgreSqlBuilder("imresamu/postgis:16-3.4")
             .WithReuse(true)
             .WithLabel("reuse-id", reuseId)
             .Build();
@@ -55,20 +54,28 @@ public class PostgresFixture(string? reuseId) : IAsyncLifetime, ISqlContentFixtu
                 .AddNamedDbContext<PostgresContentDbContext>((builder, name) =>
                 {
                     builder.UseBulkInsertPostgreSql();
-                    builder.UseNpgsql(connectionString);
+                    builder.UseNpgsql(connectionString, options =>
+                    {
+                        options.MigrationsHistoryTable($"{name}MigrationHistory");
+                    });
 
                     builder.ConfigureWarnings(w =>
                         w.Ignore(RelationalEventId.PendingModelChangesWarning));
                 })
                 .AddSingleton<ConnectionStringParser, PostgresConnectionStringParser>()
-                .AddSingletonAs<DatabaseCreator<TestDbContextPostgres>>().Done()
                 .AddSingleton(TestUtils.DefaultSerializer)
-                .AddSingleton<IInitializable, SqlDialectInitializer<TestDbContextPostgres>>()
                 .BuildServiceProvider();
 
         foreach (var service in services.GetRequiredService<IEnumerable<IInitializable>>())
         {
             await service.InitializeAsync(default);
+        }
+
+        await using var dbContext = await services.GetRequiredService<IDbContextFactory<TestDbContextPostgres>>().CreateDbContextAsync();
+        await dbContext.Database.EnsureCreatedAsync();
+        if (dbContext is IDbContextWithDialect withDialect)
+        {
+            await withDialect.Dialect.InitializeAsync(dbContext, default);
         }
     }
 

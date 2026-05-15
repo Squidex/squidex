@@ -1,8 +1,7 @@
 -- =============================================================================
 -- TYPE-AGNOSTIC
 -- =============================================================================
-DROP FUNCTION IF EXISTS dbo.json_empty;;
-CREATE FUNCTION dbo.json_empty(@col NVARCHAR(MAX), @path NVARCHAR(500))
+CREATE OR ALTER FUNCTION dbo.json_empty(@col NVARCHAR(MAX), @path NVARCHAR(500))
 RETURNS BIT
 AS
 BEGIN
@@ -17,8 +16,7 @@ BEGIN
   RETURN 0;
 END;;
 
-DROP FUNCTION IF EXISTS dbo.json_exists;;
-CREATE FUNCTION dbo.json_exists(@col NVARCHAR(MAX), @path NVARCHAR(500))
+CREATE OR ALTER FUNCTION dbo.json_exists(@col NVARCHAR(MAX), @path NVARCHAR(500))
 RETURNS BIT
 AS
 BEGIN
@@ -29,8 +27,7 @@ END;;
 -- =============================================================================
 -- NULL
 -- =============================================================================
-DROP FUNCTION IF EXISTS dbo.json_null_equals;;
-CREATE FUNCTION dbo.json_null_equals(@col NVARCHAR(MAX), @path NVARCHAR(500))
+CREATE OR ALTER FUNCTION dbo.json_null_equals(@col NVARCHAR(MAX), @path NVARCHAR(500))
 RETURNS BIT
 AS
 BEGIN
@@ -42,8 +39,7 @@ BEGIN
   RETURN CASE WHEN JSON_VALUE(@col, @path) IS NULL THEN 1 ELSE 0 END;
 END;;
 
-DROP FUNCTION IF EXISTS dbo.json_null_notequals;;
-CREATE FUNCTION dbo.json_null_notequals(@col NVARCHAR(MAX), @path NVARCHAR(500))
+CREATE OR ALTER FUNCTION dbo.json_null_notequals(@col NVARCHAR(MAX), @path NVARCHAR(500))
 RETURNS BIT
 AS
 BEGIN
@@ -54,8 +50,7 @@ END;;
 -- =============================================================================
 -- TEXT
 -- =============================================================================
-DROP FUNCTION IF EXISTS dbo.json_text_equals;;
-CREATE FUNCTION dbo.json_text_equals(@col NVARCHAR(MAX), @path NVARCHAR(500), @target NVARCHAR(2000))
+CREATE OR ALTER FUNCTION dbo.json_text_equals(@col NVARCHAR(MAX), @path NVARCHAR(500), @target NVARCHAR(2000))
 RETURNS BIT
 AS
 BEGIN
@@ -67,8 +62,7 @@ BEGIN
   RETURN CASE WHEN JSON_VALUE(@col, @path) = @target THEN 1 ELSE 0 END;
 END;;
 
-DROP FUNCTION IF EXISTS dbo.json_text_notequals;;
-CREATE FUNCTION dbo.json_text_notequals(@col NVARCHAR(MAX), @path NVARCHAR(500), @target NVARCHAR(2000))
+CREATE OR ALTER FUNCTION dbo.json_text_notequals(@col NVARCHAR(MAX), @path NVARCHAR(500), @target NVARCHAR(2000))
 RETURNS BIT
 AS
 BEGIN
@@ -80,8 +74,7 @@ BEGIN
   RETURN CASE WHEN JSON_VALUE(@col, @path) != @target THEN 1 ELSE 0 END;
 END;;
 
-DROP FUNCTION IF EXISTS dbo.json_text_lessthan;;
-CREATE FUNCTION dbo.json_text_lessthan(@col NVARCHAR(MAX), @path NVARCHAR(500), @target NVARCHAR(2000))
+CREATE OR ALTER FUNCTION dbo.json_text_lessthan(@col NVARCHAR(MAX), @path NVARCHAR(500), @target NVARCHAR(2000))
 RETURNS BIT
 AS
 BEGIN
@@ -93,8 +86,7 @@ BEGIN
   RETURN CASE WHEN JSON_VALUE(@col, @path) < @target THEN 1 ELSE 0 END;
 END;;
 
-DROP FUNCTION IF EXISTS dbo.json_text_lessthanorequal;;
-CREATE FUNCTION dbo.json_text_lessthanorequal(@col NVARCHAR(MAX), @path NVARCHAR(500), @target NVARCHAR(2000))
+CREATE OR ALTER FUNCTION dbo.json_text_lessthanorequal(@col NVARCHAR(MAX), @path NVARCHAR(500), @target NVARCHAR(2000))
 RETURNS BIT
 AS
 BEGIN
@@ -106,8 +98,7 @@ BEGIN
   RETURN CASE WHEN JSON_VALUE(@col, @path) <= @target THEN 1 ELSE 0 END;
 END;;
 
-DROP FUNCTION IF EXISTS dbo.json_text_greaterthan;;
-CREATE FUNCTION dbo.json_text_greaterthan(@col NVARCHAR(MAX), @path NVARCHAR(500), @target NVARCHAR(2000))
+CREATE OR ALTER FUNCTION dbo.json_text_greaterthan(@col NVARCHAR(MAX), @path NVARCHAR(500), @target NVARCHAR(2000))
 RETURNS BIT
 AS
 BEGIN
@@ -119,8 +110,7 @@ BEGIN
   RETURN CASE WHEN JSON_VALUE(@col, @path) > @target THEN 1 ELSE 0 END;
 END;;
 
-DROP FUNCTION IF EXISTS dbo.json_text_greaterthanorequal;;
-CREATE FUNCTION dbo.json_text_greaterthanorequal(@col NVARCHAR(MAX), @path NVARCHAR(500), @target NVARCHAR(2000))
+CREATE OR ALTER FUNCTION dbo.json_text_greaterthanorequal(@col NVARCHAR(MAX), @path NVARCHAR(500), @target NVARCHAR(2000))
 RETURNS BIT
 AS
 BEGIN
@@ -132,8 +122,7 @@ BEGIN
   RETURN CASE WHEN JSON_VALUE(@col, @path) >= @target THEN 1 ELSE 0 END;
 END;;
 
-DROP FUNCTION IF EXISTS dbo.json_text_contains;;
-CREATE FUNCTION dbo.json_text_contains(@col NVARCHAR(MAX), @path NVARCHAR(500), @target NVARCHAR(2000))
+CREATE OR ALTER FUNCTION dbo.json_text_contains(@col NVARCHAR(MAX), @path NVARCHAR(500), @target NVARCHAR(2000))
 RETURNS BIT
 AS
 BEGIN
@@ -145,8 +134,7 @@ BEGIN
   RETURN CASE WHEN JSON_VALUE(@col, @path) LIKE '%' + @target + '%' THEN 1 ELSE 0 END;
 END;;
 
-DROP FUNCTION IF EXISTS dbo.json_text_startswith;;
-CREATE FUNCTION dbo.json_text_startswith(@col NVARCHAR(MAX), @path NVARCHAR(500), @target NVARCHAR(2000))
+CREATE OR ALTER FUNCTION dbo.json_text_startswith(@col NVARCHAR(MAX), @path NVARCHAR(500), @target NVARCHAR(2000))
 RETURNS BIT
 AS
 BEGIN
@@ -158,8 +146,7 @@ BEGIN
   RETURN CASE WHEN JSON_VALUE(@col, @path) LIKE @target + '%' THEN 1 ELSE 0 END;
 END;;
 
-DROP FUNCTION IF EXISTS dbo.json_text_endswith;;
-CREATE FUNCTION dbo.json_text_endswith(@col NVARCHAR(MAX), @path NVARCHAR(500), @target NVARCHAR(2000))
+CREATE OR ALTER FUNCTION dbo.json_text_endswith(@col NVARCHAR(MAX), @path NVARCHAR(500), @target NVARCHAR(2000))
 RETURNS BIT
 AS
 BEGIN
@@ -171,8 +158,7 @@ BEGIN
   RETURN CASE WHEN JSON_VALUE(@col, @path) LIKE '%' + @target THEN 1 ELSE 0 END;
 END;;
 
-DROP FUNCTION IF EXISTS dbo.json_text_matchs;;
-CREATE FUNCTION dbo.json_text_matchs(@col NVARCHAR(MAX), @path NVARCHAR(500), @target NVARCHAR(2000))
+CREATE OR ALTER FUNCTION dbo.json_text_matchs(@col NVARCHAR(MAX), @path NVARCHAR(500), @target NVARCHAR(2000))
 RETURNS BIT
 AS
 BEGIN
@@ -188,8 +174,7 @@ END;;
 -- =============================================================================
 -- NUMBER
 -- =============================================================================
-DROP FUNCTION IF EXISTS dbo.json_number_equals;;
-CREATE FUNCTION dbo.json_number_equals(@col NVARCHAR(MAX), @path NVARCHAR(500), @target DECIMAL(38, 10))
+CREATE OR ALTER FUNCTION dbo.json_number_equals(@col NVARCHAR(MAX), @path NVARCHAR(500), @target DECIMAL(38, 10))
 RETURNS BIT
 AS
 BEGIN
@@ -203,8 +188,7 @@ BEGIN
   RETURN CASE WHEN TRY_CAST(JSON_VALUE(@col, @path) AS DECIMAL(38, 10)) = @target THEN 1 ELSE 0 END;
 END;;
 
-DROP FUNCTION IF EXISTS dbo.json_number_notequals;;
-CREATE FUNCTION dbo.json_number_notequals(@col NVARCHAR(MAX), @path NVARCHAR(500), @target DECIMAL(38, 10))
+CREATE OR ALTER FUNCTION dbo.json_number_notequals(@col NVARCHAR(MAX), @path NVARCHAR(500), @target DECIMAL(38, 10))
 RETURNS BIT
 AS
 BEGIN
@@ -218,8 +202,7 @@ BEGIN
   RETURN CASE WHEN TRY_CAST(JSON_VALUE(@col, @path) AS DECIMAL(38, 10)) != @target THEN 1 ELSE 0 END;
 END;;
 
-DROP FUNCTION IF EXISTS dbo.json_number_lessthan;;
-CREATE FUNCTION dbo.json_number_lessthan(@col NVARCHAR(MAX), @path NVARCHAR(500), @target DECIMAL(38, 10))
+CREATE OR ALTER FUNCTION dbo.json_number_lessthan(@col NVARCHAR(MAX), @path NVARCHAR(500), @target DECIMAL(38, 10))
 RETURNS BIT
 AS
 BEGIN
@@ -233,8 +216,7 @@ BEGIN
   RETURN CASE WHEN TRY_CAST(JSON_VALUE(@col, @path) AS DECIMAL(38, 10)) < @target THEN 1 ELSE 0 END;
 END;;
 
-DROP FUNCTION IF EXISTS dbo.json_number_lessthanorequal;;
-CREATE FUNCTION dbo.json_number_lessthanorequal(@col NVARCHAR(MAX), @path NVARCHAR(500), @target DECIMAL(38, 10))
+CREATE OR ALTER FUNCTION dbo.json_number_lessthanorequal(@col NVARCHAR(MAX), @path NVARCHAR(500), @target DECIMAL(38, 10))
 RETURNS BIT
 AS
 BEGIN
@@ -248,8 +230,7 @@ BEGIN
   RETURN CASE WHEN TRY_CAST(JSON_VALUE(@col, @path) AS DECIMAL(38, 10)) <= @target THEN 1 ELSE 0 END;
 END;;
 
-DROP FUNCTION IF EXISTS dbo.json_number_greaterthan;;
-CREATE FUNCTION dbo.json_number_greaterthan(@col NVARCHAR(MAX), @path NVARCHAR(500), @target DECIMAL(38, 10))
+CREATE OR ALTER FUNCTION dbo.json_number_greaterthan(@col NVARCHAR(MAX), @path NVARCHAR(500), @target DECIMAL(38, 10))
 RETURNS BIT
 AS
 BEGIN
@@ -263,8 +244,7 @@ BEGIN
   RETURN CASE WHEN TRY_CAST(JSON_VALUE(@col, @path) AS DECIMAL(38, 10)) > @target THEN 1 ELSE 0 END;
 END;;
 
-DROP FUNCTION IF EXISTS dbo.json_number_greaterthanorequal;;
-CREATE FUNCTION dbo.json_number_greaterthanorequal(@col NVARCHAR(MAX), @path NVARCHAR(500), @target DECIMAL(38, 10))
+CREATE OR ALTER FUNCTION dbo.json_number_greaterthanorequal(@col NVARCHAR(MAX), @path NVARCHAR(500), @target DECIMAL(38, 10))
 RETURNS BIT
 AS
 BEGIN
@@ -282,8 +262,7 @@ END;;
 -- =============================================================================
 -- BOOLEAN
 -- =============================================================================
-DROP FUNCTION IF EXISTS dbo.json_boolean_equals;;
-CREATE FUNCTION dbo.json_boolean_equals(@col NVARCHAR(MAX), @path NVARCHAR(500), @target BIT)
+CREATE OR ALTER FUNCTION dbo.json_boolean_equals(@col NVARCHAR(MAX), @path NVARCHAR(500), @target BIT)
 RETURNS BIT
 AS
 BEGIN
@@ -297,8 +276,7 @@ BEGIN
   RETURN CASE WHEN IIF(JSON_VALUE(@col, @path) = 'true', 1, IIF(JSON_VALUE(@col, @path) = 'false', 0, NULL)) = @target THEN 1 ELSE 0 END;
 END;;
 
-DROP FUNCTION IF EXISTS dbo.json_boolean_notequals;;
-CREATE FUNCTION dbo.json_boolean_notequals(@col NVARCHAR(MAX), @path NVARCHAR(500), @target BIT)
+CREATE OR ALTER FUNCTION dbo.json_boolean_notequals(@col NVARCHAR(MAX), @path NVARCHAR(500), @target BIT)
 RETURNS BIT
 AS
 BEGIN

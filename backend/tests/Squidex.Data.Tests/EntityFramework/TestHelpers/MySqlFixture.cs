@@ -13,7 +13,6 @@ using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Hosting;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
-using Squidex.Infrastructure.Queries;
 using Squidex.Providers.MySql;
 using Squidex.Providers.MySql.Content;
 using Testcontainers.MySql;
@@ -60,20 +59,26 @@ public class MySqlFixture(string? reuseId = null) : IAsyncLifetime, ISqlContentF
                     builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), options =>
                     {
                         options.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
+                        options.MigrationsHistoryTable($"{name}MigrationHistory");
                     });
 
                     builder.ConfigureWarnings(w =>
                         w.Ignore(RelationalEventId.PendingModelChangesWarning));
                 })
                 .AddSingleton<ConnectionStringParser, MySqlConnectionStringParser>()
-                .AddSingletonAs<DatabaseCreator<TestDbContextMySql>>().Done()
                 .AddSingleton(TestUtils.DefaultSerializer)
-                .AddSingleton<IInitializable, SqlDialectInitializer<TestDbContextMySql>>()
                 .BuildServiceProvider();
 
         foreach (var service in services.GetRequiredService<IEnumerable<IInitializable>>())
         {
             await service.InitializeAsync(default);
+        }
+
+        await using var dbContext = await services.GetRequiredService<IDbContextFactory<TestDbContextMySql>>().CreateDbContextAsync();
+        await dbContext.Database.EnsureCreatedAsync();
+        if (dbContext is IDbContextWithDialect withDialect)
+        {
+            await withDialect.Dialect.InitializeAsync(dbContext, default);
         }
     }
 
