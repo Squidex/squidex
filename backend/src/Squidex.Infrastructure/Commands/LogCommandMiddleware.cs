@@ -48,17 +48,17 @@ public sealed partial class LogCommandMiddleware(ILogger<LogCommandMiddleware> l
     }
 
     [LoggerMessage(EventId = 1, Level = LogLevel.Debug, Message = "Command {command} with ID {id} started.")]
-    private static partial void LogCommandStarted(ILogger logger, Type command, Guid id);
+    private static partial void LogCommandStarted(ILogger logger, Type command, DomainId id);
 
     [LoggerMessage(EventId = 2, Level = LogLevel.Information, Message = "Command {command} with ID {id} succeeded.")]
-    private static partial void LogCommandSucceeded(ILogger logger, Type command, Guid id);
+    private static partial void LogCommandSucceeded(ILogger logger, Type command, DomainId id);
 
     [LoggerMessage(EventId = 3, Level = LogLevel.Information, Message = "Command {command} with ID {id} completed after {time}ms.")]
-    private static partial void LogCommandCompleted(ILogger logger, Type command, Guid id, long time);
+    private static partial void LogCommandCompleted(ILogger logger, Type command, DomainId id, long time);
 
     [LoggerMessage(EventId = 4, Level = LogLevel.Error, Message = "Command {command} with ID {id} failed.")]
-    private static partial void LogCommandFailed(ILogger logger, Type command, Guid id, Exception exception);
+    private static partial void LogCommandFailed(ILogger logger, Type command, DomainId id, Exception exception);
 
     [LoggerMessage(EventId = 5, Level = LogLevel.Critical, Message = "Command {command} with ID {id} not handled.")]
-    private static partial void LogCommandNotHandled(ILogger logger, Type command, Guid id);
+    private static partial void LogCommandNotHandled(ILogger logger, Type command, DomainId id);
 }
