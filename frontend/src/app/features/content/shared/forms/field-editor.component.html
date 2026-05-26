@@ -1,5 +1,5 @@
 @if (formModel) {
-    <div class="field" (click)="select()" [class.expanded]="isExpanded && !isCollapsed" #root>
+    <div class="field" #root [class.expanded]="isExpanded && !isCollapsed" (click)="select()">
         <div class="row">
             <div class="col-4">
                 <div class="truncate">
@@ -14,9 +14,7 @@
 
             <div class="col-8 buttons">
                 <sqx-menu alignment="right" small>
-                    <fieldset class="d-flex gap-1" [disabled]="(isDisabled | async) || isCollapsed">
-                        <ng-content></ng-content>
-                    </fieldset>
+                    <ng-content></ng-content>
 
                     @if (isString) {
                         <sqx-menu-item

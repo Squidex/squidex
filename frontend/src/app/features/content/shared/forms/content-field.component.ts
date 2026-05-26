@@ -8,7 +8,7 @@
 import { AsyncPipe, NgTemplateOutlet } from '@angular/common';
 import { booleanAttribute, Component, EventEmitter, HostBinding, inject, Input, numberAttribute, Optional, Output } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { AppLanguageDto, AppsState, changed$, CommentSelected, CommentsState, disabled$, EditContentForm, FieldForm, FocusMarkerComponent, invalid$, LocalStoreService, MenuItemComponent, MessageBus, SchemaDto, Settings, Subscriptions, TranslateDto, TranslatePipe, TranslationsService, TypedSimpleChanges, UIOptions } from '@app/shared';
+import { AppLanguageDto, AppsState, changed$, CommentSelected, CommentsState, disabled$, EditContentForm, FieldForm, FocusMarkerComponent, invalid$, LocalStoreService, MenuItemComponent, MenuItemRegistry, MessageBus, SchemaDto, Settings, Subscriptions, TranslateDto, TranslatePipe, TranslationsService, TypedSimpleChanges, UIOptions } from '@app/shared';
 import { FieldCopyButtonComponent } from './field-copy-button.component';
 import { FieldEditorComponent } from './field-editor.component';
 import { FieldLanguagesComponent } from './field-languages.component';
@@ -27,6 +27,7 @@ import { FieldLanguagesComponent } from './field-languages.component';
         NgTemplateOutlet,
         TranslatePipe,
     ],
+    providers: [MenuItemRegistry],
 })
 export class ContentFieldComponent {
     private readonly subscriptions = new Subscriptions();

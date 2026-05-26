@@ -1,5 +1,5 @@
 <div class="d-flex flex-nowrap relative" #container [class.gap-1]="small" [class.gap-2]="!small" [class.justify-content-end]="isRightAligned">
-    @if (overflowMenuItems) {
+    @if (overflowMenuItems(); as menu) {
         <button
             class="btn btn-text-secondary"
             #buttonOptions
@@ -17,7 +17,7 @@
             scrollY="true"
             [sqxAnchoredTo]="buttonOptions"
             *sqxModal="overflowDropdown; closeAlways: true">
-            @for (item of overflowMenuItems; track item) {
+            @for (item of menu; track item) {
                 <ng-container *ngTemplateOutlet="item.template"></ng-container>
             }
         </sqx-dropdown-menu>
@@ -28,8 +28,8 @@
         #menu
         [class.gap-1]="small"
         [class.gap-2]="!small"
-        [class.overflown-left]="!!overflowMenuItems && !isRightAligned"
-        [class.overflown-right]="!!overflowMenuItems && isRightAligned">
+        [class.overflown-left]="!!overflowMenuItems() && !isRightAligned"
+        [class.overflown-right]="!!overflowMenuItems() && isRightAligned">
         <ng-content />
     </div>
 </div>

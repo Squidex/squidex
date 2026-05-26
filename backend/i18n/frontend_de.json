@@ -455,6 +455,7 @@
   "contents.changeStatusTo": "Inhaltselement(e) auf {action} ändern",
   "contents.changeStatusToImmediately": "Sofort auf {action} setzen.",
   "contents.changeStatusToLater": "Zu einem späteren Datum und einer späteren Uhrzeit auf {action} setzen.",
+  "contents.comment": "Write comment",
   "contents.componentInvalid": "Ungültige Komponente, Schema wurde gelöscht.",
   "contents.componentNoSchema": "Fügen Sie mindestens ein Schema hinzu, um eine Komponente festzulegen.",
   "contents.componentsNoSchema": "Fügen Sie mindestens ein Schema hinzu, um Komponenten hinzuzufügen.",

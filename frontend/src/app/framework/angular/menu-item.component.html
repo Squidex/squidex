@@ -1,15 +1,14 @@
 <ng-template #dropdownTemplate>
     <button
         class="dropdown-item"
-        [attr.disabled]="disabled"
-        [class.disabled]="disabled"
+        [disabled]="disabled"
         [confirmRememberKey]="confirmRememberKey"
         [confirmText]="confirmText | sqxTranslate"
         [confirmTitle]="confirmTitle | sqxTranslate"
         (sqxConfirmClick)="action.emit()"
         [title]="tooltip | sqxTranslate"
         type="button">
-        {{ menuLabel || label | sqxTranslate }}
+        {{ actualMenuLabel }}
     </button>
 </ng-template>
 

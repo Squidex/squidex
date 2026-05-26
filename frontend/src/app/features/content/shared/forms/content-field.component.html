@@ -103,30 +103,32 @@
 </div>
 
 <ng-template #sharedButtons>
-    <sqx-field-languages
-        [formModel]="formModel"
-        [language]="language"
-        (languageChange)="languageChange.emit($event)"
-        [languages]="languages"
-        [showAllControls]="showAllControls"
-        (showAllControlsChange)="changeShowAllControls($event)" />
+    <fieldset class="d-flex gap-1" [disabled]="(isDisabled | async) || isCollapsed">
+        <sqx-field-languages
+            [formModel]="formModel"
+            [language]="language"
+            (languageChange)="languageChange.emit($event)"
+            [languages]="languages"
+            [showAllControls]="showAllControls"
+            (showAllControlsChange)="changeShowAllControls($event)" />
 
-    <sqx-field-copy-button [formModel]="formModel" [languages]="languages" />
+        <sqx-field-copy-button [formModel]="formModel" [languages]="languages" />
 
-    @if (isTranslatable) {
-        <sqx-menu-item
-            (action)="translate()"
-            [disabled]="formModel.field.isDisabled"
-            icon="translate"
-            menuLabel="i18n:contents.autotranslateMenu"
-            small
-            tabIndex="-1"
-            tooltip="i18n:contents.autotranslate" />
-    }
+        @if (isTranslatable) {
+            <sqx-menu-item
+                (action)="translate()"
+                [disabled]="formModel.field.isDisabled"
+                icon="translate"
+                menuLabel="i18n:contents.autotranslateMenu"
+                small
+                tabIndex="-1"
+                tooltip="i18n:contents.autotranslate" />
+        }
+    </fieldset>
 
     @if (isCollapsed) {
-        <sqx-menu-item (action)="toggle()" icon="minus2" menuLabel="i18n:common.collapse" small tooltip="i18n:contents.arrayCollapseItem" />
+        <sqx-menu-item (action)="toggle()" icon="angle-down" menuLabel="i18n:common.collapse" small tooltip="i18n:contents.arrayCollapseItem" />
     } @else {
-        <sqx-menu-item (action)="toggle()" icon="plus2" menuLabel="i18n:common.expand" small tooltip="i18n:contents.arrayCollapseItem" />
+        <sqx-menu-item (action)="toggle()" icon="angle-up" menuLabel="i18n:common.expand" small tooltip="i18n:contents.arrayCollapseItem" />
     }
 </ng-template>

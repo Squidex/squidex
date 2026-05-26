@@ -455,6 +455,7 @@
   "contents.changeStatusTo": "Cambia gli elementi del contenuto in {action}",
   "contents.changeStatusToImmediately": "Imposta {action} immediatamente.",
   "contents.changeStatusToLater": "Imposta {action} ad una data e ora successiva.",
+  "contents.comment": "Write comment",
   "contents.componentInvalid": "Invalid component, schema has been deleted.",
   "contents.componentNoSchema": "Add at least one schema to set component.",
   "contents.componentsNoSchema": "Add at least one schema to add components.",

@@ -7,13 +7,34 @@
 
 
 import { NgTemplateOutlet } from '@angular/common';
-import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, ContentChildren, ElementRef, Input, QueryList, ViewChild } from '@angular/core';
+import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, computed, ElementRef, Injectable, Input, Optional, signal, SkipSelf, ViewChild } from '@angular/core';
 import { ModalModel, ResizeListener, ResizeService, Subscriptions } from '@app/framework/internal';
 import { DropdownMenuComponent } from './dropdown-menu.component';
 import { MenuItemComponent } from './menu-item.component';
 import { ModalPlacementDirective } from './modals/modal-placement.directive';
 import { ModalDirective } from './modals/modal.directive';
 import { TranslatePipe } from './pipes/translate.pipe';
+
+@Injectable()
+export class MenuItemRegistry {
+    public readonly menuItems = signal(new Set<MenuItemComponent>());
+
+    public registerItem(item: MenuItemComponent) {
+        this.menuItems.update(x => {
+            const update = new Set<MenuItemComponent>(x);
+            update.add(item);
+            return update;
+        });
+    }
+
+    public unregisterItem(item: MenuItemComponent) {
+        this.menuItems.update(x => {
+            const update = new Set<MenuItemComponent>(x);
+            update.delete(item);
+            return update;
+        });
+    }
+}
 
 @Component({
     selector: 'sqx-menu',
@@ -27,11 +48,17 @@ import { TranslatePipe } from './pipes/translate.pipe';
         NgTemplateOutlet,
         TranslatePipe,
     ],
+    providers: [{
+        provide: MenuItemRegistry,
+        useFactory: (menu: MenuComponent) => menu.menuItemsRegistry,
+        deps: [MenuComponent],
+    }]
 })
 export class MenuComponent implements AfterViewInit, ResizeListener {
     private readonly subscriptions = new Subscriptions();
-    private measuredContainer?: number;
-    private measuredMenu?: number;
+    private readonly menuItemsRegistry: MenuItemRegistry;
+    private readonly measuredContainer = signal(-1);
+    private readonly measuredMenu = signal(-1);
 
     @Input()
     public alignment: 'left' | 'right' = 'left';
@@ -48,10 +75,6 @@ export class MenuComponent implements AfterViewInit, ResizeListener {
     @ViewChild('menu', { static: true })
     public menu!: ElementRef<HTMLDivElement>;
 
-    @ContentChildren(MenuItemComponent)
-    public menuItems!: QueryList<MenuItemComponent>;
-
-    public overflowMenuItems: MenuItemComponent[] | null = null;
     public overflowDropdown = new ModalModel();
 
     public get isRightAligned() {
@@ -60,8 +83,9 @@ export class MenuComponent implements AfterViewInit, ResizeListener {
 
     constructor(
         private readonly resizeService: ResizeService,
-        private readonly changeDetector: ChangeDetectorRef,
+        @Optional() @SkipSelf() parentMenuItemRegistry?: MenuItemRegistry,
     ) {
+        this.menuItemsRegistry = parentMenuItemRegistry ?? new MenuItemRegistry();
     }
 
     public ngAfterViewInit() {
@@ -71,17 +95,22 @@ export class MenuComponent implements AfterViewInit, ResizeListener {
 
     public onResize(rect: DOMRect, element: Element): void {
         if (element === this.container.nativeElement) {
-            this.measuredContainer = rect.width;
+            this.measuredContainer.set(rect.width);
         } else {
-            this.measuredMenu = Math.max(rect.width, element.scrollWidth);
+            this.measuredMenu.set(Math.max(rect.width, element.scrollWidth));
         }
-
-        if (!this.measuredContainer || !this.measuredMenu) {
-            return;
-        }
-
-        const isOverlapping = this.measuredMenu > this.measuredContainer;
-        this.overflowMenuItems = isOverlapping ? this.menuItems.toArray().filter(x => x.showInDropdown) : null;
-        this.changeDetector.detectChanges();
     }
+
+    protected overflowMenuItems = computed(() => {
+        const items = this.menuItemsRegistry.menuItems();
+        const measuredContainer = this.measuredContainer();
+        const measuredMenu = this.measuredMenu();
+
+        if (measuredContainer < 0 || measuredMenu < 0) {
+            return null;
+        }
+
+        const isOverlapping = measuredMenu > measuredContainer;
+        return isOverlapping ? [...items.values()].filter(x => x.actualMenuLabel).sortedByString(x => x.actualMenuLabel) : null;
+    });
 }

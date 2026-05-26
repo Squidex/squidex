@@ -455,6 +455,7 @@
   "contents.changeStatusTo": "Verander inhoud item(s) in {action}",
   "contents.changeStatusToImmediately": "Zet onmiddellijk op {action}.",
   "contents.changeStatusToLater": "Zet op {action} op een latere datum en tijd.",
+  "contents.comment": "Write comment",
   "contents.componentInvalid": "Ongeldig component, schema is verwijderd.",
   "contents.componentNoSchema": "Voeg ten minste één schema toe om het component te kunnen zetten.",
   "contents.componentsNoSchema": "AVoeg ten minste één schema toe om de componenten te kunnen zetten.",

@@ -455,6 +455,7 @@
   "contents.changeStatusTo": "Remplacez le(s) élément(s) de contenu par {action}",
   "contents.changeStatusToImmediately": "Réglez sur {action} immédiatement.",
   "contents.changeStatusToLater": "Définir sur {action} à une date et une heure ultérieures.",
+  "contents.comment": "Write comment",
   "contents.componentInvalid": "Composant non valide, le schéma a été supprimé.",
   "contents.componentNoSchema": "Ajoutez au moins un schéma pour définir le composant.",
   "contents.componentsNoSchema": "Ajoutez au moins un schéma pour ajouter des composants.",

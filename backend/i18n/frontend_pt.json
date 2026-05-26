@@ -455,6 +455,7 @@
   "contents.changeStatusTo": "Alterar o(s) item de conteúdo para {action}",
   "contents.changeStatusToImmediately": "Desa um conjunto de {action} imediatamente.",
   "contents.changeStatusToLater": "Definir para {action} numa data e hora posteriores.",
+  "contents.comment": "Write comment",
   "contents.componentInvalid": "Componente inválido, o esquema foi eliminado.",
   "contents.componentNoSchema": "Adicione pelo menos um esquema para definir o componente.",
   "contents.componentsNoSchema": "Adicione pelo menos um esquema para adicionar componentes.",
