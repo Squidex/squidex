@@ -152,7 +152,7 @@ public abstract partial class DomainObject<T> : IAggregate where T : Entity, new
             }
             catch (Exception ex)
             {
-                log.LogError(ex, "Failed to repair snapshot for domain object of type {type} with ID {id}.", GetType(), UniqueId);
+                LogMessages.LogFailedToRepairDomainObjectSnapshot(log, GetType(), UniqueId, ex);
             }
         }
 
