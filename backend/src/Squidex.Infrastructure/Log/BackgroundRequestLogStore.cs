@@ -13,7 +13,7 @@ using Squidex.Infrastructure.Timers;
 
 namespace Squidex.Infrastructure.Log;
 
-public sealed partial class BackgroundRequestLogStore : DisposableObjectBase, IRequestLogStore
+public sealed class BackgroundRequestLogStore : DisposableObjectBase, IRequestLogStore
 {
     private readonly IRequestLogRepository logRepository;
     private readonly ILogger<BackgroundRequestLogStore> log;
@@ -88,7 +88,7 @@ public sealed partial class BackgroundRequestLogStore : DisposableObjectBase, IR
         }
         catch (Exception ex)
         {
-            LogTrackUsageFailed(log, ex);
+            LogMessages.LogTrackUsageFailed(log, ex);
         }
         finally
         {
@@ -127,7 +127,4 @@ public sealed partial class BackgroundRequestLogStore : DisposableObjectBase, IR
 
         return Task.CompletedTask;
     }
-
-    [LoggerMessage(EventId = 1, Level = LogLevel.Error, Message = "Failed to track usage in background.")]
-    private static partial void LogTrackUsageFailed(ILogger logger, Exception exception);
 }

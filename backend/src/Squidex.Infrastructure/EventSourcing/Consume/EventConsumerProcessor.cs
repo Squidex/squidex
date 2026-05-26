@@ -69,7 +69,7 @@ public partial class EventConsumerProcessor : IEventSubscriber<ParsedEvents>
             }
             catch (Exception ex)
             {
-                LogFailedToCompleteConsumer(log, ex);
+                LogMessages.LogFailedToCompleteConsumer(log, ex);
             }
         }
 
@@ -107,7 +107,7 @@ public partial class EventConsumerProcessor : IEventSubscriber<ParsedEvents>
 
             if (logWindow.CanRetryAfterFailure())
             {
-                LogFailedToHandleEvent(log, exception);
+                LogMessages.LogFailedToHandleEvent(log, exception);
             }
         }, State.Position);
     }
@@ -215,7 +215,7 @@ public partial class EventConsumerProcessor : IEventSubscriber<ParsedEvents>
                     ex = new AggregateException(ex, unsubscribeException);
                 }
 
-                LogFailedToUpdateConsumer(log, eventConsumer.Name, position, caller, ex);
+                LogMessages.LogFailedToUpdateConsumer(log, eventConsumer.Name, position, caller, ex);
 
                 State = previousState.Stopped(ex);
             }
@@ -232,7 +232,7 @@ public partial class EventConsumerProcessor : IEventSubscriber<ParsedEvents>
     {
         if (log.IsEnabled(LogLevel.Debug))
         {
-            LogEventConsumerResetStarted(log, eventConsumer.Name);
+            LogMessages.LogEventConsumerResetStarted(log, eventConsumer.Name);
         }
 
         var watch = ValueStopwatch.StartNew();
@@ -242,7 +242,7 @@ public partial class EventConsumerProcessor : IEventSubscriber<ParsedEvents>
         }
         finally
         {
-            LogEventConsumerResetCompleted(log, eventConsumer.Name, watch.Stop());
+            LogMessages.LogEventConsumerResetCompleted(log, eventConsumer.Name, watch.Stop());
         }
     }
 
@@ -281,19 +281,4 @@ public partial class EventConsumerProcessor : IEventSubscriber<ParsedEvents>
     {
         return eventStore.CreateSubscription(subscriber, eventConsumer.EventsFilter, State.Position);
     }
-
-    [LoggerMessage(EventId = 1, Level = LogLevel.Critical, Message = "Failed to complete consumer.")]
-    private static partial void LogFailedToCompleteConsumer(ILogger logger, Exception exception);
-
-    [LoggerMessage(EventId = 2, Level = LogLevel.Error, Message = "Failed to handle event.")]
-    private static partial void LogFailedToHandleEvent(ILogger logger, Exception exception);
-
-    [LoggerMessage(EventId = 3, Level = LogLevel.Critical, Message = "Failed to update consumer {consumer} at position {position} from {caller}.")]
-    private static partial void LogFailedToUpdateConsumer(ILogger logger, string consumer, string? position, string? caller, Exception exception);
-
-    [LoggerMessage(EventId = 4, Level = LogLevel.Debug, Message = "Event consumer {consumer} reset started")]
-    private static partial void LogEventConsumerResetStarted(ILogger logger, string consumer);
-
-    [LoggerMessage(EventId = 5, Level = LogLevel.Debug, Message = "Event consumer {consumer} reset completed after {time}ms.")]
-    private static partial void LogEventConsumerResetCompleted(ILogger logger, string consumer, long time);
 }

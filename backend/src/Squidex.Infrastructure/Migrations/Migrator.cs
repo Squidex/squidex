@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Squidex.Infrastructure.Migrations;
 
-public sealed partial class Migrator(
+public sealed class Migrator(
     IMigrationStatus migrationStatus,
     IMigrationPath migrationPath,
     ILogger<Migrator> log)
@@ -41,7 +41,7 @@ public sealed partial class Migrator(
                 {
                     var name = migration.ToString()!;
 
-                    LogMigrationStarted(log, name);
+                    LogMessages.LogMigrationStarted(log, name);
 
                     try
                     {
@@ -49,11 +49,11 @@ public sealed partial class Migrator(
 
                         await migration.UpdateAsync(ct);
 
-                        LogMigrationCompleted(log, name, watch.Stop());
+                        LogMessages.LogMigrationCompleted(log, name, watch.Stop());
                     }
                     catch (Exception ex)
                     {
-                        LogMigrationFailed(log, name, ex);
+                        LogMessages.LogMigrationFailed(log, name, ex);
                         throw new MigrationFailedException(name, ex);
                     }
                 }
@@ -76,7 +76,7 @@ public sealed partial class Migrator(
         {
             while (!await migrationStatus.TryLockAsync(ct))
             {
-                LogMigrationLockRetry(log, LockWaitMs);
+                LogMessages.LogMigrationLockRetry(log, LockWaitMs);
                 await Task.Delay(LockWaitMs, ct);
             }
         }
@@ -92,16 +92,4 @@ public sealed partial class Migrator(
     {
         return migrationStatus.UnlockAsync();
     }
-
-    [LoggerMessage(EventId = 1, Level = LogLevel.Information, Message = "Migration {migration} started.")]
-    private static partial void LogMigrationStarted(ILogger logger, string migration);
-
-    [LoggerMessage(EventId = 2, Level = LogLevel.Information, Message = "Migration {migration} completed after {time}ms.")]
-    private static partial void LogMigrationCompleted(ILogger logger, string migration, long time);
-
-    [LoggerMessage(EventId = 3, Level = LogLevel.Critical, Message = "Migration {migration} failed.")]
-    private static partial void LogMigrationFailed(ILogger logger, string migration, Exception exception);
-
-    [LoggerMessage(EventId = 4, Level = LogLevel.Information, Message = "Could not acquire lock to start migrating. Trying again in {time}ms.")]
-    private static partial void LogMigrationLockRetry(ILogger logger, int time);
 }

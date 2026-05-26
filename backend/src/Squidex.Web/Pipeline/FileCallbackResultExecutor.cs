@@ -54,7 +54,7 @@ public sealed class FileCallbackResultExecutor(ILoggerFactory loggerFactory) : F
                 response.Headers.Clear();
                 response.StatusCode = 404;
 
-                Logger.LogCritical(new EventId(99), e, "Failed to send result.");
+                LogMessages.LogFailedToSendResult(Logger, e);
             }
             else
             {
