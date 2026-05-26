@@ -13,7 +13,7 @@ using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Infrastructure.EventSourcing.Consume;
 
-public partial class EventConsumerProcessor : IEventSubscriber<ParsedEvents>
+public class EventConsumerProcessor : IEventSubscriber<ParsedEvents>
 {
     private readonly SimpleState<EventConsumerState> state;
     private readonly IEventFormatter eventFormatter;
