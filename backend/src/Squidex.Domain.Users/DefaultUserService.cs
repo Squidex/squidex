@@ -195,7 +195,7 @@ public sealed class DefaultUserService(
             }
             catch (Exception ex2)
             {
-                log.LogError(ex2, "Failed to cleanup user after creation failed.");
+                LogMessages.LogFailedToCleanupUser(log, ex2);
             }
 
             throw;

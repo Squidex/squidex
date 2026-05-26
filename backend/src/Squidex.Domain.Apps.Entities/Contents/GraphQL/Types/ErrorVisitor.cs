@@ -26,11 +26,11 @@ internal static class ErrorVisitor
 
             if (!string.IsNullOrWhiteSpace(fieldName))
             {
-                log.LogError(context.OriginalException, "Failed to resolve field {field}.", fieldName);
+                LogMessages.LogFailedToResolveField(log, fieldName, context.OriginalException);
             }
             else
             {
-                log.LogError(context.OriginalException, "Failed to resolve execute query.");
+                LogMessages.LogFailedToResolveQuery(log, context.OriginalException);
             }
 
             if (context.OriginalException is ValidationException or DomainException)

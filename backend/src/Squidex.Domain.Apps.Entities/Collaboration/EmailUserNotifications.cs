@@ -123,13 +123,13 @@ public sealed class EmailUserNotifications(
     {
         if (string.IsNullOrWhiteSpace(emailBody))
         {
-            log.LogWarning("Cannot send email to {email}: No email subject configured for template {template}.", template, user.Email);
+            LogMessages.LogNoEmailSubjectConfigured(log, template, user.Email);
             return;
         }
 
         if (string.IsNullOrWhiteSpace(emailSubj))
         {
-            log.LogWarning("Cannot send email to {email}: No email body configured for template {template}.", template, user.Email);
+            LogMessages.LogNoEmailBodyConfigured(log, template, user.Email);
             return;
         }
 
@@ -146,7 +146,7 @@ public sealed class EmailUserNotifications(
         }
         catch (Exception ex)
         {
-            log.LogError(ex, "Failed to send notification to {email}.", user.Email);
+            LogMessages.LogFailedToSendNotification(log, user.Email, ex);
             throw;
         }
     }

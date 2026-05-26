@@ -128,11 +128,11 @@ public class NotifoService : IUserEvents
         }
         catch (NotifoException ex)
         {
-            log.LogError(ex, "Failed to register user in notifo: {details}.", ex.ToString());
+            LogMessages.LogFailedToRegisterUserInNotifoWithDetails(log, ex.ToString(), ex);
         }
         catch (Exception ex)
         {
-            log.LogError(ex, "Failed to register user in notifo.");
+            LogMessages.LogFailedToRegisterUserInNotifo(log, ex);
         }
     }
 
@@ -191,11 +191,11 @@ public class NotifoService : IUserEvents
         }
         catch (NotifoException ex)
         {
-            log.LogError(ex, "Failed to push user to notifo: {details}.", ex.ToString());
+            LogMessages.LogFailedToPushUserToNotifoWithDetails(log, ex.ToString(), ex);
         }
         catch (Exception ex)
         {
-            log.LogError(ex, "Failed to push user to notifo.");
+            LogMessages.LogFailedToPushUserToNotifo(log, ex);
         }
     }
 

@@ -98,7 +98,7 @@ public sealed class UsersController(
         }
         catch (Exception ex)
         {
-            log.LogError(ex, "Failed to return users, returning empty results.");
+            LogMessages.LogFailedToReturnUsers(log, ex);
         }
 
         return Ok(Array.Empty<UserDto>());
@@ -129,7 +129,7 @@ public sealed class UsersController(
         }
         catch (Exception ex)
         {
-            log.LogError(ex, "Failed to return user, returning empty results.");
+            LogMessages.LogFailedToReturnUser(log, ex);
         }
 
         return NotFound();
@@ -202,7 +202,7 @@ public sealed class UsersController(
         }
         catch (Exception ex)
         {
-            log.LogError(ex, "Failed to return user picture, returning fallback image.");
+            LogMessages.LogFailedToReturnUserPicture(log, ex);
         }
 
         return new FileStreamResult(new MemoryStream(AvatarBytes), "image/png");

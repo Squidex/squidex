@@ -55,7 +55,7 @@ public sealed class ContentSchedulerProcess(
         }
         catch (Exception ex)
         {
-            log.LogError(ex, "Failed to query scheduled status changes-");
+            LogMessages.LogFailedToQueryScheduledStatusChanges(log, ex);
         }
     }
 
@@ -88,7 +88,7 @@ public sealed class ContentSchedulerProcess(
         }
         catch (Exception ex)
         {
-            log.LogError(ex, "Failed to execute scheduled status change for content '{contentId}'.", content.Id);
+            LogMessages.LogFailedToExecuteScheduledStatusChange(log, content.Id, ex);
         }
     }
 }

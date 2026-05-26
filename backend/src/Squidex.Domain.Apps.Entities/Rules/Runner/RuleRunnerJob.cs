@@ -171,8 +171,7 @@ public sealed class RuleRunnerJob : IJobRunner
                     throw result.EnrichmentError;
                 }
 
-                log.LogWarning(result.EnrichmentError, "Failed to run rule with ID {ruleId}, continue with next job.",
-                    result.Rule?.Id);
+                LogMessages.LogFailedToRunRule(log, result.Rule?.Id, result.EnrichmentError);
             }
         }
     }
@@ -212,8 +211,7 @@ public sealed class RuleRunnerJob : IJobRunner
                         throw result.EnrichmentError;
                     }
 
-                    log.LogWarning(result.EnrichmentError, "Failed to run rule with ID {ruleId}, continue with next job.",
-                        result.Rule?.Id);
+                    LogMessages.LogFailedToRunRule(log, result.Rule?.Id, result.EnrichmentError);
                 }
             }
         }

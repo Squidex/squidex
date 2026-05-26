@@ -37,7 +37,7 @@ public sealed class SearchManager(IEnumerable<ISearchSource> searchSources, ILog
         }
         catch (Exception ex)
         {
-            log.LogError(ex, "Failed to execute search from source {source} with query '{query}'.", source, query);
+            LogMessages.LogFailedToExecuteSearch(log, source.GetType().Name, query, ex);
             return Empty;
         }
     }

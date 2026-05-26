@@ -46,7 +46,7 @@ internal static class UserManagerExtensions
 
             var errorMessage = errorMessageBuilder.ToString();
 
-            log.LogError("Identity operation failed: {errorMessage}.", errorMessage);
+            LogMessages.LogIdentityOperationFailed(log, errorMessage);
 
             throw new ValidationException(result.Errors.Select(x => new ValidationError(Localize(x))).ToList());
         }

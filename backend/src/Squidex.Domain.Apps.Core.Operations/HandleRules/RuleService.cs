@@ -108,7 +108,7 @@ public sealed class RuleService(
             CreateJobs(@event, context, states, ct)
                 .Catch(ex =>
                 {
-                    log.LogError(ex, "Failed to create rule job.");
+                    LogMessages.LogFailedToCreateRuleJob(log, ex);
 
                     return states.Select(state => JobResult.Skipped(state.Rule, SkipReason.Failed));
                 });
@@ -237,7 +237,7 @@ public sealed class RuleService(
                 CreateTriggerJobs(typed, triggerHandler, rulesByTrigger, context, ct)
                     .Catch(ex =>
                     {
-                        log.LogError(ex, "Failed to create rule jobs from trigger.");
+                        LogMessages.LogFailedToCreateRuleJobsFromTrigger(log, ex);
 
                         return states.Select(state => JobResult.Skipped(state.Rule, SkipReason.Failed));
                     });
@@ -263,7 +263,7 @@ public sealed class RuleService(
                 CreateEventJobs(@event, enrichedEvent, triggerHandler, states, context)
                     .Catch(ex =>
                     {
-                        log.LogError(ex, "Failed to create rule jobs from event.");
+                        LogMessages.LogFailedToCreateRuleJobsFromEvent(log, ex);
 
                         return states.Select(state =>
                             new JobResult

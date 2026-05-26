@@ -59,7 +59,7 @@ public sealed class JobProcessor
         if (pending.Any())
         {
             // This should actually never happen, so we log with warning.
-            log.LogWarning("Removed unfinished jobs for owner {ownerId} after start.", ownerId);
+            LogMessages.LogRemovedUnfinishedJobs(log, ownerId);
 
             foreach (var job in pending.ToList())
             {
@@ -81,7 +81,7 @@ public sealed class JobProcessor
     {
         return scheduler.ScheduleAsync(async _ =>
         {
-            log.LogInformation("Clearing jobs for owner {ownerId}.", ownerId);
+            LogMessages.LogClearingJobs(log, ownerId);
 
             var job = state.Value.Jobs.Find(x => x.Id == jobId);
 
@@ -105,7 +105,7 @@ public sealed class JobProcessor
     {
         return scheduler.ScheduleAsync(async _ =>
         {
-            log.LogInformation("Clearing jobs for owner {ownerId}.", ownerId);
+            LogMessages.LogClearingJobs(log, ownerId);
 
             foreach (var job in state.Value.Jobs)
             {
@@ -164,7 +164,7 @@ public sealed class JobProcessor
                 OwnerId = ownerId,
             };
 
-            log.LogInformation("Starting new backup with backup id '{backupId}' for owner {ownerId}.", context.Job.Id, ownerId);
+            LogMessages.LogStartingJob(log, context.Job.Id, ownerId);
 
             state.Value.Jobs.Insert(0, context.Job);
             try
@@ -221,7 +221,7 @@ public sealed class JobProcessor
         }
         catch (Exception ex)
         {
-            log.LogError(ex, "Failed to run job with ID {jobId}.", context.Job.Id);
+            LogMessages.LogFailedToRunJob(log, context.Job.Id, ex);
 
             await SetStatusAsync(context, JobStatus.Failed);
         }

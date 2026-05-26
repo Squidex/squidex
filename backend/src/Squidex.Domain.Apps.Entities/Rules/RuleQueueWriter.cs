@@ -35,8 +35,10 @@ public sealed class RuleQueueWriter(IFlowManager<FlowEventContext> flowManager, 
 
         writes.Add(result.Job.Value);
 
-        log?.LogInformation("Adding rule job for Rule(trigger={ruleTrigger})",
-            result.Rule.Trigger.GetType().Name);
+        if (log != null)
+        {
+            LogMessages.LogAddingRuleJob(log, result.Rule.Trigger.GetType().Name);
+        }
 
         var today = Clock.GetCurrentInstant().ToDateOnly();
 

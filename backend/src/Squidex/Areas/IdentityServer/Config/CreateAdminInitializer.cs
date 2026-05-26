@@ -84,7 +84,7 @@ public sealed class CreateAdminInitializer(IServiceProvider serviceProvider) : I
         {
             var log = serviceProvider.GetRequiredService<ILogger<CreateAdminInitializer>>();
 
-            log.LogError(ex, "Failed to create administrator.");
+            LogMessages.LogFailedToCreateAdministrator(log, ex);
         }
     }
 

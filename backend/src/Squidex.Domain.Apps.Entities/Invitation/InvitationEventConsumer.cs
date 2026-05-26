@@ -106,7 +106,7 @@ public sealed class InvitationEventConsumer(
 
         if (assigner == null)
         {
-            log.LogWarning("Failed to invite user: Assigner {assignerId} not found.", assignerId);
+            LogMessages.LogInvitationAssignerNotFound(log, assignerId);
             return default;
         }
 
@@ -114,7 +114,7 @@ public sealed class InvitationEventConsumer(
 
         if (assignee == null)
         {
-            log.LogWarning("Failed to invite user: Assignee {assigneeId} not found.", assigneeId);
+            LogMessages.LogInvitationAssigneeNotFound(log, assigneeId);
             return default;
         }
 

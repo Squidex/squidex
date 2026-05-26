@@ -104,7 +104,7 @@ public sealed class KafkaProducer
 
     private static void LogError(ILogger<KafkaProducer> log, Error error)
     {
-        log.LogWarning("Kafka error with {code} and {reason}.", error.Code, error.Reason);
+        LogMessages.LogKafkaError(log, error.Code, error.Reason);
     }
 
     public async Task SendAsync(KafkaMessageRequest job,

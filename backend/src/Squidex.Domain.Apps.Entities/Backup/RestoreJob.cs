@@ -107,7 +107,7 @@ public sealed class RestoreJob(
             await context.LogAsync("  * Restore all objects like app, schemas and contents");
             await context.LogAsync("  * Complete the restore operation for all objects");
             await context.FlushAsync();
-            log.LogInformation("Backup with job id {backupId} with from URL '{url}' started.", context.Job.Id, state.Url);
+            LogMessages.LogRestoreJobStarted(log, context.Job.Id, state.Url);
 
             state.Reader = await DownloadAsync(context, state, ct);
 
@@ -147,7 +147,7 @@ public sealed class RestoreJob(
             await AssignContributorAsync(context, state);
             await context.LogAsync("Completed, Yeah!");
 
-            log.LogInformation("Backup with job id {backupId} from URL '{url}' completed.", context.Job.Id, state.Url);
+            LogMessages.LogRestoreJobCompleted(log, context.Job.Id, state.Url);
         }
         catch (Exception ex)
         {
@@ -168,7 +168,7 @@ public sealed class RestoreJob(
 
             await context.LogAsync(message);
 
-            log.LogError(ex, "Backup with job id {backupId} from URL '{url}' failed.", context.Job.Id, state.Url);
+            LogMessages.LogRestoreJobFailed(log, context.Job.Id, state.Url, ex);
             throw;
         }
         finally
@@ -231,7 +231,7 @@ public sealed class RestoreJob(
             }
             catch (Exception ex)
             {
-                log.LogError(ex, "Failed to clean up restore.");
+                LogMessages.LogFailedToCleanUpRestore(log, ex);
             }
         }
     }

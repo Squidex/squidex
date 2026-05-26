@@ -116,7 +116,7 @@ public sealed partial class CommentCollaborationHandler(
                 catch (Exception ex)
                 {
                     // We are in an extra task, so the exception would be probably swallowed.
-                    log.LogError(ex, "Failed to handle yjs event.");
+                    LogMessages.LogFailedToHandleYjsEvent(log, ex);
                     throw;
                 }
             });

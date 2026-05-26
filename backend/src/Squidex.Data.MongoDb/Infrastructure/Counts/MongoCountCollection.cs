@@ -50,7 +50,7 @@ internal sealed class MongoCountCollection(IMongoDatabase database, ILogger log,
         }
         catch (Exception ex)
         {
-            log.LogError(ex, "Failed to update count for collection {collection}.", collectionName);
+            LogMessages.LogFailedToUpdateCount(log, collectionName, ex);
         }
     }
 

@@ -84,7 +84,7 @@ public sealed class AzureMetadataSource : IAssetMetadataSource
         }
         catch (Exception ex)
         {
-            log.LogError(ex, "Failed to enrich asset.");
+            LogMessages.LogFailedToEnrichAsset(log, ex);
         }
     }
 

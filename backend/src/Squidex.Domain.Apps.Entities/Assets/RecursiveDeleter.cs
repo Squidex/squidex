@@ -58,7 +58,7 @@ public sealed class RecursiveDeleter(
             }
             catch (Exception ex)
             {
-                log.LogError(ex, "Failed to delete asset recursively.");
+                LogMessages.LogFailedToDeleteAssetRecursively(log, ex);
             }
         }
 
