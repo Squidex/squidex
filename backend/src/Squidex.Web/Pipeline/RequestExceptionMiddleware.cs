@@ -15,7 +15,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Squidex.Web.Pipeline;
 
-public sealed class RequestExceptionMiddleware(RequestDelegate next)
+public sealed partial class RequestExceptionMiddleware(RequestDelegate next)
 {
     private static readonly ActionDescriptor EmptyActionDescriptor = new ActionDescriptor();
     private static readonly RouteData EmptyRouteData = new RouteData();
@@ -37,7 +37,7 @@ public sealed class RequestExceptionMiddleware(RequestDelegate next)
         }
         catch (Exception ex)
         {
-            log.LogError(ex, "An unexpected exception has occurred.");
+            LogUnexpectedException(log, ex);
 
             if (!context.Response.HasStarted)
             {
@@ -77,4 +77,7 @@ public sealed class RequestExceptionMiddleware(RequestDelegate next)
     {
         return statusCode is >= 400 and < 600;
     }
+
+    [LoggerMessage(EventId = 1, Level = LogLevel.Error, Message = "An unexpected exception has occurred.")]
+    private static partial void LogUnexpectedException(ILogger logger, Exception exception);
 }

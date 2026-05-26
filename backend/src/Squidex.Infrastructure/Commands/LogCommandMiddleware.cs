@@ -9,7 +9,7 @@ using Microsoft.Extensions.Logging;
 
 namespace Squidex.Infrastructure.Commands;
 
-public sealed class LogCommandMiddleware(ILogger<LogCommandMiddleware> log) : ICommandMiddleware
+public sealed partial class LogCommandMiddleware(ILogger<LogCommandMiddleware> log) : ICommandMiddleware
 {
     public async Task HandleAsync(CommandContext context, NextDelegate next,
         CancellationToken ct)
@@ -20,7 +20,7 @@ public sealed class LogCommandMiddleware(ILogger<LogCommandMiddleware> log) : IC
         {
             if (log.IsEnabled(LogLevel.Debug))
             {
-                log.LogDebug("Command {command} with ID {id} started.", type, context.ContextId);
+                LogCommandStarted(log, type, context.ContextId);
             }
 
             var watch = ValueStopwatch.StartNew();
@@ -28,22 +28,37 @@ public sealed class LogCommandMiddleware(ILogger<LogCommandMiddleware> log) : IC
             {
                 await next(context, ct);
 
-                log.LogInformation("Command {command} with ID {id} succeeded.", type, context.ContextId);
+                LogCommandSucceeded(log, type, context.ContextId);
             }
             finally
             {
-                log.LogInformation("Command {command} with ID {id} completed after {time}ms.", type, context.ContextId, watch.Stop());
+                LogCommandCompleted(log, type, context.ContextId, watch.Stop());
             }
         }
         catch (Exception ex)
         {
-            log.LogError(ex, "Command {command} with ID {id} failed.", type, context.ContextId);
+            LogCommandFailed(log, type, context.ContextId, ex);
             throw;
         }
 
         if (!context.IsCompleted)
         {
-            log.LogCritical("Command {command} with ID {id} not handled.", type, context.ContextId);
+            LogCommandNotHandled(log, type, context.ContextId);
         }
     }
+
+    [LoggerMessage(EventId = 1, Level = LogLevel.Debug, Message = "Command {command} with ID {id} started.")]
+    private static partial void LogCommandStarted(ILogger logger, Type command, Guid id);
+
+    [LoggerMessage(EventId = 2, Level = LogLevel.Information, Message = "Command {command} with ID {id} succeeded.")]
+    private static partial void LogCommandSucceeded(ILogger logger, Type command, Guid id);
+
+    [LoggerMessage(EventId = 3, Level = LogLevel.Information, Message = "Command {command} with ID {id} completed after {time}ms.")]
+    private static partial void LogCommandCompleted(ILogger logger, Type command, Guid id, long time);
+
+    [LoggerMessage(EventId = 4, Level = LogLevel.Error, Message = "Command {command} with ID {id} failed.")]
+    private static partial void LogCommandFailed(ILogger logger, Type command, Guid id, Exception exception);
+
+    [LoggerMessage(EventId = 5, Level = LogLevel.Critical, Message = "Command {command} with ID {id} not handled.")]
+    private static partial void LogCommandNotHandled(ILogger logger, Type command, Guid id);
 }
