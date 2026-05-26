@@ -41,7 +41,10 @@ public sealed class TeamResolver(IAppProvider appProvider) : IAsyncActionFilter
             {
                 var log = context.HttpContext.RequestServices?.GetService<ILogger<TeamResolver>>();
 
-                log?.LogWarning("Cannot find team with the given id {id}.", teamId);
+                if (log != null)
+                {
+                    LogMessages.LogCannotFindTeamById(log, teamId);
+                }
 
                 context.Result = new NotFoundResult();
                 return;
@@ -69,7 +72,10 @@ public sealed class TeamResolver(IAppProvider appProvider) : IAsyncActionFilter
                 {
                     var log = context.HttpContext.RequestServices?.GetService<ILogger<AppResolver>>();
 
-                    log?.LogWarning("Authenticated user has no permission to access the team with ID {id}.", team.Id);
+                    if (log != null)
+                    {
+                        LogMessages.LogNoPermissionToAccessTeam(log, team.Id);
+                    }
 
                     context.Result = new NotFoundResult();
                 }

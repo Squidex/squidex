@@ -58,4 +58,7 @@ internal static partial class LogMessages
 
     [LoggerMessage(Level = LogLevel.Error, Message = "Failed to repair snapshot for domain object of type {type} with ID {id}.")]
     public static partial void LogFailedToRepairDomainObjectSnapshot(ILogger logger, Type type, DomainId id, Exception exception);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Found corrupt domain object of type {type} with ID {id}.")]
+    public static partial void LogFoundCorruptDomainObject(ILogger logger, Type type, DomainId id, Exception exception);
 }

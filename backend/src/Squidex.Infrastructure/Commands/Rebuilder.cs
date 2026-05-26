@@ -105,7 +105,7 @@ public class Rebuilder(
                         }
                         catch (Exception ex)
                         {
-                            log.LogWarning(ex, "Found corrupt domain object of type {type} with ID {id}.", typeof(T), id);
+                            LogMessages.LogFoundCorruptDomainObject(log, typeof(T), id, ex);
                             Interlocked.Increment(ref handlerErrors);
                         }
                     }

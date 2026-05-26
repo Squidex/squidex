@@ -34,7 +34,7 @@ public sealed class ApiExceptionFilterAttribute : ActionFilterAttribute, IExcept
         {
             var log = context.HttpContext.RequestServices.GetRequiredService<ILogger<ApiExceptionFilterAttribute>>();
 
-            log.LogError(unhandled, "An unexpected exception has occurred.");
+            LogMessages.LogUnexpectedException(log, unhandled);
         }
 
         context.Result = GetResult(error);

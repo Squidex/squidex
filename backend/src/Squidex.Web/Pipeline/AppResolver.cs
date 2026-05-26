@@ -41,7 +41,10 @@ public sealed class AppResolver(IAppProvider appProvider) : IAsyncActionFilter
             {
                 var log = context.HttpContext.RequestServices?.GetService<ILogger<AppResolver>>();
 
-                log?.LogWarning("Cannot find app with the given name {name}.", appName);
+                if (log != null)
+                {
+                    LogMessages.LogCannotFindAppByName(log, appName);
+                }
 
                 context.Result = new NotFoundResult();
                 return;
@@ -97,9 +100,10 @@ public sealed class AppResolver(IAppProvider appProvider) : IAsyncActionFilter
                 {
                     var log = context.HttpContext.RequestServices?.GetService<ILogger<AppResolver>>();
 
-                    log?.LogWarning("Authenticated user has no permission to access the app {name} with ID {id}.",
-                        app.Id,
-                        app.Name);
+                    if (log != null)
+                    {
+                        LogMessages.LogNoPermissionToAccessApp(log, app.Id, app.Name);
+                    }
 
                     context.Result = new NotFoundResult();
                 }

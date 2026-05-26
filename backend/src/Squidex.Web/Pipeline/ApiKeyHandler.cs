@@ -75,7 +75,7 @@ public sealed class ApiKeyHandler(
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Error while handling api key.");
+            LogMessages.LogErrorHandlingApiKey(Logger, ex);
 
             throw;
         }

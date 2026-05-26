@@ -82,7 +82,7 @@ public sealed class BackgroundUsageTracker : DisposableObjectBase, IUsageTracker
         }
         catch (Exception ex)
         {
-            log.LogError(ex, "Failed to track usage in background.");
+            LogMessages.LogTrackUsageFailed(log, ex);
         }
         finally
         {
