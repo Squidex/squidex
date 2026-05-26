@@ -75,6 +75,9 @@ public class MigratorTests
     {
         ct = cts.Token;
 
+        A.CallTo(() => log.IsEnabled(A<LogLevel>._))
+            .Returns(true);
+
         A.CallTo(() => path.GetNext(A<int>._))
             .ReturnsLazily((int version) =>
             {
