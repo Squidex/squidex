@@ -34,6 +34,9 @@ public class InvitationEventConsumerTests : GivenContext
 
     public InvitationEventConsumerTests()
     {
+        A.CallTo(() => log.IsEnabled(A<LogLevel>._))
+            .Returns(true);
+
         A.CallTo(() => userNotifications.IsActive)
             .Returns(true);
 

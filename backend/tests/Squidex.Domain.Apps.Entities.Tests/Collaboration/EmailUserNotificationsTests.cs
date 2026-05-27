@@ -27,6 +27,9 @@ public class EmailUserNotificationsTests : GivenContext
 
     public EmailUserNotificationsTests()
     {
+        A.CallTo(() => log.IsEnabled(A<LogLevel>._))
+            .Returns(true);
+
         A.CallTo(() => urlGenerator.UI())
             .Returns("my-ui");
 
