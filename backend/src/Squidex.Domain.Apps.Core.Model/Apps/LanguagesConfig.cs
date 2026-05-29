@@ -23,20 +23,11 @@ public sealed class LanguagesConfig : IFieldPartitioning
     private readonly Dictionary<string, LanguageConfig> values;
     private readonly string master;
 
-    public string Master
-    {
-        get => master;
-    }
+    public string Master => master;
 
-    public IEnumerable<string> AllKeys
-    {
-        get => values.Keys;
-    }
+    public IEnumerable<string> AllKeys => values.Keys;
 
-    public IReadOnlyDictionary<string, LanguageConfig> Values
-    {
-        get => values;
-    }
+    public IReadOnlyDictionary<string, LanguageConfig> Values => values;
 
     public LanguagesConfig(Dictionary<string, LanguageConfig> values, string master)
     {
@@ -144,10 +135,7 @@ public sealed class LanguagesConfig : IFieldPartitioning
         };
     }
 
-    public bool IsMaster(string key)
-    {
-        return Equals(Master, key);
-    }
+    public bool IsMaster(string key) => Equals(Master, key);
 
     public string? GetName(string key)
     {
@@ -194,10 +182,7 @@ public sealed class LanguagesConfig : IFieldPartitioning
         }
     }
 
-    public bool Contains(string key)
-    {
-        return key != null && values.ContainsKey(key);
-    }
+    public bool Contains(string key) => key != null && values.ContainsKey(key);
 
     public override string ToString()
     {
