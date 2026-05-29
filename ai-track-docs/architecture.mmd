@@ -1,0 +1,34 @@
+%% architecture.mmd — Squidex high-level component diagram
+%% Status: Placeholder — refine during the Crawl phase.
+%%
+%% Render with: mmdc -i architecture.mmd -o architecture.svg
+
+graph TD
+    Client["Browser / Mobile Client"]
+
+    subgraph Frontend["frontend/ (Angular SPA)"]
+        AngularApp["Angular App"]
+    end
+
+    subgraph API["backend/src/Squidex (ASP.NET Core)"]
+        WebAPI["REST & GraphQL API"]
+        Auth["OpenID Connect / Identity"]
+        Domain["Domain Layer"]
+        Infra["Infrastructure Layer"]
+    end
+
+    subgraph DataStores["Data Stores"]
+        Mongo["MongoDB"]
+        EF["SQL / Entity Framework (optional)"]
+    end
+
+    Client -->|HTTPS| AngularApp
+    Client -->|HTTPS| WebAPI
+    AngularApp -->|REST / GraphQL| WebAPI
+    WebAPI --> Auth
+    WebAPI --> Domain
+    Domain --> Infra
+    Infra --> Mongo
+    Infra -.->|alternative| EF
+
+    %% TODO during Crawl: add event bus, asset storage, caching nodes
