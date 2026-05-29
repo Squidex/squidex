@@ -274,4 +274,18 @@ public class LanguagesConfigTests
 
         Assert.Equal(Language.EN, config_2.Master);
     }
+
+    [Fact]
+    public void Should_enumerate_all_configured_language_keys()
+    {
+        var config =
+            LanguagesConfig.English
+                .Set(Language.DE)
+                .Set(Language.IT);
+
+        Assert.Equal(3, config.AllKeys.Count());
+        Assert.Contains((string)Language.EN, config.AllKeys);
+        Assert.Contains((string)Language.DE, config.AllKeys);
+        Assert.Contains((string)Language.IT, config.AllKeys);
+    }
 }
