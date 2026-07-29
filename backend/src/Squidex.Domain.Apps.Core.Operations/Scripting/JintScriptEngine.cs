@@ -146,7 +146,7 @@ public sealed class JintScriptEngine(IMemoryCache cache, IOptions<JintScriptOpti
             engineOptions.AddObjectConverter(JintObjectConverter.Instance);
             engineOptions.AllowClrWrite(!options.Readonly);
             engineOptions.SetTypeConverter(engine => new CustomClrConverter(engine));
-            engineOptions.SetReferencesResolver(NullPropagation.Instance);
+            engineOptions.SetReferencesResolver(NullPropagation.Instance, NullPropagation.Interests);
             engineOptions.Strict();
 
             if (!Debugger.IsAttached)
