@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using System.Collections;
-using System.Globalization;
 using Jint;
 using Jint.Native;
 using Jint.Native.Object;
@@ -18,10 +17,6 @@ namespace Squidex.Domain.Apps.Core.Scripting.Internal;
 
 public static class JsonMapper
 {
-    private sealed class JsonObjectInstance(Engine engine) : ObjectInstance(engine)
-    {
-    }
-
     public static JsValue Map(JsonValue value, Engine engine)
     {
         switch (value.Value)
@@ -33,9 +28,9 @@ public static class JsonMapper
             case false:
                 return JsBoolean.False;
             case double n:
-                return new JsNumber(n);
+                return JsNumber.Create(n);
             case string s:
-                return new JsString(s);
+                return JsString.Create(s);
             case JsonObject o:
                 return FromObject(o, engine);
             case JsonArray a:
@@ -58,16 +53,20 @@ public static class JsonMapper
         return engine.Intrinsics.Array.Construct(target);
     }
 
-    private static JsonObjectInstance FromObject(JsonObject obj, Engine engine)
+    private static JsObject FromObject(JsonObject obj, Engine engine)
     {
-        var target = new JsonObjectInstance(engine);
+        // Built through the hidden class machinery, so JSON objects sharing a key sequence - every content
+        // item of the same schema does - share one hidden class and keep a script reading them monomorphic.
+        // A bare ObjectInstance subclass can never be in shape mode and is outside the read caches entirely.
+        var entries = new KeyValuePair<string, JsValue>[obj.Count];
 
+        var index = 0;
         foreach (var (key, value) in obj)
         {
-            target.Set(key, Map(value, engine));
+            entries[index++] = new KeyValuePair<string, JsValue>(key, Map(value, engine));
         }
 
-        return target;
+        return JsObject.CreateFromEntries(engine, entries);
     }
 
     public static JsonValue Map(JsValue? value)
@@ -116,11 +115,15 @@ public static class JsonMapper
 
         if (value is JsArray a)
         {
-            var result = new JsonArray((int)a.Length);
+            var length = a.Length;
 
-            for (var i = 0; i < a.Length; i++)
+            var result = new JsonArray((int)length);
+
+            // The indexed accessor reads the dense backing directly, where a string key would allocate one
+            // key per element and route through the full property lookup.
+            for (var i = 0u; i < length; i++)
             {
-                result.Add(Map(a.Get(i.ToString(CultureInfo.InvariantCulture))));
+                result.Add(Map(a[i]));
             }
 
             return result;
