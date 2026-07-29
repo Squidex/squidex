@@ -382,6 +382,10 @@ a {
         @include button-variant($color-extern-twitter, $color-extern-twitter);
     }
 
+    &-externaloidc {
+        @include button-variant($color-extern-oidc, $color-extern-oidc);
+    }
+
     // Special radio button.
     &-radio {
         & {
