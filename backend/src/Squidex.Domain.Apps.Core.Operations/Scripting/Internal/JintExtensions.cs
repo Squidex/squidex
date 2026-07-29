@@ -7,6 +7,7 @@
 
 using Jint;
 using Jint.Native;
+using Jint.Runtime.Interop;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Scripting.Internal;
@@ -73,12 +74,29 @@ public static class JintExtensions
         {
             foreach (var (key, item) in vars)
             {
-                engine.SetValue(key, item);
+                // Deferred instead of Engine.SetValue, which maps every variable now. The global itself is
+                // installed eagerly, so existence checks and enumeration see the name without materializing
+                // anything; only the mapping waits for the first read of the value.
+                engine.Advanced.AddLazyGlobal(key, e => MapVariable(e, item));
             }
         }
 
         engine.SetValue("async", true);
 
         return context;
+    }
+
+    /// <summary>
+    /// The conversion <see cref="Engine.SetValue(string, object)"/> performs, including its special case for
+    /// a CLR type, so deferring a variable cannot change what the script sees.
+    /// </summary>
+    private static JsValue MapVariable(Engine engine, object? item)
+    {
+        if (item is Type type)
+        {
+            return TypeReference.CreateTypeReference(engine, type);
+        }
+
+        return JsValue.FromObject(engine, item);
     }
 }

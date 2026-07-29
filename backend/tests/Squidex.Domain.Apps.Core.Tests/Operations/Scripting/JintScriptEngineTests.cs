@@ -1047,6 +1047,153 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
         Assert.Equal(JsonValue.Create("number,json,user"), actual);
     }
 
+    [Fact]
+    public void Should_not_map_unread_variable()
+    {
+        var principal = new CountingPrincipal();
+
+        var vars = new ScriptVars
+        {
+            ["number"] = 13,
+            ["user"] = principal,
+        };
+
+        const string script = @"
+                number + 1;
+            ";
+
+        var actual = sut.Execute(vars, script);
+
+        Assert.Equal(JsonValue.Create(14), actual);
+        Assert.Equal(0, principal.Reads);
+    }
+
+    [Fact]
+    public void Should_see_unread_variable_in_enumeration()
+    {
+        var principal = new CountingPrincipal();
+
+        var vars = new ScriptVars
+        {
+            ["user"] = principal,
+        };
+
+        const string script = @"
+                ('user' in globalThis) + ',' + (Object.getOwnPropertyNames(globalThis).indexOf('user') >= 0);
+            ";
+
+        var actual = sut.Execute(vars, script);
+
+        Assert.Equal(JsonValue.Create("true,true"), actual);
+        Assert.Equal(0, principal.Reads);
+    }
+
+    [Fact]
+    public void Should_map_variable_on_first_read()
+    {
+        var principal = new CountingPrincipal();
+
+        var vars = new ScriptVars
+        {
+            ["user"] = principal,
+        };
+
+        const string script = @"
+                user.id;
+            ";
+
+        var actual = sut.Execute(vars, script);
+
+        Assert.Equal(JsonValue.Create("user1"), actual);
+        Assert.True(principal.Reads > 0);
+    }
+
+    [Fact]
+    public void Should_not_map_unread_context_variable()
+    {
+        var principal = new CountingPrincipal();
+
+        var vars = new ScriptVars
+        {
+            ["number"] = 13,
+            ["user"] = principal,
+        };
+
+        const string script = @"
+                ctx.number + 1;
+            ";
+
+        var actual = sut.Execute(vars, script, new ScriptOptions { AsContext = true });
+
+        Assert.Equal(JsonValue.Create(14), actual);
+        Assert.Equal(0, principal.Reads);
+    }
+
+    [Fact]
+    public void Should_see_unread_context_variable_in_enumeration()
+    {
+        var principal = new CountingPrincipal();
+
+        var vars = new ScriptVars
+        {
+            ["number"] = 13,
+            ["user"] = principal,
+        };
+
+        const string script = @"
+                Object.keys(ctx).join(',') + '|' + ('user' in ctx);
+            ";
+
+        var actual = sut.Execute(vars, script, new ScriptOptions { AsContext = true });
+
+        Assert.Equal(JsonValue.Create("number,user|true"), actual);
+        Assert.Equal(0, principal.Reads);
+    }
+
+    [Fact]
+    public void Should_map_context_variable_on_first_read()
+    {
+        var principal = new CountingPrincipal();
+
+        var vars = new ScriptVars
+        {
+            ["user"] = principal,
+        };
+
+        const string script = @"
+                ctx.user.id;
+            ";
+
+        var actual = sut.Execute(vars, script, new ScriptOptions { AsContext = true });
+
+        Assert.Equal(JsonValue.Create("user1"), actual);
+        Assert.True(principal.Reads > 0);
+    }
+
+    private sealed class CountingPrincipal : ClaimsPrincipal
+    {
+        public int Reads { get; private set; }
+
+        public CountingPrincipal()
+            : base(new ClaimsIdentity(
+            [
+                new Claim(OpenIdClaims.Subject, "user1"),
+                new Claim(OpenIdClaims.Name, "user"),
+            ], "Squidex"))
+        {
+        }
+
+        public override IEnumerable<Claim> Claims
+        {
+            get
+            {
+                Reads++;
+
+                return base.Claims;
+            }
+        }
+    }
+
     private static ScriptVars CreateVars()
     {
         return new ScriptVars
