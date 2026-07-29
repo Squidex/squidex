@@ -21,6 +21,29 @@ namespace Squidex.Domain.Apps.Core.Scripting.Internal;
 
 public sealed class JintObjectConverter : IObjectConverter
 {
+    /// <summary>
+    /// The CLR types this converter answers for, declared at registration so the engine can keep its
+    /// compiled interop member-read lane for members whose declared type can never reach this converter.
+    /// </summary>
+    /// <remarks>
+    /// Matching is by assignability, so <see cref="IUser"/> covers every implementation. Registering the
+    /// converter without this set makes every wrapped CLR member read in the engine take the slow lane.
+    /// Enums are not listed: they are handled natively through
+    /// <see cref="Options.InteropOptions.EnumConversion"/>.
+    /// </remarks>
+    public static readonly Type[] HandledTypes =
+    [
+        typeof(IUser),
+        typeof(ClaimsPrincipal),
+        typeof(ScriptVars),
+        typeof(JsonValue),
+        typeof(DomainId),
+        typeof(Guid),
+        typeof(Instant),
+        typeof(Status),
+        typeof(ContentData),
+    ];
+
     public static readonly JintObjectConverter Instance = new JintObjectConverter();
 
     private JintObjectConverter()
@@ -30,12 +53,6 @@ public sealed class JintObjectConverter : IObjectConverter
     public bool TryConvert(Engine engine, object value, [MaybeNullWhen(false)] out JsValue result)
     {
         result = null!;
-
-        if (value is Enum)
-        {
-            result = value.ToString();
-            return true;
-        }
 
         switch (value)
         {

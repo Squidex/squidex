@@ -143,8 +143,9 @@ public sealed class JintScriptEngine(IMemoryCache cache, IOptions<JintScriptOpti
 
         var engine = new Engine(engineOptions =>
         {
-            engineOptions.AddObjectConverter(JintObjectConverter.Instance);
+            engineOptions.AddObjectConverter(JintObjectConverter.Instance, JintObjectConverter.HandledTypes);
             engineOptions.AllowClrWrite(!options.Readonly);
+            engineOptions.Interop.EnumConversion = EnumConversionMode.String;
             engineOptions.SetTypeConverter(engine => new CustomClrConverter(engine));
             engineOptions.SetReferencesResolver(NullPropagation.Instance, NullPropagation.Interests);
             engineOptions.Strict();
