@@ -132,6 +132,29 @@ public sealed class ContentFieldObject : ObjectInstance
         return valueProperties?.GetValueOrDefault(propertyName) ?? PropertyDescriptor.Undefined;
     }
 
+    protected override OwnPropertyProbe ProbeOwnProperty(JsValue property)
+    {
+        // Deliberately mirrors GetOwnProperty above, minus the descriptor: the flags are on the descriptor
+        // itself, so an existence or enumerability question is answered without ever reading CustomValue,
+        // which is what maps the JSON value to a JsValue. The engine trusts the answer without verifying it,
+        // so the two must stay in step.
+        EnsurePropertiesInitialized();
+
+        var propertyName = property.AsString();
+
+        if (propertyName.Equals("toJSON", StringComparison.OrdinalIgnoreCase))
+        {
+            return OwnPropertyProbe.Missing;
+        }
+
+        if (!valueProperties.TryGetValue(propertyName, out var propertyDescriptor))
+        {
+            return OwnPropertyProbe.Missing;
+        }
+
+        return propertyDescriptor.Enumerable ? OwnPropertyProbe.Enumerable : OwnPropertyProbe.NonEnumerable;
+    }
+
     public override IEnumerable<KeyValuePair<JsValue, PropertyDescriptor>> GetOwnProperties()
     {
         EnsurePropertiesInitialized();
