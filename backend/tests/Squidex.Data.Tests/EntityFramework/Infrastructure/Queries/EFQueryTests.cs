@@ -890,6 +890,24 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
         Assert.Equal(AllExept(7), actual.Order().ToArray());
     }
 
+    [Theory]
+    [InlineData("x' OR '1'='1")]
+    [InlineData("x\" OR \"1\"=\"1")]
+    [InlineData("x') OR (1=1) --")]
+    [InlineData("x\\")]
+    public async Task Should_not_allow_sql_injection_through_json_path(string malicious)
+    {
+        // A crafted JSON path segment must be treated as a literal (non-matching) key and must not
+        // break out of the generated SQL. If escaping failed, an OR-based payload would either raise
+        // a SQL syntax error or leak every row instead of returning nothing.
+        var actual = await QueryAsync(new ClrQuery
+        {
+            Filter = ClrFilter.Eq($"Json.mixed.{malicious}", "value"),
+        });
+
+        Assert.Empty(actual);
+    }
+
     [Fact]
     public async Task Should_filter_by_string_contains_in_json()
     {

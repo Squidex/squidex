@@ -124,6 +124,56 @@ public class SsrfHelperTests
     }
 
     [Theory]
+    [InlineData("::ffff:127.0.0.1")]
+    [InlineData("::ffff:10.0.0.1")]
+    [InlineData("::ffff:172.16.0.1")]
+    [InlineData("::ffff:192.168.0.1")]
+    [InlineData("::ffff:169.254.169.254")]
+    [InlineData("::ffff:0.0.0.0")]
+    public void Should_block_ipv4_mapped_ipv6_private_addresses(string ip)
+    {
+        var address = IPAddress.Parse(ip);
+
+        var result = SsrfHelper.IsPrivateOrReservedIp(address, null);
+
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void Should_block_ipv4_mapped_ipv6_of_blacklisted_ipv4()
+    {
+        var address = IPAddress.Parse("::ffff:169.254.169.254");
+        var blacklist = new HashSet<IPAddress> { IPAddress.Parse("169.254.169.254") };
+
+        var result = SsrfHelper.IsPrivateOrReservedIp(address, blacklist);
+
+        Assert.True(result);
+    }
+
+    [Fact]
+    public void Should_block_ipv4_of_blacklisted_ipv4_mapped_ipv6()
+    {
+        var address = IPAddress.Parse("1.2.3.4");
+        var blacklist = new HashSet<IPAddress> { IPAddress.Parse("::ffff:1.2.3.4") };
+
+        var result = SsrfHelper.IsPrivateOrReservedIp(address, blacklist);
+
+        Assert.True(result);
+    }
+
+    [Theory]
+    [InlineData("::ffff:8.8.8.8")]
+    [InlineData("::ffff:1.1.1.1")]
+    public void Should_allow_ipv4_mapped_ipv6_public_addresses(string ip)
+    {
+        var address = IPAddress.Parse(ip);
+
+        var result = SsrfHelper.IsPrivateOrReservedIp(address, null);
+
+        Assert.False(result);
+    }
+
+    [Theory]
     [InlineData("8.8.8.8")]
     [InlineData("1.1.1.1")]
     [InlineData("203.0.113.1")]

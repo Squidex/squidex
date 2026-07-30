@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Users;
+using Squidex.Hosting.Ssrf;
 using Squidex.Shared.Users;
 
 namespace Squidex.Config.Authentication;
@@ -17,7 +18,8 @@ public static class IdentityServices
         services.Configure<MyIdentityOptions>(config,
             "identity");
 
-        services.AddHttpClient("Users");
+        services.AddHttpClient("Users")
+            .EnableSsrfProtection();
 
         services.AddSingletonAs<DefaultUserResolver>()
             .AsOptional<IUserResolver>();

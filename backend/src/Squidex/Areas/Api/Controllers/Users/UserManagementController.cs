@@ -167,7 +167,7 @@ public sealed class UserManagementController(ICommandBus commandBus, IUserServic
     [HttpDelete]
     [Route("user-management/{id}/")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ApiPermission(PermissionIds.AdminUsersUnlock)]
+    [ApiPermission(PermissionIds.AdminUsersDelete)]
     public async Task<IActionResult> DeleteUser(string id)
     {
         if (this.IsUser(id))
