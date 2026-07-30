@@ -17,7 +17,6 @@ namespace Squidex.Domain.Apps.Entities.Apps.Templates;
 
 public sealed partial class TemplatesClient(IHttpClientFactory httpClientFactory, IOptions<TemplatesOptions> options)
 {
-    private static readonly Regex RegexTemplate = BuildTemplateRegex();
     private readonly TemplatesOptions options = options.Value;
 
     public async Task<string?> GetRepositoryUrl(string name,
@@ -31,7 +30,7 @@ public sealed partial class TemplatesClient(IHttpClientFactory httpClientFactory
 
             var text = await httpClient.GetStringAsync(url, ct);
 
-            foreach (var match in RegexTemplate.Matches(text).OfType<Match>())
+            foreach (var match in TemplateRegex.Matches(text).OfType<Match>())
             {
                 var currentName = match.Groups["Name"].Value;
 
@@ -58,7 +57,7 @@ public sealed partial class TemplatesClient(IHttpClientFactory httpClientFactory
 
             var text = await httpClient.GetStringAsync(url, ct);
 
-            foreach (var match in RegexTemplate.Matches(text).OfType<Match>())
+            foreach (var match in TemplateRegex.Matches(text).OfType<Match>())
             {
                 var templateName = match.Groups["Name"].Value;
                 var templateTitle = match.Groups["Title"].Value;
@@ -109,7 +108,7 @@ public sealed partial class TemplatesClient(IHttpClientFactory httpClientFactory
                 var text = await response.Content.ReadAsStringAsync(ct);
 
                 string? logo = null;
-                text = BuildLogoRegex().Replace(text, match =>
+                text = LogoRegex.Replace(text, match =>
                 {
                     var imageRelative = new Uri(match.Groups["Url"].Value, UriKind.Relative);
                     var imageAbsolute = new Uri(url, imageRelative);
@@ -161,7 +160,7 @@ public sealed partial class TemplatesClient(IHttpClientFactory httpClientFactory
         {
             if (inline is LiteralInline literal)
             {
-                return literal.Content.AsSpan().Trim().Equals("Usage", StringComparison.Ordinal);
+                return literal.Content.AsSpan().Trim() is "Usage";
             }
 
             if (inline is ContainerInline container)
@@ -182,8 +181,8 @@ public sealed partial class TemplatesClient(IHttpClientFactory httpClientFactory
     }
 
     [GeneratedRegex("\\* \\[(?<Title>.*)\\]\\((?<Name>.*)\\/README\\.md\\): (?<Description>.*)", RegexOptions.ExplicitCapture | RegexOptions.Compiled)]
-    private static partial Regex BuildTemplateRegex();
+    private static partial Regex TemplateRegex { get; }
 
     [GeneratedRegex("Logo: \\[Logo\\]\\((?<Url>(.*))\\)", RegexOptions.ExplicitCapture | RegexOptions.Compiled)]
-    private static partial Regex BuildLogoRegex();
+    private static partial Regex LogoRegex { get; }
 }

@@ -13,7 +13,6 @@ using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Hosting.Ssrf;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Http;
 
 namespace Squidex.Config.Domain;
 

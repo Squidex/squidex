@@ -20,6 +20,9 @@ using Squidex.Infrastructure.Translations;
 using Squidex.Messaging.Subscriptions;
 using Squidex.Shared;
 
+#pragma warning disable MA0005 // Use Array.Empty<T>()
+#pragma warning disable CA1825 // Avoid zero-length array allocations
+
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 
 internal static class ContentActions

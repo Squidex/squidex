@@ -22,7 +22,6 @@ using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Hosting.Ssrf;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Diagnostics;
-using Squidex.Infrastructure.Http;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Translations;
 using Squidex.Infrastructure.UsageTracking;

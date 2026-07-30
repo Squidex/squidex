@@ -14,6 +14,8 @@ using Squidex.Domain.Apps.Core.ExtractReferenceIds;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Primitives;
 using Squidex.Infrastructure.Json.Objects;
 
+#pragma warning disable MA0005 // Use Array.Empty<T>()
+
 namespace Squidex.Domain.Apps.Entities.Contents.GraphQL.Types.Contents;
 
 internal static class ContentFields
