@@ -729,9 +729,8 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
     [Fact]
     public void Should_not_throw_if_reading_undeclared_identifier()
     {
-        // The null propagation resolver answers an unresolvable reference with the reference base, which is
-        // Jint's internal sentinel. The value is odd, but it is what scripts have always seen and the point
-        // of the test is that the read does not throw a reference error.
+        // Reading an unknown name does not throw, it returns an internal Jint marker string. That is odd,
+        // but it is what scripts have always seen here, see NullPropagation.TryUnresolvableReference.
         const string script = @"
                 String(unknownName) + '|' + (typeof unknownName);
             ";

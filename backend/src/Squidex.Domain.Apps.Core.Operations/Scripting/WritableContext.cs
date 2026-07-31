@@ -21,12 +21,10 @@ internal sealed class WritableContext : ObjectInstance
     {
         this.vars = vars;
 
-        // Scripts touch a fraction of the variables, but mapping one is not always cheap: a content data
-        // variable builds a wrapper, a user variable walks and groups every claim. The descriptors are
-        // installed eagerly - so key order, enumeration and existence checks are exactly what they were -
-        // and only the mapping waits for the first read of a value. Once it has run the descriptor drops
-        // back to an ordinary data property and rejoins the write inline cache, which is what a
-        // hand-written CustomJsValue descriptor cannot do.
+        // Adds the value, but runs the conversion only when the script reads it for the first time. Most
+        // scripts use a few of these variables and some of them are expensive, e.g. the user variable walks
+        // and groups all claims. The properties themselves are added right away, so key order, enumeration
+        // and "in" checks stay the same.
         foreach (var (key, item) in vars)
         {
             SetOwnProperty(key, PropertyDescriptor.CreateLazy(

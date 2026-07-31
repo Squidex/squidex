@@ -145,7 +145,10 @@ public sealed class JintScriptEngine(IMemoryCache cache, IOptions<JintScriptOpti
         {
             engineOptions.AddObjectConverter(JintObjectConverter.Instance, JintObjectConverter.HandledTypes);
             engineOptions.AllowClrWrite(!options.Readonly);
+
+            // Converts enums to their name, e.g. "Published". This was done by JintObjectConverter before.
             engineOptions.Interop.EnumConversion = EnumConversionMode.String;
+
             engineOptions.SetTypeConverter(engine => new CustomClrConverter(engine));
             engineOptions.SetReferencesResolver(NullPropagation.Instance, NullPropagation.Interests);
             engineOptions.Strict();

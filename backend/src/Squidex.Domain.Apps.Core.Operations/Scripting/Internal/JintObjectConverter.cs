@@ -22,14 +22,14 @@ namespace Squidex.Domain.Apps.Core.Scripting.Internal;
 public sealed class JintObjectConverter : IObjectConverter
 {
     /// <summary>
-    /// The CLR types this converter answers for, declared at registration so the engine can keep its
-    /// compiled interop member-read lane for members whose declared type can never reach this converter.
+    /// The types this converter handles, passed to Jint when the converter is registered.
     /// </summary>
     /// <remarks>
-    /// Matching is by assignability, so <see cref="IUser"/> covers every implementation. Registering the
-    /// converter without this set makes every wrapped CLR member read in the engine take the slow lane.
-    /// Enums are not listed: they are handled natively through
-    /// <see cref="Options.InteropOptions.EnumConversion"/>.
+    /// Without this list Jint has to offer every property of every .NET object to this converter and cannot
+    /// use its faster property reader for any of them. Base types and interfaces count, so
+    /// <see cref="IUser"/> covers all implementations. Keep the list in sync with the switch below - a type
+    /// that is converted but not listed here fails a test (see JintHostContractVerification). Enums are
+    /// missing on purpose, they are converted by Jint itself, see EnumConversion in JintScriptEngine.
     /// </remarks>
     public static readonly Type[] HandledTypes =
     [

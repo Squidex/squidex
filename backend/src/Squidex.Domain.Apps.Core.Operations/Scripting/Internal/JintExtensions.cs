@@ -74,9 +74,8 @@ public static class JintExtensions
         {
             foreach (var (key, item) in vars)
             {
-                // Deferred instead of Engine.SetValue, which maps every variable now. The global itself is
-                // installed eagerly, so existence checks and enumeration see the name without materializing
-                // anything; only the mapping waits for the first read of the value.
+                // Sets the value, but runs the conversion only when the script reads it for the first time.
+                // The name is added right away, so enumeration and "in" checks work as before.
                 engine.Advanced.AddLazyGlobal(key, e => MapVariable(e, item));
             }
         }
@@ -87,8 +86,8 @@ public static class JintExtensions
     }
 
     /// <summary>
-    /// The conversion <see cref="Engine.SetValue(string, object)"/> performs, including its special case for
-    /// a CLR type, so deferring a variable cannot change what the script sees.
+    /// Converts a value exactly like <see cref="Engine.SetValue(string, object)"/> does, including its
+    /// special case for types, so that a deferred variable cannot look different from an eager one.
     /// </summary>
     private static JsValue MapVariable(Engine engine, object? item)
     {

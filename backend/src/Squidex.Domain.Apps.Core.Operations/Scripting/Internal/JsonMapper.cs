@@ -55,9 +55,9 @@ public static class JsonMapper
 
     private static JsObject FromObject(JsonObject obj, Engine engine)
     {
-        // Built through the hidden class machinery, so JSON objects sharing a key sequence - every content
-        // item of the same schema does - share one hidden class and keep a script reading them monomorphic.
-        // A bare ObjectInstance subclass can never be in shape mode and is outside the read caches entirely.
+        // Objects that are created this way and have the same keys - all content items of a schema do -
+        // share one description of their layout, like a class. Reading a property is then a lot faster than
+        // with a custom ObjectInstance class, where every single object gets its own property dictionary.
         var entries = new KeyValuePair<string, JsValue>[obj.Count];
 
         var index = 0;
@@ -119,8 +119,8 @@ public static class JsonMapper
 
             var result = new JsonArray((int)length);
 
-            // The indexed accessor reads the dense backing directly, where a string key would allocate one
-            // key per element and route through the full property lookup.
+            // The indexer reads the array storage directly. The old version converted the index to a string
+            // and did a full property lookup for every element.
             for (var i = 0u; i < length; i++)
             {
                 result.Add(Map(a[i]));

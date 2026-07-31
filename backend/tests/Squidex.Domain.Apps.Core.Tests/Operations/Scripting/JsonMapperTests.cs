@@ -22,10 +22,9 @@ public class JsonMapperTests
         var mapped = (ObjectInstance)JsonMapper.Map(CreateJson(), engine);
         var nested = (ObjectInstance)mapped.Get("nested");
 
-        // A shared shape is what keeps a script reading a batch of content items monomorphic. It is a
-        // performance property and never a correctness one, but it is silent when it regresses: building
-        // these objects as a host ObjectInstance subclass again would put them back in the per-object
-        // dictionary with no test noticing.
+        // Sharing the layout is what makes reading properties of many content items fast. It only affects
+        // performance and never behavior, which is why it is asserted here: building these objects with a
+        // custom ObjectInstance class again would silently undo it and no other test would notice.
         Assert.True(engine.Advanced.HasSharedShape(mapped));
         Assert.True(engine.Advanced.HasSharedShape(nested));
     }
