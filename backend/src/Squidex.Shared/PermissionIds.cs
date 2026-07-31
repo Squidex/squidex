@@ -34,6 +34,7 @@ public static class PermissionIds
     public const string AdminUsers = "squidex.admin.users";
     public const string AdminUsersRead = "squidex.admin.users.read";
     public const string AdminUsersCreate = "squidex.admin.users.create";
+    public const string AdminUsersDelete = "squidex.admin.users.delete";
     public const string AdminUsersUpdate = "squidex.admin.users.update";
     public const string AdminUsersUnlock = "squidex.admin.users.unlock";
     public const string AdminUsersLock = "squidex.admin.users.lock";

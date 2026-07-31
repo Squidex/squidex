@@ -16,7 +16,8 @@ public static class Extensions
     public static StringBuilder AppendJsonPath(this StringBuilder sb, PropertyPath path, bool asString)
     {
         sb.Append('"');
-        sb.Append(path[0]);
+        // Escape embedded quotes so a crafted path segment cannot break out of the quoted identifier.
+        sb.Append(path[0].Replace("\"", "\"\"", StringComparison.Ordinal));
         sb.Append('"');
 
         var i = 1;
@@ -37,7 +38,11 @@ public static class Extensions
             }
             else
             {
-                sb.Append($"'{property}'");
+                // The property name is a user-controlled JSON path segment that is embedded as a
+                // single-quoted string literal. Escape embedded quotes to prevent SQL injection.
+                sb.Append('\'');
+                sb.Append(property.Replace("'", "''", StringComparison.Ordinal));
+                sb.Append('\'');
             }
 
             i++;

@@ -99,7 +99,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
                 invalid(()
             ";
 
-        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(new ScriptVars(), script));
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync([], script));
     }
 
     [Fact]
@@ -109,7 +109,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
                 throw 'Error';
             ";
 
-        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(new ScriptVars(), script));
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync([], script));
     }
 
     [Fact]
@@ -179,7 +179,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
                 throw 'Error';
             ";
 
-        await Assert.ThrowsAsync<ValidationException>(() => sut.TransformAsync(new DataScriptVars(), script));
+        await Assert.ThrowsAsync<ValidationException>(() => sut.TransformAsync([], script));
     }
 
     [Fact]

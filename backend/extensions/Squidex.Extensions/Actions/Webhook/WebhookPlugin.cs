@@ -7,7 +7,7 @@
 
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Squidex.Infrastructure.Http;
+using Squidex.Hosting.Ssrf;
 using Squidex.Infrastructure.Plugins;
 
 namespace Squidex.Extensions.Actions.Webhook;

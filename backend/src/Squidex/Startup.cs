@@ -27,6 +27,7 @@ public sealed class Startup(IConfiguration config)
         services.AddHealthChecks();
         services.AddDefaultWebServices(config);
         services.AddDefaultForwardRules();
+        services.AddSsrfProtectedHttpClient(config);
 
         // They must be called in this order.
         services.AddSquidexMvcWithPlugins(config);
