@@ -21,6 +21,29 @@ namespace Squidex.Domain.Apps.Core.Scripting.Internal;
 
 public sealed class JintObjectConverter : IObjectConverter
 {
+    /// <summary>
+    /// The types this converter handles, passed to Jint when the converter is registered.
+    /// </summary>
+    /// <remarks>
+    /// Without this list Jint has to offer every property of every .NET object to this converter and cannot
+    /// use its faster property reader for any of them. Base types and interfaces count, so
+    /// <see cref="IUser"/> covers all implementations. Keep the list in sync with the switch below - a type
+    /// that is converted but not listed here fails a test (see JintHostContractVerification). Enums are
+    /// missing on purpose, they are converted by Jint itself, see EnumConversion in JintScriptEngine.
+    /// </remarks>
+    public static readonly Type[] HandledTypes =
+    [
+        typeof(IUser),
+        typeof(ClaimsPrincipal),
+        typeof(ScriptVars),
+        typeof(JsonValue),
+        typeof(DomainId),
+        typeof(Guid),
+        typeof(Instant),
+        typeof(Status),
+        typeof(ContentData),
+    ];
+
     public static readonly JintObjectConverter Instance = new JintObjectConverter();
 
     private JintObjectConverter()
@@ -30,12 +53,6 @@ public sealed class JintObjectConverter : IObjectConverter
     public bool TryConvert(Engine engine, object value, [MaybeNullWhen(false)] out JsValue result)
     {
         result = null!;
-
-        if (value is Enum)
-        {
-            result = value.ToString();
-            return true;
-        }
 
         switch (value)
         {

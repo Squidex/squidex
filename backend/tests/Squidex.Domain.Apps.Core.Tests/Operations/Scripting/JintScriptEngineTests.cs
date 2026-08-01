@@ -725,4 +725,497 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
 
         Assert.Equal(42.0, result.Value);
     }
+
+    [Fact]
+    public void Should_not_throw_if_reading_undeclared_identifier()
+    {
+        // Reading an unknown name does not throw, it returns an internal Jint marker string. That is odd,
+        // but it is what scripts have always seen here, see NullPropagation.TryUnresolvableReference.
+        const string script = @"
+                String(unknownName) + '|' + (typeof unknownName);
+            ";
+
+        var actual = sut.Execute(new ScriptVars(), script);
+
+        Assert.Equal(JsonValue.Create("[[Unresolvable]]|undefined"), actual);
+    }
+
+    [Fact]
+    public void Should_null_propagate_over_nullish_property_base()
+    {
+        var vars = new ScriptVars
+        {
+            ["value"] = 13,
+        };
+
+        const string script = @"
+                ctx.unknown.deeper.evenDeeper === undefined;
+            ";
+
+        var actual = sut.Execute(vars, script, new ScriptOptions { AsContext = true });
+
+        Assert.Equal(JsonValue.True, actual);
+    }
+
+    [Fact]
+    public void Should_chain_call_over_nullish_property_base()
+    {
+        var vars = new ScriptVars
+        {
+            ["value"] = 13,
+        };
+
+        const string script = @"
+                ctx.unknown.deeper.someMethod() === undefined;
+            ";
+
+        var actual = sut.Execute(vars, script, new ScriptOptions { AsContext = true });
+
+        Assert.Equal(JsonValue.True, actual);
+    }
+
+    [Fact]
+    public void Should_return_base_if_calling_non_callable_member()
+    {
+        var vars = new ScriptVars
+        {
+            ["value"] = "squidex",
+        };
+
+        const string script = @"
+                ctx.value.notAFunction();
+            ";
+
+        var actual = sut.Execute(vars, script, new ScriptOptions { AsContext = true });
+
+        Assert.Equal(JsonValue.Create("squidex"), actual);
+    }
+
+    [Fact]
+    public void Should_not_change_normal_member_reads_and_calls()
+    {
+        var vars = new ScriptVars
+        {
+            ["value"] = JsonValue.Create(new JsonObject().Add("name", JsonValue.Create("squidex"))),
+        };
+
+        const string script = @"
+                ctx.value.name.toUpperCase();
+            ";
+
+        var actual = sut.Execute(vars, script, new ScriptOptions { AsContext = true });
+
+        Assert.Equal(JsonValue.Create("SQUIDEX"), actual);
+    }
+
+    [Fact]
+    public void Should_convert_enum_to_name()
+    {
+        var vars = new ScriptVars
+        {
+            ["value"] = ScriptScope.ContentScript,
+        };
+
+        const string script = @"
+                value;
+            ";
+
+        var actual = sut.Execute(vars, script);
+
+        Assert.Equal(JsonValue.Create("ContentScript"), actual);
+    }
+
+    [Fact]
+    public void Should_convert_flags_enum_to_names()
+    {
+        var vars = new ScriptVars
+        {
+            ["value"] = ScriptScope.ContentScript | ScriptScope.Transform,
+        };
+
+        const string script = @"
+                value;
+            ";
+
+        var actual = sut.Execute(vars, script);
+
+        Assert.Equal(JsonValue.Create("ContentScript, Transform"), actual);
+    }
+
+    [Fact]
+    public void Should_convert_enum_member_of_wrapped_object_to_name()
+    {
+        var vars = new ScriptVars
+        {
+            ["value"] = new { scope = ScriptScope.Transform },
+        };
+
+        const string script = @"
+                value.scope;
+            ";
+
+        var actual = sut.Execute(vars, script);
+
+        Assert.Equal(JsonValue.Create("Transform"), actual);
+    }
+
+    [Fact]
+    public void Should_project_json_object_with_source_key_order()
+    {
+        var vars = new ScriptVars
+        {
+            ["value"] = CreateJson(),
+        };
+
+        const string script = @"
+                Object.keys(ctx.value).join(',');
+            ";
+
+        var actual = sut.Execute(vars, script, new ScriptOptions { AsContext = true });
+
+        Assert.Equal(JsonValue.Create("name,count,nested,items"), actual);
+    }
+
+    [Fact]
+    public void Should_stringify_projected_json_object()
+    {
+        var vars = new ScriptVars
+        {
+            ["value"] = CreateJson(),
+        };
+
+        const string script = @"
+                JSON.stringify(ctx.value);
+            ";
+
+        var actual = sut.Execute(vars, script, new ScriptOptions { AsContext = true });
+
+        Assert.Equal(
+            JsonValue.Create("{\"name\":\"squidex\",\"count\":3,\"nested\":{\"flag\":true},\"items\":[1,2]}"),
+            actual);
+    }
+
+    [Fact]
+    public void Should_enumerate_projected_json_object()
+    {
+        var vars = new ScriptVars
+        {
+            ["value"] = CreateJson(),
+        };
+
+        const string script = @"
+                var actual = [];
+                for (var key in ctx.value) {
+                    actual.push(key + '=' + (typeof ctx.value[key]));
+                }
+                actual.join(',');
+            ";
+
+        var actual = sut.Execute(vars, script, new ScriptOptions { AsContext = true });
+
+        Assert.Equal(
+            JsonValue.Create("name=string,count=number,nested=object,items=object"),
+            actual);
+    }
+
+    [Fact]
+    public void Should_allow_mutation_of_projected_json_object()
+    {
+        var vars = new ScriptVars
+        {
+            ["value"] = CreateJson(),
+        };
+
+        const string script = @"
+                ctx.value.name = 'changed';
+                ctx.value.added = 42;
+                delete ctx.value.count;
+                ctx.value;
+            ";
+
+        var actual = sut.Execute(vars, script, new ScriptOptions { AsContext = true });
+
+        var expected =
+            JsonValue.Create(
+                new JsonObject()
+                    .Add("name", JsonValue.Create("changed"))
+                    .Add("nested", JsonValue.Create(new JsonObject().Add("flag", JsonValue.True)))
+                    .Add("items", JsonValue.Create(new JsonArray().Add(JsonValue.Create(1)).Add(JsonValue.Create(2))))
+                    .Add("added", JsonValue.Create(42)));
+
+        Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public void Should_round_trip_projected_json_object()
+    {
+        var json = CreateJson();
+
+        var vars = new ScriptVars
+        {
+            ["value"] = json,
+        };
+
+        const string script = @"
+                ctx.value;
+            ";
+
+        var actual = sut.Execute(vars, script, new ScriptOptions { AsContext = true });
+
+        Assert.Equal(json, actual);
+    }
+
+    [Fact]
+    public void Should_enumerate_context_keys()
+    {
+        const string script = @"
+                Object.keys(ctx).join(',');
+            ";
+
+        var actual = sut.Execute(CreateVars(), script, new ScriptOptions { AsContext = true });
+
+        Assert.Equal(JsonValue.Create("number,text,json,user"), actual);
+    }
+
+    [Fact]
+    public void Should_answer_in_operator_for_context_keys()
+    {
+        const string script = @"
+                ('json' in ctx) + ',' + ('unknown' in ctx);
+            ";
+
+        var actual = sut.Execute(CreateVars(), script, new ScriptOptions { AsContext = true });
+
+        Assert.Equal(JsonValue.Create("true,false"), actual);
+    }
+
+    [Fact]
+    public void Should_report_types_of_context_values()
+    {
+        const string script = @"
+                var actual = [];
+                for (var key in ctx) {
+                    actual.push(key + '=' + (typeof ctx[key]));
+                }
+                actual.join(',');
+            ";
+
+        var actual = sut.Execute(CreateVars(), script, new ScriptOptions { AsContext = true });
+
+        Assert.Equal(JsonValue.Create("number=number,text=string,json=object,user=object"), actual);
+    }
+
+    [Fact]
+    public void Should_read_context_values()
+    {
+        const string script = @"
+                ctx.number + '|' + ctx.text + '|' + ctx.json.name + '|' + ctx.user.id;
+            ";
+
+        var actual = sut.Execute(CreateVars(), script, new ScriptOptions { AsContext = true });
+
+        Assert.Equal(JsonValue.Create("13|hello|squidex|user1"), actual);
+    }
+
+    [Fact]
+    public void Should_write_context_value_through_to_vars()
+    {
+        var vars = CreateVars();
+
+        const string script = @"
+                ctx.number = ctx.number * 2;
+            ";
+
+        sut.Execute(vars, script, new ScriptOptions { AsContext = true });
+
+        Assert.Equal(26.0, vars["number"]);
+    }
+
+    [Fact]
+    public void Should_delete_context_value()
+    {
+        var vars = CreateVars();
+
+        const string script = @"
+                delete ctx.text;
+                Object.keys(ctx).join(',');
+            ";
+
+        var actual = sut.Execute(vars, script, new ScriptOptions { AsContext = true });
+
+        Assert.Equal(JsonValue.Create("number,json,user"), actual);
+    }
+
+    [Fact]
+    public void Should_not_map_unread_variable()
+    {
+        var principal = new CountingPrincipal();
+
+        var vars = new ScriptVars
+        {
+            ["number"] = 13,
+            ["user"] = principal,
+        };
+
+        const string script = @"
+                number + 1;
+            ";
+
+        var actual = sut.Execute(vars, script);
+
+        Assert.Equal(JsonValue.Create(14), actual);
+        Assert.Equal(0, principal.Reads);
+    }
+
+    [Fact]
+    public void Should_see_unread_variable_in_enumeration()
+    {
+        var principal = new CountingPrincipal();
+
+        var vars = new ScriptVars
+        {
+            ["user"] = principal,
+        };
+
+        const string script = @"
+                ('user' in globalThis) + ',' + (Object.getOwnPropertyNames(globalThis).indexOf('user') >= 0);
+            ";
+
+        var actual = sut.Execute(vars, script);
+
+        Assert.Equal(JsonValue.Create("true,true"), actual);
+        Assert.Equal(0, principal.Reads);
+    }
+
+    [Fact]
+    public void Should_map_variable_on_first_read()
+    {
+        var principal = new CountingPrincipal();
+
+        var vars = new ScriptVars
+        {
+            ["user"] = principal,
+        };
+
+        const string script = @"
+                user.id;
+            ";
+
+        var actual = sut.Execute(vars, script);
+
+        Assert.Equal(JsonValue.Create("user1"), actual);
+        Assert.True(principal.Reads > 0);
+    }
+
+    [Fact]
+    public void Should_not_map_unread_context_variable()
+    {
+        var principal = new CountingPrincipal();
+
+        var vars = new ScriptVars
+        {
+            ["number"] = 13,
+            ["user"] = principal,
+        };
+
+        const string script = @"
+                ctx.number + 1;
+            ";
+
+        var actual = sut.Execute(vars, script, new ScriptOptions { AsContext = true });
+
+        Assert.Equal(JsonValue.Create(14), actual);
+        Assert.Equal(0, principal.Reads);
+    }
+
+    [Fact]
+    public void Should_see_unread_context_variable_in_enumeration()
+    {
+        var principal = new CountingPrincipal();
+
+        var vars = new ScriptVars
+        {
+            ["number"] = 13,
+            ["user"] = principal,
+        };
+
+        const string script = @"
+                Object.keys(ctx).join(',') + '|' + ('user' in ctx);
+            ";
+
+        var actual = sut.Execute(vars, script, new ScriptOptions { AsContext = true });
+
+        Assert.Equal(JsonValue.Create("number,user|true"), actual);
+        Assert.Equal(0, principal.Reads);
+    }
+
+    [Fact]
+    public void Should_map_context_variable_on_first_read()
+    {
+        var principal = new CountingPrincipal();
+
+        var vars = new ScriptVars
+        {
+            ["user"] = principal,
+        };
+
+        const string script = @"
+                ctx.user.id;
+            ";
+
+        var actual = sut.Execute(vars, script, new ScriptOptions { AsContext = true });
+
+        Assert.Equal(JsonValue.Create("user1"), actual);
+        Assert.True(principal.Reads > 0);
+    }
+
+    private sealed class CountingPrincipal : ClaimsPrincipal
+    {
+        public int Reads { get; private set; }
+
+        public CountingPrincipal()
+            : base(new ClaimsIdentity(
+            [
+                new Claim(OpenIdClaims.Subject, "user1"),
+                new Claim(OpenIdClaims.Name, "user"),
+            ], "Squidex"))
+        {
+        }
+
+        public override IEnumerable<Claim> Claims
+        {
+            get
+            {
+                Reads++;
+
+                return base.Claims;
+            }
+        }
+    }
+
+    private static ScriptVars CreateVars()
+    {
+        return new ScriptVars
+        {
+            ["number"] = 13,
+            ["text"] = "hello",
+            ["json"] = CreateJson(),
+            ["user"] = new ClaimsPrincipal(
+                new ClaimsIdentity(
+                [
+                    new Claim(OpenIdClaims.Subject, "user1"),
+                    new Claim(OpenIdClaims.Name, "user"),
+                ], "Squidex")),
+        };
+    }
+
+    private static JsonValue CreateJson()
+    {
+        return JsonValue.Create(
+            new JsonObject()
+                .Add("name", JsonValue.Create("squidex"))
+                .Add("count", JsonValue.Create(3))
+                .Add("nested", JsonValue.Create(new JsonObject().Add("flag", JsonValue.True)))
+                .Add("items", JsonValue.Create(new JsonArray().Add(JsonValue.Create(1)).Add(JsonValue.Create(2)))));
+    }
 }

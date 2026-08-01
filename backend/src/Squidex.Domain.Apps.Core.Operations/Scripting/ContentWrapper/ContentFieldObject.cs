@@ -132,6 +132,29 @@ public sealed class ContentFieldObject : ObjectInstance
         return valueProperties?.GetValueOrDefault(propertyName) ?? PropertyDescriptor.Undefined;
     }
 
+    protected override OwnPropertyProbe ProbeOwnProperty(JsValue property)
+    {
+        // Answers whether a key exists without converting its value, which reading the property would do.
+        // Used by "in", hasOwnProperty, Object.keys, spread and JSON.stringify. Must give the same answer as
+        // GetOwnProperty above, which Jint does not check at runtime, only in tests (see
+        // JintHostContractVerification), so the two methods are kept identical apart from the return value.
+        EnsurePropertiesInitialized();
+
+        var propertyName = property.AsString();
+
+        if (propertyName.Equals("toJSON", StringComparison.OrdinalIgnoreCase))
+        {
+            return OwnPropertyProbe.Missing;
+        }
+
+        if (!valueProperties.TryGetValue(propertyName, out var propertyDescriptor))
+        {
+            return OwnPropertyProbe.Missing;
+        }
+
+        return propertyDescriptor.Enumerable ? OwnPropertyProbe.Enumerable : OwnPropertyProbe.NonEnumerable;
+    }
+
     public override IEnumerable<KeyValuePair<JsValue, PropertyDescriptor>> GetOwnProperties()
     {
         EnsurePropertiesInitialized();

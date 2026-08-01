@@ -409,6 +409,138 @@ public class ContentDataObjectTests
         ExecuteScript([], script);
     }
 
+    [Fact]
+    public void Should_answer_in_operator_for_field_values()
+    {
+        const string script = @"
+                ('iv' in data.string) + ',' + ('unknown' in data.string);
+            ";
+
+        var actual = EvaluateScript(CreateContent(), script);
+
+        Assert.Equal("true,false", actual);
+    }
+
+    [Fact]
+    public void Should_answer_has_own_property_for_field_values()
+    {
+        const string script = @"
+                data.string.hasOwnProperty('iv') + ',' + data.string.hasOwnProperty('unknown');
+            ";
+
+        var actual = EvaluateScript(CreateContent(), script);
+
+        Assert.Equal("true,false", actual);
+    }
+
+    [Fact]
+    public void Should_list_field_value_keys()
+    {
+        const string script = @"
+                Object.keys(data.string).join(',');
+            ";
+
+        var actual = EvaluateScript(CreateContent(), script);
+
+        Assert.Equal("iv,de", actual);
+    }
+
+    [Fact]
+    public void Should_report_field_values_as_enumerable()
+    {
+        const string script = @"
+                data.string.propertyIsEnumerable('iv') + ',' + data.string.propertyIsEnumerable('unknown');
+            ";
+
+        var actual = EvaluateScript(CreateContent(), script);
+
+        Assert.Equal("true,false", actual);
+    }
+
+    [Fact]
+    public void Should_stringify_field_values()
+    {
+        const string script = @"
+                JSON.stringify(data.string);
+            ";
+
+        var actual = EvaluateScript(CreateContent(), script);
+
+        Assert.Equal("{\"iv\":\"1\",\"de\":\"2\"}", actual);
+    }
+
+    [Fact]
+    public void Should_stringify_content_data()
+    {
+        const string script = @"
+                JSON.stringify(data);
+            ";
+
+        var actual = EvaluateScript(CreateContent(), script);
+
+        Assert.Equal("{\"string\":{\"iv\":\"1\",\"de\":\"2\"},\"number\":{\"iv\":42}}", actual);
+    }
+
+    [Fact]
+    public void Should_spread_field_values()
+    {
+        const string script = @"
+                JSON.stringify({ ...data.string });
+            ";
+
+        var actual = EvaluateScript(CreateContent(), script);
+
+        Assert.Equal("{\"iv\":\"1\",\"de\":\"2\"}", actual);
+    }
+
+    [Fact]
+    public void Should_not_see_deleted_field_values()
+    {
+        const string script = @"
+                delete data.string.de;
+                ('de' in data.string) + ',' + Object.keys(data.string).join(',');
+            ";
+
+        var actual = EvaluateScript(CreateContent(), script);
+
+        Assert.Equal("false,iv", actual);
+    }
+
+    [Fact]
+    public void Should_see_added_field_values()
+    {
+        const string script = @"
+                data.string.en = '3';
+                ('en' in data.string) + ',' + Object.keys(data.string).join(',');
+            ";
+
+        var actual = EvaluateScript(CreateContent(), script);
+
+        Assert.Equal("true,iv,de,en", actual);
+    }
+
+    private static ContentData CreateContent()
+    {
+        return
+            new ContentData()
+                .AddField("string",
+                    new ContentFieldData()
+                        .AddInvariant("1")
+                        .AddLocalized("de", "2"))
+                .AddField("number",
+                    new ContentFieldData()
+                        .AddInvariant(42));
+    }
+
+    private static object? EvaluateScript(ContentData original, string script)
+    {
+        var engine = new Engine(o => o.Strict());
+
+        engine.SetValue("data", new ContentDataObject(engine, original));
+
+        return engine.Evaluate(script).ToObject();
+    }
+
     private static ContentData ExecuteScript(ContentData original, string script)
     {
         var engine = new Engine(o => o.Strict());

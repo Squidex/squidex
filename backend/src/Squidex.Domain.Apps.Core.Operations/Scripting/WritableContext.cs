@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -8,6 +8,7 @@
 using Jint;
 using Jint.Native;
 using Jint.Native.Object;
+using Jint.Runtime.Descriptors;
 
 namespace Squidex.Domain.Apps.Core.Scripting;
 
@@ -20,9 +21,15 @@ internal sealed class WritableContext : ObjectInstance
     {
         this.vars = vars;
 
+        // Adds the value, but runs the conversion only when the script reads it for the first time. Most
+        // scripts use a few of these variables and some of them are expensive, e.g. the user variable walks
+        // and groups all claims. The properties themselves are added right away, so key order, enumeration
+        // and "in" checks stay the same.
         foreach (var (key, item) in vars)
         {
-            base.Set(key, FromObject(engine, item), this);
+            SetOwnProperty(key, PropertyDescriptor.CreateLazy(
+                (Engine: engine, Item: item),
+                static state => FromObject(state.Engine, state.Item)));
         }
     }
 
