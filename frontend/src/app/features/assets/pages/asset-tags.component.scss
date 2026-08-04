@@ -29,6 +29,18 @@
 }
 
 .nav-item {
+    .nav-link {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        text-align: left;
+        text-decoration: none;
+    }
+
+    .row {
+        width: 100%;
+    }
+
     &:hover {
         .btn-rename {
             display: block;
