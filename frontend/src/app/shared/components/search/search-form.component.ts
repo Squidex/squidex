@@ -216,6 +216,7 @@ export class SearchFormComponent {
     }
 
     public saveQueryComplete() {
+        debugger;
         const value = this.saveQueryForm.submit();
         if (!value) {
             return;

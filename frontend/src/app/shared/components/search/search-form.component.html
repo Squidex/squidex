@@ -79,11 +79,6 @@
                 <sqx-form-row check for="user" label="search.saveQueryMyself" vertical>
                     <input class="form-check-input" id="user" formControlName="user" type="checkbox" />
                 </sqx-form-row>
-
-                <div class="form-check">
-                    <input class="form-check-input" id="user" formControlName="user" type="checkbox" />
-                    <label class="form-check-label" for="user"> {{ "search.saveQueryMyself" | sqxTranslate }}</label>
-                </div>
             </ng-container>
             <ng-container footer>
                 <button class="btn btn-text-secondary" (click)="saveQueryDialog.hide()" type="button">

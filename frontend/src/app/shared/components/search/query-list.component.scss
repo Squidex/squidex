@@ -3,6 +3,8 @@
 
 .btn-remove {
     visibility: hidden;
+    margin-left: 0;
+    margin-right: -.5rem;
 
     i {
         margin: 0;
@@ -10,6 +12,18 @@
 }
 
 .nav-item {
+    .nav-link {
+        display: flex;
+        align-items: center;
+        width: 100%;
+        text-align: left;
+        text-decoration: none;
+    }
+
+    .row {
+        width: 100%;
+    }
+
     &:hover {
         .btn-remove {
             visibility: visible;

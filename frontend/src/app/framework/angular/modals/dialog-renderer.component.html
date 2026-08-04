@@ -28,7 +28,7 @@
             animate.leave="fade-out"
             (click)="close(notification)"
             role="alert">
-            <button class="btn-sm btn-close" data-dismiss="alert" (dialogClose)="close(notification)" type="button"></button>
+            <button class="btn btn-sm btn-close" data-dismiss="alert" (dialogClose)="close(notification)" type="button"></button>
             <div class="timer timer-{{ notification.messageType }}"></div>
             <div [sqxMarkdown]="notification.message | sqxTranslate"></div>
         </div>
