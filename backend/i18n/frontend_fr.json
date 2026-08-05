@@ -1130,6 +1130,7 @@
   "search.queriesEmpty": "Recherchez {types} et utilisez<i class=\"icon-star-empty\"></i> icône dans le formulaire de recherche pour enregistrer la requête pour tous les contributeurs.",
   "search.queryAllNewestFirst": "Tous (le plus récent en premier)",
   "search.queryAllOldestFirst": "Tous (le plus ancien en premier)",
+  "search.queryNotUsed": "Run the query before you save it",
   "search.quickNavPlaceholder": "Navigation rapide (Appuyez sur 'q')",
   "search.saveQueryMyself": "Enregistrer la requête uniquement pour moi-même.",
   "search.searchFailed": "Échec de la recherche. Veuillez recharger.",
