@@ -72,6 +72,8 @@
         <sqx-modal-dialog (dialogClose)="saveQueryDialog.hide()">
             <ng-container title> {{ "search.nameQuery" | sqxTranslate }}</ng-container>
             <ng-container content>
+                <sqx-form-error [error]="saveQueryForm.error | async" />
+
                 <sqx-form-row for="name" label="common.name" vertical>
                     <input class="form-control" id="name" autocomplete="off" formControlName="name" sqxFocusOnInit />
                 </sqx-form-row>
@@ -79,11 +81,6 @@
                 <sqx-form-row check for="user" label="search.saveQueryMyself" vertical>
                     <input class="form-check-input" id="user" formControlName="user" type="checkbox" />
                 </sqx-form-row>
-
-                <div class="form-check">
-                    <input class="form-check-input" id="user" formControlName="user" type="checkbox" />
-                    <label class="form-check-label" for="user"> {{ "search.saveQueryMyself" | sqxTranslate }}</label>
-                </div>
             </ng-container>
             <ng-container footer>
                 <button class="btn btn-text-secondary" (click)="saveQueryDialog.hide()" type="button">

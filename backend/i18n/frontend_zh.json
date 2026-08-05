@@ -1130,6 +1130,7 @@
   "search.queriesEmpty": "搜索 {types} 并在搜索表单中使用 <i class=\"icon-star-empty\"></i> 图标来保存所有贡献者的查询。",
   "search.queryAllNewestFirst": "全部（最新的在前）",
   "search.queryAllOldestFirst": "所有（最旧的在前）",
+  "search.queryNotUsed": "Run the query before you save it",
   "search.quickNavPlaceholder": "快速导航（按'q'）",
   "search.saveQueryMyself": "只为我保存查询。",
   "search.searchFailed": "搜索失败，请重新加载。",

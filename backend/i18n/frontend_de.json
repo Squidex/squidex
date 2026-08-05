@@ -1130,6 +1130,7 @@
   "search.queriesEmpty": "Suchen Sie nach {types} und verwenden Sie das <i class=\"icon-star-empty\"></i>-Symbol im Suchformular, um die Abfrage für alle Mitwirkenden zu speichern.",
   "search.queryAllNewestFirst": "Alle (neueste zuerst)",
   "search.queryAllOldestFirst": "Alle (älteste zuerst)",
+  "search.queryNotUsed": "Run the query before you save it",
   "search.quickNavPlaceholder": "Schnellnavigation (Taste 'q' drücken)",
   "search.saveQueryMyself": "Die Abfrage nur für mich speichern.",
   "search.searchFailed": "Fehler bei der Suche. Bitte neu laden.",

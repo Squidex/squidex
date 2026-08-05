@@ -1130,6 +1130,7 @@
   "search.queriesEmpty": "Procure por {types} e use <i class=\"icon-star-empty\"></i> ícone em forma de pesquisa para guardar consulta para todos os contribuintes.",
   "search.queryAllNewestFirst": "Todos (o mais novo primeiro)",
   "search.queryAllOldestFirst": "Todos (o mais velho primeiro)",
+  "search.queryNotUsed": "Run the query before you save it",
   "search.quickNavPlaceholder": "Quick Nav (Prima 'q')",
   "search.saveQueryMyself": "Guarde a consulta apenas para mim.",
   "search.searchFailed": "Falhou em fazer uma busca. Por favor, recarregue.",

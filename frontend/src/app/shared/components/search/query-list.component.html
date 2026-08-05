@@ -2,8 +2,8 @@
     <ul class="nav nav-light flex-column">
         @for (saved of queries; track saved.name) {
             <li class="nav-item">
-                <button class="nav-link" [class.active]="isSelectedQuery(saved)" (click)="search.emit(saved.query)" type="button">
-                    <div class="row g-0">
+                <button class="nav-link w-full" [class.active]="isSelectedQuery(saved)" (click)="search.emit(saved.query)" type="button">
+                    <div class="row g-1 align-items-center">
                         <div class="col truncate">
                             <i class="icon-circle" [class.hidden]="!saved.color" [style.color]="saved.color"></i>
                             {{ saved.name | sqxTranslate }}
@@ -12,7 +12,7 @@
                         <div class="col-auto">
                             @if (canRemove) {
                                 <button
-                                    class="btn-sm btn-text-danger btn-remove"
+                                    class="btn btn-sm btn-text-danger btn-remove"
                                     attr.aria-label="{{ 'common.delete' | sqxTranslate }}"
                                     (click)="remove.emit(saved)"
                                     sqxStopClick

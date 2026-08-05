@@ -1130,6 +1130,7 @@
   "search.queriesEmpty": "Search for {types} and use <i class=\"icon-star-empty\"></i> icon in search form to save query for all contributors.",
   "search.queryAllNewestFirst": "All (newest first)",
   "search.queryAllOldestFirst": "All (oldest first)",
+  "search.queryNotUsed": "Run the query before you save it",
   "search.quickNavPlaceholder": "Quick Nav (Press 'q')",
   "search.saveQueryMyself": "Save the query only for myself.",
   "search.searchFailed": "Failed to make search. Please reload.",

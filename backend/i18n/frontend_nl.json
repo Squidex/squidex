@@ -1130,6 +1130,7 @@
   "search.queriesEmpty": "Zoek naar {types} en gebruik <i class = \" icon-star-empty \"> </i> icon in het zoekformulier om de zoekopdracht op te slaan voor alle bijdragers.",
   "search.queryAllNewestFirst": "Alle (nieuwste eerst)",
   "search.queryAllOldestFirst": "Alle (oudste eerst)",
+  "search.queryNotUsed": "Run the query before you save it",
   "search.quickNavPlaceholder": "Snelle navigatie (druk op 'q')",
   "search.saveQueryMyself": "Bewaar de zoekopdracht alleen voor mezelf.",
   "search.searchFailed": "Zoeken mislukt. Laad opnieuw.",
