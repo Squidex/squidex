@@ -135,7 +135,7 @@ public partial class MongoContentRepository : ISnapshotStore<WriteContent>, IDel
                 collectionUpdates.GetOrAddNew(collection).Add(entity);
             });
 
-            foreach (var job in jobs)
+            foreach (var job in validJobs)
             {
                 if (job.Value.ShouldWritePublished())
                 {

@@ -46,9 +46,13 @@ public sealed class ContentQueryService(
         // We run this query without a timeout because it is meant for long running background operations.
         var contents = contentRepository.StreamAll(context.App.Id, HashSet.Of(schema.Id), context.Scope(), ct);
 
-        await foreach (var content in contents.WithCancellation(ct))
+        await foreach (var batch in contents.Batch(50, ct).WithCancellation(ct))
         {
-            yield return await contentEnricher.EnrichAsync(content, false, context, ct);
+            var enriched = await contentEnricher.EnrichAsync(batch, context, ct);
+            foreach (var content in enriched)
+            {
+                yield return content;
+            }
         }
     }
 

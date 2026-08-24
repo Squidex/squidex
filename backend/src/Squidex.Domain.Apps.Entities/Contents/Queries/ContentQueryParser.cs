@@ -277,19 +277,19 @@ public class ContentQueryParser(
     {
         if (schema == null)
         {
-            return $"EDM/__generic";
+            return $"EDM/{app.Id}/{app.Version}/{withHidden}";
         }
 
-        return $"EDM/{app.Version}/{schema.Id}_{schema.Version}/{withHidden}";
+        return $"EDM/{app.Id}/{app.Version}/{schema.Id}_{schema.Version}/{withHidden}";
     }
 
     private static string BuildJsonCacheKey(App app, Schema? schema, bool withHidden)
     {
         if (schema == null)
         {
-            return $"JSON/__generic";
+            return $"JSON/{app.Id}/{app.Version}/{withHidden}";
         }
 
-        return $"JSON/{app.Version}/{schema.Id}_{schema.Version}/{withHidden}";
+        return $"JSON/{app.Id}/{app.Version}/{schema.Id}_{schema.Version}/{withHidden}";
     }
 }

@@ -39,8 +39,7 @@ public sealed class DynamicSchemeProvider(
     public async Task<string> AddTemporarySchemeAsync(AuthScheme scheme,
         CancellationToken ct = default)
     {
-        var id = Guid.NewGuid().ToString();
-
+        var schemaId = Guid.NewGuid().ToString();
         var serialized = jsonSerializer.SerializeToBytes(scheme);
 
         var cacheOptions = new DistributedCacheEntryOptions
@@ -48,8 +47,8 @@ public sealed class DynamicSchemeProvider(
             AbsoluteExpirationRelativeToNow = TimeSpan.FromMinutes(10),
         };
 
-        await dynamicCache.SetAsync(CacheKey(id), serialized, cacheOptions, ct);
-        return id;
+        await dynamicCache.SetAsync(CacheKey(schemaId), serialized, cacheOptions, ct);
+        return schemaId;
     }
 
     public async Task<AuthenticationScheme?> GetSchemaByEmailAddressAsync(string email)
@@ -60,14 +59,12 @@ public sealed class DynamicSchemeProvider(
         }
 
         var parts = email.Split('@');
-
         if (parts.Length != 2)
         {
             return null;
         }
 
         var team = await appProvider.GetTeamByAuthDomainAsync(parts[1], default);
-
         if (team?.AuthScheme != null)
         {
             return CreateScheme(team.Id.ToString(), team.AuthScheme).Scheme;
@@ -79,7 +76,6 @@ public sealed class DynamicSchemeProvider(
     public override async Task<AuthenticationScheme?> GetSchemeAsync(string name)
     {
         var result = await GetSchemeCoreAsync(name, default);
-
         if (result != null)
         {
             return result.Scheme;
@@ -98,7 +94,6 @@ public sealed class DynamicSchemeProvider(
         }
 
         var path = httpContextAccessor.HttpContext.Request.Path.Value;
-
         if (string.IsNullOrWhiteSpace(path))
         {
             return result;
@@ -131,6 +126,7 @@ public sealed class DynamicSchemeProvider(
             return new DynamicOpenIdConnectOptions();
         }
 
+        // This method is not called very often, so the performance issues are acceptable here.
         var scheme = GetSchemeCoreAsync(name, default).Result;
 
         return scheme?.Options ?? new DynamicOpenIdConnectOptions();

@@ -24,7 +24,6 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
     private static readonly EmptyDataLoaderResult<EnrichedAsset> EmptyAssets = new EmptyDataLoaderResult<EnrichedAsset>();
     private static readonly EmptyDataLoaderResult<EnrichedContent> EmptyContents = new EmptyDataLoaderResult<EnrichedContent>();
     private readonly IDataLoaderContextAccessor dataLoaders;
-    private readonly GraphQLOptions options;
     private readonly int batchSize;
 
     public override Context Context { get; }
@@ -48,8 +47,6 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
             .WithResolveSchemaNames()
             .WithNoCleanup()
             .WithNoEnrichment());
-
-        this.options = options.Value;
 
         batchSize = Context.BatchSize();
 
@@ -188,7 +185,7 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
 
         for (var i = 0; i < ids.Count; i++)
         {
-            keys[i] = (ids[0], fields);
+            keys[i] = (ids[i], fields);
         }
 
         return keys;
