@@ -9,9 +9,9 @@ overhead / allocation churn), **S4** low (worth fixing while nearby).
 
 Item numbers are stable and never reused. Completed items move to
 [resolved.md](resolved.md) keeping their number, so gaps in the sequence here are
-expected — items **4**, **5**, **7**, **8** and **9** are done and live there.
+expected — items **4**, **5**, **6**, **7**, **8**, **9**, **12** and **13** are closed and live there.
 
-**Status: 14 open of 20. Item 6 accepted as-is (see below); items 4, 5, 7, 8, 9 are in [resolved.md](resolved.md).**
+**Status: 11 open of 20. Items 4, 5, 6, 7, 8, 9, 12, 13 are in [resolved.md](resolved.md).**
 
 ---
 
@@ -68,29 +68,6 @@ already isolated in `ContentScriptVars`.
 
 ## S2 — High
 
-### 6. Sync-over-async on the authentication path — **ACCEPTED, WON'T FIX**
-`backend/src/Squidex/Areas/IdentityServer/Config/Dynamic/DynamicSchemeProvider.cs:129`
-
-```csharp
-var scheme = GetSchemeCoreAsync(name, default).Result;
-```
-
-`Get(string? name)` blocks a thread-pool thread on a DB round trip. **Accepted as-is —
-this is not an important path** (dynamic OIDC scheme resolution, only reached for
-team-level auth domains, not on ordinary API traffic), so the starvation risk does not
-justify the rework. Left documented rather than deleted so it is not re-reported as a
-new finding.
-
-If it ever does move onto a hot path, the fix is to cache scheme results synchronously
-(populated by an async initializer / background refresh) so `Get` can return without
-blocking.
-
-Same pattern elsewhere, also low blast radius:
-- `Squidex.Domain.Apps.Entities/Contents/DomainObject/Guards/ScriptingExtensions.cs:144` — `.Wait()` on full content validation inside a script callback.
-- `Squidex.Data.MongoDb/Infrastructure/MongoRepositoryBase.cs:26` — `InitializeAsync(default).Wait()`.
-
----
-
 ### 10. Unbounded in-memory request-log queue
 `backend/src/Squidex.Infrastructure/Log/BackgroundRequestLogStore.cs:22,126`
 
@@ -126,34 +103,6 @@ request, uncached.
 ---
 
 ## S3 — Moderate
-
-### 12. `ReaderWriterLockSlim` used exclusively for write locks in the ETag path
-`backend/src/Squidex.Web/Pipeline/CachingManager.cs:37,55,83,107,178`
-
-`CacheContext` takes `EnterWriteLock` in `AddDependency`, `AddDependency<T>`,
-`AddHeader` and `Finish`. No code path ever takes a read lock, so the reader/writer
-machinery is pure overhead — `ReaderWriterLockSlim` costs roughly 2–3× a plain
-`Monitor` acquisition.
-
-`AddDependency` is called once per content, once per schema and once per resolved
-reference, so a 200-item list with references takes on the order of a thousand
-write-lock round trips per request.
-
-**Fix:** a plain `lock` object.
-
----
-
-### 13. Rules dictionary rebuilt per event inside the batch loop
-`backend/src/Squidex.Domain.Apps.Entities/Rules/RuleEnqueuer.cs:106`
-
-`On(...)` receives batches of 200 events and builds
-`Rules = rules.ToReadonlyDictionary(x => x.Id)` for each one. Events in a batch are
-overwhelmingly from the same app, so the same immutable dictionary is constructed up to
-200 times per batch, alongside a fresh `RulesContext` record each iteration.
-
-**Fix:** group the batch by `AppId` and build one `RulesContext` per group.
-
----
 
 ### 14. `AppProvider` copies cached schema/rule lists on every call
 `backend/src/Squidex.Domain.Apps.Entities/AppProvider.cs:197,208,216`

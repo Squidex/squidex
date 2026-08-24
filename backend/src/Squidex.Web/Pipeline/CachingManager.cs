@@ -34,15 +34,14 @@ public sealed class CachingManager : IRequestCache
         private readonly IncrementalHash hasher = IncrementalHash.CreateHash(HashAlgorithmName.SHA256);
         private readonly HashSet<string> keys = [];
         private readonly HashSet<string> headers = [];
-        private readonly ReaderWriterLockSlim slimLock = new ReaderWriterLockSlim();
+        private readonly Lock lockObject = new Lock();
+
         private bool hasDependency;
         private bool isFinished;
 
         public void Dispose()
         {
             hasher.Dispose();
-
-            slimLock.Dispose();
         }
 
         public void AddDependency(string key, long version)
@@ -52,8 +51,7 @@ public sealed class CachingManager : IRequestCache
                 return;
             }
 
-            slimLock.EnterWriteLock();
-            try
+            lock (lockObject)
             {
                 if (!keys.Add(key))
                 {
@@ -64,10 +62,6 @@ public sealed class CachingManager : IRequestCache
                 hasher.AppendLong(version);
 
                 hasDependency = true;
-            }
-            finally
-            {
-                slimLock.ExitWriteLock();
             }
         }
 
@@ -80,16 +74,11 @@ public sealed class CachingManager : IRequestCache
                 return;
             }
 
-            slimLock.EnterWriteLock();
-            try
+            lock (lockObject)
             {
                 hasher.AppendString(formatted);
 
                 hasDependency = true;
-            }
-            finally
-            {
-                slimLock.ExitWriteLock();
             }
         }
 
@@ -104,8 +93,7 @@ public sealed class CachingManager : IRequestCache
             // Set to finish before we start to ensure that we do not call it again in case of an error.
             isFinished = true;
 
-            slimLock.EnterWriteLock();
-            try
+            lock (lockObject)
             {
                 if (hasDependency && !response.Headers.ContainsKey(HeaderNames.ETag))
                 {
@@ -160,10 +148,6 @@ public sealed class CachingManager : IRequestCache
                     response.Headers[HeaderNames.Vary] = new StringValues(headers.ToArray());
                 }
             }
-            finally
-            {
-                slimLock.ExitWriteLock();
-            }
         }
 
         public void AddHeader(string header, StringValues values)
@@ -173,15 +157,9 @@ public sealed class CachingManager : IRequestCache
                 return;
             }
 
-            try
+            lock (lockObject)
             {
-                slimLock.EnterWriteLock();
-
                 headers.Add(header);
-            }
-            finally
-            {
-                slimLock.ExitWriteLock();
             }
 
             foreach (var value in values)

@@ -79,19 +79,27 @@ public sealed class RuleEnqueuer(
             // Write in batches of 100 items for better performance. Dispose completes the last write.
             await using var batch = new RuleQueueWriter(flowManager, ruleUsageTracker, log);
 
-            foreach (var @event in events)
+            static NamedId<DomainId>? GetAppId(Envelope<IEvent> @event)
             {
-                if (@event.Headers.Restored())
+                // Returns null for events that are not handled, so that they all end up in one group to skip.
+                if (@event.Headers.Restored() || @event.Payload is not AppEvent appEvent)
+                {
+                    return null;
+                }
+
+                return appEvent.AppId;
+            }
+
+            // The events of a batch usually belong to the same app, so the rules are only resolved
+            // and indexed once per app instead of once per event.
+            foreach (var byApp in events.GroupBy(GetAppId))
+            {
+                if (byApp.Key == null)
                 {
                     continue;
                 }
 
-                if (@event.Payload is not AppEvent appEvent)
-                {
-                    continue;
-                }
-
-                var rules = await GetRulesAsync(appEvent.AppId.Id);
+                var rules = await GetRulesAsync(byApp.Key.Id);
                 if (rules.Count == 0)
                 {
                     continue;
@@ -99,7 +107,7 @@ public sealed class RuleEnqueuer(
 
                 var context = new RulesContext
                 {
-                    AppId = appEvent.AppId,
+                    AppId = byApp.Key,
                     AllowExtraEvents = maxExtraEvents > 0,
                     IncludeSkipped = false,
                     IncludeStale = false,
@@ -107,12 +115,26 @@ public sealed class RuleEnqueuer(
                     MaxEvents = maxExtraEvents,
                 };
 
-                await foreach (var result in ruleService.CreateJobsAsync(@event, context))
+                foreach (var @event in byApp)
                 {
-                    await batch.WriteAsync(appEvent.AppId.Id, result);
+                    await foreach (var result in ruleService.CreateJobsAsync(@event, context))
+                    {
+                        await batch.WriteAsync(byApp.Key.Id, result);
+                    }
                 }
             }
         }
+    }
+
+    // Returns null for events that are not handled, so that they all end up in one group to skip.
+    private static NamedId<DomainId>? GetAppId(Envelope<IEvent> @event)
+    {
+        if (@event.Headers.Restored() || @event.Payload is not AppEvent appEvent)
+        {
+            return null;
+        }
+
+        return appEvent.AppId;
     }
 
     private Task<List<Rule>> GetRulesAsync(DomainId appId)

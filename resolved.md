@@ -3,8 +3,8 @@
 Items from the backend performance review that are done. Numbering matches
 [todo.md](todo.md) — resolved items keep their original number so references stay valid.
 
-Item **6** is not listed here: it is open but accepted as won't-fix, and stays documented
-in `todo.md` so it is not re-reported as a new finding.
+Most entries are fixes. Item **6** is closed as *accepted, won't fix* — kept here so it is
+not re-reported as a new finding.
 
 ---
 
@@ -218,3 +218,116 @@ reads `partitioning.GetName(...)` and `IsOptional`, so a key built from the lang
 `app.Version` is conservative but provably correct: it changes whenever anything about
 the app does. Trading guaranteed correctness for a cache-hit-rate win is the wrong
 direction here, so it stays until someone establishes the model's exact dependency set.
+
+---
+
+### 6. Sync-over-async on the authentication path — **CLOSED: ACCEPTED, WON'T FIX**
+`backend/src/Squidex/Areas/IdentityServer/Config/Dynamic/DynamicSchemeProvider.cs:129`
+
+```csharp
+var scheme = GetSchemeCoreAsync(name, default).Result;
+```
+
+`Get(string? name)` blocks a thread-pool thread on a DB round trip, which in a hot path
+is a classic thread-pool starvation source.
+
+**Closed as accepted, not fixed.** This is dynamic OIDC scheme resolution — reached only
+for team-level auth domains, not on ordinary API traffic — so the risk does not justify
+the rework. Recorded here rather than deleted so it is not re-reported as a new finding.
+
+If it ever moves onto a hot path, the fix is to cache scheme results synchronously
+(populated by an async initializer / background refresh) so `Get` can return without
+blocking.
+
+Same pattern elsewhere, also accepted:
+- `Squidex.Domain.Apps.Entities/Contents/DomainObject/Guards/ScriptingExtensions.cs:144` — `.Wait()` on full content validation inside a script callback.
+- `Squidex.Data.MongoDb/Infrastructure/MongoRepositoryBase.cs:26` — `InitializeAsync(default).Wait()`.
+
+---
+
+### 12. `ReaderWriterLockSlim` used exclusively for write locks in the ETag path — **FIXED**
+`backend/src/Squidex.Web/Pipeline/CachingManager.cs`
+
+**Was:** `CacheContext` guarded `AddDependency`, `AddDependency<T>`, `AddHeader` and
+`Finish` with `ReaderWriterLockSlim` — but every one of them took `EnterWriteLock`. No
+code path ever took a read lock, so the reader/writer bookkeeping was pure overhead at
+roughly 2–3× the cost of a plain monitor. `AddDependency` is called once per content,
+once per schema and once per resolved reference, so a 200-item list with references took
+on the order of a thousand write-lock round trips per request.
+
+**Now:** a plain `Lock` (`System.Threading.Lock`, matching `DisposableObjectBase`), with
+each `EnterWriteLock`/`try`/`finally`/`ExitWriteLock` block collapsed to `lock (...)`.
+
+Two incidental improvements fell out of the rewrite:
+
+- `Dispose()` no longer has a lock to dispose, so `CacheContext` only disposes the hasher.
+- `AddHeader` had its `EnterWriteLock` *inside* the `try`, so a throw from the acquire
+  would have hit `ExitWriteLock` on an unheld lock and masked the original error with a
+  `SynchronizationLockException`. `lock` cannot express that shape.
+
+Nothing about the concurrency contract changed — every operation mutates the hasher and
+the sets, so there was never anything a read lock could have protected.
+
+**Verified:** build clean, `Squidex.Web.Tests` green (167).
+
+---
+
+### 13. Rules dictionary rebuilt per event inside the batch loop — **FIXED**
+`backend/src/Squidex.Domain.Apps.Entities/Rules/RuleEnqueuer.cs`
+
+**Was:** `On(...)` receives batches of 200 events and ran
+`Rules = rules.ToReadonlyDictionary(x => x.Id)` for *each* one — a full `Dictionary`
+build plus a wrapper allocation per event, even though the events in a batch are
+overwhelmingly from the same app.
+
+Note the rules *lookup* was already cheap: `RulesCacheDuration` defaults to 10s, so
+`appProvider.GetRulesAsync` was memoized. The waste was purely the per-event indexing.
+
+**Now:** the batch is grouped by app, so rules are resolved and indexed once per app and
+the context is built once per group:
+
+```csharp
+foreach (var byApp in events.GroupBy(GetAppId))
+{
+    if (byApp.Key == null) { continue; }
+
+    var rules = await GetRulesAsync(byApp.Key.Id);
+    if (rules.Count == 0) { continue; }
+
+    var context = new RulesContext { AppId = byApp.Key, Rules = rules.ToReadonlyDictionary(x => x.Id), ... };
+
+    foreach (var @event in byApp) { ... }
+}
+```
+
+`GetAppId` returns `null` for restored events and non-`AppEvent` payloads, so they all
+collect into one group that is skipped — replacing the two per-event `continue` guards.
+
+**Why `GroupBy` rather than memoizing per app inside the original loop.** The first
+attempt kept the original per-event loop and cached the indexed dictionary in a
+`Dictionary<DomainId, ...>`, specifically to avoid reordering events. `GroupBy` does
+reorder across apps, so that had to be checked rather than assumed:
+
+- Rules are scoped to a single app (`context.AppId`, `context.Rules`), so a rule cannot
+  observe another app's events.
+- `RuleQueueWriter` is app-agnostic — it accumulates `CreateFlowInstanceRequest` values
+  and flushes every 100 regardless of origin.
+- `ruleUsageTracker.TrackAsync` is an additive counter per (app, rule, day).
+- `GroupBy` preserves source order *within* each group, which is the ordering that can
+  actually matter.
+
+Nothing cross-app is order-sensitive, so `GroupBy` is safe — and it is both simpler and
+slightly more correct than the memo: keying on `NamedId<DomainId>` (a `sealed record`,
+so value equality over id *and* name) means an app renamed mid-batch yields two groups
+each carrying its own correct name, where the memo keyed on `.Id` would have reused the
+first name seen.
+
+**Verified:** a new test,
+`RuleEnqueuerTests.Should_handle_events_of_multiple_apps_with_the_rules_of_each_app`,
+feeds an interleaved two-app batch and asserts each event is handled with its own app's
+rules, that the grouped order is what reaches the service, and — via `Assert.Same` on the
+`Rules` instance — that indexing happens once per app rather than once per event. It
+**fails on the pre-fix code** (the ordering assertion shows `app1, app2, app1, app2`
+against the expected `app1, app1, app2, app2`) and passes after. Existing coverage did
+not include a multi-app batch at all: `Should_handle_events_in_batches` repeats the *same*
+event ten times. Full `Squidex.Domain.Apps.Entities.Tests` green (1528).

@@ -350,6 +350,55 @@ public class RuleEnqueuerTests : GivenContext
             .MustHaveHappenedANumberOfTimesMatching(x => x == 10);
     }
 
+    [Fact]
+    public async Task Should_handle_events_of_multiple_apps_with_the_rules_of_each_app()
+    {
+        var rule1 = CreateAndSetupRule();
+
+        var otherAppId = NamedId.Of(DomainId.NewGuid(), "other-app");
+        var rule2 = CreateRule();
+
+        A.CallTo(() => AppProvider.GetRulesAsync(otherAppId.Id, A<CancellationToken>._))
+            .Returns([rule2]);
+
+        var event1 = Envelope.Create<IEvent>(new ContentCreated { AppId = AppId });
+        var event2 = Envelope.Create<IEvent>(new ContentCreated { AppId = otherAppId });
+        var event3 = Envelope.Create<IEvent>(new ContentCreated { AppId = AppId });
+        var event4 = Envelope.Create<IEvent>(new ContentCreated { AppId = otherAppId });
+
+        var contexts = new List<(Envelope<IEvent> Event, RulesContext Context)>();
+
+        A.CallTo(() => ruleService.CreateJobsAsync(A<Envelope<IEvent>>._, A<RulesContext>._, default))
+            .Invokes((Envelope<IEvent> source, RulesContext context, CancellationToken _) =>
+            {
+                contexts.Add((source, context));
+            })
+            .Returns(Array.Empty<JobResult>().ToAsyncEnumerable());
+
+        await sut.On([event1, event2, event3, event4]);
+
+        // Every event must be handled, even though they are grouped by app.
+        Assert.Equal([event1, event3, event2, event4], contexts.Select(x => x.Event).ToArray());
+
+        // Every event must be handled with the rules of its own app.
+        Assert.All(contexts.Where(x => x.Event == event1 || x.Event == event3), x =>
+        {
+            Assert.Equal(AppId, x.Context.AppId);
+            Assert.Equal([rule1], x.Context.Rules.Values.ToArray());
+        });
+
+        Assert.All(contexts.Where(x => x.Event == event2 || x.Event == event4), x =>
+        {
+            Assert.Equal(otherAppId, x.Context.AppId);
+            Assert.Equal([rule2], x.Context.Rules.Values.ToArray());
+        });
+
+        // The rules must only be indexed once per app, not once per event.
+        Assert.Same(contexts[0].Context.Rules, contexts[1].Context.Rules);
+        Assert.Same(contexts[2].Context.Rules, contexts[3].Context.Rules);
+    }
+
+
     private static RulesContext MatchingContext(Rule rule)
     {
         // These two properties must not be set to true for performance reasons.
