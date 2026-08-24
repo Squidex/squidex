@@ -9,9 +9,9 @@ overhead / allocation churn), **S4** low (worth fixing while nearby).
 
 Item numbers are stable and never reused. Completed items move to
 [resolved.md](resolved.md) keeping their number, so gaps in the sequence here are
-expected — items **4**, **5** and **7** are done and live there.
+expected — items **4**, **5**, **7**, **8** and **9** are done and live there.
 
-**Status: 17 open of 20 — 15 untouched, 1 half fixed (8), 1 attempted but still open (9).**
+**Status: 14 open of 20. Item 6 accepted as-is (see below); items 4, 5, 7, 8, 9 are in [resolved.md](resolved.md).**
 
 ---
 
@@ -68,87 +68,26 @@ already isolated in `ContentScriptVars`.
 
 ## S2 — High
 
-### 9. Generic query-model cache key still collides across apps — **ATTEMPTED, STILL OPEN**
-`backend/src/Squidex.Domain.Apps.Entities/Contents/Queries/ContentQueryParser.cs:280,290`
-
-The constant `"EDM/__generic"` was replaced with:
-
-```csharp
-if (schema == null) return $"EDM/{app.Version}/{withHidden}";
-if (schema == null) return $"JSON/{app.Version}/{withHidden}";
-```
-
-**This does not close the hole.** `App.Version` is `Entity.Version` — a per-aggregate
-event-stream position (`Squidex.Infrastructure/Commands/Entity.cs:24`), not a globally
-unique value. Two different apps that have received the same number of events share the
-same version, which is the common case for young or low-traffic apps. `EDM/7/False`
-means "app A at v7" and "app B at v7" interchangeably.
-
-The cached model is built from `context.App.PartitionResolver()`, so a colliding app
-still parses cross-schema `/contents` queries against **another tenant's languages** —
-wrong filters accepted, correct ones rejected, for the 60-minute cache lifetime.
-
-The schema-scoped keys on lines 283 and 293 are safe: they embed `schema.Id`, a globally
-unique `DomainId`.
-
-**Fix:** put `app.Id` in the key, not just the version —
-`$"EDM/{app.Id}/{app.Version}/{withHidden}"`.
-
-Separately, and unchanged: keying on `app.Version` means *any* app-level event (a
-contributor edit, a settings tweak) invalidates the EDM models of every schema in the
-app, forcing expensive OData model rebuilds. Keying on the language-config version
-instead would invalidate only when something the model actually depends on changes.
-
----
-
-### 8. GraphQL field-selection data loader — **HALF FIXED**
-`backend/src/Squidex.Domain.Apps.Entities/Contents/GraphQL/GraphQLExecutionContext.cs:162,166`
-
-The key-building bug is fixed — line 188 is now `keys[i] = (ids[i], fields)`, so the
-batch requests all N ids instead of the first one N times.
-
-The second half is untouched. The batch callback still keys its result dictionary by the
-*merged* `fields` set:
-
-```csharp
-var fields = batch.SelectMany(x => x.Fields).ToHashSet();   // line 162
-var result = await QueryContentsByIdsAsync(batch.Select(x => x.Id), fields, ct);
-return result.ToDictionary(x => (x.Id, fields));            // line 166
-```
-
-The keys the loader was *called* with hold the caller's `HashSet<string>` instance;
-`fields` here is a freshly allocated one. `HashSet<T>` has no structural equality, so
-the tuple comparer falls back to reference equality and **no lookup ever matches**. The
-contents are fetched from the database and then thrown away; every field-selected
-GraphQL content resolves to null.
-
-**Fix:** supply an `IEqualityComparer` for the tuple key that compares field sets by
-content, or key by a canonical string (sorted field names joined) instead of the set
-itself.
-
----
-
-### 6. Sync-over-async on the authentication path — **OPEN**
+### 6. Sync-over-async on the authentication path — **ACCEPTED, WON'T FIX**
 `backend/src/Squidex/Areas/IdentityServer/Config/Dynamic/DynamicSchemeProvider.cs:129`
-
-The file was touched (a variable rename and whitespace tidy-up), but the blocking call
-is unchanged — it just moved from line 134 to 129:
 
 ```csharp
 var scheme = GetSchemeCoreAsync(name, default).Result;
 ```
 
-`Get(string? name)` is an options-resolution hook invoked from the auth pipeline, so
-each call parks a thread-pool thread on a DB round trip. Under load this is a classic
-thread-pool starvation source, and it deadlocks outright if any sync context is ever
-installed.
+`Get(string? name)` blocks a thread-pool thread on a DB round trip. **Accepted as-is —
+this is not an important path** (dynamic OIDC scheme resolution, only reached for
+team-level auth domains, not on ordinary API traffic), so the starvation risk does not
+justify the rework. Left documented rather than deleted so it is not re-reported as a
+new finding.
 
-Same pattern, lower blast radius:
+If it ever does move onto a hot path, the fix is to cache scheme results synchronously
+(populated by an async initializer / background refresh) so `Get` can return without
+blocking.
+
+Same pattern elsewhere, also low blast radius:
 - `Squidex.Domain.Apps.Entities/Contents/DomainObject/Guards/ScriptingExtensions.cs:144` — `.Wait()` on full content validation inside a script callback.
 - `Squidex.Data.MongoDb/Infrastructure/MongoRepositoryBase.cs:26` — `InitializeAsync(default).Wait()`.
-
-**Fix:** cache scheme results synchronously (populated by an async initializer /
-background refresh) so `Get` can return without blocking.
 
 ---
 
@@ -341,17 +280,17 @@ size limit, so each edit of a script adds another full-source-sized entry for th
 
 ## Suggested order of attack
 
-1. **Finish items 9 and 8** — both are one-line-ish completions of work already started,
-   and both are correctness bugs. Item 9 in particular still leaks one tenant's language
-   config into another's query model whenever two apps share a version number.
-2. **Engine pooling (items 1–3)** — one change in `JintScriptEngine` fixes the largest
-   open read-path cost, and items 2 and 3 mostly disappear with it.
-3. **Item 11** — small, self-contained; removes an uncached full-collection count from a
+1. **Engine pooling (items 1–3)** — now the largest open cost by a wide margin. One
+   change in `JintScriptEngine` addresses it, and items 2 and 3 mostly disappear with it.
+2. **Item 11** — small, self-contained; removes an uncached full-collection count from a
    paged endpoint.
-4. **Items 6, 10** — stability under load rather than throughput; worth doing before the
-   micro-optimisations.
-5. **Everything else** — steady-state allocation and lock overhead; measure with a
+3. **Item 10** — stability under load rather than throughput; an unbounded queue that
+   turns a storage outage into an OOM.
+4. **Everything else** — steady-state allocation and lock overhead; measure with a
    profiler on a representative content-list request before and after.
+
+All the correctness-shaped findings are now closed. What remains is genuine performance
+work, which is exactly the category that should be profiled before it is written.
 
 ---
 

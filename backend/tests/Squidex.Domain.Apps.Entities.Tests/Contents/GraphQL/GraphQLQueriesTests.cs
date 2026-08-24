@@ -1108,6 +1108,81 @@ public class GraphQLQueriesTests : GraphQLTestBase
     }
 
     [Fact]
+    public async Task Should_resolve_referenced_contents_when_field_queries_are_optimized()
+    {
+        var contentRefId = DomainId.NewGuid();
+        var contentRef = TestContent.CreateSimple(TestSchemas.Reference1.NamedId(), contentRefId, "reference1-field", "reference1");
+
+        var data =
+            new ContentData()
+                .AddField("my-references",
+                    new ContentFieldData()
+                        .AddInvariant(JsonValue.Array(contentRefId)));
+
+        var contentId = DomainId.NewGuid();
+        var content = TestContent.Create(contentId, data);
+
+        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                A<Q>.That.HasIdsWithoutTotal(contentRefId),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(0, contentRef));
+
+        A.CallTo(() => contentQuery.QueryAsync(MatchsContentContext(),
+                A<Q>.That.HasIdsWithoutTotal(contentId),
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(1, content));
+
+        var actual = await ExecuteAsync(new TestQuery
+        {
+            Query = @"
+                query {
+                  findMySchemaContent(id: '{contentId}') @optimizeFieldQueries {
+                    id
+                    flatData {
+                      myReferences {
+                        id
+                        flatData {
+                          reference1Field
+                        }
+                      }
+                    }
+                  }
+                }",
+            Args = new
+            {
+                contentId,
+            },
+        });
+
+        var expected = new
+        {
+            data = new
+            {
+                findMySchemaContent = new
+                {
+                    id = content.Id,
+                    flatData = new
+                    {
+                        myReferences = new[]
+                        {
+                            new
+                            {
+                                id = contentRefId,
+                                flatData = new
+                                {
+                                    reference1Field = "reference1",
+                                },
+                            },
+                        },
+                    },
+                },
+            },
+        };
+
+        AssertResult(expected, actual);
+    }
+
+    [Fact]
     public async Task Should_cache_referenced_contents_from_flat_data()
     {
         var contentRefId = DomainId.NewGuid();

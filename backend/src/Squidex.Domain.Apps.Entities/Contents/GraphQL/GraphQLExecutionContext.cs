@@ -23,8 +23,32 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
     private const int MinBatchSize = 1;
     private static readonly EmptyDataLoaderResult<EnrichedAsset> EmptyAssets = new EmptyDataLoaderResult<EnrichedAsset>();
     private static readonly EmptyDataLoaderResult<EnrichedContent> EmptyContents = new EmptyDataLoaderResult<EnrichedContent>();
+
+    // Field names are resolved to a new set for every field, therefore the sets have to be compared
+    // by their content. Otherwise the results are never matched to the keys they were loaded for.
+    private static readonly IEqualityComparer<HashSet<string>> FieldsComparer = HashSet<string>.CreateSetComparer();
+
     private readonly IDataLoaderContextAccessor dataLoaders;
     private readonly int batchSize;
+
+    private sealed class ContentWithFieldsComparer : IEqualityComparer<(DomainId Id, HashSet<string> Fields)>
+    {
+        public static readonly ContentWithFieldsComparer Instance = new ContentWithFieldsComparer();
+
+        private ContentWithFieldsComparer()
+        {
+        }
+
+        public bool Equals((DomainId Id, HashSet<string> Fields) x, (DomainId Id, HashSet<string> Fields) y)
+        {
+            return x.Id.Equals(y.Id) && FieldsComparer.Equals(x.Fields, y.Fields);
+        }
+
+        public int GetHashCode((DomainId Id, HashSet<string> Fields) obj)
+        {
+            return HashCode.Combine(obj.Id, FieldsComparer.GetHashCode(obj.Fields));
+        }
+    }
 
     public override Context Context { get; }
 
@@ -159,11 +183,21 @@ public sealed class GraphQLExecutionContext : QueryExecutionContext
         return dataLoaders.Context!.GetOrAddNonCachingBatchLoader<(DomainId Id, HashSet<string> Fields), EnrichedContent>(nameof(GetContentsLoaderWithFields),
             async (batch, ct) =>
             {
-                var fields = batch.SelectMany(x => x.Fields).ToHashSet();
+                var result = new Dictionary<(DomainId Id, HashSet<string> Fields), EnrichedContent>(ContentWithFieldsComparer.Instance);
 
-                var result = await QueryContentsByIdsAsync(batch.Select(x => x.Id), fields, ct);
+                // A batch can contain several field selections. They cannot be merged into a single
+                // query, because every content must only contain the fields it was requested with.
+                foreach (var byFields in batch.GroupBy(x => x.Fields, FieldsComparer))
+                {
+                    var contents = await QueryContentsByIdsAsync(byFields.Select(x => x.Id), byFields.Key, ct);
 
-                return result.ToDictionary(x => (x.Id, fields));
+                    foreach (var content in contents)
+                    {
+                        result[(content.Id, byFields.Key)] = content;
+                    }
+                }
+
+                return result;
             }, maxBatchSize: batchSize);
     }
 

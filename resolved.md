@@ -3,7 +3,8 @@
 Items from the backend performance review that are done. Numbering matches
 [todo.md](todo.md) — resolved items keep their original number so references stay valid.
 
-Partially-addressed items (**8**, **9**) stay in `todo.md` until closed.
+Item **6** is not listed here: it is open but accepted as won't-fix, and stays documented
+in `todo.md` so it is not re-reported as a new finding.
 
 ---
 
@@ -111,3 +112,109 @@ operations over 8 threads against 3000 distinct patterns in a 1000-entry cache
 (continuous eviction) with 0 exceptions, 0 wrong matches and the cache correctly bounded
 at 1000; full `Squidex.Domain.Apps.Core.Tests` suite green (1247), plus 25 validation
 tests in `Squidex.Domain.Apps.Entities.Tests`.
+
+---
+
+### 8. GraphQL field-selection data loader never matched its results — **FIXED**
+`backend/src/Squidex.Domain.Apps.Entities/Contents/GraphQL/GraphQLExecutionContext.cs`
+
+**Was:** two separate defects in the `GetContentsLoaderWithFields` path, which serves
+every GraphQL reference resolved under the `@optimizeFieldQueries` directive.
+
+1. `BuildKeys` wrote `keys[i] = (ids[0], fields)` — every key in the batch was the
+   *first* id, so one content was requested N times and the other N−1 never were.
+2. The batch callback keyed its result dictionary by a freshly merged field set:
+
+   ```csharp
+   var fields = batch.SelectMany(x => x.Fields).ToHashSet();
+   return result.ToDictionary(x => (x.Id, fields));
+   ```
+
+   `NonCachingBatchLoader` then looks the results up with the *original* key. The key
+   type is `(DomainId, HashSet<string>)` and `HashSet<T>` has no structural equality, so
+   the tuple comparer fell back to reference equality and **no lookup ever matched**.
+   Contents were fetched from the database and thrown away; every field-selected
+   reference resolved to `null`.
+
+   This was unconditional, not a race: `SharedExtensions.FieldNames()` builds a *new*
+   `HashSet` per resolver invocation (`new FieldNameResolver(...).Iterate(...)`), so the
+   requested instance and the merged instance were never the same object.
+
+**Now:** `(1)` was fixed to `ids[i]`. For `(2)`, the key is compared by value:
+
+```csharp
+private static readonly IEqualityComparer<HashSet<string>> FieldsComparer = HashSet<string>.CreateSetComparer();
+
+private sealed class ContentWithFieldsComparer : IEqualityComparer<(DomainId Id, HashSet<string> Fields)>
+{
+    public bool Equals((DomainId Id, HashSet<string> Fields) x, (DomainId Id, HashSet<string> Fields) y)
+        => x.Id.Equals(y.Id) && FieldsComparer.Equals(x.Fields, y.Fields);
+
+    public int GetHashCode((DomainId Id, HashSet<string> Fields) obj)
+        => HashCode.Combine(obj.Id, FieldsComparer.GetHashCode(obj.Fields));
+}
+```
+
+and the callback groups by field selection instead of merging:
+
+```csharp
+var result = new Dictionary<(DomainId Id, HashSet<string> Fields), EnrichedContent>(ContentWithFieldsComparer.Instance);
+
+foreach (var byFields in batch.GroupBy(x => x.Fields, FieldsComparer))
+{
+    var contents = await QueryContentsByIdsAsync(byFields.Select(x => x.Id), byFields.Key, ct);
+
+    foreach (var content in contents)
+    {
+        result[(content.Id, byFields.Key)] = content;
+    }
+}
+```
+
+Grouping rather than merging matters for correctness: a batch can hold several different
+field selections, and merging them would hand a caller fields it did not request. Because
+the grouping is by *value*, identical selections coming from different resolvers still
+collapse into a single query — which the old reference-equality behaviour could not do.
+
+`HashSet<string>.CreateSetComparer()` is cached in a static; it allocates a new comparer
+on every call.
+
+**Verified:** a new regression test,
+`GraphQLQueriesTests.Should_resolve_referenced_contents_when_field_queries_are_optimized`,
+resolves a reference under `@optimizeFieldQueries`. It **fails on the pre-fix code** and
+passes after — red-to-green, not just green. Full GraphQL suite (79) and full
+`Squidex.Domain.Apps.Entities.Tests` (1527) green.
+
+---
+
+### 9. Generic query-model cache key collided across apps — **FIXED**
+`backend/src/Squidex.Domain.Apps.Entities/Contents/Queries/ContentQueryParser.cs:276-294`
+
+**Was:** the cross-schema (`schema == null`) cache key was the constant
+`"EDM/__generic"` / `"JSON/__generic"`. The cached model is built from
+`context.App.PartitionResolver()`, so whichever app populated the cache first imposed its
+languages on every other app's cross-schema `/contents` queries for the 60-minute cache
+lifetime — wrong filters accepted, correct ones rejected, across tenants.
+
+An intermediate fix replaced it with `$"EDM/{app.Version}/{withHidden}"`, which did not
+close the hole: `App.Version` is `Entity.Version`, a per-aggregate event-stream position,
+so two apps with the same event count still collided.
+
+**Now:** the key carries the app identity (commit `b7103a12`):
+
+```csharp
+return $"EDM/{app.Id}/{app.Version}/{withHidden}";
+return $"EDM/{app.Id}/{app.Version}/{schema.Id}_{schema.Version}/{withHidden}";
+```
+
+`app.Id` is a globally unique `DomainId`, so no two apps can share a key.
+
+**Deliberately not changed: the `app.Version` over-invalidation.** Keying on `app.Version`
+means any app-level event (a contributor edit, a settings tweak) rebuilds the EDM models
+of every schema in the app. Narrowing it to a language-specific token looked attractive —
+`PartitionResolver` is just `app.Languages.ToResolver()` — but `BuildDataSchema` also
+reads `partitioning.GetName(...)` and `IsOptional`, so a key built from the language
+*codes* alone could serve a stale model after a language rename or fallback change.
+`app.Version` is conservative but provably correct: it changes whenever anything about
+the app does. Trading guaranteed correctness for a cache-hit-rate win is the wrong
+direction here, so it stays until someone establishes the model's exact dependency set.
