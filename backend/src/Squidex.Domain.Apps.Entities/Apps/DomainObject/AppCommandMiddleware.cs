@@ -37,7 +37,7 @@ public sealed class AppCommandMiddleware(
     {
         if (result.Payload is App app)
         {
-            contextProvider.Context.App = app;
+            contextProvider.Context = contextProvider.Context.WithApp(app);
         }
 
         return base.EnrichResultAsync(context, result, ct);

@@ -621,3 +621,123 @@ The `_Schemas_` marker keeps this key space distinct from the single-schema over
 interchangeable.
 
 **Verified:** build clean, all suites green.
+
+---
+
+### 18. Sequential N+1 schema and component lookups — **CLOSED: FINDING WAS WRONG**
+`backend/src/Squidex.Domain.Apps.Entities/AppProviderExtensions.cs`
+`backend/src/Squidex/Areas/Api/Controllers/Contents/Generator/SchemasOpenApiGenerator.cs`
+
+The original finding claimed the OpenAPI docs endpoint "serialises 100 round trips" for an
+app with 100 schemas. **That is not true, and the claim was never verified.**
+
+`ContentOpenApiController` calls `appProvider.GetSchemasAsync(AppId, ...)` *before*
+`GenerateAsync`, and `AppProvider.GetSchemasAsync` writes every schema into the
+request-scoped local cache under `SchemaCacheKey(appId, schema.Id)`. Inside
+`GetComponentsAsync`, the component lookup is
+`appProvider.GetSchemaAsync(appId, schemaId, false, ct)`, which reads that exact same key
+through `GetOrCreate`. Component schemas belong to the same app by construction, so every
+one of those lookups is a local-cache hit. Zero database round trips, the loop just walks
+an in-memory dictionary.
+
+**The remaining path is real but small and not worth the risk.** `ContentEnricher` does
+*not* pre-warm the cache, so a content query whose schema has component fields does pay one
+round trip per distinct component schema, sequentially, on the first use in a request —
+typically a handful.
+
+Parallelising the resolver was considered and rejected. `GetComponentsAsync` is recursive
+over a shared `Dictionary<DomainId, Schema>` and relies on inserting each schema *before*
+recursing into it, which is what breaks reference cycles between component schemas.
+Running the lookups concurrently would mean unsynchronised writes to that dictionary and
+would lose the cycle guarantee, in exchange for saving a couple of milliseconds on a path
+that only pays the cost once per request. `AppProvider.GetOrCreate` also has a
+check-then-act race that concurrency would expose.
+
+---
+
+### 19. Header parsing re-split and re-allocated on every read — **FIXED**
+`backend/src/Squidex.Domain.Apps.Entities/Context.cs`
+`backend/src/Squidex.Domain.Apps.Entities/ContextHeaders.cs`
+
+**Was:** `AsStrings` ran `value.Split(...).Select(x => x.Trim()).Distinct()` on every call —
+a split array, two LINQ iterators and an internal `HashSet` each time. The same headers are
+read repeatedly per request: `ConvertData.GenerateConverter` reads `Languages()` and
+`ResolveUrls()` once per schema group, and `Fields()` is read from several steps. The
+headers never change once a request is running.
+
+**Now:** `Context` parses each header once into a `string[]` and keeps it.
+
+```csharp
+private readonly ConcurrentDictionary<string, string[]> headerValues = new (StringComparer.OrdinalIgnoreCase);
+```
+
+A `ConcurrentDictionary` rather than a plain one, because a `Context` is shared between the
+parallel resolvers of a GraphQL query. The cache is cleared whenever `Headers` is assigned,
+which is the only way it can change (`Context.Change`).
+
+`Fields()` and `Languages()` still build their own `HashSet` per call, deliberately. Their
+results are handed to callers that retain them — `Q.WithFields`, `ExcludeOtherFields` — so
+returning a shared instance would let one caller mutate another's copy. Caching the parsed
+`string[]` removes the expensive part while leaving ownership exactly as it was.
+
+**This also fixed a latent crash.** The rewrite uses
+`StringSplitOptions.RemoveEmptyEntries | TrimEntries`, which drops whitespace-only entries.
+The old order — split, *then* trim — turned a header like `X-Languages: " , "` into a
+single empty string, and `Language.GetLanguage("")` calls `Guard.NotNullOrEmpty` and
+throws. Verified the difference against the runtime rather than assuming it.
+
+**Verified:** a new `ContextHeadersTests` covering splitting, trimming, deduplication,
+memoization (`Assert.Same`), invalidation on change and on removal, clone isolation, and
+the whitespace case. Two of them **fail on the pre-fix code** — the memoization test and
+the whitespace test — which are exactly the two behaviours that changed.
+`Squidex.Domain.Apps.Entities.Tests` green (1540).
+
+---
+
+### Immutable `Context` (follow-up to 19)
+`backend/src/Squidex.Domain.Apps.Entities/Context.cs`
+`backend/src/Squidex.Domain.Apps.Entities/IContextProvider.cs`
+`backend/src/Squidex.Web/ContextProvider.cs`
+
+`Context` was mutable in two ways: `Headers { get; private set; }` changed by `Change()`,
+and a public `App { get; set; }`. That is what forced the header cache added in item 19 to
+carry invalidation logic.
+
+**Now `IContextProvider.Context` has a setter and `Context` is immutable.** Both setters
+are gone, along with `Change()` and `ICloneBuilder.Update()`; `Clone()` and a new
+`WithApp()` return a new instance. The header cache needs no invalidation at all — a
+`Context` parses each header at most once for its whole lifetime.
+
+The three mutation sites in the codebase became replacements:
+
+```csharp
+contextProvider.Context = contextProvider.Context.WithApp(app);                       // AppCommandMiddleware
+contextProvider.Context = contextProvider.Context.Clone(b => b.WithNoEnrichment()…);   // both bulk middlewares
+```
+
+`ContextProvider` stores it symmetrically to how it reads it — `HttpContext.Features` when
+there is a request, the `AsyncLocal` fallback when there is not. `AppResolver` already
+replaced the whole context this way, so the pattern was established.
+
+**Why this is safe.** Replacing a reference is only equivalent to mutating in place if
+nobody holds the old one. Every consumer of `IContextProvider` was checked:
+`AssetCommandMiddleware`, `ContentCommandMiddleware`, `RuleCommandMiddleware`,
+`EnrichWithAppIdCommandMiddleware` and both bulk middlewares all read
+`contextProvider.Context` fresh at the point of use. None capture it in a field or across
+an await that spans a replacement.
+
+**Three existing tests failed and were right to.** Their doubles pinned the getter with
+`A.CallTo(() => provider.Context).Returns(ctx)`, which made a *replacement* invisible while
+the old in-place mutation had been visible. The fakes now assign (`provider.Context = ctx`)
+so FakeItEasy tracks the property like the real provider, and
+`AppCommandMiddlewareTests` asserts through `ApiContextProvider.Context.App` rather than
+through a now-stale local reference.
+
+**New `ContextProviderTests`** covers both storage paths: reading from and writing to
+`HttpContext.Features`, header population, and the `AsyncLocal` fallback. Writing it
+surfaced a trap worth knowing about — `A.Fake<IHttpContextAccessor>()` returns a *dummy*
+`HttpContext` rather than `null`, so the fallback path is never reached unless the fake is
+explicitly configured to return null.
+
+**Verified:** build clean. Entities 1541, Web 176, Core 1243, Infrastructure 1033,
+Data 180 — all green.

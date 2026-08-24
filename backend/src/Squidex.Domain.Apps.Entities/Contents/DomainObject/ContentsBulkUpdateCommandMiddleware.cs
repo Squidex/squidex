@@ -61,7 +61,7 @@ public sealed class ContentsBulkUpdateCommandMiddleware(
             return;
         }
 
-        contextProvider.Context.Change(b => b
+        contextProvider.Context = contextProvider.Context.Clone(b => b
             .WithNoEnrichment()
             .WithNoCleanup()
             .WithUnpublished(true)

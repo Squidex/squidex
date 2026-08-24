@@ -9,9 +9,9 @@ overhead / allocation churn), **S4** low (worth fixing while nearby).
 
 Item numbers are stable and never reused. Completed items move to
 [resolved.md](resolved.md) keeping their number, so gaps in the sequence here are
-expected — items **4**–**17** and **20** are closed and live there.
+expected — items **4**–**20** are closed and live there.
 
-**Status: 5 open of 20 — items 1, 2, 3, 18, 19. The other 15 are in [resolved.md](resolved.md).**
+**Status: 3 open of 20 — items 1, 2, 3, all the same root cause. The other 17 are in [resolved.md](resolved.md).**
 
 ---
 
@@ -66,55 +66,19 @@ already isolated in `ContentScriptVars`.
 
 ---
 
-## S3 — Moderate
-
-### 18. Sequential N+1 schema and component lookups
-`backend/src/Squidex.Domain.Apps.Entities/AppProviderExtensions.cs:30`
-`backend/src/Squidex/Areas/Api/Controllers/Contents/Generator/SchemasOpenApiGenerator.cs:39,48`
-
-`ResolveSchemasAsync` awaits `appProvider.GetSchemaAsync` once per id in a loop; the
-OpenAPI generator awaits `GetComponentsAsync(schema, ...)` once per schema in a loop.
-For an app with 100 schemas the OpenAPI docs endpoint serialises 100 round trips that
-have no dependency on each other.
-
-**Fix:** `await Task.WhenAll(...)` over the lookups, or add a batch accessor. Both are
-warm-cache paths, which is why this sits at S3 rather than S2.
-
----
-
-### 19. Header parsing re-splits and re-allocates on every read
-`backend/src/Squidex.Domain.Apps.Entities/Contents/ContentHeaders.cs:140,150`
-`backend/src/Squidex.Domain.Apps.Entities/ContextHeaders.cs:133`
-
-```csharp
-public static HashSet<string>? Fields(this Context context)
-    => context.AsStrings(KeyFields).ToHashSet();
-
-public static HashSet<Language> Languages(this Context context)
-    => context.AsStrings(KeyLanguages).Select(Language.GetLanguage).ToHashSet();
-```
-
-`AsStrings` does `value.Split(...).Select(Trim).Distinct()`. Each call allocates the
-split array, two LINQ iterators and a `HashSet`. `ConvertData.GenerateConverter` calls
-`Languages()` **and** `ResolveUrls().ToList()` per schema group, and `Fields()` is read
-from several steps. The headers never change for the lifetime of a `Context`.
-
-**Fix:** memoize the parsed values on `Context`, invalidating in the clone builder.
-
----
-
 ## Suggested order of attack
 
-1. **Engine pooling (items 1–3)** — by a wide margin the largest remaining cost, and the
-   only one left that can dominate a request. One change in `JintScriptEngine` addresses
-   it, and items 2 and 3 mostly disappear with it.
-2. **Items 18 and 19** — steady-state allocation and a warm-cache N+1; both are small and
-   neither is likely to show up next to item 1.
+Only one piece of work is left: **pool the Jint engines (item 1)**. Items 2 and 3 are the
+same cost seen from two call sites and mostly disappear once item 1 is done; what remains
+of them afterwards is the sequential `await` per content, which is worth re-measuring
+rather than assuming.
 
-Everything correctness-shaped is closed, as is everything in the stability category. What
-remains is pure throughput work — exactly the category that should be profiled before it
-is written. Item 1 in particular is worth measuring first: the estimate that it dominates
-a scripted content list comes from reading the loops, not from a trace.
+**Profile this one before writing it.** Everything correctness- and stability-shaped is
+closed, so what is left is pure throughput, and the estimate that engine construction
+dominates a scripted content list is read off the loops, not taken from a trace. Engine
+pooling is also the most invasive change on the whole list — it touches the security
+boundary of user-authored scripts, since a pooled engine must not carry state from one
+script into the next. That is worth confirming is a real cost before taking the risk.
 
 ---
 

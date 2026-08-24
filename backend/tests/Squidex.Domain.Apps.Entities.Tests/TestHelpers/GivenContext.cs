@@ -139,8 +139,9 @@ public class GivenContext
     {
         var result = A.Fake<IContextProvider>();
 
-        A.CallTo(() => result.Context)
-            .Returns(context);
+        // Assign instead of configuring the getter, so that the fake keeps the value like the real
+        // provider does. The context is immutable and is replaced to change it.
+        result.Context = context;
 
         return result;
     }

@@ -595,8 +595,9 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
             PermissionIds.ForApp(id, AppId.Name, schemaId.Name).Id,
             PermissionIds.ForApp(id, AppId.Name, schemaCustomId.Name).Id);
 
-        A.CallTo(() => contextProvider.Context)
-            .Returns(requestContext);
+        // Assign instead of configuring the getter, so that the fake keeps the value like the real
+        // provider does. The middleware replaces the context, because it is immutable.
+        contextProvider.Context = requestContext;
 
         return requestContext;
     }

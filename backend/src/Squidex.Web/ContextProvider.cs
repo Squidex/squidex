@@ -27,5 +27,16 @@ public sealed class ContextProvider(IHttpContextAccessor httpContextAccessor) : 
 
             return httpContextAccessor.HttpContext.Context();
         }
+        set
+        {
+            if (httpContextAccessor.HttpContext == null)
+            {
+                asyncLocal.Value = value;
+            }
+            else
+            {
+                httpContextAccessor.HttpContext.Features.Set(value);
+            }
+        }
     }
 }

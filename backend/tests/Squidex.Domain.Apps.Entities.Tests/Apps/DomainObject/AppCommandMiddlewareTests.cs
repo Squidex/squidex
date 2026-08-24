@@ -43,7 +43,8 @@ public class AppCommandMiddlewareTests : HandlerTestBase<App>
 
         await HandleAsync(new UpdateApp(), replaced);
 
-        Assert.Same(replaced, ApiContext.App);
+        // The context is immutable, so the provider gets a new one instead of an updated one.
+        Assert.Same(replaced, ApiContextProvider.Context.App);
     }
 
     [Fact]

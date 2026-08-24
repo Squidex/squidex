@@ -183,8 +183,9 @@ public class AssetsBulkUpdateCommandMiddlewareTests : GivenContext
     {
         var requestContext = CreateContext(false, PermissionIds.ForApp(id, AppId.Name).Id);
 
-        A.CallTo(() => contextProvider.Context)
-            .Returns(requestContext);
+        // Assign instead of configuring the getter, so that the fake keeps the value like the real
+        // provider does. The middleware replaces the context, because it is immutable.
+        contextProvider.Context = requestContext;
 
         return requestContext;
     }

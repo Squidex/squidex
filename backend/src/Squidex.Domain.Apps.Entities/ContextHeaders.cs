@@ -11,8 +11,6 @@ namespace Squidex.Domain.Apps.Entities;
 
 public static class ContextHeaders
 {
-    private static readonly char[] Separators = [',', ';'];
-
     public const string KeyBatchSize = "X-BatchSize";
     public const string KeyNoCacheKeys = "X-NoCacheKeys";
     public const string KeyNoScripting = "X-NoScripting";
@@ -128,11 +126,8 @@ public static class ContextHeaders
 
     public static IEnumerable<string> AsStrings(this Context context, string key)
     {
-        if (context.Headers.TryGetValue(key, out var value))
-        {
-            return value.Split(Separators, StringSplitOptions.RemoveEmptyEntries).Select(x => x.Trim()).Distinct();
-        }
-
-        return [];
+        // The context parses the header once and keeps the result, because the same headers are
+        // read several times while a query is enriched.
+        return context.HeaderValues(key);
     }
 }

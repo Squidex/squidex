@@ -56,7 +56,7 @@ public sealed class AssetsBulkUpdateCommandMiddleware(IContextProvider contextPr
             return;
         }
 
-        contextProvider.Context.Change(b => b
+        contextProvider.Context = contextProvider.Context.Clone(b => b
             .WithNoAssetEnrichment()
             .WithNoCleanup()
             .WithUnpublished(true)
