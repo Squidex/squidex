@@ -5,7 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Concurrent;
 using System.Globalization;
+using System.Reflection;
 using System.Resources;
 using System.Text;
 
@@ -13,6 +15,13 @@ namespace Squidex.Infrastructure.Translations;
 
 public sealed class ResourcesLocalizer(ResourceManager resourceManager) : ILocalizer
 {
+    // Resolving a property by name is the expensive part of the formatting. The arguments are
+    // compiler generated types and the variable names come from the resources, so the number of
+    // combinations is defined by the code and the cache cannot grow beyond that. Misses are cached
+    // as null, otherwise an unknown variable would pay for the lookup every time.
+    private static readonly ConcurrentDictionary<(Type Type, string Name), PropertyInfo?> Properties =
+        new ConcurrentDictionary<(Type Type, string Name), PropertyInfo?>();
+
     public (string Result, bool Found) Get(CultureInfo culture, string key, string fallback, object? args = null)
     {
         Guard.NotNull(culture);
@@ -74,7 +83,7 @@ public sealed class ResourcesLocalizer(ResourceManager resourceManager) : ILocal
 
                 var variableName = variable.ToString();
                 var variableValue = variableName;
-                var property = argsType.GetProperty(variableName);
+                var property = Properties.GetOrAdd((argsType, variableName), static key => key.Type.GetProperty(key.Name));
 
                 if (property != null)
                 {

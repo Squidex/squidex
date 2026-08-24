@@ -68,7 +68,7 @@ public sealed class JobWorker :
         return GetJobProcessorAsync(message.OwnerId);
     }
 
-    private Task<JobProcessor> GetJobProcessorAsync(DomainId appId)
+    private async Task<JobProcessor> GetJobProcessorAsync(DomainId appId)
     {
         Task<JobProcessor> processor;
         lock (processors)
@@ -82,7 +82,7 @@ public sealed class JobWorker :
                 return loaded;
             });
         }
-        
+
         try
         {
             return await processor;

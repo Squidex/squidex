@@ -9,9 +9,9 @@ overhead / allocation churn), **S4** low (worth fixing while nearby).
 
 Item numbers are stable and never reused. Completed items move to
 [resolved.md](resolved.md) keeping their number, so gaps in the sequence here are
-expected — items **4**–**33** and **35** are closed and live there.
+expected — items **4**–**35** are closed and live there.
 
-**Status: 4 open of 35 — items 1, 2, 3 (one root cause) and 34. The other 31 are in [resolved.md](resolved.md).**
+**Status: 3 open of 35 — items 1, 2 and 3, which are one root cause. The other 32 are in [resolved.md](resolved.md).**
 
 ---
 
@@ -66,45 +66,15 @@ already isolated in `ContentScriptVars`.
 
 ---
 
-## S3 — Moderate
-
-### 34. Message formatting looks up properties by reflection on every call
-`backend/src/Squidex.Infrastructure/Translations/ResourcesLocalizer.cs:77`
-
-`ResourcesLocalizer.Get` substitutes `{variable}` placeholders by reflecting over the
-anonymous args object:
-
-```csharp
-var property = argsType.GetProperty(variableName);
-```
-
-No `PropertyInfo` is cached, so every call re-resolves it. `Type.GetProperty(string)` is one
-of the slower reflection calls — it does a name lookup over the type's members.
-
-Mostly this sits on error paths, where it does not matter. The one that is not is
-`ResolveReferences.CreateFallback` (`ResolveReferences.cs:125`):
-
-```csharp
-var text = T.Get("contents.listReferences", new { count = referencedContents.Count });
-```
-
-That runs inside the per-content, per-partition loop of the enrichment pipeline, for every
-reference field that resolves to more than one item. The same method also allocates a fresh
-`JsonObject` and loops over every app language on each call.
-
-**Fix:** cache the `PropertyInfo` per (type, name); a small static dictionary is enough since
-the arg types are compiler-generated and few.
-
----
-
 ## Suggested order of attack
 
-1. **Item 34** — small and self-contained: cache the `PropertyInfo` per (type, name).
-2. **Items 1–3, engine pooling** — the largest single cost, and the most invasive change on
-   the list. It touches the security boundary of user-authored scripts, since a pooled
-   engine must not carry state from one script into the next. **Profile before writing it**:
-   the estimate that engine construction dominates a scripted content list is read off the
-   loops, not taken from a trace.
+Only **engine pooling (items 1–3)** is left. It is the largest single cost on the list and
+also the most invasive change: it touches the security boundary of user-authored scripts,
+because a pooled engine must not carry state from one script into the next.
+
+**Profile before writing it.** The estimate that engine construction dominates a scripted
+content list is read off the loops, not taken from a trace, and this is the one item where
+the fix is expensive enough that being wrong about the size of the win would matter.
 
 ---
 

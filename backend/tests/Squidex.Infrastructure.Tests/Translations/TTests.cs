@@ -57,4 +57,32 @@ public class TTests
 
         Assert.Equal(("Var: Upper.", true), actual);
     }
+
+    [Fact]
+    public void Should_return_variable_name_when_property_does_not_exist()
+    {
+        var actual = sut.Get(CultureInfo.CurrentUICulture, "withVar", "fallback", new { other = 5 });
+
+        Assert.Equal(("Var: var.", true), actual);
+    }
+
+    [Fact]
+    public void Should_return_same_text_when_called_again()
+    {
+        var actual1 = sut.Get(CultureInfo.CurrentUICulture, "withVar", "fallback", new { var = 5 });
+        var actual2 = sut.Get(CultureInfo.CurrentUICulture, "withVar", "fallback", new { var = 8 });
+
+        Assert.Equal(("Var: 5.", true), actual1);
+        Assert.Equal(("Var: 8.", true), actual2);
+    }
+
+    [Fact]
+    public void Should_not_reuse_property_of_other_type()
+    {
+        var actual1 = sut.Get(CultureInfo.CurrentUICulture, "withVar", "fallback", new { var = 5 });
+        var actual2 = sut.Get(CultureInfo.CurrentUICulture, "withVar", "fallback", new { var = "text" });
+
+        Assert.Equal(("Var: 5.", true), actual1);
+        Assert.Equal(("Var: text.", true), actual2);
+    }
 }

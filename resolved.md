@@ -1194,3 +1194,43 @@ one. The same defect as item 15.
 **Now:** the entry is removed when the task faults, comparing by reference so a newer
 successful entry added by another caller is not discarded. The removal takes the same lock
 that guards the dictionary.
+
+---
+
+### 34. Message formatting looked up properties by reflection on every call — **FIXED**
+`backend/src/Squidex.Infrastructure/Translations/ResourcesLocalizer.cs`
+
+**Was:** `ResourcesLocalizer.Get` resolved every `{variable}` placeholder with
+`argsType.GetProperty(variableName)` and cached nothing, so each call paid a name search over
+the type's members. Mostly harmless on error paths, but `ResolveReferences.CreateFallback`
+calls `T.Get("contents.listReferences", new { count = … })` inside the per-content,
+per-partition loop of the enrichment pipeline.
+
+**Now:** a static `ConcurrentDictionary<(Type, string), PropertyInfo?>` memoizes the lookup.
+
+**Two details that matter more than they look:**
+
+- **Misses are cached as `null`.** An unknown variable name is a legitimate case — the code
+  falls back to printing the name — and without caching the negative result those would pay
+  the reflection cost on every single call, which is the worst case rather than the best.
+- **The key is (Type, name), not name.** Different anonymous types share property names, so a
+  name-only key would hand back another type's `PropertyInfo` and `GetValue` would throw into
+  the existing `catch`, silently degrading the message to the raw variable name.
+
+No eviction: the arg types are compiler-generated and the variable names come from the
+resource files, so the number of combinations is fixed by the code.
+
+**Verified:** three new tests in `TTests` — an unknown property, repeated calls with different
+values, and two different arg types using the same variable name. The last one is the guard
+against the name-only key: mutating the implementation to key by name alone fails it, along
+with the two existing case-conversion tests, and leaves the rest passing.
+`Squidex.Infrastructure.Tests` green (1036).
+
+---
+
+### Note: `JobWorker` build fix
+
+While running the suites, `JobWorker.GetJobProcessorAsync` did not compile — the helper from
+item 35 had been inlined into it but the method was still declared non-async while using
+`await`. Added the `async` modifier and removed a trailing whitespace. No behavioural change;
+the `lock` block closes before the `await`, so nothing is held across it.
