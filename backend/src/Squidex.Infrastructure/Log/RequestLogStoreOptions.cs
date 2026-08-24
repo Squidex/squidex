@@ -16,4 +16,8 @@ public sealed class RequestLogStoreOptions
     public int BatchSize { get; set; } = 1000;
 
     public int WriteIntervall { get; set; } = 1000;
+
+    // Requests are only written every few seconds. When the repository is not available the pending
+    // entries would grow without a limit, therefore they are dropped when this size is reached.
+    public int MaxPendingItems { get; set; } = 50_000;
 }

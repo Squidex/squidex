@@ -116,7 +116,61 @@ public class BackgroundRequestLogStoreTests
             .MustHaveHappened();
     }
 
+    [Fact]
+    public async Task Should_drop_logs_when_pending_queue_is_full()
+    {
+        options.MaxPendingItems = 10;
+
+        for (var i = 0; i < 25; i++)
+        {
+            await sut.LogAsync(new Request { Key = i.ToString(CultureInfo.InvariantCulture) }, ct);
+        }
+
+        await WaitForCompletion();
+
+        // The first entries are kept and everything above the limit is dropped.
+        A.CallTo(() => requestLogRepository.InsertManyAsync(Batch("0", "9"), A<CancellationToken>._))
+            .MustHaveHappened();
+
+        A.CallTo(() => requestLogRepository.InsertManyAsync(A<IEnumerable<Request>>._, A<CancellationToken>._))
+            .MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public async Task Should_accept_logs_again_after_pending_queue_has_been_written()
+    {
+        options.MaxPendingItems = 10;
+
+        for (var i = 0; i < 25; i++)
+        {
+            await sut.LogAsync(new Request { Key = i.ToString(CultureInfo.InvariantCulture) }, ct);
+        }
+
+        await WaitForDrain();
+
+        // The queue must not stay full after it has been drained.
+        for (var i = 100; i < 110; i++)
+        {
+            await sut.LogAsync(new Request { Key = i.ToString(CultureInfo.InvariantCulture) }, ct);
+        }
+
+        await WaitForCompletion();
+
+        A.CallTo(() => requestLogRepository.InsertManyAsync(Batch("0", "9"), A<CancellationToken>._))
+            .MustHaveHappened();
+
+        A.CallTo(() => requestLogRepository.InsertManyAsync(Batch("100", "109"), A<CancellationToken>._))
+            .MustHaveHappened();
+    }
+
     private async Task WaitForCompletion()
+    {
+        await WaitForDrain();
+
+        sut.Dispose();
+    }
+
+    private async Task WaitForDrain()
     {
         sut.Next();
 
@@ -128,8 +182,6 @@ public class BackgroundRequestLogStoreTests
 
             await Task.Delay(20, tcs.Token);
         }
-
-        sut.Dispose();
     }
 
     private static IEnumerable<Request> Batch(string from, string to)

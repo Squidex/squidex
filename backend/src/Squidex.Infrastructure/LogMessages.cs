@@ -56,6 +56,9 @@ internal static partial class LogMessages
     [LoggerMessage(Level = LogLevel.Error, Message = "Failed to track usage in background.")]
     public static partial void LogTrackUsageFailed(ILogger logger, Exception exception);
 
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Dropped {count} request log entries, because the pending queue is full.")]
+    public static partial void LogRequestLogDropped(ILogger logger, int count);
+
     [LoggerMessage(Level = LogLevel.Error, Message = "Failed to repair snapshot for domain object of type {type} with ID {id}.")]
     public static partial void LogFailedToRepairDomainObjectSnapshot(ILogger logger, Type type, DomainId id, Exception exception);
 

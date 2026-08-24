@@ -524,3 +524,100 @@ Deduplicating it was tried and reverted: the gain is small enough that it does n
 threading a materialized `List<IGrouping<...>>` through the method signatures.
 
 **Verified:** build clean, all suites green.
+
+---
+
+### 10. Unbounded in-memory request-log queue — **FIXED**
+`backend/src/Squidex.Infrastructure/Log/BackgroundRequestLogStore.cs`
+`backend/src/Squidex.Infrastructure/Log/RequestLogStoreOptions.cs`
+
+**Was:** `jobs` was an unbounded `ConcurrentQueue<Request>`. `LogAsync` enqueues on every
+API request while the flush timer drains only once per `WriteIntervall` (1s by default).
+If `InsertManyAsync` threw — Mongo unreachable, disk full — the drain aborted and the
+surviving entries stayed queued while new ones kept arriving. A sustained storage outage
+under load grew the queue until the process ran out of memory: the request *log* taking
+down the whole server.
+
+**Now:** a soft bound with an explicit drop counter.
+
+```csharp
+if (Volatile.Read(ref jobsCount) >= options.MaxPendingItems)
+{
+    Interlocked.Increment(ref jobsDropped);
+    return Task.CompletedTask;
+}
+
+Interlocked.Increment(ref jobsCount);
+
+jobs.Enqueue(request);
+```
+
+`jobsCount` is decremented as the drain dequeues, so the queue accepts entries again once
+it has been written. Each drain reports what it dropped via a new
+`LogRequestLogDropped` message, so the gap in the request log is visible rather than
+silent. `MaxPendingItems` defaults to 50,000 — roughly 50 seconds of headroom at 1000
+requests/second — and is configurable.
+
+The bound is deliberately *soft*: two threads can both observe `jobsCount < max` and both
+enqueue, so the queue can overshoot by the number of concurrent writers. That is fine for
+a backpressure limit and avoids a lock on the hot path.
+
+A `Channel` with `BoundedChannelFullMode.DropWrite` was the alternative. The counter was
+chosen because it keeps the existing drain loop unchanged and makes the drop explicit at
+the call site instead of hiding it behind a channel option.
+
+**Verified:** two new tests —
+`Should_drop_logs_when_pending_queue_is_full` and
+`Should_accept_logs_again_after_pending_queue_has_been_written`. Both **fail on the
+pre-fix code**. The second was additionally mutation-checked: removing the
+`Interlocked.Decrement` from the drain loop kills it and nothing else, confirming it
+really covers the recovery path rather than passing incidentally. This required splitting
+the test helper, because the existing `WaitForCompletion` disposes the store and so cannot
+be used to drain twice. `Squidex.Infrastructure.Tests` green (1033).
+
+---
+
+### 11. Cross-schema content queries never used the cached total — **FIXED**
+`backend/src/Squidex.Data.MongoDb/Domain/Apps/Entities/Contents/Operations/QueryByQuery.cs`
+
+**Was:**
+
+```csharp
+var (filter, isDefault) = CreateFilter(app.Id, schemas.Select(x => x.Id), ...);
+```
+
+`isDefault` was computed and then discarded. The multi-schema overload had no
+`else if (isDefault)` branch, unlike the single-schema overload thirty lines below which
+routes through `countCollection.GetOrAddAsync`. So the "all schemas" `/contents` endpoint
+ran a full uncached `CountDocumentsAsync` over every content in the app on each page.
+
+**Now:** the branch is mirrored, keyed by app plus the schema set:
+
+```csharp
+else if (isDefault)
+{
+    var totalKey = CreateTotalKey(app, schemas);
+
+    contentTotal = await countCollection.GetOrAddAsync(totalKey, ct => Collection.Find(filter).CountDocumentsAsync(ct), ct);
+}
+```
+
+**The key needs care, which is why it is not just an interpolated list.** The schema set
+depends on the caller's permissions and arrives in no guaranteed order, so the ids are
+sorted before hashing — otherwise the same query would produce different keys and never
+hit. And the key becomes the `_id` of the count document, where MongoDB caps index keys at
+1024 bytes; a raw join of 37-character ids would exceed that at roughly 27 schemas. Hashing
+gives a bounded, deterministic key:
+
+```csharp
+var schemaIds = schemas.Select(x => x.Id.ToString()).Order(StringComparer.Ordinal);
+
+return $"{app.Id}_Schemas_{string.Join('_', schemaIds).ToSha256Base64()}";
+```
+
+The `_Schemas_` marker keeps this key space distinct from the single-schema overload's
+`$"{appId}_{schemaId}"`. The two must not share entries in any case: their filters differ
+(`Filter.In` vs `Filter.Eq`, and different existence guards), so the counts are not
+interchangeable.
+
+**Verified:** build clean, all suites green.

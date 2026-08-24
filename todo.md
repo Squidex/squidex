@@ -9,9 +9,9 @@ overhead / allocation churn), **S4** low (worth fixing while nearby).
 
 Item numbers are stable and never reused. Completed items move to
 [resolved.md](resolved.md) keeping their number, so gaps in the sequence here are
-expected — items **4**, **5**, **6**, **7**, **8**, **9**, **12**, **13**, **14**, **15**, **16**, **17** and **20** are closed and live there.
+expected — items **4**–**17** and **20** are closed and live there.
 
-**Status: 7 open of 20 — items 1, 2, 3, 10, 11, 18, 19. The other 13 are in [resolved.md](resolved.md).**
+**Status: 5 open of 20 — items 1, 2, 3, 18, 19. The other 15 are in [resolved.md](resolved.md).**
 
 ---
 
@@ -66,42 +66,6 @@ already isolated in `ContentScriptVars`.
 
 ---
 
-## S2 — High
-
-### 10. Unbounded in-memory request-log queue
-`backend/src/Squidex.Infrastructure/Log/BackgroundRequestLogStore.cs:22,126`
-
-`jobs` is an unbounded `ConcurrentQueue<Request>`; `LogAsync` enqueues on every API
-request and the flush timer runs once per `WriteIntervall`. If `InsertManyAsync` throws
-(Mongo unreachable, disk full), the `TrackAsync` loop aborts and the surviving items
-stay queued while new ones keep arriving. A sustained storage outage under load grows
-the queue until OOM — the logging subsystem takes down the whole process.
-
-`BackgroundUsageTracker` uses a `ConcurrentDictionary` keyed by (key, category, date),
-so it is naturally bounded and not affected.
-
-**Fix:** bound the queue (drop-oldest with a counter, or `Channel` with
-`BoundedChannelFullMode.DropWrite`) and log the drop count.
-
----
-
-### 11. Cross-schema content queries never use the cached total
-`backend/src/Squidex.Data.MongoDb/Domain/Apps/Entities/Contents/Operations/QueryByQuery.cs:56`
-
-```csharp
-var (filter, isDefault) = CreateFilter(app.Id, schemas.Select(x => x.Id), ...);
-```
-
-`isDefault` is computed and then discarded — the multi-schema overload has no
-`else if (isDefault)` branch, unlike the single-schema overload 30 lines below which
-routes through `countCollection.GetOrAddAsync`. So the "all schemas" `/contents`
-endpoint runs a full `CountDocumentsAsync` over every content in the app on each page
-request, uncached.
-
-**Fix:** mirror the single-schema branch, keyed by app + sorted schema-id set.
-
----
-
 ## S3 — Moderate
 
 ### 18. Sequential N+1 schema and component lookups
@@ -141,17 +105,16 @@ from several steps. The headers never change for the lifetime of a `Context`.
 
 ## Suggested order of attack
 
-1. **Engine pooling (items 1–3)** — now the largest open cost by a wide margin. One
-   change in `JintScriptEngine` addresses it, and items 2 and 3 mostly disappear with it.
-2. **Item 11** — small, self-contained; removes an uncached full-collection count from a
-   paged endpoint.
-3. **Item 10** — stability under load rather than throughput; an unbounded queue that
-   turns a storage outage into an OOM.
-4. **Everything else** — steady-state allocation and lock overhead; measure with a
-   profiler on a representative content-list request before and after.
+1. **Engine pooling (items 1–3)** — by a wide margin the largest remaining cost, and the
+   only one left that can dominate a request. One change in `JintScriptEngine` addresses
+   it, and items 2 and 3 mostly disappear with it.
+2. **Items 18 and 19** — steady-state allocation and a warm-cache N+1; both are small and
+   neither is likely to show up next to item 1.
 
-All the correctness-shaped findings are now closed. What remains is genuine performance
-work, which is exactly the category that should be profiled before it is written.
+Everything correctness-shaped is closed, as is everything in the stability category. What
+remains is pure throughput work — exactly the category that should be profiled before it
+is written. Item 1 in particular is worth measuring first: the estimate that it dominates
+a scripted content list comes from reading the loops, not from a trace.
 
 ---
 

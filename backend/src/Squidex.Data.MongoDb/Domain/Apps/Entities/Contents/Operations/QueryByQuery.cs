@@ -64,6 +64,13 @@ internal sealed class QueryByQuery(MongoCountCollection countCollection) : Opera
             {
                 contentTotal = -1;
             }
+            else if (isDefault)
+            {
+                // Cache total count by app and schemas because no other filters are applied (aka default).
+                var totalKey = CreateTotalKey(app, schemas);
+
+                contentTotal = await countCollection.GetOrAddAsync(totalKey, ct => Collection.Find(filter).CountDocumentsAsync(ct), ct);
+            }
             else if (query.IsSatisfiedByIndex())
             {
                 // It is faster to filter with sorting when there is an index, because it forces the index to be used.
@@ -76,6 +83,16 @@ internal sealed class QueryByQuery(MongoCountCollection countCollection) : Opera
         }
 
         return ResultList.Create<Content>(contentTotal, contentEntities);
+    }
+
+    private static string CreateTotalKey(App app, List<Schema> schemas)
+    {
+        // The schemas depend on the permissions of the user and are not in a stable order, so the ids
+        // are sorted. They are also hashed, because the key is the ID of the count document and there
+        // can be enough schemas to exceed the maximum key size of MongoDB.
+        var schemaIds = schemas.Select(x => x.Id.ToString()).Order(StringComparer.Ordinal);
+
+        return $"{app.Id}_Schemas_{string.Join('_', schemaIds).ToSha256Base64()}";
     }
 
     public async Task<IResultList<Content>> QueryAsync(Schema schema, Q q,

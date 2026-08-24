@@ -20,6 +20,8 @@ public sealed class BackgroundRequestLogStore : DisposableObjectBase, IRequestLo
     private readonly CompletionTimer logTimer;
     private readonly RequestLogStoreOptions options;
     private readonly ConcurrentQueue<Request> jobs = new ConcurrentQueue<Request>();
+    private int jobsCount;
+    private int jobsDropped;
     private bool isUpdating;
 
     public bool HasPendingJobs => !jobs.IsEmpty || isUpdating;
@@ -68,10 +70,21 @@ public sealed class BackgroundRequestLogStore : DisposableObjectBase, IRequestLo
         isUpdating = true;
         try
         {
+            // Report the entries that have been dropped since the last run, so that the gap in the
+            // request log is visible instead of silent.
+            var dropped = Interlocked.Exchange(ref jobsDropped, 0);
+
+            if (dropped > 0)
+            {
+                LogMessages.LogRequestLogDropped(log, dropped);
+            }
+
             var batch = new List<Request>(options.BatchSize);
 
             while (jobs.TryDequeue(out var dequeued))
             {
+                Interlocked.Decrement(ref jobsCount);
+
                 batch.Add(dequeued);
 
                 if (batch.Count >= options.BatchSize)
@@ -122,6 +135,17 @@ public sealed class BackgroundRequestLogStore : DisposableObjectBase, IRequestLo
         {
             return Task.CompletedTask;
         }
+
+        // The queue is only drained by a timer. If the repository is not available for a longer time
+        // the queue would grow until the process runs out of memory, so new entries are dropped.
+        // Logging a request is never important enough to take the whole process down.
+        if (Volatile.Read(ref jobsCount) >= options.MaxPendingItems)
+        {
+            Interlocked.Increment(ref jobsDropped);
+            return Task.CompletedTask;
+        }
+
+        Interlocked.Increment(ref jobsCount);
 
         jobs.Enqueue(request);
 
