@@ -52,7 +52,8 @@ public sealed class CachingUsageTracker(IUsageTracker inner, IMemoryCache cache)
     {
         Guard.NotNull(key);
 
-        var cacheKey = $"{typeof(CachingUsageTracker)}_UsageForMonth_{key}_{date}_{category}";
+        // A tuple avoids building a string per request and also avoids formatting the date.
+        var cacheKey = (typeof(CachingUsageTracker), nameof(GetForMonthAsync), key, date, category);
 
         return cache.GetOrCreateAsync(cacheKey, entry =>
         {
@@ -67,7 +68,7 @@ public sealed class CachingUsageTracker(IUsageTracker inner, IMemoryCache cache)
     {
         Guard.NotNull(key);
 
-        var cacheKey = $"{typeof(CachingUsageTracker)}_Usage_{key}_{fromDate}_{toDate}_{category}";
+        var cacheKey = (typeof(CachingUsageTracker), nameof(GetAsync), key, fromDate, toDate, category);
 
         return cache.GetOrCreateAsync(cacheKey, entry =>
         {

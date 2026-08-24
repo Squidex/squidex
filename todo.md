@@ -9,9 +9,9 @@ overhead / allocation churn), **S4** low (worth fixing while nearby).
 
 Item numbers are stable and never reused. Completed items move to
 [resolved.md](resolved.md) keeping their number, so gaps in the sequence here are
-expected — items **4**, **5**, **6**, **7**, **8**, **9**, **12** and **13** are closed and live there.
+expected — items **4**, **5**, **6**, **7**, **8**, **9**, **12**, **13** and **20** are closed and live there.
 
-**Status: 11 open of 20. Items 4, 5, 6, 7, 8, 9, 12, 13 are in [resolved.md](resolved.md).**
+**Status: 10 open of 20. Items 4, 5, 6, 7, 8, 9, 12, 13, 20 are in [resolved.md](resolved.md).**
 
 ---
 
@@ -206,24 +206,6 @@ split array, two LINQ iterators and a `HashSet`. `ConvertData.GenerateConverter`
 from several steps. The headers never change for the lifetime of a `Context`.
 
 **Fix:** memoize the parsed values on `Context`, invalidating in the clone builder.
-
----
-
-## S4 — Low
-
-### 20. Script cache key embeds the entire script source
-`backend/src/Squidex.Domain.Apps.Core.Operations/Scripting/Internal/CacheParser.cs:20`
-
-```csharp
-var cacheKey = $"{typeof(CacheParser)}_Script_{script}";
-```
-
-Every parse allocates a new string containing a copy of the whole script body and hashes
-it end to end, and `IMemoryCache` retains that string as the key. Entries also have no
-size limit, so each edit of a script adds another full-source-sized entry for the
-10-minute window.
-
-**Fix:** key by a precomputed hash of the source (or by schema id + script version).
 
 ---
 

@@ -86,7 +86,7 @@ public sealed class AppProvider(
     public async Task<Team?> GetTeamAsync(DomainId teamId,
         CancellationToken ct = default)
     {
-        var cacheKey = TeamCacheKey(teamId);
+        var cacheKey = (nameof(AppProvider), "TEAMS_ID", teamId);
 
         var team = await GetOrCreate(cacheKey, () =>
         {
@@ -99,7 +99,7 @@ public sealed class AppProvider(
     public async Task<Team?> GetTeamByAuthDomainAsync(string authDomain,
         CancellationToken ct = default)
     {
-        var cacheKey = TeamCacheKey(authDomain);
+        var cacheKey = (nameof(AppProvider), "TEAMS_DOMAIN", authDomain);
 
         var team = await GetOrCreate(cacheKey, () =>
         {
@@ -148,7 +148,7 @@ public sealed class AppProvider(
     public async Task<List<App>> GetUserAppsAsync(string userId, PermissionSet permissions,
         CancellationToken ct = default)
     {
-        var apps = await GetOrCreate($"GetUserApps({userId})", () =>
+        var apps = await GetOrCreate((nameof(AppProvider), "GET_USER_APPS", userId), () =>
         {
             return indexForApps.GetAppsForUserAsync(userId, permissions, ct)!;
         });
@@ -159,7 +159,7 @@ public sealed class AppProvider(
     public async Task<List<App>> GetTeamAppsAsync(DomainId teamId,
         CancellationToken ct = default)
     {
-        var apps = await GetOrCreate($"GetTeamApps({teamId})", () =>
+        var apps = await GetOrCreate((nameof(AppProvider), "GET_TEAM_APPS", teamId), () =>
         {
             return indexForApps.GetAppsForTeamAsync(teamId, ct)!;
         });
@@ -169,7 +169,7 @@ public sealed class AppProvider(
 
     public async Task<List<Team>> GetUserTeamsAsync(string userId, CancellationToken ct = default)
     {
-        var teams = await GetOrCreate($"GetUserTeams({userId})", () =>
+        var teams = await GetOrCreate((nameof(AppProvider), "GET_USER_TEAMS", userId), () =>
         {
             return indexForTeams.GetTeamsAsync(userId, ct)!;
         });
@@ -180,7 +180,7 @@ public sealed class AppProvider(
     public async Task<List<Schema>> GetSchemasAsync(DomainId appId,
         CancellationToken ct = default)
     {
-        var schemas = await GetOrCreate($"GetSchemasAsync({appId})", () =>
+        var schemas = await GetOrCreate((nameof(AppProvider), "GET_SCHEMAS", appId), () =>
         {
             return indexForSchemas.GetSchemasAsync(appId, ct)!;
         });
@@ -200,7 +200,7 @@ public sealed class AppProvider(
     public async Task<List<Rule>> GetRulesAsync(DomainId appId,
         CancellationToken ct = default)
     {
-        var rules = await GetOrCreate($"GetRulesAsync({appId})", () =>
+        var rules = await GetOrCreate((nameof(AppProvider), "GET_RULES", appId), () =>
         {
             return indexForRules.GetRulesAsync(appId, ct)!;
         });
@@ -242,34 +242,24 @@ public sealed class AppProvider(
 
         return await result;
     }
-
-    private static string AppCacheKey(DomainId appId)
+    
+    private static object AppCacheKey(DomainId appId)
     {
-        return $"APPS_ID_{appId}";
+        return (nameof(AppProvider), "APPS_ID", appId);
     }
 
-    private static string AppCacheKey(string appName)
+    private static object AppCacheKey(string appName)
     {
-        return $"APPS_NAME_{appName}";
+        return (nameof(AppProvider), "APPS_NAME", appName);
     }
 
-    private static string TeamCacheKey(DomainId teamId)
+    private static object SchemaCacheKey(DomainId appId, DomainId id)
     {
-        return $"TEAMS_ID_{teamId}";
+        return (nameof(AppProvider), "SCHEMAS_ID", appId, id);
     }
 
-    private static string TeamCacheKey(string authDomain)
+    private static object SchemaCacheKey(DomainId appId, string name)
     {
-        return $"TEAMS_DOMAIN_{authDomain}";
-    }
-
-    private static string SchemaCacheKey(DomainId appId, DomainId id)
-    {
-        return $"SCHEMAS_ID_{appId}_{id}";
-    }
-
-    private static string SchemaCacheKey(DomainId appId, string name)
-    {
-        return $"SCHEMAS_NAME_{appId}_{name}";
+        return (nameof(AppProvider), "SCHEMAS_NAME", appId, name);
     }
 }

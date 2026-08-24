@@ -29,7 +29,7 @@ public sealed class Context
 
     public App App { get; set; }
 
-    public bool IsFrontendClient => UserPrincipal.IsInClient(DefaultClients.Frontend);
+    public bool IsFrontendClient { get; };
 
     public Context(ClaimsPrincipal user, App app)
         : this(app, user, user.Claims.Permissions(), EmptyHeaders)
@@ -47,6 +47,8 @@ public sealed class Context
 
         UserPrincipal = userPrincipal;
         UserPermissions = userPermissions;
+
+        IsFrontendClient = userPrincipal.IsInClient(DefaultClients.Frontend);
 
         Headers = headers;
     }

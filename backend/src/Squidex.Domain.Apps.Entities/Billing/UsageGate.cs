@@ -89,12 +89,17 @@ public sealed partial class UsageGate(
 
     private bool HasNotifiedBefore(DomainId appId)
     {
-        return memoryCache.Get<bool>(appId);
+        return memoryCache.Get<bool>(NotifiedKey(appId));
     }
 
     private bool TrackNotified(DomainId appId)
     {
-        return memoryCache.Set(appId, true, TimeSpan.FromHours(1));
+        return memoryCache.Set(NotifiedKey(appId), true, TimeSpan.FromHours(1));
+    }
+
+    private static object NotifiedKey(DomainId appId)
+    {
+        return (typeof(UsageGate), nameof(TrackNotified), appId);
     }
 
     private static string[] GetUsers(App app)
@@ -192,8 +197,8 @@ public sealed partial class UsageGate(
         return Task.FromResult((plan, planId));
     }
 
-    private static string CacheKey(DomainId appId)
+    private static object CacheKey(DomainId appId)
     {
-        return $"{appId}_Plan";
+        return (typeof(UsageGate), nameof(GetPlanForAppAsync), appId);
     }
 }

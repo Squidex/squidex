@@ -331,3 +331,75 @@ rules, that the grouped order is what reaches the service, and — via `Assert.S
 against the expected `app1, app1, app2, app2`) and passes after. Existing coverage did
 not include a multi-app batch at all: `Should_handle_events_in_batches` repeats the *same*
 event ten times. Full `Squidex.Domain.Apps.Entities.Tests` green (1528).
+
+---
+
+### 20. Script cache key embedded the entire script source — **FIXED**
+`backend/src/Squidex.Domain.Apps.Core.Operations/Scripting/Internal/CacheParser.cs:20`
+
+**Was:**
+
+```csharp
+var cacheKey = $"{typeof(CacheParser)}_Script_{script}";
+```
+
+Every parse allocated a new string holding a full copy of the script body, and
+`IMemoryCache` then retained that copy as the key — so each cached script was held twice.
+
+**Now:** `var cacheKey = (typeof(CacheParser), script);`
+
+The tuple boxes once (one small allocation) but holds a *reference* to the existing
+script string, so nothing is copied and the cache no longer keeps a second copy alive.
+
+**Honest limit:** this removes the allocation and the duplicate retention, not the hash.
+`ValueTuple.GetHashCode` still calls `string.GetHashCode()` on the source, which is O(n)
+— .NET does not cache string hash codes. Removing that too would mean keying by schema id
++ script version, which needs that context plumbed into `CacheParser` and changes its API.
+Not worth it unless profiling says the hash itself shows up.
+
+---
+
+### Tuple cache keys — sweep of the other call sites
+
+Same change applied where the key was an interpolated string and the cache accepts
+`object`. Beyond skipping the string build, a tuple also avoids *formatting* non-string
+parts (`DateOnly`, `long`), which the interpolation did on every call.
+
+| Site | Key before | Key now |
+| --- | --- | --- |
+| `CachingUsageTracker.GetForMonthAsync` | `$"{typeof(..)}_UsageForMonth_{key}_{date}_{category}"` | `(typeof(..), nameof(GetForMonthAsync), key, date, category)` |
+| `CachingUsageTracker.GetAsync` | `$"{typeof(..)}_Usage_{key}_{fromDate}_{toDate}_{category}"` | `(typeof(..), nameof(GetAsync), key, fromDate, toDate, category)` |
+| `EventEnricher.FindUserAsync` | `$"{typeof(..)}_Users_{actor.Identifier}"` | `(typeof(EventEnricher), actor.Identifier)` |
+| `RuleEnqueuer.GetRulesAsync` | `$"{typeof(..)}_Rules_{appId}"` | `(typeof(RuleEnqueuer), appId)` |
+| `UsageGate.CacheKey` | `$"{appId}_Plan"` | `(typeof(UsageGate), nameof(GetPlanForAppAsync), appId)` |
+| `UsageGate` notified flag | bare `DomainId` | `(typeof(UsageGate), nameof(TrackNotified), appId)` |
+| `CachingGraphQLResolver` | `$"GraphQLModel_{appId}_{etag}"` | `(typeof(CachingGraphQLResolver), app.Id, app.Version)` |
+| `AppProvider` × 11 | `$"APPS_ID_{appId}"`, `$"GetSchemasAsync({appId})"`, … | `(nameof(AppProvider), "APPS_ID", appId)`, … |
+
+Notes:
+
+- `CachingUsageTracker.GetForMonthAsync` runs on **every API request** (via
+  `UsageGate.IsBlockedAsync`) and its old key formatted a `DateOnly` — a culture lookup
+  plus an allocation — before building an ~80-character string.
+- `CachingGraphQLResolver` no longer needs
+  `app.Version.ToString(CultureInfo.InvariantCulture)`; the tuple carries the `long`
+  directly, so `System.Globalization` was dropped from the file.
+- `UsageGate`'s notified flag previously used a bare `DomainId` as the key. It was safe
+  only because that `MemoryCache` is private to the class; it is now explicit.
+- `AppProvider` keys carry `nameof(AppProvider)` plus the lookup name, preserving the
+  namespacing the old string prefixes provided. The two `TeamCacheKey` overloads and
+  `CachingGraphQLResolver.CreateCacheKey` had a single call site each and were inlined;
+  `AppCacheKey` and `SchemaCacheKey` have three each and stayed as helpers.
+
+**Three sites were deliberately left as strings:**
+
+- `MongoCountCollection.GetOrAddAsync(string key, …)` — used by `QueryByQuery` and
+  `MongoAssetRepository`. That key is **persisted as a MongoDB document id**, not an
+  in-memory cache key. Changing it would change stored data.
+- `DataLoaderContext.GetOrAddLoader(string loaderKey, …)` — the GraphQL.DataLoader API
+  takes a `string`, so `GraphQLExecutionContext.GetContent` cannot use a tuple.
+- `Singletons<IMongoClient>.GetOrAdd(string, …)` — typed `string`, and startup-only.
+
+**Verified:** build clean (0 warnings). `Squidex.Domain.Apps.Core.Tests` (1243),
+`Squidex.Domain.Apps.Entities.Tests` (1528), `Squidex.Infrastructure.Tests` (1031) and
+`Squidex.Web.Tests` (167) all green.

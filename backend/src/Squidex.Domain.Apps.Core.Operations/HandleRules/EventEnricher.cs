@@ -43,7 +43,7 @@ public sealed class EventEnricher(IMemoryCache userCache, IUserResolver userReso
 
     private Task<IUser?> FindUserAsync(RefToken actor)
     {
-        var cacheKey = $"{typeof(EventEnricher)}_Users_{actor.Identifier}";
+        var cacheKey = (typeof(EventEnricher), actor.Identifier);
 
         return userCache.GetOrCreateAsync(cacheKey, async x =>
         {

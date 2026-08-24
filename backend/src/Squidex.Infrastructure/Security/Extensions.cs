@@ -69,6 +69,14 @@ public static class Extensions
 
     public static bool IsInClient(this ClaimsPrincipal principal, string client)
     {
-        return principal.Claims.Any(x => x.Type == OpenIdClaims.ClientId && string.Equals(x.Value, client, StringComparison.OrdinalIgnoreCase));
+        foreach (var claim in principal.Claims)
+        {
+            if (claim.Type == OpenIdClaims.ClientId && string.Equals(claim.Value, client, StringComparison.OrdinalIgnoreCase))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

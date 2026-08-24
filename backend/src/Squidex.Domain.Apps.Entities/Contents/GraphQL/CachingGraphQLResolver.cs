@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Globalization;
 using GraphQL;
 using GraphQL.DI;
 using Microsoft.Extensions.DependencyInjection;
@@ -64,7 +63,8 @@ public sealed class CachingGraphQLResolver(
             return CreateModelAsync(app);
         }
 
-        var cacheKey = CreateCacheKey(app.Id, app.Version.ToString(CultureInfo.InvariantCulture));
+        // A tuple can hold the version as it is, so it does not have to be formatted first.
+        var cacheKey = (typeof(CachingGraphQLResolver), app.Id, app.Version);
 
         return cache.GetOrCreateAsync(cacheKey, options.CacheDuration, async entry =>
         {
@@ -84,10 +84,5 @@ public sealed class CachingGraphQLResolver(
         var schemasKey = SchemasHashKey.Create(app, schemasList);
 
         return new CacheEntry(new Builder(app, options).BuildSchema(schemasList), schemasKey);
-    }
-
-    private static object CreateCacheKey(DomainId appId, string etag)
-    {
-        return $"GraphQLModel_{appId}_{etag}";
     }
 }

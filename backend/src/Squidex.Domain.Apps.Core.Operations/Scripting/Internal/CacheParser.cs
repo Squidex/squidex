@@ -17,7 +17,9 @@ internal sealed class CacheParser(IMemoryCache cache)
 
     public Prepared<Script> Parse(string script)
     {
-        var cacheKey = $"{typeof(CacheParser)}_Script_{script}";
+        // A tuple keeps a reference to the source instead of copying it into a bigger string on
+        // every execution, which also stops the cache from holding a second copy of every script.
+        var cacheKey = (typeof(CacheParser), script);
 
         return cache.GetOrCreate(cacheKey, entry =>
         {
