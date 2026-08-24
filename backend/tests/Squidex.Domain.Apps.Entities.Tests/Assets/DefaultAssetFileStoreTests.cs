@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Globalization;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
@@ -21,6 +22,7 @@ public class DefaultAssetFileStoreTests : GivenContext
     private readonly DomainId assetId = DomainId.NewGuid();
     private readonly long assetFileVersion = 21;
     private readonly AssetOptions options = new AssetOptions();
+    private readonly IMemoryCache cache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
     private readonly DefaultAssetFileStore sut;
 
     public static readonly TheoryData<bool, string, string> PathCases = new TheoryData<bool, string, string>
@@ -39,7 +41,7 @@ public class DefaultAssetFileStoreTests : GivenContext
 
     public DefaultAssetFileStoreTests()
     {
-        sut = new DefaultAssetFileStore(assetStore, assetRepository, Options.Create(options));
+        sut = new DefaultAssetFileStore(assetStore, assetRepository, cache, Options.Create(options));
     }
 
     [Theory]

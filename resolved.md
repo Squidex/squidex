@@ -108,6 +108,10 @@ across threads; a cold race can build the same pattern twice, which only wastes 
 work and never returns anything incorrect. The critical section is just the dictionary
 and linked-list updates.
 
+`MemoryCache` would remove the lock, but `PatternValidator` is constructed without
+dependency injection, so it would have to create and hold its own cache instance. The lock
+is the smaller change and it is already covered by the concurrency harness below.
+
 **Verified:** `dotnet build` clean (0 warnings); a harness mirroring `GetRegex` ran 1.6M
 operations over 8 threads against 3000 distinct patterns in a 1000-entry cache
 (continuous eviction) with 0 exceptions, 0 wrong matches and the cache correctly bounded
@@ -922,3 +926,110 @@ They should be validated against a container run before release.
 
 Items 25, 26 and 27 are pure hoists with no behavioural change and are covered by the
 enrichment tests that did run.
+
+---
+
+### 28. Asset downloads used an exception as the legacy-path fallback — **FIXED**
+`backend/src/Squidex.Domain.Apps.Entities/Assets/DefaultAssetFileStore.cs`
+
+**Was:** `GetFileSizeAsync` and `DownloadAsync` tried the current file name, caught
+`AssetNotFoundException`, and retried with the legacy name (no app ID). On an instance that
+still holds assets under the old scheme, *every* access to those assets threw and caught
+first — and against a cloud store the failed attempt is a full network round trip, so the
+fallback roughly doubled the latency of every legacy asset served.
+
+**Now:** the outcome is remembered per asset in the injected `IMemoryCache`, keyed by
+`(typeof(DefaultAssetFileStore), appId, id)` with a one hour sliding lifetime, so the wrong
+name is only tried once. `IMemoryCache` rather than `Squidex.Caching.LRUCache` because it is
+thread safe on its own — see item 7 for what `LRUCache` does under concurrent access.
+
+**The memo is a hint, not a decision.** `FileNames(...)` returns both names ordered by what
+was last seen to work, and the other one is still tried on failure. That matters because an
+asset can move between schemes — a migration, or an eviction followed by a re-probe — and a
+cache that *decided* rather than *hinted* would turn a stale entry into a hard failure. The
+cost of a wrong hint is one extra round trip, exactly what the code did before.
+
+Two things fell out of it: the `options.FolderPerApp` case now short-circuits to a single
+name with no try/catch at all, and the partial-write hazard flagged in the finding (a retry
+appending to a stream the first attempt already wrote to) is now hit far less often, since a
+warm asset takes the right branch first. It is not *fixed* — that would need the asset store
+to guarantee it writes nothing before failing.
+
+---
+
+### 29. Removing items while iterating a `JsonArray` was quadratic — **FIXED**
+`backend/src/Squidex.Domain.Apps.Core.Operations/ConvertContent/ContentConverter.cs:145,175`
+
+**Was:** `ConvertArray` and `ConvertComponents` both removed in place with
+`array.RemoveAt(i); i--;`. `JsonArray` derives from `List<JsonValue>`, so each removal shifts
+every following element — dropping *k* of *n* items costs O(n·k), and the case where many
+items are dropped (entries referencing deleted component schemas) is exactly the case where
+the array is large.
+
+**Now:** a single compaction pass with a write index, then one `RemoveRange` for the tail.
+
+```csharp
+var target = 0;
+
+for (var i = 0; i < array.Count; i++)
+{
+    var oldValue = array[i];
+
+    var (removed, newValue) = ConvertArrayItem(field, oldValue);
+    if (removed)
+    {
+        continue;
+    }
+
+    array[target] = ReferenceEquals(newValue.Value, oldValue.Value) ? oldValue : newValue;
+    target++;
+}
+
+array.RemoveRange(target, array.Count - target);
+```
+
+The write index is always `<= i`, so a slot is only ever overwritten after it has been read —
+no read-after-write hazard, and the surviving order is preserved.
+
+**Verified with new tests** — `ContentConversionRemovalTests`, 27 cases covering nine removal
+patterns (none, first, middle, last, adjacent pairs, alternating, all) across three ways an
+item gets dropped: a non-object in an array, a component of an unknown schema, and a
+component with no discriminator.
+
+Two checks on the tests themselves, because this is a behaviour-preserving rewrite rather
+than a bug fix:
+
+- They pass against **both** the original `RemoveAt` implementation and the new one, which is
+  the property that actually matters here — they pin the contract rather than the code.
+- Mutation check: deleting the `RemoveRange` line fails 24 of the 27, so they are not
+  vacuous.
+
+A first attempt at these tests drove removal through a custom `IContentItemConverter` that
+stripped the discriminator; that never removed anything, because `ConvertComponent` checks
+the discriminator *before* calling `ConvertNested`. The tests now use inherently invalid
+items, which is both simpler and closer to the real cause.
+
+---
+
+### 30. `stream.ToArray()` copied straight back out of the pooled buffer — **FIXED**
+`backend/src/Squidex.Domain.Apps.Entities/Assets/Transformations.cs:79`
+
+**Was:** `GetTextAsync` downloaded into a `DefaultPools.MemoryStream`
+(`RecyclableMemoryStreamManager`) and then called `ToArray()`, allocating a fresh array of
+the whole file and copying the pooled buffer into it — for a file at the 4 MB limit, straight
+onto the large object heap on every call.
+
+**Now:**
+
+```csharp
+var bytes = new ReadOnlySpan<byte>(stream.GetBuffer(), 0, (int)stream.Length);
+```
+
+`Convert.ToBase64String` and `Encoding.GetString` all have `ReadOnlySpan<byte>` overloads, so
+nothing downstream changed.
+
+Worth being precise about why `GetBuffer` is better rather than just "avoids a copy":
+`RecyclableMemoryStream.GetBuffer()` still consolidates into a single contiguous buffer when
+the stream spans several blocks. The difference is that the buffer it returns comes from the
+pool and goes back on dispose, whereas `ToArray` allocates a new GC array every time.
+`RecyclableMemoryStream` documents `ToArray` as the call to avoid for exactly this reason.

@@ -76,7 +76,9 @@ public static class Transformations
         {
             await DownloadAsync(asset, assetFileStore, stream, ct);
 
-            var bytes = stream.ToArray();
+            // Use the buffer of the pooled stream. ToArray would allocate another copy of the whole
+            // file, which for a file of up to the maximum size would go to the large object heap.
+            var bytes = new ReadOnlySpan<byte>(stream.GetBuffer(), 0, (int)stream.Length);
 
             switch (encoding?.ToLowerInvariant())
             {

@@ -9,9 +9,9 @@ overhead / allocation churn), **S4** low (worth fixing while nearby).
 
 Item numbers are stable and never reused. Completed items move to
 [resolved.md](resolved.md) keeping their number, so gaps in the sequence here are
-expected — items **4**–**22**, **24**–**27** are closed and live there.
+expected — items **4**–**22** and **24**–**30** are closed and live there.
 
-**Status: 7 open of 30 — items 1, 2, 3, 23, 28, 29, 30. The other 23 are in [resolved.md](resolved.md).**
+**Status: 4 open of 30 — items 1, 2, 3 (one root cause) and 23. The other 26 are in [resolved.md](resolved.md).**
 
 ---
 
@@ -92,81 +92,6 @@ than a fixed 1000-id prefix that the outer query re-sorts.
 
 ---
 
-## S3 — Moderate
-
-### 28. Asset downloads use an exception as the legacy-path fallback
-`backend/src/Squidex.Domain.Apps.Entities/Assets/DefaultAssetFileStore.cs:57,74`
-
-```csharp
-try
-{
-    await assetStore.DownloadAsync(fileNameNew, stream, range, ct);
-}
-catch (AssetNotFoundException) when (!options.FolderPerApp)
-{
-    await assetStore.DownloadAsync(fileNameOld, stream, range, ct);
-}
-```
-
-On an instance that still holds assets under the old naming scheme, **every** download of those
-assets throws and catches first. A .NET exception costs on the order of tens of microseconds,
-and against a cloud store (S3, Azure Blob) the failed attempt is also a full network round trip
-before the retry — so the fallback doubles the latency of every legacy asset served.
-
-`GetFileSizeAsync` (line 57) has the same shape.
-
-Worth checking while fixing: whether `assetStore.DownloadAsync` can write bytes into the target
-stream before discovering the file is missing. If it can, the retry appends to a partially
-written response body rather than replacing it.
-
-**Fix:** probe once per asset and remember which naming scheme it uses, or migrate the names so
-the fallback can be deleted.
-
----
-
-## S4 — Low
-
-### 29. Removing items while iterating a `JsonArray` is quadratic
-`backend/src/Squidex.Domain.Apps.Core.Operations/ConvertContent/ContentConverter.cs:159,185`
-
-```csharp
-for (int i = 0; i < array.Count; i++)
-{
-    ...
-    if (removed)
-    {
-        array.RemoveAt(i);
-        i--;
-    }
-}
-```
-
-`JsonArray` derives from `List<JsonValue>`, so each `RemoveAt` shifts every following element.
-Dropping *k* items from an *n*-element array costs O(n·k). It only bites when many items are
-removed at once — an array or components field whose entries reference deleted schemas or
-components — but that is exactly the case where the array is large.
-
-**Fix:** compact in a single pass (write index) rather than removing in place.
-
----
-
-### 30. `stream.ToArray()` copies straight back out of the pooled buffer
-`backend/src/Squidex.Domain.Apps.Entities/Assets/Transformations.cs:79`
-
-`GetTextAsync` downloads into a `DefaultPools.MemoryStream` (a
-`RecyclableMemoryStreamManager`) and then calls `stream.ToArray()`, which allocates a fresh
-array of the full file and copies the pooled buffer into it — defeating the point of the pool.
-`RecyclableMemoryStream` documents `ToArray` as the thing not to call for this reason.
-
-Bounded at 4 MB by `MaxSize`, and this runs from scripts rather than the main content path,
-which is why it ranks last — but 4 MB straight into the large object heap per call is still
-worth avoiding.
-
-**Fix:** `GetBuffer()` with the stream length, or the `Encoding.GetString(ReadOnlySpan<byte>)`
-overload over the stream's sequence.
-
----
-
 ## Suggested order of attack
 
 1. **Item 23** — full-text paging. Really a correctness fix that happens to also be faster:
@@ -176,7 +101,9 @@ overload over the stream's sequence.
    engine must not carry state from one script into the next. **Profile before writing it**:
    the estimate that engine construction dominates a scripted content list is read off the
    loops, not taken from a trace.
-3. **Items 28, 29, 30** — narrow, conditional or off the main path.
+
+Nothing else is outstanding. Everything cheap, every correctness-shaped finding and
+everything in the stability category is closed.
 
 ---
 

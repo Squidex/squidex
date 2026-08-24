@@ -149,21 +149,26 @@ public sealed class ContentConverter(ResolvedComponents components, Schema schem
             return (true, default);
         }
 
-        for (int i = 0; i < array.Count; i++)
+        // Compact in place instead of removing items, because every remove moves all the items
+        // after it and dropping many items from a large array would be quadratic.
+        var target = 0;
+
+        for (var i = 0; i < array.Count; i++)
         {
             var oldValue = array[i];
 
             var (removed, newValue) = ConvertArrayItem(field, oldValue);
             if (removed)
             {
-                array.RemoveAt(i);
-                i--;
+                continue;
             }
-            else if (!ReferenceEquals(newValue.Value, oldValue.Value))
-            {
-                array[i] = newValue;
-            }
+
+            // Faster to check for reference equality than for deep equals.
+            array[target] = ReferenceEquals(newValue.Value, oldValue.Value) ? oldValue : newValue;
+            target++;
         }
+
+        array.RemoveRange(target, array.Count - target);
 
         return (false, array);
     }
@@ -175,22 +180,26 @@ public sealed class ContentConverter(ResolvedComponents components, Schema schem
             return (true, default);
         }
 
-        for (int i = 0; i < array.Count; i++)
+        // Compact in place instead of removing items, because every remove moves all the items
+        // after it and dropping many items from a large array would be quadratic.
+        var target = 0;
+
+        for (var i = 0; i < array.Count; i++)
         {
             var oldValue = array[i];
 
             var (removed, newValue) = ConvertComponent(oldValue, parent);
             if (removed)
             {
-                array.RemoveAt(i);
-                i--;
+                continue;
             }
-            else if (!ReferenceEquals(newValue.Value, oldValue.Value))
-            {
-                // Faster to check for reference equality than for deep equals.
-                array[i] = newValue;
-            }
+
+            // Faster to check for reference equality than for deep equals.
+            array[target] = ReferenceEquals(newValue.Value, oldValue.Value) ? oldValue : newValue;
+            target++;
         }
+
+        array.RemoveRange(target, array.Count - target);
 
         return (false, array);
     }

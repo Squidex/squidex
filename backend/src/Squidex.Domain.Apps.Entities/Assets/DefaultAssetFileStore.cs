@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Text;
+using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Core.Apps;
@@ -17,9 +18,11 @@ namespace Squidex.Domain.Apps.Entities.Assets;
 public sealed class DefaultAssetFileStore(
     IAssetStore assetStore,
     IAssetRepository assetRepository,
+    IMemoryCache cache,
     IOptions<AssetOptions> options)
     : IAssetFileStore, IDeleter
 {
+    private static readonly TimeSpan CacheDuration = TimeSpan.FromHours(1);
     private readonly AssetOptions options = options.Value;
 
     async Task IDeleter.DeleteAppAsync(App app,
@@ -48,35 +51,71 @@ public sealed class DefaultAssetFileStore(
     public async Task<long> GetFileSizeAsync(DomainId appId, DomainId id, long fileVersion, string? suffix,
         CancellationToken ct = default)
     {
+        if (options.FolderPerApp)
+        {
+            return await assetStore.GetSizeAsync(GetFileName(appId, id, fileVersion, suffix), ct);
+        }
+
+        var (first, second, isOldFirst) = FileNames(appId, id, fileVersion, suffix);
         try
         {
-            var fileNameNew = GetFileName(appId, id, fileVersion, suffix);
-
-            return await assetStore.GetSizeAsync(fileNameNew, ct);
+            return await assetStore.GetSizeAsync(first, ct);
         }
-        catch (AssetNotFoundException) when (!options.FolderPerApp)
+        catch (AssetNotFoundException)
         {
-            var fileNameOld = GetFileName(id, fileVersion, suffix);
+            RememberFileName(appId, id, !isOldFirst);
 
-            return await assetStore.GetSizeAsync(fileNameOld, ct);
+            return await assetStore.GetSizeAsync(second, ct);
         }
     }
 
     public async Task DownloadAsync(DomainId appId, DomainId id, long fileVersion, string? suffix, Stream stream, BytesRange range = default,
         CancellationToken ct = default)
     {
+        if (options.FolderPerApp)
+        {
+            await assetStore.DownloadAsync(GetFileName(appId, id, fileVersion, suffix), stream, range, ct);
+            return;
+        }
+
+        var (first, second, isOldFirst) = FileNames(appId, id, fileVersion, suffix);
         try
         {
-            var fileNameNew = GetFileName(appId, id, fileVersion, suffix);
-
-            await assetStore.DownloadAsync(fileNameNew, stream, range, ct);
+            await assetStore.DownloadAsync(first, stream, range, ct);
         }
-        catch (AssetNotFoundException) when (!options.FolderPerApp)
+        catch (AssetNotFoundException)
         {
-            var fileNameOld = GetFileName(id, fileVersion, suffix);
+            RememberFileName(appId, id, !isOldFirst);
 
-            await assetStore.DownloadAsync(fileNameOld, stream, range, ct);
+            await assetStore.DownloadAsync(second, stream, range, ct);
         }
+    }
+
+    // Assets from older versions are stored under a file name without the app ID. Which name an
+    // asset uses can only be found out by trying, and a failed try is a full roundtrip to the asset
+    // store. Therefore the outcome is remembered as a hint. Both names are still tried, so that a
+    // stale hint only costs the roundtrip it was there to save.
+    private (string First, string Second, bool IsOldFirst) FileNames(DomainId appId, DomainId id, long fileVersion, string? suffix)
+    {
+        var fileNameNew = GetFileName(appId, id, fileVersion, suffix);
+        var fileNameOld = GetFileName(id, fileVersion, suffix);
+
+        if (cache.TryGetValue<bool>(CacheKey(appId, id), out var useOld) && useOld)
+        {
+            return (fileNameOld, fileNameNew, true);
+        }
+
+        return (fileNameNew, fileNameOld, false);
+    }
+
+    private void RememberFileName(DomainId appId, DomainId id, bool useOld)
+    {
+        cache.Set(CacheKey(appId, id), useOld, CacheDuration);
+    }
+
+    private static object CacheKey(DomainId appId, DomainId id)
+    {
+        return (typeof(DefaultAssetFileStore), appId, id);
     }
 
     public Task DownloadAsync(string tempFile, Stream stream,
