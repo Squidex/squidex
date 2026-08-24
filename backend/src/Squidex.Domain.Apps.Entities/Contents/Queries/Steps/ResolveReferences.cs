@@ -136,9 +136,13 @@ public sealed class ResolveReferences(Lazy<IContentQueryService> contentQuery, I
 
     private static void AddReferenceIds(HashSet<DomainId> ids, Schema schema, ResolvedComponents components, IEnumerable<EnrichedContent> contents)
     {
+        // ResolvingReferences is a lazy query over all fields of the schema, therefore it is only
+        // evaluated once here and not again for every content.
+        var fields = schema.ResolvingReferences().ToList();
+
         foreach (var content in contents)
         {
-            content.Data.AddReferencedIds(schema.ResolvingReferences(), ids, components);
+            content.Data.AddReferencedIds(fields, ids, components);
         }
     }
 

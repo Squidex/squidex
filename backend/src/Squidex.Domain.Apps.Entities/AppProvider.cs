@@ -242,7 +242,7 @@ public sealed class AppProvider(
 
         return await result;
     }
-    
+
     private static object AppCacheKey(DomainId appId)
     {
         return (nameof(AppProvider), "APPS_ID", appId);

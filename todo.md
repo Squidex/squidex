@@ -9,9 +9,9 @@ overhead / allocation churn), **S4** low (worth fixing while nearby).
 
 Item numbers are stable and never reused. Completed items move to
 [resolved.md](resolved.md) keeping their number, so gaps in the sequence here are
-expected — items **4**, **5**, **6**, **7**, **8**, **9**, **12**, **13** and **20** are closed and live there.
+expected — items **4**, **5**, **6**, **7**, **8**, **9**, **12**, **13**, **14**, **15**, **16**, **17** and **20** are closed and live there.
 
-**Status: 10 open of 20. Items 4, 5, 6, 7, 8, 9, 12, 13, 20 are in [resolved.md](resolved.md).**
+**Status: 7 open of 20 — items 1, 2, 3, 10, 11, 18, 19. The other 13 are in [resolved.md](resolved.md).**
 
 ---
 
@@ -103,76 +103,6 @@ request, uncached.
 ---
 
 ## S3 — Moderate
-
-### 14. `AppProvider` copies cached schema/rule lists on every call
-`backend/src/Squidex.Domain.Apps.Entities/AppProvider.cs:197,208,216`
-
-`GetSchemasAsync` and `GetRulesAsync` end with `?.ToList() ?? []` — a defensive copy of
-the cached list allocated per call, even on a cache hit. `GetRuleAsync` (line 216)
-copies the entire rule list just to `Find` one element.
-
-These are called per request in the query pipeline and per event in `RuleEnqueuer`.
-
-**Fix:** return the cached `IReadOnlyList<T>` directly (the cached instances are already
-immutable) and have `GetRuleAsync` search without materialising.
-
----
-
-### 15. Faulted tasks are cached permanently in `CollectionProvider`
-`backend/src/Squidex.Data.MongoDb/Domain/Apps/Entities/Contents/CollectionProvider.cs:21`
-
-```csharp
-return collections.GetOrAdd((appId, schemaId), CreateCollectionAsync);
-```
-
-`CreateCollectionAsync` creates indexes, so it can fail transiently. `GetOrAdd` stores
-the returned `Task` — including a *faulted* one — for the process lifetime. One
-transient Mongo hiccup during first access permanently breaks queries for that
-app/schema until restart.
-
-`GetOrAdd` can also invoke the factory concurrently for the same key, issuing duplicate
-`CreateManyAsync` calls.
-
-The same faulted-task-caching pattern exists in `AppProvider.GetOrCreate`
-(`AppProvider.cs:213`), though the local cache is request-scoped so the window is small.
-
-**Fix:** evict the entry when the task faults; wrap in `Lazy<Task<T>>` with
-`ExecutionAndPublication` to deduplicate.
-
----
-
-### 16. `IsFrontendClient` re-scans claims on every access
-`backend/src/Squidex.Domain.Apps.Entities/Context.cs:32`
-
-```csharp
-public bool IsFrontendClient => UserPrincipal.IsInClient(DefaultClients.Frontend);
-```
-
-`IsInClient` is `principal.Claims.Any(x => ...)` — `ClaimsPrincipal.Claims` walks every
-identity and every claim, and the LINQ `Any` allocates an enumerator per call. It is
-read in the enrichment steps, in `ConvertData.GenerateConverter` (per schema group) and
-in `ShouldEnrich` guards, so it runs many times per request against an unchanging value.
-
-**Fix:** compute once in the constructor into a `readonly bool`.
-
----
-
-### 17. `ResolvingReferences()` re-evaluated per content
-`backend/src/Squidex.Domain.Apps.Entities/Contents/Queries/Steps/ResolveReferences.cs:63,141`
-
-`SchemaExtensions.ResolvingReferences` is a lazy `Fields.OfType<...>().Where(...)` — it
-is not materialised. Line 141 calls it inside `foreach (var content in contents)`, so
-the full field scan plus two LINQ iterator allocations happen once per content rather
-than once per schema.
-
-`ResolveReferences.EnrichAsync` also enumerates `contents.GroupBy(...)` twice
-(lines 37 and 47), as does `ConvertData` (lines 39 and 67) — safe for a `List`, wasteful
-for anything lazy.
-
-**Fix:** hoist to `var refFields = schema.ResolvingReferences().ToList();` outside the
-loop; materialise `contents` once at the top of each step.
-
----
 
 ### 18. Sequential N+1 schema and component lookups
 `backend/src/Squidex.Domain.Apps.Entities/AppProviderExtensions.cs:30`

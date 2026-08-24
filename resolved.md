@@ -3,8 +3,8 @@
 Items from the backend performance review that are done. Numbering matches
 [todo.md](todo.md) — resolved items keep their original number so references stay valid.
 
-Most entries are fixes. Item **6** is closed as *accepted, won't fix* — kept here so it is
-not re-reported as a new finding.
+Most entries are fixes. Items **6** and **14** are closed as *accepted* rather than fixed —
+kept here so they are not re-reported as new findings.
 
 ---
 
@@ -403,3 +403,124 @@ Notes:
 **Verified:** build clean (0 warnings). `Squidex.Domain.Apps.Core.Tests` (1243),
 `Squidex.Domain.Apps.Entities.Tests` (1528), `Squidex.Infrastructure.Tests` (1031) and
 `Squidex.Web.Tests` (167) all green.
+
+---
+
+### 14. `AppProvider` copies cached schema/rule lists on every call — **CLOSED: ACCEPTED**
+`backend/src/Squidex.Domain.Apps.Entities/AppProvider.cs`
+
+`GetSchemasAsync` and `GetRulesAsync` end with `?.ToList() ?? []`, a defensive copy of the
+cached list on every call including cache hits, and `GetRuleAsync` copies the whole rule
+list just to `Find` one element.
+
+**Closed as accepted, not fixed.** The copy is a single shallow `List` allocation of
+already-immutable elements; returning the cached instance directly would expose it to
+mutation by callers, which is a worse trade than the allocation. Recorded here so it is
+not re-reported as a new finding.
+
+---
+
+### 15. Faulted tasks were cached permanently in `CollectionProvider` — **FIXED**
+`backend/src/Squidex.Data.MongoDb/Domain/Apps/Entities/Contents/CollectionProvider.cs`
+
+**Was:**
+
+```csharp
+return collections.GetOrAdd((appId, schemaId), CreateCollectionAsync);
+```
+
+Two defects. `CreateCollectionAsync` creates indexes, so it can fail transiently — and
+`GetOrAdd` stored the returned `Task` including a *faulted* one for the process lifetime,
+so a single Mongo hiccup on first access permanently broke queries for that app/schema
+until restart. Separately, `GetOrAdd` may invoke its factory concurrently for the same
+key, issuing duplicate `CreateManyAsync` calls.
+
+**Now:** the dictionary holds `Lazy<Task<...>>` with `LazyThreadSafetyMode.ExecutionAndPublication`,
+so the factory runs exactly once per key even under concurrent access, and the entry is
+evicted when it fails:
+
+```csharp
+var collection = collections.GetOrAdd(key, CreateLazyCollection);
+
+return AwaitCollectionAsync(key, collection);
+...
+try
+{
+    return await collection.Value;
+}
+catch
+{
+    collections.TryRemove(new KeyValuePair<...>(key, collection));
+    throw;
+}
+```
+
+The removal uses the `TryRemove(KeyValuePair)` overload, which only removes when the value
+is still the *same* `Lazy` instance. The plain `TryRemove(key)` would race: a second thread
+that had already retried and succeeded would have its good entry discarded by the first
+thread's cleanup.
+
+A `using` alias for the key tuple was tried first, but StyleCop's SA1008 rejects the space
+before the parenthesis in `using X = (A, B);`, so the tuple type is written out instead.
+
+**Verified:** build clean, `Squidex.Data.Tests` (180) and all other suites green.
+
+---
+
+### 16. `IsFrontendClient` re-scanned claims on every access — **FIXED (verified)**
+`backend/src/Squidex.Domain.Apps.Entities/Context.cs:32,51`
+`backend/src/Squidex.Infrastructure/Security/Extensions.cs:70`
+
+**Was:** `public bool IsFrontendClient => UserPrincipal.IsInClient(DefaultClients.Frontend);`
+— a computed property whose implementation was `principal.Claims.Any(x => ...)`, walking
+every identity and every claim and allocating an enumerator plus a delegate per call. It is
+read from several enrichment steps and from `ConvertData.GenerateConverter` per schema
+group, so it ran many times per request against a value that cannot change.
+
+**Now:** a get-only auto-property assigned once in the private constructor, and
+`IsInClient` rewritten from LINQ `Any` to a plain `foreach`, dropping the closure.
+
+**Verification found the commit did not compile.** Line 32 read
+`public bool IsFrontendClient { get; };` — a stray semicolon, `error CS1597: Semicolon
+after method or accessor block is not valid`. Removed the semicolon.
+
+Beyond compiling, the assignment is correct for every construction path: the public
+`Context(ClaimsPrincipal, App)` chains to the private constructor via `: this(...)`,
+`Anonymous` and `Admin` both go through that public one, and `HeaderBuilder.Build` calls
+the private 4-argument constructor directly. All four paths therefore set the field.
+
+---
+
+### 17. `ResolvingReferences()` re-evaluated per content — **FIXED**
+`backend/src/Squidex.Domain.Apps.Entities/Contents/Queries/Steps/ResolveReferences.cs`
+
+**Was:** `SchemaExtensions.ResolvingReferences` is a lazy
+`Fields.OfType<...>().Where(...)` that is never materialized, and `AddReferenceIds` called
+it *inside* the per-content loop — so the full field scan plus two LINQ iterator
+allocations happened once per content instead of once per schema.
+
+**Now:** hoisted out of the loop.
+
+```csharp
+var fields = schema.ResolvingReferences().ToList();
+
+foreach (var content in contents)
+{
+    content.Data.AddReferencedIds(fields, ids, components);
+}
+```
+
+(The other call site, the outer `foreach` in `ResolveReferencesAsync`, enumerates the
+sequence exactly once and was left alone.)
+
+**The double `GroupBy` was deliberately left alone.** `ResolveReferences.EnrichAsync` and
+`ConvertData` each build `contents.GroupBy(x => x.SchemaId.Id)` twice. This does *not*
+cause duplicate schema fetches: `ContentEnricher` passes a `ProvideSchema` delegate backed
+by a per-call `schemaCache` dictionary, so the second grouping resolves every schema from
+memory. The only real cost is re-materializing the LINQ `Lookup` — one extra pass over the
+contents and one set of bucket allocations per step.
+
+Deduplicating it was tried and reverted: the gain is small enough that it does not justify
+threading a materialized `List<IGrouping<...>>` through the method signatures.
+
+**Verified:** build clean, all suites green.
