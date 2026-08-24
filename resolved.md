@@ -3,8 +3,9 @@
 Items from the backend performance review that are done. Numbering matches
 [todo.md](todo.md) — resolved items keep their original number so references stay valid.
 
-Most entries are fixes. Items **6** and **14** are closed as *accepted* rather than fixed —
-kept here so they are not re-reported as new findings.
+Most entries are fixes. Items **6** and **14** are closed as *accepted* and item **21** as
+*rejected*, kept here so they are not re-reported as new findings. Item **18** records a
+finding that turned out to be wrong.
 
 ---
 
@@ -741,3 +742,183 @@ explicitly configured to return null.
 
 **Verified:** build clean. Entities 1541, Web 176, Core 1243, Infrastructure 1033,
 Data 180 — all green.
+
+---
+
+### 21. Content DTO link generation — **CLOSED: REJECTED**
+`backend/src/Squidex/Areas/Api/Controllers/Contents/Models/ContentDto.cs:156`
+
+`CreateLinksAsync` issues up to ten `IUrlHelper.Action` calls per content, so a 200-item
+frontend page runs on the order of 2000 link generations.
+
+**Rejected, not fixed.** The proposed fix — building URLs from a cached per-schema prefix
+and concatenating the id — bypasses the ASP.NET routing system. Links would stop reflecting
+the actual route table, so any change to a route template, a route constraint, or the path
+base would silently produce wrong URLs. That is not a trade worth making for link
+generation, whatever it costs. Recorded here so it is not re-reported as a new finding.
+
+If this ever does show up in a profile, the answer has to stay inside the routing system —
+for example ASP.NET's own `LinkGenerator` with a cached endpoint lookup — not around it.
+
+---
+
+### 22. The EF data layer never used `AsNoTracking` — **FIXED**
+`backend/src/Squidex.Data.EntityFramework/ContentDbContext.cs`
+`backend/src/Squidex.Data.EntityFramework/Infrastructure/Extensions.cs:116,150`
+plus the entity-materializing reads in the content and asset repositories
+
+**Was:** not a single `AsNoTracking()` in the layer and no `QueryTrackingBehavior` setting
+anywhere. Every entity from every read query got a change-tracking snapshot — on entities
+that carry a full content `Data` blob, so roughly double the memory per content read.
+
+**Now, and the split matters:**
+
+- `ContentDbContext` gets `QueryTrackingBehavior.NoTracking` as its **default**. That
+  context is content-only, and every content write goes through `BulkInsertAsync`, never by
+  mutating a queried entity.
+- `AppDbContext` keeps its default, with `AsNoTracking()` applied to the individual read
+  paths: both `QueryAsync` helpers in `Infrastructure/Extensions.cs` (which most repository
+  reads funnel through), `EFContentRepository.FindContentAsync`,
+  `EFAssetRepository.StreamAll`, the `ReadAllAsync` / single-read paths of the content, asset
+  and asset-folder snapshot stores, `DynamicTables`, and both paths of the generic
+  `EFSnapshotStore`.
+
+**Why `AppDbContext` was not flipped globally — corrected.** The first version of this note
+claimed ASP.NET Identity's `UserStore.SetTokenAsync` would silently stop persisting under a
+global `NoTracking` default, because it assigns `token.Value = value` with no `Update` call.
+**That was wrong**, and it was asserted from memory rather than checked. Tested against
+Identity 10.0.6 + EF SQLite with the default flipped both ways: the token round trip and the
+user update both persist correctly. The reason is that the EF `UserStore` reaches tokens via
+`DbSet.FindAsync`, and `Find`/`FindAsync` track the entity regardless of
+`QueryTrackingBehavior` — they are not LINQ queries.
+
+**The real reason, found by auditing the shared libraries** (`D:\squidex-tools\libs`).
+`AppDbContext` is not only Squidex's own repositories — `OnModelCreating` also mounts
+`UseOpenIddict()`, `UseAssetKeyValueStore` (Tus), `UseChatStore()`, `UseFlows()`,
+`UseCronJobs()`, `UseMessagingDataStore()`, `UseMessagingTransport()` and Identity. Two of
+those stores read an entity with a **LINQ query**, mutate it, and call `SaveChanges` with no
+`Update`, which is exactly the pattern a `NoTracking` default turns into a silent no-op:
+
+| Store | Code | Effect under a global `NoTracking` default |
+| --- | --- | --- |
+| `Squidex.AI.EntityFramework/EFChatStore.SetAsync` | `Where(...).FirstOrDefaultAsync()` then `entity.Value = json` | conversation updates never persist |
+| `Squidex.Messaging.EntityFramework/EFSubscription` | `query.FirstOrDefaultAsync()` then `efMessage.TimeHandled = now` | **message is never marked handled** |
+
+The messaging one is the blocker. That assignment *is* the queue's claim on a message, and
+the `DbUpdateConcurrencyException` it can raise is the only thing stopping two processes
+consuming the same message. With no tracked change, `SaveChangesAsync` issues no UPDATE, so
+`TimeHandled` stays null, the concurrency guard can never fire, the callback still runs, and
+the next poll matches the same row again — silent infinite redelivery plus duplicate
+processing across processes, with no exception anywhere.
+
+Everything else audited clean: `EFCronJobStore`, `EFAssetKeyValueStore`, `EFEventStore`,
+`EFMessagingDataStore` and `EFTransport` all `AddAsync` new entities; `EFFlowStateStore` uses
+`ExecuteUpdateAsync` and bulk upsert; OpenIddict uses explicit `Attach` + `Update`; Identity
+was verified empirically (see above) and calls `_userStore.Update(user)` explicitly.
+
+**So the flip is two one-line fixes away.** Adding `dbContext.Update(entity)` before
+`SaveChangesAsync` in those two stores would make `AppDbContext` safe to default to
+`NoTracking` — and would also remove a latent fragility, since both currently depend on the
+tracking configuration of a `DbContext` the library does not own.
+
+`ContentDbContext` has no such tenants, which is what makes the global flip safe there.
+
+**Caveat on the explicit approach, which is real.** Enumerating read sites is fragile: a
+later sweep found five more entity-materializing reads that the first pass missed —
+`EFAssetFolderRepository_SnapshotStore` (both paths), `DynamicTables`, and both paths of the
+generic `EFSnapshotStore`, which backs *every* domain object snapshot and streams the whole
+table on a rebuild. Those have been fixed too, but a global default would not have needed
+finding them.
+
+The `ReadAllAsync` streams were the worst individual case: they walk every content or asset
+in the database for a rebuild, so tracking retained the entire table in the change tracker.
+
+All seven `SaveChangesAsync` call sites in the layer were checked first — every one
+constructs a new entity and `Add`s or bulk-inserts it. None mutate a queried entity, which
+is what makes the change safe.
+
+---
+
+### 24. Queries by id spent an extra round trip counting a bounded set — **FIXED**
+`backend/src/Squidex.Data.MongoDb/Infrastructure/Queries/LimitExtensions.cs:16`
+`backend/src/Squidex.Data.MongoDb/Domain/Apps/Entities/Contents/Operations/QueryByIds.cs:59`
+`backend/src/Squidex.Data.MongoDb/Domain/Apps/Entities/Assets/MongoAssetRepository.cs:112`
+
+**Was:** both id-query paths ran `CountDocumentsAsync` to get the total even though the
+filter is `In(ids)`. Since `ContentQueryParser.WithPaging` sets `Take = q.Ids.Count` for id
+queries, the guard fired whenever every requested id was found — the normal case — so this
+was an extra round trip on the reference-resolution path.
+
+**Now:** a shared predicate decides when a count can tell you anything new.
+
+```csharp
+public static bool NeedsTotalById(this ClrQuery query, int idCount)
+{
+    return query.Skip > 0 || query.Take < idCount || query.Random > 0;
+}
+```
+
+**The `Random` term is the non-obvious one.** Both paths finish through
+`ToListRandomAsync`, which — when `query.Random > 0` — returns a random *sample* of the
+matches rather than all of them. In that case the returned count is not the match count, so
+the count query is still required. The first version of this fix omitted that and would have
+reported the sample size as the total.
+
+`NoTotal` semantics are unchanged: it still short-circuits to `-1` before this predicate is
+consulted, rather than opportunistically returning a total the caller asked not to have.
+
+---
+
+### 25. `ResolvingAssets()` re-evaluated per content — **FIXED**
+`backend/src/Squidex.Domain.Apps.Entities/Contents/Queries/Steps/ResolveAssets.cs:129`
+
+The same defect as item 17, in the sibling step: `AddAssetIds` called the lazy
+`schema.ResolvingAssets()` inside the per-content loop, rescanning every field of the schema
+and allocating two LINQ iterators per content. Hoisted to a single `ToList()` above the loop.
+
+---
+
+### 26. `CalculatePreviewText` filtered all schema fields once per content — **FIXED**
+`backend/src/Squidex.Domain.Apps.Entities/Contents/Queries/Steps/CalculatePreviewText.cs:31`
+
+`schema.Fields.Where(x => x.RawProperties is RichTextFieldProperties)` sat in the inner loop,
+re-scanning every field for every content to produce a list identical for the whole group.
+Hoisted, with an early return when the schema has no rich-text fields at all — which is the
+common case and previously still paid a full field scan per content.
+
+---
+
+### 27. `EnrichForCaching` re-added the same schema and app dependency per content — **FIXED**
+`backend/src/Squidex.Domain.Apps.Entities/Contents/Queries/Steps/EnrichForCaching.cs`
+
+**Was:** all three `AddDependency` calls sat in the per-content loop, but only the content one
+varies. The other two re-added a key already in the set, so `CachingManager` took its lock and
+did a `HashSet.Add` that returned false — a 200-item page paid ~600 lock acquisitions to do
+~202 useful ones.
+
+**Now:** the app and schema dependencies are added once per schema group.
+
+**They were deliberately left *inside* the group loop rather than hoisted to the top of the
+method.** Hoisting looks tidier but changes behaviour for an empty result: with no contents
+there are no groups, so today nothing is added, `hasDependency` stays false, and the response
+gets no ETag. Adding the app dependency unconditionally would start emitting an ETag for
+empty responses — a change in caching behaviour that has nothing to do with this finding.
+Once per group is still 1 instead of 200 for the normal single-schema query.
+
+---
+
+### Verification note for items 22 and 24
+
+Build clean; `Squidex.Domain.Apps.Entities.Tests` (1541), `Squidex.Domain.Apps.Core.Tests`
+(1243), `Squidex.Infrastructure.Tests` (1033), `Squidex.Web.Tests` (176) and the runnable part
+of `Squidex.Data.Tests` (180) are all green.
+
+**That green is weaker than it looks for items 22 and 24.** `Squidex.Data.Tests` contains
+~1349 tests, of which only 180 run without the `Dependencies` / `TestContainer` categories —
+the ~1169 excluded ones are exactly the EF and MongoDB integration tests that would actually
+exercise `AsNoTracking` and `NeedsTotalById` against a real database. Those two items are
+reasoned-correct and compile, but they are **not covered by any test that was run here**.
+They should be validated against a container run before release.
+
+Items 25, 26 and 27 are pure hoists with no behavioural change and are covered by the
+enrichment tests that did run.

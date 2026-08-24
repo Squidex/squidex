@@ -30,18 +30,25 @@ public sealed class CalculatePreviewText : IContentEnricherStep
 
     private static void AddTexts(Schema schema, RichTextNode node, IEnumerable<EnrichedContent> contents)
     {
+        // The fields are the same for all contents of the schema, so they are only filtered once.
+        var richTextFields = schema.Fields.Where(x => x.RawProperties is RichTextFieldProperties).ToList();
+        if (richTextFields.Count == 0)
+        {
+            return;
+        }
+
         foreach (var content in contents)
         {
-            foreach (var field in schema.Fields.Where(x => x.RawProperties is RichTextFieldProperties))
+            foreach (var richTextField in richTextFields)
             {
-                if (!content.Data.TryGetValue(field.Name, out var fieldData) || fieldData is not { Count: > 0 })
+                if (!content.Data.TryGetValue(richTextField.Name, out var fieldData) || fieldData is not { Count: > 0 })
                 {
                     continue;
                 }
 
                 content.ReferenceData ??= [];
 
-                var fieldReference = content.ReferenceData.GetOrAdd(field.Name, _ => [])!;
+                var fieldReference = content.ReferenceData.GetOrAdd(richTextField.Name, _ => [])!;
 
                 foreach (var (partitionKey, partitionValue) in fieldData)
                 {

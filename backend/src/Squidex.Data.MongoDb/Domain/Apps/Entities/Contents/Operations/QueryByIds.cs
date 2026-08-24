@@ -56,7 +56,7 @@ internal sealed class QueryByIds : OperationBase
             {
                 contentTotal = -1;
             }
-            else
+            else if (query.NeedsTotalById(q.Ids.Count))
             {
                 contentTotal = await Collection.Find(filter).CountDocumentsAsync(ct);
             }

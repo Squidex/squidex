@@ -11,6 +11,13 @@ namespace Squidex.Infrastructure.Queries;
 
 public static class LimitExtensions
 {
+    public static bool NeedsTotalById(this ClrQuery query, int idCount)
+    {
+        // A query by ID can never match more documents than the number of requested IDs, so the result
+        // already contains all of them unless skip, take or the random selection could have cut it off.
+        return query.Skip > 0 || query.Take < idCount || query.Random > 0;
+    }
+
     public static IAggregateFluent<T> QueryLimit<T>(this IAggregateFluent<T> cursor, ClrQuery query)
     {
         if (query.Take < long.MaxValue)

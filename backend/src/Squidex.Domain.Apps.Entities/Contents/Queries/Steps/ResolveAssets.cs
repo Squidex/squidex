@@ -128,9 +128,13 @@ public sealed class ResolveAssets(IUrlGenerator urlGenerator, IAssetQueryService
 
     private static void AddAssetIds(HashSet<DomainId> ids, Schema schema, ResolvedComponents components, IEnumerable<EnrichedContent> contents)
     {
+        // ResolvingAssets is a lazy query over all fields of the schema, therefore it is only
+        // evaluated once here and not again for every content.
+        var fields = schema.ResolvingAssets().ToList();
+
         foreach (var content in contents)
         {
-            content.Data.AddReferencedIds(schema.ResolvingAssets(), ids, components, 1);
+            content.Data.AddReferencedIds(fields, ids, components, 1);
         }
     }
 

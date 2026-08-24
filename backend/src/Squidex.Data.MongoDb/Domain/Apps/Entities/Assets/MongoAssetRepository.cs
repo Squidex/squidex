@@ -109,7 +109,7 @@ public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAsse
                         {
                             assetTotal = -1;
                         }
-                        else
+                        else if (query.NeedsTotalById(q.Ids.Count))
                         {
                             assetTotal = await Collection.Find(filter).CountDocumentsAsync(ct);
                         }
