@@ -70,16 +70,37 @@ public sealed class JobWorker :
 
     private Task<JobProcessor> GetJobProcessorAsync(DomainId appId)
     {
+        Task<JobProcessor> processor;
         lock (processors)
         {
-            return processors.GetOrAdd(appId, async key =>
+            processor = processors.GetOrAdd(appId, async key =>
             {
-                var processor = processorFactory(key);
+                var loaded = processorFactory(key);
 
-                await processor.LoadAsync(default);
+                await loaded.LoadAsync(default);
 
-                return processor;
+                return loaded;
             });
+        }
+        
+        try
+        {
+            return await processor;
+        }
+        catch
+        {
+            // A failed attempt must not stay in the cache. Loading can fail for a transient reason
+            // and the jobs of the app would never run again. Only remove our own entry, so that a
+            // newer successful one is not thrown away.
+            lock (processors)
+            {
+                if (processors.TryGetValue(appId, out var current) && ReferenceEquals(current, processor))
+                {
+                    processors.Remove(appId);
+                }
+            }
+
+            throw;
         }
     }
 }

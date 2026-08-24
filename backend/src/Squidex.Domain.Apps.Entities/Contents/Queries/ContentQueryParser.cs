@@ -90,7 +90,7 @@ public class ContentQueryParser(
 
         var searchFilters = new List<CompareFilter<ClrValue>>();
 
-        var textQuery = new TextQuery(query.FullText, 1000)
+        var textQuery = new TextQuery(query.FullText, options.MaxFullTextResults)
         {
             PreferredSchemaId = schema.Id,
         };

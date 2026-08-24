@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Collections.Concurrent;
 using System.Diagnostics.CodeAnalysis;
 using System.Diagnostics.Contracts;
 using Squidex.Infrastructure;
@@ -17,6 +18,8 @@ namespace Squidex.Domain.Apps.Core.Apps;
 
 public sealed class Roles
 {
+    private const int MaxResolved = 1000;
+    private readonly ConcurrentDictionary<(string App, string Name, bool IsFrontend), Role?> resolved = new ConcurrentDictionary<(string, string, bool), Role?>();
     private readonly ReadonlyDictionary<string, Role> inner;
 
     public static readonly IReadOnlyDictionary<string, Role> Defaults = new Dictionary<string, Role>
@@ -159,18 +162,34 @@ public sealed class Roles
     {
         Guard.NotNull(app);
 
-        value = null!;
+        // Resolving a role builds a permission for every permission of the role, but the result only
+        // depends on the key and the roles are immutable, so it is only done once. This is called for
+        // every request.
+        value = resolved.GetOrAdd((app, name, isFrontend), static (key, self) => self.Resolve(key.App, key.Name, key.IsFrontend), this)!;
+
+        return value != null;
+    }
+
+    private Role? Resolve(string app, string name, bool isFrontend)
+    {
+        // Apps without custom roles share the same empty instance, so this cache is not bound to a
+        // single app and could grow with the number of apps. Start over when it gets too large.
+        if (resolved.Count >= MaxResolved)
+        {
+            resolved.Clear();
+        }
 
         if (Defaults.TryGetValue(name, out var role))
         {
-            value = role.ForApp(app, isFrontend && name != Role.Owner);
-        }
-        else if (inner.TryGetValue(name, out role))
-        {
-            value = role.ForApp(app, isFrontend);
+            return role.ForApp(app, isFrontend && name != Role.Owner);
         }
 
-        return value != null;
+        if (inner.TryGetValue(name, out role))
+        {
+            return role.ForApp(app, isFrontend);
+        }
+
+        return null;
     }
 
     private static string WithoutPrefix(string permission)

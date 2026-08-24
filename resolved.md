@@ -3,9 +3,9 @@
 Items from the backend performance review that are done. Numbering matches
 [todo.md](todo.md) — resolved items keep their original number so references stay valid.
 
-Most entries are fixes. Items **6** and **14** are closed as *accepted* and item **21** as
-*rejected*, kept here so they are not re-reported as new findings. Item **18** records a
-finding that turned out to be wrong.
+Most entries are fixes. Items **6** and **14** are closed as *accepted*, **21** as *rejected*
+and **23** as *bounded but not fixed* — kept here so they are not re-reported as new findings.
+Item **18** records a finding that turned out to be wrong.
 
 ---
 
@@ -1033,3 +1033,164 @@ Worth being precise about why `GetBuffer` is better rather than just "avoids a c
 the stream spans several blocks. The difference is that the buffer it returns comes from the
 pool and goes back on dispose, whereas `ToArray` allocates a new GC array every time.
 `RecyclableMemoryStream` documents `ToArray` as the call to avoid for exactly this reason.
+
+---
+
+### 23. Full-text search loads a fixed 1000 ids — **CLOSED: BOUNDED, NOT FIXED**
+`backend/src/Squidex.Domain.Apps.Entities/Contents/Queries/ContentQueryParser.cs:93`
+`backend/src/Squidex.Domain.Apps.Entities/Contents/ContentsOptions.cs`
+`backend/src/Squidex/appsettings.json`
+
+**Was:** `new TextQuery(query.FullText, 1000)` — a hardcoded literal. The ids come back and go
+into an `In("id", …)` filter, so a query matching more than 1000 items silently loses the
+rest, relevance order is discarded, and up to 1000 GUID strings travel to the database on
+every page.
+
+**Now:** the limit is `ContentsOptions.MaxFullTextResults`, configurable as
+`contents:maxFullTextResults` and documented in `appsettings.json` with what raising it costs.
+Default unchanged at 1000.
+
+**Why this is closed as bounded rather than fixed.** I proposed paging the text index and
+walked it back after working through the constraint: **the full text index and the content
+store are separate, independently configured stores**, and any combination is legal —
+Mongo+Mongo, Elastic+Mongo, Elastic+SQL, Azure+anything. `MongoContentRepository` takes
+`store:mongoDb:contentDatabase` while the text index resolves the default `IMongoDatabase`;
+in EF the index is on `AppDbContext` and contents are on `ContentDbContext`.
+
+So this is a cross-store join, always, and the 1000 is not a magic number — it is the join
+buffer. No value for it is correct, because how many survive depends on a filter the index
+has never seen.
+
+Paging the index only works when the index alone decides both membership *and* order. It
+does not, in two common cases:
+
+| Case | Ids that must cross the boundary |
+| --- | --- |
+| search only, relevance-ordered | the page (~20) |
+| search + explicit `$orderby` | all matches |
+| search + `$filter` | all matches, or an iterative top-up |
+
+And the default sort is `lastModified` — `WithSorting` adds it when the caller gives none —
+so today's pipeline is already "the 1000 most relevant, displayed newest first", which is
+neither. Making paging work would mean changing the default sort for full-text queries to
+relevance: a behaviour change, not an optimisation.
+
+There is also no architectural escape. Pushing the filter into the index means indexing
+arbitrary user-filterable fields — reimplementing the query engine on the search side.
+Pushing relevance into the content store means the store needs the scores. Either way the
+boundary just moves, and because the backends pair arbitrarily you would owe it for every
+combination.
+
+**Left undone, deliberately, and worth knowing about:** a truncated result is still
+indistinguishable from a complete one. A caller paging a 5000-hit search gets a confident
+wrong total and silently loses the remainder. Returning `total = -1` when the cap is hit —
+the codebase's existing "unknown" convention, used by `NoTotal` — would make it visible
+without any interface change. Defaulting full-text queries to relevance order is arguably a
+bug fix on its own.
+
+---
+
+### 31. Every request rebuilt the caller's permission set — **FIXED**
+`backend/src/Squidex.Domain.Apps.Core.Model/Apps/Roles.cs`
+
+**Was:** `AppResolver` runs on every API request and resolves the caller's role through
+`Roles.TryGet` → `Role.ForApp(app, isFrontend)`, which rebuilt the permission set each time:
+a prefix `Permission` (three `string.Replace` calls), then a concatenated string and a
+`Permission` per role permission, ten more for a frontend caller, plus a `HashSet`, a
+`PermissionSet` and a `Role`.
+
+**Now:** `Roles` memoizes the resolved role in a `ConcurrentDictionary` keyed by
+(app, name, isFrontend). `Role` is a record and immutable, so the result is a pure function
+of that key.
+
+**The cache lives on `Roles`, not on `Role`, for two reasons.** `Role` is a `record`, so its
+synthesized `Equals`/`GetHashCode` cover every instance field — adding a cache field would
+make two logically equal roles compare unequal. And `Roles` instances hang off the cached
+`App`, so the natural lifetime is already right.
+
+**It is bounded, and that is not cosmetic.** `App.Roles` defaults to the *shared static*
+`Roles.Empty`, so for every app without custom roles the cache lives on one instance shared
+across all tenants and would grow with the number of apps. It is capped at 1000 entries and
+cleared wholesale on overflow; hitting the cap degrades to the old behaviour rather than
+leaking. An app with its own roles has its own `Roles` instance and never approaches it.
+
+`Microsoft.Extensions.Caching.Memory` would have been the nicer bound, but
+`Squidex.Domain.Apps.Core.Model` is a pure model project with no caching dependency and it
+did not seem worth adding one there.
+
+---
+
+### 32. Any app change threw away the whole GraphQL schema — **FIXED**
+`backend/src/Squidex.Domain.Apps.Entities/Contents/GraphQL/CachingGraphQLResolver.cs:67`
+
+**Was:** the cache key was `(typeof(CachingGraphQLResolver), app.Id, app.Version)`.
+`app.Version` bumps on *any* app event — a contributor, a client, a role, a setting — so each
+one was a cold miss, and the next GraphQL request paid a full `BuildSchema`: a content type, a
+result type and a component type per schema, each initialised with a GraphQL field per schema
+field, plus queries, mutations and a `FieldMap`.
+
+**Now:** the key is `(typeof(CachingGraphQLResolver), app.Id)`.
+
+**The version was redundant, not load-bearing.** The entry is already created with a
+validator, and `SchemasHashKey.Create` builds its dictionary starting with
+`[app.Id] = app.Version` before adding every schema version. So the app version was in the
+validator all along — having it in the key too meant app changes could never *reach* the
+validator, they just missed.
+
+The behavioural difference is which path a change takes: an app-level change now goes through
+the validator like a schema change does — the cached schema is served and refreshed — instead
+of blocking the next request on a rebuild. That is the same eventual-consistency trade the
+design already makes for schema changes, which are the more visible ones.
+
+---
+
+### 33. Asset and content tokens serialized an object per item — **FIXED**
+`backend/src/Squidex.Domain.Apps.Entities/Assets/Queries/Steps/CalculateTokens.cs`
+`backend/src/Squidex.Domain.Apps.Entities/Contents/Queries/Steps/CalculateTokens.cs`
+
+**Was:** both steps allocated a fresh anonymous object per item to hold the edit token, when
+only one or two of its fields actually vary:
+
+```csharp
+foreach (var asset in assets)
+{
+    var token = new { a = asset.AppId.Name, i = asset.Id.ToString(), u = url };
+
+    asset.EditToken = Convert.ToBase64String(serializer.SerializeToBytes(token));
+}
+```
+
+**Now:** a private `Token` class is created once per call and its properties are assigned per
+item. The short wire names are kept with `[JsonPropertyName]`, so the properties can have
+readable names without changing the format.
+
+**There is a content version of this too**, which the original finding missed — it carries a
+fourth field (`s`, the schema name) and sits on the content list path, which is hotter than
+the asset one. Both are fixed.
+
+**The wire format is load-bearing and was pinned first.** The token is base64 of a JSON object
+with single-letter keys, decoded by the frontend, and the existing tests only asserted
+`EditToken != null` — nothing covered the shape. So a test asserting the exact decoded string
+was added and confirmed green against the *old* code before the change, then again after:
+
+```csharp
+var expected = $$"""{"a":"{{asset.AppId.Name}}","i":"{{asset.Id}}","u":"https://squidex.io"}""";
+```
+
+This removes the per-item object allocation, not the per-item serialization — the serializer
+still runs once per item. Emitting the constant prefix once and varying only the id would go
+further, at the cost of hand-writing JSON.
+
+---
+
+### 35. `JobWorker` cached a faulted task for the process lifetime — **FIXED**
+`backend/src/Squidex.Domain.Apps.Entities/Jobs/JobWorker.cs`
+
+**Was:** `processors.GetOrAdd(appId, async key => …)` stored the `Task<JobProcessor>`, so a
+transient failure in `LoadAsync` was cached permanently — jobs for that app never ran again,
+and the failure was invisible because every caller saw the *same* exception rather than a new
+one. The same defect as item 15.
+
+**Now:** the entry is removed when the task faults, comparing by reference so a newer
+successful entry added by another caller is not discarded. The removal takes the same lock
+that guards the dictionary.

@@ -19,6 +19,11 @@ public sealed class ContentsOptions
 
     public int MaxResults { get; set; } = 200;
 
+    // The number of IDs to fetch from the full text index. The index and the content store can be
+    // different databases, so the IDs have to be loaded to filter and sort them in the store. A
+    // query with more matches than this limit silently loses the rest.
+    public int MaxFullTextResults { get; set; } = 1000;
+
     public string? CDN { get; set; }
 
     public TimeSpan TimeoutFind { get; set; } = TimeSpan.FromSeconds(1);

@@ -63,8 +63,11 @@ public sealed class CachingGraphQLResolver(
             return CreateModelAsync(app);
         }
 
-        // A tuple can hold the version as it is, so it does not have to be formatted first.
-        var cacheKey = (typeof(CachingGraphQLResolver), app.Id, app.Version);
+        // The version is not part of the key. Building the schema is expensive and the version
+        // changes for every app event, most of which do not affect the schema at all. The validator
+        // below detects the changes that do, because SchemasHashKey contains the app version as
+        // well as the version of every schema.
+        var cacheKey = (typeof(CachingGraphQLResolver), app.Id);
 
         return cache.GetOrCreateAsync(cacheKey, options.CacheDuration, async entry =>
         {

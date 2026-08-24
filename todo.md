@@ -9,9 +9,9 @@ overhead / allocation churn), **S4** low (worth fixing while nearby).
 
 Item numbers are stable and never reused. Completed items move to
 [resolved.md](resolved.md) keeping their number, so gaps in the sequence here are
-expected — items **4**–**22** and **24**–**30** are closed and live there.
+expected — items **4**–**33** and **35** are closed and live there.
 
-**Status: 4 open of 30 — items 1, 2, 3 (one root cause) and 23. The other 26 are in [resolved.md](resolved.md).**
+**Status: 4 open of 35 — items 1, 2, 3 (one root cause) and 34. The other 31 are in [resolved.md](resolved.md).**
 
 ---
 
@@ -66,44 +66,45 @@ already isolated in `ContentScriptVars`.
 
 ---
 
-## S2 — High
+## S3 — Moderate
 
-### 23. Full-text search inlines up to 1000 ids into a MongoDB `$in`
-`backend/src/Squidex.Domain.Apps.Entities/Contents/Queries/ContentQueryParser.cs:93,107`
+### 34. Message formatting looks up properties by reflection on every call
+`backend/src/Squidex.Infrastructure/Translations/ResourcesLocalizer.cs:77`
+
+`ResourcesLocalizer.Get` substitutes `{variable}` placeholders by reflecting over the
+anonymous args object:
 
 ```csharp
-var textQuery = new TextQuery(query.FullText, 1000) { PreferredSchemaId = schema.Id };
-var fullTextIds = await textIndex.SearchAsync(context.App, textQuery, context.Scope(), ct);
-...
-searchFilters.Add(ClrFilter.In("id", fullTextIds.Select(x => x.ToString()).ToList()));
+var property = argsType.GetProperty(variableName);
 ```
 
-Every full-text content query becomes: one search round trip, then a second query whose filter
-carries up to 1000 GUID strings — roughly 37 KB of BSON — forcing 1000 index seeks. The
-`Select(x => x.ToString())` also allocates 1000 strings per query.
+No `PropertyInfo` is cached, so every call re-resolves it. `Type.GetProperty(string)` is one
+of the slower reflection calls — it does a name lookup over the type's members.
 
-There is a correctness edge here too, which is why it outranks pure throughput items:
-the index returns the top 1000 *by relevance*, but the outer query then re-sorts by the default
-`LastModified` and pages over that. Relevance order is discarded, and anything past the 1000
-cap is silently missing — invisible to the caller, who just sees fewer results than exist.
+Mostly this sits on error paths, where it does not matter. The one that is not is
+`ResolveReferences.CreateFallback` (`ResolveReferences.cs:125`):
 
-**Fix:** push paging into the text index so it returns only the page (plus a total), rather
-than a fixed 1000-id prefix that the outer query re-sorts.
+```csharp
+var text = T.Get("contents.listReferences", new { count = referencedContents.Count });
+```
+
+That runs inside the per-content, per-partition loop of the enrichment pipeline, for every
+reference field that resolves to more than one item. The same method also allocates a fresh
+`JsonObject` and loops over every app language on each call.
+
+**Fix:** cache the `PropertyInfo` per (type, name); a small static dictionary is enough since
+the arg types are compiler-generated and few.
 
 ---
 
 ## Suggested order of attack
 
-1. **Item 23** — full-text paging. Really a correctness fix that happens to also be faster:
-   the 1000-id cap silently truncates results and discards relevance order today.
+1. **Item 34** — small and self-contained: cache the `PropertyInfo` per (type, name).
 2. **Items 1–3, engine pooling** — the largest single cost, and the most invasive change on
    the list. It touches the security boundary of user-authored scripts, since a pooled
    engine must not carry state from one script into the next. **Profile before writing it**:
    the estimate that engine construction dominates a scripted content list is read off the
    loops, not taken from a trace.
-
-Nothing else is outstanding. Everything cheap, every correctness-shaped finding and
-everything in the stability category is closed.
 
 ---
 

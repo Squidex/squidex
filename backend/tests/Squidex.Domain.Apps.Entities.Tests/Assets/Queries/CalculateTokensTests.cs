@@ -5,7 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Text;
 using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Assets.Queries.Steps;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure.Json;
@@ -57,5 +59,24 @@ public class CalculateTokensTests : GivenContext
 
         A.CallTo(() => urlGenerator.Root())
             .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_compute_ui_token_with_stable_format()
+    {
+        var asset = CreateAsset();
+
+        A.CallTo(() => urlGenerator.Root())
+            .Returns("https://squidex.io");
+
+        var target = new CalculateTokens(urlGenerator, TestUtils.DefaultSerializer);
+
+        await target.EnrichAsync(ApiContext, [asset], CancellationToken);
+
+        var actual = Encoding.UTF8.GetString(Convert.FromBase64String(asset.EditToken!));
+
+        var expected = $$"""{"a":"{{asset.AppId.Name}}","i":"{{asset.Id}}","u":"https://squidex.io"}""";
+
+        Assert.Equal(expected, actual);
     }
 }
