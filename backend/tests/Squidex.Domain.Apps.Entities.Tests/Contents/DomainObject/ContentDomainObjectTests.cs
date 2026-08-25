@@ -95,7 +95,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
             .Publish();
 
         A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, A<string>._, ScriptOptions(), CancellationToken))
-            .ReturnsLazily(x => Task.FromResult(x.GetArgument<DataScriptVars>(0)!.Data!));
+            .ReturnsLazily(x => new ValueTask<ContentData>(x.GetArgument<DataScriptVars>(0)!.Data!));
 
         A.CallTo(() => scriptEngine.Execute(A<ScriptVars>._, A<string>._, A<ScriptOptions>._))
             .Returns(JsonValue.Create(43));

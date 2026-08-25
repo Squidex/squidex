@@ -47,6 +47,23 @@ internal sealed class MockupHttpHandler(HttpResponseMessage response) : HttpMess
             currentContentType = body.Headers.ContentType?.MediaType;
         }
 
-        return response;
+        // The caller disposes the response, therefore every request gets its own copy of the template.
+        var result = new HttpResponseMessage(response.StatusCode)
+        {
+            Content = new StringContent(await response.Content.ReadAsStringAsync(cancellationToken)),
+        };
+
+        foreach (var (key, values) in response.Content.Headers)
+        {
+            result.Content.Headers.Remove(key);
+            result.Content.Headers.TryAddWithoutValidation(key, values);
+        }
+
+        foreach (var (key, values) in response.Headers)
+        {
+            result.Headers.TryAddWithoutValidation(key, values);
+        }
+
+        return result;
     }
 }

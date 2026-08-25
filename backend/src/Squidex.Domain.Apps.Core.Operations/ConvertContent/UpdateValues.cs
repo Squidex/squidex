@@ -14,6 +14,7 @@ namespace Squidex.Domain.Apps.Core.ConvertContent;
 
 public sealed class UpdateValues(ContentData existingData, IScriptEngine scriptEngine, bool canUnset) : IContentValueConverter, IContentDataConverter
 {
+    private static readonly ScriptOptions Options = new ScriptOptions { Readonly = true };
     private ScriptVars? vars;
 
     public void ConvertDataBefore(Schema schema, ContentData source)
@@ -32,8 +33,6 @@ public sealed class UpdateValues(ContentData existingData, IScriptEngine scriptE
 
             if (Updates.IsUpdate(value, out var expression))
             {
-                var options = new ScriptOptions { Readonly = true };
-
                 // Reuse the vars to save allocations.
                 vars ??= new ScriptVars
                 {
@@ -44,7 +43,7 @@ public sealed class UpdateValues(ContentData existingData, IScriptEngine scriptE
                 vars["$self"] = value;
 
                 // Put the expression in brackets to return an object directly.
-                var result = scriptEngine.Execute(vars, $"({expression})", options);
+                var result = scriptEngine.Execute(vars, $"({expression})", Options);
 
                 if (result.Value is JsonObject obj)
                 {
@@ -93,8 +92,6 @@ public sealed class UpdateValues(ContentData existingData, IScriptEngine scriptE
             return (false, source);
         }
 
-        var options = new ScriptOptions { Readonly = true };
-
         // Reuse the vars to save allocations.
         vars ??= new ScriptVars
         {
@@ -105,7 +102,7 @@ public sealed class UpdateValues(ContentData existingData, IScriptEngine scriptE
         vars["$self"] = obj;
 
         // Put the expression in brackets to return an object directly.
-        var result = scriptEngine.Execute(vars, $"({expression})", options);
+        var result = scriptEngine.Execute(vars, $"({expression})", Options);
 
         return (false, result);
     }

@@ -24,20 +24,14 @@ public sealed class ContentsJintExtension(IServiceProvider serviceProvider) : IJ
 
     public void ExtendAsync(Engine engine)
     {
-        var context = engine.GetContext();
-
-        if (!context.TryGetValueIfExists<DomainId>("appId", out var appId))
-        {
-            return;
-        }
-
-        if (!context.TryGetValueIfExists<ClaimsPrincipal>("user", out var user))
-        {
-            return;
-        }
-
         var getContents = new GetContentsDelegate((schemas, query, callback) =>
         {
+            if (!engine.TryGetVar<DomainId>("appId", out var appId) ||
+                !engine.TryGetVar<ClaimsPrincipal>("user", out var user))
+            {
+                throw new JavaScriptException("'getContents' is not available in this script.");
+            }
+
             GetContents(engine, appId, user, schemas, query, callback);
         });
 

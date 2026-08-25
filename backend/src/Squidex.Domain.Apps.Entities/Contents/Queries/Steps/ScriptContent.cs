@@ -12,6 +12,18 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 
 public sealed class ScriptContent(IScriptEngine scriptEngine) : IContentEnricherStep
 {
+    private static readonly ScriptOptions PreOptions = new ScriptOptions
+    {
+        AsContext = true,
+    };
+
+    private static readonly ScriptOptions Options = new ScriptOptions
+    {
+        AsContext = true,
+        CanDisallow = true,
+        CanReject = true,
+    };
+
     public async Task EnrichAsync(Context context, IEnumerable<EnrichedContent> contents, ProvideSchema schemas,
         CancellationToken ct)
     {
@@ -46,22 +58,20 @@ public sealed class ScriptContent(IScriptEngine scriptEngine) : IContentEnricher
 
             if (!string.IsNullOrWhiteSpace(preScript))
             {
-                var options = new ScriptOptions
-                {
-                    AsContext = true,
-                };
-
-                await scriptEngine.ExecuteAsync(vars, preScript, options, ct);
+                await scriptEngine.ExecuteAsync(vars, preScript, PreOptions, ct);
             }
+
+            // The script is compiled once and then reused for all contents of the schema.
+            using var compiled = scriptEngine.CreateAsyncScript(script, Options);
 
             foreach (var content in group)
             {
-                await TransformAsync(vars, script, content, ct);
+                await TransformAsync(compiled, vars, content, ct);
             }
         }
     }
 
-    private async Task TransformAsync(ContentScriptVars sharedVars, string script, EnrichedContent content,
+    private static async Task TransformAsync(IAsyncScript script, ContentScriptVars sharedVars, EnrichedContent content,
         CancellationToken ct)
     {
         // Script vars are just wrappers over dictionaries for better performance.
@@ -80,14 +90,7 @@ public sealed class ScriptContent(IScriptEngine scriptEngine) : IContentEnricher
 
         vars.CopyFrom(sharedVars);
 
-        var options = new ScriptOptions
-        {
-            AsContext = true,
-            CanDisallow = true,
-            CanReject = true,
-        };
-
-        content.Data = await scriptEngine.TransformAsync(vars, script, options, ct);
+        content.Data = await script.TransformAsync(vars, ct);
     }
 
     private static bool ShouldEnrich(Context context)

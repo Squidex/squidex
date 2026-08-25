@@ -68,13 +68,11 @@ public sealed class EventJintExtension(IUrlGenerator urlGenerator) : IJintExtens
 
     public void Extend(Engine engine)
     {
-        var context = engine.GetContext();
-
         engine.SetValue("console", FlowConsoleWrapper.Instance);
 
         engine.SetValue("contentAction", new EventDelegate(() =>
         {
-            if (context.TryGetValue("event", out var temp) && temp is EnrichedContentEvent contentEvent)
+            if (engine.TryGetVar<EnrichedContentEvent>("event", out var contentEvent))
             {
                 return contentEvent.Status.ToString();
             }
@@ -84,7 +82,7 @@ public sealed class EventJintExtension(IUrlGenerator urlGenerator) : IJintExtens
 
         engine.SetValue("contentUrl", new EventDelegate(() =>
         {
-            if (context.TryGetValue("event", out var temp) && temp is EnrichedContentEvent contentEvent)
+            if (engine.TryGetVar<EnrichedContentEvent>("event", out var contentEvent))
             {
                 return urlGenerator.ContentUI(contentEvent.AppId, contentEvent.SchemaId, contentEvent.Id);
             }
@@ -94,7 +92,7 @@ public sealed class EventJintExtension(IUrlGenerator urlGenerator) : IJintExtens
 
         engine.SetValue("assetContentSlugUrl", new EventDelegate(() =>
         {
-            if (context.TryGetValue("event", out var temp) && temp is EnrichedAssetEvent assetEvent)
+            if (engine.TryGetVar<EnrichedAssetEvent>("event", out var assetEvent))
             {
                 return urlGenerator.AssetContent(assetEvent.AppId, assetEvent.FileName.Slugify());
             }
@@ -104,7 +102,7 @@ public sealed class EventJintExtension(IUrlGenerator urlGenerator) : IJintExtens
 
         var assetUrl = new EventDelegate(() =>
         {
-            if (context.TryGetValue("event", out var temp) && temp is EnrichedAssetEvent assetEvent)
+            if (engine.TryGetVar<EnrichedAssetEvent>("event", out var assetEvent))
             {
                 return urlGenerator.AssetContent(assetEvent.AppId, assetEvent.Id.ToString());
             }

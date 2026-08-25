@@ -31,7 +31,7 @@ public class AssetsJintExtensionTests : GivenContext, IClassFixture<Translations
     private readonly IAssetFileStore assetFileStore = A.Fake<IAssetFileStore>();
     private readonly IAssetQueryService assetQuery = A.Fake<IAssetQueryService>();
     private readonly IAssetThumbnailGenerator assetGenerator = A.Fake<IAssetThumbnailGenerator>();
-    private readonly JintScriptEngine sut;
+    private readonly IScriptEngine sut;
 
     public static readonly TheoryData<string> Encodings =
         new TheoryData<string>("ascii", "unicode", "utf8", "base64");
@@ -83,7 +83,7 @@ public class AssetsJintExtensionTests : GivenContext, IClassFixture<Translations
 
         var script = @"getAsset('id')";
 
-        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, ct: CancellationToken));
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, ct: CancellationToken).AsTask());
     }
 
     [Fact]
@@ -114,7 +114,7 @@ public class AssetsJintExtensionTests : GivenContext, IClassFixture<Translations
 
         var script = @"getAssetV2('id')";
 
-        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, ct: CancellationToken));
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, ct: CancellationToken).AsTask());
     }
 
     [Fact]
@@ -145,7 +145,7 @@ public class AssetsJintExtensionTests : GivenContext, IClassFixture<Translations
 
         var script = @"getAssetV2('id')";
 
-        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, ct: CancellationToken));
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, ct: CancellationToken).AsTask());
     }
 
     [Fact]

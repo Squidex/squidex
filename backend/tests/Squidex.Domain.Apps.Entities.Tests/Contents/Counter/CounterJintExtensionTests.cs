@@ -15,7 +15,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Counter;
 public class CounterJintExtensionTests : GivenContext
 {
     private readonly ICounterService counterService = A.Fake<ICounterService>();
-    private readonly JintScriptEngine sut;
+    private readonly IScriptEngine sut;
 
     public CounterJintExtensionTests()
     {

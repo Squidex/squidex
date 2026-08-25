@@ -13,6 +13,18 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries.Steps;
 
 public sealed class ScriptAsset(IScriptEngine scriptEngine) : IAssetEnricherStep
 {
+    private static readonly ScriptOptions PreOptions = new ScriptOptions
+    {
+        AsContext = true,
+    };
+
+    private static readonly ScriptOptions Options = new ScriptOptions
+    {
+        AsContext = true,
+        CanDisallow = true,
+        CanReject = true,
+    };
+
     public async Task EnrichAsync(Context context, IEnumerable<EnrichedAsset> assets,
         CancellationToken ct)
     {
@@ -40,21 +52,19 @@ public sealed class ScriptAsset(IScriptEngine scriptEngine) : IAssetEnricherStep
 
         if (!string.IsNullOrWhiteSpace(preScript))
         {
-            var options = new ScriptOptions
-            {
-                AsContext = true,
-            };
-
-            await scriptEngine.ExecuteAsync(vars, preScript, options, ct);
+            await scriptEngine.ExecuteAsync(vars, preScript, PreOptions, ct);
         }
+
+        // The script is compiled once and then reused for all assets.
+        using var compiled = scriptEngine.CreateAsyncScript(script, Options);
 
         foreach (var asset in assets)
         {
-            await ScriptAsync(vars, script, asset, ct);
+            await ScriptAsync(compiled, vars, asset, ct);
         }
     }
 
-    private async Task ScriptAsync(AssetScriptVars sharedVars, string script, EnrichedAsset asset,
+    private static async Task ScriptAsync(IAsyncScript script, AssetScriptVars sharedVars, EnrichedAsset asset,
         CancellationToken ct)
     {
         // Script vars are just wrappers over dictionaries for better performance.
@@ -80,14 +90,7 @@ public sealed class ScriptAsset(IScriptEngine scriptEngine) : IAssetEnricherStep
 
         vars.CopyFrom(sharedVars);
 
-        var options = new ScriptOptions
-        {
-            AsContext = true,
-            CanDisallow = true,
-            CanReject = true,
-        };
-
-        await scriptEngine.ExecuteAsync(vars, script, options, ct);
+        await script.ExecuteAsync(vars, ct);
     }
 
     private static bool ShouldEnrich(Context context)

@@ -25,7 +25,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
     private readonly IHttpClientFactory httpClientFactory = A.Fake<IHttpClientFactory>();
     private readonly ITranslator translator = A.Fake<ITranslator>();
     private readonly IChatAgent chatAgent = A.Fake<IChatAgent>();
-    private readonly JintScriptEngine sut;
+    private readonly IScriptEngine sut;
 
     public JintScriptEngineHelperTests()
     {
@@ -266,7 +266,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
                 reject()
             ";
 
-        var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, options));
+        var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, options).AsTask());
 
         Assert.NotEmpty(ex.Errors);
     }
@@ -287,7 +287,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
                 reject('Error1')
             ";
 
-        var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, options));
+        var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, options).AsTask());
 
         Assert.Equal(new[] { "Error1" }, ex.Errors.Select(x => x.Message).ToArray());
     }
@@ -308,7 +308,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
                 reject(['Error1', 'Error2'])
             ";
 
-        var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, options));
+        var ex = await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, options).AsTask());
 
         Assert.Equal(new[] { "Error1", "Error2" }, ex.Errors.Select(x => x.Message).ToArray());
     }
@@ -329,7 +329,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
                 disallow()
             ";
 
-        var ex = await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.ExecuteAsync(vars, script, options));
+        var ex = await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.ExecuteAsync(vars, script, options).AsTask());
 
         Assert.Equal("Script has forbidden the operation.", ex.Message);
     }
@@ -350,7 +350,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
         {
         };
 
-        var ex = await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.ExecuteAsync(vars, script, options));
+        var ex = await Assert.ThrowsAsync<DomainForbiddenException>(() => sut.ExecuteAsync(vars, script, options).AsTask());
 
         Assert.Equal("Operation not allowed", ex.Message);
     }
@@ -368,7 +368,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
                 });
             ";
 
-        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script));
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script).AsTask());
     }
 
     [Fact]
@@ -386,7 +386,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
                 });
             ";
 
-        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script));
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script).AsTask());
     }
 
     [Fact]
@@ -402,7 +402,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
                 getJSON(url, null);
             ";
 
-        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script));
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script).AsTask());
     }
 
     [Fact]
@@ -719,7 +719,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
                 generate('prompt', null);
             ";
 
-        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script));
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script).AsTask());
     }
 
     [Fact]
@@ -802,7 +802,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
                 translate('text', 'en', null);
             ";
 
-        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script));
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script).AsTask());
     }
 
     [Theory]
@@ -976,7 +976,7 @@ public class JintScriptEngineHelperTests : IClassFixture<TranslationsFixture>
                 }});
             ";
 
-        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script));
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script).AsTask());
     }
 
     private MockupHttpHandler SetupRequest(HttpStatusCode statusCode = HttpStatusCode.OK, StringContent? responseContent = null)

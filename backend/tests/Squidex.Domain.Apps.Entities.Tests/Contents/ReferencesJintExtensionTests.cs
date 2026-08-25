@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Contents;
 public class ReferencesJintExtensionTests : GivenContext, IClassFixture<TranslationsFixture>
 {
     private readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
-    private readonly JintScriptEngine sut;
+    private readonly IScriptEngine sut;
 
     public ReferencesJintExtensionTests()
     {
@@ -53,7 +53,7 @@ public class ReferencesJintExtensionTests : GivenContext, IClassFixture<Translat
 
         var script = @"getReference('id')";
 
-        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, ct: CancellationToken));
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, ct: CancellationToken).AsTask());
     }
 
     [Fact]
@@ -84,7 +84,7 @@ public class ReferencesJintExtensionTests : GivenContext, IClassFixture<Translat
 
         var script = @"getReferenceV2('id')";
 
-        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, ct: CancellationToken));
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, ct: CancellationToken).AsTask());
     }
 
     [Fact]
@@ -115,7 +115,7 @@ public class ReferencesJintExtensionTests : GivenContext, IClassFixture<Translat
 
         var script = @"getReferences('id')";
 
-        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, ct: CancellationToken));
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, ct: CancellationToken).AsTask());
     }
 
     [Fact]

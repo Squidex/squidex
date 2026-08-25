@@ -133,7 +133,7 @@ public sealed class RuleEnqueuer(
             return appProvider.GetRulesAsync(appId);
         }
 
-        var cacheKey = (typeof(RuleEnqueuer), appId);
+        var cacheKey = $"{typeof(RuleEnqueuer)}_Rules_{appId}";
 
         // Cache the rules for performance reasons for a short period of time (usually 10 sec).
         return cache.GetOrCreateAsync(cacheKey, entry =>

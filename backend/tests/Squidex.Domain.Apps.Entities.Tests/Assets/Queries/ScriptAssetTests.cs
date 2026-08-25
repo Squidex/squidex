@@ -16,10 +16,14 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries;
 public class ScriptAssetTests : GivenContext
 {
     private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
+    private readonly IAsyncScript script = A.Fake<IAsyncScript>();
     private readonly ScriptAsset sut;
 
     public ScriptAssetTests()
     {
+        A.CallTo(() => scriptEngine.CreateAsyncScript(A<string>._, A<ScriptOptions>._))
+            .Returns(script);
+
         sut = new ScriptAsset(scriptEngine);
     }
 
@@ -29,6 +33,9 @@ public class ScriptAssetTests : GivenContext
         var asset = CreateAsset();
 
         await sut.EnrichAsync(ApiContext, [asset], CancellationToken);
+
+        A.CallTo(() => script.ExecuteAsync(A<AssetScriptVars>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
 
         A.CallTo(() => scriptEngine.ExecuteAsync(A<AssetScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -43,6 +50,9 @@ public class ScriptAssetTests : GivenContext
 
         await sut.EnrichAsync(FrontendContext, [asset], CancellationToken);
 
+        A.CallTo(() => script.ExecuteAsync(A<AssetScriptVars>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
+
         A.CallTo(() => scriptEngine.ExecuteAsync(A<AssetScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
             .MustNotHaveHappened();
     }
@@ -55,6 +65,9 @@ public class ScriptAssetTests : GivenContext
         var asset = CreateAsset();
 
         await sut.EnrichAsync(ContextWithNoScript(), [asset], CancellationToken);
+
+        A.CallTo(() => script.ExecuteAsync(A<AssetScriptVars>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
 
         A.CallTo(() => scriptEngine.ExecuteAsync(A<AssetScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
             .MustNotHaveHappened();
@@ -69,14 +82,15 @@ public class ScriptAssetTests : GivenContext
 
         await sut.EnrichAsync(ApiContext, [asset], CancellationToken);
 
-        A.CallTo(() => scriptEngine.ExecuteAsync(
+        A.CallTo(() => scriptEngine.CreateAsyncScript("my-query", ScriptOptions()))
+            .MustHaveHappened();
+
+        A.CallTo(() => script.ExecuteAsync(
                 A<AssetScriptVars>.That.Matches(x =>
                     Equals(x["assetId"], asset.Id) &&
                     Equals(x["appId"], AppId.Id) &&
                     Equals(x["appName"], AppId.Name) &&
                     Equals(x["user"], ApiContext.UserPrincipal)),
-                "my-query",
-                ScriptOptions(),
                 CancellationToken))
             .MustHaveHappened();
     }
@@ -101,14 +115,12 @@ public class ScriptAssetTests : GivenContext
                 CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => scriptEngine.ExecuteAsync(
+        A.CallTo(() => script.ExecuteAsync(
                 A<AssetScriptVars>.That.Matches(x =>
                     Equals(x.GetValue<object>("assetId"), asset.Id) &&
                     Equals(x["appId"], AppId.Id) &&
                     Equals(x["appName"], AppId.Name) &&
                     Equals(x["user"], ApiContext.UserPrincipal)),
-                "my-query",
-                ScriptOptions(),
                 CancellationToken))
             .MustHaveHappened();
     }

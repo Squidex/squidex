@@ -42,13 +42,13 @@ public sealed class AssetsJintExtension(IServiceProvider serviceProvider) : IJin
 
     private void AddUpdateAsset(Engine engine)
     {
-        if (!engine.GetContext().TryGetValueIfExists<ClaimsPrincipal>("user", out var user))
-        {
-            return;
-        }
-
         var updateAsset = new UpdateAssetDelegate((asset, metadata) =>
         {
+            if (!engine.TryGetVar<ClaimsPrincipal>("user", out var user))
+            {
+                throw new JavaScriptException("'updateAsset' is not available in this script.");
+            }
+
             UpdateAsset(engine, user, asset, metadata);
         });
 
@@ -90,25 +90,25 @@ public sealed class AssetsJintExtension(IServiceProvider serviceProvider) : IJin
 
     private void AddGetAssetObject(Engine engine)
     {
-        var context = engine.GetContext();
-
-        if (!context.TryGetValueIfExists<DomainId>("appId", out var appId))
-        {
-            return;
-        }
-
-        if (!context.TryGetValueIfExists<ClaimsPrincipal>("user", out var user))
-        {
-            return;
-        }
-
         var getAssets = new GetAssetsDelegate((references, callback) =>
         {
+            if (!engine.TryGetVar<DomainId>("appId", out var appId) ||
+                !engine.TryGetVar<ClaimsPrincipal>("user", out var user))
+            {
+                throw new JavaScriptException("'getAssets' is not available in this script.");
+            }
+
             GetAssets(engine, appId, user, references, callback);
         });
 
         var getAsset = new GetAssetsDelegate((references, callback) =>
         {
+            if (!engine.TryGetVar<DomainId>("appId", out var appId) ||
+                !engine.TryGetVar<ClaimsPrincipal>("user", out var user))
+            {
+                throw new JavaScriptException("'getAssetV2' is not available in this script.");
+            }
+
             GetAsset(engine, appId, user, references, callback);
         });
 
@@ -282,16 +282,14 @@ public sealed class AssetsJintExtension(IServiceProvider serviceProvider) : IJin
                 return true;
 
             case AssetEntityScriptVars vars:
-                var context = engine.GetContext();
-
-                if (!context.TryGetValueIfExists<string>(nameof(AssetScriptVars.AppName), out var appName) ||
-                    !context.TryGetValueIfExists<DomainId>(nameof(AssetScriptVars.AppId), out var appId) ||
-                    !context.TryGetValueIfExists<DomainId>(nameof(AssetScriptVars.AssetId), out var assetId))
+                if (!engine.TryGetVar<string>(nameof(AssetScriptVars.AppName), out var appName) ||
+                    !engine.TryGetVar<DomainId>(nameof(AssetScriptVars.AppId), out var appId) ||
+                    !engine.TryGetVar<DomainId>(nameof(AssetScriptVars.AssetId), out var assetId))
                 {
                     return false;
                 }
 
-                context.TryGetValueIfExists<string?>(nameof(AssetScriptVars.FileId), out var fileId);
+                engine.TryGetVar<string?>(nameof(AssetScriptVars.FileId), out var fileId);
 
                 assetRef = new AssetRef(
                     NamedId.Of(appId, appName),

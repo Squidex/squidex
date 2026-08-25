@@ -5,21 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Diagnostics;
-using Acornima;
-using Jint;
-using Jint.Native;
-using Jint.Runtime;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Properties;
-using Squidex.Domain.Apps.Core.Scripting.ContentWrapper;
 using Squidex.Domain.Apps.Core.Scripting.Internal;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.Json.Objects;
-using Squidex.Infrastructure.Translations;
-using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Core.Scripting;
 
@@ -27,196 +17,29 @@ public sealed class JintScriptEngine(IMemoryCache cache, IOptions<JintScriptOpti
 {
     private readonly IJintExtension[] extensions = extensions?.ToArray() ?? [];
     private readonly CacheParser parser = new CacheParser(cache);
-    private readonly TimeSpan timeoutScript = options.Value.TimeoutScript;
-    private readonly TimeSpan timeoutExecution = options.Value.TimeoutExecution;
-    private readonly TimeSpan timeoutPromise = options.Value.TimeoutPromise;
 
-    public async Task<JsonValue> ExecuteAsync(ScriptVars vars, string script, ScriptOptions options = default,
-        CancellationToken ct = default)
+    public IScript CreateScript(string script, ScriptOptions scriptOptions = default)
     {
-        Guard.NotNull(vars);
-        Guard.NotNullOrEmpty(script);
-
-        using var combined = CancellationTokenSource.CreateLinkedTokenSource(ct);
-        try
-        {
-            // Enforce a timeout after a configured time span.
-            combined.CancelAfter(timeoutExecution);
-
-            var context =
-                CreateEngine<JsonValue>(options, combined.Token)
-                    .ExtendWithVariables(vars, options)
-                    .ExtendWithFunctions(extensions)
-                    .ExtendWithAsyncFunctions(extensions);
-
-            context.Engine.SetValue("complete", new Action<JsValue?>(value =>
-            {
-                context.Complete(JsonMapper.Map(value));
-            }));
-
-            var result = await ExecuteAsync(context, script);
-
-            return await context.WaitForCompletionAsync(() => JsonMapper.Map(result));
-        }
-        catch (Exception ex)
-        {
-            throw MapException(ex);
-        }
-        finally
-        {
-            // Stop pending tasks before the token source is disposed, they must not touch the engine anymore.
-            await combined.CancelAsync();
-        }
+        return CreateScriptCore(script, scriptOptions, false);
     }
 
-    public async Task<ContentData> TransformAsync(DataScriptVars vars, string script, ScriptOptions options = default,
-        CancellationToken ct = default)
+    public IAsyncScript CreateAsyncScript(string script, ScriptOptions scriptOptions = default)
     {
-        Guard.NotNull(vars);
-        Guard.NotNullOrEmpty(script);
-
-        var data = vars.Data!;
-
-        using var combined = CancellationTokenSource.CreateLinkedTokenSource(ct);
-        try
-        {
-            // Enforce a timeout after a configured time span.
-            combined.CancelAfter(timeoutExecution);
-
-            var context =
-                    CreateEngine<ContentData>(options, combined.Token)
-                        .ExtendWithVariables(vars, options)
-                        .ExtendWithFunctions(extensions)
-                        .ExtendWithAsyncFunctions(extensions);
-
-            context.Engine.SetValue("complete", new Action<JsValue?>(_ =>
-            {
-                context.Complete(data!);
-            }));
-
-            context.Engine.SetValue("replace", new Action(() =>
-            {
-                var dataInstance = context.Engine.GetValue("ctx").AsObject().Get("data");
-
-                if (dataInstance != null && dataInstance.IsObject() && dataInstance.AsObject() is ContentDataObject data)
-                {
-                    if (!context.IsCompleted && data.TryUpdate(out var modified))
-                    {
-                        context.Complete(modified);
-                    }
-                }
-            }));
-
-            await ExecuteAsync(context, script);
-
-            return await context.WaitForCompletionAsync(() => data);
-        }
-        catch (Exception ex)
-        {
-            throw MapException(ex);
-        }
-        finally
-        {
-            // Stop pending tasks before the token source is disposed, they must not touch the engine anymore.
-            await combined.CancelAsync();
-        }
+        return CreateScriptCore(script, scriptOptions, true);
     }
 
-    public JsonValue Execute(ScriptVars vars, string script, ScriptOptions options = default)
+    private JintScript CreateScriptCore(string script, ScriptOptions scriptOptions, bool allowAsync)
     {
-        Guard.NotNull(vars);
         Guard.NotNullOrEmpty(script);
 
         try
         {
-            var context =
-                CreateEngine<object>(options, default)
-                    .ExtendWithVariables(vars, options)
-                    .ExtendWithFunctions(extensions);
-
-            var result = Execute(context, script);
-
-            return JsonMapper.Map(result);
+            // The parser caches the prepared script, therefore the same source is only parsed once.
+            return new JintScript(parser.Parse(script), scriptOptions, options.Value, extensions, allowAsync);
         }
         catch (Exception ex)
         {
-            throw MapException(ex);
-        }
-    }
-
-    private ScriptExecutionContext<T> CreateEngine<T>(ScriptOptions options, CancellationToken ct)
-    {
-        if (Debugger.IsAttached)
-        {
-            ct = default;
-        }
-
-        var engine = new Engine(engineOptions =>
-        {
-            engineOptions.AddObjectConverter(JintObjectConverter.Instance);
-            engineOptions.AllowClrWrite(!options.Readonly);
-            engineOptions.SetTypeConverter(engine => new CustomClrConverter(engine));
-            engineOptions.SetReferencesResolver(NullPropagation.Instance);
-            engineOptions.Strict();
-
-            if (!Debugger.IsAttached)
-            {
-                engineOptions.Constraints.PromiseTimeout = timeoutPromise;
-                engineOptions.TimeoutInterval(timeoutScript);
-                engineOptions.CancellationToken(ct);
-            }
-        });
-
-        if (options.CanDisallow)
-        {
-            engine.AddDisallow();
-        }
-
-        if (options.CanReject)
-        {
-            engine.AddReject();
-        }
-
-        return new ScriptExecutionContext<T>(engine, ct);
-    }
-
-    private JsValue Execute(ScriptExecutionContext context, string script)
-    {
-        var parsed = parser.Parse(script);
-
-        return context.Evaluate(parsed);
-    }
-
-    private Task<JsValue> ExecuteAsync(ScriptExecutionContext context, string script)
-    {
-        var parsed = parser.Parse(script);
-
-        return context.EvaluateAsync(parsed);
-    }
-
-    private static Exception MapException(Exception inner)
-    {
-        static Exception BuildException(string errorKey, string message, Exception? inner = null)
-        {
-            return new ValidationException(T.Get(errorKey, new { message }), inner);
-        }
-
-        switch (inner)
-        {
-            case ArgumentException:
-                return BuildException("common.jsParseError", inner.Message);
-            case ParseErrorException:
-                return BuildException("common.jsError", inner.Message);
-            case ScriptPreparationException:
-                return BuildException("common.jsError", inner.Message);
-            case JavaScriptException:
-                return BuildException("common.jsError", inner.Message);
-            case JintException:
-                return BuildException("common.jsError", inner.Message);
-            case DomainException:
-                return inner;
-            default:
-                return BuildException("common.jsError", inner.GetType().Name, inner);
+            throw JintScript.MapException(ex);
         }
     }
 

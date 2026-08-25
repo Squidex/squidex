@@ -22,7 +22,7 @@ namespace Squidex.Domain.Apps.Entities.Contents;
 public class ContentsJintExtensionTests : GivenContext, IClassFixture<TranslationsFixture>
 {
     private readonly IContentQueryService contentQuery = A.Fake<IContentQueryService>();
-    private readonly JintScriptEngine sut;
+    private readonly IScriptEngine sut;
 
     public ContentsJintExtensionTests()
     {
@@ -53,7 +53,7 @@ public class ContentsJintExtensionTests : GivenContext, IClassFixture<Translatio
 
         var script = @"getContents('my-schema', '$filter=data/field/iv eq 42')";
 
-        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, ct: CancellationToken));
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync(vars, script, ct: CancellationToken).AsTask());
     }
 
     [Fact]

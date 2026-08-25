@@ -24,25 +24,25 @@ public sealed class ReferencesJintExtension(IServiceProvider serviceProvider) : 
 
     public void ExtendAsync(Engine engine)
     {
-        var context = engine.GetContext();
-
-        if (!context.TryGetValueIfExists<DomainId>("appId", out var appId))
-        {
-            return;
-        }
-
-        if (!context.TryGetValueIfExists<ClaimsPrincipal>("user", out var user))
-        {
-            return;
-        }
-
         var getReference = new GetReferencesDelegate((references, callback) =>
         {
+            if (!engine.TryGetVar<DomainId>("appId", out var appId) ||
+                !engine.TryGetVar<ClaimsPrincipal>("user", out var user))
+            {
+                throw new JavaScriptException("'getReference' is not available in this script.");
+            }
+
             GetReference(engine, appId, user, references, callback);
         });
 
         var getReferences = new GetReferencesDelegate((references, callback) =>
         {
+            if (!engine.TryGetVar<DomainId>("appId", out var appId) ||
+                !engine.TryGetVar<ClaimsPrincipal>("user", out var user))
+            {
+                throw new JavaScriptException("'getReferences' is not available in this script.");
+            }
+
             GetReferences(engine, appId, user, references, callback);
         });
 

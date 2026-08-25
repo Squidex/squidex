@@ -15,7 +15,7 @@ namespace Squidex.Web.Scripting;
 public class HttpRequestJintExtensionTests
 {
     private readonly IHttpContextAccessor httpContextAccessor = A.Fake<IHttpContextAccessor>();
-    private readonly JintScriptEngine sut;
+    private readonly IScriptEngine sut;
 
     public HttpRequestJintExtensionTests()
     {

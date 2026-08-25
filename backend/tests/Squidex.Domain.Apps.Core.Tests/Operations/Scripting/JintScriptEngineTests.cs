@@ -32,7 +32,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
     };
 
     private readonly IHttpClientFactory httpClientFactory = A.Fake<IHttpClientFactory>();
-    private readonly JintScriptEngine sut;
+    private readonly IScriptEngine sut;
 
     public JintScriptEngineTests()
     {
@@ -94,7 +94,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
                 invalid(()
             ";
 
-        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync([], script));
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync([], script).AsTask());
     }
 
     [Fact]
@@ -104,7 +104,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
                 throw 'Error';
             ";
 
-        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync([], script));
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync([], script).AsTask());
     }
 
     [Fact]
@@ -174,7 +174,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
                 throw 'Error';
             ";
 
-        await Assert.ThrowsAsync<ValidationException>(() => sut.TransformAsync([], script));
+        await Assert.ThrowsAsync<ValidationException>(() => sut.TransformAsync([], script).AsTask());
     }
 
     [Fact]
@@ -189,7 +189,7 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
                 invalid(();
             ";
 
-        await Assert.ThrowsAsync<ValidationException>(() => sut.TransformAsync(vars, script, contentOptions));
+        await Assert.ThrowsAsync<ValidationException>(() => sut.TransformAsync(vars, script, contentOptions).AsTask());
     }
 
     [Fact]
@@ -425,6 +425,217 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
         var actual = await sut.TransformAsync(vars, script, contentOptions);
 
         Assert.Equal(expected, actual);
+    }
+
+    [Fact]
+    public async Task Should_not_deadlock_if_callback_completes_synchronously()
+    {
+        // The callback runs on the thread of the evaluation, which holds the engine lock at that moment.
+        const string script = @"
+                function delay() {
+                    return new Promise((resolve) => {
+                        setTimeout(function () {
+                            resolve(1);
+                        }, 0);
+                    });
+                }
+
+                (async () => {
+                    let total = 0;
+
+                    for (let i = 0; i < 10; i++) {
+                        total += await delay();
+                    }
+
+                    complete(total);
+                })()
+            ";
+
+        var actual = await sut.ExecuteAsync([], script);
+
+        Assert.Equal(JsonValue.Create(10), actual);
+    }
+
+    [Fact]
+    public async Task Should_throw_if_promise_is_rejected()
+    {
+        const string script = @"
+                (async () => {
+                    await new Promise((resolve, reject) => {
+                        getJSON('http://mockup.squidex.io', function () {
+                            reject('rejected');
+                        });
+                    });
+
+                    complete(42);
+                })()
+            ";
+
+        await Assert.ThrowsAsync<ValidationException>(() => sut.ExecuteAsync([], script).AsTask());
+    }
+
+    [Fact]
+    public async Task Should_not_throw_if_rejected_promise_is_handled()
+    {
+        const string script = @"
+                (async () => {
+                    try {
+                        await new Promise((resolve, reject) => {
+                            getJSON('http://mockup.squidex.io', function () {
+                                reject('rejected');
+                            });
+                        });
+                    } catch (e) {
+                        complete(42);
+                    }
+                })()
+            ";
+
+        var actual = await sut.ExecuteAsync([], script);
+
+        Assert.Equal(JsonValue.Create(42), actual);
+    }
+
+    [Fact]
+    public void Should_not_leak_globals_between_executions()
+    {
+        var script = sut.CreateScript("var actual = typeof leaked; var leaked = 1; actual");
+
+        for (var i = 1; i <= 3; i++)
+        {
+            Assert.Equal(JsonValue.Create("undefined"), script.Execute([]));
+        }
+    }
+
+    [Fact]
+    public void Should_leak_prototype_changes_between_executions_of_same_script()
+    {
+        // The snapshot restores the globals, but it does not undo changes to the prototypes. That is
+        // acceptable because a script is never shared between apps, but it must not go unnoticed.
+        var script = sut.CreateScript("var actual = ({}).polluted; Object.prototype.polluted = 'yes'; typeof actual");
+
+        Assert.Equal(JsonValue.Create("undefined"), script.Execute([]));
+        Assert.Equal(JsonValue.Create("string"), script.Execute([]));
+    }
+
+    [Fact]
+    public void Should_not_leak_prototype_changes_to_other_scripts()
+    {
+        sut.CreateScript("Object.prototype.polluted = 'yes'; 1").Execute([]);
+
+        var script = sut.CreateScript("typeof ({}).polluted");
+
+        Assert.Equal(JsonValue.Create("undefined"), script.Execute([]));
+    }
+
+    [Fact]
+    public void Should_complete_sync_script()
+    {
+        var script = sut.CreateScript("complete(42); 1");
+
+        Assert.Equal(JsonValue.Create(42), script.Execute([]));
+    }
+
+    [Fact]
+    public void Should_transform_with_sync_script()
+    {
+        var vars = new DataScriptVars
+        {
+            ["data"] = new ContentData(),
+        };
+
+        var script = sut.CreateScript("ctx.data.number = { iv: 42 }; replace()", contentOptions);
+
+        var actual = script.Transform(vars);
+
+        Assert.Equal(JsonValue.Create(42), actual["number"]!["iv"]);
+    }
+
+    [Fact]
+    public async Task Should_cancel_async_script()
+    {
+        using var cts = new CancellationTokenSource();
+
+        var script = sut.CreateAsyncScript("while (true) { }");
+
+        await cts.CancelAsync();
+
+        await Assert.ThrowsAnyAsync<Exception>(() => script.ExecuteAsync([], cts.Token).AsTask());
+    }
+
+    [Fact]
+    public async Task Should_run_same_script_in_parallel()
+    {
+        var script = sut.CreateAsyncScript("const factor = 2; value.i * factor");
+
+        var tasks = Enumerable.Range(1, 20).Select(async i =>
+        {
+            var vars = new ScriptVars
+            {
+                ["value"] = new { i },
+            };
+
+            return (i, actual: await script.ExecuteAsync(vars));
+        });
+
+        foreach (var (i, actual) in await Task.WhenAll(tasks))
+        {
+            Assert.Equal(JsonValue.Create(i * 2), actual);
+        }
+    }
+
+    [Fact]
+    public async Task Should_reuse_script_with_callbacks()
+    {
+        var script = sut.CreateAsyncScript(@"
+                const factor = value.i;
+
+                getJSON('http://mockup.squidex.io', function(actual) {
+                    complete(actual.key * factor);
+                });
+            ");
+
+        for (var i = 1; i <= 3; i++)
+        {
+            var vars = new ScriptVars
+            {
+                ["value"] = new { i },
+            };
+
+            Assert.Equal(JsonValue.Create(42 * i), await script.ExecuteAsync(vars));
+        }
+    }
+
+    [Fact]
+    public void Should_reuse_script_with_global_declarations()
+    {
+        var script = sut.CreateScript("const factor = 2; value.i * factor");
+
+        for (var i = 1; i <= 3; i++)
+        {
+            var vars = new ScriptVars
+            {
+                ["value"] = new { i },
+            };
+
+            Assert.Equal(JsonValue.Create(i * 2), script.Execute(vars));
+        }
+    }
+
+    [Fact]
+    public async Task Should_reuse_async_script_with_global_declarations()
+    {
+        var script = sut.CreateAsyncScript("const factor = 2; value.i * factor");
+
+        for (var i = 1; i <= 3; i++)
+        {
+            var vars = new ScriptVars
+            {
+                ["value"] = new { i },
+            };
+
+            Assert.Equal(JsonValue.Create(i * 2), await script.ExecuteAsync(vars));
+        }
     }
 
     [Fact]

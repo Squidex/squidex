@@ -7,6 +7,7 @@
 
 using Jint;
 using Jint.Native;
+using Jint.Runtime;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Properties;
 using Squidex.Infrastructure;
@@ -21,13 +22,13 @@ public sealed class CounterJintExtension(ICounterService counterService) : IJint
 
     public void Extend(Engine engine)
     {
-        if (!engine.GetContext().TryGetValueIfExists<DomainId>("appId", out var appId))
-        {
-            return;
-        }
-
         var increment = new Func<string, long>(name =>
         {
+            if (!engine.TryGetVar<DomainId>("appId", out var appId))
+            {
+                return 0;
+            }
+
             return Increment(appId, name);
         });
 
@@ -35,6 +36,11 @@ public sealed class CounterJintExtension(ICounterService counterService) : IJint
 
         var reset = new CounterResetDelegate((name, value) =>
         {
+            if (!engine.TryGetVar<DomainId>("appId", out var appId))
+            {
+                return 0;
+            }
+
             return Reset(appId, name, value);
         });
 
@@ -43,13 +49,13 @@ public sealed class CounterJintExtension(ICounterService counterService) : IJint
 
     public void ExtendAsync(Engine engine)
     {
-        if (!engine.GetContext().TryGetValueIfExists<DomainId>("appId", out var appId))
-        {
-            return;
-        }
-
         var increment = new Action<string, Action<JsValue>>((name, callback) =>
         {
+            if (!engine.TryGetVar<DomainId>("appId", out var appId))
+            {
+                throw new JavaScriptException("'incrementCounterV2' is not available in this script.");
+            }
+
             IncrementV2(engine, appId, name, callback);
         });
 
@@ -57,6 +63,11 @@ public sealed class CounterJintExtension(ICounterService counterService) : IJint
 
         var reset = new CounterResetV2Delegate((name, callback, value) =>
         {
+            if (!engine.TryGetVar<DomainId>("appId", out var appId))
+            {
+                throw new JavaScriptException("'resetCounterV2' is not available in this script.");
+            }
+
             ResetV2(engine, appId, name, callback, value);
         });
 

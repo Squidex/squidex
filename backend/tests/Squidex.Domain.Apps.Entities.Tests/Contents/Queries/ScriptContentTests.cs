@@ -19,10 +19,14 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries;
 public class ScriptContentTests : GivenContext
 {
     private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
+    private readonly IAsyncScript script = A.Fake<IAsyncScript>();
     private readonly ScriptContent sut;
 
     public ScriptContentTests()
     {
+        A.CallTo(() => scriptEngine.CreateAsyncScript(A<string>._, A<ScriptOptions>._))
+            .Returns(script);
+
         sut = new ScriptContent(scriptEngine);
     }
 
@@ -33,7 +37,7 @@ public class ScriptContentTests : GivenContext
 
         await sut.EnrichAsync(ApiContext, [content], SchemaProvider(), CancellationToken);
 
-        A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
+        A.CallTo(() => script.TransformAsync(A<DataScriptVars>._, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -49,7 +53,7 @@ public class ScriptContentTests : GivenContext
 
         await sut.EnrichAsync(FrontendContext, [content], SchemaProvider(), CancellationToken);
 
-        A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
+        A.CallTo(() => script.TransformAsync(A<DataScriptVars>._, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -65,7 +69,7 @@ public class ScriptContentTests : GivenContext
 
         await sut.EnrichAsync(ContextWithNoScript(), [content], SchemaProvider(), CancellationToken);
 
-        A.CallTo(() => scriptEngine.TransformAsync(A<DataScriptVars>._, A<string>._, ScriptOptions(), A<CancellationToken>._))
+        A.CallTo(() => script.TransformAsync(A<DataScriptVars>._, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
@@ -84,15 +88,16 @@ public class ScriptContentTests : GivenContext
 
         Assert.NotSame(contentBefore.Data, contentData);
 
-        A.CallTo(() => scriptEngine.TransformAsync(
+        A.CallTo(() => scriptEngine.CreateAsyncScript("my-query", ScriptOptions()))
+            .MustHaveHappened();
+
+        A.CallTo(() => script.TransformAsync(
                 A<DataScriptVars>.That.Matches(x =>
                     Equals(x["contentId"], contentBefore.Id) &&
                     Equals(x["data"], contentData) &&
                     Equals(x["appId"], AppId.Id) &&
                     Equals(x["appName"], AppId.Name) &&
                     Equals(x["user"], ApiContext.UserPrincipal)),
-                "my-query",
-                ScriptOptions(),
                 CancellationToken))
             .MustHaveHappened();
     }
@@ -124,15 +129,16 @@ public class ScriptContentTests : GivenContext
                 CancellationToken))
             .MustHaveHappened();
 
-        A.CallTo(() => scriptEngine.TransformAsync(
+        A.CallTo(() => scriptEngine.CreateAsyncScript("my-query", ScriptOptions()))
+            .MustHaveHappened();
+
+        A.CallTo(() => script.TransformAsync(
                 A<DataScriptVars>.That.Matches(x =>
                     Equals(x["contentId"], contentBefore.Id) &&
                     Equals(x["data"], contentData) &&
                     Equals(x["appId"], AppId.Id) &&
                     Equals(x["appName"], AppId.Name) &&
                     Equals(x["user"], ApiContext.UserPrincipal)),
-                "my-query",
-                ScriptOptions(),
                 CancellationToken))
             .MustHaveHappened();
     }
