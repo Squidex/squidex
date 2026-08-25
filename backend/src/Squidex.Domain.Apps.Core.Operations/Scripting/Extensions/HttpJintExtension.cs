@@ -21,48 +21,48 @@ public sealed class HttpJintExtension(IHttpClientFactory httpClientFactory) : IJ
     private delegate void HttpJsonWithBodyDelegate(string url, JsValue body, Action<JsValue> callback, JsValue? headers = null, bool ignoreError = false);
     private delegate void HttpRequestDelegate(JsValue requestInit, Action<JsValue> callback);
 
-    public void ExtendAsync(ScriptExecutionContext context)
+    public void ExtendAsync(Engine engine)
     {
-        AddBodyMethod(context, HttpMethod.Patch, "patchJSON");
-        AddBodyMethod(context, HttpMethod.Post, "postJSON");
-        AddBodyMethod(context, HttpMethod.Put, "putJSON");
-        AddMethod(context, HttpMethod.Delete, "deleteJSON");
-        AddMethod(context, HttpMethod.Get, "getJSON");
-        AddMethod(context, "request");
+        AddBodyMethod(engine, HttpMethod.Patch, "patchJSON");
+        AddBodyMethod(engine, HttpMethod.Post, "postJSON");
+        AddBodyMethod(engine, HttpMethod.Put, "putJSON");
+        AddMethod(engine, HttpMethod.Delete, "deleteJSON");
+        AddMethod(engine, HttpMethod.Get, "getJSON");
+        AddMethod(engine, "request");
     }
 
-    private void AddMethod(ScriptExecutionContext context, string name)
+    private void AddMethod(Engine engine, string name)
     {
         var action = new HttpRequestDelegate((requestInit, callback) =>
         {
-            var httpRequest = ParseRequestInit(requestInit);
-            Request(context, httpRequest.Method, httpRequest.Url, httpRequest.Body, callback, httpRequest.Headers, true, true);
+            var (url, method, headers, body) = ParseRequestInit(requestInit);
+            Request(engine, method, url, body, callback, headers, true, true);
         });
 
-        context.Engine.SetValue(name, action);
+        engine.SetValue(name, action);
     }
 
-    private void AddMethod(ScriptExecutionContext context, HttpMethod method, string name)
+    private void AddMethod(Engine engine, HttpMethod method, string name)
     {
         var action = new HttpJsonDelegate((url, callback, headers, ignoreError) =>
         {
-            Request(context, method, url, null, callback, headers, ignoreError);
+            Request(engine, method, url, null, callback, headers, ignoreError);
         });
 
-        context.Engine.SetValue(name, action);
+        engine.SetValue(name, action);
     }
 
-    private void AddBodyMethod(ScriptExecutionContext context, HttpMethod method, string name)
+    private void AddBodyMethod(Engine engine, HttpMethod method, string name)
     {
         var action = new HttpJsonWithBodyDelegate((url, body, callback, headers, ignoreError) =>
         {
-            Request(context, method, url, body, callback, headers, ignoreError);
+            Request(engine, method, url, body, callback, headers, ignoreError);
         });
 
-        context.Engine.SetValue(name, action);
+        engine.SetValue(name, action);
     }
 
-    private void Request(ScriptExecutionContext context, HttpMethod method, string url, JsValue? body, Action<JsValue> callback, JsValue? headers, bool ignoreError, bool forceRawResponse = false)
+    private void Request(Engine engine, HttpMethod method, string url, JsValue? body, Action<JsValue> callback, JsValue? headers, bool ignoreError, bool forceRawResponse = false)
     {
         if (!Uri.TryCreate(url, UriKind.Absolute, out var uri))
         {
@@ -74,53 +74,67 @@ public sealed class HttpJintExtension(IHttpClientFactory httpClientFactory) : IJ
             throw new JavaScriptException("Callback is not defined.");
         }
 
-        context.Schedule(async (scheduler, ct) =>
+        // The request reads javascript values and is therefore created while we are still inside the engine.
+        var request = CreateRequest(engine, method, uri, body, headers);
+
+        engine.Schedule(async ct =>
         {
             try
             {
-                var httpClient = httpClientFactory.CreateClient("Jint");
-
-                var request = CreateRequest(context, method, uri, body, headers);
-                var response = await httpClient.SendAsync(request, ct);
-
-                if (!ignoreError)
+                using (request)
                 {
-                    response.EnsureSuccessStatusCode();
-                }
+                    var httpClient = httpClientFactory.CreateClient("Jint");
 
-                JsValue responseObject;
+                    using var response = await httpClient.SendAsync(request, ct);
 
-                var responseString = await response.Content.ReadAsStringAsync(ct);
-
-                if (ignoreError && (forceRawResponse || !response.IsSuccessStatusCode || string.IsNullOrEmpty(responseString)))
-                {
-                    responseObject = JsValue.FromObject(context.Engine, new Dictionary<string, object?>
+                    if (!ignoreError)
                     {
-                        ["statusCode"] = (int)response.StatusCode,
-                        ["headers"] =
+                        response.EnsureSuccessStatusCode();
+                    }
+
+                    var responseString = await response.Content.ReadAsStringAsync(ct);
+
+                    return (
+                        StatusCode: (int)response.StatusCode,
+                        Headers:
                             response.Content.Headers
                                 .Concat(response.Headers)
                                 .Concat(response.TrailingHeaders)
                                 .GroupBy(x => x.Key)
                                 .ToDictionary(x => x.Key, x => x.Last().Value.First()),
-                        ["body"] = responseString,
-                    });
+                        Body: responseString,
+                        IsRaw: ignoreError && (forceRawResponse || !response.IsSuccessStatusCode || string.IsNullOrEmpty(responseString))
+                    );
                 }
-                else
-                {
-                    responseObject = ParseResponse(context, responseString, ct);
-                }
-
-                scheduler.Run(callback, responseObject);
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 throw new JavaScriptException(ex.Message);
             }
+        },
+        response =>
+        {
+            JsValue responseObject;
+
+            if (response.IsRaw)
+            {
+                responseObject = JsValue.FromObject(engine, new Dictionary<string, object?>
+                {
+                    ["statusCode"] = response.StatusCode,
+                    ["headers"] = response.Headers,
+                    ["body"] = response.Body,
+                });
+            }
+            else
+            {
+                responseObject = new JsonParser(engine).Parse(response.Body);
+            }
+
+            callback(responseObject);
         });
     }
 
-    private static HttpRequestMessage CreateRequest(ScriptExecutionContext context,
+    private static HttpRequestMessage CreateRequest(Engine engine,
         HttpMethod method,
         Uri uri,
         JsValue? body,
@@ -166,7 +180,7 @@ public sealed class HttpJintExtension(IHttpClientFactory httpClientFactory) : IJ
             }
             else
             {
-                var jsonWriter = new JsonSerializer(context.Engine);
+                var jsonWriter = new JsonSerializer(engine);
                 var jsonContent = jsonWriter.Serialize(body, JsValue.Undefined, JsValue.Undefined)?.ToString();
 
                 if (jsonContent != null)
@@ -177,19 +191,6 @@ public sealed class HttpJintExtension(IHttpClientFactory httpClientFactory) : IJ
         }
 
         return request;
-    }
-
-    private static JsValue ParseResponse(ScriptExecutionContext context, string responseString,
-        CancellationToken ct)
-    {
-        ct.ThrowIfCancellationRequested();
-
-        var jsonParser = new JsonParser(context.Engine);
-        var jsonValue = jsonParser.Parse(responseString);
-
-        ct.ThrowIfCancellationRequested();
-
-        return jsonValue;
     }
 
     public void Describe(AddDescription describe, ScriptScope scope)

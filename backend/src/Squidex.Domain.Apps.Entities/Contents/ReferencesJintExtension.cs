@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Security.Claims;
+using Jint;
 using Jint.Native;
 using Jint.Runtime;
 using Microsoft.Extensions.DependencyInjection;
@@ -21,8 +22,10 @@ public sealed class ReferencesJintExtension(IServiceProvider serviceProvider) : 
 {
     private delegate void GetReferencesDelegate(JsValue references, Action<JsValue> callback);
 
-    public void ExtendAsync(ScriptExecutionContext context)
+    public void ExtendAsync(Engine engine)
     {
+        var context = engine.GetContext();
+
         if (!context.TryGetValueIfExists<DomainId>("appId", out var appId))
         {
             return;
@@ -35,20 +38,20 @@ public sealed class ReferencesJintExtension(IServiceProvider serviceProvider) : 
 
         var getReference = new GetReferencesDelegate((references, callback) =>
         {
-            GetReference(context, appId, user, references, callback);
+            GetReference(engine, appId, user, references, callback);
         });
 
         var getReferences = new GetReferencesDelegate((references, callback) =>
         {
-            GetReferences(context, appId, user, references, callback);
+            GetReferences(engine, appId, user, references, callback);
         });
 
-        context.Engine.SetValue("getReference", getReferences);
-        context.Engine.SetValue("getReferenceV2", getReference);
-        context.Engine.SetValue("getReferences", getReferences);
+        engine.SetValue("getReference", getReferences);
+        engine.SetValue("getReferenceV2", getReference);
+        engine.SetValue("getReferences", getReferences);
     }
 
-    private void GetReferences(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user,
+    private void GetReferences(Engine engine, DomainId appId, ClaimsPrincipal user,
         JsValue references, Action<JsValue> callback)
     {
         if (callback == null)
@@ -56,23 +59,18 @@ public sealed class ReferencesJintExtension(IServiceProvider serviceProvider) : 
             throw new JavaScriptException("Callback is not defined.");
         }
 
-        context.Schedule(async (scheduler, ct) =>
+        // The javascript values are read while we are still inside the engine.
+        var ids = references.ToIds();
+
+        if (ids.Count == 0)
         {
-            var ids = references.ToIds();
+            callback(new JsArray(engine));
+            return;
+        }
 
-            if (ids.Count == 0)
-            {
-                scheduler.Run(callback, new JsArray(context.Engine));
-                return;
-            }
-
+        engine.Schedule(async ct =>
+        {
             var app = await GetAppAsync(appId);
-
-            if (app == null)
-            {
-                scheduler.Run(callback, new JsArray(context.Engine));
-                return;
-            }
 
             var contentQuery = serviceProvider.GetRequiredService<IContentQueryService>();
 
@@ -83,13 +81,12 @@ public sealed class ReferencesJintExtension(IServiceProvider serviceProvider) : 
                     .WithUnpublished()
                     .WithNoTotal());
 
-            var contents = await contentQuery.QueryAsync(requestContext, Q.Empty.WithIds(ids), ct);
-
-            scheduler.Run(callback, JsValue.FromObject(context.Engine, contents.ToArray()));
-        });
+            return await contentQuery.QueryAsync(requestContext, Q.Empty.WithIds(ids), ct);
+        },
+        contents => callback(JsValue.FromObject(engine, contents.ToArray())));
     }
 
-    private void GetReference(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user,
+    private void GetReference(Engine engine, DomainId appId, ClaimsPrincipal user,
         JsValue references, Action<JsValue> callback)
     {
         if (callback == null)
@@ -97,23 +94,18 @@ public sealed class ReferencesJintExtension(IServiceProvider serviceProvider) : 
             throw new JavaScriptException("Callback is not defined.");
         }
 
-        context.Schedule(async (scheduler, ct) =>
+        // The javascript values are read while we are still inside the engine.
+        var ids = references.ToIds();
+
+        if (ids.Count == 0)
         {
-            var ids = references.ToIds();
+            callback(JsValue.Null);
+            return;
+        }
 
-            if (ids.Count == 0)
-            {
-                scheduler.Run(callback, JsValue.Null);
-                return;
-            }
-
+        engine.Schedule(async ct =>
+        {
             var app = await GetAppAsync(appId);
-
-            if (app == null)
-            {
-                scheduler.Run(callback, JsValue.Null);
-                return;
-            }
 
             var contentQuery = serviceProvider.GetRequiredService<IContentQueryService>();
 
@@ -124,10 +116,9 @@ public sealed class ReferencesJintExtension(IServiceProvider serviceProvider) : 
                     .WithUnpublished()
                     .WithNoTotal());
 
-            var contents = await contentQuery.QueryAsync(requestContext, Q.Empty.WithIds(ids), ct);
-
-            scheduler.Run(callback, JsValue.FromObject(context.Engine, contents.FirstOrDefault()));
-        });
+            return await contentQuery.QueryAsync(requestContext, Q.Empty.WithIds(ids), ct);
+        },
+        contents => callback(JsValue.FromObject(engine, contents.FirstOrDefault())));
     }
 
     private async Task<App> GetAppAsync(DomainId appId)

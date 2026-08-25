@@ -62,6 +62,11 @@ public sealed class JintScriptEngine(IMemoryCache cache, IOptions<JintScriptOpti
         {
             throw MapException(ex);
         }
+        finally
+        {
+            // Stop pending tasks before the token source is disposed, they must not touch the engine anymore.
+            await combined.CancelAsync();
+        }
     }
 
     public async Task<ContentData> TransformAsync(DataScriptVars vars, string script, ScriptOptions options = default,
@@ -109,6 +114,11 @@ public sealed class JintScriptEngine(IMemoryCache cache, IOptions<JintScriptOpti
         catch (Exception ex)
         {
             throw MapException(ex);
+        }
+        finally
+        {
+            // Stop pending tasks before the token source is disposed, they must not touch the engine anymore.
+            await combined.CancelAsync();
         }
     }
 
@@ -165,11 +175,6 @@ public sealed class JintScriptEngine(IMemoryCache cache, IOptions<JintScriptOpti
         if (options.CanReject)
         {
             engine.AddReject();
-        }
-
-        foreach (var extension in extensions)
-        {
-            extension.Extend(engine);
         }
 
         return new ScriptExecutionContext<T>(engine, ct);

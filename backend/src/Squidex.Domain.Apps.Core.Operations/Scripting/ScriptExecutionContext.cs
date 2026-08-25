@@ -5,27 +5,54 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Runtime.CompilerServices;
 using Acornima.Ast;
 using Jint;
 using Jint.Native;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Tasks;
 
 namespace Squidex.Domain.Apps.Core.Scripting;
 
-public abstract class ScriptExecutionContext(Engine engine) : ScriptVars
+public abstract class ScriptExecutionContext : ScriptVars
 {
-    public Engine Engine { get; } = engine;
+    private static readonly ConditionalWeakTable<Engine, ScriptExecutionContext> Contexts = new ConditionalWeakTable<Engine, ScriptExecutionContext>();
+
+    public Engine Engine { get; }
+
+    protected ScriptExecutionContext(Engine engine)
+    {
+        Engine = engine;
+
+        // The extensions only get the engine and resolve the context from there.
+        Contexts.AddOrUpdate(engine, this);
+    }
+
+    public static ScriptExecutionContext GetContext(Engine engine)
+    {
+        if (!Contexts.TryGetValue(engine, out var context))
+        {
+            ThrowHelper.InvalidOperationException("Engine is not attached to a script context.");
+            return default!;
+        }
+
+        return context;
+    }
 
     public abstract JsValue Evaluate(Prepared<Script> script);
 
     public abstract Task<JsValue> EvaluateAsync(Prepared<Script> script);
 
-    public abstract void Schedule(Func<IScheduler, CancellationToken, Task> action);
+    public abstract void Schedule(Func<CancellationToken, Task> action);
+
+    public abstract void Schedule<TResult>(Func<CancellationToken, Task<TResult>> action, Action<TResult>? callback);
 }
 
-public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, IScheduler
+public sealed class ScriptExecutionContext<T> : ScriptExecutionContext
 {
-    private readonly TaskCompletionSource<CompletedValue?> tcs = new TaskCompletionSource<CompletedValue?>();
+    private readonly TaskCompletionSource<CompletedValue?> tcs = new TaskCompletionSource<CompletedValue?>(TaskCreationOptions.RunContinuationsAsynchronously);
+    private readonly SemaphoreSlim engineLock = new SemaphoreSlim(1);
+    private readonly CancellationTokenRegistration cancellationRegistration;
     private readonly CancellationToken cancellationToken;
     private int pendingTasks = 1;
 
@@ -34,28 +61,55 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
         public T Value { get; init; }
     }
 
+    private readonly struct Releaser(SemaphoreSlim semaphore) : IDisposable
+    {
+        public void Dispose()
+        {
+            semaphore.Release();
+        }
+    }
+
     public bool IsCompleted
     {
-        get => tcs.Task.Status is TaskStatus.RanToCompletion or TaskStatus.Faulted;
+        get => tcs.Task.IsCompleted;
     }
 
     internal ScriptExecutionContext(Engine engine, CancellationToken cancellationToken)
         : base(engine)
     {
         this.cancellationToken = cancellationToken;
+
+        // Settle the source on cancellation, so that pending callbacks do not enter the engine anymore.
+        cancellationRegistration = cancellationToken.Register(static state =>
+        {
+            var self = (ScriptExecutionContext<T>)state!;
+
+            self.tcs.TrySetCanceled(self.cancellationToken);
+        },
+        this);
     }
 
     public async Task<T> WaitForCompletionAsync(Func<T> fallback)
     {
         TryComplete();
-
-        var result = await tcs.Task.WithCancellation(cancellationToken);
-        if (result == null)
+        try
         {
-            return fallback();
-        }
+            var result = await tcs.Task;
+            if (result != null)
+            {
+                return result.Value;
+            }
 
-        return result.Value;
+            // The fallback converts javascript values and therefore needs exclusive access to the engine.
+            using (await LockEngineAsync())
+            {
+                return fallback();
+            }
+        }
+        finally
+        {
+            await cancellationRegistration.DisposeAsync();
+        }
     }
 
     public void Complete(T value)
@@ -65,15 +119,36 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
 
     public override JsValue Evaluate(Prepared<Script> script)
     {
+        // The synchronous path cannot schedule tasks, therefore nothing else can enter the engine.
         return Engine.Evaluate(script);
     }
 
     public override Task<JsValue> EvaluateAsync(Prepared<Script> script)
     {
+        // The lock cannot be taken here, otherwise we would deadlock.
         return Engine.EvaluateAsync(script, cancellationToken);
     }
 
-    public override void Schedule(Func<IScheduler, CancellationToken, Task> action)
+    public override void Schedule(Func<CancellationToken, Task> action)
+    {
+        ScheduleCoreAsync(CallWithDummyResult(action), null);
+    }
+
+    public override void Schedule<TResult>(Func<CancellationToken, Task<TResult>> action, Action<TResult>? callback)
+    {
+        ScheduleCoreAsync(action, callback);
+    }
+
+    private static Func<CancellationToken, Task<bool>> CallWithDummyResult(Func<CancellationToken, Task> action)
+    {
+        return async ct =>
+        {
+            await action(ct);
+            return true;
+        };
+    }
+
+    private void ScheduleCoreAsync<TResult>(Func<CancellationToken, Task<TResult>> action, Action<TResult>? callback)
     {
         if (IsCompleted)
         {
@@ -85,7 +160,21 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
             TryStart();
             try
             {
-                await action(this, cancellationToken);
+                // The action must not touch the engine, so that parallel tasks do not block each other.
+                var result = await action(cancellationToken);
+
+                // The callback converts javascript values and is therefore the only part that needs the lock.
+                using (await LockEngineAsync())
+                {
+                    if (!IsCompleted)
+                    {
+                        // The task can take a while, therefore the callback gets a fresh timeout.
+                        Engine.Constraints.Reset();
+
+                        callback?.Invoke(result);
+                    }
+                }
+
                 TryComplete();
             }
             catch (Exception ex)
@@ -97,52 +186,11 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
         ScheduleAsync().Forget();
     }
 
-    void IScheduler.Run(Action? action)
+    private async Task<Releaser> LockEngineAsync()
     {
-        if (IsCompleted || action == null)
-        {
-            return;
-        }
+        await engineLock.WaitAsync(cancellationToken);
 
-        TryStart();
-        try
-        {
-            lock (Engine)
-            {
-                Engine.Constraints.Reset();
-                action();
-            }
-
-            TryComplete();
-        }
-        catch (Exception ex)
-        {
-            TryFail(ex);
-        }
-    }
-
-    void IScheduler.Run<TArg>(Action<TArg>? action, TArg argument)
-    {
-        if (IsCompleted || action == null)
-        {
-            return;
-        }
-
-        TryStart();
-        try
-        {
-            lock (Engine)
-            {
-                Engine.Constraints.Reset();
-                action(argument);
-            }
-
-            TryComplete(default!);
-        }
-        catch (Exception ex)
-        {
-            TryFail(ex);
-        }
+        return new Releaser(engineLock);
     }
 
     private void TryFail(Exception exception)
@@ -162,13 +210,4 @@ public sealed class ScriptExecutionContext<T> : ScriptExecutionContext, ISchedul
             tcs.TrySetResult(result);
         }
     }
-}
-
-#pragma warning disable MA0048 // File name must match type name
-public interface IScheduler
-#pragma warning restore MA0048 // File name must match type name
-{
-    void Run(Action? action);
-
-    void Run<T>(Action<T>? action, T argument);
 }

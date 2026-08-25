@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Jint;
 using Jint.Native;
 using Jint.Runtime;
 using Squidex.AI;
@@ -20,39 +21,40 @@ public sealed class StringAsyncJintExtension(ITranslator translator, IChatAgent 
     private delegate void TextGenerateDelegate(string prompt, Action<JsValue> callback);
     private delegate void TextTranslateDelegate(string text, string language, Action<JsValue> callback, string sourceLanguage);
 
-    public void ExtendAsync(ScriptExecutionContext context)
+    public void ExtendAsync(Engine engine)
     {
         var generate = new TextGenerateDelegate((prompt, callback) =>
         {
-            Generate(context, prompt, callback);
+            Generate(engine, prompt, callback);
         });
 
         var translate = new TextTranslateDelegate((text, language, callback, sourceLanguage) =>
         {
-            Translate(context, text, language, callback, sourceLanguage);
+            Translate(engine, text, language, callback, sourceLanguage);
         });
 
-        context.Engine.SetValue("generate", generate);
-        context.Engine.SetValue("translate", translate);
+        engine.SetValue("generate", generate);
+        engine.SetValue("translate", translate);
     }
 
-    private void Generate(ScriptExecutionContext context, string prompt, Action<JsValue> callback)
+    private void Generate(Engine engine, string prompt, Action<JsValue> callback)
     {
         if (callback == null)
         {
             throw new JavaScriptException("Callback is not defined.");
         }
 
-        context.Schedule(async (scheduler, ct) =>
+        // We are still inside the engine here, therefore the callback can be invoked directly.
+        if (string.IsNullOrWhiteSpace(prompt))
+        {
+            callback(JsValue.Null);
+            return;
+        }
+
+        engine.Schedule(async ct =>
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(prompt))
-                {
-                    scheduler.Run(callback, JsValue.Null);
-                    return;
-                }
-
                 var request = new ChatRequest
                 {
                     Prompt = prompt,
@@ -60,41 +62,44 @@ public sealed class StringAsyncJintExtension(ITranslator translator, IChatAgent 
 
                 var result = await chatAgent.PromptAsync(request, ct: ct);
 
-                scheduler.Run(callback, JsValue.FromObject(context.Engine, result.Content));
+                return result.Content;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 throw new JavaScriptException(ex.Message);
             }
-        });
+        },
+        content => callback(JsValue.FromObject(engine, content)));
     }
 
-    private void Translate(ScriptExecutionContext context, string text, string language, Action<JsValue> callback, string sourceLanguage)
+    private void Translate(Engine engine, string text, string language, Action<JsValue> callback, string sourceLanguage)
     {
         if (callback == null)
         {
             throw new JavaScriptException("Callback is not defined.");
         }
 
-        context.Schedule(async (scheduler, ct) =>
+        // We are still inside the engine here, therefore the callback can be invoked directly.
+        if (string.IsNullOrWhiteSpace(text) || string.IsNullOrWhiteSpace(language))
+        {
+            callback(JsValue.Null);
+            return;
+        }
+
+        engine.Schedule(async ct =>
         {
             try
             {
-                if (string.IsNullOrWhiteSpace(text) || string.IsNullOrWhiteSpace(language))
-                {
-                    scheduler.Run(callback, JsValue.Null);
-                    return;
-                }
-
                 var translation = await translator.TranslateAsync(text, language, sourceLanguage, ct);
 
-                scheduler.Run(callback, JsValue.FromObject(context.Engine, translation.Text));
+                return translation.Text;
             }
-            catch (Exception ex)
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
                 throw new JavaScriptException(ex.Message);
             }
-        });
+        },
+        translated => callback(JsValue.FromObject(engine, translated)));
     }
 
     public void Describe(AddDescription describe, ScriptScope scope)

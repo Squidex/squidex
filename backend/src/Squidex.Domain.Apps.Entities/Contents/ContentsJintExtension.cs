@@ -22,8 +22,10 @@ public sealed class ContentsJintExtension(IServiceProvider serviceProvider) : IJ
 {
     private delegate void GetContentsDelegate(string schema, JsValue query, Action<JsValue> callback);
 
-    public void ExtendAsync(ScriptExecutionContext context)
+    public void ExtendAsync(Engine engine)
     {
+        var context = engine.GetContext();
+
         if (!context.TryGetValueIfExists<DomainId>("appId", out var appId))
         {
             return;
@@ -36,13 +38,13 @@ public sealed class ContentsJintExtension(IServiceProvider serviceProvider) : IJ
 
         var getContents = new GetContentsDelegate((schemas, query, callback) =>
         {
-            GetContents(context, appId, user, schemas, query, callback);
+            GetContents(engine, appId, user, schemas, query, callback);
         });
 
-        context.Engine.SetValue("getContents", getContents);
+        engine.SetValue("getContents", getContents);
     }
 
-    private void GetContents(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user,
+    private void GetContents(Engine engine, DomainId appId, ClaimsPrincipal user,
         string schema, JsValue query, Action<JsValue> callback)
     {
         if (callback == null)
@@ -50,15 +52,23 @@ public sealed class ContentsJintExtension(IServiceProvider serviceProvider) : IJ
             throw new JavaScriptException("Callback is not defined.");
         }
 
-        context.Schedule(async (scheduler, ct) =>
+        // The query is read while we are still inside the engine.
+        var q = Q.Empty;
+        if (query is ObjectInstance obj)
+        {
+            if (obj.TryGetValue("query", out var t) && t is JsString oDataQuery)
+            {
+                q = q.WithODataQuery(oDataQuery.AsString());
+            }
+        }
+        else if (query is JsString oDataQueryValue)
+        {
+            q = q.WithODataQuery(oDataQueryValue.AsString());
+        }
+
+        engine.Schedule(async ct =>
         {
             var app = await GetAppAsync(appId);
-
-            if (app == null)
-            {
-                scheduler.Run(callback, new JsArray(context.Engine));
-                return;
-            }
 
             var contentQuery = serviceProvider.GetRequiredService<IContentQueryService>();
 
@@ -69,23 +79,9 @@ public sealed class ContentsJintExtension(IServiceProvider serviceProvider) : IJ
                     .WithUnpublished()
                     .WithNoTotal());
 
-            var q = Q.Empty;
-            if (query is ObjectInstance obj)
-            {
-                if (obj.TryGetValue("query", out var t) && t is JsString oDataQuery)
-                {
-                    q = q.WithODataQuery(oDataQuery.AsString());
-                }
-            }
-            else if (query is JsString oDataQuery)
-            {
-                q = q.WithODataQuery(oDataQuery.AsString());
-            }
-
-            var contents = await contentQuery.QueryAsync(requestContext, schema, q, ct);
-
-            scheduler.Run(callback, JsValue.FromObject(context.Engine, contents.ToArray()));
-        });
+            return await contentQuery.QueryAsync(requestContext, schema, q, ct);
+        },
+        contents => callback(JsValue.FromObject(engine, contents.ToArray())));
     }
 
     private async Task<App> GetAppAsync(DomainId appId)

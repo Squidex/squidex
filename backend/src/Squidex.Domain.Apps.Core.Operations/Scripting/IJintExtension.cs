@@ -15,11 +15,7 @@ public interface IJintExtension
     {
     }
 
-    void Extend(ScriptExecutionContext context)
-    {
-    }
-
-    void ExtendAsync(ScriptExecutionContext context)
+    void ExtendAsync(Engine engine)
     {
     }
 }

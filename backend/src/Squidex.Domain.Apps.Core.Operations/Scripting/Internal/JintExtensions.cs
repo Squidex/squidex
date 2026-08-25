@@ -37,7 +37,7 @@ public static class JintExtensions
     {
         foreach (var extension in extensions)
         {
-            extension.ExtendAsync(context);
+            extension.ExtendAsync(context.Engine);
         }
 
         return context;
@@ -48,7 +48,7 @@ public static class JintExtensions
     {
         foreach (var extension in extensions)
         {
-            extension.Extend(context);
+            extension.Extend(context.Engine);
         }
 
         return context;

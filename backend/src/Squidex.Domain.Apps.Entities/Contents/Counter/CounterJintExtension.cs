@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Jint;
 using Jint.Native;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Entities.Properties;
@@ -18,9 +19,9 @@ public sealed class CounterJintExtension(ICounterService counterService) : IJint
     private delegate long CounterResetDelegate(string name, long value = 0);
     private delegate void CounterResetV2Delegate(string name, Action<JsValue>? callback = null, long value = 0);
 
-    public void Extend(ScriptExecutionContext context)
+    public void Extend(Engine engine)
     {
-        if (!context.TryGetValueIfExists<DomainId>("appId", out var appId))
+        if (!engine.GetContext().TryGetValueIfExists<DomainId>("appId", out var appId))
         {
             return;
         }
@@ -30,36 +31,36 @@ public sealed class CounterJintExtension(ICounterService counterService) : IJint
             return Increment(appId, name);
         });
 
-        context.Engine.SetValue("incrementCounter", increment);
+        engine.SetValue("incrementCounter", increment);
 
         var reset = new CounterResetDelegate((name, value) =>
         {
             return Reset(appId, name, value);
         });
 
-        context.Engine.SetValue("resetCounter", reset);
+        engine.SetValue("resetCounter", reset);
     }
 
-    public void ExtendAsync(ScriptExecutionContext context)
+    public void ExtendAsync(Engine engine)
     {
-        if (!context.TryGetValueIfExists<DomainId>("appId", out var appId))
+        if (!engine.GetContext().TryGetValueIfExists<DomainId>("appId", out var appId))
         {
             return;
         }
 
         var increment = new Action<string, Action<JsValue>>((name, callback) =>
         {
-            IncrementV2(context, appId, name, callback);
+            IncrementV2(engine, appId, name, callback);
         });
 
-        context.Engine.SetValue("incrementCounterV2", increment);
+        engine.SetValue("incrementCounterV2", increment);
 
         var reset = new CounterResetV2Delegate((name, callback, value) =>
         {
-            ResetV2(context, appId, name, callback, value);
+            ResetV2(engine, appId, name, callback, value);
         });
 
-        context.Engine.SetValue("resetCounterV2", reset);
+        engine.SetValue("resetCounterV2", reset);
     }
 
     private long Increment(DomainId appId, string name)
@@ -67,17 +68,10 @@ public sealed class CounterJintExtension(ICounterService counterService) : IJint
         return AsyncHelper.Sync(() => counterService.IncrementAsync(appId, name));
     }
 
-    private void IncrementV2(ScriptExecutionContext context, DomainId appId, string name, Action<JsValue> callback)
+    private void IncrementV2(Engine engine, DomainId appId, string name, Action<JsValue> callback)
     {
-        context.Schedule(async (scheduler, ct) =>
-        {
-            var result = await counterService.IncrementAsync(appId, name, ct);
-
-            if (callback != null)
-            {
-                scheduler.Run(callback, JsValue.FromObject(context.Engine, result));
-            }
-        });
+        engine.Schedule(ct => counterService.IncrementAsync(appId, name, ct),
+            result => callback?.Invoke(JsValue.FromObject(engine, result)));
     }
 
     private long Reset(DomainId appId, string name, long value)
@@ -85,17 +79,10 @@ public sealed class CounterJintExtension(ICounterService counterService) : IJint
         return AsyncHelper.Sync(() => counterService.ResetAsync(appId, name, value));
     }
 
-    private void ResetV2(ScriptExecutionContext context, DomainId appId, string name, Action<JsValue>? callback, long value)
+    private void ResetV2(Engine engine, DomainId appId, string name, Action<JsValue>? callback, long value)
     {
-        context.Schedule(async (scheduler, ct) =>
-        {
-            var result = await counterService.ResetAsync(appId, name, value, ct);
-
-            if (callback != null)
-            {
-                scheduler.Run(callback, JsValue.FromObject(context.Engine, result));
-            }
-        });
+        engine.Schedule(ct => counterService.ResetAsync(appId, name, value, ct),
+            result => callback?.Invoke(JsValue.FromObject(engine, result)));
     }
 
     public void Describe(AddDescription describe, ScriptScope scope)

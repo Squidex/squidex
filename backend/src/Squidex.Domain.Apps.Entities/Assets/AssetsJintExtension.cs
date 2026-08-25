@@ -32,46 +32,47 @@ public sealed class AssetsJintExtension(IServiceProvider serviceProvider) : IJin
     private delegate void GetAssetTextDelegate(JsValue asset, Action<JsValue> callback, JsValue? encoding);
     private delegate void GetBlurHashDelegate(JsValue asset, Action<JsValue> callback, JsValue? componentX, JsValue? componentY);
 
-    public void ExtendAsync(ScriptExecutionContext context)
+    public void ExtendAsync(Engine engine)
     {
-        AddGetAssetText(context);
-        AddGetAssetBlurHash(context);
-        AddGetAssetObject(context);
-        AddUpdateAsset(context);
+        AddGetAssetText(engine);
+        AddGetAssetBlurHash(engine);
+        AddGetAssetObject(engine);
+        AddUpdateAsset(engine);
     }
 
-    private void AddUpdateAsset(ScriptExecutionContext context)
+    private void AddUpdateAsset(Engine engine)
     {
-        if (!context.TryGetValueIfExists<ClaimsPrincipal>("user", out var user))
+        if (!engine.GetContext().TryGetValueIfExists<ClaimsPrincipal>("user", out var user))
         {
             return;
         }
 
         var updateAsset = new UpdateAssetDelegate((asset, metadata) =>
         {
-            UpdateAsset(context, user, asset, metadata);
+            UpdateAsset(engine, user, asset, metadata);
         });
 
-        context.Engine.SetValue("updateAsset", updateAsset);
+        engine.SetValue("updateAsset", updateAsset);
     }
 
-    private void UpdateAsset(ScriptExecutionContext context, ClaimsPrincipal user, JsValue input, JsValue metadata)
+    private void UpdateAsset(Engine engine, ClaimsPrincipal user, JsValue input, JsValue metadata)
     {
-        context.Schedule(async (scheduler, ct) =>
+        // The javascript values are read while we are still inside the engine.
+        if (!TryGetAssetRef(engine, input, out var asset) || metadata is not ObjectInstance metadataObj)
         {
-            if (!TryGetAssetRef(context, input, out var asset) || metadata is not ObjectInstance metadataObj)
-            {
-                return;
-            }
+            return;
+        }
 
+        var assetMetadata = new AssetMetadata();
+
+        foreach (var (key, value) in metadataObj.GetOwnProperties())
+        {
+            assetMetadata[key.AsString()] = JsonMapper.Map(value.Value);
+        }
+
+        engine.Schedule(async ct =>
+        {
             var commandBus = serviceProvider.GetRequiredService<ICommandBus>();
-
-            var assetMetadata = new AssetMetadata();
-
-            foreach (var (key, value) in metadataObj.GetOwnProperties())
-            {
-                assetMetadata[key.AsString()] = JsonMapper.Map(value.Value);
-            }
 
             var command = new AnnotateAsset
             {
@@ -87,8 +88,10 @@ public sealed class AssetsJintExtension(IServiceProvider serviceProvider) : IJin
         });
     }
 
-    private void AddGetAssetObject(ScriptExecutionContext context)
+    private void AddGetAssetObject(Engine engine)
     {
+        var context = engine.GetContext();
+
         if (!context.TryGetValueIfExists<DomainId>("appId", out var appId))
         {
             return;
@@ -101,40 +104,40 @@ public sealed class AssetsJintExtension(IServiceProvider serviceProvider) : IJin
 
         var getAssets = new GetAssetsDelegate((references, callback) =>
         {
-            GetAssets(context, appId, user, references, callback);
+            GetAssets(engine, appId, user, references, callback);
         });
 
         var getAsset = new GetAssetsDelegate((references, callback) =>
         {
-            GetAsset(context, appId, user, references, callback);
+            GetAsset(engine, appId, user, references, callback);
         });
 
-        context.Engine.SetValue("getAsset", getAssets);
-        context.Engine.SetValue("getAssetV2", getAsset);
-        context.Engine.SetValue("getAssets", getAssets);
+        engine.SetValue("getAsset", getAssets);
+        engine.SetValue("getAssetV2", getAsset);
+        engine.SetValue("getAssets", getAssets);
     }
 
-    private void AddGetAssetText(ScriptExecutionContext context)
+    private void AddGetAssetText(Engine engine)
     {
         var action = new GetAssetTextDelegate((references, callback, encoding) =>
         {
-            GetText(context, references, callback, encoding);
+            GetText(engine, references, callback, encoding);
         });
 
-        context.Engine.SetValue("getAssetText", action);
+        engine.SetValue("getAssetText", action);
     }
 
-    private void AddGetAssetBlurHash(ScriptExecutionContext context)
+    private void AddGetAssetBlurHash(Engine engine)
     {
         var getBlurHash = new GetBlurHashDelegate((input, callback, componentX, componentY) =>
         {
-            GetBlurHash(context, input, callback, componentX, componentY);
+            GetBlurHash(engine, input, callback, componentX, componentY);
         });
 
-        context.Engine.SetValue("getAssetBlurHash", getBlurHash);
+        engine.SetValue("getAssetBlurHash", getBlurHash);
     }
 
-    private void GetText(ScriptExecutionContext context,
+    private void GetText(Engine engine,
         JsValue input, Action<JsValue> callback, JsValue? encoding)
     {
         if (callback == null)
@@ -142,23 +145,26 @@ public sealed class AssetsJintExtension(IServiceProvider serviceProvider) : IJin
             throw new JavaScriptException("Callback is not defined.");
         }
 
-        context.Schedule(async (scheduler, ct) =>
+        // The javascript values are read while we are still inside the engine.
+        TryGetAssetRef(engine, input, out var asset);
+
+        var encodingName = encoding?.ToString();
+
+        engine.Schedule(async ct =>
         {
-            TryGetAssetRef(context, input, out var asset);
             try
             {
-                var text = await asset.GetTextAsync(encoding?.ToString(), serviceProvider, ct);
-
-                scheduler.Run(callback, text);
+                return await asset.GetTextAsync(encodingName, serviceProvider, ct);
             }
-            catch
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
-                scheduler.Run(callback, JsValue.Null);
+                return null;
             }
-        });
+        },
+        text => callback(JsValue.FromObject(engine, text)));
     }
 
-    private void GetBlurHash(ScriptExecutionContext context,
+    private void GetBlurHash(Engine engine,
         JsValue input, Action<JsValue> callback, JsValue? componentX, JsValue? componentY)
     {
         if (callback == null)
@@ -166,36 +172,36 @@ public sealed class AssetsJintExtension(IServiceProvider serviceProvider) : IJin
             throw new JavaScriptException("Callback is not defined.");
         }
 
-        context.Schedule(async (scheduler, ct) =>
+        // The javascript values are read while we are still inside the engine.
+        TryGetAssetRef(engine, input, out var asset);
+
+        var options = new BlurOptions();
+
+        if (componentX?.IsNumber() == true)
         {
-            TryGetAssetRef(context, input, out var asset);
+            options.ComponentX = (int)componentX.AsNumber();
+        }
 
-            var options = new BlurOptions();
+        if (componentY?.IsNumber() == true)
+        {
+            options.ComponentX = (int)componentY.AsNumber();
+        }
 
-            if (componentX?.IsNumber() == true)
-            {
-                options.ComponentX = (int)componentX.AsNumber();
-            }
-
-            if (componentY?.IsNumber() == true)
-            {
-                options.ComponentX = (int)componentY.AsNumber();
-            }
-
+        engine.Schedule(async ct =>
+        {
             try
             {
-                var hash = await asset.GetBlurHashAsync(options, serviceProvider, ct);
-
-                scheduler.Run(callback, hash);
+                return await asset.GetBlurHashAsync(options, serviceProvider, ct);
             }
-            catch
+            catch (Exception ex) when (ex is not OperationCanceledException)
             {
-                scheduler.Run(callback, JsValue.Null);
+                return null;
             }
-        });
+        },
+        hash => callback(JsValue.FromObject(engine, hash)));
     }
 
-    private void GetAssets(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user,
+    private void GetAssets(Engine engine, DomainId appId, ClaimsPrincipal user,
         JsValue references, Action<JsValue> callback)
     {
         if (callback == null)
@@ -203,23 +209,18 @@ public sealed class AssetsJintExtension(IServiceProvider serviceProvider) : IJin
             throw new JavaScriptException("Callback is not defined.");
         }
 
-        context.Schedule(async (scheduler, ct) =>
+        // The javascript values are read while we are still inside the engine.
+        var ids = references.ToIds();
+
+        if (ids.Count == 0)
         {
-            var ids = references.ToIds();
+            callback(new JsArray(engine));
+            return;
+        }
 
-            if (ids.Count == 0)
-            {
-                scheduler.Run(callback, new JsArray(context.Engine));
-                return;
-            }
-
+        engine.Schedule(async ct =>
+        {
             var app = await GetAppAsync(appId, ct);
-
-            if (app == null)
-            {
-                scheduler.Run(callback, new JsArray(context.Engine));
-                return;
-            }
 
             var assetQuery = serviceProvider.GetRequiredService<IAssetQueryService>();
 
@@ -227,35 +228,28 @@ public sealed class AssetsJintExtension(IServiceProvider serviceProvider) : IJin
                 new Context(user, app).Clone(b => b
                     .WithNoTotal());
 
-            var assets = await assetQuery.QueryAsync(requestContext, null, Q.Empty.WithIds(ids), ct);
-
-            scheduler.Run(callback, JsValue.FromObject(context.Engine, assets.ToArray()));
-            return;
-        });
+            return await assetQuery.QueryAsync(requestContext, null, Q.Empty.WithIds(ids), ct);
+        },
+        assets => callback(JsValue.FromObject(engine, assets.ToArray())));
     }
 
-    private void GetAsset(ScriptExecutionContext context, DomainId appId, ClaimsPrincipal user,
+    private void GetAsset(Engine engine, DomainId appId, ClaimsPrincipal user,
         JsValue references, Action<JsValue> callback)
     {
         Guard.NotNull(callback);
 
-        context.Schedule(async (scheduler, ct) =>
+        // The javascript values are read while we are still inside the engine.
+        var ids = references.ToIds();
+
+        if (ids.Count == 0)
         {
-            var ids = references.ToIds();
+            callback(JsValue.Null);
+            return;
+        }
 
-            if (ids.Count == 0)
-            {
-                scheduler.Run(callback, JsValue.Null);
-                return;
-            }
-
+        engine.Schedule(async ct =>
+        {
             var app = await GetAppAsync(appId, ct);
-
-            if (app == null)
-            {
-                scheduler.Run(callback, JsValue.Null);
-                return;
-            }
 
             var assetQuery = serviceProvider.GetRequiredService<IAssetQueryService>();
 
@@ -263,14 +257,12 @@ public sealed class AssetsJintExtension(IServiceProvider serviceProvider) : IJin
                 new Context(user, app).Clone(b => b
                     .WithNoTotal());
 
-            var assets = await assetQuery.QueryAsync(requestContext, null, Q.Empty.WithIds(ids), ct);
-
-            scheduler.Run(callback, JsValue.FromObject(context.Engine, assets.FirstOrDefault()));
-            return;
-        });
+            return await assetQuery.QueryAsync(requestContext, null, Q.Empty.WithIds(ids), ct);
+        },
+        assets => callback(JsValue.FromObject(engine, assets.FirstOrDefault())));
     }
 
-    private static bool TryGetAssetRef(ScriptExecutionContext context, JsValue input, out AssetRef assetRef)
+    private static bool TryGetAssetRef(Engine engine, JsValue input, out AssetRef assetRef)
     {
         assetRef = default;
 
@@ -290,6 +282,8 @@ public sealed class AssetsJintExtension(IServiceProvider serviceProvider) : IJin
                 return true;
 
             case AssetEntityScriptVars vars:
+                var context = engine.GetContext();
+
                 if (!context.TryGetValueIfExists<string>(nameof(AssetScriptVars.AppName), out var appName) ||
                     !context.TryGetValueIfExists<DomainId>(nameof(AssetScriptVars.AppId), out var appId) ||
                     !context.TryGetValueIfExists<DomainId>(nameof(AssetScriptVars.AssetId), out var assetId))

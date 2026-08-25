@@ -18,6 +18,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Security;
 using Squidex.Infrastructure.Validation;
+using Engine = Jint.Engine;
 
 namespace Squidex.Domain.Apps.Core.Operations.Scripting;
 
@@ -68,26 +69,20 @@ public class JintScriptEngineTests : IClassFixture<TranslationsFixture>
     {
         private delegate void Delay(Action callback, int time);
 
-        public void ExtendAsync(ScriptExecutionContext context)
+        public void ExtendAsync(Engine engine)
         {
-            context.Engine.SetValue("setTimeout", new Delay((callback, time) =>
+            engine.SetValue("setTimeout", new Delay((callback, time) =>
             {
-                if (time == 0)
+                engine.Schedule(async ct =>
                 {
-                    context.Schedule((scheduler, ct) =>
-                    {
-                        scheduler.Run(callback);
-                        return Task.CompletedTask;
-                    });
-                }
-                else
-                {
-                    context.Schedule(async (scheduler, ct) =>
+                    if (time > 0)
                     {
                         await Task.Delay(time, ct);
-                        scheduler.Run(callback);
-                    });
-                }
+                    }
+
+                    return true;
+                },
+                _ => callback());
             }));
         }
     }
