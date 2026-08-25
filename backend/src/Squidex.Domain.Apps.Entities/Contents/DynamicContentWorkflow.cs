@@ -7,40 +7,59 @@
 
 using System.Security.Claims;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Scripting;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public sealed class DynamicContentWorkflow(IScriptEngine scriptEngine, IAppProvider appProvider) : IContentWorkflow
+public sealed class DynamicContentWorkflow(WorkflowDefinition definition, IScriptEngine scriptEngine) : IContentWorkflow
 {
-    public async ValueTask<StatusInfo[]> GetAllAsync(Schema schema)
-    {
-        var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
+    // The same expression is evaluated for every content of a batch, therefore the compiled script is
+    // kept around. A script that cannot be compiled is stored as null to not retry it over and over.
+    private readonly Dictionary<string, IScript?> scripts = [];
 
-        return workflow.Steps.Select(x => new StatusInfo(x.Key, GetColor(x.Value))).ToArray();
+    // The next statuses of a step without any condition are the same for every content and user.
+    private readonly Dictionary<Status, StatusInfo[]> nextStatuses = [];
+
+    public StatusInfo[] GetAll()
+    {
+        return definition.AllStatuses;
     }
 
-    public async ValueTask<bool> CanPublishInitialAsync(Schema schema, ClaimsPrincipal? user)
+    public Status GetInitialStatus()
     {
-        var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
+        return definition.Workflow.Initial;
+    }
+
+    public StatusInfo? GetInfo(Status status)
+    {
+        return definition.StatusInfos.GetValueOrDefault(status);
+    }
+
+    public bool ShouldValidate(Status status)
+    {
+        if (definition.Workflow.TryGetStep(status, out var step) && step.Validate)
+        {
+            return true;
+        }
+
+        return status == Status.Published && definition.ValidateOnPublish;
+    }
+
+    public bool CanPublishInitial(ClaimsPrincipal? user)
+    {
+        var workflow = definition.Workflow;
 
         return workflow.TryGetTransition(workflow.Initial, Status.Published, out var transition) && IsTrue(transition, null, user);
     }
 
-    public async ValueTask<bool> CanMoveToAsync(Content content, Status status, Status next, ClaimsPrincipal? user)
+    public bool CanMoveTo(Content content, Status status, Status next, ClaimsPrincipal? user)
     {
-        var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
-
-        return workflow.TryGetTransition(status, next, out var transition) && IsTrue(transition, content.Data, user);
+        return definition.Workflow.TryGetTransition(status, next, out var transition) && IsTrue(transition, content.Data, user);
     }
 
-    public async ValueTask<bool> CanUpdateAsync(Content content, Status status, ClaimsPrincipal? user)
+    public bool CanUpdate(Content content, Status status, ClaimsPrincipal? user)
     {
-        var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
-
-        if (workflow.TryGetStep(status, out var step))
+        if (definition.Workflow.TryGetStep(status, out var step))
         {
             return step.NoUpdate == null || !IsTrue(step.NoUpdate, content.Data, user);
         }
@@ -48,54 +67,44 @@ public sealed class DynamicContentWorkflow(IScriptEngine scriptEngine, IAppProvi
         return true;
     }
 
-    public async ValueTask<bool> ShouldValidateAsync(Schema schema, Status status)
+    public StatusInfo[] GetNext(Content content, Status status, ClaimsPrincipal? user)
     {
-        var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
-
-        if (workflow.TryGetStep(status, out var step) && step.Validate)
+        if (nextStatuses.TryGetValue(status, out var cached))
         {
-            return true;
+            return cached;
         }
 
-        return status == Status.Published && schema.Properties.ValidateOnPublish;
-    }
+        List<StatusInfo>? result = null;
 
-    public async ValueTask<StatusInfo?> GetInfoAsync(Content content, Status status)
-    {
-        var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
-
-        if (workflow.TryGetStep(status, out var step))
+        var isStatic = true;
+        foreach (var (to, _, transition) in definition.Workflow.GetTransitions(status))
         {
-            return new StatusInfo(status, GetColor(step));
-        }
+            isStatic = isStatic && IsUnconditional(transition);
 
-        return null;
-    }
-
-    public async ValueTask<Status> GetInitialStatusAsync(Schema schema)
-    {
-        var workflow = await GetWorkflowAsync(schema.AppId.Id, schema.Id);
-
-        var (status, _) = workflow.GetInitialStepId();
-
-        return status;
-    }
-
-    public async ValueTask<StatusInfo[]> GetNextAsync(Content content, Status status, ClaimsPrincipal? user)
-    {
-        var result = new List<StatusInfo>();
-
-        var workflow = await GetWorkflowAsync(content.AppId.Id, content.SchemaId.Id);
-
-        foreach (var (to, step, transition) in workflow.GetTransitions(status))
-        {
             if (IsTrue(transition, content.Data, user))
             {
-                result.Add(new StatusInfo(to, GetColor(step)));
+                result ??= [];
+                result.Add(definition.StatusInfos[to]);
             }
         }
 
-        return result.ToArray();
+        var statuses = result?.ToArray() ?? [];
+        if (isStatic)
+        {
+            nextStatuses[status] = statuses;
+        }
+
+        return statuses;
+    }
+
+    public void Dispose()
+    {
+        foreach (var script in scripts.Values)
+        {
+            script?.Dispose();
+        }
+
+        scripts.Clear();
     }
 
     private bool IsTrue(WorkflowCondition condition, ContentData? data, ClaimsPrincipal? user)
@@ -110,43 +119,45 @@ public sealed class DynamicContentWorkflow(IScriptEngine scriptEngine, IAppProvi
 
         if (!string.IsNullOrWhiteSpace(condition?.Expression) && data != null)
         {
+            var script = GetScript(condition.Expression);
+            if (script == null)
+            {
+                return false;
+            }
+
             var vars = new DataScriptVars
             {
                 Data = data,
             };
 
-            return scriptEngine.Evaluate(vars, condition.Expression);
+            return script.Evaluate(vars);
         }
 
         return true;
     }
 
-    private async ValueTask<Workflow> GetWorkflowAsync(DomainId appId, DomainId schemaId)
+    private IScript? GetScript(string expression)
     {
-        Workflow? result = null;
-
-        var app = await appProvider.GetAppAsync(appId, false);
-
-        if (app != null)
+        if (scripts.TryGetValue(expression, out var script))
         {
-            result = app.Workflows.Values.FirstOrDefault(x => x.SchemaIds.Contains(schemaId));
-
-            if (result == null)
-            {
-                result = app.Workflows.Values.FirstOrDefault(x => x.SchemaIds.Count == 0);
-            }
+            return script;
         }
 
-        if (result == null)
+        try
         {
-            result = Workflow.Default;
+            script = scriptEngine.CreateScript(expression);
+        }
+        catch
+        {
+            script = null;
         }
 
-        return result;
+        scripts[expression] = script;
+        return script;
     }
 
-    private static string GetColor(WorkflowStep step)
+    private static bool IsUnconditional(WorkflowCondition condition)
     {
-        return step.Color ?? StatusColors.Draft;
+        return condition.Roles == null && string.IsNullOrWhiteSpace(condition.Expression);
     }
 }

@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -7,6 +7,7 @@
 
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Options;
+using Squidex.Caching;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -20,7 +21,7 @@ namespace Squidex.Domain.Apps.Entities.Contents;
 public class DynamicContentWorkflowTests : GivenContext
 {
     private readonly DomainId simpleSchemaId = DomainId.NewGuid();
-    private readonly DynamicContentWorkflow sut;
+    private readonly DynamicContentWorkflows sut;
 
     private readonly Workflow workflow = new Workflow(
         Status.Draft,
@@ -86,15 +87,15 @@ public class DynamicContentWorkflowTests : GivenContext
                 TimeoutExecution = TimeSpan.FromSeconds(10),
             }));
 
-        sut = new DynamicContentWorkflow(scriptEngine, AppProvider);
+        sut = new DynamicContentWorkflows(scriptEngine, new AsyncLocalCache());
     }
 
     [Fact]
     public async Task Should_return_info_for_valid_status()
     {
-        var content = CreateContent(Status.Draft, 2);
+        using var sutWorkflow = await GetWorkflowAsync();
 
-        var info = await sut.GetInfoAsync(content, Status.Draft);
+        var info = sutWorkflow.GetInfo(Status.Draft);
 
         Assert.Equal(new StatusInfo(Status.Draft, StatusColors.Draft), info);
     }
@@ -102,9 +103,9 @@ public class DynamicContentWorkflowTests : GivenContext
     [Fact]
     public async Task Should_return_info_as_null_for_invalid_status()
     {
-        var content = CreateContent(Status.Draft, 2);
+        using var sutWorkflow = await GetWorkflowAsync();
 
-        var info = await sut.GetInfoAsync(content, new Status("Invalid"));
+        var info = sutWorkflow.GetInfo(new Status("Invalid"));
 
         Assert.Null(info);
     }
@@ -112,7 +113,9 @@ public class DynamicContentWorkflowTests : GivenContext
     [Fact]
     public async Task Should_return_draft_as_initial_status()
     {
-        var actual = await sut.GetInitialStatusAsync(Schema);
+        using var sutWorkflow = await GetWorkflowAsync();
+
+        var actual = sutWorkflow.GetInitialStatus();
 
         Assert.Equal(Status.Draft, actual);
     }
@@ -120,7 +123,9 @@ public class DynamicContentWorkflowTests : GivenContext
     [Fact]
     public async Task Should_allow_publish_on_create()
     {
-        var actual = await sut.CanPublishInitialAsync(Schema, Mocks.FrontendUser(Role.Editor));
+        using var sutWorkflow = await GetWorkflowAsync();
+
+        var actual = sutWorkflow.CanPublishInitial(Mocks.FrontendUser(Role.Editor));
 
         Assert.True(actual);
     }
@@ -128,7 +133,9 @@ public class DynamicContentWorkflowTests : GivenContext
     [Fact]
     public async Task Should_not_allow_publish_on_create_if_role_not_allowed()
     {
-        var actual = await sut.CanPublishInitialAsync(Schema, Mocks.FrontendUser(Role.Developer));
+        using var sutWorkflow = await GetWorkflowAsync();
+
+        var actual = sutWorkflow.CanPublishInitial(Mocks.FrontendUser(Role.Developer));
 
         Assert.False(actual);
     }
@@ -136,19 +143,11 @@ public class DynamicContentWorkflowTests : GivenContext
     [Fact]
     public async Task Should_allow_if_transition_is_valid()
     {
+        using var sutWorkflow = await GetWorkflowAsync();
+
         var content = CreateContent(Status.Draft, 2);
 
-        var actual = await sut.CanMoveToAsync(content, content.Status, Status.Published, Mocks.FrontendUser(Role.Editor));
-
-        Assert.True(actual);
-    }
-
-    [Fact]
-    public async Task Should_allow_if_transition_is_valid_for_content()
-    {
-        var content = CreateContent(Status.Draft, 2);
-
-        var actual = await sut.CanMoveToAsync(content, content.Status, Status.Published, Mocks.FrontendUser(Role.Editor));
+        var actual = sutWorkflow.CanMoveTo(content, content.Status, Status.Published, Mocks.FrontendUser(Role.Editor));
 
         Assert.True(actual);
     }
@@ -156,49 +155,50 @@ public class DynamicContentWorkflowTests : GivenContext
     [Fact]
     public async Task Should_not_allow_transition_if_role_is_not_allowed()
     {
+        using var sutWorkflow = await GetWorkflowAsync();
+
         var content = CreateContent(Status.Draft, 2);
 
-        var actual = await sut.CanMoveToAsync(content, content.Status, Status.Published, Mocks.FrontendUser(Role.Developer));
+        var actual = sutWorkflow.CanMoveTo(content, content.Status, Status.Published, Mocks.FrontendUser(Role.Developer));
 
         Assert.False(actual);
-    }
-
-    [Fact]
-    public async Task Should_allow_transition_if_role_is_allowed()
-    {
-        var content = CreateContent(Status.Draft, 2);
-
-        var actual = await sut.CanMoveToAsync(content, content.Status, Status.Published, Mocks.FrontendUser(Role.Editor));
-
-        Assert.True(actual);
     }
 
     [Fact]
     public async Task Should_not_allow_transition_if_data_not_valid()
     {
+        using var sutWorkflow = await GetWorkflowAsync();
+
         var content = CreateContent(Status.Draft, 4);
 
-        var actual = await sut.CanMoveToAsync(content, content.Status, Status.Published, Mocks.FrontendUser(Role.Editor));
+        var actual = sutWorkflow.CanMoveTo(content, content.Status, Status.Published, Mocks.FrontendUser(Role.Editor));
 
         Assert.False(actual);
     }
 
     [Fact]
-    public async Task Should_be_able_to_update_published()
+    public async Task Should_evaluate_reused_expression_per_content()
     {
-        var content = CreateContent(Status.Published, 2);
+        using var sutWorkflow = await GetWorkflowAsync();
 
-        var actual = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser(Role.Developer));
+        var content1 = CreateContent(Status.Draft, 2);
+        var content2 = CreateContent(Status.Draft, 4);
 
-        Assert.True(actual);
+        var user = Mocks.FrontendUser(Role.Editor);
+
+        Assert.True(sutWorkflow.CanMoveTo(content1, content1.Status, Status.Published, user));
+        Assert.False(sutWorkflow.CanMoveTo(content2, content2.Status, Status.Published, user));
+        Assert.True(sutWorkflow.CanMoveTo(content1, content1.Status, Status.Published, user));
     }
 
     [Fact]
-    public async Task Should_be_able_to_update_draft()
+    public async Task Should_be_able_to_update_published()
     {
+        using var sutWorkflow = await GetWorkflowAsync();
+
         var content = CreateContent(Status.Published, 2);
 
-        var actual = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser(Role.Developer));
+        var actual = sutWorkflow.CanUpdate(content, content.Status, Mocks.FrontendUser(Role.Developer));
 
         Assert.True(actual);
     }
@@ -206,9 +206,11 @@ public class DynamicContentWorkflowTests : GivenContext
     [Fact]
     public async Task Should_not_be_able_to_update_archived()
     {
+        using var sutWorkflow = await GetWorkflowAsync();
+
         var content = CreateContent(Status.Archived, 2);
 
-        var actual = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser(Role.Developer));
+        var actual = sutWorkflow.CanUpdate(content, content.Status, Mocks.FrontendUser(Role.Developer));
 
         Assert.False(actual);
     }
@@ -216,9 +218,11 @@ public class DynamicContentWorkflowTests : GivenContext
     [Fact]
     public async Task Should_not_be_able_to_update_published_with_true_expression()
     {
+        using var sutWorkflow = await GetWorkflowAsync();
+
         var content = CreateContent(Status.Published, 2);
 
-        var actual = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser(Role.Owner));
+        var actual = sutWorkflow.CanUpdate(content, content.Status, Mocks.FrontendUser(Role.Owner));
 
         Assert.False(actual);
     }
@@ -226,9 +230,11 @@ public class DynamicContentWorkflowTests : GivenContext
     [Fact]
     public async Task Should_be_able_to_update_published_with_false_expression()
     {
+        using var sutWorkflow = await GetWorkflowAsync();
+
         var content = CreateContent(Status.Published, 1);
 
-        var actual = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser(Role.Owner));
+        var actual = sutWorkflow.CanUpdate(content, content.Status, Mocks.FrontendUser(Role.Owner));
 
         Assert.True(actual);
     }
@@ -236,9 +242,11 @@ public class DynamicContentWorkflowTests : GivenContext
     [Fact]
     public async Task Should_not_be_able_to_update_published_with_correct_roles()
     {
+        using var sutWorkflow = await GetWorkflowAsync();
+
         var content = CreateContent(Status.Published, 2);
 
-        var actual = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser(Role.Editor));
+        var actual = sutWorkflow.CanUpdate(content, content.Status, Mocks.FrontendUser(Role.Editor));
 
         Assert.False(actual);
     }
@@ -246,9 +254,11 @@ public class DynamicContentWorkflowTests : GivenContext
     [Fact]
     public async Task Should_be_able_to_update_published_with_incorrect_roles()
     {
+        using var sutWorkflow = await GetWorkflowAsync();
+
         var content = CreateContent(Status.Published, 1);
 
-        var actual = await sut.CanUpdateAsync(content, content.Status, Mocks.FrontendUser(Role.Owner));
+        var actual = sutWorkflow.CanUpdate(content, content.Status, Mocks.FrontendUser(Role.Owner));
 
         Assert.True(actual);
     }
@@ -256,6 +266,8 @@ public class DynamicContentWorkflowTests : GivenContext
     [Fact]
     public async Task Should_get_next_statuses_for_draft()
     {
+        using var sutWorkflow = await GetWorkflowAsync();
+
         var content = CreateContent(Status.Draft, 2);
 
         var expected = new[]
@@ -263,7 +275,7 @@ public class DynamicContentWorkflowTests : GivenContext
             new StatusInfo(Status.Archived, StatusColors.Archived),
         };
 
-        var actual = await sut.GetNextAsync(content, content.Status, Mocks.FrontendUser(Role.Developer));
+        var actual = sutWorkflow.GetNext(content, content.Status, Mocks.FrontendUser(Role.Developer));
 
         actual.Should().BeEquivalentTo(expected);
     }
@@ -271,6 +283,8 @@ public class DynamicContentWorkflowTests : GivenContext
     [Fact]
     public async Task Should_limit_next_statuses_if_expression_does_not_evauate_to_true()
     {
+        using var sutWorkflow = await GetWorkflowAsync();
+
         var content = CreateContent(Status.Draft, 4);
 
         var expected = new[]
@@ -278,7 +292,7 @@ public class DynamicContentWorkflowTests : GivenContext
             new StatusInfo(Status.Archived, StatusColors.Archived),
         };
 
-        var actual = await sut.GetNextAsync(content, content.Status, Mocks.FrontendUser(Role.Editor));
+        var actual = sutWorkflow.GetNext(content, content.Status, Mocks.FrontendUser(Role.Editor));
 
         actual.Should().BeEquivalentTo(expected);
     }
@@ -286,6 +300,8 @@ public class DynamicContentWorkflowTests : GivenContext
     [Fact]
     public async Task Should_limit_next_statuses_if_role_is_not_allowed()
     {
+        using var sutWorkflow = await GetWorkflowAsync();
+
         var content = CreateContent(Status.Draft, 2);
 
         var expected = new[]
@@ -294,14 +310,38 @@ public class DynamicContentWorkflowTests : GivenContext
             new StatusInfo(Status.Published, StatusColors.Published),
         };
 
-        var actual = await sut.GetNextAsync(content, content.Status, Mocks.FrontendUser(Role.Editor));
+        var actual = sutWorkflow.GetNext(content, content.Status, Mocks.FrontendUser(Role.Editor));
 
         actual.Should().BeEquivalentTo(expected);
     }
 
     [Fact]
+    public async Task Should_not_reuse_next_statuses_of_conditional_step()
+    {
+        using var sutWorkflow = await GetWorkflowAsync();
+
+        var allowed = CreateContent(Status.Draft, 2);
+        var denied = CreateContent(Status.Draft, 4);
+
+        var user = Mocks.FrontendUser(Role.Editor);
+
+        sutWorkflow.GetNext(allowed, allowed.Status, user).Should().BeEquivalentTo(new[]
+        {
+            new StatusInfo(Status.Archived, StatusColors.Archived),
+            new StatusInfo(Status.Published, StatusColors.Published),
+        });
+
+        sutWorkflow.GetNext(denied, denied.Status, user).Should().BeEquivalentTo(new[]
+        {
+            new StatusInfo(Status.Archived, StatusColors.Archived),
+        });
+    }
+
+    [Fact]
     public async Task Should_get_next_statuses_for_archived()
     {
+        using var sutWorkflow = await GetWorkflowAsync();
+
         var content = CreateContent(Status.Archived, 2);
 
         var expected = new[]
@@ -309,7 +349,7 @@ public class DynamicContentWorkflowTests : GivenContext
             new StatusInfo(Status.Draft, StatusColors.Draft),
         };
 
-        var actual = await sut.GetNextAsync(content, content.Status, null!);
+        var actual = sutWorkflow.GetNext(content, content.Status, null!);
 
         actual.Should().BeEquivalentTo(expected);
     }
@@ -317,6 +357,8 @@ public class DynamicContentWorkflowTests : GivenContext
     [Fact]
     public async Task Should_get_next_statuses_for_published()
     {
+        using var sutWorkflow = await GetWorkflowAsync();
+
         var content = CreateContent(Status.Published, 2);
 
         var expected = new[]
@@ -325,7 +367,7 @@ public class DynamicContentWorkflowTests : GivenContext
             new StatusInfo(Status.Draft, StatusColors.Draft),
         };
 
-        var actual = await sut.GetNextAsync(content, content.Status, null!);
+        var actual = sutWorkflow.GetNext(content, content.Status, null!);
 
         actual.Should().BeEquivalentTo(expected);
     }
@@ -333,6 +375,8 @@ public class DynamicContentWorkflowTests : GivenContext
     [Fact]
     public async Task Should_return_all_statuses()
     {
+        using var sutWorkflow = await GetWorkflowAsync();
+
         var expected = new[]
         {
             new StatusInfo(Status.Archived, StatusColors.Archived),
@@ -340,7 +384,7 @@ public class DynamicContentWorkflowTests : GivenContext
             new StatusInfo(Status.Published, StatusColors.Published),
         };
 
-        var actual = await sut.GetAllAsync(Schema);
+        var actual = sutWorkflow.GetAll();
 
         actual.Should().BeEquivalentTo(expected);
     }
@@ -348,13 +392,15 @@ public class DynamicContentWorkflowTests : GivenContext
     [Fact]
     public async Task Should_return_all_statuses_for_simple_schema_workflow()
     {
+        using var sutWorkflow = await GetWorkflowAsync(Schema.WithId(simpleSchemaId, "simple-schema"));
+
         var expected = new[]
         {
             new StatusInfo(Status.Draft, StatusColors.Draft),
             new StatusInfo(Status.Published, StatusColors.Published),
         };
 
-        var actual = await sut.GetAllAsync(Schema.WithId(simpleSchemaId, "simple-schema"));
+        var actual = sutWorkflow.GetAll();
 
         actual.Should().BeEquivalentTo(expected);
     }
@@ -367,6 +413,8 @@ public class DynamicContentWorkflowTests : GivenContext
             Workflows = Workflows.Empty,
         };
 
+        using var sutWorkflow = await GetWorkflowAsync();
+
         var expected = new[]
         {
             new StatusInfo(Status.Archived, StatusColors.Archived),
@@ -374,7 +422,7 @@ public class DynamicContentWorkflowTests : GivenContext
             new StatusInfo(Status.Published, StatusColors.Published),
         };
 
-        var actual = await sut.GetAllAsync(Schema);
+        var actual = sutWorkflow.GetAll();
 
         actual.Should().BeEquivalentTo(expected);
     }
@@ -382,7 +430,9 @@ public class DynamicContentWorkflowTests : GivenContext
     [Fact]
     public async Task Should_not_validate_when_not_publishing()
     {
-        var actual = await sut.ShouldValidateAsync(Schema, Status.Draft);
+        using var sutWorkflow = await GetWorkflowAsync();
+
+        var actual = sutWorkflow.ShouldValidate(Status.Draft);
 
         Assert.False(actual);
     }
@@ -390,12 +440,12 @@ public class DynamicContentWorkflowTests : GivenContext
     [Fact]
     public async Task Should_not_validate_when_publishing_but_not_enabled()
     {
-        var schema = Schema with
+        using var sutWorkflow = await GetWorkflowAsync(Schema with
         {
             Properties = new SchemaProperties { ValidateOnPublish = false },
-        };
+        });
 
-        var actual = await sut.ShouldValidateAsync(schema, Status.Published);
+        var actual = sutWorkflow.ShouldValidate(Status.Published);
 
         Assert.False(actual);
     }
@@ -403,12 +453,12 @@ public class DynamicContentWorkflowTests : GivenContext
     [Fact]
     public async Task Should_validate_when_publishing_and_enabled()
     {
-        var schema = Schema with
+        using var sutWorkflow = await GetWorkflowAsync(Schema with
         {
             Properties = new SchemaProperties { ValidateOnPublish = true },
-        };
+        });
 
-        var actual = await sut.ShouldValidateAsync(schema, Status.Published);
+        var actual = sutWorkflow.ShouldValidate(Status.Published);
 
         Assert.True(actual);
     }
@@ -416,24 +466,21 @@ public class DynamicContentWorkflowTests : GivenContext
     [Fact]
     public async Task Should_validate_when_enabled_in_step()
     {
-        var actual = await sut.ShouldValidateAsync(Schema, Status.Archived);
+        using var sutWorkflow = await GetWorkflowAsync();
+
+        var actual = sutWorkflow.ShouldValidate(Status.Archived);
 
         Assert.True(actual);
     }
 
-    private EnrichedContent CreateContent(Status status, int value, bool simple = false)
+    private ValueTask<IContentWorkflow> GetWorkflowAsync(Schema? schema = null)
     {
-        var content = CreateContent();
+        return sut.GetWorkflowAsync(App, schema ?? Schema, CancellationToken);
+    }
 
-        if (simple)
-        {
-            content = content with
-            {
-                SchemaId = NamedId.Of(simpleSchemaId, "my-simple-schema"),
-            };
-        }
-
-        content = content with
+    private EnrichedContent CreateContent(Status status, int value)
+    {
+        return CreateContent() with
         {
             Status = status,
             Data =
@@ -442,7 +489,5 @@ public class DynamicContentWorkflowTests : GivenContext
                         new ContentFieldData()
                             .AddInvariant(value)),
         };
-
-        return content;
     }
 }

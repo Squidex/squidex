@@ -25,7 +25,7 @@ namespace Squidex.Areas.Api.Controllers.Contents;
 public sealed class ContentsSharedController(
     ICommandBus commandBus,
     IContentQueryService contentQuery,
-    IContentWorkflow contentWorkflow)
+    IContentWorkflows contentWorkflows)
     : ApiController(commandBus)
 {
     private static readonly GraphQLHttpMiddlewareOptions GraphQLOptions = new GraphQLHttpMiddlewareOptions
@@ -146,7 +146,7 @@ public sealed class ContentsSharedController(
 
         var response = Deferred.AsyncResponse(() =>
         {
-            return ContentsDto.FromContentsAsync(contents, Resources, null, contentWorkflow);
+            return ContentsDto.FromContentsAsync(contents, Resources, null, contentWorkflows);
         });
 
         return Ok(response);
@@ -179,7 +179,7 @@ public sealed class ContentsSharedController(
 
         var response = Deferred.AsyncResponse(() =>
         {
-            return ContentsDto.FromContentsAsync(contents, Resources, null, contentWorkflow);
+            return ContentsDto.FromContentsAsync(contents, Resources, null, contentWorkflows);
         });
 
         return Ok(response);

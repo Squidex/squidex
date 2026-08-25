@@ -7,25 +7,24 @@
 
 using System.Security.Claims;
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Core.Schemas;
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
-public interface IContentWorkflow
+public interface IContentWorkflow : IDisposable
 {
-    ValueTask<Status> GetInitialStatusAsync(Schema schema);
+    Status GetInitialStatus();
 
-    ValueTask<bool> CanMoveToAsync(Content content, Status status, Status next, ClaimsPrincipal? user);
+    bool CanMoveTo(Content content, Status status, Status next, ClaimsPrincipal? user);
 
-    ValueTask<bool> CanUpdateAsync(Content content, Status status, ClaimsPrincipal? user);
+    bool CanUpdate(Content content, Status status, ClaimsPrincipal? user);
 
-    ValueTask<bool> CanPublishInitialAsync(Schema schema, ClaimsPrincipal? user);
+    bool CanPublishInitial(ClaimsPrincipal? user);
 
-    ValueTask<bool> ShouldValidateAsync(Schema schema, Status status);
+    bool ShouldValidate(Status status);
 
-    ValueTask<StatusInfo?> GetInfoAsync(Content content, Status status);
+    StatusInfo? GetInfo(Status status);
 
-    ValueTask<StatusInfo[]> GetNextAsync(Content content, Status status, ClaimsPrincipal? user);
+    StatusInfo[] GetNext(Content content, Status status, ClaimsPrincipal? user);
 
-    ValueTask<StatusInfo[]> GetAllAsync(Schema schema);
+    StatusInfo[] GetAll();
 }

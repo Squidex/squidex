@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Infrastructure.Queries;
@@ -20,22 +21,17 @@ public sealed class QueryModelDto
 
     public StatusInfoDto[] Statuses { get; set; }
 
-    public static async Task<QueryModelDto> FromModelAsync(QueryModel model, Schema? schema, IContentWorkflow workflow)
+    public static async Task<QueryModelDto> FromModelAsync(QueryModel model, App app, Schema? schema, IContentWorkflows workflows)
     {
         var result = SimpleMapper.Map(model, new QueryModelDto());
 
         if (schema != null)
         {
-            await result.AssignStatusesAsync(workflow, schema);
+            using var workflow = await workflows.GetWorkflowAsync(app, schema);
+
+            result.Statuses = workflow.GetAll().Select(StatusInfoDto.FromDomain).ToArray();
         }
 
         return result;
-    }
-
-    private async Task AssignStatusesAsync(IContentWorkflow workflow, Schema schema)
-    {
-        var allStatuses = await workflow.GetAllAsync(schema);
-
-        Statuses = allStatuses.Select(StatusInfoDto.FromDomain).ToArray();
     }
 }

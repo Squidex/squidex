@@ -30,7 +30,7 @@ public sealed class ContentsDto : Resource
     public StatusInfoDto[] Statuses { get; set; }
 
     public static async Task<ContentsDto> FromContentsAsync(IResultList<EnrichedContent> contents, Resources resources,
-        Schema? schema, IContentWorkflow workflow)
+        Schema? schema, IContentWorkflows workflows)
     {
         var result = new ContentsDto
         {
@@ -40,8 +40,10 @@ public sealed class ContentsDto : Resource
 
         if (schema != null)
         {
-            await result.CreateStatusesAsync(workflow, schema);
-            await result.CreateLinksAsync(resources, workflow, schema);
+            using var workflow = await workflows.GetWorkflowAsync(resources.Context.App, schema);
+
+            result.CreateStatuses(workflow);
+            result.CreateLinks(resources, workflow, schema);
         }
         else
         {
@@ -51,14 +53,12 @@ public sealed class ContentsDto : Resource
         return result;
     }
 
-    private async Task CreateStatusesAsync(IContentWorkflow workflow, Schema schema)
+    private void CreateStatuses(IContentWorkflow workflow)
     {
-        var allStatuses = await workflow.GetAllAsync(schema);
-
-        Statuses = allStatuses.Select(StatusInfoDto.FromDomain).ToArray();
+        Statuses = workflow.GetAll().Select(StatusInfoDto.FromDomain).ToArray();
     }
 
-    private async Task CreateLinksAsync(Resources resources, IContentWorkflow workflow, Schema schema)
+    private void CreateLinks(Resources resources, IContentWorkflow workflow, Schema schema)
     {
         var values = new { app = resources.App, schema = schema.Name };
 
@@ -69,7 +69,7 @@ public sealed class ContentsDto : Resource
             AddPostLink("create",
                 resources.Url<ContentsController>(x => nameof(x.PostContent), values));
 
-            if (resources.CanChangeStatus(values.schema) && await workflow.CanPublishInitialAsync(schema, resources.Context.UserPrincipal))
+            if (resources.CanChangeStatus(values.schema) && workflow.CanPublishInitial(resources.Context.UserPrincipal))
             {
                 var publishValues = new { values.app, values.schema, publish = true };
 

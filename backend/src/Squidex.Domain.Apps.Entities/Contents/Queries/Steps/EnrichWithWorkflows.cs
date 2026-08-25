@@ -6,34 +6,44 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 
-public sealed class EnrichWithWorkflows(IContentWorkflow contentWorkflow) : IContentEnricherStep
+public sealed class EnrichWithWorkflows(IContentWorkflows contentWorkflows) : IContentEnricherStep
 {
     private const string DefaultColor = StatusColors.Draft;
 
     public async Task EnrichAsync(Context context, IEnumerable<EnrichedContent> contents, ProvideSchema schemas,
         CancellationToken ct)
     {
-        var cache = new Dictionary<(DomainId, Status), StatusInfo>();
+        var withStatuses = ShouldEnrichWithStatuses(context);
 
-        foreach (var content in contents)
+        foreach (var group in contents.GroupBy(x => x.SchemaId.Id))
         {
             ct.ThrowIfCancellationRequested();
 
-            await EnrichColorAsync(content, cache);
+            var (schema, _) = await schemas(group.Key);
 
-            if (ShouldEnrichWithStatuses(context))
+            // The workflow is resolved once per schema and caches the compiled conditions and the
+            // status colors for all contents of the group.
+            using var workflow = await contentWorkflows.GetWorkflowAsync(context.App, schema, ct);
+
+            foreach (var content in group)
             {
-                await EnrichNextsAsync(content, context);
-                await EnrichCanUpdateAsync(content, context);
+                ct.ThrowIfCancellationRequested();
+
+                EnrichColor(content, workflow);
+
+                if (withStatuses)
+                {
+                    EnrichNexts(content, workflow, context);
+                    EnrichCanUpdate(content, workflow, context);
+                }
             }
         }
     }
 
-    private async Task EnrichNextsAsync(EnrichedContent content, Context context)
+    private static void EnrichNexts(EnrichedContent content, IContentWorkflow workflow, Context context)
     {
         var editingStatus = content.NewStatus ?? content.Status;
 
@@ -53,47 +63,35 @@ public sealed class EnrichWithWorkflows(IContentWorkflow contentWorkflow) : ICon
         }
         else
         {
-            content.NextStatuses = await contentWorkflow.GetNextAsync(content, editingStatus, context.UserPrincipal);
+            content.NextStatuses = workflow.GetNext(content, editingStatus, context.UserPrincipal);
         }
     }
 
-    private async Task EnrichCanUpdateAsync(EnrichedContent content, Context context)
+    private static void EnrichCanUpdate(EnrichedContent content, IContentWorkflow workflow, Context context)
     {
         var editingStatus = content.NewStatus ?? content.Status;
 
-        content.CanUpdate = await contentWorkflow.CanUpdateAsync(content, editingStatus, context.UserPrincipal);
+        content.CanUpdate = workflow.CanUpdate(content, editingStatus, context.UserPrincipal);
     }
 
-    private async Task EnrichColorAsync(EnrichedContent content, Dictionary<(DomainId, Status), StatusInfo> cache)
+    private static void EnrichColor(EnrichedContent content, IContentWorkflow workflow)
     {
-        content.StatusColor = await GetColorAsync(content, content.Status, cache);
+        content.StatusColor = GetColor(workflow, content.Status);
 
         if (content.NewStatus != null)
         {
-            content.NewStatusColor = await GetColorAsync(content, content.NewStatus.Value, cache);
+            content.NewStatusColor = GetColor(workflow, content.NewStatus.Value);
         }
 
         if (content.ScheduleJob != null)
         {
-            content.ScheduledStatusColor = await GetColorAsync(content, content.ScheduleJob.Status, cache);
+            content.ScheduledStatusColor = GetColor(workflow, content.ScheduleJob.Status);
         }
     }
 
-    private async Task<string> GetColorAsync(Content content, Status status, Dictionary<(DomainId, Status), StatusInfo> cache)
+    private static string GetColor(IContentWorkflow workflow, Status status)
     {
-        if (!cache.TryGetValue((content.SchemaId.Id, status), out var info))
-        {
-            info = await contentWorkflow.GetInfoAsync(content, status);
-
-            if (info == null)
-            {
-                info = new StatusInfo(status, DefaultColor);
-            }
-
-            cache[(content.SchemaId.Id, status)] = info;
-        }
-
-        return info.Color;
+        return workflow.GetInfo(status)?.Color ?? DefaultColor;
     }
 
     private static bool ShouldEnrichWithStatuses(Context context)

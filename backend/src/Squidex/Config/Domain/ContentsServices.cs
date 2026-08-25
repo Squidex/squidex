@@ -90,8 +90,8 @@ public static class ContentsServices
         services.AddSingletonAs<ContentLoader>()
             .As<IContentLoader>();
 
-        services.AddSingletonAs<DynamicContentWorkflow>()
-            .AsOptional<IContentWorkflow>();
+        services.AddSingletonAs<DynamicContentWorkflows>()
+            .AsOptional<IContentWorkflows>();
 
         services.AddSingletonAs<DefaultWorkflowsValidator>()
             .AsOptional<IWorkflowsValidator>();

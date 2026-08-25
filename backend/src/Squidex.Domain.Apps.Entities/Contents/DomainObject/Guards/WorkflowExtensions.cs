@@ -14,27 +14,27 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards;
 
 public static class WorkflowExtensions
 {
-    public static ValueTask<Status> GetInitialStatusAsync(this ContentOperation operation)
+    public static async ValueTask<Status> GetInitialStatusAsync(this ContentOperation operation)
     {
-        var workflow = GetWorkflow(operation);
+        using var workflow = await GetWorkflowAsync(operation);
 
-        return workflow.GetInitialStatusAsync(operation.Schema);
+        return workflow.GetInitialStatus();
     }
 
-    public static ValueTask<bool> ShouldValidateAsync(this ContentOperation operation, Status status)
+    public static async ValueTask<bool> ShouldValidateAsync(this ContentOperation operation, Status status)
     {
-        var workflow = GetWorkflow(operation);
+        using var workflow = await GetWorkflowAsync(operation);
 
-        return workflow.ShouldValidateAsync(operation.Schema, status);
+        return workflow.ShouldValidate(status);
     }
 
     public static async Task CheckTransitionAsync(this ContentOperation operation, Status status)
     {
         if (operation.Schema.Type != SchemaType.Singleton)
         {
-            var workflow = GetWorkflow(operation);
+            using var workflow = await GetWorkflowAsync(operation);
 
-            if (!await workflow.CanMoveToAsync(operation.Snapshot.ToContent(), operation.Snapshot.EditingStatus, status, operation.User))
+            if (!workflow.CanMoveTo(operation.Snapshot.ToContent(), operation.Snapshot.EditingStatus, status, operation.User))
             {
                 var values = new { oldStatus = operation.Snapshot.EditingStatus, newStatus = status };
 
@@ -48,9 +48,9 @@ public static class WorkflowExtensions
     {
         if (operation.Schema.Type != SchemaType.Singleton)
         {
-            var workflow = GetWorkflow(operation);
+            using var workflow = await GetWorkflowAsync(operation);
 
-            var statusInfo = await workflow.GetInfoAsync(operation.Snapshot.ToContent(), status);
+            var statusInfo = workflow.GetInfo(status);
 
             if (statusInfo == null)
             {
@@ -64,17 +64,17 @@ public static class WorkflowExtensions
     {
         if (operation.User != null)
         {
-            var workflow = GetWorkflow(operation);
+            using var workflow = await GetWorkflowAsync(operation);
 
-            if (!await workflow.CanUpdateAsync(operation.Snapshot.ToContent(), operation.Snapshot.EditingStatus, operation.User))
+            if (!workflow.CanUpdate(operation.Snapshot.ToContent(), operation.Snapshot.EditingStatus, operation.User))
             {
                 throw new DomainException(T.Get("contents.workflowErrorUpdate", new { status = operation.Snapshot.EditingStatus }));
             }
         }
     }
 
-    private static IContentWorkflow GetWorkflow(ContentOperation operation)
+    private static ValueTask<IContentWorkflow> GetWorkflowAsync(ContentOperation operation)
     {
-        return operation.Resolve<IContentWorkflow>();
+        return operation.Resolve<IContentWorkflows>().GetWorkflowAsync(operation.App, operation.Schema);
     }
 }

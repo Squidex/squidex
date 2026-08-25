@@ -7,6 +7,7 @@
 
 using System.Security.Claims;
 using Microsoft.Extensions.DependencyInjection;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
@@ -24,6 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.DomainObject.Guards;
 public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture>
 {
     private readonly IContentWorkflow contentWorkflow = A.Fake<IContentWorkflow>();
+    private readonly IContentWorkflows contentWorkflows = A.Fake<IContentWorkflows>();
     private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
     private readonly Schema normalSchema;
     private readonly Schema normalUnpublishedSchema;
@@ -33,6 +35,9 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
 
     public GuardContentTests()
     {
+        A.CallTo(() => contentWorkflows.GetWorkflowAsync(A<App>._, A<Schema>._, A<CancellationToken>._))
+            .Returns(contentWorkflow);
+
         normalUnpublishedSchema =
             Schema.Unpublish();
 
@@ -214,7 +219,7 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
     {
         var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-        A.CallTo(() => contentWorkflow.GetInitialStatusAsync(operation.Schema))
+        A.CallTo(() => contentWorkflow.GetInitialStatus())
             .Returns(Status.Archived);
 
         Assert.Equal(Status.Archived, await operation.GetInitialStatusAsync());
@@ -225,7 +230,7 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
     {
         var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-        A.CallTo(() => contentWorkflow.CanUpdateAsync(operation.Snapshot.ToContent(), operation.Snapshot.EditingStatus, operation.User))
+        A.CallTo(() => contentWorkflow.CanUpdate(operation.Snapshot.ToContent(), operation.Snapshot.EditingStatus, operation.User))
             .Returns(false);
 
         await Assert.ThrowsAsync<DomainException>(() => operation.CheckUpdateAsync());
@@ -236,7 +241,7 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
     {
         var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-        A.CallTo(() => contentWorkflow.CanUpdateAsync(operation.Snapshot.ToContent(), operation.Snapshot.EditingStatus, operation.User))
+        A.CallTo(() => contentWorkflow.CanUpdate(operation.Snapshot.ToContent(), operation.Snapshot.EditingStatus, operation.User))
             .Returns(true);
 
         await operation.CheckUpdateAsync();
@@ -247,8 +252,8 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
     {
         var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-        A.CallTo(() => contentWorkflow.GetInfoAsync(operation.Snapshot.ToContent(), Status.Archived))
-            .Returns(ValueTask.FromResult<StatusInfo?>(null));
+        A.CallTo(() => contentWorkflow.GetInfo(Status.Archived))
+            .Returns(null);
 
         await Assert.ThrowsAsync<ValidationException>(() => operation.CheckStatusAsync(Status.Archived));
     }
@@ -258,7 +263,7 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
     {
         var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-        A.CallTo(() => contentWorkflow.GetInfoAsync(operation.Snapshot.ToContent(), Status.Archived))
+        A.CallTo(() => contentWorkflow.GetInfo(Status.Archived))
             .Returns(new StatusInfo(Status.Archived, StatusColors.Archived));
 
         await operation.CheckStatusAsync(Status.Archived);
@@ -271,7 +276,7 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
 
         await operation.CheckStatusAsync(Status.Archived);
 
-        A.CallTo(() => contentWorkflow.GetInfoAsync(operation.Snapshot.ToContent(), Status.Archived))
+        A.CallTo(() => contentWorkflow.GetInfo(Status.Archived))
             .MustNotHaveHappened();
     }
 
@@ -280,7 +285,7 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
     {
         var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-        A.CallTo(() => contentWorkflow.CanMoveToAsync(operation.Snapshot.ToContent(), operation.Snapshot.EditingStatus, Status.Archived, operation.User))
+        A.CallTo(() => contentWorkflow.CanMoveTo(operation.Snapshot.ToContent(), operation.Snapshot.EditingStatus, Status.Archived, operation.User))
             .Returns(false);
 
         await Assert.ThrowsAsync<ValidationException>(() => operation.CheckTransitionAsync(Status.Archived));
@@ -291,7 +296,7 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
     {
         var operation = Operation(CreateContent(Status.Draft), normalSchema);
 
-        A.CallTo(() => contentWorkflow.CanMoveToAsync(operation.Snapshot.ToContent(), operation.Snapshot.EditingStatus, Status.Archived, operation.User))
+        A.CallTo(() => contentWorkflow.CanMoveTo(operation.Snapshot.ToContent(), operation.Snapshot.EditingStatus, Status.Archived, operation.User))
             .Returns(true);
 
         await operation.CheckTransitionAsync(Status.Archived);
@@ -304,7 +309,7 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
 
         await operation.CheckTransitionAsync(Status.Archived);
 
-        A.CallTo(() => contentWorkflow.CanMoveToAsync(operation.Snapshot.ToContent(), operation.Snapshot.EditingStatus, A<Status>._, A<ClaimsPrincipal>._))
+        A.CallTo(() => contentWorkflow.CanMoveTo(operation.Snapshot.ToContent(), operation.Snapshot.EditingStatus, A<Status>._, A<ClaimsPrincipal>._))
             .MustNotHaveHappened();
     }
 
@@ -375,7 +380,7 @@ public class GuardContentTests : GivenContext, IClassFixture<TranslationsFixture
         var serviceProvider =
             new ServiceCollection()
                 .AddSingleton(contentRepository)
-                .AddSingleton(contentWorkflow)
+                .AddSingleton(contentWorkflows)
                 .BuildServiceProvider();
 
         return new ContentOperation(serviceProvider, () => content)

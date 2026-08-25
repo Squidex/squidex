@@ -26,7 +26,7 @@ namespace Squidex.Areas.Api.Controllers.Contents;
 public sealed class ContentsController(
     ICommandBus commandBus,
     IContentQueryService contentQuery,
-    IContentWorkflow contentWorkflow)
+    IContentWorkflows contentWorkflows)
     : ApiController(commandBus)
 {
     /// <summary>
@@ -83,7 +83,7 @@ public sealed class ContentsController(
 
         var response = Deferred.AsyncResponse(() =>
         {
-            return ContentsDto.FromContentsAsync(contents, Resources, Schema, contentWorkflow);
+            return ContentsDto.FromContentsAsync(contents, Resources, Schema, contentWorkflows);
         });
 
         return Ok(response);
@@ -117,7 +117,7 @@ public sealed class ContentsController(
 
         var response = Deferred.AsyncResponse(() =>
         {
-            return ContentsDto.FromContentsAsync(contents, Resources, Schema, contentWorkflow);
+            return ContentsDto.FromContentsAsync(contents, Resources, Schema, contentWorkflows);
         });
 
         return Ok(response);
@@ -216,7 +216,7 @@ public sealed class ContentsController(
 
         var response = Deferred.AsyncResponse(() =>
         {
-            return ContentsDto.FromContentsAsync(contents, Resources, null, contentWorkflow);
+            return ContentsDto.FromContentsAsync(contents, Resources, null, contentWorkflows);
         });
 
         return Ok(response);
@@ -251,7 +251,7 @@ public sealed class ContentsController(
 
         var response = Deferred.AsyncResponse(() =>
         {
-            return ContentsDto.FromContentsAsync(contents, Resources, null, contentWorkflow);
+            return ContentsDto.FromContentsAsync(contents, Resources, null, contentWorkflows);
         });
 
         return Ok(response);

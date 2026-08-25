@@ -10,6 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using NodaTime;
 using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -29,6 +30,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 {
     private readonly DomainId contentId = DomainId.NewGuid();
     private readonly IContentWorkflow contentWorkflow = A.Fake<IContentWorkflow>();
+    private readonly IContentWorkflows contentWorkflows = A.Fake<IContentWorkflows>();
     private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
     private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
 
@@ -100,22 +102,25 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
         A.CallTo(() => scriptEngine.Execute(A<ScriptVars>._, A<string>._, A<ScriptOptions>._))
             .Returns(JsonValue.Create(43));
 
-        A.CallTo(() => contentWorkflow.GetInitialStatusAsync(Schema))
+        A.CallTo(() => contentWorkflows.GetWorkflowAsync(A<App>._, A<Schema>._, A<CancellationToken>._))
+            .Returns(contentWorkflow);
+
+        A.CallTo(() => contentWorkflow.GetInitialStatus())
             .Returns(Status.Draft);
 
-        A.CallTo(() => contentWorkflow.CanMoveToAsync(A<Content>._, Status.Draft, Status.Published, A<ClaimsPrincipal?>._))
+        A.CallTo(() => contentWorkflow.CanMoveTo(A<Content>._, Status.Draft, Status.Published, A<ClaimsPrincipal?>._))
             .Returns(true);
 
-        A.CallTo(() => contentWorkflow.CanMoveToAsync(A<Content>._, Status.Draft, Status.Archived, A<ClaimsPrincipal?>._))
+        A.CallTo(() => contentWorkflow.CanMoveTo(A<Content>._, Status.Draft, Status.Archived, A<ClaimsPrincipal?>._))
             .Returns(true);
 
-        A.CallTo(() => contentWorkflow.CanMoveToAsync(A<Content>._, Status.Published, Status.Draft, A<ClaimsPrincipal?>._))
+        A.CallTo(() => contentWorkflow.CanMoveTo(A<Content>._, Status.Published, Status.Draft, A<ClaimsPrincipal?>._))
             .Returns(true);
 
-        A.CallTo(() => contentWorkflow.CanMoveToAsync(A<Content>._, Status.Published, Status.Archived, A<ClaimsPrincipal?>._))
+        A.CallTo(() => contentWorkflow.CanMoveTo(A<Content>._, Status.Published, Status.Archived, A<ClaimsPrincipal?>._))
             .Returns(true);
 
-        A.CallTo(() => contentWorkflow.CanUpdateAsync(A<Content>._, A<Status>._, A<ClaimsPrincipal?>._))
+        A.CallTo(() => contentWorkflow.CanUpdate(A<Content>._, A<Status>._, A<ClaimsPrincipal?>._))
             .Returns(true);
 
         patched = patch.MergeInto(data);
@@ -127,7 +132,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
                 .AddSingleton(AppProvider)
                 .AddSingleton(A.Fake<ILogger<ContentValidator>>())
                 .AddSingleton(log)
-                .AddSingleton(contentWorkflow)
+                .AddSingleton(contentWorkflows)
                 .AddSingleton(contentRepository)
                 .AddSingleton(scriptEngine)
                 .AddSingleton(TestUtils.DefaultSerializer)
@@ -612,7 +617,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var command = new ChangeContentStatus { Status = Status.Archived, StatusJobId = sut.Snapshot.ScheduleJob!.Id };
 
-        A.CallTo(() => contentWorkflow.CanMoveToAsync(A<Content>._, Status.Draft, Status.Archived, ApiContext.UserPrincipal))
+        A.CallTo(() => contentWorkflow.CanMoveTo(A<Content>._, Status.Draft, Status.Archived, ApiContext.UserPrincipal))
             .Returns(true);
 
         var actual = await PublishAsync(command);
@@ -633,7 +638,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var command = new ChangeContentStatus { Status = Status.Published, StatusJobId = sut.Snapshot.ScheduleJob!.Id };
 
-        A.CallTo(() => contentWorkflow.CanMoveToAsync(A<Content>._, Status.Draft, Status.Published, ApiContext.UserPrincipal))
+        A.CallTo(() => contentWorkflow.CanMoveTo(A<Content>._, Status.Draft, Status.Published, ApiContext.UserPrincipal))
             .Returns(false);
 
         var actual = await PublishAsync(command);
