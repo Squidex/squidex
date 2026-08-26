@@ -398,7 +398,6 @@ public class RuleEnqueuerTests : GivenContext
         Assert.Same(contexts[2].Context.Rules, contexts[3].Context.Rules);
     }
 
-
     private static RulesContext MatchingContext(Rule rule)
     {
         // These two properties must not be set to true for performance reasons.

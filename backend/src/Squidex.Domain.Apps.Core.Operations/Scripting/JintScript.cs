@@ -54,8 +54,8 @@ internal sealed class JintScript : IScript, IAsyncScript, IDisposable
 
         engine = new Engine(options =>
         {
-            options.AddObjectConverter(JintObjectConverter.Instance);
-            options.AllowOperatorOverloading();
+            options.AddObjectConverter(JintObjectConverter.Instance, JintObjectConverter.HandledTypes);
+            options.AddObjectConverter(EnumToStringConverter.Instance);
             options.AllowClrWrite(!scriptOptions.Readonly);
             options.SetTypeConverter(engine => new CustomClrConverter(engine));
             options.SetReferencesResolver(NullPropagation.Instance);
