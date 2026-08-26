@@ -82,7 +82,7 @@ public static class ServiceExtensions
 
                 services.AddPooledDbContextFactory<MySqlAppDbContext>(builder =>
                 {
-                    builder.SetDefaultWarnings();
+                    builder.SetDefaults();
                     builder.UseMySql(connectionString, version, options =>
                     {
                         options.UseNetTopologySuite();
@@ -93,7 +93,7 @@ public static class ServiceExtensions
 
                 services.AddNamedDbContext<MySqlContentDbContext>((builder, name) =>
                 {
-                    builder.SetDefaultWarnings();
+                    builder.SetDefaults();
                     builder.UseBulkInsertMySql();
                     builder.UseMySql(connectionString, version, options =>
                     {
@@ -118,7 +118,7 @@ public static class ServiceExtensions
             {
                 services.AddPooledDbContextFactory<PostgresAppDbContext>(builder =>
                 {
-                    builder.SetDefaultWarnings();
+                    builder.SetDefaults();
                     builder.UseBulkInsertPostgreSql();
                     builder.UseNpgsql(connectionString, options =>
                     {
@@ -128,7 +128,7 @@ public static class ServiceExtensions
 
                 services.AddNamedDbContext<PostgresContentDbContext>((builder, name) =>
                 {
-                    builder.SetDefaultWarnings();
+                    builder.SetDefaults();
                     builder.UseBulkInsertPostgreSql();
                     builder.UseNpgsql(connectionString, options =>
                     {
@@ -152,7 +152,7 @@ public static class ServiceExtensions
             {
                 services.AddPooledDbContextFactory<SqlServerAppDbContext>(builder =>
                 {
-                    builder.SetDefaultWarnings();
+                    builder.SetDefaults();
                     builder.UseSqlServer(connectionString, options =>
                     {
                         options.UseNetTopologySuite();
@@ -162,7 +162,7 @@ public static class ServiceExtensions
 
                 services.AddNamedDbContext<SqlServerContentDbContext>((builder, name) =>
                 {
-                    builder.SetDefaultWarnings();
+                    builder.SetDefaults();
                     builder.UseBulkInsertSqlServer();
                     builder.UseSqlServer(connectionString, options =>
                     {

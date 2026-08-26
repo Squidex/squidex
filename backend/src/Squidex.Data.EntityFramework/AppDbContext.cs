@@ -29,16 +29,6 @@ public abstract class AppDbContext(DbContextOptions options, IJsonSerializer jso
 {
     public abstract SqlDialect Dialect { get; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        // Almost everything is read only or written by inserting new entities, so tracking would
-        // only cost a snapshot of every entity that is read. The few stores that update an entity
-        // they have queried ask for it with AsTracking.
-        optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-
-        base.OnConfiguring(optionsBuilder);
-    }
-
     protected override void OnModelCreating(ModelBuilder builder)
     {
         var jsonColumnType = Dialect.JsonColumnType();

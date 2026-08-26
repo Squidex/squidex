@@ -47,6 +47,7 @@ public class SqlServerFixture(string? reuseId = null) : IAsyncLifetime, ISqlCont
             new ServiceCollection()
                 .AddPooledDbContextFactory<TestDbContextSqlServer>(builder =>
                 {
+                    builder.SetDefaults();
                     builder.UseBulkInsertSqlServer();
                     builder.UseSqlServer(connectionString, options =>
                     {
@@ -55,6 +56,7 @@ public class SqlServerFixture(string? reuseId = null) : IAsyncLifetime, ISqlCont
                 })
                 .AddNamedDbContext<SqlServerContentDbContext>((builder, name) =>
                 {
+                    builder.SetDefaults();
                     builder.UseBulkInsertSqlServer();
                     builder.UseSqlServer(connectionString, options =>
                     {

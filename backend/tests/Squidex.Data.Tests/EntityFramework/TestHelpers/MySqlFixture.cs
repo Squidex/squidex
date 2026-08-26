@@ -46,6 +46,7 @@ public class MySqlFixture(string? reuseId = null) : IAsyncLifetime, ISqlContentF
             new ServiceCollection()
                 .AddPooledDbContextFactory<TestDbContextMySql>(builder =>
                 {
+                    builder.SetDefaults();
                     builder.UseBulkInsertMySql();
                     builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), options =>
                     {
@@ -55,6 +56,7 @@ public class MySqlFixture(string? reuseId = null) : IAsyncLifetime, ISqlContentF
                 })
                 .AddNamedDbContext<MySqlContentDbContext>((builder, name) =>
                 {
+                    builder.SetDefaults();
                     builder.UseBulkInsertMySql();
                     builder.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), options =>
                     {

@@ -54,9 +54,15 @@ public static class Extensions
         return options.GetExtension<PrefixExtension>().Prefix;
     }
 
-    public static DbContextOptionsBuilder SetDefaultWarnings(this DbContextOptionsBuilder builder)
+    public static DbContextOptionsBuilder SetDefaults(this DbContextOptionsBuilder builder)
     {
         builder.ConfigureWarnings(w => w.Ignore(CoreEventId.CollectionWithoutComparer));
+
+        // Almost everything is read only or written by inserting new entities, so tracking would
+        // only cost a snapshot of every entity that is read. The few stores that update an entity
+        // they have queried ask for it with AsTracking. This cannot be done in OnConfiguring,
+        // because the contexts are pooled and pooling forbids to modify the options there.
+        builder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
         return builder;
     }
 

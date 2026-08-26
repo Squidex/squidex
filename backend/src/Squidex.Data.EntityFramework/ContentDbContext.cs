@@ -19,15 +19,6 @@ public abstract class ContentDbContext(DbContextOptions options, IJsonSerializer
 {
     public abstract SqlDialect Dialect { get; }
 
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    {
-        // Contents are never written by changing a queried entity, they are inserted in bulk, so
-        // tracking only costs a snapshot of every content that is read.
-        optionsBuilder.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
-
-        base.OnConfiguring(optionsBuilder);
-    }
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.UseContent(jsonSerializer, Dialect.JsonColumnType(), options.Prefix());

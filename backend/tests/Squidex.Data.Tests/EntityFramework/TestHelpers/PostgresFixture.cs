@@ -45,6 +45,7 @@ public class PostgresFixture(string? reuseId) : IAsyncLifetime, ISqlContentFixtu
             new ServiceCollection()
                 .AddPooledDbContextFactory<TestDbContextPostgres>(builder =>
                 {
+                    builder.SetDefaults();
                     builder.UseBulkInsertPostgreSql();
                     builder.UseNpgsql(connectionString, options =>
                     {
@@ -53,6 +54,7 @@ public class PostgresFixture(string? reuseId) : IAsyncLifetime, ISqlContentFixtu
                 })
                 .AddNamedDbContext<PostgresContentDbContext>((builder, name) =>
                 {
+                    builder.SetDefaults();
                     builder.UseBulkInsertPostgreSql();
                     builder.UseNpgsql(connectionString, options =>
                     {
