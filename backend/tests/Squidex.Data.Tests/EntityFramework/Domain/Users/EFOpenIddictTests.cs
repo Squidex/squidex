@@ -20,6 +20,10 @@ public abstract class EFOpenIddictTests<TContext>(ISqlFixture<TContext> fixture)
     public async Task Should_allow_openiddict_tokens_without_application()
     {
         await using var dbContext = await fixture.DbContextFactory.CreateDbContextAsync();
+        var tokenId = Guid.NewGuid().ToString();
+        var type = TokenTypeIdentifiers.Private.AuthorizationCode;
+        var typeProperty = dbContext.Model.FindEntityType(typeof(OpenIddictEntityFrameworkCoreToken))?.FindProperty(nameof(OpenIddictEntityFrameworkCoreToken.Type));
+        Assert.Equal(60, typeProperty?.GetMaxLength());
 
         var authorization = new OpenIddictEntityFrameworkCoreAuthorization
         {
@@ -33,19 +37,22 @@ public abstract class EFOpenIddictTests<TContext>(ISqlFixture<TContext> fixture)
 
         var token = new OpenIddictEntityFrameworkCoreToken
         {
-            Id = Guid.NewGuid().ToString(),
+            Id = tokenId,
             ApplicationId = null,
             Authorization = authorization,
             CreationDate = DateTime.UtcNow,
             ExpirationDate = DateTime.UtcNow.AddMinutes(5),
             Status = Statuses.Valid,
             Subject = "admin@squidex.io",
-            Type = "authorization_code",
+            Type = type,
         };
 
         dbContext.Set<OpenIddictEntityFrameworkCoreAuthorization>().Add(authorization);
         dbContext.Set<OpenIddictEntityFrameworkCoreToken>().Add(token);
 
         await dbContext.SaveChangesAsync();
+
+        var found = await dbContext.Set<OpenIddictEntityFrameworkCoreToken>().FindAsync(tokenId);
+        Assert.Equal(type, found?.Type);
     }
 }

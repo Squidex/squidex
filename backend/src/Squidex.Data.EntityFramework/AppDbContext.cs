@@ -7,6 +7,7 @@
 
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using OpenIddict.EntityFrameworkCore.Models;
 using Squidex.Assets.TusAdapter;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -21,6 +22,9 @@ using Squidex.Infrastructure.EventSourcing.Consume;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.States;
+using Squidex.Providers.MySql;
+using Squidex.Providers.Postgres;
+using Squidex.Providers.SqlServer;
 using YDotNet.Server.EntityFramework;
 
 namespace Squidex;
@@ -66,6 +70,8 @@ public abstract class AppDbContext(DbContextOptions options, IJsonSerializer jso
         builder.UseYDotNet();
 
         base.OnModelCreating(builder);
+
+        builder.UseOpenIddictTokenType(Dialect);
     }
 }
 
@@ -73,6 +79,26 @@ public abstract class AppDbContext(DbContextOptions options, IJsonSerializer jso
 internal static class Extensions
 #pragma warning restore MA0048 // File name must match type name
 {
+    public static void UseOpenIddictTokenType(this ModelBuilder builder, SqlDialect dialect)
+    {
+        var tokenType = builder.Entity<OpenIddictEntityFrameworkCoreToken>()
+            .Property(x => x.Type)
+            .HasMaxLength(60);
+
+        if (dialect is MySqlDialect)
+        {
+            tokenType.HasColumnType("varchar(60)");
+        }
+        else if (dialect is PostgresDialect)
+        {
+            tokenType.HasColumnType("character varying(60)");
+        }
+        else if (dialect is SqlServerDialect)
+        {
+            tokenType.HasColumnType("nvarchar(60)");
+        }
+    }
+
     public static void UseIdentity(this ModelBuilder builder, IJsonSerializer jsonSerializer, string? jsonColumn)
     {
         builder.UseSnapshot<DefaultKeyStore.State>(jsonSerializer, jsonColumn);
