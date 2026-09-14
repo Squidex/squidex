@@ -28,6 +28,7 @@ public class MigrateContentsJobTests : GivenContext
     private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
     private readonly List<BulkUpdateContents> commands = [];
     private readonly MigrateContentsJob sut;
+    private BulkUpdateResult bulkUpdateResult = new BulkUpdateResult();
 
     public MigrateContentsJobTests()
     {
@@ -46,7 +47,7 @@ public class MigrateContentsJobTests : GivenContext
                     commands.Add(bulkUpdate);
                 }
 
-                return Task.FromResult(new CommandContext(command, commandBus).Complete(new BulkUpdateResult()));
+                return Task.FromResult(new CommandContext(command, commandBus).Complete(bulkUpdateResult));
             });
 
         sut = new MigrateContentsJob(AppProvider, commandBus, contentRepository, contextProvider, TestUtils.DefaultSerializer);
@@ -173,6 +174,47 @@ public class MigrateContentsJobTests : GivenContext
         await sut.RunAsync(CreateRunContext(CreateJob()), CancellationToken);
 
         Assert.Equal([100, 50], commands.Select(x => x.Jobs!.Length));
+    }
+
+    [Fact]
+    public async Task Should_log_progress_as_single_line()
+    {
+        var contents = Enumerable.Range(0, 150).Select(_ => CreateContent(new ContentData()
+            .AddField("my-field",
+                new ContentFieldData()
+                    .AddInvariant("invalid")))).ToArray();
+
+        SetupContents(contents);
+
+        var context = CreateRunContext(CreateJob());
+
+        await sut.RunAsync(context, CancellationToken);
+
+        Assert.Equal("Checked contents: 150, updated: 150", Assert.Single(context.Job.Log).Message);
+    }
+
+    [Fact]
+    public async Task Should_not_overwrite_errors_with_progress()
+    {
+        var content = CreateContent(new ContentData()
+            .AddField("my-field",
+                new ContentFieldData()
+                    .AddInvariant("invalid")));
+
+        SetupContents(content);
+
+        bulkUpdateResult = new BulkUpdateResult([new BulkUpdateResultItem(content.Id, 0, new DomainException("Error"))]);
+
+        var context = CreateRunContext(CreateJob());
+
+        await sut.RunAsync(context, CancellationToken);
+
+        Assert.Equal(
+            [
+                $"Failed to migrate content {content.Id}: Error",
+                "Checked contents: 1, updated: 1",
+            ],
+            context.Job.Log.Select(x => x.Message));
     }
 
     private void SetupContents(params Content[] contents)

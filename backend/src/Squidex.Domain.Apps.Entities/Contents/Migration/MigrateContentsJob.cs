@@ -107,6 +107,9 @@ public sealed class MigrateContentsJob(
         var totalCount = 0;
         var totalUpdates = 0;
 
+        // The progress is a single log line, but it must not overwrite the errors of the previous batch.
+        var replaceProgress = false;
+
         await foreach (var batch in batches)
         {
             var jobs = new List<BulkUpdateJob>(batch.Count);
@@ -131,15 +134,18 @@ public sealed class MigrateContentsJob(
             totalCount += batch.Count;
             totalUpdates += jobs.Count;
 
+            var errors = 0;
+
             if (jobs.Count > 0)
             {
-                await UpdateAsync(context, app, schema, jobs, ct);
+                errors = await UpdateAsync(context, app, schema, jobs, ct);
             }
 
-            await context.LogAsync($"Checked contents: {totalCount}, updated: {totalUpdates}", true);
+            await context.LogAsync($"Checked contents: {totalCount}, updated: {totalUpdates}", replaceProgress && errors == 0);
+            replaceProgress = true;
         }
 
-        await context.LogAsync($"Checked contents: {totalCount}, updated: {totalUpdates}", true);
+        await context.LogAsync($"Checked contents: {totalCount}, updated: {totalUpdates}", replaceProgress);
     }
 
     private ContentConverter BuildConverter(App app, Schema schema, ResolvedComponents components)
@@ -156,7 +162,7 @@ public sealed class MigrateContentsJob(
         return converter;
     }
 
-    private async Task UpdateAsync(JobRunContext context, App app, Schema schema, List<BulkUpdateJob> jobs,
+    private async Task<int> UpdateAsync(JobRunContext context, App app, Schema schema, List<BulkUpdateJob> jobs,
         CancellationToken ct)
     {
         // The contents are only converted to the current schema, therefore all custom logic must be skipped.
@@ -177,15 +183,20 @@ public sealed class MigrateContentsJob(
         // Errors are reported per content item, so that a single invalid item does not stop the migration.
         if (commandContext.PlainResult is not BulkUpdateResult result)
         {
-            return;
+            return 0;
         }
+
+        var errors = 0;
 
         foreach (var item in result)
         {
             if (item.Exception != null)
             {
                 await context.LogAsync($"Failed to migrate content {item.Id}: {item.Exception.Message}");
+                errors++;
             }
         }
+
+        return errors;
     }
 }
