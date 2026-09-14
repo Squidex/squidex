@@ -12,6 +12,7 @@ import { map } from 'rxjs/operators';
 import { ConfirmClickDirective, defined, DropdownMenuComponent, LanguagesState, LayoutComponent, ListViewComponent, MessageBus, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, SchemasState, SidebarMenuDirective, Subscriptions, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, UIOptions } from '@app/shared';
 import { SchemaCloning } from '../messages';
 import { SchemaEditFormComponent } from './common/schema-edit-form.component';
+import { SchemaMigrateFormComponent } from './common/schema-migrate-form.component';
 import { SchemaExportFormComponent } from './export/schema-export-form.component';
 import { SchemaFieldsComponent } from './fields/schema-fields.component';
 import { SchemaIndexesComponent } from './indexes/schema-indexes.component';
@@ -40,6 +41,7 @@ import { SchemaUIFormComponent } from './ui/schema-ui-form.component';
         SchemaFieldRulesFormComponent,
         SchemaFieldsComponent,
         SchemaIndexesComponent,
+        SchemaMigrateFormComponent,
         SchemaPreviewUrlsFormComponent,
         SchemaScriptsFormComponent,
         SchemaUIFormComponent,

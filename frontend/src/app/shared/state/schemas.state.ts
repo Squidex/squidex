@@ -175,6 +175,14 @@ export class SchemasState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
+    public migrateContents(schema: SchemaDto): Observable<any> {
+        return this.schemasService.postContentMigration(this.appName, schema).pipe(
+            tap(() => {
+                this.dialogs.notifyInfo('i18n:schemas.migrateContentsStarted');
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
     public addCategory(name: string) {
         this.next(s => {
             const categories = new Set([...s.addedCategories, name]);

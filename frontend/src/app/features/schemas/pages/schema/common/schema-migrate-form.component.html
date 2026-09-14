@@ -1,0 +1,20 @@
+<h5>{{ "schemas.migrateContents" | sqxTranslate }}</h5>
+
+<div class="card">
+    <div class="card-body">
+        <span [sqxMarkdown]="'schemas.migrateContentsHint' | sqxTranslate" trusted="true"></span>
+    </div>
+
+    <div class="card-footer">
+        @if (schema.canContentsMigrate) {
+            <button
+                class="float-end btn btn-primary"
+                confirmText="i18n:schemas.migrateContentsConfirmText"
+                confirmTitle="i18n:schemas.migrateContentsConfirmTitle"
+                (sqxConfirmClick)="migrateContents()"
+                type="button">
+                {{ "schemas.migrateContentsButton" | sqxTranslate }}
+            </button>
+        }
+    </div>
+</div>

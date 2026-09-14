@@ -486,6 +486,10 @@ export class SchemaDto extends generated.SchemaDto {
         return this.compute('canContentsCreateAndPublish', () => hasAnyLink(this._links, 'contents/create/publish'));
     }
 
+    public get canContentsMigrate() {
+        return this.compute('canContentsMigrate', () => hasAnyLink(this._links, 'contents/migrate'));
+    }
+
     public get canContentsRead() {
         return this.compute('canContentsRead', () => hasAnyLink(this._links, 'contents'));
     }

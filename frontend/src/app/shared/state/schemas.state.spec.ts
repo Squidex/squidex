@@ -189,6 +189,24 @@ describe('SchemasState', () => {
             expect(schemasState.snapshot.schemas).toEqualIgnoringProps([updated, schema2]);
         });
 
+        it('should notify if content migration has been started', () => {
+            schemasService.setup(x => x.postContentMigration(app, schema1))
+                .returns(() => of({})).verifiable();
+
+            schemasState.migrateContents(schema1).subscribe();
+
+            dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
+        });
+
+        it('should not change schemas if content migration has been started', () => {
+            schemasService.setup(x => x.postContentMigration(app, schema1))
+                .returns(() => of({})).verifiable();
+
+            schemasState.migrateContents(schema1).subscribe();
+
+            expect(schemasState.snapshot.schemas).toEqualIgnoringProps([schema1, schema2]);
+        });
+
         describe('with selection', () => {
             beforeEach(() => {
                 schemasService.setup(x => x.getSchema(app, schema1.name))

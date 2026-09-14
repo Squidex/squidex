@@ -44,6 +44,9 @@ Some tests need test setup or test containers which are slow. Run the tests like
 dotnet test --filter "Category!=Dependencies & Category!=TestContainer"
 ```
 
+- Use xUnit assertions (`Assert.Equal`, `Assert.True`, `Assert.Single`, `Assert.Empty`, ...) for simple properties and values.
+- Use FluentAssertions (`Should().BeEquivalentTo(...)`) only for deep, structural comparisons of objects and collections.
+
 ### Best Practices
 
 - Code style is enforced by StyleCop (`backend/stylecop.json`) and `.editorconfig` — follow the surrounding file's conventions.
