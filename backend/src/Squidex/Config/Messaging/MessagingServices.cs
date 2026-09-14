@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Entities.Backup;
 using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Domain.Apps.Entities.Contents;
 using Squidex.Domain.Apps.Entities.Contents.Indexes;
+using Squidex.Domain.Apps.Entities.Contents.Migration;
 using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Domain.Apps.Entities.Rules.Runner;
 using Squidex.Domain.Apps.Entities.Rules.UsageTracking;
@@ -94,6 +95,9 @@ public static class MessagingServices
             .As<IJobRunner>();
 
         services.AddSingletonAs<DropIndexJob>()
+            .As<IJobRunner>();
+
+        services.AddSingletonAs<MigrateContentsJob>()
             .As<IJobRunner>();
 
         services.AddSingleton<IMessagingSerializer>(c =>

@@ -46,6 +46,8 @@ public sealed class Resources(ApiController controller)
 
     public bool CanManageIndexes(string schema) => Can(PermissionIds.AppSchemasIndexes, schema);
 
+    public bool CanMigrateSchemaContents(string schema) => Can(PermissionIds.AppSchemasMigrate, schema);
+
     public bool CanCreateSchema => Can(PermissionIds.AppSchemasCreate);
 
     public bool CanUpdateSettings => Can(PermissionIds.AppUpdateSettings);

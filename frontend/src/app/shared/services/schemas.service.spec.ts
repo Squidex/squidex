@@ -541,6 +541,23 @@ describe('SchemasService', () => {
         expect(schema!).toEqual(createSchema(12));
     }));
 
+    it('should make post request to migrate contents', inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+        const resource: Resource = {
+            _links: {
+                'contents/migrate': { method: 'POST', href: '/api/apps/my-app/schemas/my-schema/contents/migrate' },
+            },
+        };
+
+        schemasService.postContentMigration('my-app', resource).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/contents/migrate');
+
+        expect(req.request.method).toEqual('POST');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush({});
+    }));
+
     it('should make delete request to delete schema', inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
         const resource: Resource = {
             _links: {

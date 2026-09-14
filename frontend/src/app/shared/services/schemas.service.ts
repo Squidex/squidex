@@ -279,6 +279,15 @@ export class SchemasService {
             pretifyError('i18n:schemas.deleteFieldFailed'));
     }
 
+    public postContentMigration(appName: string, resource: Resource): Observable<any> {
+        const link = resource._links['contents/migrate'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return this.http.request(link.method, url).pipe(
+            pretifyError('i18n:schemas.migrateContentsFailed'));
+    }
+
     public deleteSchema(appName: string, resource: Resource, version: VersionOrTag): Observable<Versioned<any>> {
         const link = resource._links['delete'];
 

@@ -1,5 +1,5 @@
 {
-  "x-generator": "NSwag v14.1.0.0 (NJsonSchema v11.0.2.0 (Newtonsoft.Json v13.0.0.0))",
+  "x-generator": "NSwag v14.7.1.0 (NJsonSchema v11.6.1.0 (Newtonsoft.Json v13.0.0.0))",
   "openapi": "3.0.0",
   "info": {
     "title": "Squidex API",
@@ -332,7 +332,7 @@
         "security": [
           {
             "squidex-oauth-auth": [
-              "squidex.admin.users.unlock"
+              "squidex.admin.users.delete"
             ]
           }
         ]
@@ -2083,6 +2083,73 @@
           {
             "squidex-oauth-auth": [
               "squidex.apps.{app}.search"
+            ]
+          }
+        ]
+      }
+    },
+    "/api/apps/{app}/schemas/{schema}/contents/migrate": {
+      "post": {
+        "tags": [
+          "Schemas"
+        ],
+        "summary": "Migrate the contents to the current schema.",
+        "description": "Schema changes are not applied to the stored contents. This endpoint starts a job that rewrites all\ncontents of the schema so that the stored data matches the current schema.",
+        "operationId": "SchemaContents_PostContentMigration",
+        "parameters": [
+          {
+            "name": "app",
+            "in": "path",
+            "required": true,
+            "description": "The name of the app.",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 1
+          },
+          {
+            "name": "schema",
+            "in": "path",
+            "required": true,
+            "description": "The name of the schema.",
+            "schema": {
+              "type": "string"
+            },
+            "x-position": 2
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Content migration added to job queue."
+          },
+          "404": {
+            "description": "Schema or app not found."
+          },
+          "400": {
+            "description": "Validation error.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Operation failed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorDto"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "squidex-oauth-auth": [
+              "squidex.apps.{app}.schemas.{schema}.migrate"
             ]
           }
         ]

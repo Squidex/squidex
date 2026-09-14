@@ -120,6 +120,9 @@
                                 }
                                 <sqx-schema-field-rules-form [schema]="schema" />
                                 <sqx-schema-edit-form [languages]="languages" [schema]="schema" />
+                                @if (schema.type !== "Component") {
+                                    <sqx-schema-migrate-form [schema]="schema" />
+                                }
                             </div>
                         </sqx-list-view>
                     }
