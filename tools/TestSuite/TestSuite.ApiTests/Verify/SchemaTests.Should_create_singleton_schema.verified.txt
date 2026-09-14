@@ -10,6 +10,9 @@
     contents: {
       Method: GET
     },
+    contents/migrate: {
+      Method: POST
+    },
     delete: {
       Method: DELETE
     },
