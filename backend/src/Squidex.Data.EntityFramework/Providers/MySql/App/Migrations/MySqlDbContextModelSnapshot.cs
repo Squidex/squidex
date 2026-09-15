@@ -18,7 +18,7 @@ namespace Squidex.Providers.MySql.Migrations
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "10.0.5")
+                .HasAnnotation("ProductVersion", "10.0.6")
                 .HasAnnotation("Relational:MaxIdentifierLength", 64);
 
             MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
@@ -306,8 +306,8 @@ namespace Squidex.Providers.MySql.Migrations
                         .HasColumnType("varchar(400)");
 
                     b.Property<string>("Type")
-                        .HasMaxLength(50)
-                        .HasColumnType("varchar(50)");
+                        .HasMaxLength(150)
+                        .HasColumnType("varchar(150)");
 
                     b.HasKey("Id");
 
@@ -316,7 +316,8 @@ namespace Squidex.Providers.MySql.Migrations
                     b.HasIndex("ReferenceId")
                         .IsUnique();
 
-                    b.HasIndex("ApplicationId", "Status", "Subject", "Type");
+                    b.HasIndex("ApplicationId", "Status", "Subject", "Type")
+                        .HasAnnotation("MySql:IndexPrefixLength", new[] { 0, 0, 0, 50 });
 
                     b.ToTable("OpenIddictTokens", (string)null);
                 });
@@ -330,13 +331,14 @@ namespace Squidex.Providers.MySql.Migrations
                     b.Property<DateTime>("LastUpdated")
                         .HasColumnType("datetime(6)");
 
+                    b.Property<Guid>("LastVersion")
+                        .IsConcurrencyToken()
+                        .HasColumnType("char(36)")
+                        .HasColumnName("Version");
+
                     b.Property<string>("Value")
                         .IsRequired()
                         .HasColumnType("longtext");
-
-                    b.Property<Guid>("Version")
-                        .IsConcurrencyToken()
-                        .HasColumnType("char(36)");
 
                     b.HasKey("Id");
 
