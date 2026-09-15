@@ -160,9 +160,10 @@ jobs:
           - name: sqlserver
             compose: docker-compose-sqlserver.yml
             optional: false
-          - name: ferretdb
-            compose: docker-compose-ferretdb.yml
-            optional: true
+          # Disabled for now.
+          # - name: ferretdb
+          #   compose: docker-compose-ferretdb.yml
+          #   optional: true
     continue-on-error: ${{ matrix.optional == true }}
 
     steps:

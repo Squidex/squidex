@@ -7,6 +7,7 @@
 
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using OpenIddict.EntityFrameworkCore.Models;
 using Squidex.Assets.TusAdapter;
 using Squidex.Domain.Apps.Entities.Apps;
 using Squidex.Domain.Apps.Entities.Assets;
@@ -54,6 +55,7 @@ public abstract class AppDbContext(DbContextOptions options, IJsonSerializer jso
         builder.UseMigration();
         builder.UseNames(jsonSerializer, jsonColumnType);
         builder.UseOpenIddict();
+        builder.UseOpenIddictTokenType(Database.IsMySql());
         builder.UseRequest(jsonSerializer, jsonColumnType);
         builder.UseRules(jsonSerializer, jsonColumnType);
         builder.UseSchema(jsonSerializer, jsonColumnType);
@@ -73,6 +75,21 @@ public abstract class AppDbContext(DbContextOptions options, IJsonSerializer jso
 internal static class Extensions
 #pragma warning restore MA0048 // File name must match type name
 {
+    public static void UseOpenIddictTokenType(this ModelBuilder builder, bool isMySql)
+    {
+        builder.Entity<OpenIddictEntityFrameworkCoreToken>(b =>
+        {
+            // OpenIddict 7 stores token type URNs with up to 57 characters, but the fork still limits the column to 50.
+            b.Property(x => x.Type).HasMaxLength(150);
+
+            if (isMySql)
+            {
+                // Keeps the index below the maximum key length of 3072 bytes with utf8mb4. Token types are unique within 50 characters.
+                b.HasIndex(x => new { x.ApplicationId, x.Status, x.Subject, x.Type }).HasPrefixLength(0, 0, 0, 50);
+            }
+        });
+    }
+
     public static void UseIdentity(this ModelBuilder builder, IJsonSerializer jsonSerializer, string? jsonColumn)
     {
         builder.UseSnapshot<DefaultKeyStore.State>(jsonSerializer, jsonColumn);

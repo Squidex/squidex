@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using NetTopologySuite.Geometries;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
@@ -9,12 +10,14 @@ using Squidex.Providers.Postgres.App;
 
 #nullable disable
 
-namespace Squidex.Providers.Postgres.Migrations
+namespace Squidex.Providers.Postgres.App.Migrations
 {
     [DbContext(typeof(PostgresAppDbContext))]
-    partial class PostgresDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260915181452_WidenOpenIddictTokenType")]
+    partial class WidenOpenIddictTokenType
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
