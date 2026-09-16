@@ -26,6 +26,9 @@ public interface IContentRepository
     IAsyncEnumerable<Content> StreamAll(DomainId appId, HashSet<DomainId>? schemaIds, SearchScope scope,
         CancellationToken ct = default);
 
+    IAsyncEnumerable<WriteContent> StreamWriteContents(DomainId appId, HashSet<DomainId>? schemaIds, HashSet<DomainId>? ids,
+        CancellationToken ct = default);
+
     IAsyncEnumerable<Content> StreamReferencing(DomainId appId, DomainId references, int take, SearchScope scope,
         CancellationToken ct = default);
 

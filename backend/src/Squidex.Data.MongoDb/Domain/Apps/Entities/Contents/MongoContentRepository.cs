@@ -66,6 +66,12 @@ public partial class MongoContentRepository(
         return GetCollection(scope).StreamAll(appId, schemaIds, ct);
     }
 
+    public IAsyncEnumerable<WriteContent> StreamWriteContents(DomainId appId, HashSet<DomainId>? schemaIds, HashSet<DomainId>? ids,
+        CancellationToken ct = default)
+    {
+        return collectionComplete.StreamWriteContents(appId, schemaIds, ids, ct);
+    }
+
     public IAsyncEnumerable<Content> StreamReferencing(DomainId appId, DomainId reference, int take, SearchScope scope,
         CancellationToken ct = default)
     {

@@ -367,7 +367,7 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
         Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
 
         A.CallTo(() => commandBus.PublishAsync(
-                A<MigrateContent>.That.Matches(x => x.ContentId == id && x.Data == data && x.NewData == data), A<CancellationToken>._))
+                A<MigrateContent>.That.Matches(x => x.ContentId == id && Equals(x.Data, data) && Equals(x.NewData, data)), A<CancellationToken>._))
             .MustHaveHappened();
     }
 

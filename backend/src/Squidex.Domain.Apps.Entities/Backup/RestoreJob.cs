@@ -77,10 +77,7 @@ public sealed class RestoreJob(
     public async Task RunAsync(JobRunContext context,
         CancellationToken ct)
     {
-        if (!context.Job.Arguments.TryGetValue(ArgUrl, out var urlValue))
-        {
-            throw new DomainException($"Argument '{ArgUrl}' missing.");
-        }
+        var urlValue = context.GetArgument(ArgUrl);
 
         if (!Uri.TryCreate(urlValue, UriKind.Absolute, out var url))
         {
@@ -93,7 +90,7 @@ public sealed class RestoreJob(
             // Required argument.
             Url = url,
             // Optional argument.
-            NewAppName = context.Job.Arguments.GetValueOrDefault(ArgName),
+            NewAppName = context.TryGetArgument(ArgName),
         };
 
         // Use a readable name to describe the job.

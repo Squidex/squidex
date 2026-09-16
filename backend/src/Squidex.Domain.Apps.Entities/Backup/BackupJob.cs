@@ -66,7 +66,7 @@ public sealed class BackupJob(
         CancellationToken ct)
     {
         var appId = context.OwnerId;
-        var appName = context.Job.Arguments.GetValueOrDefault(ArgAppName, "app");
+        var appName = context.TryGetArgument(ArgAppName) ?? "app";
 
         // We store the file in a the asset store and make the information available.
         context.Job.File = new JobFile($"backup-{appName}-{context.Job.Started:yyyy-MM-dd_HH-mm-ss}.zip", "application/zip");

@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core;
-using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
@@ -16,7 +15,6 @@ using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Collections;
 using Squidex.Infrastructure.Commands;
-using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.States;
 using IClock = NodaTime.IClock;
 using TestUtils = Squidex.Domain.Apps.Core.TestHelpers.TestUtils;
@@ -30,7 +28,7 @@ public class MigrateContentsJobTests : GivenContext
     private readonly IContextProvider contextProvider = A.Fake<IContextProvider>();
     private readonly List<BulkUpdateContents> commands = [];
     private readonly MigrateContentsJob sut;
-    private BulkUpdateResult bulkUpdateResult = new BulkUpdateResult();
+    private Func<BulkUpdateContents, BulkUpdateResult> bulkUpdateResult = _ => new BulkUpdateResult();
 
     public MigrateContentsJobTests()
     {
@@ -49,7 +47,7 @@ public class MigrateContentsJobTests : GivenContext
                     commands.Add(bulkUpdate);
                 }
 
-                return Task.FromResult(new CommandContext(command, commandBus).Complete(bulkUpdateResult));
+                return Task.FromResult(new CommandContext(command, commandBus).Complete(bulkUpdateResult((command as BulkUpdateContents)!)));
             });
 
         sut = new MigrateContentsJob(AppProvider, commandBus, contentRepository, contextProvider, TestUtils.DefaultSerializer);
@@ -114,7 +112,7 @@ public class MigrateContentsJobTests : GivenContext
     [Fact]
     public async Task Should_not_submit_content_if_data_matches_schema()
     {
-        SetupContents(CreateContent(ValidData()));
+        SetupContents(CreateWrite(ValidData()));
 
         await sut.RunAsync(CreateRunContext(CreateJob()), CancellationToken);
 
@@ -124,7 +122,7 @@ public class MigrateContentsJobTests : GivenContext
     [Fact]
     public async Task Should_submit_content_with_invalid_values()
     {
-        var content = CreateContent(InvalidData());
+        var content = CreateWrite(InvalidData());
 
         SetupContents(content);
 
@@ -148,10 +146,7 @@ public class MigrateContentsJobTests : GivenContext
     [Fact]
     public async Task Should_submit_published_and_draft_data_for_content_with_draft()
     {
-        var content = CreateContent(InvalidData()) with { NewStatus = Status.Draft };
-
-        SetupContents(content);
-        SetupPublished(content, InvalidData());
+        SetupContents(CreateWrite(InvalidData(), draft: InvalidData()));
 
         await sut.RunAsync(CreateRunContext(CreateJob()), CancellationToken);
 
@@ -164,10 +159,7 @@ public class MigrateContentsJobTests : GivenContext
     [Fact]
     public async Task Should_not_submit_content_with_draft_if_both_versions_match_schema()
     {
-        var content = CreateContent(ValidData()) with { NewStatus = Status.Draft };
-
-        SetupContents(content);
-        SetupPublished(content, ValidData());
+        SetupContents(CreateWrite(ValidData(), draft: ValidData()));
 
         await sut.RunAsync(CreateRunContext(CreateJob()), CancellationToken);
 
@@ -177,7 +169,7 @@ public class MigrateContentsJobTests : GivenContext
     [Fact]
     public async Task Should_not_submit_published_content_if_published_versions_are_excluded()
     {
-        SetupContents(CreateContent(InvalidData()));
+        SetupContents(CreateWrite(InvalidData()));
 
         await sut.RunAsync(CreateRunContext(CreateJob(migratePublished: false)), CancellationToken);
 
@@ -187,7 +179,7 @@ public class MigrateContentsJobTests : GivenContext
     [Fact]
     public async Task Should_not_submit_unpublished_content_if_draft_versions_are_excluded()
     {
-        SetupContents(CreateContent(InvalidData()) with { Status = Status.Draft });
+        SetupContents(CreateWrite(InvalidData(), Status.Draft));
 
         await sut.RunAsync(CreateRunContext(CreateJob(migrateDraft: false)), CancellationToken);
 
@@ -197,10 +189,7 @@ public class MigrateContentsJobTests : GivenContext
     [Fact]
     public async Task Should_not_submit_draft_data_if_draft_versions_are_excluded()
     {
-        var content = CreateContent(InvalidData()) with { NewStatus = Status.Draft };
-
-        SetupContents(content);
-        SetupPublished(content, InvalidData());
+        SetupContents(CreateWrite(InvalidData(), draft: InvalidData()));
 
         await sut.RunAsync(CreateRunContext(CreateJob(migrateDraft: false)), CancellationToken);
 
@@ -211,11 +200,9 @@ public class MigrateContentsJobTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_not_query_published_data_if_published_versions_are_excluded()
+    public async Task Should_not_submit_published_data_if_published_versions_are_excluded()
     {
-        var content = CreateContent(InvalidData()) with { NewStatus = Status.Draft };
-
-        SetupContents(content);
+        SetupContents(CreateWrite(InvalidData(), draft: InvalidData()));
 
         await sut.RunAsync(CreateRunContext(CreateJob(migratePublished: false)), CancellationToken);
 
@@ -223,18 +210,12 @@ public class MigrateContentsJobTests : GivenContext
 
         Assert.Null(job.Data);
         Assert.NotNull(job.NewData);
-
-        A.CallTo(() => contentRepository.QueryAsync(A<App>._, A<Schema>._, A<Q>._, SearchScope.Published, A<CancellationToken>._))
-            .MustNotHaveHappened();
     }
 
     [Fact]
     public async Task Should_migrate_all_versions_if_arguments_do_not_contain_flags()
     {
-        var content = CreateContent(InvalidData()) with { NewStatus = Status.Draft };
-
-        SetupContents(content);
-        SetupPublished(content, InvalidData());
+        SetupContents(CreateWrite(InvalidData(), draft: InvalidData()));
 
         var context = CreateRunContext(new Job
         {
@@ -254,9 +235,49 @@ public class MigrateContentsJobTests : GivenContext
     }
 
     [Fact]
+    public async Task Should_migrate_content_again_if_version_does_not_match()
+    {
+        var content = CreateWrite(InvalidData());
+
+        SetupContents(content);
+
+        // The content has been changed after it has been read.
+        var updated = content with { Version = content.Version + 1 };
+
+        SetupConflicts(content, 1);
+        SetupReload(updated);
+
+        var context = CreateRunContext(CreateJob());
+
+        await sut.RunAsync(context, CancellationToken);
+
+        Assert.Equal(2, commands.Count);
+        Assert.Equal(updated.Version, Assert.Single(commands[1].Jobs!).ExpectedVersion);
+        Assert.Equal("Checked contents: 1, submitted: 1", Assert.Single(context.Job.Log).Message);
+    }
+
+    [Fact]
+    public async Task Should_log_error_if_version_never_matches()
+    {
+        var content = CreateWrite(InvalidData());
+
+        SetupContents(content);
+        SetupConflicts(content, int.MaxValue);
+        SetupReload(content);
+
+        var context = CreateRunContext(CreateJob());
+
+        await sut.RunAsync(context, CancellationToken);
+
+        // The first attempt and three retries.
+        Assert.Equal(4, commands.Count);
+        Assert.Contains(context.Job.Log, x => x.Message.StartsWith($"Failed to migrate content {content.Id}", StringComparison.Ordinal));
+    }
+
+    [Fact]
     public async Task Should_submit_contents_in_batches()
     {
-        SetupContents(Enumerable.Range(0, 150).Select(_ => CreateContent(InvalidData())).ToArray());
+        SetupContents(Enumerable.Range(0, 150).Select(_ => CreateWrite(InvalidData())).ToArray());
 
         await sut.RunAsync(CreateRunContext(CreateJob()), CancellationToken);
 
@@ -266,7 +287,7 @@ public class MigrateContentsJobTests : GivenContext
     [Fact]
     public async Task Should_log_progress_as_single_line()
     {
-        SetupContents(Enumerable.Range(0, 150).Select(_ => CreateContent(InvalidData())).ToArray());
+        SetupContents(Enumerable.Range(0, 150).Select(_ => CreateWrite(InvalidData())).ToArray());
 
         var context = CreateRunContext(CreateJob());
 
@@ -278,11 +299,11 @@ public class MigrateContentsJobTests : GivenContext
     [Fact]
     public async Task Should_not_overwrite_errors_with_progress()
     {
-        var content = CreateContent(InvalidData());
+        var content = CreateWrite(InvalidData());
 
         SetupContents(content);
 
-        bulkUpdateResult = new BulkUpdateResult([new BulkUpdateResultItem(content.Id, 0, new DomainException("Error"))]);
+        bulkUpdateResult = _ => new BulkUpdateResult([new BulkUpdateResultItem(content.Id, 0, new DomainException("Error"))]);
 
         var context = CreateRunContext(CreateJob());
 
@@ -315,25 +336,42 @@ public class MigrateContentsJobTests : GivenContext
                     .AddInvariant("invalid"));
     }
 
-    private void SetupContents(params Content[] contents)
+    private void SetupContents(params WriteContent[] contents)
     {
-        A.CallTo(() => contentRepository.StreamAll(AppId.Id, A<HashSet<DomainId>>._, SearchScope.All, A<CancellationToken>._))
+        A.CallTo(() => contentRepository.StreamWriteContents(AppId.Id, A<HashSet<DomainId>>._, null, A<CancellationToken>._))
             .Returns(contents.ToAsyncEnumerable());
     }
 
-    private void SetupPublished(Content content, ContentData data)
+    private void SetupReload(WriteContent content)
     {
-        A.CallTo(() => contentRepository.QueryAsync(A<App>._, A<Schema>._, A<Q>._, SearchScope.Published, A<CancellationToken>._))
-            .Returns(ResultList.CreateFrom(1, content with { Data = data }));
+        A.CallTo(() => contentRepository.StreamWriteContents(AppId.Id, A<HashSet<DomainId>>._, A<HashSet<DomainId>>.That.Not.IsNull(), A<CancellationToken>._))
+            .Returns(Enumerable.Repeat(content, 1).ToAsyncEnumerable());
     }
 
-    private Content CreateContent(ContentData data)
+    private void SetupConflicts(WriteContent content, int count)
     {
-        var content = CreateContent();
+        var attempts = 0;
 
-        content.Data = data;
+        bulkUpdateResult = _ =>
+        {
+            if (attempts++ >= count)
+            {
+                return new BulkUpdateResult();
+            }
 
-        return content;
+            return new BulkUpdateResult([new BulkUpdateResultItem(content.Id, 0, new DomainObjectVersionException(content.Id.ToString(), 1, 2))]);
+        };
+    }
+
+    private WriteContent CreateWrite(ContentData data, Status? status = null, ContentData? draft = null)
+    {
+        var content = CreateWriteContent();
+
+        return content with
+        {
+            CurrentVersion = new ContentVersion(status ?? Status.Published, data),
+            NewVersion = draft != null ? new ContentVersion(Status.Draft, draft) : null,
+        };
     }
 
     private Job CreateJob(bool migrateDraft = true, bool migratePublished = true)

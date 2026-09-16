@@ -115,6 +115,12 @@ public sealed class MongoContentCollection : MongoRepositoryBase<MongoContentEnt
         return queryAsStream.StreamAll(appId, schemaIds, ct);
     }
 
+    public IAsyncEnumerable<WriteContent> StreamWriteContents(DomainId appId, HashSet<DomainId>? schemaIds, HashSet<DomainId>? ids,
+        CancellationToken ct)
+    {
+        return queryAsStream.StreamWriteContents(appId, schemaIds, ids, ct);
+    }
+
     public IAsyncEnumerable<Content> StreamReferencing(DomainId appId, DomainId reference, int take,
         CancellationToken ct)
     {

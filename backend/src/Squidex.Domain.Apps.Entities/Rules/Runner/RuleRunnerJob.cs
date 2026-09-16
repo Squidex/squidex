@@ -89,16 +89,12 @@ public sealed class RuleRunnerJob : IJobRunner
     public async Task RunAsync(JobRunContext context,
         CancellationToken ct)
     {
-        if (!context.Job.Arguments.TryGetValue(ArgRuleId, out var ruleId))
-        {
-            throw new DomainException($"Argument '{ArgRuleId}' missing.");
-        }
+        var ruleId = context.GetArgumentId(ArgRuleId);
 
-        var rule = await appProvider.GetRuleAsync(context.OwnerId, DomainId.Create(ruleId), ct)
-            ?? throw new DomainObjectNotFoundException(ruleId);
+        var rule = await appProvider.GetRuleAsync(context.OwnerId, ruleId, ct)
+            ?? throw new DomainObjectNotFoundException(ruleId.ToString());
 
-        var fromSnapshotArg = context.Job.Arguments.GetValueOrDefault(ArgSnapshot);
-        var fromSnapshotValue = string.Equals(fromSnapshotArg, "true", StringComparison.OrdinalIgnoreCase);
+        var fromSnapshotValue = context.GetArgumentFlag(ArgSnapshot);
 
         // Use a readable name to describe the job.
         SetDescription(context, rule, fromSnapshotValue);

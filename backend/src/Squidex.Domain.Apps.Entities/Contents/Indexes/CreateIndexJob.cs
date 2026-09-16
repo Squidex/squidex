@@ -59,15 +59,8 @@ public sealed class CreateIndexJob(IContentRepository contentRepository) : IJobR
         CancellationToken ct)
     {
         // The other arguments are just there for debugging purposes. Therefore do not validate them.
-        if (!context.Job.Arguments.TryGetValue(ArgSchemaId, out var schemaId))
-        {
-            throw new DomainException($"Argument '{ArgSchemaId}' missing.");
-        }
-
-        if (!context.Job.Arguments.TryGetValue(ArgSchemaName, out var schemaName))
-        {
-            throw new DomainException($"Argument '{ArgSchemaName}' missing.");
-        }
+        var schemaId = context.GetArgumentId(ArgSchemaId);
+        var schemaName = context.GetArgument(ArgSchemaName);
 
         var index = new IndexDefinition();
 
@@ -96,6 +89,6 @@ public sealed class CreateIndexJob(IContentRepository contentRepository) : IJobR
         // Use a readable name to describe the job.
         context.Job.Description = $"Schema {schemaName}: Create index {index.ToName()}";
 
-        await contentRepository.CreateIndexAsync(context.OwnerId, DomainId.Create(schemaId), index, ct);
+        await contentRepository.CreateIndexAsync(context.OwnerId, schemaId, index, ct);
     }
 }

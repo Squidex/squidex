@@ -15,7 +15,6 @@ using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json;
-using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.Tasks;
 
@@ -29,6 +28,21 @@ public sealed class MigrateContentsJob(
     IJsonSerializer jsonSerializer)
     : IJobRunner
 {
+    private sealed class MigrationContext
+    {
+        required public JobRunContext Run { get; init; }
+
+        required public App App { get; init; }
+
+        required public Schema Schema { get; init; }
+
+        required public ContentConverter Converter { get; init; }
+
+        required public bool MigrateDraft { get; init; }
+
+        required public bool MigratePublished { get; init; }
+    }
+
     public const string TaskName = "migrateContents";
     public const string ArgAppId = "appId";
     public const string ArgAppName = "appName";
@@ -38,6 +52,7 @@ public sealed class MigrateContentsJob(
     public const string ArgMigratePublished = "migratePublished";
 
     private const int BatchSize = 100;
+    private const int MaxRetries = 3;
 
     public string Name => TaskName;
 
@@ -68,20 +83,12 @@ public sealed class MigrateContentsJob(
         CancellationToken ct)
     {
         // The other arguments are just there for debugging purposes. Therefore do not validate them.
-        if (!context.Job.Arguments.TryGetValue(ArgSchemaId, out var schemaIdValue))
-        {
-            throw new DomainException($"Argument '{ArgSchemaId}' missing.");
-        }
+        var schemaId = context.GetArgumentId(ArgSchemaId);
+        var schemaName = context.GetArgument(ArgSchemaName);
 
-        if (!context.Job.Arguments.TryGetValue(ArgSchemaName, out var schemaName))
-        {
-            throw new DomainException($"Argument '{ArgSchemaName}' missing.");
-        }
-
-        var migrateDraft = GetFlag(context.Job, ArgMigrateDraft);
-        var migratePublished = GetFlag(context.Job, ArgMigratePublished);
-
-        var schemaId = DomainId.Create(schemaIdValue);
+        // Migrate all versions by default, if the arguments have not been provided.
+        var migrateDraft = context.GetArgumentFlag(ArgMigrateDraft, true);
+        var migratePublished = context.GetArgumentFlag(ArgMigratePublished, true);
 
         var (app, schema) = await appProvider.GetAppWithSchemaAsync(context.OwnerId, schemaId, ct: ct);
         if (app == null)
@@ -91,7 +98,7 @@ public sealed class MigrateContentsJob(
 
         if (schema == null)
         {
-            throw new DomainObjectNotFoundException(schemaIdValue);
+            throw new DomainObjectNotFoundException(schemaId.ToString());
         }
 
         // Use a readable name to describe the job.
@@ -104,11 +111,25 @@ public sealed class MigrateContentsJob(
             .WithUnpublished(true));
 
         var components = await appProvider.GetComponentsAsync(schema, ct);
-        var converter = ContentMigration.CreateConverter(schema, components, app.Languages, jsonSerializer);
 
+        await MigrateAsync(
+            new MigrationContext
+            {
+                App = app,
+                Converter = CreateConverter(app, schema, components),
+                MigrateDraft = migrateDraft,
+                MigratePublished = migratePublished,
+                Run = context,
+                Schema = schema,
+            }, ct);
+    }
+
+    private async Task MigrateAsync(MigrationContext migration,
+        CancellationToken ct)
+    {
         // Buffer the batches, so that the next contents are read while the current batch is written.
         var batches =
-            contentRepository.StreamAll(app.Id, [schemaId], SearchScope.All, ct)
+            contentRepository.StreamWriteContents(migration.App.Id, [migration.Schema.Id], null, ct)
                 .Batch(BatchSize, ct)
                 .Buffered(2, ct);
 
@@ -120,87 +141,138 @@ public sealed class MigrateContentsJob(
 
         await foreach (var batch in batches)
         {
-            var publishedData = await GetPublishedDataAsync(app, schema, batch, migratePublished, ct);
+            var (submitted, errors) = await MigrateBatchAsync(migration, batch, ct);
 
-            var jobs = new List<BulkUpdateJob>(batch.Count);
+            totalCount += batch.Count;
+            totalSubmitted += submitted;
 
-            foreach (var content in batch)
+            await migration.Run.LogAsync($"Checked contents: {totalCount}, submitted: {totalSubmitted}", replaceProgress && errors == 0);
+            replaceProgress = true;
+        }
+
+        await migration.Run.LogAsync($"Checked contents: {totalCount}, submitted: {totalSubmitted}", replaceProgress);
+    }
+
+    private ContentConverter CreateConverter(App app, Schema schema, ResolvedComponents components)
+    {
+        // The converter itself removes all fields and components that are not part of the schema anymore.
+        var converter = new ContentConverter(components, schema);
+
+        // Remove all values that are not compatible with the current field type.
+        converter.Add(new ExcludeChangedTypes(jsonSerializer));
+
+        // Move the values over when the partitioning of a field has been changed.
+        converter.Add(new ResolveFromPreviousPartitioning(app.Languages));
+
+        return converter;
+    }
+
+    private async Task<(int Submitted, int Errors)> MigrateBatchAsync(MigrationContext migration, List<WriteContent> contents,
+        CancellationToken ct)
+    {
+        var submitted = 0;
+        var errors = 0;
+
+        for (var attempt = 0; ; attempt++)
+        {
+            var jobs = CreateJobs(migration, contents);
+            if (jobs.Count == 0)
             {
-                ContentData? newCurrentData;
-                ContentData? newDraftData = null;
+                break;
+            }
 
-                if (content.NewStatus != null)
-                {
-                    // The stream only contains the draft of the content, the published version is queried separately.
-                    newCurrentData = publishedData.GetValueOrDefault(content.Id) is ContentData data ? Convert(converter, data) : null;
-                    newDraftData = migrateDraft ? Convert(converter, content.Data) : null;
-                }
-                else
-                {
-                    // The current version is only the published version, if it has the published status. Otherwise it is a draft.
-                    var migrateCurrent = content.Status == Status.Published ? migratePublished : migrateDraft;
+            // Only count the first attempt, because the retries are for the same contents.
+            if (attempt == 0)
+            {
+                submitted = jobs.Count;
+            }
 
-                    newCurrentData = migrateCurrent ? Convert(converter, content.Data) : null;
-                }
+            var command = new BulkUpdateContents
+            {
+                Actor = migration.Run.Actor,
+                AppId = migration.App.NamedId(),
+                Jobs = jobs.ToArray(),
+                SchemaId = migration.Schema.NamedId(),
+            };
 
-                if (newCurrentData == null && newDraftData == null)
+            var commandContext = await commandBus.PublishAsync(command, ct);
+            if (commandContext.PlainResult is not BulkUpdateResult result)
+            {
+                break;
+            }
+
+            var conflicts = new HashSet<DomainId>();
+
+            // Errors are reported per content item, so that a single invalid item does not stop the migration.
+            foreach (var item in result)
+            {
+                if (item.Exception == null)
                 {
                     continue;
                 }
 
-                // Fail the item instead of overwriting a change that has been made after the content has been read.
-                jobs.Add(new BulkUpdateJob
+                // The content has been changed after it has been read, therefore migrate it again with the new data.
+                if (item.Exception is DomainObjectVersionException && item.Id != null && attempt < MaxRetries)
                 {
-                    Id = content.Id,
-                    Data = newCurrentData,
-                    ExpectedCount = 1,
-                    ExpectedVersion = content.Version,
-                    NewData = newDraftData,
-                    Type = BulkUpdateContentType.Migrate,
-                });
+                    conflicts.Add(item.Id.Value);
+                    continue;
+                }
+
+                await migration.Run.LogAsync($"Failed to migrate content {item.Id}: {item.Exception.Message}");
+                errors++;
             }
 
-            totalCount += batch.Count;
-            totalSubmitted += jobs.Count;
-
-            var errors = 0;
-
-            if (jobs.Count > 0)
+            if (conflicts.Count == 0)
             {
-                errors = await MigrateAsync(context, app, schema, jobs, ct);
+                break;
             }
 
-            await context.LogAsync($"Checked contents: {totalCount}, submitted: {totalSubmitted}", replaceProgress && errors == 0);
-            replaceProgress = true;
+            contents = await contentRepository.StreamWriteContents(migration.App.Id, [migration.Schema.Id], conflicts, ct).ToListAsync(ct);
         }
 
-        await context.LogAsync($"Checked contents: {totalCount}, submitted: {totalSubmitted}", replaceProgress);
+        return (submitted, errors);
     }
 
-    private async Task<Dictionary<DomainId, ContentData>> GetPublishedDataAsync(App app, Schema schema, List<Content> batch, bool migratePublished,
-        CancellationToken ct)
+    private static List<BulkUpdateJob> CreateJobs(MigrationContext migration, List<WriteContent> contents)
     {
-        var result = new Dictionary<DomainId, ContentData>();
+        var jobs = new List<BulkUpdateJob>(contents.Count);
 
-        if (!migratePublished)
+        foreach (var content in contents)
         {
-            return result;
+            // The current version is only the published version, if it has the published status. Otherwise it is a draft.
+            var migrateCurrent =
+                content.CurrentVersion.Status == Status.Published ?
+                migration.MigratePublished :
+                migration.MigrateDraft;
+
+            var newCurrentData =
+                migrateCurrent ?
+                Convert(migration.Converter, content.CurrentVersion.Data) :
+                null;
+
+            var newDraftData =
+                migration.MigrateDraft && content.NewVersion != null ?
+                Convert(migration.Converter, content.NewVersion.Data) :
+                null;
+
+            if (newCurrentData == null && newDraftData == null)
+            {
+                continue;
+            }
+
+            // Fail the item instead of overwriting a change that has been made after the content has been read.
+            jobs.Add(new BulkUpdateJob
+            {
+                Id = content.Id,
+                Data = newCurrentData,
+                ExpectedCount = 1,
+                ExpectedVersion = content.Version,
+                NewData = newDraftData,
+                Type = BulkUpdateContentType.Migrate,
+            });
         }
 
-        var ids = batch.Where(x => x.NewStatus != null).Select(x => x.Id).ToHashSet();
-        if (ids.Count == 0)
-        {
-            return result;
-        }
-
-        var published = await contentRepository.QueryAsync(app, schema, Q.Empty.WithIds(ids).WithoutTotal(), SearchScope.Published, ct);
-
-        foreach (var content in published)
-        {
-            result[content.Id] = content.Data;
-        }
-
-        return result;
+        return jobs;
     }
 
     private static ContentData? Convert(ContentConverter converter, ContentData data)
@@ -209,44 +281,5 @@ public sealed class MigrateContentsJob(
         var converted = converter.Convert(data.Clone());
 
         return converted.Equals(data) ? null : converted;
-    }
-
-    private static bool GetFlag(Job job, string name)
-    {
-        // Migrate all versions by default, if the argument has not been provided.
-        return !job.Arguments.TryGetValue(name, out var value) || !bool.TryParse(value, out var result) || result;
-    }
-
-    private async Task<int> MigrateAsync(JobRunContext context, App app, Schema schema, List<BulkUpdateJob> jobs,
-        CancellationToken ct)
-    {
-        var command = new BulkUpdateContents
-        {
-            Actor = context.Actor,
-            AppId = app.NamedId(),
-            Jobs = jobs.ToArray(),
-            SchemaId = schema.NamedId(),
-        };
-
-        var commandContext = await commandBus.PublishAsync(command, ct);
-
-        // Errors are reported per content item, so that a single invalid item does not stop the migration.
-        if (commandContext.PlainResult is not BulkUpdateResult result)
-        {
-            return 0;
-        }
-
-        var errors = 0;
-
-        foreach (var item in result)
-        {
-            if (item.Exception != null)
-            {
-                await context.LogAsync($"Failed to migrate content {item.Id}: {item.Exception.Message}");
-                errors++;
-            }
-        }
-
-        return errors;
     }
 }

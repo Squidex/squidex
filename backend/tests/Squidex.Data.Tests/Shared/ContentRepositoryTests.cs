@@ -85,13 +85,16 @@ public abstract class ContentRepositoryTests : GivenContext
 
     protected abstract Task<IContentRepository> CreateSutAsync();
 
-    private async Task<IContentRepository> CreateAndPrepareSutAsync()
+    private async Task<IContentRepository> CreateAndPrepareSutAsync(params WriteContent[] contents)
     {
         var sut = await CreateSutAsync();
         if (sut is not ISnapshotStore<WriteContent> store)
         {
             return sut;
         }
+
+        // Write the contents of the test itself, because the shared contents are only written once.
+        await WriteAsync(store, contents);
 
         if (await sut.StreamAll(AppIds[0].Id, [schema.Id], SearchScope.All).AnyAsync())
         {
@@ -163,6 +166,16 @@ public abstract class ContentRepositoryTests : GivenContext
         return sut;
     }
 
+    private static async Task WriteAsync(ISnapshotStore<WriteContent> store, WriteContent[] contents)
+    {
+        if (contents.Length == 0)
+        {
+            return;
+        }
+
+        await store.WriteManyAsync(contents.Select(x => new SnapshotWriteJob<WriteContent>(x.UniqueId, x, 0)).ToList(), default);
+    }
+
     [Fact]
     public async Task Should_find_by_id()
     {
@@ -219,6 +232,96 @@ public abstract class ContentRepositoryTests : GivenContext
         var count = await sut.StreamAll(AppIds[0].Id, [], SearchScope.All).CountAsync();
 
         // IDs is not predicable, therefore the weak assertion.
+        Assert.Equal(0, count);
+    }
+
+    [Fact]
+    public async Task Should_stream_write_contents_with_schema()
+    {
+        var sut = await CreateAndPrepareSutAsync();
+
+        var count = await sut.StreamWriteContents(AppIds[0].Id, [schema.Id], null).CountAsync();
+
+        // IDs is not predicable, therefore the weak assertion.
+        Assert.Equal(NumValues, count);
+    }
+
+    [Fact]
+    public async Task Should_stream_write_contents_without_schema()
+    {
+        var sut = await CreateAndPrepareSutAsync();
+
+        var count = await sut.StreamWriteContents(AppIds[0].Id, null, null).CountAsync();
+
+        // IDs is not predicable, therefore the weak assertion.
+        Assert.Equal(NumValues * SchemaIds.Length, count);
+    }
+
+    [Fact]
+    public async Task Should_stream_write_contents_with_empty_schemas()
+    {
+        var sut = await CreateAndPrepareSutAsync();
+
+        var count = await sut.StreamWriteContents(AppIds[0].Id, [], null).CountAsync();
+
+        Assert.Equal(0, count);
+    }
+
+    [Fact]
+    public async Task Should_stream_write_contents_with_all_versions()
+    {
+        static ContentData DataOf(string value)
+        {
+            return new ContentData()
+                .AddField("field1",
+                    new ContentFieldData()
+                        .AddInvariant(JsonValue.Create(value)));
+        }
+
+        // Use another app to not change the results of the other tests.
+        var appId = NamedId.Of(DomainId.NewGuid(), "my-app-versions");
+
+        var content = CreateWriteContent() with
+        {
+            Id = DomainId.NewGuid(),
+            AppId = appId,
+            CurrentVersion = new ContentVersion(Status.Published, DataOf("published")),
+            NewVersion = new ContentVersion(Status.Draft, DataOf("draft")),
+            SchemaId = schema.NamedId(),
+        };
+
+        var sut = await CreateAndPrepareSutAsync(content);
+
+        var actual = await sut.StreamWriteContents(appId.Id, [schema.Id], [content.Id]).ToListAsync();
+
+        var found = Assert.Single(actual);
+
+        Assert.Equal(Status.Published, found.CurrentVersion.Status);
+        Assert.Equal(Status.Draft, found.NewVersion?.Status);
+
+        found.CurrentVersion.Data.Should().BeEquivalentTo(DataOf("published"));
+        found.NewVersion!.Data.Should().BeEquivalentTo(DataOf("draft"));
+    }
+
+    [Fact]
+    public async Task Should_stream_write_contents_with_ids()
+    {
+        var sut = await CreateAndPrepareSutAsync();
+
+        var contentIds = await sut.StreamAll(app.Id, [schema.Id], SearchScope.All).Select(x => x.Id).Take(2).ToHashSetAsync();
+
+        var contents = await sut.StreamWriteContents(app.Id, [schema.Id], contentIds).ToListAsync();
+
+        Assert.Equal(contentIds, contents.Select(x => x.Id).ToHashSet());
+    }
+
+    [Fact]
+    public async Task Should_stream_write_contents_with_empty_ids()
+    {
+        var sut = await CreateAndPrepareSutAsync();
+
+        var count = await sut.StreamWriteContents(app.Id, [schema.Id], []).CountAsync();
+
         Assert.Equal(0, count);
     }
 

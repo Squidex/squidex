@@ -75,6 +75,12 @@ public sealed class MongoShardedContentRepository(IShardingStrategy sharding, Fu
         return Shard(appId).StreamIds(appId, schemaIds, scope, ct);
     }
 
+    public IAsyncEnumerable<WriteContent> StreamWriteContents(DomainId appId, HashSet<DomainId>? schemaIds, HashSet<DomainId>? ids,
+        CancellationToken ct = default)
+    {
+        return Shard(appId).StreamWriteContents(appId, schemaIds, ids, ct);
+    }
+
     public IAsyncEnumerable<Content> StreamReferencing(DomainId appId, DomainId references, int take, SearchScope scope,
         CancellationToken ct = default)
     {
