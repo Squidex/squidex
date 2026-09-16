@@ -38,6 +38,23 @@ public sealed class QueryAsStream : OperationBase
         }
     }
 
+    public async IAsyncEnumerable<WriteContent> StreamWriteContents(DomainId appId, HashSet<DomainId>? schemaIds, HashSet<DomainId>? ids,
+        [EnumeratorCancellation] CancellationToken ct)
+    {
+        if (schemaIds is { Count: 0 } || ids is { Count: 0 })
+        {
+            yield break;
+        }
+
+        var filter = CreateFilter(appId, schemaIds, ids);
+        var find = Collection.Find(filter).ToAsyncEnumerable(ct);
+
+        await foreach (var entity in find.WithCancellation(ct))
+        {
+            yield return entity.ToState();
+        }
+    }
+
     public async IAsyncEnumerable<DomainId> StreamAllIds(DomainId appId, HashSet<DomainId>? schemaIds,
         [EnumeratorCancellation] CancellationToken ct)
     {
@@ -58,7 +75,7 @@ public sealed class QueryAsStream : OperationBase
         }
     }
 
-    private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId appId, HashSet<DomainId>? schemaIds)
+    private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId appId, HashSet<DomainId>? schemaIds, HashSet<DomainId>? ids = null)
     {
         var filters = new List<FilterDefinition<MongoContentEntity>>
         {
@@ -75,6 +92,11 @@ public sealed class QueryAsStream : OperationBase
         {
             // If we also add this filter, it is more likely that the index will be used.
             filters.Add(Filter.Exists(x => x.IndexedSchemaId));
+        }
+
+        if (ids != null)
+        {
+            filters.Add(Filter.In(x => x.Id, ids));
         }
 
         filters.Add(Filter.Ne(x => x.IsDeleted, true));

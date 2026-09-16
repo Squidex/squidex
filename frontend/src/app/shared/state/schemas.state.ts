@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { EMPTY, forkJoin, Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
-import { AddFieldDto, ChangeCategoryDto, ConfigureFieldRulesDto, ConfigureUIFieldsDto, CreateSchemaDto, FieldDto, NestedFieldDto, SchemaDto, SynchronizeSchemaDto, UpdateFieldDto, UpdateSchemaDto } from '../model';
+import { AddFieldDto, ChangeCategoryDto, ConfigureFieldRulesDto, ConfigureUIFieldsDto, CreateSchemaDto, FieldDto, MigrateContentsDto, NestedFieldDto, SchemaDto, SynchronizeSchemaDto, UpdateFieldDto, UpdateSchemaDto } from '../model';
 import { SchemasService } from '../services/schemas.service';
 import { AppsState } from './apps.state';
 
@@ -175,8 +175,8 @@ export class SchemasState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
-    public migrateContents(schema: SchemaDto): Observable<any> {
-        return this.schemasService.postContentMigration(this.appName, schema).pipe(
+    public migrateContents(schema: SchemaDto, request: MigrateContentsDto): Observable<any> {
+        return this.schemasService.postContentMigration(this.appName, schema, request).pipe(
             tap(() => {
                 this.dialogs.notifyInfo('i18n:schemas.migrateContentsStarted');
             }),

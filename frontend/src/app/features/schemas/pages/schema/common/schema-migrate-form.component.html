@@ -3,6 +3,18 @@
 <div class="card">
     <div class="card-body">
         <span [sqxMarkdown]="'schemas.migrateContentsHint' | sqxTranslate" trusted="true"></span>
+
+        @if (schema.canContentsMigrate) {
+            <div class="mt-3">
+                <sqx-form-row check for="migrateDraft" hint="schemas.migrateContentsDraftHint" label="schemas.migrateContentsDraft" vertical>
+                    <input class="form-check-input" id="migrateDraft" [(ngModel)]="migrateDraft" [ngModelOptions]="{ standalone: true }" type="checkbox" />
+                </sqx-form-row>
+
+                <sqx-form-row check for="migratePublished" hint="schemas.migrateContentsPublishedHint" label="schemas.migrateContentsPublished" vertical>
+                    <input class="form-check-input" id="migratePublished" [(ngModel)]="migratePublished" [ngModelOptions]="{ standalone: true }" type="checkbox" />
+                </sqx-form-row>
+            </div>
+        }
     </div>
 
     <div class="card-footer">
@@ -11,6 +23,7 @@
                 class="float-end btn btn-primary"
                 confirmText="i18n:schemas.migrateContentsConfirmText"
                 confirmTitle="i18n:schemas.migrateContentsConfirmTitle"
+                [disabled]="!migrateDraft && !migratePublished"
                 (sqxConfirmClick)="migrateContents()"
                 type="button">
                 {{ "schemas.migrateContentsButton" | sqxTranslate }}

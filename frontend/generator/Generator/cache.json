@@ -2094,7 +2094,7 @@
           "Schemas"
         ],
         "summary": "Migrate the contents to the current schema.",
-        "description": "Schema changes are not applied to the stored contents. This endpoint starts a job that rewrites all\ncontents of the schema so that the stored data matches the current schema.",
+        "description": "Schema changes are not applied to the stored contents. This endpoint starts a job that rewrites all\ncontents of the schema so that the stored data matches the current schema. The draft and the published\nversion of a content are migrated independently.",
         "operationId": "SchemaContents_PostContentMigration",
         "parameters": [
           {
@@ -2118,6 +2118,19 @@
             "x-position": 2
           }
         ],
+        "requestBody": {
+          "x-name": "request",
+          "description": "The request object that defines which versions to migrate.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MigrateContentsDto"
+              }
+            }
+          },
+          "required": true,
+          "x-position": 3
+        },
         "responses": {
           "204": {
             "description": "Content migration added to job queue."
@@ -16073,6 +16086,22 @@
           "Schema"
         ]
       },
+      "MigrateContentsDto": {
+        "type": "object",
+        "additionalProperties": false,
+        "properties": {
+          "migrateDraft": {
+            "type": "boolean",
+            "description": "True, to migrate the draft versions. Default: true.",
+            "nullable": true
+          },
+          "migratePublished": {
+            "type": "boolean",
+            "description": "True, to migrate the published versions. Default: true.",
+            "nullable": true
+          }
+        }
+      },
       "SchemaDto": {
         "allOf": [
           {
@@ -21397,7 +21426,12 @@
             "nullable": true
           },
           "data": {
-            "description": "The data of the content when type is set to 'Upsert', 'Create', 'Update' or 'Patch.",
+            "description": "The data of the content when type is set to 'Upsert', 'Create', 'Update', 'Patch' or 'Migrate'.",
+            "nullable": true,
+            "$ref": "#/components/schemas/ContentData"
+          },
+          "newData": {
+            "description": "The data of the new version (draft) when the type is set to 'Migrate'.",
             "nullable": true,
             "$ref": "#/components/schemas/ContentData"
           },
@@ -21518,7 +21552,8 @@
           "Patch",
           "Update",
           "Validate",
-          "EnrichDefaults"
+          "EnrichDefaults",
+          "Migrate"
         ],
         "enum": [
           "Upsert",
@@ -21528,7 +21563,8 @@
           "Patch",
           "Update",
           "Validate",
-          "EnrichDefaults"
+          "EnrichDefaults",
+          "Migrate"
         ]
       },
       "ChangeStatusDto": {

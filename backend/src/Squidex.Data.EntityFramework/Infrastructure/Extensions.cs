@@ -91,6 +91,26 @@ public static class Extensions
         return source.Where(predicate);
     }
 
+    public static IQueryable<T> WhereIf<T, TValue>(this IQueryable<T> source, TValue? value, Func<TValue, Expression<Func<T, bool>>> predicate) where TValue : struct
+    {
+        if (value == null)
+        {
+            return source;
+        }
+
+        return source.Where(predicate(value.Value));
+    }
+
+    public static IQueryable<T> WhereIf<T, TValue>(this IQueryable<T> source, IReadOnlyCollection<TValue>? values, Func<IReadOnlyCollection<TValue>, Expression<Func<T, bool>>> predicate)
+    {
+        if (values is not { Count: > 0 })
+        {
+            return source;
+        }
+
+        return source.Where(predicate(values));
+    }
+
     public static Task BulkUpsertAsync<T>(this DbContext dbContext, List<T> source,
         CancellationToken ct) where T : class
     {

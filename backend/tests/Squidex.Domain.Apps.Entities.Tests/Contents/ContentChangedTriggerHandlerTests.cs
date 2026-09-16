@@ -73,6 +73,12 @@ public class ContentChangedTriggerHandlerTests : GivenContext
     }
 
     [Fact]
+    public void Should_not_handle_content_migrated_event()
+    {
+        Assert.False(sut.Handles(new ContentMigrated()));
+    }
+
+    [Fact]
     public void Should_calculate_name_for_created()
     {
         var @event = new ContentCreated { SchemaId = schemaMatching };

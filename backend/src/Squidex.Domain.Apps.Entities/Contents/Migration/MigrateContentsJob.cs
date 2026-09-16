@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Apps;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.ConvertContent;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.Commands;
@@ -27,18 +28,35 @@ public sealed class MigrateContentsJob(
     IJsonSerializer jsonSerializer)
     : IJobRunner
 {
+    private sealed class MigrationContext
+    {
+        required public JobRunContext Run { get; init; }
+
+        required public App App { get; init; }
+
+        required public Schema Schema { get; init; }
+
+        required public ContentConverter Converter { get; init; }
+
+        required public bool MigrateDraft { get; init; }
+
+        required public bool MigratePublished { get; init; }
+    }
+
     public const string TaskName = "migrateContents";
     public const string ArgAppId = "appId";
     public const string ArgAppName = "appName";
     public const string ArgSchemaId = "schemaId";
     public const string ArgSchemaName = "schemaName";
+    public const string ArgMigrateDraft = "migrateDraft";
+    public const string ArgMigratePublished = "migratePublished";
 
-    // Schema changes are not applied to the stored contents, therefore a lot of items can be affected.
     private const int BatchSize = 100;
+    private const int MaxRetries = 3;
 
     public string Name => TaskName;
 
-    public static JobRequest BuildRequest(RefToken actor, App app, Schema schema)
+    public static JobRequest BuildRequest(RefToken actor, App app, Schema schema, bool migrateDraft = true, bool migratePublished = true)
     {
         Guard.NotNull(actor);
         Guard.NotNull(app);
@@ -53,6 +71,8 @@ public sealed class MigrateContentsJob(
                 [ArgAppName] = app.Name,
                 [ArgSchemaId] = schema.Id.ToString(),
                 [ArgSchemaName] = schema.Name,
+                [ArgMigrateDraft] = migrateDraft.ToString(),
+                [ArgMigratePublished] = migratePublished.ToString(),
             }) with
         {
             AppId = app.NamedId(),
@@ -63,17 +83,12 @@ public sealed class MigrateContentsJob(
         CancellationToken ct)
     {
         // The other arguments are just there for debugging purposes. Therefore do not validate them.
-        if (!context.Job.Arguments.TryGetValue(ArgSchemaId, out var schemaIdValue))
-        {
-            throw new DomainException($"Argument '{ArgSchemaId}' missing.");
-        }
+        var schemaId = context.GetArgumentId(ArgSchemaId);
+        var schemaName = context.GetArgument(ArgSchemaName);
 
-        if (!context.Job.Arguments.TryGetValue(ArgSchemaName, out var schemaName))
-        {
-            throw new DomainException($"Argument '{ArgSchemaName}' missing.");
-        }
-
-        var schemaId = DomainId.Create(schemaIdValue);
+        // Migrate all versions by default, if the arguments have not been provided.
+        var migrateDraft = context.GetArgumentFlag(ArgMigrateDraft, true);
+        var migratePublished = context.GetArgumentFlag(ArgMigratePublished, true);
 
         var (app, schema) = await appProvider.GetAppWithSchemaAsync(context.OwnerId, schemaId, ct: ct);
         if (app == null)
@@ -83,7 +98,7 @@ public sealed class MigrateContentsJob(
 
         if (schema == null)
         {
-            throw new DomainObjectNotFoundException(schemaIdValue);
+            throw new DomainObjectNotFoundException(schemaId.ToString());
         }
 
         // Use a readable name to describe the job.
@@ -96,59 +111,49 @@ public sealed class MigrateContentsJob(
             .WithUnpublished(true));
 
         var components = await appProvider.GetComponentsAsync(schema, ct);
-        var converter = BuildConverter(app, schema, components);
 
+        await MigrateAsync(
+            new MigrationContext
+            {
+                App = app,
+                Converter = CreateConverter(app, schema, components),
+                MigrateDraft = migrateDraft,
+                MigratePublished = migratePublished,
+                Run = context,
+                Schema = schema,
+            }, ct);
+    }
+
+    private async Task MigrateAsync(MigrationContext migration,
+        CancellationToken ct)
+    {
         // Buffer the batches, so that the next contents are read while the current batch is written.
         var batches =
-            contentRepository.StreamAll(app.Id, [schemaId], SearchScope.All, ct)
+            contentRepository.StreamWriteContents(migration.App.Id, [migration.Schema.Id], null, ct)
                 .Batch(BatchSize, ct)
                 .Buffered(2, ct);
 
         var totalCount = 0;
-        var totalUpdates = 0;
+        var totalSubmitted = 0;
 
         // The progress is a single log line, but it must not overwrite the errors of the previous batch.
         var replaceProgress = false;
 
         await foreach (var batch in batches)
         {
-            var jobs = new List<BulkUpdateJob>(batch.Count);
-
-            foreach (var content in batch)
-            {
-                // The converter takes ownership of the data, therefore the clone is needed for the comparison.
-                var converted = converter.Convert(content.Data.Clone());
-                if (converted.Equals(content.Data))
-                {
-                    continue;
-                }
-
-                jobs.Add(new BulkUpdateJob
-                {
-                    Id = content.Id,
-                    Data = converted,
-                    Type = BulkUpdateContentType.Update,
-                });
-            }
+            var (submitted, errors) = await MigrateBatchAsync(migration, batch, ct);
 
             totalCount += batch.Count;
-            totalUpdates += jobs.Count;
+            totalSubmitted += submitted;
 
-            var errors = 0;
-
-            if (jobs.Count > 0)
-            {
-                errors = await UpdateAsync(context, app, schema, jobs, ct);
-            }
-
-            await context.LogAsync($"Checked contents: {totalCount}, updated: {totalUpdates}", replaceProgress && errors == 0);
+            await migration.Run.LogAsync($"Checked contents: {totalCount}, submitted: {totalSubmitted}", replaceProgress && errors == 0);
             replaceProgress = true;
         }
 
-        await context.LogAsync($"Checked contents: {totalCount}, updated: {totalUpdates}", replaceProgress);
+        await migration.Run.LogAsync($"Checked contents: {totalCount}, submitted: {totalSubmitted}", replaceProgress);
     }
 
-    private ContentConverter BuildConverter(App app, Schema schema, ResolvedComponents components)
+    private ContentConverter CreateConverter(App app, Schema schema, ResolvedComponents components)
     {
         // The converter itself removes all fields and components that are not part of the schema anymore.
         var converter = new ContentConverter(components, schema);
@@ -162,41 +167,119 @@ public sealed class MigrateContentsJob(
         return converter;
     }
 
-    private async Task<int> UpdateAsync(JobRunContext context, App app, Schema schema, List<BulkUpdateJob> jobs,
+    private async Task<(int Submitted, int Errors)> MigrateBatchAsync(MigrationContext migration, List<WriteContent> contents,
         CancellationToken ct)
     {
-        // The contents are only converted to the current schema, therefore all custom logic must be skipped.
-        var command = new BulkUpdateContents
-        {
-            Jobs = jobs.ToArray(),
-            Actor = context.Actor,
-            AppId = app.NamedId(),
-            DoNotScript = true,
-            DoNotValidate = true,
-            DoNotValidateWorkflow = true,
-            OptimizeValidation = true,
-            SchemaId = schema.NamedId(),
-        };
-
-        var commandContext = await commandBus.PublishAsync(command, ct);
-
-        // Errors are reported per content item, so that a single invalid item does not stop the migration.
-        if (commandContext.PlainResult is not BulkUpdateResult result)
-        {
-            return 0;
-        }
-
+        var submitted = 0;
         var errors = 0;
 
-        foreach (var item in result)
+        for (var attempt = 0; ; attempt++)
         {
-            if (item.Exception != null)
+            var jobs = CreateJobs(migration, contents);
+            if (jobs.Count == 0)
             {
-                await context.LogAsync($"Failed to migrate content {item.Id}: {item.Exception.Message}");
+                break;
+            }
+
+            // Only count the first attempt, because the retries are for the same contents.
+            if (attempt == 0)
+            {
+                submitted = jobs.Count;
+            }
+
+            var command = new BulkUpdateContents
+            {
+                Actor = migration.Run.Actor,
+                AppId = migration.App.NamedId(),
+                Jobs = jobs.ToArray(),
+                SchemaId = migration.Schema.NamedId(),
+            };
+
+            var commandContext = await commandBus.PublishAsync(command, ct);
+            if (commandContext.PlainResult is not BulkUpdateResult result)
+            {
+                break;
+            }
+
+            var conflicts = new HashSet<DomainId>();
+
+            // Errors are reported per content item, so that a single invalid item does not stop the migration.
+            foreach (var item in result)
+            {
+                if (item.Exception == null)
+                {
+                    continue;
+                }
+
+                // The content has been changed after it has been read, therefore migrate it again with the new data.
+                if (item.Exception is DomainObjectVersionException && item.Id != null && attempt < MaxRetries)
+                {
+                    conflicts.Add(item.Id.Value);
+                    continue;
+                }
+
+                await migration.Run.LogAsync($"Failed to migrate content {item.Id}: {item.Exception.Message}");
                 errors++;
             }
+
+            if (conflicts.Count == 0)
+            {
+                break;
+            }
+
+            contents = await contentRepository.StreamWriteContents(migration.App.Id, [migration.Schema.Id], conflicts, ct).ToListAsync(ct);
         }
 
-        return errors;
+        return (submitted, errors);
+    }
+
+    private static List<BulkUpdateJob> CreateJobs(MigrationContext migration, List<WriteContent> contents)
+    {
+        var jobs = new List<BulkUpdateJob>(contents.Count);
+
+        foreach (var content in contents)
+        {
+            // The current version is only the published version, if it has the published status. Otherwise it is a draft.
+            var migrateCurrent =
+                content.CurrentVersion.Status == Status.Published ?
+                migration.MigratePublished :
+                migration.MigrateDraft;
+
+            var newCurrentData =
+                migrateCurrent ?
+                Convert(migration.Converter, content.CurrentVersion.Data) :
+                null;
+
+            var newDraftData =
+                migration.MigrateDraft && content.NewVersion != null ?
+                Convert(migration.Converter, content.NewVersion.Data) :
+                null;
+
+            if (newCurrentData == null && newDraftData == null)
+            {
+                continue;
+            }
+
+            // Fail the item instead of overwriting a change that has been made after the content has been read.
+            jobs.Add(new BulkUpdateJob
+            {
+                Id = content.Id,
+                Data = newCurrentData,
+                ExpectedCount = 1,
+                ExpectedVersion = content.Version,
+                NewData = newDraftData,
+                Type = BulkUpdateContentType.Migrate,
+            });
+        }
+
+        return jobs;
+    }
+
+    private static ContentData? Convert(ContentConverter converter, ContentData data)
+    {
+        // The converter takes ownership of the data, therefore the clone is needed for the comparison.
+        var converted = converter.Convert(data.Clone());
+
+        return converted.Equals(data) ? null : converted;
     }
 }

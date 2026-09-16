@@ -10,7 +10,7 @@ import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { ApiUrlConfig, HTTP, pretifyError, Resource, ScriptCompletions, Versioned, VersionOrTag } from '@app/framework';
-import { AddFieldDto, ChangeCategoryDto, ConfigureFieldRulesDto, ConfigureUIFieldsDto, CreateSchemaDto, GenerateSchemaDto, GenerateSchemaResponseDto, SchemaDto, SchemasDto, SynchronizeSchemaDto, UpdateFieldDto, UpdateSchemaDto } from './../model';
+import { AddFieldDto, ChangeCategoryDto, ConfigureFieldRulesDto, ConfigureUIFieldsDto, CreateSchemaDto, GenerateSchemaDto, GenerateSchemaResponseDto, MigrateContentsDto, SchemaDto, SchemasDto, SynchronizeSchemaDto, UpdateFieldDto, UpdateSchemaDto } from './../model';
 import { QueryModel } from './query';
 
 @Injectable({
@@ -279,12 +279,12 @@ export class SchemasService {
             pretifyError('i18n:schemas.deleteFieldFailed'));
     }
 
-    public postContentMigration(appName: string, resource: Resource): Observable<any> {
+    public postContentMigration(appName: string, resource: Resource, dto: MigrateContentsDto): Observable<any> {
         const link = resource._links['contents/migrate'];
 
         const url = this.apiUrl.buildUrl(link.href);
 
-        return this.http.request(link.method, url).pipe(
+        return this.http.request(link.method, url, { body: dto.toJSON() }).pipe(
             pretifyError('i18n:schemas.migrateContentsFailed'));
     }
 

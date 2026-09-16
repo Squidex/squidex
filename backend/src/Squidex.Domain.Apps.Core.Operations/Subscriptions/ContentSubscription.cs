@@ -32,6 +32,9 @@ public sealed class ContentSubscription : ISubscription
         {
             case EnrichedContentEvent enrichedContentEvent:
                 return ShouldHandle(enrichedContentEvent);
+            case ContentMigrated:
+                // Migrations only adjust the stored data to the schema and are not published to subscribers.
+                return false;
             case ContentEvent contentEvent:
                 return ShouldHandle(contentEvent);
             default:

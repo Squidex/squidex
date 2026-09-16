@@ -217,6 +217,14 @@ public partial class ContentDomainObject(
                     return Snapshot;
                 }, ct);
 
+            case MigrateContent migrateContent:
+                return ApplyReturn(migrateContent, c =>
+                {
+                    MigrateCore(c);
+
+                    return Snapshot;
+                }, ct);
+
             case DeleteContent { Permanent: true } deleteContent:
                 return DeletePermanentAsync(deleteContent, async (c, ct) =>
                 {
@@ -310,6 +318,18 @@ public partial class ContentDomainObject(
         }
 
         ChangeStatus(c);
+    }
+
+    private void MigrateCore(MigrateContent c)
+    {
+        // The data has already been converted by the caller, therefore only the changed versions are written.
+        var newCurrentData = c.Data != null && !c.Data.Equals(Snapshot.CurrentVersion.Data) ? c.Data : null;
+        var newDraftData = c.NewData != null && Snapshot.NewVersion != null && !c.NewData.Equals(Snapshot.NewVersion.Data) ? c.NewData : null;
+
+        if (newCurrentData != null || newDraftData != null)
+        {
+            Migrate(c, newCurrentData, newDraftData);
+        }
     }
 
     private async Task UpdateCore(UpdateContent c, ContentOperation operation,
@@ -458,6 +478,11 @@ public partial class ContentDomainObject(
     private void Update(ContentCommand command, ContentData data)
     {
         Raise(command, new ContentUpdated { Data = data });
+    }
+
+    private void Migrate(ContentCommand command, ContentData? data, ContentData? newData)
+    {
+        Raise(command, new ContentMigrated { Data = data, NewData = newData });
     }
 
     private void ChangeStatus(ChangeContentStatus command)

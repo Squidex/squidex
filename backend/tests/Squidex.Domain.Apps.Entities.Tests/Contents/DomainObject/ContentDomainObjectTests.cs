@@ -730,6 +730,101 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
     }
 
     [Fact]
+    public async Task MigrateContent_should_migrate_current_version()
+    {
+        await PublishAsync(new CreateContent { Data = otherData });
+
+        var command = new MigrateContent { Data = data };
+
+        var actual = await PublishAsync(command);
+
+        await VerifySutAsync(actual);
+    }
+
+    [Fact]
+    public async Task MigrateContent_should_migrate_published_and_draft_version()
+    {
+        await PublishAsync(new CreateContent { Data = otherData });
+        await ExecutePublishAsync();
+        await ExecuteCreateDraftAsync();
+
+        var command = new MigrateContent { Data = data, NewData = patch };
+
+        var actual = await PublishAsync(command);
+
+        var @event = Assert.IsType<ContentMigrated>(Assert.Single(LastEvents).Payload);
+
+        Assert.NotNull(@event.Data);
+        Assert.NotNull(@event.NewData);
+
+        await VerifySutAsync(actual);
+    }
+
+    [Fact]
+    public async Task MigrateContent_should_only_migrate_draft_version_if_published_data_is_not_provided()
+    {
+        await PublishAsync(new CreateContent { Data = otherData });
+        await ExecutePublishAsync();
+        await ExecuteCreateDraftAsync();
+
+        var command = new MigrateContent { NewData = data };
+
+        var actual = await PublishAsync(command);
+
+        var @event = Assert.IsType<ContentMigrated>(Assert.Single(LastEvents).Payload);
+
+        Assert.Null(@event.Data);
+        Assert.NotNull(@event.NewData);
+
+        await VerifySutAsync(actual);
+    }
+
+    [Fact]
+    public async Task MigrateContent_should_only_migrate_published_version_if_draft_data_is_not_provided()
+    {
+        await PublishAsync(new CreateContent { Data = otherData });
+        await ExecutePublishAsync();
+        await ExecuteCreateDraftAsync();
+
+        var command = new MigrateContent { Data = data };
+
+        var actual = await PublishAsync(command);
+
+        var @event = Assert.IsType<ContentMigrated>(Assert.Single(LastEvents).Payload);
+
+        Assert.NotNull(@event.Data);
+        Assert.Null(@event.NewData);
+
+        await VerifySutAsync(actual);
+    }
+
+    [Fact]
+    public async Task MigrateContent_should_not_migrate_draft_version_if_content_has_no_draft()
+    {
+        await PublishAsync(new CreateContent { Data = otherData });
+
+        var command = new MigrateContent { NewData = data };
+
+        await PublishAsync(command);
+
+        Assert.Empty(LastEvents);
+        Assert.Equal(0, sut.Version);
+    }
+
+    [Fact]
+    public async Task MigrateContent_should_not_migrate_content_if_data_is_not_changed()
+    {
+        await ExecuteCreateAsync();
+
+        var command = new MigrateContent { Data = data };
+
+        await PublishAsync(command);
+
+        Assert.Empty(LastEvents);
+        Assert.Equal(0, sut.Version);
+    }
+
+    [Fact]
     public async Task Delete_should_create_events_and_update_deleted_flag()
     {
         await ExecuteCreateAsync();

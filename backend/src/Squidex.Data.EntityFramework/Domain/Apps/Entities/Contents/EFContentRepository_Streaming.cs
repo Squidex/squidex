@@ -38,7 +38,7 @@ public sealed partial class EFContentRepository<TContext, TContentContext>
         var query =
             dbContext.Set<T>()
                 .Where(x => x.IndexedAppId == appId)
-                .WhereIf(x => schemaIds!.Contains(x.IndexedSchemaId), schemaIds is { Count: > 0 })
+                .WhereIf(schemaIds, s => x => s.Contains(x.IndexedSchemaId))
                 .Select(x => x.Id)
                 .ToAsyncEnumerable();
 
@@ -69,13 +69,38 @@ public sealed partial class EFContentRepository<TContext, TContentContext>
         var query =
             dbContext.Set<T>()
                 .Where(x => x.IndexedAppId == appId)
-                .WhereIf(x => schemaIds!.Contains(x.IndexedSchemaId), schemaIds is { Count: > 0 })
+                .WhereIf(schemaIds, s => x => s.Contains(x.IndexedSchemaId))
                 .Select(x => x)
                 .ToAsyncEnumerable();
 
         await foreach (var entity in query.WithCancellation(ct))
         {
             yield return entity;
+        }
+    }
+
+    public async IAsyncEnumerable<WriteContent> StreamWriteContents(DomainId appId, HashSet<DomainId>? schemaIds, HashSet<DomainId>? ids,
+        [EnumeratorCancellation] CancellationToken ct = default)
+    {
+        if (schemaIds is { Count: 0 } || ids is { Count: 0 })
+        {
+            yield break;
+        }
+
+        await using var dbContext = await CreateDbContextAsync(ct);
+
+        // The complete entity is the only entity with the data of all versions.
+        var query =
+            dbContext.Set<EFContentCompleteEntity>()
+                .Where(x => x.IndexedAppId == appId)
+                .WhereIf(schemaIds, s => x => s.Contains(x.IndexedSchemaId))
+                .WhereIf(ids, i => x => i.Contains(x.Id))
+                .Select(x => x)
+                .ToAsyncEnumerable();
+
+        await foreach (var entity in query.WithCancellation(ct))
+        {
+            yield return entity.ToState();
         }
     }
 

@@ -38,7 +38,8 @@ public sealed class ContentChangedTriggerHandler(
 
     public bool Handles(AppEvent appEvent)
     {
-        return appEvent is ContentEvent;
+        // Migrations only adjust the stored data to the schema and do not change the content from a user perspective.
+        return appEvent is ContentEvent and not ContentMigrated;
     }
 
     public async IAsyncEnumerable<EnrichedEvent> CreateSnapshotEventsAsync(RuleContext context,

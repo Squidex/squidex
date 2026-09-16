@@ -40,6 +40,36 @@ public sealed class JobRunContext : IDisposable
         cancellationLinked.Dispose();
     }
 
+    public string GetArgument(string name)
+    {
+        if (!Job.Arguments.TryGetValue(name, out var value))
+        {
+            throw new DomainException($"Argument '{name}' missing.");
+        }
+
+        return value;
+    }
+
+    public DomainId GetArgumentId(string name)
+    {
+        return DomainId.Create(GetArgument(name));
+    }
+
+    public string? TryGetArgument(string name)
+    {
+        return Job.Arguments.GetValueOrDefault(name);
+    }
+
+    public bool GetArgumentFlag(string name, bool defaultValue = false)
+    {
+        if (!Job.Arguments.TryGetValue(name, out var value) || !bool.TryParse(value, out var result))
+        {
+            return defaultValue;
+        }
+
+        return result;
+    }
+
     public Task LogAsync(string message, bool replace = false)
     {
         var item = new JobLogMessage(clock.GetCurrentInstant(), message);

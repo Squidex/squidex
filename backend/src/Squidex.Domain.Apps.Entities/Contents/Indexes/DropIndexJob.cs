@@ -51,24 +51,13 @@ public sealed class DropIndexJob(IContentRepository contentRepository) : IJobRun
         CancellationToken ct)
     {
         // The other arguments are just there for debugging purposes. Therefore do not validate them.
-        if (!context.Job.Arguments.TryGetValue(ArgSchemaId, out var schemaId))
-        {
-            throw new DomainException($"Argument '{ArgSchemaId}' missing.");
-        }
-
-        if (!context.Job.Arguments.TryGetValue(ArgSchemaName, out var schemaName))
-        {
-            throw new DomainException($"Argument '{ArgSchemaName}' missing.");
-        }
-
-        if (!context.Job.Arguments.TryGetValue(ArgIndexName, out var indexName))
-        {
-            throw new DomainException($"Argument '{ArgIndexName}' missing.");
-        }
+        var schemaId = context.GetArgumentId(ArgSchemaId);
+        var schemaName = context.GetArgument(ArgSchemaName);
+        var indexName = context.GetArgument(ArgIndexName);
 
         // Use a readable name to describe the job.
         context.Job.Description = $"Schema {schemaName}: Drop index {indexName}";
 
-        await contentRepository.DropIndexAsync(context.OwnerId, DomainId.Create(schemaId), indexName, ct);
+        await contentRepository.DropIndexAsync(context.OwnerId, schemaId, indexName, ct);
     }
 }
