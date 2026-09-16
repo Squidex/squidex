@@ -5,17 +5,15 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Contents.Commands;
+using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Infrastructure.EventSourcing;
 
-public enum BulkUpdateContentType
+namespace Squidex.Domain.Apps.Events.Contents;
+
+[EventType(nameof(ContentMigrated))]
+public sealed class ContentMigrated : ContentEvent
 {
-    Upsert,
-    ChangeStatus,
-    Create,
-    Delete,
-    Patch,
-    Update,
-    Validate,
-    EnrichDefaults,
-    Migrate,
+    public ContentData? Data { get; set; }
+
+    public ContentData? NewData { get; set; }
 }

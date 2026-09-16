@@ -53,6 +53,16 @@ public class ContentSubscriptionTests
     }
 
     [Fact]
+    public async Task Should_return_false_for_content_migrated_event()
+    {
+        var sut = WithPermission(new ContentSubscription());
+
+        var @event = Enrich(new ContentMigrated());
+
+        Assert.False(await sut.ShouldHandle(@event));
+    }
+
+    [Fact]
     public async Task Should_return_true_for_content_event_with_correct_type()
     {
         var sut = WithPermission(new ContentSubscription { Type = EnrichedContentEventType.Created });

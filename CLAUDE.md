@@ -56,3 +56,9 @@ dotnet test --filter "Category!=Dependencies & Category!=TestContainer"
 
 - Do write precise short comments and only when needed.
 - Do not comment a class or a method, only put comments inside functions or above variables.
+- Do not comment properties in general (for example event properties). Only comment behavior inside classes.
+- Exception: properties of API models (DTOs) keep their XML comments, because they are used for the OpenAPI documentation.
+
+## Maintaining this file
+
+- When the user states a new general coding guideline, confirm it with the user and then add it to this file automatically.

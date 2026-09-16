@@ -27,6 +27,8 @@ public sealed class BulkUpdateJob
 
     public ContentData? Data { get; set; }
 
+    public ContentData? NewData { get; set; }
+
     public string? Schema { get; set; }
 
     public bool Patch { get; set; }

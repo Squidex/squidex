@@ -185,6 +185,10 @@ public sealed class ContentsBulkUpdateCommandMiddleware(
                     return CreateTask<EnrichContentDefaults>(id, schemaId, bulkJob, bulk, jobIndex,
                         PermissionIds.AppContentsUpdateOwn);
 
+                case BulkUpdateContentType.Migrate:
+                    return CreateTask<MigrateContent>(id, schemaId, bulkJob, bulk, jobIndex,
+                        PermissionIds.AppSchemasMigrate);
+
                 case BulkUpdateContentType.ChangeStatus:
                     return CreateTask<ChangeContentStatus>(id, schemaId, bulkJob, bulk, jobIndex,
                         PermissionIds.AppContentsChangeStatusOwn);

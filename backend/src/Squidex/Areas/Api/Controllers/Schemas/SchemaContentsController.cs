@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.AspNetCore.Mvc;
+using Squidex.Areas.Api.Controllers.Schemas.Models;
 using Squidex.Domain.Apps.Entities.Contents.Migration;
 using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Infrastructure.Commands;
@@ -27,20 +28,22 @@ public class SchemaContentsController(ICommandBus commandBus, IJobService jobSer
     /// </summary>
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
+    /// <param name="request">The request object that defines which versions to migrate.</param>
     /// <response code="204">Content migration added to job queue.</response>
     /// <response code="404">Schema or app not found.</response>
     /// <remarks>
     /// Schema changes are not applied to the stored contents. This endpoint starts a job that rewrites all
-    /// contents of the schema so that the stored data matches the current schema.
+    /// contents of the schema so that the stored data matches the current schema. The draft and the published
+    /// version of a content are migrated independently.
     /// </remarks>
     [HttpPost]
     [Route("apps/{app}/schemas/{schema}/contents/migrate")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ApiPermissionOrAnonymous(PermissionIds.AppSchemasMigrate)]
     [ApiCosts(1)]
-    public async Task<IActionResult> PostContentMigration(string app, string schema)
+    public async Task<IActionResult> PostContentMigration(string app, string schema, [FromBody] MigrateContentsDto request)
     {
-        var job = MigrateContentsJob.BuildRequest(User.Token()!, App, Schema);
+        var job = MigrateContentsJob.BuildRequest(User.Token()!, App, Schema, request.MigrateDraft ?? true, request.MigratePublished ?? true);
 
         await jobService.StartAsync(App.Id, job, HttpContext.RequestAborted);
 

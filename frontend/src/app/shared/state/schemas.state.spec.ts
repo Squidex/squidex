@@ -7,7 +7,7 @@
 
 import { firstValueFrom, of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { AddFieldDto, ChangeCategoryDto, ConfigureFieldRulesDto, ConfigureUIFieldsDto, CreateSchemaDto, DialogService, SchemaDto, SchemasDto, SchemasService, SynchronizeSchemaDto, UpdateFieldDto, UpdateSchemaDto, versioned } from '@app/shared/internal';
+import { AddFieldDto, ChangeCategoryDto, ConfigureFieldRulesDto, ConfigureUIFieldsDto, CreateSchemaDto, DialogService, MigrateContentsDto, SchemaDto, SchemasDto, SchemasService, SynchronizeSchemaDto, UpdateFieldDto, UpdateSchemaDto, versioned } from '@app/shared/internal';
 import { createSchema } from '../services/schemas.service.spec';
 import { TestValues } from './_test-helpers';
 import { getCategoryTree, SchemasState } from './schemas.state';
@@ -190,19 +190,23 @@ describe('SchemasState', () => {
         });
 
         it('should notify if content migration has been started', () => {
-            schemasService.setup(x => x.postContentMigration(app, schema1))
+            const request = new MigrateContentsDto({ migrateDraft: false, migratePublished: true });
+
+            schemasService.setup(x => x.postContentMigration(app, schema1, It.isValue(request)))
                 .returns(() => of({})).verifiable();
 
-            schemasState.migrateContents(schema1).subscribe();
+            schemasState.migrateContents(schema1, request).subscribe();
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
 
         it('should not change schemas if content migration has been started', () => {
-            schemasService.setup(x => x.postContentMigration(app, schema1))
+            const request = new MigrateContentsDto({ migrateDraft: true, migratePublished: true });
+
+            schemasService.setup(x => x.postContentMigration(app, schema1, It.isValue(request)))
                 .returns(() => of({})).verifiable();
 
-            schemasState.migrateContents(schema1).subscribe();
+            schemasState.migrateContents(schema1, request).subscribe();
 
             expect(schemasState.snapshot.schemas).toEqualIgnoringProps([schema1, schema2]);
         });

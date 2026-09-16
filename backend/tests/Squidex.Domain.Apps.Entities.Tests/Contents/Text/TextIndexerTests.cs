@@ -297,6 +297,69 @@ public abstract class TextIndexerTests : GivenContext
     }
 
     [Fact]
+    public async Task Should_migrate_current_version()
+    {
+        // Create initial content.
+        await CreateTextAsync(Ids1[0], "iv", "Version1");
+
+        // Publish the content.
+        await PublishAsync(Ids1[0]);
+
+        // Migrate the only version.
+        await MigrateTextAsync(Ids1[0], "iv", "Migrated1", null);
+
+        await SearchText(expected: null, text: "Version1", target: SearchScope.All);
+        await SearchText(expected: null, text: "Version1", target: SearchScope.Published);
+
+        await SearchText(expected: Ids1, text: "Migrated1", target: SearchScope.All);
+        await SearchText(expected: Ids1, text: "Migrated1", target: SearchScope.Published);
+    }
+
+    [Fact]
+    public async Task Should_migrate_published_and_draft_version()
+    {
+        // Create initial content.
+        await CreateTextAsync(Ids1[0], "iv", "Version1");
+
+        // Publish the content and create a new version with other data.
+        await PublishAsync(Ids1[0]);
+        await CreateDraftWithTextAsync(Ids1[0], "iv", "Version2");
+
+        // Migrate both versions.
+        await MigrateTextAsync(Ids1[0], "iv", "Migrated1", "Migrated2");
+
+        await SearchText(expected: null, text: "Version1", target: SearchScope.Published);
+        await SearchText(expected: null, text: "Version2", target: SearchScope.All);
+
+        await SearchText(expected: Ids1, text: "Migrated1", target: SearchScope.Published);
+        await SearchText(expected: null, text: "Migrated1", target: SearchScope.All);
+
+        await SearchText(expected: Ids1, text: "Migrated2", target: SearchScope.All);
+        await SearchText(expected: null, text: "Migrated2", target: SearchScope.Published);
+    }
+
+    [Fact]
+    public async Task Should_migrate_published_version_only()
+    {
+        // Create initial content.
+        await CreateTextAsync(Ids1[0], "iv", "Version1");
+
+        // Publish the content and create a new version with other data.
+        await PublishAsync(Ids1[0]);
+        await CreateDraftWithTextAsync(Ids1[0], "iv", "Version2");
+
+        // Migrate the published version only.
+        await MigrateTextAsync(Ids1[0], "iv", "Migrated1", null);
+
+        await SearchText(expected: Ids1, text: "Migrated1", target: SearchScope.Published);
+        await SearchText(expected: null, text: "Migrated1", target: SearchScope.All);
+
+        // The new version must not be changed.
+        await SearchText(expected: Ids1, text: "Version2", target: SearchScope.All);
+        await SearchText(expected: null, text: "Version2", target: SearchScope.Published);
+    }
+
+    [Fact]
     public async Task Should_simulate_content_reversion()
     {
         await CreateTextAsync(Ids1[0], "iv", "Version1");
@@ -393,6 +456,14 @@ public abstract class TextIndexerTests : GivenContext
         var data = TextData(language, text);
 
         return UpdateAsync(id, new ContentDraftCreated { MigratedData = data });
+    }
+
+    protected Task MigrateTextAsync(DomainId id, string language, string? text, string? newText)
+    {
+        var data = text != null ? TextData(language, text) : null;
+        var newData = newText != null ? TextData(language, newText) : null;
+
+        return UpdateAsync(id, new ContentMigrated { Data = data, NewData = newData });
     }
 
     protected Task CreateDraftAsync(DomainId id)

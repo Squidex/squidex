@@ -143,6 +143,60 @@ public class BackupContentsTests : GivenContext
     }
 
     [Fact]
+    public async Task Should_replace_asset_url_in_migrated_content()
+    {
+        var me = RefToken.User("123");
+
+        var newAssetsUrl = "https://new.squidex.com/api/assets";
+        var newAssetsUrlApp = "https://old.squidex.com/api/assets/my-new-app";
+
+        var oldAssetsUrl = "https://old.squidex.com/api/assets";
+        var oldAssetsUrlApp = "https://old.squidex.com/api/assets/my-old-app";
+
+        var reader = A.Fake<IBackupReader>();
+
+        A.CallTo(() => urlGenerator.AssetContentBase())
+            .Returns(newAssetsUrl);
+
+        A.CallTo(() => urlGenerator.AssetContentBase(AppId.Name))
+            .Returns(newAssetsUrlApp);
+
+        A.CallTo(() => reader.ReadJsonAsync<BackupContents.Urls>(A<string>._, CancellationToken))
+            .Returns(new BackupContents.Urls
+            {
+                Assets = oldAssetsUrl,
+                AssetsApp = oldAssetsUrlApp,
+            });
+
+        static ContentData AssetData(string url)
+        {
+            return new ContentData()
+                .AddField("asset",
+                    new ContentFieldData()
+                        .AddInvariant($"Asset: {url}/my-asset.jpg."));
+        }
+
+        var data = AssetData(oldAssetsUrlApp);
+        var newData = AssetData(oldAssetsUrlApp);
+
+        var context = new RestoreContext(AppId.Id, new UserMapping(me), reader, DomainId.NewGuid());
+
+        await sut.RestoreEventAsync(Envelope.Create(new AppCreated
+        {
+            Name = AppId.Name,
+        }), context, CancellationToken);
+
+        await sut.RestoreEventAsync(Envelope.Create(new ContentMigrated
+        {
+            Data = data,
+            NewData = newData,
+        }), context, CancellationToken);
+
+        data.Should().BeEquivalentTo(AssetData(newAssetsUrlApp));
+        newData.Should().BeEquivalentTo(AssetData(newAssetsUrlApp));
+    }
+
+    [Fact]
     public async Task Should_restore_states_for_all_contents()
     {
         var me = RefToken.User("123");

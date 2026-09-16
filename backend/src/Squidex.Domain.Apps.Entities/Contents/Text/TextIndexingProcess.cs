@@ -61,6 +61,9 @@ public sealed class TextIndexingProcess(
                 case ContentUpdated updated:
                     Update(updated, updated.Data);
                     break;
+                case ContentMigrated migrated:
+                    Migrate(migrated);
+                    break;
                 case ContentStatusChanged statusChanged when statusChanged.Status == Status.Published:
                     Publish(statusChanged);
                     break;
@@ -184,6 +187,57 @@ public sealed class TextIndexingProcess(
                     case TextState.Stage1_Published__Stage0_Draft:
                         CoreUpsert(@event, uniqueId, 0, true, false, data);
                         CoreUpdate(@event, uniqueId, 1, false, true);
+                        break;
+                }
+
+                currentUpdates[state.UniqueContentId] = state;
+            }
+        }
+
+        private void Migrate(ContentMigrated @event)
+        {
+            var uniqueId = new UniqueContentId(@event.AppId.Id, @event.ContentId);
+
+            if (states.TryGetValue(uniqueId, out var state))
+            {
+                // The current version is stored in the published stage, if a draft exists. Otherwise it is the only stage.
+                switch (state.State)
+                {
+                    case TextState.Stage0_Draft__Stage1_None when @event.Data != null:
+                        CoreUpsert(@event, uniqueId, 0, true, false, @event.Data);
+                        break;
+                    case TextState.Stage0_Published__Stage1_None when @event.Data != null:
+                        CoreUpsert(@event, uniqueId, 0, true, true, @event.Data);
+                        break;
+                    case TextState.Stage1_Draft__Stage0_None when @event.Data != null:
+                        CoreUpsert(@event, uniqueId, 1, true, false, @event.Data);
+                        break;
+                    case TextState.Stage1_Published__Stage0_None when @event.Data != null:
+                        CoreUpsert(@event, uniqueId, 1, true, true, @event.Data);
+                        break;
+                    case TextState.Stage0_Published__Stage1_Draft:
+                        if (@event.Data != null)
+                        {
+                            CoreUpsert(@event, uniqueId, 0, false, true, @event.Data);
+                        }
+
+                        if (@event.NewData != null)
+                        {
+                            CoreUpsert(@event, uniqueId, 1, true, false, @event.NewData);
+                        }
+
+                        break;
+                    case TextState.Stage1_Published__Stage0_Draft:
+                        if (@event.Data != null)
+                        {
+                            CoreUpsert(@event, uniqueId, 1, false, true, @event.Data);
+                        }
+
+                        if (@event.NewData != null)
+                        {
+                            CoreUpsert(@event, uniqueId, 0, true, false, @event.NewData);
+                        }
+
                         break;
                 }
 

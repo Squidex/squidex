@@ -2233,6 +2233,73 @@ export const SearchResultTypeValues: ReadonlyArray<SearchResultType> = [
 	"Schema"
 ];
 
+export class MigrateContentsDto implements IMigrateContentsDto {
+    /** Uses the cache values because the actual object is frozen. */
+    private readonly cachedValues: { [key: string]: any } = {};
+    /** True, to migrate the draft versions. Default: true. */
+    readonly migrateDraft?: boolean | undefined;
+    /** True, to migrate the published versions. Default: true. */
+    readonly migratePublished?: boolean | undefined;
+
+    constructor(data?: IMigrateContentsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data: any) {
+        (<any>this).migrateDraft = _data["migrateDraft"];
+        (<any>this).migratePublished = _data["migratePublished"];
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): MigrateContentsDto {
+        const result = new MigrateContentsDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["migrateDraft"] = this.migrateDraft;
+        data["migratePublished"] = this.migratePublished;
+        this.cleanup(data);
+        return data;
+    }
+
+    protected cleanup(target: any) {
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
+    }
+
+    protected compute<T>(key: string, action: () => T): T {
+        if (!this.cachedValues.hasOwnProperty(key)) {
+            const value = action();
+            this.cachedValues[key] = value;
+            return value;
+        } else {
+            return this.cachedValues[key] as any;
+        }
+    }
+}
+
+export interface IMigrateContentsDto {
+    /** True, to migrate the draft versions. Default: true. */
+    readonly migrateDraft?: boolean | undefined;
+    /** True, to migrate the published versions. Default: true. */
+    readonly migratePublished?: boolean | undefined;
+}
+
 export class SchemaDto extends ResourceDto implements ISchemaDto {
     /** The ID of the schema. */
     readonly id!: string;
@@ -12226,8 +12293,10 @@ export class BulkUpdateContentsJobDto implements IBulkUpdateContentsJobDto {
     readonly query?: QueryJsonDto | undefined;
     /** An optional ID of the content to update. */
     readonly id?: string | undefined;
-    /** The data of the content when type is set to 'Upsert', 'Create', 'Update' or 'Patch. */
+    /** The data of the content when type is set to 'Upsert', 'Create', 'Update', 'Patch' or 'Migrate'. */
     readonly data?: { [key: string]: { [key: string]: any; }; } | undefined;
+    /** The data of the new version (draft) when the type is set to 'Migrate'. */
+    readonly newData?: { [key: string]: { [key: string]: any; }; } | undefined;
     /** The new status when the type is set to 'ChangeStatus' or 'Upsert'. */
     readonly status?: string | undefined;
     /** The due time. */
@@ -12266,6 +12335,13 @@ export class BulkUpdateContentsJobDto implements IBulkUpdateContentsJobDto {
                     (<any>(<any>this).data)![key] = _data["data"][key];
             }
         }
+        if (_data["newData"]) {
+            (<any>this).newData = {} as any;
+            for (let key in _data["newData"]) {
+                if (_data["newData"].hasOwnProperty(key))
+                    (<any>(<any>this).newData)![key] = _data["newData"][key];
+            }
+        }
         (<any>this).status = _data["status"];
         (<any>this).dueTime = _data["dueTime"] ? DateTime.parseISO(_data["dueTime"].toString()) : <any>undefined;
         (<any>this).type = _data["type"];
@@ -12294,6 +12370,13 @@ export class BulkUpdateContentsJobDto implements IBulkUpdateContentsJobDto {
             for (let key in this.data) {
                 if (this.data.hasOwnProperty(key))
                     (<any>data["data"])[key] = (<any>this.data)[key];
+            }
+        }
+        if (this.newData) {
+            data["newData"] = {};
+            for (let key in this.newData) {
+                if (this.newData.hasOwnProperty(key))
+                    (<any>data["newData"])[key] = (<any>this.newData)[key];
             }
         }
         data["status"] = this.status;
@@ -12336,8 +12419,10 @@ export interface IBulkUpdateContentsJobDto {
     readonly query?: QueryJsonDto | undefined;
     /** An optional ID of the content to update. */
     readonly id?: string | undefined;
-    /** The data of the content when type is set to 'Upsert', 'Create', 'Update' or 'Patch. */
+    /** The data of the content when type is set to 'Upsert', 'Create', 'Update', 'Patch' or 'Migrate'. */
     readonly data?: { [key: string]: { [key: string]: any; }; } | undefined;
+    /** The data of the new version (draft) when the type is set to 'Migrate'. */
+    readonly newData?: { [key: string]: { [key: string]: any; }; } | undefined;
     /** The new status when the type is set to 'ChangeStatus' or 'Upsert'. */
     readonly status?: string | undefined;
     /** The due time. */
@@ -12516,7 +12601,7 @@ export interface ISortNodeDto {
     readonly order: SortOrder;
 }
 
-export type BulkUpdateContentType = "Upsert" | "ChangeStatus" | "Create" | "Delete" | "Patch" | "Update" | "Validate" | "EnrichDefaults";
+export type BulkUpdateContentType = "Upsert" | "ChangeStatus" | "Create" | "Delete" | "Patch" | "Update" | "Validate" | "EnrichDefaults" | "Migrate";
 
 export const BulkUpdateContentTypeValues: ReadonlyArray<BulkUpdateContentType> = [
 	"Upsert",
@@ -12526,7 +12611,8 @@ export const BulkUpdateContentTypeValues: ReadonlyArray<BulkUpdateContentType> =
 	"Patch",
 	"Update",
 	"Validate",
-	"EnrichDefaults"
+	"EnrichDefaults",
+	"Migrate"
 ];
 
 export class ChangeStatusDto implements IChangeStatusDto {

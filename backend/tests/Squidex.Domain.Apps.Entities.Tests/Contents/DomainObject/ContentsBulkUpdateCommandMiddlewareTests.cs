@@ -353,6 +353,43 @@ public class ContentsBulkUpdateCommandMiddlewareTests : GivenContext
     }
 
     [Fact]
+    public async Task Should_migrate_content()
+    {
+        SetupContext(PermissionIds.AppSchemasMigrate);
+
+        var (id, data, _) = CreateTestData(false);
+
+        var command = BulkCommand(BulkUpdateContentType.Migrate, new BulkUpdateJob { Data = data, NewData = data }, id);
+
+        var actual = await PublishAsync(command);
+
+        Assert.Single(actual);
+        Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception == null);
+
+        A.CallTo(() => commandBus.PublishAsync(
+                A<MigrateContent>.That.Matches(x => x.ContentId == id && x.Data == data && x.NewData == data), A<CancellationToken>._))
+            .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_throw_security_exception_if_user_has_no_permission_for_migration()
+    {
+        SetupContext(PermissionIds.AppContentsUpdate);
+
+        var (id, _, _) = CreateTestData(false);
+
+        var command = BulkCommand(BulkUpdateContentType.Migrate, new BulkUpdateJob(), id);
+
+        var actual = await PublishAsync(command);
+
+        Assert.Single(actual);
+        Assert.Single(actual, x => x.JobIndex == 0 && x.Id == id && x.Exception is DomainForbiddenException);
+
+        A.CallTo(() => commandBus.PublishAsync(A<ICommand>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
     public async Task Should_patch_content()
     {
         SetupContext(PermissionIds.AppContentsUpdateOwn);

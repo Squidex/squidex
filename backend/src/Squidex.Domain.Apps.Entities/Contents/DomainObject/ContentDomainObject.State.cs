@@ -108,6 +108,18 @@ public partial class ContentDomainObject
                 };
                 break;
 
+            case ContentMigrated e:
+                newSnapshot = snapshot with
+                {
+                    CurrentVersion = e.Data != null ?
+                        snapshot.CurrentVersion with { Data = e.Data.UseSameFields(CurrentData()) } :
+                        snapshot.CurrentVersion,
+                    NewVersion = e.NewData != null && snapshot.NewVersion != null ?
+                        snapshot.NewVersion with { Data = e.NewData.UseSameFields(snapshot.NewVersion.Data) } :
+                        snapshot.NewVersion,
+                };
+                break;
+
             case ContentSchedulingCancelled:
                 newSnapshot = snapshot with { ScheduleJob = null };
                 break;

@@ -78,6 +78,21 @@ public sealed class BackupContents(Rebuilder rebuilder, IUrlGenerator urlGenerat
                 }
 
                 break;
+            case ContentMigrated contentMigrated:
+                if (assetsUrlNew != null && assetsUrlOld != null)
+                {
+                    if (contentMigrated.Data != null)
+                    {
+                        ReplaceAssetUrl(contentMigrated.Data);
+                    }
+
+                    if (contentMigrated.NewData != null)
+                    {
+                        ReplaceAssetUrl(contentMigrated.NewData);
+                    }
+                }
+
+                break;
         }
 
         return true;

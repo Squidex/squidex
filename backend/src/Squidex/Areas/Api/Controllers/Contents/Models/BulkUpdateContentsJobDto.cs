@@ -28,9 +28,14 @@ public class BulkUpdateContentsJobDto
     public DomainId? Id { get; set; }
 
     /// <summary>
-    /// The data of the content when type is set to 'Upsert', 'Create', 'Update' or 'Patch.
+    /// The data of the content when type is set to 'Upsert', 'Create', 'Update', 'Patch' or 'Migrate'.
     /// </summary>
     public ContentData? Data { get; set; }
+
+    /// <summary>
+    /// The data of the new version (draft) when the type is set to 'Migrate'.
+    /// </summary>
+    public ContentData? NewData { get; set; }
 
     /// <summary>
     /// The new status when the type is set to 'ChangeStatus' or 'Upsert'.
