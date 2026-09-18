@@ -16,7 +16,7 @@
     <PackageReference Include="CommandDotNet.FluentValidation" Version="6.0.2" />
     <PackageReference Include="CommandDotNet.IoC.MicrosoftDependencyInjection" Version="5.0.1" />
     <PackageReference Include="ConsoleTables" Version="2.6.1" />
-    <PackageReference Include="Meziantou.Analyzer" Version="2.0.110">
+    <PackageReference Include="Meziantou.Analyzer" Version="3.0.50">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>

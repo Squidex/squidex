@@ -15,12 +15,12 @@ public static class Helper
     [
         [
             "apps",
-            "teams"
+            "teams",
         ],
         [
             "chatBot",
-            "translate"
-        ]
+            "translate",
+        ],
     ];
 
     public static string RelativeName(FileInfo file, DirectoryInfo folder)

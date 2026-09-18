@@ -20,6 +20,9 @@ namespace Squidex.Domain.Apps.Entities.Assets;
 
 public partial class AssetUsageTracker : IEventConsumer
 {
+    // The cache is keyed by asset, therefore it needs an upper bound to not grow with the number of assets.
+    private const long CacheSizeLimit = 10_000;
+
     private IMemoryCache memoryCache;
 
     public int BatchSize => 1000;
@@ -31,7 +34,7 @@ public partial class AssetUsageTracker : IEventConsumer
     private void ClearCache()
     {
         memoryCache?.Dispose();
-        memoryCache = new MemoryCache(Options.Create(new MemoryCacheOptions()));
+        memoryCache = new MemoryCache(Options.Create(new MemoryCacheOptions { SizeLimit = CacheSizeLimit }));
     }
 
     public async Task ClearAsync()
@@ -86,7 +89,13 @@ public partial class AssetUsageTracker : IEventConsumer
             tagsPerAsset[key] = state;
 
             // Write to the cache immediately, to be available for the next event. Use a relatively long cache time for live updates.
-            memoryCache.Set(key, state, TimeSpan.FromHours(1));
+            memoryCache.Set(key, state, new MemoryCacheEntryOptions
+            {
+                AbsoluteExpirationRelativeToNow = TimeSpan.FromHours(1),
+
+                // The cache has a size limit, therefore every entry must define a size. All entries are counted equally.
+                Size = 1,
+            });
         }
 
         foreach (var @event in events)

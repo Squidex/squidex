@@ -92,7 +92,7 @@ public static class Program
                 Code = code,
                 NameNative = value["nativeName"],
                 NameEnglish = value["name"],
-                FieldName = code.ToUpperInvariant()
+                FieldName = code.ToUpperInvariant(),
             });
         }
 
@@ -107,7 +107,7 @@ public static class Program
                     Code = code,
                     NameNative = culture.NativeName,
                     NameEnglish = culture.EnglishName,
-                    FieldName = ToFieldName(culture.EnglishName)
+                    FieldName = ToFieldName(culture.EnglishName),
                 });
             }
         }

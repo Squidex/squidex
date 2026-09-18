@@ -31,6 +31,7 @@ public sealed class AssetContentController(
     IAssetQueryService assetQuery,
     IAssetLoader assetLoader,
     IAssetThumbnailGenerator assetGenerator,
+    AssetResizeGate assetResizeGate,
     IOptions<AssetOptions> assetOptions)
     : ApiController(commandBus)
 {
@@ -121,9 +122,17 @@ public sealed class AssetContentController(
 
         Response.Headers[HeaderNames.ETag] = $"\"{asset.FileVersion.ToString(CultureInfo.InvariantCulture)}\"";
 
-        if (request.CacheDuration > 0)
+        if (asset.IsProtected)
         {
-            Response.Headers[HeaderNames.CacheControl] = $"public,max-age={request.CacheDuration}";
+            // The URL of a protected asset does not contain any credentials, therefore a shared cache
+            // would serve the file to callers that are not allowed to read it.
+            Response.Headers[HeaderNames.CacheControl] = "private,no-store";
+        }
+        else if (request.CacheDuration > 0)
+        {
+            var maxAge = Math.Min(request.CacheDuration, (long)assetOptions.MaxCacheDuration.TotalSeconds);
+
+            Response.Headers[HeaderNames.CacheControl] = $"public,max-age={maxAge}";
         }
 
         var resizeOptions = request.ToResizeOptions(
@@ -147,17 +156,31 @@ public sealed class AssetContentController(
 
                 if (request.Force)
                 {
-                    await ResizeAsync(asset, suffix, body, resizeOptions, true, ct);
-                }
-                else
-                {
-                    try
+                    using (await assetResizeGate.AcquireAsync(ResizeKey(asset, suffix), ct))
                     {
-                        await DownloadAsync(asset, body, suffix, range, ct);
+                        await ResizeAsync(asset, suffix, body, resizeOptions, true, ct);
                     }
-                    catch (AssetNotFoundException)
+
+                    return;
+                }
+
+                try
+                {
+                    await DownloadAsync(asset, body, suffix, range, ct);
+                }
+                catch (AssetNotFoundException)
+                {
+                    using (await assetResizeGate.AcquireAsync(ResizeKey(asset, suffix), ct))
                     {
-                        await ResizeAsync(asset, suffix, body, resizeOptions, false, ct);
+                        // Another request might have created the file while we have been waiting for the gate.
+                        try
+                        {
+                            await DownloadAsync(asset, body, suffix, range, ct);
+                        }
+                        catch (AssetNotFoundException)
+                        {
+                            await ResizeAsync(asset, suffix, body, resizeOptions, false, ct);
+                        }
                     }
                 }
             };
@@ -181,6 +204,11 @@ public sealed class AssetContentController(
             LastModified = asset.LastModified.ToDateTimeOffset(),
             SendInline = request.Download != 1,
         };
+    }
+
+    private static string ResizeKey(Asset asset, string suffix)
+    {
+        return string.Concat(asset.AppId.Id.ToString(), "/", asset.Id.ToString(), "/", asset.FileVersion.ToString(CultureInfo.InvariantCulture), "/", suffix);
     }
 
     private async Task DownloadAsync(Asset asset, Stream bodyStream, string? suffix, BytesRange range,
