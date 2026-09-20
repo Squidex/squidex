@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Text.RegularExpressions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Squidex.Infrastructure.UsageTracking;
@@ -22,10 +23,26 @@ public class EFUsageRepository<TContext>(IDbContextFactory<TContext> dbContextFa
             .ExecuteDeleteAsync(ct);
     }
 
-    public Task DeleteByKeyPatternAsync(string pattern,
+    public async Task DeleteByKeyPatternAsync(string pattern,
         CancellationToken ct = default)
     {
-        return Task.CompletedTask;
+        Guard.NotNull(pattern);
+
+        await using var dbContext = await CreateDbContextAsync(ct);
+
+        // Not all supported databases have regular expressions, therefore the keys are matched in memory.
+        var regex = new Regex(pattern, RegexOptions.None, TimeSpan.FromSeconds(1));
+
+        var keys =
+            await dbContext.Set<EFUsageCounterEntity>()
+                .Select(x => x.Key).Distinct()
+                .ToListAsync(ct);
+
+        foreach (var batch in keys.Where(x => regex.IsMatch(x)).Chunk(1000))
+        {
+            await dbContext.Set<EFUsageCounterEntity>().Where(x => batch.Contains(x.Key))
+                .ExecuteDeleteAsync(ct);
+        }
     }
 
     public async Task TrackUsagesAsync(UsageUpdate[] updates,

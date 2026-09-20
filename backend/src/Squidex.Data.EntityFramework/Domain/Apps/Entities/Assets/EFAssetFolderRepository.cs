@@ -25,6 +25,7 @@ public sealed partial class EFAssetFolderRepository<TContext>(IDbContextFactory<
             var assetFolderEntities =
                 await dbContext.Set<EFAssetFolderEntity>()
                     .Where(x => x.IndexedAppId == appId)
+                    .Where(x => !x.IsDeleted)
                     .WhereIf(parentId, p => x => x.ParentId == p)
                     .ToListAsync(ct);
 
@@ -42,6 +43,7 @@ public sealed partial class EFAssetFolderRepository<TContext>(IDbContextFactory<
             var assetFolderIds =
                 await dbContext.Set<EFAssetFolderEntity>()
                     .Where(x => x.IndexedAppId == appId)
+                    .Where(x => !x.IsDeleted)
                     .WhereIf(parentId, p => x => x.ParentId == p)
                     .Select(x => x.Id)
                     .ToListAsync(ct);

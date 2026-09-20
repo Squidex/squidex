@@ -135,4 +135,38 @@ public abstract class RuleRepositoryTests
         var found2 = await sut.QueryAllAsync(appId.Id);
         Assert.Empty(found2);
     }
+
+    [Fact]
+    public async Task Should_not_query_deleted()
+    {
+        var sut = await CreateSutAsync();
+
+        var appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+
+        var active = new Rule
+        {
+            AppId = appId,
+            Id = DomainId.NewGuid(),
+            Name = "active",
+            Flow = new FlowDefinition(),
+        };
+
+        var deleted = new Rule
+        {
+            AppId = appId,
+            Id = DomainId.NewGuid(),
+            Name = "deleted",
+            Flow = new FlowDefinition(),
+            IsDeleted = true,
+        };
+
+        await PrepareAsync(sut, [
+            active,
+            deleted,
+        ]);
+
+        var found = await sut.QueryAllAsync(appId.Id);
+
+        Assert.Equal(active.Id, found.Single().Id);
+    }
 }

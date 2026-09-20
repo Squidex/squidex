@@ -62,7 +62,7 @@ public sealed class MongoAppRepository(IMongoDatabase database) : MongoSnapshotS
         using (Telemetry.Activities.StartActivity("MongoAppRepository/QueryAllAsync"))
         {
             var entities =
-                await Collection.Find(x => x.IndexedTeamId == teamId).SortBy(x => x.IndexedCreated)
+                await Collection.Find(x => x.IndexedTeamId == teamId && !x.IndexedDeleted).SortBy(x => x.IndexedCreated)
                     .ToListAsync(ct);
 
             return RemoveDuplicateNames(entities);

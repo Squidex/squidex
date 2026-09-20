@@ -519,6 +519,243 @@ public abstract class ContentRepositoryTests : GivenContext
         Assert.Equal(40, contents.Count);
     }
 
+    [Fact]
+    public async Task Should_stream_ids()
+    {
+        var sut = await CreateAndPrepareSutAsync();
+
+        var count = await sut.StreamIds(AppIds[0].Id, [schema.Id], SearchScope.All).CountAsync();
+
+        Assert.Equal(NumValues, count);
+    }
+
+    [Fact]
+    public async Task Should_stream_ids_including_deleted_content()
+    {
+        var (otherApp, otherSchema) = CreateOtherApp();
+
+        var active = CreateContent(otherApp, Status.Published);
+        var deleted = CreateContent(otherApp, Status.Published) with { IsDeleted = true };
+
+        var sut = await CreateAndPrepareSutAsync(active, deleted);
+
+        var streamedIds = await sut.StreamIds(otherApp.Id, [otherSchema.Id], SearchScope.All).ToHashSetAsync();
+
+        // The IDs are used to clean up events and states, which also exist for deleted contents.
+        Assert.Equal(HashSet.Of(active.Id, deleted.Id), streamedIds);
+    }
+
+    [Fact]
+    public async Task Should_stream_ids_with_empty_schemas()
+    {
+        var sut = await CreateAndPrepareSutAsync();
+
+        var count = await sut.StreamIds(AppIds[0].Id, [], SearchScope.All).CountAsync();
+
+        Assert.Equal(0, count);
+    }
+
+    [Fact]
+    public async Task Should_only_return_published_content_in_published_scope()
+    {
+        var (otherApp, otherSchema) = CreateOtherApp();
+
+        var published = CreateContent(otherApp, Status.Published);
+        var draft = CreateContent(otherApp, Status.Draft);
+
+        var sut = await CreateAndPrepareSutAsync(published, draft);
+
+        var ids = HashSet.Of(published.Id, draft.Id);
+
+        var streamedAll = await sut.StreamAll(otherApp.Id, [otherSchema.Id], SearchScope.All).Select(x => x.Id).ToHashSetAsync();
+        var streamedPublished = await sut.StreamAll(otherApp.Id, [otherSchema.Id], SearchScope.Published).Select(x => x.Id).ToHashSetAsync();
+        var streamedIds = await sut.StreamIds(otherApp.Id, [otherSchema.Id], SearchScope.Published).ToHashSetAsync();
+        var queriedIds = await sut.QueryIdsAsync(otherApp, ids, SearchScope.Published);
+
+        Assert.Equal(ids, streamedAll);
+        Assert.Equal(HashSet.Of(published.Id), streamedPublished);
+        Assert.Equal(HashSet.Of(published.Id), streamedIds);
+        Assert.Equal(HashSet.Of(published.Id), queriedIds.Select(x => x.Id).ToHashSet());
+
+        Assert.NotNull(await sut.FindContentAsync(otherApp, otherSchema, draft.Id, null, SearchScope.All));
+        Assert.Null(await sut.FindContentAsync(otherApp, otherSchema, draft.Id, null, SearchScope.Published));
+    }
+
+    [Fact]
+    public async Task Should_remove_content_from_published_scope_if_unpublished()
+    {
+        var (otherApp, otherSchema) = CreateOtherApp();
+
+        var sut = await CreateAndPrepareSutAsync();
+        if (sut is not ISnapshotStore<WriteContent> store)
+        {
+            return;
+        }
+
+        var published = CreateContent(otherApp, Status.Published);
+
+        await store.WriteAsync(new SnapshotWriteJob<WriteContent>(published.UniqueId, published, 0));
+
+        var unpublished = published with
+        {
+            CurrentVersion = new ContentVersion(Status.Draft, published.CurrentVersion.Data),
+            Version = 1,
+        };
+
+        await store.WriteAsync(new SnapshotWriteJob<WriteContent>(unpublished.UniqueId, unpublished, 1));
+
+        Assert.NotNull(await sut.FindContentAsync(otherApp, otherSchema, published.Id, null, SearchScope.All));
+        Assert.Null(await sut.FindContentAsync(otherApp, otherSchema, published.Id, null, SearchScope.Published));
+    }
+
+    [Fact]
+    public async Task Should_not_return_deleted_content()
+    {
+        var (otherApp, otherSchema) = CreateOtherApp();
+
+        var active = CreateContent(otherApp, Status.Published);
+        var deleted = CreateContent(otherApp, Status.Published) with { IsDeleted = true };
+
+        var sut = await CreateAndPrepareSutAsync(active, deleted);
+
+        var ids = HashSet.Of(active.Id, deleted.Id);
+
+        var streamed = await sut.StreamAll(otherApp.Id, null, SearchScope.All).Select(x => x.Id).ToHashSetAsync();
+        var streamedWrites = await sut.StreamWriteContents(otherApp.Id, null, null).Select(x => x.Id).ToHashSetAsync();
+        var queriedIds = await sut.QueryIdsAsync(otherApp, ids, SearchScope.All);
+        var queried = await sut.QueryAsync(otherApp, otherSchema, Q.Empty.WithIds(ids), SearchScope.All);
+
+        Assert.Equal(HashSet.Of(active.Id), streamed);
+        Assert.Equal(HashSet.Of(active.Id), streamedWrites);
+        Assert.Equal(HashSet.Of(active.Id), queriedIds.Select(x => x.Id).ToHashSet());
+        Assert.Equal(HashSet.Of(active.Id), queried.Select(x => x.Id).ToHashSet());
+    }
+
+    [Fact]
+    public async Task Should_find_referrers()
+    {
+        var (otherApp, _) = CreateOtherApp();
+
+        var referenced = CreateContent(otherApp, Status.Published);
+        var referencing = CreateContent(otherApp, Status.Published, referenced.Id);
+
+        var sut = await CreateAndPrepareSutAsync(referenced, referencing);
+
+        var referrers = await sut.StreamReferencing(otherApp.Id, referenced.Id, 100, SearchScope.All).ToListAsync();
+
+        Assert.True(await sut.HasReferrersAsync(otherApp, referenced.Id, SearchScope.All));
+        Assert.False(await sut.HasReferrersAsync(otherApp, referencing.Id, SearchScope.All));
+        Assert.Equal(referencing.Id, referrers.Single().Id);
+    }
+
+    [Fact]
+    public async Task Should_not_find_deleted_referrers()
+    {
+        var (otherApp, _) = CreateOtherApp();
+
+        var referenced = CreateContent(otherApp, Status.Published);
+        var referencing = CreateContent(otherApp, Status.Published, referenced.Id) with { IsDeleted = true };
+
+        var sut = await CreateAndPrepareSutAsync(referenced, referencing);
+
+        var referrers = await sut.StreamReferencing(otherApp.Id, referenced.Id, 100, SearchScope.All).ToListAsync();
+
+        // A deleted content must not block the deletion of the referenced content.
+        Assert.False(await sut.HasReferrersAsync(otherApp, referenced.Id, SearchScope.All));
+        Assert.Empty(referrers);
+    }
+
+    [Fact]
+    public async Task Should_not_find_content_as_referrer_of_itself()
+    {
+        var (otherApp, _) = CreateOtherApp();
+
+        var id = DomainId.NewGuid();
+
+        var selfReferencing = CreateContent(otherApp, Status.Published, id) with { Id = id };
+
+        var sut = await CreateAndPrepareSutAsync(selfReferencing);
+
+        var referrers = await sut.StreamReferencing(otherApp.Id, id, 100, SearchScope.All).ToListAsync();
+
+        Assert.False(await sut.HasReferrersAsync(otherApp, id, SearchScope.All));
+        Assert.Empty(referrers);
+    }
+
+    [Fact]
+    public async Task Should_only_stream_scheduled_content_that_is_due()
+    {
+        var (otherApp, _) = CreateOtherApp();
+
+        var due = CreateContent(otherApp, Status.Draft) with { ScheduleJob = CreateScheduleJob(now.Minus(Duration.FromDays(1))) };
+        var future = CreateContent(otherApp, Status.Draft) with { ScheduleJob = CreateScheduleJob(now.Plus(Duration.FromDays(1))) };
+        var deleted = CreateContent(otherApp, Status.Draft) with { ScheduleJob = CreateScheduleJob(now.Minus(Duration.FromDays(1))), IsDeleted = true };
+
+        var sut = await CreateAndPrepareSutAsync(due, future, deleted);
+
+        // The scheduler scans all apps, therefore we only look at the contents of this test.
+        var scheduled =
+            await sut.StreamScheduledWithoutDataAsync(now, SearchScope.All)
+                .Where(x => x.AppId.Id == otherApp.Id)
+                .Select(x => x.Id)
+                .ToHashSetAsync();
+
+        Assert.Equal(HashSet.Of(due.Id), scheduled);
+    }
+
+    [Fact]
+    public async Task Should_reset_scheduled()
+    {
+        var (otherApp, _) = CreateOtherApp();
+
+        var due = CreateContent(otherApp, Status.Draft) with { ScheduleJob = CreateScheduleJob(now.Minus(Duration.FromDays(1))) };
+
+        var sut = await CreateAndPrepareSutAsync(due);
+
+        await sut.ResetScheduledAsync(otherApp.Id, due.Id, SearchScope.All);
+
+        var scheduled =
+            await sut.StreamScheduledWithoutDataAsync(now, SearchScope.All)
+                .Where(x => x.Id == due.Id)
+                .ToListAsync();
+
+        Assert.Empty(scheduled);
+    }
+
+    private (App, Schema) CreateOtherApp()
+    {
+        // Use another app to not change the results of the other tests.
+        var otherApp = CreateApp(DomainId.NewGuid(), "my-app-other");
+        var otherSchema = CreateSchema(otherApp, schema.Id, schema.Name);
+
+        return (otherApp, otherSchema);
+    }
+
+    private WriteContent CreateContent(App forApp, Status status, params DomainId[] references)
+    {
+        return CreateWriteContent() with
+        {
+            Id = DomainId.NewGuid(),
+            AppId = forApp.NamedId(),
+            CurrentVersion = new ContentVersion(
+                status,
+                new ContentData()
+                    .AddField("field1",
+                        new ContentFieldData()
+                            .AddInvariant(JsonValue.Create(1)))
+                    .AddField("references",
+                        new ContentFieldData()
+                            .AddInvariant(JsonValue.Array(references)))),
+            SchemaId = schema.NamedId(),
+            ScheduleJob = null,
+        };
+    }
+
+    private ScheduleJob CreateScheduleJob(Instant dueTime)
+    {
+        return new ScheduleJob(DomainId.NewGuid(), Status.Published, User, dueTime);
+    }
+
     private async Task<IResultList<Content>> QueryAsync(
         ClrQuery clrQuery,
         int top = 1000,

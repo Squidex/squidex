@@ -335,6 +335,159 @@ public abstract class AssetRepositoryTests : GivenContext
         Assert.NotEmpty(assets);
     }
 
+    [Fact]
+    public async Task Should_not_find_deleted()
+    {
+        var sut = await CreateSutAsync();
+
+        // Use another app to not change the results of the other tests.
+        var otherAppId = NamedId.Of(DomainId.NewGuid(), "my-app");
+
+        var deleted = CreateAsset() with { AppId = otherAppId, Slug = "deleted", IsDeleted = true };
+
+        await WriteAsync(sut, deleted);
+
+        var byId = await sut.FindAssetAsync(otherAppId.Id, deleted.Id, false);
+        var byIdOnly = await sut.FindAssetAsync(deleted.Id);
+        var bySlug = await sut.FindAssetBySlugAsync(otherAppId.Id, deleted.Slug, false);
+        var byHash = await sut.FindAssetByHashAsync(otherAppId.Id, deleted.FileHash!, deleted.FileName, deleted.FileSize);
+
+        Assert.Null(byId);
+        Assert.Null(byIdOnly);
+        Assert.Null(bySlug);
+        Assert.Null(byHash);
+    }
+
+    [Fact]
+    public async Task Should_find_deleted_if_allowed()
+    {
+        var sut = await CreateSutAsync();
+
+        // Use another app to not change the results of the other tests.
+        var otherAppId = NamedId.Of(DomainId.NewGuid(), "my-app");
+
+        var deleted = CreateAsset() with { AppId = otherAppId, Slug = "deleted", IsDeleted = true };
+
+        await WriteAsync(sut, deleted);
+
+        var byId = await sut.FindAssetAsync(otherAppId.Id, deleted.Id, true);
+        var bySlug = await sut.FindAssetBySlugAsync(otherAppId.Id, deleted.Slug, true);
+
+        Assert.Equal(deleted.Id, byId?.Id);
+        Assert.Equal(deleted.Id, bySlug?.Id);
+    }
+
+    [Fact]
+    public async Task Should_not_query_deleted()
+    {
+        var sut = await CreateSutAsync();
+
+        // Use another app to not change the results of the other tests.
+        var otherAppId = NamedId.Of(DomainId.NewGuid(), "my-app");
+
+        var active = CreateAsset() with { AppId = otherAppId, ParentId = ParentId };
+        var deleted = CreateAsset() with { AppId = otherAppId, ParentId = ParentId, IsDeleted = true };
+
+        await WriteAsync(sut, active, deleted);
+
+        var byQuery = await sut.QueryAsync(otherAppId.Id, null, Q.Empty.WithQuery(SortedQuery(new ClrQuery())));
+        var byIds = await sut.QueryAsync(otherAppId.Id, null, Q.Empty.WithIds([active.Id, deleted.Id]));
+        var ids = await sut.QueryIdsAsync(otherAppId.Id, [active.Id, deleted.Id]);
+        var childIds = await sut.QueryChildIdsAsync(otherAppId.Id, ParentId);
+        var streamed = await sut.StreamAll(otherAppId.Id).ToListAsync();
+
+        Assert.Equal(active.Id, byQuery.Single().Id);
+        Assert.Equal(active.Id, byIds.Single().Id);
+        Assert.Equal(active.Id, ids.Single());
+        Assert.Equal(active.Id, childIds.Single());
+        Assert.Equal(active.Id, streamed.Single().Id);
+    }
+
+    [Fact]
+    public async Task Should_query_deleted_if_filtered_by_deletion()
+    {
+        var sut = await CreateSutAsync();
+
+        // Use another app to not change the results of the other tests.
+        var otherAppId = NamedId.Of(DomainId.NewGuid(), "my-app");
+
+        var active = CreateAsset() with { AppId = otherAppId };
+        var deleted = CreateAsset() with { AppId = otherAppId, IsDeleted = true };
+
+        await WriteAsync(sut, active, deleted);
+
+        var query = new ClrQuery
+        {
+            Filter = ClrFilter.Eq("isDeleted", true),
+        };
+
+        var found = await sut.QueryAsync(otherAppId.Id, null, Q.Empty.WithQuery(SortedQuery(query)));
+
+        // The trash view queries the deleted assets explicitly.
+        Assert.Equal(deleted.Id, found.Single().Id);
+    }
+
+    [Fact]
+    public async Task Should_not_find_by_hash_if_file_name_or_size_differs()
+    {
+        var sut = await CreateSutAsync();
+
+        // Use another app to not change the results of the other tests.
+        var otherAppId = NamedId.Of(DomainId.NewGuid(), "my-app");
+
+        var asset = CreateAsset() with { AppId = otherAppId };
+
+        await WriteAsync(sut, asset);
+
+        var byOtherName = await sut.FindAssetByHashAsync(otherAppId.Id, asset.FileHash!, "other.png", asset.FileSize);
+        var byOtherSize = await sut.FindAssetByHashAsync(otherAppId.Id, asset.FileHash!, asset.FileName, asset.FileSize + 1);
+        var byMatch = await sut.FindAssetByHashAsync(otherAppId.Id, asset.FileHash!, asset.FileName, asset.FileSize);
+
+        Assert.Null(byOtherName);
+        Assert.Null(byOtherSize);
+        Assert.Equal(asset.Id, byMatch?.Id);
+    }
+
+    [Fact]
+    public async Task Should_not_find_asset_of_other_app()
+    {
+        var sut = await CreateAndPrepareSutAsync();
+
+        var asset = await sut.StreamAll(appId).FirstAsync();
+
+        var otherAppId = DomainId.NewGuid();
+
+        var byId = await sut.FindAssetAsync(otherAppId, asset.Id, true);
+        var bySlug = await sut.FindAssetBySlugAsync(otherAppId, asset.Slug!, true);
+        var byHash = await sut.FindAssetByHashAsync(otherAppId, asset.FileHash!, asset.FileName, asset.FileSize);
+
+        Assert.Null(byId);
+        Assert.Null(bySlug);
+        Assert.Null(byHash);
+    }
+
+    private static ClrQuery SortedQuery(ClrQuery query)
+    {
+        query.Take = 1000;
+        query.Sort =
+        [
+            new SortNode("lastModified", SortOrder.Descending),
+            new SortNode("id", SortOrder.Ascending),
+        ];
+
+        return query;
+    }
+
+    private static async Task WriteAsync(IAssetRepository sut, params Asset[] assets)
+    {
+        if (sut is not ISnapshotStore<Asset> store)
+        {
+            return;
+        }
+
+        await store.WriteManyAsync(assets.Select(x => new SnapshotWriteJob<Asset>(x.UniqueId, x, 0)));
+    }
+
     private async Task<IResultList<Asset>> QueryAsync(DomainId? parentId,
         ClrQuery clrQuery,
         int top = 1000,

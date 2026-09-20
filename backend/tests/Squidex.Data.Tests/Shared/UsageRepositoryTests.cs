@@ -65,6 +65,7 @@ public abstract class UsageRepositoryTests
         return sut;
     }
 
+    [Fact]
     public async Task Should_query_results()
     {
         var sut = await CreateAndPrepareSutAsync();
@@ -85,7 +86,7 @@ public abstract class UsageRepositoryTests
                     ["Key1"] = 3,
                     ["key2"] = 4,
                 }),
-            new StoredUsage("Category3", startDate.AddDays(1),
+            new StoredUsage("Category1", startDate.AddDays(1),
                 new Counters
                 {
                     ["Key1"] = 5,
@@ -129,6 +130,38 @@ public abstract class UsageRepositoryTests
 
         var byKey2 = await sut.QueryAsync(key2, DateOnly.MinValue, DateOnly.MaxValue);
         Assert.Empty(byKey2);
+    }
+
+    [Fact]
+    public async Task Should_delete_by_key_pattern()
+    {
+        var sut = await CreateSutAsync();
+
+        // Only use characters that have no special meaning in the pattern.
+        var prefix = Guid.NewGuid().ToString("N");
+
+        var matching1 = $"{prefix}_AppAssets";
+        var matching2 = $"{prefix}_TeamAssets";
+        var notMatching = $"{prefix}_API";
+
+        var writes = new[] { matching1, matching2, notMatching }.Select(key =>
+            new UsageUpdate(startDate, key, "Category1",
+                new Counters
+                {
+                    ["Key1"] = 1,
+                })).ToArray();
+
+        await sut.TrackUsagesAsync(writes);
+
+        await sut.DeleteByKeyPatternAsync($"^{prefix}_[A-Za-z]+Assets");
+
+        var byMatching1 = await sut.QueryAsync(matching1, DateOnly.MinValue, DateOnly.MaxValue);
+        var byMatching2 = await sut.QueryAsync(matching2, DateOnly.MinValue, DateOnly.MaxValue);
+        var byNotMatching = await sut.QueryAsync(notMatching, DateOnly.MinValue, DateOnly.MaxValue);
+
+        Assert.Empty(byMatching1);
+        Assert.Empty(byMatching2);
+        Assert.Single(byNotMatching);
     }
 
     [Fact]
