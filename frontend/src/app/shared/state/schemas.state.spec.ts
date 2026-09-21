@@ -51,7 +51,6 @@ describe('SchemasState', () => {
 
             expect(schemasState.snapshot.schemas).toEqualIgnoringProps(oldSchemas.items);
             expect(schemasState.snapshot.isLoaded).toBeTruthy();
-
             schemasService.verifyAll();
         });
 
@@ -65,7 +64,6 @@ describe('SchemasState', () => {
             expect(schemasState.snapshot.isLoaded).toBeTruthy();
             expect(schemasState.snapshot.isLoading).toBeFalsy();
             expect(schemasState.snapshot.schemas).toEqualIgnoringProps(oldSchemas.items);
-
             schemasService.verifyAll();
         });
 

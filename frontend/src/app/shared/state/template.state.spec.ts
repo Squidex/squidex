@@ -39,7 +39,6 @@ describe('TemplatesState', () => {
             expect(templatesState.snapshot.templates).toEqual([template1, template2]);
             expect(templatesState.snapshot.isLoaded).toBeTruthy();
             expect(templatesState.snapshot.isLoading).toBeFalsy();
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 

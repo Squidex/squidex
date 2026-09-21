@@ -47,7 +47,6 @@ describe('SchemaMustExistPublishedGuard', () => {
         const result = await firstValueFrom(schemaMustExistPublishedGuard(route));
 
         expect(result).toBeTruthy();
-
         router.verify(x => x.navigate(It.isAny()), Times.never());
     });
 
@@ -58,7 +57,6 @@ describe('SchemaMustExistPublishedGuard', () => {
         const result = await firstValueFrom(schemaMustExistPublishedGuard(route));
 
         expect(result).toBeFalsy();
-
         router.verify(x => x.navigate(['/404']), Times.once());
     });
 
@@ -69,7 +67,6 @@ describe('SchemaMustExistPublishedGuard', () => {
         const result = await firstValueFrom(schemaMustExistPublishedGuard(route));
 
         expect(result).toBeFalsy();
-
         router.verify(x => x.navigate(['/404']), Times.once());
     });
 
@@ -80,7 +77,6 @@ describe('SchemaMustExistPublishedGuard', () => {
         const result = await firstValueFrom(schemaMustExistPublishedGuard(route));
 
         expect(result).toBeFalsy();
-
         router.verify(x => x.navigate(['/404']), Times.once());
     });
 });

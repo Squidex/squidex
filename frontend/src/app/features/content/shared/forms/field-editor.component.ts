@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { booleanAttribute, Component, ElementRef, EventEmitter, Input, numberAttribute, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { AbstractContentForm, AnnotationCreate, AnnotationsSelected, AnyFieldDto, AppLanguageDto, ChatDialogComponent, CheckboxGroupComponent, CodeEditorComponent, ColorPickerComponent, CommentSelected, CommentsState, ControlErrorsComponent, DateTimeEditorComponent, DialogModel, disabled$, EditContentForm, FieldSelected, FormHintComponent, GeolocationEditorComponent, hasNoValue$, HTTP, IndeterminateValueDirective, MarkdownDirective, MathHelper, MenuComponent, MenuItemComponent, MessageBus, ModalDirective, RadioGroupComponent, ReferenceInputComponent, ReferencesFieldPropertiesDto, RichEditorComponent, StarsComponent, Subscriptions, TagEditorComponent, ToggleComponent, TransformInputDirective, TypedSimpleChanges, Types } from '@app/shared';
+import { AbstractContentForm, AnnotationCreate, AnnotationsSelected, AnyFieldDto, AppLanguageDto, ChatDialogComponent, CheckboxGroupComponent, CodeEditorComponent, ColorPickerComponent, CommentSelected, CommentsState, ControlErrorsComponent, DateTimeEditorComponent, DialogModel, disabled$, EditContentForm, FieldSelected, FormHintComponent, GeolocationEditorComponent, hasNoValue$, HTTP, IndeterminateValueDirective, MarkdownDirective, MathHelper, MenuComponent, MenuItemComponent, MessageBus, ModalDirective, RadioGroupComponent, ReferenceInputComponent, ReferencesFieldPropertiesDto, RichEditorComponent, StarsComponent, Subscriptions, TagEditorComponent, ToggleComponent, TooltipDirective, TransformInputDirective, TypedSimpleChanges, Types } from '@app/shared';
 import { ReferenceDropdownComponent } from '../references/reference-dropdown.component';
 import { ReferencesCheckboxesComponent } from '../references/references-checkboxes.component';
 import { ReferencesEditorComponent } from '../references/references-editor.component';
@@ -59,6 +59,7 @@ import { UserInfoEditorComponent } from './user-info-editor.component';
         StockPhotoEditorComponent,
         TagEditorComponent,
         ToggleComponent,
+        TooltipDirective,
         TransformInputDirective,
         UserInfoEditorComponent,
     ],

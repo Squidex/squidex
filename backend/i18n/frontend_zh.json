@@ -87,6 +87,8 @@
   "assets.deleteReferrerConfirmTitle": "删除资源",
   "assets.downloadVersion": "下载此版本",
   "assets.dropToUpdate": "下拉更新",
+  "assets.duplicateConfirmText": "This file has already been uploaded. Do you want to upload it anyway as a new asset?",
+  "assets.duplicateConfirmTitle": "Duplicate asset",
   "assets.duplicateFile": "资源已经上传。",
   "assets.edit": "Edit Asset",
   "assets.editor.flipHorizontally": "Flip Horizontally",

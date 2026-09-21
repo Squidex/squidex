@@ -27,7 +27,6 @@ describe('UnsetTeamGuard', () => {
         const result = await firstValueFrom(unsetTeamGuard());
 
         expect(result).toBeTruthy();
-
         teamsState.verify(x => x.select(null), Times.once());
     });
 });

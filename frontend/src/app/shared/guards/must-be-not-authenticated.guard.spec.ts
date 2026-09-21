@@ -55,7 +55,6 @@ describe('MustBeNotAuthenticatedGuard', () => {
         const result = await firstValueFrom(mustBeNotAuthenticatedGuard({} as any));
 
         expect(result!).toBeFalsy();
-
         router.verify(x => x.navigate(['app'], { queryParams: { redirectPath: '/my-path' } }), Times.once());
     });
 
@@ -66,7 +65,6 @@ describe('MustBeNotAuthenticatedGuard', () => {
         const result = await firstValueFrom(mustBeNotAuthenticatedGuard({} as any));
 
         expect(result).toBeTruthy();
-
         router.verify(x => x.navigate(It.isAny()), Times.never());
     });
 
@@ -79,7 +77,6 @@ describe('MustBeNotAuthenticatedGuard', () => {
         const result = await firstValueFrom(mustBeNotAuthenticatedGuard({ queryParams: {} } as any));
 
         expect(result).toBeFalsy();
-
         authService.verify(x => x.loginRedirect('/my-path'), Times.once());
     });
 
@@ -92,7 +89,6 @@ describe('MustBeNotAuthenticatedGuard', () => {
         const result = await firstValueFrom(mustBeNotAuthenticatedGuard({ queryParams: { logout: true } } as any));
 
         expect(result).toBeTruthy();
-
         authService.verify(x => x.loginRedirect('/my-path'), Times.never());
     });
 });

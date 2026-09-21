@@ -41,7 +41,6 @@ describe('EventConsumersState', () => {
             expect(eventConsumersState.snapshot.eventConsumers).toEqual([eventConsumer1, eventConsumer2]);
             expect(eventConsumersState.snapshot.isLoaded).toBeTruthy();
             expect(eventConsumersState.snapshot.isLoading).toBeFalsy();
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 

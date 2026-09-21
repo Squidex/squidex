@@ -27,7 +27,6 @@ describe('LoadSchemasGuard', () => {
         const result = await firstValueFrom(loadSchemasGuard());
 
         expect(result).toBeTruthy();
-
         schemasState.verify(x => x.load(), Times.once());
     });
 });

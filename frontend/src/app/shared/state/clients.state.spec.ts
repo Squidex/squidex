@@ -42,7 +42,6 @@ describe('ClientsState', () => {
             expect(clientsState.snapshot.isLoaded).toBeTruthy();
             expect(clientsState.snapshot.isLoading).toBeFalsy();
             expect(clientsState.snapshot.version).toEqual(version);
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 

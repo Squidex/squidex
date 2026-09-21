@@ -43,7 +43,6 @@ describe('RuleEventsState', () => {
         expect(ruleEventsState.snapshot.isLoaded).toBeTruthy();
         expect(ruleEventsState.snapshot.isLoading).toBeFalsy();
         expect(ruleEventsState.snapshot.total).toEqual(200);
-
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
     });
 

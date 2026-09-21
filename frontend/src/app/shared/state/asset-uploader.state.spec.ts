@@ -6,7 +6,7 @@
  */
 
 import { lastValueFrom, NEVER, Observable, of, onErrorResumeNextWith, throwError } from 'rxjs';
-import { IMock, Mock } from 'typemoq';
+import { IMock, It, Mock, Times } from 'typemoq';
 import { AssetsService, AssetUploaderState, DialogService } from '@app/shared/internal';
 import { createAsset } from '../services/assets.service.spec';
 import { TestValues } from './_test-helpers';
@@ -18,7 +18,7 @@ describe('AssetUploaderState', () => {
     let dialogs: IMock<DialogService>;
     let assetUploader: AssetUploaderState;
 
-    const asset = createAsset(1);
+    const asset = createAsset(1, undefined, '', undefined, false);
 
     beforeEach(() => {
         dialogs = Mock.ofType<DialogService>();
@@ -86,6 +86,44 @@ describe('AssetUploaderState', () => {
         expect(upload.status).toBe('Completed');
         expect(upload.progress).toBe(100);
         expect(uploadedAsset).toEqual(asset);
+    });
+
+    it('should upload file again if duplicate is confirmed', async () => {
+        const file: File = <any>{ name: 'my-file' };
+
+        const duplicate = createAsset(2);
+
+        assetsService.setup(x => x.postAssetFile(app, file, undefined))
+            .returns(() => of(10, duplicate)).verifiable();
+
+        assetsService.setup(x => x.postAssetFile(app, file, undefined, true))
+            .returns(() => of(10, asset)).verifiable();
+
+        dialogs.setup(x => x.confirm(It.isAnyString(), It.isAnyString()))
+            .returns(() => of(true)).verifiable();
+
+        const uploadedAsset = await lastValueFrom(assetUploader.uploadFile(file));
+
+        expect(uploadedAsset).toEqual(asset);
+        dialogs.verifyAll();
+    });
+
+    it('should return existing asset if duplicate is not confirmed', async () => {
+        const file: File = <any>{ name: 'my-file' };
+
+        const duplicate = createAsset(2);
+
+        assetsService.setup(x => x.postAssetFile(app, file, undefined))
+            .returns(() => of(10, duplicate)).verifiable();
+
+        dialogs.setup(x => x.confirm(It.isAnyString(), It.isAnyString()))
+            .returns(() => of(false)).verifiable();
+
+        const uploadedAsset = await lastValueFrom(assetUploader.uploadFile(file));
+
+        expect(uploadedAsset).toEqual(duplicate);
+        assetsService.verify(x => x.postAssetFile(app, file, undefined, true), Times.never());
+        dialogs.verifyAll();
     });
 
     it('should create initial state if uploading asset', () => {

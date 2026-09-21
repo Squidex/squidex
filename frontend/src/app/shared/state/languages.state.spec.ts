@@ -42,7 +42,6 @@ describe('LanguagesState', () => {
 
     afterEach(() => {
         languagesService.verifyAll();
-
         allLanguagesService.verifyAll();
     });
 
@@ -65,7 +64,6 @@ describe('LanguagesState', () => {
             expect(languagesState.snapshot.isLoaded).toBeTruthy();
             expect(languagesState.snapshot.isLoading).toBeFalsy();
             expect(languagesState.snapshot.version).toEqual(version);
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 

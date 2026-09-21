@@ -60,7 +60,6 @@ describe('DialogService', () => {
 
             expect(isCompleted).toBeTruthy();
             expect(isNext!).toEqual(confirmed);
-
             localStore.verify(x => x.setInt(It.isAnyString(), It.isAnyNumber()), Times.never());
         });
     });
@@ -87,7 +86,6 @@ describe('DialogService', () => {
 
             expect(isCompleted).toBeTruthy();
             expect(isNext!).toEqual(confirmed);
-
             localStore.verify(x => x.setInt(It.isAnyString(), It.isAnyNumber()), Times.never());
         });
     });
@@ -118,7 +116,6 @@ describe('DialogService', () => {
 
             expect(isCompleted).toBeTruthy();
             expect(isNext!).toEqual(confirmed);
-
             localStore.verify(x => x.setBoolean('dialogs.confirm.MyKey', It.isAny()), Times.exactly(saved));
         });
     });

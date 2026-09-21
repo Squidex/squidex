@@ -75,7 +75,6 @@ describe('PlansState', () => {
             ]);
             expect(plansState.snapshot.isLoaded).toBeTruthy();
             expect(plansState.snapshot.version).toEqual(version);
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 
@@ -92,7 +91,6 @@ describe('PlansState', () => {
             expect(plansState.snapshot.isLoaded).toBeTruthy();
             expect(plansState.snapshot.isLoading).toBeFalsy();
             expect(plansState.snapshot.version).toEqual(version);
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 

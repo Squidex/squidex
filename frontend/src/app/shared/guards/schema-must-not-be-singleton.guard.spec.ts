@@ -54,7 +54,6 @@ describe('SchemaMustNotBeSingletonGuard', () => {
         const result = await firstValueFrom(schemaMustNotBeSingletonGuard(false)(route, state));
 
         expect(result).toBeTruthy();
-
         router.verify(x => x.navigate(It.isAny()), Times.never());
     });
 
@@ -67,7 +66,6 @@ describe('SchemaMustNotBeSingletonGuard', () => {
         const result = await firstValueFrom(schemaMustNotBeSingletonGuard(false)(route, state));
 
         expect(result).toBeFalsy();
-
         router.verify(x => x.navigate([state.url, '123']), Times.once());
     });
 
@@ -80,7 +78,6 @@ describe('SchemaMustNotBeSingletonGuard', () => {
         const result = await firstValueFrom(schemaMustNotBeSingletonGuard(false)(route, state));
 
         expect(result).toBeFalsy();
-
         router.verify(x => x.navigate(['schemas/my-schema/', '123']), Times.once());
     });
 
@@ -93,7 +90,6 @@ describe('SchemaMustNotBeSingletonGuard', () => {
         const result = await firstValueFrom(schemaMustNotBeSingletonGuard(false)(route, state));
 
         expect(result).toBeFalsy();
-
         router.verify(x => x.navigate([state.url, 'extension']), Times.once());
     });
 
@@ -106,7 +102,6 @@ describe('SchemaMustNotBeSingletonGuard', () => {
         const result = await firstValueFrom(schemaMustNotBeSingletonGuard(true)(route, state));
 
         expect(result).toBeFalsy();
-
         router.verify(x => x.navigate([state.url, '..']), Times.once());
     });
 
@@ -119,7 +114,6 @@ describe('SchemaMustNotBeSingletonGuard', () => {
         const result = await firstValueFrom(schemaMustNotBeSingletonGuard(true)(route, state));
 
         expect(result).toBeTruthy();
-
         router.verify(x => x.navigate(It.isAny()), Times.never());
     });
 });

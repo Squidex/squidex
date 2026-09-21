@@ -5,6 +5,9 @@
                 <div class="truncate">
                     <label class="mb-1">
                         {{ field.displayName }} {{ displaySuffix }} <span class="field-required" [class.hidden]="!field.properties.isRequired">*</span>
+                        @if (field.properties.isRequiredOnPublish && !field.properties.isRequired) {
+                            <span class="field-required-publish" title="i18n:schemas.field.requiredOnPublish">*</span>
+                        }
                     </label>
                     @if (field.isDisabled) {
                         <small class="field-disabled ps-1">Disabled</small>

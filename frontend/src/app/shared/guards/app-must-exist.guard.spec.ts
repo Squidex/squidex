@@ -53,7 +53,6 @@ describe('AppMustExistGuard', () => {
         const result = await firstValueFrom(appMustExistGuard(route));
 
         expect(result).toBeFalsy();
-
         router.verify(x => x.navigate(['/404']), Times.once());
     });
 

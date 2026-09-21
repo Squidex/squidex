@@ -35,7 +35,6 @@ describe('ConfirmClickDirective', () => {
         confirmClickDirective.onClick(new Event('click'));
 
         expect(invoked).toBe(true);
-
         dialogs.verify(x => x.confirm(It.isAnyString(), It.isAnyString(), It.isAny()), Times.never());
     });
 

@@ -106,8 +106,8 @@ export class AssetsService {
             pretifyError('i18n:assets.loadFailed'));
     }
 
-    public postAssetFile(appName: string, file: HTTP.UploadFile, parentId?: string): Observable<number | AssetDto> {
-        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets${StringHelper.buildQuery({ parentId })}`);
+    public postAssetFile(appName: string, file: HTTP.UploadFile, parentId?: string, duplicate?: boolean): Observable<number | AssetDto> {
+        const url = this.apiUrl.buildUrl(`api/apps/${appName}/assets${StringHelper.buildQuery({ parentId, duplicate })}`);
 
         return HTTP.upload(this.http, 'POST', url, file).pipe(
             filter(event =>

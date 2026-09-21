@@ -27,7 +27,6 @@ describe('LoadTeamsGuard', () => {
         const result = await firstValueFrom(loadTeamsGuard());
 
         expect(result).toBeTruthy();
-
         teamsState.verify(x => x.load(), Times.once());
     });
 });

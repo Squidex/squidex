@@ -116,7 +116,6 @@ describe('Router2State', () => {
             const query = synchronizer.parseFromState(state);
 
             expect(query).toEqual({ page: '10', pageSize: '20' });
-
             localStore.verify(x => x.setInt('contents.pageSize', 20), Times.once());
         });
 
@@ -126,7 +125,6 @@ describe('Router2State', () => {
             const query = synchronizer.parseFromState(state);
 
             expect(query).toEqual({ page: undefined, pageSize: '20' });
-
             localStore.verify(x => x.setInt('contents.pageSize', 20), Times.once());
         });
 
@@ -239,7 +237,6 @@ describe('Router2State', () => {
             expect(routeExtras!.replaceUrl).toBe(true);
             expect(routeExtras!.queryParamsHandling).toBe('merge');
             expect(routeExtras!.queryParams).toEqual({ state1: 'hello', state2: 'squidex,cms' });
-
             router.verify(x => x.navigate(It.isAny(), It.isAny()), Times.exactly(2));
         });
 
@@ -262,7 +259,6 @@ describe('Router2State', () => {
             expect(routeExtras!.replaceUrl).toBe(true);
             expect(routeExtras!.queryParamsHandling).toBe('merge');
             expect(routeExtras!.queryParams).toEqual({ state1: 'hello', state2: 'squidex,cms' });
-
             router.verify(x => x.navigate(It.isAny(), It.isAny()), Times.exactly(2));
         });
     });

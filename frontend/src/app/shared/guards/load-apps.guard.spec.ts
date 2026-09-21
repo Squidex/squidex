@@ -27,7 +27,6 @@ describe('LoadAppsGuard', () => {
         const result = await firstValueFrom(loadAppsGuard());
 
         expect(result).toBeTruthy();
-
         appsState.verify(x => x.load(), Times.once());
     });
 });

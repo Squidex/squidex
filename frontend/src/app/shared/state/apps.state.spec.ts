@@ -48,7 +48,6 @@ describe('AppsState', () => {
         expect(appSelect).toBe(app1);
         expect(appsState.snapshot.selectedApp).toBe(app1);
         expect(appsState.snapshot.selectedSettings).not.toBeNull();
-
         appsService.verify(x => x.getSettings(app1.name), Times.once());
     });
 
@@ -71,7 +70,6 @@ describe('AppsState', () => {
         expect(appSelected).toBeNull();
         expect(appsState.snapshot.selectedApp).toBeNull();
         expect(appsState.snapshot.selectedSettings).toBeNull();
-
         appsService.verify(x => x.getSettings(It.isAnyString()), Times.never());
     });
 

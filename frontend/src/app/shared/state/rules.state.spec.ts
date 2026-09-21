@@ -53,7 +53,6 @@ describe('RulesState', () => {
 
             expect(ruleRunning).toBe(rule1);
             expect(rulesState.snapshot.runningRuleId).toBe(rule1.id);
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 

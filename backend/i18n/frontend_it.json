@@ -87,6 +87,8 @@
   "assets.deleteReferrerConfirmTitle": "Risorsa cancellata",
   "assets.downloadVersion": "Scarica questa versione",
   "assets.dropToUpdate": "Trascina il file per aggiornare",
+  "assets.duplicateConfirmText": "This file has already been uploaded. Do you want to upload it anyway as a new asset?",
+  "assets.duplicateConfirmTitle": "Duplicate asset",
   "assets.duplicateFile": "La risorsa è già stata caricata.",
   "assets.edit": "Edit Asset",
   "assets.editor.flipHorizontally": "Capovolgi orizzontalmente",

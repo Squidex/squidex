@@ -42,7 +42,6 @@ describe('WorkflowsState', () => {
             expect(workflowsState.snapshot.isLoading).toBeFalsy();
             expect(workflowsState.snapshot.version).toEqual(version);
             expect(workflowsState.snapshot.workflows).toEqual(oldWorkflows.items);
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 

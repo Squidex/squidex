@@ -113,7 +113,6 @@ describe('ResolveContents', () => {
             contents[1],
             contents[2],
         ]);
-
         contentsService.verify(x => x.getAllContents(app, { ids }), Times.once());
     });
 
@@ -137,7 +136,6 @@ describe('ResolveContents', () => {
             contents[0],
             contents[1],
         ]);
-
         contentsService.verify(x => x.getAllContents(app, { ids }), Times.once());
     });
 
@@ -159,7 +157,6 @@ describe('ResolveContents', () => {
             contents[0],
             contents[1],
         ]);
-
         contentsService.verify(x => x.getAllContents(app, { ids }), Times.once());
     });
 

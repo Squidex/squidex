@@ -177,7 +177,6 @@ describe('TableSettings', () => {
         tableSettings.updateSize(META_FIELDS.version.name, 100, true);
 
         uiState.verify(x => x.setAppUser('schemas.my-schema.config', { ...EMPTY, sizes: { [META_FIELDS.version.name]: 100 } }), Times.once());
-
         expect(fieldSizes!).toEqual({ [META_FIELDS.version.name]: 100 });
     });
 
@@ -196,7 +195,6 @@ describe('TableSettings', () => {
         tableSettings.updateSize(META_FIELDS.version.name, 100, false);
 
         uiState.verify(x => x.setAppUser('schemas.my-schema.config', It.isAny()), Times.never());
-
         expect(fieldSizes!).toEqual({ [META_FIELDS.version.name]: 100 });
     });
 
@@ -215,7 +213,6 @@ describe('TableSettings', () => {
         tableSettings.toggleWrapping(META_FIELDS.version.name, true);
 
         uiState.verify(x => x.setAppUser('schemas.my-schema.config', { ...EMPTY, wrappings: { [META_FIELDS.version.name]: true } }), Times.once());
-
         expect(fieldWrappings!).toEqual({ [META_FIELDS.version.name]: true });
     });
 
@@ -234,7 +231,6 @@ describe('TableSettings', () => {
         tableSettings.toggleWrapping(META_FIELDS.version.name, false);
 
         uiState.verify(x => x.setAppUser('schemas.my-schema.config', It.isAny()), Times.never());
-
         expect(fieldWrappings!).toEqual({ [META_FIELDS.version.name]: true });
     });
 

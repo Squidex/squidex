@@ -6,7 +6,7 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable, shareReplay, Subject, takeUntil } from 'rxjs';
+import { Observable, of, shareReplay, Subject, switchMap, take, takeUntil } from 'rxjs';
 import { debug, DialogService, HTTP, MathHelper, State, Types } from '@app/framework';
 import { AssetDto } from '../model';
 import { AssetsService } from '../services/assets.service';
@@ -72,7 +72,19 @@ export class AssetUploaderState extends State<Snapshot> {
     }
 
     public uploadFile(file: HTTP.UploadFile, parentId?: string): Observable<AssetDto | number> {
-        const stream = this.assetsService.postAssetFile(this.appName, file, parentId);
+        const stream = this.assetsService.postAssetFile(this.appName, file, parentId).pipe(
+            switchMap(event => {
+                if (Types.isNumber(event) || !event.isDuplicate) {
+                    return of(event);
+                }
+
+                // Let the user decide whether to keep the existing asset or upload the file again.
+                return this.dialogs.confirm('i18n:assets.duplicateConfirmTitle', 'i18n:assets.duplicateConfirmText').pipe(
+                    take(1),
+                    switchMap(confirmed => confirmed ?
+                        this.assetsService.postAssetFile(this.appName, file, parentId, true) :
+                        of(event)));
+            }));
 
         return this.upload(stream, MathHelper.guid(), file.name);
     }

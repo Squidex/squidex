@@ -47,7 +47,6 @@ describe('IndexesState', () => {
             expect(indexesState.snapshot.indexes).toEqual([index1, index2]);
             expect(indexesState.snapshot.isLoaded).toBeTruthy();
             expect(indexesState.snapshot.isLoading).toBeFalsy();
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 
@@ -105,7 +104,6 @@ describe('IndexesState', () => {
             indexesState.create(request).subscribe();
 
             expect(indexesState.snapshot.indexes.length).toBe(2);
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
 
@@ -116,7 +114,6 @@ describe('IndexesState', () => {
             indexesState.delete(index1).subscribe();
 
             expect(indexesState.snapshot.indexes.length).toBe(2);
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
     });

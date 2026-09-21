@@ -248,6 +248,22 @@ describe('AssetsService', () => {
         expect(asset!).toEqual(createAsset(12));
     }));
 
+    it('should make post with duplicate flag to create asset', inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
+        let asset: AssetDto;
+        assetsService.postAssetFile('my-app', null!, 'parent1', true).subscribe(result => {
+            asset = <AssetDto>result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/assets?parentId=parent1&duplicate=true');
+
+        expect(req.request.method).toEqual('POST');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush(assetResponse(12));
+
+        expect(asset!).toEqual(createAsset(12));
+    }));
+
     it('should return proper error if upload failed with 413', inject([AssetsService, HttpTestingController], (assetsService: AssetsService, httpMock: HttpTestingController) => {
         let error: ErrorDto;
         assetsService.postAssetFile('my-app', null!).subscribe({
@@ -517,7 +533,7 @@ describe('AssetsService', () => {
     }
 });
 
-export function createAsset(id: number, tags?: string[], suffix = '', parentId?: string) {
+export function createAsset(id: number, tags?: string[], suffix = '', parentId?: string, isDuplicate = true) {
     parentId = parentId || MathHelper.EMPTY_GUID;
 
     const key = `${id}${suffix}`;
@@ -553,7 +569,7 @@ export function createAsset(id: number, tags?: string[], suffix = '', parentId?:
             update: new ResourceLinkDto({ method: 'PUT', href: `/assets/${id}` }),
         },
         _meta: new AssetMetaDto({
-            isDuplicate: 'true',
+            isDuplicate: isDuplicate ? 'true' : 'false',
         }),
     });
 }
