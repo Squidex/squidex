@@ -59,6 +59,12 @@
         </li>
     }
 
+    @if (app.canReadScriptLogs) {
+        <li class="nav-item" sqxTourStep="script-logs">
+            <a class="nav-link" routerLink="script-logs" routerLinkActive="active"> <i class="icon-bug"></i> {{ "common.scriptLogs" | sqxTranslate }}</a>
+        </li>
+    }
+
     @if (app.canReadPlans) {
         <li class="nav-item" sqxTourStep="plans">
             <a class="nav-link" routerLink="plans" routerLinkActive="active"> <i class="icon-subscription"></i> {{ "common.subscription" | sqxTranslate }}</a>

@@ -15,6 +15,7 @@ import { LanguagesPageComponent } from './pages/languages/languages-page.compone
 import { MorePageComponent } from './pages/more/more-page.component';
 import { PlansPageComponent } from './pages/plans/plans-page.component';
 import { RolesPageComponent } from './pages/roles/roles-page.component';
+import { ScriptLogsPageComponent } from './pages/script-logs/script-logs-page.component';
 import { SettingsPageComponent } from './pages/settings/settings-page.component';
 import { WorkflowsPageComponent } from './pages/workflows/workflows-page.component';
 import { SettingsAreaComponent } from './settings-area.component';
@@ -220,6 +221,10 @@ export const SETTINGS_ROUTES: Routes = [
                         },
                     },
                 ],
+            },
+            {
+                path: 'script-logs',
+                component: ScriptLogsPageComponent,
             },
         ],
     },

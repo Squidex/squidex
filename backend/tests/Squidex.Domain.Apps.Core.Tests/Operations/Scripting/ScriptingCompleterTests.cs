@@ -5,10 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Logging.Abstractions;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.GenerateFilters;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Domain.Apps.Core.Scripting.Extensions;
 using Squidex.Infrastructure.Queries;
 
 namespace Squidex.Domain.Apps.Core.Operations.Scripting;
@@ -353,6 +355,20 @@ public class ScriptingCompleterTests
         var actual = sut.Trigger("Usage");
 
         AssertUsageTrigger(actual);
+    }
+
+    [Fact]
+    public void Should_describe_functions_of_objects_with_property_syntax()
+    {
+        var completer = new ScriptingCompleter([new ConsoleJintExtension(NullLogger<ConsoleJintExtension>.Instance)]);
+
+        var actual = completer.ContentScript(dataSchema).Select(x => x.Path).ToArray();
+
+        Assert.Contains("console", actual);
+        Assert.Contains("console.log(value)", actual);
+        Assert.Contains("console.info(value)", actual);
+        Assert.Contains("console.warn(value)", actual);
+        Assert.Contains("console.error(value)", actual);
     }
 
     private static void AssertUsageTrigger(IReadOnlyList<ScriptingValue> actual)

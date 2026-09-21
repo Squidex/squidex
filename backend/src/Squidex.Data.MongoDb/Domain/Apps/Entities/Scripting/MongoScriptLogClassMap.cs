@@ -16,13 +16,16 @@ internal static class MongoScriptLogClassMap
     {
         BsonClassMap.TryRegisterClassMap<ScriptLogEntry>(cm =>
         {
+            cm.MapProperty(x => x.Timestamp)
+                .SetElementName("t");
+
             cm.MapProperty(x => x.Level)
                 .SetElementName("l");
 
             cm.MapProperty(x => x.Message)
                 .SetElementName("m");
 
-            cm.MapCreator(x => new ScriptLogEntry(x.Level, x.Message));
+            cm.MapCreator(x => new ScriptLogEntry(x.Timestamp, x.Level, x.Message));
         });
     }
 }

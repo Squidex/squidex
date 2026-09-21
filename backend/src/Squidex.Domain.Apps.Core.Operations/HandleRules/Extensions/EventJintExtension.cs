@@ -19,57 +19,8 @@ public sealed class EventJintExtension(IUrlGenerator urlGenerator) : IJintExtens
 {
     private delegate JsValue EventDelegate();
 
-    private sealed class FlowConsoleWrapper
-    {
-        public static readonly FlowConsoleWrapper Instance = new FlowConsoleWrapper();
-
-#pragma warning disable CA1822 // Mark members as static
-        private void LogCore(string? message, string prefix)
-#pragma warning restore CA1822 // Mark members as static
-        {
-            if (string.IsNullOrWhiteSpace(message))
-            {
-                return;
-            }
-
-            if (!string.IsNullOrWhiteSpace(prefix))
-            {
-                message = $"{prefix}: {message}";
-            }
-
-            FlowConsole.Out(message);
-        }
-
-        public void Log(string message)
-        {
-            LogCore(message, string.Empty);
-        }
-
-        public void Info(string message)
-        {
-            LogCore(message, "INFO");
-        }
-
-        public void Warn(string message)
-        {
-            LogCore(message, "WARN");
-        }
-
-        public void Error(string message)
-        {
-            LogCore(message, "ERROR");
-        }
-
-        public void Debug(string message)
-        {
-            LogCore(message, "DEBUG");
-        }
-    }
-
     public void Extend(Engine engine)
     {
-        engine.SetValue("console", FlowConsoleWrapper.Instance);
-
         engine.SetValue("contentAction", new EventDelegate(() =>
         {
             if (engine.TryGetVar<EnrichedContentEvent>("event", out var contentEvent))

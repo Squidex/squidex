@@ -65,6 +65,10 @@ export class AppDto extends generated.AppDto {
         return this.compute('canReadSchemas', () => hasAnyLink(this._links, 'schemas'));
     }
 
+    public get canReadScriptLogs() {
+        return this.compute('canReadScriptLogs', () => hasAnyLink(this._links, 'script-logs'));
+    }
+
     public get canReadWorkflows() {
         return this.compute('canReadWorkflows', () => hasAnyLink(this._links, 'workflows'));
     }

@@ -8,9 +8,11 @@
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
+using Squidex.Domain.Apps.Core.HandleRules.Extensions;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.Scripting.Extensions;
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Flows;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Validation;
 
@@ -156,6 +158,64 @@ public class ConsoleJintExtensionTests : IClassFixture<TranslationsFixture>
         }));
 
         Assert.Equal(["Failed"], ex.Errors.Select(x => x.Message));
+    }
+
+    [Fact]
+    public void Should_write_to_flow_console()
+    {
+        const string script = @"
+                console.log('Log');
+                console.info('Info');
+                console.warn('Warn');
+                console.error('Error');
+                console.debug('Debug');
+            ";
+
+        var lines = new List<string>();
+
+        FlowConsole.Output = (message, _) => lines.Add(message);
+        try
+        {
+            sut.Execute(new ScriptVars(), script);
+        }
+        finally
+        {
+            FlowConsole.Output = null!;
+        }
+
+        Assert.Equal(["Log", "INFO: Info", "WARN: Warn", "ERROR: Error", "DEBUG: Debug"], lines);
+    }
+
+    [Fact]
+    public async Task Should_not_be_replaced_by_rule_extension()
+    {
+        IScriptEngine engine = new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
+            Options.Create(new JintScriptOptions
+            {
+                TimeoutScript = TimeSpan.FromSeconds(2),
+                TimeoutExecution = TimeSpan.FromSeconds(10),
+            }),
+            [
+                new ConsoleJintExtension(NullLogger<ConsoleJintExtension>.Instance, scriptLogStore),
+                new EventJintExtension(A.Fake<IUrlGenerator>()),
+            ]);
+
+        var vars = new ScriptVars
+        {
+            ["appId"] = appId,
+        };
+
+        const string script = @"
+                console.log('Hello');
+            ";
+
+        await ScriptLog.CollectAsync("my-script", async () =>
+        {
+            await engine.ExecuteAsync(vars, script);
+        });
+
+        A.CallTo(() => scriptLogStore.Log(appId, "my-script", A<ScriptLog>._))
+            .MustHaveHappenedOnceExactly();
     }
 
     [Fact]

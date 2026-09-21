@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using NodaTime;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Infrastructure.Reflection;
 
@@ -12,6 +13,11 @@ namespace Squidex.Areas.Api.Controllers.ScriptLogs.Models;
 
 public sealed class ScriptLogEntryDto
 {
+    /// <summary>
+    /// The time when the entry has been logged.
+    /// </summary>
+    public Instant Timestamp { get; set; }
+
     /// <summary>
     /// The log level, for example 'log', 'info', 'warn' or 'error'.
     /// </summary>

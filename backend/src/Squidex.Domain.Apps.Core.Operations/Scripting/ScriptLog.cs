@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using NodaTime;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Scripting;
@@ -100,7 +101,7 @@ public sealed class ScriptLog : IDisposable
 
             if (entries.Count < MaxEntries)
             {
-                entries.Add(new ScriptLogEntry(level, message));
+                entries.Add(new ScriptLogEntry(SystemClock.Instance.GetCurrentInstant(), level, message));
             }
         }
     }

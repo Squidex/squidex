@@ -75,6 +75,12 @@ namespace Squidex.Domain.Apps.Core.Properties {
             }
         }
         
+        internal static string ScriptingConsole {
+            get {
+                return ResourceManager.GetString("ScriptingConsole", resourceCulture);
+            }
+        }
+
         internal static string ScriptingConsoleLog {
             get {
                 return ResourceManager.GetString("ScriptingConsoleLog", resourceCulture);

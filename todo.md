@@ -285,7 +285,7 @@ actions keep a thin `IConvertibleToAction` shim for migration only.
 
 ## 6. Give scripts a way to log (#2822)
 
-> ✅ **Implemented.** Scripts get `console.log/info/warn/error` (`ConsoleJintExtension`). Each run collects its output in a named `ScriptLog` scope (max 100 stored entries of 1000 chars, plus the total count). The Script flow step writes it to the step log. Content and asset scripts persist it via `IScriptLogStore` in the background (latest 100 logs per app, 7 days), readable with `GET apps/{app}/script-logs` and the `script-logs.read` permission. Logs are never added to API errors, because they can contain sensitive data. Everything also goes to `ILogger` at debug level.
+> ✅ **Implemented.** Scripts get `console.log/info/warn/error/debug` (`ConsoleJintExtension`, which replaces the rules-only console of `EventJintExtension`). Output is forwarded to `FlowConsole`, so every rule step still logs it, and collected in a named `ScriptLog` scope (max 100 stored entries of 1000 chars, plus the total count). Content and asset scripts persist it via `IScriptLogStore` in the background (latest 100 logs per app, 7 days), readable with `GET apps/{app}/script-logs` and the `script-logs.read` permission. Logs are never added to API errors, because they can contain sensitive data. Everything also goes to `ILogger` at debug level.
 
 **Asked:** `console.log` in scripting, and documentation of what `ctx` holds.
 <https://support.squidex.io/t/console-log-in-scripting-ctx-values/2822>

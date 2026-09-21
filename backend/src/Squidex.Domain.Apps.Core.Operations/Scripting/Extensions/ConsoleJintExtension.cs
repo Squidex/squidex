@@ -12,13 +12,14 @@ using Jint.Native.Json;
 using Jint.Runtime.Interop;
 using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Properties;
+using Squidex.Flows;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Core.Scripting.Extensions;
 
 public sealed class ConsoleJintExtension(ILogger<ConsoleJintExtension> log, IScriptLogStore? scriptLogStore = null) : IJintExtension, IScriptDescriptor
 {
-    private static readonly string[] Levels = ["log", "info", "warn", "error"];
+    private static readonly string[] Levels = ["log", "info", "warn", "error", "debug"];
 
     public void Extend(Engine engine)
     {
@@ -40,13 +41,15 @@ public sealed class ConsoleJintExtension(ILogger<ConsoleJintExtension> log, IScr
     {
         var context = engine.GetContext();
 
-        var scriptLog = ScriptLog.Current;
-        if (scriptLog == null && !log.IsEnabled(LogLevel.Debug))
+        var message = Format(engine, args);
+
+        // Rules capture the output per flow step, the output is ignored outside of flows.
+        if (!string.IsNullOrWhiteSpace(message))
         {
-            return;
+            FlowConsole.Out(level == "log" ? message : $"{level.ToUpperInvariant()}: {message}");
         }
 
-        var message = Format(engine, args);
+        var scriptLog = ScriptLog.Current;
 
         if (scriptLog != null)
         {
@@ -116,6 +119,9 @@ public sealed class ConsoleJintExtension(ILogger<ConsoleJintExtension> log, IScr
 
     public void Describe(AddDescription describe, ScriptScope scope)
     {
+        describe(JsonType.Object, "console",
+            Resources.ScriptingConsole);
+
         describe(JsonType.Function, "console.log(value)",
             Resources.ScriptingConsoleLog);
 
@@ -126,6 +132,9 @@ public sealed class ConsoleJintExtension(ILogger<ConsoleJintExtension> log, IScr
             Resources.ScriptingConsoleLog);
 
         describe(JsonType.Function, "console.error(value)",
+            Resources.ScriptingConsoleLog);
+
+        describe(JsonType.Function, "console.debug(value)",
             Resources.ScriptingConsoleLog);
     }
 }

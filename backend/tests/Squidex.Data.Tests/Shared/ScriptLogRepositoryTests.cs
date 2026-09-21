@@ -157,8 +157,8 @@ public abstract class ScriptLogRepositoryTests
             Name = name,
             Entries =
             [
-                new ScriptLogEntry("log", "Hello"),
-                new ScriptLogEntry("warn", "World"),
+                new ScriptLogEntry(now, "log", "Hello"),
+                new ScriptLogEntry(now.Plus(Duration.FromMilliseconds(5)), "warn", "World"),
             ],
             TotalEntries = 5,
             Timestamp = now.Plus(Duration.FromSeconds(seconds)),

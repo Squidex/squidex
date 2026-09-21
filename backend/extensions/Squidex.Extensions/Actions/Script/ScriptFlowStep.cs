@@ -7,7 +7,6 @@
 
 using System.ComponentModel.DataAnnotations;
 using Squidex.Domain.Apps.Core.Rules.Deprecated;
-using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Flows;
 using Squidex.Infrastructure.Reflection;
 
@@ -34,19 +33,7 @@ public sealed record ScriptFlowStep : FlowStep, IConvertibleToAction
     {
         if (!string.IsNullOrWhiteSpace(Script))
         {
-            using var log = ScriptLog.Begin("flows/script");
-            try
-            {
-                await executionContext.RenderAsync($"Script({Script})", executionContext.Context);
-            }
-            finally
-            {
-                // Also write the log when the script fails, because this is when it is needed the most.
-                foreach (var line in log.ToLines())
-                {
-                    executionContext.Log(line);
-                }
-            }
+            await executionContext.RenderAsync($"Script({Script})", executionContext.Context);
         }
 
         return Next();

@@ -1,2 +1,8 @@
 @import 'mixins';
 @import 'vars';
+
+.nav-link {
+    align-items: center;
+    display: flex;
+    direction: inherit;
+}

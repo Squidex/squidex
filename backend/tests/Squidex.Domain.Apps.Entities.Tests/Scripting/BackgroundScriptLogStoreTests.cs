@@ -51,7 +51,7 @@ public class BackgroundScriptLogStoreTests : GivenContext
         Assert.Equal(AppId.Id, record.AppId);
         Assert.Equal("contents/my-schema/create", record.Name);
         Assert.Equal(now, record.Timestamp);
-        Assert.Equal([new ScriptLogEntry("log", "Hello")], record.Entries);
+        Assert.Equal([("log", "Hello")], record.Entries.Select(x => (x.Level, x.Message)));
         Assert.Equal(1, record.TotalEntries);
     }
 
