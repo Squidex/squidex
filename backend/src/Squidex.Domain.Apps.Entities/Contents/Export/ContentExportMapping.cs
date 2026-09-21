@@ -1,4 +1,4 @@
-// ==========================================================================
+﻿// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -15,12 +15,9 @@ using Squidex.Infrastructure.Validation;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Export;
 
-public sealed class ContentExportMapping : List<ContentExportField>
+public sealed partial class ContentExportMapping : List<ContentExportField>
 {
     private const string DataField = "data";
-
-    // Syntax: "name=path/format". The format is only used for imports.
-    private static readonly Regex FieldRegex = new Regex("^(?<Lhs>[^\\/=]*)(=(?<Rhs>[^\\/]*))?(\\/(?<Format>.*))?$", RegexOptions.Compiled | RegexOptions.ExplicitCapture);
 
     private static readonly Dictionary<string, Func<EnrichedContent, JsonValue>> MetaFields = new (StringComparer.OrdinalIgnoreCase)
     {
@@ -188,4 +185,7 @@ public sealed class ContentExportMapping : List<ContentExportField>
     {
         return string.Equals(segment, DataField, StringComparison.OrdinalIgnoreCase);
     }
+
+    [GeneratedRegex("^(?<Lhs>[^\\/=]*)(=(?<Rhs>[^\\/]*))?(\\/(?<Format>.*))?$", RegexOptions.Compiled | RegexOptions.ExplicitCapture)]
+    private static partial Regex FieldRegex { get; }
 }

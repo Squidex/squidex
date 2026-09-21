@@ -8,7 +8,7 @@
 /* eslint-disable @angular-eslint/no-input-rename */
 
 import { booleanAttribute, ChangeDetectorRef, Directive, EmbeddedViewRef, Input, OnDestroy, Renderer2, RendererFactory2, TemplateRef, ViewContainerRef } from '@angular/core';
-import { DialogModel, ModalModel, Subscriptions, Types } from '@app/framework/internal';
+import { DialogModel, ModalModel, ModalService, OpenModal, Subscriptions, Types } from '@app/framework/internal';
 import { RootViewComponent } from './root-view.component';
 
 declare type Model = DialogModel | ModalModel | any;
@@ -16,7 +16,7 @@ declare type Model = DialogModel | ModalModel | any;
 @Directive({
     selector: '[sqxModal]',
 })
-export class ModalDirective<T = unknown> implements OnDestroy {
+export class ModalDirective<T = unknown> implements OnDestroy, OpenModal {
     private readonly eventsView = new Subscriptions();
     private readonly eventsModel = new Subscriptions();
     private static backdrop: any;
@@ -50,6 +50,7 @@ export class ModalDirective<T = unknown> implements OnDestroy {
 
     constructor(
         private readonly changeDetector: ChangeDetectorRef,
+        private readonly modalService: ModalService,
         private readonly renderer: Renderer2,
         private readonly rendererFactory: RendererFactory2,
         private readonly rootView: RootViewComponent,
@@ -61,8 +62,18 @@ export class ModalDirective<T = unknown> implements OnDestroy {
     public ngOnDestroy() {
         this.hideModal(this.currentModel);
 
+        this.modalService.remove(this);
+
         this.eventsView.unsubscribeAll();
         this.eventsModel.unsubscribeAll();
+    }
+
+    public contains(element: Element) {
+        return this.renderRoots?.some(x => x.contains(element)) === true;
+    }
+
+    public hide() {
+        this.hideModal(this.currentModel);
     }
 
     private update(isOpen: boolean) {
@@ -98,6 +109,12 @@ export class ModalDirective<T = unknown> implements OnDestroy {
         }
 
         this.isOpen = isOpen;
+
+        if (isOpen) {
+            this.modalService.add(this);
+        } else {
+            this.modalService.remove(this);
+        }
     }
 
     private getContainer() {

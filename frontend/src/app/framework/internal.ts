@@ -17,6 +17,7 @@ export * from './services/loading.service';
 export * from './services/local-store.service';
 export * from './services/localizer.service';
 export * from './services/message-bus.service';
+export * from './services/modal.service';
 export * from './services/previous-url.service';
 export * from './services/resize.service';
 export * from './services/resource-loader.service';

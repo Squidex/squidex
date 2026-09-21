@@ -32,7 +32,7 @@ being postponed and declined. See
 | # | Feature | Forum status | Views | Size |
 | --- | --- | --- | --- | --- |
 | [1](#1-visual-diff-between-content-versions-5286) | Visual diff between content versions | Postponed | 1412 | large |
-| [2](#2-export-and-import-content-from-the-ui-as-jobs-3461-1366-3438) | Export/import content from the UI as jobs | Declined ×2 | 5381 | large |
+| [2](#2-export-and-import-content-from-the-ui-as-jobs-3461-1366-3438) | ✅ **Export done**, import open — Export/import content from the UI as jobs | Declined ×2 | 5381 | large |
 | [3](#3-scope-asset-permissions-to-folders-5921-5676-1229) | Scope asset permissions to folders | Open ×2 + Declined | 3857 | large |
 | [4](#4-dark-mode-and-per-app-theming-5720-816) | Dark mode and per-app theming | Open + Declined | 2102 | large |
 | [5](#5-azure-service-bus-flow-step-4522) | ✅ **Done** — Azure Service Bus flow step | Postponed | 1838 | medium |
@@ -100,6 +100,8 @@ is where this belongs.
 ---
 
 ## 2. Export and import content from the UI as jobs (#3461, #1366, #3438)
+
+> ✅ **Export implemented, import still open.** New `ExportContentsJob` (`Contents/Export/`) streams all contents of a schema to a CSV or JSON file, which is downloaded from the jobs page. It is started with `POST apps/{app}/schemas/{schema}/contents/export` (link `contents/export`, requires `contents.{schema}.read`) or with the export button on the content list. Fields use the `Name=path` syntax of the CLI, for example `id, Title=data.title.en`; without fields the metadata and all fields are exported. Filtering by query was dropped on purpose, because paging over large schemas puts too much load on the database. All job endpoints also accept an optional `reference` that is returned with the job, so API clients can find the job they started. Covered by domain, frontend and API tests.
 
 **Asked:** export schemas and content to CSV from the UI, and import from a
 spreadsheet, without dropping to the CLI.
