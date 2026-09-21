@@ -82,7 +82,7 @@
 
                     @if (isDeletable || canDelete) {
                         <button
-                            class="btn btn-sm btn-text-secondary"
+                            class="btn btn-sm btn-text-danger"
                             attr.aria-label="{{ 'common.delete' | sqxTranslate }}"
                             confirmRememberKey="deleteComment"
                             [confirmRequired]="confirmDelete"
@@ -92,6 +92,9 @@
                             title="{{ 'common.delete' | sqxTranslate }}"
                             type="button">
                             <i class="icon-bin3"></i>
+                            @if (isOnlyDelete) {
+                                {{ "common.delete" | sqxTranslate }}
+                            }
                         </button>
                     }
                 </div>

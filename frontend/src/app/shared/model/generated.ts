@@ -2535,6 +2535,86 @@ export interface IMigrateContentsDto {
     readonly migratePublished?: boolean | undefined;
 }
 
+export class ExportContentsDto implements IExportContentsDto {
+    /** Uses the cache values because the actual object is frozen. */
+    private readonly cachedValues: { [key: string]: any } = {};
+    /** The format of the exported file. Default: Csv. */
+    readonly format?: ExportFormat | undefined;
+    /** The optional comma separated list of fields in the format 'name=path', for example 'id,Title=data.title.en'. */
+    readonly fields?: string | undefined;
+    /** True, to export the unpublished versions. Default: false. */
+    readonly unpublished?: boolean | undefined;
+
+    constructor(data?: IExportContentsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data: any) {
+        (<any>this).format = _data["format"];
+        (<any>this).fields = _data["fields"];
+        (<any>this).unpublished = _data["unpublished"];
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): ExportContentsDto {
+        const result = new ExportContentsDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {};
+        data["format"] = this.format;
+        data["fields"] = this.fields;
+        data["unpublished"] = this.unpublished;
+        this.cleanup(data);
+        return data;
+    }
+
+    protected cleanup(target: any) {
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
+    }
+
+    protected compute<T>(key: string, action: () => T): T {
+        if (!this.cachedValues.hasOwnProperty(key)) {
+            const value = action();
+            this.cachedValues[key] = value;
+            return value;
+        } else {
+            return this.cachedValues[key] as any;
+        }
+    }
+}
+
+export interface IExportContentsDto {
+    /** The format of the exported file. Default: Csv. */
+    readonly format?: ExportFormat | undefined;
+    /** The optional comma separated list of fields in the format 'name=path', for example 'id,Title=data.title.en'. */
+    readonly fields?: string | undefined;
+    /** True, to export the unpublished versions. Default: false. */
+    readonly unpublished?: boolean | undefined;
+}
+
+export type ExportFormat = "Csv" | "Json";
+
+export const ExportFormatValues: ReadonlyArray<ExportFormat> = [
+	"Csv",
+	"Json"
+];
+
 export class SchemaDto extends ResourceDto implements ISchemaDto {
     /** The ID of the schema. */
     readonly id!: string;
@@ -2583,6 +2663,10 @@ export class SchemaDto extends ResourceDto implements ISchemaDto {
 
     public get canContentsCreateAndPublish() {
         return this.compute('canContentsCreateAndPublish', () => hasAnyLink(this._links, 'contents/create/publish'));
+    }
+
+    public get canContentsExport() {
+        return this.compute('canContentsExport', () => hasAnyLink(this._links, 'contents/export'));
     }
 
     public get canContentsMigrate() {
@@ -11334,6 +11418,8 @@ export class JobDto extends ResourceDto implements IJobDto {
     readonly status!: JobStatus;
     /** The name of the task. */
     readonly taskName!: string;
+    /** The optional reference that has been passed in when the job has been started. */
+    readonly reference?: string | undefined;
     /** The description of the job. */
     readonly description!: string;
     /** The arguments for the job. */
@@ -11370,6 +11456,7 @@ export class JobDto extends ResourceDto implements IJobDto {
         (<any>this).stopped = _data["stopped"] ? DateTime.parseISO(_data["stopped"].toString()) : <any>undefined;
         (<any>this).status = _data["status"];
         (<any>this).taskName = _data["taskName"];
+        (<any>this).reference = _data["reference"];
         (<any>this).description = _data["description"];
         if (_data["taskArguments"]) {
             (<any>this).taskArguments = {} as any;
@@ -11401,6 +11488,7 @@ export class JobDto extends ResourceDto implements IJobDto {
         data["stopped"] = this.stopped ? this.stopped.toISOString() : <any>undefined;
         data["status"] = this.status;
         data["taskName"] = this.taskName;
+        data["reference"] = this.reference;
         data["description"] = this.description;
         if (this.taskArguments) {
             data["taskArguments"] = {};
@@ -11432,6 +11520,8 @@ export interface IJobDto extends IResourceDto {
     readonly status: JobStatus;
     /** The name of the task. */
     readonly taskName: string;
+    /** The optional reference that has been passed in when the job has been started. */
+    readonly reference?: string | undefined;
     /** The description of the job. */
     readonly description: string;
     /** The arguments for the job. */

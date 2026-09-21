@@ -39,8 +39,10 @@ public class BackupTests(ClientFixture fixture) : IClassFixture<ClientFixture>
         await PrepareAppAsync(app);
 
 
-        // STEP 2: Create backup.
-        await app.Backups.PostBackupAsync();
+        // STEP 2: Create backup with a reference to find the job.
+        var reference = Guid.NewGuid().ToString();
+
+        await app.Backups.PostBackupAsync(reference);
 
 
         // STEP 3: Get obsolete backup.
@@ -50,7 +52,7 @@ public class BackupTests(ClientFixture fixture) : IClassFixture<ClientFixture>
 
 
         // STEP 4: Get obsolete backup.
-        var job = await app.Jobs.PollAsync(x => x.Status is JobStatus.Completed or JobStatus.Failed);
+        var job = await app.Jobs.PollAsync(x => x.Reference == reference && x.Status is JobStatus.Completed or JobStatus.Failed);
 
         Assert.Equal(JobStatus.Completed, job?.Status);
 
@@ -88,8 +90,10 @@ public class BackupTests(ClientFixture fixture) : IClassFixture<ClientFixture>
         await PrepareAppAsync(app);
 
 
-        // STEP 2: Create backup.
-        await app.Backups.PostBackupAsync();
+        // STEP 2: Create backup with a reference to find the job.
+        var reference = Guid.NewGuid().ToString();
+
+        await app.Backups.PostBackupAsync(reference);
 
 
         // STEP 3: Get obsolete backup.
@@ -99,7 +103,7 @@ public class BackupTests(ClientFixture fixture) : IClassFixture<ClientFixture>
 
 
         // STEP 4: Get obsolete backup.
-        var job = await app.Jobs.PollAsync(x => x.Status is JobStatus.Completed or JobStatus.Failed);
+        var job = await app.Jobs.PollAsync(x => x.Reference == reference && x.Status is JobStatus.Completed or JobStatus.Failed);
 
         Assert.Equal(JobStatus.Completed, job?.Status);
 

@@ -8,7 +8,7 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { AddFieldDto, ApiUrlConfig, ArrayFieldPropertiesDto, AssetsFieldPropertiesDto, BooleanFieldPropertiesDto, ChangeCategoryDto, ComponentFieldPropertiesDto, ComponentsFieldPropertiesDto, ConfigureFieldRulesDto, ConfigureUIFieldsDto, createProperties, CreateSchemaDto, DateTime, DateTimeFieldPropertiesDto, FieldDto, FieldRuleDto, GenerateSchemaDto, GenerateSchemaResponseDto, GeolocationFieldPropertiesDto, JsonFieldPropertiesDto, MigrateContentsDto, NestedFieldDto, NumberFieldPropertiesDto, ReferencesFieldPropertiesDto, Resource, ResourceLinkDto, SchemaDto, SchemaPropertiesDto, SchemaScriptsDto, SchemasDto, SchemasService, ScriptCompletions, StringFieldPropertiesDto, SynchronizeSchemaDto, TagsFieldPropertiesDto, UpdateFieldDto, UpdateSchemaDto, VersionTag } from '@app/shared/internal';
+import { AddFieldDto, ApiUrlConfig, ArrayFieldPropertiesDto, AssetsFieldPropertiesDto, BooleanFieldPropertiesDto, ChangeCategoryDto, ComponentFieldPropertiesDto, ComponentsFieldPropertiesDto, ConfigureFieldRulesDto, ConfigureUIFieldsDto, createProperties, CreateSchemaDto, DateTime, DateTimeFieldPropertiesDto, ExportContentsDto, FieldDto, FieldRuleDto, GenerateSchemaDto, GenerateSchemaResponseDto, GeolocationFieldPropertiesDto, JsonFieldPropertiesDto, MigrateContentsDto, NestedFieldDto, NumberFieldPropertiesDto, ReferencesFieldPropertiesDto, Resource, ResourceLinkDto, SchemaDto, SchemaPropertiesDto, SchemaScriptsDto, SchemasDto, SchemasService, ScriptCompletions, StringFieldPropertiesDto, SynchronizeSchemaDto, TagsFieldPropertiesDto, UpdateFieldDto, UpdateSchemaDto, VersionTag } from '@app/shared/internal';
 
 describe('SchemasService', () => {
     const version = new VersionTag('1');
@@ -557,6 +557,26 @@ describe('SchemasService', () => {
         expect(req.request.method).toEqual('POST');
         expect(req.request.headers.get('If-Match')).toBeNull();
         expect(req.request.body).toEqual({ migrateDraft: false, migratePublished: true });
+
+        req.flush({});
+    }));
+
+    it('should make post request to export contents', inject([SchemasService, HttpTestingController], (schemasService: SchemasService, httpMock: HttpTestingController) => {
+        const resource: Resource = {
+            _links: {
+                'contents/export': { method: 'POST', href: '/api/apps/my-app/schemas/my-schema/contents/export' },
+            },
+        };
+
+        const dto = new ExportContentsDto({ format: 'Json', unpublished: true });
+
+        schemasService.postContentExport('my-app', resource, dto).subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/schemas/my-schema/contents/export');
+
+        expect(req.request.method).toEqual('POST');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+        expect(req.request.body).toEqual({ format: 'Json', unpublished: true });
 
         req.flush({});
     }));

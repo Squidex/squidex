@@ -50,14 +50,15 @@ public class RestoreController(ICommandBus commandBus, IJobService jobService) :
     /// Restore a backup.
     /// </summary>
     /// <param name="request">The backup to restore.</param>
+    /// <param name="reference">An optional reference to find the job.</param>
     /// <response code="204">Restore operation started.</response>
     [HttpPost]
     [Route("apps/restore/")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ApiPermission(PermissionIds.AdminRestore)]
-    public async Task<IActionResult> PostRestoreJob([FromBody] RestoreRequestDto request)
+    public async Task<IActionResult> PostRestoreJob([FromBody] RestoreRequestDto request, [FromQuery] string? reference = null)
     {
-        var job = RestoreJob.BuildRequest(User.Token()!, request.Url, request.Name);
+        var job = RestoreJob.BuildRequest(User.Token()!, request.Url, request.Name) with { Reference = reference };
 
         await jobService.StartAsync(default, job, HttpContext.RequestAborted);
 

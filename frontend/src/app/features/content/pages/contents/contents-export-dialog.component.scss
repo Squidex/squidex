@@ -1,0 +1,23 @@
+@import 'mixins';
+@import 'vars';
+
+.fields-help {
+    border-top: 1px solid $color-border;
+    margin-top: 1rem;
+    padding-top: 1rem;
+}
+
+.fields-help-text {
+    font-size: $font-small;
+}
+
+.path-label {
+    font-size: $font-small;
+    white-space: nowrap;
+    width: 1%;
+}
+
+.path {
+    font-family: monospace;
+    margin: 0 .25rem .25rem 0;
+}

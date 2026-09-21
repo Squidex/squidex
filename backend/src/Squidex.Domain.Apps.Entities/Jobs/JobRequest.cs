@@ -16,6 +16,8 @@ public record struct JobRequest(RefToken Actor, string TaskName, ReadonlyDiction
 {
     public NamedId<DomainId>? AppId { get; set; }
 
+    public string? Reference { get; set; }
+
     public static JobRequest Create(RefToken actor, string taskName, Dictionary<string, string>? arguments = null)
     {
         var args = arguments?.ToReadonlyDictionary() ?? ReadonlyDictionary.Empty<string, string>();

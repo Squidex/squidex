@@ -24,7 +24,7 @@
                     placeholder="{{ 'contents.searchPlaceholder' | sqxTranslate }}"
                     [queries]="queries | async"
                     [queriesTypes]="'common.contents' | sqxTranslate"
-                    [query]="contentsState.query | async"
+                   
                     (queryChange)="search($event)"
                     [queryModel]="queryModel | async" />
             </div>
@@ -37,6 +37,19 @@
                         (languageChange)="changeLanguage($event)"
                         [languages]="languages"
                         [percents]="translationStatus" />
+                </div>
+            }
+
+            @if (schema.canContentsExport) {
+                <div class="col-auto">
+                    <button
+                        class="btn btn-outline-secondary"
+                        attr.aria-label="{{ 'contents.exportTooltip' | sqxTranslate }}"
+                        (click)="exportDialog.show()"
+                        title="i18n:contents.exportTooltip"
+                        type="button">
+                        <i class="icon-download"></i>
+                    </button>
                 </div>
             }
 
@@ -192,3 +205,4 @@
 </sqx-layout>
 <router-outlet />
 <sqx-due-time-selector #dueTimeSelector [disabled]="disableScheduler" />
+<sqx-contents-export-dialog (dialogClose)="exportDialog.hide()" [languages]="languages" [schema]="schema" *sqxModal="exportDialog" />

@@ -167,10 +167,10 @@ public sealed class DefaultRuleRunnerService(
         return jobService.CancelAsync(appId, taskName, ct);
     }
 
-    public Task RunAsync(RefToken actor, App app, DomainId ruleId, bool fromSnapshots = false,
+    public Task RunAsync(RefToken actor, App app, DomainId ruleId, bool fromSnapshots = false, string? reference = null,
         CancellationToken ct = default)
     {
-        var job = RuleRunnerJob.BuildRequest(actor, app, ruleId, fromSnapshots);
+        var job = RuleRunnerJob.BuildRequest(actor, app, ruleId, fromSnapshots) with { Reference = reference };
 
         return jobService.StartAsync(app.Id, job, ct);
     }

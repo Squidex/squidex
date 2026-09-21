@@ -509,8 +509,14 @@ public class RuleRunnerTests(ClientFixture fixture, WebhookCatcherFixture webhoo
         await CreateContentAsync(app);
 
 
-        // STEP 4: Run rule.
-        await app.Rules.PutRuleRunAsync(rule.Id, fromSnapshots);
+        // STEP 4: Run rule with a reference to find the job.
+        var reference = Guid.NewGuid().ToString();
+
+        await app.Rules.PutRuleRunAsync(rule.Id, fromSnapshots, reference);
+
+        var job = await app.Jobs.PollAsync(x => x.Reference == reference && x.Status is JobStatus.Completed or JobStatus.Failed);
+
+        Assert.Equal(JobStatus.Completed, job?.Status);
 
         // Get requests.
         var request = await webhookCatcher.PollAsync(sessionId, x => x.IsPost() && x.HasContent(schemaName));

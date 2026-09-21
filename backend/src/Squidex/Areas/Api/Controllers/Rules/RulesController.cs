@@ -222,15 +222,16 @@ public sealed class RulesController(
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the rule to run.</param>
     /// <param name="fromSnapshots">Runs the rule from snapeshots if possible.</param>
+    /// <param name="reference">An optional reference to find the job.</param>
     /// <response code="204">Rule started.</response>
     [HttpPut]
     [Route("apps/{app}/rules/{id}/run")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ApiPermissionOrAnonymous(PermissionIds.AppRulesEventsRun)]
     [ApiCosts(1)]
-    public async Task<IActionResult> PutRuleRun(string app, DomainId id, [FromQuery] bool fromSnapshots = false)
+    public async Task<IActionResult> PutRuleRun(string app, DomainId id, [FromQuery] bool fromSnapshots = false, [FromQuery] string? reference = null)
     {
-        await ruleRunnerService.RunAsync(User.Token()!, App, id, fromSnapshots, HttpContext.RequestAborted);
+        await ruleRunnerService.RunAsync(User.Token()!, App, id, fromSnapshots, reference, HttpContext.RequestAborted);
 
         return NoContent();
     }

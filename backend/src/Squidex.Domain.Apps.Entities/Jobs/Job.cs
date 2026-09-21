@@ -21,6 +21,8 @@ public sealed class Job
 
     public string TaskName { get; init; }
 
+    public string? Reference { get; init; }
+
     public string Description { get; set; }
 
     public JobFile? File { get; set; }

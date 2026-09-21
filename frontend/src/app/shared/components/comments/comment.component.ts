@@ -83,6 +83,7 @@ export class CommentComponent extends StatefulComponent<State> {
 
     public isDeletable = false;
     public isEditable = false;
+    public isOnlyDelete = false;
 
     constructor(
         private readonly dialogs: DialogService,
@@ -96,6 +97,9 @@ export class CommentComponent extends StatefulComponent<State> {
 
         this.isDeletable = isMyComment;
         this.isEditable = isMyComment;
+
+        // A single icon without context is hard to understand, therefore we show a label in this case.
+        this.isOnlyDelete = !this.canAnswer && !(this.isEditable && this.canEdit) && !this.canResolve;
     }
 
     public select() {

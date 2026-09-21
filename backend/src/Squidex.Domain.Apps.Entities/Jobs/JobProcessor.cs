@@ -160,6 +160,7 @@ public sealed class JobProcessor
                     Started = default,
                     Status = JobStatus.Created,
                     TaskName = request.TaskName,
+                    Reference = request.Reference,
                 },
                 OwnerId = ownerId,
             };

@@ -1,0 +1,65 @@
+<sqx-modal-dialog (dialogClose)="dialogClose.emit()" size="lg">
+    <ng-container title> {{ "contents.export" | sqxTranslate }} </ng-container>
+    <ng-container content>
+        <span [sqxMarkdown]="'contents.exportHint' | sqxTranslate" trusted="true"></span>
+
+        <div class="mt-3">
+            <sqx-form-row for="exportFormatCsv" label="contents.exportFormat" vertical>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" id="exportFormatCsv" name="exportFormat" [(ngModel)]="format" type="radio" value="Csv" />
+                    <label class="form-check-label" for="exportFormatCsv">CSV</label>
+                </div>
+
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" id="exportFormatJson" name="exportFormat" [(ngModel)]="format" type="radio" value="Json" />
+                    <label class="form-check-label" for="exportFormatJson">JSON</label>
+                </div>
+            </sqx-form-row>
+
+            <sqx-form-row check for="exportUnpublished" hint="contents.exportUnpublishedHint" label="contents.exportUnpublished" vertical>
+                <input class="form-check-input" id="exportUnpublished" [(ngModel)]="unpublished" [ngModelOptions]="{ standalone: true }" type="checkbox" />
+            </sqx-form-row>
+
+            <sqx-form-row
+                for="exportFields"
+                [hint]="format === 'Json' ? 'contents.exportFieldsHintJson' : 'contents.exportFieldsHintCsv'"
+                label="contents.exportFields"
+                vertical>
+                <input class="form-control" id="exportFields" [(ngModel)]="fields" [ngModelOptions]="{ standalone: true }" placeholder="id, Title=data.title.en" />
+            </sqx-form-row>
+
+            <div class="fields-help">
+                <div class="fields-help-text" inline="false" [sqxMarkdown]="'contents.exportFieldsHelp' | sqxTranslate" trusted="true"></div>
+
+                <h6 class="mt-3">{{ "contents.exportFieldsAvailable" | sqxTranslate }}</h6>
+
+                <table class="table table-sm table-borderless mb-0">
+                    <tbody>
+                        <tr>
+                            <td class="path-label">{{ "contents.exportFieldsMetadata" | sqxTranslate }}</td>
+                            <td>
+                                @for (path of metaPaths; track path) {
+                                    <button class="btn btn-sm btn-outline-secondary path" (click)="addPath(path)" type="button">{{ path }}</button>
+                                }
+                            </td>
+                        </tr>
+                        @for (field of fieldPaths; track field.label) {
+                            <tr>
+                                <td class="path-label">{{ field.label }}</td>
+                                <td>
+                                    @for (path of field.paths; track path) {
+                                        <button class="btn btn-sm btn-outline-secondary path" (click)="addPath(path)" type="button">{{ path }}</button>
+                                    }
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </ng-container>
+    <ng-container footer>
+        <button class="btn btn-text-secondary" (click)="dialogClose.emit()" type="button">{{ "common.cancel" | sqxTranslate }}</button>
+        <button class="btn btn-primary" (click)="export()" type="button">{{ "contents.exportButton" | sqxTranslate }}</button>
+    </ng-container>
+</sqx-modal-dialog>
