@@ -41,6 +41,8 @@ using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Repositories;
+using Squidex.Domain.Apps.Entities.Scripting;
+using Squidex.Domain.Apps.Entities.Scripting.Repositories;
 using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Domain.Apps.Entities.Teams.Repositories;
 using Squidex.Domain.Users;
@@ -155,6 +157,9 @@ public static class ServiceExtensions
 
         services.AddSingletonAs<MongoRequestLogRepository>()
             .As<IRequestLogRepository>();
+
+        services.AddSingletonAs<MongoScriptLogRepository>()
+            .As<IScriptLogRepository>();
 
         services.AddSingletonAs<MongoRoleStore>()
             .As<IRoleStore<IdentityRole>>();

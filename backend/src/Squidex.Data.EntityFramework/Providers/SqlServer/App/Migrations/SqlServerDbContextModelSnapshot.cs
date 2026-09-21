@@ -369,6 +369,41 @@ namespace Squidex.Providers.SqlServer.Migrations
                     b.ToTable("AssetKeyValueStore_TusMetadata", (string)null);
                 });
 
+            modelBuilder.Entity("Squidex.Domain.Apps.Core.Scripting.ScriptLogRecord", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("AppId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("Entries")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.Property<DateTimeOffset>("Timestamp")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<int>("TotalEntries")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Timestamp");
+
+                    b.HasIndex("AppId", "Timestamp");
+
+                    b.ToTable("ScriptLogs", (string)null);
+                });
+
             modelBuilder.Entity("Squidex.Domain.Apps.Entities.Apps.EFAppEntity", b =>
                 {
                     b.Property<string>("DocumentId")

@@ -367,6 +367,41 @@ namespace Squidex.Providers.Postgres.Migrations
                     b.ToTable("AssetKeyValueStore_TusMetadata", (string)null);
                 });
 
+            modelBuilder.Entity("Squidex.Domain.Apps.Core.Scripting.ScriptLogRecord", b =>
+                {
+                    b.Property<string>("Id")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("AppId")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<string>("Entries")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
+
+                    b.Property<DateTimeOffset>("Timestamp")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int>("TotalEntries")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("Timestamp");
+
+                    b.HasIndex("AppId", "Timestamp");
+
+                    b.ToTable("ScriptLogs", (string)null);
+                });
+
             modelBuilder.Entity("Squidex.Domain.Apps.Entities.Apps.EFAppEntity", b =>
                 {
                     b.Property<string>("DocumentId")

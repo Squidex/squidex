@@ -37,6 +37,8 @@ using Squidex.Domain.Apps.Entities.Rules;
 using Squidex.Domain.Apps.Entities.Rules.Repositories;
 using Squidex.Domain.Apps.Entities.Schemas;
 using Squidex.Domain.Apps.Entities.Schemas.Repositories;
+using Squidex.Domain.Apps.Entities.Scripting;
+using Squidex.Domain.Apps.Entities.Scripting.Repositories;
 using Squidex.Domain.Apps.Entities.Teams;
 using Squidex.Domain.Apps.Entities.Teams.Repositories;
 using Squidex.Domain.Users;
@@ -236,6 +238,9 @@ public static class ServiceExtensions
 
         services.AddSingletonAs<EFHistoryEventRepository<TContext>>()
             .As<IHistoryEventRepository>().As<IDeleter>();
+
+        services.AddSingletonAs<EFScriptLogRepository<TContext>>()
+            .As<IScriptLogRepository>();
 
         services.AddSingletonAs<EFRequestLogRepository<TContext>>()
             .As<IRequestLogRepository>();

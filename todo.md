@@ -36,7 +36,7 @@ being postponed and declined. See
 | [3](#3-scope-asset-permissions-to-folders-5921-5676-1229) | Scope asset permissions to folders | Open ×2 + Declined | 3857 | large |
 | [4](#4-dark-mode-and-per-app-theming-5720-816) | Dark mode and per-app theming | Open + Declined | 2102 | large |
 | [5](#5-azure-service-bus-flow-step-4522) | ✅ **Done** — Azure Service Bus flow step | Postponed | 1838 | medium |
-| [6](#6-give-scripts-a-way-to-log-2822) | Give scripts a way to log | Unresolved | 2575 | medium |
+| [6](#6-give-scripts-a-way-to-log-2822) | ✅ **Done** — Give scripts a way to log | Unresolved | 2575 | medium |
 | [7](#7-upsert-mode-for-the-create-content-flow-step-5616) | ✅ **Done** — Upsert mode for "Create content" step | Unresolved | 786 | small |
 | [8](#8-regenerate-a-client-secret-from-the-ui-5807) | ✅ **Done** — Regenerate a client secret from the UI | Open | 1383 | small |
 | [9](#9-show-which-fields-are-required-when-publishing-4375) | ✅ **Done** — Mark "required when publishing" fields | Declined | 1707 | tiny |
@@ -285,6 +285,7 @@ actions keep a thin `IConvertibleToAction` shim for migration only.
 
 ## 6. Give scripts a way to log (#2822)
 
+> ✅ **Implemented.** Scripts get `console.log/info/warn/error` (`ConsoleJintExtension`). Each run collects its output in a named `ScriptLog` scope (max 100 stored entries of 1000 chars, plus the total count). The Script flow step writes it to the step log. Content and asset scripts persist it via `IScriptLogStore` in the background (latest 100 logs per app, 7 days), readable with `GET apps/{app}/script-logs` and the `script-logs.read` permission. Logs are never added to API errors, because they can contain sensitive data. Everything also goes to `ILogger` at debug level.
 
 **Asked:** `console.log` in scripting, and documentation of what `ctx` holds.
 <https://support.squidex.io/t/console-log-in-scripting-ctx-values/2822>

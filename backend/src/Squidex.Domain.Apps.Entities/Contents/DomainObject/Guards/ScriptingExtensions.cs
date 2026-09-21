@@ -41,7 +41,7 @@ public static class ScriptingExtensions
             StatusOld = default,
         });
 
-        return TransformAsync(operation, script, vars, ct);
+        return TransformAsync(operation, "create", script, vars, ct);
     }
 
     public static Task<ContentData> ExecuteUpdateScriptAsync(this ContentOperation operation, ContentData data,
@@ -66,7 +66,7 @@ public static class ScriptingExtensions
             StatusOld = default,
         });
 
-        return TransformAsync(operation, script, vars, ct);
+        return TransformAsync(operation, "update", script, vars, ct);
     }
 
     public static Task<ContentData> ExecuteChangeScriptAsync(this ContentOperation operation, Status status, StatusChange change,
@@ -92,7 +92,7 @@ public static class ScriptingExtensions
             Validate = Validate(operation, status),
         });
 
-        return TransformAsync(operation, script, vars, ct);
+        return TransformAsync(operation, "change", script, vars, ct);
     }
 
     public static Task ExecuteDeleteScriptAsync(this ContentOperation operation, bool permanent,
@@ -118,19 +118,25 @@ public static class ScriptingExtensions
             StatusOld = default,
         });
 
-        return ExecuteAsync(operation, script, vars, ct);
+        return ExecuteAsync(operation, "delete", script, vars, ct);
     }
 
-    private static async Task<ContentData> TransformAsync(ContentOperation operation, string script, ContentScriptVars vars,
+    private static async Task<ContentData> TransformAsync(ContentOperation operation, string name, string script, ContentScriptVars vars,
         CancellationToken ct)
     {
-        return await operation.Resolve<IScriptEngine>().TransformAsync(vars, script, Options, ct);
+        return await ScriptLog.CollectAsync($"contents/{operation.Schema.Name}/{name}", async () =>
+        {
+            return await operation.Resolve<IScriptEngine>().TransformAsync(vars, script, Options, ct);
+        });
     }
 
-    private static async Task ExecuteAsync(ContentOperation operation, string script, ContentScriptVars vars,
+    private static async Task ExecuteAsync(ContentOperation operation, string name, string script, ContentScriptVars vars,
         CancellationToken ct)
     {
-        await operation.Resolve<IScriptEngine>().ExecuteAsync(vars, script, Options, ct);
+        await ScriptLog.CollectAsync($"contents/{operation.Schema.Name}/{name}", async () =>
+        {
+            await operation.Resolve<IScriptEngine>().ExecuteAsync(vars, script, Options, ct);
+        });
     }
 
     private static Action Validate(ContentOperation operation, Status status)
