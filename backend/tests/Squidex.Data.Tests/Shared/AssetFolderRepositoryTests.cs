@@ -135,4 +135,70 @@ public abstract class AssetFolderRepositoryTests : GivenContext
         // Default page size is unlimited.
         Assert.True(assets.Count >= NumValues);
     }
+
+    [Fact]
+    public async Task Should_query_root_folders_only()
+    {
+        var sut = await CreateSutAsync();
+
+        // Use another app to not change the results of the other tests.
+        var otherAppId = NamedId.Of(DomainId.NewGuid(), "my-app");
+
+        var root = CreateAssetFolder() with { AppId = otherAppId };
+        var child = CreateAssetFolder() with { AppId = otherAppId, ParentId = root.Id };
+
+        await WriteAsync(sut, root, child);
+
+        var byRoot = await sut.QueryAsync(otherAppId.Id, DomainId.Empty);
+        var byAll = await sut.QueryAsync(otherAppId.Id, null);
+
+        Assert.Equal(root.Id, byRoot.Single().Id);
+        Assert.Equal(2, byAll.Count);
+    }
+
+    [Fact]
+    public async Task Should_not_query_deleted()
+    {
+        var sut = await CreateSutAsync();
+
+        // Use another app to not change the results of the other tests.
+        var otherAppId = NamedId.Of(DomainId.NewGuid(), "my-app");
+
+        var active = CreateAssetFolder() with { AppId = otherAppId, ParentId = ParentId };
+        var deleted = CreateAssetFolder() with { AppId = otherAppId, ParentId = ParentId, IsDeleted = true };
+
+        await WriteAsync(sut, active, deleted);
+
+        var byParent = await sut.QueryAsync(otherAppId.Id, ParentId);
+        var byAll = await sut.QueryAsync(otherAppId.Id, null);
+        var childIds = await sut.QueryChildIdsAsync(otherAppId.Id, ParentId);
+        var byId = await sut.FindAssetFolderAsync(otherAppId.Id, deleted.Id);
+
+        Assert.Equal(active.Id, byParent.Single().Id);
+        Assert.Equal(active.Id, byAll.Single().Id);
+        Assert.Equal(active.Id, childIds.Single());
+        Assert.Null(byId);
+    }
+
+    [Fact]
+    public async Task Should_not_find_folder_of_other_app()
+    {
+        var sut = await CreateAndPrepareSutAsync();
+
+        var assetFolder = (await sut.QueryAsync(appId, null))[0];
+
+        var found = await sut.FindAssetFolderAsync(DomainId.NewGuid(), assetFolder.Id);
+
+        Assert.Null(found);
+    }
+
+    private static async Task WriteAsync(IAssetFolderRepository sut, params AssetFolder[] assetFolders)
+    {
+        if (sut is not ISnapshotStore<AssetFolder> store)
+        {
+            return;
+        }
+
+        await store.WriteManyAsync(assetFolders.Select(x => new SnapshotWriteJob<AssetFolder>(x.UniqueId, x, 0)));
+    }
 }

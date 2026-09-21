@@ -175,4 +175,96 @@ public abstract class AppRepositoryTests
 
         Assert.Equal("default-not-deleted", result?.Description);
     }
+
+    [Fact]
+    public async Task Should_return_null_if_not_found()
+    {
+        var sut = await CreateAndPrepareSutAsync();
+
+        var byId = await sut.FindAsync(DomainId.NewGuid());
+        var byName = await sut.FindAsync(Guid.NewGuid().ToString());
+
+        Assert.Null(byId);
+        Assert.Null(byName);
+    }
+
+    [Fact]
+    public async Task Should_not_find_deleted_by_id()
+    {
+        var sut = await CreateSutAsync();
+
+        var deleted = CreateApp() with { IsDeleted = true };
+
+        await PrepareAsync(sut, [deleted]);
+
+        var result = await sut.FindAsync(deleted.Id);
+
+        Assert.Null(result);
+    }
+
+    [Fact]
+    public async Task Should_not_query_deleted_by_team()
+    {
+        var sut = await CreateSutAsync();
+
+        var teamId = DomainId.NewGuid();
+
+        var active = CreateApp() with { TeamId = teamId };
+        var deleted = CreateApp() with { TeamId = teamId, IsDeleted = true };
+
+        await PrepareAsync(sut, [active, deleted]);
+
+        var result = await sut.QueryAllAsync(teamId);
+
+        Assert.Equal(active.Id, result.Single().Id);
+    }
+
+    [Fact]
+    public async Task Should_not_query_deleted_by_contributor()
+    {
+        var sut = await CreateSutAsync();
+
+        var contributorId = Guid.NewGuid().ToString();
+        var contributors = Contributors.Empty.Assign(contributorId, Role.Owner);
+
+        var active = CreateApp() with { Contributors = contributors };
+        var deleted = CreateApp() with { Contributors = contributors, IsDeleted = true };
+
+        await PrepareAsync(sut, [active, deleted]);
+
+        var result = await sut.QueryAllAsync(contributorId, []);
+
+        Assert.Equal(active.Id, result.Single().Id);
+    }
+
+    [Fact]
+    public async Task Should_query_by_contributor_or_name()
+    {
+        var sut = await CreateSutAsync();
+
+        var contributorId = Guid.NewGuid().ToString();
+
+        var byContributor = CreateApp() with { Contributors = Contributors.Empty.Assign(contributorId, Role.Owner) };
+        var byName = CreateApp();
+
+        await PrepareAsync(sut, [byContributor, byName]);
+
+        var result = await sut.QueryAllAsync(contributorId, [byName.Name]);
+
+        Assert.Equal([byContributor.Id, byName.Id], result.Select(x => x.Id).ToHashSet());
+    }
+
+    private static App CreateApp()
+    {
+        var id = DomainId.NewGuid();
+
+        // Use unique names, because the apps are written into a shared database.
+        return new App
+        {
+            Id = id,
+            Name = $"app-{id}",
+            Created = SystemClock.Instance.GetCurrentInstant(),
+            CreatedBy = RefToken.Client("client1"),
+        };
+    }
 }

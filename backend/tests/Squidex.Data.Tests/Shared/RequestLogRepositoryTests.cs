@@ -38,6 +38,34 @@ public abstract class RequestLogRepositoryTests
     }
 
     [Fact]
+    public async Task Should_store_all_values()
+    {
+        var sut = await CreateSutAsync();
+
+        var key = Guid.NewGuid().ToString();
+
+        // Some databases have a lower precision, therefore we use full seconds.
+        var now = Instant.FromUnixTimeSeconds(SystemClock.Instance.GetCurrentInstant().ToUnixTimeSeconds());
+
+        var request = new Request
+        {
+            Key = key,
+            Timestamp = now,
+            Properties = new Dictionary<string, string>
+            {
+                ["property1"] = "value1",
+                ["property2"] = "value2",
+            },
+        };
+
+        await sut.InsertManyAsync([request]);
+
+        var found = await sut.QueryAllAsync(key, now, now).ToListAsync();
+
+        found.Should().BeEquivalentTo([request]);
+    }
+
+    [Fact]
     public async Task Should_query_by_several_factory()
     {
         var sut = await CreateSutAsync();

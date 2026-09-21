@@ -13,5 +13,11 @@ public sealed class GraphQLOptions
 
     public int DataLoaderBatchSize { get; set; } = 1000;
 
+    public int MaxDepth { get; set; } = 30;
+
+    public int MaxComplexity { get; set; }
+
     public bool EnableSubscriptions { get; set; } = true;
+
+    public bool EnableTracing { get; set; }
 }

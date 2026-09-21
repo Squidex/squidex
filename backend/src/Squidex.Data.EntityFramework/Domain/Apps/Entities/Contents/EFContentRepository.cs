@@ -77,6 +77,7 @@ public sealed partial class EFContentRepository<TContext, TContentContext>(
             await dbContext.Set<T>()
                 .Where(x => x.IndexedAppId == appId)
                 .Where(x => ids.Contains(x.Id))
+                .Where(x => !x.IsDeleted)
                 .Select(x => new { SchemaId = x.IndexedSchemaId, x.Id, x.Status })
                 .ToListAsync(ct);
 
@@ -89,22 +90,25 @@ public sealed partial class EFContentRepository<TContext, TContentContext>(
         using (Telemetry.Activities.StartActivity("EFContentRepository/HasReferrersAsync"))
         {
             return scope == SearchScope.All ?
-                await HasReferrersAsync<EFReferenceCompleteEntity>(app.Id, reference, ct) :
-                await HasReferrersAsync<EFReferencePublishedEntity>(app.Id, reference, ct);
+                await HasReferrersAsync<EFContentCompleteEntity, EFReferenceCompleteEntity>(app.Id, reference, ct) :
+                await HasReferrersAsync<EFContentPublishedEntity, EFReferencePublishedEntity>(app.Id, reference, ct);
         }
     }
 
-    public async Task<bool> HasReferrersAsync<TReference>(DomainId appId, DomainId reference,
-        CancellationToken ct = default) where TReference : EFContentReferenceEntity
+    public async Task<bool> HasReferrersAsync<T, TReference>(DomainId appId, DomainId reference,
+        CancellationToken ct = default) where T : EFContentEntity where TReference : EFContentReferenceEntity
     {
         using (Telemetry.Activities.StartActivity("EFContentRepository/QueryIdsAsync"))
         {
             await using var dbContext = await CreateDbContextAsync(ct);
 
+            // References are also stored for deleted contents, which must not block the deletion of the referenced content.
             var result =
                 await dbContext.Set<TReference>()
                     .Where(x => x.AppId == appId)
                     .Where(x => x.ToId == reference)
+                    .Join(dbContext.Set<T>(), r => r.FromKey, t => t.DocumentId, (r, t) => t)
+                    .Where(x => !x.IsDeleted && x.Id != reference)
                     .AnyAsync(ct);
 
             return result;

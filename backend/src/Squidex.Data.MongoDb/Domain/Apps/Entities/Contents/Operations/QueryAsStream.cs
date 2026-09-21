@@ -66,7 +66,8 @@ public sealed class QueryAsStream : OperationBase
         // Only query the ID from the database to improve performance.
         var projection = Builders<MongoContentEntity>.Projection.Include(x => x.Id);
 
-        var filter = CreateFilter(appId, schemaIds);
+        // The IDs are used to clean up events and states, which also exist for deleted contents.
+        var filter = CreateFilter(appId, schemaIds, includeDeleted: true);
         var find = Collection.Find(filter).Project<IdOnly>(projection);
 
         await foreach (var entity in find.ToAsyncEnumerable(ct).WithCancellation(ct))
@@ -75,7 +76,8 @@ public sealed class QueryAsStream : OperationBase
         }
     }
 
-    private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId appId, HashSet<DomainId>? schemaIds, HashSet<DomainId>? ids = null)
+    private static FilterDefinition<MongoContentEntity> CreateFilter(DomainId appId, HashSet<DomainId>? schemaIds, HashSet<DomainId>? ids = null,
+        bool includeDeleted = false)
     {
         var filters = new List<FilterDefinition<MongoContentEntity>>
         {
@@ -99,7 +101,10 @@ public sealed class QueryAsStream : OperationBase
             filters.Add(Filter.In(x => x.Id, ids));
         }
 
-        filters.Add(Filter.Ne(x => x.IsDeleted, true));
+        if (!includeDeleted)
+        {
+            filters.Add(Filter.Ne(x => x.IsDeleted, true));
+        }
 
         return Filter.And(filters);
     }

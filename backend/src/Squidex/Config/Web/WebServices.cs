@@ -128,11 +128,28 @@ public static class WebServices
         .AddSquidexSerializers();
     }
 
-    public static void AddSquidexGraphQL(this IServiceCollection services)
+    public static void AddSquidexGraphQL(this IServiceCollection services, IConfiguration config)
     {
+        var graphQLOptions = config.GetSection("graphql").Get<GraphQLOptions>() ?? new ();
+
         services.AddGraphQL(builder =>
         {
-            builder.UseApolloTracing();
+            // Tracing measures every single field resolution and is therefore not enabled by default.
+            if (graphQLOptions.EnableTracing)
+            {
+                builder.UseApolloTracing();
+            }
+
+            // Without a limit a single deeply nested query over references can exhaust the whole node.
+            if (graphQLOptions.MaxDepth > 0 || graphQLOptions.MaxComplexity > 0)
+            {
+                builder.AddComplexityAnalyzer(options =>
+                {
+                    options.MaxDepth = graphQLOptions.MaxDepth > 0 ? graphQLOptions.MaxDepth : null;
+                    options.MaxComplexity = graphQLOptions.MaxComplexity > 0 ? graphQLOptions.MaxComplexity : null;
+                });
+            }
+
             builder.AddSchema<DummySchema>();
             builder.AddSystemTextJson();
             builder.AddDataLoader();

@@ -23,6 +23,10 @@ public sealed class AssetOptions
 
     public long MaxSize { get; set; } = 5 * 1024 * 1024;
 
+    public int MaxConcurrentResizes { get; set; }
+
+    public TimeSpan MaxCacheDuration { get; set; } = TimeSpan.FromDays(365);
+
     public string? CDN { get; set; }
 
     public TimeSpan TimeoutFind { get; set; } = TimeSpan.FromSeconds(1);

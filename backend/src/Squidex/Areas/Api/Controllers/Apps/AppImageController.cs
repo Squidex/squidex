@@ -10,6 +10,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Net.Http.Headers;
 using Squidex.Assets;
 using Squidex.Domain.Apps.Entities.Apps;
+using Squidex.Domain.Apps.Entities.Assets;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Web;
@@ -24,7 +25,8 @@ public sealed class AppImageController(
     ICommandBus commandBus,
     IAppImageStore appImageStore,
     IAssetStore assetStore,
-    IAssetThumbnailGenerator assetGenerator)
+    IAssetThumbnailGenerator assetGenerator,
+    AssetResizeGate assetResizeGate)
     : ApiController(commandBus)
 {
     /// <summary>
@@ -59,7 +61,18 @@ public sealed class AppImageController(
             }
             catch (AssetNotFoundException)
             {
-                await ResizeAsync(resizedAsset, App.Image.MimeType, body, ct);
+                using (await assetResizeGate.AcquireAsync(resizedAsset, ct))
+                {
+                    // Another request might have created the file while we have been waiting for the gate.
+                    try
+                    {
+                        await assetStore.DownloadAsync(resizedAsset, body, ct: ct);
+                    }
+                    catch (AssetNotFoundException)
+                    {
+                        await ResizeAsync(resizedAsset, App.Image.MimeType, body, ct);
+                    }
+                }
             }
         });
 

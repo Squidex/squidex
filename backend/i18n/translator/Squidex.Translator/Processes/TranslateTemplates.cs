@@ -18,7 +18,7 @@ public partial class TranslateTemplates(DirectoryInfo folder, TranslationService
         "code",
         "script",
         "sqx-code",
-        "style"
+        "style",
     ];
 
     private static readonly HashSet<string> AttributesToTranslate = new HashSet<string>(StringComparer.OrdinalIgnoreCase)

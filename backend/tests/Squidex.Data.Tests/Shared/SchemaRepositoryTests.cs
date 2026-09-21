@@ -203,4 +203,62 @@ public abstract class SchemaRepositoryTests
         var found2 = await sut.QueryAllAsync(appId.Id);
         Assert.Equal(schema1.Id, found2.Single().Id);
     }
+
+    [Fact]
+    public async Task Should_not_find_deleted()
+    {
+        var sut = await CreateSutAsync();
+
+        var appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+
+        var deleted = new Schema
+        {
+            AppId = appId,
+            Id = DomainId.NewGuid(),
+            Name = "deleted",
+            IsDeleted = true,
+        };
+
+        await PrepareAsync(sut, [deleted]);
+
+        var byId = await sut.FindAsync(appId.Id, deleted.Id);
+        var byName = await sut.FindAsync(appId.Id, deleted.Name);
+        var byApp = await sut.QueryAllAsync(appId.Id);
+
+        Assert.Null(byId);
+        Assert.Null(byName);
+        Assert.Empty(byApp);
+    }
+
+    [Fact]
+    public async Task Should_not_find_schema_of_other_app()
+    {
+        var sut = await CreateAndPrepareSutAsync();
+
+        var otherAppId = DomainId.NewGuid();
+
+        var byId = await sut.FindAsync(otherAppId, KnownId);
+        var byName = await sut.FindAsync(otherAppId, "schema2");
+
+        Assert.Null(byId);
+        Assert.Null(byName);
+    }
+
+    [Fact]
+    public async Task Should_query_sorted_by_name()
+    {
+        var sut = await CreateSutAsync();
+
+        var appId = NamedId.Of(DomainId.NewGuid(), "my-app");
+
+        await PrepareAsync(sut, [
+            new Schema { AppId = appId, Id = DomainId.NewGuid(), Name = "schema-c" },
+            new Schema { AppId = appId, Id = DomainId.NewGuid(), Name = "schema-a" },
+            new Schema { AppId = appId, Id = DomainId.NewGuid(), Name = "schema-b" },
+        ]);
+
+        var found = await sut.QueryAllAsync(appId.Id);
+
+        Assert.Equal(["schema-a", "schema-b", "schema-c"], found.Select(x => x.Name));
+    }
 }

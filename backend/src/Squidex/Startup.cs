@@ -45,7 +45,7 @@ public sealed class Startup(IConfiguration config)
         services.AddSquidexControllerServices(config);
         services.AddSquidexEventSourcing(config);
         services.AddSquidexFrontend(config);
-        services.AddSquidexGraphQL();
+        services.AddSquidexGraphQL(config);
         services.AddSquidexHealthChecks(config);
         services.AddSquidexHistory(config);
         services.AddSquidexImageResizing(config);

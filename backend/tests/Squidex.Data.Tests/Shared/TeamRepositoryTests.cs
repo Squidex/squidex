@@ -111,4 +111,46 @@ public abstract class TeamRepositoryTests
 
         Assert.Equal("by-contributor", result.Single().Name);
     }
+
+    [Fact]
+    public async Task Should_return_null_if_not_found()
+    {
+        var sut = await CreateAndPrepareSutAsync();
+
+        var byId = await sut.FindAsync(DomainId.NewGuid());
+        var byAuthDomain = await sut.FindByAuthDomainAsync($"{Guid.NewGuid()}.io");
+
+        Assert.Null(byId);
+        Assert.Null(byAuthDomain);
+    }
+
+    [Fact]
+    public async Task Should_not_find_deleted()
+    {
+        var sut = await CreateSutAsync();
+
+        var authDomain = $"{Guid.NewGuid()}.io";
+        var contributorId = Guid.NewGuid().ToString();
+
+        var deleted = new Team
+        {
+            Id = DomainId.NewGuid(),
+            Name = "deleted",
+            Created = SystemClock.Instance.GetCurrentInstant(),
+            CreatedBy = RefToken.Client("client1"),
+            AuthScheme = new AuthScheme { Domain = authDomain },
+            Contributors = Contributors.Empty.Assign(contributorId, Role.Owner),
+            IsDeleted = true,
+        };
+
+        await PrepareAsync(sut, [deleted]);
+
+        var byId = await sut.FindAsync(deleted.Id);
+        var byAuthDomain = await sut.FindByAuthDomainAsync(authDomain);
+        var byContributor = await sut.QueryAllAsync(contributorId);
+
+        Assert.Null(byId);
+        Assert.Null(byAuthDomain);
+        Assert.Empty(byContributor);
+    }
 }

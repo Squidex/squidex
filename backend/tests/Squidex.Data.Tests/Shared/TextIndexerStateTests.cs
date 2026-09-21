@@ -51,6 +51,31 @@ public abstract class TextIndexerStateTests : GivenContext
     }
 
     [Fact]
+    public async Task Should_update_state()
+    {
+        var sut = await CreateSutAsync(contentRepository);
+
+        var id1 = new UniqueContentId(AppId.Id, DomainId.NewGuid());
+
+        await sut.SetAsync(
+        [
+            new TextContentState { UniqueContentId = id1, State = TextState.Stage0_Draft__Stage1_None },
+        ]);
+
+        await sut.SetAsync(
+        [
+            new TextContentState { UniqueContentId = id1, State = TextState.Stage0_Published__Stage1_None },
+        ]);
+
+        var actual = await sut.GetAsync(HashSet.Of(id1));
+
+        actual.Should().BeEquivalentTo(new Dictionary<UniqueContentId, TextContentState>
+        {
+            [id1] = new TextContentState { UniqueContentId = id1, State = TextState.Stage0_Published__Stage1_None },
+        });
+    }
+
+    [Fact]
     public async Task Should_remove_state()
     {
         var sut = await CreateSutAsync(contentRepository);

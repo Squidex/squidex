@@ -47,6 +47,9 @@ public static class AssetServices
         services.AddSingletonAs<AssetCache>()
             .As<IAssetCache>();
 
+        services.AddSingletonAs<AssetResizeGate>()
+            .AsSelf();
+
         services.AddSingletonAs<RebuildFiles>()
             .AsSelf();
 
