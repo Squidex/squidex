@@ -285,7 +285,9 @@ actions keep a thin `IConvertibleToAction` shim for migration only.
 
 ## 6. Give scripts a way to log (#2822)
 
-> ✅ **Implemented.** Scripts get `console.log/info/warn/error/debug` (`ConsoleJintExtension`, which replaces the rules-only console of `EventJintExtension`). Output is forwarded to `FlowConsole`, so every rule step still logs it, and collected in a named `ScriptLog` scope (max 100 stored entries of 1000 chars, plus the total count). Content and asset scripts persist it via `IScriptLogStore` in the background (latest 100 logs per app, 7 days), readable with `GET apps/{app}/script-logs` and the `script-logs.read` permission. Logs are never added to API errors, because they can contain sensitive data. Everything also goes to `ILogger` at debug level.
+> ✅ **Implemented.** Scripts get `console.log/info/warn/error/debug` (`ConsoleJintExtension`). Output is forwarded to `FlowConsole`, so every rule step still logs it, and collected in a named `ScriptLog` scope (max 100 stored entries of 1000 chars, each with its own timestamp, plus the total count). Content and asset scripts persist it via `IScriptLogStore` in the background (latest 100 logs per app, 7 days, configurable under `scripting:logs`), readable with `GET apps/{app}/script-logs` and the `script-logs.read` permission, and shown under *Settings → Script Logs* as a console view. Logs are never added to API errors, because they can contain sensitive data. Everything also goes to `ILogger` at debug level. Covered by unit, repository and API tests (`ScriptLogsTests`).
+>
+> **Correction to the analysis below:** rules already had a `console` (in `EventJintExtension`, writing to `FlowConsole`), it just never reached content or asset scripts. It was replaced by the shared `ConsoleJintExtension`.
 
 **Asked:** `console.log` in scripting, and documentation of what `ctx` holds.
 <https://support.squidex.io/t/console-log-in-scripting-ctx-values/2822>
@@ -357,7 +359,7 @@ exactly what it needs to do."*
 
 ## 8. Regenerate a client secret from the UI (#5807)
 
-> ✅ **Implemented.** New `RegenerateClientSecret` command and `AppClientSecretRegenerated` event keep the client ID and issue a new secret. Exposed as `PUT apps/{app}/clients/{id}/secret` (link `secret`) and as a button next to the secret in the client settings.
+> ✅ **Implemented.** New `RegenerateClientSecret` command and `AppClientSecretRegenerated` event keep the client ID and issue a new secret. Exposed as `PUT apps/{app}/clients/{id}/secret` (link `secret`) and as a button next to the secret in the client settings. Covered by domain, guard and frontend tests.
 
 **Asked:** a button to issue a new secret for an existing client.
 <https://support.squidex.io/t/manually-generate-a-new-client-secret-from-within-the-ui/5807>
