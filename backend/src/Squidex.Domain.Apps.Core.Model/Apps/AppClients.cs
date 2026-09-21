@@ -57,6 +57,25 @@ public sealed class AppClients : ReadonlyDictionary<string, AppClient>
     }
 
     [Pure]
+    public AppClients RegenerateSecret(string id, string secret)
+    {
+        Guard.NotNullOrEmpty(id);
+        Guard.NotNullOrEmpty(secret);
+
+        if (!TryGetValue(id, out var client))
+        {
+            return this;
+        }
+
+        if (!this.TrySet(id, client with { Secret = secret }, out var updated))
+        {
+            return this;
+        }
+
+        return new AppClients(updated);
+    }
+
+    [Pure]
     public AppClients Update(string id, string? name = null, string? role = null,
         long? apiCallsLimit = null,
         long? apiTrafficLimit = null,

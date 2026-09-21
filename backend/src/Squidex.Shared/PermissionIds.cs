@@ -182,6 +182,10 @@ public static class PermissionIds
     public const string AppAssetSScriptsRead = "squidex.apps.{app}.asset-scripts.read";
     public const string AppAssetsScriptsUpdate = "squidex.apps.{app}.asset-scripts.update";
 
+    // App Script Logs
+    public const string AppScriptLogs = "squidex.apps.{app}.script-logs";
+    public const string AppScriptLogsRead = "squidex.apps.{app}.script-logs.read";
+
     // App Rules
     public const string AppRules = "squidex.apps.{app}.rules";
     public const string AppRulesRead = "squidex.apps.{app}.rules.read";

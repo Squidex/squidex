@@ -147,7 +147,7 @@ public class RolesTests
         Assert.False(Roles.IsDefault(firstRole));
     }
 
-    [InlineData("Developer", 6)]
+    [InlineData("Developer", 7)]
     [InlineData("Editor", 4)]
     [InlineData("Reader", 2)]
     [InlineData("Owner", 1)]
@@ -169,7 +169,7 @@ public class RolesTests
         Assert.Equal(permissionCount, actual!.Permissions.Count);
     }
 
-    [InlineData("Developer", 15)]
+    [InlineData("Developer", 16)]
     [InlineData("Editor", 13)]
     [InlineData("Reader", 12)]
     [InlineData("Owner", 1)]

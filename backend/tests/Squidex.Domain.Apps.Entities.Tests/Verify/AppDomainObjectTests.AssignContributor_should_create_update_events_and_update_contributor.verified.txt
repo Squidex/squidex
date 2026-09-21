@@ -73,6 +73,9 @@
                 Id: schemas
               },
               {
+                Id: script-logs
+              },
+              {
                 Id: workflows
               }
             ],

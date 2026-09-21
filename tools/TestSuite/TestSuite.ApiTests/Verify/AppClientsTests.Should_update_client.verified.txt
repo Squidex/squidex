@@ -9,6 +9,9 @@
         delete: {
           Method: DELETE
         },
+        secret: {
+          Method: PUT
+        },
         update: {
           Method: PUT
         }
@@ -24,6 +27,9 @@
       Links: {
         delete: {
           Method: DELETE
+        },
+        secret: {
+          Method: PUT
         },
         update: {
           Method: PUT

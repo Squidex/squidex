@@ -101,6 +101,30 @@ public sealed class AppClientsController(ICommandBus commandBus) : ApiController
     }
 
     /// <summary>
+    /// Regenerates the secret of an app client.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <param name="id">The ID of the client that must be updated.</param>
+    /// <response code="200">Client secret regenerated.</response>
+    /// <response code="404">Client or app not found.</response>
+    /// <remarks>
+    /// The client ID stays the same, but applications that use the old secret cannot request new access tokens anymore.
+    /// </remarks>
+    [HttpPut]
+    [Route("apps/{app}/clients/{id}/secret/")]
+    [ProducesResponseType(typeof(ClientsDto), StatusCodes.Status200OK)]
+    [ApiPermissionOrAnonymous(PermissionIds.AppClientsUpdate)]
+    [ApiCosts(1)]
+    public async Task<IActionResult> PutClientSecret(string app, string id)
+    {
+        var command = new RegenerateClientSecret { Id = id };
+
+        var response = await InvokeCommandAsync(command);
+
+        return Ok(response);
+    }
+
+    /// <summary>
     /// Revoke an app client.
     /// </summary>
     /// <param name="app">The name of the app.</param>

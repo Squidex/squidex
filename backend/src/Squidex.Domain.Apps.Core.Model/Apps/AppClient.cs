@@ -15,7 +15,7 @@ public sealed record AppClient(string Name, string Secret)
 {
     public string Name { get; init; } = Guard.NotNullOrEmpty(Name);
 
-    public string Secret { get; } = Guard.NotNullOrEmpty(Secret);
+    public string Secret { get; init; } = Guard.NotNullOrEmpty(Secret);
 
     public long ApiCallsLimit { get; init; }
 

@@ -2171,6 +2171,241 @@ export interface IStorageUsagePerDateDto {
     readonly totalSize: number;
 }
 
+export class ScriptLogsDto implements IScriptLogsDto {
+    /** Uses the cache values because the actual object is frozen. */
+    private readonly cachedValues: { [key: string]: any } = {};
+    /** The script logs, newest first. */
+    readonly items!: ScriptLogDto[];
+
+    constructor(data?: IScriptLogsDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data: any) {
+        if (Array.isArray(_data["items"])) {
+            (<any>this).items = [] as any;
+            for (let item of _data["items"])
+                (<any>this).items!.push(ScriptLogDto.fromJSON(item));
+        }
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): ScriptLogsDto {
+        const result = new ScriptLogsDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        this.cleanup(data);
+        return data;
+    }
+
+    protected cleanup(target: any) {
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
+    }
+
+    protected compute<T>(key: string, action: () => T): T {
+        if (!this.cachedValues.hasOwnProperty(key)) {
+            const value = action();
+            this.cachedValues[key] = value;
+            return value;
+        } else {
+            return this.cachedValues[key] as any;
+        }
+    }
+}
+
+export interface IScriptLogsDto {
+    /** The script logs, newest first. */
+    readonly items: ScriptLogDto[];
+}
+
+export class ScriptLogDto implements IScriptLogDto {
+    /** Uses the cache values because the actual object is frozen. */
+    private readonly cachedValues: { [key: string]: any } = {};
+    /** The ID of the log. */
+    readonly id!: string;
+    /** The name of the script, for example 'contents/my-schema/create' or 'assets/annotate'. */
+    readonly name!: string;
+    /** The time when the script has been executed. */
+    readonly timestamp!: DateTime;
+    /** The log entries. */
+    readonly entries!: ScriptLogEntryDto[];
+    /** The total number of entries the script has logged. Can be greater than the number of stored entries, because only the first entries are kept. */
+    readonly totalEntries!: number;
+
+    constructor(data?: IScriptLogDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data: any) {
+        (<any>this).id = _data["id"];
+        (<any>this).name = _data["name"];
+        (<any>this).timestamp = _data["timestamp"] ? DateTime.parseISO(_data["timestamp"].toString()) : <any>undefined;
+        if (Array.isArray(_data["entries"])) {
+            (<any>this).entries = [] as any;
+            for (let item of _data["entries"])
+                (<any>this).entries!.push(ScriptLogEntryDto.fromJSON(item));
+        }
+        (<any>this).totalEntries = _data["totalEntries"];
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): ScriptLogDto {
+        const result = new ScriptLogDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["id"] = this.id;
+        data["name"] = this.name;
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        if (Array.isArray(this.entries)) {
+            data["entries"] = [];
+            for (let item of this.entries)
+                data["entries"].push(item.toJSON());
+        }
+        data["totalEntries"] = this.totalEntries;
+        this.cleanup(data);
+        return data;
+    }
+
+    protected cleanup(target: any) {
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
+    }
+
+    protected compute<T>(key: string, action: () => T): T {
+        if (!this.cachedValues.hasOwnProperty(key)) {
+            const value = action();
+            this.cachedValues[key] = value;
+            return value;
+        } else {
+            return this.cachedValues[key] as any;
+        }
+    }
+}
+
+export interface IScriptLogDto {
+    /** The ID of the log. */
+    readonly id: string;
+    /** The name of the script, for example 'contents/my-schema/create' or 'assets/annotate'. */
+    readonly name: string;
+    /** The time when the script has been executed. */
+    readonly timestamp: DateTime;
+    /** The log entries. */
+    readonly entries: ScriptLogEntryDto[];
+    /** The total number of entries the script has logged. Can be greater than the number of stored entries, because only the first entries are kept. */
+    readonly totalEntries: number;
+}
+
+export class ScriptLogEntryDto implements IScriptLogEntryDto {
+    /** Uses the cache values because the actual object is frozen. */
+    private readonly cachedValues: { [key: string]: any } = {};
+    /** The time when the entry has been logged. */
+    readonly timestamp!: DateTime;
+    /** The log level, for example 'log', 'info', 'warn' or 'error'. */
+    readonly level!: string;
+    /** The logged message. */
+    readonly message!: string;
+
+    constructor(data?: IScriptLogEntryDto) {
+        if (data) {
+            for (var property in data) {
+                if (data.hasOwnProperty(property))
+                    (<any>this)[property] = (<any>data)[property];
+            }
+        }
+    }
+
+    init(_data: any) {
+        (<any>this).timestamp = _data["timestamp"] ? DateTime.parseISO(_data["timestamp"].toString()) : <any>undefined;
+        (<any>this).level = _data["level"];
+        (<any>this).message = _data["message"];
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): ScriptLogEntryDto {
+        const result = new ScriptLogEntryDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["timestamp"] = this.timestamp ? this.timestamp.toISOString() : <any>undefined;
+        data["level"] = this.level;
+        data["message"] = this.message;
+        this.cleanup(data);
+        return data;
+    }
+
+    protected cleanup(target: any) {
+        for (var property in target) {
+            if (target.hasOwnProperty(property)) {
+                const value = target[property];
+                if (value === undefined) {
+                    delete target[property];
+                }
+            }
+        }
+    }
+
+    protected compute<T>(key: string, action: () => T): T {
+        if (!this.cachedValues.hasOwnProperty(key)) {
+            const value = action();
+            this.cachedValues[key] = value;
+            return value;
+        } else {
+            return this.cachedValues[key] as any;
+        }
+    }
+}
+
+export interface IScriptLogEntryDto {
+    /** The time when the entry has been logged. */
+    readonly timestamp: DateTime;
+    /** The log level, for example 'log', 'info', 'warn' or 'error'. */
+    readonly level: string;
+    /** The logged message. */
+    readonly message: string;
+}
+
 export class SearchResultDto extends ResourceDto implements ISearchResultDto {
     /** The name of the search result. */
     readonly name!: string;
@@ -14489,6 +14724,10 @@ export class ClientDto extends ResourceDto implements IClientDto {
     /** True to allow anonymous access without an access token for this client. */
     readonly allowAnonymous!: boolean;
 
+    public get canRegenerateSecret() {
+        return this.compute('canRegenerateSecret', () => hasAnyLink(this._links, 'secret'));
+    }
+
     public get canRevoke() {
         return this.compute('canRevoke', () => hasAnyLink(this._links, 'delete'));
     }
@@ -15340,6 +15579,10 @@ export class AppDto extends ResourceDto implements IAppDto {
 
     public get canReadSchemas() {
         return this.compute('canReadSchemas', () => hasAnyLink(this._links, 'schemas'));
+    }
+
+    public get canReadScriptLogs() {
+        return this.compute('canReadScriptLogs', () => hasAnyLink(this._links, 'script-logs'));
     }
 
     public get canReadWorkflows() {

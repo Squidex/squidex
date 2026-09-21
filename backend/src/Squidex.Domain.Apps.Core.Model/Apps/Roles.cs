@@ -53,6 +53,7 @@ public sealed class Roles
                     WithoutPrefix(PermissionIds.AppRolesRead),
                     WithoutPrefix(PermissionIds.AppRules),
                     WithoutPrefix(PermissionIds.AppSchemas),
+                    WithoutPrefix(PermissionIds.AppScriptLogs),
                     WithoutPrefix(PermissionIds.AppWorkflows)),
                 JsonValue.Object()),
     };

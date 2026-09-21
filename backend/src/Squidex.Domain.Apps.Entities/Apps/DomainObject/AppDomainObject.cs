@@ -178,6 +178,16 @@ public partial class AppDomainObject(
                     return Snapshot;
                 }, ct);
 
+            case RegenerateClientSecret regenerateClientSecret:
+                return ApplyReturn(regenerateClientSecret, c =>
+                {
+                    GuardAppClients.CanRegenerateSecret(c, Snapshot);
+
+                    RegenerateClientSecret(c);
+
+                    return Snapshot;
+                }, ct);
+
             case RevokeClient revokeClient:
                 return ApplyReturn(revokeClient, c =>
                 {
@@ -417,6 +427,11 @@ public partial class AppDomainObject(
     private void AttachClient(AttachClient command)
     {
         Raise(command, new AppClientAttached());
+    }
+
+    private void RegenerateClientSecret(RegenerateClientSecret command)
+    {
+        Raise(command, new AppClientSecretRegenerated());
     }
 
     private void RevokeClient(RevokeClient command)

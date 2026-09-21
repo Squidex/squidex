@@ -65,6 +65,10 @@ export class AppDto extends generated.AppDto {
         return this.compute('canReadSchemas', () => hasAnyLink(this._links, 'schemas'));
     }
 
+    public get canReadScriptLogs() {
+        return this.compute('canReadScriptLogs', () => hasAnyLink(this._links, 'script-logs'));
+    }
+
     public get canReadWorkflows() {
         return this.compute('canReadWorkflows', () => hasAnyLink(this._links, 'workflows'));
     }
@@ -212,6 +216,10 @@ export class AuthSchemeResponseDto extends generated.AuthSchemeResponseDto {
 }
 
 export class ClientDto extends generated.ClientDto {
+    public get canRegenerateSecret() {
+        return this.compute('canRegenerateSecret', () => hasAnyLink(this._links, 'secret'));
+    }
+
     public get canRevoke() {
         return this.compute('canRevoke', () => hasAnyLink(this._links, 'delete'));
     }

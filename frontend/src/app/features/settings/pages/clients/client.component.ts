@@ -56,6 +56,10 @@ export class ClientComponent {
         this.clientsState.revoke(this.client);
     }
 
+    public regenerateSecret() {
+        this.clientsState.regenerateSecret(this.client);
+    }
+
     public updateRole(role: string) {
         const request = new UpdateClientDto({ role });
 

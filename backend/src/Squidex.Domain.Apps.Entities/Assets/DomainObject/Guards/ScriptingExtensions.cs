@@ -70,7 +70,7 @@ public static class ScriptingExtensions
             Tags = create.Tags?.ToReadonlyList(),
         };
 
-        await ExecuteScriptAsync(operation, script, vars, asset, ct);
+        await ExecuteScriptAsync(operation, "create", script, vars, asset, ct);
     }
 
     public static Task ExecuteUpdateScriptAsync(this AssetOperation operation, UpdateAsset update,
@@ -100,7 +100,7 @@ public static class ScriptingExtensions
             Operation = "Update",
         };
 
-        return ExecuteScriptAsync(operation, script, vars, null, ct);
+        return ExecuteScriptAsync(operation, "update", script, vars, null, ct);
     }
 
     public static Task ExecuteAnnotateScriptAsync(this AssetOperation operation, AnnotateAsset annotate,
@@ -128,7 +128,7 @@ public static class ScriptingExtensions
             Operation = "Annotate",
         };
 
-        return ExecuteScriptAsync(operation, script, vars, null, ct);
+        return ExecuteScriptAsync(operation, "annotate", script, vars, null, ct);
     }
 
     public static async Task ExecuteMoveScriptAsync(this AssetOperation operation, MoveAsset move,
@@ -154,7 +154,7 @@ public static class ScriptingExtensions
             Operation = "Move",
         };
 
-        await ExecuteScriptAsync(operation, script, vars, null, ct);
+        await ExecuteScriptAsync(operation, "move", script, vars, null, ct);
     }
 
     public static Task ExecuteDeleteScriptAsync(this AssetOperation operation, DeleteAsset delete,
@@ -177,10 +177,10 @@ public static class ScriptingExtensions
             Operation = "Delete",
         };
 
-        return ExecuteScriptAsync(operation, script, vars, null, ct);
+        return ExecuteScriptAsync(operation, "delete", script, vars, null, ct);
     }
 
-    private static async Task ExecuteScriptAsync(AssetOperation operation, string script, AssetScriptVars vars, AssetEntityScriptVars? asset,
+    private static async Task ExecuteScriptAsync(AssetOperation operation, string name, string script, AssetScriptVars vars, AssetEntityScriptVars? asset,
         CancellationToken ct)
     {
         var snapshot = operation.Snapshot;
@@ -210,7 +210,10 @@ public static class ScriptingExtensions
 
         var scriptEngine = operation.Resolve<IScriptEngine>();
 
-        await scriptEngine.ExecuteAsync(vars, script, Options, ct);
+        await ScriptLog.CollectAsync($"assets/{name}", async () =>
+        {
+            await scriptEngine.ExecuteAsync(vars, script, Options, ct);
+        });
     }
 
     private static async Task<Array> GetPathAsync(AssetOperation operation, DomainId parentId,

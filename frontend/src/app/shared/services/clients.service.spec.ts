@@ -100,7 +100,33 @@ describe('ClientsService', () => {
         expect(clients!).toEqual({ payload: createClients(1, 2), version: new VersionTag('2') });
     }));
 
-    it('should make delete request to remove client', inject([ClientsService, HttpTestingController], (clientsService: ClientsService, httpMock: HttpTestingController) => {
+    it('should make put request to regenerate client secret', inject([ClientsService, HttpTestingController], (clientsService: ClientsService, httpMock: HttpTestingController) => {
+        const resource: Resource = {
+            _links: {
+                secret: { method: 'PUT', href: '/api/apps/my-app/clients/client1/secret' },
+            },
+        };
+
+        let clients: Versioned<ClientsDto>;
+        clientsService.putClientSecret('my-app', resource, version).subscribe(result => {
+            clients = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/apps/my-app/clients/client1/secret');
+
+        expect(req.request.method).toEqual('PUT');
+        expect(req.request.headers.get('If-Match')).toEqual(version.value);
+
+        req.flush(clientsResponse(1, 2), {
+            headers: {
+                etag: '2',
+            },
+        });
+
+        expect(clients!).toEqual({ payload: createClients(1, 2), version: new VersionTag('2') });
+    }));
+
+    it('should make delete request to remove client',inject([ClientsService, HttpTestingController], (clientsService: ClientsService, httpMock: HttpTestingController) => {
         const resource: Resource = {
             _links: {
                 delete: { method: 'DELETE', href: '/api/apps/my-app/clients/client1' },

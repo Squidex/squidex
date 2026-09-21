@@ -12,6 +12,7 @@ using Squidex.Areas.Api.Controllers.Ping;
 using Squidex.Areas.Api.Controllers.Plans;
 using Squidex.Areas.Api.Controllers.Rules;
 using Squidex.Areas.Api.Controllers.Schemas;
+using Squidex.Areas.Api.Controllers.ScriptLogs;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
@@ -185,6 +186,12 @@ public sealed class AppDto : Resource
         {
             AddGetLink("jobs",
                 resources.Url<JobsController>(x => nameof(x.GetJobs), values));
+        }
+
+        if (resources.IsAllowed(PermissionIds.AppScriptLogsRead, Name, additional: permissions))
+        {
+            AddGetLink("script-logs",
+                resources.Url<ScriptLogsController>(x => nameof(x.GetScriptLogs), values));
         }
 
         if (resources.IsAllowed(PermissionIds.AppClientsRead, Name, additional: permissions))

@@ -1,0 +1,33 @@
+<sqx-title message="i18n:common.scriptLogs" />
+<sqx-layout innerWidth="55" layout="main" titleIcon="bug" titleText="i18n:common.scriptLogs">
+    <ng-container menu>
+        <button class="btn btn-text-secondary me-2" (click)="reload()" shortcut="CTRL + B" title="i18n:scriptLogs.refreshTooltip" type="button">
+            <i class="icon-reset"></i> {{ "common.refresh" | sqxTranslate }}
+        </button>
+        <div class="form-inline">
+            <input
+                class="form-control"
+                #nameInput
+                (change)="filter(nameInput.value)"
+                [ngModel]="scriptLogsState.name | async"
+                placeholder="{{ 'scriptLogs.filterPlaceholder' | sqxTranslate }}"
+                shortcut="CTRL + I"
+                shortcutAction="focus" />
+        </div>
+    </ng-container>
+    <ng-container>
+        <sqx-list-view innerWidth="55rem" [isLoading]="scriptLogsState.isLoading | async">
+            <sqx-form-alert marginTop="0">{{ "scriptLogs.description" | sqxTranslate }}</sqx-form-alert>
+
+            @if ((scriptLogsState.isLoaded | async) && (scriptLogsState.scriptLogs | async); as scriptLogs) {
+                @if (scriptLogs.length === 0) {
+                    <div class="table-items-row table-items-row-summary table-items-row-empty">{{ "scriptLogs.empty" | sqxTranslate }}</div>
+                }
+
+                @for (scriptLog of scriptLogs; track scriptLog.id) {
+                    <sqx-script-log [scriptLog]="scriptLog" />
+                }
+            }
+        </sqx-list-view>
+    </ng-container>
+</sqx-layout>

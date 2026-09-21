@@ -534,7 +534,8 @@ public sealed partial class ScriptingCompleter(IEnumerable<IScriptDescriptor> de
             }
         }
 
-        [GeneratedRegex("^(?!\\d)[\\w$]+$", RegexOptions.Compiled)]
+        // Functions of objects are described with their parameters, e.g. 'console.log(value)'.
+        [GeneratedRegex("^(?!\\d)[\\w$]+(?:\\(.*\\))?$", RegexOptions.Compiled)]
         private static partial Regex BuildPropertyRegex();
     }
 }

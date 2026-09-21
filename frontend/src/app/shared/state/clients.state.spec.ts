@@ -111,6 +111,17 @@ describe('ClientsState', () => {
             expectNewClients(updated);
         });
 
+        it('should update clients if secret regenerated', () => {
+            const updated = createClients(1, 2, 3);
+
+            clientsService.setup(x => x.putClientSecret(app, oldClients.items[0], version))
+                .returns(() => of(versioned(newVersion, updated))).verifiable();
+
+            clientsState.regenerateSecret(oldClients.items[0]).subscribe();
+
+            expectNewClients(updated);
+        });
+
         it('should update clients if client revoked', () => {
             const updated = createClients(1, 2, 3);
 

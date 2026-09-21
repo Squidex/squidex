@@ -1,0 +1,36 @@
+<div class="table-items-row table-items-row-expandable">
+    <div class="table-items-row-summary">
+        <div class="row align-items-center">
+            <div class="col">
+                <h4 class="truncate">{{ scriptLog.name }}</h4>
+
+                <div class="text-muted">
+                    <span>{{ scriptLog.timestamp | sqxFromNow }}</span>
+                    <span class="ms-2 badge rounded-pill badge-secondary">{{ scriptLog.totalEntries }}</span>
+                </div>
+            </div>
+
+            <div class="col-auto">
+                <button class="btn btn-outline-secondary btn-expand" [class.expanded]="isExpanded" (click)="toggleExpanded()" type="button">
+                    <span class="hidden">{{ "common.logs" | sqxTranslate }}</span> <i class="icon-settings"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    @if (isExpanded) {
+        <div class="table-items-row-details">
+            <div class="console">
+                @for (line of lines; track $index) {
+                    <div class="console-line console-{{ line.level }}">
+                        <span class="console-time">{{ line.time }}</span> <span class="console-level">[{{ line.level }}]</span> <span class="console-message">{{ line.message }}</span>
+                    </div>
+                }
+
+                @if (omitted > 0) {
+                    <div class="console-line console-omitted">{{ "scriptLogs.omitted" | sqxTranslate: { count: omitted } }}</div>
+                }
+            </div>
+        </div>
+    }
+</div>

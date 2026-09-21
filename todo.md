@@ -36,9 +36,9 @@ being postponed and declined. See
 | [3](#3-scope-asset-permissions-to-folders-5921-5676-1229) | Scope asset permissions to folders | Open ×2 + Declined | 3857 | large |
 | [4](#4-dark-mode-and-per-app-theming-5720-816) | Dark mode and per-app theming | Open + Declined | 2102 | large |
 | [5](#5-azure-service-bus-flow-step-4522) | ✅ **Done** — Azure Service Bus flow step | Postponed | 1838 | medium |
-| [6](#6-give-scripts-a-way-to-log-2822) | Give scripts a way to log | Unresolved | 2575 | medium |
+| [6](#6-give-scripts-a-way-to-log-2822) | ✅ **Done** — Give scripts a way to log | Unresolved | 2575 | medium |
 | [7](#7-upsert-mode-for-the-create-content-flow-step-5616) | ✅ **Done** — Upsert mode for "Create content" step | Unresolved | 786 | small |
-| [8](#8-regenerate-a-client-secret-from-the-ui-5807) | Regenerate a client secret from the UI | Open | 1383 | small |
+| [8](#8-regenerate-a-client-secret-from-the-ui-5807) | ✅ **Done** — Regenerate a client secret from the UI | Open | 1383 | small |
 | [9](#9-show-which-fields-are-required-when-publishing-4375) | ✅ **Done** — Mark "required when publishing" fields | Declined | 1707 | tiny |
 | [10](#10-let-users-upload-a-duplicate-asset-anyway-3144) | ✅ **Done** — "Upload anyway" for duplicate assets | Declined | 1356 | tiny |
 
@@ -285,6 +285,10 @@ actions keep a thin `IConvertibleToAction` shim for migration only.
 
 ## 6. Give scripts a way to log (#2822)
 
+> ✅ **Implemented.** Scripts get `console.log/info/warn/error/debug` (`ConsoleJintExtension`). Output is forwarded to `FlowConsole`, so every rule step still logs it, and collected in a named `ScriptLog` scope (max 100 stored entries of 1000 chars, each with its own timestamp, plus the total count). Content and asset scripts persist it via `IScriptLogStore` in the background (latest 100 logs per app, 7 days, configurable under `scripting:logs`), readable with `GET apps/{app}/script-logs` and the `script-logs.read` permission, and shown under *Settings → Script Logs* as a console view. Logs are never added to API errors, because they can contain sensitive data. Everything also goes to `ILogger` at debug level. Covered by unit, repository and API tests (`ScriptLogsTests`).
+>
+> **Correction to the analysis below:** rules already had a `console` (in `EventJintExtension`, writing to `FlowConsole`), it just never reached content or asset scripts. It was replaced by the shared `ConsoleJintExtension`.
+
 **Asked:** `console.log` in scripting, and documentation of what `ctx` holds.
 <https://support.squidex.io/t/console-log-in-scripting-ctx-values/2822>
 · Unresolved · 2575 views · 2021-01
@@ -354,6 +358,8 @@ exactly what it needs to do."*
 ---
 
 ## 8. Regenerate a client secret from the UI (#5807)
+
+> ✅ **Implemented.** New `RegenerateClientSecret` command and `AppClientSecretRegenerated` event keep the client ID and issue a new secret. Exposed as `PUT apps/{app}/clients/{id}/secret` (link `secret`) and as a button next to the secret in the client settings. Covered by domain, guard and frontend tests.
 
 **Asked:** a button to issue a new secret for an existing client.
 <https://support.squidex.io/t/manually-generate-a-new-client-secret-from-within-the-ui/5807>

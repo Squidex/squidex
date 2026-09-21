@@ -30,6 +30,9 @@ public sealed class AppHistoryEventsCreator : HistoryEventsCreatorBase
         AddEventMessage<AppClientRevoked>(
             "history.apps.clientRevoked");
 
+        AddEventMessage<AppClientSecretRegenerated>(
+            "history.apps.clientSecretRegenerated");
+
         AddEventMessage<AppClientUpdated>(
             "history.apps.clientUpdated");
 
@@ -106,6 +109,8 @@ public sealed class AppHistoryEventsCreator : HistoryEventsCreatorBase
             case AppClientUpdated e:
                 return CreateClientsEvent(e, e.Id);
             case AppClientRevoked e:
+                return CreateClientsEvent(e, e.Id);
+            case AppClientSecretRegenerated e:
                 return CreateClientsEvent(e, e.Id);
             case AppLanguageAdded e:
                 return CreateLanguagesEvent(e, e.Language);

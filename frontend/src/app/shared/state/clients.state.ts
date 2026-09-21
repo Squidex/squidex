@@ -98,6 +98,14 @@ export class ClientsState extends State<Snapshot> {
             shareSubscribed(this.dialogs));
     }
 
+    public regenerateSecret(client: ClientDto): Observable<any> {
+        return this.clientsService.putClientSecret(this.appName, client, this.version).pipe(
+            tap(({ version, payload }) => {
+                this.replaceClients(payload, version);
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
     public update(client: ClientDto, request: UpdateClientDto): Observable<any> {
         return this.clientsService.putClient(this.appName, client, request, this.version).pipe(
             tap(({ version, payload }) => {

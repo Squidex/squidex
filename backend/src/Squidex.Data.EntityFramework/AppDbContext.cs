@@ -59,6 +59,7 @@ public abstract class AppDbContext(DbContextOptions options, IJsonSerializer jso
         builder.UseRequest(jsonSerializer, jsonColumnType);
         builder.UseRules(jsonSerializer, jsonColumnType);
         builder.UseSchema(jsonSerializer, jsonColumnType);
+        builder.UseScriptLogs(jsonSerializer, jsonColumnType);
         builder.UseSettings(jsonSerializer, jsonColumnType);
         builder.UseTags(jsonSerializer, jsonColumnType);
         builder.UseTeams(jsonSerializer, jsonColumnType);

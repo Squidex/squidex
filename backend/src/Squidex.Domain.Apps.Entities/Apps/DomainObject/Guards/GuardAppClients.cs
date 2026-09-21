@@ -49,6 +49,21 @@ public static class GuardAppClients
         });
     }
 
+    public static void CanRegenerateSecret(RegenerateClientSecret command, App app)
+    {
+        Guard.NotNull(command);
+
+        GetClientOrThrow(app.Clients, command.Id);
+
+        Validate.It(e =>
+        {
+            if (string.IsNullOrWhiteSpace(command.Id))
+            {
+                e(Not.Defined("ClientId"), nameof(command.Id));
+            }
+        });
+    }
+
     public static void CanUpdate(UpdateClient command, App app)
     {
         Guard.NotNull(command);

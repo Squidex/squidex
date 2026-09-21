@@ -132,6 +132,12 @@
   <data name="ScriptingComplete" xml:space="preserve">
     <value>Completes the script when an async method is used.</value>
   </data>
+  <data name="ScriptingConsole" xml:space="preserve">
+    <value>Writes values to the script log.</value>
+  </data>
+  <data name="ScriptingConsoleLog" xml:space="preserve">
+    <value>Writes the values to the script log. The log is shown in the script logs and in the rule execution log.</value>
+  </data>
   <data name="ScriptingContentAction" xml:space="preserve">
     <value>The status of the content.</value>
   </data>

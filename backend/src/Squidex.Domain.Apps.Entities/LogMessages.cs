@@ -89,4 +89,13 @@ internal static partial class LogMessages
 
     [LoggerMessage(Level = LogLevel.Error, Message = "Failed to execute search from source {source} with query '{query}'.")]
     public static partial void LogFailedToExecuteSearch(ILogger logger, string source, string query, Exception exception);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "Failed to write script logs in background.")]
+    public static partial void LogFailedToWriteScriptLogs(ILogger logger, Exception exception);
+
+    [LoggerMessage(Level = LogLevel.Error, Message = "Failed to clean up script logs.")]
+    public static partial void LogFailedToCleanupScriptLogs(ILogger logger, Exception exception);
+
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Dropped {count} script logs, because the pending queue is full.")]
+    public static partial void LogScriptLogsDropped(ILogger logger, int count);
 }

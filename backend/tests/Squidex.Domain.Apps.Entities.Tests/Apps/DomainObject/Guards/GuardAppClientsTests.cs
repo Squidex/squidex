@@ -83,6 +83,36 @@ public class GuardAppClientsTests : GivenContext, IClassFixture<TranslationsFixt
     }
 
     [Fact]
+    public void CanRegenerateSecret_should_throw_execption_if_client_id_is_null()
+    {
+        var command = new RegenerateClientSecret();
+
+        ValidationAssert.Throws(() => GuardAppClients.CanRegenerateSecret(command, App),
+            new ValidationError("Client ID is required.", "Id"));
+    }
+
+    [Fact]
+    public void CanRegenerateSecret_should_throw_exception_if_client_is_not_found()
+    {
+        var command = new RegenerateClientSecret { Id = "ios" };
+
+        Assert.Throws<DomainObjectNotFoundException>(() => GuardAppClients.CanRegenerateSecret(command, App));
+    }
+
+    [Fact]
+    public void CanRegenerateSecret_should_not_throw_exception_if_client_is_found()
+    {
+        var command = new RegenerateClientSecret { Id = "ios" };
+
+        App = App with
+        {
+            Clients = AppClients.Empty.Add("ios", "secret"),
+        };
+
+        GuardAppClients.CanRegenerateSecret(command, App);
+    }
+
+    [Fact]
     public void CanUpdate_should_throw_execption_if_client_id_is_null()
     {
         var command = new UpdateClient { Name = "iOS" };

@@ -54,6 +54,18 @@
                         type="button">
                         <i class="icon-copy"></i>
                     </button>
+                    @if (client.canRegenerateSecret) {
+                        <button
+                            class="btn btn-outline-secondary"
+                            attr.aria-label="{{ 'clients.regenerateSecret' | sqxTranslate }}"
+                            confirmText="i18n:clients.regenerateSecretConfirmText"
+                            confirmTitle="i18n:clients.regenerateSecretConfirmTitle"
+                            (sqxConfirmClick)="regenerateSecret()"
+                            title="i18n:clients.regenerateSecret"
+                            type="button">
+                            <i class="icon-reset"></i>
+                        </button>
+                    }
                 </div>
             </sqx-form-row>
 
