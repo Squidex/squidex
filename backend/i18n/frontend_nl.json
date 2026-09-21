@@ -87,6 +87,8 @@
   "assets.deleteReferrerConfirmTitle": "Verwijder bestand",
   "assets.downloadVersion": "Download deze versie",
   "assets.dropToUpdate": "Zet neer om te updaten",
+  "assets.duplicateConfirmText": "This file has already been uploaded. Do you want to upload it anyway as a new asset?",
+  "assets.duplicateConfirmTitle": "Duplicate asset",
   "assets.duplicateFile": "Asset is al geüpload.",
   "assets.edit": "Asset aanpassen",
   "assets.editor.flipHorizontally": "Horizontaal spiegelen",

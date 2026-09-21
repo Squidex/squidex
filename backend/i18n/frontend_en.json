@@ -87,6 +87,8 @@
   "assets.deleteReferrerConfirmTitle": "Delete asset",
   "assets.downloadVersion": "Download this Version",
   "assets.dropToUpdate": "Drop to update",
+  "assets.duplicateConfirmText": "This file has already been uploaded. Do you want to upload it anyway as a new asset?",
+  "assets.duplicateConfirmTitle": "Duplicate asset",
   "assets.duplicateFile": "Asset has already been uploaded.",
   "assets.edit": "Edit Asset",
   "assets.editor.flipHorizontally": "Flip Horizontally",

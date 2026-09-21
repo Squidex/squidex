@@ -87,6 +87,8 @@
   "assets.deleteReferrerConfirmTitle": "Excluir o ficheiro",
   "assets.downloadVersion": "Descarregue esta versão",
   "assets.dropToUpdate": "Deixar para atualizar",
+  "assets.duplicateConfirmText": "This file has already been uploaded. Do you want to upload it anyway as a new asset?",
+  "assets.duplicateConfirmTitle": "Duplicate asset",
   "assets.duplicateFile": "O ficheiro já foi carregado.",
   "assets.edit": "Edição de ficheiros",
   "assets.editor.flipHorizontally": "Virar horizontalmente",

@@ -87,6 +87,8 @@
   "assets.deleteReferrerConfirmTitle": "Supprimer l'actif",
   "assets.downloadVersion": "Télécharger cette version",
   "assets.dropToUpdate": "Déposez pour mettre à jour",
+  "assets.duplicateConfirmText": "This file has already been uploaded. Do you want to upload it anyway as a new asset?",
+  "assets.duplicateConfirmTitle": "Duplicate asset",
   "assets.duplicateFile": "L'actif a déjà été téléchargé.",
   "assets.edit": "Modifier l'actif",
   "assets.editor.flipHorizontally": "Retourner horizontalement",
