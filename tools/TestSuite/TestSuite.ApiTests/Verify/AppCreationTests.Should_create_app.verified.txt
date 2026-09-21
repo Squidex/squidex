@@ -52,6 +52,9 @@
     schemas/create: {
       Method: POST
     },
+    script-logs: {
+      Method: GET
+    },
     settings: {
       Method: GET
     },

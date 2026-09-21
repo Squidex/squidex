@@ -9,6 +9,9 @@
         delete: {
           Method: DELETE
         },
+        secret: {
+          Method: PUT
+        },
         update: {
           Method: PUT
         }
