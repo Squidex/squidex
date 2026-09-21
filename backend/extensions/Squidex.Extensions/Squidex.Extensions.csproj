@@ -11,6 +11,7 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="Algolia.Search" Version="6.17.0" />
+    <PackageReference Include="Azure.Messaging.ServiceBus" Version="7.20.1" />
     <PackageReference Include="Azure.Monitor.OpenTelemetry.Exporter" Version="1.7.0" />
     <PackageReference Include="Azure.Search.Documents" Version="11.7.0" />
     <PackageReference Include="CoreTweet" Version="1.0.0.483" />

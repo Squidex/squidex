@@ -35,9 +35,9 @@ being postponed and declined. See
 | [2](#2-export-and-import-content-from-the-ui-as-jobs-3461-1366-3438) | Export/import content from the UI as jobs | Declined ×2 | 5381 | large |
 | [3](#3-scope-asset-permissions-to-folders-5921-5676-1229) | Scope asset permissions to folders | Open ×2 + Declined | 3857 | large |
 | [4](#4-dark-mode-and-per-app-theming-5720-816) | Dark mode and per-app theming | Open + Declined | 2102 | large |
-| [5](#5-azure-service-bus-flow-step-4522) | Azure Service Bus flow step | Postponed | 1838 | medium |
+| [5](#5-azure-service-bus-flow-step-4522) | ✅ **Done** — Azure Service Bus flow step | Postponed | 1838 | medium |
 | [6](#6-give-scripts-a-way-to-log-2822) | Give scripts a way to log | Unresolved | 2575 | medium |
-| [7](#7-upsert-mode-for-the-create-content-flow-step-5616) | Upsert mode for "Create content" step | Unresolved | 786 | small |
+| [7](#7-upsert-mode-for-the-create-content-flow-step-5616) | ✅ **Done** — Upsert mode for "Create content" step | Unresolved | 786 | small |
 | [8](#8-regenerate-a-client-secret-from-the-ui-5807) | Regenerate a client secret from the UI | Open | 1383 | small |
 | [9](#9-show-which-fields-are-required-when-publishing-4375) | ✅ **Done** — Mark "required when publishing" fields | Declined | 1707 | tiny |
 | [10](#10-let-users-upload-a-duplicate-asset-anyway-3144) | ✅ **Done** — "Upload anyway" for duplicate assets | Declined | 1356 | tiny |
@@ -246,6 +246,8 @@ it look expensive in 2019.
 
 ## 5. Azure Service Bus flow step (#4522)
 
+> ✅ **Implemented.** New `AzureServiceBusFlowStep` (`Actions/AzureServiceBus/`) sends to a queue or topic, with connection string, payload, subject, session ID and message ID configurable per step.
+
 **Asked:** contribute a Service Bus action upstream.
 <https://support.squidex.io/t/inactive-azure-service-bus-action-type/4522>
 · Postponed (`INACTIVE`) · 1838 views · 4 likes · **3 votes** (joint highest of
@@ -323,6 +325,8 @@ has a notion of user-visible log lines to imitate.
 ---
 
 ## 7. Upsert mode for the "Create content" flow step (#5616)
+
+> ✅ **Implemented.** `CreateContentFlowStep` has an optional `ID` (expression) and a `Patch` flag. With an ID it issues `UpsertContent` (create if missing, update or patch otherwise); without one it creates as before.
 
 **Asked:** a rule that creates content when it does not exist and updates it
 when it does.
