@@ -736,6 +736,9 @@
   <data name="history.apps.clientRevoked" xml:space="preserve">
     <value>cliente {[Id]} revogado </value>
   </data>
+  <data name="history.apps.clientSecretRegenerated" xml:space="preserve">
+    <value>regenerated secret of client {[Id]}</value>
+  </data>
   <data name="history.apps.clientUpdated" xml:space="preserve">
     <value>cliente {[Id]} actualizado</value>
   </data>

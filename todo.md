@@ -38,7 +38,7 @@ being postponed and declined. See
 | [5](#5-azure-service-bus-flow-step-4522) | ✅ **Done** — Azure Service Bus flow step | Postponed | 1838 | medium |
 | [6](#6-give-scripts-a-way-to-log-2822) | Give scripts a way to log | Unresolved | 2575 | medium |
 | [7](#7-upsert-mode-for-the-create-content-flow-step-5616) | ✅ **Done** — Upsert mode for "Create content" step | Unresolved | 786 | small |
-| [8](#8-regenerate-a-client-secret-from-the-ui-5807) | Regenerate a client secret from the UI | Open | 1383 | small |
+| [8](#8-regenerate-a-client-secret-from-the-ui-5807) | ✅ **Done** — Regenerate a client secret from the UI | Open | 1383 | small |
 | [9](#9-show-which-fields-are-required-when-publishing-4375) | ✅ **Done** — Mark "required when publishing" fields | Declined | 1707 | tiny |
 | [10](#10-let-users-upload-a-duplicate-asset-anyway-3144) | ✅ **Done** — "Upload anyway" for duplicate assets | Declined | 1356 | tiny |
 
@@ -285,6 +285,7 @@ actions keep a thin `IConvertibleToAction` shim for migration only.
 
 ## 6. Give scripts a way to log (#2822)
 
+
 **Asked:** `console.log` in scripting, and documentation of what `ctx` holds.
 <https://support.squidex.io/t/console-log-in-scripting-ctx-values/2822>
 · Unresolved · 2575 views · 2021-01
@@ -354,6 +355,8 @@ exactly what it needs to do."*
 ---
 
 ## 8. Regenerate a client secret from the UI (#5807)
+
+> ✅ **Implemented.** New `RegenerateClientSecret` command and `AppClientSecretRegenerated` event keep the client ID and issue a new secret. Exposed as `PUT apps/{app}/clients/{id}/secret` (link `secret`) and as a button next to the secret in the client settings.
 
 **Asked:** a button to issue a new secret for an existing client.
 <https://support.squidex.io/t/manually-generate-a-new-client-secret-from-within-the-ui/5807>

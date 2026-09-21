@@ -88,6 +88,22 @@ public class AppClientsTests
     }
 
     [Fact]
+    public void Should_regenerate_secret()
+    {
+        var clients_1 = clients_0.RegenerateSecret("1", "new-secret");
+
+        Assert.Equal(new AppClient("1", "new-secret"), clients_1["1"]);
+    }
+
+    [Fact]
+    public void Should_return_same_clients_if_client_to_regenerate_secret_not_found()
+    {
+        var clients_1 = clients_0.RegenerateSecret("2", "new-secret");
+
+        Assert.Same(clients_0, clients_1);
+    }
+
+    [Fact]
     public void Should_revoke_client()
     {
         var clients_1 = clients_0.Add("2", "secret2");

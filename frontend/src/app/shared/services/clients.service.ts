@@ -62,6 +62,18 @@ export class ClientsService {
             pretifyError('i18n:clients.revokeFailed'));
     }
 
+    public putClientSecret(appName: string, resource: Resource, version: VersionOrTag): Observable<Versioned<ClientsDto>> {
+        const link = resource._links['secret'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return HTTP.requestVersioned(this.http, link.method, url, version, {}).pipe(
+            mapVersioned(({ body }) => {
+                return ClientsDto.fromJSON(body);
+            }),
+            pretifyError('i18n:clients.regenerateSecretFailed'));
+    }
+
     public deleteClient(appName: string, resource: Resource, version: VersionOrTag): Observable<Versioned<ClientsDto>> {
         const link = resource._links['delete'];
 

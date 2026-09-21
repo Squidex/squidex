@@ -736,6 +736,9 @@
   <data name="history.apps.clientRevoked" xml:space="preserve">
     <value>已撤销客户端 {[Id]}</value>
   </data>
+  <data name="history.apps.clientSecretRegenerated" xml:space="preserve">
+    <value>regenerated secret of client {[Id]}</value>
+  </data>
   <data name="history.apps.clientUpdated" xml:space="preserve">
     <value>更新的客户端 {[Id]}</value>
   </data>

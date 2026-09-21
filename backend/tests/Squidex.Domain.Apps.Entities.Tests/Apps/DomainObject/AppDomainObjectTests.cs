@@ -375,6 +375,21 @@ public class AppDomainObjectTests : HandlerTestBase<App>
     }
 
     [Fact]
+    public async Task RegenerateClientSecret_should_create_events_and_update_secret()
+    {
+        var command = new RegenerateClientSecret { Id = clientId };
+
+        await ExecuteCreateAsync();
+        await ExecuteAttachClientAsync();
+
+        var actual = await PublishAsync(sut, command);
+
+        await VerifySutAsync(actual);
+
+        Assert.Equal(command.Secret, sut.Snapshot.Clients[clientId].Secret);
+    }
+
+    [Fact]
     public async Task RevokeClient_should_create_events_and_remove_client()
     {
         var command = new RevokeClient { Id = clientId };

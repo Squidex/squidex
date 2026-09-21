@@ -14489,6 +14489,10 @@ export class ClientDto extends ResourceDto implements IClientDto {
     /** True to allow anonymous access without an access token for this client. */
     readonly allowAnonymous!: boolean;
 
+    public get canRegenerateSecret() {
+        return this.compute('canRegenerateSecret', () => hasAnyLink(this._links, 'secret'));
+    }
+
     public get canRevoke() {
         return this.compute('canRevoke', () => hasAnyLink(this._links, 'delete'));
     }

@@ -217,6 +217,7 @@
   "history.apps.assetScriptsConfigured": "updated asset scripts",
   "history.apps.clientAdded": "added client {[Id]} to app",
   "history.apps.clientRevoked": "revoked client {[Id]}",
+  "history.apps.clientSecretRegenerated": "regenerated secret of client {[Id]}",
   "history.apps.clientUpdated": "updated client {[Id]}",
   "history.apps.common.updated": "updated general settings",
   "history.apps.contributoreAssigned": "assigned {user:[Contributor]} as {[Role]}",

@@ -75,6 +75,10 @@ public partial class AppDomainObject
                 newSnapshot = snapshot.UpdateClients(e, (e, c) => c.Update(e.Id, e.Name, e.Role, e.ApiCallsLimit, e.ApiTrafficLimit, e.AllowAnonymous));
                 break;
 
+            case AppClientSecretRegenerated e:
+                newSnapshot = snapshot.UpdateClients(e, (e, c) => c.RegenerateSecret(e.Id, e.Secret));
+                break;
+
             case AppClientRevoked e:
                 newSnapshot = snapshot.UpdateClients(e, (e, c) => c.Revoke(e.Id));
                 break;

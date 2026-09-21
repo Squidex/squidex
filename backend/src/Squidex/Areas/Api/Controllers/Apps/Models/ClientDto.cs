@@ -61,6 +61,9 @@ public sealed class ClientDto : Resource
         {
             AddPutLink("update",
                 resources.Url<AppClientsController>(x => nameof(x.PutClient), values));
+
+            AddPutLink("secret",
+                resources.Url<AppClientsController>(x => nameof(x.PutClientSecret), values));
         }
 
         if (resources.CanDeleteClient)

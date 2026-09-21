@@ -212,6 +212,10 @@ export class AuthSchemeResponseDto extends generated.AuthSchemeResponseDto {
 }
 
 export class ClientDto extends generated.ClientDto {
+    public get canRegenerateSecret() {
+        return this.compute('canRegenerateSecret', () => hasAnyLink(this._links, 'secret'));
+    }
+
     public get canRevoke() {
         return this.compute('canRevoke', () => hasAnyLink(this._links, 'delete'));
     }
