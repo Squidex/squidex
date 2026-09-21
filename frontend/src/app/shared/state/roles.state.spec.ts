@@ -38,7 +38,6 @@ describe('RolesState', () => {
             expect(rolesState.snapshot.isLoading).toBeFalsy();
             expect(rolesState.snapshot.roles).toEqual(oldRoles.items);
             expect(rolesState.snapshot.version).toEqual(version);
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 

@@ -47,7 +47,6 @@ describe('RuleSimulatorState', () => {
         expect(ruleSimulatorState.snapshot.isLoaded).toBeTruthy();
         expect(ruleSimulatorState.snapshot.isLoading).toBeFalsy();
         expect(ruleSimulatorState.snapshot.total).toEqual(200);
-
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
     });
 
@@ -62,7 +61,6 @@ describe('RuleSimulatorState', () => {
         expect(ruleSimulatorState.snapshot.isLoaded).toBeTruthy();
         expect(ruleSimulatorState.snapshot.isLoading).toBeFalsy();
         expect(ruleSimulatorState.snapshot.total).toEqual(200);
-
         dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
     });
 

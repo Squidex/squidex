@@ -47,7 +47,6 @@ describe('ContentMustExistGuard', () => {
         const result = await firstValueFrom(contentMustExistGuard(route));
 
         expect(result).toBeTruthy();
-
         router.verify(x => x.navigate(It.isAny()), Times.never());
     });
 
@@ -64,7 +63,6 @@ describe('ContentMustExistGuard', () => {
         const result = await firstValueFrom(contentMustExistGuard(route));
 
         expect(result).toBeFalsy();
-
         router.verify(x => x.navigate(['/404']), Times.once());
     });
 
@@ -81,7 +79,6 @@ describe('ContentMustExistGuard', () => {
         const result = await firstValueFrom(contentMustExistGuard(route));
 
         expect(result!).toBeTruthy();
-
         contentsState.verify(x => x.select(null), Times.once());
     });
 
@@ -98,7 +95,6 @@ describe('ContentMustExistGuard', () => {
         const result = await firstValueFrom(contentMustExistGuard(route));
 
         expect(result!).toBeTruthy();
-
         contentsState.verify(x => x.select(null), Times.once());
     });
 });

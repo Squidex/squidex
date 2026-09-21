@@ -52,7 +52,6 @@ describe('TeamContributorsState', () => {
             expect(contributorsState.snapshot.total).toEqual(20);
             expect(contributorsState.snapshot.maxContributors).toBe(oldContributors.maxContributors);
             expect(contributorsState.snapshot.version).toEqual(version);
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 

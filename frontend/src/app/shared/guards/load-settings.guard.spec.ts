@@ -27,7 +27,6 @@ describe('LoadAppsGuard', () => {
         const result = await firstValueFrom(loadSettingsGuard());
 
         expect(result).toBeTruthy();
-
         uiState.verify(x => x.load(), Times.once());
     });
 });

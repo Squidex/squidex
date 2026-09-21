@@ -27,7 +27,6 @@ describe('UnsetAppGuard', () => {
         const result = await firstValueFrom(unsetAppGuard());
 
         expect(result).toBeTruthy();
-
         appsState.verify(x => x.select(null), Times.once());
     });
 });

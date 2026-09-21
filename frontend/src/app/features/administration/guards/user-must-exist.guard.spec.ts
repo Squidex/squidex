@@ -47,7 +47,6 @@ describe('UserMustExistGuard', () => {
         const result = await firstValueFrom(userMustExistGuard(route));
 
         expect(result).toBeTruthy();
-
         usersState.verify(x => x.select('123'), Times.once());
     });
 
@@ -64,7 +63,6 @@ describe('UserMustExistGuard', () => {
         const result = await firstValueFrom(userMustExistGuard(route));
 
         expect(result).toBeFalsy();
-
         router.verify(x => x.navigate(['/404']), Times.once());
     });
 
@@ -81,7 +79,6 @@ describe('UserMustExistGuard', () => {
         const result = await firstValueFrom(userMustExistGuard(route));
 
         expect(result).toBeTruthy();
-
         usersState.verify(x => x.select(null), Times.once());
     });
 
@@ -98,7 +95,6 @@ describe('UserMustExistGuard', () => {
         const result = await firstValueFrom(userMustExistGuard(route));
 
         expect(result).toBeTruthy();
-
         usersState.verify(x => x.select(null), Times.once());
     });
 });

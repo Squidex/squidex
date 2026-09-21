@@ -27,7 +27,6 @@ describe('LoadLanguagesGuard', () => {
         const result = await firstValueFrom(loadLanguagesGuard());
 
         expect(result).toBeTruthy();
-
         languagesState.verify(x => x.load(), Times.once());
     });
 });

@@ -57,7 +57,6 @@ describe('AssetsState', () => {
             expect(assetsState.snapshot.isLoaded).toBeTruthy();
             expect(assetsState.snapshot.isLoading).toBeFalsy();
             expect(assetsState.snapshot.total).toEqual(200);
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 

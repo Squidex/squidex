@@ -33,7 +33,6 @@ describe('UsersProviderService', () => {
         }).unsubscribe();
 
         expect(resultingUser!).toBe(user);
-
         usersService.verifyAll();
     });
 
@@ -52,7 +51,6 @@ describe('UsersProviderService', () => {
         }).unsubscribe();
 
         expect(resultingUser!).toBe(user);
-
         usersService.verifyAll();
     });
 
@@ -72,7 +70,6 @@ describe('UsersProviderService', () => {
         }).unsubscribe();
 
         expect(resultingUser!).toEqual(new UserDto({ id: '123', displayName: 'Me' } as any));
-
         usersService.verifyAll();
     });
 
@@ -90,7 +87,6 @@ describe('UsersProviderService', () => {
         }).unsubscribe();
 
         expect(resultingUser!).toEqual(new UserDto({ id: 'Unknown', displayName: 'Unknown' } as any));
-
         usersService.verifyAll();
     });
 });

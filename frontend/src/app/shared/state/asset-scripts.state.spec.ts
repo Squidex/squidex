@@ -45,7 +45,6 @@ describe('AssetScriptsState', () => {
             expect(assetScriptsState.snapshot.isLoaded).toBeTruthy();
             expect(assetScriptsState.snapshot.isLoading).toBeFalsy();
             expect(assetScriptsState.snapshot.version).toEqual(version);
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 

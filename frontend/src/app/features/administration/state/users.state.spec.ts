@@ -44,7 +44,6 @@ describe('UsersState', () => {
             expect(usersState.snapshot.isLoaded).toBeTruthy();
             expect(usersState.snapshot.isLoading).toBeFalsy();
             expect(usersState.snapshot.total).toEqual(200);
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 

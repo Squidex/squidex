@@ -56,7 +56,6 @@ describe('SchemaMustExistGuard', () => {
         const result = await firstValueFrom(schemaMustExistGuard(route));
 
         expect(result).toBeFalsy();
-
         router.verify(x => x.navigate(['/404']), Times.once());
     });
 });

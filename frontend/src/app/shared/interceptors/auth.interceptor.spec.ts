@@ -144,7 +144,6 @@ describe('AuthInterceptor', () => {
         expect(invokedRequest.length).toEqual(2);
         expect(req1.headers.get('Authorization')).toEqual('token1');
         expect(req2.headers.get('Authorization')).toEqual('token2');
-
         authService.verify(x => x.logoutRedirect('/my-path'), Times.once());
     });
 

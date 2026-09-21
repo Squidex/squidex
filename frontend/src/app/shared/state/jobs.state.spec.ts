@@ -42,7 +42,6 @@ describe('JobsState', () => {
             expect(jobsState.snapshot.jobs).toEqual([job1, job2]);
             expect(jobsState.snapshot.isLoaded).toBeTruthy();
             expect(jobsState.snapshot.isLoading).toBeFalsy();
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.never());
         });
 
@@ -98,7 +97,6 @@ describe('JobsState', () => {
             jobsState.startBackup().subscribe();
 
             expect(jobsState.snapshot.jobs.length).toBe(2);
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
 
@@ -109,7 +107,6 @@ describe('JobsState', () => {
             jobsState.delete(job1).subscribe();
 
             expect(jobsState.snapshot.jobs.length).toBe(2);
-
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
     });

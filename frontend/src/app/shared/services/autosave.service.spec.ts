@@ -70,7 +70,6 @@ describe('AutoSaveService', () => {
         const content = autoSaveService.fetch(key);
 
         expect(content).toEqual({ text: 'Hello' });
-
         localStore.verify(x => x.remove(It.isAnyString()), Times.once());
     });
 
@@ -83,7 +82,6 @@ describe('AutoSaveService', () => {
         const content = autoSaveService.fetch(key);
 
         expect(content).toEqual({ text: 'Hello' });
-
         localStore.verify(x => x.remove(It.isAnyString()), Times.once());
     });
 
@@ -93,7 +91,6 @@ describe('AutoSaveService', () => {
         const content = autoSaveService.fetch(null!);
 
         expect(content).toBeNull();
-
         localStore.verify(x => x.get(It.isAnyString()), Times.never());
     });
 });

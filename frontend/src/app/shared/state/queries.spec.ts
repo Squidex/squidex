@@ -105,7 +105,6 @@ describe('Queries', () => {
         queries.addUser('key3', { fullText: 'text3' });
 
         expect(true).toBeTruthy();
-
         uiState.verify(x => x.setAppUser('schemas.my-schema.queries.key3', '{"fullText":"text3"}'), Times.once());
     });
 
@@ -113,7 +112,6 @@ describe('Queries', () => {
         queries.addShared('key3', { fullText: 'text3' });
 
         expect(true).toBeTruthy();
-
         uiState.verify(x => x.setAppShared('schemas.my-schema.queries.key3', '{"fullText":"text3"}'), Times.once());
     });
 
@@ -121,7 +119,6 @@ describe('Queries', () => {
         queries.removeShared({ name: 'key3' });
 
         expect(true).toBeTruthy();
-
         uiState.verify(x => x.removeAppShared('schemas.my-schema.queries.key3'), Times.once());
     });
 
@@ -129,7 +126,6 @@ describe('Queries', () => {
         queries.removeUser({ name: 'key3' });
 
         expect(true).toBeTruthy();
-
         uiState.verify(x => x.removeAppUser('schemas.my-schema.queries.key3'), Times.once());
     });
 });
