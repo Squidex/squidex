@@ -90,6 +90,39 @@ export default defineConfig({
         },
 
         {
+            name: 'visual-setup',
+            testMatch: 'tests/visual/_setup.ts',
+            dependencies: ['login'],
+            use: {
+                storageState: STORAGE_STATE,
+            },
+        },
+
+        {
+            name: 'visual light',
+            testMatch: 'tests/visual/*.spec.ts',
+            dependencies: ['visual-setup'],
+            use: {
+                ...devices['Desktop Chrome'],
+                colorScheme: 'light',
+                ignoreHTTPSErrors: true,
+                storageState: STORAGE_STATE,
+            },
+        },
+
+        {
+            name: 'visual dark',
+            testMatch: 'tests/visual/*.spec.ts',
+            dependencies: ['visual-setup'],
+            use: {
+                ...devices['Desktop Chrome'],
+                colorScheme: 'dark',
+                ignoreHTTPSErrors: true,
+                storageState: STORAGE_STATE,
+            },
+        },
+
+        {
             name: 'logged out',
             testMatch: 'tests/*.spec.ts',
             use: {

@@ -2,7 +2,7 @@
 @import "mixins";
 @import "vars";
 
-$background-color: color.adjust($color-border, $lightness: 2%);
+$background-color: $color-border-muted-2;
 
 :host ::ng-deep {
     .panel2-main-inner.white {
@@ -23,17 +23,17 @@ $background-color: color.adjust($color-border, $lightness: 2%);
 
 .btn-enabled {
     @include absolute(1.5rem, 1.75rem, null, null);
-    background-color: $color-white;
+    background-color: $color-surface;
 
     &:hover {
-        background-color: $color-white;
+        background-color: $color-surface;
     }
 }
 
 .btn-circle {
     @include force-height(4rem);
     @include force-width(4rem);
-    background-color: $color-white;
+    background-color: $color-surface;
     border-radius: 100%;
     border-color: $color-border;
     padding: 1rem;
@@ -84,7 +84,7 @@ $background-color: color.adjust($color-border, $lightness: 2%);
 
 label {
     @include truncate;
-    background-color: $color-white;
+    background-color: $color-surface;
     display: inline-block;
     max-width: 7rem;
     padding: 0.125rem 0.25rem;

@@ -91,7 +91,7 @@ a, button {
 }
 
 .alert-hint {
-    background: color.adjust($color-theme-brand, $lightness: 35%);
+    background: $color-hint-background;
     border: 0;
     border-radius: $border-radius;
     color: $color-text;
@@ -101,7 +101,7 @@ a, button {
     position: relative;
 
     &.light {
-        background: $color-white;
+        background: $color-surface;
         border: 1px solid $color-border;
         border-radius: $border-radius;
     }
@@ -154,7 +154,7 @@ a {
 }
 
 .navbar {
-    @include box-shadow-outer(0, 2px, 4px, .2);
+    @include box-shadow-outer(0, 2px, 4px, $color-shadow-20);
 }
 
 .navbar-nav {
@@ -229,7 +229,7 @@ a {
 
             &:disabled,
             &.disabled {
-                color: color.adjust($color-theme-error, $lightness: 20%);
+                color: $color-theme-error-muted-20;
             }
         }
     }
@@ -248,7 +248,7 @@ a {
 
         .breadcrumb-item {
             & {
-                background: url('data:image/svg+xml;charset=UTF-8,%3csvg xmlns="http://www.w3.org/2000/svg" width="7" height="20"%3e%3cpath d="M0 0l7 10-7 10" fill="none" stroke="%23e4e7e9" stroke-width=".5"/%3e%3c/svg%3e');
+                background: escape-svg(url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='7' height='20'><path d='M0 0l7 10-7 10' fill='none' stroke='#{$color-breadcrumb-arrow}' stroke-width='.5'/></svg>"));
                 background-position-x: right;
                 background-repeat: no-repeat;
                 background-size: contain;
@@ -294,7 +294,7 @@ a {
         }
 
         &::before {
-            color: color.adjust($color-border, $lightness: -10%);
+            color: $color-border-contrast-10;
         }
 
         &.done {
@@ -454,7 +454,7 @@ a {
     &-group {
         .btn-toggle {
             & {
-                background: $color-white;
+                background: $color-surface;
                 border: 1px solid $color-theme-secondary;
             }
 
@@ -487,31 +487,31 @@ a {
     // Link buttons only exists with blue text color in bootstrap. Provide them for all colors.
     &-text {
         &-primary {
-            @include build-text-button($color-theme-brand);
+            @include build-text-button($color-theme-brand, $color-theme-brand-contrast-25, $color-theme-brand-focus);
         }
 
         &-secondary {
-            @include build-text-button($color-text-decent);
+            @include build-text-button($color-text-decent, $color-text-decent-contrast-25, $color-text-decent-focus);
         }
 
         &-danger {
-            @include build-text-button($color-theme-error);
+            @include build-text-button($color-theme-error, $color-theme-error-contrast-25, $color-theme-error-focus);
         }
 
         &-success {
-            @include build-text-button($color-theme-success);
+            @include build-text-button($color-theme-success, $color-theme-success-contrast-25, $color-theme-success-focus);
         }
 
         &-info {
-            @include build-text-button($color-theme-info);
+            @include build-text-button($color-theme-info, $color-theme-info-contrast-25, $color-theme-info-focus);
         }
 
         &-warning {
-            @include build-text-button($color-theme-warning);
+            @include build-text-button($color-theme-warning, $color-theme-warning-contrast-25, $color-theme-warning-focus);
         }
 
         &-secondary2 {
-            @include build-text-button($color-text);
+            @include build-text-button($color-text, $color-text-contrast-25, $color-text-focus);
         }
     }
 
@@ -522,8 +522,8 @@ a {
     &-dashed {
         @include truncate-nowidth;
         border-style: dashed;
-        border-color: color.adjust($color-theme-secondary, $lightness: -10%);
-        color: color.adjust($color-text-decent, $lightness: 20%);
+        border-color: $color-theme-secondary-contrast-10;
+        color: $color-text-decent-muted-20;
     }
 
     &-decent {
@@ -555,7 +555,7 @@ a {
 .btn-circle {
     @include force-height(4rem);
     @include force-width(4rem);
-    background-color: $color-white;
+    background-color: $color-surface;
     border-radius: 100%;
     border-color: $color-border;
     margin-left: 2rem;
@@ -566,7 +566,7 @@ a {
 .btn-circle-sm {
     @include force-height(1.5rem);
     @include force-width(1.5rem);
-    background-color: $color-white;
+    background-color: $color-surface;
     border-radius: 100%;
     border-color: $color-border;
     font-size: 60%;
@@ -655,7 +655,7 @@ $icon-size: 4.5rem;
     }
 
     &-content {
-        @include box-shadow-outer(0, 8px, 16px, .3);
+        @include box-shadow-outer(0, 8px, 16px, $color-shadow-30);
         border: 0;
         border-radius: $border-radius;
         max-height: 100%;
@@ -681,7 +681,7 @@ $icon-size: 4.5rem;
     }
 
     &-tabs {
-        background-color: $color-white;
+        background-color: $color-surface;
         border: 0;
         border-bottom: 1px solid $color-border;
         padding-bottom: 0;
@@ -764,5 +764,35 @@ $icon-size: 4.5rem;
         border-radius: $border-radius;
         color: $input-disabled-color;
         opacity: 1;
+    }
+}
+
+//
+// Dark mode for components that use compile time colors in bootstrap.
+//
+[data-bs-theme='dark'] {
+    .btn-secondary {
+        --bs-btn-bg: #{$color-theme-secondary};
+        --bs-btn-border-color: #{$color-theme-secondary};
+        --bs-btn-color: #{$color-text};
+        --bs-btn-hover-bg: #{$color-theme-secondary-contrast-5};
+        --bs-btn-hover-border-color: #{$color-theme-secondary-contrast-5};
+        --bs-btn-hover-color: #{$color-title};
+        --bs-btn-active-bg: #{$color-theme-secondary-contrast-10};
+        --bs-btn-active-border-color: #{$color-theme-secondary-contrast-10};
+        --bs-btn-active-color: #{$color-title};
+        --bs-btn-disabled-bg: #{$color-theme-secondary};
+        --bs-btn-disabled-border-color: #{$color-theme-secondary};
+    }
+
+    .btn-outline-secondary {
+        --bs-btn-border-color: #{$color-input};
+        --bs-btn-hover-bg: #{$color-theme-secondary};
+        --bs-btn-hover-border-color: #{$color-theme-secondary};
+        --bs-btn-hover-color: #{$color-title};
+        --bs-btn-active-bg: #{$color-theme-secondary};
+        --bs-btn-active-border-color: #{$color-theme-secondary};
+        --bs-btn-active-color: #{$color-title};
+        --bs-btn-disabled-border-color: #{$color-input};
     }
 }

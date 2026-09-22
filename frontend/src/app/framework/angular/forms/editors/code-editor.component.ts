@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, forwardRef, Input, numberAttribute, ViewChild } from '@angular/core';
+import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, forwardRef, inject, Input, numberAttribute, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { debounceTime, Subject } from 'rxjs';
-import { ResourceLoaderService, ScriptCompletion, ScriptCompletions, StatefulControlComponent, TypedSimpleChanges, Types } from '@app/framework/internal';
+import { ResourceLoaderService, ScriptCompletion, ScriptCompletions, StatefulControlComponent, Subscriptions, ThemeService, TypedSimpleChanges, Types } from '@app/framework/internal';
 import { FocusComponent } from '../forms-helper';
 
 export const SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
@@ -27,6 +27,8 @@ type Editor = AceAjax.Editor & { completers?: AceAjax.Completer[]; completer?: {
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CodeEditorComponent extends StatefulControlComponent<{}, any> implements AfterViewInit, FocusComponent {
+    private readonly subscriptions = new Subscriptions();
+    private readonly themeService = inject(ThemeService);
     private aceModes?: ModeList;
     private aceEditor?: Editor;
     private aceTools = false;
@@ -168,6 +170,12 @@ export class CodeEditorComponent extends StatefulControlComponent<{}, any> imple
         this.setOptions();
         this.setWordWrap();
         this.onDisabled(this.snapshot.isDisabled);
+
+        this.subscriptions.add(
+            this.themeService.themeChanges
+                .subscribe(theme => {
+                    this.aceEditor?.setTheme(theme === 'dark' ? 'ace/theme/one_dark' : 'ace/theme/textmate');
+                }));
 
         if (this.aceTools && !this.disableTools) {
             const originalCompleter = this.aceEditor.completer!;

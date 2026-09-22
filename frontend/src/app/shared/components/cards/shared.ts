@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChartOptions as IChartOptions } from 'chart.js';
-import { DateTime } from '@app/framework';
+import { Chart, ChartOptions as IChartOptions } from 'chart.js';
+import { DateTime, ThemeService } from '@app/framework';
 
 const ColorSchema: ReadonlyArray<string> = [
     ' 51, 137, 213',
@@ -42,6 +42,25 @@ export module ChartHelpers {
     export function getBorderColor(i = 0) {
         return `rgba(${ColorSchema[i]}, 1)`;
     }
+}
+
+export function syncChartTheme(themeService: ThemeService) {
+    return themeService.themeChanges.subscribe(() => {
+        const text = themeService.getColor('chart-text');
+        const grid = themeService.getColor('chart-grid');
+
+        // Keep the defaults of chart.js if the styles are not loaded yet.
+        if (!text || !grid) {
+            return;
+        }
+
+        Chart.defaults.color = text;
+        Chart.defaults.borderColor = grid;
+
+        for (const chart of Object.values(Chart.instances)) {
+            chart.update();
+        }
+    });
 }
 
 export module ChartOptions {

@@ -15,7 +15,7 @@ noscript {
 
 @media (width <= 550px) {
     .profile {
-        background-color: $color-white;
+        background-color: $color-surface;
     }
 
     .profile-card {
@@ -116,10 +116,10 @@ noscript {
         }
 
         &-text {
-            background: $color-white;
+            background: $color-surface;
             border: 0;
             bottom: -.75rem;
-            color: color.adjust($color-border, $lightness: -15%);
+            color: $color-border-darker;
             display: inline-block;
             padding: 0 1rem;
             position: relative;

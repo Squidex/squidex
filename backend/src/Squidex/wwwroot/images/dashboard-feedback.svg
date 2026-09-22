@@ -12,5 +12,4 @@
   <circle id="circle148" cx="15.1" cy="48.1" r="1.5" fill="#fff" class="st14"/>
   <circle id="circle150" cx="8" cy="48" r="1.5" fill="#fff" class="st14"/>
   <path id="path152" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" stroke-miterlimit="10" stroke-width="2" d="M6 53s6 5 12 0"/>
-  <path id="path154" fill="#b4bcc1" d="M43 32v11.8c0 2.3-1.9 4.2-4.2 4.2H36c-.6 0-1 .4-1 1v4.1l-3.7-2.6c-1.9-1.3-4-2.1-6.3-2.4v2c1.8.2 3.6.9 5.1 2l5.3 3.7c.2.1.4.2.6.2.2 0 .3 0 .5-.1.3-.2.5-.5.5-.9v-5h1.8c3.4 0 6.2-2.8 6.2-6.2V32z"/>
 </svg>

@@ -112,7 +112,7 @@ gridster-item {
 
         &-href {
             &:hover {
-                @include box-shadow-outer(0, 3px, 16px, .2);
+                @include box-shadow-outer(0, 3px, 16px, $color-shadow-20);
             }
         }
     }

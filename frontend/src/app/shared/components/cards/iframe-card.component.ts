@@ -6,7 +6,7 @@
  */
 
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
-import { ApiUrlConfig, Types } from '@app/framework';
+import { ApiUrlConfig, Subscriptions, ThemeService, Types } from '@app/framework';
 import { AppDto, AuthService, TeamDto } from '@app/shared/internal';
 
 @Component({
@@ -16,6 +16,7 @@ import { AppDto, AuthService, TeamDto } from '@app/shared/internal';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class IFrameCardComponent implements AfterViewInit {
+    private readonly subscriptions = new Subscriptions();
     private readonly context: any;
     private isInitialized = false;
 
@@ -41,8 +42,16 @@ export class IFrameCardComponent implements AfterViewInit {
         }
     }
 
-    constructor(apiUrl: ApiUrlConfig, authService: AuthService) {
+    constructor(apiUrl: ApiUrlConfig, authService: AuthService,
+        private readonly themeService: ThemeService,
+    ) {
         this.context = { apiUrl: apiUrl.buildUrl('api'), user: authService.user };
+
+        this.subscriptions.add(
+            this.themeService.themeChanges
+                .subscribe(() => {
+                    this.sendTheme();
+                }));
     }
 
     public ngAfterViewInit() {
@@ -57,9 +66,14 @@ export class IFrameCardComponent implements AfterViewInit {
             if (type === 'started') {
                 this.isInitialized = true;
 
+                this.sendTheme();
                 this.sendInit();
             }
         }
+    }
+
+    private sendTheme() {
+        this.sendMessage('themeChanged', { theme: this.themeService.theme });
     }
 
     private sendInit() {

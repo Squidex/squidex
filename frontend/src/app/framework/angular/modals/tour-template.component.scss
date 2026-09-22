@@ -1,12 +1,11 @@
 @import 'mixins';
 @import 'vars';
 
-$hide-shadow: rgba(0, 0, 0, 50%);
 
 .tour {
     &-step {
-        @include box-shadow-outer(0, 0, 4px, .2);
-        background: $color-white;
+        @include box-shadow-outer(0, 0, 4px, $color-shadow-20);
+        background: $color-surface;
         border: 0;
         border-radius: 0;
     }

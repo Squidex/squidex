@@ -217,7 +217,7 @@ test('hide field', async ({ schemasPage, schemaPage }) => {
     const dropdown = await fieldRow.openOptionsDropdown();
     await dropdown.action('Hide in API');
 
-    await expect(fieldRow.root.getByText(fieldName)).toHaveCSS('color', 'rgb(166, 170, 179)');
+    await expect(fieldRow.root.getByText(fieldName)).toHaveClass(/field-hidden/);
 });
 
 test('show field', async ({ schemasPage, schemaPage }) => {
@@ -232,7 +232,7 @@ test('show field', async ({ schemasPage, schemaPage }) => {
     const dropdown2 = await fieldRow.openOptionsDropdown();
     await dropdown2.action('Show in API');
 
-    await expect(fieldRow.root.getByText(fieldName)).not.toHaveCSS('color', 'rgb(166, 170, 179)');
+    await expect(fieldRow.root.getByText(fieldName)).not.toHaveClass(/field-hidden/);
 });
 
 test('lock field', async ({ schemasPage, schemaPage }) => {

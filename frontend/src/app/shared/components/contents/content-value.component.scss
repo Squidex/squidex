@@ -12,7 +12,7 @@
 
     .btn {
         @include absolute(.5rem, .25rem);
-        background-color: $color-white;
+        background-color: $color-surface;
         border: 1px solid $color-border;
         border-radius: $border-radius;
         display: none;
@@ -54,7 +54,7 @@
 
 .preview {
     img {
-        @include box-shadow-outer(0, 3px, 16px, 0.2);
+        @include box-shadow-outer(0, 3px, 16px, $color-shadow-20);
         background-image: $asset-background;
         max-width: 300px;
         max-height: 300px;

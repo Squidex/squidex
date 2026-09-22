@@ -157,7 +157,7 @@
     & {
         @include absolute(2px, auto, auto, 0);
         @include box-shadow-outer;
-        background: $color-white;
+        background: $color-surface;
         border: 1px solid $color-input;
         border-radius: $border-radius;
         max-height: 15rem;
@@ -174,7 +174,7 @@
         }
 
         &.separated {
-            border-bottom: 1px solid color.adjust($color-input, $lightness: 5%);
+            border-bottom: 1px solid $color-input-muted-5;
 
             &:last-child {
                 border: 0;

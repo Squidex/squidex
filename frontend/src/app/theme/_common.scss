@@ -14,7 +14,7 @@ body {
 
     // White body for login and profile page.
     &.white {
-        background: $color-white;
+        background: $color-surface;
     }
 }
 
@@ -106,8 +106,8 @@ hr {
 
         &::before {
             @include force-height(100%);
-            background: $color-white;
-            border: 2px dashed color.adjust($color-border, $lightness: -5%);
+            background: $color-surface;
+            border: 2px dashed $color-border-contrast-5;
             border-radius: 2px;
             display: block;
             content: '';
@@ -203,14 +203,14 @@ hr {
 
 .code-copy {
     @include absolute(0, 0, auto, auto);
-    background: color.adjust($color-border-dark, $lightness: -30%);
+    background: $color-border-dark-contrast-30;
     border: 0;
     color: $color-white;
     padding-left: .375rem;
     padding-right: .375rem;
 
     &:focus {
-        background: color.adjust($color-border-dark, $lightness: -40%);
+        background: $color-border-dark-contrast-40;
     }
 }
 
@@ -234,7 +234,7 @@ hr {
 .squid {
     @include circle(50px);
     align-items: center;
-    background: $color-white;
+    background: $color-surface;
     display: flex;
     flex-grow: 1;
     flex-wrap: nowrap;
@@ -327,7 +327,7 @@ hr {
             align-items: center;
             border: 2px dashed $color-border;
             border-radius: $border-radius;
-            color: color.adjust($color-border, $lightness: -30%);
+            color: $color-border-contrast-30;
             display: none;
             font-size: 1.2rem;
             font-weight: normal;
@@ -340,15 +340,15 @@ hr {
         }
 
         &.drag {
-            border-color: color.adjust($color-border, $lightness: -10%);
-            color: color.adjust($color-border, $lightness: -40%);
+            border-color: $color-border-contrast-10;
+            color: $color-border-contrast-40;
             cursor: copy;
             text-decoration: none;
         }
     }
 
     .drop-text {
-        background: $color-white;
+        background: $color-surface;
     }
 }
 
@@ -451,7 +451,7 @@ hr {
 // ACE
 //
 .ace_tooltip {
-    background: $color-white;
+    background: $color-surface;
     border: 1px solid $color-input;
     border-radius: 0;
     font-size: 14px;
@@ -474,5 +474,13 @@ i {
 
     &.spin2 {
         display: inline-block;
+    }
+}
+
+// The illustrations are designed for light backgrounds.
+[data-bs-theme='dark'] {
+    .card-image img {
+        // Invert the lightness, but keep the hue.
+        filter: invert(.85) hue-rotate(180deg) brightness(1.1) saturate(1.2);
     }
 }

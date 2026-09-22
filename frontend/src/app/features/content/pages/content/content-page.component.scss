@@ -13,7 +13,7 @@
     @include absolute(null, null, -.6125rem, 0);
     @include force-width(1.25rem);
     @include force-height(1.25rem);
-    background-color: $color-white;
+    background-color: $color-surface;
     line-height: 1;
     padding: 0;
     text-align: center;
@@ -33,7 +33,7 @@
 .menu {
     @include absolute(0, 0, 0);
     align-items: center;
-    background: white;
+    background: $color-surface;
     border-radius: 0;
     border: 0;
     display: flex;

@@ -23,6 +23,16 @@
             </style>
         </noscript>
 
+        <script>
+            // Apply the color scheme before the app is loaded to avoid flickering. See ThemeService.
+            try {
+                var themeMode = localStorage.getItem("squidex.theme");
+                var themeDark = themeMode === "dark" || (themeMode !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+                document.documentElement.setAttribute("data-bs-theme", themeDark ? "dark" : "light");
+            } catch {}
+        </script>
+
         <link href="./scripts/outdatedbrowser/outdatedbrowser.min.css" rel="stylesheet" type="text/css" />
 
         <script src="./scripts/outdatedbrowser/outdatedbrowser.min.js"></script>

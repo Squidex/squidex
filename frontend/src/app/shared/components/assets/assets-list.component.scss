@@ -51,7 +51,7 @@ h5 {
     transition: border-color .4s ease;
 
     &.drag {
-        border-color: color.adjust($color-border, $lightness: -10%);
+        border-color: $color-border-contrast-10;
         border-style: dashed;
         cursor: copy;
     }
@@ -69,7 +69,7 @@ h5 {
     }
 
     &-info {
-        color: color.adjust($color-border, $lightness: -30%);
+        color: $color-border-contrast-30;
     }
 }
 

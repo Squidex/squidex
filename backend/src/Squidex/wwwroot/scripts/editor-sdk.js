@@ -27,6 +27,13 @@ function measureAndNotifyParent() {
     }, 50);
 }
 
+function applyTheme(theme) {
+    // Plugins that use the Squidex stylesheet or bootstrap are switched to the same color scheme automatically.
+    if (isString(theme)) {
+        document.documentElement.setAttribute('data-bs-theme', theme);
+    }
+}
+
 function isNumber(value) {
     return typeof value === 'number';
 }
@@ -64,12 +71,20 @@ function SquidexSidebar(options) {
     var contentHandler;
     var content;
     var context;
+    var theme;
+    var themeHandler;
     var timer;
     var acceptedOrigins = options && isArrayOfStrings(options.acceptedOrigins) ? options.acceptedOrigins : null;
 
     function raiseContentChanged() {
         if (contentHandler && content) {
             contentHandler(content);
+        }
+    }
+
+    function raiseThemeChanged() {
+        if (themeHandler && isString(theme)) {
+            themeHandler(theme);
         }
     }
 
@@ -96,6 +111,11 @@ function SquidexSidebar(options) {
             content = event.data.content;
 
             raiseContentChanged();
+        } else if (type === 'themeChanged') {
+            theme = event.data.theme;
+
+            applyTheme(theme);
+            raiseThemeChanged();
         } else if (type === 'init') {
             context = event.data.context;
 
@@ -157,6 +177,28 @@ function SquidexSidebar(options) {
         },
 
         /**
+         * Get the current theme of the Squidex UI ('light' or 'dark').
+         */
+        getTheme: function () {
+            return theme;
+        },
+
+        /**
+         * Register an function that is called whenever the theme of the Squidex UI has changed.
+         *
+         * @param {function} callback: The callback to invoke. Argument 1: Theme ('light' or 'dark').
+         */
+        onThemeChanged: function (callback) {
+            if (!isFunction(callback)) {
+                return;
+            }
+
+            themeHandler = callback;
+
+            raiseThemeChanged();
+        },
+
+        /**
          * Clean the editor SDK.
          */
         clean: function () {
@@ -183,6 +225,8 @@ function SquidexWidget(options) {
     var initHandler;
     var initCalled = false;
     var context;
+    var theme;
+    var themeHandler;
     var acceptedOrigins = options && isArrayOfStrings(options.acceptedOrigins) ? options.acceptedOrigins : null;
 
     document.body.style.margin = '0';
@@ -192,6 +236,12 @@ function SquidexWidget(options) {
         if (initHandler && !initCalled && context) {
             initHandler(context);
             initCalled = true;
+        }
+    }
+
+    function raiseThemeChanged() {
+        if (themeHandler && isString(theme)) {
+            themeHandler(theme);
         }
     }
 
@@ -211,6 +261,11 @@ function SquidexWidget(options) {
             context = event.data.context;
 
             raiseInit();
+        } else if (type === 'themeChanged') {
+            theme = event.data.theme;
+
+            applyTheme(theme);
+            raiseThemeChanged();
         }
 
         console.log('Received Message: ' + type);
@@ -239,6 +294,28 @@ function SquidexWidget(options) {
             initHandler = callback;
 
             raiseInit();
+        },
+
+        /**
+         * Get the current theme of the Squidex UI ('light' or 'dark').
+         */
+        getTheme: function () {
+            return theme;
+        },
+
+        /**
+         * Register an function that is called whenever the theme of the Squidex UI has changed.
+         *
+         * @param {function} callback: The callback to invoke. Argument 1: Theme ('light' or 'dark').
+         */
+        onThemeChanged: function (callback) {
+            if (!isFunction(callback)) {
+                return;
+            }
+
+            themeHandler = callback;
+
+            raiseThemeChanged();
         },
 
         /**
@@ -277,6 +354,8 @@ function SquidexFormField(options) {
     var language;
     var languageHandler;
     var movedHandler;
+    var theme;
+    var themeHandler;
     var timer;
     var value;
     var valueHandler;
@@ -334,6 +413,12 @@ function SquidexFormField(options) {
     function raisedMoved() {
         if (movedHandler && isNumber(index)) {
             movedHandler(index);
+        }
+    }
+
+    function raiseThemeChanged() {
+        if (themeHandler && isString(theme)) {
+            themeHandler(theme);
         }
     }
 
@@ -397,6 +482,11 @@ function SquidexFormField(options) {
             context = event.data.context;
 
             raiseContextChanged();
+        } else if (type === 'themeChanged') {
+            theme = event.data.theme;
+
+            applyTheme(theme);
+            raiseThemeChanged();
         } else if (type === 'confirmResult') {
             var correlationId = event.data.correlationId;
 
@@ -485,6 +575,13 @@ function SquidexFormField(options) {
          */
         isExpanded: function () {
             return expanded;
+        },
+
+        /**
+         * Get the current theme of the Squidex UI ('light' or 'dark').
+         */
+        getTheme: function () {
+            return theme;
         },
 
         /**
@@ -756,6 +853,20 @@ function SquidexFormField(options) {
 
             expandedHandler = callback;
             raiseExpanded();
+        },
+
+        /**
+         * Register an function that is called whenever the theme of the Squidex UI has changed.
+         *
+         * @param {function} callback: The callback to invoke. Argument 1: Theme ('light' or 'dark').
+         */
+        onThemeChanged: function (callback) {
+            if (!isFunction(callback)) {
+                return;
+            }
+
+            themeHandler = callback;
+            raiseThemeChanged();
         },
 
         /**

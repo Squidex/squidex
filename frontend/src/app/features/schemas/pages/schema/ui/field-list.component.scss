@@ -10,7 +10,7 @@
 
     &-assigned {
         @include absolute(0, 50%, 0, 0);
-        border-right: 1px solid color.adjust($color-input, $lightness: -2%);
+        border-right: 1px solid $color-input-contrast-2;
     }
 
     &-available {

@@ -8,7 +8,7 @@
 import { booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, HostListener, Input, numberAttribute, OnDestroy, Output, Renderer2, ViewChild } from '@angular/core';
 import { AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AppLanguageDto, AppsState, AssetDto, AssetSelectorComponent, computeEditorUrl, ContentDto, ContentSelectorComponent, DialogModel, DialogService, disabled$, ModalDirective, SafeResourceUrlPipe, StatefulComponent, Subscriptions, TypedSimpleChanges, Types, value$ } from '@app/shared';
+import { AppLanguageDto, AppsState, AssetDto, AssetSelectorComponent, computeEditorUrl, ContentDto, ContentSelectorComponent, DialogModel, DialogService, disabled$, ModalDirective, SafeResourceUrlPipe, StatefulComponent, Subscriptions, ThemeService, TypedSimpleChanges, Types, value$ } from '@app/shared';
 
 interface State {
     // True, when the editor is shown as fullscreen.
@@ -29,6 +29,7 @@ interface State {
 })
 export class IFrameEditorComponent extends StatefulComponent<State> implements OnDestroy {
     private readonly subscriptions = new Subscriptions();
+    private readonly themeSubscriptions = new Subscriptions();
     private value: any;
     private isInitialized = false;
     private isDisabled = false;
@@ -98,8 +99,15 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
         private readonly dialogs: DialogService,
         private readonly renderer: Renderer2,
         private readonly router: Router,
+        private readonly themeService: ThemeService,
     ) {
         super({ isFullscreen: false });
+
+        this.themeSubscriptions.add(
+            this.themeService.themeChanges
+                .subscribe(() => {
+                    this.sendTheme();
+                }));
     }
 
     public ngOnDestroy() {
@@ -156,6 +164,7 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
             if (type === 'started') {
                 this.isInitialized = true;
 
+                this.sendTheme();
                 this.sendInit();
                 this.sendFullscreen();
                 this.sendExpanded();
@@ -289,6 +298,10 @@ export class IFrameEditorComponent extends StatefulComponent<State> implements O
 
     private sendInit() {
         this.sendMessage('init', { context: { ...this.context || {}, field: this.formField } });
+    }
+
+    private sendTheme() {
+        this.sendMessage('themeChanged', { theme: this.themeService.theme });
     }
 
     private sendValue() {

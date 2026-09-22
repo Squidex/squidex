@@ -2,7 +2,8 @@
 @import 'vars';
 
 .navbar {
-    @include box-shadow-outer(0, 2px, 3px, .13);
+    @include box-shadow-outer(0, 2px, 3px, $color-shadow-13);
+    background: $color-surface;
     padding-left: $size-sidebar-width + 2rem;
 }
 

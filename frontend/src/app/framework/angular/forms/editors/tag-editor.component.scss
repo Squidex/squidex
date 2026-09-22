@@ -2,8 +2,6 @@
 @import 'mixins';
 @import 'vars';
 
-$focus-color: #b3d3ff;
-$focus-shadow: rgba(51, 137, 255, 25%);
 $inner-height: 1.75rem;
 
 /* stylelint-disable no-descending-specificity */
@@ -43,9 +41,9 @@ $inner-height: 1.75rem;
     }
 
     &.focus {
-        border-color: $focus-color;
+        border-color: $color-tag-focus;
         border-width: 1px;
-        box-shadow: 0 0 0 .2rem $focus-shadow;
+        box-shadow: 0 0 0 .2rem $color-tag-focus-shadow;
     }
 
     &.singleline {
@@ -170,7 +168,7 @@ div {
     }
 
     &:hover {
-        background: color.adjust($color-input, $lightness: -10%);
+        background: $color-input-contrast-10;
     }
 }
 

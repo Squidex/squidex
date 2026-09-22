@@ -32,7 +32,7 @@
 }
 
 .invalid {
-    color: color.adjust($color-border, $lightness: -30%);
+    color: $color-border-contrast-30;
     font-size: 1.2rem;
     font-weight: normal;
     padding: 2rem;

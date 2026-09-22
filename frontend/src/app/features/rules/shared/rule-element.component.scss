@@ -13,7 +13,7 @@
     @include absolute(.25rem, null, null, -1rem);
     border-radius: 100%;
     border-color: $color-theme-error;
-    background-color: $color-white;
+    background-color: $color-surface;
     display: none;
 
     &:hover {

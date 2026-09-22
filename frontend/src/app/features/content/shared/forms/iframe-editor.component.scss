@@ -9,7 +9,7 @@ iframe {
 
 .fullscreen {
     @include fixed(0, 0, 0, 0);
-    background: $color-white;
+    background: $color-surface;
     border: 0;
     border-radius: 0;
     z-index: 1040;

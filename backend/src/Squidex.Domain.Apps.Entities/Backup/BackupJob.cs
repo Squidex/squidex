@@ -69,7 +69,10 @@ public sealed class BackupJob(
         var appName = context.TryGetArgument(ArgAppName) ?? "app";
 
         // We store the file in a the asset store and make the information available.
-        context.Job.File = new JobFile($"backup-{appName}-{context.Job.Started:yyyy-MM-dd_HH-mm-ss}.zip", "application/zip");
+        context.Job.File =
+            new JobFile(
+                $"backup-{appName}-{context.Job.Started:yyyy-MM-dd_HH-mm-ss}.zip",
+                "application/zip");
 
         // Use a readable name to describe the job.
         context.Job.Description = T.Get("jobs.backup");
@@ -77,7 +80,6 @@ public sealed class BackupJob(
         var handlers = backupHandlerFactory.CreateMany();
 
         await using var stream = backupArchiveLocation.OpenStream(context.Job.Id);
-
         using (var writer = await backupArchiveLocation.OpenWriterAsync(stream, ct))
         {
             await writer.WriteVersionAsync();
