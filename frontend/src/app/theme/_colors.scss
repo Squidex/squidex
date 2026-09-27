@@ -66,6 +66,9 @@ $theme-light: (
     'diagram-text-stroke':          #fff,
     'chart-text':                   #666,
     'chart-grid':                   rgba(0, 0, 0, .1),
+    'editor-base':                  #fff,
+    'editor-border':                #dedfe3,
+    'editor-accent':                #3389ff,
 );
 
 $theme-dark: (
@@ -111,6 +114,9 @@ $theme-dark: (
     'diagram-text-stroke':          #1f2227,
     'chart-text':                   #a9afb9,
     'chart-grid':                   rgba(255, 255, 255, .08),
+    'editor-base':                  #1f2227,
+    'editor-border':                #363a42,
+    'editor-accent':                #3389ff,
 );
 
 $color-background:          var(--sqx-background);

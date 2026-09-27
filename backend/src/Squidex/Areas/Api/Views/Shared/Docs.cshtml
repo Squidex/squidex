@@ -17,6 +17,12 @@
     <style>
         body { margin: 0; padding: 0; }
 
+        html[data-bs-theme='dark'] body { background: #16181c; }
+
+        /* Some labels of redoc use hardcoded colors. */
+        html[data-bs-theme='dark'] #redoc-container h5,
+        html[data-bs-theme='dark'] #redoc-container h5 span { color: #a9afb9; }
+
         .menu-content {
             position: fixed !important;
         }
@@ -35,10 +41,75 @@
 <body>
     <div id="redoc-container"></div>
 
+    <script>
+        // Apply the color scheme before the page is rendered to avoid flickering. See ThemeService.
+        var themeDark = false;
+
+        try {
+            var themeMode = localStorage.getItem("squidex.theme");
+
+            themeDark = themeMode === "dark" || (themeMode !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+            document.documentElement.setAttribute("data-bs-theme", themeDark ? "dark" : "light");
+        } catch { }
+    </script>
+
     <script src="~/scripts/redoc.standalone.js"></script>
     <script>
+        // Redoc has its own theme and does not use the stylesheet of the app.
+        var themeDarkColors = {
+            colors: {
+                primary: {
+                    main: '#3f83df'
+                },
+                text: {
+                    primary: '#d6d9de',
+                    secondary: '#a9afb9'
+                },
+                border: {
+                    dark: '#363a42',
+                    light: '#2e3238'
+                },
+                gray: {
+                    50: '#1f2227',
+                    100: '#2e3238'
+                }
+            },
+            sidebar: {
+                backgroundColor: '#1f2227',
+                textColor: '#d6d9de',
+                activeTextColor: '#75aeff'
+            },
+            rightPanel: {
+                backgroundColor: '#101216'
+            },
+            schema: {
+                nestedBackground: '#1f2227',
+                typeNameColor: '#a9afb9',
+                typeTitleColor: '#d6d9de'
+            },
+            responses: {
+                success: {
+                    color: '#5fd08a',
+                    backgroundColor: '#173a28'
+                },
+                error: {
+                    color: '#f38a96',
+                    backgroundColor: '#43202a'
+                },
+                redirect: {
+                    color: '#f0b35a',
+                    backgroundColor: '#3d2e14'
+                },
+                info: {
+                    color: '#5dcde6',
+                    backgroundColor: '#113a45'
+                }
+            }
+        };
+
         Redoc.init('@Url.Content(Model.Specification)', {
-            theme: {
+            theme: themeDark ? themeDarkColors : {
                 colors: {
                     primary: {
                         main: '#3f83df'

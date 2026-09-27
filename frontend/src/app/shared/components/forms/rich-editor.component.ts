@@ -9,7 +9,7 @@ import { AsyncPipe } from '@angular/common';
 import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, forwardRef, Input, OnDestroy, Output, ViewChild } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { BehaviorSubject, catchError, of, switchMap } from 'rxjs';
-import { HTTP, ModalDirective, TypedSimpleChanges } from '@app/framework';
+import { HTTP, ModalDirective, Subscriptions, ThemeService, TypedSimpleChanges } from '@app/framework';
 import { ApiUrlConfig, AppLanguageDto, AppsState, AssetDto, AssetsService, AssetUploaderState, ContentDto, DialogModel, getContentValue, ResourceLoaderService, StatefulControlComponent, Types } from '@app/shared/internal';
 import { AssetDialogComponent } from '../assets/asset-dialog.component';
 import { AssetSelectorComponent } from '../assets/asset-selector.component';
@@ -38,6 +38,7 @@ export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
     ],
 })
 export class RichEditorComponent extends StatefulControlComponent<{}, EditorValue> implements AfterViewInit, OnDestroy {
+    private readonly subscriptions = new Subscriptions();
     private readonly assetId = new BehaviorSubject<string | null>(null);
     private editorWrapper?: SquidexEditorWrapper;
     private value?: string;
@@ -113,6 +114,7 @@ export class RichEditorComponent extends StatefulControlComponent<{}, EditorValu
         private readonly assetUploader: AssetUploaderState,
         private readonly assetService: AssetsService,
         private readonly resourceLoader: ResourceLoaderService,
+        private readonly themeService: ThemeService,
     ) {
         super({});
     }
@@ -198,9 +200,24 @@ export class RichEditorComponent extends StatefulControlComponent<{}, EditorValu
             canSelectAssets: true,
             canSelectContents: !!this.schemaIds,
             classNames: this.classNames,
+            ...this.editorColors(),
             isDisabled: this.snapshot.isDisabled,
             value: this.value || '',
         });
+
+        this.subscriptions.add(
+            this.themeService.themeChanges
+                .subscribe(() => {
+                    this.editorWrapper?.update(this.editorColors());
+                }));
+    }
+
+    private editorColors() {
+        return {
+            accentColor: this.themeService.getColor('editor-accent'),
+            baseColor: this.themeService.getColor('editor-base'),
+            borderColor: this.themeService.getColor('editor-border'),
+        };
     }
 
     public reset() {

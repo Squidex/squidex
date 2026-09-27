@@ -9,6 +9,7 @@ import { readFile } from 'fs/promises';
 import path from 'path';
 import { test as setup } from '../given-login/_fixture';
 import { writeJsonAsync } from '../utils';
+import { EDITORS_SCHEMA } from './_editors';
 
 setup('prepare visual app', async ({ page, appsPage, assetsPage, contentsPage, contentPage, rulesPage, rulePage, schemasPage, schemaPage }) => {
     setup.setTimeout(120_000);
@@ -16,35 +17,64 @@ setup('prepare visual app', async ({ page, appsPage, assetsPage, contentsPage, c
     // Use a dedicated app with a fixed name, so that other tests cannot change the screenshots.
     const appName = 'visual-tests';
     const schemaName = 'visual-schema';
+    const editorsSchemaName = 'visual-editors';
 
-    await writeJsonAsync('visual', { appName, schemaName });
+    await writeJsonAsync('visual', { appName, schemaName, editorsSchemaName });
 
     await appsPage.goto();
 
-    // The app is only created once per database, because the name cannot be reused.
-    if (await page.getByRole('heading', { name: appName, exact: true }).isVisible()) {
-        return;
-    }
+    // Everything is only created once per database, because the names cannot be reused.
+    const hasApp = await page.getByRole('heading', { name: appName, exact: true }).isVisible();
 
-    await appsPage.createNewApp(appName);
+    if (!hasApp) {
+        await appsPage.createNewApp(appName);
+    }
 
     await schemasPage.goto(appName);
 
-    const schemaDialog = await schemasPage.openSchemaDialog();
-    await schemaDialog.enterName(schemaName);
-    await schemaDialog.save();
+    if (!await hasSchema(schemaName)) {
+        const schemaDialog = await schemasPage.openSchemaDialog();
+        await schemaDialog.enterName(schemaName);
+        await schemaDialog.save();
 
-    await schemaPage.publish();
+        await schemaPage.publish();
 
-    for (const [name, type] of [['title', 'String'], ['count', 'Number'], ['active', 'Boolean'], ['text', 'RichText']]) {
-        const fieldDialog = await schemaPage.openFieldWizard();
-        await fieldDialog.enterName(name);
-        await fieldDialog.enterType(type);
-        await fieldDialog.createAndClose();
+        for (const [name, type] of [['title', 'String'], ['count', 'Number'], ['active', 'Boolean'], ['text', 'RichText']]) {
+            const fieldDialog = await schemaPage.openFieldWizard();
+            await fieldDialog.enterName(name);
+            await fieldDialog.enterType(type);
+            await fieldDialog.createAndClose();
 
-        // Wait for the field, otherwise the request is cancelled when navigating away.
-        const fieldRow = await schemaPage.getFieldRow(name);
-        await fieldRow.root.waitFor({ state: 'visible' });
+            // Wait for the field, otherwise the request is cancelled when navigating away.
+            const fieldRow = await schemaPage.getFieldRow(name);
+            await fieldRow.root.waitFor({ state: 'visible' });
+        }
+
+        await schemasPage.goto(appName);
+    }
+
+    if (!await hasSchema(editorsSchemaName)) {
+        const editorsDialog = await schemasPage.openSchemaDialog();
+        await editorsDialog.enterName(editorsSchemaName);
+        await editorsDialog.save();
+    }
+
+    // The schema defines a field for every editor, which is faster and more stable than the field wizard.
+    await page.goto(`/app/${appName}/schemas/${editorsSchemaName}?tab=json`);
+    await page.locator('.ace_editor').waitFor({ state: 'visible' });
+    await page.locator('.ace_editor').evaluate((element, json) => {
+        (window as any).ace.edit(element).setValue(json, -1);
+    }, JSON.stringify(EDITORS_SCHEMA, undefined, 2));
+
+    // The editor notifies the form with a delay.
+    await page.waitForTimeout(1000);
+
+    const synchronized = page.waitForResponse(x => x.url().includes(`/schemas/${editorsSchemaName}/sync`) && x.request().method() === 'PUT');
+    await page.getByRole('button', { name: 'Synchronize' }).click();
+    await synchronized;
+
+    if (hasApp) {
+        return;
     }
 
     await contentsPage.goto(appName, schemaName);
@@ -75,4 +105,11 @@ setup('prepare visual app', async ({ page, appsPage, assetsPage, contentsPage, c
 
     await rulePage.enterName('visual-rule');
     await rulePage.save();
+
+    // The schemas are loaded asynchronously, therefore we have to wait for them.
+    async function hasSchema(name: string) {
+        const link = await schemasPage.getSchemaLink(name);
+
+        return await link.root.waitFor({ timeout: 5000 }).then(() => true, () => false);
+    }
 });

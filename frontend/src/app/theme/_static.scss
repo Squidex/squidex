@@ -55,6 +55,11 @@ noscript {
         height: 2.5rem;
     }
 
+    // The default logo has a dark text and is not readable in dark mode.
+    &-logo-dark {
+        display: none;
+    }
+
     &-password-signup {
         color: $color-text-decent;
     }
@@ -250,5 +255,15 @@ a {
     div {
         font-size: 30px;
         font-weight: lighter;
+    }
+}
+
+[data-bs-theme='dark'] {
+    .profile-logo-light {
+        display: none;
+    }
+
+    .profile-logo-dark {
+        display: block;
     }
 }

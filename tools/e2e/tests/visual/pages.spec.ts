@@ -14,6 +14,12 @@ type VisualPage = {
     intercept?: (page: Page, appName: string) => Promise<void>;
     prepare?: (page: Page) => Promise<void>;
     mask?: (page: Page) => Locator[];
+
+    // The selector of an inner container that scrolls, because a full page screenshot does not include it.
+    scroll?: string;
+
+    // False, if the page renders more content when it is scrolled and would never be stable.
+    fullPage?: boolean;
 };
 
 const pages: VisualPage[] = [
@@ -59,6 +65,12 @@ const pages: VisualPage[] = [
     {
         name: 'content-new',
         url: 'content/visual-schema/new',
+    },
+    {
+        name: 'content-editors',
+        url: 'content/visual-editors/new',
+        scroll: '.list-content',
+        mask: page => [page.locator('sqx-geolocation-editor')],
     },
     {
         name: 'assets',
@@ -145,9 +157,25 @@ const pages: VisualPage[] = [
         name: 'administration-restore',
         url: '/app/administration/restore',
     },
+    {
+        name: 'identity-login',
+        url: '/identity-server/account/login',
+    },
+    {
+        name: 'identity-profile',
+        url: '/identity-server/account/profile',
+    },
+    {
+        name: 'api-docs',
+        url: '/api/docs',
+        fullPage: false,
+        prepare: async page => {
+            await page.locator('#redoc-container h1').first().waitFor();
+        },
+    },
 ];
 
-for (const { name, url, intercept, prepare, mask } of pages) {
+for (const { name, url, intercept, prepare, mask, scroll, fullPage } of pages) {
     test(name, async ({ page, appName }) => {
         if (intercept) {
             await intercept(page, appName);
@@ -161,12 +189,28 @@ for (const { name, url, intercept, prepare, mask } of pages) {
             await prepare(page);
         }
 
+        if (scroll) {
+            await resizeToContent(page, scroll);
+        }
+
         await expect(page).toHaveScreenshot(`${name}.png`, {
             animations: 'disabled',
             caret: 'hide',
-            fullPage: true,
+            fullPage: fullPage !== false,
             mask: mask?.(page),
             maxDiffPixelRatio: 0.01,
         });
     });
+}
+
+// Screenshots do not include the content of inner scroll containers, therefore the window is resized to fit.
+async function resizeToContent(page: Page, selector: string) {
+    const viewport = page.viewportSize()!;
+
+    const hiddenHeight = await page.locator(selector).evaluate(element => element.scrollHeight - element.clientHeight);
+
+    if (hiddenHeight > 0) {
+        await page.setViewportSize({ width: viewport.width, height: Math.min(viewport.height + hiddenHeight, 8000) });
+        await page.waitForLoadState('networkidle');
+    }
 }

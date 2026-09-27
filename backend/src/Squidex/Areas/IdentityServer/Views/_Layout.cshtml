@@ -8,6 +8,16 @@
 
     <title>@ViewBag.Title - @T.Get("common.product")</title>
 
+    <script>
+        // Apply the color scheme before the page is rendered to avoid flickering. See ThemeService.
+        try {
+            var themeMode = localStorage.getItem("squidex.theme");
+            var themeDark = themeMode === "dark" || (themeMode !== "light" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+
+            document.documentElement.setAttribute("data-bs-theme", themeDark ? "dark" : "light");
+        } catch { }
+    </script>
+
     <link rel="stylesheet" href="styles.css" asp-append-version="true" />
     
     @if (IsSectionDefined("header"))
@@ -22,7 +32,8 @@
 </head>
 <body class="profile">
     <div class="profile-container">
-        <img class="profile-logo" alt="@T.Get("common.product")" title="@T.Get("common.product")" src="images/logo.svg" />
+        <img class="profile-logo profile-logo-light" alt="@T.Get("common.product")" title="@T.Get("common.product")" src="images/logo.svg" />
+        <img class="profile-logo profile-logo-dark" alt="@T.Get("common.product")" title="@T.Get("common.product")" src="images/logo-white.png" />
 
         <div class="profile-card card">
             <div class="profile-card-body card-body">
