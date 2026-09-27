@@ -114,6 +114,7 @@ jobs:
         working-directory: './tools/e2e'
 
       - name: Run Playwright Tests
+        id: playwright
         run: npx playwright test --retries=3
         working-directory: './tools/e2e'
         env:
@@ -126,7 +127,23 @@ jobs:
           name: playwright-report
           path: tools/e2e/playwright-report/
           retention-days: 30
-       
+
+      - name: Update Playwright Snapshots
+        if: failure() && steps.playwright.outcome == 'failure'
+        continue-on-error: true
+        run: npx playwright test --update-snapshots --reporter=list
+        working-directory: './tools/e2e'
+        env:
+          BASE__URL: http://localhost:8080
+
+      - name: Upload Playwright Snapshots
+        if: failure() && steps.playwright.outcome == 'failure'
+        uses: actions/upload-artifact@v4.6.2
+        with:
+          name: playwright-snapshots
+          path: tools/e2e/snapshots/
+          retention-days: 30
+
       - name: Dump docker logs on failure
         if: failure()
         uses: jwalton/gh-docker-logs@v2.2.2
