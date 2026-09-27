@@ -98,12 +98,12 @@ public sealed record CreateContentFlowStep : FlowStep, IConvertibleToAction
         ContentDataCommand command;
         if (!string.IsNullOrWhiteSpace(Id))
         {
-            command = new UpsertCommand 
-            { 
+            command = new UpsertCommand
+            {
                 ContentId = DomainId.Create(Id.Trim()),
                 EnrichDefaults = true,
                 EnrichRequiredFields = false,
-                Patch = Patch, 
+                Patch = Patch,
                 Status = status
             };
         }
