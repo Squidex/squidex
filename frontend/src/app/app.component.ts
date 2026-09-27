@@ -8,7 +8,7 @@
 
 import { Component, Injector } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
-import { AnalyticsService, CopyGlobalDirective, DialogRendererComponent, RootViewComponent, TourGuideComponent, TourTemplateComponent, TranslatePipe } from '@app/shared';
+import { AnalyticsService, CopyGlobalDirective, DialogRendererComponent, RootViewComponent, syncChartTheme, ThemeService, TourGuideComponent, TourTemplateComponent, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-app',
@@ -29,5 +29,6 @@ export class AppComponent {
 
     constructor(injector: Injector) {
         injector.get(AnalyticsService);
+        syncChartTheme(injector.get(ThemeService));
     }
 }

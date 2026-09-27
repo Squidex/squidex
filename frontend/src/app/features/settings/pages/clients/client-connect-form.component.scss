@@ -79,7 +79,7 @@ sqx-code {
     position: relative;
 
     &:hover {
-        border-color: color.adjust($color-border, $lightness: -10%);
+        border-color: $color-border-contrast-10;
     }
 
     i {

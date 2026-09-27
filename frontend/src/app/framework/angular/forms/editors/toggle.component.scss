@@ -13,7 +13,7 @@ $toggle-button-size: $toggle-height - .25rem;
 .toggle {
     &-button {
         @include circle($toggle-button-size);
-        @include box-shadow-outer(0, 2px, 2px, .2);
+        @include box-shadow-outer(0, 2px, 2px, $color-shadow-20);
         @include absolute($toggle-height * .5, auto, auto, $toggle-width * .5);
         background: $color-white;
         border: 0;
@@ -24,7 +24,7 @@ $toggle-button-size: $toggle-height - .25rem;
 
     &-container {
         @include box-shadow-outer;
-        background: color.adjust($color-border, $lightness: 6%);
+        background: $color-border-muted-6;
         border: 0;
         border-radius: $toggle-height * .5;
         height: $toggle-height;

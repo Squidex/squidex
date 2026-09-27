@@ -72,7 +72,7 @@ h2 {
     @include absolute(0, null, null, 50%);
     @include circle($size-squid);
     border: 1px solid $color-border;
-    background: $color-white;
+    background: $color-surface;
     margin-left: -$size-squid * .5;
     margin-top: -$size-squid * .5;
 

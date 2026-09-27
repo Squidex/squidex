@@ -1,83 +1,17 @@
 /* stylelint-disable */
-@use 'sass:color';
-
-$color-background:          #f5f6f9;
-
-$color-border:              #dedfe3;
-$color-border-light:        #f5f6f9;
-$color-border-lighter:      color.adjust($color-border-light, $lightness: 1%);
-$color-border-dark:         #e7e8ea;
-$color-border-darker:       color.adjust($color-border, $lightness: -15%);
-
-$color-title:               #000;
-$color-text:                #373a3c;
-$color-text-decent:         #41444C;
-$color-tooltip:             #1a2129;
-
-$color-code-background:     #f5f7f9;
-$color-code-text:           #708090;
-
-$color-extern-github:       #353535;
-$color-extern-google:       #d34836;
-$color-extern-microsoft:    #004185;
-$color-extern-twitter:      #1da1f2;
-$color-extern-oidc:         #526484;
-
-$color-theme-brand:         #3389ff;
-$color-theme-brand-dark:    #3284f4;
-$color-theme-brand-darker:  #2f7deb;
-$color-theme-brand-light:   #d9e8fc;
-$color-theme-secondary:     #e0e1e5;
-
-$color-theme-error:         #eb3142;
-$color-theme-error-dark:    #c00;
-$color-theme-info:          #0eafcc;
-$color-theme-success-dark:  #38a678;
-$color-theme-success:       #3ab480;
-$color-theme-warning-dark:  #a65b00;
-$color-theme-warning:       #ffb136;
-
-$color-black:   #000;
-$color-white:   #fff;
-
-$color-input:               #e0e1e5;
-$color-input-background:    #fff;
-$color-input-disabled:      #eff1f4;
-$color-input-placeholder:   color.adjust($color-text-decent, $lightness: 20%);
-$color-input-shortcut:      rgba(255, 255, 255, .2);
-
-$color-badge-success-background:    #e4f6e6;
-$color-badge-success-foreground:    #42a54c;
-
-$color-badge-warning-background:    #ffe8cc;
-$color-badge-warning-foreground:    #d18c3e;
-
-$color-badge-danger-background:     #fce0e3;
-$color-badge-danger-foreground:     #e56471;
-
-$color-badge-info-background:       #d0f2fb;
-$color-badge-info-foreground:       #3bb1cc;
-
-$color-badge-primary-background:    #cce1ff;
-$color-badge-primary-foreground:    #4186e0;
-
-$color-badge-secondary-background:  #e6e6e6;
-$color-badge-secondary-foreground:  #555;
-
-$body-secondary-color:      $color-text-decent;
+@import 'colors';
 
 $border-radius:             .25rem;
 
-$input-shadow:              inset 0 1px 2px rgb(0 0 0 / 8%);
+$input-shadow:              inset 0 1px 2px $color-input-shadow;
 
 $size-navbar-height:        3.75rem;
 $size-sidebar-width:        5rem;
 
-$card-bg:                   $color-white;
+$card-bg:                   $color-surface;
 
-$table-bg:                  $color-white;
+$table-bg:                  $color-surface;
 
-$color-dark-onboarding:   #273039;
 
 $panel-padding:             1.5rem;
 $panel-header:              5.4rem;
@@ -92,9 +26,9 @@ $btn-disabled-color:        inherit;
 $btn-disabled-bg:           inherit;
 $btn-disabled-border-color: inherit;
 
-$dropdown-bg:               $color-white;
+$dropdown-bg:               $color-surface;
 
-$modal-content-bg:          $color-white;
+$modal-content-bg:          $color-surface;
 
 $history-dot-size:          10px;
 $history-dot-offset-x:      -($history-dot-size * .5 + 1px);

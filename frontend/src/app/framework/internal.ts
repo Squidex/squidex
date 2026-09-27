@@ -23,6 +23,7 @@ export * from './services/resize.service';
 export * from './services/resource-loader.service';
 export * from './services/shortcut.service';
 export * from './services/temp.service';
+export * from './services/theme.service';
 export * from './services/title.service';
 export * from './services/toolbar.service';
 export * from './utils/angular';

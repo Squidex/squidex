@@ -28,6 +28,7 @@ npm run lint
 
 - i18n texts live in `backend/i18n`, translations are generated into the frontend — do not edit generated translation files by hand.
 - Do not write JsDoc comments.
+- Define colors only in `src/app/theme/_colors.scss`: literal values, the light/dark palettes and computed colors (`shade()`, `fade()`, ...). Everywhere else use the `$color-*` variables. In TypeScript, read theme colors with `ThemeService.getColor()`. Exceptions are semantic data colors (avatar colors, rule icon colors, chart colors).
 - In tests, keep `verify` calls and `expect` calls next to each other, without blank lines between them.
 
 ## Backend

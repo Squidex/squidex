@@ -20,7 +20,7 @@
 
     &.expanded {
         @include absolute(0, 0, 0, 0);
-        background-color: $color-white;
+        background-color: $color-surface;
         border: 0;
         border-radius: 0;
         overflow-x: hidden;
@@ -44,8 +44,8 @@
     margin-bottom: 1rem;
 
     &-separator {
-        border-bottom: 1px solid color.adjust($color-border, $lightness: -5%);
-        color: color.adjust($color-text, $lightness: 20%);
+        border-bottom: 1px solid $color-border-contrast-5;
+        color: $color-text-muted-20;
         font-size: 1.3rem;
         font-weight: normal;
         margin-bottom: 0;

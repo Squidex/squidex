@@ -6,7 +6,7 @@
  */
 
 import { AfterViewInit, Component, ElementRef, Input, OnDestroy, ViewChild } from '@angular/core';
-import { ListViewComponent, ResourceLoaderService, WorkflowView } from '@app/shared';
+import { ListViewComponent, ResourceLoaderService, Subscriptions, ThemeService, WorkflowView } from '@app/shared';
 
 declare const vis: any;
 
@@ -19,6 +19,7 @@ declare const vis: any;
     ],
 })
 export class WorkflowDiagramComponent implements AfterViewInit, OnDestroy {
+    private readonly subscriptions = new Subscriptions();
     private network: any;
 
     @ViewChild('chartContainer', { static: false })
@@ -31,7 +32,13 @@ export class WorkflowDiagramComponent implements AfterViewInit, OnDestroy {
 
     constructor(
         private readonly resourceLoader: ResourceLoaderService,
+        private readonly themeService: ThemeService,
     ) {
+        this.subscriptions.add(
+            this.themeService.themeChanges
+                .subscribe(() => {
+                    this.updateNetwork();
+                }));
     }
 
     public ngOnDestroy() {
@@ -53,10 +60,17 @@ export class WorkflowDiagramComponent implements AfterViewInit, OnDestroy {
 
         await this.resourceLoader.loadLocalScript('dependencies/vis-network/vis-network.min.js');
 
-        const { edges, nodes } = buildGraph(this.workflow);
+        const colors = {
+            edge: this.themeService.getColor('diagram-edge'),
+            start: this.themeService.getColor('diagram-start'),
+            text: this.themeService.getColor('diagram-text'),
+            textStroke: this.themeService.getColor('diagram-text-stroke'),
+        };
+
+        const { edges, nodes } = buildGraph(this.workflow, colors);
 
         this.network?.destroy();
-        this.network = new vis.Network(this.chartContainer.nativeElement, { edges, nodes }, GRAPH_OPTIONS);
+        this.network = new vis.Network(this.chartContainer.nativeElement, { edges, nodes }, buildOptions(colors));
         this.network.stabilize();
         this.network.fit();
 
@@ -64,7 +78,9 @@ export class WorkflowDiagramComponent implements AfterViewInit, OnDestroy {
     }
 }
 
-function buildGraph(workflow: WorkflowView) {
+type DiagramColors = { edge: string; start: string; text: string; textStroke: string };
+
+function buildGraph(workflow: WorkflowView, colors: DiagramColors) {
     const nodes = new vis.DataSet();
 
     for (const step of workflow.steps) {
@@ -92,7 +108,7 @@ function buildGraph(workflow: WorkflowView) {
     }
 
     if (workflow.dto.initial) {
-        nodes.add({ id: 0, color: '#000', label: 'Start', shape: 'dot', size: 3 });
+        nodes.add({ id: 0, color: colors.start, label: 'Start', shape: 'dot', size: 3 });
     }
 
     const edges = new vis.DataSet();
@@ -120,7 +136,7 @@ function buildGraph(workflow: WorkflowView) {
     return { edges, nodes };
 }
 
-const GRAPH_OPTIONS = {
+const buildOptions = (colors: DiagramColors) => ({
     nodes: {
         borderWidth: 2,
         font: {
@@ -132,6 +148,7 @@ const GRAPH_OPTIONS = {
             bold: {
                 size: 20,
             },
+            color: colors.text,
             size: 16,
         },
         shape: 'dot',
@@ -144,9 +161,11 @@ const GRAPH_OPTIONS = {
             ital: {
                 size: 16,
             },
+            color: colors.text,
             size: 16,
+            strokeColor: colors.textStroke,
         },
-        color: 'gray',
+        color: colors.edge,
     },
     layout: {
         randomSeed: 2,
@@ -158,4 +177,4 @@ const GRAPH_OPTIONS = {
         },
         solver: 'repulsion',
     },
-};
+});

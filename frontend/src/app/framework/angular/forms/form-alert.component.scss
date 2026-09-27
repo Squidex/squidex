@@ -1,7 +1,6 @@
 @import 'mixins';
 @import 'vars';
 
-$color: #fcfeff;
 
 :host {
     display: block;
@@ -10,5 +9,5 @@ $color: #fcfeff;
 }
 
 .light {
-    background: $color;
+    background: $color-alert-light-background;
 }

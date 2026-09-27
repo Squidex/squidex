@@ -7,7 +7,7 @@
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
-import { ApiUrlConfig, AppsState, AuthService, computeEditorUrl, ContentDto, SafeResourceUrlPipe, SchemaDto, TypedSimpleChanges, Types } from '@app/shared';
+import { ApiUrlConfig, AppsState, AuthService, computeEditorUrl, ContentDto, SafeResourceUrlPipe, SchemaDto, Subscriptions, ThemeService, TypedSimpleChanges, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-content-extension',
@@ -19,6 +19,7 @@ import { ApiUrlConfig, AppsState, AuthService, computeEditorUrl, ContentDto, Saf
     ],
 })
 export class ContentExtensionComponent {
+    private readonly subscriptions = new Subscriptions();
     private readonly context: any;
     private isInitialized = false;
 
@@ -44,7 +45,14 @@ export class ContentExtensionComponent {
     constructor(apiUrl: ApiUrlConfig, authService: AuthService,
         private readonly appsState: AppsState,
         private readonly router: Router,
+        private readonly themeService: ThemeService,
     ) {
+        this.subscriptions.add(
+            this.themeService.themeChanges
+                .subscribe(() => {
+                    this.sendTheme();
+                }));
+
         this.context = {
             apiUrl: apiUrl.buildUrl('api'),
             appId: appsState.snapshot.selectedApp!.id,
@@ -72,6 +80,7 @@ export class ContentExtensionComponent {
             if (type === 'started') {
                 this.isInitialized = true;
 
+                this.sendTheme();
                 this.sendInit();
                 this.sendContent();
             } else if (type === 'resize' && !this.scrollable) {
@@ -88,6 +97,10 @@ export class ContentExtensionComponent {
 
     private sendInit() {
         this.sendMessage('init', { context: this.context });
+    }
+
+    private sendTheme() {
+        this.sendMessage('themeChanged', { theme: this.themeService.theme });
     }
 
     private sendContent() {

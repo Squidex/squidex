@@ -15,7 +15,7 @@ noscript {
 
 @media (width <= 550px) {
     .profile {
-        background-color: $color-white;
+        background-color: $color-surface;
     }
 
     .profile-card {
@@ -53,6 +53,11 @@ noscript {
         margin-left: auto;
         margin-bottom: 1rem;
         height: 2.5rem;
+    }
+
+    // The default logo has a dark text and is not readable in dark mode.
+    &-logo-dark {
+        display: none;
     }
 
     &-password-signup {
@@ -116,10 +121,10 @@ noscript {
         }
 
         &-text {
-            background: $color-white;
+            background: $color-surface;
             border: 0;
             bottom: -.75rem;
-            color: color.adjust($color-border, $lightness: -15%);
+            color: $color-border-darker;
             display: inline-block;
             padding: 0 1rem;
             position: relative;
@@ -250,5 +255,15 @@ a {
     div {
         font-size: 30px;
         font-weight: lighter;
+    }
+}
+
+[data-bs-theme='dark'] {
+    .profile-logo-light {
+        display: none;
+    }
+
+    .profile-logo-dark {
+        display: block;
     }
 }

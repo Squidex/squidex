@@ -12,7 +12,7 @@ import { createGraphiQLFetcher } from '@graphiql/toolkit';
 import { GraphiQL } from 'graphiql';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom/client';
-import { ApiUrlConfig, AppsState, AuthService, ClientDto, ClientsService, ClientsState, DialogModel, FormHintComponent, FormRowComponent, LayoutComponent, MessageBus, ModalDialogComponent, ModalDirective, QueryExecuted, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, Types } from '@app/shared';
+import { ApiUrlConfig, AppsState, AuthService, ClientDto, ClientsService, ClientsState, DialogModel, FormHintComponent, FormRowComponent, LayoutComponent, MessageBus, ModalDialogComponent, ModalDirective, QueryExecuted, Subscriptions, ThemeService, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-graphql-page',
@@ -38,6 +38,9 @@ export class GraphQLPageComponent implements AfterViewInit, OnInit, OnDestroy {
     @ViewChild('graphiQLContainer', { static: false })
     public graphiQLContainer!: ElementRef;
 
+    private readonly subscriptions = new Subscriptions();
+    private fetcher?: ReturnType<typeof createGraphiQLFetcher>;
+
     public clientsReadable = false;
     public clientsDialog = new DialogModel();
     public clientSelected: ClientDto | null = null;
@@ -48,6 +51,7 @@ export class GraphQLPageComponent implements AfterViewInit, OnInit, OnDestroy {
         private readonly authService: AuthService,
         private readonly clientsService: ClientsService,
         private readonly messageBus: MessageBus,
+        private readonly themeService: ThemeService,
         public readonly clientsState: ClientsState,
     ) {
     }
@@ -68,6 +72,12 @@ export class GraphQLPageComponent implements AfterViewInit, OnInit, OnDestroy {
     public ngAfterViewInit() {
         this.reactRoot = ReactDOM.createRoot(this.graphiQLContainer.nativeElement);
         this.selectClient(null);
+
+        this.subscriptions.add(
+            this.themeService.themeChanges
+                .subscribe(() => {
+                    this.render();
+                }));
     }
 
     public selectClient(client: ClientDto | null) {
@@ -94,7 +104,7 @@ export class GraphQLPageComponent implements AfterViewInit, OnInit, OnDestroy {
                 .replace('https://', 'wss://') +
                 `?access_token=${accessToken}`;
 
-        const fetcher = createGraphiQLFetcher({
+        this.fetcher = createGraphiQLFetcher({
             url: graphQLEndpoint,
             headers: {
                 Authorization: `Bearer ${accessToken}`,
@@ -111,9 +121,18 @@ export class GraphQLPageComponent implements AfterViewInit, OnInit, OnDestroy {
             subscriptionUrl,
         });
 
+        this.render();
+    }
+
+    private render() {
+        if (!this.fetcher) {
+            return;
+        }
+
         this.reactRoot?.render(
             React.createElement(GraphiQL, {
-                fetcher,
+                fetcher: this.fetcher,
+                forcedTheme: this.themeService.theme,
             }),
         );
     }

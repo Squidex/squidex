@@ -84,14 +84,12 @@ public sealed class JobProcessor
             LogMessages.LogClearingJobs(log, ownerId);
 
             var job = state.Value.Jobs.Find(x => x.Id == jobId);
-
             if (job == null)
             {
                 return;
             }
 
             var runner = runners.FirstOrDefault(x => x.Name == job.TaskName);
-
             if (runner != null)
             {
                 await runner.CleanupAsync(job);

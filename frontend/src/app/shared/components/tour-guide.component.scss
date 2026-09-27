@@ -9,7 +9,7 @@ $caret-size: 14px;
 }
 
 .card {
-    @include box-shadow-outer(0, 2px, 5px, .2);
+    @include box-shadow-outer(0, 2px, 5px, $color-shadow-20);
     margin-bottom: 1rem;
     margin-top: 0;
     max-width: 300px;
@@ -31,7 +31,7 @@ $caret-size: 14px;
     }
 
     &::after {
-        @include caret-bottom($color-white, $caret-size);
+        @include caret-bottom($color-surface, $caret-size);
         @include absolute(null, 15px, -$caret-size * 2 + 3, null);
     }
 }
@@ -45,7 +45,7 @@ $caret-size: 14px;
 
     &.active {
         &:hover {
-            color: color.adjust($color-text, $lightness: -50%) !important;
+            color: $color-text-contrast-50 !important;
             cursor: pointer
         }
     }
@@ -86,7 +86,7 @@ $caret-size: 14px;
     .counter {
         @include circle(30px);
         align-items: center;
-        background-color: rgba(0, 0, 0, 30%);
+        background-color: $color-overlay;
         display: none;
         flex-grow: 1;
         flex-wrap: nowrap;
@@ -95,7 +95,7 @@ $caret-size: 14px;
     }
 
     .squid {
-        @include box-shadow-outer(0, 2px, 4px, .1);
+        @include box-shadow-outer(0, 2px, 4px, $color-shadow-10);
         border: 1px solid $color-border;
     }
 

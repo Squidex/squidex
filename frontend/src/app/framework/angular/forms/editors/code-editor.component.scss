@@ -6,7 +6,7 @@
 
 :host ::ng-deep {
     .ace_editor {
-        background: $color-white;
+        background: $color-surface;
 
         &.no-border {
             border: 0;
@@ -14,7 +14,7 @@
     }
 
     .ace_tooltip {
-        background: $color-white;
+        background: $color-surface;
         border: 1px solid $color-input;
         border-radius: 0;
         line-height: 1.6;
@@ -29,7 +29,7 @@
     }
 
     .ace_gutter-active-line {
-        background: color.adjust($color-border, $lightness: -5%) !important;
+        background: $color-border-contrast-5 !important;
     }
 
     .ace_gutter {

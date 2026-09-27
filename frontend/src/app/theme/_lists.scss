@@ -61,7 +61,7 @@
     //
     tbody {
         td {
-            background: $color-white;
+            background: $color-surface;
             border-bottom: 1px solid $color-border;
             border-top: 1px solid $color-border;
             margin: 0;
@@ -100,7 +100,7 @@
     //
     &-row {
         & {
-            background: $color-white;
+            background: $color-surface;
             border: 1px solid $color-border;
             border-radius: $border-radius;
             margin-bottom: .25rem;
@@ -285,7 +285,7 @@ tbody {
 
         &:hover,
         &.active {
-            color: color.adjust($color-text, $lightness: -20%);
+            color: $color-text-contrast-20;
         }
     }
 }

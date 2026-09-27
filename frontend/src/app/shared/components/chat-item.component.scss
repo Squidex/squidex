@@ -8,7 +8,7 @@
 }
 
 .bubble {
-    background-color: $color-white;
+    background-color: $color-surface;
     border: 0;
     border-radius: $border-radius;
     padding: 1rem;
@@ -16,14 +16,14 @@
 
     &-right {
         &::before {
-            @include caret-left($color-white, 10px);
+            @include caret-left($color-surface, 10px);
             @include absolute(.5rem, null, null, -18px);
         }
     }
 
     &-left {
         &::before {
-            @include caret-right($color-white, 10px);
+            @include caret-right($color-surface, 10px);
             @include absolute(.5rem, -18px);
         }
     }

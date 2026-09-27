@@ -1,12 +1,6 @@
 @import 'mixins';
 @import 'vars';
 
-$console-background: #1e1f22;
-$console-text: #d4d4d4;
-$console-muted: #7f848e;
-$console-info: #4fc1ff;
-$console-warn: #e5c07b;
-$console-error: #f48771;
 
 h4 {
     font-size: 1rem;
@@ -15,10 +9,10 @@ h4 {
 }
 
 .console {
-    background: $console-background;
+    background: $color-console-background;
     border-bottom-left-radius: $border-radius;
     border-bottom-right-radius: $border-radius;
-    color: $console-text;
+    color: $color-console-text;
     font-family: monospace;
     font-size: .85rem;
     line-height: 1.5;
@@ -41,23 +35,23 @@ h4 {
 
     &-time,
     &-debug {
-        color: $console-muted;
+        color: $color-console-muted;
     }
 
     &-info {
-        color: $console-info;
+        color: $color-console-info;
     }
 
     &-warn {
-        color: $console-warn;
+        color: $color-console-warn;
     }
 
     &-error {
-        color: $console-error;
+        color: $color-console-error;
     }
 
     &-omitted {
-        color: $console-muted;
+        color: $color-console-muted;
         font-style: italic;
         font-weight: normal;
     }

@@ -8,7 +8,7 @@
 import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component, inject, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { ApiUrlConfig, AuthService, Cookies, DropdownMenuComponent, ExternalLinkDirective, ModalDirective, ModalModel, ModalPlacementDirective, StatefulComponent, StopClickDirective, Subscriptions, TranslatePipe, UILanguages, UIOptions, UIState, UserIdPicturePipe } from '@app/shared';
+import { ApiUrlConfig, AuthService, Cookies, DropdownMenuComponent, ExternalLinkDirective, ModalDirective, ModalModel, ModalPlacementDirective, StatefulComponent, StopClickDirective, Subscriptions, ThemeMode, ThemeService, TranslatePipe, UILanguages, UIOptions, UIState, UserIdPicturePipe } from '@app/shared';
 
 interface State {
     // The display name of the user.
@@ -23,8 +23,8 @@ interface State {
     // The url to the user profile.
     profileUrl: string;
 
-    // True when the submenu should be open.
-    showSubmenu: boolean;
+    // The submenu that is open.
+    submenu: 'language' | 'theme' | null;
 }
 
 @Component({
@@ -52,17 +52,24 @@ export class ProfileMenuComponent extends StatefulComponent<State> implements On
     public readonly language = inject(UIOptions).value.culture;
     public readonly languages = UILanguages.ALL;
 
+    public readonly themeModes: ReadonlyArray<{ mode: ThemeMode; label: string }> = [
+        { mode: 'light', label: 'common.themeLight' },
+        { mode: 'dark', label: 'common.themeDark' },
+        { mode: 'system', label: 'common.themeSystem' },
+    ];
+
     constructor(apiUrl: ApiUrlConfig,
         public readonly uiState: UIState,
         public readonly uiOptions: UIOptions,
         public readonly authService: AuthService,
+        public readonly themeService: ThemeService,
     ) {
         super({
             profileDisplayName: '',
             profileEmail: '',
             profileId: '',
             profileUrl: apiUrl.buildUrl('/identity-server/account/profile'),
-            showSubmenu: false,
+            submenu: null,
         });
     }
 
@@ -90,19 +97,23 @@ export class ProfileMenuComponent extends StatefulComponent<State> implements On
         location.reload();
     }
 
+    public changeTheme(mode: ThemeMode) {
+        this.themeService.setMode(mode);
+    }
+
     public toggleProfile() {
         this.modalMenu.toggle();
 
         this.next(s => ({
             ...s,
-            showSubmenu: false,
+            submenu: null,
         }));
     }
 
-    public toggleSubmenu() {
+    public toggleSubmenu(submenu: 'language' | 'theme') {
         this.next(s => ({
             ...s,
-            showSubmenu: !s.showSubmenu,
+            submenu: s.submenu === submenu ? null : submenu,
         }));
     }
 

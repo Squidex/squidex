@@ -1,0 +1,277 @@
+@use 'sass:color';
+@use 'sass:map';
+@use 'sass:math';
+@use 'sass:meta';
+
+/* stylelint-disable */
+
+// Changes the lightness in the opposite direction for dark themes (--sqx-shade: -1) to keep the contrast.
+@function shade($color, $amount) {
+    @if meta.type-of($color) == 'color' {
+        @return color.adjust($color, $lightness: $amount);
+    }
+
+    @return unquote('hsl(from #{$color} h s calc(l + #{math.div($amount, 1%)} * var(--sqx-shade)))');
+}
+
+@function fade($color, $alpha) {
+    @if meta.type-of($color) == 'color' {
+        @return rgba($color, $alpha);
+    }
+
+    @return unquote('rgb(from #{$color} r g b / #{$alpha})');
+}
+
+// Colors that depend on the color scheme. They are exposed as CSS variables (see _themes.scss).
+$theme-light: (
+    'background':                   #f5f6f9,
+    'surface':                      #fff,
+    'border':                       #dedfe3,
+    'border-light':                 #f5f6f9,
+    'border-lighter':               color.adjust(#f5f6f9, $lightness: 1%),
+    'border-dark':                  #e7e8ea,
+    'border-darker':                color.adjust(#dedfe3, $lightness: -15%),
+    'title':                        #000,
+    'text':                         #373a3c,
+    'text-decent':                  #41444c,
+    'code-background':              #f5f7f9,
+    'code-text':                    #708090,
+    'theme-brand-light':            #d9e8fc,
+    'theme-secondary':              #e0e1e5,
+    'input':                        #e0e1e5,
+    'input-background':             #fff,
+    'input-disabled':               #eff1f4,
+    'input-placeholder':            color.adjust(#41444c, $lightness: 20%),
+    'badge-success-background':     #e4f6e6,
+    'badge-success-foreground':     #42a54c,
+    'badge-warning-background':     #ffe8cc,
+    'badge-warning-foreground':     #d18c3e,
+    'badge-danger-background':      #fce0e3,
+    'badge-danger-foreground':      #e56471,
+    'badge-info-background':        #d0f2fb,
+    'badge-info-foreground':        #3bb1cc,
+    'badge-primary-background':     #cce1ff,
+    'badge-primary-foreground':     #4186e0,
+    'badge-secondary-background':   #e6e6e6,
+    'badge-secondary-foreground':   #555,
+    'hint-background':              color.adjust(#3389ff, $lightness: 35%),
+    'shadow':                       rgb(0 0 0 / 20%),
+    'field-line':                   #c7cfd7,
+    'alert-light-background':       #fcfeff,
+    'progress':                     #3d7dd5,
+    'progress-trail':               #f4f4f4,
+    'diagram-start':                #000,
+    'diagram-edge':                 #808080,
+    'diagram-text':                 #343434,
+    'diagram-text-stroke':          #fff,
+    'chart-text':                   #666,
+    'chart-grid':                   rgba(0, 0, 0, .1),
+    'editor-base':                  #fff,
+    'editor-border':                #dedfe3,
+    'editor-accent':                #3389ff,
+);
+
+$theme-dark: (
+    'background':                   #16181c,
+    'surface':                      #1f2227,
+    'border':                       #363a42,
+    'border-light':                 #272a30,
+    'border-lighter':               #25282e,
+    'border-dark':                  #2e3238,
+    'border-darker':                #5a606b,
+    'title':                        #f3f4f6,
+    'text':                         #d6d9de,
+    'text-decent':                  #a9afb9,
+    'code-background':              #25282e,
+    'code-text':                    #9fadbb,
+    'theme-brand-light':            #1f3a5f,
+    'theme-secondary':              #3a3f47,
+    'input':                        #3d424a,
+    'input-background':             #1a1d21,
+    'input-disabled':               #26292e,
+    'input-placeholder':            #7d848f,
+    'badge-success-background':     #173a28,
+    'badge-success-foreground':     #5fd08a,
+    'badge-warning-background':     #3d2e14,
+    'badge-warning-foreground':     #f0b35a,
+    'badge-danger-background':      #43202a,
+    'badge-danger-foreground':      #f38a96,
+    'badge-info-background':        #113a45,
+    'badge-info-foreground':        #5dcde6,
+    'badge-primary-background':     #1c3558,
+    'badge-primary-foreground':     #75aeff,
+    'badge-secondary-background':   #33373e,
+    'badge-secondary-foreground':   #b9bfc8,
+    'hint-background':              #1d3350,
+    'shadow':                       rgb(0 0 0 / 60%),
+    'field-line':                   #4a505a,
+    'alert-light-background':       #1f2227,
+    'progress':                     #4f8fe8,
+    'progress-trail':               #2e3238,
+    'diagram-start':                #f3f4f6,
+    'diagram-edge':                 #7d848f,
+    'diagram-text':                 #d6d9de,
+    'diagram-text-stroke':          #1f2227,
+    'chart-text':                   #a9afb9,
+    'chart-grid':                   rgba(255, 255, 255, .08),
+    'editor-base':                  #1f2227,
+    'editor-border':                #363a42,
+    'editor-accent':                #3389ff,
+);
+
+$color-background:          var(--sqx-background);
+$color-surface:             var(--sqx-surface);
+
+$color-border:              var(--sqx-border);
+$color-border-light:        var(--sqx-border-light);
+$color-border-lighter:      var(--sqx-border-lighter);
+$color-border-dark:         var(--sqx-border-dark);
+$color-border-darker:       var(--sqx-border-darker);
+
+$color-title:               var(--sqx-title);
+$color-text:                var(--sqx-text);
+$color-text-decent:         var(--sqx-text-decent);
+$color-tooltip:             #1a2129;
+
+$color-code-background:     var(--sqx-code-background);
+$color-code-text:           var(--sqx-code-text);
+
+$color-extern-github:       #353535;
+$color-extern-google:       #d34836;
+$color-extern-microsoft:    #004185;
+$color-extern-twitter:      #1da1f2;
+$color-extern-oidc:         #526484;
+
+$color-theme-brand:         #3389ff;
+$color-theme-brand-dark:    #3284f4;
+$color-theme-brand-darker:  #2f7deb;
+$color-theme-brand-light:   var(--sqx-theme-brand-light);
+$color-theme-secondary:     var(--sqx-theme-secondary);
+
+$color-theme-error:         #eb3142;
+$color-theme-error-dark:    #c00;
+$color-theme-info:          #0eafcc;
+$color-theme-success-dark:  #38a678;
+$color-theme-success:       #3ab480;
+$color-theme-warning-dark:  #a65b00;
+$color-theme-warning:       #ffb136;
+
+$color-black:   #000;
+$color-white:   #fff;
+
+$color-input:               var(--sqx-input);
+$color-input-background:    var(--sqx-input-background);
+$color-input-disabled:      var(--sqx-input-disabled);
+$color-input-placeholder:   var(--sqx-input-placeholder);
+$color-input-shortcut:      rgba(255, 255, 255, .2);
+
+$color-badge-success-background:    var(--sqx-badge-success-background);
+$color-badge-success-foreground:    var(--sqx-badge-success-foreground);
+
+$color-badge-warning-background:    var(--sqx-badge-warning-background);
+$color-badge-warning-foreground:    var(--sqx-badge-warning-foreground);
+
+$color-badge-danger-background:     var(--sqx-badge-danger-background);
+$color-badge-danger-foreground:     var(--sqx-badge-danger-foreground);
+
+$color-badge-info-background:       var(--sqx-badge-info-background);
+$color-badge-info-foreground:       var(--sqx-badge-info-foreground);
+
+$color-badge-primary-background:    var(--sqx-badge-primary-background);
+$color-badge-primary-foreground:    var(--sqx-badge-primary-foreground);
+
+$color-badge-secondary-background:  var(--sqx-badge-secondary-background);
+$color-badge-secondary-foreground:  var(--sqx-badge-secondary-foreground);
+
+$color-hint-background:             var(--sqx-hint-background);
+$color-shadow:                      var(--sqx-shadow);
+$color-field-line:                  var(--sqx-field-line);
+$color-alert-light-background:      var(--sqx-alert-light-background);
+
+// Shadows and overlays.
+$color-input-shadow:                rgb(0 0 0 / 8%);
+$color-overlay:                     rgba(0, 0, 0, 30%);
+$color-overlay-dark:                rgba(0, 0, 0, 50%);
+
+// Special colors for single components.
+$color-dark-onboarding:             #273039;
+$color-breadcrumb-arrow:            #e4e7e9;
+$color-graphql-hover:               rgba(59, 75, 104, 7%);
+$color-notifo-link:                 rgba(0, 0, 0, 55%);
+$color-stars:                       #ffd700;
+$color-tag-focus:                   #b3d3ff;
+$color-tag-focus-shadow:            rgba(51, 137, 255, 25%);
+
+// Script logs are always shown as dark console.
+$color-console-background:          #1e1f22;
+$color-console-text:                #d4d4d4;
+$color-console-muted:               #7f848e;
+$color-console-info:                #4fc1ff;
+$color-console-warn:                #e5c07b;
+$color-console-error:               #f48771;
+
+// Shadows with different strength.
+$color-shadow-10:                    rgba(0, 0, 0, .1);
+$color-shadow-13:                    rgba(0, 0, 0, .13);
+$color-shadow-20:                    rgba(0, 0, 0, .2);
+$color-shadow-30:                    rgba(0, 0, 0, .3);
+
+// Computed colors. "contrast" moves away from the background (darker in light mode), "muted" moves towards it.
+$color-background-muted-2:           shade($color-background, 2%);
+
+$color-border-contrast-5:            shade($color-border, -5%);
+$color-border-contrast-10:           shade($color-border, -10%);
+$color-border-contrast-30:           shade($color-border, -30%);
+$color-border-contrast-40:           shade($color-border, -40%);
+$color-border-muted-2:               shade($color-border, 2%);
+$color-border-muted-6:               shade($color-border, 6%);
+$color-border-dark-contrast-30:      shade($color-border-dark, -30%);
+$color-border-dark-contrast-40:      shade($color-border-dark, -40%);
+$color-border-darker-contrast-10:    shade($color-border-darker, -10%);
+
+$color-text-contrast-20:             shade($color-text, -20%);
+$color-text-contrast-50:             shade($color-text, -50%);
+$color-text-muted-20:                shade($color-text, 20%);
+$color-text-decent-muted-20:         shade($color-text-decent, 20%);
+$color-text-decent-muted-40:         shade($color-text-decent, 40%);
+
+$color-input-contrast-2:             shade($color-input, -2%);
+$color-input-contrast-10:            shade($color-input, -10%);
+$color-input-muted-5:                shade($color-input, 5%);
+
+$color-theme-secondary-contrast-5:   shade($color-theme-secondary, -5%);
+$color-theme-secondary-contrast-10:  shade($color-theme-secondary, -10%);
+$color-theme-secondary-contrast-20:  shade($color-theme-secondary, -20%);
+
+$color-theme-error-contrast-10:      shade($color-theme-error, -10%);
+$color-theme-error-muted-20:         shade($color-theme-error, 20%);
+$color-white-contrast-10:            shade($color-white, -10%);
+
+// Hover and focus colors for text buttons.
+$color-theme-brand-contrast-25:      shade($color-theme-brand, -25%);
+$color-theme-brand-focus:            fade($color-theme-brand, .5);
+$color-theme-error-contrast-25:      shade($color-theme-error, -25%);
+$color-theme-error-focus:            fade($color-theme-error, .5);
+$color-theme-info-contrast-25:       shade($color-theme-info, -25%);
+$color-theme-info-focus:             fade($color-theme-info, .5);
+$color-theme-success-contrast-25:    shade($color-theme-success, -25%);
+$color-theme-success-focus:          fade($color-theme-success, .5);
+$color-theme-warning-contrast-25:    shade($color-theme-warning, -25%);
+$color-theme-warning-focus:          fade($color-theme-warning, .5);
+$color-text-contrast-25:             shade($color-text, -25%);
+$color-text-focus:                   fade($color-text, .5);
+$color-text-decent-contrast-25:      shade($color-text-decent, -25%);
+$color-text-decent-focus:            fade($color-text-decent, .5);
+
+// Raw values for bootstrap and GraphiQL, which cannot work with CSS variables.
+$color-raw-light-background:         map.get($theme-light, 'background');
+$color-raw-light-text:               map.get($theme-light, 'text');
+$color-raw-light-text-decent:        map.get($theme-light, 'text-decent');
+$color-raw-light-theme-secondary:    map.get($theme-light, 'theme-secondary');
+$color-raw-dark-background:          map.get($theme-dark, 'background');
+$color-raw-dark-border:              map.get($theme-dark, 'border');
+$color-raw-dark-border-light:        map.get($theme-dark, 'border-light');
+$color-raw-dark-surface:             map.get($theme-dark, 'surface');
+$color-raw-dark-text:                map.get($theme-dark, 'text');
+$color-raw-dark-text-decent:         map.get($theme-dark, 'text-decent');
+$color-raw-dark-title:               map.get($theme-dark, 'title');

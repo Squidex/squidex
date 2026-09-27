@@ -6,7 +6,7 @@
 
     .edit-menu {
         @include absolute(.5rem, auto, auto, .5rem);
-        background: $color-white;
+        background: $color-surface;
         border-right: 1px solid $color-border;
         padding-right: 1rem;
         white-space: nowrap;
@@ -15,12 +15,12 @@
 }
 
 tr {
-    background-color: $color-white;
+    background-color: $color-surface;
 }
 
 td {
     border-bottom: .7px solid $color-border;
-    border-left: 1px solid $color-white;
+    border-left: 1px solid $color-surface;
     border-top: 0 !important;
     position: relative;
     vertical-align: middle;

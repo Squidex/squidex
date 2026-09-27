@@ -1,7 +1,6 @@
 @import 'mixins';
 @import 'vars';
 
-$field-header: #e7ebef;
 
 .language {
     &-master {
@@ -23,7 +22,7 @@ $field-header: #e7ebef;
     }
 
     &-language {
-        background: $color-white;
+        background: $color-surface;
         border: 0;
         border-radius: $border-radius;
         line-height: 2rem;

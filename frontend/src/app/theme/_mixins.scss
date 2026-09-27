@@ -6,13 +6,13 @@
     font-weight: normal;
 }
 
-@mixin build-icon($color) {
+@mixin build-icon($color, $hover) {
     color: $color;
     transition: color .3s ease;
 
     &:hover,
     &:focus {
-        color: color.adjust($color, $lightness: -10%);
+        color: $hover;
     }
 }
 
@@ -23,7 +23,7 @@
     z-index: 100;
 }
 
-@mixin build-text-button($color) {
+@mixin build-text-button($color, $hover, $focus) {
     color: $color;
 
     &:disabled,
@@ -35,17 +35,17 @@
 
     &:focus,
     &.focus {
-        box-shadow: 0 0 0 $btn-focus-width rgba($color, .5);
+        box-shadow: 0 0 0 $btn-focus-width $focus;
     }
 
     &:active,
     &.active,
     &:hover {
-        color: color.adjust($color, $lightness: -25%);
+        color: $hover;
     }
 }
 
-@mixin scrollbars($size, $foreground-color, $background-color: mix($foreground-color, white, 50%)) {
+@mixin scrollbars($size, $foreground-color, $background-color) {
     &::-webkit-scrollbar {
         height: $size;
         width:  $size;
@@ -198,12 +198,12 @@
     }
 }
 
-@mixin box-shadow-outer($x-axis: 0, $y-axis: 1px, $blur: 2px, $alpha: .1) {
-    box-shadow: $x-axis $y-axis $blur rgba(0, 0, 0, $alpha);
+@mixin box-shadow-outer($x-axis: 0, $y-axis: 1px, $blur: 2px, $color: $color-shadow-10) {
+    box-shadow: $x-axis $y-axis $blur $color;
 }
 
-@mixin box-shadow-inner($x-axis: 0, $y-axis: 1px, $blur: 2px, $alpha: .1) {
-    box-shadow: inset $x-axis $y-axis $blur rgba(0, 0, 0, $alpha);
+@mixin box-shadow-inner($x-axis: 0, $y-axis: 1px, $blur: 2px, $color: $color-shadow-10) {
+    box-shadow: inset $x-axis $y-axis $blur $color;
 }
 
 @mixin position($t: null, $r: null, $b: null, $l: null) {

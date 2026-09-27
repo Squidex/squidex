@@ -6,6 +6,20 @@
 $enable-cssgrid:                true;
 
 //
+// COLOR MODES
+//
+$enable-dark-mode:              true;
+$color-mode-type:               data;
+
+$body-color-dark:               $color-raw-dark-text;
+$body-bg-dark:                  $color-raw-dark-background;
+$body-emphasis-color-dark:      $color-raw-dark-title;
+$body-secondary-color-dark:     $color-raw-dark-text-decent;
+$body-secondary-bg-dark:        $color-raw-dark-border-light;
+$body-tertiary-bg-dark:         $color-raw-dark-surface;
+$border-color-dark:             $color-raw-dark-border;
+
+//
 // GENERAL
 //
 $enable-shadows:                true;
@@ -39,14 +53,14 @@ $primary:                       $color-theme-brand;
 // Theme colors.
 $danger:                        $color-theme-error;
 $info:                          $color-theme-info;
-$secondary:                     $color-theme-secondary;
+$secondary:                     $color-raw-light-theme-secondary;
 $success:                       $color-theme-success;
 $warning:                       $color-theme-warning;
 
 // Background.
-$body-bg:                       $color-background;
+$body-bg:                       $color-raw-light-background;
 
-$body-secondary-color:          $color-text-decent;
+$body-secondary-color:          $color-raw-light-text-decent;
 
 // Borders.
 $border-color:                  $color-border;
@@ -67,10 +81,10 @@ $alert-link-font-weight:        normal;
 $label-margin-bottom:           .25rem;
 
 // Imputs
-$input-bg:                      $color-white;
+$input-bg:                      $color-input-background;
 $input-border-color:            $color-input;
 $input-disabled-bg:             $color-input-disabled;
-$input-group-addon-bg:          $color-white;
+$input-group-addon-bg:          $color-surface;
 $input-placeholder-color:       $color-input-placeholder;
 
 $form-select-box-shadow:        0 0 0 0;
@@ -79,7 +93,7 @@ $badge-bg-level: 2;
 
 // Dropdown
 $dropdown-border-color:         0;
-$dropdown-box-shadow:           0 3px 16px rgba(0, 0, 0, .2);
+$dropdown-box-shadow:           0 3px 16px $color-shadow;
 $dropdown-divider-bg:           $color-border-dark;
 $dropdown-link-hover-bg:        $color-theme-brand-light;
 
@@ -89,7 +103,7 @@ $hr-opacity:                    1;
 // cards
 $card-border-color:             $color-border;
 $card-border-radius:            $border-radius;
-$card-cap-bg:                   $color-white;
+$card-cap-bg:                   $color-surface;
 
 // Paragraphs
 $paragraph-margin-bottom:       .5rem;

@@ -5,6 +5,8 @@ type PluginOptions = {
     acceptedOrigins?: string[];
 }
 
+type SquidexTheme = 'light' | 'dark';
+
 declare class SquidexSidebar {
     /** 
      * The constructor.
@@ -38,6 +40,18 @@ declare class SquidexSidebar {
     onContentChanged(callback: (content: any) => void): void;
 
     /**
+     * Get the current theme of the Squidex UI ('light' or 'dark').
+     */
+    getTheme(): SquidexTheme | undefined;
+
+    /**
+     * Register an function that is called whenever the theme of the Squidex UI has changed.
+     *
+     * @param callback: The callback to invoke. Argument 1: Theme ('light' or 'dark').
+     */
+    onThemeChanged(callback: (theme: SquidexTheme) => void): void;
+
+    /**
      * Clean the editor SDK.
      */
     clean(): void; 
@@ -62,6 +76,18 @@ declare class SquidexWidget {
      * @param callback: The callback to invoke.
      */
     onInit(callback: () => void): void;
+
+    /**
+     * Get the current theme of the Squidex UI ('light' or 'dark').
+     */
+    getTheme(): SquidexTheme | undefined;
+
+    /**
+     * Register an function that is called whenever the theme of the Squidex UI has changed.
+     *
+     * @param callback: The callback to invoke. Argument 1: Theme ('light' or 'dark').
+     */
+    onThemeChanged(callback: (theme: SquidexTheme) => void): void;
 
     /**
      * Clean the editor SDK.
@@ -246,6 +272,18 @@ declare class SquidexFormField {
      * @param callback: The callback to invoke. Argument 1: Expanded state (boolean, expanded on = true, expanded off = false).
      */
     onExpanded(callback: (isExpanded: boolean) => void): void;
+
+    /**
+     * Get the current theme of the Squidex UI ('light' or 'dark').
+     */
+    getTheme(): SquidexTheme | undefined;
+
+    /**
+     * Register an function that is called whenever the theme of the Squidex UI has changed.
+     *
+     * @param callback: The callback to invoke. Argument 1: Theme ('light' or 'dark').
+     */
+    onThemeChanged(callback: (theme: SquidexTheme) => void): void;
 
     /**
      * Clean the editor SDK.

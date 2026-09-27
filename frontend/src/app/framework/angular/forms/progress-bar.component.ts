@@ -7,7 +7,7 @@
 
 import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, ElementRef, Input, numberAttribute, OnInit, Renderer2 } from '@angular/core';
 import * as ProgressBar from 'progressbar.js';
-import { TypedSimpleChanges } from '@app/framework/internal';
+import { Subscriptions, ThemeService, TypedSimpleChanges } from '@app/framework/internal';
 
 @Component({
     selector: 'sqx-progress-bar',
@@ -20,16 +20,17 @@ import { TypedSimpleChanges } from '@app/framework/internal';
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ProgressBarComponent implements  OnInit {
+    private readonly subscriptions = new Subscriptions();
     private progressBar: any;
 
     @Input()
     public mode = 'Line';
 
     @Input()
-    public color = '#3d7dd5';
+    public color?: string;
 
     @Input()
-    public trailColor = '#f4f4f4';
+    public trailColor?: string;
 
     @Input({ transform: numberAttribute })
     public trailWidth = 4;
@@ -49,14 +50,15 @@ export class ProgressBarComponent implements  OnInit {
     constructor(changeDetector: ChangeDetectorRef,
         private readonly element: ElementRef,
         private readonly renderer: Renderer2,
+        private readonly themeService: ThemeService,
     ) {
         changeDetector.detach();
     }
 
     public ngOnInit() {
         const options = {
-            color: this.color,
-            trailColor: this.trailColor,
+            color: this.getColor(),
+            trailColor: this.getTrailColor(),
             trailWidth: this.trailWidth,
             strokeWidth: this.strokeWidth,
             svgStyle: { width: '100%', height: '100%' },
@@ -71,12 +73,27 @@ export class ProgressBarComponent implements  OnInit {
         }
 
         this.updateValue();
+
+        this.subscriptions.add(
+            this.themeService.themeChanges
+                .subscribe(() => {
+                    this.progressBar.path?.setAttribute('stroke', this.getColor());
+                    this.progressBar.trail?.setAttribute('stroke', this.getTrailColor());
+                }));
     }
 
     public ngOnChanges(changes: TypedSimpleChanges<this>) {
         if (this.progressBar && changes.value) {
             this.updateValue();
         }
+    }
+
+    private getColor() {
+        return this.color || this.themeService.getColor('progress');
+    }
+
+    private getTrailColor() {
+        return this.trailColor || this.themeService.getColor('progress-trail');
     }
 
     private updateValue() {

@@ -1,0 +1,23 @@
+@import 'vars';
+
+/* stylelint-disable */
+
+@mixin theme-variables($theme) {
+    @each $name, $value in $theme {
+        --sqx-#{$name}: #{$value};
+    }
+}
+
+:root,
+[data-bs-theme='light'] {
+    @include theme-variables($theme-light);
+
+    // Direction of lightness changes, see shade() function.
+    --sqx-shade: 1;
+}
+
+[data-bs-theme='dark'] {
+    @include theme-variables($theme-dark);
+
+    --sqx-shade: -1;
+}

@@ -28,7 +28,7 @@
 .circle {
     @include circle(2rem);
     border: 1px solid $color-border;
-    background: $color-white;
+    background: $color-surface;
     position: relative;
 
     &.sm {

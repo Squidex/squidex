@@ -41,8 +41,8 @@
 
 .btn-add {
     &.drag {
-        border-color: color.adjust($color-theme-secondary, $lightness: -20%);
-        color: color.adjust($color-border, $lightness: -40%);
+        border-color: $color-theme-secondary-contrast-20;
+        color: $color-border-contrast-40;
         cursor: copy;
     }
 }

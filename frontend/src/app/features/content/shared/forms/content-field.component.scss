@@ -25,7 +25,7 @@
 
 .change-marker {
     @include absolute(-1.5rem, null, null, 0);
-    background: $color-white;
+    background: $color-surface;
     border: 1px solid $color-border;
     border-radius: $border-radius;
     font-size: $font-smallest;

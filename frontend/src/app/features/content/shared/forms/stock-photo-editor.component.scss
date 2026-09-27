@@ -1,12 +1,10 @@
 @import 'mixins';
 @import 'vars';
 
-$color-user-background: rgba(0, 0, 0, 50%);
-$color-background: #000;
 
 .preview {
     align-items: center;
-    background: $color-background;
+    background: $color-black;
     border: 0;
     border-radius: 0;
     text-align: center;
@@ -63,7 +61,7 @@ $color-background: #000;
 
     &-user {
         @include absolute(auto, 0, 0, 0);
-        background: $color-user-background;
+        background: $color-overlay-dark;
         border: 0;
         padding: .5rem .75rem;
     }

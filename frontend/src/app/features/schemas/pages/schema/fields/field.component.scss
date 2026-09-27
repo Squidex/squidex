@@ -2,8 +2,6 @@
 @import 'mixins';
 @import 'vars';
 
-$field-header: #e7ebef;
-$field-line: #c7cfd7;
 $padding: 1rem;
 
 .table-items-row-details {
@@ -24,7 +22,7 @@ $padding: 1rem;
     border-radius: 0;
 
     .table-items-row-details {
-        background: $color-white;
+        background: $color-surface;
         border: 1px solid $color-border;
         border-radius: $border-radius;
     }
@@ -62,14 +60,14 @@ $padding: 1rem;
         &-line-v {
             @include absolute($padding, auto, 3 * $padding + .25rem, $padding);
             border: 0;
-            border-left: 2px dashed $field-line;
+            border-left: 2px dashed $color-field-line;
             width: 2px;
         }
 
         &-line-h {
             @include absolute(-2px, auto, 50%, -$padding);
             border: 0;
-            border-bottom: 2px dashed $field-line;
+            border-bottom: 2px dashed $color-field-line;
             width: $padding - .25rem;
         }
     }
@@ -91,7 +89,7 @@ $padding: 1rem;
     }
 
     &-hidden {
-        color: color.adjust($color-text-decent, $lightness: 40%);
+        color: $color-text-decent-muted-40;
     }
 
     &-partitioning {

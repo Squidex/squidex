@@ -1,7 +1,6 @@
 @import 'mixins';
 @import 'vars';
 
-$color-gold: #ffd700;
 
 .many-stars {
     color: $color-text-decent;
@@ -25,7 +24,7 @@ $color-gold: #ffd700;
     vertical-align: middle;
 
     &::before {
-        color: $color-gold;
+        color: $color-stars;
         content: '☆';
         display: inline-block;
         font-size: 1.8rem;

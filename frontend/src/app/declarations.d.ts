@@ -90,6 +90,15 @@ interface EditorProps {
     // The class names.
     classNames?: ReadonlyArray<string>;
 
+    // The background color of the toolbar and the menus. The text color is derived from it.
+    baseColor?: string;
+
+    // The color for active and selected elements.
+    accentColor?: string;
+
+    // The color for all borders.
+    borderColor?: string;
+
     // Called when the value has been changed.
     onChange?: OnChange;
 
