@@ -31,6 +31,9 @@ services:
       - STORE__MONGODB__TEXTHARDCOUNT=20
       - URLS__BASEPATH=squidex/
       - URLS__BASEURL=http://localhost:8081/squidex/
+    volumes:
+      # Share the assets with the worker, because files of jobs are created by the worker.
+      - assets_mongo_path:/app/Assets
     depends_on:
       - db_mongo
 
@@ -47,6 +50,8 @@ services:
       - STORE__MONGODB__TEXTHARDCOUNT=20
       - URLS__BASEPATH=squidex/
       - URLS__BASEURL=http://localhost:8081/squidex/
+    volumes:
+      - assets_mongo_path:/app/Assets
     depends_on:
       - db_mongo
 
@@ -82,3 +87,6 @@ services:
     command: serve --port 1026
     ports:
       - "1026:1026"
+
+volumes:
+  assets_mongo_path:

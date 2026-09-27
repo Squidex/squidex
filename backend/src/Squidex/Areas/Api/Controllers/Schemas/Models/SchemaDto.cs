@@ -180,6 +180,12 @@ public class SchemaDto : Resource
                 resources.Url<SchemaContentsController>(x => nameof(x.PostContentMigration), values));
         }
 
+        if (resources.CanExportContents(Name) && Type != SchemaType.Component)
+        {
+            AddPostLink("contents/export",
+                resources.Url<SchemaContentsController>(x => nameof(x.PostContentExport), values));
+        }
+
         if (resources.CanPublishSchema(Name))
         {
             if (IsPublished)

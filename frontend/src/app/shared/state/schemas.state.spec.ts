@@ -7,7 +7,7 @@
 
 import { firstValueFrom, of, onErrorResumeNextWith, throwError } from 'rxjs';
 import { IMock, It, Mock, Times } from 'typemoq';
-import { AddFieldDto, ChangeCategoryDto, ConfigureFieldRulesDto, ConfigureUIFieldsDto, CreateSchemaDto, DialogService, MigrateContentsDto, SchemaDto, SchemasDto, SchemasService, SynchronizeSchemaDto, UpdateFieldDto, UpdateSchemaDto, versioned } from '@app/shared/internal';
+import { AddFieldDto, ChangeCategoryDto, ConfigureFieldRulesDto, ConfigureUIFieldsDto, CreateSchemaDto, DialogService, ExportContentsDto, MigrateContentsDto, SchemaDto, SchemasDto, SchemasService, SynchronizeSchemaDto, UpdateFieldDto, UpdateSchemaDto, versioned } from '@app/shared/internal';
 import { createSchema } from '../services/schemas.service.spec';
 import { TestValues } from './_test-helpers';
 import { getCategoryTree, SchemasState } from './schemas.state';
@@ -194,6 +194,17 @@ describe('SchemasState', () => {
                 .returns(() => of({})).verifiable();
 
             schemasState.migrateContents(schema1, request).subscribe();
+
+            dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
+        });
+
+        it('should notify if content export has been started', () => {
+            const request = new ExportContentsDto({ format: 'Csv' });
+
+            schemasService.setup(x => x.postContentExport(app, schema1, It.isValue(request)))
+                .returns(() => of({})).verifiable();
+
+            schemasState.exportContents(schema1, request).subscribe();
 
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });

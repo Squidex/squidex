@@ -42,6 +42,11 @@ public sealed class JobDto : Resource
     public string TaskName { get; set; }
 
     /// <summary>
+    /// The optional reference that has been passed in when the job has been started.
+    /// </summary>
+    public string? Reference { get; set; }
+
+    /// <summary>
     /// The description of the job.
     /// </summary>
     public string Description { get; set; }

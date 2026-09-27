@@ -55,11 +55,13 @@ public class ContentMigrationTests(ClientFixture fixture) : IClassFixture<Client
 
 
         // STEP 4: Start the migration with the default options.
-        await app.Schemas.PostContentMigrationAsync(schemaName, new MigrateContentsDto());
+        var reference = Guid.NewGuid().ToString();
+
+        await app.Schemas.PostContentMigrationAsync(schemaName, new MigrateContentsDto(), reference);
 
 
         // STEP 5: Wait for the migration to complete.
-        var job = await WaitForMigrationAsync(app);
+        var job = await WaitForMigrationAsync(app, reference);
 
         Assert.Equal("Checked contents: 2, submitted: 1", Assert.Single(job.Log).Message);
 
@@ -88,12 +90,14 @@ public class ContentMigrationTests(ClientFixture fixture) : IClassFixture<Client
 
 
         // STEP 3: Only migrate the published version, because the draft is valid anyway.
+        var reference = Guid.NewGuid().ToString();
+
         await app.Schemas.PostContentMigrationAsync(schemaName, new MigrateContentsDto
         {
             MigrateDraft = false,
-        });
+        }, reference);
 
-        await WaitForMigrationAsync(app);
+        await WaitForMigrationAsync(app, reference);
 
 
         // STEP 4: The published version has been migrated.
@@ -118,12 +122,14 @@ public class ContentMigrationTests(ClientFixture fixture) : IClassFixture<Client
 
 
         // STEP 3: Only migrate the draft version, which is valid.
+        var reference = Guid.NewGuid().ToString();
+
         await app.Schemas.PostContentMigrationAsync(schemaName, new MigrateContentsDto
         {
             MigratePublished = false,
-        });
+        }, reference);
 
-        await WaitForMigrationAsync(app);
+        await WaitForMigrationAsync(app, reference);
 
 
         // STEP 4: Nothing has been changed.
@@ -187,9 +193,9 @@ public class ContentMigrationTests(ClientFixture fixture) : IClassFixture<Client
         });
     }
 
-    private static async Task<JobDto> WaitForMigrationAsync(ISquidexClient app)
+    private static async Task<JobDto> WaitForMigrationAsync(ISquidexClient app, string reference)
     {
-        var job = await app.Jobs.PollAsync(x => x.TaskName == "migrateContents" && x.Status is JobStatus.Completed or JobStatus.Failed);
+        var job = await app.Jobs.PollAsync(x => x.Reference == reference && x.Status is JobStatus.Completed or JobStatus.Failed);
 
         Assert.Equal(JobStatus.Completed, job?.Status);
 

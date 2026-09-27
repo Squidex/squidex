@@ -21,6 +21,8 @@ public sealed class Resources(ApiController controller)
     // Contents
     public bool CanReadContent(string schema) => Can(PermissionIds.AppContentsReadOwn, schema);
 
+    public bool CanExportContents(string schema) => Can(PermissionIds.AppContentsRead, schema);
+
     public bool CanCreateContent(string schema) => Can(PermissionIds.AppContentsCreate, schema);
 
     public bool CanCreateContentVersion(string schema) => Can(PermissionIds.AppContentsVersionCreateOwn, schema);

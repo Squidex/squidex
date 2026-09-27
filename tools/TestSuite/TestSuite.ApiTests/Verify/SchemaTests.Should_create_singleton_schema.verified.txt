@@ -10,6 +10,9 @@
     contents: {
       Method: GET
     },
+    contents/export: {
+      Method: POST
+    },
     contents/migrate: {
       Method: POST
     },

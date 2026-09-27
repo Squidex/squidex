@@ -55,6 +55,7 @@ public class SchemaIndexesController(ICommandBus commandBus, IJobService jobServ
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="request">The request object that represents an index.</param>
+    /// <param name="reference">An optional reference to find the job.</param>
     /// <response code="200">Schema findexes returned.</response>
     /// <response code="404">Schema or app not found.</response>
     [HttpPost]
@@ -62,9 +63,9 @@ public class SchemaIndexesController(ICommandBus commandBus, IJobService jobServ
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ApiPermissionOrAnonymous(PermissionIds.AppSchemasIndexes)]
     [ApiCosts(1)]
-    public async Task<IActionResult> PostIndex(string app, string schema, [FromBody] CreateIndexDto request)
+    public async Task<IActionResult> PostIndex(string app, string schema, [FromBody] CreateIndexDto request, [FromQuery] string? reference = null)
     {
-        var job = CreateIndexJob.BuildRequest(User.Token()!, App, Schema, request.ToIndex());
+        var job = CreateIndexJob.BuildRequest(User.Token()!, App, Schema, request.ToIndex()) with { Reference = reference };
 
         await jobService.StartAsync(App.Id, job, HttpContext.RequestAborted);
 
@@ -77,6 +78,7 @@ public class SchemaIndexesController(ICommandBus commandBus, IJobService jobServ
     /// <param name="app">The name of the app.</param>
     /// <param name="schema">The name of the schema.</param>
     /// <param name="name">The name of the index.</param>
+    /// <param name="reference">An optional reference to find the job.</param>
     /// <response code="204">Schema index deletion added to job queue.</response>
     /// <response code="404">Schema or app not found.</response>
     [HttpDelete]
@@ -84,9 +86,9 @@ public class SchemaIndexesController(ICommandBus commandBus, IJobService jobServ
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ApiPermissionOrAnonymous(PermissionIds.AppSchemasIndexes)]
     [ApiCosts(1)]
-    public async Task<IActionResult> DeleteIndex(string app, string schema, string name)
+    public async Task<IActionResult> DeleteIndex(string app, string schema, string name, [FromQuery] string? reference = null)
     {
-        var job = DropIndexJob.BuildRequest(User.Token()!, App, Schema, name);
+        var job = DropIndexJob.BuildRequest(User.Token()!, App, Schema, name) with { Reference = reference };
 
         await jobService.StartAsync(App.Id, job, HttpContext.RequestAborted);
 

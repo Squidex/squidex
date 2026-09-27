@@ -8,9 +8,9 @@
 /* eslint-disable @angular-eslint/no-input-rename */
 /* eslint-disable @angular-eslint/directive-selector */
 
-import { Directive, Input, numberAttribute, OnInit } from '@angular/core';
+import { Directive, ElementRef, Input, numberAttribute, OnInit } from '@angular/core';
 import { timer } from 'rxjs';
-import { FloatingPlacement, StepDefinition, Subscriptions, TourService, TourState, Types } from '@app/shared/internal';
+import { FloatingPlacement, ModalService, StepDefinition, Subscriptions, TourService, TourState, Types } from '@app/shared/internal';
 
 @Directive({
     selector: '[hintText]',
@@ -34,6 +34,8 @@ export class TourHintDirective implements OnInit {
     public titlePosition?: FloatingPlacement;
 
     constructor(
+        private readonly element: ElementRef<Element>,
+        private readonly modalService: ModalService,
         private readonly tourService: TourService,
         private readonly tourState: TourState,
     ) {
@@ -62,6 +64,9 @@ export class TourHintDirective implements OnInit {
                 if (!this.tourState.shouldShowHint(this.anchorId)) {
                     return;
                 }
+
+                // Dialogs and dropdowns would cover the hint, but keep the one that contains the anchor.
+                this.modalService.hideAll(this.element.nativeElement);
 
                 this.tourService.initialize([{
                     anchorId: this.anchorId,

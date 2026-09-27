@@ -50,6 +50,7 @@ public class BackupsController(ICommandBus commandBus, IJobService jobService) :
     /// Start a new backup.
     /// </summary>
     /// <param name="app">The name of the app.</param>
+    /// <param name="reference">An optional reference to find the job.</param>
     /// <response code="204">Backup started.</response>
     /// <response code="400">Backup contingent reached.</response>
     /// <response code="404">App not found.</response>
@@ -58,9 +59,9 @@ public class BackupsController(ICommandBus commandBus, IJobService jobService) :
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ApiPermissionOrAnonymous(PermissionIds.AppJobsCreate)]
     [ApiCosts(0)]
-    public async Task<IActionResult> PostBackup(string app)
+    public async Task<IActionResult> PostBackup(string app, [FromQuery] string? reference = null)
     {
-        var job = BackupJob.BuildRequest(User.Token()!, App);
+        var job = BackupJob.BuildRequest(User.Token()!, App) with { Reference = reference };
 
         await jobService.StartAsync(App.Id, job, default);
 

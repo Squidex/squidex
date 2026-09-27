@@ -9,7 +9,7 @@ import { Injectable } from '@angular/core';
 import { EMPTY, forkJoin, Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
 import { debug, DialogService, LoadingState, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
-import { AddFieldDto, ChangeCategoryDto, ConfigureFieldRulesDto, ConfigureUIFieldsDto, CreateSchemaDto, FieldDto, MigrateContentsDto, NestedFieldDto, SchemaDto, SynchronizeSchemaDto, UpdateFieldDto, UpdateSchemaDto } from '../model';
+import { AddFieldDto, ChangeCategoryDto, ConfigureFieldRulesDto, ConfigureUIFieldsDto, CreateSchemaDto, ExportContentsDto, FieldDto, MigrateContentsDto, NestedFieldDto, SchemaDto, SynchronizeSchemaDto, UpdateFieldDto, UpdateSchemaDto } from '../model';
 import { SchemasService } from '../services/schemas.service';
 import { AppsState } from './apps.state';
 
@@ -179,6 +179,14 @@ export class SchemasState extends State<Snapshot> {
         return this.schemasService.postContentMigration(this.appName, schema, request).pipe(
             tap(() => {
                 this.dialogs.notifyInfo('i18n:schemas.migrateContentsStarted');
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
+    public exportContents(schema: SchemaDto, request: ExportContentsDto): Observable<any> {
+        return this.schemasService.postContentExport(this.appName, schema, request).pipe(
+            tap(() => {
+                this.dialogs.notifyInfo('i18n:contents.exportStarted');
             }),
             shareSubscribed(this.dialogs));
     }
