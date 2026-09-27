@@ -147,6 +147,17 @@ const pages: VisualPage[] = [
     {
         name: 'administration-users',
         url: '/app/administration/users',
+        intercept: async page => {
+            // Other tests create users with random names, therefore only show the admin user.
+            await page.route(/\/api\/user-management(\?.*)?$/, async route => {
+                const response = await route.fetch();
+                const users = await response.json();
+
+                const items = users.items.filter((x: any) => x.email === 'hello@squidex.io');
+
+                await route.fulfill({ response, json: { ...users, items, total: items.length } });
+            });
+        },
     },
     {
         name: 'administration-event-consumers',
