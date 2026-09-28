@@ -25,6 +25,9 @@ public static class PermissionIds
     // Backup Admin
     public const string AdminRestore = "squidex.admin.restore";
 
+    // Text Index Admin
+    public const string AdminTextIndex = "squidex.admin.text-index";
+
     // Event Admin
     public const string AdminEvents = "squidex.admin.events";
     public const string AdminEventsRead = "squidex.admin.events.read";

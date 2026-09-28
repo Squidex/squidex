@@ -15,5 +15,17 @@
         <sqx-form-row #tagsRow for="tags" hint="schemas.field.tagsHint" label="common.tags" [prefix]="field.fieldId">
             <sqx-tag-editor [id]="tagsRow.fieldName" formControlName="tags" />
         </sqx-form-row>
+
+        <sqx-form-row #searchModeRow for="searchMode" hint="schemas.field.searchModeHint" label="schemas.field.searchMode" [prefix]="field.fieldId">
+            <select class="form-select" [id]="searchModeRow.fieldName" formControlName="searchMode">
+                <option ngValue="Default">{{ "schemas.field.searchModeDefault" | sqxTranslate }}</option>
+                <option ngValue="Title">{{ "schemas.field.searchModeTitle" | sqxTranslate }}</option>
+                <option ngValue="Exclude">{{ "schemas.field.searchModeExclude" | sqxTranslate }}</option>
+            </select>
+        </sqx-form-row>
+
+        <sqx-form-row #searchPathsRow for="searchPaths" hint="schemas.field.searchPathsHint" label="schemas.field.searchPaths" [prefix]="field.fieldId">
+            <sqx-tag-editor [id]="searchPathsRow.fieldName" formControlName="searchPaths" />
+        </sqx-form-row>
     }
 </div>

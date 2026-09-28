@@ -40,6 +40,12 @@ public sealed class JobsDto : Resource
                 resources.Url<BackupsController>(x => nameof(x.PostBackup), values));
         }
 
+        if (resources.CanRebuildTextIndex)
+        {
+            AddPostLink("create/text-index",
+                resources.Url<JobsController>(x => nameof(x.PostTextIndexRebuild), values));
+        }
+
         return this;
     }
 }

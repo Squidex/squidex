@@ -29,7 +29,8 @@
                 "isRequired": true,
                 "isRequiredOnPublish": true,
                 "isHalfWidth": false,
-                "isCreateOnly": false
+                "isCreateOnly": false,
+                "searchMode": "Default"
             }
         },
         {
@@ -54,7 +55,8 @@
                 "isRequired": false,
                 "isRequiredOnPublish": false,
                 "isHalfWidth": false,
-                "isCreateOnly": false
+                "isCreateOnly": false,
+                "searchMode": "Default"
             }
         },
         {
@@ -75,7 +77,8 @@
                 "isRequired": false,
                 "isRequiredOnPublish": false,
                 "isHalfWidth": false,
-                "isCreateOnly": false
+                "isCreateOnly": false,
+                "searchMode": "Default"
             }
         },
         {
@@ -94,7 +97,8 @@
                 "isRequired": false,
                 "isRequiredOnPublish": false,
                 "isHalfWidth": false,
-                "isCreateOnly": false
+                "isCreateOnly": false,
+                "searchMode": "Default"
             }
         },
         {
@@ -114,7 +118,8 @@
                 "isRequired": false,
                 "isRequiredOnPublish": false,
                 "isHalfWidth": false,
-                "isCreateOnly": false
+                "isCreateOnly": false,
+                "searchMode": "Default"
             }
         },
         {
@@ -132,7 +137,8 @@
                 "isRequired": true,
                 "isRequiredOnPublish": true,
                 "isHalfWidth": false,
-                "isCreateOnly": false
+                "isCreateOnly": false,
+                "searchMode": "Default"
             }
         },
         {
@@ -148,7 +154,8 @@
                 "isRequired": false,
                 "isRequiredOnPublish": false,
                 "isHalfWidth": true,
-                "isCreateOnly": false
+                "isCreateOnly": false,
+                "searchMode": "Default"
             }
         },
         {
@@ -163,7 +170,8 @@
                 "isRequired": false,
                 "isRequiredOnPublish": false,
                 "isHalfWidth": false,
-                "isCreateOnly": false
+                "isCreateOnly": false,
+                "searchMode": "Default"
             }
         },
         {
@@ -186,7 +194,8 @@
                     "1",
                     "2",
                     "3"
-                ]
+                ],
+                "searchMode": "Default"
             }
         },
         {
@@ -209,7 +218,8 @@
                 "isRequired": false,
                 "isRequiredOnPublish": false,
                 "isHalfWidth": false,
-                "isCreateOnly": false
+                "isCreateOnly": false,
+                "searchMode": "Default"
             }
         },
         {
@@ -239,7 +249,8 @@
                 "isRequired": false,
                 "isRequiredOnPublish": false,
                 "isHalfWidth": false,
-                "isCreateOnly": false
+                "isCreateOnly": false,
+                "searchMode": "Default"
             }
         },
         {
@@ -255,7 +266,8 @@
                 "isRequired": false,
                 "isRequiredOnPublish": false,
                 "isHalfWidth": false,
-                "isCreateOnly": false
+                "isCreateOnly": false,
+                "searchMode": "Default"
             },
             "children": [
                 {
@@ -275,7 +287,8 @@
                         "isRequired": false,
                         "isRequiredOnPublish": false,
                         "isHalfWidth": false,
-                        "isCreateOnly": false
+                        "isCreateOnly": false,
+                        "searchMode": "Default"
                     }
                 }
             ]
@@ -293,7 +306,8 @@
                 "isRequired": false,
                 "isRequiredOnPublish": false,
                 "isHalfWidth": false,
-                "isCreateOnly": true
+                "isCreateOnly": true,
+                "searchMode": "Default"
             }
         }
     ],

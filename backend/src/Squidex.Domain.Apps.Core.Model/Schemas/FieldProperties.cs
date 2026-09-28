@@ -25,6 +25,10 @@ public abstract record FieldProperties : NamedElementPropertiesBase
 
     public ReadonlyList<string>? Tags { get; init; }
 
+    public FieldSearchMode SearchMode { get; init; }
+
+    public ReadonlyList<string>? SearchPaths { get; init; }
+
     public abstract T Accept<T, TArgs>(IFieldPropertiesVisitor<T, TArgs> visitor, TArgs args);
 
     public abstract T Accept<T, TArgs>(IFieldVisitor<T, TArgs> visitor, IField field, TArgs args);

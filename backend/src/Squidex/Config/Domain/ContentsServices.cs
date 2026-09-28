@@ -14,6 +14,7 @@ using Squidex.Domain.Apps.Entities.Contents.Counter;
 using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 using Squidex.Domain.Apps.Entities.Contents.Text;
+using Squidex.Domain.Apps.Entities.Contents.Text.Extraction;
 using Squidex.Domain.Apps.Entities.Contents.Validation;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Search;
@@ -97,7 +98,40 @@ public static class ContentsServices
             .AsOptional<IWorkflowsValidator>();
 
         services.AddSingletonAs<TextIndexingProcess>()
-            .As<IEventConsumer>();
+            .As<IEventConsumer>().As<ITextIndexRebuilder>();
+
+        services.AddSingletonAs<TextExtractor>()
+            .AsSelf();
+
+        services.AddSingletonAs<ScriptTextExtractionStrategy>()
+            .As<ITextExtractionStrategy>();
+
+        services.AddSingletonAs<SchemaTextExtractionStrategy>()
+            .As<ITextExtractionStrategy>();
+
+        services.AddSingletonAs<SearchPathsFieldTextStrategy>()
+            .As<IFieldTextStrategy>();
+
+        services.AddSingletonAs<RichTextFieldTextStrategy>()
+            .As<IFieldTextStrategy>();
+
+        services.AddSingletonAs<ArrayFieldTextStrategy>()
+            .As<IFieldTextStrategy>();
+
+        services.AddSingletonAs<ComponentTextStrategy>()
+            .As<IFieldTextStrategy>();
+
+        services.AddSingletonAs<JsonTextStrategy>()
+            .As<IFieldTextStrategy>();
+
+        services.AddSingletonAs<MarkdownTextNormalizer>()
+            .As<ITextNormalizer>();
+
+        services.AddSingletonAs<HtmlTextNormalizer>()
+            .As<ITextNormalizer>();
+
+        services.AddSingletonAs<NoiseTextNormalizer>()
+            .As<ITextNormalizer>();
 
         services.AddSingletonAs<ContentsSearchSource>()
             .As<ISearchSource>();

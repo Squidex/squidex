@@ -63,5 +63,15 @@ public abstract class FieldPropertiesDto
     /// </summary>
     public ReadonlyList<string>? Tags { get; set; }
 
+    /// <summary>
+    /// Defines how the field is used for the full text search.
+    /// </summary>
+    public FieldSearchMode SearchMode { get; set; }
+
+    /// <summary>
+    /// Optional paths to the values that are indexed for the full text search, e.g. 'items.label'.
+    /// </summary>
+    public ReadonlyList<string>? SearchPaths { get; set; }
+
     public abstract FieldProperties ToProperties();
 }

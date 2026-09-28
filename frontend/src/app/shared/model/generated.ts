@@ -3124,6 +3124,8 @@ export class SchemaScriptsDto implements ISchemaScriptsDto {
     readonly delete?: string | undefined;
     /** The script that is executed when change a content status. */
     readonly change?: string | undefined;
+    /** The script that is executed when a content is indexed for the full text search. */
+    readonly index?: string | undefined;
 
     constructor(data?: ISchemaScriptsDto) {
         if (data) {
@@ -3141,6 +3143,7 @@ export class SchemaScriptsDto implements ISchemaScriptsDto {
         (<any>this).update = _data["update"];
         (<any>this).delete = _data["delete"];
         (<any>this).change = _data["change"];
+        (<any>this).index = _data["index"];
         this.cleanup(this);
         return this;
     }
@@ -3159,6 +3162,7 @@ export class SchemaScriptsDto implements ISchemaScriptsDto {
         data["update"] = this.update;
         data["delete"] = this.delete;
         data["change"] = this.change;
+        data["index"] = this.index;
         this.cleanup(data);
         return data;
     }
@@ -3198,6 +3202,8 @@ export interface ISchemaScriptsDto {
     readonly delete?: string | undefined;
     /** The script that is executed when change a content status. */
     readonly change?: string | undefined;
+    /** The script that is executed when a content is indexed for the full text search. */
+    readonly index?: string | undefined;
 }
 
 export class FieldRuleDto implements IFieldRuleDto {
@@ -3449,6 +3455,10 @@ export abstract class FieldPropertiesDto implements IFieldPropertiesDto {
     readonly editorUrl?: string | undefined;
     /** Tags for automation processes. */
     readonly tags?: string[] | undefined;
+    /** Defines how the field is used for the full text search. */
+    readonly searchMode?: FieldSearchMode;
+    /** Optional paths to the values that are indexed for the full text search, e.g. 'items.label'. */
+    readonly searchPaths?: string[] | undefined;
 
     public get isComplexUI() {
         return true;
@@ -3493,6 +3503,12 @@ export abstract class FieldPropertiesDto implements IFieldPropertiesDto {
             (<any>this).tags = [] as any;
             for (let item of _data["tags"])
                 (<any>this).tags!.push(item);
+        }
+        (<any>this).searchMode = _data["searchMode"];
+        if (Array.isArray(_data["searchPaths"])) {
+            (<any>this).searchPaths = [] as any;
+            for (let item of _data["searchPaths"])
+                (<any>this).searchPaths!.push(item);
         }
         this.cleanup(this);
         return this;
@@ -3563,6 +3579,12 @@ export abstract class FieldPropertiesDto implements IFieldPropertiesDto {
             for (let item of this.tags)
                 data["tags"].push(item);
         }
+        data["searchMode"] = this.searchMode;
+        if (Array.isArray(this.searchPaths)) {
+            data["searchPaths"] = [];
+            for (let item of this.searchPaths)
+                data["searchPaths"].push(item);
+        }
         this.cleanup(data);
         return data;
     }
@@ -3608,7 +3630,19 @@ export interface IFieldPropertiesDto {
     readonly editorUrl?: string | undefined;
     /** Tags for automation processes. */
     readonly tags?: string[] | undefined;
+    /** Defines how the field is used for the full text search. */
+    readonly searchMode?: FieldSearchMode;
+    /** Optional paths to the values that are indexed for the full text search, e.g. 'items.label'. */
+    readonly searchPaths?: string[] | undefined;
 }
+
+export type FieldSearchMode = "Default" | "Title" | "Exclude";
+
+export const FieldSearchModeValues: ReadonlyArray<FieldSearchMode> = [
+	"Default",
+	"Title",
+	"Exclude"
+];
 
 export class ArrayFieldPropertiesDto extends FieldPropertiesDto implements IArrayFieldPropertiesDto {
     /** The minimum allowed items for the field value. */
@@ -11366,6 +11400,10 @@ export class JobsDto extends ResourceDto implements IJobsDto {
 
     public get canCreateBackup() {
         return this.compute('canCreateBackup', () => hasAnyLink(this._links, 'create/backups'));
+    }
+
+    public get canRebuildTextIndex() {
+        return this.compute('canRebuildTextIndex', () => hasAnyLink(this._links, 'create/text-index'));
     }
 
     constructor(data?: IJobsDto) {

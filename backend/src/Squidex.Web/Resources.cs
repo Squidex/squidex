@@ -149,6 +149,8 @@ public sealed class Resources(ApiController controller)
     // Backups
     public bool CanRestoreBackup => Can(PermissionIds.AdminRestore);
 
+    public bool CanRebuildTextIndex => Can(PermissionIds.AdminTextIndex);
+
     public bool CanCreateBackup => Can(PermissionIds.AppJobs);
 
     // Jobs

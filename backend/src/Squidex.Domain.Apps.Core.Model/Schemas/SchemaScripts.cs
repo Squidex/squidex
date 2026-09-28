@@ -20,4 +20,6 @@ public sealed record SchemaScripts
     public string? Query { get; init; }
 
     public string? QueryPre { get; init; }
+
+    public string? Index { get; init; }
 }

@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Domain.Apps.Entities.TestHelpers;
@@ -627,7 +628,8 @@ public abstract class TextIndexerTests : GivenContext
         {
             var index = await CreateSutAsync();
 
-            process = new TextIndexingProcess(TestUtils.DefaultSerializer, index, new InMemoryTextIndexerState());
+            process = new TextIndexingProcess(TestUtils.DefaultSerializer, index, new InMemoryTextIndexerState(),
+                AppProvider, TextExtractorTests.CreateExtractor(A.Fake<IScriptEngine>()), A.Fake<IEventStore>(), A.Fake<IEventFormatter>());
         }
 
         return process;

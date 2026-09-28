@@ -114,7 +114,7 @@ public class ContentQueryParserTests : GivenContext
     [Fact]
     public async Task Should_convert_full_text_query_to_filter_with_other_filter()
     {
-        A.CallTo(() => textIndex.SearchAsync(ApiContext.App, A<TextQuery>.That.Matches(x => x.Text == "Hello"), ApiContext.Scope(), CancellationToken))
+        A.CallTo(() => textIndex.SearchAsync(ApiContext.App, A<TextQuery>.That.Matches(x => x.Text == "Hello" && x.RequiredSchemaIds!.SequenceEqual(new[] { SchemaId.Id })), ApiContext.Scope(), CancellationToken))
             .Returns([DomainId.Create("1"), DomainId.Create("2")]);
 
         var query = Q.Empty.WithODataQuery("$search=Hello&$filter=data/firstName/iv eq 'ABC'");
