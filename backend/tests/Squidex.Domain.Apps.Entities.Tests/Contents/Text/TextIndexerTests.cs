@@ -5,10 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Domain.Apps.Entities.Contents.Text.Rebuild;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
+using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Events;
@@ -628,8 +631,16 @@ public abstract class TextIndexerTests : GivenContext
         {
             var index = await CreateSutAsync();
 
-            process = new TextIndexingProcess(TestUtils.DefaultSerializer, index, new InMemoryTextIndexerState(),
-                AppProvider, TextExtractorTests.CreateExtractor(A.Fake<IScriptEngine>()), A.Fake<IEventStore>(), A.Fake<IEventFormatter>());
+            var registry =
+                new TextIndexRebuildRegistry(
+                    new InMemoryPersistenceFactory<TextIndexRebuildRequests>(),
+                    new InMemoryPersistenceFactory<TextIndexSkipList>());
+
+            var coordinator = new TextIndexRebuildCoordinator(registry, AppProvider, A.Fake<IJobService>(), A.Fake<ILogger<TextIndexRebuildCoordinator>>());
+
+            var extraction = new TextIndexExtraction(AppProvider, TextExtractorTests.CreateExtractor(A.Fake<IScriptEngine>()));
+
+            process = new TextIndexingProcess(TestUtils.DefaultSerializer, index, new InMemoryTextIndexerState(), extraction, coordinator);
         }
 
         return process;

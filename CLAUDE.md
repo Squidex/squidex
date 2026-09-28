@@ -61,6 +61,8 @@ dotnet test --filter "Category!=Dependencies & Category!=TestContainer"
 - Do not comment properties in general (for example event properties). Only comment behavior inside classes.
 - Exception: properties of API models (DTOs) keep their XML comments, because they are used for the OpenAPI documentation.
 - Do not write conditions that span multiple lines. Split them into multiple `if` statements (e.g. early returns) instead.
+- Try to keep files under 300 lines. Split larger classes by responsibility.
+- Do not put a blank line between a variable assignment and an `if` statement that checks this variable.
 
 ## Maintaining this file
 

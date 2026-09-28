@@ -18,7 +18,6 @@ public sealed class TextExtractor(IEnumerable<ITextExtractionStrategy> strategie
         foreach (var strategy in strategies)
         {
             var result = await strategy.ExtractAsync(context, ct);
-
             if (result != null)
             {
                 return result;

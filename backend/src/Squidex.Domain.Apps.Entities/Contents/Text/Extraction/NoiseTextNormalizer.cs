@@ -27,7 +27,6 @@ public sealed partial class NoiseTextNormalizer : ITextNormalizer
     public static bool IsNoise(string text)
     {
         var span = text.AsSpan().Trim();
-
         if (span.Length == 0)
         {
             return true;

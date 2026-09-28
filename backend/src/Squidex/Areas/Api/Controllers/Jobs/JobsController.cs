@@ -9,7 +9,7 @@ using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Jobs.Models;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities;
-using Squidex.Domain.Apps.Entities.Contents.Text;
+using Squidex.Domain.Apps.Entities.Contents.Text.Rebuild;
 using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;

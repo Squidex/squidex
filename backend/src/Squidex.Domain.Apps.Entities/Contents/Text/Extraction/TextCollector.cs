@@ -34,7 +34,6 @@ public sealed class TextCollector : IDisposable
         }
 
         var target = isTitle ? titles : bodies;
-
         if (!target.TryGetValue(language, out var sb))
         {
             sb = DefaultPools.StringBuilder.Get();

@@ -27,7 +27,6 @@ public sealed class ScriptTextExtractionStrategy(IScriptEngine scriptEngine, ILo
         CancellationToken ct)
     {
         var script = context.Schema?.Scripts.Index;
-
         if (string.IsNullOrWhiteSpace(script))
         {
             return null;

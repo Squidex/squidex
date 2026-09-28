@@ -39,7 +39,6 @@ public sealed class FieldTextContext
         foreach (var normalizer in normalizers)
         {
             var normalized = normalizer.Normalize(text, field);
-
             if (string.IsNullOrWhiteSpace(normalized))
             {
                 return;
@@ -72,7 +71,6 @@ public sealed class FieldTextContext
     public void AppendField(IField? field, JsonValue value)
     {
         var searchMode = field?.RawProperties.SearchMode ?? FieldSearchMode.Default;
-
         if (searchMode == FieldSearchMode.Exclude)
         {
             return;

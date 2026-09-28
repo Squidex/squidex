@@ -12,34 +12,40 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 using IClock = NodaTime.IClock;
 
-namespace Squidex.Domain.Apps.Entities.Contents.Text;
+namespace Squidex.Domain.Apps.Entities.Contents.Text.Rebuild;
 
 public class RebuildTextIndexJobTests : GivenContext
 {
     private readonly IContentRepository contentRepository = A.Fake<IContentRepository>();
-    private readonly ITextIndexRebuilder textIndexRebuilder = A.Fake<ITextIndexRebuilder>();
+    private readonly ITextIndexRebuilder rebuilder = A.Fake<ITextIndexRebuilder>();
+    private readonly ITextIndexRebuildRegistry registry = A.Fake<ITextIndexRebuildRegistry>();
+    private readonly TextIndexRebuildRequest request = new TextIndexRebuildRequest { Id = DomainId.NewGuid() };
     private readonly List<List<DomainId>> batches = [];
     private readonly RebuildTextIndexJob sut;
+    private TextIndexSkipList? skipList;
 
     public RebuildTextIndexJobTests()
     {
-        A.CallTo(() => textIndexRebuilder.RebuildAsync(AppId.Id, A<IReadOnlyCollection<DomainId>>._, A<CancellationToken>._))
+        skipList = new TextIndexSkipList { RequestId = request.Id, IsTakenOver = true };
+
+        A.CallTo(() => registry.StartAsync(AppId.Id, A<CancellationToken>._))
+            .Returns(request);
+
+        A.CallTo(() => registry.GetSkipListAsync(AppId.Id, A<CancellationToken>._))
+            .ReturnsLazily(() => skipList);
+
+        A.CallTo(() => registry.UpdateAsync(AppId.Id, request.Id, A<long>._, A<TextIndexRebuildStatus>._, A<CancellationToken>._))
+            .Returns(true);
+
+        A.CallTo(() => rebuilder.RebuildAsync(AppId.Id, A<IReadOnlyCollection<DomainId>>._, A<CancellationToken>._))
             .Invokes(x => batches.Add(x.GetArgument<IReadOnlyCollection<DomainId>>(1)!.ToList()));
 
-        sut = new RebuildTextIndexJob(AppProvider, contentRepository, textIndexRebuilder);
-    }
-
-    [Fact]
-    public void Should_create_request_for_app()
-    {
-        var job = RebuildTextIndexJob.BuildRequest(User, App);
-
-        job.Arguments.Should().BeEquivalentTo(
-            new Dictionary<string, string>
-            {
-                ["appId"] = App.Id.ToString(),
-                ["appName"] = App.Name,
-            });
+        sut = new RebuildTextIndexJob(AppProvider, contentRepository, rebuilder, registry)
+        {
+            AcknowledgeTimeout = TimeSpan.FromMilliseconds(200),
+            HandBackTimeout = TimeSpan.FromMilliseconds(200),
+            PollInterval = TimeSpan.FromMilliseconds(10),
+        };
     }
 
     [Fact]
@@ -58,23 +64,23 @@ public class RebuildTextIndexJobTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_throw_exception_if_app_not_found()
+    public void Should_create_recovery_request()
     {
-        A.CallTo(() => AppProvider.GetAppAsync(AppId.Id, A<bool>._, A<CancellationToken>._))
-            .Returns(Task.FromResult<Core.Apps.App?>(null));
+        var job = RebuildTextIndexJob.BuildRecoveryRequest(User, App);
 
-        var context = CreateRunContext(CreateJob());
-
-        await Assert.ThrowsAsync<DomainObjectNotFoundException>(() => sut.RunAsync(context, CancellationToken));
+        job.Arguments.Should().BeEquivalentTo(
+            new Dictionary<string, string>
+            {
+                ["appId"] = App.Id.ToString(),
+                ["appName"] = App.Name,
+                ["recovery"] = "True",
+            });
     }
 
     [Fact]
-    public async Task Should_rebuild_all_contents_of_app_in_batches()
+    public async Task Should_rebuild_all_contents_in_batches_and_hand_back()
     {
-        var ids = Enumerable.Range(0, 250).Select(_ => DomainId.NewGuid()).ToList();
-
-        A.CallTo(() => contentRepository.StreamIds(AppId.Id, null, SearchScope.All, CancellationToken))
-            .Returns(ids.ToAsyncEnumerable());
+        var ids = SetupContents(250);
 
         var job = CreateJob();
 
@@ -83,42 +89,107 @@ public class RebuildTextIndexJobTests : GivenContext
         Assert.Equal([100, 100, 50], batches.Select(x => x.Count));
         Assert.Equal(ids, batches.SelectMany(x => x));
         Assert.Equal("Rebuild full text index", job.Description);
+
+        A.CallTo(() => registry.UpdateAsync(AppId.Id, request.Id, A<long>._, TextIndexRebuildStatus.Completing, A<CancellationToken>._))
+            .MustHaveHappened();
+        A.CallTo(() => registry.RemoveAsync(AppId.Id, request.Id, A<CancellationToken>._))
+            .MustHaveHappenedOnceExactly();
     }
 
     [Fact]
-    public async Task Should_only_rebuild_contents_of_schema()
+    public async Task Should_rebuild_skipped_contents()
     {
-        var ids = new List<DomainId> { DomainId.NewGuid() };
+        var id1 = DomainId.NewGuid();
+        var id2 = DomainId.NewGuid();
 
-        A.CallTo(() => contentRepository.StreamIds(AppId.Id, A<HashSet<DomainId>>.That.IsSameSequenceAs(new[] { SchemaId.Id }), SearchScope.All, CancellationToken))
-            .Returns(ids.ToAsyncEnumerable());
+        skipList = new TextIndexSkipList { RequestId = request.Id, IsTakenOver = true };
+        skipList.Add(id1);
+        skipList.Add(id2);
 
-        var job = CreateJob(Schema);
+        await sut.RunAsync(CreateRunContext(CreateJob(isRecovery: true)), CancellationToken);
+
+        Assert.Equal([id1, id2], batches.Single());
+
+        A.CallTo(() => registry.UpdateAsync(AppId.Id, request.Id, 2, TextIndexRebuildStatus.Completing, A<CancellationToken>._))
+            .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_not_rebuild_all_contents_in_recovery_mode()
+    {
+        SetupContents(10);
+
+        var job = CreateJob(isRecovery: true);
 
         await sut.RunAsync(CreateRunContext(job), CancellationToken);
 
-        Assert.Equal(ids, batches.SelectMany(x => x));
-        Assert.Equal($"Schema {Schema.Name}: Rebuild full text index", job.Description);
+        Assert.Empty(batches);
+        Assert.Equal("Recover full text index", job.Description);
+
+        A.CallTo(() => registry.RemoveAsync(AppId.Id, request.Id, A<CancellationToken>._))
+            .MustHaveHappenedOnceExactly();
     }
 
     [Fact]
-    public async Task Should_not_rebuild_if_app_has_no_contents()
+    public async Task Should_hand_back_if_cancelled()
     {
-        A.CallTo(() => contentRepository.StreamIds(AppId.Id, null, SearchScope.All, CancellationToken))
-            .Returns(AsyncEnumerable.Empty<DomainId>());
+        A.CallTo(() => contentRepository.StreamIds(AppId.Id, null, SearchScope.All, A<CancellationToken>._))
+            .Throws(new OperationCanceledException());
 
-        await sut.RunAsync(CreateRunContext(CreateJob()), CancellationToken);
+        await Assert.ThrowsAsync<OperationCanceledException>(() => sut.RunAsync(CreateRunContext(CreateJob()), CancellationToken));
 
-        A.CallTo(() => textIndexRebuilder.RebuildAsync(A<DomainId>._, A<IReadOnlyCollection<DomainId>>._, A<CancellationToken>._))
+        A.CallTo(() => registry.RemoveAsync(AppId.Id, request.Id, A<CancellationToken>._))
+            .MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public async Task Should_fail_if_text_indexer_does_not_acknowledge()
+    {
+        skipList = null;
+
+        await Assert.ThrowsAsync<DomainException>(() => sut.RunAsync(CreateRunContext(CreateJob()), CancellationToken));
+
+        Assert.Empty(batches);
+
+        A.CallTo(() => registry.RemoveAsync(A<DomainId>._, A<DomainId>._, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 
-    private Job CreateJob(Core.Schemas.Schema? schema = null)
+    [Fact]
+    public async Task Should_fail_if_request_has_been_removed()
     {
+        A.CallTo(() => registry.UpdateAsync(AppId.Id, request.Id, A<long>._, A<TextIndexRebuildStatus>._, A<CancellationToken>._))
+            .Returns(false);
+
+        SetupContents(10);
+
+        await Assert.ThrowsAsync<DomainException>(() => sut.RunAsync(CreateRunContext(CreateJob()), CancellationToken));
+
+        A.CallTo(() => registry.RemoveAsync(A<DomainId>._, A<DomainId>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
+
+    private List<DomainId> SetupContents(int count)
+    {
+        var ids = Enumerable.Range(0, count).Select(_ => DomainId.NewGuid()).ToList();
+
+        A.CallTo(() => contentRepository.StreamIds(AppId.Id, null, SearchScope.All, A<CancellationToken>._))
+            .Returns(ids.ToAsyncEnumerable());
+
+        return ids;
+    }
+
+    private Job CreateJob(bool isRecovery = false)
+    {
+        var jobRequest =
+            isRecovery ?
+            RebuildTextIndexJob.BuildRecoveryRequest(User, App) :
+            RebuildTextIndexJob.BuildRequest(User, App);
+
         return new Job
         {
             Id = DomainId.NewGuid(),
-            Arguments = RebuildTextIndexJob.BuildRequest(User, App, schema).Arguments,
+            Arguments = jobRequest.Arguments,
         };
     }
 
