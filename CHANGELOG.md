@@ -4,6 +4,73 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/), and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [7.24.0] - 2026-09-28
+
+### Added
+
+* **API**: GraphQL depth and complexity limits (`graphql:maxDepth`, default 30, and `graphql:maxComplexity`, default off).
+* **API**: Optional `?reference=` query parameter for all endpoints that start jobs, returned as `reference` in the job.
+* **Assets**: New option `assets:maxConcurrentResizes` to limit parallel image resizes. Concurrent requests for the same thumbnail are only resized once.
+* **Assets**: New option `assets:maxCacheDuration` (default 365 days) to cap the requested `cache` duration.
+* **Assets**: Ask whether a duplicate file should be uploaded anyway as a new asset.
+* **Backend**: New option `logging:maxPendingItems` to limit the request log queue when the log store is unavailable.
+* **Clients**: Regenerate the secret of a client while keeping the client ID, via API (`PUT apps/{app}/clients/{id}/secret`) or UI.
+* **Content**: Export contents of a schema to CSV or JSON as a background job, via API (`POST apps/{app}/schemas/{schema}/contents/export`) or the new export dialog in the content list.
+* **Content**: New option `contents:maxFullTextResults` (default 1000) to limit the number of results from the full text index.
+* **Content**: New `plainHtml` node type for rich text.
+* **Content**: Mark fields that are only required on publish in the content editor.
+* **Frontend**: Dark theme, with a new theme selection (Light, Dark, System) in the profile menu. The theme is also applied to the code editor, rich text editor, GraphiQL, API docs and login pages.
+* **Frontend**: The editor SDK provides `getTheme()` and `onThemeChanged(callback)`, so custom editors and plugins can follow the Squidex theme.
+* **Rules**: New flow step to send messages to Azure Service Bus queues or topics.
+* **Rules**: The "Create content" flow step supports an optional ID for upserts and a patch option.
+* **Schemas**: New job to migrate all contents of a schema to the current schema definition. It removes deleted fields and components, drops values with incompatible types and moves values after partitioning changes. It can be started via API (`POST apps/{app}/schemas/{schema}/contents/migrate`) or in the schema settings.
+* **Scripting**: `console.log`, `console.info`, `console.warn`, `console.error` and `console.debug` for content and asset scripts.
+* **Scripting**: New "Script Logs" settings page and API endpoint (`GET apps/{app}/script-logs`) to view the console output of scripts. Can be configured in `scripting:logs`.
+
+### Changed
+
+* **API**: GraphQL Apollo tracing is disabled by default and can be enabled with `graphql:enableTracing`.
+* **API**: The GraphQL schema is not rebuilt anymore for every app change.
+* **Backend**: Many performance improvements, for example for workflows, role resolution, validation, rules and EF Core queries.
+* **Backend**: Size limits for several in-memory caches.
+* **Backend**: Logging with source-generated log methods.
+* **Backend**: Updated dependencies, for example MongoDB.Driver to 3.10.0 and Magick.NET to 14.16.0.
+* **Backend**: Breaking changes for plugins: `IContentWorkflow` is resolved per schema via `IContentWorkflows`, `IJintExtension` receives the Jint `Engine`, and `Context` is immutable.
+* **MongoDB**: Cache total counts for unfiltered queries and skip counting when not needed.
+* **Scripting**: Upgraded Jint to 4.16.1 with faster script execution.
+* **Scripting**: Scripts are compiled once per query instead of once per item.
+* **Scripting**: Better error message when a function is not available in the current script.
+* **Scripting**: Autocompletion shows function parameters.
+* **Security**: Deleting users requires the new `squidex.admin.users.delete` permission.
+* **Security**: SSRF protection also covers the HTTP client of the identity services.
+* **SQL**: JSON helper functions are created by an EF Core migration instead of at startup.
+* **Frontend**: Updated inline filter with search and reset buttons.
+* **Frontend**: All colors are defined as CSS variables. Custom styles that rely on the old variables might need to be adjusted.
+
+### Fixed
+
+* **API**: Fix GraphQL references with field selections resolving to the wrong content.
+* **Assets**: Protected assets are not cached by public caches anymore.
+* **Backend**: Retry to load the job processor of an app after transient errors.
+* **Content**: The delete button of a content item depends on the delete permission.
+* **Content**: Fix the "Oldest first" saved query.
+* **Content**: Fix query model cache for queries without a schema being shared between apps.
+* **Content**: Fix collapse and expand of content fields.
+* **Frontend**: Fix overflow menus, date-time editor with seconds, saved queries, asset tags and several layout issues.
+* **Frontend**: Fix the item count for reference and asset fields in lists.
+* **Identity**: Styling of the external OIDC login button.
+* **MongoDB**: Fix reading legacy GUIDs.
+* **MongoDB**: Support AWS IAM authentication for MongoDB Atlas.
+* **MongoDB**: Retry index creation after transient errors.
+* **MongoDB**: Skip invalid snapshots when rebuilding published contents.
+* **MongoDB**: Do not return deleted apps for teams.
+* **Schemas**: Show the unique checkbox for string fields again.
+* **Security**: Hardened escaping of JSON paths in SQL queries.
+* **SQL**: Fix startup failure on restart because JSON functions already exist.
+* **SQL**: Widen OpenIddict token type column for OpenIddict 7.
+* **SQL**: Ignore deleted items in several queries, for example for references, asset folders and scheduled contents.
+* **SQL**: Fix deletion of usage counters.
+
 ## [7.23.0] - 2026-04-16
 
 ### Changed
