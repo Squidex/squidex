@@ -12,28 +12,23 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Rebuild;
 public sealed class TextIndexBatch : IDisposable
 {
     private readonly IDisposable handle;
-    private readonly Dictionary<DomainId, TextIndexRebuildScope> scopes;
+    private readonly Dictionary<DomainId, long> skippedEvents;
 
-    internal TextIndexBatch(IDisposable handle, Dictionary<DomainId, TextIndexRebuildScope> scopes)
+    internal TextIndexBatch(IDisposable handle, Dictionary<DomainId, long> skippedEvents)
     {
         this.handle = handle;
-        this.scopes = scopes;
+        this.skippedEvents = skippedEvents;
     }
 
-    public bool TrySkip(DomainId appId, DomainId schemaId, DomainId contentId)
+    public bool TrySkip(DomainId appId)
     {
-        if (!scopes.TryGetValue(appId, out var scope))
+        if (!skippedEvents.TryGetValue(appId, out var count))
         {
             return false;
         }
 
-        if (!scope.Includes(schemaId))
-        {
-            return false;
-        }
-
-        // The rebuild job has taken over the content, therefore it has to rebuild it again.
-        scope.SkippedContents.Add(contentId);
+        // The rebuild reads the event from the event store, but it must know that it has to catch up.
+        skippedEvents[appId] = count + 1;
         return true;
     }
 

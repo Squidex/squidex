@@ -7,33 +7,45 @@
 
 using System.Runtime.ExceptionServices;
 using Squidex.Domain.Apps.Core.Apps;
-using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Entities.Contents.Repositories;
+using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Domain.Apps.Entities.Jobs;
+using Squidex.Domain.Apps.Events.Contents;
+using Squidex.Events;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.Rebuild;
 
 public sealed class RebuildTextIndexJob(
     IAppProvider appProvider,
-    IContentRepository contentRepository,
-    ITextIndexRebuilder rebuilder,
-    TextIndexRebuildCoordinator coordinator,
-    TextIndexRebuildMarkers markers)
+    IEventStore eventStore,
+    IEventFormatter eventFormatter,
+    IJsonSerializer serializer,
+    ITextIndex textIndex,
+    ITextIndexerState textIndexerState,
+    TextIndexExtraction extraction,
+    TextIndexRebuildCoordinator coordinator)
     : IJobRunner
 {
     public const string TaskName = "rebuildTextIndex";
     public const string ArgAppId = "appId";
     public const string ArgAppName = "appName";
-    public const string ArgSchemaId = "schemaId";
-    public const string ArgSchemaName = "schemaName";
 
-    // The rebuilder keeps the latest versions of all contents of a batch in memory.
-    private const int BatchSize = 100;
+    // Same as the text indexer, the commands only keep the latest version of each content in the batch.
+    private const int BatchSize = 1000;
+
+    private sealed class Progress
+    {
+        // The position of the last event that has been written to the index.
+        public string? Position { get; set; }
+
+        public long ProcessedEvents { get; set; }
+    }
 
     public string Name => TaskName;
 
-    public static JobRequest BuildRequest(RefToken actor, App app, Schema? schema = null)
+    public static JobRequest BuildRequest(RefToken actor, App app)
     {
         Guard.NotNull(actor);
         Guard.NotNull(app);
@@ -43,12 +55,6 @@ public sealed class RebuildTextIndexJob(
             [ArgAppId] = app.Id.ToString(),
             [ArgAppName] = app.Name,
         };
-
-        if (schema != null)
-        {
-            arguments[ArgSchemaId] = schema.Id.ToString();
-            arguments[ArgSchemaName] = schema.Name;
-        }
 
         return JobRequest.Create(actor, TaskName, arguments) with
         {
@@ -62,31 +68,20 @@ public sealed class RebuildTextIndexJob(
         var app = await appProvider.GetAppAsync(context.OwnerId, true, ct)
             ?? throw new DomainObjectNotFoundException(context.OwnerId.ToString());
 
-        DomainId? schemaId = null;
+        // Use a readable name to describe the job.
+        context.Job.Description = "Rebuild full text index";
 
-        var schemaName = context.TryGetArgument(ArgSchemaName);
-        if (!string.IsNullOrWhiteSpace(schemaName))
-        {
-            schemaId = context.GetArgumentId(ArgSchemaId);
+        // From now on the text indexer skips the events of the app and only counts them.
+        await coordinator.TakeOverAsync(app.Id, ct);
 
-            // Use a readable name to describe the job.
-            context.Job.Description = $"Schema {schemaName}: Rebuild full text index";
-        }
-        else
-        {
-            context.Job.Description = "Rebuild full text index";
-        }
+        await context.LogAsync("Started rebuild");
 
-        // Mark the rebuild first, so that it is restarted when the worker crashes before the app is handed back.
-        await markers.AddAsync(app.Id, schemaId, ct);
-
-        // From now on the text indexer skips the events of the contents and remembers them for us.
-        await coordinator.TakeOverAsync(app.Id, schemaId, ct);
+        var progress = new Progress();
 
         ExceptionDispatchInfo? error = null;
         try
         {
-            await RebuildAllAsync(context, app.Id, schemaId, ct);
+            await ReplayAsync(context, app.Id, progress, ct);
         }
         catch (Exception ex)
         {
@@ -94,87 +89,78 @@ public sealed class RebuildTextIndexJob(
         }
 
         // Hand the app back to the text indexer, also when the job has been cancelled or has failed.
-        await HandBackAsync(context, app.Id);
+        await HandBackAsync(context, app.Id, progress);
 
         error?.Throw();
     }
 
-    private async Task RebuildAllAsync(JobRunContext context, DomainId appId, DomainId? schemaId,
-        CancellationToken ct)
-    {
-        HashSet<DomainId>? schemaIds = schemaId != null ? [schemaId.Value] : null;
-
-        var batch = new List<DomainId>(BatchSize);
-        var totalRebuilt = 0;
-
-        async Task RebuildBatchAsync()
-        {
-            await rebuilder.RebuildAsync(appId, batch.ToArray(), ct);
-
-            totalRebuilt += batch.Count;
-            batch.Clear();
-
-            // Also rebuild the contents that have been changed in the meantime, so that they are updated soon.
-            await RebuildSkippedAsync(appId, await coordinator.TakeSkippedAsync(appId, ct), ct);
-
-            await context.LogAsync($"Rebuilt contents: {totalRebuilt}", true);
-        }
-
-        await context.LogAsync("Started rebuild");
-
-        // Deleted contents have already been removed from the index by the normal indexing.
-        await foreach (var id in contentRepository.StreamIds(appId, schemaIds, SearchScope.All, ct))
-        {
-            batch.Add(id);
-
-            if (batch.Count >= BatchSize)
-            {
-                await RebuildBatchAsync();
-            }
-        }
-
-        if (batch.Count > 0)
-        {
-            await RebuildBatchAsync();
-        }
-
-        await context.LogAsync($"Completed rebuild of {totalRebuilt} contents");
-    }
-
-    private async Task HandBackAsync(JobRunContext context, DomainId appId)
+    private async Task HandBackAsync(JobRunContext context, DomainId appId, Progress progress)
     {
         try
         {
-            // The handback is not cancelled with the job, but it only rebuilds the contents that have been changed in the meantime.
+            // The events are replayed in order, therefore the contents could be at an older version when the job has been cancelled.
+            // So we cannot cancel the handback, but have to replay all remaining events.
             while (true)
             {
-                var skipped = await coordinator.TryHandBackAsync(appId);
-                if (skipped.Count == 0)
+                var skippedEvents = await coordinator.GetSkippedEventsAsync(appId);
+
+                await ReplayAsync(context, appId, progress, default);
+
+                // Only hand back if the text indexer has not skipped any event while we were reading the event store.
+                if (await coordinator.TryHandBackAsync(appId, skippedEvents))
                 {
                     break;
                 }
-
-                await RebuildSkippedAsync(appId, skipped, default);
             }
         }
         catch
         {
-            // The text indexer must not skip the app forever. The marker restarts the rebuild for the lost contents.
+            // The text indexer must not skip the app forever. The job fails and has to be started again.
             await coordinator.ReleaseAsync(appId);
             throw;
         }
 
-        await markers.RemoveAsync(appId);
-
-        await context.LogAsync("Handed back to the text indexer");
+        await context.LogAsync($"Completed rebuild of {progress.ProcessedEvents} events");
     }
 
-    private async Task RebuildSkippedAsync(DomainId appId, List<DomainId> contentIds,
+    private async Task ReplayAsync(JobRunContext context, DomainId appId, Progress progress,
         CancellationToken ct)
     {
-        foreach (var chunk in contentIds.Chunk(BatchSize))
+        var streamFilter = StreamFilter.Prefix($"content-{appId}{DomainId.IdSeparator}");
+
+        // Continue from the last position, e.g. to catch up with the events that have been skipped by the text indexer.
+        await foreach (var batch in eventStore.QueryAllAsync(streamFilter, progress.Position, ct: ct).Batch(BatchSize, ct))
         {
-            await rebuilder.RebuildAsync(appId, chunk, ct);
+            await ApplyAsync(batch, ct);
+
+            progress.Position = batch[^1].EventPosition;
+            progress.ProcessedEvents += batch.Count;
+
+            await context.LogAsync($"Rebuilt events: {progress.ProcessedEvents}", true);
         }
+    }
+
+    private async Task ApplyAsync(List<StoredEvent> storedEvents,
+        CancellationToken ct)
+    {
+        var events = storedEvents.Select(eventFormatter.ParseIfKnown).NotNull().ToList();
+
+        var ids =
+            events
+                .Select(x => x.Payload).OfType<ContentEvent>()
+                .Select(x => new UniqueContentId(x.AppId.Id, x.ContentId))
+                .ToHashSet();
+
+        var states = await textIndexerState.GetAsync(ids, ct);
+
+        // The text indexer skips the events of the app, therefore we can replay the events without the version check.
+        var updates = new TextIndexUpdates(states, new TextIndexCommands(serializer), true);
+
+        foreach (var @event in events)
+        {
+            updates.On(@event);
+        }
+
+        await updates.WriteAsync(textIndex, textIndexerState, extraction, ct);
     }
 }

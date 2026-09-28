@@ -51,7 +51,7 @@ public sealed class TextIndexingProcess(
         foreach (var @event in events)
         {
             // The rebuild job indexes the skipped contents from the event store.
-            if (@event.Payload is ContentEvent contentEvent && batch.TrySkip(contentEvent.AppId.Id, contentEvent.SchemaId.Id, contentEvent.ContentId))
+            if (@event.Payload is ContentEvent contentEvent && batch.TrySkip(contentEvent.AppId.Id))
             {
                 continue;
             }

@@ -59,9 +59,6 @@ public static class MessagingServices
             services.AddSingletonAs<FlowExecutionWorker<FlowEventContext>>()
                 .AsSelf();
 
-            services.AddSingletonAs<TextIndexRebuildRecovery>()
-                .AsSelf();
-
             services.AddSingletonAs<EventConsumerWorker>()
                 .AsSelf().As<IMessageHandler>();
 

@@ -7,8 +7,6 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Jobs.Models;
-using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Contents.Text.Rebuild;
 using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Infrastructure;
@@ -23,7 +21,7 @@ namespace Squidex.Areas.Api.Controllers.Jobs;
 /// Update and query jobs for apps.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Jobs))]
-public class JobsController(ICommandBus commandBus, IAppProvider appProvider, IJobService jobService) : ApiController(commandBus)
+public class JobsController(ICommandBus commandBus, IJobService jobService) : ApiController(commandBus)
 {
     /// <summary>
     /// Get all jobs.
@@ -49,27 +47,18 @@ public class JobsController(ICommandBus commandBus, IAppProvider appProvider, IJ
     /// Rebuild the full text index.
     /// </summary>
     /// <param name="app">The name of the app.</param>
-    /// <param name="schema">The optional name of the schema to rebuild.</param>
     /// <param name="reference">An optional reference to find the job.</param>
     /// <response code="204">Rebuild started.</response>
     /// <response code="400">Another job is already running.</response>
-    /// <response code="404">App or schema not found.</response>
+    /// <response code="404">App not found.</response>
     [HttpPost]
     [Route("apps/{app}/jobs/text-index/")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ApiPermission(PermissionIds.AdminTextIndex)]
     [ApiCosts(0)]
-    public async Task<IActionResult> PostTextIndexRebuild(string app, [FromQuery] string? schema = null, [FromQuery] string? reference = null)
+    public async Task<IActionResult> PostTextIndexRebuild(string app, [FromQuery] string? reference = null)
     {
-        Schema? targetSchema = null;
-
-        if (!string.IsNullOrWhiteSpace(schema))
-        {
-            targetSchema = await appProvider.GetSchemaAsync(App.Id, schema, ct: HttpContext.RequestAborted)
-                ?? throw new DomainObjectNotFoundException(schema);
-        }
-
-        var job = RebuildTextIndexJob.BuildRequest(User.Token()!, App, targetSchema) with { Reference = reference };
+        var job = RebuildTextIndexJob.BuildRequest(User.Token()!, App) with { Reference = reference };
 
         await jobService.StartAsync(App.Id, job, HttpContext.RequestAborted);
 

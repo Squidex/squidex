@@ -46,12 +46,12 @@ internal sealed class TextIndexCommands(IJsonSerializer serializer)
         sources.Clear();
     }
 
-    public void Create(ContentEvent @event, UniqueContentId uniqueId, ContentData data)
+    public void Create(ContentEvent @event, UniqueContentId uniqueId, ContentData data, bool isNew)
     {
         var upsert = new UpsertIndexEntry
         {
             UniqueContentId = uniqueId,
-            IsNew = true,
+            IsNew = isNew,
             Stage = 0,
             ServeAll = true,
             ServePublished = false,
@@ -93,34 +93,6 @@ internal sealed class TextIndexCommands(IJsonSerializer serializer)
                 UniqueContentId = uniqueId,
                 Stage = stage,
             });
-    }
-
-    public void PrepareRebuild()
-    {
-        var contents = new Dictionary<UniqueContentId, NamedId<DomainId>>();
-
-        foreach (var command in commands.Values)
-        {
-            // The entries already exist, therefore old geo objects and user infos must be deleted.
-            if (command is UpsertIndexEntry upsert)
-            {
-                upsert.IsNew = false;
-            }
-
-            contents[command.UniqueContentId] = command.SchemaId;
-        }
-
-        // Delete entries of stages that do not exist anymore.
-        foreach (var (uniqueId, schemaId) in contents)
-        {
-            for (byte stage = 0; stage < 2; stage++)
-            {
-                if (!commands.ContainsKey((uniqueId, stage)))
-                {
-                    commands[(uniqueId, stage)] = new DeleteIndexEntry { UniqueContentId = uniqueId, SchemaId = schemaId, Stage = stage };
-                }
-            }
-        }
     }
 
     private void Index(ContentEvent @event, IndexCommand command, TextIndexSource? source = null)

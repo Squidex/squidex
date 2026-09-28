@@ -15,7 +15,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
 internal sealed partial class TextIndexUpdates(
     Dictionary<UniqueContentId, TextContentState> states,
-    TextIndexCommands commands)
+    TextIndexCommands commands,
+    bool isRebuild = false)
 {
     private readonly Dictionary<UniqueContentId, TextContentState> currentUpdates = [];
 
@@ -46,8 +47,8 @@ internal sealed partial class TextIndexUpdates(
         // The version is only missing in tests, where events are not read from the event store.
         long? version = @event.Headers.ContainsKey(CommonHeaders.EventStreamNumber) ? @event.Headers.EventStreamNumber() : null;
 
-        // A rebuild has already indexed the content up to this version.
-        if (version != null && states.TryGetValue(uniqueId, out var existing) && existing.Version >= version)
+        // A rebuild has already indexed the content up to this version. The rebuild itself replays everything from the start.
+        if (!isRebuild && version != null && states.TryGetValue(uniqueId, out var existing) && existing.Version >= version)
         {
             return;
         }
@@ -110,7 +111,16 @@ internal sealed partial class TextIndexUpdates(
             UniqueContentId = uniqueId,
         };
 
-        commands.Create(@event, uniqueId, data);
+        if (isRebuild)
+        {
+            // The entries already exist, therefore we have to replace them.
+            commands.Create(@event, uniqueId, data, false);
+            commands.Delete(@event, uniqueId, 1);
+        }
+        else
+        {
+            commands.Create(@event, uniqueId, data, true);
+        }
 
         states[state.UniqueContentId] = state;
         currentUpdates[state.UniqueContentId] = state;

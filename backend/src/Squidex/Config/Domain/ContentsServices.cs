@@ -104,12 +104,6 @@ public static class ContentsServices
         services.AddSingletonAs<TextIndexExtraction>()
             .AsSelf();
 
-        services.AddSingletonAs<TextIndexRebuilder>()
-            .As<ITextIndexRebuilder>();
-
-        services.AddSingletonAs<TextIndexRebuildMarkers>()
-            .AsSelf().As<IDeleter>();
-
         services.AddSingletonAs<TextIndexRebuildCoordinator>()
             .AsSelf();
 

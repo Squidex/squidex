@@ -14,85 +14,61 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text.Rebuild;
 public sealed class TextIndexRebuildCoordinator
 {
     private readonly AsyncLock syncLock = new AsyncLock();
-    private readonly Dictionary<DomainId, TextIndexRebuildScope> scopes = [];
+
+    // The number of events per app that the text indexer has skipped, because the app is rebuilt.
+    private readonly Dictionary<DomainId, long> skippedEvents = [];
 
     public async Task<TextIndexBatch> BeginBatchAsync(
         CancellationToken ct = default)
     {
-        // The lock is only held for short operations of the rebuild, e.g. to take over an app, never for the rebuild itself.
+        // The rebuild only holds the lock for short operations in memory, never for the rebuild itself.
         var handle = await syncLock.EnterAsync(ct);
 
-        return new TextIndexBatch(handle, scopes);
+        return new TextIndexBatch(handle, skippedEvents);
     }
 
-    public async Task TakeOverAsync(DomainId appId, DomainId? schemaId,
+    public async Task TakeOverAsync(DomainId appId,
         CancellationToken ct = default)
     {
         using (await syncLock.EnterAsync(ct))
         {
-            if (!scopes.TryAdd(appId, new TextIndexRebuildScope(schemaId)))
+            if (!skippedEvents.TryAdd(appId, 0))
             {
                 throw new DomainException("The full text index of the app is already rebuilt.");
             }
         }
     }
 
-    public async Task<bool> IsRebuildingAsync(DomainId appId,
+    public async Task<long> GetSkippedEventsAsync(DomainId appId,
         CancellationToken ct = default)
     {
         using (await syncLock.EnterAsync(ct))
         {
-            return scopes.ContainsKey(appId);
+            return skippedEvents.GetValueOrDefault(appId);
         }
     }
 
-    public async Task<List<DomainId>> TakeSkippedAsync(DomainId appId,
+    public async Task<bool> TryHandBackAsync(DomainId appId, long expectedSkippedEvents,
         CancellationToken ct = default)
     {
         using (await syncLock.EnterAsync(ct))
         {
-            return TakeSkipped(appId);
-        }
-    }
-
-    public async Task<List<DomainId>> TryHandBackAsync(DomainId appId,
-        CancellationToken ct = default)
-    {
-        using (await syncLock.EnterAsync(ct))
-        {
-            var skipped = TakeSkipped(appId);
-            if (skipped.Count > 0)
+            // The text indexer has skipped events after the rebuild has read the event store, therefore it has to catch up again.
+            if (skippedEvents.TryGetValue(appId, out var count) && count != expectedSkippedEvents)
             {
-                return skipped;
+                return false;
             }
 
-            // Nothing has been skipped since the last call, therefore the text indexer can index the app again.
-            scopes.Remove(appId);
-            return skipped;
+            skippedEvents.Remove(appId);
+            return true;
         }
     }
 
-    public async Task<List<DomainId>> ReleaseAsync(DomainId appId)
+    public async Task ReleaseAsync(DomainId appId)
     {
         using (await syncLock.EnterAsync())
         {
-            var skipped = TakeSkipped(appId);
-
-            scopes.Remove(appId);
-            return skipped;
+            skippedEvents.Remove(appId);
         }
-    }
-
-    private List<DomainId> TakeSkipped(DomainId appId)
-    {
-        if (!scopes.TryGetValue(appId, out var scope))
-        {
-            return [];
-        }
-
-        var result = scope.SkippedContents.ToList();
-
-        scope.SkippedContents.Clear();
-        return result;
     }
 }
