@@ -46,12 +46,13 @@ public class SchemaContentsController(ICommandBus commandBus, IJobService jobSer
     public async Task<IActionResult> PostContentMigration(string app, string schema, [FromBody] MigrateContentsDto request, [FromQuery] string? reference = null)
     {
         var job = MigrateContentsJob.BuildRequest(
-            User.Token()!, 
-            App, 
-            Schema, 
-            request.MigrateDraft ?? true, 
+            User.Token()!,
+            App,
+            Schema,
+            request.MigrateDraft ?? true,
             request.MigratePublished ?? true)
-            with { Reference = reference };
+            with
+        { Reference = reference, };
 
         await jobService.StartAsync(App.Id, job, HttpContext.RequestAborted);
 
@@ -80,12 +81,13 @@ public class SchemaContentsController(ICommandBus commandBus, IJobService jobSer
     {
         var job = ExportContentsJob.BuildRequest(
             User.Token()!,
-            App, 
+            App,
             Schema,
-            request.Format ?? ExportFormat.Csv, 
+            request.Format ?? ExportFormat.Csv,
             request.Fields,
-            request.Unpublished ?? false) 
-            with { Reference = reference };
+            request.Unpublished ?? false)
+            with
+        { Reference = reference };
 
         await jobService.StartAsync(App.Id, job, HttpContext.RequestAborted);
 

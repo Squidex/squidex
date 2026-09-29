@@ -14,7 +14,7 @@ public sealed class ArrayFieldTextStrategy : IFieldTextStrategy
 {
     public int Order => 0;
 
-    public bool TryExtract(IField? field, JsonValue value, FieldTextContext context)
+    public bool TryExtract(IField? field, JsonValue value, TextCollector collector)
     {
         if (field is not IArrayField arrayField || value.Value is not JsonArray items)
         {
@@ -25,7 +25,7 @@ public sealed class ArrayFieldTextStrategy : IFieldTextStrategy
         {
             if (item.Value is JsonObject obj)
             {
-                context.AppendObject(obj, name => arrayField.FieldsByName.GetValueOrDefault(name));
+                collector.AppendObject(obj, name => arrayField.FieldsByName.GetValueOrDefault(name));
             }
         }
 

@@ -9,17 +9,8 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.Rebuild;
 
-public sealed class TextIndexBatch : IDisposable
+internal sealed class TextIndexBatch(IDisposable handle, Dictionary<DomainId, long> skippedEvents) : IDisposable
 {
-    private readonly IDisposable handle;
-    private readonly Dictionary<DomainId, long> skippedEvents;
-
-    internal TextIndexBatch(IDisposable handle, Dictionary<DomainId, long> skippedEvents)
-    {
-        this.handle = handle;
-        this.skippedEvents = skippedEvents;
-    }
-
     public bool TrySkip(DomainId appId)
     {
         if (!skippedEvents.TryGetValue(appId, out var count))

@@ -17,14 +17,14 @@ public sealed class ComponentTextStrategy : IFieldTextStrategy
     // Components are detected by value, because they can also be nested in other values.
     public int Order => 100;
 
-    public bool TryExtract(IField? field, JsonValue value, FieldTextContext context)
+    public bool TryExtract(IField? field, JsonValue value, TextCollector collector)
     {
-        if (!Component.IsValid(value, out var discriminator) || !context.Components.TryGetValue(DomainId.Create(discriminator), out var schema))
+        if (!Component.IsValid(value, out var discriminator) || !collector.Components.TryGetValue(DomainId.Create(discriminator), out var schema))
         {
             return false;
         }
 
-        context.AppendObject(value.AsObject, name => schema.FieldsByName.GetValueOrDefault(name));
+        collector.AppendObject(value.AsObject, name => schema.FieldsByName.GetValueOrDefault(name));
         return true;
     }
 }

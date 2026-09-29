@@ -5,7 +5,9 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.Extraction;
 
@@ -16,15 +18,14 @@ public sealed class SchemaTextExtractionStrategy(IEnumerable<IFieldTextStrategy>
 
     public int Order => 0;
 
-    public ValueTask<Dictionary<string, string>?> ExtractAsync(TextExtractionContext context,
-        CancellationToken ct)
+    public Dictionary<string, string>? Extract(TextExtractionContext context, DomainId contentId, ContentData data)
     {
-        using var collector = new TextCollector();
+        using var collector = new TextCollector(fieldStrategies, normalizers, context);
 
         var schema = context.Schema;
-        var titleFields = GetTitleFields(schema);
 
-        foreach (var (fieldName, fieldData) in context.Data)
+        var titleFields = context.GetOrAdd(typeof(SchemaTextExtractionStrategy), () => GetTitleFields(schema));
+        foreach (var (fieldName, fieldData) in data)
         {
             if (fieldData == null)
             {
@@ -34,17 +35,16 @@ public sealed class SchemaTextExtractionStrategy(IEnumerable<IFieldTextStrategy>
             RootField? field = null;
             schema?.FieldsByName.TryGetValue(fieldName, out field);
 
-            var isTitle = titleFields.Contains(fieldName);
-
             foreach (var (language, value) in fieldData)
             {
-                var fieldContext = new FieldTextContext(fieldStrategies, normalizers, collector, context.Components, language, isTitle);
+                collector.Language = language;
+                collector.IsTitle = titleFields.Contains(fieldName);
 
-                fieldContext.AppendField(field, value);
+                collector.AppendField(field, value);
             }
         }
 
-        return new ValueTask<Dictionary<string, string>?>(collector.Build());
+        return collector.Build();
     }
 
     private static HashSet<string> GetTitleFields(Schema? schema)

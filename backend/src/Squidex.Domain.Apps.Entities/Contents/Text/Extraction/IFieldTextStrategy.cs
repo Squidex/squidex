@@ -14,5 +14,5 @@ public interface IFieldTextStrategy
 {
     int Order { get; }
 
-    bool TryExtract(IField? field, JsonValue value, FieldTextContext context);
+    bool TryExtract(IField? field, JsonValue value, TextCollector collector);
 }

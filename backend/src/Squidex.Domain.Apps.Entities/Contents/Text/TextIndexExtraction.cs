@@ -8,46 +8,51 @@
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.Text.Extraction;
+using Squidex.Domain.Apps.Events.Contents;
+using Squidex.Events;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
 public sealed class TextIndexExtraction(IAppProvider appProvider, TextExtractor textExtractor)
 {
-    public async Task<Dictionary<ContentData, Dictionary<string, string>?>> ExtractAsync(IEnumerable<TextIndexSource> sources,
+    public async Task<Dictionary<ContentData, Dictionary<string, string>?>> ExtractAsync(IEnumerable<Envelope<IEvent>> events,
         CancellationToken ct)
     {
         // Compare by reference, because the events hold the instances and value equality is expensive.
         var result = new Dictionary<ContentData, Dictionary<string, string>?>(ReferenceEqualityComparer.Instance);
 
-        var schemas = new Dictionary<(DomainId AppId, DomainId SchemaId), (Schema? Schema, ResolvedComponents Components)>();
+        // Group by schema, so that the strategies can reuse expensive values for all contents, e.g. compiled scripts.
+        var groups =
+            events
+                .Select(x => x.Payload).OfType<ContentEvent>()
+                .GroupBy(x => (AppId: x.AppId.Id, SchemaId: x.SchemaId.Id));
 
-        foreach (var (@event, data, _) in sources)
+        foreach (var group in groups)
         {
-            if (result.ContainsKey(data))
-            {
-                continue;
-            }
+            var (schema, components) = await GetSchemaAsync(group.Key.AppId, group.Key.SchemaId, ct);
 
-            (DomainId AppId, DomainId SchemaId) key = (@event.AppId.Id, @event.SchemaId.Id);
+            var first = group.First();
 
-            if (!schemas.TryGetValue(key, out var schema))
+            using var context = new TextExtractionContext
             {
-                schema = await GetSchemaAsync(key.AppId, key.SchemaId, ct);
-                schemas[key] = schema;
-            }
-
-            var context = new TextExtractionContext
-            {
-                AppId = @event.AppId,
-                Components = schema.Components,
-                ContentId = @event.ContentId,
-                Data = data,
-                Schema = schema.Schema,
-                SchemaId = @event.SchemaId,
+                AppId = first.AppId,
+                Components = components,
+                Schema = schema,
+                SchemaId = first.SchemaId,
             };
 
-            result[data] = await textExtractor.ExtractAsync(context, ct);
+            foreach (var @event in group)
+            {
+                foreach (var data in GetData(@event))
+                {
+                    if (!result.ContainsKey(data))
+                    {
+                        result[data] = textExtractor.Extract(context, @event.ContentId, data);
+                    }
+                }
+            }
         }
 
         return result;
@@ -65,5 +70,33 @@ public sealed class TextIndexExtraction(IAppProvider appProvider, TextExtractor 
         var components = await appProvider.GetComponentsAsync(schema, ct);
 
         return (schema, components);
+    }
+
+    private static IEnumerable<ContentData> GetData(ContentEvent @event)
+    {
+        switch (@event)
+        {
+            case ContentCreated created:
+                yield return created.Data;
+                break;
+            case ContentUpdated updated:
+                yield return updated.Data;
+                break;
+            case ContentDraftCreated { MigratedData: not null } draftCreated:
+                yield return draftCreated.MigratedData;
+                break;
+            case ContentMigrated migrated:
+                if (migrated.Data != null)
+                {
+                    yield return migrated.Data;
+                }
+
+                if (migrated.NewData != null)
+                {
+                    yield return migrated.NewData;
+                }
+
+                break;
+        }
     }
 }

@@ -104,7 +104,7 @@ public sealed record CreateContentFlowStep : FlowStep, IConvertibleToAction
                 EnrichDefaults = true,
                 EnrichRequiredFields = false,
                 Patch = Patch,
-                Status = status
+                Status = status,
             };
         }
         else

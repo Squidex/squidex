@@ -15,14 +15,14 @@ public sealed class RichTextFieldTextStrategy : IFieldTextStrategy
 {
     public int Order => 0;
 
-    public bool TryExtract(IField? field, JsonValue value, FieldTextContext context)
+    public bool TryExtract(IField? field, JsonValue value, TextCollector collector)
     {
         if (field?.RawProperties is not RichTextFieldProperties || !RichTextNode.TryCreate(value, SquidexRichText.Options, out var node))
         {
             return false;
         }
 
-        context.AppendText(node.ToText(), field);
+        collector.AppendText(node.ToText(), field);
         return true;
     }
 }

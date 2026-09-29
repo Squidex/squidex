@@ -7,27 +7,38 @@
 
 using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core;
+using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.Extraction;
 
 public sealed class ScriptTextExtractionStrategy(IScriptEngine scriptEngine, ILogger<ScriptTextExtractionStrategy> log) : ITextExtractionStrategy
 {
+    private static readonly object ScriptKey = new object();
     private static readonly ScriptOptions ScriptOptions = new ScriptOptions
     {
         AsContext = true,
+        CanDisallow = false,
+        CanReject = false,
         Readonly = true,
     };
 
     // The script can override the schema, therefore it must run first.
     public int Order => -1000;
 
-    public async ValueTask<Dictionary<string, string>?> ExtractAsync(TextExtractionContext context,
-        CancellationToken ct)
+    public Dictionary<string, string>? Extract(TextExtractionContext context, DomainId contentId, ContentData data)
     {
         var script = context.Schema?.Scripts.Index;
         if (string.IsNullOrWhiteSpace(script))
+        {
+            return null;
+        }
+
+        // The context is only used by one thread, therefore the script can be reused for all contents of the schema.
+        var compiled = context.GetOrAdd(ScriptKey, () => Compile(context, script));
+        if (compiled == null)
         {
             return null;
         }
@@ -39,22 +50,36 @@ public sealed class ScriptTextExtractionStrategy(IScriptEngine scriptEngine, ILo
             {
                 AppId = context.AppId.Id,
                 AppName = context.AppId.Name,
-                ContentId = context.ContentId,
-                Data = context.Data,
+                ContentId = contentId,
+                Data = data,
                 SchemaId = context.SchemaId.Id,
                 SchemaName = context.SchemaId.Name,
             };
 
-            // The engine caches the parsed script, therefore we do not have to cache it here.
-            var result = await scriptEngine.ExecuteAsync(vars, script, ScriptOptions, ct);
-
-            return ToTexts(result);
+            return ToTexts(compiled.Execute(vars));
         }
         catch (Exception ex)
         {
-            log.LogWarning(ex, "Failed to execute index script for content {contentId} of schema {schemaId}.", context.ContentId, context.SchemaId.Id);
+            log.LogWarning(ex, "Failed to execute index script for content {contentId} of schema {schemaId}.", contentId, context.SchemaId.Id);
+
+            // The state of the script is unknown after an error, e.g. a timeout, therefore it is not reused.
+            context.Remove(ScriptKey);
 
             // Fallback to the next strategy.
+            return null;
+        }
+    }
+
+    private IScript? Compile(TextExtractionContext context, string script)
+    {
+        try
+        {
+            return scriptEngine.CreateScript(script, ScriptOptions);
+        }
+        catch (Exception ex)
+        {
+            // Only log the error once per schema and batch, the contents are indexed without the script.
+            log.LogWarning(ex, "Failed to compile index script of schema {schemaId}.", context.SchemaId.Id);
             return null;
         }
     }

@@ -99,7 +99,7 @@ public static class ContentsServices
             .AsOptional<IWorkflowsValidator>();
 
         services.AddSingletonAs<TextIndexingProcess>()
-            .As<IEventConsumer>();
+            .AsSelf().As<IEventConsumer>();
 
         services.AddSingletonAs<TextIndexExtraction>()
             .AsSelf();

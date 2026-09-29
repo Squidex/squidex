@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Buffers;
 using System.Globalization;
 using System.Text.RegularExpressions;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -16,6 +17,10 @@ public sealed partial class NoiseTextNormalizer : ITextNormalizer
     // Strings without whitespaces above this length are usually tokens, hashes or base64 data.
     private const int MaxWordLength = 64;
 
+    // Same as char.IsWhiteSpace, but vectorized.
+    private static readonly SearchValues<char> WhiteSpaces =
+        SearchValues.Create(Enumerable.Range(char.MinValue, char.MaxValue + 1).Select(x => (char)x).Where(char.IsWhiteSpace).ToArray());
+
     // Runs last, because the other normalizers can change the text.
     public int Order => 1000;
 
@@ -26,6 +31,7 @@ public sealed partial class NoiseTextNormalizer : ITextNormalizer
 
     public static bool IsNoise(string text)
     {
+        // The checks are ordered by costs, most texts are sentences or words and should be handled by the cheap checks.
         var span = text.AsSpan().Trim();
         if (span.Length == 0)
         {
@@ -33,15 +39,33 @@ public sealed partial class NoiseTextNormalizer : ITextNormalizer
         }
 
         // Anything with whitespaces is considered as normal text.
-        foreach (var c in span)
+        if (span.ContainsAny(WhiteSpaces))
         {
-            if (char.IsWhiteSpace(c))
-            {
-                return false;
-            }
+            return false;
         }
 
         if (span.Length > MaxWordLength)
+        {
+            return true;
+        }
+
+        if (IsUrl(span))
+        {
+            return true;
+        }
+
+        // Numbers, colors, dates and IDs contain digits.
+        if (!span.ContainsAnyInRange('0', '9'))
+        {
+            return false;
+        }
+
+        if (span[0] == '#')
+        {
+            return HexColorRegex().IsMatch(span);
+        }
+
+        if (span.Length >= 10 && span[4] == '-' && IsoDateRegex().IsMatch(span))
         {
             return true;
         }
@@ -52,22 +76,23 @@ public sealed partial class NoiseTextNormalizer : ITextNormalizer
             return true;
         }
 
-        if (double.TryParse(span, NumberStyles.Float, CultureInfo.InvariantCulture, out _))
+        return double.TryParse(span, NumberStyles.Float, CultureInfo.InvariantCulture, out _);
+    }
+
+    private static bool IsUrl(ReadOnlySpan<char> span)
+    {
+        // Only the prefix is checked, because a full validation would be expensive and the URL is not indexed anyway.
+        if (span.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
         {
             return true;
         }
 
-        if (HexColorRegex().IsMatch(span) || IsoDateRegex().IsMatch(span))
+        if (span.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
         {
             return true;
         }
 
-        if (!Uri.TryCreate(span.ToString(), UriKind.Absolute, out var uri))
-        {
-            return false;
-        }
-
-        return uri.Scheme == Uri.UriSchemeHttp || uri.Scheme == Uri.UriSchemeHttps || uri.Scheme == "data";
+        return span.StartsWith("data:", StringComparison.OrdinalIgnoreCase);
     }
 
     [GeneratedRegex("^#([0-9a-fA-F]{3,4}|[0-9a-fA-F]{6}|[0-9a-fA-F]{8})$")]

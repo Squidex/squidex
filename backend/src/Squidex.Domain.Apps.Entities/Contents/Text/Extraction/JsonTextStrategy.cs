@@ -15,24 +15,24 @@ public sealed class JsonTextStrategy : IFieldTextStrategy
     // Fallback for all values, e.g. JSON fields or unknown fields, that indexes all strings.
     public int Order => int.MaxValue;
 
-    public bool TryExtract(IField? field, JsonValue value, FieldTextContext context)
+    public bool TryExtract(IField? field, JsonValue value, TextCollector collector)
     {
         switch (value.Value)
         {
             case string text:
-                context.AppendText(text, field);
+                collector.AppendText(text, field);
                 break;
             case JsonArray array:
                 foreach (var item in array)
                 {
-                    context.AppendValue(item);
+                    collector.AppendValue(item);
                 }
 
                 break;
             case JsonObject obj:
                 foreach (var (_, item) in obj)
                 {
-                    context.AppendValue(item);
+                    collector.AppendValue(item);
                 }
 
                 break;

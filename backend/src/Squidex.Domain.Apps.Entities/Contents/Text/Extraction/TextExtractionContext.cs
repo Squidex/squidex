@@ -5,23 +5,53 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.Extraction;
 
-public sealed class TextExtractionContext
+// The context is created for all contents of a schema in a batch and only used by a single thread.
+public sealed class TextExtractionContext : IDisposable
 {
+    private readonly Dictionary<object, object?> items = [];
+
     required public NamedId<DomainId> AppId { get; init; }
 
     required public NamedId<DomainId> SchemaId { get; init; }
 
-    required public DomainId ContentId { get; init; }
-
-    required public ContentData Data { get; init; }
-
     public Schema? Schema { get; init; }
 
     public ResolvedComponents Components { get; init; } = ResolvedComponents.Empty;
+
+    public void Dispose()
+    {
+        foreach (var item in items.Values.OfType<IDisposable>())
+        {
+            item.Dispose();
+        }
+
+        items.Clear();
+    }
+
+    public T GetOrAdd<T>(object key, Func<T> factory)
+    {
+        // The strategies can store expensive values for the schema, e.g. compiled scripts.
+        if (items.TryGetValue(key, out var existing))
+        {
+            return (T)existing!;
+        }
+
+        var value = factory();
+
+        items[key] = value;
+        return value;
+    }
+
+    public void Remove(object key)
+    {
+        if (items.Remove(key, out var existing) && existing is IDisposable disposable)
+        {
+            disposable.Dispose();
+        }
+    }
 }

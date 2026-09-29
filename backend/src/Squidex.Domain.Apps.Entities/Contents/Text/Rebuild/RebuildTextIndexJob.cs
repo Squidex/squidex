@@ -7,13 +7,10 @@
 
 using System.Runtime.ExceptionServices;
 using Squidex.Domain.Apps.Core.Apps;
-using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Domain.Apps.Entities.Jobs;
-using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
-using Squidex.Infrastructure.Json;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.Rebuild;
 
@@ -21,10 +18,7 @@ public sealed class RebuildTextIndexJob(
     IAppProvider appProvider,
     IEventStore eventStore,
     IEventFormatter eventFormatter,
-    IJsonSerializer serializer,
-    ITextIndex textIndex,
-    ITextIndexerState textIndexerState,
-    TextIndexExtraction extraction,
+    TextIndexingProcess textIndexer,
     TextIndexRebuildCoordinator coordinator)
     : IJobRunner
 {
@@ -131,36 +125,13 @@ public sealed class RebuildTextIndexJob(
         // Continue from the last position, e.g. to catch up with the events that have been skipped by the text indexer.
         await foreach (var batch in eventStore.QueryAllAsync(streamFilter, progress.Position, ct: ct).Batch(BatchSize, ct))
         {
-            await ApplyAsync(batch, ct);
+            // The text indexer skips the events of the app, therefore we can replay the events without the version check.
+            await textIndexer.ApplyAsync(batch.Select(eventFormatter.ParseIfKnown).NotNull().ToList(), true, ct);
 
             progress.Position = batch[^1].EventPosition;
             progress.ProcessedEvents += batch.Count;
 
             await context.LogAsync($"Rebuilt events: {progress.ProcessedEvents}", true);
         }
-    }
-
-    private async Task ApplyAsync(List<StoredEvent> storedEvents,
-        CancellationToken ct)
-    {
-        var events = storedEvents.Select(eventFormatter.ParseIfKnown).NotNull().ToList();
-
-        var ids =
-            events
-                .Select(x => x.Payload).OfType<ContentEvent>()
-                .Select(x => new UniqueContentId(x.AppId.Id, x.ContentId))
-                .ToHashSet();
-
-        var states = await textIndexerState.GetAsync(ids, ct);
-
-        // The text indexer skips the events of the app, therefore we can replay the events without the version check.
-        var updates = new TextIndexUpdates(states, new TextIndexCommands(serializer), true);
-
-        foreach (var @event in events)
-        {
-            updates.On(@event);
-        }
-
-        await updates.WriteAsync(textIndex, textIndexerState, extraction, ct);
     }
 }
