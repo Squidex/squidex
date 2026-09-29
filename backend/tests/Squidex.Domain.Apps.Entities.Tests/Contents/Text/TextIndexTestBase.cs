@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -7,7 +7,6 @@
 
 using System.Globalization;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
@@ -21,31 +20,28 @@ using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
+using Squidex.Infrastructure.States;
+using IClock = NodaTime.IClock;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
 public abstract class TextIndexTestBase : GivenContext
 {
+    private readonly List<(StoredEvent Stored, Envelope<IEvent> Parsed)> storedEvents = [];
+
     protected ITextIndex TextIndex { get; } = A.Fake<ITextIndex>();
 
     protected IEventStore EventStore { get; } = A.Fake<IEventStore>();
 
     protected IEventFormatter EventFormatter { get; } = A.Fake<IEventFormatter>();
 
-    protected IJobService JobService { get; } = A.Fake<IJobService>();
-
     protected InMemoryTextIndexerState TextIndexerState { get; } = new InMemoryTextIndexerState();
+
+    protected TextIndexRebuildCoordinator Coordinator { get; } = new TextIndexRebuildCoordinator();
 
     protected List<IndexCommand> Commands { get; } = [];
 
     protected DomainId ContentId { get; } = DomainId.NewGuid();
-
-    protected TextIndexRebuildRegistry Registry { get; } =
-        new TextIndexRebuildRegistry(
-            new InMemoryPersistenceFactory<TextIndexRebuildRequests>(),
-            new InMemoryPersistenceFactory<TextIndexSkipList>());
-
-    protected TextIndexRebuildCoordinator Coordinator { get; }
 
     protected TextIndexExtraction Extraction { get; }
 
@@ -53,6 +49,12 @@ public abstract class TextIndexTestBase : GivenContext
     {
         A.CallTo(() => TextIndex.ExecuteAsync(A<IndexCommand[]>._, A<CancellationToken>._))
             .Invokes(x => Commands.AddRange(x.GetArgument<IndexCommand[]>(0)!));
+
+        A.CallTo(() => EventStore.QueryAllAsync(A<StreamFilter>._, A<StreamPosition>._, A<int>._, A<CancellationToken>._))
+            .ReturnsLazily(x => QueryEvents(x.GetArgument<StreamPosition>(1).Token));
+
+        A.CallTo(() => EventFormatter.ParseIfKnown(A<StoredEvent>._))
+            .ReturnsLazily(x => storedEvents.Find(e => e.Stored == x.GetArgument<StoredEvent>(0)).Parsed);
 
         var scriptEngine =
             new JintScriptEngine(new MemoryCache(Options.Create(new MemoryCacheOptions())),
@@ -63,8 +65,6 @@ public abstract class TextIndexTestBase : GivenContext
                 }));
 
         Extraction = new TextIndexExtraction(AppProvider, TextExtractorTests.CreateExtractor(scriptEngine));
-
-        Coordinator = new TextIndexRebuildCoordinator(Registry, AppProvider, JobService, A.Fake<ILogger<TextIndexRebuildCoordinator>>());
     }
 
     protected TextIndexingProcess CreateProcess()
@@ -72,31 +72,34 @@ public abstract class TextIndexTestBase : GivenContext
         return new TextIndexingProcess(TestUtils.DefaultSerializer, TextIndex, TextIndexerState, Extraction, Coordinator);
     }
 
-    protected TextIndexRebuilder CreateRebuilder()
+    protected RebuildTextIndexJob CreateJob(TextIndexingProcess process)
     {
-        return new TextIndexRebuilder(TestUtils.DefaultSerializer, TextIndex, TextIndexerState, Extraction, EventStore, EventFormatter);
+        return new RebuildTextIndexJob(AppProvider, EventStore, EventFormatter, process, Coordinator);
     }
 
-    protected void SetupStream(params Envelope<IEvent>[] events)
+    protected JobRunContext CreateRunContext()
     {
-        var streamName = $"content-{DomainId.Combine(AppId.Id, ContentId)}";
+        var state = new SimpleState<JobsState>(A.Fake<IPersistenceFactory<JobsState>>(), GetType(), App.Id);
 
-        var storedEvents = events.Select(e =>
+        var jobRequest = RebuildTextIndexJob.BuildRequest(User, App);
+
+        return new JobRunContext(state, A.Fake<IClock>(), default)
         {
-            var version = e.Headers.EventStreamNumber();
+            Actor = User,
+            Job = new Job { Id = DomainId.NewGuid(), Arguments = jobRequest.Arguments },
+            OwnerId = App.Id,
+        };
+    }
 
-            return new StoredEvent(streamName, version.ToString(CultureInfo.InvariantCulture), version, new EventData("Type", [], "Payload"));
-        }).ToList();
-
-        A.CallTo(() => EventStore.QueryStreamAsync(streamName, EtagVersion.Empty, A<CancellationToken>._))
-            .Returns(storedEvents);
-
-        for (var i = 0; i < events.Length; i++)
+    protected void StoreEvents(params Envelope<IEvent>[] events)
+    {
+        foreach (var @event in events)
         {
-            var storedEvent = storedEvents[i];
+            var position = storedEvents.Count.ToString(CultureInfo.InvariantCulture);
 
-            A.CallTo(() => EventFormatter.ParseIfKnown(storedEvent))
-                .Returns(events[i]);
+            var stored = new StoredEvent("content", position, 0, new EventData("Type", [], "Payload"));
+
+            storedEvents.Add((stored, @event));
         }
     }
 
@@ -110,6 +113,11 @@ public abstract class TextIndexTestBase : GivenContext
     protected string? GetText()
     {
         return Commands.OfType<UpsertIndexEntry>().Last().Texts?[InvariantPartitioning.Key];
+    }
+
+    protected string? GetTitle()
+    {
+        return Commands.OfType<UpsertIndexEntry>().Last().Titles?[InvariantPartitioning.Key];
     }
 
     protected UniqueContentId UniqueId()
@@ -138,6 +146,14 @@ public abstract class TextIndexTestBase : GivenContext
     protected Envelope<IEvent> Published(long? version = null)
     {
         return CreateEnvelope(new ContentStatusChanged { Status = Status.Published }, version);
+    }
+
+    private IAsyncEnumerable<StoredEvent> QueryEvents(string? position)
+    {
+        // The position is the index of the last event that has been read.
+        var skip = position != null ? int.Parse(position, CultureInfo.InvariantCulture) + 1 : 0;
+
+        return storedEvents.Skip(skip).Select(x => x.Stored).ToList().ToAsyncEnumerable();
     }
 
     private Envelope<IEvent> CreateEnvelope(ContentEvent @event, long? version, NamedId<DomainId>? appId = null)

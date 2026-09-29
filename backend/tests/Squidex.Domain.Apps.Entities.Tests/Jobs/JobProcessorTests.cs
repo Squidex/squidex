@@ -6,10 +6,12 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Logging.Abstractions;
+using NodaTime;
 using Squidex.Caching;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Entities.Collaboration;
 using Squidex.Domain.Apps.Entities.TestHelpers;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.TestHelpers;
 
 namespace Squidex.Domain.Apps.Entities.Jobs;
@@ -52,5 +54,42 @@ public class JobProcessorTests : GivenContext
 
         Assert.Equal("my-reference", job.Reference);
         Assert.Equal(JobStatus.Completed, job.Status);
+    }
+
+    [Fact]
+    public async Task Should_mark_interrupted_jobs_as_failed()
+    {
+        var job = new Job { Id = DomainId.NewGuid(), TaskName = "job1", Status = JobStatus.Started };
+
+        state.Snapshot = new JobsState { Jobs = [job] };
+
+        await sut.LoadAsync(CancellationToken);
+
+        var actual = Assert.Single(state.Snapshot.Jobs);
+
+        Assert.Equal(JobStatus.Failed, actual.Status);
+        Assert.NotNull(actual.Stopped);
+        Assert.Single(actual.Log);
+
+        A.CallTo(() => runner.CleanupAsync(job))
+            .MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public async Task Should_not_change_completed_jobs()
+    {
+        var job = new Job { Id = DomainId.NewGuid(), TaskName = "job1", Status = JobStatus.Completed, Stopped = default(Instant) };
+
+        state.Snapshot = new JobsState { Jobs = [job] };
+
+        await sut.LoadAsync(CancellationToken);
+
+        var actual = Assert.Single(state.Snapshot.Jobs);
+
+        Assert.Equal(JobStatus.Completed, actual.Status);
+        Assert.Empty(actual.Log);
+
+        A.CallTo(() => runner.CleanupAsync(A<Job>._))
+            .MustNotHaveHappened();
     }
 }

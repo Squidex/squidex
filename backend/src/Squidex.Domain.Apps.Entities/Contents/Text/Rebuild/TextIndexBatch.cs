@@ -9,7 +9,7 @@ using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.Rebuild;
 
-internal sealed class TextIndexBatch(IDisposable handle, Dictionary<DomainId, long> skippedEvents) : IDisposable
+public sealed class TextIndexBatch(IDisposable handle, Dictionary<DomainId, long> skippedEvents) : IDisposable
 {
     public bool TrySkip(DomainId appId)
     {

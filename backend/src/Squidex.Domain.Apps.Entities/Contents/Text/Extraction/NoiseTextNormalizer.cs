@@ -54,15 +54,16 @@ public sealed partial class NoiseTextNormalizer : ITextNormalizer
             return true;
         }
 
-        // Numbers, colors, dates and IDs contain digits.
-        if (!span.ContainsAnyInRange('0', '9'))
-        {
-            return false;
-        }
-
+        // Colors can consist of letters only, e.g. #fff, therefore they are checked before the digits.
         if (span[0] == '#')
         {
             return HexColorRegex().IsMatch(span);
+        }
+
+        // Numbers, dates and IDs contain digits.
+        if (!span.ContainsAnyInRange('0', '9'))
+        {
+            return false;
         }
 
         if (span.Length >= 10 && span[4] == '-' && IsoDateRegex().IsMatch(span))

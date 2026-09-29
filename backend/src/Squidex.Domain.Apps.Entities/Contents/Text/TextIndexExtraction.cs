@@ -9,31 +9,26 @@ using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities.Contents.Text.Extraction;
 using Squidex.Domain.Apps.Events.Contents;
-using Squidex.Events;
 using Squidex.Infrastructure;
-using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
 public sealed class TextIndexExtraction(IAppProvider appProvider, TextExtractor textExtractor)
 {
-    public async Task<Dictionary<ContentData, ExtractedTexts?>> ExtractAsync(IEnumerable<Envelope<IEvent>> events,
+    public async Task<Dictionary<ContentData, ExtractedTexts?>> ExtractAsync(IEnumerable<(ContentEvent Event, ContentData Data)> sources,
         CancellationToken ct)
     {
         // Compare by reference, because the events hold the instances and value equality is expensive.
         var result = new Dictionary<ContentData, ExtractedTexts?>(ReferenceEqualityComparer.Instance);
 
         // Group by schema, so that the strategies can reuse expensive values for all contents, e.g. compiled scripts.
-        var groups =
-            events
-                .Select(x => x.Payload).OfType<ContentEvent>()
-                .GroupBy(x => (AppId: x.AppId.Id, SchemaId: x.SchemaId.Id));
+        var groups = sources.GroupBy(x => (AppId: x.Event.AppId.Id, SchemaId: x.Event.SchemaId.Id));
 
         foreach (var group in groups)
         {
             var (schema, components) = await GetSchemaAsync(group.Key.AppId, group.Key.SchemaId, ct);
 
-            var first = group.First();
+            var first = group.First().Event;
 
             using var context = new TextExtractionContext
             {
@@ -43,14 +38,11 @@ public sealed class TextIndexExtraction(IAppProvider appProvider, TextExtractor 
                 SchemaId = first.SchemaId,
             };
 
-            foreach (var @event in group)
+            foreach (var (@event, data) in group)
             {
-                foreach (var data in GetData(@event))
+                if (!result.ContainsKey(data))
                 {
-                    if (!result.ContainsKey(data))
-                    {
-                        result[data] = textExtractor.Extract(context, @event.ContentId, data);
-                    }
+                    result[data] = textExtractor.Extract(context, @event.ContentId, data);
                 }
             }
         }
@@ -67,36 +59,9 @@ public sealed class TextIndexExtraction(IAppProvider appProvider, TextExtractor 
             return (null, ResolvedComponents.Empty);
         }
 
-        var components = await appProvider.GetComponentsAsync(schema, ct);
+        // Slightly outdated components are fine for the index, but loading them for each batch is expensive.
+        var components = await appProvider.GetComponentsAsync(schema, true, ct);
 
         return (schema, components);
-    }
-
-    private static IEnumerable<ContentData> GetData(ContentEvent @event)
-    {
-        switch (@event)
-        {
-            case ContentCreated created:
-                yield return created.Data;
-                break;
-            case ContentUpdated updated:
-                yield return updated.Data;
-                break;
-            case ContentDraftCreated { MigratedData: not null } draftCreated:
-                yield return draftCreated.MigratedData;
-                break;
-            case ContentMigrated migrated:
-                if (migrated.Data != null)
-                {
-                    yield return migrated.Data;
-                }
-
-                if (migrated.NewData != null)
-                {
-                    yield return migrated.NewData;
-                }
-
-                break;
-        }
     }
 }

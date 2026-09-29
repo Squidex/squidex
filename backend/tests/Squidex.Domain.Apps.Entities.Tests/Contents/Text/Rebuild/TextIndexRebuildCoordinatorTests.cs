@@ -1,197 +1,114 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.Extensions.Logging;
-using NodaTime;
-using Squidex.Domain.Apps.Entities.Jobs;
-using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.Rebuild;
 
-public class TextIndexRebuildCoordinatorTests : GivenContext
+public class TextIndexRebuildCoordinatorTests
 {
-    private readonly IJobService jobService = A.Fake<IJobService>();
-    private readonly IClock clock = A.Fake<IClock>();
-    private readonly TextIndexRebuildRegistry registry;
-    private readonly TextIndexRebuildCoordinator sut;
-    private Instant now = SystemClock.Instance.GetCurrentInstant();
+    private readonly DomainId appId = DomainId.NewGuid();
+    private readonly TextIndexRebuildCoordinator sut = new TextIndexRebuildCoordinator();
 
-    public TextIndexRebuildCoordinatorTests()
+    [Fact]
+    public async Task Should_throw_exception_if_app_is_already_taken_over()
     {
-        A.CallTo(() => clock.GetCurrentInstant())
-            .ReturnsLazily(() => now);
+        await sut.TakeOverAsync(appId);
 
-        registry =
-            new TextIndexRebuildRegistry(
-                new InMemoryPersistenceFactory<TextIndexRebuildRequests>(),
-                new InMemoryPersistenceFactory<TextIndexSkipList>())
-            {
-                Clock = clock,
-            };
+        await Assert.ThrowsAsync<DomainException>(() => sut.TakeOverAsync(appId));
+    }
 
-        sut = new TextIndexRebuildCoordinator(registry, AppProvider, jobService, A.Fake<ILogger<TextIndexRebuildCoordinator>>())
+    [Fact]
+    public async Task Should_not_skip_events_if_app_is_not_taken_over()
+    {
+        using var batch = await sut.BeginBatchAsync();
+
+        Assert.False(batch.TrySkip(appId));
+    }
+
+    [Fact]
+    public async Task Should_skip_and_count_events_if_app_is_taken_over()
+    {
+        await sut.TakeOverAsync(appId);
+
+        using (var batch = await sut.BeginBatchAsync())
         {
-            Clock = clock,
-        };
+            Assert.True(batch.TrySkip(appId));
+            Assert.True(batch.TrySkip(appId));
+            Assert.False(batch.TrySkip(DomainId.NewGuid()));
+        }
+
+        var skipped = await sut.GetSkippedEventsAsync(appId);
+
+        Assert.Equal(2, skipped);
     }
 
     [Fact]
-    public async Task Should_not_skip_without_requests()
+    public async Task Should_not_hand_back_if_events_have_been_skipped_in_the_meantime()
     {
-        await sut.SynchronizeAsync(CancellationToken);
+        await sut.TakeOverAsync(appId);
 
-        Assert.False(await TrySkipAsync(DomainId.NewGuid()));
+        using (var batch = await sut.BeginBatchAsync())
+        {
+            batch.TrySkip(appId);
+        }
+
+        var handedBack = await sut.TryHandBackAsync(appId, 0);
+
+        Assert.False(handedBack);
     }
 
     [Fact]
-    public async Task Should_acknowledge_request_and_skip_app()
+    public async Task Should_hand_back_if_no_events_have_been_skipped_in_the_meantime()
     {
-        var request = await registry.StartAsync(AppId.Id, CancellationToken);
+        await sut.TakeOverAsync(appId);
 
-        Assert.False(await TrySkipAsync(DomainId.NewGuid()));
+        using (var batch = await sut.BeginBatchAsync())
+        {
+            batch.TrySkip(appId);
+        }
 
-        await sut.SynchronizeAsync(CancellationToken);
+        var handedBack = await sut.TryHandBackAsync(appId, 1);
 
-        var skipList = await registry.GetSkipListAsync(AppId.Id, CancellationToken);
+        using (var batch = await sut.BeginBatchAsync())
+        {
+            Assert.False(batch.TrySkip(appId));
+        }
 
-        Assert.Equal(request.Id, skipList?.RequestId);
-        Assert.True(await TrySkipAsync(DomainId.NewGuid()));
+        Assert.True(handedBack);
     }
 
     [Fact]
-    public async Task Should_record_skipped_contents_once_per_content()
+    public async Task Should_not_skip_events_after_release()
     {
-        var contentId1 = DomainId.NewGuid();
-        var contentId2 = DomainId.NewGuid();
+        await sut.TakeOverAsync(appId);
+        await sut.ReleaseAsync(appId);
 
-        await registry.StartAsync(AppId.Id, CancellationToken);
-        await sut.SynchronizeAsync(CancellationToken);
+        using (var batch = await sut.BeginBatchAsync())
+        {
+            Assert.False(batch.TrySkip(appId));
+        }
 
-        await TrySkipAsync(contentId1);
-        await TrySkipAsync(contentId2);
-        await TrySkipAsync(contentId1);
-
-        var skipList = await registry.GetSkipListAsync(AppId.Id, CancellationToken);
-
-        Assert.Equal(3, skipList?.Sequence);
-        Assert.Equal([(contentId2, 2L), (contentId1, 3L)], skipList!.Contents.Select(x => (x.ContentId, x.Sequence)).OrderBy(x => x.Sequence));
+        await sut.TakeOverAsync(appId);
     }
 
     [Fact]
-    public async Task Should_carry_over_skipped_contents_to_new_request()
+    public async Task Should_not_hand_back_while_batch_is_processed()
     {
-        var contentId = DomainId.NewGuid();
+        await sut.TakeOverAsync(appId);
 
-        await registry.StartAsync(AppId.Id, CancellationToken);
-        await sut.SynchronizeAsync(CancellationToken);
-        await TrySkipAsync(contentId);
+        var batch = await sut.BeginBatchAsync();
 
-        // For example when the job has crashed and a recovery job has been started.
-        var request = await registry.StartAsync(AppId.Id, CancellationToken);
-        await sut.SynchronizeAsync(CancellationToken);
+        var handBack = sut.TryHandBackAsync(appId, 0);
 
-        var skipList = await registry.GetSkipListAsync(AppId.Id, CancellationToken);
-
-        Assert.Equal(request.Id, skipList?.RequestId);
-        Assert.Equal(contentId, Assert.Single(skipList!.Contents).ContentId);
-    }
-
-    [Fact]
-    public async Task Should_take_over_if_request_is_completing_and_all_contents_are_processed()
-    {
-        var request = await registry.StartAsync(AppId.Id, CancellationToken);
-        await sut.SynchronizeAsync(CancellationToken);
-        await TrySkipAsync(DomainId.NewGuid());
-
-        await registry.UpdateAsync(AppId.Id, request.Id, 1, TextIndexRebuildStatus.Completing, CancellationToken);
-        await sut.SynchronizeAsync(CancellationToken);
-
-        var skipList = await registry.GetSkipListAsync(AppId.Id, CancellationToken);
-
-        Assert.True(skipList?.IsTakenOver);
-        Assert.False(await TrySkipAsync(DomainId.NewGuid()));
-    }
-
-    [Fact]
-    public async Task Should_not_take_over_if_contents_are_not_processed()
-    {
-        var request = await registry.StartAsync(AppId.Id, CancellationToken);
-        await sut.SynchronizeAsync(CancellationToken);
-        await TrySkipAsync(DomainId.NewGuid());
-
-        await registry.UpdateAsync(AppId.Id, request.Id, 0, TextIndexRebuildStatus.Completing, CancellationToken);
-        await sut.SynchronizeAsync(CancellationToken);
-
-        Assert.True(await TrySkipAsync(DomainId.NewGuid()));
-    }
-
-    [Fact]
-    public async Task Should_start_recovery_once_if_heartbeat_has_expired()
-    {
-        await registry.StartAsync(AppId.Id, CancellationToken);
-        await sut.SynchronizeAsync(CancellationToken);
-
-        now = now.Plus(Duration.FromMinutes(11));
-
-        await sut.SynchronizeAsync(CancellationToken);
-        await sut.SynchronizeAsync(CancellationToken);
-
-        A.CallTo(() => jobService.StartAsync(AppId.Id, A<JobRequest>.That.Matches(x => x.Arguments.ContainsKey(RebuildTextIndexJob.ArgRecovery)), A<CancellationToken>._))
-            .MustHaveHappenedOnceExactly();
-    }
-
-    [Fact]
-    public async Task Should_remove_skip_list_if_request_is_removed()
-    {
-        var request = await registry.StartAsync(AppId.Id, CancellationToken);
-        await sut.SynchronizeAsync(CancellationToken);
-
-        await registry.RemoveAsync(AppId.Id, request.Id, CancellationToken);
-        await sut.SynchronizeAsync(CancellationToken);
-
-        Assert.Null(await registry.GetSkipListAsync(AppId.Id, CancellationToken));
-    }
-
-    [Fact]
-    public async Task Should_remove_requests_and_skip_lists_on_reset()
-    {
-        var request = await registry.StartAsync(AppId.Id, CancellationToken);
-        await sut.SynchronizeAsync(CancellationToken);
-
-        await sut.ResetAsync(CancellationToken);
-
-        Assert.False(await registry.UpdateAsync(AppId.Id, request.Id, 0, TextIndexRebuildStatus.Running, CancellationToken));
-        Assert.Null(await registry.GetSkipListAsync(AppId.Id, CancellationToken));
-        Assert.False(await TrySkipAsync(DomainId.NewGuid()));
-    }
-
-    [Fact]
-    public async Task Should_wait_for_batch_before_synchronizing()
-    {
-        var batch = await sut.BeginBatchAsync(CancellationToken);
-
-        var synchronize = sut.SynchronizeAsync(CancellationToken);
-
-        await Task.Delay(50, CancellationToken);
-        Assert.False(synchronize.IsCompleted);
+        Assert.False(handBack.IsCompleted);
 
         batch.Dispose();
 
-        await synchronize;
-    }
-
-    private async Task<bool> TrySkipAsync(DomainId contentId)
-    {
-        using var batch = await sut.BeginBatchAsync(CancellationToken);
-
-        var result = batch.TrySkip(AppId.Id, contentId);
-
-        await batch.CommitAsync(CancellationToken);
-        return result;
+        Assert.True(await handBack);
     }
 }

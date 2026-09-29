@@ -20,7 +20,13 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text;
 public class TextExtractorTests
 {
     private readonly DomainId componentId = DomainId.NewGuid();
-    private readonly TextExtractor sut = CreateExtractor(A.Fake<IScriptEngine>());
+    private readonly IScriptEngine scriptEngine = A.Fake<IScriptEngine>();
+    private readonly TextExtractor sut;
+
+    public TextExtractorTests()
+    {
+        sut = CreateExtractor(scriptEngine);
+    }
 
     public static TextExtractor CreateExtractor(IScriptEngine scriptEngine)
     {
@@ -48,7 +54,7 @@ public class TextExtractorTests
     }
 
     [Fact]
-    public async Task Should_extract_texts_by_language_without_schema()
+    public void Should_extract_texts_by_language_without_schema()
     {
         var data =
             new ContentData()
@@ -60,14 +66,15 @@ public class TextExtractorTests
                     new ContentFieldData()
                         .AddLocalized("en", "World"));
 
-        var actual = await ExtractAsync(data);
+        var actual = Extract(data);
 
-        Assert.Equal("Hello World", actual!["en"]);
-        Assert.Equal("Hallo", actual!["de"]);
+        Assert.Equal("Hello World", actual!.Texts!["en"]);
+        Assert.Equal("Hallo", actual!.Texts!["de"]);
+        Assert.Null(actual!.Titles);
     }
 
     [Fact]
-    public async Task Should_return_null_if_no_text_found()
+    public void Should_return_null_if_no_text_found()
     {
         var data =
             new ContentData()
@@ -75,13 +82,13 @@ public class TextExtractorTests
                     new ContentFieldData()
                         .AddInvariant(42));
 
-        var actual = await ExtractAsync(data);
+        var actual = Extract(data);
 
         Assert.Null(actual);
     }
 
     [Fact]
-    public async Task Should_extract_all_strings_from_json_values()
+    public void Should_extract_all_strings_from_json_values()
     {
         var data =
             new ContentData()
@@ -92,9 +99,9 @@ public class TextExtractorTests
                                 .Add("label", "Hello")
                                 .Add("nested", JsonValue.Array(JsonValue.Object().Add("text", "World")))));
 
-        var actual = await ExtractAsync(data);
+        var actual = Extract(data);
 
-        Assert.Equal("Hello World", actual![InvariantPartitioning.Key]);
+        Assert.Equal("Hello World", actual!.Texts![InvariantPartitioning.Key]);
     }
 
     [Theory]
@@ -126,7 +133,7 @@ public class TextExtractorTests
     }
 
     [Fact]
-    public async Task Should_skip_reference_ids()
+    public void Should_skip_reference_ids()
     {
         var schema =
             new Schema { Name = "my-schema" }
@@ -142,13 +149,14 @@ public class TextExtractorTests
                     new ContentFieldData()
                         .AddInvariant(JsonValue.Array(DomainId.NewGuid().ToString(), DomainId.NewGuid().ToString())));
 
-        var actual = await ExtractAsync(data, schema);
+        var actual = Extract(data, schema);
 
-        Assert.Equal("Hello Hello Hello", actual![InvariantPartitioning.Key]);
+        Assert.Equal("Hello", actual!.Titles![InvariantPartitioning.Key]);
+        Assert.Null(actual!.Texts);
     }
 
     [Fact]
-    public async Task Should_boost_first_field_if_nothing_configured()
+    public void Should_use_first_field_as_title_if_nothing_configured()
     {
         var schema =
             new Schema { Name = "my-schema" }
@@ -164,13 +172,14 @@ public class TextExtractorTests
                     new ContentFieldData()
                         .AddInvariant("Hello"));
 
-        var actual = await ExtractAsync(data, schema);
+        var actual = Extract(data, schema);
 
-        Assert.Equal("Hello Hello Hello World", actual![InvariantPartitioning.Key]);
+        Assert.Equal("Hello", actual!.Titles![InvariantPartitioning.Key]);
+        Assert.Equal("World", actual!.Texts![InvariantPartitioning.Key]);
     }
 
     [Fact]
-    public async Task Should_boost_fields_in_references()
+    public void Should_use_fields_in_references_as_title()
     {
         var schema =
             new Schema { Name = "my-schema" }
@@ -188,13 +197,14 @@ public class TextExtractorTests
                     new ContentFieldData()
                         .AddInvariant("Hello"));
 
-        var actual = await ExtractAsync(data, schema);
+        var actual = Extract(data, schema);
 
-        Assert.Equal("Hello Hello Hello World", actual![InvariantPartitioning.Key]);
+        Assert.Equal("Hello", actual!.Titles![InvariantPartitioning.Key]);
+        Assert.Equal("World", actual!.Texts![InvariantPartitioning.Key]);
     }
 
     [Fact]
-    public async Task Should_boost_fields_with_title_mode()
+    public void Should_use_fields_with_title_mode_as_title()
     {
         var schema =
             new Schema { Name = "my-schema" }
@@ -212,13 +222,14 @@ public class TextExtractorTests
                     new ContentFieldData()
                         .AddInvariant(JsonValue.Object().Add("name", "Hello")));
 
-        var actual = await ExtractAsync(data, schema);
+        var actual = Extract(data, schema);
 
-        Assert.Equal("Hello Hello Hello World", actual![InvariantPartitioning.Key]);
+        Assert.Equal("Hello", actual!.Titles![InvariantPartitioning.Key]);
+        Assert.Equal("World", actual!.Texts![InvariantPartitioning.Key]);
     }
 
     [Fact]
-    public async Task Should_skip_excluded_fields()
+    public void Should_skip_excluded_fields()
     {
         var schema =
             new Schema { Name = "my-schema" }
@@ -235,13 +246,14 @@ public class TextExtractorTests
                     new ContentFieldData()
                         .AddInvariant("Secret"));
 
-        var actual = await ExtractAsync(data, schema);
+        var actual = Extract(data, schema);
 
-        Assert.Equal("Hello Hello Hello", actual![InvariantPartitioning.Key]);
+        Assert.Equal("Hello", actual!.Titles![InvariantPartitioning.Key]);
+        Assert.Null(actual!.Texts);
     }
 
     [Fact]
-    public async Task Should_only_index_search_paths()
+    public void Should_only_index_search_paths()
     {
         var schema =
             new Schema { Name = "my-schema" }
@@ -262,13 +274,13 @@ public class TextExtractorTests
                                 .Add("author", JsonValue.Object().Add("name", "Sebastian"))
                                 .Add("other", "Hidden3")));
 
-        var actual = await ExtractAsync(data, schema);
+        var actual = Extract(data, schema);
 
-        Assert.Equal("Label1 Label2 Sebastian", actual![InvariantPartitioning.Key]);
+        Assert.Equal("Label1 Label2 Sebastian", actual!.Texts![InvariantPartitioning.Key]);
     }
 
     [Fact]
-    public async Task Should_apply_settings_of_nested_fields()
+    public void Should_apply_settings_of_nested_fields()
     {
         var schema =
             new Schema { Name = "my-schema" }
@@ -286,13 +298,13 @@ public class TextExtractorTests
                             JsonValue.Array(
                                 JsonValue.Object().Add("nested1", "Hello").Add("nested2", "Hidden"))));
 
-        var actual = await ExtractAsync(data, schema);
+        var actual = Extract(data, schema);
 
-        Assert.Equal("Hello", actual![InvariantPartitioning.Key]);
+        Assert.Equal("Hello", actual!.Texts![InvariantPartitioning.Key]);
     }
 
     [Fact]
-    public async Task Should_apply_settings_of_component_fields()
+    public void Should_apply_settings_of_component_fields()
     {
         var componentSchema =
             new Schema { Name = "my-component" }
@@ -320,13 +332,13 @@ public class TextExtractorTests
                                 .Add("visible", "Hello")
                                 .Add("hidden", "Hidden")));
 
-        var actual = await ExtractAsync(data, schema, components);
+        var actual = Extract(data, schema, components);
 
-        Assert.Equal("Hello", actual![InvariantPartitioning.Key]);
+        Assert.Equal("Hello", actual!.Texts![InvariantPartitioning.Key]);
     }
 
     [Fact]
-    public async Task Should_convert_markdown_to_text()
+    public void Should_convert_markdown_to_text()
     {
         var schema =
             new Schema { Name = "my-schema" }
@@ -340,21 +352,21 @@ public class TextExtractorTests
                     new ContentFieldData()
                         .AddInvariant("# Hello **World**"));
 
-        var actual = await ExtractAsync(data, schema);
+        var actual = Extract(data, schema);
 
-        Assert.Equal("Hello World", actual![InvariantPartitioning.Key].Trim());
+        Assert.Equal("Hello World", actual!.Texts![InvariantPartitioning.Key]);
     }
 
     [Fact]
-    public async Task Should_use_custom_field_strategy_before_default_strategies()
+    public void Should_use_custom_field_strategy_before_default_strategies()
     {
         var customStrategy = A.Fake<ITextFieldStrategy>();
 
         A.CallTo(() => customStrategy.Order)
             .Returns(-1);
 
-        A.CallTo(() => customStrategy.TryExtract(A<IField?>.That.Matches(x => x != null && x.Name == "custom"), A<JsonValue>._, A<FieldTextContext>._))
-            .Invokes(x => x.GetArgument<FieldTextContext>(2)!.AppendText("Custom"))
+        A.CallTo(() => customStrategy.TryExtract(A<IField?>.That.Matches(x => x != null && x.Name == "custom"), A<JsonValue>._, A<ContentTextWalker>._))
+            .Invokes(x => x.GetArgument<ContentTextWalker>(2)!.AppendText("Custom"))
             .Returns(true);
 
         var customExtractor = new TextExtractor([new SchemaTextExtractionStrategy([customStrategy, new JsonTextStrategy()], [])]);
@@ -371,20 +383,13 @@ public class TextExtractorTests
                     new ContentFieldData()
                         .AddInvariant(JsonValue.Object().Add("raw", "Hidden")));
 
-        var actual = await customExtractor.ExtractAsync(new TextExtractionContext
-        {
-            AppId = NamedId.Of(DomainId.NewGuid(), "my-app"),
-            ContentId = DomainId.NewGuid(),
-            Data = data,
-            Schema = schema,
-            SchemaId = NamedId.Of(DomainId.NewGuid(), "my-schema"),
-        });
+        var actual = Extract(customExtractor, data, schema);
 
-        Assert.Equal("Custom", actual![InvariantPartitioning.Key]);
+        Assert.Equal("Custom", actual!.Texts![InvariantPartitioning.Key]);
     }
 
     [Fact]
-    public async Task Should_apply_normalizers_in_order_and_exclude_dropped_texts()
+    public void Should_apply_normalizers_in_order_and_exclude_dropped_texts()
     {
         var normalizer1 = A.Fake<ITextNormalizer>();
         var normalizer2 = A.Fake<ITextNormalizer>();
@@ -409,19 +414,13 @@ public class TextExtractorTests
                     new ContentFieldData()
                         .AddInvariant(JsonValue.Array("Drop", "Keep")));
 
-        var actual = await customExtractor.ExtractAsync(new TextExtractionContext
-        {
-            AppId = NamedId.Of(DomainId.NewGuid(), "my-app"),
-            ContentId = DomainId.NewGuid(),
-            Data = data,
-            SchemaId = NamedId.Of(DomainId.NewGuid(), "my-schema"),
-        });
+        var actual = Extract(customExtractor, data);
 
-        Assert.Equal("Keep!", actual![InvariantPartitioning.Key]);
+        Assert.Equal("Keep!", actual!.Texts![InvariantPartitioning.Key]);
     }
 
     [Fact]
-    public async Task Should_not_convert_markdown_if_field_is_not_markdown()
+    public void Should_not_convert_markdown_if_field_is_not_markdown()
     {
         var schema =
             new Schema { Name = "my-schema" }
@@ -434,27 +433,27 @@ public class TextExtractorTests
                     new ContentFieldData()
                         .AddInvariant("C# **is** great"));
 
-        var actual = await ExtractAsync(data, schema);
+        var actual = Extract(data, schema);
 
-        Assert.Equal("C# **is** great", actual![InvariantPartitioning.Key]);
+        Assert.Equal("C# **is** great", actual!.Texts![InvariantPartitioning.Key]);
     }
 
     [Fact]
-    public async Task Should_convert_html_to_text()
+    public void Should_convert_html_to_text()
     {
         var data =
             new ContentData()
                 .AddField("html",
                     new ContentFieldData()
-                        .AddInvariant("<p>Hello<strong>World</strong> &amp; <script>alert(1)</script>more</p>"));
+                        .AddInvariant("<p>Hello <strong>World</strong> &amp; <script>alert(1)</script>more</p>"));
 
-        var actual = await ExtractAsync(data);
+        var actual = Extract(data);
 
-        Assert.Equal("Hello World & more", actual![InvariantPartitioning.Key]);
+        Assert.Equal("Hello World & more", actual!.Texts![InvariantPartitioning.Key]);
     }
 
     [Fact]
-    public async Task Should_convert_rich_text_to_text()
+    public void Should_convert_rich_text_to_text()
     {
         var schema =
             new Schema { Name = "my-schema" }
@@ -478,9 +477,9 @@ public class TextExtractorTests
                                                         .Add("type", "text")
                                                         .Add("text", "Hello World")))))));
 
-        var actual = await ExtractAsync(data, schema);
+        var actual = Extract(data, schema);
 
-        Assert.Equal("Hello World", actual![InvariantPartitioning.Key].Trim());
+        Assert.Equal("Hello World", actual!.Texts![InvariantPartitioning.Key]);
     }
 
     [Fact]
@@ -496,7 +495,8 @@ public class TextExtractorTests
     {
         var actual = ScriptTextExtractionStrategy.ToTexts(JsonValue.Create("Hello World"));
 
-        Assert.Equal("Hello World", actual![InvariantPartitioning.Key]);
+        Assert.Equal("Hello World", actual!.Texts![InvariantPartitioning.Key]);
+        Assert.Null(actual!.Titles);
     }
 
     [Fact]
@@ -512,23 +512,172 @@ public class TextExtractorTests
 
         var actual = ScriptTextExtractionStrategy.ToTexts(result);
 
-        Assert.Equal("Hello Hello Hello", actual![InvariantPartitioning.Key]);
-        Assert.Equal("World", actual!["en"]);
-        Assert.Equal("Welt", actual!["de"]);
+        Assert.Equal("Hello", actual!.Titles![InvariantPartitioning.Key]);
+        Assert.Equal("World", actual!.Texts!["en"]);
+        Assert.Equal("Welt", actual!.Texts!["de"]);
     }
 
-    private async Task<Dictionary<string, string>?> ExtractAsync(ContentData data, Schema? schema = null, ResolvedComponents? components = null)
+    [Fact]
+    public void Should_use_script_before_schema()
     {
-        var context = new TextExtractionContext
+        var script = A.Fake<IScript>();
+
+        A.CallTo(() => scriptEngine.CreateScript("script", A<ScriptOptions>._))
+            .Returns(script);
+
+        A.CallTo(() => script.Execute(A<ScriptVars>._))
+            .Returns(JsonValue.Create("Scripted"));
+
+        var actual = Extract(CreateData("Hello"), CreateScriptSchema());
+
+        Assert.Equal("Scripted", actual!.Texts![InvariantPartitioning.Key]);
+        Assert.Null(actual!.Titles);
+    }
+
+    [Fact]
+    public void Should_fallback_to_schema_if_script_returns_null()
+    {
+        var script = A.Fake<IScript>();
+
+        A.CallTo(() => scriptEngine.CreateScript("script", A<ScriptOptions>._))
+            .Returns(script);
+
+        A.CallTo(() => script.Execute(A<ScriptVars>._))
+            .Returns(JsonValue.Null);
+
+        var actual = Extract(CreateData("Hello"), CreateScriptSchema());
+
+        Assert.Equal("Hello", actual!.Titles![InvariantPartitioning.Key]);
+    }
+
+    [Fact]
+    public void Should_not_fallback_to_schema_if_script_returns_empty_object()
+    {
+        var script = A.Fake<IScript>();
+
+        A.CallTo(() => scriptEngine.CreateScript("script", A<ScriptOptions>._))
+            .Returns(script);
+
+        A.CallTo(() => script.Execute(A<ScriptVars>._))
+            .Returns(JsonValue.Object());
+
+        var actual = Extract(CreateData("Hello"), CreateScriptSchema());
+
+        Assert.Null(actual!.Texts);
+        Assert.Null(actual!.Titles);
+    }
+
+    [Fact]
+    public void Should_compile_script_only_once_per_context()
+    {
+        var script = A.Fake<IScript>();
+
+        A.CallTo(() => scriptEngine.CreateScript("script", A<ScriptOptions>._))
+            .Returns(script);
+
+        A.CallTo(() => script.Execute(A<ScriptVars>._))
+            .Returns(JsonValue.Create("Scripted"));
+
+        using (var context = CreateContext(CreateScriptSchema()))
+        {
+            sut.Extract(context, DomainId.NewGuid(), CreateData("Hello"));
+            sut.Extract(context, DomainId.NewGuid(), CreateData("World"));
+        }
+
+        A.CallTo(() => scriptEngine.CreateScript("script", A<ScriptOptions>._))
+            .MustHaveHappenedOnceExactly();
+        A.CallTo(() => script.Execute(A<ScriptVars>._))
+            .MustHaveHappenedTwiceExactly();
+        A.CallTo(() => script.Dispose())
+            .MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public void Should_recompile_script_after_error()
+    {
+        var script = A.Fake<IScript>();
+
+        A.CallTo(() => scriptEngine.CreateScript("script", A<ScriptOptions>._))
+            .Returns(script);
+
+        A.CallTo(() => script.Execute(A<ScriptVars>._))
+            .Throws(new InvalidOperationException());
+
+        using var context = CreateContext(CreateScriptSchema());
+
+        var actual1 = sut.Extract(context, DomainId.NewGuid(), CreateData("Hello"));
+        var actual2 = sut.Extract(context, DomainId.NewGuid(), CreateData("World"));
+
+        Assert.Equal("Hello", actual1!.Titles![InvariantPartitioning.Key]);
+        Assert.Equal("World", actual2!.Titles![InvariantPartitioning.Key]);
+
+        A.CallTo(() => scriptEngine.CreateScript("script", A<ScriptOptions>._))
+            .MustHaveHappenedTwiceExactly();
+        A.CallTo(() => script.Dispose())
+            .MustHaveHappenedTwiceExactly();
+    }
+
+    [Fact]
+    public void Should_fallback_to_schema_if_script_cannot_be_compiled()
+    {
+        A.CallTo(() => scriptEngine.CreateScript("script", A<ScriptOptions>._))
+            .Throws(new InvalidOperationException());
+
+        using var context = CreateContext(CreateScriptSchema());
+
+        var actual1 = sut.Extract(context, DomainId.NewGuid(), CreateData("Hello"));
+        var actual2 = sut.Extract(context, DomainId.NewGuid(), CreateData("World"));
+
+        Assert.Equal("Hello", actual1!.Titles![InvariantPartitioning.Key]);
+        Assert.Equal("World", actual2!.Titles![InvariantPartitioning.Key]);
+
+        A.CallTo(() => scriptEngine.CreateScript("script", A<ScriptOptions>._))
+            .MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public void Should_return_text_if_html_cannot_be_parsed()
+    {
+        var actual = new HtmlTextNormalizer().Normalize("<!-]</p>", null);
+
+        Assert.NotNull(actual);
+    }
+
+    private static Schema CreateScriptSchema()
+    {
+        return new Schema { Name = "my-schema" }
+            .AddString(1, "title", Partitioning.Invariant)
+            .SetScripts(new SchemaScripts { Index = "script" });
+    }
+
+    private static ContentData CreateData(string title)
+    {
+        return new ContentData()
+            .AddField("title",
+                new ContentFieldData()
+                    .AddInvariant(title));
+    }
+
+    private ExtractedTexts? Extract(ContentData data, Schema? schema = null, ResolvedComponents? components = null)
+    {
+        return Extract(sut, data, schema, components);
+    }
+
+    private static ExtractedTexts? Extract(TextExtractor extractor, ContentData data, Schema? schema = null, ResolvedComponents? components = null)
+    {
+        using var context = CreateContext(schema, components);
+
+        return extractor.Extract(context, DomainId.NewGuid(), data);
+    }
+
+    private static TextExtractionContext CreateContext(Schema? schema, ResolvedComponents? components = null)
+    {
+        return new TextExtractionContext
         {
             AppId = NamedId.Of(DomainId.NewGuid(), "my-app"),
             Components = components ?? ResolvedComponents.Empty,
-            ContentId = DomainId.NewGuid(),
-            Data = data,
             Schema = schema,
             SchemaId = NamedId.Of(DomainId.NewGuid(), "my-schema"),
         };
-
-        return await sut.ExtractAsync(context);
     }
 }

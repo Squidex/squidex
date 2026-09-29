@@ -631,12 +631,7 @@ public abstract class TextIndexerTests : GivenContext
         {
             var index = await CreateSutAsync();
 
-            var registry =
-                new TextIndexRebuildRegistry(
-                    new InMemoryPersistenceFactory<TextIndexRebuildRequests>(),
-                    new InMemoryPersistenceFactory<TextIndexSkipList>());
-
-            var coordinator = new TextIndexRebuildCoordinator(registry, AppProvider, A.Fake<IJobService>(), A.Fake<ILogger<TextIndexRebuildCoordinator>>());
+            var coordinator = new TextIndexRebuildCoordinator();
 
             var extraction = new TextIndexExtraction(AppProvider, TextExtractorTests.CreateExtractor(A.Fake<IScriptEngine>()));
 

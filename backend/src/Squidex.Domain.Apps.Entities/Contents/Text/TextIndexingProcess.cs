@@ -6,7 +6,6 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Contents;
-using Squidex.Domain.Apps.Entities.Contents.Text.Extraction;
 using Squidex.Domain.Apps.Entities.Contents.Text.Rebuild;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Domain.Apps.Events.Contents;
@@ -39,15 +38,31 @@ public sealed class TextIndexingProcess(
 
     private sealed class Updates(
         Dictionary<UniqueContentId, TextContentState> states,
-        Dictionary<ContentData, ExtractedTexts?> texts,
         IJsonSerializer serializer,
         bool isRebuild)
     {
         private readonly Dictionary<UniqueContentId, TextContentState> currentUpdates = [];
         private readonly Dictionary<(UniqueContentId, byte), IndexCommand> commands = [];
+        private readonly Dictionary<UpsertIndexEntry, (ContentEvent Event, ContentData Data)> sources = [];
 
-        public async Task WriteAsync(ITextIndex textIndex, ITextIndexerState textIndexerState)
+        public async Task WriteAsync(ITextIndex textIndex, ITextIndexerState textIndexerState, TextIndexExtraction extraction,
+            CancellationToken ct)
         {
+            if (sources.Count > 0)
+            {
+                // Only calculate the values for the final versions, the other versions have been replaced within the batch.
+                var texts = await extraction.ExtractAsync(sources.Values, ct);
+
+                foreach (var (upsert, (_, data)) in sources)
+                {
+                    var text = texts.GetValueOrDefault(data);
+
+                    upsert.GeoObjects = data.ToGeo(serializer);
+                    upsert.Texts = text?.Texts;
+                    upsert.Titles = text?.Titles;
+                }
+            }
+
             if (commands.Count > 0)
             {
                 await textIndex.ExecuteAsync(commands.Values.ToArray());
@@ -134,15 +149,13 @@ public sealed class TextIndexingProcess(
                 new UpsertIndexEntry
                 {
                     UniqueContentId = uniqueId,
-                    GeoObjects = data.ToGeo(serializer),
                     IsNew = !isRebuild,
                     Stage = 0,
                     ServeAll = true,
                     ServePublished = false,
-                    Texts = texts.GetValueOrDefault(data)?.Texts,
-                    Titles = texts.GetValueOrDefault(data)?.Titles,
                     UserInfos = data.ToUserInfos(),
-                });
+                },
+                data);
 
             // The entries of a rebuild already exist, therefore we also delete the old draft.
             if (isRebuild)
@@ -366,13 +379,11 @@ public sealed class TextIndexingProcess(
                 new UpsertIndexEntry
                 {
                     UniqueContentId = uniqueId,
-                    GeoObjects = data.ToGeo(serializer),
                     Stage = stage,
                     ServeAll = all,
                     ServePublished = published,
-                    Texts = texts.GetValueOrDefault(data)?.Texts,
-                    Titles = texts.GetValueOrDefault(data)?.Titles,
-                });
+                },
+                data);
         }
 
         private void CoreUpdate(ContentEvent @event, UniqueContentId uniqueId, byte stage, bool all, bool published)
@@ -397,11 +408,22 @@ public sealed class TextIndexingProcess(
                 });
         }
 
-        private void Index(ContentEvent @event, IndexCommand command)
+        private void Index(ContentEvent @event, IndexCommand command, ContentData? data = null)
         {
             command.SchemaId = @event.SchemaId;
 
             var key = (command.UniqueContentId, command.Stage);
+
+            // The replaced version does not need to be extracted anymore.
+            if (command is not UpdateIndexEntry && commands.TryGetValue(key, out var replaced) && replaced is UpsertIndexEntry replacedUpsert)
+            {
+                sources.Remove(replacedUpsert);
+            }
+
+            if (command is UpsertIndexEntry newUpsert && data != null)
+            {
+                sources[newUpsert] = (@event, data);
+            }
 
             if (command is UpdateIndexEntry update &&
                 commands.TryGetValue(key, out var existing) &&
@@ -448,15 +470,14 @@ public sealed class TextIndexingProcess(
         CancellationToken ct = default)
     {
         var textStates = await QueryStatesAsync(events);
-        var textValues = await extraction.ExtractAsync(events, ct);
-        var textBatch = new Updates(textStates, textValues, serializer, isRebuild);
+        var textBatch = new Updates(textStates, serializer, isRebuild);
 
         foreach (var @event in events)
         {
             textBatch.On(@event);
         }
 
-        await textBatch.WriteAsync(textIndex, textIndexerState);
+        await textBatch.WriteAsync(textIndex, textIndexerState, extraction, ct);
     }
 
     private Task<Dictionary<UniqueContentId, TextContentState>> QueryStatesAsync(IEnumerable<Envelope<IEvent>> events)

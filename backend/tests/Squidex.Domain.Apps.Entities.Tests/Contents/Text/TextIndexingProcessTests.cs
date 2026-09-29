@@ -8,7 +8,6 @@
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Domain.Apps.Entities.Contents.Text.Rebuild;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Infrastructure;
 
@@ -33,7 +32,8 @@ public class TextIndexingProcessTests : TextIndexTestBase
 
         await sut.On([Created(TextData("title", "Hello").AddField("internal", new ContentFieldData().AddInvariant("Secret")))]);
 
-        Assert.Equal("Hello Hello Hello", GetText());
+        Assert.Equal("Hello", GetTitle());
+        Assert.Null(GetText());
     }
 
     [Fact]
@@ -46,7 +46,8 @@ public class TextIndexingProcessTests : TextIndexTestBase
 
         await sut.On([Created(TextData("title", "Hello"))]);
 
-        Assert.Equal("Hello Hello Hello World", GetText());
+        Assert.Equal("Hello", GetTitle());
+        Assert.Equal("World", GetText());
     }
 
     [Fact]
@@ -93,27 +94,44 @@ public class TextIndexingProcessTests : TextIndexTestBase
     }
 
     [Fact]
-    public async Task Should_skip_and_record_events_of_app_that_is_rebuilt()
+    public async Task Should_ignore_version_of_state_during_rebuild()
     {
-        var request = await Registry.StartAsync(AppId.Id, CancellationToken);
+        await TextIndexerState.SetAsync([new TextContentState { UniqueContentId = UniqueId(), State = TextState.Stage0_Draft__Stage1_None, Version = 5 }]);
 
-        await Coordinator.SynchronizeAsync(CancellationToken);
+        await sut.ApplyAsync([Created(TextData("field", "Hello"), 0)], true, CancellationToken);
 
-        await sut.On([Created(TextData("field", "Hello"), 0)]);
+        var state = await GetStateAsync();
 
-        var skipList = await Registry.GetSkipListAsync(AppId.Id, CancellationToken);
+        Assert.Equal("Hello", GetText());
+        Assert.Equal(0, state?.Version);
+    }
+
+    [Fact]
+    public async Task Should_only_index_final_version_of_content_in_batch()
+    {
+        await sut.On([Created(TextData("field", "Version1"), 0), Updated(TextData("field", "Version2"), 1)]);
+
+        Assert.Equal("Version2", GetText());
+        Assert.Single(Commands.OfType<UpsertIndexEntry>());
+    }
+
+    [Fact]
+    public async Task Should_skip_and_count_events_of_app_that_is_rebuilt()
+    {
+        await Coordinator.TakeOverAsync(AppId.Id, CancellationToken);
+
+        await sut.On([Created(TextData("field", "Hello"), 0), Updated(TextData("field", "World"), 1)]);
+
+        var skipped = await Coordinator.GetSkippedEventsAsync(AppId.Id, CancellationToken);
 
         Assert.Empty(Commands);
-        Assert.Equal(request.Id, skipList?.RequestId);
-        Assert.Equal(ContentId, Assert.Single(skipList!.Contents).ContentId);
+        Assert.Equal(2, skipped);
     }
 
     [Fact]
     public async Task Should_index_other_apps_while_app_is_rebuilt()
     {
-        await Registry.StartAsync(AppId.Id, CancellationToken);
-
-        await Coordinator.SynchronizeAsync(CancellationToken);
+        await Coordinator.TakeOverAsync(AppId.Id, CancellationToken);
 
         var otherApp = NamedId.Of(DomainId.NewGuid(), "other-app");
 
@@ -127,15 +145,21 @@ public class TextIndexingProcessTests : TextIndexTestBase
     }
 
     [Fact]
-    public async Task Should_index_app_again_after_takeover()
+    public async Task Should_index_app_again_after_hand_back()
     {
-        var request = await Registry.StartAsync(AppId.Id, CancellationToken);
+        await Coordinator.TakeOverAsync(AppId.Id, CancellationToken);
+        await Coordinator.TryHandBackAsync(AppId.Id, 0, CancellationToken);
 
-        await Coordinator.SynchronizeAsync(CancellationToken);
+        await sut.On([Created(TextData("field", "Hello"), 0)]);
 
-        await Registry.UpdateAsync(AppId.Id, request.Id, 0, TextIndexRebuildStatus.Completing, CancellationToken);
+        Assert.Equal("Hello", GetText());
+    }
 
-        await Coordinator.SynchronizeAsync(CancellationToken);
+    [Fact]
+    public async Task Should_index_app_again_after_release()
+    {
+        await Coordinator.TakeOverAsync(AppId.Id, CancellationToken);
+        await Coordinator.ReleaseAsync(AppId.Id);
 
         await sut.On([Created(TextData("field", "Hello"), 0)]);
 

@@ -18,7 +18,7 @@ public sealed class TextIndexRebuildCoordinator
     // The number of events per app that the text indexer has skipped, because the app is rebuilt.
     private readonly Dictionary<DomainId, long> skippedEvents = [];
 
-    internal async Task<TextIndexBatch> BeginBatchAsync(
+    public async Task<TextIndexBatch> BeginBatchAsync(
         CancellationToken ct = default)
     {
         // The rebuild only holds the lock for short operations in memory, never for the rebuild itself.

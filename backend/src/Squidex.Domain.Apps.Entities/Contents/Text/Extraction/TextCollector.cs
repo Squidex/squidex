@@ -47,13 +47,13 @@ public sealed class TextCollector : IDisposable
     {
         var extractedTexts = Build(bodies);
         var extractedTitles = Build(titles);
-    
+
         if (extractedTexts == null && extractedTitles == null)
         {
             return null;
         }
 
-        return new ExtractedTexts(extractedTitles, extractedTexts);
+        return new ExtractedTexts(extractedTexts, extractedTitles);
     }
 
     private static Dictionary<string, string>? Build(Dictionary<string, StringBuilder> source)
