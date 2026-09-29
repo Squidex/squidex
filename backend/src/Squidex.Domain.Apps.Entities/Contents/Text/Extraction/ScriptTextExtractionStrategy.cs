@@ -28,7 +28,7 @@ public sealed class ScriptTextExtractionStrategy(IScriptEngine scriptEngine, ILo
     // The script can override the schema, therefore it must run first.
     public int Order => -1000;
 
-    public Dictionary<string, string>? Extract(TextExtractionContext context, DomainId contentId, ContentData data)
+    public ExtractedTexts? Extract(TextExtractionContext context, DomainId contentId, ContentData data)
     {
         var script = context.Schema?.Scripts.Index;
         if (string.IsNullOrWhiteSpace(script))
@@ -37,7 +37,7 @@ public sealed class ScriptTextExtractionStrategy(IScriptEngine scriptEngine, ILo
         }
 
         // The context is only used by one thread, therefore the script can be reused for all contents of the schema.
-        var compiled = context.GetOrAdd(ScriptKey, () => Compile(context, script));
+        var compiled = context.GetOrAdd(ScriptKey, (Strategy: this, Context: context, Script: script), static x => x.Strategy.Compile(x.Context, x.Script));
         if (compiled == null)
         {
             return null;
@@ -84,7 +84,7 @@ public sealed class ScriptTextExtractionStrategy(IScriptEngine scriptEngine, ILo
         }
     }
 
-    public static Dictionary<string, string>? ToTexts(JsonValue result)
+    public static ExtractedTexts? ToTexts(JsonValue result)
     {
         // The script output is used as it is, therefore the normalizers are not applied.
         using var collector = new TextCollector();
@@ -103,7 +103,8 @@ public sealed class ScriptTextExtractionStrategy(IScriptEngine scriptEngine, ILo
                 return null;
         }
 
-        return collector.Build() ?? [];
+        // An empty result means that the script has handled the content, therefore the next strategy must not run.
+        return collector.Build() ?? new ExtractedTexts(null, null);
     }
 
     private static void Append(TextCollector collector, JsonObject obj, string key, bool isTitle)

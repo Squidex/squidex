@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Entities.Contents.Text.Extraction;
 using Squidex.Domain.Apps.Entities.Contents.Text.Rebuild;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
 using Squidex.Domain.Apps.Events.Contents;
@@ -38,7 +39,7 @@ public sealed class TextIndexingProcess(
 
     private sealed class Updates(
         Dictionary<UniqueContentId, TextContentState> states,
-        Dictionary<ContentData, Dictionary<string, string>?> texts,
+        Dictionary<ContentData, ExtractedTexts?> texts,
         IJsonSerializer serializer,
         bool isRebuild)
     {
@@ -138,7 +139,8 @@ public sealed class TextIndexingProcess(
                     Stage = 0,
                     ServeAll = true,
                     ServePublished = false,
-                    Texts = texts.GetValueOrDefault(data),
+                    Texts = texts.GetValueOrDefault(data)?.Texts,
+                    Titles = texts.GetValueOrDefault(data)?.Titles,
                     UserInfos = data.ToUserInfos(),
                 });
 
@@ -368,7 +370,8 @@ public sealed class TextIndexingProcess(
                     Stage = stage,
                     ServeAll = all,
                     ServePublished = published,
-                    Texts = texts.GetValueOrDefault(data),
+                    Texts = texts.GetValueOrDefault(data)?.Texts,
+                    Titles = texts.GetValueOrDefault(data)?.Titles,
                 });
         }
 

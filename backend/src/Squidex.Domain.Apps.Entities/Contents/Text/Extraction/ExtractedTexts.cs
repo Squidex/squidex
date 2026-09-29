@@ -5,14 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Squidex.Domain.Apps.Core.Schemas;
-using Squidex.Infrastructure.Json.Objects;
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.Extraction;
 
-public interface ITextFieldStrategy
-{
-    int Order { get; }
-
-    bool TryExtract(IField? field, JsonValue value, ContentTextWalker walker);
-}
+public sealed record ExtractedTexts(Dictionary<string, string>? Texts, Dictionary<string, string>? Titles);

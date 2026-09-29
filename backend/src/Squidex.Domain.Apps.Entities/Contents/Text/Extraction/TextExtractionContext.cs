@@ -33,7 +33,7 @@ public sealed class TextExtractionContext : IDisposable
         items.Clear();
     }
 
-    public T GetOrAdd<T>(object key, Func<T> factory)
+    public T GetOrAdd<T, TArg>(object key, TArg arg, Func<TArg, T> factory)
     {
         // The strategies can store expensive values for the schema, e.g. compiled scripts.
         if (items.TryGetValue(key, out var existing))
@@ -41,7 +41,8 @@ public sealed class TextExtractionContext : IDisposable
             return (T)existing!;
         }
 
-        var value = factory();
+        // The argument allows static factories without closures, because this method is called for every content.
+        var value = factory(arg);
 
         items[key] = value;
         return value;

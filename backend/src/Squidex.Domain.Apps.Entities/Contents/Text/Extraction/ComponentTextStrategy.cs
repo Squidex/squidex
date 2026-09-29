@@ -12,19 +12,19 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.Extraction;
 
-public sealed class ComponentTextStrategy : IFieldTextStrategy
+public sealed class ComponentTextStrategy : ITextFieldStrategy
 {
     // Components are detected by value, because they can also be nested in other values.
     public int Order => 100;
 
-    public bool TryExtract(IField? field, JsonValue value, TextCollector collector)
+    public bool TryExtract(IField? field, JsonValue value, ContentTextWalker walker)
     {
-        if (!Component.IsValid(value, out var discriminator) || !collector.Components.TryGetValue(DomainId.Create(discriminator), out var schema))
+        if (!Component.IsValid(value, out var discriminator) || !walker.Context.Components.TryGetValue(DomainId.Create(discriminator), out var schema))
         {
             return false;
         }
 
-        collector.AppendObject(value.AsObject, name => schema.FieldsByName.GetValueOrDefault(name));
+        walker.AppendObject(value.AsObject, name => schema.FieldsByName.GetValueOrDefault(name));
         return true;
     }
 }

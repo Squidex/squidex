@@ -10,11 +10,11 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.Extraction;
 
-public sealed class ArrayFieldTextStrategy : IFieldTextStrategy
+public sealed class ArrayFieldTextStrategy : ITextFieldStrategy
 {
     public int Order => 0;
 
-    public bool TryExtract(IField? field, JsonValue value, TextCollector collector)
+    public bool TryExtract(IField? field, JsonValue value, ContentTextWalker walker)
     {
         if (field is not IArrayField arrayField || value.Value is not JsonArray items)
         {
@@ -25,7 +25,7 @@ public sealed class ArrayFieldTextStrategy : IFieldTextStrategy
         {
             if (item.Value is JsonObject obj)
             {
-                collector.AppendObject(obj, name => arrayField.FieldsByName.GetValueOrDefault(name));
+                walker.AppendObject(obj, name => arrayField.FieldsByName.GetValueOrDefault(name));
             }
         }
 

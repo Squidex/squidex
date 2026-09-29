@@ -117,19 +117,19 @@ public static class ContentsServices
             .As<ITextExtractionStrategy>();
 
         services.AddSingletonAs<SearchPathsFieldTextStrategy>()
-            .As<IFieldTextStrategy>();
+            .As<ITextFieldStrategy>();
 
         services.AddSingletonAs<RichTextFieldTextStrategy>()
-            .As<IFieldTextStrategy>();
+            .As<ITextFieldStrategy>();
 
         services.AddSingletonAs<ArrayFieldTextStrategy>()
-            .As<IFieldTextStrategy>();
+            .As<ITextFieldStrategy>();
 
         services.AddSingletonAs<ComponentTextStrategy>()
-            .As<IFieldTextStrategy>();
+            .As<ITextFieldStrategy>();
 
         services.AddSingletonAs<JsonTextStrategy>()
-            .As<IFieldTextStrategy>();
+            .As<ITextFieldStrategy>();
 
         services.AddSingletonAs<MarkdownTextNormalizer>()
             .As<ITextNormalizer>();

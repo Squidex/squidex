@@ -115,7 +115,9 @@ public sealed class CommandFactory<T>(Func<Dictionary<string, string>, T> textBu
 
     private T? BuildTexts(UpsertIndexEntry upsert)
     {
-        return upsert.Texts == null ? null : textBuilder(upsert.Texts);
+        var weightedTexts = upsert.GetWeightedTexts();
+
+        return weightedTexts == null ? null : textBuilder(weightedTexts);
     }
 
     private static void UpdateEntry(UpdateIndexEntry update, List<WriteModel<MongoTextIndexEntity<T>>> writes)

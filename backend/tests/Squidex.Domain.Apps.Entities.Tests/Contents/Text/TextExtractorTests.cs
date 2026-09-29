@@ -24,7 +24,7 @@ public class TextExtractorTests
 
     public static TextExtractor CreateExtractor(IScriptEngine scriptEngine)
     {
-        IFieldTextStrategy[] fieldStrategies =
+        ITextFieldStrategy[] fieldStrategies =
         [
             new ArrayFieldTextStrategy(),
             new ComponentTextStrategy(),
@@ -348,7 +348,7 @@ public class TextExtractorTests
     [Fact]
     public async Task Should_use_custom_field_strategy_before_default_strategies()
     {
-        var customStrategy = A.Fake<IFieldTextStrategy>();
+        var customStrategy = A.Fake<ITextFieldStrategy>();
 
         A.CallTo(() => customStrategy.Order)
             .Returns(-1);

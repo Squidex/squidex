@@ -14,7 +14,7 @@ public sealed class TextExtractor(IEnumerable<ITextExtractionStrategy> strategie
 {
     private readonly ITextExtractionStrategy[] strategies = strategies.OrderBy(x => x.Order).ToArray();
 
-    public Dictionary<string, string>? Extract(TextExtractionContext context, DomainId contentId, ContentData data)
+    public ExtractedTexts? Extract(TextExtractionContext context, DomainId contentId, ContentData data)
     {
         // The first strategy that returns a result wins, e.g. the index script before the schema.
         foreach (var strategy in strategies)

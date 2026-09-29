@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Text;
 using NetTopologySuite.Geometries;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
@@ -57,6 +58,38 @@ public static class Extensions
                     }
                 }
             }
+        }
+
+        return result;
+    }
+
+    public static Dictionary<string, string>? GetWeightedTexts(this UpsertIndexEntry upsert, int titleWeight = 3)
+    {
+        // Not all text indexes support field weights, therefore they can boost the titles by repeating them.
+        if (upsert.Titles is not { Count: > 0 } titles)
+        {
+            return upsert.Texts;
+        }
+
+        var result = new Dictionary<string, string>(upsert.Texts ?? []);
+
+        foreach (var (language, title) in titles)
+        {
+            var sb = new StringBuilder();
+
+            for (var i = 0; i < titleWeight; i++)
+            {
+                sb.AppendIfNotEmpty(' ');
+                sb.Append(title);
+            }
+
+            if (result.TryGetValue(language, out var text))
+            {
+                sb.Append(' ');
+                sb.Append(text);
+            }
+
+            result[language] = sb.ToString();
         }
 
         return result;

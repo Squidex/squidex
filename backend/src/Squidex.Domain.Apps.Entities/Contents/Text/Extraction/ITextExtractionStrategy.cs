@@ -14,5 +14,5 @@ public interface ITextExtractionStrategy
 {
     int Order { get; }
 
-    Dictionary<string, string>? Extract(TextExtractionContext context, DomainId contentId, ContentData data);
+    ExtractedTexts? Extract(TextExtractionContext context, DomainId contentId, ContentData data);
 }

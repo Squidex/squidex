@@ -17,11 +17,11 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
 public sealed class TextIndexExtraction(IAppProvider appProvider, TextExtractor textExtractor)
 {
-    public async Task<Dictionary<ContentData, Dictionary<string, string>?>> ExtractAsync(IEnumerable<Envelope<IEvent>> events,
+    public async Task<Dictionary<ContentData, ExtractedTexts?>> ExtractAsync(IEnumerable<Envelope<IEvent>> events,
         CancellationToken ct)
     {
         // Compare by reference, because the events hold the instances and value equality is expensive.
-        var result = new Dictionary<ContentData, Dictionary<string, string>?>(ReferenceEqualityComparer.Instance);
+        var result = new Dictionary<ContentData, ExtractedTexts?>(ReferenceEqualityComparer.Instance);
 
         // Group by schema, so that the strategies can reuse expensive values for all contents, e.g. compiled scripts.
         var groups =
