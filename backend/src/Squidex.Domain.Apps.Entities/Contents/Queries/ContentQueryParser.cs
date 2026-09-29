@@ -143,7 +143,7 @@ public class ContentQueryParser(
 
         if (schema != null)
         {
-            components = await appprovider.GetComponentsAsync(schema, ct);
+            components = await appprovider.GetComponentsAsync(schema, ct: ct);
         }
 
         var query = q.Query;

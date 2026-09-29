@@ -25,6 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
 public abstract class TextIndexerTests : GivenContext
 {
+    private readonly Dictionary<DomainId, long> versions = [];
     private TextIndexingProcess? process;
 
     protected List<DomainId> Ids1 { get; } = [DomainId.NewGuid()];
@@ -503,7 +504,12 @@ public abstract class TextIndexerTests : GivenContext
         contentEvent.AppId = AppId;
         contentEvent.SchemaId = SchemaId;
 
-        await sut.On(Enumerable.Repeat(Envelope.Create<IEvent>(contentEvent), 1));
+        // The indexer ignores events with versions that have already been indexed.
+        var version = versions.GetValueOrDefault(id, -1) + 1;
+
+        versions[id] = version;
+
+        await sut.On([Envelope.Create<IEvent>(contentEvent).SetEventStreamNumber(version)]);
     }
 
     private static ContentData TextData(string language, string text)

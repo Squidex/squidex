@@ -392,7 +392,7 @@ public sealed class SchemasController(
     [ApiExplorerSettings(IgnoreApi = true)]
     public async Task<IActionResult> GetFilters(string app, string schema)
     {
-        var components = await appProvider.GetComponentsAsync(Schema, HttpContext.RequestAborted);
+        var components = await appProvider.GetComponentsAsync(Schema, ct: HttpContext.RequestAborted);
 
         var result = ContentQueryModel.Build(Schema, App.PartitionResolver(), components).Flatten();
         var response = await QueryModelDto.FromModelAsync(result, App, Schema, workflows);
@@ -402,7 +402,7 @@ public sealed class SchemasController(
 
     private async Task<FilterSchema> BuildModel()
     {
-        var components = await appProvider.GetComponentsAsync(Schema, HttpContext.RequestAborted);
+        var components = await appProvider.GetComponentsAsync(Schema, ct: HttpContext.RequestAborted);
 
         return Schema.BuildDataSchema(App.PartitionResolver(), components);
     }

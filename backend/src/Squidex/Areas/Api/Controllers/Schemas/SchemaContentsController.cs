@@ -51,8 +51,7 @@ public class SchemaContentsController(ICommandBus commandBus, IJobService jobSer
             Schema,
             request.MigrateDraft ?? true,
             request.MigratePublished ?? true)
-            with
-        { Reference = reference, };
+            with { Reference = reference };
 
         await jobService.StartAsync(App.Id, job, HttpContext.RequestAborted);
 
@@ -86,8 +85,7 @@ public class SchemaContentsController(ICommandBus commandBus, IJobService jobSer
             request.Format ?? ExportFormat.Csv,
             request.Fields,
             request.Unpublished ?? false)
-            with
-        { Reference = reference };
+            with { Reference = reference };
 
         await jobService.StartAsync(App.Id, job, HttpContext.RequestAborted);
 

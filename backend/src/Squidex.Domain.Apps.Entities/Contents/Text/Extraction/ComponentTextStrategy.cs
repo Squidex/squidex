@@ -24,7 +24,7 @@ public sealed class ComponentTextStrategy : ITextFieldStrategy
             return false;
         }
 
-        walker.AppendObject(value.AsObject, name => schema.FieldsByName.GetValueOrDefault(name));
+        walker.AppendObject(value.AsObject, schema.FieldsByName);
         return true;
     }
 }

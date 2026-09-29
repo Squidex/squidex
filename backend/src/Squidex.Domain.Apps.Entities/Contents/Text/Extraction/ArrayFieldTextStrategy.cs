@@ -25,7 +25,7 @@ public sealed class ArrayFieldTextStrategy : ITextFieldStrategy
         {
             if (item.Value is JsonObject obj)
             {
-                walker.AppendObject(obj, name => arrayField.FieldsByName.GetValueOrDefault(name));
+                walker.AppendObject(obj, arrayField.FieldsByName);
             }
         }
 

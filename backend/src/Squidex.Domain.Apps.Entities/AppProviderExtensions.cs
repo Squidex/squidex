@@ -13,13 +13,7 @@ namespace Squidex.Domain.Apps.Entities;
 
 public static class AppProviderExtensions
 {
-    public static Task<ResolvedComponents> GetComponentsAsync(this IAppProvider appProvider, Schema schema,
-        CancellationToken ct = default)
-    {
-        return appProvider.GetComponentsAsync(schema, false, ct);
-    }
-
-    public static async Task<ResolvedComponents> GetComponentsAsync(this IAppProvider appProvider, Schema schema, bool canCache,
+    public static async Task<ResolvedComponents> GetComponentsAsync(this IAppProvider appProvider, Schema schema, bool canCache = false,
         CancellationToken ct = default)
     {
         Dictionary<DomainId, Schema>? result = null;

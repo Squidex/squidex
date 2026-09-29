@@ -28,6 +28,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text;
 public abstract class TextIndexTestBase : GivenContext
 {
     private readonly List<(StoredEvent Stored, Envelope<IEvent> Parsed)> storedEvents = [];
+    private long lastVersion = -1;
 
     protected ITextIndex TextIndex { get; } = A.Fake<ITextIndex>();
 
@@ -162,13 +163,9 @@ public abstract class TextIndexTestBase : GivenContext
         @event.ContentId = ContentId;
         @event.SchemaId = SchemaId;
 
-        var envelope = Envelope.Create<IEvent>(@event);
+        // The indexer ignores events with versions that have already been indexed, therefore we need increasing versions.
+        lastVersion = Math.Max(lastVersion, version ?? lastVersion + 1);
 
-        if (version != null)
-        {
-            envelope.SetEventStreamNumber(version.Value);
-        }
-
-        return envelope;
+        return Envelope.Create<IEvent>(@event).SetEventStreamNumber(version ?? lastVersion);
     }
 }

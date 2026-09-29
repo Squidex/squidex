@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using System.Runtime.ExceptionServices;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Events;
@@ -72,20 +71,17 @@ public sealed class RebuildTextIndexJob(
 
         var progress = new Progress();
 
-        ExceptionDispatchInfo? error = null;
         try
         {
             await ReplayAsync(context, app.Id, progress, ct);
         }
-        catch (Exception ex)
+        finally
         {
-            error = ExceptionDispatchInfo.Capture(ex);
+            // Hand the app back to the text indexer, also when the job has been cancelled or has failed.
+            await HandBackAsync(context, app.Id, progress);
         }
 
-        // Hand the app back to the text indexer, also when the job has been cancelled or has failed.
-        await HandBackAsync(context, app.Id, progress);
-
-        error?.Throw();
+        await context.LogAsync($"Completed rebuild of {progress.ProcessedEvents} events");
     }
 
     private async Task HandBackAsync(JobRunContext context, DomainId appId, Progress progress)
@@ -113,8 +109,6 @@ public sealed class RebuildTextIndexJob(
             await coordinator.ReleaseAsync(appId);
             throw;
         }
-
-        await context.LogAsync($"Completed rebuild of {progress.ProcessedEvents} events");
     }
 
     private async Task ReplayAsync(JobRunContext context, DomainId appId, Progress progress,

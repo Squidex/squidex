@@ -110,7 +110,7 @@ public sealed class MigrateContentsJob(
             .WithNoCleanup()
             .WithUnpublished(true));
 
-        var components = await appProvider.GetComponentsAsync(schema, ct);
+        var components = await appProvider.GetComponentsAsync(schema, ct: ct);
 
         await MigrateAsync(
             new MigrationContext

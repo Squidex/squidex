@@ -48,13 +48,15 @@ public sealed class TextIndexingProcess(
         public async Task WriteAsync(ITextIndex textIndex, ITextIndexerState textIndexerState, TextIndexExtraction extraction,
             CancellationToken ct)
         {
-            if (sources.Count > 0)
+            // Only calculate the values for the final versions, the other versions have been replaced within the batch.
+            var upserts = commands.Values.OfType<UpsertIndexEntry>().ToList();
+            if (upserts.Count > 0)
             {
-                // Only calculate the values for the final versions, the other versions have been replaced within the batch.
-                var texts = await extraction.ExtractAsync(sources.Values, ct);
+                var texts = await extraction.ExtractAsync(upserts.Select(x => sources[x]), ct);
 
-                foreach (var (upsert, (_, data)) in sources)
+                foreach (var upsert in upserts)
                 {
+                    var data = sources[upsert].Data;
                     var text = texts.GetValueOrDefault(data);
 
                     upsert.GeoObjects = data.ToGeo(serializer);
@@ -83,11 +85,10 @@ public sealed class TextIndexingProcess(
 
             var uniqueId = new UniqueContentId(contentEvent.AppId.Id, contentEvent.ContentId);
 
-            // The version is only missing in tests, where events are not read from the event store.
-            long? version = @event.Headers.ContainsKey(CommonHeaders.EventStreamNumber) ? @event.Headers.EventStreamNumber() : null;
+            var version = @event.Headers.EventStreamNumber();
 
             // A rebuild has already indexed the content up to this version. The rebuild itself replays everything from the start.
-            if (!isRebuild && version != null && states.TryGetValue(uniqueId, out var existing) && existing.Version >= version)
+            if (!isRebuild && states.TryGetValue(uniqueId, out var existing) && existing.Version >= version)
             {
                 return;
             }
@@ -128,7 +129,7 @@ public sealed class TextIndexingProcess(
                     break;
             }
 
-            if (version != null && states.TryGetValue(uniqueId, out var state))
+            if (states.TryGetValue(uniqueId, out var state))
             {
                 state.Version = version;
 
@@ -413,12 +414,6 @@ public sealed class TextIndexingProcess(
             command.SchemaId = @event.SchemaId;
 
             var key = (command.UniqueContentId, command.Stage);
-
-            // The replaced version does not need to be extracted anymore.
-            if (command is not UpdateIndexEntry && commands.TryGetValue(key, out var replaced) && replaced is UpsertIndexEntry replacedUpsert)
-            {
-                sources.Remove(replacedUpsert);
-            }
 
             if (command is UpsertIndexEntry newUpsert && data != null)
             {

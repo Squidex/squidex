@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Scripting;
@@ -14,7 +13,7 @@ using Squidex.Infrastructure.Json.Objects;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text.Extraction;
 
-public sealed class ScriptTextExtractionStrategy(IScriptEngine scriptEngine, ILogger<ScriptTextExtractionStrategy> log) : ITextExtractionStrategy
+public sealed class ScriptTextExtractionStrategy(IScriptEngine scriptEngine) : ITextExtractionStrategy
 {
     private static readonly object ScriptKey = new object();
     private static readonly ScriptOptions ScriptOptions = new ScriptOptions
@@ -37,7 +36,7 @@ public sealed class ScriptTextExtractionStrategy(IScriptEngine scriptEngine, ILo
         }
 
         // The context is only used by one thread, therefore the script can be reused for all contents of the schema.
-        var compiled = context.GetOrAdd(ScriptKey, (Strategy: this, Context: context, Script: script), static x => x.Strategy.Compile(x.Context, x.Script));
+        var compiled = context.GetOrAdd(ScriptKey, (ScriptEngine: scriptEngine, Script: script), static x => Compile(x.ScriptEngine, x.Script));
         if (compiled == null)
         {
             return null;
@@ -58,10 +57,8 @@ public sealed class ScriptTextExtractionStrategy(IScriptEngine scriptEngine, ILo
 
             return ToTexts(compiled.Execute(vars));
         }
-        catch (Exception ex)
+        catch
         {
-            log.LogWarning(ex, "Failed to execute index script for content {contentId} of schema {schemaId}.", contentId, context.SchemaId.Id);
-
             // The state of the script is unknown after an error, e.g. a timeout, therefore it is not reused.
             context.Remove(ScriptKey);
 
@@ -70,16 +67,15 @@ public sealed class ScriptTextExtractionStrategy(IScriptEngine scriptEngine, ILo
         }
     }
 
-    private IScript? Compile(TextExtractionContext context, string script)
+    private static IScript? Compile(IScriptEngine scriptEngine, string script)
     {
         try
         {
             return scriptEngine.CreateScript(script, ScriptOptions);
         }
-        catch (Exception ex)
+        catch
         {
-            // Only log the error once per schema and batch, the contents are indexed without the script.
-            log.LogWarning(ex, "Failed to compile index script of schema {schemaId}.", context.SchemaId.Id);
+            // The contents are indexed without the script.
             return null;
         }
     }

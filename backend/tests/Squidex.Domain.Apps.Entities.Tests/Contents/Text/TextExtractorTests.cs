@@ -5,7 +5,6 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -49,7 +48,7 @@ public class TextExtractorTests
         return new TextExtractor(
         [
             new SchemaTextExtractionStrategy(fieldStrategies, normalizers),
-            new ScriptTextExtractionStrategy(scriptEngine, A.Fake<ILogger<ScriptTextExtractionStrategy>>()),
+            new ScriptTextExtractionStrategy(scriptEngine),
         ]);
     }
 

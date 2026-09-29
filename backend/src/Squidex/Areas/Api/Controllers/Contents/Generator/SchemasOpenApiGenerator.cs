@@ -49,7 +49,7 @@ public sealed class SchemasOpenApiGenerator(
         {
             if (schema.IsPublished && schema.Type != SchemaDefType.Component && schema.Fields.Count > 0)
             {
-                var components = await appProvider.GetComponentsAsync(schema, httpContext.RequestAborted);
+                var components = await appProvider.GetComponentsAsync(schema, ct: httpContext.RequestAborted);
 
                 GenerateSchemaOperations(builder.Schema(schema, partitionResolver, components, flat));
             }

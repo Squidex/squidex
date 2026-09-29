@@ -39,10 +39,10 @@ public sealed class ContentTextWalker(
             RootField? field = null;
             schema?.FieldsByName.TryGetValue(fieldName, out field);
 
+            isTitle = titleFields.Contains(fieldName);
+
             foreach (var (fieldLanguage, value) in fieldData)
             {
-                isTitle = titleFields.Contains(fieldName);
-
                 // When the text is later appended we need the current language.
                 language = fieldLanguage;
 
@@ -83,7 +83,7 @@ public sealed class ContentTextWalker(
         AppendField(null, value);
     }
 
-    public void AppendObject(JsonObject obj, Func<string, IField?> fields)
+    public void AppendObject<T>(JsonObject obj, IReadOnlyDictionary<string, T> fields) where T : IField
     {
         foreach (var (key, value) in obj)
         {
@@ -92,7 +92,7 @@ public sealed class ContentTextWalker(
                 continue;
             }
 
-            AppendField(fields(key), value);
+            AppendField(fields.GetValueOrDefault(key), value);
         }
     }
 
