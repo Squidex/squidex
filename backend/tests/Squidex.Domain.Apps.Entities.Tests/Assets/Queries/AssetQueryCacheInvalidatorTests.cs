@@ -27,7 +27,16 @@ public class AssetQueryCacheInvalidatorTests : GivenContext
     {
         await HandleAsync(new AnnotateAsset { AppId = AppId });
 
-        A.CallTo(() => generations.ResetAsync(CachingAssetQueryService.GenerationKey(AppId.Id), A<CancellationToken>._))
+        A.CallTo(() => generations.Reset(CachingAssetQueryService.GenerationKey(AppId.Id)))
+            .MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public async Task Should_reset_generation_if_asset_deleted()
+    {
+        await HandleAsync(new DeleteAsset { AppId = AppId });
+
+        A.CallTo(() => generations.Reset(CachingAssetQueryService.GenerationKey(AppId.Id)))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -36,7 +45,7 @@ public class AssetQueryCacheInvalidatorTests : GivenContext
     {
         await HandleAsync(new RenameAssetFolder { AppId = AppId });
 
-        A.CallTo(() => generations.ResetAsync(A<string>._, A<CancellationToken>._))
+        A.CallTo(() => generations.Reset(A<string>._))
             .MustNotHaveHappened();
     }
 
@@ -48,7 +57,7 @@ public class AssetQueryCacheInvalidatorTests : GivenContext
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             sut.HandleAsync(commandContext, (_, _) => throw new InvalidOperationException(), CancellationToken));
 
-        A.CallTo(() => generations.ResetAsync(A<string>._, A<CancellationToken>._))
+        A.CallTo(() => generations.Reset(A<string>._))
             .MustNotHaveHappened();
     }
 

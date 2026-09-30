@@ -28,7 +28,7 @@ public class ContentQueryCacheInvalidatorTests : GivenContext
     {
         await HandleAsync(new UpdateContent { AppId = AppId });
 
-        A.CallTo(() => generations.ResetAsync(CachingContentQueryService.GenerationKey(AppId.Id), A<CancellationToken>._))
+        A.CallTo(() => generations.Reset(CachingContentQueryService.GenerationKey(AppId.Id)))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -37,7 +37,7 @@ public class ContentQueryCacheInvalidatorTests : GivenContext
     {
         await HandleAsync(new DeleteAsset { AppId = AppId });
 
-        A.CallTo(() => generations.ResetAsync(CachingContentQueryService.GenerationKey(AppId.Id), A<CancellationToken>._))
+        A.CallTo(() => generations.Reset(CachingContentQueryService.GenerationKey(AppId.Id)))
             .MustHaveHappenedOnceExactly();
     }
 
@@ -46,7 +46,25 @@ public class ContentQueryCacheInvalidatorTests : GivenContext
     {
         await HandleAsync(new ValidateContent { AppId = AppId });
 
-        A.CallTo(() => generations.ResetAsync(A<string>._, A<CancellationToken>._))
+        A.CallTo(() => generations.Reset(A<string>._))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_not_reset_generation_if_content_defaults_are_only_enriched()
+    {
+        await HandleAsync(new EnrichContentDefaults { AppId = AppId });
+
+        A.CallTo(() => generations.Reset(A<string>._))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_not_reset_generation_if_asset_changed()
+    {
+        await HandleAsync(new AnnotateAsset { AppId = AppId });
+
+        A.CallTo(() => generations.Reset(A<string>._))
             .MustNotHaveHappened();
     }
 
@@ -58,7 +76,7 @@ public class ContentQueryCacheInvalidatorTests : GivenContext
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
             sut.HandleAsync(commandContext, (_, _) => throw new InvalidOperationException(), CancellationToken));
 
-        A.CallTo(() => generations.ResetAsync(A<string>._, A<CancellationToken>._))
+        A.CallTo(() => generations.Reset(A<string>._))
             .MustNotHaveHappened();
     }
 

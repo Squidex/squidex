@@ -24,6 +24,6 @@ public sealed class AssetQueryCacheInvalidator(ICacheGenerations generations) : 
         }
 
         // A new generation changes all cache keys of the app on all nodes.
-        await generations.ResetAsync(CachingAssetQueryService.GenerationKey(asset.AppId.Id), default);
+        generations.Reset(CachingAssetQueryService.GenerationKey(asset.AppId.Id));
     }
 }

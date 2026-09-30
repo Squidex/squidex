@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -15,6 +15,9 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Json;
 
+#pragma warning disable RECS0082 // Parameter has the same name as a member and hides it
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Domain.Apps.Entities.Assets.Queries;
 
 public sealed class CachingAssetQueryService(
@@ -30,12 +33,6 @@ public sealed class CachingAssetQueryService(
     private sealed record CachedAssets(long Total, EnrichedAsset[] Items);
 
     private sealed record CacheKey<T>(string Kind, string Generation, long AppVersion, IReadOnlyDictionary<string, string> Headers, T Request);
-
-    private sealed record QueryRequest(DomainId? ParentId, Q Query);
-
-    private sealed record FindRequest(DomainId Id, bool AllowDeleted);
-
-    private sealed record FindBySlugRequest(string Slug, bool AllowDeleted);
 
     // Only the distributed cache is used, because the local caches of the other nodes cannot be invalidated.
     private readonly HybridCacheEntryOptions entryOptions = new HybridCacheEntryOptions
@@ -54,24 +51,12 @@ public sealed class CachingAssetQueryService(
             return await inner.QueryAsync(context, parentId, q!, ct);
         }
 
-        var key = await CreateKeyAsync(context, "assets.query", new QueryRequest(parentId, q), ct);
-        if (key == null)
+        var cached = await GetOrQueryAsync(context, "assets.query", new { parentId, q }, async ct =>
         {
-            return await inner.QueryAsync(context, parentId, q, ct);
-        }
+            var assets = await inner.QueryAsync(context, parentId, q, ct);
 
-        var cached = await cache.GetOrCreateAsync(key,
-            (inner, context, parentId, q),
-            static async (state, ct) =>
-            {
-                var assets = await state.inner.QueryAsync(state.context, state.parentId, state.q, ct);
-
-                return new CachedAssets(assets.Total, assets.ToArray());
-            },
-            entryOptions,
-            cancellationToken: ct);
-
-        AddCacheDependencies(context, cached.Items);
+            return new CachedAssets(assets.Total, assets.ToArray());
+        }, ct);
 
         return ResultList.Create(cached.Total, cached.Items);
     }
@@ -87,24 +72,10 @@ public sealed class CachingAssetQueryService(
             return await inner.FindAsync(context, id, allowDeleted, version, ct);
         }
 
-        var key = await CreateKeyAsync(context, "assets.find", new FindRequest(id, allowDeleted), ct);
-        if (key == null)
+        var cached = await GetOrQueryAsync(context, "assets.find", new { id, allowDeleted }, async ct =>
         {
-            return await inner.FindAsync(context, id, allowDeleted, version, ct);
-        }
-
-        var cached = await cache.GetOrCreateAsync(key,
-            (inner, context, id, allowDeleted),
-            static async (state, ct) =>
-            {
-                var asset = await state.inner.FindAsync(state.context, state.id, state.allowDeleted, EtagVersion.Any, ct);
-
-                return new CachedAssets(asset != null ? 1 : 0, asset != null ? [asset] : []);
-            },
-            entryOptions,
-            cancellationToken: ct);
-
-        AddCacheDependencies(context, cached.Items);
+            return Single(await inner.FindAsync(context, id, allowDeleted, version, ct));
+        }, ct);
 
         return cached.Items.FirstOrDefault();
     }
@@ -119,24 +90,10 @@ public sealed class CachingAssetQueryService(
             return await inner.FindBySlugAsync(context, slug, allowDeleted, ct);
         }
 
-        var key = await CreateKeyAsync(context, "assets.slug", new FindBySlugRequest(slug, allowDeleted), ct);
-        if (key == null)
+        var cached = await GetOrQueryAsync(context, "assets.slug", new { slug, allowDeleted }, async ct =>
         {
-            return await inner.FindBySlugAsync(context, slug, allowDeleted, ct);
-        }
-
-        var cached = await cache.GetOrCreateAsync(key,
-            (inner, context, slug, allowDeleted),
-            static async (state, ct) =>
-            {
-                var asset = await state.inner.FindBySlugAsync(state.context, state.slug, state.allowDeleted, ct);
-
-                return new CachedAssets(asset != null ? 1 : 0, asset != null ? [asset] : []);
-            },
-            entryOptions,
-            cancellationToken: ct);
-
-        AddCacheDependencies(context, cached.Items);
+            return Single(await inner.FindBySlugAsync(context, slug, allowDeleted, ct));
+        }, ct);
 
         return cached.Items.FirstOrDefault();
     }
@@ -172,7 +129,23 @@ public sealed class CachingAssetQueryService(
         return $"assets/{appId}";
     }
 
-    private async Task<string?> CreateKeyAsync<T>(Context context, string kind, T request,
+    private async Task<CachedAssets> GetOrQueryAsync<TRequest>(Context context, string kind, TRequest request, Func<CancellationToken, Task<CachedAssets>> query,
+        CancellationToken ct)
+    {
+        var key = await CreateKeyAsync(context, kind, request, ct);
+        if (key == null)
+        {
+            return await query(ct);
+        }
+
+        var cached = await cache.GetOrCreateAsync(key, async ct => await query(ct), entryOptions, cancellationToken: ct);
+
+        AddCacheDependencies(context, cached.Items);
+
+        return cached;
+    }
+
+    private async Task<string?> CreateKeyAsync<TRequest>(Context context, string kind, TRequest request,
         CancellationToken ct)
     {
         string generation;
@@ -187,7 +160,7 @@ public sealed class CachingAssetQueryService(
             return null;
         }
 
-        var key = new CacheKey<T>(kind, generation, context.App.Version, context.Headers, request);
+        var key = new CacheKey<TRequest>(kind, generation, context.App.Version, context.Headers, request);
         var keyHash = SHA256.HashData(serializer.SerializeToBytes(key));
 
         return $"{kind}/{context.App.Id}/{Convert.ToHexString(keyHash)}";
@@ -209,6 +182,11 @@ public sealed class CachingAssetQueryService(
         {
             requestCache.AddDependency(asset.UniqueId, asset.Version);
         }
+    }
+
+    private static CachedAssets Single(EnrichedAsset? asset)
+    {
+        return asset != null ? new CachedAssets(1, [asset]) : new CachedAssets(0, []);
     }
 
     private static bool CanCache(Context context)

@@ -66,7 +66,7 @@ public class CacheGenerationsTests
     {
         var generation = await sut.GetAsync("key", ct);
 
-        await sut.ResetAsync("key", ct);
+        sut.Reset("key");
 
         Assert.Equal(generation, await sut.GetAsync("key", ct));
     }
@@ -76,7 +76,7 @@ public class CacheGenerationsTests
     {
         var generation = await sut.GetAsync("key", ct);
 
-        await sut.ResetAsync("key", ct);
+        sut.Reset("key");
         await sut.FlushAsync(ct);
 
         Assert.NotEqual(generation, await sut.GetAsync("key", ct));
@@ -85,9 +85,9 @@ public class CacheGenerationsTests
     [Fact]
     public async Task Should_write_each_reset_key_once_on_flush()
     {
-        await sut.ResetAsync("key1", ct);
-        await sut.ResetAsync("key1", ct);
-        await sut.ResetAsync("key2", ct);
+        sut.Reset("key1");
+        sut.Reset("key1");
+        sut.Reset("key2");
 
         await sut.FlushAsync(ct);
         await sut.FlushAsync(ct);
@@ -104,7 +104,7 @@ public class CacheGenerationsTests
         A.CallTo(() => cache.SetAsync(A<string>._, A<byte[]>._, A<DistributedCacheEntryOptions>._, A<CancellationToken>._))
             .Throws(new InvalidOperationException());
 
-        await sut.ResetAsync("key", ct);
+        sut.Reset("key");
         await sut.FlushAsync(ct);
     }
 
@@ -114,7 +114,7 @@ public class CacheGenerationsTests
         await sut.StartAsync(ct);
         try
         {
-            await sut.ResetAsync("key", ct);
+            sut.Reset("key");
 
             await Task.Delay(500, ct);
 
@@ -132,7 +132,7 @@ public class CacheGenerationsTests
     {
         await sut.StartAsync(ct);
 
-        await sut.ResetAsync("key", ct);
+        sut.Reset("key");
         await sut.StopAsync(ct);
 
         A.CallTo(() => cache.SetAsync("generation/key", A<byte[]>._, A<DistributedCacheEntryOptions>._, A<CancellationToken>._))

@@ -12,6 +12,5 @@ public interface ICacheGenerations
     Task<string> GetAsync(string key,
         CancellationToken ct = default);
 
-    Task ResetAsync(string key,
-        CancellationToken ct = default);
+    void Reset(string key);
 }

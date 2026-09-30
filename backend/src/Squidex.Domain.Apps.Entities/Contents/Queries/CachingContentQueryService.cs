@@ -15,6 +15,9 @@ using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Json;
 using Squidex.Shared;
 
+#pragma warning disable RECS0082 // Parameter has the same name as a member and hides it
+#pragma warning disable SA1313 // Parameter names should begin with lower-case letter
+
 namespace Squidex.Domain.Apps.Entities.Contents.Queries;
 
 public sealed class CachingContentQueryService(
@@ -30,10 +33,6 @@ public sealed class CachingContentQueryService(
     private sealed record CachedContents(long Total, EnrichedContent[] Items);
 
     private sealed record CacheKey<T>(string Kind, string Generation, long AppVersion, IReadOnlyDictionary<string, string> Headers, T Request);
-
-    private sealed record QueryRequest(DomainId SchemaId, long SchemaVersion, Q Query);
-
-    private sealed record FindRequest(DomainId SchemaId, long SchemaVersion, DomainId Id);
 
     // Only the distributed cache is used, because the local caches of the other nodes cannot be invalidated.
     private readonly HybridCacheEntryOptions entryOptions = new HybridCacheEntryOptions
@@ -72,24 +71,12 @@ public sealed class CachingContentQueryService(
             return await inner.QueryAsync(context, schemaIdOrName, q, ct);
         }
 
-        var key = await CreateKeyAsync(context, "contents.query", new QueryRequest(schema.Id, schema.Version, q), ct);
-        if (key == null)
+        var cached = await GetOrQueryAsync(context, schema, "contents.query", q, async ct =>
         {
-            return await inner.QueryAsync(context, schemaIdOrName, q, ct);
-        }
+            var contents = await inner.QueryAsync(context, schemaIdOrName, q, ct);
 
-        var cached = await cache.GetOrCreateAsync(key,
-            (inner, context, schemaIdOrName, q),
-            static async (state, ct) =>
-            {
-                var contents = await state.inner.QueryAsync(state.context, state.schemaIdOrName, state.q, ct);
-
-                return new CachedContents(contents.Total, contents.ToArray());
-            },
-            entryOptions,
-            cancellationToken: ct);
-
-        AddCacheDependencies(context, schema, cached.Items);
+            return new CachedContents(contents.Total, contents.ToArray());
+        }, ct);
 
         return ResultList.Create(cached.Total, cached.Items);
     }
@@ -112,24 +99,12 @@ public sealed class CachingContentQueryService(
             return await inner.FindAsync(context, schemaIdOrName, id, version, ct);
         }
 
-        var key = await CreateKeyAsync(context, "contents.find", new FindRequest(schema.Id, schema.Version, id), ct);
-        if (key == null)
+        var cached = await GetOrQueryAsync(context, schema, "contents.find", id, async ct =>
         {
-            return await inner.FindAsync(context, schemaIdOrName, id, version, ct);
-        }
+            var content = await inner.FindAsync(context, schemaIdOrName, id, version, ct);
 
-        var cached = await cache.GetOrCreateAsync(key,
-            (inner, context, schemaIdOrName, id),
-            static async (state, ct) =>
-            {
-                var content = await state.inner.FindAsync(state.context, state.schemaIdOrName, state.id, EtagVersion.Any, ct);
-
-                return new CachedContents(content != null ? 1 : 0, content != null ? [content] : []);
-            },
-            entryOptions,
-            cancellationToken: ct);
-
-        AddCacheDependencies(context, schema, cached.Items);
+            return content != null ? new CachedContents(1, [content]) : new CachedContents(0, []);
+        }, ct);
 
         return cached.Items.FirstOrDefault();
     }
@@ -151,7 +126,23 @@ public sealed class CachingContentQueryService(
         return $"contents/{appId}";
     }
 
-    private async Task<string?> CreateKeyAsync<T>(Context context, string kind, T request,
+    private async Task<CachedContents> GetOrQueryAsync<TRequest>(Context context, Schema schema, string kind, TRequest request, Func<CancellationToken, Task<CachedContents>> query,
+        CancellationToken ct)
+    {
+        var key = await CreateKeyAsync(context, kind, new { schemaId = schema.Id, schemaVersion = schema.Version, request }, ct);
+        if (key == null)
+        {
+            return await query(ct);
+        }
+
+        var cached = await cache.GetOrCreateAsync(key, async ct => await query(ct), entryOptions, cancellationToken: ct);
+
+        AddCacheDependencies(context, schema, cached.Items);
+
+        return cached;
+    }
+
+    private async Task<string?> CreateKeyAsync<TRequest>(Context context, string kind, TRequest request,
         CancellationToken ct)
     {
         string generation;
@@ -166,7 +157,7 @@ public sealed class CachingContentQueryService(
             return null;
         }
 
-        var key = new CacheKey<T>(kind, generation, context.App.Version, context.Headers, request);
+        var key = new CacheKey<TRequest>(kind, generation, context.App.Version, context.Headers, request);
         var keyHash = SHA256.HashData(serializer.SerializeToBytes(key));
 
         return $"{kind}/{context.App.Id}/{Convert.ToHexString(keyHash)}";

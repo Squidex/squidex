@@ -58,13 +58,10 @@ public sealed class CacheGenerations(
         return await WriteAsync(key, ct);
     }
 
-    public Task ResetAsync(string key,
-        CancellationToken ct = default)
+    public void Reset(string key)
     {
         // Many resets in a short time, for example from bulk updates, are written once per interval.
         pendingKeys[key] = true;
-
-        return Task.CompletedTask;
     }
 
     public async Task FlushAsync(

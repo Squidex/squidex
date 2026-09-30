@@ -40,9 +40,9 @@ public class CachingContentQueryServiceTests : GivenContext
     private readonly IDistributedCache distributedCache = A.Fake<IDistributedCache>(x => x.Wrapping(new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions()))));
     private readonly IOptions<ContentQueryCacheOptions> options = Options.Create(new ContentQueryCacheOptions { CacheDuration = TimeSpan.FromMinutes(1) });
     private readonly ICacheGenerations generations = A.Fake<ICacheGenerations>();
-    private string generation = "1";
     private readonly CachingContentQueryService sut;
     private readonly EnrichedContent content;
+    private string generation = "1";
 
     public CachingContentQueryServiceTests()
     {
@@ -167,6 +167,20 @@ public class CachingContentQueryServiceTests : GivenContext
     public async Task Should_not_cache_query_if_user_can_only_read_own_content()
     {
         await QueryWithoutCacheAsync(CreateApiContext(permissionId: PermissionIds.AppContentsReadOwn), Q.Empty);
+    }
+
+    [Fact]
+    public async Task Should_not_cache_query_if_schema_has_query_pre_script()
+    {
+        Schema = Schema with { Scripts = new SchemaScripts { QueryPre = "<query-script>" } };
+
+        await QueryWithoutCacheAsync(CreateApiContext(), Q.Empty);
+    }
+
+    [Fact]
+    public async Task Should_not_cache_scheduled_query()
+    {
+        await QueryWithoutCacheAsync(CreateApiContext(), Q.Empty.WithSchedule(default, default));
     }
 
     [Fact]

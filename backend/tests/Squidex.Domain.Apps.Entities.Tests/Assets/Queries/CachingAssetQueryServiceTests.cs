@@ -33,9 +33,9 @@ public class CachingAssetQueryServiceTests : GivenContext
     private readonly IDistributedCache distributedCache = A.Fake<IDistributedCache>(x => x.Wrapping(new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions()))));
     private readonly IOptions<AssetQueryCacheOptions> options = Options.Create(new AssetQueryCacheOptions { CacheDuration = TimeSpan.FromMinutes(1) });
     private readonly ICacheGenerations generations = A.Fake<ICacheGenerations>();
-    private string generation = "1";
     private readonly CachingAssetQueryService sut;
     private readonly EnrichedAsset asset;
+    private string generation = "1";
 
     public CachingAssetQueryServiceTests()
     {
@@ -148,6 +148,69 @@ public class CachingAssetQueryServiceTests : GivenContext
         App = App with { AssetScripts = new AssetScripts { Query = "<query-script>" } };
 
         await QueryWithoutCacheAsync(ApiContext, Q.Empty);
+    }
+
+    [Fact]
+    public async Task Should_cache_query_if_app_has_asset_query_script_but_scripting_is_disabled()
+    {
+        App = App with { AssetScripts = new AssetScripts { Query = "<query-script>" } };
+
+        await QueryTwiceAsync(ApiContext.Clone(b => b.WithNoScripting()), null, Q.Empty);
+
+        A.CallTo(() => inner.QueryAsync(A<Context>._, A<DomainId?>._, A<Q>._, A<CancellationToken>._))
+            .MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public async Task Should_cache_different_queries_separately()
+    {
+        await sut.QueryAsync(ApiContext, null, Q.Empty.WithODataQuery("$top=1"), CancellationToken);
+        await WaitForEntriesAsync(QueryPrefix, 1);
+
+        await sut.QueryAsync(ApiContext, null, Q.Empty.WithODataQuery("$top=2"), CancellationToken);
+
+        A.CallTo(() => inner.QueryAsync(A<Context>._, A<DomainId?>._, A<Q>._, A<CancellationToken>._))
+            .MustHaveHappenedTwiceExactly();
+    }
+
+    [Fact]
+    public async Task Should_not_add_cache_dependencies_if_disabled()
+    {
+        await QueryTwiceAsync(ApiContext.Clone(b => b.WithNoCacheKeys()), null, Q.Empty);
+
+        A.CallTo(() => requestCache.AddDependency(A<DomainId>._, A<long>._))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_cache_asset_not_found()
+    {
+        var id = DomainId.NewGuid();
+
+        A.CallTo(() => inner.FindAsync(A<Context>._, id, A<bool>._, A<long>._, A<CancellationToken>._))
+            .Returns(Task.FromResult<EnrichedAsset?>(null));
+
+        await sut.FindAsync(ApiContext, id, ct: CancellationToken);
+        await WaitForEntriesAsync(FindPrefix, 1);
+
+        var actual = await sut.FindAsync(ApiContext, id, ct: CancellationToken);
+
+        Assert.Null(actual);
+
+        A.CallTo(() => inner.FindAsync(A<Context>._, id, false, EtagVersion.Any, A<CancellationToken>._))
+            .MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public async Task Should_cache_find_with_and_without_deleted_assets_separately()
+    {
+        await sut.FindAsync(ApiContext, asset.Id, false, ct: CancellationToken);
+        await WaitForEntriesAsync(FindPrefix, 1);
+
+        await sut.FindAsync(ApiContext, asset.Id, true, ct: CancellationToken);
+
+        A.CallTo(() => inner.FindAsync(A<Context>._, asset.Id, A<bool>._, EtagVersion.Any, A<CancellationToken>._))
+            .MustHaveHappenedTwiceExactly();
     }
 
     [Fact]

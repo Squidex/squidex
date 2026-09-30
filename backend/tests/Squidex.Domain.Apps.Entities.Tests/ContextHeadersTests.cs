@@ -110,4 +110,39 @@ public class ContextHeadersTests
         // The original must not be affected.
         Assert.Equal("my-app", context1.App.Name);
     }
+
+    [Fact]
+    public void Should_sort_headers_independent_from_insertion_order()
+    {
+        var context1 = sut.Clone(b =>
+        {
+            b.SetHeader("X-B", "2");
+            b.SetHeader("X-A", "1");
+        });
+
+        var context2 = sut.Clone(b =>
+        {
+            b.SetHeader("X-A", "1");
+            b.SetHeader("X-B", "2");
+        });
+
+        Assert.Equal(["X-A", "X-B"], context1.Headers.Keys);
+        Assert.Equal(context1.Headers, context2.Headers);
+    }
+
+    [Fact]
+    public void Should_find_headers_case_insensitive()
+    {
+        var context = sut.Clone(b => b.SetHeader("X-Fields", "a"));
+
+        Assert.Equal("a", context.Headers["x-fields"]);
+    }
+
+    [Fact]
+    public void Should_keep_headers_when_app_changes()
+    {
+        var context = sut.Clone(b => b.SetHeader("X-Fields", "a")).WithApp(new App { Name = "other-app" });
+
+        Assert.Equal("a", context.Headers["X-Fields"]);
+    }
 }

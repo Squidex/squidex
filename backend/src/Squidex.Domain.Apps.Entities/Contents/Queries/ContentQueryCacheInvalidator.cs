@@ -25,25 +25,12 @@ public sealed class ContentQueryCacheInvalidator(ICacheGenerations generations) 
         }
 
         // A new generation changes all cache keys of the app on all nodes.
-        var appId = appCommand.AppId.Id;
-
-        await generations.ResetAsync(CachingContentQueryService.GenerationKey(appId), default);
+        generations.Reset(CachingContentQueryService.GenerationKey(appCommand.AppId.Id));
     }
 
     private static bool ChangesContents(ICommand command)
     {
         // Queries remove references to deleted assets.
-        switch (command)
-        {
-            case ValidateContent:
-            case EnrichContentDefaults:
-                return false;
-            case ContentCommand:
-                return true;
-            case DeleteAsset:
-                return true;
-            default:
-                return false;
-        }
+        return command is ContentCommand and not ValidateContent and not EnrichContentDefaults or DeleteAsset;
     }
 }
