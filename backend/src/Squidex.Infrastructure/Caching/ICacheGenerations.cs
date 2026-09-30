@@ -5,18 +5,12 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-namespace Squidex.Domain.Apps.Entities.Assets.Queries;
+namespace Squidex.Infrastructure.Caching;
 
-public interface IAssetEnricherStep
+public interface ICacheGenerations
 {
-    bool RunOnCachedResults => false;
+    Task<string> GetAsync(string key,
+        CancellationToken ct = default);
 
-    Task EnrichAsync(Context context, IEnumerable<EnrichedAsset> assets,
-        CancellationToken ct);
-
-    Task EnrichAsync(Context context,
-        CancellationToken ct)
-    {
-        return Task.CompletedTask;
-    }
+    void Reset(string key);
 }

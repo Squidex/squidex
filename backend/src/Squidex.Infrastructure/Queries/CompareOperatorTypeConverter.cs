@@ -76,7 +76,7 @@ public sealed class CompareOperatorTypeConverter : TypeConverter
             case CompareOperator.GreaterThan:
                 return "gt";
             case CompareOperator.GreaterThanOrEqual:
-                return "gt";
+                return "ge";
             case CompareOperator.Empty:
                 return "empty";
             case CompareOperator.Exists:

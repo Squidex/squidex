@@ -25,7 +25,25 @@ public sealed class JsonFilterSurrogate : ISurrogate<FilterNode<JsonValue>>
 
     public void FromSource(FilterNode<JsonValue> source)
     {
-        throw new NotSupportedException();
+        switch (source)
+        {
+            case NegateFilter<JsonValue> negate:
+                Not = negate.Filter;
+                break;
+            case LogicalFilter<JsonValue> { Type: LogicalFilterType.And } and:
+                And = [.. and.Filters];
+                break;
+            case LogicalFilter<JsonValue> or:
+                Or = [.. or.Filters];
+                break;
+            case CompareFilter<JsonValue> compare:
+                Path = compare.Path.ToString();
+                Op = compare.Operator;
+                Value = compare.Value;
+                break;
+            default:
+                throw new NotSupportedException();
+        }
     }
 
     public FilterNode<JsonValue> ToSource()

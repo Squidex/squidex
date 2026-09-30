@@ -16,6 +16,9 @@ public delegate Task<(Schema Schema, ResolvedComponents Components)> ProvideSche
 
 public interface IContentEnricherStep
 {
+    // Steps that do not change the contents, but only the current request, must also run for cached results.
+    bool RunOnCachedResults => false;
+
     Task EnrichAsync(Context context, IEnumerable<EnrichedContent> contents, ProvideSchema schemas,
         CancellationToken ct);
 

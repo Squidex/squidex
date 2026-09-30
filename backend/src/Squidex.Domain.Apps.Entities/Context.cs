@@ -20,7 +20,7 @@ namespace Squidex.Domain.Apps.Entities;
 
 public sealed class Context
 {
-    private static readonly IReadOnlyDictionary<string, string> EmptyHeaders = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+    private static readonly SortedDictionary<string, string> EmptyHeaders = new SortedDictionary<string, string>(StringComparer.OrdinalIgnoreCase);
     private static readonly char[] Separators = [',', ';'];
 
     // Splitting a header is not free and the same headers are read several times per request, for
@@ -29,7 +29,10 @@ public sealed class Context
     // parsed values never have to be invalidated.
     private readonly ConcurrentDictionary<string, string[]> headerValues = new ConcurrentDictionary<string, string[]>(StringComparer.OrdinalIgnoreCase);
 
-    public IReadOnlyDictionary<string, string> Headers { get; }
+    // The headers are sorted, so that they can be serialized to stable cache keys.
+    private readonly SortedDictionary<string, string> headers;
+
+    public IReadOnlyDictionary<string, string> Headers => headers;
 
     public ClaimsPermissions UserPermissions { get; }
 
@@ -49,7 +52,7 @@ public sealed class Context
         App app,
         ClaimsPrincipal userPrincipal,
         ClaimsPermissions userPermissions,
-        IReadOnlyDictionary<string, string> headers)
+        SortedDictionary<string, string> headers)
     {
         App = app;
 
@@ -58,7 +61,7 @@ public sealed class Context
 
         IsFrontendClient = userPrincipal.IsInClient(DefaultClients.Frontend);
 
-        Headers = headers;
+        this.headers = headers;
     }
 
     public static Context Anonymous(App app)
@@ -105,7 +108,7 @@ public sealed class Context
 
     private sealed class HeaderBuilder(Context context) : ICloneBuilder
     {
-        private Dictionary<string, string>? headers;
+        private SortedDictionary<string, string>? headers;
 
         public Context Build()
         {
@@ -119,20 +122,20 @@ public sealed class Context
 
         public void Remove(string key)
         {
-            headers ??= new Dictionary<string, string>(context.Headers, StringComparer.OrdinalIgnoreCase);
+            headers ??= new SortedDictionary<string, string>(context.headers, StringComparer.OrdinalIgnoreCase);
             headers.Remove(key);
         }
 
         public void SetHeader(string key, string value)
         {
-            headers ??= new Dictionary<string, string>(context.Headers, StringComparer.OrdinalIgnoreCase);
+            headers ??= new SortedDictionary<string, string>(context.headers, StringComparer.OrdinalIgnoreCase);
             headers[key] = value;
         }
     }
 
     public Context WithApp(App app)
     {
-        return new Context(app, UserPrincipal, UserPermissions, Headers);
+        return new Context(app, UserPrincipal, UserPermissions, headers);
     }
 
     public Context Clone(Action<ICloneBuilder> action)

@@ -16,4 +16,7 @@ public interface IContentEnricher
 
     Task<IReadOnlyList<EnrichedContent>> EnrichAsync(IEnumerable<Content> contents, Context context,
         CancellationToken ct);
+
+    Task EnrichCachedAsync(IReadOnlyList<EnrichedContent> contents, Context context,
+        CancellationToken ct);
 }

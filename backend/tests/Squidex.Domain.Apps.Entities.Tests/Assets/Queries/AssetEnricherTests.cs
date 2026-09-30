@@ -37,6 +37,39 @@ public class AssetEnricherTests : GivenContext
     }
 
     [Fact]
+    public async Task Should_only_invoke_steps_for_cached_results_if_flagged()
+    {
+        var assets = new[] { CreateAsset() };
+
+        var step1 = A.Fake<IAssetEnricherStep>();
+        var step2 = A.Fake<IAssetEnricherStep>();
+
+        A.CallTo(() => step1.RunOnCachedResults)
+            .Returns(true);
+
+        var sut = new AssetEnricher([step1, step2]);
+
+        await sut.EnrichCachedAsync(assets, ApiContext, CancellationToken);
+
+        A.CallTo(() => step1.EnrichAsync(ApiContext, CancellationToken))
+            .MustHaveHappened();
+        A.CallTo(() => step1.EnrichAsync(ApiContext, assets, CancellationToken))
+            .MustHaveHappened();
+        A.CallTo(() => step2.EnrichAsync(A<Context>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
+        A.CallTo(() => step2.EnrichAsync(A<Context>._, A<IEnumerable<EnrichedAsset>>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public void Should_run_caching_step_for_cached_results()
+    {
+        IAssetEnricherStep step = new Steps.EnrichForCaching(A.Fake<Infrastructure.Caching.IRequestCache>());
+
+        Assert.True(step.RunOnCachedResults);
+    }
+
+    [Fact]
     public async Task Should_invoke_steps()
     {
         var source = CreateAsset();

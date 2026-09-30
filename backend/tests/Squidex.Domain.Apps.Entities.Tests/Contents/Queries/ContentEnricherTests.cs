@@ -53,6 +53,39 @@ public class ContentEnricherTests : GivenContext
     }
 
     [Fact]
+    public async Task Should_only_invoke_steps_for_cached_results_if_flagged()
+    {
+        var contents = new[] { CreateContent() };
+
+        var step1 = A.Fake<IContentEnricherStep>();
+        var step2 = A.Fake<IContentEnricherStep>();
+
+        A.CallTo(() => step1.RunOnCachedResults)
+            .Returns(true);
+
+        var sut = new ContentEnricher([step1, step2], AppProvider);
+
+        await sut.EnrichCachedAsync(contents, ApiContext, CancellationToken);
+
+        A.CallTo(() => step1.EnrichAsync(ApiContext, CancellationToken))
+            .MustHaveHappened();
+        A.CallTo(() => step1.EnrichAsync(ApiContext, contents, A<ProvideSchema>._, CancellationToken))
+            .MustHaveHappened();
+        A.CallTo(() => step2.EnrichAsync(A<Context>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
+        A.CallTo(() => step2.EnrichAsync(A<Context>._, A<IEnumerable<EnrichedContent>>._, A<ProvideSchema>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public void Should_run_caching_step_for_cached_results()
+    {
+        IContentEnricherStep step = new Steps.EnrichForCaching(A.Fake<Infrastructure.Caching.IRequestCache>());
+
+        Assert.True(step.RunOnCachedResults);
+    }
+
+    [Fact]
     public async Task Should_invoke_steps()
     {
         var source = CreateContent();
