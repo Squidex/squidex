@@ -90,10 +90,7 @@ public static class AssetServices
                 .AsSelf();
 
             services.AddSingletonAs(c => ActivatorUtilities.CreateInstance<CachingAssetQueryService>(c, c.GetRequiredService<AssetQueryService>()))
-                .As<IAssetQueryService>();
-
-            services.AddSingletonAs<AssetQueryCacheInvalidator>()
-                .As<ICommandMiddleware>();
+                .As<IAssetQueryService>().As<ICommandMiddleware>();
         }
         else
         {

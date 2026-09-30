@@ -16,4 +16,7 @@ public interface IAssetEnricher
 
     Task<IReadOnlyList<EnrichedAsset>> EnrichAsync(IEnumerable<Asset> assets, Context context,
         CancellationToken ct);
+
+    Task EnrichCachedAsync(IReadOnlyList<EnrichedAsset> assets, Context context,
+        CancellationToken ct);
 }

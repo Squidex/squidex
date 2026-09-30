@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -10,8 +10,11 @@ using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Schemas;
+using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json;
 using Squidex.Shared;
 
@@ -24,15 +27,15 @@ public sealed class CachingContentQueryService(
     IContentQueryService inner,
     HybridCache cache,
     ICacheGenerations generations,
-    IRequestCache requestCache,
+    IContentEnricher contentEnricher,
     IJsonSerializer serializer,
     IOptions<ContentQueryCacheOptions> options,
     ILogger<CachingContentQueryService> log)
-    : IContentQueryService
+    : IContentQueryService, ICommandMiddleware
 {
     private sealed record CachedContents(long Total, EnrichedContent[] Items);
 
-    private sealed record CacheKey<T>(string Kind, string Generation, long AppVersion, IReadOnlyDictionary<string, string> Headers, T Request);
+    private sealed record CacheKey(string Generation, long AppVersion, DomainId SchemaId, long SchemaVersion, IReadOnlyDictionary<string, string> Headers, Q Query);
 
     // Only the distributed cache is used, because the local caches of the other nodes cannot be invalidated.
     private readonly HybridCacheEntryOptions entryOptions = new HybridCacheEntryOptions
@@ -40,6 +43,26 @@ public sealed class CachingContentQueryService(
         Expiration = options.Value.CacheDuration,
         Flags = HybridCacheEntryFlags.DisableLocalCache,
     };
+
+    public async Task HandleAsync(CommandContext context, NextDelegate next,
+        CancellationToken ct)
+    {
+        await next(context, ct);
+
+        if (context.Command is not IAppCommand appCommand || !ChangesContents(appCommand))
+        {
+            return;
+        }
+
+        static bool ChangesContents(ICommand command)
+        {
+            // Queries remove references to deleted assets.
+            return command is ContentCommand and not ValidateContent and not EnrichContentDefaults or DeleteAsset;
+        }
+
+        // A new generation changes all cache keys of the app on all nodes.
+        generations.Reset(GenerationKey(appCommand.AppId.Id));
+    }
 
     public IAsyncEnumerable<EnrichedContent> StreamAsync(Context context, string schemaIdOrName, int skip,
         CancellationToken ct = default)
@@ -71,42 +94,37 @@ public sealed class CachingContentQueryService(
             return await inner.QueryAsync(context, schemaIdOrName, q, ct);
         }
 
-        var cached = await GetOrQueryAsync(context, schema, "contents.query", q, async ct =>
+        var key = await CreateKeyAsync(context, schema, q, ct);
+        if (key == null)
         {
+            return await inner.QueryAsync(context, schemaIdOrName, q, ct);
+        }
+
+        var isQueried = false;
+
+        var cached = await cache.GetOrCreateAsync(key, async ct =>
+        {
+            isQueried = true;
+
             var contents = await inner.QueryAsync(context, schemaIdOrName, q, ct);
 
             return new CachedContents(contents.Total, contents.ToArray());
-        }, ct);
+        }, entryOptions, cancellationToken: ct);
+
+        // Results from the cache have skipped the enrichment steps, which only affect the current request.
+        if (!isQueried)
+        {
+            await contentEnricher.EnrichCachedAsync(cached.Items, context, ct);
+        }
 
         return ResultList.Create(cached.Total, cached.Items);
     }
 
-    public async Task<EnrichedContent?> FindAsync(Context context, string schemaIdOrName, DomainId id, long version = EtagVersion.Any,
+    public Task<EnrichedContent?> FindAsync(Context context, string schemaIdOrName, DomainId id, long version = EtagVersion.Any,
         CancellationToken ct = default)
     {
-        Guard.NotNull(context);
-
-        // Specific versions are loaded from the event store and not from the query store.
-        if (version != EtagVersion.Any)
-        {
-            return await inner.FindAsync(context, schemaIdOrName, id, version, ct);
-        }
-
-        // Also validates the permissions, which must never be skipped by a cache hit.
-        var schema = await inner.GetSchemaOrThrowAsync(context, schemaIdOrName, ct);
-        if (!CanCache(context, schema))
-        {
-            return await inner.FindAsync(context, schemaIdOrName, id, version, ct);
-        }
-
-        var cached = await GetOrQueryAsync(context, schema, "contents.find", id, async ct =>
-        {
-            var content = await inner.FindAsync(context, schemaIdOrName, id, version, ct);
-
-            return content != null ? new CachedContents(1, [content]) : new CachedContents(0, []);
-        }, ct);
-
-        return cached.Items.FirstOrDefault();
+        // Single contents are loaded by ID, which is not faster with the distributed cache.
+        return inner.FindAsync(context, schemaIdOrName, id, version, ct);
     }
 
     public Task<Schema> GetSchemaOrThrowAsync(Context context, string schemaIdOrName,
@@ -121,28 +139,7 @@ public sealed class CachingContentQueryService(
         return inner.GetSchemaAsync(context, schemaIdOrName, ct);
     }
 
-    public static string GenerationKey(DomainId appId)
-    {
-        return $"contents/{appId}";
-    }
-
-    private async Task<CachedContents> GetOrQueryAsync<TRequest>(Context context, Schema schema, string kind, TRequest request, Func<CancellationToken, Task<CachedContents>> query,
-        CancellationToken ct)
-    {
-        var key = await CreateKeyAsync(context, kind, new { schemaId = schema.Id, schemaVersion = schema.Version, request }, ct);
-        if (key == null)
-        {
-            return await query(ct);
-        }
-
-        var cached = await cache.GetOrCreateAsync(key, async ct => await query(ct), entryOptions, cancellationToken: ct);
-
-        AddCacheDependencies(context, schema, cached.Items);
-
-        return cached;
-    }
-
-    private async Task<string?> CreateKeyAsync<TRequest>(Context context, string kind, TRequest request,
+    private async Task<string?> CreateKeyAsync(Context context, Schema schema, Q q,
         CancellationToken ct)
     {
         string generation;
@@ -157,38 +154,20 @@ public sealed class CachingContentQueryService(
             return null;
         }
 
-        var key = new CacheKey<TRequest>(kind, generation, context.App.Version, context.Headers, request);
-        var keyHash = SHA256.HashData(serializer.SerializeToBytes(key));
+        var keyObj = new CacheKey(generation, context.App.Version, schema.Id, schema.Version, context.Headers, q);
+        var keyHash = SHA256.HashData(serializer.SerializeToBytes(keyObj));
 
-        return $"{kind}/{context.App.Id}/{Convert.ToHexString(keyHash)}";
-    }
-
-    private void AddCacheDependencies(Context context, Schema schema, EnrichedContent[] contents)
-    {
-        // A cache hit skips the enricher, which usually adds the dependencies for the etag and the surrogate keys.
-        if (context.NoCacheKeys())
-        {
-            return;
-        }
-
-        context.AddCacheHeaders(requestCache);
-
-        if (contents.Length == 0)
-        {
-            return;
-        }
-
-        requestCache.AddDependency(context.App.UniqueId, context.App.Version);
-        requestCache.AddDependency(schema.UniqueId, schema.Version);
-
-        foreach (var content in contents)
-        {
-            requestCache.AddDependency(content.UniqueId, content.Version);
-        }
+        return $"contents/{context.App.Id}/{Convert.ToHexString(keyHash)}";
     }
 
     private static bool CanCache(Context context, Schema schema)
     {
+        // Clients can bypass the cache, for example with the Cache-Control header.
+        if (context.NoQueryCache())
+        {
+            return false;
+        }
+
         // Only published content is invalidated reliably and the UI always needs the latest state.
         if (context.IsFrontendClient || context.Scope() != SearchScope.Published)
         {
@@ -237,6 +216,11 @@ public sealed class CachingContentQueryService(
         }
 
         return !ContainsRandom(q.QueryAsJson) && !ContainsRandom(q.QueryAsOdata);
+    }
+
+    private static string GenerationKey(DomainId appId)
+    {
+        return $"contents/{appId}";
     }
 
     private static bool ContainsRandom(string? query)

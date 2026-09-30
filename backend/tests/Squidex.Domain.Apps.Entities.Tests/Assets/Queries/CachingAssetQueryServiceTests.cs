@@ -13,9 +13,11 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Assets;
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Queries;
@@ -24,18 +26,16 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries;
 
 public class CachingAssetQueryServiceTests : GivenContext
 {
-    private const string QueryPrefix = "assets.query/";
-    private const string FindPrefix = "assets.find/";
-    private const string SlugPrefix = "assets.slug/";
+    private const string QueryPrefix = "assets/";
 
     private readonly IAssetQueryService inner = A.Fake<IAssetQueryService>();
-    private readonly IRequestCache requestCache = A.Fake<IRequestCache>();
+    private readonly IAssetEnricher assetEnricher = A.Fake<IAssetEnricher>();
     private readonly IDistributedCache distributedCache = A.Fake<IDistributedCache>(x => x.Wrapping(new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions()))));
     private readonly IOptions<AssetQueryCacheOptions> options = Options.Create(new AssetQueryCacheOptions { CacheDuration = TimeSpan.FromMinutes(1) });
     private readonly ICacheGenerations generations = A.Fake<ICacheGenerations>();
     private readonly CachingAssetQueryService sut;
     private readonly EnrichedAsset asset;
-    private string generation = "1";
+    private readonly Dictionary<string, string> generationValues = [];
 
     public CachingAssetQueryServiceTests()
     {
@@ -51,7 +51,10 @@ public class CachingAssetQueryServiceTests : GivenContext
             .ReturnsLazily(() => asset);
 
         A.CallTo(() => generations.GetAsync(A<string>._, A<CancellationToken>._))
-            .ReturnsLazily(() => generation);
+            .ReturnsLazily((string key, CancellationToken _) => generationValues.GetValueOrDefault(key, "1"));
+
+        A.CallTo(() => generations.Reset(A<string>._))
+            .Invokes(x => generationValues[x.GetArgument<string>(0)!] = Guid.NewGuid().ToString());
 
         sut = CreateSut(distributedCache);
     }
@@ -69,6 +72,24 @@ public class CachingAssetQueryServiceTests : GivenContext
     }
 
     [Fact]
+    public async Task Should_enrich_result_for_request_if_read_from_cache()
+    {
+        await QueryTwiceAsync(ApiContext, null, Q.Empty);
+
+        A.CallTo(() => assetEnricher.EnrichCachedAsync(A<IReadOnlyList<EnrichedAsset>>.That.Matches(x => x.Single().Id == asset.Id), ApiContext, A<CancellationToken>._))
+            .MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public async Task Should_not_enrich_result_again_if_queried()
+    {
+        await sut.QueryAsync(ApiContext, null, Q.Empty, CancellationToken);
+
+        A.CallTo(() => assetEnricher.EnrichCachedAsync(A<IReadOnlyList<EnrichedAsset>>._, A<Context>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
     public async Task Should_read_query_from_distributed_cache_of_other_node()
     {
         await sut.QueryAsync(ApiContext, null, Q.Empty, CancellationToken);
@@ -83,12 +104,12 @@ public class CachingAssetQueryServiceTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_query_again_if_generation_has_been_reset()
+    public async Task Should_query_again_after_change()
     {
         await sut.QueryAsync(ApiContext, null, Q.Empty, CancellationToken);
         await WaitForEntriesAsync(QueryPrefix, 1);
 
-        generation = "2";
+        await HandleAsync(new AnnotateAsset { AppId = AppId });
 
         await sut.QueryAsync(ApiContext, null, Q.Empty, CancellationToken);
 
@@ -123,17 +144,33 @@ public class CachingAssetQueryServiceTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_find_by_slug_with_inner_service_if_generation_cannot_be_read()
+    public async Task Should_not_cache_query_if_disabled_by_header()
     {
-        var failingGenerations = A.Fake<ICacheGenerations>();
+        await QueryWithoutCacheAsync(ApiContext.Clone(b => b.WithNoQueryCache()), Q.Empty);
+    }
 
-        A.CallTo(() => failingGenerations.GetAsync(A<string>._, A<CancellationToken>._))
-            .Throws(new InvalidOperationException());
+    [Fact]
+    public async Task Should_not_cache_find()
+    {
+        await sut.FindAsync(ApiContext, asset.Id, ct: CancellationToken);
+        await sut.FindAsync(ApiContext, asset.Id, ct: CancellationToken);
 
-        var actual = await CreateSut(distributedCache, failingGenerations).FindBySlugAsync(ApiContext, "my-slug", ct: CancellationToken);
-
-        actual.Should().BeEquivalentTo(asset);
         AssertCacheNotUsed();
+
+        A.CallTo(() => inner.FindAsync(A<Context>._, asset.Id, false, EtagVersion.Any, A<CancellationToken>._))
+            .MustHaveHappenedTwiceExactly();
+    }
+
+    [Fact]
+    public async Task Should_not_cache_find_by_slug()
+    {
+        await sut.FindBySlugAsync(ApiContext, "my-slug", ct: CancellationToken);
+        await sut.FindBySlugAsync(ApiContext, "my-slug", ct: CancellationToken);
+
+        AssertCacheNotUsed();
+
+        A.CallTo(() => inner.FindBySlugAsync(A<Context>._, "my-slug", false, A<CancellationToken>._))
+            .MustHaveHappenedTwiceExactly();
     }
 
     [Fact]
@@ -174,46 +211,6 @@ public class CachingAssetQueryServiceTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_not_add_cache_dependencies_if_disabled()
-    {
-        await QueryTwiceAsync(ApiContext.Clone(b => b.WithNoCacheKeys()), null, Q.Empty);
-
-        A.CallTo(() => requestCache.AddDependency(A<DomainId>._, A<long>._))
-            .MustNotHaveHappened();
-    }
-
-    [Fact]
-    public async Task Should_cache_asset_not_found()
-    {
-        var id = DomainId.NewGuid();
-
-        A.CallTo(() => inner.FindAsync(A<Context>._, id, A<bool>._, A<long>._, A<CancellationToken>._))
-            .Returns(Task.FromResult<EnrichedAsset?>(null));
-
-        await sut.FindAsync(ApiContext, id, ct: CancellationToken);
-        await WaitForEntriesAsync(FindPrefix, 1);
-
-        var actual = await sut.FindAsync(ApiContext, id, ct: CancellationToken);
-
-        Assert.Null(actual);
-
-        A.CallTo(() => inner.FindAsync(A<Context>._, id, false, EtagVersion.Any, A<CancellationToken>._))
-            .MustHaveHappenedOnceExactly();
-    }
-
-    [Fact]
-    public async Task Should_cache_find_with_and_without_deleted_assets_separately()
-    {
-        await sut.FindAsync(ApiContext, asset.Id, false, ct: CancellationToken);
-        await WaitForEntriesAsync(FindPrefix, 1);
-
-        await sut.FindAsync(ApiContext, asset.Id, true, ct: CancellationToken);
-
-        A.CallTo(() => inner.FindAsync(A<Context>._, asset.Id, A<bool>._, EtagVersion.Any, A<CancellationToken>._))
-            .MustHaveHappenedTwiceExactly();
-    }
-
-    [Fact]
     public async Task Should_not_cache_already_parsed_query()
     {
         await QueryWithoutCacheAsync(ApiContext, Q.Empty.WithQuery(new ClrQuery { Take = 5 }));
@@ -223,57 +220,6 @@ public class CachingAssetQueryServiceTests : GivenContext
     public async Task Should_not_cache_random_query()
     {
         await QueryWithoutCacheAsync(ApiContext, Q.Empty.WithJsonQuery(new Query<JsonValue> { Random = 5 }));
-    }
-
-    [Fact]
-    public async Task Should_add_cache_dependencies_for_cached_result()
-    {
-        await QueryTwiceAsync(ApiContext, null, Q.Empty);
-
-        A.CallTo(() => requestCache.AddDependency(asset.UniqueId, asset.Version))
-            .MustHaveHappenedTwiceExactly();
-        A.CallTo(() => requestCache.AddDependency(App.Id, App.Version))
-            .MustHaveHappenedTwiceExactly();
-    }
-
-    [Fact]
-    public async Task Should_find_with_inner_service_once_if_asset_is_cached()
-    {
-        await sut.FindAsync(ApiContext, asset.Id, ct: CancellationToken);
-        await WaitForEntriesAsync(FindPrefix, 1);
-
-        var actual = await sut.FindAsync(ApiContext, asset.Id, ct: CancellationToken);
-
-        actual.Should().BeEquivalentTo(asset);
-
-        A.CallTo(() => inner.FindAsync(A<Context>._, asset.Id, false, EtagVersion.Any, A<CancellationToken>._))
-            .MustHaveHappenedOnceExactly();
-    }
-
-    [Fact]
-    public async Task Should_not_cache_asset_with_specific_version()
-    {
-        await sut.FindAsync(ApiContext, asset.Id, version: 3, ct: CancellationToken);
-        await sut.FindAsync(ApiContext, asset.Id, version: 3, ct: CancellationToken);
-
-        AssertCacheNotUsed();
-
-        A.CallTo(() => inner.FindAsync(A<Context>._, asset.Id, false, 3, A<CancellationToken>._))
-            .MustHaveHappenedTwiceExactly();
-    }
-
-    [Fact]
-    public async Task Should_find_by_slug_with_inner_service_once_if_asset_is_cached()
-    {
-        await sut.FindBySlugAsync(ApiContext, "my-slug", ct: CancellationToken);
-        await WaitForEntriesAsync(SlugPrefix, 1);
-
-        var actual = await sut.FindBySlugAsync(ApiContext, "my-slug", ct: CancellationToken);
-
-        actual.Should().BeEquivalentTo(asset);
-
-        A.CallTo(() => inner.FindBySlugAsync(A<Context>._, "my-slug", false, A<CancellationToken>._))
-            .MustHaveHappenedOnceExactly();
     }
 
     [Fact]
@@ -300,6 +246,50 @@ public class CachingAssetQueryServiceTests : GivenContext
             .MustHaveHappenedTwiceExactly();
     }
 
+    [Fact]
+    public async Task Should_reset_generation_if_asset_changed()
+    {
+        await HandleAsync(new AnnotateAsset { AppId = AppId });
+
+        A.CallTo(() => generations.Reset(A<string>._))
+            .MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public async Task Should_reset_generation_if_asset_deleted()
+    {
+        await HandleAsync(new DeleteAsset { AppId = AppId });
+
+        A.CallTo(() => generations.Reset(A<string>._))
+            .MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public async Task Should_not_reset_generation_if_folder_changed()
+    {
+        await HandleAsync(new RenameAssetFolder { AppId = AppId });
+
+        A.CallTo(() => generations.Reset(A<string>._))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_not_reset_generation_if_command_failed()
+    {
+        var commandContext = new CommandContext(new AnnotateAsset { AppId = AppId }, A.Fake<ICommandBus>());
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            sut.HandleAsync(commandContext, (_, _) => throw new InvalidOperationException(), CancellationToken));
+
+        A.CallTo(() => generations.Reset(A<string>._))
+            .MustNotHaveHappened();
+    }
+
+    private Task HandleAsync(ICommand command)
+    {
+        return sut.HandleAsync(new CommandContext(command, A.Fake<ICommandBus>()), (_, _) => Task.CompletedTask, CancellationToken);
+    }
+
     private async Task<IResultList<EnrichedAsset>> QueryTwiceAsync(Context requestContext, DomainId? parentId, Q q)
     {
         await sut.QueryAsync(requestContext, parentId, q, CancellationToken);
@@ -324,7 +314,7 @@ public class CachingAssetQueryServiceTests : GivenContext
         return new CachingAssetQueryService(inner,
             CreateHybridCache(cache, TestUtils.DefaultSerializer),
             customGenerations ?? generations,
-            requestCache,
+            assetEnricher,
             TestUtils.DefaultSerializer,
             options,
             A.Fake<ILogger<CachingAssetQueryService>>());

@@ -10,9 +10,10 @@ using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Assets;
-using Squidex.Domain.Apps.Entities.Contents;
+using Squidex.Domain.Apps.Entities.Assets.Commands;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json;
 
 #pragma warning disable RECS0082 // Parameter has the same name as a member and hides it
@@ -24,22 +25,42 @@ public sealed class CachingAssetQueryService(
     IAssetQueryService inner,
     HybridCache cache,
     ICacheGenerations generations,
-    IRequestCache requestCache,
+    IAssetEnricher assetEnricher,
     IJsonSerializer serializer,
     IOptions<AssetQueryCacheOptions> options,
     ILogger<CachingAssetQueryService> log)
-    : IAssetQueryService
+    : IAssetQueryService, ICommandMiddleware
 {
     private sealed record CachedAssets(long Total, EnrichedAsset[] Items);
 
-    private sealed record CacheKey<T>(string Kind, string Generation, long AppVersion, IReadOnlyDictionary<string, string> Headers, T Request);
+    private sealed record CacheKey(string Generation, long AppVersion, DomainId? ParentId, IReadOnlyDictionary<string, string> Headers, Q Query);
 
-    // Only the distributed cache is used, because the local caches of the other nodes cannot be invalidated.
     private readonly HybridCacheEntryOptions entryOptions = new HybridCacheEntryOptions
     {
         Expiration = options.Value.CacheDuration,
+        // Only the distributed cache is used, because the local caches of the other nodes cannot be invalidated.
         Flags = HybridCacheEntryFlags.DisableLocalCache,
     };
+
+    public async Task HandleAsync(CommandContext context, NextDelegate next,
+        CancellationToken ct)
+    {
+        await next(context, ct);
+
+        if (context.Command is not IAppCommand appCommand || !ChangesAssets(appCommand))
+        {
+            return;
+        }
+
+        static bool ChangesAssets(ICommand command)
+        {
+            // Queries remove references to deleted assets.
+            return command is AssetCommand;
+        }
+
+        // A new generation changes all cache keys of the app on all nodes.
+        generations.Reset(GenerationKey(appCommand.AppId.Id));
+    }
 
     public async Task<IResultList<EnrichedAsset>> QueryAsync(Context context, DomainId? parentId, Q q,
         CancellationToken ct = default)
@@ -51,51 +72,42 @@ public sealed class CachingAssetQueryService(
             return await inner.QueryAsync(context, parentId, q!, ct);
         }
 
-        var cached = await GetOrQueryAsync(context, "assets.query", new { parentId, q }, async ct =>
+        var key = await CreateKeyAsync(context, parentId, q, ct);
+        if (key == null)
         {
+            return await inner.QueryAsync(context, parentId, q, ct);
+        }
+
+        var isQueried = false;
+
+        var cached = await cache.GetOrCreateAsync(key, async ct =>
+        {
+            isQueried = true;
+
             var assets = await inner.QueryAsync(context, parentId, q, ct);
 
             return new CachedAssets(assets.Total, assets.ToArray());
-        }, ct);
+        }, entryOptions, cancellationToken: ct);
+
+        // Results from the cache have skipped the enrichment steps, which only affect the current request.
+        if (!isQueried)
+        {
+            await assetEnricher.EnrichCachedAsync(cached.Items, context, ct);
+        }
 
         return ResultList.Create(cached.Total, cached.Items);
     }
 
-    public async Task<EnrichedAsset?> FindAsync(Context context, DomainId id, bool allowDeleted = false, long version = EtagVersion.Any,
+    public Task<EnrichedAsset?> FindAsync(Context context, DomainId id, bool allowDeleted = false, long version = EtagVersion.Any,
         CancellationToken ct = default)
     {
-        Guard.NotNull(context);
-
-        // Specific versions are loaded from the event store and not from the query store.
-        if (version != EtagVersion.Any || !CanCache(context))
-        {
-            return await inner.FindAsync(context, id, allowDeleted, version, ct);
-        }
-
-        var cached = await GetOrQueryAsync(context, "assets.find", new { id, allowDeleted }, async ct =>
-        {
-            return Single(await inner.FindAsync(context, id, allowDeleted, version, ct));
-        }, ct);
-
-        return cached.Items.FirstOrDefault();
+        return inner.FindAsync(context, id, allowDeleted, version, ct);
     }
 
-    public async Task<EnrichedAsset?> FindBySlugAsync(Context context, string slug, bool allowDeleted = false,
+    public Task<EnrichedAsset?> FindBySlugAsync(Context context, string slug, bool allowDeleted = false,
         CancellationToken ct = default)
     {
-        Guard.NotNull(context);
-
-        if (!CanCache(context))
-        {
-            return await inner.FindBySlugAsync(context, slug, allowDeleted, ct);
-        }
-
-        var cached = await GetOrQueryAsync(context, "assets.slug", new { slug, allowDeleted }, async ct =>
-        {
-            return Single(await inner.FindBySlugAsync(context, slug, allowDeleted, ct));
-        }, ct);
-
-        return cached.Items.FirstOrDefault();
+        return inner.FindBySlugAsync(context, slug, allowDeleted, ct);
     }
 
     public Task<IResultList<AssetFolder>> QueryAssetFoldersAsync(Context context, DomainId? parentId,
@@ -113,39 +125,21 @@ public sealed class CachingAssetQueryService(
     public Task<EnrichedAsset?> FindByHashAsync(Context context, string hash, string fileName, long fileSize,
         CancellationToken ct = default)
     {
-        // Used to detect duplicates when uploading and therefore needs the latest state.
         return inner.FindByHashAsync(context, hash, fileName, fileSize, ct);
     }
 
     public Task<EnrichedAsset?> FindGlobalAsync(Context context, DomainId id,
         CancellationToken ct = default)
     {
-        // The asset can belong to any app, therefore there is no generation to invalidate it.
         return inner.FindGlobalAsync(context, id, ct);
     }
 
-    public static string GenerationKey(DomainId appId)
+    private static string GenerationKey(DomainId appId)
     {
         return $"assets/{appId}";
     }
 
-    private async Task<CachedAssets> GetOrQueryAsync<TRequest>(Context context, string kind, TRequest request, Func<CancellationToken, Task<CachedAssets>> query,
-        CancellationToken ct)
-    {
-        var key = await CreateKeyAsync(context, kind, request, ct);
-        if (key == null)
-        {
-            return await query(ct);
-        }
-
-        var cached = await cache.GetOrCreateAsync(key, async ct => await query(ct), entryOptions, cancellationToken: ct);
-
-        AddCacheDependencies(context, cached.Items);
-
-        return cached;
-    }
-
-    private async Task<string?> CreateKeyAsync<TRequest>(Context context, string kind, TRequest request,
+    private async Task<string?> CreateKeyAsync(Context context, DomainId? parentId, Q q,
         CancellationToken ct)
     {
         string generation;
@@ -160,37 +154,20 @@ public sealed class CachingAssetQueryService(
             return null;
         }
 
-        var key = new CacheKey<TRequest>(kind, generation, context.App.Version, context.Headers, request);
-        var keyHash = SHA256.HashData(serializer.SerializeToBytes(key));
+        var keyObj = new CacheKey(generation, context.App.Version, parentId, context.Headers, q);
+        var keyHash = SHA256.HashData(serializer.SerializeToBytes(keyObj));
 
-        return $"{kind}/{context.App.Id}/{Convert.ToHexString(keyHash)}";
-    }
-
-    private void AddCacheDependencies(Context context, EnrichedAsset[] assets)
-    {
-        // A cache hit skips the enricher, which usually adds the dependencies for the etag and the surrogate keys.
-        if (context.NoCacheKeys())
-        {
-            return;
-        }
-
-        context.AddCacheHeaders(requestCache);
-
-        requestCache.AddDependency(context.App.Id, context.App.Version);
-
-        foreach (var asset in assets)
-        {
-            requestCache.AddDependency(asset.UniqueId, asset.Version);
-        }
-    }
-
-    private static CachedAssets Single(EnrichedAsset? asset)
-    {
-        return asset != null ? new CachedAssets(1, [asset]) : new CachedAssets(0, []);
+        return $"assets/{context.App.Id}/{Convert.ToHexString(keyHash)}";
     }
 
     private static bool CanCache(Context context)
     {
+        // Clients can bypass the cache, for example with the Cache-Control header.
+        if (context.NoQueryCache())
+        {
+            return false;
+        }
+
         // The UI always needs the latest state.
         if (context.IsFrontendClient)
         {

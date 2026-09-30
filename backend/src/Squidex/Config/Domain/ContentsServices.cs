@@ -64,10 +64,7 @@ public static class ContentsServices
                 .AsSelf();
 
             services.AddSingletonAs(c => ActivatorUtilities.CreateInstance<CachingContentQueryService>(c, c.GetRequiredService<ContentQueryService>()))
-                .As<IContentQueryService>();
-
-            services.AddSingletonAs<ContentQueryCacheInvalidator>()
-                .As<ICommandMiddleware>();
+                .As<IContentQueryService>().As<ICommandMiddleware>();
         }
         else
         {

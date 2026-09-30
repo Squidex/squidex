@@ -13,9 +13,12 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Domain.Apps.Entities.Assets.Commands;
+using Squidex.Domain.Apps.Entities.Contents.Commands;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Json;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Json.System;
@@ -27,8 +30,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries;
 
 public class CachingContentQueryServiceTests : GivenContext
 {
-    private const string QueryPrefix = "contents.query/";
-    private const string FindPrefix = "contents.find/";
+    private const string QueryPrefix = "contents/";
 
     private static readonly IJsonSerializer Serializer = TestUtils.CreateSerializer(options =>
     {
@@ -36,13 +38,13 @@ public class CachingContentQueryServiceTests : GivenContext
     });
 
     private readonly IContentQueryService inner = A.Fake<IContentQueryService>();
-    private readonly IRequestCache requestCache = A.Fake<IRequestCache>();
+    private readonly IContentEnricher contentEnricher = A.Fake<IContentEnricher>();
     private readonly IDistributedCache distributedCache = A.Fake<IDistributedCache>(x => x.Wrapping(new MemoryDistributedCache(Options.Create(new MemoryDistributedCacheOptions()))));
     private readonly IOptions<ContentQueryCacheOptions> options = Options.Create(new ContentQueryCacheOptions { CacheDuration = TimeSpan.FromMinutes(1) });
     private readonly ICacheGenerations generations = A.Fake<ICacheGenerations>();
     private readonly CachingContentQueryService sut;
     private readonly EnrichedContent content;
-    private string generation = "1";
+    private readonly Dictionary<string, string> generationValues = [];
 
     public CachingContentQueryServiceTests()
     {
@@ -58,7 +60,10 @@ public class CachingContentQueryServiceTests : GivenContext
             .ReturnsLazily(() => content);
 
         A.CallTo(() => generations.GetAsync(A<string>._, A<CancellationToken>._))
-            .ReturnsLazily(() => generation);
+            .ReturnsLazily((string key, CancellationToken _) => generationValues.GetValueOrDefault(key, "1"));
+
+        A.CallTo(() => generations.Reset(A<string>._))
+            .Invokes(x => generationValues[x.GetArgument<string>(0)!] = Guid.NewGuid().ToString());
 
         sut = CreateSut(distributedCache);
     }
@@ -76,6 +81,26 @@ public class CachingContentQueryServiceTests : GivenContext
     }
 
     [Fact]
+    public async Task Should_enrich_result_for_request_if_read_from_cache()
+    {
+        var requestContext = CreateApiContext();
+
+        await QueryTwiceAsync(requestContext, Q.Empty);
+
+        A.CallTo(() => contentEnricher.EnrichCachedAsync(A<IReadOnlyList<EnrichedContent>>.That.Matches(x => x.Single().Id == content.Id), requestContext, A<CancellationToken>._))
+            .MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public async Task Should_not_enrich_result_again_if_queried()
+    {
+        await sut.QueryAsync(CreateApiContext(), SchemaId.Name, Q.Empty, CancellationToken);
+
+        A.CallTo(() => contentEnricher.EnrichCachedAsync(A<IReadOnlyList<EnrichedContent>>._, A<Context>._, A<CancellationToken>._))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
     public async Task Should_read_query_from_distributed_cache_of_other_node()
     {
         await sut.QueryAsync(CreateApiContext(), SchemaId.Name, Q.Empty, CancellationToken);
@@ -90,12 +115,12 @@ public class CachingContentQueryServiceTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_query_again_if_generation_has_been_reset()
+    public async Task Should_query_again_after_change()
     {
         await sut.QueryAsync(CreateApiContext(), SchemaId.Name, Q.Empty, CancellationToken);
         await WaitForEntriesAsync(QueryPrefix, 1);
 
-        generation = "2";
+        await HandleAsync(new UpdateContent { AppId = AppId });
 
         await sut.QueryAsync(CreateApiContext(), SchemaId.Name, Q.Empty, CancellationToken);
 
@@ -132,17 +157,21 @@ public class CachingContentQueryServiceTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_find_with_inner_service_if_generation_cannot_be_read()
+    public async Task Should_not_cache_query_if_disabled_by_header()
     {
-        var failingGenerations = A.Fake<ICacheGenerations>();
+        await QueryWithoutCacheAsync(CreateApiContext().Clone(b => b.WithNoQueryCache()), Q.Empty);
+    }
 
-        A.CallTo(() => failingGenerations.GetAsync(A<string>._, A<CancellationToken>._))
-            .Throws(new InvalidOperationException());
+    [Fact]
+    public async Task Should_not_cache_find()
+    {
+        await sut.FindAsync(CreateApiContext(), SchemaId.Name, content.Id, ct: CancellationToken);
+        await sut.FindAsync(CreateApiContext(), SchemaId.Name, content.Id, ct: CancellationToken);
 
-        var actual = await CreateSut(distributedCache, failingGenerations).FindAsync(CreateApiContext(), SchemaId.Name, content.Id, ct: CancellationToken);
-
-        actual.Should().BeEquivalentTo(content);
         AssertCacheNotUsed();
+
+        A.CallTo(() => inner.FindAsync(A<Context>._, SchemaId.Name, content.Id, EtagVersion.Any, A<CancellationToken>._))
+            .MustHaveHappenedTwiceExactly();
     }
 
     [Fact]
@@ -279,73 +308,6 @@ public class CachingContentQueryServiceTests : GivenContext
     }
 
     [Fact]
-    public async Task Should_add_cache_dependencies_for_cached_result()
-    {
-        await QueryTwiceAsync(CreateApiContext(), Q.Empty);
-
-        A.CallTo(() => requestCache.AddDependency(content.UniqueId, content.Version))
-            .MustHaveHappenedTwiceExactly();
-        A.CallTo(() => requestCache.AddDependency(Schema.UniqueId, Schema.Version))
-            .MustHaveHappenedTwiceExactly();
-        A.CallTo(() => requestCache.AddHeader(ContentHeaders.KeyLanguages))
-            .MustHaveHappenedTwiceExactly();
-    }
-
-    [Fact]
-    public async Task Should_not_add_cache_dependencies_if_disabled()
-    {
-        await QueryTwiceAsync(CreateApiContext().Clone(b => b.WithNoCacheKeys()), Q.Empty);
-
-        A.CallTo(() => requestCache.AddDependency(A<DomainId>._, A<long>._))
-            .MustNotHaveHappened();
-    }
-
-    [Fact]
-    public async Task Should_find_with_inner_service_once_if_content_is_cached()
-    {
-        await sut.FindAsync(CreateApiContext(), SchemaId.Name, content.Id, ct: CancellationToken);
-        await WaitForEntriesAsync(FindPrefix, 1);
-
-        var actual = await sut.FindAsync(CreateApiContext(), SchemaId.Name, content.Id, ct: CancellationToken);
-
-        actual.Should().BeEquivalentTo(content);
-
-        A.CallTo(() => inner.FindAsync(A<Context>._, SchemaId.Name, content.Id, EtagVersion.Any, A<CancellationToken>._))
-            .MustHaveHappenedOnceExactly();
-    }
-
-    [Fact]
-    public async Task Should_cache_content_not_found()
-    {
-        var id = DomainId.NewGuid();
-
-        A.CallTo(() => inner.FindAsync(A<Context>._, SchemaId.Name, id, A<long>._, A<CancellationToken>._))
-            .Returns(Task.FromResult<EnrichedContent?>(null));
-
-        await sut.FindAsync(CreateApiContext(), SchemaId.Name, id, ct: CancellationToken);
-        await WaitForEntriesAsync(FindPrefix, 1);
-
-        var actual = await sut.FindAsync(CreateApiContext(), SchemaId.Name, id, ct: CancellationToken);
-
-        Assert.Null(actual);
-
-        A.CallTo(() => inner.FindAsync(A<Context>._, SchemaId.Name, id, EtagVersion.Any, A<CancellationToken>._))
-            .MustHaveHappenedOnceExactly();
-    }
-
-    [Fact]
-    public async Task Should_not_cache_content_with_specific_version()
-    {
-        await sut.FindAsync(CreateApiContext(), SchemaId.Name, content.Id, 3, CancellationToken);
-        await sut.FindAsync(CreateApiContext(), SchemaId.Name, content.Id, 3, CancellationToken);
-
-        AssertCacheNotUsed();
-
-        A.CallTo(() => inner.FindAsync(A<Context>._, SchemaId.Name, content.Id, 3, A<CancellationToken>._))
-            .MustHaveHappenedTwiceExactly();
-    }
-
-    [Fact]
     public async Task Should_not_cache_query_over_all_schemas()
     {
         await sut.QueryAsync(CreateApiContext(), Q.Empty, CancellationToken);
@@ -355,6 +317,68 @@ public class CachingContentQueryServiceTests : GivenContext
 
         A.CallTo(() => inner.QueryAsync(A<Context>._, A<Q>._, A<CancellationToken>._))
             .MustHaveHappenedTwiceExactly();
+    }
+
+    [Fact]
+    public async Task Should_reset_generation_if_content_changed()
+    {
+        await HandleAsync(new UpdateContent { AppId = AppId });
+
+        A.CallTo(() => generations.Reset(A<string>._))
+            .MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public async Task Should_reset_generation_if_asset_deleted()
+    {
+        await HandleAsync(new DeleteAsset { AppId = AppId });
+
+        A.CallTo(() => generations.Reset(A<string>._))
+            .MustHaveHappenedOnceExactly();
+    }
+
+    [Fact]
+    public async Task Should_not_reset_generation_if_content_is_only_validated()
+    {
+        await HandleAsync(new ValidateContent { AppId = AppId });
+
+        A.CallTo(() => generations.Reset(A<string>._))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_not_reset_generation_if_content_defaults_are_only_enriched()
+    {
+        await HandleAsync(new EnrichContentDefaults { AppId = AppId });
+
+        A.CallTo(() => generations.Reset(A<string>._))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_not_reset_generation_if_asset_changed()
+    {
+        await HandleAsync(new AnnotateAsset { AppId = AppId });
+
+        A.CallTo(() => generations.Reset(A<string>._))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Should_not_reset_generation_if_command_failed()
+    {
+        var commandContext = new CommandContext(new UpdateContent { AppId = AppId }, A.Fake<ICommandBus>());
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            sut.HandleAsync(commandContext, (_, _) => throw new InvalidOperationException(), CancellationToken));
+
+        A.CallTo(() => generations.Reset(A<string>._))
+            .MustNotHaveHappened();
+    }
+
+    private Task HandleAsync(ICommand command)
+    {
+        return sut.HandleAsync(new CommandContext(command, A.Fake<ICommandBus>()), (_, _) => Task.CompletedTask, CancellationToken);
     }
 
     private async Task<IResultList<EnrichedContent>> QueryTwiceAsync(Context requestContext, Q q)
@@ -394,7 +418,7 @@ public class CachingContentQueryServiceTests : GivenContext
         return new CachingContentQueryService(inner,
             CreateHybridCache(cache, Serializer),
             customGenerations ?? generations,
-            requestCache,
+            contentEnricher,
             Serializer,
             options,
             A.Fake<ILogger<CachingContentQueryService>>());

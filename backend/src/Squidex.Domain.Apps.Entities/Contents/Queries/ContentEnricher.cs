@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -33,25 +33,24 @@ public sealed class ContentEnricher(IEnumerable<IContentEnricherStep> steps, IAp
         return EnrichInternalAsync(contents, false, context, ct);
     }
 
+    public async Task EnrichCachedAsync(IReadOnlyList<EnrichedContent> contents, Context context,
+        CancellationToken ct)
+    {
+        Guard.NotNull(contents);
+        Guard.NotNull(context);
+
+        using (Telemetry.Activities.StartActivity("ContentEnricher/EnrichCachedAsync"))
+        {
+            await RunStepsAsync(steps.Where(x => x.RunOnCachedResults), contents, context, ct);
+        }
+    }
+
     private async Task<IReadOnlyList<EnrichedContent>> EnrichInternalAsync(IEnumerable<Content> contents, bool cloneData, Context context,
         CancellationToken ct)
     {
         using (var activity = Telemetry.Activities.StartActivity("ContentEnricher/EnrichInternalAsync"))
         {
             var results = new List<EnrichedContent>();
-
-            if (context.App != null)
-            {
-                foreach (var step in steps)
-                {
-                    await step.EnrichAsync(context, ct);
-                }
-            }
-
-            if (!contents.Any())
-            {
-                return results;
-            }
 
             foreach (var content in contents)
             {
@@ -69,37 +68,55 @@ public sealed class ContentEnricher(IEnumerable<IContentEnricherStep> steps, IAp
                 results.Add(result);
             }
 
-            if (context.App != null)
-            {
-                var schemaCache = new Dictionary<DomainId, Task<(Schema, ResolvedComponents)>>();
-
-                Task<(Schema, ResolvedComponents)> GetSchema(DomainId id)
-                {
-                    return schemaCache.GetOrAdd(id, async x =>
-                    {
-                        var schema = await appProvider.GetSchemaAsync(context.App.Id, x, false, ct)
-                            ?? throw new DomainObjectNotFoundException(x.ToString());
-
-                        var components = await appProvider.GetComponentsAsync(schema, ct);
-
-                        return (schema, components);
-                    });
-                }
-
-                foreach (var step in steps)
-                {
-                    ct.ThrowIfCancellationRequested();
-
-                    using (Telemetry.Activities.StartActivity(step.ToString()!))
-                    {
-                        await step.EnrichAsync(context, results, GetSchema, ct);
-                    }
-                }
-            }
+            await RunStepsAsync(steps, results, context, ct);
 
             activity?.SetTag("numItems", results.Count);
 
             return results;
+        }
+    }
+
+    private async Task RunStepsAsync(IEnumerable<IContentEnricherStep> stepsToRun, IReadOnlyList<EnrichedContent> contents, Context context,
+        CancellationToken ct)
+    {
+        if (context.App == null)
+        {
+            return;
+        }
+
+        foreach (var step in stepsToRun)
+        {
+            await step.EnrichAsync(context, ct);
+        }
+
+        if (contents.Count == 0)
+        {
+            return;
+        }
+
+        var schemaCache = new Dictionary<DomainId, Task<(Schema, ResolvedComponents)>>();
+
+        Task<(Schema, ResolvedComponents)> GetSchema(DomainId id)
+        {
+            return schemaCache.GetOrAdd(id, async x =>
+            {
+                var schema = await appProvider.GetSchemaAsync(context.App.Id, x, false, ct)
+                    ?? throw new DomainObjectNotFoundException(x.ToString());
+
+                var components = await appProvider.GetComponentsAsync(schema, ct);
+
+                return (schema, components);
+            });
+        }
+
+        foreach (var step in stepsToRun)
+        {
+            ct.ThrowIfCancellationRequested();
+
+            using (Telemetry.Activities.StartActivity(step.ToString()!))
+            {
+                await step.EnrichAsync(context, contents, GetSchema, ct);
+            }
         }
     }
 }

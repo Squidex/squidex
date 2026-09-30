@@ -9,6 +9,8 @@ namespace Squidex.Domain.Apps.Entities.Assets.Queries;
 
 public interface IAssetEnricherStep
 {
+    bool RunOnCachedResults => false;
+
     Task EnrichAsync(Context context, IEnumerable<EnrichedAsset> assets,
         CancellationToken ct);
 
