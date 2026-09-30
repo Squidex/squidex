@@ -174,6 +174,36 @@ public class QueryJsonTests
         SerializeAndDeserialize(json);
     }
 
+    [Fact]
+    public void Should_serialize_and_deserialize_all_operators()
+    {
+        foreach (var op in Enum.GetValues<CompareOperator>())
+        {
+            var serialized = TestUtils.DefaultSerializer.Serialize(op);
+
+            Assert.Equal(op, TestUtils.DefaultSerializer.Deserialize<CompareOperator>(serialized));
+        }
+    }
+
+    [Fact]
+    public void Should_serialize_and_deserialize_filter()
+    {
+        var source =
+            new LogicalFilter<JsonValue>(LogicalFilterType.Or,
+            [
+                new LogicalFilter<JsonValue>(LogicalFilterType.And,
+                [
+                    new CompareFilter<JsonValue>("property1", CompareOperator.GreaterThanOrEqual, 10),
+                    new CompareFilter<JsonValue>("property2", CompareOperator.In, JsonValue.Array(1, 2)),
+                ]),
+                new NegateFilter<JsonValue>(new CompareFilter<JsonValue>("property3", CompareOperator.Empty, default)),
+            ]);
+
+        var filter = SerializeAndDeserialize<FilterNode<JsonValue>>(source);
+
+        Assert.Equal(source.ToString(), filter.ToString());
+    }
+
     private static FilterNode<JsonValue> SerializeAndDeserialize<T>(T value)
     {
         var json = TestUtils.DefaultSerializer.Serialize(value, true);
