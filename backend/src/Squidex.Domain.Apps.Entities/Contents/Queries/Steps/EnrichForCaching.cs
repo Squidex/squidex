@@ -11,6 +11,8 @@ namespace Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 
 public sealed class EnrichForCaching(IRequestCache requestCache) : IContentEnricherStep
 {
+    public bool RunOnCachedResults => true;
+
     public Task EnrichAsync(Context context,
         CancellationToken ct)
     {

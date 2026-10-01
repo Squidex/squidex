@@ -12,6 +12,7 @@ using Squidex.Domain.Apps.Entities.Assets.Queries.Steps;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Search;
 using Squidex.Hosting.Ssrf;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Config.Domain;
@@ -80,8 +81,22 @@ public static class AssetServices
         services.AddSingletonAs<ScriptAsset>()
             .As<IAssetEnricherStep>();
 
-        services.AddSingletonAs<AssetQueryService>()
-            .As<IAssetQueryService>();
+        if (config.GetValue<TimeSpan>("caching:assets:cacheDuration") > TimeSpan.Zero)
+        {
+            services.Configure<AssetQueryCacheOptions>(config,
+                "caching:assets");
+
+            services.AddSingletonAs<AssetQueryService>()
+                .AsSelf();
+
+            services.AddSingletonAs(c => ActivatorUtilities.CreateInstance<CachingAssetQueryService>(c, c.GetRequiredService<AssetQueryService>()))
+                .As<IAssetQueryService>().As<ICommandMiddleware>();
+        }
+        else
+        {
+            services.AddSingletonAs<AssetQueryService>()
+                .As<IAssetQueryService>();
+        }
 
         services.AddSingletonAs<AssetLoader>()
             .As<IAssetLoader>();

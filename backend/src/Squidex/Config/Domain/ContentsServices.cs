@@ -19,6 +19,7 @@ using Squidex.Domain.Apps.Entities.Contents.Text.Rebuild;
 using Squidex.Domain.Apps.Entities.Contents.Validation;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Search;
+using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 
 namespace Squidex.Config.Domain;
@@ -56,8 +57,22 @@ public static class ContentsServices
         services.AddSingletonAs<ContentHistoryEventsCreator>()
             .As<IHistoryEventsCreator>();
 
-        services.AddSingletonAs<ContentQueryService>()
-            .As<IContentQueryService>();
+        if (config.GetValue<TimeSpan>("caching:contents:cacheDuration") > TimeSpan.Zero)
+        {
+            services.Configure<ContentQueryCacheOptions>(config,
+                "caching:contents");
+
+            services.AddSingletonAs<ContentQueryService>()
+                .AsSelf();
+
+            services.AddSingletonAs(c => ActivatorUtilities.CreateInstance<CachingContentQueryService>(c, c.GetRequiredService<ContentQueryService>()))
+                .As<IContentQueryService>().As<ICommandMiddleware>();
+        }
+        else
+        {
+            services.AddSingletonAs<ContentQueryService>()
+                .As<IContentQueryService>();
+        }
 
         services.AddSingletonAs<ConvertData>()
             .As<IContentEnricherStep>();

@@ -23,6 +23,7 @@ using Squidex.Domain.Apps.Entities.Scripting;
 using Squidex.Domain.Apps.Entities.Tags;
 using Squidex.Hosting.Ssrf;
 using Squidex.Infrastructure;
+using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Diagnostics;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Translations;
@@ -57,6 +58,15 @@ public static class InfrastructureServices
         services.AddReplicatedCache();
         services.AddAsyncLocalCache();
         services.AddBackgroundCache();
+
+        services.AddHybridCache()
+            .AddSerializerFactory<JsonHybridCacheSerializerFactory>();
+
+        services.Configure<CacheGenerationsOptions>(config,
+            "caching:generations");
+
+        services.AddSingletonAs<CacheGenerations>()
+            .As<ICacheGenerations>();
 
         services.AddSingletonAs(_ => SystemClock.Instance)
             .As<IClock>();

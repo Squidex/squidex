@@ -1,4 +1,4 @@
-﻿// ==========================================================================
+// ==========================================================================
 //  Squidex Headless CMS
 // ==========================================================================
 //  Copyright (c) Squidex UG (haftungsbeschraenkt)
@@ -32,44 +32,54 @@ public sealed class AssetEnricher(IEnumerable<IAssetEnricherStep> steps) : IAsse
 
         using (var activity = Telemetry.Activities.StartActivity("AssetEnricher/EnrichAsync"))
         {
-            var results = new List<EnrichedAsset>();
+            var results = assets.Select(x => SimpleMapper.Map(x, new EnrichedAsset())).ToList();
 
-            if (context.App != null)
-            {
-                foreach (var step in steps)
-                {
-                    await step.EnrichAsync(context, ct);
-                }
-            }
-
-            if (!assets.Any())
-            {
-                return results;
-            }
-
-            foreach (var asset in assets)
-            {
-                var result = SimpleMapper.Map(asset, new EnrichedAsset());
-
-                results.Add(result);
-            }
-
-            if (context.App != null)
-            {
-                foreach (var step in steps)
-                {
-                    ct.ThrowIfCancellationRequested();
-
-                    using (Telemetry.Activities.StartActivity(step.ToString()!))
-                    {
-                        await step.EnrichAsync(context, results, ct);
-                    }
-                }
-            }
+            await RunStepsAsync(steps, results, context, ct);
 
             activity?.SetTag("numItems", results.Count);
 
             return results;
+        }
+    }
+
+    public async Task EnrichCachedAsync(IReadOnlyList<EnrichedAsset> assets, Context context,
+        CancellationToken ct)
+    {
+        Guard.NotNull(assets);
+        Guard.NotNull(context);
+
+        using (Telemetry.Activities.StartActivity("AssetEnricher/EnrichCachedAsync"))
+        {
+            await RunStepsAsync(steps.Where(x => x.RunOnCachedResults), assets, context, ct);
+        }
+    }
+
+    private static async Task RunStepsAsync(IEnumerable<IAssetEnricherStep> stepsToRun, IReadOnlyList<EnrichedAsset> assets, Context context,
+        CancellationToken ct)
+    {
+        if (context.App == null)
+        {
+            return;
+        }
+
+        foreach (var step in stepsToRun)
+        {
+            await step.EnrichAsync(context, ct);
+        }
+
+        if (assets.Count == 0)
+        {
+            return;
+        }
+
+        foreach (var step in stepsToRun)
+        {
+            ct.ThrowIfCancellationRequested();
+
+            using (Telemetry.Activities.StartActivity(step.ToString()!))
+            {
+                await step.EnrichAsync(context, assets, ct);
+            }
         }
     }
 }

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Squidex.Domain.Apps.Entities;
 
@@ -26,10 +27,23 @@ public sealed class ContextFilter : IAsyncActionFilter
                         builder.SetHeader(key, value.ToString());
                     }
                 }
+
+                // Clients can also bypass the query cache with the standard HTTP header.
+                if (IsNoCache(httpContext.Request))
+                {
+                    builder.WithNoQueryCache();
+                }
             });
 
         httpContext.Features.Set(requestContext);
 
         return next();
+    }
+
+    private static bool IsNoCache(HttpRequest request)
+    {
+        var cacheControl = request.GetTypedHeaders().CacheControl;
+
+        return cacheControl?.NoCache == true || cacheControl?.NoStore == true;
     }
 }
