@@ -102,7 +102,7 @@ public sealed class ContentEnricher(IEnumerable<IContentEnricherStep> steps, IAp
                 var schema = await appProvider.GetSchemaAsync(context.App.Id, x, false, ct)
                     ?? throw new DomainObjectNotFoundException(x.ToString());
 
-                var components = await appProvider.GetComponentsAsync(schema, ct);
+                var components = await appProvider.GetComponentsAsync(schema, ct: ct);
 
                 return (schema, components);
             });
