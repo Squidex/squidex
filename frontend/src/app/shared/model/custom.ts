@@ -463,6 +463,10 @@ export class JobsDto extends generated.JobsDto {
     public get canCreateBackup() {
         return this.compute('canCreateBackup', () => hasAnyLink(this._links, 'create/backups'));
     }
+
+    public get canRebuildTextIndex() {
+        return this.compute('canRebuildTextIndex', () => hasAnyLink(this._links, 'create/text-index'));
+    }
 }
 
 export class RoleDto extends generated.RoleDto {

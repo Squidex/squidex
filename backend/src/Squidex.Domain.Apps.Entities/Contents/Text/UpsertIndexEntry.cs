@@ -16,6 +16,8 @@ public sealed class UpsertIndexEntry : IndexCommand
 
     public Dictionary<string, string>? Texts { get; set; }
 
+    public Dictionary<string, string>? Titles { get; set; }
+
     public List<UserInfoValue>? UserInfos { get; set; }
 
     public bool ServeAll { get; set; }

@@ -69,8 +69,8 @@ internal static partial class LogMessages
     [LoggerMessage(Level = LogLevel.Warning, Message = "Failed to invite user: Assignee {assigneeId} not found.")]
     public static partial void LogInvitationAssigneeNotFound(ILogger logger, string assigneeId);
 
-    [LoggerMessage(Level = LogLevel.Warning, Message = "Removed unfinished jobs for owner {ownerId} after start.")]
-    public static partial void LogRemovedUnfinishedJobs(ILogger logger, DomainId ownerId);
+    [LoggerMessage(Level = LogLevel.Warning, Message = "Marked interrupted jobs for owner {ownerId} as failed after start.")]
+    public static partial void LogInterruptedJobs(ILogger logger, DomainId ownerId);
 
     [LoggerMessage(Level = LogLevel.Information, Message = "Clearing jobs for owner {ownerId}.")]
     public static partial void LogClearingJobs(ILogger logger, DomainId ownerId);

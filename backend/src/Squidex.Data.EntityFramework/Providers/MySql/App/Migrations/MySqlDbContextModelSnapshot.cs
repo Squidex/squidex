@@ -981,6 +981,9 @@ namespace Squidex.Providers.MySql.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("varchar(100)");
 
+                    b.Property<long?>("Version")
+                        .HasColumnType("bigint");
+
                     b.HasKey("UniqueContentId");
 
                     b.ToTable("TextState", (string)null);

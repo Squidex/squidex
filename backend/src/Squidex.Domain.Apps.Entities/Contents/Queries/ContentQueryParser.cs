@@ -92,7 +92,7 @@ public class ContentQueryParser(
 
         var textQuery = new TextQuery(query.FullText, options.MaxFullTextResults)
         {
-            PreferredSchemaId = schema.Id,
+            RequiredSchemaIds = [schema.Id],
         };
 
         var fullTextIds = await textIndex.SearchAsync(context.App, textQuery, context.Scope(), ct);
@@ -143,7 +143,7 @@ public class ContentQueryParser(
 
         if (schema != null)
         {
-            components = await appprovider.GetComponentsAsync(schema, ct);
+            components = await appprovider.GetComponentsAsync(schema, ct: ct);
         }
 
         var query = q.Query;

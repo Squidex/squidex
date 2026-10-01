@@ -6,9 +6,9 @@
  */
 
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { EMPTY, Observable } from 'rxjs';
 import { finalize, tap } from 'rxjs/operators';
-import { debug, DialogService, LoadingState, shareSubscribed, State } from '@app/framework';
+import { debug, DialogService, LoadingState, Resource, shareSubscribed, State } from '@app/framework';
 import { JobDto } from '../model';
 import { JobsService } from '../services/jobs.service';
 import { AppsState } from './apps.state';
@@ -19,6 +19,9 @@ interface Snapshot extends LoadingState {
 
     // Indicates if the user can create new backups.
     canCreateBackup?: boolean;
+
+    // The resource to rebuild the full text index, if the user is allowed to do so.
+    textIndexResource?: Resource;
 }
 
 @Injectable({
@@ -39,6 +42,9 @@ export class JobsState extends State<Snapshot> {
 
     public canCreateBackup =
         this.project(x => x.canCreateBackup === true);
+
+    public canRebuildTextIndex =
+        this.project(x => !!x.textIndexResource);
 
     public get appId() {
         return this.appsState.appId;
@@ -72,7 +78,9 @@ export class JobsState extends State<Snapshot> {
         }
 
         return this.jobsService.getJobs(this.appName).pipe(
-            tap(({ items: jobs, canCreateBackup }) => {
+            tap(payload => {
+                const { items: jobs, canCreateBackup, canRebuildTextIndex } = payload;
+
                 if (isReload && !silent) {
                     this.dialogs.notifyInfo('i18n:jobs.reloaded');
                 }
@@ -80,6 +88,7 @@ export class JobsState extends State<Snapshot> {
                 this.next({
                     jobs,
                     canCreateBackup,
+                    textIndexResource: canRebuildTextIndex ? payload : undefined,
                     isLoaded: true,
                     isLoading: false,
                 }, 'Loading Success');
@@ -92,6 +101,20 @@ export class JobsState extends State<Snapshot> {
 
     public startBackup(): Observable<any> {
         return this.jobsService.postBackup(this.appsState.appName).pipe(
+            tap(() => {
+                this.dialogs.notifyInfo('i18n:jobs.started');
+            }),
+            shareSubscribed(this.dialogs));
+    }
+
+    public rebuildTextIndex(): Observable<any> {
+        const resource = this.snapshot.textIndexResource;
+
+        if (!resource) {
+            return EMPTY;
+        }
+
+        return this.jobsService.postTextIndexRebuild(this.appsState.appName, resource).pipe(
             tap(() => {
                 this.dialogs.notifyInfo('i18n:jobs.started');
             }),

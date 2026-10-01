@@ -10,8 +10,6 @@ using NetTopologySuite.Geometries;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json;
-using Squidex.Infrastructure.Json.Objects;
-using Squidex.Infrastructure.ObjectPool;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
@@ -65,84 +63,35 @@ public static class Extensions
         return result;
     }
 
-    public static Dictionary<string, string>? ToTexts(this ContentData data)
+    public static Dictionary<string, string>? GetWeightedTexts(this UpsertIndexEntry upsert, int titleWeight = 3)
     {
-        Dictionary<string, string>? result = null;
-
-        if (data != null)
+        // Not all text indexes support field weights, therefore they can boost the titles by repeating them.
+        if (upsert.Titles is not { Count: > 0 } titles)
         {
-            var languages = new Dictionary<string, StringBuilder>();
-            try
-            {
-                foreach (var (_, value) in data)
-                {
-                    if (value != null)
-                    {
-                        foreach (var (key, jsonValue) in value)
-                        {
-                            AppendJsonText(languages, key, jsonValue);
-                        }
-                    }
-                }
+            return upsert.Texts;
+        }
 
-                foreach (var (key, sb) in languages)
-                {
-                    if (sb.Length > 0)
-                    {
-                        result ??= [];
-                        result[key] = sb.ToString();
-                    }
-                }
-            }
-            finally
+        var result = new Dictionary<string, string>(upsert.Texts ?? []);
+
+        foreach (var (language, title) in titles)
+        {
+            var sb = new StringBuilder();
+
+            for (var i = 0; i < titleWeight; i++)
             {
-                foreach (var (_, sb) in languages)
-                {
-                    DefaultPools.StringBuilder.Return(sb);
-                }
+                sb.AppendIfNotEmpty(' ');
+                sb.Append(title);
             }
+
+            if (result.TryGetValue(language, out var text))
+            {
+                sb.Append(' ');
+                sb.Append(text);
+            }
+
+            result[language] = sb.ToString();
         }
 
         return result;
-    }
-
-    private static void AppendJsonText(Dictionary<string, StringBuilder> languages, string language, JsonValue value)
-    {
-        switch (value.Value)
-        {
-            case string s:
-                AppendText(languages, language, s);
-                break;
-            case JsonArray a:
-                foreach (var item in a)
-                {
-                    AppendJsonText(languages, language, item);
-                }
-
-                break;
-            case JsonObject o:
-                foreach (var (_, item) in o)
-                {
-                    AppendJsonText(languages, language, item);
-                }
-
-                break;
-        }
-    }
-
-    private static void AppendText(Dictionary<string, StringBuilder> languages, string language, string text)
-    {
-        if (!string.IsNullOrWhiteSpace(text))
-        {
-            if (!languages.TryGetValue(language, out var sb))
-            {
-                sb = DefaultPools.StringBuilder.Get();
-
-                languages[language] = sb;
-            }
-
-            sb.AppendIfNotEmpty(' ');
-            sb.Append(text);
-        }
     }
 }

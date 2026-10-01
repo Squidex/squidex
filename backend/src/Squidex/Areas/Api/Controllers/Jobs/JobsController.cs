@@ -7,9 +7,11 @@
 
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.Jobs.Models;
+using Squidex.Domain.Apps.Entities.Contents.Text.Rebuild;
 using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Infrastructure.Security;
 using Squidex.Shared;
 using Squidex.Web;
 
@@ -39,6 +41,28 @@ public class JobsController(ICommandBus commandBus, IJobService jobService) : Ap
         var result = JobsDto.FromDomain(jobs, Resources);
 
         return Ok(result);
+    }
+
+    /// <summary>
+    /// Rebuild the full text index.
+    /// </summary>
+    /// <param name="app">The name of the app.</param>
+    /// <param name="reference">An optional reference to find the job.</param>
+    /// <response code="204">Rebuild started.</response>
+    /// <response code="400">Another job is already running.</response>
+    /// <response code="404">App not found.</response>
+    [HttpPost]
+    [Route("apps/{app}/jobs/text-index/")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    [ApiPermission(PermissionIds.AdminTextIndex)]
+    [ApiCosts(0)]
+    public async Task<IActionResult> PostTextIndexRebuild(string app, [FromQuery] string? reference = null)
+    {
+        var job = RebuildTextIndexJob.BuildRequest(User.Token()!, App) with { Reference = reference };
+
+        await jobService.StartAsync(App.Id, job, HttpContext.RequestAborted);
+
+        return NoContent();
     }
 
     /// <summary>

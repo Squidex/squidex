@@ -14,6 +14,8 @@ using Squidex.Domain.Apps.Entities.Contents.Counter;
 using Squidex.Domain.Apps.Entities.Contents.Queries;
 using Squidex.Domain.Apps.Entities.Contents.Queries.Steps;
 using Squidex.Domain.Apps.Entities.Contents.Text;
+using Squidex.Domain.Apps.Entities.Contents.Text.Extraction;
+using Squidex.Domain.Apps.Entities.Contents.Text.Rebuild;
 using Squidex.Domain.Apps.Entities.Contents.Validation;
 using Squidex.Domain.Apps.Entities.History;
 using Squidex.Domain.Apps.Entities.Search;
@@ -112,7 +114,46 @@ public static class ContentsServices
             .AsOptional<IWorkflowsValidator>();
 
         services.AddSingletonAs<TextIndexingProcess>()
-            .As<IEventConsumer>();
+            .AsSelf().As<IEventConsumer>();
+
+        services.AddSingletonAs<TextIndexExtraction>()
+            .AsSelf();
+
+        services.AddSingletonAs<TextIndexRebuildCoordinator>()
+            .AsSelf();
+
+        services.AddSingletonAs<TextExtractor>()
+            .AsSelf();
+
+        services.AddSingletonAs<ScriptTextExtractionStrategy>()
+            .As<ITextExtractionStrategy>();
+
+        services.AddSingletonAs<SchemaTextExtractionStrategy>()
+            .As<ITextExtractionStrategy>();
+
+        services.AddSingletonAs<SearchPathsFieldTextStrategy>()
+            .As<ITextFieldStrategy>();
+
+        services.AddSingletonAs<RichTextFieldTextStrategy>()
+            .As<ITextFieldStrategy>();
+
+        services.AddSingletonAs<ArrayFieldTextStrategy>()
+            .As<ITextFieldStrategy>();
+
+        services.AddSingletonAs<ComponentTextStrategy>()
+            .As<ITextFieldStrategy>();
+
+        services.AddSingletonAs<JsonTextStrategy>()
+            .As<ITextFieldStrategy>();
+
+        services.AddSingletonAs<MarkdownTextNormalizer>()
+            .As<ITextNormalizer>();
+
+        services.AddSingletonAs<HtmlTextNormalizer>()
+            .As<ITextNormalizer>();
+
+        services.AddSingletonAs<NoiseTextNormalizer>()
+            .As<ITextNormalizer>();
 
         services.AddSingletonAs<ContentsSearchSource>()
             .As<ISearchSource>();

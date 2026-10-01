@@ -4,6 +4,17 @@
         <button class="btn btn-text-secondary me-2" (click)="reload()" shortcut="CTRL + B" title="i18n:jobs.refreshTooltip" type="button">
             <i class="icon-reset"></i> {{ "common.refresh" | sqxTranslate }}
         </button>
+        @if (jobsState.canRebuildTextIndex | async) {
+            <button
+                class="btn btn-outline-secondary me-2"
+                confirmText="i18n:jobs.textIndexConfirmText"
+                confirmTitle="i18n:jobs.textIndexConfirmTitle"
+                (sqxConfirmClick)="rebuildTextIndex()"
+                title="i18n:jobs.textIndexTooltip"
+                type="button">
+                {{ "jobs.textIndexStart" | sqxTranslate }}
+            </button>
+        }
         @if (jobsState.canCreateBackup | async) {
             <button class="btn btn-success" (click)="startBackup()" [disabled]="jobsState.maxBackupsReached | async" type="button">
                 {{ "jobs.backupStart" | sqxTranslate }}

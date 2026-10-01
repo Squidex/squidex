@@ -16,8 +16,8 @@
     </PackageReference>
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.3.0" />
     <PackageReference Include="NSwag.Core" Version="14.6.3" />
-    <PackageReference Include="Squidex.Assets" Version="8.0.0" />
-    <PackageReference Include="Squidex.Assets.ImageSharp" Version="8.0.0" />
+    <PackageReference Include="Squidex.Assets" Version="8.0.5" />
+    <PackageReference Include="Squidex.Assets.ImageSharp" Version="8.0.5" />
     <PackageReference Include="StyleCop.Analyzers" Version="1.1.118" PrivateAssets="all" />
     <PackageReference Include="Verify.XunitV3" Version="28.12.0" />
     <PackageReference Include="xunit.v3" Version="3.2.2" />

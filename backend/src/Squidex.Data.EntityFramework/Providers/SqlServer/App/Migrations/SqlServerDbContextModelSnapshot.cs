@@ -983,6 +983,9 @@ namespace Squidex.Providers.SqlServer.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<long?>("Version")
+                        .HasColumnType("bigint");
+
                     b.HasKey("UniqueContentId");
 
                     b.ToTable("TextState", (string)null);

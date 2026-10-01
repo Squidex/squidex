@@ -110,4 +110,33 @@ describe('JobsState', () => {
             dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
         });
     });
+
+    describe('Text Index', () => {
+        const payload = { items: [], canRebuildTextIndex: true, _links: { 'create/text-index': { method: 'POST', href: '/text-index' } } };
+
+        it('should not allow rebuild if link is missing', () => {
+            jobsService.setup(x => x.getJobs(app))
+                .returns(() => of({ items: [] } as any)).verifiable();
+
+            jobsState.load().subscribe();
+
+            let canRebuild: boolean | undefined;
+            jobsState.canRebuildTextIndex.subscribe(x => canRebuild = x);
+
+            expect(canRebuild).toBeFalsy();
+        });
+
+        it('should start rebuild with resource from payload', () => {
+            jobsService.setup(x => x.getJobs(app))
+                .returns(() => of(payload as any)).verifiable();
+
+            jobsService.setup(x => x.postTextIndexRebuild(app, It.isValue(payload as any)))
+                .returns(() => of({})).verifiable();
+
+            jobsState.load().subscribe();
+            jobsState.rebuildTextIndex().subscribe();
+
+            dialogs.verify(x => x.notifyInfo(It.isAnyString()), Times.once());
+        });
+    });
 });

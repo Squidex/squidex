@@ -243,7 +243,8 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
                 switch (command)
                 {
                     case UpsertIndexEntry upsert:
-                        if (upsert.Texts != null)
+                        var weightedTexts = upsert.GetWeightedTexts();
+                        if (weightedTexts != null)
                         {
                             insertsText.Add(new EFTextIndexTextEntity
                             {
@@ -254,7 +255,7 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
                                 ServeAll = upsert.ServeAll,
                                 ServePublished = upsert.ServePublished,
                                 Stage = upsert.Stage,
-                                Texts = Tokenizer.Terms(upsert.Texts),
+                                Texts = Tokenizer.Terms(weightedTexts),
                             });
                         }
 

@@ -57,6 +57,15 @@ export class JobsService {
             pretifyError('i18n:jobs.backupFailed'));
     }
 
+    public postTextIndexRebuild(appName: string, resource: Resource): Observable<any> {
+        const link = resource._links['create/text-index'];
+
+        const url = this.apiUrl.buildUrl(link.href);
+
+        return this.http.request(link.method, url).pipe(
+            pretifyError('i18n:jobs.textIndexFailed'));
+    }
+
     public postRestore(dto: RestoreRequestDto): Observable<any> {
         const url = this.apiUrl.buildUrl('api/apps/restore');
 

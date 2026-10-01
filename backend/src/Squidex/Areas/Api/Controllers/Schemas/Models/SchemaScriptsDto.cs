@@ -43,6 +43,11 @@ public sealed class SchemaScriptsDto
     /// </summary>
     public string? Change { get; set; }
 
+    /// <summary>
+    /// The script that is executed when a content is indexed for the full text search.
+    /// </summary>
+    public string? Index { get; set; }
+
     public ConfigureScripts ToCommand()
     {
         var scripts = SimpleMapper.Map(this, new SchemaScripts());

@@ -92,7 +92,8 @@ public static class CommandFactory
             }
         }
 
-        if (upsert.Texts is { Count: > 0 })
+        var weightedTexts = upsert.GetWeightedTexts();
+        if (weightedTexts is { Count: > 0 })
         {
             var document = new SearchDocument
             {
@@ -106,7 +107,7 @@ public static class CommandFactory
                 ["servePublished"] = upsert.ServePublished,
             };
 
-            foreach (var (key, value) in upsert.Texts)
+            foreach (var (key, value) in weightedTexts)
             {
                 var textMerged = value;
                 var textLanguage = AzureIndexDefinition.GetFieldName(key);

@@ -5,9 +5,13 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Core.Contents;
+using Squidex.Domain.Apps.Core.Scripting;
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.Domain.Apps.Entities.Contents.Text.Rebuild;
 using Squidex.Domain.Apps.Entities.Contents.Text.State;
+using Squidex.Domain.Apps.Entities.Jobs;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Events;
@@ -21,6 +25,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
 public abstract class TextIndexerTests : GivenContext
 {
+    private readonly Dictionary<DomainId, long> versions = [];
     private TextIndexingProcess? process;
 
     protected List<DomainId> Ids1 { get; } = [DomainId.NewGuid()];
@@ -499,7 +504,12 @@ public abstract class TextIndexerTests : GivenContext
         contentEvent.AppId = AppId;
         contentEvent.SchemaId = SchemaId;
 
-        await sut.On(Enumerable.Repeat(Envelope.Create<IEvent>(contentEvent), 1));
+        // The indexer ignores events with versions that have already been indexed.
+        var version = versions.GetValueOrDefault(id, -1) + 1;
+
+        versions[id] = version;
+
+        await sut.On([Envelope.Create<IEvent>(contentEvent).SetEventStreamNumber(version)]);
     }
 
     private static ContentData TextData(string language, string text)
@@ -627,7 +637,11 @@ public abstract class TextIndexerTests : GivenContext
         {
             var index = await CreateSutAsync();
 
-            process = new TextIndexingProcess(TestUtils.DefaultSerializer, index, new InMemoryTextIndexerState());
+            var coordinator = new TextIndexRebuildCoordinator();
+
+            var extraction = new TextIndexExtraction(AppProvider, TextExtractorTests.CreateExtractor(A.Fake<IScriptEngine>()));
+
+            process = new TextIndexingProcess(TestUtils.DefaultSerializer, index, new InMemoryTextIndexerState(), extraction, coordinator);
         }
 
         return process;

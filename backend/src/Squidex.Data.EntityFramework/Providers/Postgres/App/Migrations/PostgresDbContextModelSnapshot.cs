@@ -981,6 +981,9 @@ namespace Squidex.Providers.Postgres.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("character varying(100)");
 
+                    b.Property<long?>("Version")
+                        .HasColumnType("bigint");
+
                     b.HasKey("UniqueContentId");
 
                     b.ToTable("TextState", (string)null);

@@ -20,6 +20,10 @@ internal static class MongoTextStateClassMap
 
             cm.MapProperty(x => x.State)
                 .SetElementName("s");
+
+            cm.MapProperty(x => x.Version)
+                .SetElementName("v")
+                .SetIgnoreIfNull(true);
         });
     }
 }

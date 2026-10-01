@@ -203,6 +203,9 @@ export class EditSchemaScriptsForm extends Form<ExtendedFormGroup, {}, object> {
             update: new UntypedFormControl('',
                 Validators.nullValidator,
             ),
+            index: new UntypedFormControl('',
+                Validators.nullValidator,
+            ),
         }));
     }
 }
@@ -244,11 +247,21 @@ export class EditFieldForm extends Form<ExtendedFormGroup, {}, FieldPropertiesDt
             tags: new UntypedFormControl([],
                 Validators.nullValidator,
             ),
+            searchMode: new UntypedFormControl('Default',
+                Validators.nullValidator,
+            ),
+            searchPaths: new UntypedFormControl([],
+                Validators.nullValidator,
+            ),
         };
 
         properties.accept(new EditFieldFormVisitor(config));
 
         return new ExtendedFormGroup(config);
+    }
+
+    protected transformLoad(value: Partial<FieldPropertiesDto>) {
+        return { ...value, searchMode: value.searchMode || 'Default' };
     }
 }
 

@@ -54,8 +54,8 @@ public class SearchTests(ContentFixture fixture) : IClassFixture<ContentFixture>
     [Trait("Category", "MongoOnly")]
     public async Task Should_search_content()
     {
-        // STEP 1: Create content.
-        var contentString = Guid.NewGuid().ToString();
+        // STEP 1: Create content. Plain IDs are not indexed, therefore we need a prefix.
+        var contentString = $"text{Guid.NewGuid():N}";
 
         var createRequest = new TestEntityData
         {

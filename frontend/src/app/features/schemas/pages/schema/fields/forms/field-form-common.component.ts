@@ -8,7 +8,7 @@
 
 import { Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule, UntypedFormGroup } from '@angular/forms';
-import { FieldDto, FormRowComponent, SchemaDto, TagEditorComponent } from '@app/shared';
+import { FieldDto, FormRowComponent, SchemaDto, TagEditorComponent, TranslatePipe } from '@app/shared';
 
 @Component({
     selector: 'sqx-field-form-common',
@@ -19,6 +19,7 @@ import { FieldDto, FormRowComponent, SchemaDto, TagEditorComponent } from '@app/
         FormsModule,
         ReactiveFormsModule,
         TagEditorComponent,
+        TranslatePipe,
     ],
 })
 export class FieldFormCommonComponent {
