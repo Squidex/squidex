@@ -39,8 +39,6 @@ public static class FindExtensions
     {
         var filters = new List<FilterDefinition<MongoAssetEntity>>
         {
-            Filter.Ne(x => x.LastModified, default),
-            Filter.Ne(x => x.Id, default),
             Filter.Eq(x => x.IndexedAppId, appId),
         };
 
