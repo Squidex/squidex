@@ -45,16 +45,23 @@ public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAsse
     protected override Task SetupCollectionAsync(IMongoCollection<MongoAssetEntity> collection,
         CancellationToken ct)
     {
+        // Equality fields first, then the default sort order, so that pages and counts are bounded by the app or folder.
         return collection.Indexes.CreateManyAsync(
         [
             new CreateIndexModel<MongoAssetEntity>(
                 Index
+                    .Ascending(x => x.IndexedAppId)
                     .Descending(x => x.LastModified)
                     .Ascending(x => x.Id)
-                    .Ascending(x => x.IndexedAppId)
                     .Ascending(x => x.IsDeleted)
-                    .Ascending(x => x.ParentId)
                     .Ascending(x => x.Tags)),
+            new CreateIndexModel<MongoAssetEntity>(
+                Index
+                    .Ascending(x => x.IndexedAppId)
+                    .Ascending(x => x.ParentId)
+                    .Descending(x => x.LastModified)
+                    .Ascending(x => x.Id)
+                    .Ascending(x => x.IsDeleted)),
             new CreateIndexModel<MongoAssetEntity>(
                 Index
                     .Ascending(x => x.IndexedAppId)
@@ -279,8 +286,6 @@ public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAsse
     private static FilterDefinition<MongoAssetEntity> BuildFilter(DomainId appId, DomainId parentId)
     {
         return Filter.And(
-            Filter.Gt(x => x.LastModified, default),
-            Filter.Gt(x => x.Id, DomainId.Create(string.Empty)),
             Filter.Eq(x => x.IndexedAppId, appId),
             Filter.Ne(x => x.IsDeleted, true),
             Filter.Eq(x => x.ParentId, parentId));

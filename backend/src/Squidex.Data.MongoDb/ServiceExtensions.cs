@@ -292,6 +292,9 @@ public static class ServiceExtensions
 
         services.AddTransientAs<ConvertBackup>()
             .As<IMigration>();
+
+        services.AddTransientAs<DropOldAssetIndex>()
+            .As<IMigration>();
     }
 
     private static IMongoClient GetMongoClient(IConfiguration config, JsonSerializerOptions serializerOptions, string prefix)

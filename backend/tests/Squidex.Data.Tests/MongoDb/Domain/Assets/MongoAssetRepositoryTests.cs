@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.Extensions.Logging;
+using MongoDB.Driver;
 using Squidex.Domain.Apps.Entities.Assets.Repositories;
 using Squidex.Domain.Apps.Entities.MongoDb.Assets;
 using Squidex.MongoDb.TestHelpers;
@@ -15,11 +16,33 @@ namespace Squidex.MongoDb.Domain.Assets;
 
 [Trait("Category", "TestContainer")]
 [Collection(MongoFixtureCollection.Name)]
-public class MongoAssetRepositoryTests(MongoFixture fixture) : AssetRepositoryTests
+public class MongoAssetRepositoryTests : AssetRepositoryTests, IAsyncLifetime
 {
+    private readonly IMongoDatabase database;
+    private readonly MongoQueryProfiler profiler;
+
+    public MongoAssetRepositoryTests(MongoFixture fixture)
+    {
+        // The profiler works per database, therefore we use a dedicated one to not record queries from other tests.
+        database = fixture.Client.GetDatabase("Test_Assets");
+
+        profiler = new MongoQueryProfiler(database, "States_Assets2");
+    }
+
+    public async ValueTask InitializeAsync()
+    {
+        await profiler.StartAsync();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await profiler.StopAsync();
+        await profiler.AssertIndexedAsync();
+    }
+
     protected override async Task<IAssetRepository> CreateSutAsync()
     {
-        var sut = new MongoAssetRepository(fixture.Database, A.Fake<ILogger<MongoAssetRepository>>(), string.Empty);
+        var sut = new MongoAssetRepository(database, A.Fake<ILogger<MongoAssetRepository>>(), string.Empty);
 
         await sut.InitializeAsync(default);
         return sut;

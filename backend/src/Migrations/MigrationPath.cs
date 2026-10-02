@@ -16,7 +16,7 @@ namespace Migrations;
 
 public sealed class MigrationPath(IServiceProvider serviceProvider) : IMigrationPath
 {
-    private const int CurrentVersion = 27;
+    private const int CurrentVersion = 28;
 
     public (int Version, IEnumerable<IMigration>? Migrations) GetNext(int version)
     {
@@ -125,6 +125,12 @@ public sealed class MigrationPath(IServiceProvider serviceProvider) : IMigration
         if (version < 27)
         {
             yield return serviceProvider.GetService<ConvertBackup>();
+        }
+
+        // Version 28: New asset indexes.
+        if (version < 28)
+        {
+            yield return serviceProvider.GetService<Squidex.Migrations.DropOldAssetIndex>();
         }
     }
 }
