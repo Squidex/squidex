@@ -58,6 +58,12 @@ public sealed partial class MongoAssetRepository : MongoRepositoryBase<MongoAsse
             new CreateIndexModel<MongoAssetEntity>(
                 Index
                     .Ascending(x => x.IndexedAppId)
+                    .Ascending(x => x.ParentId)
+                    .Descending(x => x.LastModified)
+                    .Ascending(x => x.Id)),
+            new CreateIndexModel<MongoAssetEntity>(
+                Index
+                    .Ascending(x => x.IndexedAppId)
                     .Ascending(x => x.Slug)),
             new CreateIndexModel<MongoAssetEntity>(
                 Index
