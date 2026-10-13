@@ -8,6 +8,7 @@
 using System.Text.RegularExpressions;
 using Microsoft.OData.UriParser;
 using Microsoft.Spatial;
+using NodaTime;
 
 namespace Squidex.Infrastructure.Queries.OData;
 
@@ -42,9 +43,43 @@ public sealed class FilterVisitor : QueryNodeVisitor<FilterNode<ClrValue>>
 
     public override FilterNode<ClrValue> Visit(InNode nodeIn)
     {
+        var path = PropertyPathVisitor.Visit(nodeIn.Left);
+
         var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
 
-        return ClrFilter.In(PropertyPathVisitor.Visit(nodeIn.Left), value);
+        if (value.Value is not List<Instant> instants || nodeIn.Right is not CollectionConstantNode collection)
+        {
+            return ClrFilter.In(path, value);
+        }
+
+        // Items are converted to the target type and lose their original literal, therefore we parse the collection literal.
+        var literals = collection.LiteralText?.Trim('(', ')').Split(',', StringSplitOptions.TrimEntries);
+        if (literals?.Length != instants.Count)
+        {
+            return ClrFilter.In(path, value);
+        }
+
+        var dates = new List<Instant>();
+        var others = new List<Instant>();
+
+        for (var i = 0; i < instants.Count; i++)
+        {
+            if (DateFilter.IsDate(literals[i]))
+            {
+                dates.Add(instants[i]);
+            }
+            else
+            {
+                others.Add(instants[i]);
+            }
+        }
+
+        if (dates.Count == 0)
+        {
+            return ClrFilter.In(path, value);
+        }
+
+        return DateFilter.CreateIn(path, dates, others);
     }
 
     public override FilterNode<ClrValue> Visit(SingleValueFunctionCallNode nodeIn)
@@ -157,49 +192,52 @@ public sealed class FilterVisitor : QueryNodeVisitor<FilterNode<ClrValue>>
         {
             if (nodeIn.OperatorKind == BinaryOperatorKind.NotEqual)
             {
-                var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
-
-                return ClrFilter.Ne(PropertyPathVisitor.Visit(nodeIn.Left), value);
+                return Compare(nodeIn, CompareOperator.NotEquals);
             }
 
             if (nodeIn.OperatorKind == BinaryOperatorKind.Equal)
             {
-                var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
-
-                return ClrFilter.Eq(PropertyPathVisitor.Visit(nodeIn.Left), value);
+                return Compare(nodeIn, CompareOperator.Equals);
             }
 
             if (nodeIn.OperatorKind == BinaryOperatorKind.LessThan)
             {
-                var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
-
-                return ClrFilter.Lt(PropertyPathVisitor.Visit(nodeIn.Left), value);
+                return Compare(nodeIn, CompareOperator.LessThan);
             }
 
             if (nodeIn.OperatorKind == BinaryOperatorKind.LessThanOrEqual)
             {
-                var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
-
-                return ClrFilter.Le(PropertyPathVisitor.Visit(nodeIn.Left), value);
+                return Compare(nodeIn, CompareOperator.LessThanOrEqual);
             }
 
             if (nodeIn.OperatorKind == BinaryOperatorKind.GreaterThan)
             {
-                var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
-
-                return ClrFilter.Gt(PropertyPathVisitor.Visit(nodeIn.Left), value);
+                return Compare(nodeIn, CompareOperator.GreaterThan);
             }
 
             if (nodeIn.OperatorKind == BinaryOperatorKind.GreaterThanOrEqual)
             {
-                var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
-
-                return ClrFilter.Ge(PropertyPathVisitor.Visit(nodeIn.Left), value);
+                return Compare(nodeIn, CompareOperator.GreaterThanOrEqual);
             }
         }
 
         ThrowHelper.NotSupportedException();
         return default!;
+    }
+
+    private static FilterNode<ClrValue> Compare(BinaryOperatorNode nodeIn, CompareOperator @operator)
+    {
+        var path = PropertyPathVisitor.Visit(nodeIn.Left);
+
+        var value = ConstantWithTypeVisitor.Visit(nodeIn.Right);
+
+        // Dates without time are converted to ranges to match the whole day.
+        if (value.Value is Instant date && ConstantWithTypeVisitor.IsDate(nodeIn.Right))
+        {
+            return DateFilter.Create(path, @operator, date);
+        }
+
+        return new CompareFilter<ClrValue>(path, @operator, value);
     }
 
     private static FilterNode<ClrValue> ParseMatch(BinaryOperatorNode nodeIn, SingleValueFunctionCallNode functionNode, Func<char, bool> condition)

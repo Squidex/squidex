@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using NodaTime;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Validation;
 
@@ -91,7 +92,7 @@ public sealed class JsonFilterVisitor : FilterNodeVisitor<FilterNode<ClrValue>, 
 
             if (args.Errors.Count == 0 && fieldErrors.Count == 0 && value != null)
             {
-                return new CompareFilter<ClrValue>(nodeIn.Path, nodeIn.Operator, value);
+                return CreateFilter(nodeIn, value);
             }
             else if (field == fieldMatches.Last())
             {
@@ -100,5 +101,45 @@ public sealed class JsonFilterVisitor : FilterNodeVisitor<FilterNode<ClrValue>, 
         }
 
         return new CompareFilter<ClrValue>(nodeIn.Path, nodeIn.Operator, ClrValue.Null);
+    }
+
+    private static FilterNode<ClrValue> CreateFilter(CompareFilter<JsonValue> nodeIn, ClrValue value)
+    {
+        // Dates without time are converted to ranges to match the whole day.
+        if (value.Value is Instant instant && nodeIn.Value.Value is string text && DateFilter.IsDate(text))
+        {
+            return DateFilter.Create(nodeIn.Path, nodeIn.Operator, instant);
+        }
+
+        if (value.Value is not List<Instant> instants)
+        {
+            return new CompareFilter<ClrValue>(nodeIn.Path, nodeIn.Operator, value);
+        }
+
+        var source = nodeIn.Value.Value as JsonArray ?? [nodeIn.Value];
+        if (source.Count == instants.Count)
+        {
+            var dates = new List<Instant>();
+            var others = new List<Instant>();
+
+            for (var i = 0; i < source.Count; i++)
+            {
+                if (source[i].Value is string item && DateFilter.IsDate(item))
+                {
+                    dates.Add(instants[i]);
+                }
+                else
+                {
+                    others.Add(instants[i]);
+                }
+            }
+
+            if (dates.Count > 0)
+            {
+                return DateFilter.CreateIn(nodeIn.Path, dates, others);
+            }
+        }
+
+        return new CompareFilter<ClrValue>(nodeIn.Path, nodeIn.Operator, value);
     }
 }

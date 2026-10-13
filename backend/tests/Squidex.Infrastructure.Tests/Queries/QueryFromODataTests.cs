@@ -107,11 +107,35 @@ public class QueryFromODataTests
         Assert.Equal(o, i);
     }
 
-    [Fact]
-    public void Should_parse_filter_if_type_is_datetime_and_and_value_is_date()
+    [Theory]
+    [InlineData("eq", "(created >= 1988-01-19T00:00:00Z && created < 1988-01-20T00:00:00Z)")]
+    [InlineData("ne", "!((created >= 1988-01-19T00:00:00Z && created < 1988-01-20T00:00:00Z))")]
+    [InlineData("lt", "created < 1988-01-19T00:00:00Z")]
+    [InlineData("le", "created < 1988-01-20T00:00:00Z")]
+    [InlineData("gt", "created >= 1988-01-20T00:00:00Z")]
+    [InlineData("ge", "created >= 1988-01-19T00:00:00Z")]
+    public void Should_parse_filter_if_type_is_datetime_and_value_is_date(string op, string expected)
     {
-        var i = _o("$filter=created eq 1988-01-19");
-        var o = _q("Filter: created == 1988-01-19T00:00:00Z");
+        var i = _o($"$filter=created {op} 1988-01-19");
+        var o = _q($"Filter: {expected}");
+
+        Assert.Equal(o, i);
+    }
+
+    [Fact]
+    public void Should_parse_filter_if_type_is_datetime_and_value_is_date_in_nested_property()
+    {
+        var i = _o("$filter=properties/datetime eq 1988-01-19");
+        var o = _q("Filter: (properties/datetime >= 1988-01-19T00:00:00Z && properties/datetime < 1988-01-20T00:00:00Z)");
+
+        Assert.Equal(o, i);
+    }
+
+    [Fact]
+    public void Should_parse_filter_if_type_is_datetime_list_and_values_are_dates()
+    {
+        var i = _o("$filter=created in (1988-01-19, 1988-01-29, 1988-02-09T12:00:00Z)");
+        var o = _q("Filter: ((created >= 1988-01-19T00:00:00Z && created < 1988-01-20T00:00:00Z) || (created >= 1988-01-29T00:00:00Z && created < 1988-01-30T00:00:00Z) || created in [1988-02-09T12:00:00Z])");
 
         Assert.Equal(o, i);
     }
