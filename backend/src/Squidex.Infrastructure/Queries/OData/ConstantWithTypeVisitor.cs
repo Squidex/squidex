@@ -36,6 +36,18 @@ public sealed class ConstantWithTypeVisitor : QueryNodeVisitor<ClrValue>
         return node.Accept(Instance);
     }
 
+    public static bool IsDate(QueryNode node)
+    {
+        while (node is ConvertNode convert)
+        {
+            node = convert.Source;
+        }
+
+#pragma warning disable CS0618 // Type or member is obsolete
+        return node is ConstantNode { Value: DateOnly or Date };
+#pragma warning restore CS0618 // Type or member is obsolete
+    }
+
     public override ClrValue Visit(ConvertNode nodeIn)
     {
         return nodeIn.Source.Accept(this);

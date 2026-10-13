@@ -95,6 +95,36 @@ public class QueryFromJsonTests
             AssertFilter(json, "datetimeNullable == null");
         }
 
+        [Theory]
+        [InlineData("eq", "(datetime >= 2012-11-10T00:00:00Z && datetime < 2012-11-11T00:00:00Z)")]
+        [InlineData("ne", "!((datetime >= 2012-11-10T00:00:00Z && datetime < 2012-11-11T00:00:00Z))")]
+        [InlineData("lt", "datetime < 2012-11-10T00:00:00Z")]
+        [InlineData("le", "datetime < 2012-11-11T00:00:00Z")]
+        [InlineData("gt", "datetime >= 2012-11-11T00:00:00Z")]
+        [InlineData("ge", "datetime >= 2012-11-10T00:00:00Z")]
+        public void Should_parse_filter_with_date_as_range(string op, string expected)
+        {
+            var json = new { path = "datetime", op, value = "2012-11-10" };
+
+            AssertFilter(json, expected);
+        }
+
+        [Fact]
+        public void Should_parse_in_filter_with_dates_as_ranges()
+        {
+            var json = new { path = "datetime", op = "in", value = new[] { "2012-11-10", "2012-11-20", "2012-11-30T09:08:07Z" } };
+
+            AssertFilter(json, "((datetime >= 2012-11-10T00:00:00Z && datetime < 2012-11-11T00:00:00Z) || (datetime >= 2012-11-20T00:00:00Z && datetime < 2012-11-21T00:00:00Z) || datetime in [2012-11-30T09:08:07Z])");
+        }
+
+        [Fact]
+        public void Should_parse_in_filter_with_single_date_as_range()
+        {
+            var json = new { path = "datetime", op = "in", value = "2012-11-10" };
+
+            AssertFilter(json, "(datetime >= 2012-11-10T00:00:00Z && datetime < 2012-11-11T00:00:00Z)");
+        }
+
         [Fact]
         public void Should_add_error_if_field_is_not_nullable()
         {
