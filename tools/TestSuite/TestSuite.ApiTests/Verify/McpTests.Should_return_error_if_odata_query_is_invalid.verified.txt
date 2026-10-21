@@ -1,0 +1,6 @@
+﻿{
+  IsError: true,
+  Content: [
+    An error occurred invoking 'query_contents': OData $filter clause not valid: Expression expected at position 8 in 'invalid('.
+  ]
+}

@@ -40,6 +40,38 @@ export class ClientConnectFormComponent implements OnInit {
 
     public step = 'Start';
 
+    public get mcpUrl() {
+        return this.apiUrl.buildUrl(`/api/apps/${this.appName}/mcp`);
+    }
+
+    public get mcpServerName() {
+        return `squidex-${this.appName}`;
+    }
+
+    public get mcpCommand() {
+        return `claude mcp add --transport http ${this.mcpServerName} ${this.mcpUrl} --header "Authorization: Bearer ${this.token}"`;
+    }
+
+    public get mcpConfig() {
+        const config = {
+            mcpServers: {
+                [this.mcpServerName]: {
+                    type: 'http',
+                    url: this.mcpUrl,
+                    headers: {
+                        Authorization: `Bearer ${this.token}`,
+                    },
+                },
+            },
+        };
+
+        return JSON.stringify(config, undefined, 4);
+    }
+
+    private get token() {
+        return this.appToken?.accessToken || '[YOUR_TOKEN]';
+    }
+
     constructor(
         public readonly appsState: AppsState,
         public readonly apiUrl: ApiUrlConfig,

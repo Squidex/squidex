@@ -1,0 +1,49 @@
+﻿{
+  total: 2,
+  items: [
+    {
+      id: Guid_1,
+      schema: my-mcp,
+      status: Published,
+      newStatus: null,
+      version: 1,
+      created: DateTimeOffset_1,
+      lastModified: DateTimeOffset_1,
+      data: {
+        localized: {
+          en: default,
+          de: default,
+          custom: default
+        },
+        number: {
+          iv: 2
+        },
+        string: {
+          iv: Guid_2
+        }
+      }
+    },
+    {
+      id: Guid_3,
+      schema: my-mcp,
+      status: Published,
+      newStatus: null,
+      version: 1,
+      created: DateTimeOffset_1,
+      lastModified: DateTimeOffset_1,
+      data: {
+        localized: {
+          en: default,
+          de: default,
+          custom: default
+        },
+        number: {
+          iv: 1
+        },
+        string: {
+          iv: Guid_2
+        }
+      }
+    }
+  ]
+}

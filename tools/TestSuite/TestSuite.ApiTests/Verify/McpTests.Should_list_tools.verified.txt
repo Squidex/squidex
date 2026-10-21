@@ -1,0 +1,186 @@
+﻿[
+  {
+    name: get_asset,
+    title: Get asset,
+    description: Gets the metadata of a single asset by ID, including the URL to download the file.,
+    inputSchema: {
+      type: object,
+      properties: {
+        id: {
+          description: The ID of the asset.,
+          type: string
+        }
+      },
+      required: [
+        id
+      ]
+    },
+    annotations: {
+      title: Get asset,
+      idempotentHint: true,
+      openWorldHint: false,
+      readOnlyHint: true
+    }
+  },
+  {
+    name: get_content,
+    title: Get content,
+    description: Gets a single content item by ID.,
+    inputSchema: {
+      type: object,
+      properties: {
+        schema: {
+          description: The name or ID of the schema.,
+          type: string
+        },
+        id: {
+          description: The ID of the content item.,
+          type: string
+        },
+        unpublished: {
+          description: True to also return unpublished content items.,
+          type: boolean,
+          default: false
+        }
+      },
+      required: [
+        schema,
+        id
+      ]
+    },
+    annotations: {
+      title: Get content,
+      idempotentHint: true,
+      openWorldHint: false,
+      readOnlyHint: true
+    }
+  },
+  {
+    name: get_schema,
+    title: Get schema,
+    description: Gets a schema with all fields. The field names are the keys in the data of content items.,
+    inputSchema: {
+      type: object,
+      properties: {
+        schema: {
+          description: The name or ID of the schema.,
+          type: string
+        }
+      },
+      required: [
+        schema
+      ]
+    },
+    annotations: {
+      title: Get schema,
+      idempotentHint: true,
+      openWorldHint: false,
+      readOnlyHint: true
+    }
+  },
+  {
+    name: list_schemas,
+    title: List schemas,
+    description: Lists all schemas of the app with name, type and label. Use get_schema to get the fields of a schema.,
+    inputSchema: {
+      type: object
+    },
+    annotations: {
+      title: List schemas,
+      idempotentHint: true,
+      openWorldHint: false,
+      readOnlyHint: true
+    }
+  },
+  {
+    name: query_assets,
+    title: Query assets,
+    description:
+Queries assets. Use either a JSON query or an OData query. If both are provided, the JSON query is used.
+JSON query example: {"filter": {"path": "fileName", "op": "contains", "value": "logo"}, "sort": [{"path": "lastModified", "order": "descending"}], "take": 20}.
+OData query example: $filter=contains(fileName, 'logo')&$orderby=lastModified desc&$top=20.,
+    inputSchema: {
+      type: object,
+      properties: {
+        query: {
+          description: The optional JSON query.,
+          type: [
+            string,
+            null
+          ],
+          default: null
+        },
+        odata: {
+          description: The optional OData query, e.g. $filter=mimeType eq 'image/png'&$top=10.,
+          type: [
+            string,
+            null
+          ],
+          default: null
+        },
+        parentId: {
+          description: The optional ID of the folder. Omit to search in all folders.,
+          type: [
+            string,
+            null
+          ],
+          default: null
+        }
+      }
+    },
+    annotations: {
+      title: Query assets,
+      idempotentHint: true,
+      openWorldHint: false,
+      readOnlyHint: true
+    }
+  },
+  {
+    name: query_contents,
+    title: Query contents,
+    description:
+Queries content items of a schema. Use either a JSON query or an OData query. If both are provided, the JSON query is used.
+JSON query example: {"filter": {"path": "data.title.iv", "op": "contains", "value": "hello"}, "sort": [{"path": "lastModified", "order": "descending"}], "skip": 0, "take": 20}.
+OData query example: $filter=contains(data/title/iv, 'hello')&$orderby=lastModified desc&$skip=0&$top=20.
+Field values are stored per language or with the "iv" key for non-localized fields. Use get_schema to get the field names.,
+    inputSchema: {
+      type: object,
+      properties: {
+        schema: {
+          description: The name or ID of the schema.,
+          type: string
+        },
+        query: {
+          description: The optional JSON query.,
+          type: [
+            string,
+            null
+          ],
+          default: null
+        },
+        odata: {
+          description: The optional OData query, e.g. $filter=data/title/iv eq 'hello'&$top=10.,
+          type: [
+            string,
+            null
+          ],
+          default: null
+        },
+        unpublished: {
+          description: True to also return unpublished content items.,
+          type: boolean,
+          default: false
+        }
+      },
+      required: [
+        schema
+      ]
+    },
+    annotations: {
+      title: Query contents,
+      idempotentHint: true,
+      openWorldHint: false,
+      readOnlyHint: true
+    }
+  }
+]

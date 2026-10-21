@@ -1,0 +1,32 @@
+﻿{
+  published: {
+    total: 0
+  },
+  unpublished: {
+    total: 1,
+    items: [
+      {
+        id: Guid_1,
+        schema: my-mcp,
+        status: Draft,
+        newStatus: null,
+        version: 0,
+        created: DateTimeOffset_1,
+        lastModified: DateTimeOffset_1,
+        data: {
+          localized: {
+            en: default,
+            de: default,
+            custom: default
+          },
+          number: {
+            iv: 0
+          },
+          string: {
+            iv: Guid_2
+          }
+        }
+      }
+    ]
+  }
+}
