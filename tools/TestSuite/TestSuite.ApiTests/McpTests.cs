@@ -6,11 +6,12 @@
 // ==========================================================================
 
 using System.Net;
+using System.Net.Http.Headers;
 using System.Text;
-using System.Text.Json;
 using ModelContextProtocol;
 using ModelContextProtocol.Client;
 using ModelContextProtocol.Protocol;
+using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Squidex.ClientLibrary;
 using TestSuite.Model;
@@ -32,9 +33,9 @@ public class McpTests(McpFixture fixture) : IClassFixture<McpFixture>
         var tools = await mcp.ListToolsAsync();
 
         // Snapshot the full definitions, because the descriptions and schemas are what the agents see.
-        var json = JsonSerializer.Serialize(tools.Select(x => x.ProtocolTool).OrderBy(x => x.Name), McpJsonUtilities.DefaultOptions);
-
-        await VerifyJson(json);
+        await VerifyJson(System.Text.Json.JsonSerializer.Serialize(
+            tools.Select(x => x.ProtocolTool).OrderBy(x => x.Name),
+            McpJsonUtilities.DefaultOptions));
     }
 
     [Fact]
@@ -53,7 +54,10 @@ public class McpTests(McpFixture fixture) : IClassFixture<McpFixture>
     {
         await using var mcp = await _.CreateMcpClientAsync();
 
-        var result = await CallAsync(mcp, "get_schema", new () { ["schema"] = _.SchemaName });
+        var result = await CallAsync(mcp, "get_schema", new ()
+        {
+            ["schema"] = _.SchemaName,
+        });
 
         await VerifyJson(result);
     }
@@ -70,9 +74,14 @@ public class McpTests(McpFixture fixture) : IClassFixture<McpFixture>
         // STEP 2: Query the content item.
         await using var mcp = await _.CreateMcpClientAsync();
 
-        var query = EqualsQuery($"data.{TestEntityData.StringField}.iv", value);
-
-        var result = await CallAsync(mcp, "query_contents", new () { ["schema"] = _.SchemaName, ["query"] = query });
+        var result = await CallAsync(mcp, "query_contents", new ()
+        {
+            ["schema"] = _.SchemaName,
+            ["query"] = JsonConvert.SerializeObject(new
+            {
+                filter = new { path = $"data.{TestEntityData.StringField}.iv", op = "eq", value },
+            }),
+        });
 
         await VerifyJson(result);
     }
@@ -83,22 +92,29 @@ public class McpTests(McpFixture fixture) : IClassFixture<McpFixture>
         // STEP 1: Create published content items with a unique value.
         var value = Guid.NewGuid().ToString();
 
-        await _.Contents.CreateAsync(new TestEntityData { String = value, Number = 1 }, ContentCreateOptions.AsPublish);
-        await _.Contents.CreateAsync(new TestEntityData { String = value, Number = 2 }, ContentCreateOptions.AsPublish);
+        await _.Contents.CreateAsync(
+            new TestEntityData { String = value, Number = 1 },
+            ContentCreateOptions.AsPublish);
+
+        await _.Contents.CreateAsync(
+            new TestEntityData { String = value, Number = 2 },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Query the content items with filter and sorting.
         await using var mcp = await _.CreateMcpClientAsync();
 
-        var odata = $"$filter=data/{TestEntityData.StringField}/iv eq '{value}'&$orderby=data/{TestEntityData.NumberField}/iv desc";
-
-        var result = await CallAsync(mcp, "query_contents", new () { ["schema"] = _.SchemaName, ["odata"] = odata });
+        var result = await CallAsync(mcp, "query_contents", new ()
+        {
+            ["schema"] = _.SchemaName,
+            ["odata"] = $"$filter=data/{TestEntityData.StringField}/iv eq '{value}'&$orderby=data/{TestEntityData.NumberField}/iv desc",
+        });
 
         await VerifyJson(result);
     }
 
     [Fact]
-    public async Task Should_only_query_unpublished_contents_if_requested()
+    public async Task Should_not_query_unpublished_contents_by_default()
     {
         // STEP 1: Create an unpublished content item with a unique value.
         var value = Guid.NewGuid().ToString();
@@ -109,25 +125,60 @@ public class McpTests(McpFixture fixture) : IClassFixture<McpFixture>
         // STEP 2: Query the content item.
         await using var mcp = await _.CreateMcpClientAsync();
 
-        var query = EqualsQuery($"data.{TestEntityData.StringField}.iv", value);
+        var result = await CallAsync(mcp, "query_contents", new ()
+        {
+            ["schema"] = _.SchemaName,
+            ["query"] = JsonConvert.SerializeObject(new
+            {
+                filter = new { path = $"data.{TestEntityData.StringField}.iv", op = "eq", value },
+            }),
+        });
 
-        var published = await CallAsync(mcp, "query_contents", new () { ["schema"] = _.SchemaName, ["query"] = query });
-        var unpublished = await CallAsync(mcp, "query_contents", new () { ["schema"] = _.SchemaName, ["query"] = query, ["unpublished"] = true });
+        await VerifyJson(result);
+    }
 
-        await VerifyJson($$"""{"published": {{published}}, "unpublished": {{unpublished}}}""");
+    [Fact]
+    public async Task Should_query_unpublished_contents_if_requested()
+    {
+        // STEP 1: Create an unpublished content item with a unique value.
+        var value = Guid.NewGuid().ToString();
+
+        await _.Contents.CreateAsync(new TestEntityData { String = value });
+
+
+        // STEP 2: Query the content item.
+        await using var mcp = await _.CreateMcpClientAsync();
+
+        var result = await CallAsync(mcp, "query_contents", new ()
+        {
+            ["schema"] = _.SchemaName,
+            ["query"] = JsonConvert.SerializeObject(new
+            {
+                filter = new { path = $"data.{TestEntityData.StringField}.iv", op = "eq", value },
+            }),
+            ["unpublished"] = true,
+        });
+
+        await VerifyJson(result);
     }
 
     [Fact]
     public async Task Should_get_content()
     {
         // STEP 1: Create a published content item.
-        var content = await _.Contents.CreateAsync(new TestEntityData { Number = 42 }, ContentCreateOptions.AsPublish);
+        var content = await _.Contents.CreateAsync(
+            new TestEntityData { Number = 42 },
+            ContentCreateOptions.AsPublish);
 
 
         // STEP 2: Get the content item.
         await using var mcp = await _.CreateMcpClientAsync();
 
-        var result = await CallAsync(mcp, "get_content", new () { ["schema"] = _.SchemaName, ["id"] = content.Id });
+        var result = await CallAsync(mcp, "get_content", new ()
+        {
+            ["schema"] = _.SchemaName,
+            ["id"] = content.Id,
+        });
 
         await VerifyJson(result);
     }
@@ -137,9 +188,13 @@ public class McpTests(McpFixture fixture) : IClassFixture<McpFixture>
     {
         await using var mcp = await _.CreateMcpClientAsync();
 
-        var result = await mcp.CallToolAsync("get_content", new Dictionary<string, object?> { ["schema"] = "unknown", ["id"] = Guid.NewGuid().ToString() });
+        var result = await mcp.CallToolAsync("get_content", new Dictionary<string, object?>
+        {
+            ["schema"] = "unknown",
+            ["id"] = Guid.NewGuid().ToString(),
+        });
 
-        await Verify(Simplify(result));
+        await Verify(result);
     }
 
     [Fact]
@@ -147,9 +202,13 @@ public class McpTests(McpFixture fixture) : IClassFixture<McpFixture>
     {
         await using var mcp = await _.CreateMcpClientAsync();
 
-        var result = await mcp.CallToolAsync("query_contents", new Dictionary<string, object?> { ["schema"] = _.SchemaName, ["odata"] = "$filter=invalid(" });
+        var result = await mcp.CallToolAsync("query_contents", new Dictionary<string, object?>
+        {
+            ["schema"] = _.SchemaName,
+            ["odata"] = "$filter=invalid(",
+        });
 
-        await Verify(Simplify(result));
+        await Verify(result);
     }
 
     [Fact]
@@ -162,7 +221,10 @@ public class McpTests(McpFixture fixture) : IClassFixture<McpFixture>
         // STEP 2: Get the asset.
         await using var mcp = await _.CreateMcpClientAsync();
 
-        var result = await CallAsync(mcp, "get_asset", new () { ["id"] = asset.Id });
+        var result = await CallAsync(mcp, "get_asset", new ()
+        {
+            ["id"] = asset.Id,
+        });
 
         await VerifyJson(result).ScrubInlineGuids();
     }
@@ -177,9 +239,13 @@ public class McpTests(McpFixture fixture) : IClassFixture<McpFixture>
         // STEP 2: Query the asset.
         await using var mcp = await _.CreateMcpClientAsync();
 
-        var query = EqualsQuery("id", asset.Id);
-
-        var result = await CallAsync(mcp, "query_assets", new () { ["query"] = query });
+        var result = await CallAsync(mcp, "query_assets", new ()
+        {
+            ["query"] = JsonConvert.SerializeObject(new
+            {
+                filter = new { path = "id", op = "eq", value = asset.Id },
+            }),
+        });
 
         await VerifyJson(result).ScrubInlineGuids();
     }
@@ -194,7 +260,10 @@ public class McpTests(McpFixture fixture) : IClassFixture<McpFixture>
         // STEP 2: Query the asset.
         await using var mcp = await _.CreateMcpClientAsync();
 
-        var result = await CallAsync(mcp, "query_assets", new () { ["odata"] = $"$filter=id eq '{asset.Id}'" });
+        var result = await CallAsync(mcp, "query_assets", new ()
+        {
+            ["odata"] = $"$filter=id eq '{asset.Id}'",
+        });
 
         await VerifyJson(result).ScrubInlineGuids();
     }
@@ -223,7 +292,7 @@ public class McpTests(McpFixture fixture) : IClassFixture<McpFixture>
     public async Task Should_allow_anonymous_access_if_client_is_anonymous()
     {
         // STEP 1: Create app.
-        var (app, _) = await this._.PostAppAsync();
+        var (app, _) = await _.PostAppAsync();
 
 
         // STEP 2: Make the client anonymous.
@@ -233,14 +302,99 @@ public class McpTests(McpFixture fixture) : IClassFixture<McpFixture>
         // STEP 3: Use MCP without authentication.
         using var httpClient = new HttpClient();
 
-        await using var mcp = await this._.CreateMcpClientAsync(httpClient, app.Options.AppName);
+        await using var mcp = await _.CreateMcpClientAsync(httpClient, app.Options.AppName);
 
         var result = await mcp.CallToolAsync("list_schemas");
 
-        await Verify(Simplify(result));
+        await Verify(result);
     }
 
-    private static async Task<string> CallAsync(McpClient mcp, string tool, Dictionary<string, object?>? arguments = null)
+    [Theory]
+    [InlineData(true)]
+    [InlineData(false)]
+    public async Task Should_authenticate_with_client_secret(bool fullClientId)
+    {
+        // STEP 1: Create app and get the secret of the default client.
+        var (app, _) = await _.PostAppAsync();
+
+        var client = (await app.Apps.GetClientsAsync()).Items.Single(x => x.Id == "default");
+
+
+        // STEP 2: Use MCP with the client secret.
+        using var httpClient = CreateBasicClient(
+            fullClientId ? $"{app.Options.AppName}:{client.Id}" : client.Id,
+            client.Secret);
+
+        await using var mcp = await _.CreateMcpClientAsync(httpClient, app.Options.AppName);
+
+        var result = await mcp.CallToolAsync("list_schemas");
+
+        await Verify(result);
+    }
+
+    [Fact]
+    public async Task Should_return_401_if_client_secret_is_invalid()
+    {
+        // STEP 1: Create app.
+        var (app, _) = await _.PostAppAsync();
+
+
+        // STEP 2: Use MCP with a wrong secret.
+        using var httpClient = CreateBasicClient("default", "invalid");
+
+        var response = await PostToolsListAsync(httpClient, _.McpUrl(app.Options.AppName));
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Should_return_401_if_client_secret_is_used_for_other_app()
+    {
+        // STEP 1: Create two apps.
+        var (app1, _) = await _.PostAppAsync();
+        var (app2, _) = await _.PostAppAsync();
+
+        var client = (await app1.Apps.GetClientsAsync()).Items.Single(x => x.Id == "default");
+
+
+        // STEP 2: Use the secret of the first app for the second app.
+        using var httpClient = CreateBasicClient($"{app1.Options.AppName}:{client.Id}", client.Secret);
+
+        var response = await PostToolsListAsync(httpClient, _.McpUrl(app2.Options.AppName));
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task Should_not_accept_client_secret_outside_of_mcp()
+    {
+        // STEP 1: Create app.
+        var (app, _) = await _.PostAppAsync();
+
+        var client = (await app.Apps.GetClientsAsync()).Items.Single(x => x.Id == "default");
+
+
+        // STEP 2: Use the client secret for the REST API.
+        using var httpClient = CreateBasicClient(client.Id, client.Secret);
+
+        var response = await httpClient.GetAsync(
+            _.Client.GenerateUrl($"api/apps/{app.Options.AppName}/settings"));
+
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+
+    private static HttpClient CreateBasicClient(string clientId, string secret)
+    {
+        var httpClient = new HttpClient();
+
+        httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(
+            "Basic",
+            Convert.ToBase64String(Encoding.UTF8.GetBytes($"{clientId}:{secret}")));
+        return httpClient;
+    }
+
+    private static async Task<string> CallAsync(McpClient mcp, string tool,
+        Dictionary<string, object?>? arguments = null)
     {
         var result = await mcp.CallToolAsync(tool, arguments ?? []);
 
@@ -250,29 +404,14 @@ public class McpTests(McpFixture fixture) : IClassFixture<McpFixture>
         return text;
     }
 
-    private static object Simplify(CallToolResult result)
-    {
-        // The metadata contains the server version and would make the snapshots brittle.
-        return new
-        {
-            result.IsError,
-            Content = result.Content.OfType<TextContentBlock>().Select(x => x.Text).ToList(),
-        };
-    }
-
-    private static string EqualsQuery(string path, string value)
-    {
-        return new JObject
-        {
-            ["filter"] = new JObject { ["path"] = path, ["op"] = "eq", ["value"] = value },
-        }.ToString();
-    }
-
     private static Task<HttpResponseMessage> PostToolsListAsync(HttpClient httpClient, string url)
     {
         var request = new HttpRequestMessage(HttpMethod.Post, url)
         {
-            Content = new StringContent("""{"jsonrpc":"2.0","id":1,"method":"tools/list"}""", Encoding.UTF8, "application/json"),
+            Content = new StringContent(
+                """{"jsonrpc":"2.0","id":1,"method":"tools/list"}""",
+                Encoding.UTF8,
+                "application/json"),
         };
 
         request.Headers.Accept.ParseAdd("application/json");

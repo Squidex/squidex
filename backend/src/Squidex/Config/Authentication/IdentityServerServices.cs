@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using OpenIddict.Validation.AspNetCore;
+using Squidex.Areas.Mcp.Config;
 using Squidex.Hosting;
 using Squidex.Web;
 using Squidex.Web.Pipeline;
@@ -43,6 +44,11 @@ public static class IdentityServerServices
             {
                 options.ForwardDefaultSelector = context =>
                 {
+                    if (McpClientSecretHandler.IsClientSecret(context))
+                    {
+                        return McpClientSecretHandler.SchemeName;
+                    }
+
                     if (ApiKeyHandler.IsApiKey(context.Request, out _))
                     {
                         return ApiKeyDefaults.AuthenticationScheme;

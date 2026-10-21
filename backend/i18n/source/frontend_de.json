@@ -172,6 +172,7 @@
   "clients.connectWizard.manuallyTokenHint": "Tokens laufen normalerweise nach 30 Tagen ab, aber Sie können mehrere Tokens anfordern.",
   "clients.connectWizard.mcp": "KI-Agenten verbinden (MCP)",
   "clients.connectWizard.mcpHint": "Geben Sie KI-Agenten wie Claude, GitHub Copilot oder Cursor über das Model Context Protocol Zugriff auf die Schemas, Inhalte und Assets dieser App.",
+  "clients.connectWizard.mcpSecretHint": "Die Konfiguration enthält das Client-Secret und läuft nicht ab. Löschen Sie den Client oder erstellen Sie ein neues Secret, um den Zugriff zu widerrufen.",
   "clients.connectWizard.mcpStep1": "Verwenden Sie den MCP-Endpunkt dieser App",
   "clients.connectWizard.mcpStep1Hint": "Der Endpunkt verwendet den Streamable-HTTP-Transport. Der Agent hat dieselben Berechtigungen wie dieser Client.",
   "clients.connectWizard.mcpStep2": "Fügen Sie den Server zu Claude Code hinzu",

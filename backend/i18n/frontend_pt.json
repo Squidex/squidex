@@ -178,6 +178,7 @@
   "clients.connectWizard.manuallyTokenHint": "Tokens normalmente expiram após 30 dias, mas você pode solicitar várias tokens.",
   "clients.connectWizard.mcp": "Connect an AI agent (MCP)",
   "clients.connectWizard.mcpHint": "Give AI agents like Claude, GitHub Copilot or Cursor access to the schemas, contents and assets of this app with the Model Context Protocol.",
+  "clients.connectWizard.mcpSecretHint": "The configuration contains the client secret and does not expire. Delete the client or create a new secret to revoke the access.",
   "clients.connectWizard.mcpStep1": "Use the MCP endpoint of this app",
   "clients.connectWizard.mcpStep1Hint": "The endpoint uses the Streamable HTTP transport. The agent has the same permissions as this client.",
   "clients.connectWizard.mcpStep2": "Add the server to Claude Code",

@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authorization;
 using Squidex.Areas.Mcp.Tools;
 using Squidex.Web;
@@ -23,6 +24,10 @@ public static class McpServices
             .WithTools<SchemaTools>()
             .WithTools<ContentTools>()
             .WithTools<AssetTools>();
+
+        // Agents keep their configuration for a long time, so they can use the client secret instead of an expiring token.
+        services.AddAuthentication()
+            .AddScheme<AuthenticationSchemeOptions, McpClientSecretHandler>(McpClientSecretHandler.SchemeName, null);
     }
 
     public static void UseSquidexMcp(this IApplicationBuilder app)
