@@ -41,16 +41,16 @@ jobs:
           echo "area=$area" >> "$GITHUB_OUTPUT"
           echo "Focus: $area"
 
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
         with:
           fetch-depth: 50
 
-      - uses: actions/setup-dotnet@v4
+      - uses: actions/setup-dotnet@v5
         if: steps.focus.outputs.area == 'backend'
         with:
           dotnet-version: "10.0.x"
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         if: steps.focus.outputs.area == 'frontend'
         with:
           node-version: "22"
@@ -60,7 +60,11 @@ jobs:
       - name: Install frontend dependencies
         if: steps.focus.outputs.area == 'frontend'
         working-directory: frontend
-        run: npm ci
+        run: |
+          # Same as the Dockerfile, the lock file is not always in sync with package.json.
+          npm install --loglevel=error --force --no-audit --no-fund
+          # Keep lock file changes out of the PR.
+          git checkout -- package-lock.json
 
       - name: Find and fix the worst problem
         uses: anthropics/claude-code-action@v1
