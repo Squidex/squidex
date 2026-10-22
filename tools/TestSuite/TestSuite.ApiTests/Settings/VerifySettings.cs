@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using System.Runtime.CompilerServices;
+using ModelContextProtocol.Protocol;
 
 namespace TestSuite.ApiTests.Settings;
 
@@ -20,5 +21,8 @@ public static class VerifySettings
 
             return new PathInfo(path, type.Name, method.Name);
         });
+
+        // The MCP metadata contains the server version and would make the snapshots brittle.
+        VerifierSettings.IgnoreMember<Result>(x => x.Meta);
     }
 }

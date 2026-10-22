@@ -1,0 +1,9 @@
+﻿{
+  Content: [
+    {
+      Type: text,
+      Text: []
+    }
+  ],
+  ResultType: complete
+}

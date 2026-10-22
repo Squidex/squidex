@@ -6,19 +6,12 @@
 // ==========================================================================
 
 using ModelContextProtocol.Client;
-using ModelContextProtocol.Protocol;
 using TestSuite.Fixtures;
 
 namespace TestSuite.ApiTests;
 
 public sealed class McpFixture : TestSchemaFixtureBase
 {
-    static McpFixture()
-    {
-        // The metadata contains the server version and would make the snapshots brittle.
-        VerifierSettings.IgnoreMember<CallToolResult>(x => x.Meta);
-    }
-
     public McpFixture()
         : base("my-mcp")
     {
