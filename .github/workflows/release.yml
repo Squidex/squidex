@@ -67,7 +67,7 @@ jobs:
       - name: Prepare - Setup Node
         uses: actions/setup-node@v4.4.0
         with:
-          node-version: 18
+          node-version: 22
 
       - name: Build
         uses: docker/build-push-action@v6.18.0
@@ -176,7 +176,7 @@ jobs:
       - name: Prepare - Setup Node
         uses: actions/setup-node@v4.4.0
         with:
-          node-version: 18
+          node-version: 22
 
       - name: Build
         uses: docker/build-push-action@v6.18.0
