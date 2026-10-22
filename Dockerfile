@@ -65,7 +65,7 @@ ENV CONTINUOUS_INTEGRATION=1
 COPY frontend/package*.json ./
 
 # Install Node packages 
-RUN npm install --loglevel=error --force
+RUN npm ci --loglevel=error --no-audit --no-fund
 
 COPY frontend .
 

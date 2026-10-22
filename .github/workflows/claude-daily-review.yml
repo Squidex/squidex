@@ -60,11 +60,7 @@ jobs:
       - name: Install frontend dependencies
         if: steps.focus.outputs.area == 'frontend'
         working-directory: frontend
-        run: |
-          # Same as the Dockerfile, the lock file is not always in sync with package.json.
-          npm install --loglevel=error --force --no-audit --no-fund
-          # Keep lock file changes out of the PR.
-          git checkout -- package-lock.json
+        run: npm ci --loglevel=error --no-audit --no-fund
 
       - name: Find and fix the worst problem
         uses: anthropics/claude-code-action@v1
