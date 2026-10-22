@@ -1,0 +1,125 @@
+name: Claude daily review
+
+on:
+  schedule:
+    - cron: "0 3 * * *"
+  workflow_dispatch:
+    inputs:
+      area:
+        description: "Force area (backend/frontend), empty = alternate"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+  pull-requests: write
+  id-token: write
+
+concurrency:
+  group: claude-daily-review
+  cancel-in-progress: false
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - name: Pick focus area
+        id: focus
+        env:
+          INPUT_AREA: ${{ github.event.inputs.area }}
+        run: |
+          area="$INPUT_AREA"
+          if [ -z "$area" ]; then
+            # Alternate by day of the year, 10# avoids octal parsing of days like 008.
+            if [ $(( 10#$(date +%j) % 2 )) -eq 0 ]; then area=backend; else area=frontend; fi
+          fi
+          if [ "$area" != "backend" ] && [ "$area" != "frontend" ]; then
+            echo "Invalid area: $area"
+            exit 1
+          fi
+          echo "area=$area" >> "$GITHUB_OUTPUT"
+          echo "Focus: $area"
+
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 50
+
+      - uses: actions/setup-dotnet@v4
+        if: steps.focus.outputs.area == 'backend'
+        with:
+          dotnet-version: "10.0.x"
+
+      - uses: actions/setup-node@v4
+        if: steps.focus.outputs.area == 'frontend'
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install frontend dependencies
+        if: steps.focus.outputs.area == 'frontend'
+        working-directory: frontend
+        run: npm ci
+
+      - name: Find and fix the worst problem
+        uses: anthropics/claude-code-action@v1
+        with:
+          claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          prompt: |
+            You are doing a daily automated review of this repository (Squidex).
+            Today's focus area is: ${{ steps.focus.outputs.area }}
+            - backend  = `backend/src` (ASP.NET Core, event-sourced domain, MongoDB / EF Core)
+            - frontend = `frontend/src/app` (Angular)
+            Only look at and change code in today's focus area.
+
+            1. Run `gh pr list --label claude-daily --state all --limit 30` and do not
+               repeat a problem that was already reported.
+            2. Find the single most severe problem in the focus area from a security,
+               correctness (bug) or performance perspective. Prefer real, reachable
+               issues over theoretical ones.
+            3. Fix it in the working tree, following CLAUDE.md. Add or adjust a test
+               if reasonable. The total diff (added + removed lines) MUST stay under
+               400 lines. If the fix would be bigger, make the smallest safe partial
+               fix and describe the rest.
+            4. Verify the fix:
+               - backend: `dotnet build` the affected project and run related tests with
+                 `--filter "Category!=Dependencies & Category!=TestContainer"`.
+               - frontend: run `npm run lint` and `npm test` in `frontend/`.
+            5. Write the PR description to ${{ runner.temp }}/pr-body.md: first line is the
+               PR title (prefix it with "[${{ steps.focus.outputs.area }}]"), then category,
+               severity, affected files, explanation of the problem, how it could be
+               triggered, and what the fix does.
+
+            Do NOT commit, push or create the PR yourself.
+          claude_args: >-
+            --model ${{ vars.CLAUDE_MODEL || 'claude-opus-5-5' }}
+            --max-turns 80
+            --allowedTools "Read,Grep,Glob,Edit,Write,Bash(gh pr list:*),Bash(git log:*),Bash(git diff:*),Bash(dotnet build:*),Bash(dotnet test:*),Bash(npm run lint:*),Bash(npm test:*),Bash(npx vitest:*)"
+
+      - name: Enforce size limit and open PR
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          AREA: ${{ steps.focus.outputs.area }}
+        run: |
+          git add -A
+          lines=$(git diff --cached --numstat | awk '{s+=$1+$2} END {print s+0}')
+          echo "Changed lines: $lines"
+          if [ "$lines" -eq 0 ]; then echo "No changes."; exit 0; fi
+          if [ "$lines" -gt 400 ]; then echo "Diff too large ($lines > 400)"; exit 1; fi
+          if [ ! -s "$RUNNER_TEMP/pr-body.md" ]; then echo "PR description missing."; exit 1; fi
+
+          branch="claude/daily-$AREA-$(date +%Y-%m-%d)"
+          title=$(head -n 1 "$RUNNER_TEMP/pr-body.md")
+          tail -n +2 "$RUNNER_TEMP/pr-body.md" > "$RUNNER_TEMP/body.md"
+
+          git config user.name "claude[bot]"
+          git config user.email "claude[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git commit -m "$title"
+          git push origin "$branch"
+
+          gh label create claude-daily --color 7057ff --force
+          gh label create "$AREA" --color 0e8a16 --force
+          gh pr create --title "$title" --body-file "$RUNNER_TEMP/body.md" --label claude-daily --label "$AREA" --base master
