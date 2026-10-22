@@ -20,5 +20,5 @@
   version: 0,
   created: DateTimeOffset_1,
   lastModified: DateTimeOffset_1,
-  url: https://localhost:5001/api/assets/integration-tests/Guid_1/
+  url: {url}/api/assets/integration-tests/Guid_1/
 }

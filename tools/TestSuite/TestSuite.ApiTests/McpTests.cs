@@ -226,7 +226,9 @@ public class McpTests(McpFixture fixture) : IClassFixture<McpFixture>
             ["id"] = asset.Id,
         });
 
-        await VerifyJson(result).ScrubInlineGuids();
+        await VerifyJson(result)
+            .ScrubInlineGuids()
+            .AddScrubber(x => x.Replace(_.Url.TrimEnd('/'), "{url}"));
     }
 
     [Fact]
@@ -247,7 +249,9 @@ public class McpTests(McpFixture fixture) : IClassFixture<McpFixture>
             }),
         });
 
-        await VerifyJson(result).ScrubInlineGuids();
+        await VerifyJson(result)
+            .ScrubInlineGuids()
+            .AddScrubber(x => x.Replace(_.Url.TrimEnd('/'), "{url}"));
     }
 
     [Fact]
@@ -265,7 +269,9 @@ public class McpTests(McpFixture fixture) : IClassFixture<McpFixture>
             ["odata"] = $"$filter=id eq '{asset.Id}'",
         });
 
-        await VerifyJson(result).ScrubInlineGuids();
+        await VerifyJson(result)
+            .ScrubInlineGuids()
+            .AddScrubber(x => x.Replace(_.Url.TrimEnd('/'), "{url}"));
     }
 
     [Fact]
