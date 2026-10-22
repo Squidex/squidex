@@ -22,6 +22,10 @@ public static class VerifySettings
             return new PathInfo(path, type.Name, method.Name);
         });
 
+        // JSON dates are not covered by the scrubbing of DateTimeOffset members, but have only second precision.
+        // Therefore two items have the same date counter, if they were created in the same second.
+        VerifierSettings.ScrubMembers("created", "lastModified");
+
         // The MCP metadata contains the server version and would make the snapshots brittle.
         VerifierSettings.ScrubMember<Result>(x => x.Meta);
     }

@@ -7,8 +7,8 @@
       status: Published,
       newStatus: null,
       version: 1,
-      created: DateTimeOffset_1,
-      lastModified: DateTimeOffset_1,
+      created: {Scrubbed},
+      lastModified: {Scrubbed},
       data: {
         localized: {
           en: default,

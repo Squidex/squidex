@@ -2,7 +2,7 @@
   findAsset: {
     id: Guid_1,
     version: {Scrubbed},
-    created: DateTimeOffset_1,
+    created: {Scrubbed},
     createdBy: client:root,
     createdByUser: {
       id: root,
@@ -10,7 +10,7 @@
       displayName: root
     },
     editToken: {Scrubbed},
-    lastModified: DateTimeOffset_1,
+    lastModified: {Scrubbed},
     lastModifiedBy: client:root,
     lastModifiedByUser: {
       id: root,

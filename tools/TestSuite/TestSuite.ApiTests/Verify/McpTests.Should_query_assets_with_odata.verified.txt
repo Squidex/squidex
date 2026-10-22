@@ -21,8 +21,8 @@
         image/medium
       ],
       version: 0,
-      created: DateTimeOffset_1,
-      lastModified: DateTimeOffset_1,
+      created: {Scrubbed},
+      lastModified: {Scrubbed},
       url: {url}/api/assets/integration-tests/Guid_1/
     }
   ]
