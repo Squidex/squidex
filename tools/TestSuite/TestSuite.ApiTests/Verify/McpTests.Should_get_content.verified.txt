@@ -1,19 +1,19 @@
 ﻿{
-  id: Guid_1,
-  schema: my-mcp,
-  status: Published,
-  newStatus: null,
-  version: 1,
   created: {Scrubbed},
-  lastModified: {Scrubbed},
   data: {
     localized: {
-      en: default,
+      custom: default,
       de: default,
-      custom: default
+      en: default
     },
     number: {
       iv: 42
     }
-  }
+  },
+  id: Guid_1,
+  lastModified: {Scrubbed},
+  newStatus: null,
+  schema: my-mcp,
+  status: Published,
+  version: 1
 }

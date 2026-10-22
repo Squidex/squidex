@@ -1,27 +1,27 @@
 ﻿{
-  total: 1,
   items: [
     {
-      id: Guid_1,
-      schema: my-mcp,
-      status: Published,
-      newStatus: null,
-      version: 1,
       created: {Scrubbed},
-      lastModified: {Scrubbed},
       data: {
         localized: {
-          en: default,
+          custom: default,
           de: default,
-          custom: default
+          en: default
         },
         number: {
           iv: 0
         },
         string: {
-          iv: Guid_2
+          iv: Guid_1
         }
-      }
+      },
+      id: Guid_2,
+      lastModified: {Scrubbed},
+      newStatus: null,
+      schema: my-mcp,
+      status: Published,
+      version: 1
     }
-  ]
+  ],
+  total: 1
 }

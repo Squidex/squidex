@@ -1,44 +1,44 @@
 ﻿{
   findAsset: {
-    id: Guid_1,
-    version: {Scrubbed},
     created: {Scrubbed},
     createdBy: client:root,
     createdByUser: {
-      id: root,
+      displayName: root,
       email: client:root,
-      displayName: root
+      id: root
     },
     editToken: {Scrubbed},
+    fileHash: pAp0RDvipkoNCCTgey1HTJekRKKEWT6Ft5JdRLuAfAc=,
+    fileName: logo-squared.png,
+    fileSize: 19430,
+    fileVersion: 0,
+    id: Guid_1,
+    isImage: true,
+    isProtected: false,
     lastModified: {Scrubbed},
     lastModifiedBy: client:root,
     lastModifiedByUser: {
-      id: root,
+      displayName: root,
       email: client:root,
-      displayName: root
+      id: root
     },
-    url: {Scrubbed},
-    thumbnailUrl: {Scrubbed},
+    metadata: {Scrubbed},
+    metadataPixelWidth: 600,
+    metadataText: 600x600px, 19 kB,
+    metadataUnknown: null,
     mimeType: image/png,
-    fileName: logo-squared.png,
-    fileHash: pAp0RDvipkoNCCTgey1HTJekRKKEWT6Ft5JdRLuAfAc=,
-    fileSize: 19430,
-    fileVersion: 0,
-    isImage: true,
-    isProtected: false,
-    pixelWidth: 600,
-    pixelHeight: 600,
     parentId: Guid_Empty,
+    pixelHeight: 600,
+    pixelWidth: 600,
+    slug: logo-squared.png,
     tags: [
       type/png,
       image,
       image/medium
     ],
+    thumbnailUrl: {Scrubbed},
     type: IMAGE,
-    metadataText: 600x600px, 19 kB,
-    metadataPixelWidth: 600,
-    metadataUnknown: null,
-    metadata: {Scrubbed},
-    slug: logo-squared.png
+    url: {Scrubbed},
+    version: {Scrubbed}
   }
 }

@@ -1,24 +1,24 @@
 ﻿{
-  id: Guid_1,
-  parentId: Guid_Empty,
+  created: {Scrubbed},
   fileName: logo-squared.png,
   fileSize: 19430,
-  mimeType: image/png,
-  slug: logo-squared.png,
-  type: Image,
+  id: Guid_1,
   isProtected: false,
+  lastModified: {Scrubbed},
   metadata: {
-    pixelWidth: 600,
+    description: PNG File,
     pixelHeight: 600,
-    description: PNG File
+    pixelWidth: 600
   },
+  mimeType: image/png,
+  parentId: Guid_Empty,
+  slug: logo-squared.png,
   tags: [
     type/png,
     image,
     image/medium
   ],
-  version: 0,
-  created: {Scrubbed},
-  lastModified: {Scrubbed},
-  url: {url}/api/assets/integration-tests/Guid_1/
+  type: Image,
+  url: {url}/api/assets/integration-tests/Guid_1/,
+  version: 0
 }
