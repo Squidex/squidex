@@ -1,10 +1,13 @@
 ﻿{
+  Name: {Scrubbed},
   IsDefaultRole: false,
   Links: {
     delete: {
+      Href: {Scrubbed},
       Method: DELETE
     },
     update: {
+      Href: {Scrubbed},
       Method: PUT
     }
   }

@@ -79,11 +79,11 @@ public sealed class GraphQLTests(GraphQLFixture fixture) : IClassFixture<GraphQL
         var result = await _.Client.SharedDynamicContents.GraphQlAsync<JToken>(query);
 
         var settings = new VerifySettings();
-        settings.IgnoreMember("editToken");
-        settings.IgnoreMember("metadata");
-        settings.IgnoreMember("thumbnailUrl");
-        settings.IgnoreMember("url");
-        settings.IgnoreMember("version");
+        settings.ScrubMember("editToken");
+        settings.ScrubMember("metadata");
+        settings.ScrubMember("thumbnailUrl");
+        settings.ScrubMember("url");
+        settings.ScrubMember("version");
 
         await VerifyJson(JsonConvert.SerializeObject(result), settings);
     }

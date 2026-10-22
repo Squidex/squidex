@@ -23,6 +23,6 @@ public static class VerifySettings
         });
 
         // The MCP metadata contains the server version and would make the snapshots brittle.
-        VerifierSettings.IgnoreMember<Result>(x => x.Meta);
+        VerifierSettings.ScrubMember<Result>(x => x.Meta);
     }
 }

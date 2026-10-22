@@ -2,23 +2,28 @@
   Items: [
     {
       Id: default,
+      Secret: {Scrubbed},
       Name: default,
       Role: Owner,
       AllowAnonymous: false,
       Links: {
         delete: {
+          Href: {Scrubbed},
           Method: DELETE
         },
         secret: {
+          Href: {Scrubbed},
           Method: PUT
         },
         update: {
+          Href: {Scrubbed},
           Method: PUT
         }
       }
     },
     {
       Id: Guid_1,
+      Secret: {Scrubbed},
       Name: My Client,
       Role: Owner,
       ApiCallsLimit: 100,
@@ -26,12 +31,15 @@
       AllowAnonymous: true,
       Links: {
         delete: {
+          Href: {Scrubbed},
           Method: DELETE
         },
         secret: {
+          Href: {Scrubbed},
           Method: PUT
         },
         update: {
+          Href: {Scrubbed},
           Method: PUT
         }
       }
@@ -39,9 +47,11 @@
   ],
   Links: {
     create: {
+      Href: {Scrubbed},
       Method: POST
     },
     self: {
+      Href: {Scrubbed},
       Method: GET
     }
   }

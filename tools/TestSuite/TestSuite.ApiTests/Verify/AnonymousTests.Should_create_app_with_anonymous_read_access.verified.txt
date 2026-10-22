@@ -2,69 +2,93 @@
   Id: Guid_1,
   Name: Guid_2,
   Version: 2,
+  Created: {Scrubbed},
+  LastModified: {Scrubbed},
   CanAccessContent: true,
+  RoleProperties: {Scrubbed},
   Links: {
     assets: {
+      Href: {Scrubbed},
       Method: GET
     },
     assets/create: {
+      Href: {Scrubbed},
       Method: POST
     },
     assets/scripts: {
+      Href: {Scrubbed},
       Method: DELETE
     },
     clients: {
+      Href: {Scrubbed},
       Method: GET
     },
     contributors: {
+      Href: {Scrubbed},
       Method: GET
     },
     delete: {
+      Href: {Scrubbed},
       Method: DELETE
     },
     image/delete: {
+      Href: {Scrubbed},
       Method: DELETE
     },
     image/upload: {
+      Href: {Scrubbed},
       Method: POST
     },
     jobs: {
+      Href: {Scrubbed},
       Method: GET
     },
     languages: {
+      Href: {Scrubbed},
       Method: GET
     },
     ping: {
+      Href: {Scrubbed},
       Method: GET
     },
     plans: {
+      Href: {Scrubbed},
       Method: GET
     },
     roles: {
+      Href: {Scrubbed},
       Method: GET
     },
     rules: {
+      Href: {Scrubbed},
       Method: GET
     },
     schemas: {
+      Href: {Scrubbed},
       Method: GET
     },
     schemas/create: {
+      Href: {Scrubbed},
       Method: POST
     },
     script-logs: {
+      Href: {Scrubbed},
       Method: GET
     },
     settings: {
+      Href: {Scrubbed},
       Method: GET
     },
     transfer: {
+      Href: {Scrubbed},
       Method: PUT
     },
     update: {
+      Href: {Scrubbed},
       Method: PUT
     },
     workflows: {
+      Href: {Scrubbed},
       Method: GET
     }
   }

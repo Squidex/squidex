@@ -1,6 +1,7 @@
 ﻿{
   findAsset: {
     id: Guid_1,
+    version: {Scrubbed},
     created: DateTimeOffset_1,
     createdBy: client:root,
     createdByUser: {
@@ -8,6 +9,7 @@
       email: client:root,
       displayName: root
     },
+    editToken: {Scrubbed},
     lastModified: DateTimeOffset_1,
     lastModifiedBy: client:root,
     lastModifiedByUser: {
@@ -15,6 +17,8 @@
       email: client:root,
       displayName: root
     },
+    url: {Scrubbed},
+    thumbnailUrl: {Scrubbed},
     mimeType: image/png,
     fileName: logo-squared.png,
     fileHash: pAp0RDvipkoNCCTgey1HTJekRKKEWT6Ft5JdRLuAfAc=,
@@ -34,6 +38,7 @@
     metadataText: 600x600px, 19 kB,
     metadataPixelWidth: 600,
     metadataUnknown: null,
+    metadata: {Scrubbed},
     slug: logo-squared.png
   }
 }

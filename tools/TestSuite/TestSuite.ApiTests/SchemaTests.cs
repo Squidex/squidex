@@ -82,7 +82,7 @@ public class SchemaTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFi
         Assert.Equal(schemaName, schema.Name);
 
         await Verify(schema)
-            .IgnoreMember<SchemaDto>(x => x.Name);
+            .ScrubMember<SchemaDto>(x => x.Name);
 
 
         // STEP 2: Get all schemas.
@@ -117,7 +117,7 @@ public class SchemaTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFi
         Assert.Equal(schemaName, schema.Name);
 
         await Verify(schema)
-            .IgnoreMember<SchemaDto>(x => x.Name);
+            .ScrubMember<SchemaDto>(x => x.Name);
 
 
         // STEP 2: Get all schemas.

@@ -10,15 +10,25 @@
   NewStatus: ,
   Status: Draft,
   EditingStatus: Draft,
+  AppName: {Scrubbed},
+  SchemaName: {Scrubbed},
   Id: Guid_1,
+  CreatedBy: {Scrubbed},
+  LastModifiedBy: {Scrubbed},
+  Created: {Scrubbed},
+  LastModified: {Scrubbed},
+  EditToken: {Scrubbed},
   Links: {
     clone: {
+      Href: {Scrubbed},
       Method: POST
     },
     delete: {
+      Href: {Scrubbed},
       Method: DELETE
     },
     self: {
+      Href: {Scrubbed},
       Method: GET
     }
   }

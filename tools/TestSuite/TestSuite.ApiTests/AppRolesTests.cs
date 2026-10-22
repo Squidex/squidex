@@ -31,7 +31,7 @@ public sealed class AppRolesTests(CreatedAppFixture fixture) : IClassFixture<Cre
         Assert.Empty(role.Permissions);
 
         await Verify(role)
-            .IgnoreMember<RoleDto>(x => x.Name);
+            .ScrubMember<RoleDto>(x => x.Name);
     }
 
     [Fact]
@@ -44,7 +44,7 @@ public sealed class AppRolesTests(CreatedAppFixture fixture) : IClassFixture<Cre
         Assert.Empty(role.Permissions);
 
         await Verify(role)
-            .IgnoreMember<RoleDto>(x => x.Name);
+            .ScrubMember<RoleDto>(x => x.Name);
     }
 
     [Fact]
@@ -67,7 +67,7 @@ public sealed class AppRolesTests(CreatedAppFixture fixture) : IClassFixture<Cre
         Assert.Equal(updateRequest.Permissions, role_2?.Permissions);
 
         await Verify(role_2)
-            .IgnoreMember<RoleDto>(x => x.Name);
+            .ScrubMember<RoleDto>(x => x.Name);
     }
 
     [Fact]

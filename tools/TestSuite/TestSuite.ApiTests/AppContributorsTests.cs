@@ -51,9 +51,9 @@ public sealed class AppContributorsTests(ClientFixture fixture) : IClassFixture<
         Assert.Equal("Developer", contributor_1?.Role);
 
         await Verify(contributor_1)
-            .IgnoreMember<ContributorDto>(x => x.ContributorId)
-            .IgnoreMember<ContributorDto>(x => x.ContributorEmail)
-            .IgnoreMember<ContributorDto>(x => x.ContributorName);
+            .ScrubMember<ContributorDto>(x => x.ContributorId)
+            .ScrubMember<ContributorDto>(x => x.ContributorEmail)
+            .ScrubMember<ContributorDto>(x => x.ContributorName);
     }
 
     [Fact]
@@ -102,9 +102,9 @@ public sealed class AppContributorsTests(ClientFixture fixture) : IClassFixture<
         Assert.DoesNotContain(contributors_2.Items, x => x.ContributorId == contributor2.ContributorId);
 
         await Verify(contributors_2)
-            .IgnoreMember<ContributorDto>(x => x.ContributorId)
-            .IgnoreMember<ContributorDto>(x => x.ContributorEmail)
-            .IgnoreMember<ContributorDto>(x => x.ContributorName);
+            .ScrubMember<ContributorDto>(x => x.ContributorId)
+            .ScrubMember<ContributorDto>(x => x.ContributorEmail)
+            .ScrubMember<ContributorDto>(x => x.ContributorName);
     }
 
     [Fact]

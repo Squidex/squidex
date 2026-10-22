@@ -9,22 +9,34 @@
   NewStatus: ,
   Status: Published,
   EditingStatus: Published,
+  AppName: {Scrubbed},
+  SchemaName: {Scrubbed},
   Id: Guid_1,
+  CreatedBy: {Scrubbed},
+  LastModifiedBy: {Scrubbed},
+  Created: {Scrubbed},
+  LastModified: {Scrubbed},
   Version: 1,
+  EditToken: {Scrubbed},
   Links: {
     clone: {
+      Href: {Scrubbed},
       Method: POST
     },
     delete: {
+      Href: {Scrubbed},
       Method: DELETE
     },
     draft/create: {
+      Href: {Scrubbed},
       Method: POST
     },
     previous: {
+      Href: {Scrubbed},
       Method: GET
     },
     self: {
+      Href: {Scrubbed},
       Method: GET
     }
   }

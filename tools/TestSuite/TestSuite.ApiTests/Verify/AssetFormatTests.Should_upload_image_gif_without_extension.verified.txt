@@ -1,10 +1,14 @@
 ﻿{
   Id: Guid_1,
   ParentId: Guid_Empty,
+  FileName: {Scrubbed},
+  FileHash: {Scrubbed},
   IsProtected: false,
+  Slug: {Scrubbed},
   MimeType: image/gif,
   FileType: blob,
   MetadataText: 600x400px, 154.2 kB,
+  EditToken: {Scrubbed},
   Metadata: {
     pixelHeight: 400,
     pixelWidth: 600
@@ -16,26 +20,37 @@
   ],
   FileSize: 157934,
   Type: Image,
+  CreatedBy: {Scrubbed},
+  LastModifiedBy: {Scrubbed},
+  Created: {Scrubbed},
+  LastModified: {Scrubbed},
   Links: {
     content: {
+      Href: {Scrubbed},
       Method: GET
     },
     content/slug: {
+      Href: {Scrubbed},
       Method: GET
     },
     delete: {
+      Href: {Scrubbed},
       Method: DELETE
     },
     move: {
+      Href: {Scrubbed},
       Method: PUT
     },
     self: {
+      Href: {Scrubbed},
       Method: GET
     },
     update: {
+      Href: {Scrubbed},
       Method: PUT
     },
     upload: {
+      Href: {Scrubbed},
       Method: PUT
     }
   }

@@ -6,5 +6,6 @@
     }
   ],
   IsError: true,
+  Meta: {Scrubbed},
   ResultType: complete
 }

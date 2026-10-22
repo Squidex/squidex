@@ -85,7 +85,8 @@ public class TeamTests(CreatedTeamFixture fixture) : IClassFixture<CreatedTeamFi
         var scheme = new AuthSchemeDto
         {
             Authority = "https://squidex.io",
-            Domain = "squidex.io",
+            // Domains can only be assigned to one team, so use a new one for each run.
+            Domain = $"{Guid.NewGuid()}.squidex.io",
             DisplayName = "Squidex",
             ClientId = "ID",
             ClientSecret = "secret",
@@ -114,7 +115,8 @@ public class TeamTests(CreatedTeamFixture fixture) : IClassFixture<CreatedTeamFi
         var scheme = new AuthSchemeDto
         {
             Authority = "https://squidex.io",
-            Domain = "squidex.io",
+            // Domains can only be assigned to one team, so use a new one for each run.
+            Domain = $"{Guid.NewGuid()}.squidex.io",
             DisplayName = "Squidex",
             ClientId = "ID",
             ClientSecret = "secret",

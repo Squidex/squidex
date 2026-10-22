@@ -1,9 +1,11 @@
 ﻿{
   Links: {
     create: {
+      Href: {Scrubbed},
       Method: POST
     },
     self: {
+      Href: {Scrubbed},
       Method: GET
     }
   }

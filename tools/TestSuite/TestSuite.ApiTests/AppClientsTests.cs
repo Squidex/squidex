@@ -36,7 +36,7 @@ public sealed class AppClientsTests(ClientFixture fixture) : IClassFixture<Clien
         Assert.Equal(id, client.Name);
 
         await Verify(client)
-            .IgnoreMember<ClientDto>(x => x.Secret);
+            .ScrubMember<ClientDto>(x => x.Secret);
     }
 
     [Fact]
@@ -71,7 +71,7 @@ public sealed class AppClientsTests(ClientFixture fixture) : IClassFixture<Clien
         Assert.Equal(updateNameRequest.Role, client_2?.Role);
 
         await Verify(clients_2)
-            .IgnoreMember<ClientDto>(x => x.Secret);
+            .ScrubMember<ClientDto>(x => x.Secret);
     }
 
     [Fact]
@@ -92,7 +92,7 @@ public sealed class AppClientsTests(ClientFixture fixture) : IClassFixture<Clien
         Assert.DoesNotContain(clients_2.Items, x => x.Id == client.Id);
 
         await Verify(clients_2)
-            .IgnoreMember<ClientDto>(x => x.Secret);
+            .ScrubMember<ClientDto>(x => x.Secret);
     }
 
     private async Task<ClientDto> CreateAsync(ISquidexClient app)

@@ -13,9 +13,11 @@
       IsOptional: false,
       Links: {
         delete: {
+          Href: {Scrubbed},
           Method: DELETE
         },
         update: {
+          Href: {Scrubbed},
           Method: PUT
         }
       }
@@ -27,9 +29,11 @@
       IsOptional: false,
       Links: {
         delete: {
+          Href: {Scrubbed},
           Method: DELETE
         },
         update: {
+          Href: {Scrubbed},
           Method: PUT
         }
       }
@@ -37,9 +41,11 @@
   ],
   Links: {
     create: {
+      Href: {Scrubbed},
       Method: POST
     },
     self: {
+      Href: {Scrubbed},
       Method: GET
     }
   }

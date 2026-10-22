@@ -33,9 +33,9 @@ public class AssetFormatTests(CreatedAppFixture fixture) : IClassFixture<Created
         Assert.Equal(AssetType.Image, asset.Type);
 
         await Verify(asset)
-            .IgnoreMember<AssetDto>(x => x.FileName)
-            .IgnoreMember<AssetDto>(x => x.FileHash)
-            .IgnoreMember<AssetDto>(x => x.Slug);
+            .ScrubMember<AssetDto>(x => x.FileName)
+            .ScrubMember<AssetDto>(x => x.FileHash)
+            .ScrubMember<AssetDto>(x => x.Slug);
     }
 
     [Fact]
