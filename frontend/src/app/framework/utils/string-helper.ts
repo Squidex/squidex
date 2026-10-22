@@ -54,6 +54,14 @@ export module StringHelper {
         }
     }
 
+    export function escapeRegex(value: string) {
+        return value.replace(/[.*+?^${}()|[\]\\/-]/g, '\\$&');
+    }
+
+    export function searchRegex(query: string) {
+        return new RegExp(escapeRegex(query), 'i');
+    }
+
     export function hashCode(value: string) {
         let hash = 0;
 

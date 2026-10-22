@@ -6,7 +6,7 @@
  */
 
 import { Pipe, PipeTransform } from '@angular/core';
-import { escapeHTML, Types } from '@app/framework/internal';
+import { escapeHTML, StringHelper, Types } from '@app/framework/internal';
 
 @Pipe({
     name: 'sqxHighlight',
@@ -21,7 +21,7 @@ export class HighlightPipe implements PipeTransform {
         }
 
         if (Types.isString(highlight)) {
-            highlight = new RegExp(highlight, 'i');
+            highlight = StringHelper.searchRegex(highlight);
         }
 
         const result = text.replace(highlight, s => `<b>${s}</b>`);

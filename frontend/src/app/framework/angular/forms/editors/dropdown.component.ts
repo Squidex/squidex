@@ -9,7 +9,7 @@
 import { AfterContentInit, booleanAttribute, ChangeDetectionStrategy, Component, ContentChildren, EventEmitter, forwardRef, Input, OnInit, Output, QueryList, TemplateRef } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { map } from 'rxjs/operators';
-import { FloatingPlacement, Keys, ModalModel, StatefulControlComponent, Subscriptions, TypedSimpleChanges, Types } from '@app/framework/internal';
+import { FloatingPlacement, Keys, ModalModel, StatefulControlComponent, StringHelper, Subscriptions, TypedSimpleChanges, Types } from '@app/framework/internal';
 import { DropdownMenuComponent } from '../../dropdown-menu.component';
 import { LoaderComponent } from '../../loader.component';
 import { ModalPlacementDirective } from '../../modals/modal-placement.directive';
@@ -136,7 +136,7 @@ export class DropdownComponent extends StatefulControlComponent<State, ReadonlyA
                     if (!this.items || !queryText) {
                         return { query: undefined, items: this.items };
                     } else {
-                        const query = new RegExp(queryText, 'i');
+                        const query = StringHelper.searchRegex(queryText);
 
                         const items = this.items.filter(x => {
                             if (Types.isString(x)) {

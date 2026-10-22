@@ -58,6 +58,17 @@ describe('StringHelper', () => {
         expect(StringHelper.hashCode('ABC')).not.toBe(StringHelper.hashCode('XYZ'));
     });
 
+    it('should escape regex special characters', () => {
+        expect(StringHelper.escapeRegex('a(b)[c]*.+?^$|{}\\/-')).toBe('a\\(b\\)\\[c\\]\\*\\.\\+\\?\\^\\$\\|\\{\\}\\\\\\/\\-');
+    });
+
+    it('should create search regex that matches special characters literally', () => {
+        const regex = StringHelper.searchRegex('(A.');
+
+        expect(regex.test('x(a.y')).toBeTruthy();
+        expect(regex.test('xaby')).toBeFalsy();
+    });
+
     it('should build query for empty object', () => {
         const url = StringHelper.buildQuery({});
 
