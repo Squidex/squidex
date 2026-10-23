@@ -39,29 +39,40 @@
           {
             Log: [
               {
+                Timestamp: {Scrubbed},
                 Message: DEBUG: Hello debug
               },
               {
+                Timestamp: {Scrubbed},
                 Message: ERROR: Hello error
               },
               {
+                Timestamp: {Scrubbed},
                 Message: INFO: Hello info
               },
               {
+                Timestamp: {Scrubbed},
                 Message: Hello Log
               },
               {
+                Timestamp: {Scrubbed},
                 Message: WARN: Hello warn
               }
-            ]
+            ],
+            Started: {Scrubbed},
+            Completed: {Scrubbed}
           }
         ]
       }
     },
+    NextRun: {Scrubbed},
+    Created: {Scrubbed},
+    Completed: {Scrubbed},
     Status: Completed
   },
   Links: {
     update: {
+      Href: {Scrubbed},
       Method: PUT
     }
   }

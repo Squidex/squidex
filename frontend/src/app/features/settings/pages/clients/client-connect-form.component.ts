@@ -40,6 +40,39 @@ export class ClientConnectFormComponent implements OnInit {
 
     public step = 'Start';
 
+    public get mcpUrl() {
+        return this.apiUrl.buildUrl(`/api/apps/${this.appName}/mcp`);
+    }
+
+    public get mcpServerName() {
+        return `squidex-${this.appName}`;
+    }
+
+    public get mcpCommand() {
+        return `claude mcp add --transport http ${this.mcpServerName} ${this.mcpUrl} --header "Authorization: ${this.mcpAuthorization}"`;
+    }
+
+    public get mcpConfig() {
+        const config = {
+            mcpServers: {
+                [this.mcpServerName]: {
+                    type: 'http',
+                    url: this.mcpUrl,
+                    headers: {
+                        Authorization: this.mcpAuthorization,
+                    },
+                },
+            },
+        };
+
+        return JSON.stringify(config, undefined, 4);
+    }
+
+    private get mcpAuthorization() {
+        // The client secret does not expire, unlike the access token.
+        return `Basic ${btoa(`${this.appName}:${this.client.id}:${this.client.secret}`)}`;
+    }
+
     constructor(
         public readonly appsState: AppsState,
         public readonly apiUrl: ApiUrlConfig,

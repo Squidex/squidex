@@ -1,16 +1,20 @@
 ﻿{
   Id: Guid_1,
+  Secret: {Scrubbed},
   Name: Guid_1,
   Role: Editor,
   AllowAnonymous: false,
   Links: {
     delete: {
+      Href: {Scrubbed},
       Method: DELETE
     },
     secret: {
+      Href: {Scrubbed},
       Method: PUT
     },
     update: {
+      Href: {Scrubbed},
       Method: PUT
     }
   }

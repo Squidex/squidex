@@ -1,55 +1,75 @@
 ﻿{
   Id: Guid_1,
+  CreatedBy: {Scrubbed},
+  LastModifiedBy: {Scrubbed},
+  Name: {Scrubbed},
   Type: Singleton,
   Properties: {
     ValidateOnPublish: false
   },
   IsPublished: true,
+  Created: {Scrubbed},
+  LastModified: {Scrubbed},
   Scripts: {},
   Links: {
     contents: {
+      Href: {Scrubbed},
       Method: GET
     },
     contents/export: {
+      Href: {Scrubbed},
       Method: POST
     },
     contents/migrate: {
+      Href: {Scrubbed},
       Method: POST
     },
     delete: {
+      Href: {Scrubbed},
       Method: DELETE
     },
     fields/add: {
+      Href: {Scrubbed},
       Method: POST
     },
     fields/order: {
+      Href: {Scrubbed},
       Method: PUT
     },
     fields/ui: {
+      Href: {Scrubbed},
       Method: PUT
     },
     self: {
+      Href: {Scrubbed},
       Method: GET
     },
     unpublish: {
+      Href: {Scrubbed},
       Method: PUT
     },
     update: {
+      Href: {Scrubbed},
       Method: PUT
     },
     update/category: {
+      Href: {Scrubbed},
       Method: PUT
     },
     update/rules: {
+      Href: {Scrubbed},
       Method: PUT
     },
     update/scripts: {
+      Href: {Scrubbed},
       Method: PUT
     },
     update/sync: {
+      Href: {Scrubbed},
       Method: PUT
     },
     update/urls: {
+      Href: {Scrubbed},
       Method: PUT
     }
   }

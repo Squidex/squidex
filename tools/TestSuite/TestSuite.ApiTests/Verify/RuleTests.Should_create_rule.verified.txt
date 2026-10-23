@@ -1,5 +1,9 @@
 ﻿{
   Id: Guid_1,
+  CreatedBy: {Scrubbed},
+  LastModifiedBy: {Scrubbed},
+  Created: {Scrubbed},
+  LastModified: {Scrubbed},
   IsEnabled: true,
   Trigger: {
     HandleAll: true
@@ -17,21 +21,27 @@
   },
   Links: {
     delete: {
+      Href: {Scrubbed},
       Method: DELETE
     },
     disable: {
+      Href: {Scrubbed},
       Method: PUT
     },
     logs: {
+      Href: {Scrubbed},
       Method: GET
     },
     run: {
+      Href: {Scrubbed},
       Method: PUT
     },
     run/snapshots: {
+      Href: {Scrubbed},
       Method: PUT
     },
     update: {
+      Href: {Scrubbed},
       Method: PUT
     }
   }

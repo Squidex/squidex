@@ -8,6 +8,7 @@
 using Squidex.Areas.Api.Config.OpenApi;
 using Squidex.Areas.Frontend;
 using Squidex.Areas.IdentityServer.Config;
+using Squidex.Areas.Mcp.Config;
 using Squidex.Config.Authentication;
 using Squidex.Config.Domain;
 using Squidex.Config.Messaging;
@@ -51,6 +52,7 @@ public sealed class Startup(IConfiguration config)
         services.AddSquidexImageResizing(config);
         services.AddSquidexInfrastructure(config);
         services.AddSquidexLocalization();
+        services.AddSquidexMcp();
         services.AddSquidexMessaging(config);
         services.AddSquidexMigration(config);
         services.AddSquidexOpenApiSettings();
@@ -108,10 +110,12 @@ public sealed class Startup(IConfiguration config)
         app.UseRouting();
         app.UseAuthentication();
         app.UseAuthorization();
+        app.UseSquidexMcp();
 
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllers();
+            endpoints.MapSquidexMcp();
         });
 
         // Return a 404 for all unresolved api requests.

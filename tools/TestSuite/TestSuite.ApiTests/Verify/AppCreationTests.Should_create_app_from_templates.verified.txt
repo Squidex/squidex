@@ -2,12 +2,16 @@
   Items: [
     {
       Id: Guid_1,
+      CreatedBy: {Scrubbed},
+      LastModifiedBy: {Scrubbed},
       Name: pages,
       Properties: {
         Label: Pages,
         ValidateOnPublish: false
       },
       IsPublished: true,
+      Created: {Scrubbed},
+      LastModified: {Scrubbed},
       Version: 7,
       Scripts: {
         Create:
@@ -50,18 +54,23 @@
           },
           Links: {
             delete: {
+              Href: {Scrubbed},
               Method: DELETE
             },
             disable: {
+              Href: {Scrubbed},
               Method: PUT
             },
             hide: {
+              Href: {Scrubbed},
               Method: PUT
             },
             lock: {
+              Href: {Scrubbed},
               Method: PUT
             },
             update: {
+              Href: {Scrubbed},
               Method: PUT
             }
           }
@@ -88,18 +97,23 @@
           },
           Links: {
             delete: {
+              Href: {Scrubbed},
               Method: DELETE
             },
             disable: {
+              Href: {Scrubbed},
               Method: PUT
             },
             hide: {
+              Href: {Scrubbed},
               Method: PUT
             },
             lock: {
+              Href: {Scrubbed},
               Method: PUT
             },
             update: {
+              Href: {Scrubbed},
               Method: PUT
             }
           }
@@ -125,18 +139,23 @@
           },
           Links: {
             delete: {
+              Href: {Scrubbed},
               Method: DELETE
             },
             enable: {
+              Href: {Scrubbed},
               Method: PUT
             },
             hide: {
+              Href: {Scrubbed},
               Method: PUT
             },
             lock: {
+              Href: {Scrubbed},
               Method: PUT
             },
             update: {
+              Href: {Scrubbed},
               Method: PUT
             }
           }
@@ -144,69 +163,91 @@
       ],
       Links: {
         contents: {
+          Href: {Scrubbed},
           Method: GET
         },
         contents/create: {
+          Href: {Scrubbed},
           Method: POST
         },
         contents/create/publish: {
+          Href: {Scrubbed},
           Method: POST
         },
         contents/export: {
+          Href: {Scrubbed},
           Method: POST
         },
         contents/migrate: {
+          Href: {Scrubbed},
           Method: POST
         },
         delete: {
+          Href: {Scrubbed},
           Method: DELETE
         },
         fields/add: {
+          Href: {Scrubbed},
           Method: POST
         },
         fields/order: {
+          Href: {Scrubbed},
           Method: PUT
         },
         fields/ui: {
+          Href: {Scrubbed},
           Method: PUT
         },
         indexes: {
+          Href: {Scrubbed},
           Method: GET
         },
         self: {
+          Href: {Scrubbed},
           Method: GET
         },
         unpublish: {
+          Href: {Scrubbed},
           Method: PUT
         },
         update: {
+          Href: {Scrubbed},
           Method: PUT
         },
         update/category: {
+          Href: {Scrubbed},
           Method: PUT
         },
         update/rules: {
+          Href: {Scrubbed},
           Method: PUT
         },
         update/scripts: {
+          Href: {Scrubbed},
           Method: PUT
         },
         update/sync: {
+          Href: {Scrubbed},
           Method: PUT
         },
         update/urls: {
+          Href: {Scrubbed},
           Method: PUT
         }
       }
     },
     {
       Id: Guid_2,
+      CreatedBy: {Scrubbed},
+      LastModifiedBy: {Scrubbed},
       Name: posts,
       Properties: {
         Label: Posts,
         ValidateOnPublish: false
       },
       IsPublished: true,
+      Created: {Scrubbed},
+      LastModified: {Scrubbed},
       Version: 7,
       Scripts: {
         Create:
@@ -249,18 +290,23 @@
           },
           Links: {
             delete: {
+              Href: {Scrubbed},
               Method: DELETE
             },
             disable: {
+              Href: {Scrubbed},
               Method: PUT
             },
             hide: {
+              Href: {Scrubbed},
               Method: PUT
             },
             lock: {
+              Href: {Scrubbed},
               Method: PUT
             },
             update: {
+              Href: {Scrubbed},
               Method: PUT
             }
           }
@@ -287,18 +333,23 @@
           },
           Links: {
             delete: {
+              Href: {Scrubbed},
               Method: DELETE
             },
             disable: {
+              Href: {Scrubbed},
               Method: PUT
             },
             hide: {
+              Href: {Scrubbed},
               Method: PUT
             },
             lock: {
+              Href: {Scrubbed},
               Method: PUT
             },
             update: {
+              Href: {Scrubbed},
               Method: PUT
             }
           }
@@ -324,18 +375,23 @@
           },
           Links: {
             delete: {
+              Href: {Scrubbed},
               Method: DELETE
             },
             enable: {
+              Href: {Scrubbed},
               Method: PUT
             },
             hide: {
+              Href: {Scrubbed},
               Method: PUT
             },
             lock: {
+              Href: {Scrubbed},
               Method: PUT
             },
             update: {
+              Href: {Scrubbed},
               Method: PUT
             }
           }
@@ -343,57 +399,75 @@
       ],
       Links: {
         contents: {
+          Href: {Scrubbed},
           Method: GET
         },
         contents/create: {
+          Href: {Scrubbed},
           Method: POST
         },
         contents/create/publish: {
+          Href: {Scrubbed},
           Method: POST
         },
         contents/export: {
+          Href: {Scrubbed},
           Method: POST
         },
         contents/migrate: {
+          Href: {Scrubbed},
           Method: POST
         },
         delete: {
+          Href: {Scrubbed},
           Method: DELETE
         },
         fields/add: {
+          Href: {Scrubbed},
           Method: POST
         },
         fields/order: {
+          Href: {Scrubbed},
           Method: PUT
         },
         fields/ui: {
+          Href: {Scrubbed},
           Method: PUT
         },
         indexes: {
+          Href: {Scrubbed},
           Method: GET
         },
         self: {
+          Href: {Scrubbed},
           Method: GET
         },
         unpublish: {
+          Href: {Scrubbed},
           Method: PUT
         },
         update: {
+          Href: {Scrubbed},
           Method: PUT
         },
         update/category: {
+          Href: {Scrubbed},
           Method: PUT
         },
         update/rules: {
+          Href: {Scrubbed},
           Method: PUT
         },
         update/scripts: {
+          Href: {Scrubbed},
           Method: PUT
         },
         update/sync: {
+          Href: {Scrubbed},
           Method: PUT
         },
         update/urls: {
+          Href: {Scrubbed},
           Method: PUT
         }
       }
@@ -401,9 +475,11 @@
   ],
   Links: {
     create: {
+      Href: {Scrubbed},
       Method: POST
     },
     self: {
+      Href: {Scrubbed},
       Method: GET
     }
   }

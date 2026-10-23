@@ -8,6 +8,7 @@
   MimeType: image/png,
   FileType: png,
   MetadataText: 600x135px, 17.1 kB,
+  EditToken: {Scrubbed},
   Metadata: {
     blurHash: UH2%3Akvb}kufmflj]j^RLaIjDe,f4f5axf4,
     description: PNG File,
@@ -22,27 +23,38 @@
   FileSize: 17539,
   FileVersion: 1,
   Type: Image,
+  CreatedBy: {Scrubbed},
+  LastModifiedBy: {Scrubbed},
+  Created: {Scrubbed},
+  LastModified: {Scrubbed},
   Version: 1,
   Links: {
     content: {
+      Href: {Scrubbed},
       Method: GET
     },
     content/slug: {
+      Href: {Scrubbed},
       Method: GET
     },
     delete: {
+      Href: {Scrubbed},
       Method: DELETE
     },
     move: {
+      Href: {Scrubbed},
       Method: PUT
     },
     self: {
+      Href: {Scrubbed},
       Method: GET
     },
     update: {
+      Href: {Scrubbed},
       Method: PUT
     },
     upload: {
+      Href: {Scrubbed},
       Method: PUT
     }
   }

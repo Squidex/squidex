@@ -27,16 +27,16 @@ public class ClientFixture : IAsyncLifetime
 
     static ClientFixture()
     {
-        VerifierSettings.IgnoreMember("AppName");
-        VerifierSettings.IgnoreMember("Created");
-        VerifierSettings.IgnoreMember("CreatedBy");
-        VerifierSettings.IgnoreMember("EditToken");
-        VerifierSettings.IgnoreMember("Href");
-        VerifierSettings.IgnoreMember("LastModified");
-        VerifierSettings.IgnoreMember("LastModifiedBy");
-        VerifierSettings.IgnoreMember("RoleProperties");
-        VerifierSettings.IgnoreMember("SchemaName");
-        VerifierSettings.IgnoreMembersWithType<DateTimeOffset>();
+        VerifierSettings.ScrubMember("AppName");
+        VerifierSettings.ScrubMember("Created");
+        VerifierSettings.ScrubMember("CreatedBy");
+        VerifierSettings.ScrubMember("EditToken");
+        VerifierSettings.ScrubMember("Href");
+        VerifierSettings.ScrubMember("LastModified");
+        VerifierSettings.ScrubMember("LastModifiedBy");
+        VerifierSettings.ScrubMember("RoleProperties");
+        VerifierSettings.ScrubMember("SchemaName");
+        VerifierSettings.ScrubMembersWithType<DateTimeOffset>();
     }
 
     public Task<(ISquidexClient, AppDto)> PostAppAsync(string? name = null)

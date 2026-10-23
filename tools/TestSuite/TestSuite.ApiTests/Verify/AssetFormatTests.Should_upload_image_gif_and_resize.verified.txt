@@ -8,6 +8,7 @@
   MimeType: image/gif,
   FileType: gif,
   MetadataText: 600x400px, 154.2 kB,
+  EditToken: {Scrubbed},
   Metadata: {
     description: GIF File,
     pixelHeight: 400,
@@ -20,26 +21,37 @@
   ],
   FileSize: 157934,
   Type: Image,
+  CreatedBy: {Scrubbed},
+  LastModifiedBy: {Scrubbed},
+  Created: {Scrubbed},
+  LastModified: {Scrubbed},
   Links: {
     content: {
+      Href: {Scrubbed},
       Method: GET
     },
     content/slug: {
+      Href: {Scrubbed},
       Method: GET
     },
     delete: {
+      Href: {Scrubbed},
       Method: DELETE
     },
     move: {
+      Href: {Scrubbed},
       Method: PUT
     },
     self: {
+      Href: {Scrubbed},
       Method: GET
     },
     update: {
+      Href: {Scrubbed},
       Method: PUT
     },
     upload: {
+      Href: {Scrubbed},
       Method: PUT
     }
   }

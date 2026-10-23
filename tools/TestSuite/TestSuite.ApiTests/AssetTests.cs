@@ -27,7 +27,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
         // STEP 1: Create asset.
         var asset_1 = await _.Client.Assets.UploadFileAsync("Assets/logo-squared.png", "image/png");
 
-        await using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
+        await using (var stream = File.OpenRead("Assets/logo-squared.png"))
         {
             var downloaded = await _.DownloadAsync(asset_1);
 
@@ -53,7 +53,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
         Assert.NotEmpty(progress.Progress);
         Assert.NotNull(progress.Asset);
 
-        await using (var stream = new FileStream("Assets/SampleVideo_1280x720_1mb.mp4", FileMode.Open))
+        await using (var stream = File.OpenRead("Assets/SampleVideo_1280x720_1mb.mp4"))
         {
             var downloaded = await _.DownloadAsync(progress.Asset);
 
@@ -79,7 +79,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
             Assert.NotNull(progress.Asset);
             Assert.True(progress.Uploads.Count > 1);
 
-            await using (var stream = new FileStream("Assets/SampleVideo_1280x720_1mb.mp4", FileMode.Open))
+            await using (var stream = File.OpenRead("Assets/SampleVideo_1280x720_1mb.mp4"))
             {
                 var downloaded = await _.DownloadAsync(progress.Asset);
 
@@ -160,7 +160,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
         // STEP 2: Reupload asset.
         var asset_2 = await _.Client.Assets.ReplaceFileAsync(asset_1.Id, "Assets/logo-wide.png", "image/png");
 
-        await using (var stream = new FileStream("Assets/logo-wide.png", FileMode.Open))
+        await using (var stream = File.OpenRead("Assets/logo-wide.png"))
         {
             var downloaded = await _.DownloadAsync(asset_2);
 
@@ -190,7 +190,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
         Assert.NotNull(progress.Asset);
         Assert.NotEmpty(progress.Progress);
 
-        await using (var stream = new FileStream("Assets/SampleVideo_1280x720_1mb.mp4", FileMode.Open))
+        await using (var stream = File.OpenRead("Assets/SampleVideo_1280x720_1mb.mp4"))
         {
             var downloaded = await _.DownloadAsync(progress.Asset);
 
@@ -220,7 +220,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
             Assert.NotNull(progress.Asset);
             Assert.True(progress.Uploads.Count > 1);
 
-            await using (var stream = new FileStream("Assets/SampleVideo_1280x720_1mb.mp4", FileMode.Open))
+            await using (var stream = File.OpenRead("Assets/SampleVideo_1280x720_1mb.mp4"))
             {
                 var downloaded = await _.DownloadAsync(progress.Asset);
 
@@ -289,8 +289,8 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
         Assert.Equal(1, tags[tag2]);
 
         await Verify(asset_2)
-            .IgnoreMember<AssetDto>(x => x.Version)
-            .IgnoreMember<AssetDto>(x => x.Tags);
+            .ScrubMember<AssetDto>(x => x.Version)
+            .ScrubMember<AssetDto>(x => x.Tags);
     }
 
     [Theory]
@@ -411,7 +411,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
 
 
         // STEP 2: Download asset.
-        await using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
+        await using (var stream = File.OpenRead("Assets/logo-squared.png"))
         {
             var downloaded = await _.DownloadAsync(asset_1);
 
@@ -432,7 +432,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
 
 
         // STEP 5: Download asset with authentication.
-        await using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
+        await using (var stream = File.OpenRead("Assets/logo-squared.png"))
         {
             var downloaded = new MemoryStream();
 
@@ -447,7 +447,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
 
 
         // STEP 5: Download asset without key.
-        await using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
+        await using (var stream = File.OpenRead("Assets/logo-squared.png"))
         {
             var ex = await Assert.ThrowsAnyAsync<HttpRequestException>(() =>
             {
@@ -460,7 +460,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
 
 
         // STEP 6: Download asset without key and version.
-        await using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
+        await using (var stream = File.OpenRead("Assets/logo-squared.png"))
         {
             var ex = await Assert.ThrowsAnyAsync<HttpRequestException>(() =>
             {
@@ -495,7 +495,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
 
 
         // STEP 3: Download asset before script.
-        await using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
+        await using (var stream = File.OpenRead("Assets/logo-squared.png"))
         {
             var downloaded = await _.DownloadAsync(asset_1);
 
@@ -517,7 +517,7 @@ public class AssetTests(CreatedAppFixture fixture) : IClassFixture<CreatedAppFix
 
 
         // STEP 5: Download asset.
-        await using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
+        await using (var stream = File.OpenRead("Assets/logo-squared.png"))
         {
             var ex = await Assert.ThrowsAnyAsync<HttpRequestException>(() =>
             {

@@ -8,6 +8,7 @@
   MimeType: audio/x-flv,
   FileType: flv,
   MetadataText: 1280x720pt, 1 MB,
+  EditToken: {Scrubbed},
   Metadata: {
     audioBitrate: 384,
     audioSampleRate: 48000,
@@ -19,26 +20,37 @@
   ],
   FileSize: 1051185,
   Type: Video,
+  CreatedBy: {Scrubbed},
+  LastModifiedBy: {Scrubbed},
+  Created: {Scrubbed},
+  LastModified: {Scrubbed},
   Links: {
     content: {
+      Href: {Scrubbed},
       Method: GET
     },
     content/slug: {
+      Href: {Scrubbed},
       Method: GET
     },
     delete: {
+      Href: {Scrubbed},
       Method: DELETE
     },
     move: {
+      Href: {Scrubbed},
       Method: PUT
     },
     self: {
+      Href: {Scrubbed},
       Method: GET
     },
     update: {
+      Href: {Scrubbed},
       Method: PUT
     },
     upload: {
+      Href: {Scrubbed},
       Method: PUT
     }
   }

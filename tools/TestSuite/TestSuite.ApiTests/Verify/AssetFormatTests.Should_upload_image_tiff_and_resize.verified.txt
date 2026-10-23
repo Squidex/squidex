@@ -8,6 +8,7 @@
   MimeType: image/jpeg,
   FileType: tiff,
   MetadataText: 600x400px, 473.6 kB,
+  EditToken: {Scrubbed},
   Metadata: {
     description: TIFF File,
     pixelHeight: 400,
@@ -20,26 +21,37 @@
   ],
   FileSize: 485012,
   Type: Image,
+  CreatedBy: {Scrubbed},
+  LastModifiedBy: {Scrubbed},
+  Created: {Scrubbed},
+  LastModified: {Scrubbed},
   Links: {
     content: {
+      Href: {Scrubbed},
       Method: GET
     },
     content/slug: {
+      Href: {Scrubbed},
       Method: GET
     },
     delete: {
+      Href: {Scrubbed},
       Method: DELETE
     },
     move: {
+      Href: {Scrubbed},
       Method: PUT
     },
     self: {
+      Href: {Scrubbed},
       Method: GET
     },
     update: {
+      Href: {Scrubbed},
       Method: PUT
     },
     upload: {
+      Href: {Scrubbed},
       Method: PUT
     }
   }

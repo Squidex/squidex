@@ -1,0 +1,11 @@
+﻿{
+  Content: [
+    {
+      Type: text,
+      Text: An error occurred invoking 'query_contents': OData $filter clause not valid: Expression expected at position 8 in 'invalid('.
+    }
+  ],
+  IsError: true,
+  Meta: {Scrubbed},
+  ResultType: complete
+}

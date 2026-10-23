@@ -13,11 +13,14 @@
   ],
   HideScheduler: false,
   HideDateTimeModeButton: false,
+  Version: {Scrubbed},
   Links: {
     self: {
+      Href: {Scrubbed},
       Method: GET
     },
     update: {
+      Href: {Scrubbed},
       Method: PUT
     }
   }

@@ -5,12 +5,15 @@
   Version: 1,
   Links: {
     delete: {
+      Href: {Scrubbed},
       Method: DELETE
     },
     move: {
+      Href: {Scrubbed},
       Method: PUT
     },
     update: {
+      Href: {Scrubbed},
       Method: PUT
     }
   }

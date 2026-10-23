@@ -8,6 +8,7 @@
   MimeType: image/x-tga,
   FileType: tga,
   MetadataText: 600x400px, 617.2 kB,
+  EditToken: {Scrubbed},
   Metadata: {
     pixelHeight: 400,
     pixelWidth: 600
@@ -19,26 +20,37 @@
   ],
   FileSize: 631995,
   Type: Image,
+  CreatedBy: {Scrubbed},
+  LastModifiedBy: {Scrubbed},
+  Created: {Scrubbed},
+  LastModified: {Scrubbed},
   Links: {
     content: {
+      Href: {Scrubbed},
       Method: GET
     },
     content/slug: {
+      Href: {Scrubbed},
       Method: GET
     },
     delete: {
+      Href: {Scrubbed},
       Method: DELETE
     },
     move: {
+      Href: {Scrubbed},
       Method: PUT
     },
     self: {
+      Href: {Scrubbed},
       Method: GET
     },
     update: {
+      Href: {Scrubbed},
       Method: PUT
     },
     upload: {
+      Href: {Scrubbed},
       Method: PUT
     }
   }

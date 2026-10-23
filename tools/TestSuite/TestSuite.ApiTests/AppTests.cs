@@ -58,7 +58,7 @@ public sealed class AppTests(CreatedAppFixture fixture) : IClassFixture<CreatedA
     public async Task Should_upload_image()
     {
         // STEP 1: Upload image.
-        await using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
+        await using (var stream = File.OpenRead("Assets/logo-squared.png"))
         {
             var file = new FileParameter(stream, "logo-squared.png", "image/png");
 
@@ -70,7 +70,7 @@ public sealed class AppTests(CreatedAppFixture fixture) : IClassFixture<CreatedA
 
 
         // STEP 2: Download image.
-        await using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
+        await using (var stream = File.OpenRead("Assets/logo-squared.png"))
         {
             var temp = new MemoryStream();
 
@@ -90,7 +90,7 @@ public sealed class AppTests(CreatedAppFixture fixture) : IClassFixture<CreatedA
     public async Task Should_delete_image()
     {
         // STEP 1: Upload image.
-        await using (var stream = new FileStream("Assets/logo-squared.png", FileMode.Open))
+        await using (var stream = File.OpenRead("Assets/logo-squared.png"))
         {
             var file = new FileParameter(stream, "logo-squared.png", "image/png");
 
@@ -139,6 +139,6 @@ public sealed class AppTests(CreatedAppFixture fixture) : IClassFixture<CreatedA
         Assert.NotEmpty(settings_1.Editors);
 
         await Verify(settings_1)
-            .IgnoreMember<AppSettingsDto>(x => x.Version);
+            .ScrubMember<AppSettingsDto>(x => x.Version);
     }
 }

@@ -8,6 +8,7 @@
   MimeType: audio/mp3,
   FileType: mp3,
   MetadataText: 00:00:27.7447500, 433.5 kB,
+  EditToken: {Scrubbed},
   Metadata: {
     audioBitrate: 128,
     audioChannels: 2,
@@ -20,26 +21,37 @@
   ],
   FileSize: 443926,
   Type: Audio,
+  CreatedBy: {Scrubbed},
+  LastModifiedBy: {Scrubbed},
+  Created: {Scrubbed},
+  LastModified: {Scrubbed},
   Links: {
     content: {
+      Href: {Scrubbed},
       Method: GET
     },
     content/slug: {
+      Href: {Scrubbed},
       Method: GET
     },
     delete: {
+      Href: {Scrubbed},
       Method: DELETE
     },
     move: {
+      Href: {Scrubbed},
       Method: PUT
     },
     self: {
+      Href: {Scrubbed},
       Method: GET
     },
     update: {
+      Href: {Scrubbed},
       Method: PUT
     },
     upload: {
+      Href: {Scrubbed},
       Method: PUT
     }
   }

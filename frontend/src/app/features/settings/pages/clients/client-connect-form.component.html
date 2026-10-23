@@ -47,6 +47,46 @@
                         <sqx-form-hint> {{ "clients.connectWizard.sdkHint" | sqxTranslate }}</sqx-form-hint>
                         <i class="icon-angle-right"></i>
                     </div>
+
+                    <div class="option" (click)="go('MCP')">
+                        <h5>{{ "clients.connectWizard.mcp" | sqxTranslate }}</h5>
+                        <sqx-form-hint> {{ "clients.connectWizard.mcpHint" | sqxTranslate }}</sqx-form-hint>
+                        <i class="icon-angle-right"></i>
+                    </div>
+                </div>
+            }
+
+            @case ("MCP") {
+                <div class="section step">
+                    <h5><span class="badge rounded-pill bg-dark">1</span> {{ "clients.connectWizard.mcpStep1" | sqxTranslate }}</h5>
+
+                    <p>
+                        <sqx-code>{{ mcpUrl }}</sqx-code>
+                        <sqx-form-hint> {{ "clients.connectWizard.mcpStep1Hint" | sqxTranslate }}</sqx-form-hint>
+                    </p>
+                </div>
+
+                <div class="section step">
+                    <h5><span class="badge rounded-pill bg-dark">2</span> {{ "clients.connectWizard.mcpStep2" | sqxTranslate }}</h5>
+
+                    <p>
+                        <sqx-code>{{ mcpCommand }}</sqx-code>
+                    </p>
+                </div>
+
+                <div class="section step">
+                    <h5><span class="badge rounded-pill bg-dark">3</span> {{ "clients.connectWizard.mcpStep3" | sqxTranslate }}</h5>
+
+                    <p>
+                        <sqx-code>{{ mcpConfig }}</sqx-code>
+                        <sqx-form-hint>
+                            <span [sqxMarkdown]="'clients.connectWizard.mcpStep3Hint' | sqxTranslate"></span>
+                        </sqx-form-hint>
+                    </p>
+                </div>
+
+                <div class="section">
+                    <sqx-form-hint> {{ "clients.connectWizard.mcpSecretHint" | sqxTranslate }}</sqx-form-hint>
                 </div>
             }
 

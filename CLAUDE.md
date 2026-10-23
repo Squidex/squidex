@@ -48,6 +48,8 @@ dotnet test --filter "Category!=Dependencies & Category!=TestContainer"
 
 - Use xUnit assertions (`Assert.Equal`, `Assert.True`, `Assert.Single`, `Assert.Empty`, ...) for simple properties and values.
 - Use FluentAssertions (`Should().BeEquivalentTo(...)`) only for deep, structural comparisons of objects and collections.
+- In Verify snapshot tests, verify one result per `Verify`/`VerifyJson` call. Do not combine several results into one snapshot.
+- Prefer scrubbing (`ScrubInlineGuids`, `AddScrubber`, ...) over ignoring members (`IgnoreMember`) for values that change between runs or environments. Only ignore members if they cannot be scrubbed.
 
 ### Best Practices
 

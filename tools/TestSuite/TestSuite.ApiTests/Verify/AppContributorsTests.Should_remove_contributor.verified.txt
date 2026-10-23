@@ -1,12 +1,17 @@
 ﻿{
   Items: [
     {
+      ContributorId: {Scrubbed},
+      ContributorName: {Scrubbed},
+      ContributorEmail: {Scrubbed},
       Role: Owner,
       Links: {
         delete: {
+          Href: {Scrubbed},
           Method: DELETE
         },
         update: {
+          Href: {Scrubbed},
           Method: POST
         }
       }
@@ -15,9 +20,11 @@
   MaxContributors: -1,
   Links: {
     create: {
+      Href: {Scrubbed},
       Method: POST
     },
     self: {
+      Href: {Scrubbed},
       Method: GET
     }
   }

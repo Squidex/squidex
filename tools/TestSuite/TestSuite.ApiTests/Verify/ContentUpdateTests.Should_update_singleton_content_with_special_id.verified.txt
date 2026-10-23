@@ -7,16 +7,26 @@
   NewStatus: ,
   Status: Published,
   EditingStatus: Published,
+  AppName: {Scrubbed},
+  SchemaName: {Scrubbed},
   Id: Guid_1,
+  CreatedBy: {Scrubbed},
+  LastModifiedBy: {Scrubbed},
+  Created: {Scrubbed},
+  LastModified: {Scrubbed},
   Version: 2,
+  EditToken: {Scrubbed},
   Links: {
     draft/create: {
+      Href: {Scrubbed},
       Method: POST
     },
     previous: {
+      Href: {Scrubbed},
       Method: GET
     },
     self: {
+      Href: {Scrubbed},
       Method: GET
     }
   }
