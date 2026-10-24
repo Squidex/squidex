@@ -8,7 +8,7 @@
 import { ChangeDetectionStrategy, Component, Input } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Observable, of } from 'rxjs';
-import { AddLanguageForm, AutocompleteComponent, AutocompleteSource, FormHintComponent, LanguageDto, LanguagesState, TranslatePipe } from '@app/shared';
+import { AddLanguageForm, AutocompleteComponent, AutocompleteSource, FormHintComponent, LanguageDto, LanguagesState, StringHelper, TranslatePipe } from '@app/shared';
 
 class LanguageSource implements AutocompleteSource {
     constructor(
@@ -21,7 +21,7 @@ class LanguageSource implements AutocompleteSource {
             return of(this.languages);
         }
 
-        const regex = new RegExp(query, 'i');
+        const regex = StringHelper.searchRegex(query);
 
         const results: LanguageDto[] = [];
         const result = this.languages.find(x => x.iso2Code === query);

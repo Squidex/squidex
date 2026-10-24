@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { EMPTY, Observable, throwError } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
-import { AssignContributorDto, ContributorDto, ContributorsDto, debug, DialogService, ErrorDto, getPagingInfo, ListState, shareMapSubscribed, shareSubscribed, State, TeamsState, Types, VersionTag } from '@app/shared';
+import { AssignContributorDto, ContributorDto, ContributorsDto, debug, DialogService, ErrorDto, getPagingInfo, ListState, shareMapSubscribed, shareSubscribed, State, StringHelper, TeamsState, Types, VersionTag } from '@app/shared';
 import { TeamContributorsService } from '../internal';
 
 interface Snapshot extends ListState<string> {
@@ -159,7 +159,7 @@ export class TeamContributorsState extends State<Snapshot> {
 }
 
 function getRegex(query?: string): RegExp | undefined {
-    return query ? new RegExp(query, 'i') : undefined;
+    return query ? StringHelper.searchRegex(query) : undefined;
 }
 
 function getFilteredContributors(snapshot: Snapshot) {
@@ -168,7 +168,7 @@ function getFilteredContributors(snapshot: Snapshot) {
     let filtered = contributors;
 
     if (query) {
-        const regex = new RegExp(query, 'i');
+        const regex = StringHelper.searchRegex(query);
 
         filtered = filtered.filter(x => regex.test(x.contributorName));
     }
