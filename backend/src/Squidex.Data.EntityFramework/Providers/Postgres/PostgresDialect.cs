@@ -51,17 +51,72 @@ public class PostgresDialect : SqlDialect
         return $"\"{tableName}\"";
     }
 
+    public override IEnumerable<string> CreateIndex(string name, string table, IReadOnlyList<SqlIndexKey> keys, string description)
+    {
+        var sqlColumns = string.Join(", ", keys.Select(x => x.IsExpression ? $"({x.Expression}) {x.Order}" : $"{x.Expression} {x.Order}"));
+
+        yield return $"CREATE INDEX {FormatTable(name)} ON {FormatTable(table)} ({sqlColumns});";
+        yield return $"COMMENT ON INDEX {FormatTable(name)} IS {FormatLiteral(description)};";
+    }
+
+    public override IEnumerable<string> DropIndex(string name, string table)
+    {
+        yield return $"DROP INDEX IF EXISTS {FormatTable(name)};";
+    }
+
+    public override Task<List<SqlIndexInfo>> QueryIndexesAsync(DbContext dbContext, string table,
+        CancellationToken ct)
+    {
+        var sqlQuery = $"""
+            SELECT i.relname AS "{nameof(SqlIndexInfo.Name)}", obj_description(i.oid, 'pg_class') AS "{nameof(SqlIndexInfo.Description)}"
+            FROM pg_index x
+            JOIN pg_class i ON i.oid = x.indexrelid
+            JOIN pg_class t ON t.oid = x.indrelid
+            WHERE t.relname = {FormatLiteral(table)} AND t.relnamespace = current_schema()::regnamespace
+            """;
+
+        return dbContext.Database.SqlQueryRaw<SqlIndexInfo>(sqlQuery).ToListAsync(ct);
+    }
+
+    public override IEnumerable<SqlIndexKey> IndexKeys(PropertyPath path, SortOrder order, bool isJson)
+    {
+        if (isJson)
+        {
+            var sqlOrder = FormatOrder(order);
+
+            // Must match the expressions of the ORDER BY clause, otherwise the index is not used.
+            yield return new SqlIndexKey(SortNumber(path), $"{sqlOrder} NULLS LAST", true);
+            yield return new SqlIndexKey(SortText(path), sqlOrder, true);
+            yield break;
+        }
+
+        foreach (var key in base.IndexKeys(path, order, isJson))
+        {
+            yield return key;
+        }
+    }
+
     public override string OrderBy(PropertyPath path, SortOrder order, bool isJson)
     {
         if (isJson)
         {
             var sqlOrder = FormatOrder(order);
-            var sqlPath = path.JsonPath(true);
 
-            return $"CASE WHEN jsonb_typeof({path.JsonPath(false)}) = 'number' THEN ({sqlPath})::numeric END {sqlOrder} NULLS LAST, {sqlPath} {sqlOrder}";
+            return $"{SortNumber(path)} {sqlOrder} NULLS LAST, {SortText(path)} {sqlOrder}";
         }
 
         return base.OrderBy(path, order, isJson);
+    }
+
+    private static string SortNumber(PropertyPath path)
+    {
+        return $"CASE WHEN jsonb_typeof({path.JsonPath(false)}) = 'number' THEN ({path.JsonPath(true)})::numeric END";
+    }
+
+    private static string SortText(PropertyPath path)
+    {
+        // Long texts would exceed the maximum size of btree index entries and the writes would fail.
+        return $"left({path.JsonPath(true)}, 200)";
     }
 
     public override string WhereMatch(PropertyPath path, string query, SqlParams queryParameters)
