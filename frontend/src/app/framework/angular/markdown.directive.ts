@@ -31,31 +31,31 @@ export class MarkdownDirective {
     }
 
     public ngOnChanges() {
-        let html = '';
+        let markdown = this.markdown || '';
 
-        let markdown = this.markdown;
-        if (markdown) {
-            const hasExclamation = markdown.indexOf('!') === 0;
+        const hasExclamation = markdown.indexOf('!') === 0;
 
-            if (hasExclamation && this.optional) {
-                markdown = markdown.substring(1);
-            }
-
-            if (!markdown) {
-                html = markdown;
-            } else if (this.optional && !hasExclamation) {
-                html = markdown;
-            } else if (this.markdown) {
-                html = markdownRender(markdown, this.inline, this.trusted);
-            }
+        // Optional markdown without exclamation is plain text and must never be interpreted as HTML.
+        if (this.optional && !hasExclamation) {
+            this.renderText(markdown);
+            return;
         }
 
+        if (this.optional) {
+            markdown = markdown.substring(1);
+        }
+
+        const html = markdownRender(markdown, this.inline, this.trusted);
         const hasHtml = html.indexOf('<') >= 0 || html.indexOf('&') >= 0;
 
         if (hasHtml) {
             this.renderer.setProperty(this.element.nativeElement, 'innerHTML', html);
         } else {
-            this.renderer.setProperty(this.element.nativeElement, 'textContent', html);
+            this.renderText(html);
         }
+    }
+
+    private renderText(text: string) {
+        this.renderer.setProperty(this.element.nativeElement, 'textContent', text);
     }
 }

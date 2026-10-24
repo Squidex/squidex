@@ -8,12 +8,31 @@
 import { marked, Renderer, Tokens } from 'marked';
 import { MathHelper } from './math-helper';
 
+const SAFE_SCHEME = /^(https?|mailto):/i;
+const ANY_SCHEME = /^[^/?#]*[:&]/;
+
+function isUnsafeUrl(url: string) {
+    // Browsers ignore whitespace and control characters in the scheme, e.g. "java\tscript:".
+    const normalized = Array.from(url).filter(c => c.charCodeAt(0) > 32).join('');
+
+    if (SAFE_SCHEME.test(normalized)) {
+        return false;
+    }
+
+    // Also treat entities as a scheme, because "javascript&#58;" is decoded by the browser.
+    return ANY_SCHEME.test(normalized);
+}
+
 class CustomRenderer extends Renderer {
     public static readonly INSTANCE = new CustomRenderer();
 
     public link({ href, tokens }: Tokens.Link): string {
         const text = this.parser.parseInline(tokens);
-        if (href && href.startsWith('mailto')) {
+        if (!href || isUnsafeUrl(href)) {
+            return text;
+        }
+
+        if (href.startsWith('mailto')) {
             return `<a href="${href}">${text}</a>`;
         } else {
             return `<a href="${href}" target="_blank", rel="noopener">${text} <i class="icon-external-link"></i></a>`;
