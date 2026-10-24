@@ -6,6 +6,8 @@
 // ==========================================================================
 
 #if INCLUDE_KAFKA
+using System.Buffers.Binary;
+using System.Security.Cryptography;
 using System.Text;
 using Avro;
 using Avro.Generic;
@@ -143,7 +145,7 @@ public sealed class KafkaProducer
 
         if (!string.IsNullOrWhiteSpace(job.PartitionKey) && job.PartitionCount > 0)
         {
-            var partition = Math.Abs(job.PartitionKey.GetHashCode(StringComparison.Ordinal)) % job.PartitionCount;
+            var partition = GetPartition(job.PartitionKey, job.PartitionCount);
 
             await producer.ProduceAsync(new TopicPartition(job.TopicName, partition), message, ct);
         }
@@ -151,6 +153,15 @@ public sealed class KafkaProducer
         {
             await producer.ProduceAsync(job.TopicName, message, ct);
         }
+    }
+
+    public static int GetPartition(string partitionKey, int partitionCount)
+    {
+        // string.GetHashCode is randomized per process, so the same key would end up in different
+        // partitions after a restart or on another instance.
+        var hash = SHA256.HashData(Encoding.UTF8.GetBytes(partitionKey));
+
+        return (int)(BinaryPrimitives.ReadUInt32LittleEndian(hash) % (uint)partitionCount);
     }
 
     private GenericRecord CreateAvroRecord(string json, string avroSchema)

@@ -65,6 +65,7 @@ dotnet test --filter "Category!=Dependencies & Category!=TestContainer"
 - Do not write conditions that span multiple lines. Split them into multiple `if` statements (e.g. early returns) instead.
 - Try to keep files under 300 lines. Split larger classes by responsibility. This does not apply to tests.
 - Do not put a blank line between a variable assignment and an `if` statement that checks this variable.
+- Use the same prefix for related variables, e.g. `postsAll` and `postsTaken` instead of `allPosts` and `taken`.
 - Use primary constructors whenever possible.
 
 ## Maintaining this file

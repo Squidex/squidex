@@ -185,7 +185,7 @@ public sealed partial class EFContentRepository<TContext, TContentContext> : ISn
                 // The existing entity is only valid if we use dedicated tables.
                 if (existing != null)
                 {
-                    var contentDbContext = await dynamicTables.CreateDbContextAsync(existing.AppId.Id, existing.AppId.Id, ct);
+                    var contentDbContext = await dynamicTables.CreateDbContextAsync(existing.AppId.Id, existing.SchemaId.Id, ct);
 
                     await RemoveCoreAsync(contentDbContext, key, ct);
                 }
@@ -351,8 +351,11 @@ public sealed partial class EFContentRepository<TContext, TContentContext> : ISn
                                 .Where(x => x.AppId.Id == bySchema.Key.AppId && x.SchemaId.Id == bySchema.Key.SchemaId)
                                 .ToList();
 
-                        await contentDbContext.BulkInsertAsync(bySchema.ToList(), ct);
-                        await contentDbContext.BulkInsertAsync(publishedContents, ct);
+                        // The bulk inserter caches the table names per context type and would ignore the prefix.
+                        contentDbContext.AddRange(bySchema);
+                        contentDbContext.AddRange(publishedContents);
+
+                        await contentDbContext.SaveChangesAsync(ct);
                     }
                 }
 

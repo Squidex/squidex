@@ -16,7 +16,7 @@ namespace Migrations;
 
 public sealed class MigrationPath(IServiceProvider serviceProvider) : IMigrationPath
 {
-    private const int CurrentVersion = 28;
+    private const int CurrentVersion = 29;
 
     public (int Version, IEnumerable<IMigration>? Migrations) GetNext(int version)
     {
@@ -131,6 +131,12 @@ public sealed class MigrationPath(IServiceProvider serviceProvider) : IMigration
         if (version < 28)
         {
             yield return serviceProvider.GetService<Squidex.Migrations.DropOldAssetIndex>();
+        }
+
+        // Version 29: Move contents into the correct dedicated tables (Entity Framework only).
+        if (version < 29)
+        {
+            yield return serviceProvider.GetKeyedService<IMigration>("RebuildDedicatedContentTables");
         }
     }
 }

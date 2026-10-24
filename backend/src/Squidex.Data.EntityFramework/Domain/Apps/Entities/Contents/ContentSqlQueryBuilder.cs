@@ -23,6 +23,17 @@ public class ContentSqlQueryBuilder(SqlDialect dialect, string table, SqlParams?
 
     public override bool IsJsonPath(PropertyPath path)
     {
-        return path.Count > 1 && string.Equals(path[0], "data", StringComparison.OrdinalIgnoreCase);
+        if (path.Count <= 1)
+        {
+            return false;
+        }
+
+        // These properties are stored as JSON columns, therefore the nested fields are queried with JSON functions.
+        if (string.Equals(path[0], nameof(EFContentEntity.Data), StringComparison.OrdinalIgnoreCase))
+        {
+            return true;
+        }
+
+        return string.Equals(path[0], nameof(EFContentEntity.TranslationStatus), StringComparison.OrdinalIgnoreCase);
     }
 }
