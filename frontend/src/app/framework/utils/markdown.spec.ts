@@ -56,6 +56,31 @@ describe('Markdown', () => {
         expect(result).toEqual('<a href="https://squidex.io" target="_blank", rel="noopener">squidex <i class="icon-external-link"></i></a>');
     });
 
+    it('should render relative link', () => {
+        const md = '[page](/app/page?a=1&b=2)';
+
+        const result = markdownRender(md, true);
+
+        expect(result).toContain('href="/app/page?a=1&amp;b=2"');
+    });
+
+    [
+        'javascript:alert(1)',
+        'JaVaScRiPt:alert(1)',
+        'java\tscript:alert(1)',
+        'javascript&#58;alert(1)',
+        'data:text/html,test',
+        'vbscript:msgbox(1)',
+    ].forEach(href => {
+        it(`should not render link with unsafe url ${href}`, () => {
+            const md = `[click](${href})`;
+
+            const result = markdownRender(md, true);
+
+            expect(result).not.toContain('<a');
+        });
+    });
+
     it('should render image', () => {
         const md = '![{name}](https://localhost:5001/ai-images/dall-e/ea68c867-6472-4d77-a526-7c9d9c4698fe)';
 

@@ -44,6 +44,22 @@ describe('MarkdownDirective', () => {
         verifyTextRender('**bold**');
     });
 
+    it('should render HTML as text if optional', () => {
+        markdownDirective.optional = true;
+        markdownDirective.markdown = '<img src="x" onerror="alert(1)">';
+        markdownDirective.ngOnChanges();
+
+        verifyTextRender('<img src="x" onerror="alert(1)">');
+    });
+
+    it('should render HTML escaped if optional with exclamation', () => {
+        markdownDirective.optional = true;
+        markdownDirective.markdown = '!<img src="x" onerror="alert(1)">';
+        markdownDirective.ngOnChanges();
+
+        verifyHtmlRender('&lt;img src=&quot;x&quot; onerror=&quot;alert(1)&quot;&gt;');
+    });
+
     it('should render if optional with exclamation', () => {
         markdownDirective.optional = true;
         markdownDirective.markdown = '!**bold**';
