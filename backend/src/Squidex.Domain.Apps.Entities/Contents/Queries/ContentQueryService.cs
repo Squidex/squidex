@@ -90,6 +90,12 @@ public sealed class ContentQueryService(
                 return null;
             }
 
+            // The API only checks for read.own permission, so the content must have been created by the user.
+            if (!HasPermission(context, schema, PermissionIds.AppContentsRead) && !IsCreatedByUser(context, content))
+            {
+                return null;
+            }
+
             return await TransformAsync(context, content, ct);
         }
     }
@@ -161,6 +167,14 @@ public sealed class ContentQueryService(
             }
 
             var contents = await QueryCoreAsync(context, parsedQuery, schemas, ct);
+
+            // The API only checks for read.own permission, so we have to remove the contents of other users.
+            var ownSchemaIds = schemas.Where(x => !HasPermission(context, x, PermissionIds.AppContentsRead)).Select(x => x.Id).ToHashSet();
+            if (ownSchemaIds.Count > 0)
+            {
+                contents = FilterOwnContents(context, contents, ownSchemaIds);
+            }
+
             if (parsedQuery.Ids is { Count: > 0 })
             {
                 contents = contents.Sorted(x => x.Id, parsedQuery.Ids);
@@ -284,6 +298,23 @@ public sealed class ContentQueryService(
 
             return await contentRepository.FindContentAsync(context.App, schema, id, context.Fields(), context.Scope(), combined.Token);
         }
+    }
+
+    private static IResultList<Content> FilterOwnContents(Context context, IResultList<Content> contents, HashSet<DomainId> ownSchemaIds)
+    {
+        var filtered = contents.Where(x => !ownSchemaIds.Contains(x.SchemaId.Id) || IsCreatedByUser(context, x)).ToList();
+
+        // A negative total means that the total has not been calculated.
+        var total = contents.Total < 0 ? contents.Total : contents.Total - (contents.Count - filtered.Count);
+
+        return ResultList.Create(total, filtered);
+    }
+
+    private static bool IsCreatedByUser(Context context, Content content)
+    {
+        var actor = context.UserPrincipal.Token();
+
+        return actor != null && Equals(content.CreatedBy, actor);
     }
 
     private static bool IsAccessible(Schema schema)
