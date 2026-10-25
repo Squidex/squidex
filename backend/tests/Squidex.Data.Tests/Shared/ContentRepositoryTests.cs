@@ -87,97 +87,6 @@ public abstract class ContentRepositoryTests : GivenContext
 
     protected virtual bool SupportsCustomIndexes => false;
 
-    private async Task<IContentRepository> CreateAndPrepareSutAsync(params WriteContent[] contents)
-    {
-        var sut = await CreateSutAsync();
-        if (sut is not ISnapshotStore<WriteContent> store)
-        {
-            return sut;
-        }
-
-        // Write the contents of the test itself, because the shared contents are only written once.
-        await WriteAsync(store, contents);
-
-        if (await sut.StreamAll(AppIds[0].Id, [schema.Id], SearchScope.All).AnyAsync())
-        {
-            return sut;
-        }
-
-        var batch = new List<SnapshotWriteJob<WriteContent>>();
-
-        async Task ExecuteBatchAsync(WriteContent? state)
-        {
-            if (state != null)
-            {
-                batch.Add(new SnapshotWriteJob<WriteContent>(state.UniqueId, state, 0));
-            }
-
-            if ((state == null || batch.Count >= 1000) && batch.Count > 0)
-            {
-                await store.WriteManyAsync(batch, default);
-                batch.Clear();
-            }
-        }
-
-        foreach (var forAppId in AppIds)
-        {
-            foreach (var forSchemaId in SchemaIds)
-            {
-                var previousIds = new List<DomainId>();
-
-                for (var i = 0; i < NumValues; i++)
-                {
-                    var contentId = DomainId.NewGuid();
-
-                    if (i == 0)
-                    {
-                        previousIds = [contentId];
-                    }
-
-                    var content = CreateWriteContent() with
-                    {
-                        Id = contentId,
-                        CurrentVersion = new ContentVersion(
-                            Status.Published,
-                            new ContentData()
-                                .AddField("field1",
-                                    new ContentFieldData()
-                                        .AddInvariant(JsonValue.Create(i)))
-                                .AddField("field2",
-                                    new ContentFieldData()
-                                        .AddInvariant(JsonValue.Create(Lorem.Paragraph(200, 20))))
-                                .AddField("references",
-                                    new ContentFieldData()
-                                        .AddInvariant(
-                                            JsonValue.Array(previousIds.ToArray())))),
-                        SchemaId = forSchemaId,
-                        ScheduleJob =
-                            i > NumValues / 2
-                            ? new ScheduleJob(DomainId.NewGuid(), Status.Archived, User, now.Plus(Duration.FromDays(i)))
-                            : null,
-                        AppId = forAppId,
-                    };
-
-                    await ExecuteBatchAsync(content);
-                }
-            }
-        }
-
-        await ExecuteBatchAsync(null);
-
-        return sut;
-    }
-
-    private static async Task WriteAsync(ISnapshotStore<WriteContent> store, WriteContent[] contents)
-    {
-        if (contents.Length == 0)
-        {
-            return;
-        }
-
-        await store.WriteManyAsync(contents.Select(x => new SnapshotWriteJob<WriteContent>(x.UniqueId, x, 0)).ToList(), default);
-    }
-
     [Fact]
     public async Task Should_find_by_id()
     {
@@ -860,6 +769,97 @@ public abstract class ContentRepositoryTests : GivenContext
 
             await Assert.ThrowsAsync<DomainException>(() => sut.CreateIndexAsync(otherApp.Id, otherSchema.Id, index));
         }
+    }
+
+    private async Task<IContentRepository> CreateAndPrepareSutAsync(params WriteContent[] contents)
+    {
+        var sut = await CreateSutAsync();
+        if (sut is not ISnapshotStore<WriteContent> store)
+        {
+            return sut;
+        }
+
+        // Write the contents of the test itself, because the shared contents are only written once.
+        await WriteAsync(store, contents);
+
+        if (await sut.StreamAll(AppIds[0].Id, [schema.Id], SearchScope.All).AnyAsync())
+        {
+            return sut;
+        }
+
+        var batch = new List<SnapshotWriteJob<WriteContent>>();
+
+        async Task ExecuteBatchAsync(WriteContent? state)
+        {
+            if (state != null)
+            {
+                batch.Add(new SnapshotWriteJob<WriteContent>(state.UniqueId, state, 0));
+            }
+
+            if ((state == null || batch.Count >= 1000) && batch.Count > 0)
+            {
+                await store.WriteManyAsync(batch, default);
+                batch.Clear();
+            }
+        }
+
+        foreach (var forAppId in AppIds)
+        {
+            foreach (var forSchemaId in SchemaIds)
+            {
+                var previousIds = new List<DomainId>();
+
+                for (var i = 0; i < NumValues; i++)
+                {
+                    var contentId = DomainId.NewGuid();
+
+                    if (i == 0)
+                    {
+                        previousIds = [contentId];
+                    }
+
+                    var content = CreateWriteContent() with
+                    {
+                        Id = contentId,
+                        CurrentVersion = new ContentVersion(
+                            Status.Published,
+                            new ContentData()
+                                .AddField("field1",
+                                    new ContentFieldData()
+                                        .AddInvariant(JsonValue.Create(i)))
+                                .AddField("field2",
+                                    new ContentFieldData()
+                                        .AddInvariant(JsonValue.Create(Lorem.Paragraph(200, 20))))
+                                .AddField("references",
+                                    new ContentFieldData()
+                                        .AddInvariant(
+                                            JsonValue.Array(previousIds.ToArray())))),
+                        SchemaId = forSchemaId,
+                        ScheduleJob =
+                            i > NumValues / 2
+                            ? new ScheduleJob(DomainId.NewGuid(), Status.Archived, User, now.Plus(Duration.FromDays(i)))
+                            : null,
+                        AppId = forAppId,
+                    };
+
+                    await ExecuteBatchAsync(content);
+                }
+            }
+        }
+
+        await ExecuteBatchAsync(null);
+
+        return sut;
+    }
+
+    private static async Task WriteAsync(ISnapshotStore<WriteContent> store, WriteContent[] contents)
+    {
+        if (contents.Length == 0)
+        {
+            return;
+        }
+
+        await store.WriteManyAsync(contents.Select(x => new SnapshotWriteJob<WriteContent>(x.UniqueId, x, 0)).ToList(), default);
     }
 
     private WriteContent CreateContent(App forApp, Status status, int number, string text)

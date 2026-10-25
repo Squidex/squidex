@@ -67,6 +67,7 @@ dotnet test --filter "Category!=Dependencies & Category!=TestContainer"
 - Do not put a blank line between a variable assignment and an `if` statement that checks this variable.
 - Use the same prefix for related variables, e.g. `postsAll` and `postsTaken` instead of `allPosts` and `taken`.
 - Use primary constructors whenever possible.
+- In test classes, put helper methods after all tests.
 
 ## Maintaining this file
 
