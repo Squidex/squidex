@@ -775,6 +775,25 @@ public abstract class ContentRepositoryTests : GivenContext
     }
 
     [Fact]
+    public async Task Should_not_fail_to_drop_unknown_custom_index()
+    {
+        if (!SupportsCustomIndexes)
+        {
+            return;
+        }
+
+        var (otherApp, otherSchema) = CreateOtherApp();
+
+        var sut = await CreateAndPrepareSutAsync();
+
+        await sut.DropIndexAsync(otherApp.Id, otherSchema.Id, "data.unknown.iv_asc");
+
+        var indexes = await sut.GetIndexesAsync(otherApp.Id, otherSchema.Id);
+
+        Assert.Empty(indexes);
+    }
+
+    [Fact]
     public async Task Should_write_and_sort_contents_with_custom_index()
     {
         if (!SupportsCustomIndexes)
@@ -793,25 +812,31 @@ public abstract class ContentRepositoryTests : GivenContext
         var sut = await CreateAndPrepareSutAsync();
 
         await sut.CreateIndexAsync(otherApp.Id, otherSchema.Id, index);
-
-        // Long texts and values that look like numbers must not break the writes.
-        var contents = new[]
+        try
         {
-            CreateContent(otherApp, Status.Published, 1, new string('a', 5000)),
-            CreateContent(otherApp, Status.Published, 3, "$"),
-            CreateContent(otherApp, Status.Published, 2, "1e400"),
-        };
+            // Long texts and values that look like numbers must not break the writes.
+            var contents = new[]
+            {
+                CreateContent(otherApp, Status.Published, 1, new string('a', 5000)),
+                CreateContent(otherApp, Status.Published, 3, "$"),
+                CreateContent(otherApp, Status.Published, 2, "1e400"),
+            };
 
-        await WriteAsync((ISnapshotStore<WriteContent>)sut, contents);
+            await WriteAsync((ISnapshotStore<WriteContent>)sut, contents);
 
-        var query = new ClrQuery
+            var query = new ClrQuery
+            {
+                Sort = [new SortNode("data.field1.iv", SortOrder.Descending)],
+            };
+
+            var result = await sut.QueryAsync(otherApp, otherSchema, Q.Empty.WithQuery(query), SearchScope.All);
+
+            Assert.Equal([contents[1].Id, contents[2].Id, contents[0].Id], result.Select(x => x.Id).ToArray());
+        }
+        finally
         {
-            Sort = [new SortNode("data.field1.iv", SortOrder.Descending)],
-        };
-
-        var result = await sut.QueryAsync(otherApp, otherSchema, Q.Empty.WithQuery(query), SearchScope.All);
-
-        Assert.Equal([contents[1].Id, contents[2].Id, contents[0].Id], result.Select(x => x.Id).ToArray());
+            await sut.DropIndexAsync(otherApp.Id, otherSchema.Id, index.ToName());
+        }
     }
 
     [Fact]

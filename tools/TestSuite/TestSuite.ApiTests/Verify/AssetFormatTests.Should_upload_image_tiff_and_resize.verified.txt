@@ -2,12 +2,12 @@
   Id: Guid_1,
   ParentId: Guid_Empty,
   FileName: SampleImage_400kb.tiff,
-  FileHash: f+ZdTDOoK23jmThbfPhWhXL8Q9+KIQajHeFfT/MtWFU=,
+  FileHash: 1hiObxbh9pwSAewpQJ/DwaMRbSd6sukujkbC3HojEqs=,
   IsProtected: false,
   Slug: sampleimage-400kb.tiff,
   MimeType: image/jpeg,
   FileType: tiff,
-  MetadataText: 600x400px, 473.6 kB,
+  MetadataText: 600x400px, 471.2 kB,
   EditToken: {Scrubbed},
   Metadata: {
     description: TIFF File,
@@ -19,7 +19,7 @@
     image,
     image/medium
   ],
-  FileSize: 485012,
+  FileSize: 482483,
   Type: Image,
   CreatedBy: {Scrubbed},
   LastModifiedBy: {Scrubbed},
