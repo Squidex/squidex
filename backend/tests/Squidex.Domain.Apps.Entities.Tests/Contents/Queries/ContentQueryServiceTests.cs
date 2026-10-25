@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Security.Claims;
 using Microsoft.Extensions.Options;
 using Squidex.Domain.Apps.Core.Contents;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -155,6 +156,69 @@ public class ContentQueryServiceTests : GivenContext
         var actual = await sut.FindAsync(requestContext, SchemaId.Name, content.Id, 13, CancellationToken);
 
         AssertContent(content, actual);
+    }
+
+    [Fact]
+    public async Task Should_return_content_by_id_if_user_has_only_own_permission_and_created_content()
+    {
+        var requestContext = SetupOwnContext();
+
+        var content = CreateContent() with { CreatedBy = requestContext.UserPrincipal.Token()! };
+        A.CallTo(() => contentRepository.FindContentAsync(App, Schema, content.Id, A<IReadOnlySet<string>>._, A<SearchScope>._, A<CancellationToken>._))
+            .Returns(content);
+
+        var actual = await sut.FindAsync(requestContext, SchemaId.Name, content.Id, ct: CancellationToken);
+
+        AssertContent(content, actual);
+    }
+
+    [Fact]
+    public async Task Should_not_return_content_by_id_if_user_has_only_own_permission_and_content_from_other_user()
+    {
+        var requestContext = SetupOwnContext();
+
+        var content = CreateContent() with { CreatedBy = RefToken.User("other") };
+        A.CallTo(() => contentRepository.FindContentAsync(App, Schema, content.Id, A<IReadOnlySet<string>>._, A<SearchScope>._, A<CancellationToken>._))
+            .Returns(content);
+
+        var actual = await sut.FindAsync(requestContext, SchemaId.Name, content.Id, ct: CancellationToken);
+
+        Assert.Null(actual);
+    }
+
+    [Fact]
+    public async Task Should_not_return_content_by_id_and_version_if_user_has_only_own_permission_and_content_from_other_user()
+    {
+        var requestContext = SetupOwnContext();
+
+        var content = CreateContent() with { CreatedBy = RefToken.User("other") };
+        A.CallTo(() => contentVersionLoader.GetAsync(AppId.Id, content.Id, 13, A<CancellationToken>._))
+            .Returns(content);
+
+        var actual = await sut.FindAsync(requestContext, SchemaId.Name, content.Id, 13, CancellationToken);
+
+        Assert.Null(actual);
+    }
+
+    [Fact]
+    public async Task Should_only_query_own_contents_by_ids_if_user_has_only_own_permission()
+    {
+        var requestContext = SetupOwnContext();
+
+        var content1 = CreateContent() with { CreatedBy = requestContext.UserPrincipal.Token()! };
+        var content2 = CreateContent() with { CreatedBy = RefToken.User("other") };
+
+        var q = Q.Empty.WithIds([content1.Id, content2.Id]);
+
+        A.CallTo(() => contentRepository.QueryAsync(App,
+                A<List<Schema>>.That.Matches(x => x.Count == 1), q, SearchScope.Published,
+                A<CancellationToken>._))
+            .Returns(ResultList.CreateFrom(2, content1, content2));
+
+        var actual = await sut.QueryAsync(requestContext, q, CancellationToken);
+
+        Assert.Equal(1, actual.Total);
+        AssertContent(content1, Assert.Single(actual));
     }
 
     [Fact]
@@ -320,6 +384,18 @@ public class ContentQueryServiceTests : GivenContext
         }
 
         return CreateContext(isFrontend == 1, permissions.ToArray()).Clone(b => b.WithUnpublished(isUnpublished == 1));
+    }
+
+    private Context SetupOwnContext()
+    {
+        var permission = PermissionIds.ForApp(PermissionIds.AppContentsReadOwn, AppId.Name, SchemaId.Name).Id;
+
+        var principal = Mocks.CreateUser(false, null, permission);
+
+        // The actor is needed to compare it with the creator of the content.
+        principal.Identities.First().AddClaim(new Claim(OpenIdClaims.ClientId, "my-client"));
+
+        return new Context(principal, App);
     }
 
     private static void AssertContent(EnrichedContent source, EnrichedContent? actual)
