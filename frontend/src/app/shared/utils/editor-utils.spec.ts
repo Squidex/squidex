@@ -61,6 +61,40 @@ describe('EditorUtils', () => {
         expect(result).toEqual('http://undefined?query=value');
     });
 
+    it('should keep relative editor url', () => {
+        const result = computeEditorUrl('/editors/${editor1}', settings);
+
+        expect(result).toEqual('/editors/url/to/editor1');
+    });
+
+    ['javascript:alert(1)', ' JavaScript:alert(1)', 'data:text/html,<script>alert(1)</script>', 'vbscript:msgbox(1)'].forEach(url => {
+        it(`should return empty string if url has unsafe protocol ${url}`, () => {
+            const result = computeEditorUrl(url, settings);
+
+            expect(result).toEqual('');
+        });
+    });
+
+    it('should return empty string if interpolated url has unsafe protocol', () => {
+        const unsafeSettings = new AppSettingsDto({
+            patterns: [],
+            hideDateTimeModeButton: false,
+            hideScheduler: false,
+            editors: [
+                new EditorDto({
+                    name: 'evil',
+                    url: 'javascript:alert(1)',
+                }),
+            ],
+            version: 1,
+            _links: {},
+        });
+
+        const result = computeEditorUrl('${evil}', unsafeSettings);
+
+        expect(result).toEqual('');
+    });
+
     [null, undefined, ''].forEach(url => {
         it(`should return empty string if url is ${url}`, () => {
             const result = computeEditorUrl(url, settings);
