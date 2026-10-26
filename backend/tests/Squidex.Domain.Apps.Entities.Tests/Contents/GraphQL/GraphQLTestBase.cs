@@ -116,6 +116,11 @@ public abstract class GraphQLTestBase : IClassFixture<TranslationsFixture>
         A.CallTo(() => appProvider.GetSchemasAsync(TestApp.Default.Id, default))
             .Returns(schemas.ToList());
 
+        return CreateSut(appProvider);
+    }
+
+    protected CachingGraphQLResolver CreateSut(IAppProvider appProvider, ISchemasHash? schemasHash = null)
+    {
         var serviceProvider =
             new ServiceCollection()
                 .AddSingleton(TimeProvider.System)
@@ -145,9 +150,10 @@ public abstract class GraphQLTestBase : IClassFixture<TranslationsFixture>
                 .AddSingleton(
                     A.Fake<ILoggerFactory>())
                 .AddSingleton(
-                    A.Fake<ISchemasHash>())
+                    schemasHash ?? A.Fake<ISchemasHash>())
                 .AddMemoryCache()
                 .AddBackgroundCache()
+                .AddAsyncLocalCache()
                 .AddSingleton(appProvider)
                 .AddSingleton(assetQuery)
                 .AddSingleton(commandBus)

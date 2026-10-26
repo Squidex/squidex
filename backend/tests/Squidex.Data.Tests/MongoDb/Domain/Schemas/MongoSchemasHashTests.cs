@@ -62,4 +62,46 @@ public class MongoSchemasHashTests(MongoFixture fixture) : GivenContext, IAsyncL
         Assert.NotEmpty(hashKey);
         Assert.Equal(hashKey.Timestamp, timestamp);
     }
+
+    [Fact]
+    public async Task Should_remove_deleted_schemas_from_hash()
+    {
+        var schema1 = Schema.WithId(DomainId.NewGuid(), "my-schema1");
+        var schema2 = Schema.WithId(DomainId.NewGuid(), "my-schema2");
+
+        var timestamp = SystemClock.Instance.GetCurrentInstant().WithoutMs();
+
+        await sut.On(
+        [
+            Envelope.Create<IEvent>(new SchemaCreated
+            {
+                AppId = AppId,
+                SchemaId = schema1.NamedId(),
+            }).SetEventStreamNumber(schema1.Version).SetTimestamp(timestamp),
+
+            Envelope.Create<IEvent>(new SchemaCreated
+            {
+                AppId = AppId,
+                SchemaId = schema2.NamedId(),
+            }).SetEventStreamNumber(schema2.Version).SetTimestamp(timestamp),
+
+            Envelope.Create<IEvent>(new SchemaDeleted
+            {
+                AppId = AppId,
+                SchemaId = schema2.NamedId(),
+            }).SetEventStreamNumber(schema2.Version + 1).SetTimestamp(timestamp),
+        ]);
+
+        var hashKey = await sut.GetCurrentHashAsync(App, CancellationToken);
+
+        Assert.Equal(SchemasHashKey.Create(App, [schema1]), hashKey);
+    }
+
+    [Fact]
+    public async Task Should_include_app_version_if_app_has_no_hash()
+    {
+        var hashKey = await sut.GetCurrentHashAsync(App, CancellationToken);
+
+        Assert.Equal(SchemasHashKey.Create(App, Array.Empty<Schema>()), hashKey);
+    }
 }
