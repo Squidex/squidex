@@ -48,6 +48,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Caching;
 using Squidex.Infrastructure.Log;
 using Squidex.Infrastructure.Migrations;
+using Squidex.Migrations;
 using Squidex.Infrastructure.Queries;
 using Squidex.Infrastructure.States;
 using Squidex.Infrastructure.UsageTracking;
@@ -217,6 +218,10 @@ public static class ServiceExtensions
 
         services.AddSingletonAs<EFMigrationStatus<TContext>>()
             .As<IMigrationStatus>();
+
+        // The migration path cannot reference the generic type, therefore it is resolved by key.
+        services.AddKeyedTransient<IMigration, RebuildDedicatedContentTables<TContext, TContextContext>>(
+            RebuildDedicatedContentTables<TContext, TContextContext>.Key);
 
         services.AddSingletonAs<EFDistributedCache<TContext>>()
             .As<IDistributedCache>();

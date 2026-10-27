@@ -23,6 +23,7 @@ namespace Squidex.Domain.Apps.Entities.Contents.GraphQL;
 
 public sealed class CachingGraphQLResolver(
     IBackgroundCache cache,
+    ILocalCache localCache,
     ISchemasHash schemasHash,
     IServiceProvider serviceProvider,
     IOptions<GraphQLOptions> options)
@@ -43,8 +44,9 @@ public sealed class CachingGraphQLResolver(
     {
         var context = ((GraphQLExecutionContext)options.UserContext!).Context;
 
-        options.Schema = await GetSchemaAsync(context.App);
+        // Register the error handler first, so that errors when building the model are logged.
         options.HandleError(serviceProvider);
+        options.Schema = await GetSchemaAsync(context.App);
 
         return await next(options);
     }
@@ -60,7 +62,7 @@ public sealed class CachingGraphQLResolver(
     {
         if (options.CacheDuration <= TimeSpan.Zero)
         {
-            return CreateModelAsync(app);
+            return CreateModelAsync(app, SchemasHashKey.Empty);
         }
 
         // The version is not part of the key. Building the schema is expensive and the version
@@ -71,7 +73,17 @@ public sealed class CachingGraphQLResolver(
 
         return cache.GetOrCreateAsync(cacheKey, options.CacheDuration, async entry =>
         {
-            return await CreateModelAsync(app);
+            // Compare the hash with the same source in the validator. A key computed from the schemas would never
+            // match if the hash store is incomplete, for example for restored apps. The hash is read before the
+            // schemas, so a change in between only causes another rebuild.
+            var hashKey = await schemasHash.GetCurrentHashAsync(app);
+
+            // The model is shared between requests. Therefore it must not use schemas from the request-local
+            // cache, which might have been loaded with the cancellation token of another request.
+            using (localCache.StartContext())
+            {
+                return await CreateModelAsync(app, hashKey);
+            }
         },
         async entry =>
         {
@@ -81,11 +93,10 @@ public sealed class CachingGraphQLResolver(
         });
     }
 
-    private async Task<CacheEntry> CreateModelAsync(App app)
+    private async Task<CacheEntry> CreateModelAsync(App app, SchemasHashKey hashKey)
     {
         var schemasList = await serviceProvider.GetRequiredService<IAppProvider>().GetSchemasAsync(app.Id);
-        var schemasKey = SchemasHashKey.Create(app, schemasList);
 
-        return new CacheEntry(new Builder(app, options).BuildSchema(schemasList), schemasKey);
+        return new CacheEntry(new Builder(app, options).BuildSchema(schemasList), hashKey);
     }
 }

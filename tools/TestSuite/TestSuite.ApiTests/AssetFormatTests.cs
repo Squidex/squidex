@@ -59,7 +59,7 @@ public class AssetFormatTests(CreatedAppFixture fixture) : IClassFixture<Created
     {
         var asset = await _.Client.Assets.UploadFileAsync("Assets/SampleImage_62kb.jpg", "image/jpeg");
 
-        await AssertImageAsync(asset);
+        await AssertImageAsync(asset, isReencoded: true);
 
         Assert.Equal(79L, asset.Metadata["imageQuality"]);
     }
@@ -77,7 +77,7 @@ public class AssetFormatTests(CreatedAppFixture fixture) : IClassFixture<Created
     {
         var asset = await _.Client.Assets.UploadFileAsync("Assets/SampleImage_400kb.tiff", "image/jpeg");
 
-        await AssertImageAsync(asset);
+        await AssertImageAsync(asset, isReencoded: true);
     }
 
     [Fact]
@@ -128,23 +128,6 @@ public class AssetFormatTests(CreatedAppFixture fixture) : IClassFixture<Created
         }
     }
 
-    private async Task AssertImageAsync(AssetDto asset)
-    {
-        await Verify(asset);
-
-        // Should parse image metadata.
-        Assert.True(asset.IsImage);
-        Assert.Equal(600L, (long)asset.PixelWidth!);
-        Assert.Equal(600L, asset.Metadata["pixelWidth"]);
-        Assert.Equal(400L, (long)asset.PixelHeight!);
-        Assert.Equal(400L, asset.Metadata["pixelHeight"]);
-        Assert.Equal(AssetType.Image, asset.Type);
-
-        var resized = await GetResizedLengthAsync(asset.Id, 100, 100);
-
-        Assert.True(resized < asset.FileSize * .25);
-    }
-
     [Fact]
     public async Task Should_fix_orientation()
     {
@@ -159,7 +142,7 @@ public class AssetFormatTests(CreatedAppFixture fixture) : IClassFixture<Created
         Assert.Equal(79L, asset.Metadata["imageQuality"]);
         Assert.Equal(AssetType.Image, asset.Type);
 
-        await Verify(asset);
+        await VerifyReencoded(asset);
     }
 
     [Fact]
@@ -218,6 +201,39 @@ public class AssetFormatTests(CreatedAppFixture fixture) : IClassFixture<Created
         var asset = await _.Client.Assets.UploadFileAsync("Assets/SampleVideo_176x144_1mb.3gp", "audio/3gpp");
 
         await Verify(asset);
+    }
+
+    private async Task AssertImageAsync(AssetDto asset, bool isReencoded = false)
+    {
+        if (isReencoded)
+        {
+            await VerifyReencoded(asset);
+        }
+        else
+        {
+            await Verify(asset);
+        }
+
+        // Should parse image metadata.
+        Assert.True(asset.IsImage);
+        Assert.Equal(600L, (long)asset.PixelWidth!);
+        Assert.Equal(600L, asset.Metadata["pixelWidth"]);
+        Assert.Equal(400L, (long)asset.PixelHeight!);
+        Assert.Equal(400L, asset.Metadata["pixelHeight"]);
+        Assert.Equal(AssetType.Image, asset.Type);
+
+        var resized = await GetResizedLengthAsync(asset.Id, 100, 100);
+
+        Assert.True(resized < asset.FileSize * .25);
+    }
+
+    private static SettingsTask VerifyReencoded(AssetDto asset)
+    {
+        // The JPEG encoder produces slightly different bytes on each platform.
+        return Verify(asset)
+            .ScrubMember<AssetDto>(x => x.FileHash)
+            .ScrubMember<AssetDto>(x => x.FileSize)
+            .ScrubMember<AssetDto>(x => x.MetadataText);
     }
 
     private async Task<long> GetResizedLengthAsync(string imageId, int width, int height)

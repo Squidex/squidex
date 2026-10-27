@@ -136,24 +136,6 @@ public sealed partial class EFContentRepository<TContext, TContentContext>(
                 ct);
     }
 
-    public Task CreateIndexAsync(DomainId appId, DomainId schemaId, IndexDefinition index,
-        CancellationToken ct = default)
-    {
-        return Task.CompletedTask;
-    }
-
-    public Task<List<IndexDefinition>> GetIndexesAsync(DomainId appId, DomainId schemaId,
-        CancellationToken ct = default)
-    {
-        return Task.FromResult<List<IndexDefinition>>([]);
-    }
-
-    public Task DropIndexAsync(DomainId appId, DomainId schemaId, string name,
-        CancellationToken ct = default)
-    {
-        return Task.CompletedTask;
-    }
-
     private async Task<TContext> CreateDbContextAsync(
         CancellationToken ct)
     {

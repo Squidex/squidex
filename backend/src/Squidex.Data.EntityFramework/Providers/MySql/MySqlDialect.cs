@@ -85,23 +85,72 @@ public sealed class MySqlDialect : SqlDialect
         }
     }
 
+    public override IEnumerable<string> CreateIndex(string name, string table, IReadOnlyList<SqlIndexKey> keys, string description)
+    {
+        var sqlColumns = string.Join(", ", keys.Select(x => x.IsExpression ? $"({x.Expression}) {x.Order}" : $"{x.Expression} {x.Order}"));
+
+        yield return $"CREATE INDEX {FormatTable(name)} ON {FormatTable(table)} ({sqlColumns}) COMMENT {FormatLiteral(description)};";
+    }
+
+    public override IEnumerable<string> DropIndex(string name, string table)
+    {
+        yield return $"DROP INDEX {FormatTable(name)} ON {FormatTable(table)};";
+    }
+
+    public override Task<List<SqlIndexInfo>> QueryIndexesAsync(DbContext dbContext, string table,
+        CancellationToken ct)
+    {
+        var sqlQuery = $"""
+            SELECT INDEX_NAME AS {nameof(SqlIndexInfo.Name)}, MAX(INDEX_COMMENT) AS {nameof(SqlIndexInfo.Description)}
+            FROM information_schema.STATISTICS
+            WHERE TABLE_SCHEMA = DATABASE() AND TABLE_NAME = {FormatLiteral(table)}
+            GROUP BY INDEX_NAME
+            """;
+
+        return dbContext.Database.SqlQueryRaw<SqlIndexInfo>(sqlQuery).ToListAsync(ct);
+    }
+
+    public override IEnumerable<SqlIndexKey> IndexKeys(PropertyPath path, SortOrder order, bool isJson)
+    {
+        if (isJson)
+        {
+            var sqlOrder = FormatOrder(order);
+
+            // Must match the expressions of the ORDER BY clause, otherwise the index is not used.
+            yield return new SqlIndexKey(SortNumber(path), sqlOrder, true);
+            yield return new SqlIndexKey(SortText(path), sqlOrder, true);
+            yield break;
+        }
+
+        foreach (var key in base.IndexKeys(path, order, isJson))
+        {
+            yield return key;
+        }
+    }
+
     public override string OrderBy(PropertyPath path, SortOrder order, bool isJson)
     {
         if (isJson)
         {
             var sqlOrder = FormatOrder(order);
-            var sqlPath = path.JsonPath();
 
-            return $"""
-                IF (JSON_TYPE(JSON_EXTRACT({sqlPath})) IN ('INTEGER', 'DOUBLE', 'DECIMAL'),
-                    CAST(JSON_VALUE({sqlPath}) AS DOUBLE),
-                    NULL
-                ) {sqlOrder},
-                JSON_VALUE({sqlPath}) {sqlOrder}
-                """;
+            return $"{SortNumber(path)} {sqlOrder}, {SortText(path)} {sqlOrder}";
         }
 
         return base.OrderBy(path, order, isJson);
+    }
+
+    private static string SortNumber(PropertyPath path)
+    {
+        var sqlPath = path.JsonPath();
+
+        return $"IF(JSON_TYPE(JSON_EXTRACT({sqlPath})) IN ('INTEGER', 'DOUBLE', 'DECIMAL'), CAST(JSON_VALUE({sqlPath}) AS DOUBLE), NULL)";
+    }
+
+    private static string SortText(PropertyPath path)
+    {
+        // Long texts would exceed the maximum size of index keys.
+        return $"LEFT(JSON_VALUE({path.JsonPath()}), 200)";
     }
 
     public override string WhereMatch(PropertyPath path, string query, SqlParams queryParameters)

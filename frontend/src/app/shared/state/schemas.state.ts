@@ -8,7 +8,7 @@
 import { Injectable } from '@angular/core';
 import { EMPTY, forkJoin, Observable, of } from 'rxjs';
 import { catchError, finalize, tap } from 'rxjs/operators';
-import { debug, DialogService, LoadingState, shareMapSubscribed, shareSubscribed, State, Version } from '@app/framework';
+import { debug, DialogService, LoadingState, shareMapSubscribed, shareSubscribed, State, StringHelper, Version } from '@app/framework';
 import { AddFieldDto, ChangeCategoryDto, ConfigureFieldRulesDto, ConfigureUIFieldsDto, CreateSchemaDto, ExportContentsDto, FieldDto, MigrateContentsDto, NestedFieldDto, SchemaDto, SynchronizeSchemaDto, UpdateFieldDto, UpdateSchemaDto } from '../model';
 import { SchemasService } from '../services/schemas.service';
 import { AppsState } from './apps.state';
@@ -454,7 +454,7 @@ export function getCategoryTree(allSchemas: ReadonlyArray<SchemaDto>, categories
     let match = (_: SchemaDto) => true;
 
     if (filter) {
-        const terms = filter.split(' ').map(filter => new RegExp(filter.trim(), 'i'));
+        const terms = filter.split(' ').map(filter => StringHelper.searchRegex(filter.trim()));
 
         const matches = (value: string | undefined | null) => {
             return !!value && terms.every(term => value.search(term) >= 0);

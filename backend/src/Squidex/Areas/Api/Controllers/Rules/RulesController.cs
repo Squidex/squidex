@@ -423,6 +423,11 @@ public sealed class RulesController(
     [ApiCosts(0)]
     public async Task<IActionResult> PutEvent(string app, Guid id)
     {
+        if (!await IsEventOfAppAsync(id))
+        {
+            return NotFound();
+        }
+
         if (!await flowManager.ForceAsync(id, HttpContext.RequestAborted))
         {
             return NotFound();
@@ -441,10 +446,15 @@ public sealed class RulesController(
     [HttpDelete]
     [Route("apps/{app}/rules/events/{id}/")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
-    [ApiPermission]
+    [ApiPermissionOrAnonymous(PermissionIds.AppRulesEventsDelete)]
     [ApiCosts(0)]
     public async Task<IActionResult> DeleteEvent(string app, Guid id)
     {
+        if (!await IsEventOfAppAsync(id))
+        {
+            return NotFound();
+        }
+
         if (!await flowManager.CancelByInstanceIdAsync(id, HttpContext.RequestAborted))
         {
             return NotFound();
@@ -540,5 +550,13 @@ public sealed class RulesController(
         var response = RuleDto.FromDomain(result, runningRuleId == null, ruleRunnerService, Resources);
 
         return response;
+    }
+
+    private async Task<bool> IsEventOfAppAsync(Guid id)
+    {
+        // The event IDs are global, therefore we have to ensure that the event belongs to the current app.
+        var instance = await flowManager.FindInstanceAsync(id, HttpContext.RequestAborted);
+
+        return instance?.OwnerId == AppId.ToString();
     }
 }

@@ -112,6 +112,19 @@ describe('ContributorsState', () => {
             expect(contributorsState.snapshot.pageSize).toEqual(10);
         });
 
+        it('should treat search query as literal text', () => {
+            contributorsState.load().subscribe();
+            contributorsState.search('(4');
+
+            let contributors: ReadonlyArray<ContributorDto>;
+
+            contributorsState.contributorsFiltered.subscribe(result => {
+                contributors = result;
+            });
+
+            expect(contributors!).toEqual([]);
+        });
+
         it('should show notification on load if reload is true', () => {
             contributorsState.load(true).subscribe();
 

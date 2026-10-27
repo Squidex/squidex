@@ -46,8 +46,8 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          settings: .github/claude/settings.json
           claude_args: >-
             --model ${{ vars.CLAUDE_MODEL || 'claude-opus-5-5' }}
             --max-turns 40
-            --append-system-prompt "Follow CLAUDE.md. Before committing, verify your changes: for backend changes run dotnet build on the affected project and the related tests with --filter \"Category!=Dependencies & Category!=TestContainer\"; for frontend changes run npm run lint and npm test in frontend/. Never commit frontend/package-lock.json."
-            --allowedTools "Read,Grep,Glob,Edit,Write,Bash(git status:*),Bash(git log:*),Bash(git diff:*),Bash(gh pr view:*),Bash(gh pr diff:*),Bash(gh pr list:*),Bash(gh issue view:*),Bash(dotnet build:*),Bash(dotnet test:*),Bash(npm run lint:*),Bash(npm test:*),Bash(npx vitest:*)"
+            --append-system-prompt-file .github/claude/prompt.md

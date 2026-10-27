@@ -74,6 +74,27 @@ public class SqlDialect
         return string.Empty;
     }
 
+    public virtual IEnumerable<SqlIndexKey> IndexKeys(PropertyPath path, SortOrder order, bool isJson)
+    {
+        yield return new SqlIndexKey(FormatField(path, isJson), FormatOrder(order), isJson);
+    }
+
+    public virtual IEnumerable<string> CreateIndex(string name, string table, IReadOnlyList<SqlIndexKey> keys, string description)
+    {
+        throw new NotSupportedException();
+    }
+
+    public virtual IEnumerable<string> DropIndex(string name, string table)
+    {
+        throw new NotSupportedException();
+    }
+
+    public virtual Task<List<SqlIndexInfo>> QueryIndexesAsync(DbContext dbContext, string table,
+        CancellationToken ct)
+    {
+        throw new NotSupportedException();
+    }
+
     public virtual string FormatLimitOffset(long limit, long offset, bool hasOrder)
     {
         var hasLimit = limit > 0 && limit < long.MaxValue;
@@ -256,6 +277,11 @@ public class SqlDialect
     protected virtual string FormatTable(string tableName)
     {
         return tableName;
+    }
+
+    protected static string FormatLiteral(string value)
+    {
+        return $"'{value.Replace("'", "''", StringComparison.Ordinal)}'";
     }
 
     protected virtual string FormatField(PropertyPath path, bool isJson)

@@ -67,6 +67,7 @@ jobs:
         with:
           claude_code_oauth_token: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           github_token: ${{ secrets.GITHUB_TOKEN }}
+          settings: .github/claude/settings-daily-review.json
           prompt: |
             You are doing a daily automated review of this repository (Squidex).
             Today's focus area is: ${{ steps.focus.outputs.area }}
@@ -88,7 +89,7 @@ jobs:
                  `--filter "Category!=Dependencies & Category!=TestContainer"`.
                - frontend: run `npm run lint` and `npm test` in `frontend/`.
             5. Write the PR description to ${{ runner.temp }}/pr-body.md: first line is the
-               PR title (prefix it with "[${{ steps.focus.outputs.area }}]"), then category,
+               PR title, then category,
                severity, affected files, explanation of the problem, how it could be
                triggered, and what the fix does.
 
@@ -96,7 +97,6 @@ jobs:
           claude_args: >-
             --model ${{ vars.CLAUDE_MODEL || 'claude-opus-5-5' }}
             --max-turns 80
-            --allowedTools "Read,Grep,Glob,Edit,Write,Bash(gh pr list:*),Bash(git log:*),Bash(git diff:*),Bash(dotnet build:*),Bash(dotnet test:*),Bash(npm run lint:*),Bash(npm test:*),Bash(npx vitest:*)"
 
       - name: Enforce size limit and open PR
         env:

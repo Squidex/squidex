@@ -8,6 +8,7 @@
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Events;
+using Squidex.Domain.Apps.Events.Schemas;
 using Squidex.Events;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.EventSourcing;
@@ -44,18 +45,29 @@ public sealed class MongoSchemasHash(IMongoDatabase database) : MongoRepositoryB
                 continue;
             }
 
-            if (@event.Payload is SchemaEvent schemaEvent)
+            if (@event.Payload is not SchemaEvent schemaEvent)
             {
-                writes.Add(
-                    new UpdateOneModel<MongoSchemasHashEntity>(
-                        Filter.Eq(x => x.AppId, schemaEvent.AppId.Id),
-                        Update
-                            .Set($"s.{schemaEvent.SchemaId.Id}", @event.Headers.EventStreamNumber())
-                            .Set(x => x.Updated, @event.Headers.TimestampAsInstant()))
-                    {
-                        IsUpsert = true,
-                    });
+                continue;
             }
+
+            var timestamp = @event.Headers.TimestampAsInstant();
+
+            var fieldName = $"s.{schemaEvent.SchemaId.Id}";
+
+            // Deleted schemas are not returned by the schema index, so they must not be part of the hash either.
+            var update = Update.Set(fieldName, @event.Headers.EventStreamNumber());
+            if (schemaEvent is SchemaDeleted)
+            {
+                update = Update.Unset(fieldName);
+            }
+
+            writes.Add(
+                new UpdateOneModel<MongoSchemasHashEntity>(
+                    Filter.Eq(x => x.AppId, schemaEvent.AppId.Id),
+                    update.Set(x => x.Updated, timestamp))
+                {
+                    IsUpsert = true,
+                });
         }
 
         if (writes.Count == 0)
@@ -63,7 +75,8 @@ public sealed class MongoSchemasHash(IMongoDatabase database) : MongoRepositoryB
             return Task.CompletedTask;
         }
 
-        return Collection.BulkWriteAsync(writes, BulkUnordered);
+        // The writes for the same app must be applied in order, for example a deletion after a creation.
+        return Collection.BulkWriteAsync(writes);
     }
 
     public async Task<SchemasHashKey> GetCurrentHashAsync(App app,
@@ -74,7 +87,9 @@ public sealed class MongoSchemasHash(IMongoDatabase database) : MongoRepositoryB
         var entity = await Collection.Find(x => x.AppId == app.Id).FirstOrDefaultAsync(ct);
         if (entity == null)
         {
-            return SchemasHashKey.Empty;
+            // Apps without schema events since a restore have no document. The app version must still be part of
+            // the key, otherwise app changes would not be detected.
+            return SchemasHashKey.Create(app, new Dictionary<DomainId, long>());
         }
 
         return SchemasHashKey.Create(
