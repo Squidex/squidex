@@ -5,6 +5,8 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Text.RegularExpressions;
+using MongoDB.Bson;
 using MongoDB.Driver;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Apps.Repositories;
@@ -66,6 +68,39 @@ public sealed class MongoAppRepository(IMongoDatabase database) : MongoSnapshotS
                     .ToListAsync(ct);
 
             return RemoveDuplicateNames(entities);
+        }
+    }
+
+    public async Task<IResultList<App>> QueryAsync(string? query, Paging paging,
+        CancellationToken ct = default)
+    {
+        using (Telemetry.Activities.StartActivity("MongoAppRepository/QueryAsync"))
+        {
+            var filters = new List<FilterDefinition<MongoAppEntity>>
+            {
+                Filter.Eq(x => x.IndexedDeleted, false),
+            };
+
+            if (!string.IsNullOrWhiteSpace(query))
+            {
+                // App names are always lowercase, therefore we can avoid the slow case insensitive search.
+                filters.Add(Filter.Regex(x => x.IndexedName, new BsonRegularExpression(Regex.Escape(query.Trim().ToLowerInvariant()))));
+            }
+
+            var filter = Filter.And(filters);
+
+            var entities =
+                await Collection.Find(filter).SortBy(x => x.IndexedName).Skip(paging.Skip).Limit(paging.Take)
+                    .ToListAsync(ct);
+
+            var total = (long)entities.Count;
+
+            if (entities.Count >= paging.Take || paging.Skip > 0)
+            {
+                total = await Collection.CountDocumentsAsync(filter, cancellationToken: ct);
+            }
+
+            return ResultList.Create(total, entities.Select(x => x.Document));
         }
     }
 

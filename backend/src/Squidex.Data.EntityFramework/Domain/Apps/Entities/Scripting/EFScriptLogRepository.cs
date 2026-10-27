@@ -75,7 +75,7 @@ public sealed class EFScriptLogRepository<TContext>(IDbContextFactory<TContext> 
             .ExecuteDeleteAsync(ct);
     }
 
-    public async Task<IReadOnlyList<ScriptLogRecord>> QueryAsync(DomainId appId, string? name, int skip, int take,
+    public async Task<IReadOnlyList<ScriptLogRecord>> QueryAsync(DomainId appId, string? name, Paging paging,
         CancellationToken ct = default)
     {
         await using var dbContext = await CreateDbContextAsync(ct);
@@ -94,8 +94,8 @@ public sealed class EFScriptLogRepository<TContext>(IDbContextFactory<TContext> 
         var result =
             await query
                 .OrderByDescending(x => x.Timestamp)
-                .Skip(skip)
-                .Take(take)
+                .Skip(paging.Skip)
+                .Take(paging.Take)
                 .ToListAsync(ct);
 
         return result;

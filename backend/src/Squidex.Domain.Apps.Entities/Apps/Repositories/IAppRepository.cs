@@ -18,6 +18,9 @@ public interface IAppRepository
     Task<List<App>> QueryAllAsync(DomainId teamId,
         CancellationToken ct = default);
 
+    Task<IResultList<App>> QueryAsync(string? query, Paging paging,
+        CancellationToken ct = default);
+
     Task<App?> FindAsync(DomainId id,
         CancellationToken ct = default);
 

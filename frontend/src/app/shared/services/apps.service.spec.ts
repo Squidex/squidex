@@ -8,7 +8,7 @@
 import { provideHttpClient, withInterceptorsFromDi } from '@angular/common/http';
 import { HttpTestingController, provideHttpClientTesting } from '@angular/common/http/testing';
 import { inject, TestBed } from '@angular/core/testing';
-import { ApiUrlConfig, AppDto, AppSettingsDto, AppsService, AssetScriptsDto, DateTime, EditorDto, ErrorDto, PatternDto, Resource, Versioned, VersionTag } from '@app/shared/internal';
+import { ApiUrlConfig, AppDto, AppsDto, AppSettingsDto, AppsService, AssetScriptsDto, DateTime, EditorDto, ErrorDto, PatternDto, Resource, Versioned, VersionTag } from '@app/shared/internal';
 import { CreateAppDto, ResourceLinkDto, TransferToTeamDto, UpdateAppDto, UpdateAppSettingsDto, UpdateAssetScriptsDto } from '../model';
 
 describe('AppsService', () => {
@@ -47,6 +47,48 @@ describe('AppsService', () => {
         ]);
 
         expect(apps!).toEqual([createApp(12), createApp(13)]);
+    }));
+
+    it('should make get request to get all apps', inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+        let apps: AppsDto;
+        appsService.getAllApps().subscribe(result => {
+            apps = result;
+        });
+
+        const req = httpMock.expectOne('http://service/p/api/v2/apps');
+
+        expect(req.request.method).toEqual('GET');
+        expect(req.request.headers.get('If-Match')).toBeNull();
+
+        req.flush({
+            total: 2,
+            items: [
+                appResponse(12),
+                appResponse(13),
+            ],
+            containsAllApps: true,
+            _links: {},
+        });
+
+        expect(apps!).toEqual(new AppsDto({
+            total: 2,
+            items: [
+                createApp(12),
+                createApp(13),
+            ],
+            containsAllApps: true,
+            _links: {},
+        }));
+    }));
+
+    it('should make get request with paging and query to get all apps', inject([AppsService, HttpTestingController], (appsService: AppsService, httpMock: HttpTestingController) => {
+        appsService.getAllApps(20, 30, 'my-query').subscribe();
+
+        const req = httpMock.expectOne('http://service/p/api/v2/apps?take=20&skip=30&query=my-query');
+
+        expect(req.request.method).toEqual('GET');
+
+        req.flush({ total: 0, items: [], containsAllApps: true, _links: {} });
     }));
 
 

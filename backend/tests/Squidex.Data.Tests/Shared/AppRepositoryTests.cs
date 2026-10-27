@@ -147,6 +147,52 @@ public abstract class AppRepositoryTests
     }
 
     [Fact]
+    public async Task Should_query_apps_by_name()
+    {
+        var sut = await CreateAndPrepareSutAsync();
+
+        var result = await sut.QueryAsync("BY-TEAM", new Paging(0, 10));
+
+        Assert.Equal("by-team", result.Single().Description);
+        Assert.Equal(1, result.Total);
+    }
+
+    [Fact]
+    public async Task Should_query_apps_with_paging()
+    {
+        var sut = await CreateAndPrepareSutAsync();
+
+        var page1 = await sut.QueryAsync("by-", new Paging(0, 1));
+        var page2 = await sut.QueryAsync("by-", new Paging(1, 1));
+
+        Assert.Equal("by-contributor", page1.Single().Description);
+        Assert.Equal(2, page1.Total);
+        Assert.Equal("by-team", page2.Single().Description);
+        Assert.Equal(2, page2.Total);
+    }
+
+    [Fact]
+    public async Task Should_not_query_deleted_apps()
+    {
+        var sut = await CreateAndPrepareSutAsync();
+
+        var result = await sut.QueryAsync("default", new Paging(0, 10));
+
+        Assert.Equal("default-not-deleted", result.Single().Description);
+    }
+
+    [Fact]
+    public async Task Should_fix_invalid_paging()
+    {
+        var sut = await CreateAndPrepareSutAsync();
+
+        var result = await sut.QueryAsync("by-", new Paging(-5, 0));
+
+        Assert.Equal(["by-contributor", "by-team"], result.Select(x => x.Description).ToArray());
+        Assert.Equal(2, result.Total);
+    }
+
+    [Fact]
     public async Task Should_find_by_duplicate_name()
     {
         var sut = await CreateAndPrepareSutAsync();
