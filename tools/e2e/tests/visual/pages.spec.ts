@@ -34,6 +34,16 @@ const pages: VisualPage[] = [
 
                 await route.fulfill({ response, json: apps.filter((x: any) => x.name === appName) });
             });
+
+            // The admin also gets all apps of the installation, therefore only show the visual app.
+            await page.route(/\/api\/v2\/apps(\?.*)?$/, async route => {
+                const response = await route.fetch();
+                const apps = await response.json();
+
+                const items = apps.items.filter((x: any) => x.name === appName);
+
+                await route.fulfill({ response, json: { ...apps, items, total: items.length } });
+            });
         },
     },
     {
