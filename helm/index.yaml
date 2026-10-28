@@ -3,7 +3,7 @@ entries:
   squidex:
   - apiVersion: v2
     appVersion: 5.9.0
-    created: "2026-03-03T10:35:52.918231417-07:00"
+    created: "2026-10-28T15:11:13.4252759+01:00"
     dependencies:
     - condition: mongodb-replicaset.enabled
       name: mongodb-replicaset
@@ -29,7 +29,28 @@ entries:
   squidex7:
   - apiVersion: v2
     appVersion: 7.18.0
-    created: "2026-03-03T10:35:52.996989795-07:00"
+    created: "2026-10-28T15:11:13.483429+01:00"
+    description: Squidex CMS v7.0 and newer
+    digest: e5aba8574dc6383a6a39f85c6100c08f540e0ce6ef56afc3a307fe5c7075e2d7
+    home: https://squidex.io/
+    icon: https://raw.githubusercontent.com/Squidex/squidex/master/media/logo-squared.png
+    keywords:
+    - cms
+    - headless-cms
+    - mongodb
+    - csharp
+    - asp-net-core
+    - asp-net
+    name: squidex7
+    sources:
+    - https://github.com/Squidex/squidex
+    type: application
+    urls:
+    - squidex7-3.0.0.tgz
+    version: 3.0.0
+  - apiVersion: v2
+    appVersion: 7.18.0
+    created: "2026-10-28T15:11:13.4814163+01:00"
     dependencies:
     - condition: mongodb.enabled
       name: mongodb
@@ -55,7 +76,7 @@ entries:
     version: 2.1.2
   - apiVersion: v2
     appVersion: 7.18.0
-    created: "2026-03-03T10:35:52.985804988-07:00"
+    created: "2026-10-28T15:11:13.4759722+01:00"
     dependencies:
     - condition: mongodb.enabled
       name: mongodb
@@ -81,7 +102,7 @@ entries:
     version: 2.1.1
   - apiVersion: v2
     appVersion: 7.18.0
-    created: "2026-03-03T10:35:52.973606631-07:00"
+    created: "2026-10-28T15:11:13.4688177+01:00"
     dependencies:
     - condition: mongodb.enabled
       name: mongodb
@@ -107,7 +128,7 @@ entries:
     version: 2.1.0
   - apiVersion: v2
     appVersion: 7.18.0
-    created: "2026-03-03T10:35:52.961805079-07:00"
+    created: "2026-10-28T15:11:13.4625666+01:00"
     dependencies:
     - condition: mongodb.enabled
       name: mongodb
@@ -133,7 +154,7 @@ entries:
     version: 2.0.3
   - apiVersion: v2
     appVersion: 7.18.0
-    created: "2026-03-03T10:35:52.954012441-07:00"
+    created: "2026-10-28T15:11:13.4551724+01:00"
     dependencies:
     - condition: mongodb.enabled
       name: mongodb
@@ -159,7 +180,7 @@ entries:
     version: 2.0.2
   - apiVersion: v2
     appVersion: 7.18.0
-    created: "2026-03-03T10:35:52.942174029-07:00"
+    created: "2026-10-28T15:11:13.4473896+01:00"
     dependencies:
     - condition: mongodb.enabled
       name: mongodb
@@ -185,7 +206,7 @@ entries:
     version: 2.0.1
   - apiVersion: v2
     appVersion: 7.18.0
-    created: "2026-03-03T10:35:52.929526039-07:00"
+    created: "2026-10-28T15:11:13.440094+01:00"
     dependencies:
     - condition: mongodb.enabled
       name: mongodb
@@ -211,7 +232,7 @@ entries:
     version: 2.0.0
   - apiVersion: v2
     appVersion: 7.15.0
-    created: "2026-03-03T10:35:52.923824251-07:00"
+    created: "2026-10-28T15:11:13.433908+01:00"
     dependencies:
     - condition: mongodb-replicaset.enabled
       name: mongodb-replicaset
@@ -237,7 +258,7 @@ entries:
     version: 1.0.3
   - apiVersion: v2
     appVersion: 7.15.0
-    created: "2026-03-03T10:35:52.921763859-07:00"
+    created: "2026-10-28T15:11:13.4307827+01:00"
     dependencies:
     - condition: mongodb-replicaset.enabled
       name: mongodb-replicaset
@@ -263,7 +284,7 @@ entries:
     version: 1.0.2
   - apiVersion: v2
     appVersion: 7.0.2
-    created: "2026-03-03T10:35:52.920517312-07:00"
+    created: "2026-10-28T15:11:13.4283297+01:00"
     dependencies:
     - condition: mongodb-replicaset.enabled
       name: mongodb-replicaset
@@ -289,7 +310,7 @@ entries:
     version: 1.0.1
   - apiVersion: v2
     appVersion: 7.0.2
-    created: "2026-03-03T10:35:52.919340345-07:00"
+    created: "2026-10-28T15:11:13.4272311+01:00"
     dependencies:
     - condition: mongodb-replicaset.enabled
       name: mongodb-replicaset
@@ -313,4 +334,4 @@ entries:
     urls:
     - squidex7-1.0.0.tgz
     version: 1.0.0
-generated: "2026-03-03T10:35:52.91679264-07:00"
+generated: "2026-10-28T15:11:13.4227022+01:00"

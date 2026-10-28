@@ -388,18 +388,32 @@ mongodb:
   ## @param mongodb.replicaCount The number of replicas.
   ##
   replicaCount: 3
-  
+  ## @param mongodb.replicaSetName The name of the replica set.
+  ##
+  replicaSetName: rs0
+
+  image:
+    ## @param mongodb.image.repository MongoDB image repository.
+    ##
+    repository: mongo
+    ## @param mongodb.image.tag MongoDB image tag.
+    ##
+    tag: "8.0"
+    ## @param mongodb.image.pullPolicy MongoDB image pull policy.
+    ##
+    pullPolicy: IfNotPresent
+
   auth:
     ## @param mongodb.auth.enabled Enable authentication for MongoDB.
     ##
     enabled: false
     ## @param mongodb.auth.rootUsername The MongoDB root user name.
     ##
-    rootUsername: ""
-    ## @param mongodb.auth.rootPassword The MongoDB root password.
+    rootUsername: root
+    ## @param mongodb.auth.rootPassword The MongoDB root password (generated if empty). Use URL-safe characters only.
     ##
     rootPassword: ""
-    ## @param mongodb.auth.existingSecret The name of the existing secret to use for authentication.
+    ## @param mongodb.auth.existingSecret Existing secret with the keys `mongodb-root-password` and `mongodb-replica-set-key`.
     ##
     existingSecret: ""
   
@@ -418,10 +432,41 @@ mongodb:
     ##
     size: 10Gi
 
-  ## @skip mongodb.arbiter
-  arbiter:
-    ## @skip mongodb.arbiter.enabled
-    enabled: false
-  
+  ## @param mongodb.resources [object] Resource requests and limits.
+  resources:
+    requests:
+      cpu: "100m"
+      memory: "512Mi"
+
+  ## @skip mongodb.podSecurityContext
+  ## UID 1001 keeps volumes from the former Bitnami chart readable.
+  podSecurityContext:
+    seccompProfile:
+      type: RuntimeDefault
+    runAsNonRoot: true
+    runAsUser: 1001
+    runAsGroup: 1001
+    fsGroup: 1001
+
+  ## @skip mongodb.containerSecurityContext
+  containerSecurityContext:
+    allowPrivilegeEscalation: false
+    capabilities:
+      drop:
+        - ALL
+
   ## @skip mongodb.nodeSelector
   nodeSelector: {}
+  ## @skip mongodb.tolerations
+  tolerations: []
+  ## @skip mongodb.affinity
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchLabels:
+              app.kubernetes.io/name: mongodb
+              app.kubernetes.io/component: mongodb
+          topologyKey: kubernetes.io/hostname
