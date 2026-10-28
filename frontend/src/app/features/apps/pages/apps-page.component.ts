@@ -7,9 +7,10 @@
 
 import { AsyncPipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
+import { FormsModule, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { combineLatest } from 'rxjs';
 import { map, take } from 'rxjs/operators';
-import { AppDto, AppFormComponent, AppsState, AuthService, DialogModel, FeatureDto, LocalStoreService, ModalDirective, NewsService, Settings, TeamDto, TeamsState, TemplateDto, TemplatesState, TitleComponent, TourState, TourStepDirective, TranslatePipe, UIOptions, UIState } from '@app/shared';
+import { AllAppsState, AppDto, AppFormComponent, AppsState, AuthService, DialogModel, FeatureDto, LocalStoreService, ModalDirective, NewsService, PagerComponent, Settings, TeamDto, TeamsState, TemplateDto, TemplatesState, TitleComponent, TourState, TourStepDirective, TranslatePipe, UIOptions, UIState } from '@app/shared';
 import { AppComponent } from './app.component';
 import { NewsDialogComponent } from './news-dialog.component';
 import { OnboardingDialogComponent } from './onboarding-dialog.component';
@@ -25,9 +26,12 @@ type GroupedApps = { team?: TeamDto; apps: AppDto[] };
         AppComponent,
         AppFormComponent,
         AsyncPipe,
+        FormsModule,
         ModalDirective,
         NewsDialogComponent,
         OnboardingDialogComponent,
+        PagerComponent,
+        ReactiveFormsModule,
         TeamComponent,
         TitleComponent,
         TourStepDirective,
@@ -46,6 +50,19 @@ export class AppsPageComponent implements OnInit {
     public generalInfo = '';
 
     public starters = this.templatesState.starters;
+
+    public allAppsFilter = new UntypedFormControl();
+
+    public showAllApps =
+        combineLatest([
+            this.allAppsState.containsAllApps,
+            this.allAppsState.total,
+            this.allAppsState.query,
+            this.appsState.apps,
+        ]).pipe(map(([containsAllApps, total, query, apps]) => {
+            // Keep the section visible while searching, even if the search returns fewer apps.
+            return containsAllApps && (!!query || total > apps.length);
+        }));
 
     public groupedApps =
         combineLatest([
@@ -72,6 +89,7 @@ export class AppsPageComponent implements OnInit {
         }));
 
     constructor(
+        public readonly allAppsState: AllAppsState,
         public readonly authState: AuthService,
         public readonly uiState: UIState,
         private readonly appsState: AppsState,
@@ -120,6 +138,12 @@ export class AppsPageComponent implements OnInit {
             });
 
         this.templatesState.load(false, true);
+
+        this.allAppsState.load();
+    }
+
+    public searchAllApps() {
+        this.allAppsState.search(this.allAppsFilter.value);
     }
 
     public createNewApp(template?: TemplateDto) {

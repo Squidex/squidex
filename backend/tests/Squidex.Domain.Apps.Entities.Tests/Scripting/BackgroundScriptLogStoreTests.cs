@@ -135,10 +135,10 @@ public class BackgroundScriptLogStoreTests : GivenContext
     {
         var records = new List<ScriptLogRecord> { new ScriptLogRecord() };
 
-        A.CallTo(() => repository.QueryAsync(AppId.Id, "contents", 10, 20, CancellationToken))
+        A.CallTo(() => repository.QueryAsync(AppId.Id, "contents", new Paging(10, 20), CancellationToken))
             .Returns(records);
 
-        var actual = await sut.QueryAsync(AppId.Id, "contents", 10, 20, CancellationToken);
+        var actual = await sut.QueryAsync(AppId.Id, "contents", new Paging(10, 20), CancellationToken);
 
         Assert.Same(records, actual);
     }
@@ -146,9 +146,9 @@ public class BackgroundScriptLogStoreTests : GivenContext
     [Fact]
     public async Task Should_limit_query_to_max_items()
     {
-        await sut.QueryAsync(AppId.Id, null, -5, 1000, CancellationToken);
+        await sut.QueryAsync(AppId.Id, null, new Paging(-5, 1000), CancellationToken);
 
-        A.CallTo(() => repository.QueryAsync(AppId.Id, null, 0, options.MaxItemsPerApp, CancellationToken))
+        A.CallTo(() => repository.QueryAsync(AppId.Id, null, new Paging(0, options.MaxItemsPerApp), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -157,11 +157,11 @@ public class BackgroundScriptLogStoreTests : GivenContext
     {
         options.Enabled = false;
 
-        var actual = await sut.QueryAsync(AppId.Id, null, 0, 20, CancellationToken);
+        var actual = await sut.QueryAsync(AppId.Id, null, new Paging(0, 20), CancellationToken);
 
         Assert.Empty(actual);
 
-        A.CallTo(() => repository.QueryAsync(A<DomainId>._, A<string?>._, A<int>._, A<int>._, A<CancellationToken>._))
+        A.CallTo(() => repository.QueryAsync(A<DomainId>._, A<string?>._, A<Paging>._, A<CancellationToken>._))
             .MustNotHaveHappened();
     }
 

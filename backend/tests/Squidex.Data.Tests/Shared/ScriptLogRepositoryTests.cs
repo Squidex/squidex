@@ -7,7 +7,6 @@
 
 using NodaTime;
 using Squidex.Domain.Apps.Core.Scripting;
-using Squidex.Domain.Apps.Entities.Scripting;
 using Squidex.Domain.Apps.Entities.Scripting.Repositories;
 using Squidex.Infrastructure;
 
@@ -30,7 +29,7 @@ public abstract class ScriptLogRepositoryTests
 
         await sut.InsertManyAsync([record]);
 
-        var actual = await sut.QueryAsync(appId, null, 0, 10);
+        var actual = await sut.QueryAsync(appId, null, new Paging(0, 10));
 
         actual.Should().BeEquivalentTo([record]);
     }
@@ -49,7 +48,7 @@ public abstract class ScriptLogRepositoryTests
             CreateRecord(appId, "assets/create", 2),
         ]);
 
-        var actual = await sut.QueryAsync(appId, null, 1, 10);
+        var actual = await sut.QueryAsync(appId, null, new Paging(1, 10));
 
         Assert.Equal([now.Plus(Duration.FromSeconds(2)), now.Plus(Duration.FromSeconds(1))], actual.Select(x => x.Timestamp));
     }
@@ -69,7 +68,7 @@ public abstract class ScriptLogRepositoryTests
             CreateRecord(appId, "assets/create", 4),
         ]);
 
-        var actual = await sut.QueryAsync(appId, "contents/schema1", 0, 10);
+        var actual = await sut.QueryAsync(appId, "contents/schema1", new Paging(0, 10));
 
         Assert.Equal(["contents/schema1/update", "contents/schema1/create"], actual.Select(x => x.Name));
     }
@@ -87,7 +86,7 @@ public abstract class ScriptLogRepositoryTests
 
         await sut.TrimAsync(appId, 3);
 
-        var actual = await sut.QueryAsync(appId, null, 0, 100);
+        var actual = await sut.QueryAsync(appId, null, new Paging(0, 100));
 
         Assert.Equal(
         [
@@ -96,7 +95,7 @@ public abstract class ScriptLogRepositoryTests
             now.Plus(Duration.FromSeconds(7)),
         ], actual.Select(x => x.Timestamp));
 
-        var other = await sut.QueryAsync(appIdOther, null, 0, 100);
+        var other = await sut.QueryAsync(appIdOther, null, new Paging(0, 100));
 
         Assert.Equal(10, other.Count);
     }
@@ -112,7 +111,7 @@ public abstract class ScriptLogRepositoryTests
 
         await sut.TrimAsync(appId, 3);
 
-        var actual = await sut.QueryAsync(appId, null, 0, 100);
+        var actual = await sut.QueryAsync(appId, null, new Paging(0, 100));
 
         Assert.Equal(3, actual.Count);
     }
@@ -128,7 +127,7 @@ public abstract class ScriptLogRepositoryTests
 
         await sut.DeleteOlderThanAsync(now.Plus(Duration.FromSeconds(3)));
 
-        var actual = await sut.QueryAsync(appId, null, 0, 100);
+        var actual = await sut.QueryAsync(appId, null, new Paging(0, 100));
 
         Assert.Equal(2, actual.Count);
     }
@@ -144,7 +143,7 @@ public abstract class ScriptLogRepositoryTests
 
         await sut.DeleteAsync(appId);
 
-        var actual = await sut.QueryAsync(appId, null, 0, 100);
+        var actual = await sut.QueryAsync(appId, null, new Paging(0, 100));
 
         Assert.Empty(actual);
     }

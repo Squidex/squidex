@@ -36,7 +36,9 @@ public sealed class UserManagementController(ICommandBus commandBus, IUserServic
     [ApiPermission(PermissionIds.AdminUsersRead)]
     public async Task<IActionResult> GetUsers([FromQuery] string? query = null, [FromQuery] int skip = 0, [FromQuery] int take = 10)
     {
-        var users = await userService.QueryAsync(query, take, skip, HttpContext.RequestAborted);
+        var paging = new Paging(skip, take);
+
+        var users = await userService.QueryAsync(query, paging.Take, paging.Skip, HttpContext.RequestAborted);
 
         var response = UsersDto.FromDomain(users, users.Total, Resources);
 

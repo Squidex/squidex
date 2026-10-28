@@ -23,6 +23,8 @@
 
             @if (groupedApps | async; as groups) {
                 <div class="apps-section" sqxTourStep="allApps">
+                    <h3 class="mb-3">{{ "apps.myApps" | sqxTranslate }}</h3>
+
                     @for (group of groups; track trackByGroup($index, group)) {
                         <div class="team">
                             @if (group.team) {
@@ -44,6 +46,34 @@
                             <h5 class="empty-headline">{{ "apps.empty" | sqxTranslate }}</h5>
                         </div>
                     }
+                </div>
+            }
+
+            @if (showAllApps | async) {
+                <div class="apps-section">
+                    <div class="row align-items-center mb-3">
+                        <div class="col">
+                            <h3 class="mb-0">{{ "apps.allApps" | sqxTranslate }}</h3>
+                        </div>
+
+                        <div class="col-auto">
+                            <form (ngSubmit)="searchAllApps()">
+                                <input class="form-control search" [formControl]="allAppsFilter" placeholder="{{ 'apps.search' | sqxTranslate }}" />
+                            </form>
+                        </div>
+                    </div>
+
+                    <div class="row g-2">
+                        @for (app of allAppsState.apps | async; track app.id) {
+                            <div class="col-12 col-md-6 col-lg-4">
+                                <sqx-app [app]="app" />
+                            </div>
+                        } @empty {
+                            <small class="team-empty">{{ "apps.searchEmpty" | sqxTranslate }}</small>
+                        }
+                    </div>
+
+                    <sqx-pager [paging]="allAppsState.paging | async" (pagingChange)="allAppsState.page($event)" />
                 </div>
             }
         </div>

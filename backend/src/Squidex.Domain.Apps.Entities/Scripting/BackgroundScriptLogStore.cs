@@ -95,7 +95,7 @@ public sealed class BackgroundScriptLogStore : DisposableObjectBase, IScriptLogS
         });
     }
 
-    public Task<IReadOnlyList<ScriptLogRecord>> QueryAsync(DomainId appId, string? name, int skip, int take,
+    public Task<IReadOnlyList<ScriptLogRecord>> QueryAsync(DomainId appId, string? name, Paging paging,
         CancellationToken ct = default)
     {
         if (!options.Enabled)
@@ -107,8 +107,7 @@ public sealed class BackgroundScriptLogStore : DisposableObjectBase, IScriptLogS
         return repository.QueryAsync(
             appId,
             name,
-            Math.Max(0, skip),
-            Math.Clamp(take, 0, options.MaxItemsPerApp),
+            new Paging(paging.Skip, Math.Min(paging.Take, options.MaxItemsPerApp)),
             ct);
     }
 

@@ -10,7 +10,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Squidex.Domain.Apps.Core.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
-using Squidex.Infrastructure.Queries;
 using Squidex.Providers.Postgres;
 using Squidex.Providers.Postgres.App;
 using Testcontainers.PostgreSql;

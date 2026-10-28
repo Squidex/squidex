@@ -13,6 +13,6 @@ public interface IScriptLogStore
 {
     void Log(DomainId appId, string name, ScriptLog log);
 
-    Task<IReadOnlyList<ScriptLogRecord>> QueryAsync(DomainId appId, string? name, int skip, int take,
+    Task<IReadOnlyList<ScriptLogRecord>> QueryAsync(DomainId appId, string? name, Paging paging,
         CancellationToken ct = default);
 }

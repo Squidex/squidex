@@ -25,6 +25,6 @@ public interface IScriptLogRepository
     Task DeleteOlderThanAsync(Instant timestamp,
         CancellationToken ct = default);
 
-    Task<IReadOnlyList<ScriptLogRecord>> QueryAsync(DomainId appId, string? name, int skip, int take,
+    Task<IReadOnlyList<ScriptLogRecord>> QueryAsync(DomainId appId, string? name, Paging paging,
         CancellationToken ct = default);
 }

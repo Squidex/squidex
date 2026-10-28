@@ -12,7 +12,6 @@ using Squidex.Domain.Apps.Entities.Billing;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
-using Squidex.Shared.Identity;
 using Squidex.Web;
 using Squidex.Web.Pipeline;
 

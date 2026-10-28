@@ -11,6 +11,8 @@ using Squidex.Areas.Api.Controllers.Apps.Models;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Domain.Apps.Entities.Apps.Commands;
+using Squidex.Domain.Apps.Entities.Apps.Repositories;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
@@ -22,8 +24,10 @@ namespace Squidex.Areas.Api.Controllers.Apps;
 /// Update and query apps.
 /// </summary>
 [ApiExplorerSettings(GroupName = nameof(Apps))]
-public sealed class AppsController(ICommandBus commandBus, IAppProvider appProvider) : ApiController(commandBus)
+public sealed class AppsController(ICommandBus commandBus, IAppProvider appProvider, IAppRepository appRepository) : ApiController(commandBus)
 {
+    private static readonly Permission ReadAllAppsPermission = new Permission(PermissionIds.AdminAppsRead);
+
     /// <summary>
     /// Get your apps.
     /// </summary>
@@ -47,6 +51,53 @@ public sealed class AppsController(ICommandBus commandBus, IAppProvider appProvi
         var response = Deferred.Response(() =>
         {
             return apps.OrderBy(x => x.Name).Select(a => AppDto.FromDomain(a, userOrClientId, IsFrontend, Resources)).ToArray();
+        });
+
+        Response.Headers[HeaderNames.ETag] = apps.ToEtag();
+
+        return Ok(response);
+    }
+
+    /// <summary>
+    /// Get your apps.
+    /// </summary>
+    /// <param name="query">Optional query to search by app name. Only used for administrators.</param>
+    /// <param name="skip">The number of apps to skip. Only used for administrators.</param>
+    /// <param name="take">The number of apps to return. Only used for administrators.</param>
+    /// <response code="200">Apps returned.</response>
+    /// <remarks>
+    /// You can only retrieve the list of apps when you are authenticated as a user (OpenID implicit flow).
+    /// You will retrieve all apps, where you are assigned as a contributor.
+    /// Administrators retrieve all apps, paged and filtered by the query.
+    /// </remarks>
+    [HttpGet]
+    [Route("v2/apps/")]
+    [ProducesResponseType(typeof(AppsDto), StatusCodes.Status200OK)]
+    [ApiPermission]
+    [ApiCosts(0)]
+    public async Task<IActionResult> GetAppsV2([FromQuery] string? query = null, [FromQuery] int skip = 0, [FromQuery] int take = Paging.DefaultTake)
+    {
+        var userOrClientId = UserOrClientId!;
+        var userPermissions = Resources.Context.UserPermissions;
+
+        var containsAllApps = userPermissions.Allows(ReadAllAppsPermission);
+
+        IResultList<App> apps;
+
+        if (containsAllApps)
+        {
+            apps = await appRepository.QueryAsync(query, new Paging(skip, take), HttpContext.RequestAborted);
+        }
+        else
+        {
+            var userApps = await appProvider.GetUserAppsAsync(userOrClientId, userPermissions, HttpContext.RequestAborted);
+
+            apps = ResultList.Create(userApps.Count, userApps);
+        }
+
+        var response = Deferred.Response(() =>
+        {
+            return AppsDto.FromDomain(apps, containsAllApps, userOrClientId, IsFrontend, Resources);
         });
 
         Response.Headers[HeaderNames.ETag] = apps.ToEtag();

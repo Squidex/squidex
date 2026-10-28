@@ -17,9 +17,9 @@ setup('prepare visual app', async ({ page, appsPage, assetsPage, contentsPage, c
     // Use a dedicated app with a fixed name, so that other tests cannot change the screenshots.
     const appName = 'visual-tests';
     const schemaName = 'visual-schema';
-    const editorsSchemaName = 'visual-editors';
+    const schemaForEditors = 'visual-editors';
 
-    await writeJsonAsync('visual', { appName, schemaName, editorsSchemaName });
+    await writeJsonAsync('visual', { appName, schemaName, schemaForEditors });
 
     await appsPage.goto();
 
@@ -53,14 +53,14 @@ setup('prepare visual app', async ({ page, appsPage, assetsPage, contentsPage, c
         await schemasPage.goto(appName);
     }
 
-    if (!await hasSchema(editorsSchemaName)) {
+    if (!await hasSchema(schemaForEditors)) {
         const editorsDialog = await schemasPage.openSchemaDialog();
-        await editorsDialog.enterName(editorsSchemaName);
+        await editorsDialog.enterName(schemaForEditors);
         await editorsDialog.save();
     }
 
     // The schema defines a field for every editor, which is faster and more stable than the field wizard.
-    await page.goto(`/app/${appName}/schemas/${editorsSchemaName}?tab=json`);
+    await page.goto(`/app/${appName}/schemas/${schemaForEditors}?tab=json`);
     await page.locator('.ace_editor').waitFor({ state: 'visible' });
     await page.locator('.ace_editor').evaluate((element, json) => {
         (window as any).ace.edit(element).setValue(json, -1);
@@ -69,7 +69,7 @@ setup('prepare visual app', async ({ page, appsPage, assetsPage, contentsPage, c
     // The editor notifies the form with a delay.
     await page.waitForTimeout(1000);
 
-    const synchronized = page.waitForResponse(x => x.url().includes(`/schemas/${editorsSchemaName}/sync`) && x.request().method() === 'PUT');
+    const synchronized = page.waitForResponse(x => x.url().includes(`/schemas/${schemaForEditors}/sync`) && x.request().method() === 'PUT');
     await page.getByRole('button', { name: 'Synchronize' }).click();
     await synchronized;
 
@@ -86,8 +86,8 @@ setup('prepare visual app', async ({ page, appsPage, assetsPage, contentsPage, c
     await assetsPage.goto(appName);
     await assetsPage.uploadFile({
         name: 'logo.png',
-        mimeType: 'image/png',
         buffer: await readFile(path.join(__dirname, '../../assets/logo-squared.png')),
+        mimeType: 'image/png',
     });
 
     await assetsPage.getAssetCard('logo.png').then(x => x.root.waitFor({ state: 'visible' }));

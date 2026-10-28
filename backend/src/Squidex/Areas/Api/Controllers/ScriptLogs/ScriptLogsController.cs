@@ -8,6 +8,7 @@
 using Microsoft.AspNetCore.Mvc;
 using Squidex.Areas.Api.Controllers.ScriptLogs.Models;
 using Squidex.Domain.Apps.Core.Scripting;
+using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
 using Squidex.Shared;
 using Squidex.Web;
@@ -37,9 +38,9 @@ public sealed class ScriptLogsController(ICommandBus commandBus, IScriptLogStore
     [ProducesResponseType(typeof(ScriptLogsDto), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous(PermissionIds.AppScriptLogsRead)]
     [ApiCosts(0.1)]
-    public async Task<IActionResult> GetScriptLogs(string app, [FromQuery] string? name = null, [FromQuery] int skip = 0, [FromQuery] int take = 20)
+    public async Task<IActionResult> GetScriptLogs(string app, [FromQuery] string? name = null, [FromQuery] int skip = 0, [FromQuery] int take = Paging.DefaultTake)
     {
-        var logs = await scriptLogStore.QueryAsync(AppId, name, skip, take, HttpContext.RequestAborted);
+        var logs = await scriptLogStore.QueryAsync(AppId, name, new Paging(skip, take), HttpContext.RequestAborted);
 
         var response = ScriptLogsDto.FromDomain(logs);
 

@@ -52,6 +52,41 @@ public sealed class EFAppRepository<TContext>(IDbContextFactory<TContext> dbCont
         }
     }
 
+    public async Task<IResultList<App>> QueryAsync(string? query, Paging paging,
+        CancellationToken ct = default)
+    {
+        using (Telemetry.Activities.StartActivity("EFAppRepository/QueryAsync"))
+        {
+            await using var dbContext = await CreateDbContextAsync(ct);
+
+            var queryable = dbContext.Set<EFAppEntity>().Where(x => !x.IndexedDeleted);
+
+            if (!string.IsNullOrWhiteSpace(query))
+            {
+                // App names are always lowercase, therefore we can avoid the slow case insensitive search.
+                var search = query.Trim().ToLowerInvariant();
+
+                queryable = queryable.Where(x => x.IndexedName.Contains(search));
+            }
+
+            var entities =
+                await queryable
+                    .OrderBy(x => x.IndexedName)
+                    .Skip(paging.Skip)
+                    .Take(paging.Take)
+                    .ToListAsync(ct);
+
+            var total = (long)entities.Count;
+
+            if (entities.Count >= paging.Take || paging.Skip > 0)
+            {
+                total = await queryable.CountAsync(ct);
+            }
+
+            return ResultList.Create(total, entities.Select(x => x.Document));
+        }
+    }
+
     public async Task<App?> FindAsync(DomainId id,
         CancellationToken ct = default)
     {

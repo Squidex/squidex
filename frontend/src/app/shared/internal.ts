@@ -42,6 +42,7 @@ export * from './services/users-provider.service';
 export * from './services/users.service';
 export * from './services/workflows.service';
 export * from './state/apps.forms';
+export * from './state/all-apps.state';
 export * from './state/apps.state';
 export * from './state/asset-scripts.state';
 export * from './state/asset-uploader.state';

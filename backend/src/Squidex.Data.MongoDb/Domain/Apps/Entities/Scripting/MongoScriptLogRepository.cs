@@ -86,7 +86,7 @@ public sealed class MongoScriptLogRepository(IMongoDatabase database) : MongoRep
         return Collection.DeleteManyAsync(x => x.Timestamp < timestamp, ct);
     }
 
-    public async Task<IReadOnlyList<ScriptLogRecord>> QueryAsync(DomainId appId, string? name, int skip, int take,
+    public async Task<IReadOnlyList<ScriptLogRecord>> QueryAsync(DomainId appId, string? name, Paging paging,
         CancellationToken ct = default)
     {
         var filter = Filter.Eq(x => x.AppId, appId);
@@ -100,8 +100,8 @@ public sealed class MongoScriptLogRepository(IMongoDatabase database) : MongoRep
         var result =
             await Collection.Find(filter)
                 .SortByDescending(x => x.Timestamp)
-                .Skip(skip)
-                .Limit(take)
+                .Skip(paging.Skip)
+                .Limit(paging.Take)
                 .ToListAsync(ct);
 
         return result;

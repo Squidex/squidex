@@ -9,8 +9,8 @@ import { HttpClient, HttpErrorResponse, HttpEventType, HttpResponse } from '@ang
 import { Injectable } from '@angular/core';
 import { Observable, throwError } from 'rxjs';
 import { catchError, filter, map } from 'rxjs/operators';
-import { ApiUrlConfig, ErrorDto, HTTP, mapVersioned, pretifyError, Resource, Types, Versioned, VersionOrTag } from '@app/framework';
-import { AppDto, AppSettingsDto, AssetScriptsDto, CreateAppDto, TransferToTeamDto, UpdateAppDto, UpdateAppSettingsDto, UpdateAssetScriptsDto } from './../model';
+import { ApiUrlConfig, ErrorDto, HTTP, mapVersioned, pretifyError, Resource, StringHelper, Types, Versioned, VersionOrTag } from '@app/framework';
+import { AppDto, AppsDto, AppSettingsDto, AssetScriptsDto, CreateAppDto, TransferToTeamDto, UpdateAppDto, UpdateAppSettingsDto, UpdateAssetScriptsDto } from './../model';
 
 @Injectable({
     providedIn: 'root',
@@ -30,6 +30,16 @@ export class AppsService {
                 const apps = body.map(AppDto.fromJSON);
 
                 return apps;
+            }),
+            pretifyError('i18n:apps.loadFailed'));
+    }
+
+    public getAllApps(take?: number, skip?: number, query?: string): Observable<AppsDto> {
+        const url = this.apiUrl.buildUrl(`/api/v2/apps${StringHelper.buildQuery({ take, skip, query })}`);
+
+        return this.http.get<any>(url).pipe(
+            map(body => {
+                return AppsDto.fromJSON(body);
             }),
             pretifyError('i18n:apps.loadFailed'));
     }

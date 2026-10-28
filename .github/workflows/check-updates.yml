@@ -12,11 +12,11 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4.2.2
+      - uses: actions/checkout@v7.0.1
         with:
           token: ${{ secrets.WORKFLOW_SECRET }}
 
       - name: Check for Update
-        uses: saadmk11/github-actions-version-updater@v0.8.1
+        uses: saadmk11/github-actions-version-updater@v1.0.3
         with:
           token: ${{ secrets.WORKFLOW_SECRET }}

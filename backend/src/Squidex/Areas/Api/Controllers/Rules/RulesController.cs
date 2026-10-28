@@ -396,10 +396,12 @@ public sealed class RulesController(
     [ProducesResponseType(typeof(RuleEventsDto), StatusCodes.Status200OK)]
     [ApiPermissionOrAnonymous(PermissionIds.AppRulesEventsRead)]
     [ApiCosts(0)]
-    public async Task<IActionResult> GetEvents(string app, [FromQuery] DomainId? ruleId = null, [FromQuery] int skip = 0, [FromQuery] int take = 20)
+    public async Task<IActionResult> GetEvents(string app, [FromQuery] DomainId? ruleId = null, [FromQuery] int skip = 0, [FromQuery] int take = Paging.DefaultTake)
     {
+        var paging = new Paging(skip, take);
+
         var (states, total) =
-            await flowManager.QueryInstancesByOwnerAsync(AppId.ToString(), ruleId?.ToString(), skip, take,
+            await flowManager.QueryInstancesByOwnerAsync(AppId.ToString(), ruleId?.ToString(), paging.Skip, paging.Take,
                 HttpContext.RequestAborted);
 
         var response = RuleEventsDto.FromDomain(ResultList.Create(total, states), Resources, ruleId);

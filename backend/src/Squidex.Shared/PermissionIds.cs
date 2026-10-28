@@ -19,6 +19,9 @@ public static class PermissionIds
     // Admin App Creation
     public const string AdminAppCreate = "squidex.admin.apps.create";
 
+    // Admin App Overview
+    public const string AdminAppsRead = "squidex.admin.apps.read";
+
     // Admin Team Creation
     public const string AdminTeamCreate = "squidex.admin.teams.create";
 

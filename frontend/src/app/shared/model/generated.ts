@@ -15844,6 +15844,61 @@ export interface IAppDto extends IResourceDto {
     readonly roleProperties: { [key: string]: any; };
 }
 
+export class AppsDto extends ResourceDto implements IAppsDto {
+    /** The total number of apps. */
+    readonly total!: number;
+    /** The apps. */
+    readonly items!: AppDto[];
+    /** True, if all apps are returned and not only the apps where the user is assigned to. */
+    readonly containsAllApps!: boolean;
+
+    constructor(data?: IAppsDto) {
+        super(data);
+    }
+
+    init(_data: any) {
+        super.init(_data);
+        (<any>this).total = _data["total"];
+        if (Array.isArray(_data["items"])) {
+            (<any>this).items = [] as any;
+            for (let item of _data["items"])
+                (<any>this).items!.push(AppDto.fromJSON(item));
+        }
+        (<any>this).containsAllApps = _data["containsAllApps"];
+        this.cleanup(this);
+        return this;
+    }
+
+    static fromJSON(data: any): AppsDto {
+        const result = new AppsDto().init(data);
+        result.cleanup(this);
+        return result;
+    }
+
+    toJSON(data?: any) {
+        data = typeof data === 'object' ? data : {}; 
+        data["total"] = this.total;
+        if (Array.isArray(this.items)) {
+            data["items"] = [];
+            for (let item of this.items)
+                data["items"].push(item.toJSON());
+        }
+        data["containsAllApps"] = this.containsAllApps;
+        super.toJSON(data);
+        this.cleanup(data);
+        return data;
+    }
+}
+
+export interface IAppsDto extends IResourceDto {
+    /** The total number of apps. */
+    readonly total: number;
+    /** The apps. */
+    readonly items: AppDto[];
+    /** True, if all apps are returned and not only the apps where the user is assigned to. */
+    readonly containsAllApps: boolean;
+}
+
 export class CreateAppDto implements ICreateAppDto {
     /** Uses the cache values because the actual object is frozen. */
     private readonly cachedValues: { [key: string]: any } = {};

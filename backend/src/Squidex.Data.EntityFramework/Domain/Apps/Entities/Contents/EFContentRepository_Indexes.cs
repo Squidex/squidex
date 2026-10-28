@@ -5,11 +5,11 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
-using Microsoft.EntityFrameworkCore;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.States;
 
 #pragma warning disable MA0048 // File name must match type name
+#pragma warning disable RECS0096 // Type parameter is never used
 
 namespace Squidex.Domain.Apps.Entities.Contents;
 
