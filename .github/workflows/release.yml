@@ -11,13 +11,13 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Prepare - Checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v7.0.1
 
       - name: Prepare - Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3.11.1
+        uses: docker/setup-buildx-action@v4.4.1
 
       - name: Build
-        uses: docker/build-push-action@v6.18.0
+        uses: docker/build-push-action@v7.4.0
         env:
           DOCKER_BUILD_RECORD_UPLOAD: false
         with:
@@ -29,11 +29,11 @@ jobs:
     needs: build
     steps:
       - name: Prepare - Checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v7.0.1
 
       - name: Prepare - Setup dotnet
         id: dotnet
-        uses: actions/setup-dotnet@v4.3.1
+        uses: actions/setup-dotnet@v6.0.0
         with:
           dotnet-version: 10.0.x
 
@@ -54,23 +54,23 @@ jobs:
     needs: build
     steps:
       - name: Prepare - Checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v7.0.1
 
       - name: Prepare - Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3.11.1
+        uses: docker/setup-buildx-action@v4.4.1
 
       - name: Prepare - Setup dotnet
-        uses: actions/setup-dotnet@v4.3.1
+        uses: actions/setup-dotnet@v6.0.0
         with:
           dotnet-version: 10.0.x
 
       - name: Prepare - Setup Node
-        uses: actions/setup-node@v4.4.0
+        uses: actions/setup-node@v7.1.0
         with:
           node-version: 22
 
       - name: Build
-        uses: docker/build-push-action@v6.18.0
+        uses: docker/build-push-action@v7.4.0
         env:
           DOCKER_BUILD_RECORD_UPLOAD: false
           DOCKER_BUILD_SUMMARY: false
@@ -116,7 +116,7 @@ jobs:
 
       - name: Upload Playwright Artifacts
         if: always()
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: playwright-report
           path: tools/e2e/playwright-report/
@@ -124,13 +124,15 @@ jobs:
        
       - name: Dump docker logs on failure
         if: failure()
-        uses: jwalton/gh-docker-logs@v2.2.2
-        with:
-          dest: './docker-logs'
+        run: |
+          mkdir -p ./docker-logs
+          for name in $(docker ps -a --format '{{.Names}}'); do
+            docker logs "$name" > "./docker-logs/$name.log" 2>&1
+          done
 
       - name: Upload docker logs
         if: failure()
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: docker-logs
           path: './docker-logs'
@@ -163,23 +165,23 @@ jobs:
 
     steps:
       - name: Prepare - Checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v7.0.1
 
       - name: Prepare - Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3.11.1
+        uses: docker/setup-buildx-action@v4.4.1
 
       - name: Prepare - Setup dotnet
-        uses: actions/setup-dotnet@v4.3.1
+        uses: actions/setup-dotnet@v6.0.0
         with:
           dotnet-version: 10.0.x
 
       - name: Prepare - Setup Node
-        uses: actions/setup-node@v4.4.0
+        uses: actions/setup-node@v7.1.0
         with:
           node-version: 22
 
       - name: Build
-        uses: docker/build-push-action@v6.18.0
+        uses: docker/build-push-action@v7.4.0
         env:
           DOCKER_BUILD_RECORD_UPLOAD: false
           DOCKER_BUILD_SUMMARY: false
@@ -203,13 +205,15 @@ jobs:
        
       - name: Dump docker logs on failure
         if: failure()
-        uses: jwalton/gh-docker-logs@v2.2.2
-        with:
-          dest: './docker-logs'
+        run: |
+          mkdir -p ./docker-logs
+          for name in $(docker ps -a --format '{{.Names}}'); do
+            docker logs "$name" > "./docker-logs/$name.log" 2>&1
+          done
 
       - name: Upload docker logs
         if: failure()
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: docker-logs-${{ matrix.name }}
           path: './docker-logs'
@@ -224,16 +228,16 @@ jobs:
     needs: [test-containers, test-mongo, test-sql]
     steps:
       - name: Prepare - Checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v7.0.1
 
       - name: Prepare - Inject short Variables
-        uses: rlespinasse/github-slug-action@v5.1.0
+        uses: rlespinasse/github-slug-action@v5.7.1
 
       - name: Prepare - Setup QEMU
-        uses: docker/setup-qemu-action@v3.6.0
+        uses: docker/setup-qemu-action@v4.4.0
 
       - name: Prepare - Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3.11.1
+        uses: docker/setup-buildx-action@v4.4.1
 
       - name: Prepare - Remove unnecessary files
         run: |
@@ -242,10 +246,7 @@ jobs:
 
       - name: Version - Calculate Major
         id: version
-        uses: rishabhgupta/split-by@v1.0.1
-        with:
-          string: "${{ env.GITHUB_REF_SLUG }}"
-          split-by: "."
+        run: echo "major=${GITHUB_REF_SLUG%%.*}" >> "$GITHUB_OUTPUT"
 
       - name: Version - Check Tag
         id: normal-version
@@ -255,13 +256,13 @@ jobs:
           fi
 
       - name: Login to Docker Hub
-        uses: docker/login-action@v3.4.0
+        uses: docker/login-action@v4.7.0
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Build & Push for Multi-Platforms
-        uses: docker/build-push-action@v6.18.0
+        uses: docker/build-push-action@v7.4.0
         env:
           DOCKER_BUILD_RECORD_UPLOAD: false
         with:
@@ -270,7 +271,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/amd64,linux/arm64
-          tags: squidex/squidex:${{ env.GITHUB_REF_SLUG }},squidex/squidex:${{ steps.version.outputs._0 }}${{env.STABLE_VERSION == 'true' && ',squidex/squidex:latest'}}
+          tags: squidex/squidex:${{ env.GITHUB_REF_SLUG }},squidex/squidex:${{ steps.version.outputs.major }}${{env.STABLE_VERSION == 'true' && ',squidex/squidex:latest'}}
 
       - name: Release - Make directories
         run: sudo mkdir /build /release
@@ -287,13 +288,13 @@ jobs:
 
       - name: Release - Get Changelog Entry
         id: changelog_reader
-        uses: mindsers/changelog-reader-action@v2.2.3
+        uses: mindsers/changelog-reader-action@v2.4.0
         with:
           version: ${{ env.GITHUB_REF_SLUG }}
           path: ./CHANGELOG.md
 
       - name: Release - Publish Binaries
-        uses: ncipollo/release-action@v1.18.0
+        uses: ncipollo/release-action@v1.21.0
         with:
           allowUpdates: true
           artifactErrorsFailBuild: true

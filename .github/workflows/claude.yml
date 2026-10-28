@@ -24,15 +24,15 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7.0.1
         with:
           fetch-depth: 50
 
-      - uses: actions/setup-dotnet@v5
+      - uses: actions/setup-dotnet@v6.0.0
         with:
           dotnet-version: "10.0.x"
 
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v7.1.0
         with:
           node-version: "22"
           cache: npm

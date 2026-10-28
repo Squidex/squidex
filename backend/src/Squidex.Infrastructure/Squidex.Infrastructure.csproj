@@ -36,6 +36,7 @@
     <PackageReference Include="System.Linq.Async" Version="7.0.1" />
     <PackageReference Include="System.Reactive" Version="6.1.0" />
     <PackageReference Include="System.Reflection.TypeExtensions" Version="4.7.0" />
+    <PackageReference Include="System.Security.Cryptography.Pkcs" Version="10.0.14" />
   </ItemGroup>
   <ItemGroup>
     <AdditionalFiles Include="..\..\stylecop.json" Link="stylecop.json" />

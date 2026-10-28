@@ -9,21 +9,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Prepare - Checkout
-        uses: actions/checkout@v4.2.2
+        uses: actions/checkout@v7.0.1
 
       - name: Prepare - Setup QEMU
-        uses: docker/setup-qemu-action@v3.6.0
+        uses: docker/setup-qemu-action@v4.4.0
 
       - name: Prepare - Setup Docker Buildx
-        uses: docker/setup-buildx-action@v3.11.1
+        uses: docker/setup-buildx-action@v4.4.1
 
       - name: Prepare - Setup Node
-        uses: actions/setup-node@v4.4.0
+        uses: actions/setup-node@v7.1.0
         with:
           node-version: 22
 
       - name: Build - BUILD
-        uses: docker/build-push-action@v6.18.0
+        uses: docker/build-push-action@v7.4.0
         with:
           load: true
           cache-from: type=gha
@@ -50,7 +50,7 @@ jobs:
 
       - name: Test - Upload Playwright Artifacts
         if: always()
-        uses: actions/upload-artifact@v4.6.2
+        uses: actions/upload-artifact@v7.0.2
         with:
           name: snapshots
           path: tools/e2e/snapshots/
