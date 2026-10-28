@@ -9,7 +9,6 @@ using System.ComponentModel;
 using ModelContextProtocol;
 using ModelContextProtocol.Server;
 using Squidex.Areas.Api.Controllers.Schemas.Models;
-using Squidex.Domain.Apps.Core.Schemas;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure.Json;
 using Squidex.Shared;

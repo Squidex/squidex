@@ -7,7 +7,6 @@
 
 using NodaTime;
 using Squidex.Domain.Apps.Core.Scripting;
-using Squidex.Domain.Apps.Entities.Scripting;
 using Squidex.Domain.Apps.Entities.Scripting.Repositories;
 using Squidex.Infrastructure;
 

@@ -1,6 +1,4 @@
-using System.IO;
-using Microsoft.EntityFrameworkCore.Migrations;
-using Squidex.Providers.Postgres;
+﻿using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 

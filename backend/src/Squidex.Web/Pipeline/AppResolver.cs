@@ -13,7 +13,6 @@ using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Entities;
 using Squidex.Infrastructure.Security;
 using Squidex.Shared;
-using Squidex.Shared.Identity;
 
 namespace Squidex.Web.Pipeline;
 

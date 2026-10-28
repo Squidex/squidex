@@ -13,7 +13,6 @@ using Squidex.Caching;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Entities.Contents.GraphQL.Types;
 using Squidex.Domain.Apps.Entities.Schemas;
-using Squidex.Infrastructure;
 using GraphQLSchema = GraphQL.Types.Schema;
 
 #pragma warning disable SA1313 // Parameter names should begin with lower-case letter

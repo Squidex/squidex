@@ -10,7 +10,6 @@ using Jint.Native;
 using Squidex.Domain.Apps.Core.Properties;
 using Squidex.Domain.Apps.Core.Rules.EnrichedEvents;
 using Squidex.Domain.Apps.Core.Scripting;
-using Squidex.Flows;
 using Squidex.Text;
 
 namespace Squidex.Domain.Apps.Core.HandleRules.Extensions;
