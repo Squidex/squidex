@@ -9,7 +9,7 @@
 import { ChangeDetectionStrategy, Component, Input, OnChanges } from '@angular/core';
 import { Observable } from 'rxjs';
 import { take } from 'rxjs/operators';
-import { AuthService, ContentDto, DropdownMenuComponent, interpolate, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, Settings, StatefulComponent, TranslatePipe } from '@app/shared';
+import { AuthService, ContentDto, DropdownMenuComponent, interpolate, isSafeUrl, LocalStoreService, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, Settings, StatefulComponent, TranslatePipe } from '@app/shared';
 
 interface State {
     // The name of the selected preview config.
@@ -82,6 +82,9 @@ export class PreviewButtonComponent extends StatefulComponent<State> implements 
     private navigateTo(name: string) {
         const urlVars = { ...this.content, ...this.authService.user || {} };
         const urlLink = interpolate(this.schema.previewUrls[name], urlVars, 'iv');
+        if (!isSafeUrl(urlLink)) {
+            return;
+        }
 
         window.open(urlLink, '_blank');
     }
