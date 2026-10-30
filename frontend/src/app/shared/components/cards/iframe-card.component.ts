@@ -7,7 +7,7 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
 import { ApiUrlConfig, Subscriptions, ThemeService, Types } from '@app/framework';
-import { AppDto, AuthService, TeamDto } from '@app/shared/internal';
+import { AppDto, AuthService, isSafeFrameUrl, TeamDto } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-iframe-card',
@@ -55,7 +55,13 @@ export class IFrameCardComponent implements AfterViewInit {
     }
 
     public ngAfterViewInit() {
-        this.iframe.nativeElement.src = this.options?.src;
+        // The source comes from shared app settings and is assigned to the DOM directly, therefore it is not sanitized by Angular.
+        const src = this.options?.src;
+        if (!isSafeFrameUrl(src)) {
+            return;
+        }
+
+        this.iframe.nativeElement.src = src;
     }
 
     @HostListener('window:message', ['$event'])

@@ -6,7 +6,7 @@
  */
 
 import { AppSettingsDto, EditorDto } from '../model';
-import { computeEditorUrl } from './editor-utils';
+import { computeEditorUrl, isSafeFrameUrl } from './editor-utils';
 
 describe('EditorUtils', () => {
     const settings = new AppSettingsDto({
@@ -100,6 +100,22 @@ describe('EditorUtils', () => {
             const result = computeEditorUrl(url, settings);
 
             expect(result).toEqual('');
+        });
+    });
+
+    ['https://squidex.io/card', 'http://localhost:3000', '/cards/card.html'].forEach(url => {
+        it(`should treat frame url as safe if url is ${url}`, () => {
+            const result = isSafeFrameUrl(url);
+
+            expect(result).toBeTruthy();
+        });
+    });
+
+    ['javascript:alert(1)', ' JavaScript:alert(1)', 'data:text/html,<script>alert(1)</script>', null, undefined, '', 42, {}].forEach(url => {
+        it(`should treat frame url as unsafe if url is ${JSON.stringify(url)}`, () => {
+            const result = isSafeFrameUrl(url);
+
+            expect(result).toBeFalsy();
         });
     });
 });
