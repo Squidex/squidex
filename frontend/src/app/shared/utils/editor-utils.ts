@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { interpolate } from '@app/framework';
+import { interpolate, Types } from '@app/framework';
 import { AppSettingsDto } from '../model';
 
 export function computeEditorUrl(url?: string | null, settings?: AppSettingsDto | null) {
@@ -22,11 +22,11 @@ export function computeEditorUrl(url?: string | null, settings?: AppSettingsDto 
 
     const result = interpolate(url, editors) || '';
 
-    return isSafeEditorUrl(result) ? result : '';
+    return isSafeFrameUrl(result) ? result : '';
 }
 
-function isSafeEditorUrl(url: string) {
-    if (!url) {
+export function isSafeFrameUrl(url: unknown): url is string {
+    if (!url || !Types.isString(url)) {
         return false;
     }
 
