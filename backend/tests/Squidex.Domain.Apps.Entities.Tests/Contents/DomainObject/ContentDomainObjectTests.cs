@@ -608,6 +608,20 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
     }
 
     [Fact]
+    public async Task ChangeStatus_should_throw_exception_if_scheduled_transition_not_allowed()
+    {
+        var command = new ChangeContentStatus { Status = Status.Published, DueTime = Instant.MaxValue };
+
+        await ExecuteCreateAsync();
+
+        A.CallTo(() => contentWorkflow.CanMoveTo(A<Content>._, Status.Draft, Status.Published, ApiContext.UserPrincipal))
+            .Returns(false);
+
+        await Assert.ThrowsAsync<ValidationException>(() => PublishAsync(command));
+        Assert.Null(sut.Snapshot.ScheduleJob);
+    }
+
+    [Fact]
     public async Task ChangeStatus_should_refresh_properties_and_unset_schedule_if_completed()
     {
         var dueTime = Instant.MaxValue;
