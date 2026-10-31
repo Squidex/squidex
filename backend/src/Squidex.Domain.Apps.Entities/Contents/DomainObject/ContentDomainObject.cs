@@ -176,14 +176,14 @@ public partial class ContentDomainObject(
                 {
                     try
                     {
+                        var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
+
                         if (c.DueTime > SystemClock.Instance.GetCurrentInstant())
                         {
-                            ChangeStatusScheduled(c, c.DueTime.Value);
+                            await ScheduleCore(c, c.DueTime.Value, operation);
                         }
                         else
                         {
-                            var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
-
                             await ChangeCore(c, operation, ct);
                         }
                     }
@@ -318,6 +318,23 @@ public partial class ContentDomainObject(
         }
 
         ChangeStatus(c);
+    }
+
+    private async Task ScheduleCore(ChangeContentStatus c, Instant dueTime, ContentOperation operation)
+    {
+        // The scheduled change is executed without a user, therefore permissions and workflow roles must be checked now.
+        operation.MustHavePermission(PermissionIds.AppContentsChangeStatus);
+
+        if (c.DoNotValidateWorkflow)
+        {
+            await operation.CheckStatusAsync(c.Status);
+        }
+        else
+        {
+            await operation.CheckTransitionAsync(c.Status);
+        }
+
+        ChangeStatusScheduled(c, dueTime);
     }
 
     private void MigrateCore(MigrateContent c)
