@@ -258,7 +258,8 @@
 
                 @case (4) {
                     @if (asset | sqxPreviewable) {
-                        <ngx-doc-viewer [style]="{}" style="width: 100%; height: 50vh" [url]="asset | sqxAssetPreviewUrl" viewer="google"></ngx-doc-viewer>
+                        <!-- The Google viewer is a third party and must never receive the access token of the user. -->
+                        <ngx-doc-viewer [style]="{}" style="width: 100%; height: 50vh" [url]="asset | sqxAssetUrl: asset.version" viewer="google"></ngx-doc-viewer>
                     } @else {
                         <sqx-video-player [mimeType]="asset.mimeType" [source]="asset | sqxAssetPreviewUrl" />
                     }
