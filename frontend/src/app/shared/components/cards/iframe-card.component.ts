@@ -7,7 +7,7 @@
 
 import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, HostListener, Input, ViewChild } from '@angular/core';
 import { ApiUrlConfig, Subscriptions, ThemeService, Types } from '@app/framework';
-import { AppDto, AuthService, isSafeFrameUrl, TeamDto } from '@app/shared/internal';
+import { AppDto, AuthService, isSafeUrl, TeamDto } from '@app/shared/internal';
 
 @Component({
     selector: 'sqx-iframe-card',
@@ -57,7 +57,7 @@ export class IFrameCardComponent implements AfterViewInit {
     public ngAfterViewInit() {
         // The source comes from shared app settings and is assigned to the DOM directly, therefore it is not sanitized by Angular.
         const src = this.options?.src;
-        if (!isSafeFrameUrl(src)) {
+        if (!isSafeUrl(src)) {
             return;
         }
 

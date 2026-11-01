@@ -6,7 +6,7 @@
  */
 
 import { AppSettingsDto, EditorDto } from '../model';
-import { computeEditorUrl, isSafeFrameUrl } from './editor-utils';
+import { computeEditorUrl, isSafeUrl } from './editor-utils';
 
 describe('EditorUtils', () => {
     const settings = new AppSettingsDto({
@@ -103,19 +103,19 @@ describe('EditorUtils', () => {
         });
     });
 
-    ['https://squidex.io/card', 'http://localhost:3000', '/cards/card.html'].forEach(url => {
-        it(`should treat frame url as safe if url is ${url}`, () => {
-            const result = isSafeFrameUrl(url);
+    ['http://squidex.io/preview', 'https://squidex.io/preview?id=1', '/preview/1', 'http://localhost:3000'].forEach(url => {
+        it(`should treat url as safe ${url}`, () => {
+            const result = isSafeUrl(url);
 
-            expect(result).toBeTruthy();
+            expect(result).toBe(true);
         });
     });
 
-    ['javascript:alert(1)', ' JavaScript:alert(1)', 'data:text/html,<script>alert(1)</script>', null, undefined, '', 42, {}].forEach(url => {
-        it(`should treat frame url as unsafe if url is ${JSON.stringify(url)}`, () => {
-            const result = isSafeFrameUrl(url);
+    ['javascript:alert(1)', ' JavaScript:alert(1)', 'data:text/html,<script>alert(1)</script>', 'vbscript:msgbox(1)', '', null, undefined, 42, {}].forEach(url => {
+        it(`should treat url as unsafe ${JSON.stringify(url)}`, () => {
+            const result = isSafeUrl(url);
 
-            expect(result).toBeFalsy();
+            expect(result).toBe(false);
         });
     });
 });
