@@ -280,7 +280,13 @@ public partial class ContentDomainObject(
     private async Task ChangeCore(ChangeContentStatus c, ContentOperation operation,
         CancellationToken ct)
     {
-        operation.MustHavePermission(PermissionIds.AppContentsChangeStatus);
+        // Permission and workflow transition of scheduled changes have already been checked when the change was scheduled.
+        var isScheduled = c.StatusJobId != null && Snapshot.ScheduleJob?.Id == c.StatusJobId;
+        if (!isScheduled)
+        {
+            operation.MustHavePermission(PermissionIds.AppContentsChangeStatus);
+        }
+
         operation.MustNotChangeSingleton(c.Status);
 
         if (c.Status == Snapshot.EditingStatus)
@@ -288,7 +294,7 @@ public partial class ContentDomainObject(
             return;
         }
 
-        if (c.DoNotValidateWorkflow)
+        if (c.DoNotValidateWorkflow || isScheduled)
         {
             await operation.CheckStatusAsync(c.Status);
         }
@@ -322,7 +328,7 @@ public partial class ContentDomainObject(
 
     private async Task ScheduleCore(ChangeContentStatus c, Instant dueTime, ContentOperation operation)
     {
-        // The scheduled change is executed without a user, therefore permissions and workflow roles must be checked now.
+        // The scheduled change is executed later without a user, therefore permissions and workflow roles must be checked now.
         operation.MustHavePermission(PermissionIds.AppContentsChangeStatus);
 
         if (c.DoNotValidateWorkflow)

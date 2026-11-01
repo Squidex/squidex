@@ -108,6 +108,9 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
         A.CallTo(() => contentWorkflow.GetInitialStatus())
             .Returns(Status.Draft);
 
+        A.CallTo(() => contentWorkflow.GetInfo(A<Status>._))
+            .ReturnsLazily(x => new StatusInfo(x.GetArgument<Status>(0), StatusColors.Draft));
+
         A.CallTo(() => contentWorkflow.CanMoveTo(A<Content>._, Status.Draft, Status.Published, A<ClaimsPrincipal?>._))
             .Returns(true);
 
@@ -631,9 +634,6 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var command = new ChangeContentStatus { Status = Status.Archived, StatusJobId = sut.Snapshot.ScheduleJob!.Id };
 
-        A.CallTo(() => contentWorkflow.CanMoveTo(A<Content>._, Status.Draft, Status.Archived, ApiContext.UserPrincipal))
-            .Returns(true);
-
         var actual = await PublishAsync(command);
 
         await VerifySutAsync(actual);
@@ -652,8 +652,8 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         var command = new ChangeContentStatus { Status = Status.Published, StatusJobId = sut.Snapshot.ScheduleJob!.Id };
 
-        A.CallTo(() => contentWorkflow.CanMoveTo(A<Content>._, Status.Draft, Status.Published, ApiContext.UserPrincipal))
-            .Returns(false);
+        A.CallTo(() => contentWorkflow.GetInfo(Status.Published))
+            .Returns(null);
 
         var actual = await PublishAsync(command);
 
@@ -661,6 +661,25 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         A.CallTo(() => scriptEngine.ExecuteAsync(A<DataScriptVars>._, "<change-script>", ScriptOptions(), CancellationToken))
             .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task ChangeStatus_should_not_check_transition_if_scheduled_change_executed()
+    {
+        var dueTime = Instant.MaxValue;
+
+        await ExecuteCreateAsync();
+        await ExecuteChangeStatusAsync(Status.Published, dueTime);
+
+        var command = new ChangeContentStatus { Status = Status.Published, StatusJobId = sut.Snapshot.ScheduleJob!.Id };
+
+        A.CallTo(() => contentWorkflow.CanMoveTo(A<Content>._, Status.Draft, Status.Published, A<ClaimsPrincipal?>._))
+            .Returns(false);
+
+        await PublishAsync(command);
+
+        Assert.Equal(Status.Published, sut.Snapshot.EditingStatus);
+        Assert.Null(sut.Snapshot.ScheduleJob);
     }
 
     [Fact]
