@@ -5,6 +5,7 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Security.Claims;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Squidex.Assets;
@@ -17,6 +18,7 @@ using Squidex.Domain.Apps.Entities.Contents.Repositories;
 using Squidex.Domain.Apps.Entities.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Commands;
+using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Assets.DomainObject;
 
@@ -133,7 +135,7 @@ public class AssetDomainObjectTests : HandlerTestBase<Asset>
     [Fact]
     public async Task Upsert_should_create_events_and_update_file_state_if_found()
     {
-        var command = new UpsertAsset { File = file, FileHash = "NewHash" };
+        var command = new UpsertAsset { File = file, FileHash = "NewHash", User = CreateUser(PermissionIds.AppAssetsUpload) };
 
         await ExecuteCreateAsync();
 
@@ -143,6 +145,54 @@ public class AssetDomainObjectTests : HandlerTestBase<Asset>
 
         A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<update-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Upsert_should_create_asset_with_create_permission_only_if_not_found()
+    {
+        var command = new UpsertAsset { File = file, FileHash = "NewHash", User = CreateUser(PermissionIds.AppAssetsCreate) };
+
+        await PublishAsync(sut, command);
+
+        Assert.Equal(0, sut.Snapshot.Version);
+    }
+
+    [Fact]
+    public async Task Upsert_should_throw_exception_if_found_and_user_has_no_upload_permission()
+    {
+        var command = new UpsertAsset { File = file, FileHash = "NewHash", User = CreateUser(PermissionIds.AppAssetsCreate) };
+
+        await ExecuteCreateAsync();
+
+        await Assert.ThrowsAsync<DomainForbiddenException>(() => PublishAsync(sut, command));
+
+        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<update-script>", ScriptOptions(), CancellationToken))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Upsert_should_throw_exception_if_found_and_moved_and_user_has_no_update_permission()
+    {
+        var command = new UpsertAsset { File = file, FileHash = "NewHash", ParentId = parentId, User = CreateUser(PermissionIds.AppAssetsUpload) };
+
+        await ExecuteCreateAsync();
+
+        await Assert.ThrowsAsync<DomainForbiddenException>(() => PublishAsync(sut, command));
+
+        A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<move-script>", ScriptOptions(), CancellationToken))
+            .MustNotHaveHappened();
+    }
+
+    [Fact]
+    public async Task Upsert_should_update_and_move_asset_if_found_and_user_has_permissions()
+    {
+        var command = new UpsertAsset { File = file, FileHash = "NewHash", ParentId = parentId, User = CreateUser(PermissionIds.AppAssetsUpload, PermissionIds.AppAssetsUpdate) };
+
+        await ExecuteCreateAsync();
+
+        await PublishAsync(sut, command);
+
+        Assert.Equal(parentId, sut.Snapshot.ParentId);
     }
 
     [Fact]
@@ -314,6 +364,11 @@ public class AssetDomainObjectTests : HandlerTestBase<Asset>
 
         A.CallTo(() => scriptEngine.ExecuteAsync(A<ScriptVars>._, "<delete-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
+    }
+
+    private ClaimsPrincipal CreateUser(params string[] permissionIds)
+    {
+        return Mocks.ApiUser(null, permissionIds.Select(x => PermissionIds.ForApp(x, AppId.Name).Id).ToArray());
     }
 
     private Task ExecuteCreateAsync()
