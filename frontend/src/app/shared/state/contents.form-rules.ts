@@ -93,6 +93,8 @@ class ComponentRules implements CompiledRules {
             } else {
                 this.compiledRules = EMPTY_RULES_ARRAY;
             }
+
+            this.previouSchema = schema;
         }
 
         return this.compiledRules;
