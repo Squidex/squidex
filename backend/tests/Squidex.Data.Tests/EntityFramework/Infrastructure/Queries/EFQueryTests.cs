@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging.Abstractions;
 using NetTopologySuite.Geometries;
 using Squidex.EntityFramework.TestHelpers;
 using Squidex.Infrastructure;
@@ -33,8 +34,8 @@ public abstract class EFQueryTests<TContext>(ISqlFixture<TContext> fixture)
     {
         var dbContext = await CreateDbContextAsync();
 
-        await dbContext.CreateGeoIndexAsync("IDX_GEO", nameof(TestEntity), "Point");
-        await dbContext.CreateTextIndexAsync("IDX_Text", nameof(TestEntity), "FullText");
+        await dbContext.CreateGeoIndexAsync("IDX_GEO", nameof(TestEntity), "Point", NullLogger.Instance);
+        await dbContext.CreateTextIndexAsync("IDX_Text", nameof(TestEntity), "FullText", NullLogger.Instance);
 
         var set = dbContext.Set<TestEntity>();
         if (await set.AnyAsync())

@@ -31,6 +31,12 @@ public class PostgresDialect : SqlDialect
         return exception is PostgresException ex && ex.SqlState == "42P07";
     }
 
+    public override bool IsPrivilegeMissingException(Exception exception)
+    {
+        // Covers missing CREATE privileges, extensions that need a superuser and functions owned by other users.
+        return exception is PostgresException { SqlState: PostgresErrorCodes.InsufficientPrivilege };
+    }
+
     public override string? JsonColumnType()
     {
         return "jsonb";

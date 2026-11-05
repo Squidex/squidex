@@ -30,6 +30,22 @@ public sealed class MySqlDialect : SqlDialect
         return exception is MySqlException ex && ex.Number == 1061;
     }
 
+    public override bool IsPrivilegeMissingException(Exception exception)
+    {
+        if (exception is not MySqlException ex)
+        {
+            return false;
+        }
+
+        // Creating functions with binary logging enabled also needs SUPER, unless log_bin_trust_function_creators is set.
+        return ex.ErrorCode is
+            MySqlErrorCode.BinLogCreateRoutineNeedSuper or
+            MySqlErrorCode.DatabaseAccessDenied or
+            MySqlErrorCode.PrecedureAccessDenied or
+            MySqlErrorCode.SpecifiedAccessDeniedError or
+            MySqlErrorCode.TableAccessDenied;
+    }
+
     public override string? JsonColumnType()
     {
         return "json";

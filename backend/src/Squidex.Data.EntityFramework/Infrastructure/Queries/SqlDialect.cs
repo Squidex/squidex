@@ -20,6 +20,11 @@ public class SqlDialect
         return false;
     }
 
+    public virtual bool IsPrivilegeMissingException(Exception exception)
+    {
+        return false;
+    }
+
     public virtual Task InitializeAsync(DbContext dbContext,
         CancellationToken ct)
     {

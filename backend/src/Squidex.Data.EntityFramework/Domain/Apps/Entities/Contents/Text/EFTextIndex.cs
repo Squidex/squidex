@@ -7,6 +7,7 @@
 
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using NetTopologySuite.Geometries;
 using Squidex.Domain.Apps.Core.Apps;
 using Squidex.Domain.Apps.Core.Schemas;
@@ -17,7 +18,7 @@ using Squidex.Providers.SqlServer;
 
 namespace Squidex.Domain.Apps.Entities.Contents.Text;
 
-public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextFactory)
+public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextFactory, ILogger<EFTextIndex<TContext>> log)
     : ITextIndex, IInitializable, IDeleter
     where TContext : DbContext, IDbContextWithDialect
 {
@@ -39,8 +40,8 @@ public sealed class EFTextIndex<TContext>(IDbContextFactory<TContext> dbContextF
     {
         await using var dbContext = await CreateDbContextAsync(ct);
 
-        await dbContext.CreateTextIndexAsync("IDX_Text", "Texts", "Texts", ct);
-        await dbContext.CreateGeoIndexAsync("IDX_Geo", "Geos", "GeoObject", ct);
+        await dbContext.CreateTextIndexAsync("IDX_Text", "Texts", "Texts", log, ct);
+        await dbContext.CreateGeoIndexAsync("IDX_Geo", "Geos", "GeoObject", log, ct);
     }
 
     async Task IDeleter.DeleteAppAsync(App app,

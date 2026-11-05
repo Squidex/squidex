@@ -8,6 +8,7 @@
 using System.Text.Json;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Squidex.Infrastructure.Json.System;
 
 namespace Squidex.Providers.MySql.App;
@@ -22,7 +23,8 @@ public sealed class MySqlAppDbContextDesignTimeFactory : IDesignTimeDbContextFac
             .UseMySql(ConnectionString, ServerVersion.AutoDetect(ConnectionString), options =>
             {
                 options.UseNetTopologySuite();
-            });
+            })
+            .ReplaceService<IMigrationsSqlGenerator, MySqlScriptMigrationsSqlGenerator>();
 
         return new MySqlAppDbContext(builder.Options, new SystemJsonSerializer(JsonSerializerOptions.Default));
     }
