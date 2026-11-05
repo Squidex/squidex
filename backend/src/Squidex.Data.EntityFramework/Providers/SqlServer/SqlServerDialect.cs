@@ -30,6 +30,13 @@ public sealed class SqlServerDialect : SqlDialect
         return exception is SqlException ex && ex.Number is 1913 or 7642 or 7652;
     }
 
+    public override bool IsPrivilegeMissingException(Exception exception)
+    {
+        // 229: Object permission denied, 262: Database permission denied (e.g. CREATE FUNCTION or CREATE FULLTEXT CATALOG),
+        // 297 and 15247: Action not permitted, 2760: Schema does not exist or permission denied.
+        return exception is SqlException ex && ex.Number is 229 or 262 or 297 or 2760 or 15247;
+    }
+
     public override string GeoIndex(string name, string table, string field)
     {
         return $"CREATE SPATIAL INDEX {name} ON {FormatTable(table)} ({FormatField(field, false)}) USING GEOGRAPHY_GRID;";

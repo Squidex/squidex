@@ -6,6 +6,7 @@
 // ==========================================================================
 
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 using Squidex.Domain.Apps.Entities.Contents.Text;
 using Squidex.EntityFramework.TestHelpers;
 using Squidex.Infrastructure;
@@ -21,7 +22,7 @@ public abstract class EFTextIndexTests<TContext>(ISqlFixture<TContext> fixture) 
 
     public override async Task<ITextIndex> CreateSutAsync()
     {
-        var sut = new EFTextIndex<TContext>(fixture.DbContextFactory);
+        var sut = new EFTextIndex<TContext>(fixture.DbContextFactory, A.Fake<ILogger<EFTextIndex<TContext>>>());
 
         await sut.InitializeAsync(default);
         return sut;

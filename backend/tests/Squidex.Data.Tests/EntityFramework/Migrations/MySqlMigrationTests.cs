@@ -5,9 +5,14 @@
 //  All rights reserved. Licensed under the MIT license.
 // ==========================================================================
 
+using System.Text;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
+using MySqlConnector;
 using Squidex.Domain.Apps.Core.TestHelpers;
+using Squidex.EntityFramework.TestHelpers;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Migrations;
 using Squidex.Providers.MySql;
@@ -47,9 +52,12 @@ public class MySqlMigrationTests : IAsyncLifetime
                         options.UseNetTopologySuite();
                         options.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
                     });
+
+                    b.ReplaceService<IMigrationsSqlGenerator, MySqlScriptMigrationsSqlGenerator>();
                 })
                 .AddSingleton<ConnectionStringParser, MySqlConnectionStringParser>()
                 .AddSingleton(TestUtils.DefaultSerializer)
+                .AddLogging()
                 .AddSingleton<DatabaseMigrator<MySqlAppDbContext>>()
                 .BuildServiceProvider();
 
@@ -78,9 +86,12 @@ public class MySqlMigrationTests : IAsyncLifetime
                         options.UseNetTopologySuite();
                         options.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
                     });
+
+                    b.ReplaceService<IMigrationsSqlGenerator, MySqlScriptMigrationsSqlGenerator>();
                 })
                 .AddSingleton<ConnectionStringParser, MySqlConnectionStringParser>()
                 .AddSingleton(TestUtils.DefaultSerializer)
+                .AddLogging()
                 .AddSingleton<DatabaseMigrator<MySqlAppDbContext>>()
                 .BuildServiceProvider();
 
@@ -113,9 +124,12 @@ public class MySqlMigrationTests : IAsyncLifetime
                         options.UseNetTopologySuite();
                         options.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
                     });
+
+                    b.ReplaceService<IMigrationsSqlGenerator, MySqlScriptMigrationsSqlGenerator>();
                 })
                 .AddSingleton<ConnectionStringParser, MySqlConnectionStringParser>()
                 .AddSingleton(TestUtils.DefaultSerializer)
+                .AddLogging()
                 .AddSingleton<DatabaseMigrator<MySqlAppDbContext>>()
                 .BuildServiceProvider();
 
@@ -140,6 +154,62 @@ public class MySqlMigrationTests : IAsyncLifetime
         // Verify the functions are still callable after migration.
         // Note: {{ and }} are escaped braces for ExecuteSqlRawAsync's string.Format-style parser.
         await using var verifyContext = await databaseFactory.CreateDbContextAsync();
+        var result = await verifyContext.Database.ExecuteSqlRawAsync(
+            "SELECT json_exists('{{\"a\":1}}', '$.a')");
+        Assert.Equal(-1, result);
+    }
+
+    [Fact]
+    public async Task Should_log_script_if_privileges_are_missing()
+    {
+        // Binary logging is enabled by default, therefore functions can only be created with the SUPER privilege.
+        await using var mysqlRestricted = new MySqlBuilder("mysql:8.0").Build();
+        await mysqlRestricted.StartAsync(TestContext.Current.CancellationToken);
+
+        var log = new TestLogger<DatabaseMigrator<MySqlAppDbContext>>();
+
+        var services =
+            new ServiceCollection()
+                .AddDbContextFactory<MySqlAppDbContext>(b =>
+                {
+                    var connectionString = mysqlRestricted.GetConnectionString();
+
+                    b.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString), options =>
+                    {
+                        options.UseNetTopologySuite();
+                        options.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
+                    });
+
+                    b.ReplaceService<IMigrationsSqlGenerator, MySqlScriptMigrationsSqlGenerator>();
+                })
+                .AddSingleton<ConnectionStringParser, MySqlConnectionStringParser>()
+                .AddSingleton(TestUtils.DefaultSerializer)
+                .AddSingleton<ILogger<DatabaseMigrator<MySqlAppDbContext>>>(log)
+                .AddSingleton<DatabaseMigrator<MySqlAppDbContext>>()
+                .BuildServiceProvider();
+
+        var databaseMigrator = services.GetRequiredService<DatabaseMigrator<MySqlAppDbContext>>();
+
+        var ex = await Assert.ThrowsAsync<MySqlException>(() => databaseMigrator.InitializeAsync(default));
+        Assert.Equal(MySqlErrorCode.BinLogCreateRoutineNeedSuper, ex.ErrorCode);
+
+        var message = Assert.Single(log.Messages);
+        Assert.Contains("Insufficient privileges", message, StringComparison.Ordinal);
+        Assert.Contains("DELIMITER //", message, StringComparison.Ordinal);
+        Assert.Contains("CREATE FUNCTION json_empty", message, StringComparison.Ordinal);
+        Assert.DoesNotContain("20250204160706_Initial", message, StringComparison.Ordinal);
+
+        // Execute the script like an administrator with the MySQL client to verify that it is executable.
+        var script = message[(message.IndexOf('\n', StringComparison.Ordinal) + 1)..];
+
+        await mysqlRestricted.CopyAsync(Encoding.UTF8.GetBytes(script), "/tmp/migration.sql", ct: TestContext.Current.CancellationToken);
+
+        var execResult = await mysqlRestricted.ExecAsync(["sh", "-c", "mysql -uroot -pmysql test < /tmp/migration.sql"], TestContext.Current.CancellationToken);
+        Assert.True(execResult.ExitCode == 0, execResult.Stdout + execResult.Stderr);
+
+        await databaseMigrator.InitializeAsync(default);
+
+        await using var verifyContext = await services.GetRequiredService<IDbContextFactory<MySqlAppDbContext>>().CreateDbContextAsync();
         var result = await verifyContext.Database.ExecuteSqlRawAsync(
             "SELECT json_exists('{{\"a\":1}}', '$.a')");
         Assert.Equal(-1, result);

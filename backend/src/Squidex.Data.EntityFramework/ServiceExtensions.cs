@@ -8,6 +8,7 @@
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -91,6 +92,7 @@ public static class ServiceExtensions
                         options.UseMicrosoftJson(MySqlCommonJsonChangeTrackingOptions.FullHierarchyOptimizedSemantically);
                     });
                     builder.UseBulkInsertMySql();
+                    builder.ReplaceService<IMigrationsSqlGenerator, MySqlScriptMigrationsSqlGenerator>();
                 });
 
                 services.AddNamedDbContext<MySqlContentDbContext>((builder, name) =>
@@ -160,6 +162,7 @@ public static class ServiceExtensions
                         options.UseNetTopologySuite();
                     });
                     builder.UseBulkInsertSqlServer();
+                    builder.ReplaceService<IMigrationsSqlGenerator, SqlServerScriptMigrationsSqlGenerator>();
                 });
 
                 services.AddNamedDbContext<SqlServerContentDbContext>((builder, name) =>

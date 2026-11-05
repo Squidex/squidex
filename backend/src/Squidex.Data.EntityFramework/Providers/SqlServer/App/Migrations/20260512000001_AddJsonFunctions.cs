@@ -16,7 +16,7 @@ namespace Squidex.Providers.SqlServer.App.Migrations
             using var reader = new StreamReader(sqlStream);
 
             var sqlText = reader.ReadToEnd();
-            var statements = sqlText.Split(";;", System.StringSplitOptions.RemoveEmptyEntries | System.StringSplitOptions.TrimEntries);
+            var statements = sqlText.Split(";;", StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
 
             foreach (var statement in statements)
             {
