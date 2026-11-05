@@ -70,6 +70,24 @@ describe('AssetsField', () => {
         expect(FieldFormatter.format(field, 1)).toBe('0 Assets');
     });
 
+    it('should format to preview image and file name', () => {
+        const field2 = createField({ properties: createProperties('Assets', { previewMode: 'ImageAndFileName' }) });
+
+        expect(FieldFormatter.format(field2, ['1'], ['https://squidex.io/asset', 'image.png'])).toEqual(new HtmlValue('<div class="image"><img src="https://squidex.io/asset?width=50&amp;height=50&amp;mode=Pad&amp;" /> <span>image.png</span></div>', 'https://squidex.io/asset'));
+    });
+
+    it('should encode html in file name', () => {
+        const field2 = createField({ properties: createProperties('Assets', { previewMode: 'ImageAndFileName' }) });
+
+        expect(FieldFormatter.format(field2, ['1'], ['https://squidex.io/asset', '<a href="https://evil.com">Login</a>'])).toEqual(new HtmlValue('<div class="image"><img src="https://squidex.io/asset?width=50&amp;height=50&amp;mode=Pad&amp;" /> <span>&lt;a href=&quot;https://evil.com&quot;&gt;Login&lt;/a&gt;</span></div>', 'https://squidex.io/asset'));
+    });
+
+    it('should encode html in preview format', () => {
+        const field2 = createField({ properties: createProperties('Assets', { previewMode: 'Image', previewFormat: 'width=10&height=10"><b>' }) });
+
+        expect(FieldFormatter.format(field2, ['1'], ['https://squidex.io/asset', 'image.png'])).toEqual(new HtmlValue('<div class="image"><img src="https://squidex.io/asset?width=10&amp;height=10&quot;&gt;&lt;b&gt;" /></div>', 'https://squidex.io/asset'));
+    });
+
     it('should return default value from properties', () => {
         const field2 = createField({ properties: createProperties('Assets', { defaultValue: ['1', '2'] }) });
 
@@ -433,7 +451,13 @@ describe('StringField', () => {
     it('should format to preview image', () => {
         const field2 = createField({ properties: createProperties('String', { editor: 'StockPhoto' }) });
 
-        expect(FieldFormatter.format(field2, 'https://images.unsplash.com/123?x', undefined, true)).toEqual(new HtmlValue('<div class="image"><img src="https://images.unsplash.com/123?x&q=80&fm=jpg&crop=entropy&cs=tinysrgb&h=50&fit=max" /></div>', 'https://images.unsplash.com/123?x'));
+        expect(FieldFormatter.format(field2, 'https://images.unsplash.com/123?x', undefined, true)).toEqual(new HtmlValue('<div class="image"><img src="https://images.unsplash.com/123?x&amp;q=80&amp;fm=jpg&amp;crop=entropy&amp;cs=tinysrgb&amp;h=50&amp;fit=max" /></div>', 'https://images.unsplash.com/123?x'));
+    });
+
+    it('should encode html in preview image', () => {
+        const field2 = createField({ properties: createProperties('String', { editor: 'StockPhoto' }) });
+
+        expect(FieldFormatter.format(field2, 'https://images.com/"><a href="https://evil.com">Login</a>', undefined, true)).toEqual(new HtmlValue('<div class="image"><img src="https://images.com/&quot;&gt;&lt;a href=&quot;https://evil.com&quot;&gt;Login&lt;/a&gt;" /></div>', 'https://images.com/"><a href="https://evil.com">Login</a>'));
     });
 
     it('should not format to preview image if not unsplash image', () => {
