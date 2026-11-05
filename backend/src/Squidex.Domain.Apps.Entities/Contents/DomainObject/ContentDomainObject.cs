@@ -176,14 +176,14 @@ public partial class ContentDomainObject(
                 {
                     try
                     {
+                        var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
+
                         if (c.DueTime > SystemClock.Instance.GetCurrentInstant())
                         {
-                            ChangeStatusScheduled(c, c.DueTime.Value);
+                            await ScheduleCore(c, c.DueTime.Value, operation);
                         }
                         else
                         {
-                            var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
-
                             await ChangeCore(c, operation, ct);
                         }
                     }
@@ -280,7 +280,13 @@ public partial class ContentDomainObject(
     private async Task ChangeCore(ChangeContentStatus c, ContentOperation operation,
         CancellationToken ct)
     {
-        operation.MustHavePermission(PermissionIds.AppContentsChangeStatus);
+        // Permission and workflow transition of scheduled changes have already been checked when the change was scheduled.
+        var isScheduled = c.StatusJobId != null && Snapshot.ScheduleJob?.Id == c.StatusJobId;
+        if (!isScheduled)
+        {
+            operation.MustHavePermission(PermissionIds.AppContentsChangeStatus);
+        }
+
         operation.MustNotChangeSingleton(c.Status);
 
         if (c.Status == Snapshot.EditingStatus)
@@ -288,7 +294,7 @@ public partial class ContentDomainObject(
             return;
         }
 
-        if (c.DoNotValidateWorkflow)
+        if (c.DoNotValidateWorkflow || isScheduled)
         {
             await operation.CheckStatusAsync(c.Status);
         }
@@ -318,6 +324,23 @@ public partial class ContentDomainObject(
         }
 
         ChangeStatus(c);
+    }
+
+    private async Task ScheduleCore(ChangeContentStatus c, Instant dueTime, ContentOperation operation)
+    {
+        // The scheduled change is executed later without a user, therefore permissions and workflow roles must be checked now.
+        operation.MustHavePermission(PermissionIds.AppContentsChangeStatus);
+
+        if (c.DoNotValidateWorkflow)
+        {
+            await operation.CheckStatusAsync(c.Status);
+        }
+        else
+        {
+            await operation.CheckTransitionAsync(c.Status);
+        }
+
+        ChangeStatusScheduled(c, dueTime);
     }
 
     private void MigrateCore(MigrateContent c)
