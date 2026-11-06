@@ -81,18 +81,20 @@ export class CompiledRule {
 }
 
 class ComponentRules implements CompiledRules {
-    private previouSchema?: SchemaDto;
+    private previousSchema?: SchemaDto;
     private compiledRules: ReadonlyArray<CompiledRule> = [];
 
     public get rules() {
         const schema = this.schema();
 
-        if (schema !== this.previouSchema) {
+        if (schema !== this.previousSchema) {
             if (schema) {
                 this.compiledRules = fastMerge(this.parentRules.getRules(this.form).rules, this.getRelativeRules(this.form, schema));
             } else {
                 this.compiledRules = EMPTY_RULES_ARRAY;
             }
+
+            this.previousSchema = schema;
         }
 
         return this.compiledRules;
