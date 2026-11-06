@@ -16,6 +16,7 @@ using Squidex.Infrastructure.Commands;
 using Squidex.Infrastructure.EventSourcing;
 using Squidex.Infrastructure.Reflection;
 using Squidex.Infrastructure.States;
+using Squidex.Shared;
 
 #pragma warning disable MA0022 // Return Task.FromResult instead of returning null
 
@@ -68,8 +69,12 @@ public partial class AssetDomainObject(
                 {
                     var operation = await AssetOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
-                    if (Version > EtagVersion.Empty && !IsDeleted(Snapshot))
+                    var isUpdate = Version > EtagVersion.Empty && !IsDeleted(Snapshot);
+                    if (isUpdate)
                     {
+                        // The API only requires the create permission, which must not allow to replace existing assets.
+                        operation.MustHavePermission(PermissionIds.AppAssetsUpload);
+
                         await UpdateCore(c.AsUpdate(), operation, ct);
                     }
                     else
@@ -79,6 +84,11 @@ public partial class AssetDomainObject(
 
                     if (c.ParentId != null && c.ParentId != Snapshot.ParentId)
                     {
+                        if (isUpdate)
+                        {
+                            operation.MustHavePermission(PermissionIds.AppAssetsUpdate);
+                        }
+
                         await MoveCore(c.AsMove(c.ParentId.Value), operation, ct);
                     }
 
