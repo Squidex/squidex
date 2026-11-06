@@ -86,6 +86,9 @@ public partial class ContentDomainObject(
 
                     if (Is.OptionalChange(operation.Snapshot.EditingStatus, c.Status))
                     {
+                        // The upsert endpoint does not check the change status permission, so the owner shortcut must not be used.
+                        operation.MustHaveUserPermission(PermissionIds.AppContentsChangeStatusOwn);
+
                         await ChangeCore(c.AsChange(c.Status.Value), operation, ct);
                     }
 
@@ -105,6 +108,9 @@ public partial class ContentDomainObject(
                     }
                     else if (c.Status != null && c.Status != Snapshot.EditingStatus)
                     {
+                        // The create endpoint does not check the change status permission, but the creator is always the owner.
+                        operation.MustHaveUserPermission(PermissionIds.AppContentsChangeStatusOwn);
+
                         await ChangeCore(c.AsChange(c.Status.Value), operation, ct);
                     }
 
@@ -206,6 +212,9 @@ public partial class ContentDomainObject(
                 return ApplyReturnAsync(enrichContentDefaults, async (c, ct) =>
                 {
                     var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
+
+                    // Enriching defaults changes the data, so it needs the same permission as an update.
+                    operation.MustHavePermission(PermissionIds.AppContentsUpdate);
 
                     var newData = operation.GenerateDefaultValues(Snapshot.EditingData.Clone(), !c.EnrichRequiredFields);
 
