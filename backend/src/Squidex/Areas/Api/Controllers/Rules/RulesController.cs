@@ -242,6 +242,7 @@ public sealed class RulesController(
     /// <param name="app">The name of the app.</param>
     /// <param name="id">The ID of the rule to cancel.</param>
     /// <response code="204">Rule events cancelled.</response>
+    /// <response code="404">Rule or app not found.</response>
     [HttpDelete]
     [Route("apps/{app}/rules/{id}/events/")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -249,7 +250,19 @@ public sealed class RulesController(
     [ApiCosts(1)]
     public async Task<IActionResult> DeleteRuleEvents(string app, DomainId id)
     {
-        await flowManager.CancelByDefinitionIdAsync(id.ToString(), HttpContext.RequestAborted);
+        var rule = await appProvider.GetRuleAsync(AppId, id, HttpContext.RequestAborted);
+        if (rule == null)
+        {
+            return NotFound();
+        }
+
+        // Rule IDs are not unique across apps (e.g. after a restore), therefore we only cancel the instances of the current app.
+        var instanceIds = await GetPendingInstanceIdsAsync(id);
+
+        foreach (var instanceId in instanceIds)
+        {
+            await flowManager.CancelByInstanceIdAsync(instanceId, HttpContext.RequestAborted);
+        }
 
         return NoContent();
     }
@@ -558,5 +571,29 @@ public sealed class RulesController(
         var instance = await flowManager.FindInstanceAsync(id, HttpContext.RequestAborted);
 
         return instance?.OwnerId == AppId.ToString();
+    }
+
+    private async Task<List<Guid>> GetPendingInstanceIdsAsync(DomainId ruleId)
+    {
+        var instanceIds = new List<Guid>();
+        var instanceSkip = 0;
+
+        // Collect all IDs first, so that the cancellation does not change the pages while we iterate over them.
+        while (true)
+        {
+            var (states, total) =
+                await flowManager.QueryInstancesByOwnerAsync(AppId.ToString(), ruleId.ToString(), instanceSkip, Paging.MaxTake,
+                    HttpContext.RequestAborted);
+
+            instanceIds.AddRange(states.Where(x => x.NextRun != null).Select(x => x.InstanceId));
+            instanceSkip += states.Count;
+
+            if (states.Count < Paging.MaxTake || instanceSkip >= total)
+            {
+                break;
+            }
+        }
+
+        return instanceIds;
     }
 }
