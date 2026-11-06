@@ -24,7 +24,6 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared;
-using Squidex.Shared.Identity;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject;
 
@@ -191,15 +190,20 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
     [Fact]
     public async Task Create_should_change_status_if_set()
     {
-        var command = new CreateContent { Data = data, Status = Status.Archived, User = ChangeStatusUser() };
+        var command = new CreateContent
+        {
+            Data = data,
+            Status = Status.Archived,
+            User = Mocks.FrontendUser(permissions: [PermissionIds.ForApp(PermissionIds.AppContentsChangeStatusOwn, AppId.Name, SchemaId.Name).Id]),
+        };
 
         var actual = await PublishAsync(command);
 
         await VerifySutAsync(actual);
 
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), CancellationToken))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft, command.User), "<create-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), CancellationToken))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Archived, Status.Draft, command.User), "<change-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -223,7 +227,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
         {
             Data = data,
             Status = Status.Published,
-            User = ChangeStatusUser(),
+            User = Mocks.FrontendUser(permissions: [PermissionIds.ForApp(PermissionIds.AppContentsChangeStatusOwn, AppId.Name, SchemaId.Name).Id]),
         };
 
         await PublishAsync(command);
@@ -294,15 +298,20 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
     [Fact]
     public async Task Upsert_should_change_status_on_create_if_status_set()
     {
-        var command = new UpsertContent { Data = data, Status = Status.Archived, User = ChangeStatusUser() };
+        var command = new UpsertContent
+        {
+            Data = data,
+            Status = Status.Archived,
+            User = Mocks.FrontendUser(permissions: [PermissionIds.ForApp(PermissionIds.AppContentsChangeStatusOwn, AppId.Name, SchemaId.Name).Id]),
+        };
 
         var actual = await PublishAsync(CreateContentCommand(command));
 
         await VerifySutAsync(actual);
 
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft), "<create-script>", ScriptOptions(), CancellationToken))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Draft, command.User), "<create-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), CancellationToken))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Archived, Status.Draft, command.User), "<change-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -354,7 +363,12 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
     [Fact]
     public async Task Upsert_should_change_status_on_update_if_status_set()
     {
-        var command = new UpsertContent { Data = otherData, Status = Status.Archived, User = ChangeStatusUser() };
+        var command = new UpsertContent
+        {
+            Data = otherData,
+            Status = Status.Archived,
+            User = Mocks.FrontendUser(permissions: [PermissionIds.ForApp(PermissionIds.AppContentsChangeStatusOwn, AppId.Name, SchemaId.Name).Id]),
+        };
 
         await ExecuteCreateAsync();
 
@@ -362,9 +376,9 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
 
         await VerifySutAsync(actual);
 
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, data, Status.Draft), "<update-script>", ScriptOptions(), CancellationToken))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, data, Status.Draft, command.User), "<update-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
-        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), CancellationToken))
+        A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, null, Status.Archived, Status.Draft, command.User), "<change-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
     }
 
@@ -1057,33 +1071,22 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
         return PublishAsync(CreateContentCommand(new ChangeContentStatus { Status = Status.Published }));
     }
 
-    private ClaimsPrincipal ChangeStatusUser()
-    {
-        var userPermission = PermissionIds.ForApp(PermissionIds.AppContentsChangeStatusOwn, AppId.Name, SchemaId.Name).Id;
-
-        // Use the API user, because the script vars are compared with it.
-        var user = ApiContext.UserPrincipal;
-
-        ((ClaimsIdentity)user.Identity!).AddClaim(new Claim(SquidexClaimTypes.Permissions, userPermission));
-        return user;
-    }
-
     private static ScriptOptions ScriptOptions()
     {
         return A<ScriptOptions>.That.Matches(x => x.CanDisallow && x.CanReject && x.AsContext);
     }
 
-    private DataScriptVars DataScriptVars(ContentData? newData, ContentData? oldData, Status newStatus)
+    private DataScriptVars DataScriptVars(ContentData? newData, ContentData? oldData, Status newStatus, ClaimsPrincipal? user = null)
     {
-        return A<DataScriptVars>.That.Matches(x => Matches(x, newData, oldData, newStatus, default));
+        return A<DataScriptVars>.That.Matches(x => Matches(x, newData, oldData, newStatus, default, user));
     }
 
-    private DataScriptVars DataScriptVars(ContentData? newData, ContentData? oldData, Status newStatus, Status oldStatus)
+    private DataScriptVars DataScriptVars(ContentData? newData, ContentData? oldData, Status newStatus, Status oldStatus, ClaimsPrincipal? user = null)
     {
-        return A<DataScriptVars>.That.Matches(x => Matches(x, newData, oldData, newStatus, oldStatus));
+        return A<DataScriptVars>.That.Matches(x => Matches(x, newData, oldData, newStatus, oldStatus, user));
     }
 
-    private bool Matches(DataScriptVars x, ContentData? newData, ContentData? oldData, Status newStatus, Status oldStatus)
+    private bool Matches(DataScriptVars x, ContentData? newData, ContentData? oldData, Status newStatus, Status oldStatus, ClaimsPrincipal? user)
     {
         return
             Equals(x["contentId"], contentId) &&
@@ -1091,7 +1094,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
             Equals(x["dataOld"], oldData) &&
             Equals(x["status"], newStatus) &&
             Equals(x["statusOld"], oldStatus) &&
-            Equals(x["user"], ApiContext.UserPrincipal);
+            Equals(x["user"], user ?? ApiContext.UserPrincipal);
     }
 
     private T CreateContentEvent<T>(T @event) where T : ContentEvent
