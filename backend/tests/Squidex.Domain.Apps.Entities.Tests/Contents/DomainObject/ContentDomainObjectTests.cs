@@ -23,6 +23,7 @@ using Squidex.Domain.Apps.Events.Contents;
 using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Validation;
+using Squidex.Shared;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject;
 
@@ -760,6 +761,46 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
         var actual = await PublishAsync(command);
 
         await VerifySutAsync(actual);
+    }
+
+    [Fact]
+    public async Task EnrichContentDefaults_should_throw_exception_if_content_is_from_another_user_and_user_has_no_permission()
+    {
+        await ExecuteCreateAsync();
+
+        Schema =
+            Schema.AddString(3, "defaults", Partitioning.Invariant,
+                new StringFieldProperties { DefaultValue = "Default Value" });
+
+        var command = new EnrichContentDefaults
+        {
+            Actor = RefToken.User("other"),
+            User = Mocks.FrontendUser(),
+        };
+
+        await Assert.ThrowsAsync<DomainForbiddenException>(() => PublishAsync(command));
+    }
+
+    [Fact]
+    public async Task EnrichContentDefaults_should_update_content_from_another_user_if_user_has_permission()
+    {
+        await ExecuteCreateAsync();
+
+        Schema =
+            Schema.AddString(3, "defaults", Partitioning.Invariant,
+                new StringFieldProperties { DefaultValue = "Default Value" });
+
+        var userPermission = PermissionIds.ForApp(PermissionIds.AppContentsUpdate, AppId.Name, SchemaId.Name).Id;
+
+        var command = new EnrichContentDefaults
+        {
+            Actor = RefToken.User("other"),
+            User = Mocks.FrontendUser(permissions: [userPermission]),
+        };
+
+        await PublishAsync(command);
+
+        Assert.Single(LastEvents);
     }
 
     [Fact]

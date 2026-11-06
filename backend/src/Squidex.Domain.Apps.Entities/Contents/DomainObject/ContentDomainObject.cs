@@ -207,6 +207,9 @@ public partial class ContentDomainObject(
                 {
                     var operation = await ContentOperation.CreateAsync(serviceProvider, c, () => Snapshot);
 
+                    // Enriching defaults changes the data, so it needs the same permission as an update.
+                    operation.MustHavePermission(PermissionIds.AppContentsUpdate);
+
                     var newData = operation.GenerateDefaultValues(Snapshot.EditingData.Clone(), !c.EnrichRequiredFields);
 
                     if (!newData.Equals(Snapshot.EditingData))
