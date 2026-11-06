@@ -24,6 +24,7 @@ using Squidex.Infrastructure;
 using Squidex.Infrastructure.Json.Objects;
 using Squidex.Infrastructure.Validation;
 using Squidex.Shared;
+using Squidex.Shared.Identity;
 
 namespace Squidex.Domain.Apps.Entities.Contents.DomainObject;
 
@@ -190,7 +191,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
     [Fact]
     public async Task Create_should_change_status_if_set()
     {
-        var command = new CreateContent { Data = data, Status = Status.Archived };
+        var command = new CreateContent { Data = data, Status = Status.Archived, User = ChangeStatusUser() };
 
         var actual = await PublishAsync(command);
 
@@ -200,6 +201,34 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
             .MustHaveHappened();
         A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(data, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Create_should_throw_exception_if_status_set_and_user_has_no_change_status_permission()
+    {
+        var command = new CreateContent
+        {
+            Data = data,
+            Status = Status.Published,
+            User = Mocks.FrontendUser(),
+        };
+
+        await Assert.ThrowsAsync<DomainForbiddenException>(() => PublishAsync(command));
+    }
+
+    [Fact]
+    public async Task Create_should_change_status_if_set_and_user_has_own_change_status_permission()
+    {
+        var command = new CreateContent
+        {
+            Data = data,
+            Status = Status.Published,
+            User = ChangeStatusUser(),
+        };
+
+        await PublishAsync(command);
+
+        Assert.Equal(Status.Published, sut.Snapshot.EditingStatus);
     }
 
     [Fact]
@@ -265,7 +294,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
     [Fact]
     public async Task Upsert_should_change_status_on_create_if_status_set()
     {
-        var command = new UpsertContent { Data = data, Status = Status.Archived };
+        var command = new UpsertContent { Data = data, Status = Status.Archived, User = ChangeStatusUser() };
 
         var actual = await PublishAsync(CreateContentCommand(command));
 
@@ -325,7 +354,7 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
     [Fact]
     public async Task Upsert_should_change_status_on_update_if_status_set()
     {
-        var command = new UpsertContent { Data = otherData, Status = Status.Archived };
+        var command = new UpsertContent { Data = otherData, Status = Status.Archived, User = ChangeStatusUser() };
 
         await ExecuteCreateAsync();
 
@@ -337,6 +366,23 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
             .MustHaveHappened();
         A.CallTo(() => scriptEngine.TransformAsync(DataScriptVars(otherData, null, Status.Archived, Status.Draft), "<change-script>", ScriptOptions(), CancellationToken))
             .MustHaveHappened();
+    }
+
+    [Fact]
+    public async Task Upsert_should_throw_exception_if_status_set_on_own_content_and_user_has_no_change_status_permission()
+    {
+        var userPermission = PermissionIds.ForApp(PermissionIds.AppContentsUpdate, AppId.Name, SchemaId.Name).Id;
+
+        await ExecuteCreateAsync();
+
+        var command = new UpsertContent
+        {
+            Data = otherData,
+            Status = Status.Archived,
+            User = Mocks.FrontendUser(permissions: [userPermission]),
+        };
+
+        await Assert.ThrowsAsync<DomainForbiddenException>(() => PublishAsync(command));
     }
 
     [Fact]
@@ -1009,6 +1055,17 @@ public class ContentDomainObjectTests : HandlerTestBase<WriteContent>
     private Task ExecutePublishAsync()
     {
         return PublishAsync(CreateContentCommand(new ChangeContentStatus { Status = Status.Published }));
+    }
+
+    private ClaimsPrincipal ChangeStatusUser()
+    {
+        var userPermission = PermissionIds.ForApp(PermissionIds.AppContentsChangeStatusOwn, AppId.Name, SchemaId.Name).Id;
+
+        // Use the API user, because the script vars are compared with it.
+        var user = ApiContext.UserPrincipal;
+
+        ((ClaimsIdentity)user.Identity!).AddClaim(new Claim(SquidexClaimTypes.Permissions, userPermission));
+        return user;
     }
 
     private static ScriptOptions ScriptOptions()
