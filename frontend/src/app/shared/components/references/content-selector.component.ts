@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, Component, computed, effect, forwardRef, input, linkedSignal, numberAttribute, output, signal, untracked, inject } from '@angular/core';
+import { booleanAttribute, Component, computed, effect, forwardRef, inject, input, linkedSignal, numberAttribute, output, signal, untracked } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { of } from 'rxjs';

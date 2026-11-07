@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, forwardRef, input, linkedSignal, signal, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, forwardRef, inject, input, linkedSignal, signal } from '@angular/core';
 import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
 import { Observable } from 'rxjs';
 import { AppLanguageDto, ContentDto, ContentsDto, LocalizerService, ResolveContents, SignalControlComponent, TagEditorComponent, TranslatePipe, Types } from '@app/shared';

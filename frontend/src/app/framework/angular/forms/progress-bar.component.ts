@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, effect, ElementRef, input, numberAttribute, Renderer2, signal, inject } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, effect, ElementRef, inject, input, numberAttribute, Renderer2, signal } from '@angular/core';
 import * as ProgressBar from 'progressbar.js';
 import { ThemeService } from '@app/framework/internal';
 

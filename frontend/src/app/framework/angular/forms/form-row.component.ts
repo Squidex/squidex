@@ -7,6 +7,7 @@
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, Optional, SkipSelf } from '@angular/core';
 import { AbstractControl, FormGroupDirective } from '@angular/forms';
+import { FieldTree } from '@angular/forms/signals';
 import { Types } from '@app/framework/internal';
 import { MarkdownDirective } from '../markdown.directive';
 import { TranslatePipe } from '../pipes/translate.pipe';
@@ -43,7 +44,7 @@ import { FormHintComponent } from './form-hint.component';
 })
 export class FormRowComponent {
     /** The control or the name of the control in the parent form group. */
-    public readonly for = input.required<string | AbstractControl>();
+    public readonly for = input.required<string | AbstractControl | FieldTree<any>>();
 
     /** The label of the field. */
     public readonly label = input<string>();
@@ -141,6 +142,10 @@ export class FormRowComponent {
         const formId = this.formId();
         if (formId) {
             return formId;
+        }
+
+        if (Types.isFunction(control)) {
+            return `${control().keyInParent()}`;
         }
 
         throw new Error('Form id is required.');

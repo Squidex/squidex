@@ -6,7 +6,7 @@
  */
 
 import { CdkTrapFocus  } from '@angular/cdk/a11y';
-import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, input, output, Renderer2, viewChild, inject } from '@angular/core';
+import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, inject, input, output, Renderer2, viewChild } from '@angular/core';
 import { TranslatePipe } from '../pipes/translate.pipe';
 import { ShortcutComponent } from '../shortcut.component';
 import { TourStepDirective } from './tour-step.directive';

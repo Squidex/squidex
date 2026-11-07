@@ -7,7 +7,7 @@
 
 /* eslint-disable @angular-eslint/component-selector */
 
-import { ChangeDetectionStrategy, Component, input, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
 import { ConfirmClickDirective, ContributorDto, HighlightPipe, TooltipDirective, TranslatePipe, UserPicturePipe } from '@app/shared';
 import { TeamContributorsState } from '../../internal';
 

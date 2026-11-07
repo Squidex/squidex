@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, inject } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { FullDateTimePipe, LocalizerService, TooltipDirective, TranslatePipe } from '@app/framework';
 import { ScheduleJobDto } from '@app/shared/internal';
 

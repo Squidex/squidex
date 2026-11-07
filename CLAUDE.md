@@ -33,6 +33,8 @@ npm run lint
 - Use signals in components: `input()`, `output()`, `computed()`, `linkedSignal()` instead of `@Input`, `@Output` and `ngOnChanges`.
 - Make all signal fields `readonly`.
 - Document component inputs and outputs with a short `/** ... */` comment. Do not add any other comments to components.
+- Use `inject()` in components instead of constructor parameters.
+- Order class members: `private readonly` fields first, then other `private` fields, then everything else.
 
 ## Backend
 

@@ -6,7 +6,7 @@
  */
 
 
-import { afterRenderEffect, booleanAttribute, ChangeDetectionStrategy, Component, effect, ElementRef, input, output, signal, viewChild, inject } from '@angular/core';
+import { afterRenderEffect, booleanAttribute, ChangeDetectionStrategy, Component, effect, ElementRef, inject, input, output, signal, viewChild } from '@angular/core';
 import { lastValueFrom, Observable } from 'rxjs';
 import { filter } from 'rxjs/operators';
 import { ApiUrlConfig, HTTP, LoaderComponent, MarkdownDirective, markdownExtractImage, markdownHasImage, markdownTransformImages, ResizedDirective, TranslatePipe, Types } from '@app/framework';

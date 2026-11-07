@@ -6,7 +6,7 @@
  */
 
 import { LowerCasePipe } from '@angular/common';
-import { booleanAttribute, Component, effect, input, linkedSignal, output, signal, untracked, inject } from '@angular/core';
+import { booleanAttribute, Component, effect, inject, input, linkedSignal, output, signal, untracked } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { AppsState, CodeEditorComponent, DynamicFlowStepDefinitionDto, EntriesPipe, FormErrorComponent, FormHintComponent, FormRowComponent, MarkdownDirective, ModalDialogComponent, RuleElementDto, RulesService, ScriptCompletions, StepForm, TranslatePipe } from '@app/shared';
 import { BranchesInputComponent } from '../../shared/actions/branches-input.component';

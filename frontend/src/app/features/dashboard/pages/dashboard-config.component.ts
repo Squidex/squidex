@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, Component, computed, input, output, signal, inject } from '@angular/core';
+import { booleanAttribute, Component, computed, inject, input, output, signal } from '@angular/core';
 import { takeUntilDestroyed, toObservable } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { GridsterItemConfig } from 'angular-gridster2';

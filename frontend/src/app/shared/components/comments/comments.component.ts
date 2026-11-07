@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, Component, computed, effect, input, signal, viewChild, inject } from '@angular/core';
+import { booleanAttribute, Component, computed, effect, inject, input, signal, viewChild } from '@angular/core';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AutocompleteComponent, Keys, MessageBus, TranslatePipe } from '@app/framework';

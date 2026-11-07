@@ -5,13 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, input, signal, untracked, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
 import { AbstractControl, FormGroupDirective, UntypedFormArray } from '@angular/forms';
+import { FieldTree } from '@angular/forms/signals';
 import { merge } from 'rxjs';
 import { LocalizerService, Types } from '@app/framework/internal';
 import { ControlErrorsMessagesComponent } from './control-errors-messages.component';
 import { formatError } from './error-formatting';
 import { touchedChange$ } from './forms-helper';
+import { formatSignalErrors } from './signal-validators';
 
 @Component({
     selector: 'sqx-control-errors',
@@ -26,8 +28,21 @@ export class ControlErrorsComponent {
     private readonly formGroupDirective = inject(FormGroupDirective, { optional: true, host: true });
     private readonly localizer = inject(LocalizerService);
 
+    private readonly field = computed(() => {
+        const control = this.for();
+        if (!Types.isFunction(control)) {
+            return null;
+        }
+
+        return control as FieldTree<any>;
+    });
+
     private readonly control = computed(() => {
         const control = this.for();
+        if (Types.isFunction(control)) {
+            return null;
+        }
+
         if (!Types.isString(control)) {
             return control;
         }
@@ -41,7 +56,11 @@ export class ControlErrorsComponent {
             return fieldName;
         }
 
-        const control = this.for();
+        let control = this.for();
+        if (Types.isFunction(control)) {
+            control = `${(control as FieldTree<any>)().keyInParent()}`;
+        }
+
         if (!Types.isString(control)) {
             return this.localizer.get('common.field')!;
         }
@@ -49,8 +68,29 @@ export class ControlErrorsComponent {
         return this.localizer.get(`common.${control}`) || control.substring(0, 1).toUpperCase() + control.substring(1);
     });
 
+    private readonly controlErrorMessages = signal<ReadonlyArray<string>>([]);
+
+    private readonly fieldErrorMessages = computed(() => {
+        const field = this.field();
+        if (!field) {
+            return [];
+        }
+
+        const submitCount = this.submitCount();
+        if (Types.isNumber(submitCount) && submitCount === 0) {
+            return [];
+        }
+
+        const state = field();
+        if (!state.touched() && !Types.isArray(state.value())) {
+            return [];
+        }
+
+        return formatSignalErrors(this.localizer, this.controlDisplayName(), field);
+    }, { equal: Types.equals });
+
     /** The control or the name of the control in the parent form group. */
-    public readonly for = input.required<string | AbstractControl>();
+    public readonly for = input.required<string | AbstractControl | FieldTree<any>>();
 
     /** Shows the errors only when the form has been submitted, if set. */
     public readonly submitCount = input<number | null>();
@@ -58,7 +98,9 @@ export class ControlErrorsComponent {
     /** The field name in the error messages. Falls back to a name derived from the control. */
     public readonly fieldName = input<string | null>();
 
-    protected readonly errorMessages = signal<ReadonlyArray<string>>([]);
+    protected readonly errorMessages = computed(() => {
+        return this.field() ? this.fieldErrorMessages() : this.controlErrorMessages();
+    });
 
     constructor() {
         effect(onCleanup => {
@@ -105,10 +147,10 @@ export class ControlErrorsComponent {
             }
         }
 
-        if (errorMessages.length === 0 && this.errorMessages().length === 0) {
+        if (errorMessages.length === 0 && this.controlErrorMessages().length === 0) {
             return;
         }
 
-        this.errorMessages.set(errorMessages);
+        this.controlErrorMessages.set(errorMessages);
     }
 }

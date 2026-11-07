@@ -6,7 +6,7 @@
  */
 
 import { Location } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, linkedSignal, signal, untracked, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, linkedSignal, signal, untracked } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';

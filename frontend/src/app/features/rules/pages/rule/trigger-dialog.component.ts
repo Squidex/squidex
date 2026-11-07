@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, Component, effect, input, output, signal, untracked, inject } from '@angular/core';
+import { booleanAttribute, Component, effect, inject, input, output, signal, untracked } from '@angular/core';
 import { ReactiveFormsModule } from '@angular/forms';
 import { EntriesPipe, FormErrorComponent, ManualRuleTriggerDto, ModalDialogComponent, RulesService, RuleTriggerDto, RuleTriggerMetadataDto, SchemasState, TranslatePipe, TriggerForm } from '@app/shared';
 import { RuleElementComponent } from '../../shared/rule-element.component';

@@ -6,7 +6,7 @@
  */
 
 
-import { Component, Injector, inject } from '@angular/core';
+import { Component, inject, Injector } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { AnalyticsService, CopyGlobalDirective, DialogRendererComponent, RootViewComponent, syncChartTheme, ThemeService, TourGuideComponent, TourTemplateComponent, TranslatePipe } from '@app/shared';
 

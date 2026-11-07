@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, input, Renderer2, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, input, Renderer2 } from '@angular/core';
 import { StringColorPipe } from '@app/framework';
 import { CollaborationService } from '@app/shared/internal';
 

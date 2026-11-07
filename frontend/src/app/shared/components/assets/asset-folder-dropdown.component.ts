@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectorRef, Component, forwardRef, signal, inject } from '@angular/core';
+import { ChangeDetectorRef, Component, forwardRef, inject, signal } from '@angular/core';
 import { NG_VALUE_ACCESSOR } from '@angular/forms';
 import { ModalDirective, ModalModel, ModalPlacementDirective, SignalControlComponent, TranslatePipe, Types } from '@app/framework';
 import { AppsState, AssetsService, ROOT_ITEM } from '@app/shared/internal';

@@ -6,7 +6,7 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, effect, signal, untracked, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, effect, inject, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Subscription, timer } from 'rxjs';
 import { DialogModel, DialogRequest, DialogService, Notification, Tooltip } from '@app/framework/internal';
