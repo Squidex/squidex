@@ -1,14 +1,14 @@
-@if (renaming) {
+@if (renaming()) {
     <form (ngSubmit)="rename()">
         <div class="row g-1 align-items-center">
             <div class="col">
                 <div class="form-group">
                     <sqx-control-errors [for]="renameForm" />
                     <input
-                        class="form-control form-control-{{ size }}"
+                        class="form-control form-control-{{ size() }}"
                         [formControl]="renameForm"
                         (keydown)="onKeyDown($event)"
-                        [maxLength]="inputTitleLength"
+                        [maxLength]="inputTitleLength()"
                         spellcheck="false"
                         sqxFocusOnInit />
                 </div>
@@ -16,7 +16,7 @@
 
             <div class="col-auto">
                 <button
-                    class="btn btn-primary btn-{{ size }}"
+                    class="btn btn-primary btn-{{ size() }}"
                     attr.aria-label="{{ 'common.save' | sqxTranslate }}"
                     [disabled]="!renameForm.valid || !renameForm.dirty"
                     type="submit">
@@ -24,10 +24,10 @@
                 </button>
             </div>
 
-            @if (closeButton) {
+            @if (closeButton()) {
                 <div class="col-auto">
                     <button
-                        class="btn btn-text-secondary btn-{{ size }} btn-cancel"
+                        class="btn btn-text-secondary btn-{{ size() }} btn-cancel"
                         attr.aria-label="{{ 'common.cancel' | sqxTranslate }}"
                         (click)="toggleRename()"
                         type="button">
@@ -40,15 +40,15 @@
 } @else {
     <div class="row g-0 align-items-center title-view d-nowrap">
         <div class="col">
-            <h3 class="truncate {{ size }}" [class.fallback]="!inputTitle" (dblclick)="toggleRename()">
-                {{ inputTitle || displayFallback }}
+            <h3 class="truncate {{ size() }}" [class.fallback]="!inputTitleDisplayed()" (dblclick)="toggleRename()">
+                {{ inputTitleDisplayed() || displayFallback() }}
             </h3>
         </div>
 
-        @if (!disabled) {
+        @if (!disabled()) {
             <div class="col-auto title-edit">
                 <button
-                    class="btn btn-text-secondary btn-{{ size }}"
+                    class="btn btn-text-secondary btn-{{ size() }}"
                     attr.aria-label="{{ 'common.rename' | sqxTranslate }}"
                     (click)="toggleRename()"
                     type="button">
@@ -58,7 +58,7 @@
         }
 
         <div class="col-auto">
-            <button class="btn btn-text-secondary btn-{{ size }} btn-placeholder" (click)="toggleRename()" type="button">&nbsp;</button>
+            <button class="btn btn-text-secondary btn-{{ size() }} btn-placeholder" (click)="toggleRename()" type="button">&nbsp;</button>
         </div>
     </div>
 }

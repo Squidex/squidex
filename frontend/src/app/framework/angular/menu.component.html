@@ -18,7 +18,7 @@
             [sqxAnchoredTo]="buttonOptions"
             *sqxModal="overflowDropdown; closeAlways: true">
             @for (item of menu; track item) {
-                <ng-container *ngTemplateOutlet="item.template"></ng-container>
+                <ng-container *ngTemplateOutlet="item.template()"></ng-container>
             }
         </sqx-dropdown-menu>
     }

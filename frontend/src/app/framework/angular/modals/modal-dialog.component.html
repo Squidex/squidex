@@ -1,8 +1,8 @@
 <div class="modal" animate.enter="fade-in" animate.leave="fade-out" cdkTrapFocus data-testid="dialog">
-    <div class="modal-dialog modal-{{ size }}" [class.modal-fh]="fullHeight">
-        <div class="modal-content" [sqxTourStep]="tourId">
-            @if (showHeader) {
-                <div class="modal-header" [class.with-tabs]="hasTabs">
+    <div class="modal-dialog modal-{{ size() }}" [class.modal-fh]="fullHeight()">
+        <div class="modal-content" [sqxTourStep]="tourId()">
+            @if (showHeader()) {
+                <div class="modal-header" [class.with-tabs]="hasTabs()">
                     <h4 class="modal-title"><ng-content select="[title]"></ng-content></h4>
                     <ng-content select="[plainTitle]"></ng-content>
                     <button class="btn btn-close" attr.aria-label="{{ 'common.close' | sqxTranslate }}" (click)="dialogClose.emit()" type="button"></button>
@@ -11,9 +11,9 @@
 
             <div class="modal-tabs clearfix" #tabsElement><ng-content select="[tabs]"></ng-content></div>
 
-            <div class="modal-body" [class.flexed]="flexBody"><ng-content select="[content]"></ng-content></div>
+            <div class="modal-body" [class.flexed]="flexBody()"><ng-content select="[content]"></ng-content></div>
 
-            @if (showFooter) {
+            @if (showFooter()) {
                 <div class="modal-footer justify-content-between" #footerElement><ng-content select="[footer]"></ng-content></div>
             }
         </div>

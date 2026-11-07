@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { booleanAttribute, Component, EventEmitter, Input, numberAttribute, Output } from '@angular/core';
+import { booleanAttribute, Component, input, linkedSignal, numberAttribute, output, signal } from '@angular/core';
 import { FormControl, FormsModule, ReactiveFormsModule, ValidatorFn, Validators } from '@angular/forms';
 import { Keys } from '@app/framework/internal';
 import { TranslatePipe } from '../pipes/translate.pipe';
@@ -26,32 +25,34 @@ import { FocusOnInitDirective } from './focus-on-init.directive';
     ],
 })
 export class EditableTitleComponent {
-    @Output()
-    public inputTitleChange = new EventEmitter<string>();
+    /** Emits the new title when renamed. */
+    public readonly inputTitleChange = output<string>();
 
-    @Input({ required: true })
-    public inputTitle?: string;
+    /** The title. */
+    public readonly inputTitle = input.required<string | undefined | null>();
 
-    @Input({ transform: numberAttribute })
-    public inputTitleLength = 20;
+    /** The maximum length of the title. No limit when 0. */
+    public readonly inputTitleLength = input(20, { transform: numberAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public inputTitleRequired = true;
+    /** Prevents renaming to an empty title. */
+    public readonly inputTitleRequired = input(true, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public disabled?: boolean | null;
+    /** Prevents renaming. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public closeButton = true;
+    /** Shows a button to cancel renaming. */
+    public readonly closeButton = input(true, { transform: booleanAttribute });
 
-    @Input()
-    public size: 'sm' | 'md' | 'lg' = 'md';
+    /** The size of the title and the buttons. */
+    public readonly size = input<'sm' | 'md' | 'lg'>('md');
 
-    @Input()
-    public displayFallback = '';
+    /** The text to show when the title is empty. */
+    public readonly displayFallback = input('');
 
-    public renaming = false;
-    public renameForm = new FormControl<string>('');
+    public readonly inputTitleDisplayed = linkedSignal(() => this.inputTitle());
+
+    public readonly renaming = signal(false);
+    public readonly renameForm = new FormControl<string>('');
 
     public onKeyDown(event: KeyboardEvent) {
         if (Keys.isEscape(event)) {
@@ -60,30 +61,31 @@ export class EditableTitleComponent {
     }
 
     public toggleRename() {
-        if (this.disabled) {
+        if (this.disabled()) {
             return;
         }
 
-        if (!this.renaming) {
-            let validators: ValidatorFn[] = [];
+        if (!this.renaming()) {
+            const validators: ValidatorFn[] = [];
 
-            if (this.inputTitleLength) {
-                validators.push(Validators.maxLength(this.inputTitleLength));
+            const maxLength = this.inputTitleLength();
+            if (maxLength) {
+                validators.push(Validators.maxLength(maxLength));
             }
 
-            if (this.inputTitleRequired) {
+            if (this.inputTitleRequired()) {
                 validators.push(Validators.required);
             }
 
             this.renameForm.setValidators(validators);
         }
 
-        this.renameForm.setValue(this.inputTitle || '');
-        this.renaming = !this.renaming;
+        this.renameForm.setValue(this.inputTitleDisplayed() || '');
+        this.renaming.update(x => !x);
     }
 
     public rename() {
-        if (this.disabled) {
+        if (this.disabled()) {
             return;
         }
 
@@ -91,9 +93,8 @@ export class EditableTitleComponent {
             const text = this.renameForm.value || '';
 
             this.inputTitleChange.emit(text);
-            this.inputTitle = text;
-
-            this.renaming = false;
+            this.inputTitleDisplayed.set(text);
+            this.renaming.set(false);
         }
     }
 }

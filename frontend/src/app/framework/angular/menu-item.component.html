@@ -1,31 +1,31 @@
 <ng-template #dropdownTemplate>
     <button
         class="dropdown-item"
-        [disabled]="disabled"
-        [confirmRememberKey]="confirmRememberKey"
-        [confirmText]="confirmText | sqxTranslate"
-        [confirmTitle]="confirmTitle | sqxTranslate"
+        [disabled]="disabled()"
+        [confirmRememberKey]="confirmRememberKey()"
+        [confirmText]="confirmText() | sqxTranslate"
+        [confirmTitle]="confirmTitle() | sqxTranslate"
         (sqxConfirmClick)="action.emit()"
-        [title]="tooltip | sqxTranslate"
+        [title]="tooltip() | sqxTranslate"
         type="button">
-        {{ actualMenuLabel }}
+        {{ actualMenuLabel() }}
     </button>
 </ng-template>
 
 <button
     class="btn btn-outline-secondary"
-    [class.btn-sm]="small"
-    [confirmRememberKey]="confirmRememberKey"
-    [confirmText]="confirmText | sqxTranslate"
-    [confirmTitle]="confirmTitle | sqxTranslate"
-    [disabled]="disabled"
+    [class.btn-sm]="small()"
+    [confirmRememberKey]="confirmRememberKey()"
+    [confirmText]="confirmText() | sqxTranslate"
+    [confirmTitle]="confirmTitle() | sqxTranslate"
+    [disabled]="disabled()"
     (sqxConfirmClick)="action.emit()"
-    [tabIndex]="tabIndex"
-    [title]="tooltip | sqxTranslate"
+    [tabIndex]="tabIndex()"
+    [title]="tooltip() | sqxTranslate"
     type="button">
-    @if (icon) {
-        <i class="icon-{{ icon }}"></i>
+    @if (icon()) {
+        <i class="icon-{{ icon() }}"></i>
     }
 
-    {{ label | sqxTranslate }}
+    {{ label() | sqxTranslate }}
 </button>

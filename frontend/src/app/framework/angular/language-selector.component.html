@@ -1,29 +1,33 @@
-@if (languages.length > 1 || showAlways) {
-    @if (languages.length > 3 || percents) {
+@let languagesAll = languages();
+@let languageSelected = language();
+@let languagesExist = exists();
+@let languagesPercents = percents();
+@if (languagesAll.length > 1 || showAlways()) {
+    @if (languagesAll.length > 3 || languagesPercents) {
         <button
-            class="btn btn-outline-secondary btn-{{ size }} dropdown-toggle"
+            class="btn btn-outline-secondary btn-{{ size() }} dropdown-toggle"
             #button
             (click)="dropdown.toggle()"
             tabindex="-1"
-            title="{{ language.englishName }}"
+            title="{{ languageSelected.englishName }}"
             type="button">
-            {{ language.iso2Code }}
+            {{ languageSelected.iso2Code }}
         </button>
-        <sqx-dropdown-menu [position]="dropdownPosition" scrollY="true" [sqxAnchoredTo]="button" *sqxModal="dropdown; closeAlways: true">
+        <sqx-dropdown-menu [position]="dropdownPosition()" scrollY="true" [sqxAnchoredTo]="button" *sqxModal="dropdown; closeAlways: true">
             <table>
                 <tbody>
-                    @for (supported of languages; track supported.iso2Code) {
+                    @for (supported of languagesAll; track supported.iso2Code) {
                         <tr
                             class="dropdown-item"
-                            [class.active]="supported === language"
-                            [class.missing]="exists && !exists[supported.iso2Code]"
+                            [class.active]="supported === languageSelected"
+                            [class.missing]="languagesExist && !languagesExist[supported.iso2Code]"
                             (click)="selectLanguage(supported)">
                             <td class="text-language">{{ supported.iso2Code }}</td>
 
                             <td>({{ supported.englishName }})</td>
 
-                            @if (percents) {
-                                <td class="text-right">{{ percents[supported.iso2Code] || 0 }} %</td>
+                            @if (languagesPercents) {
+                                <td class="text-right">{{ languagesPercents[supported.iso2Code] || 0 }} %</td>
                             }
                         </tr>
                     }
@@ -31,12 +35,12 @@
             </table>
         </sqx-dropdown-menu>
     } @else {
-        <div class="btn-group btn-group-{{ size }}">
-            @for (supported of languages; track supported.iso2Code) {
+        <div class="btn-group btn-group-{{ size() }}">
+            @for (supported of languagesAll; track supported.iso2Code) {
                 <button
                     class="btn btn-outline-secondary"
-                    [class.active]="supported === language"
-                    [class.missing]="exists && !exists[supported.iso2Code]"
+                    [class.active]="supported === languageSelected"
+                    [class.missing]="languagesExist && !languagesExist[supported.iso2Code]"
                     (click)="selectLanguage(supported)"
                     tabindex="-1"
                     title="{{ supported.englishName }}"

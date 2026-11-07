@@ -5,9 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-
-import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, numberAttribute, Optional, Output, TemplateRef, ViewChild } from '@angular/core';
-import { LocalizerService, TypedSimpleChanges } from '../internal';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, DestroyRef, input, numberAttribute, Optional, output, TemplateRef, viewChild } from '@angular/core';
+import { LocalizerService } from '../internal';
 import { ConfirmClickDirective } from './forms/confirm-click.directive';
 import { MenuItemRegistry } from './menu.component';
 import { TooltipDirective } from './modals/tooltip.directive';
@@ -25,70 +24,59 @@ import { TranslatePipe } from './pipes/translate.pipe';
     ],
 })
 export class MenuItemComponent {
-    @Input()
-    public label = '';
+    /** The text of the button. */
+    public readonly label = input('');
 
-    @Input()
-    public menuLabel = '';
+    /** The text in the overflow dropdown. Falls back to the label. */
+    public readonly menuLabel = input('');
 
-    @Input()
-    public icon = '';
+    /** The name of the icon, without the "icon-" prefix. */
+    public readonly icon = input('');
 
-    @Input()
-    public tooltip = '';
+    /** The tooltip of the button. */
+    public readonly tooltip = input('');
 
-    @Input({ transform: numberAttribute })
-    public tabIndex = -1;
+    /** The tab index of the button. */
+    public readonly tabIndex = input(-1, { transform: numberAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public disabled = false;
+    /** Disables the button. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public small = false;
+    /** Renders a small button. */
+    public readonly small = input(false, { transform: booleanAttribute });
 
-    @Input()
-    public confirmRememberKey = '';
+    /** The key to remember the confirmation, so that it is only asked once. */
+    public readonly confirmRememberKey = input('');
 
-    @Input()
-    public confirmTitle = '';
+    /** The title of the confirmation dialog. No confirmation is needed when empty. */
+    public readonly confirmTitle = input('');
 
-    @Input()
-    public confirmText = '';
+    /** The text of the confirmation dialog. */
+    public readonly confirmText = input('');
 
-    @Output()
-    public action = new EventEmitter();
+    /** Emits when the button is clicked and the action is confirmed. */
+    public readonly action = output();
 
-    @ViewChild('dropdownTemplate', { static: true })
-    template!: TemplateRef<any>;
+    public readonly template = viewChild.required<TemplateRef<any>>('dropdownTemplate');
 
-    public actualMenuLabel = '';
+    public readonly actualMenuLabel = computed(() => {
+        const key = this.menuLabel() || this.label();
+        if (!key) {
+            return '';
+        }
+
+        return this.localizerService.getOrKey(key);
+    });
 
     constructor(
-        @Optional() private readonly menuItemRegistry: MenuItemRegistry | null,
+        @Optional() menuItemRegistry: MenuItemRegistry | null,
+        destroyRef: DestroyRef,
         private readonly localizerService: LocalizerService,
     ) {
-    }
+        menuItemRegistry?.registerItem(this);
 
-    public ngOnInit() {
-        this.menuItemRegistry?.registerItem(this);
-    }
-
-    public ngOnDestroy() {
-        this.menuItemRegistry?.unregisterItem(this);
-    }
-
-    public ngOnChanges(changes: TypedSimpleChanges<MenuItemComponent>) {
-        if (changes.label || changes.menuLabel) {
-             const key = this.menuLabel || this.label;
-             if (key) {
-                this.actualMenuLabel = this.localizerService.getOrKey(key);
-             } else {
-                this.actualMenuLabel = '';
-             }
-        }
-    }
-
-    public get showInDropdown() {
-        return this.label || this.menuLabel;
+        destroyRef.onDestroy(() => {
+            menuItemRegistry?.unregisterItem(this);
+        });
     }
 }

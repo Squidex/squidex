@@ -6,7 +6,7 @@
  */
 
 import { CdkTrapFocus  } from '@angular/cdk/a11y';
-import { AfterViewInit, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, EventEmitter, Input, Output, Renderer2, ViewChild } from '@angular/core';
+import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, ElementRef, input, output, Renderer2, viewChild } from '@angular/core';
 import { TranslatePipe } from '../pipes/translate.pipe';
 import { ShortcutComponent } from '../shortcut.component';
 import { TourStepDirective } from './tour-step.directive';
@@ -23,57 +23,51 @@ import { TourStepDirective } from './tour-step.directive';
         TourStepDirective,
     ],
 })
-export class ModalDialogComponent implements AfterViewInit {
-    @Output()
-    public dialogClose = new EventEmitter();
+export class ModalDialogComponent {
+    private readonly tabsElement = viewChild<ElementRef<ParentNode>>('tabsElement');
+    private readonly footerElement = viewChild<ElementRef<ParentNode>>('footerElement');
 
-    @Input({ transform: booleanAttribute })
-    public showClose?: boolean | null = true;
+    /** Emits when the dialog is closed with the close button or the escape key. */
+    public readonly dialogClose = output();
 
-    @Input({ transform: booleanAttribute })
-    public showHeader?: boolean | null = true;
+    /** Shows the close button in the header. */
+    public readonly showClose = input(true, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public showFooter?: boolean | null = true;
+    /** Shows the header with the title. */
+    public readonly showHeader = input(true, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public hasTabs?: boolean | null = false;
+    /** Shows the footer. It is hidden anyway when no footer content is provided. */
+    public readonly showFooter = input(true, { transform: booleanAttribute });
 
-    @Input()
-    public size: 'sm' | 'md' | 'lg' | 'xl' = 'md';
+    /** Removes the bottom border of the header, when the dialog has tabs. */
+    public readonly hasTabs = input(false, { transform: booleanAttribute });
 
-    @Input({ transform: booleanAttribute })
-    public flexBody?: boolean | null;
+    /** The width of the dialog. */
+    public readonly size = input<'sm' | 'md' | 'lg' | 'xl'>('md');
 
-    @Input({ transform: booleanAttribute })
-    public fullHeight?: boolean | null;
+    /** Renders the body as flex container. */
+    public readonly flexBody = input(false, { transform: booleanAttribute });
 
-    @Input()
-    public tourId?: string;
+    /** Uses the full height of the screen. */
+    public readonly fullHeight = input(false, { transform: booleanAttribute });
 
-    @ViewChild('tabsElement', { static: false })
-    public tabsElement!: ElementRef<ParentNode>;
+    /** The ID of the tour step that points to this dialog. */
+    public readonly tourId = input<string>();
 
-    @ViewChild('footerElement', { static: false })
-    public footerElement!: ElementRef<ParentNode>;
+    constructor(renderer: Renderer2) {
+        afterNextRender(() => {
+            hideWhenEmpty(renderer, this.tabsElement());
+            hideWhenEmpty(renderer, this.footerElement());
+        });
+    }
+}
 
-    constructor(
-        private readonly renderer: Renderer2,
-    ) {
+function hideWhenEmpty(renderer: Renderer2, element: ElementRef<ParentNode> | undefined) {
+    if (!element?.nativeElement) {
+        return;
     }
 
-    public ngAfterViewInit() {
-        this.hideWhenEmpty(this.tabsElement);
-        this.hideWhenEmpty(this.footerElement);
-    }
-
-    private hideWhenEmpty(element: ElementRef) {
-        if (element && element.nativeElement) {
-            const isEmpty = element.nativeElement.children.length === 0;
-
-            if (isEmpty) {
-                this.renderer.setStyle(element.nativeElement, 'display', 'none');
-            }
-        }
+    if (element.nativeElement.children.length === 0) {
+        renderer.setStyle(element.nativeElement, 'display', 'none');
     }
 }

@@ -111,6 +111,6 @@ export class MenuComponent implements AfterViewInit, ResizeListener {
         }
 
         const isOverlapping = measuredMenu > measuredContainer;
-        return isOverlapping ? [...items.values()].filter(x => x.actualMenuLabel).sortedByString(x => x.actualMenuLabel) : null;
+        return isOverlapping ? [...items.values()].filter(x => x.actualMenuLabel()).sortedByString(x => x.actualMenuLabel()) : null;
     });
 }

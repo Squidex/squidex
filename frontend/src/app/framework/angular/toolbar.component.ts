@@ -5,8 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { AsyncPipe } from '@angular/common';
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { toSignal } from '@angular/core/rxjs-interop';
 import { ToolbarService } from '@app/framework/internal';
 import { TranslatePipe } from './pipes/translate.pipe';
 
@@ -16,13 +16,13 @@ import { TranslatePipe } from './pipes/translate.pipe';
     templateUrl: './toolbar.component.html',
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        AsyncPipe,
         TranslatePipe,
     ],
 })
 export class ToolbarComponent {
-    constructor(
-        public readonly toolbar: ToolbarService,
-    ) {
+    public readonly buttons;
+
+    constructor(toolbar: ToolbarService) {
+        this.buttons = toSignal(toolbar.buttonsChanges, { initialValue: [] });
     }
 }

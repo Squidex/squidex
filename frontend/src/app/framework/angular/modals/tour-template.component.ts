@@ -6,8 +6,7 @@
  */
 
 
-import { AfterContentInit, ChangeDetectionStrategy, Component, Input } from '@angular/core';
-import { StatefulComponent } from '@app/framework/internal';
+import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { MarkdownDirective } from '../markdown.directive';
 import { TranslatePipe } from '../pipes/translate.pipe';
 import { ModalPlacementDirective } from './modal-placement.directive';
@@ -26,58 +25,65 @@ import { StepDefinition, TourService } from './tour.service';
         TranslatePipe,
     ],
 })
-export class TourTemplateComponent extends StatefulComponent implements AfterContentInit {
-    private delayedDestory: any;
+export class TourTemplateComponent {
+    private delayedDestroy: any;
 
-    @Input()
-    public currentStep!: StepDefinition;
+    public readonly isVisible = signal(false);
 
-    @Input()
-    public currentElement?: any = null;
+    public readonly currentStep = signal<StepDefinition | null>(null);
+    public readonly currentElement = signal<any>(null);
 
-    public isVisible = false;
+    public readonly hasPrev = false;
 
-    public hasPrev = false;
-    public hasNext = false;
-    public hasFinish = false;
+    public readonly hasNext = computed(() => {
+        const step = this.currentStep();
+        if (!step) {
+            return false;
+        }
 
-    public progress = '0%';
+        return this.tourService.hasNext(step) && !step.nextOnAnchorClick && !step.nextOnCondition;
+    });
+
+    public readonly hasFinish = computed(() => {
+        const step = this.currentStep();
+        if (!step) {
+            return false;
+        }
+
+        return !this.tourService.hasNext(step) && !step.hideAll;
+    });
+
+    public readonly progress = computed(() => {
+        const step = this.currentStep();
+        if (!step) {
+            return '0%';
+        }
+
+        const stepIndex = this.tourService.steps.indexOf(step) + 1;
+        const stepCount = this.tourService.steps.length;
+
+        return `${100 * stepIndex / stepCount}%`;
+    });
 
     constructor(
         public readonly tourService: TourService,
     ) {
-        super({});
-    }
-
-    public ngAfterContentInit() {
-        this.tourService.component = this;
+        tourService.component = this;
     }
 
     public render(step: StepDefinition | null, element: any | null) {
-        this.isVisible = !!step;
+        this.isVisible.set(!!step);
 
-        clearTimeout(this.delayedDestory);
+        clearTimeout(this.delayedDestroy);
 
         if (!step) {
-            this.delayedDestory = setTimeout(() => {
-                this.currentStep = null!;
-                this.currentElement = null;
-                this.detectChanges();
+            this.delayedDestroy = setTimeout(() => {
+                this.currentStep.set(null);
+                this.currentElement.set(null);
             }, 4000);
         } else {
-            const stepIndex = this.tourService.steps.indexOf(step) + 1;
-            const stepCount = this.tourService.steps.length;
-
-            this.progress = `${100 * stepIndex / stepCount}%`;
-
-            this.hasPrev = false;
-            this.hasNext = this.tourService.hasNext(step) && !step.nextOnAnchorClick && !step.nextOnCondition;
-            this.hasFinish = !this.tourService.hasNext(step) && !step.hideAll;
-
-            this.currentStep = step;
-            this.currentElement = element;
+            this.currentStep.set(step);
+            this.currentElement.set(element);
         }
-
-        this.detectChanges();
     }
 }

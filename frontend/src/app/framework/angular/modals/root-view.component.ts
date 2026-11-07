@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, ViewChild, ViewContainerRef } from '@angular/core';
+import { ChangeDetectionStrategy, Component, viewChild, ViewContainerRef } from '@angular/core';
 
 @Component({
     selector: 'sqx-root-view',
@@ -14,6 +14,5 @@ import { ChangeDetectionStrategy, Component, ViewChild, ViewContainerRef } from 
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RootViewComponent {
-    @ViewChild('element', { read: ViewContainerRef, static: false })
-    public viewContainer!: ViewContainerRef;
+    public readonly viewContainer = viewChild.required('element', { read: ViewContainerRef });
 }

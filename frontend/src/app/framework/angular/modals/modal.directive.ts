@@ -118,7 +118,7 @@ export class ModalDirective<T = unknown> implements OnDestroy, OpenModal {
     }
 
     private getContainer() {
-        return this.placeOnRoot ? this.rootView.viewContainer : this.viewContainer;
+        return this.placeOnRoot ? this.rootView.viewContainer() : this.viewContainer;
     }
 
     private setupStyles() {

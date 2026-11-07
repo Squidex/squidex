@@ -6,7 +6,7 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, EventEmitter, Input, Output } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { PagingInfo } from '../state';
 import { TooltipDirective } from './modals/tooltip.directive';
@@ -26,80 +26,82 @@ export const PAGE_SIZES: ReadonlyArray<number> = [10, 20, 30, 50];
     ],
 })
 export class PagerComponent {
-    @Output()
-    public loadTotal = new EventEmitter();
+    /** Emits when the total number of items should be loaded, because it is not known yet. */
+    public readonly loadTotal = output();
 
-    @Output()
-    public pagingChange = new EventEmitter<{ page: number; pageSize: number }>();
+    /** Emits the new page and page size when the user navigates or changes the page size. */
+    public readonly pagingChange = output<{ page: number; pageSize: number }>();
 
-    @Input({ required: true })
-    public paging: PagingInfo | undefined | null;
+    /** The current paging state. */
+    public readonly paging = input.required<PagingInfo | undefined | null>();
 
-    @Input({ transform: booleanAttribute })
-    public autoHide?: boolean | null;
+    /** Hides the pager when there is only one page. */
+    public readonly autoHide = input(false, { transform: booleanAttribute });
 
-    public totalPages = 0;
-    public totalItems = 0;
+    public readonly pageSizes = PAGE_SIZES;
 
-    public itemFirst = 0;
-    public itemLast = 0;
-
-    public canGoPrev?: boolean | null;
-    public canGoNext = false;
-
-    public translationInfo: any;
-
-    public pageSizes = PAGE_SIZES;
-
-    public ngOnChanges() {
-        if (!this.paging) {
-            return;
+    public readonly itemFirst = computed(() => {
+        const paging = this.paging();
+        if (!paging) {
+            return 0;
         }
 
-        const { page, pageSize, count, total } = this.paging;
+        return paging.page * paging.pageSize + (paging.count > 0 ? 1 : 0);
+    });
 
-        const offset = page * pageSize;
-
-        this.itemFirst = offset + (count > 0 ? 1 : 0);
-        this.itemLast = offset + count;
-
-        if (count > 0 && total >= 0) {
-            const totalPages = Math.ceil(total / pageSize);
-
-            this.canGoNext = page < totalPages - 1;
-        } else if (count > 0) {
-            this.canGoNext = count === pageSize;
-        } else {
-            this.canGoNext = false;
+    public readonly itemLast = computed(() => {
+        const paging = this.paging();
+        if (!paging) {
+            return 0;
         }
 
-        this.canGoPrev = page > 0;
+        return paging.page * paging.pageSize + paging.count;
+    });
 
-        this.translationInfo = {
-            itemFirst: this.itemFirst,
-            itemLast: this.itemLast,
-            numberOfItems: total,
-        };
-    }
+    public readonly canGoPrev = computed(() => {
+        const paging = this.paging();
+        if (!paging) {
+            return false;
+        }
+
+        return paging.page > 0;
+    });
+
+    public readonly canGoNext = computed(() => {
+        const paging = this.paging();
+        if (!paging || paging.count <= 0) {
+            return false;
+        }
+
+        if (paging.total < 0) {
+            return paging.count === paging.pageSize;
+        }
+
+        return paging.page < Math.ceil(paging.total / paging.pageSize) - 1;
+    });
+
+    public readonly translationInfo = computed(() => ({
+        itemFirst: this.itemFirst(),
+        itemLast: this.itemLast(),
+        numberOfItems: this.paging()?.total,
+    }));
 
     public goPrev() {
-        if (!this.paging) {
+        const paging = this.paging();
+        if (!paging) {
             return;
         }
 
-        const { page, pageSize } = this.paging;
-
-        this.pagingChange.emit({ page: page - 1, pageSize });
+        this.pagingChange.emit({ page: paging.page - 1, pageSize: paging.pageSize });
     }
 
     public goNext() {
-        if (!this.paging) {
+        const paging = this.paging();
+        if (!paging) {
             return;
         }
 
-        const { page, pageSize } = this.paging;
-
-        this.pagingChange.emit({ page: page + 1, pageSize });
+        this.pagingChange.emit({ page: paging.page + 1, pageSize: paging.pageSize });
     }
 
     public setPageSize(pageSize: number) {
