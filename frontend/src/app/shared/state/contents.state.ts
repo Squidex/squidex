@@ -228,7 +228,7 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                 this.dialogs.notifyInfo('i18n:contents.created');
 
                 return this.next(s => {
-                    const contents = [payload, ...s.contents].slice(s.pageSize);
+                    const contents = [payload, ...s.contents].slice(0, s.pageSize);
 
                     return { ...s, contents, total: s.total + 1 };
                 }, 'Created');
@@ -341,10 +341,9 @@ export abstract class ContentsStateBase extends State<Snapshot> {
                     for (const content of updates.items) {
                         contents = contents.replacedBy('id', content);
 
-                        selectedContent =
-                            s.selectedContent?.id !== content.id ?
-                            s.selectedContent :
-                            content;
+                        if (selectedContent?.id === content.id) {
+                            selectedContent = content;
+                        }
                     }
 
                     return { ...s, contents, selectedContent };
