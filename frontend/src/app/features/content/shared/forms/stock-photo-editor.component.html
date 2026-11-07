@@ -11,7 +11,7 @@
         <i class="icon-search"></i>
     </button>
 
-    <input class="form-control" [disabled]="true" [formControl]="valueControl" readonly />
+    <input class="form-control" [disabled]="true" readonly [value]="value() ?? ''" />
 </div>
 
 @if (stockPhotoThumbnail(); as url) {
@@ -24,7 +24,7 @@
 }
 <sqx-modal-dialog (dialogClose)="searchDialog.hide()" fullHeight="true" size="lg" *sqxModal="searchDialog">
     <ng-container title>
-        <input class="form-control search" [formControl]="stockPhotoSearch" placeholder="{{ 'contents.stockPhotoSearch' | sqxTranslate }}" sqxFocusOnInit />
+        <input class="form-control search" [disabled]="disabled()" (input)="search($event)" placeholder="{{ 'contents.stockPhotoSearch' | sqxTranslate }}" sqxFocusOnInit [value]="stockPhotoSearch()" />
         @if (stockPhotosLoading()) {
             <sqx-loader />
         }

@@ -1,16 +1,16 @@
 <div #container (sqxResized)="updateContainerWidth($event.width)">
-    @for (value of tagValues(); track value.id) {
+    @for (option of tagValues(); track option.id) {
         <div class="form-check" [class.form-check-block]="!isSingleline()" [class.form-check-inline]="isSingleline()">
             <input
                 class="form-check-input"
-                id="{{ controlId }}_{{ value }}"
-                [disabled]="isDisabled()"
+                id="{{ controlId }}_{{ option }}"
+                (blur)="touched.set(true)"
+                (change)="select(option)"
+                [checked]="option.value === value()"
+                [disabled]="disabled()"
                 [name]="controlId"
-                [ngModel]="valueModel()"
-                (ngModelChange)="callChange($event)"
-                type="radio"
-                [value]="value.value" />
-            <label class="form-check-label" for="{{ controlId }}_{{ value }}">{{ value.name }}</label>
+                type="radio" />
+            <label class="form-check-label" for="{{ controlId }}_{{ option }}">{{ option.name }}</label>
         </div>
     }
 </div>

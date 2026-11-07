@@ -5,32 +5,24 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, ElementRef, forwardRef, input, linkedSignal, signal, viewChild } from '@angular/core';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { getTagValues, MathHelper, SignalControlComponent, TagValue, TextMeasurer, Types } from '@app/framework/internal';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, ElementRef, input, linkedSignal, model, signal, viewChild } from '@angular/core';
+import { FormValueControl } from '@angular/forms/signals';
+import { getTagValues, MathHelper, TagValue, TextMeasurer, Types } from '@app/framework/internal';
 import { ResizedDirective } from '../../resized.directive';
-
-export const SQX_CHECKBOX_GROUP_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => CheckboxGroupComponent), multi: true,
-};
 
 @Component({
     selector: 'sqx-checkbox-group',
     styleUrls: ['./checkbox-group.component.scss'],
     templateUrl: './checkbox-group.component.html',
-    providers: [
-        SQX_CHECKBOX_GROUP_CONTROL_VALUE_ACCESSOR,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ResizedDirective,
     ],
 })
-export class CheckboxGroupComponent extends SignalControlComponent<string[]> {
+export class CheckboxGroupComponent implements FormValueControl<ReadonlyArray<string> | null> {
     private readonly containerElement = viewChild<ElementRef<HTMLDivElement>>('container');
     private readonly containerWidth = signal(0);
     private readonly textMeasurer = new TextMeasurer(() => this.containerElement());
-    private readonly checkedValuesRaw = signal<any>(undefined);
 
     private readonly tagValuesUnsorted = computed(() => {
         return getTagValues(this.values(), false);
@@ -51,6 +43,15 @@ export class CheckboxGroupComponent extends SignalControlComponent<string[]> {
     });
 
     protected readonly controlId = MathHelper.guid();
+
+    /** The values of the checked options. */
+    public readonly value = model<ReadonlyArray<string> | null>(null);
+
+    /** Disables the control. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
+
+    /** Indicates whether the control has been touched. */
+    public readonly touched = model(false);
 
     /** Renders the options in a single line, in multiple lines or depending on the available space. */
     public readonly layout = input<'Auto' | 'Singleline' | 'Multiline'>('Auto');
@@ -79,21 +80,24 @@ export class CheckboxGroupComponent extends SignalControlComponent<string[]> {
         return width < this.containerWidth();
     });
 
-    protected readonly checkedValues = linkedSignal<ReadonlyArray<TagValue>>(() => {
-        const raw = this.checkedValuesRaw();
-        if (!Types.isArray(raw) || raw.length === 0) {
-            return [];
-        }
+    protected readonly checkedValues = linkedSignal<{ raw: unknown; tags: ReadonlyArray<TagValue> }, ReadonlyArray<TagValue>>({
+        source: () => ({ raw: this.value(), tags: this.tagValuesUnsorted() }),
+        computation: ({ raw, tags }, previous) => {
+            // Keep the order of the user's selection, when the value was set by this control.
+            if (previous && previous.source.tags === tags && Types.equals(previous.value.map(x => x.id), raw)) {
+                return previous.value;
+            }
 
-        return this.tagValuesUnsorted().filter(x => raw.includes(x.value));
+            if (!Types.isArray(raw) || raw.length === 0) {
+                return [];
+            }
+
+            return tags.filter(x => raw.includes(x.value));
+        },
     });
 
     protected updateContainerWidth(width: number) {
         this.containerWidth.set(width);
-    }
-
-    public writeValue(obj: any) {
-        this.checkedValuesRaw.set(obj);
     }
 
     protected check(isChecked: boolean, value: TagValue) {
@@ -106,7 +110,6 @@ export class CheckboxGroupComponent extends SignalControlComponent<string[]> {
         }
 
         this.checkedValues.set(checkedValues);
-
-        this.callChange(checkedValues.map(x => x.id));
+        this.value.set(checkedValues.map(x => x.id));
     }
 }

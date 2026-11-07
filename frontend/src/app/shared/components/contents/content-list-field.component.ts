@@ -6,8 +6,8 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, input } from '@angular/core';
-import { UntypedFormGroup } from '@angular/forms';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, input, untracked } from '@angular/core';
+import { FieldTree } from '@angular/forms/signals';
 import { FromNowPipe, ShortDatePipe, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AppLanguageDto, ContentDto, FieldValue, getContentValue, META_FIELDS, SchemaDto, TableField, TableSettings } from '@app/shared/internal';
 import { UserNameRefPipe, UserPictureRefPipe } from '../pipes';
@@ -50,7 +50,7 @@ export class ContentListFieldComponent {
     public readonly patchAllowed = input(false, { transform: booleanAttribute });
 
     /** The form for inline editing. The value of the field is written to this form. */
-    public readonly patchForm = input<UntypedFormGroup | null>();
+    public readonly patchForm = input<FieldTree<Record<string, any>> | null>();
 
     /** The schema of the content. */
     public readonly schema = input.required<SchemaDto | undefined>();
@@ -86,13 +86,16 @@ export class ContentListFieldComponent {
             return;
         }
 
-        const formControl = this.patchForm()?.controls[rootField.name];
-        if (!formControl) {
+        const formField = this.patchForm()?.[rootField.name];
+        if (!formField) {
             return;
         }
 
         const { value } = getContentValue(this.content(), this.language(), rootField);
 
-        formControl.setValue(value);
+        untracked(() => {
+            formField().value.set(value);
+            formField().reset();
+        });
     }
 }

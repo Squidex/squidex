@@ -7,23 +7,16 @@
 
 import { CdkDrag, CdkDragDrop, CdkDragHandle, CdkDropList } from '@angular/cdk/drag-drop';
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, forwardRef, inject, input, signal } from '@angular/core';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { AppLanguageDto, ContentDto, ContentsColumnsPipe, ContentSelectorComponent, DialogModel, ModalDirective, ResizedDirective, ResolveContents, SignalControlComponent, sorted, TranslatePipe, Types } from '@app/shared';
+import { booleanAttribute, ChangeDetectionStrategy, Component, effect, forwardRef, inject, input, model, signal, untracked } from '@angular/core';
+import { FormValueControl } from '@angular/forms/signals';
+import { AppLanguageDto, ContentDto, ContentsColumnsPipe, ContentSelectorComponent, DialogModel, ModalDirective, ResizedDirective, ResolveContents, sorted, TranslatePipe, Types } from '@app/shared';
 import { ContentCreatorComponent } from './content-creator.component';
 import { ReferenceItemComponent } from './reference-item.component';
-
-export const SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesEditorComponent), multi: true,
-};
 
 @Component({
     selector: 'sqx-references-editor',
     styleUrls: ['./references-editor.component.scss'],
     templateUrl: './references-editor.component.html',
-    providers: [
-        SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CdkDrag,
@@ -41,8 +34,17 @@ export const SQX_REFERENCES_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
         '[class.expanded]': 'isExpanded()',
     },
 })
-export class ReferencesEditorComponent extends SignalControlComponent<ReadonlyArray<string>> {
+export class ReferencesEditorComponent implements FormValueControl<ReadonlyArray<string> | null> {
     private readonly contentsResolver = inject(ResolveContents);
+
+    /** The value of the control. */
+    public readonly value = model<ReadonlyArray<string> | null>(null);
+
+    /** Disables the control. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
+
+    /** Indicates whether the control has been touched. */
+    public readonly touched = model(false);
 
     /** Renders the references in fullscreen mode. */
     public readonly isExpanded = input(false, { transform: booleanAttribute });
@@ -73,31 +75,38 @@ export class ReferencesEditorComponent extends SignalControlComponent<ReadonlyAr
     protected readonly contentCreatorDialog = new DialogModel();
     protected readonly contentSelectorDialog = new DialogModel();
 
-    public writeValue(obj: any) {
-        if (!Types.isArrayOfString(obj)) {
-            this.setContentItems([]);
-            return;
-        }
+    constructor() {
+        effect(onCleanup => {
+            const contentIds = this.value();
 
-        if (Types.equals(obj, this.contentItems().map(x => x.id))) {
-            return;
-        }
-
-        const contentIds: string[] = obj;
-
-        this.contentsResolver.resolveMany(contentIds)
-            .subscribe({
-                next: ({ items }) => {
-                    this.setContentItems(contentIds.map(id => items.find(c => c.id === id)!).defined());
-
-                    if (this.contentItems().length !== contentIds.length) {
-                        this.updateValue();
-                    }
-                },
-                error: () => {
+            untracked(() => {
+                if (!Types.isArrayOfString(contentIds)) {
                     this.setContentItems([]);
-                },
+                    return;
+                }
+
+                if (Types.equals(contentIds, this.contentItems().map(x => x.id))) {
+                    return;
+                }
+
+                const subscription =
+                    this.contentsResolver.resolveMany(contentIds)
+                        .subscribe({
+                            next: ({ items }) => {
+                                this.setContentItems(contentIds.map(id => items.find(c => c.id === id)!).defined());
+
+                                if (this.contentItems().length !== contentIds.length) {
+                                    this.updateValue();
+                                }
+                            },
+                            error: () => {
+                                this.setContentItems([]);
+                            },
+                        });
+
+                onCleanup(() => subscription.unsubscribe());
             });
+        });
     }
 
     private setContentItems(contentItems: ReadonlyArray<ContentDto>) {
@@ -116,7 +125,7 @@ export class ReferencesEditorComponent extends SignalControlComponent<ReadonlyAr
     }
 
     protected remove(content: ContentDto) {
-        if (!content || this.isDisabled()) {
+        if (!content || this.disabled()) {
             return;
         }
 
@@ -126,7 +135,7 @@ export class ReferencesEditorComponent extends SignalControlComponent<ReadonlyAr
     }
 
     protected sort(event: CdkDragDrop<ReadonlyArray<ContentDto>>) {
-        if (!event || this.isDisabled()) {
+        if (!event || this.disabled()) {
             return;
         }
 
@@ -145,12 +154,12 @@ export class ReferencesEditorComponent extends SignalControlComponent<ReadonlyAr
         const ids = this.contentItems().map(x => x.id);
 
         if (ids.length === 0) {
-            this.callChange(null);
+            this.value.set(null);
         } else {
-            this.callChange(ids);
+            this.value.set(ids);
         }
 
-        this.callTouched();
+        this.touched.set(true);
     }
 
     protected setCompact(isCompact: boolean) {

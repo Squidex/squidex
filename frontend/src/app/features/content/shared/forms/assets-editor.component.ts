@@ -7,13 +7,9 @@
 
 import { CdkDrag, CdkDragDrop, CdkDropList } from '@angular/cdk/drag-drop';
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, effect, forwardRef, inject, input, signal } from '@angular/core';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { AssetComponent, AssetDialogComponent, AssetDto, AssetSelectorComponent, ChatDialogComponent, DialogModel, FileDropDirective, HTTP, LocalStoreService, MessageBus, ModalDirective, ResizedDirective, ResolveAssets, Settings, SignalControlComponent, sorted, TranslatePipe, Types } from '@app/shared';
-
-export const SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => AssetsEditorComponent), multi: true,
-};
+import { booleanAttribute, ChangeDetectionStrategy, Component, effect, inject, input, model, signal, untracked } from '@angular/core';
+import { FormValueControl } from '@angular/forms/signals';
+import { AssetComponent, AssetDialogComponent, AssetDto, AssetSelectorComponent, ChatDialogComponent, DialogModel, FileDropDirective, HTTP, LocalStoreService, MessageBus, ModalDirective, ResizedDirective, ResolveAssets, Settings, sorted, TranslatePipe, Types } from '@app/shared';
 
 class AssetUpdated {
     constructor(
@@ -27,9 +23,6 @@ class AssetUpdated {
     selector: 'sqx-assets-editor',
     styleUrls: ['./assets-editor.component.scss'],
     templateUrl: './assets-editor.component.html',
-    providers: [
-        SQX_ASSETS_EDITOR_CONTROL_VALUE_ACCESSOR,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AssetComponent,
@@ -47,10 +40,19 @@ class AssetUpdated {
         '[class.expanded]': 'isExpanded()',
     },
 })
-export class AssetsEditorComponent extends SignalControlComponent<ReadonlyArray<string>> {
+export class AssetsEditorComponent implements FormValueControl<ReadonlyArray<string> | null> {
     private readonly localStore = inject(LocalStoreService);
     private readonly assetsResolver = inject(ResolveAssets);
     private readonly messageBus = inject(MessageBus);
+
+    /** The value of the control. */
+    public readonly value = model<ReadonlyArray<string> | null>(null);
+
+    /** Disables the control. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
+
+    /** Indicates whether the control has been touched. */
+    public readonly touched = model(false);
 
     /** The folder to upload new assets to. */
     public readonly folderId = input<string>();
@@ -73,8 +75,6 @@ export class AssetsEditorComponent extends SignalControlComponent<ReadonlyArray<
     protected readonly assetsDialog = new DialogModel();
 
     constructor() {
-        super();
-
         effect(onCleanup => {
             const subscription =
                 this.messageBus.of(AssetUpdated)
@@ -84,33 +84,38 @@ export class AssetsEditorComponent extends SignalControlComponent<ReadonlyArray<
 
             onCleanup(() => subscription.unsubscribe());
         });
-    }
 
-    public writeValue(obj: any) {
-        if (!Types.isArrayOfString(obj)) {
-            this.setAssets([]);
-            return;
-        }
+        effect(onCleanup => {
+            const assetIds = this.value();
 
-        if (Types.equals(obj, this.assetItems().map(x => x.id))) {
-            return;
-        }
-
-        const assetIds: string[] = obj;
-
-        this.assetsResolver.resolveMany(obj)
-            .subscribe({
-                next: ({ items }) => {
-                    this.setAssets(items);
-
-                    if (this.assetItems().length !== assetIds.length) {
-                        this.updateValue();
-                    }
-                },
-                error: () => {
+            untracked(() => {
+                if (!Types.isArrayOfString(assetIds)) {
                     this.setAssets([]);
-                },
+                    return;
+                }
+
+                if (Types.equals(assetIds, this.assetItems().map(x => x.id))) {
+                    return;
+                }
+
+                const subscription =
+                    this.assetsResolver.resolveMany(assetIds)
+                        .subscribe({
+                            next: ({ items }) => {
+                                this.setAssets(items);
+
+                                if (this.assetItems().length !== assetIds.length) {
+                                    this.updateValue();
+                                }
+                            },
+                            error: () => {
+                                this.setAssets([]);
+                            },
+                        });
+
+                onCleanup(() => subscription.unsubscribe());
             });
+        });
     }
 
     protected notifyOthers(asset: AssetDto) {
@@ -204,11 +209,11 @@ export class AssetsEditorComponent extends SignalControlComponent<ReadonlyArray<
         const ids = this.assetItems().map(x => x.id);
 
         if (ids.length === 0) {
-            this.callChange(null);
+            this.value.set(null);
         } else {
-            this.callChange(ids);
+            this.value.set(ids);
         }
 
-        this.callTouched();
+        this.touched.set(true);
     }
 }

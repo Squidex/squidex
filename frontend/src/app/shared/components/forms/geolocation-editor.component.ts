@@ -6,18 +6,14 @@
  */
 
 
-import { afterNextRender, ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, forwardRef, inject, signal, viewChild } from '@angular/core';
-import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { disabled, form, FormField } from '@angular/forms/signals';
-import { ControlErrorsComponent, ResizedDirective, SignalControlComponent, SignalValidators, StringHelper, TooltipDirective, TranslatePipe } from '@app/framework';
+import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, inject, input, model, signal, untracked, viewChild } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { disabled, form, FormField, FormValueControl } from '@angular/forms/signals';
+import { ControlErrorsComponent, ResizedDirective, SignalValidators, StringHelper, TooltipDirective, TranslatePipe } from '@app/framework';
 import { LocalStoreService, ResourceLoaderService, Settings, Types, UIOptions } from '@app/shared/internal';
 
 declare const L: any;
 declare const google: any;
-
-export const SQX_GEOLOCATION_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => GeolocationEditorComponent), multi: true,
-};
 
 type Geolocation = { latitude: number | null; longitude: number | null };
 
@@ -27,9 +23,6 @@ type UpdateOptions = { reset?: boolean; pan?: true; fire?: boolean };
     selector: 'sqx-geolocation-editor',
     styleUrls: ['./geolocation-editor.component.scss'],
     templateUrl: './geolocation-editor.component.html',
-    providers: [
-        SQX_GEOLOCATION_EDITOR_CONTROL_VALUE_ACCESSOR,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ControlErrorsComponent,
@@ -40,7 +33,7 @@ type UpdateOptions = { reset?: boolean; pan?: true; fire?: boolean };
         TranslatePipe,
     ],
 })
-export class GeolocationEditorComponent extends SignalControlComponent<Geolocation> {
+export class GeolocationEditorComponent implements FormValueControl<Geolocation | null> {
     private readonly resourceLoader = inject(ResourceLoaderService);
 
     private readonly googleMapsKey = inject(UIOptions).value.map.googleMaps.key;
@@ -50,7 +43,16 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
     private readonly geolocationModel = signal({ latitude: NaN, longitude: NaN });
     private marker: any;
     private map: any;
-    private value: Geolocation | null = null;
+    private current: Geolocation | null = null;
+
+    /** The geolocation value. */
+    public readonly value = model<Geolocation | null>(null);
+
+    /** Disables the control. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
+
+    /** Indicates whether the control has been touched. */
+    public readonly touched = model(false);
 
     protected readonly isGoogleMaps = inject(UIOptions).value.map.type !== 'OSM';
 
@@ -59,7 +61,7 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
     protected readonly isCompact = signal(false);
 
     protected readonly geolocationForm = form(this.geolocationModel, path => {
-        disabled(path, () => this.isDisabled());
+        disabled(path, () => this.disabled());
         SignalValidators.between(path.latitude, -90, 90);
         SignalValidators.between(path.longitude, -180, 180);
     });
@@ -67,14 +69,20 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
     constructor() {
         const destroyRef = inject(DestroyRef);
 
-        super();
+        effect(() => {
+            const value = this.value();
+
+            untracked(() => {
+                this.applyValue(value);
+            });
+        });
 
         effect(() => {
             this.localStore.setBoolean(Settings.Local.HIDE_MAP, this.isMapHidden());
         });
 
         effect(() => {
-            const isDisabled = this.isDisabled();
+            const isDisabled = this.disabled();
 
             if (!this.isGoogleMaps) {
                 this.updateOSMDisabled(isDisabled);
@@ -105,14 +113,18 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
         this.isMapHidden.set(isMapHidden);
     }
 
-    public writeValue(obj: any) {
-        if (Types.isObject(obj) && Types.isNumber(obj.latitude) && Types.isNumber(obj.longitude)) {
-            this.value = obj;
-        } else {
-            this.value = null;
+    private applyValue(obj: any) {
+        if (Types.equals(obj, this.current)) {
+            return;
         }
 
-        if (this.marker || (!this.marker && this.map && this.value)) {
+        if (Types.isObject(obj) && Types.isNumber(obj.latitude) && Types.isNumber(obj.longitude)) {
+            this.current = obj;
+        } else {
+            this.current = null;
+        }
+
+        if (this.marker || (!this.marker && this.map && this.current)) {
             this.updateMarker({ reset: !this.marker });
         }
     }
@@ -159,8 +171,7 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
         if (lat && lng) {
             this.updateMarker({ pan: true, fire: true });
         } else {
-            this.callChange(this.value);
-            this.callTouched();
+            this.emitValue();
         }
     }
 
@@ -190,7 +201,7 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
         .on('markgeocode', (event: any) => {
             const center = event.geocode.center;
 
-            if (!this.isDisabled()) {
+            if (!this.disabled()) {
                 this.updateValue(center.lat, center.lng);
                 this.updateMarker({ reset: true, fire: true });
             }
@@ -198,7 +209,7 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
         .addTo(this.map);
 
         this.map.on('click', (event: any) => {
-            if (!this.isDisabled()) {
+            if (!this.disabled()) {
                 const latlng = event.latlng.wrap();
 
                 this.updateValue(latlng.lat, latlng.lng);
@@ -208,7 +219,7 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
 
         this.updateMarker({ reset: true });
 
-        if (this.isDisabled()) {
+        if (this.disabled()) {
             this.map.zoomControl.disable();
 
             this.map._handlers.forEach((handler: any) => {
@@ -232,7 +243,7 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
         const searchBox = new google.maps.places.SearchBox(this.searchBoxInput().nativeElement);
 
         this.map.addListener('click', (event: any) => {
-            if (!this.isDisabled()) {
+            if (!this.disabled()) {
                 const latlng = event.latLng;
 
                 this.updateValue(latlng.lat(), latlng.lng());
@@ -251,7 +262,7 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
             }
 
             const place = places[0];
-            if (!place.geometry || this.isDisabled()) {
+            if (!place.geometry || this.disabled()) {
                 return;
             }
 
@@ -264,19 +275,19 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
 
         this.updateMarker({ reset: true });
 
-        if (this.isDisabled()) {
+        if (this.disabled()) {
             this.map.setOptions({ draggable: false, zoomControl: false });
         }
     }
 
     protected clearValue() {
-        this.value = null;
+        this.current = null;
 
         this.updateMarker({ fire: true });
     }
 
     private updateValue(latitude: number | null, longitude: number | null) {
-        this.value = { latitude, longitude };
+        this.current = { latitude, longitude };
     }
 
     private updateMarker(opts?: UpdateOptions) {
@@ -286,21 +297,20 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
             this.updateMarkerGoogle(opts);
         }
 
-        if (this.value) {
-            this.geolocationModel.set({ latitude: this.value.latitude ?? NaN, longitude: this.value.longitude ?? NaN });
+        if (this.current) {
+            this.geolocationModel.set({ latitude: this.current.latitude ?? NaN, longitude: this.current.longitude ?? NaN });
         } else {
             this.geolocationModel.set({ latitude: NaN, longitude: NaN });
             this.geolocationForm().reset();
         }
 
         if (opts && opts.fire) {
-            this.callChange(this.value);
-            this.callTouched();
+            this.emitValue();
         }
     }
 
     private updateMarkerOSM(opts?: UpdateOptions) {
-        if (!this.value) {
+        if (!this.current) {
             this.marker?.removeFrom(this.map);
             this.marker = null;
             return;
@@ -316,12 +326,12 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
                 this.updateMarker({ fire: true });
             });
 
-            if (this.isDisabled()) {
+            if (this.disabled()) {
                 this.marker.dragging.disable();
             }
         }
 
-        const latLng = L.latLng(this.value.latitude, this.value.longitude);
+        const latLng = L.latLng(this.current.latitude, this.current.longitude);
 
         if (opts && opts.reset) {
             this.map.setView(latLng, 15);
@@ -333,7 +343,7 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
     }
 
     private updateMarkerGoogle(opts?: UpdateOptions) {
-        if (!this.value) {
+        if (!this.current) {
             this.marker?.setMap(null);
             this.marker = null;
             return;
@@ -350,7 +360,7 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
             });
 
             this.marker.addListener('dragend', (event: any) => {
-                if (!this.isDisabled()) {
+                if (!this.disabled()) {
                     const latlng = event.latLng;
 
                     this.updateValue(latlng.lat(), latlng.lng());
@@ -359,7 +369,7 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
             });
         }
 
-        const latLng = new google.maps.LatLng(this.value.latitude, this.value.longitude);
+        const latLng = new google.maps.LatLng(this.current.latitude, this.current.longitude);
 
         if (opts && opts.reset) {
             this.map.setZoom(12);
@@ -373,5 +383,10 @@ export class GeolocationEditorComponent extends SignalControlComponent<Geolocati
 
     protected setCompact(isCompact: boolean) {
         this.isCompact.set(isCompact);
+    }
+
+    private emitValue() {
+        this.value.set(this.current);
+        this.touched.set(true);
     }
 }

@@ -5,15 +5,15 @@
             (blur)="blur()"
             (click)="picker.click()"
             (focus)="picker.click()"
-            [ngModel]="value()"
-            (ngModelChange)="updateValue($event)"
+            (input)="updateValue($any($event.target).value)"
             [placeholder]="placeholder()"
             [style.background]="value()"
             [style.color]="valueForeground()"
-            type="text" />
+            type="text"
+            [value]="value() ?? ''" />
     } @else {
         <div class="circle" (click)="picker.click()" (focus)="picker.click()" [style.background]="value()"></div>
     }
 
-    <input class="color-picker" #picker [ngModel]="valueParsed()" (ngModelChange)="updateValue($event)" type="color" />
+    <input class="color-picker" #picker (input)="updateValue($any($event.target).value)" type="color" [value]="valueParsed()" />
 </span>

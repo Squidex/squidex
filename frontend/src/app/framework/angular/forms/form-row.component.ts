@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, Optional, SkipSelf } from '@angular/core';
-import { AbstractControl, FormGroupDirective } from '@angular/forms';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
 import { FieldTree } from '@angular/forms/signals';
 import { Types } from '@app/framework/internal';
 import { MarkdownDirective } from '../markdown.directive';
@@ -28,13 +27,6 @@ import { getFieldKey } from './signal-validators';
         '[class.row]': '!vertical()',
         '[class.form-group-aligned]': 'centered()',
     },
-    viewProviders: [
-        {
-            provide: FormGroupDirective,
-            useFactory: (directive: FormGroupDirective) => directive,
-            deps: [[new Optional(), new SkipSelf(), FormGroupDirective]],
-        },
-    ],
     imports: [
         ControlErrorsComponent,
         FormAlertComponent,
@@ -45,7 +37,7 @@ import { getFieldKey } from './signal-validators';
 })
 export class FormRowComponent {
     /** The control or the name of the control in the parent form group. */
-    public readonly for = input.required<string | AbstractControl | FieldTree<unknown>>();
+    public readonly for = input.required<string | FieldTree<unknown>>();
 
     /** The label of the field. */
     public readonly label = input<string>();

@@ -53,14 +53,16 @@ describe('SignalForm controls', () => {
         });
     });
 
-    it('should show errors when field is touched', () => {
+    it('should show errors when field is touched', async () => {
         const fixture = TestBed.createComponent(TestHostComponent);
         fixture.detectChanges();
 
         const element: HTMLElement = fixture.nativeElement;
         expect(element.textContent).not.toContain('is required');
 
-        fixture.componentInstance.form.submit();
+        await fixture.componentInstance.form.submit(() => {
+            return Promise.resolve();
+        });
         fixture.detectChanges();
 
         expect(element.textContent).toContain('Name is required.');

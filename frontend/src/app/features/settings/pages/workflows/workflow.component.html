@@ -8,10 +8,10 @@
         <div class="col col-tags">
             <sqx-tag-editor
                 [itemConverter]="schemasSource().normalConverter()"
-                [ngModel]="workflowViewValue.dto.schemaIds"
                 readonly="true"
                 styleBlank="true"
-                styleScrollable="true" />
+                styleScrollable="true"
+                [value]="workflowViewValue.dto.schemaIds" />
         </div>
 
         <div class="col-options">
@@ -81,9 +81,9 @@
                             [disabled]="!isEditable()"
                             [itemConverter]="schemasSource().converter()"
                             [itemsSource]="schemasSource().normalConverter().suggestions"
-                            [ngModel]="workflowViewValue.dto.schemaIds"
-                            (ngModelChange)="changeSchemaIds($event)"
-                            placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}" />
+                            placeholder="{{ 'common.tagAddSchema' | sqxTranslate }}"
+                            [value]="workflowViewValue.dto.schemaIds"
+                            (valueChange)="changeSchemaIds($event)" />
                     </sqx-form-row>
 
                     @for (step of workflowViewValue.steps; track step.name) {

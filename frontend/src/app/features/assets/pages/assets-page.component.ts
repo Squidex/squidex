@@ -6,7 +6,6 @@
  */
 
 import { Component, inject, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { AssetDialogComponent, AssetDto, AssetFolderDialogComponent, AssetPathComponent, AssetsListComponent, AssetsState, DialogModel, LayoutComponent, ListViewComponent, LocalStoreService, MathHelper, ModalDirective, PagerComponent, Queries, Query, QueryFullTextSynchronizer, Router2State, SearchFormComponent, Settings, ShortcutDirective, SidebarMenuDirective, TagEditorComponent, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, UIState } from '@app/shared';
 
@@ -22,7 +21,6 @@ import { AssetDialogComponent, AssetDto, AssetFolderDialogComponent, AssetPathCo
         AssetFolderDialogComponent,
         AssetPathComponent,
         AssetsListComponent,
-        FormsModule,
         LayoutComponent,
         ListViewComponent,
         ModalDirective,

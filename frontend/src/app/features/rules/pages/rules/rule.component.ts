@@ -7,7 +7,6 @@
 
 
 import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { ConfirmClickDirective, DropdownMenuComponent, DynamicRuleDto, DynamicUpdateRuleDto, EditableTitleComponent, FlowView, ModalDirective, ModalModel, ModalPlacementDirective, RuleElementDto, RulesState, RuleTriggerMetadataDto, ToggleComponent, TranslatePipe } from '@app/shared';
 import { RuleElementComponent } from '../../shared/rule-element.component';
@@ -21,7 +20,6 @@ import { RuleElementComponent } from '../../shared/rule-element.component';
         ConfirmClickDirective,
         DropdownMenuComponent,
         EditableTitleComponent,
-        FormsModule,
         ModalDirective,
         ModalPlacementDirective,
         RouterLink,

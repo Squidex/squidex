@@ -102,7 +102,7 @@ describe('SignalForm', () => {
 
         await form.submitAndUpdate(() => of({ name: 'new-name' }));
 
-        expect(form.model()).toEqual({ name: 'new-name', items: [{ key: 'a' }] });
+        expect(form.model()).toMatchObject({ name: 'new-name', items: [{ key: 'a' }] });
     });
 
     it('should reset and update value with result', async () => {

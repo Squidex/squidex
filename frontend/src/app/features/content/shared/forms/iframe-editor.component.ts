@@ -5,10 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, DestroyRef, effect, ElementRef, inject, input, numberAttribute, output, Renderer2, signal, viewChild } from '@angular/core';
-import { AbstractControl } from '@angular/forms';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, DestroyRef, effect, ElementRef, inject, input, numberAttribute, output, Renderer2, signal, untracked, viewChild } from '@angular/core';
+import { FieldTree } from '@angular/forms/signals';
 import { Router } from '@angular/router';
-import { AppLanguageDto, AppsState, AssetDto, AssetSelectorComponent, computeEditorUrl, ContentDto, ContentSelectorComponent, DialogModel, DialogService, disabled$, ModalDirective, SafeResourceUrlPipe, ThemeService, Types, value$ } from '@app/shared';
+import { AppLanguageDto, AppsState, AssetDto, AssetSelectorComponent, computeEditorUrl, ContentDto, ContentSelectorComponent, DialogModel, DialogService, ModalDirective, SafeResourceUrlPipe, ThemeService, Types } from '@app/shared';
 
 @Component({
     selector: 'sqx-iframe-editor',
@@ -61,7 +61,7 @@ export class IFrameEditorComponent {
     public readonly formValue = input.required<any>();
 
     /** The name of the field. */
-    public readonly formField = input.required<string>();
+    public readonly fieldName = input.required<string>();
 
     /** The index of the field when it is part of an array. */
     public readonly formIndex = input.required<number | null | undefined, unknown>({ transform: numberAttribute });
@@ -73,7 +73,7 @@ export class IFrameEditorComponent {
     public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
     /** The form control with the value of the field. */
-    public readonly formControlBinding = input.required<AbstractControl>();
+    public readonly formControlBinding = input.required<FieldTree<any>>();
 
     /** Disables the editor, in addition to the disabled state of the form control. */
     public readonly disabled = input(false, { transform: booleanAttribute });
@@ -128,28 +128,17 @@ export class IFrameEditorComponent {
             this.sendDisabled();
         });
 
-        effect(onCleanup => {
-            const control = this.formControlBinding();
-            if (!control) {
-                return;
-            }
+        effect(() => {
+            const state = this.formControlBinding()();
+            const value = state.value();
 
-            const subscriptions = [
-                value$(control)
-                    .subscribe(value => {
-                        this.updateValue(value);
-                    }),
-                disabled$(control)
-                    .subscribe(isDisabled => {
-                        this.isDisabledByControl.set(isDisabled);
-                    }),
-            ];
+            untracked(() => this.updateValue(value));
+        });
 
-            onCleanup(() => {
-                for (const subscription of subscriptions) {
-                    subscription.unsubscribe();
-                }
-            });
+        effect(() => {
+            const isDisabled = this.formControlBinding()().disabled();
+
+            untracked(() => this.isDisabledByControl.set(isDisabled));
         });
 
         inject(DestroyRef).onDestroy(() => {
@@ -203,10 +192,11 @@ export class IFrameEditorComponent {
             if (!Types.equals(this.value, value)) {
                 this.value = value;
 
-                this.formControlBinding()?.reset(value);
+                this.formControlBinding()().value.set(value);
+                this.formControlBinding()().markAsDirty();
             }
         } else if (type === 'touched') {
-            this.formControlBinding()?.markAsTouched();
+            this.formControlBinding()().markAsTouched();
         } else if (type === 'notifyInfo') {
             const { text } = event.data;
 
@@ -291,7 +281,7 @@ export class IFrameEditorComponent {
     }
 
     private sendInit() {
-        this.sendMessage('init', { context: { ...this.context() || {}, field: this.formField() } });
+        this.sendMessage('init', { context: { ...this.context() || {}, field: this.fieldName() } });
     }
 
     private sendTheme() {

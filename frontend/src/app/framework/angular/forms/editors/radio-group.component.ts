@@ -5,29 +5,21 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, ElementRef, forwardRef, input, signal, viewChild } from '@angular/core';
-import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { getTagValues, MathHelper, SignalControlComponent, TagValue, TextMeasurer } from '@app/framework/internal';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, ElementRef, input, model, signal, viewChild } from '@angular/core';
+import { FormValueControl } from '@angular/forms/signals';
+import { getTagValues, MathHelper, TagValue, TextMeasurer } from '@app/framework/internal';
 import { ResizedDirective } from '../../resized.directive';
-
-export const SQX_RADIO_GROUP_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => RadioGroupComponent), multi: true,
-};
 
 @Component({
     selector: 'sqx-radio-group',
     styleUrls: ['./radio-group.component.scss'],
     templateUrl: './radio-group.component.html',
-    providers: [
-        SQX_RADIO_GROUP_CONTROL_VALUE_ACCESSOR,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        FormsModule,
         ResizedDirective,
     ],
 })
-export class RadioGroupComponent extends SignalControlComponent<string> {
+export class RadioGroupComponent implements FormValueControl<any> {
     private readonly containerElement = viewChild<ElementRef<HTMLDivElement>>('container');
     private readonly containerWidth = signal(0);
     private readonly textMeasurer = new TextMeasurer(() => this.containerElement());
@@ -51,6 +43,15 @@ export class RadioGroupComponent extends SignalControlComponent<string> {
     });
 
     protected readonly controlId = MathHelper.guid();
+
+    /** The value of the selected option. */
+    public readonly value = model<any>(null);
+
+    /** Disables the control. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
+
+    /** Indicates whether the control has been touched. */
+    public readonly touched = model(false);
 
     /** Renders the options in a single line, in multiple lines or depending on the available space. */
     public readonly layout = input<'Auto' | 'Singleline' | 'Multiline'>('Auto');
@@ -79,13 +80,15 @@ export class RadioGroupComponent extends SignalControlComponent<string> {
         return width < this.containerWidth();
     });
 
-    protected readonly valueModel = signal<any>(undefined);
-
     protected updateContainerWidth(width: number) {
         this.containerWidth.set(width);
     }
 
-    public writeValue(obj: any) {
-        this.valueModel.set(obj);
+    protected select(value: TagValue) {
+        if (this.disabled()) {
+            return;
+        }
+
+        this.value.set(value.value);
     }
 }

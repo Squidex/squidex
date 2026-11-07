@@ -5,34 +5,23 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, forwardRef, inject, input, linkedSignal, signal } from '@angular/core';
-import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, inject, input, linkedSignal, model, signal, untracked } from '@angular/core';
+import { FormValueControl } from '@angular/forms/signals';
 import { Observable } from 'rxjs';
-import { AppLanguageDto, ContentDto, ContentsDto, LocalizerService, ResolveContents, SignalControlComponent, TagEditorComponent, TranslatePipe, Types } from '@app/shared';
+import { AppLanguageDto, ContentDto, ContentsDto, LocalizerService, ResolveContents, TagEditorComponent, TranslatePipe, Types } from '@app/shared';
 import { ReferencesTagsConverter } from './references-tag-converter';
-
-export const SQX_REFERENCES_TAGS_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesTagsComponent), multi: true,
-};
-
-const NO_EMIT = { emitEvent: false };
 
 @Component({
     selector: 'sqx-references-tags',
     styleUrls: ['./references-tags.component.scss'],
     templateUrl: './references-tags.component.html',
-    providers: [
-        SQX_REFERENCES_TAGS_CONTROL_VALUE_ACCESSOR,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        FormsModule,
-        ReactiveFormsModule,
         TagEditorComponent,
         TranslatePipe,
     ],
 })
-export class ReferencesTagsComponent extends SignalControlComponent<ReadonlyArray<string>> {
+export class ReferencesTagsComponent implements FormValueControl<ReadonlyArray<string> | null> {
     private readonly contentsResolver = inject(ResolveContents);
     private readonly localizer = inject(LocalizerService);
 
@@ -49,6 +38,15 @@ export class ReferencesTagsComponent extends SignalControlComponent<ReadonlyArra
 
     private isOpenedBefore = false;
 
+    /** The value of the control. */
+    public readonly value = model<ReadonlyArray<string> | null>(null);
+
+    /** Disables the control. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
+
+    /** Indicates whether the control has been touched. */
+    public readonly touched = model(false);
+
     /** The ID of the schema to select the contents from. */
     public readonly schemaId = input.required<string>();
 
@@ -58,7 +56,15 @@ export class ReferencesTagsComponent extends SignalControlComponent<ReadonlyArra
     /** All languages of the app. */
     public readonly languages = input.required<ReadonlyArray<AppLanguageDto>>();
 
-    protected readonly control = new UntypedFormControl([]);
+    protected readonly selectedIds = computed(() => {
+        const value = this.value();
+
+        return Types.isArrayOfString(value) ? value : null;
+    });
+
+    protected readonly isEditorDisabled = computed(() => {
+        return this.disabled() || !this.isValid() || this.contentsFailed();
+    });
 
     protected readonly contentsLoading = signal(false);
 
@@ -67,30 +73,17 @@ export class ReferencesTagsComponent extends SignalControlComponent<ReadonlyArra
     });
 
     constructor() {
-        super();
-
         effect(() => {
-            if (this.isDisabled() || !this.isValid() || this.contentsFailed()) {
-                this.control.disable(NO_EMIT);
-            } else {
-                this.control.enable(NO_EMIT);
-            }
-        });
+            const ids = this.selectedIds();
 
-        effect(onCleanup => {
-            const subscription =
-                this.control.valueChanges
-                    .subscribe((value: string[]) => {
-                        this.callTouched();
+            untracked(() => {
+                const contents = this.contents();
 
-                        if (value && value.length > 0) {
-                            this.callChange(value);
-                        } else {
-                            this.callChange(null);
-                        }
-                    });
-
-            onCleanup(() => subscription.unsubscribe());
+                const idsNew = ids?.filter(x => !contents.find(y => y.id === x));
+                if (idsNew && idsNew.length > 0) {
+                    this.loadMore(this.contentsResolver.resolveMany(idsNew));
+                }
+            });
         });
     }
 
@@ -103,23 +96,14 @@ export class ReferencesTagsComponent extends SignalControlComponent<ReadonlyArra
         this.loadMore(this.contentsResolver.resolveAll(this.schemaId()));
     }
 
-    public writeValue(obj: ReadonlyArray<string>) {
-        if (Types.isArrayOfString(obj)) {
-            this.selectContent(obj);
+    protected updateValue(value: ReadonlyArray<string> | null | undefined) {
+        this.touched.set(true);
+
+        if (value && value.length > 0) {
+            this.value.set(value);
         } else {
-            this.selectContent(undefined);
+            this.value.set(null);
         }
-    }
-
-    private selectContent(ids?: ReadonlyArray<string>) {
-        const contents = this.contents();
-
-        const idsNew = ids?.filter(x => !contents.find(y => y.id === x));
-        if (idsNew && idsNew.length > 0) {
-            this.loadMore(this.contentsResolver.resolveMany(idsNew));
-        }
-
-        this.control.setValue(ids, NO_EMIT);
     }
 
     private loadMore(observable: Observable<ContentsDto>) {

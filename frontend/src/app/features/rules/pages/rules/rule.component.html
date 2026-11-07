@@ -129,7 +129,7 @@
                         <i class="icon-play-line"></i>
                     </button>
                 } @else {
-                    <sqx-toggle [disabled]="!rule.canDisable && !rule.canEnable" [ngModel]="rule.isEnabled" (ngModelChange)="toggle()" />
+                    <sqx-toggle [disabled]="!rule.canDisable && !rule.canEnable" [value]="rule.isEnabled" (valueChange)="toggle()" />
                 }
             </div>
         </div>

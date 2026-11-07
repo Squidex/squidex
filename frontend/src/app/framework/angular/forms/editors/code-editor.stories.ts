@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormsModule } from '@angular/forms';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { CodeEditorComponent, ScriptCompletions } from '@app/framework';
 
@@ -23,7 +22,7 @@ export default {
             control: false,
         },
         change: {
-            action: 'ngModelChange',
+            action: 'valueChange',
         },
     },
     render: args => ({
@@ -36,8 +35,8 @@ export default {
                     [height]="height"
                     [maxLines]="maxLines"
                     [mode]="mode"
-                    (ngModelChange)="change($event)"
-                    [ngModel]="ngModel"
+                    (valueChange)="change($event)"
+                    [value]="model"
                     [singleLine]="singleLine"
                     [valueFile]="valueFile"
                     [valueMode]="valueMode"
@@ -49,7 +48,6 @@ export default {
     decorators: [
         moduleMetadata({
             imports: [
-                FormsModule,
             ],
         }),
     ],
@@ -69,12 +67,12 @@ const COMPLETIONS: ScriptCompletions = [{
     type: 'String',
 }];
 
-type Story = StoryObj<CodeEditorComponent>;
+type Story = StoryObj<CodeEditorComponent & { model: any }>;
 
 export const Default: Story = {
     args: {
         height: 'auto',
-        ngModel: 'Value',
+        model: 'Value',
     } as any,
 };
 
@@ -88,7 +86,7 @@ export const Completions: Story = {
 export const InvalidJson: Story = {
     args: {
         height: 200,
-        ngModel: 'Invalid JSON\n{ \"Hello\": 42 }',
+        model: 'Invalid JSON\n{ \"Hello\": 42 }',
         mode: 'ace/mode/javascript',
     } as any,
 };
@@ -96,7 +94,7 @@ export const InvalidJson: Story = {
 export const InvalidJsonWithoutAnnotations: Story = {
     args: {
         height: 200,
-        ngModel: 'Invalid JSON\n{ \"Hello\": 42 }',
+        model: 'Invalid JSON\n{ \"Hello\": 42 }',
         mode: 'ace/mode/javascript',
         disabled: true,
     } as any,
@@ -114,8 +112,8 @@ export const SingleLine: Story = {
                         [disabled]="disabled"
                         [height]="height"
                         [maxLines]="maxLines"
-                        (ngModelChange)="ngModelChange"
-                        [ngModel]="ngModel"
+                        (valueChange)="change($event)"
+                        [value]="model"
                         [singleLine]="singleLine"
                         [valueFile]="valueFile"
                         [valueMode]="valueMode"

@@ -146,7 +146,7 @@
 
                 <sqx-form-alert> {{ "schemas.promptExample" | sqxTranslate }}</sqx-form-alert>
 
-                <sqx-code-editor disabled="true" [height]="1000" [ngModel]="generateLog()" [ngModelOptions]="{ standalone: true }" />
+                <sqx-code-editor disabled="true" [height]="1000" [value]="generateLog()" />
             }
         </ng-container>
         <ng-container footer>

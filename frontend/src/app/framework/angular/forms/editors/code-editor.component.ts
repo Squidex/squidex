@@ -5,15 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, computed, DestroyRef, effect, ElementRef, forwardRef, inject, input, numberAttribute, signal, viewChild } from '@angular/core';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, computed, DestroyRef, effect, ElementRef, inject, input, model, numberAttribute, signal, untracked, viewChild } from '@angular/core';
+import { FormValueControl } from '@angular/forms/signals';
 import { debounceTime, Subject } from 'rxjs';
-import { ResourceLoaderService, ScriptCompletion, ScriptCompletions, SignalControlComponent, ThemeService, Types } from '@app/framework/internal';
+import { ResourceLoaderService, ScriptCompletion, ScriptCompletions, ThemeService, Types } from '@app/framework/internal';
 import { FocusComponent } from '../forms-helper';
-
-export const SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => CodeEditorComponent), multi: true,
-};
 
 type Editor = AceAjax.Editor & { completers?: AceAjax.Completer[]; completer?: { showDocTooltip: (item: any) => void } };
 
@@ -48,12 +44,9 @@ function getDocHTML(item: AceAjax.Completion) {
     selector: 'sqx-code-editor',
     styleUrls: ['./code-editor.component.scss'],
     templateUrl: './code-editor.component.html',
-    providers: [
-        SQX_CODE_EDITOR_CONTROL_VALUE_ACCESSOR,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class CodeEditorComponent extends SignalControlComponent<any> implements FocusComponent {
+export class CodeEditorComponent implements FormValueControl<any>, FocusComponent {
     private readonly themeService = inject(ThemeService);
     private readonly resourceLoader = inject(ResourceLoaderService);
     private readonly editor = viewChild.required<ElementRef<HTMLDivElement>>('editor');
@@ -75,7 +68,17 @@ export class CodeEditorComponent extends SignalControlComponent<any> implements 
 
     private aceModes?: ModeList;
     private aceTools = false;
-    private value = '';
+    private lastValue: any;
+    private valueText = '';
+
+    /** The value of the control. */
+    public readonly value = model<any>(null);
+
+    /** Disables the control. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
+
+    /** Indicates whether the control has been touched. */
+    public readonly touched = model(false);
 
     /** Renders the editor without a border. */
     public readonly borderless = input(false, { transform: booleanAttribute });
@@ -114,8 +117,6 @@ export class CodeEditorComponent extends SignalControlComponent<any> implements 
     public readonly completion = input<ScriptCompletions | undefined | null>();
 
     constructor() {
-        super();
-
         const valueSubscription =
             this.valueChanged.pipe(debounceTime(100))
                 .subscribe(() => {
@@ -153,6 +154,22 @@ export class CodeEditorComponent extends SignalControlComponent<any> implements 
         });
 
         effect(() => {
+            const value = this.value();
+            const valueMode = this.valueMode();
+
+            untracked(() => {
+                // Values that have been set by this component are already shown in the editor.
+                if (value === this.lastValue) {
+                    return;
+                }
+
+                this.lastValue = value;
+                this.valueText = formatValue(value, valueMode);
+                this.setValue(this.valueText);
+            });
+        });
+
+        effect(() => {
             this.setMode(this.aceEditor(), this.mode(), this.valueFile());
         });
 
@@ -163,27 +180,6 @@ export class CodeEditorComponent extends SignalControlComponent<any> implements 
         effect(() => {
             this.setWordWrap(this.aceEditor(), this.wordWrap());
         });
-    }
-
-    public writeValue(obj: any) {
-        const valueMode = this.valueMode();
-        try {
-            if (Types.isNull(obj) || Types.isUndefined(obj)) {
-                this.value = '';
-            } else if (Types.isString(obj) && valueMode === 'JsonString') {
-                this.value = JSON.stringify(JSON.parse(obj), undefined, 4);
-            } else if (Types.isString(obj)) {
-                this.value = obj;
-            } else if (valueMode === 'Json') {
-                this.value = JSON.stringify(obj, undefined, 4);
-            } else {
-                this.value = '';
-            }
-        } catch {
-            this.value = '';
-        }
-
-        this.setValue(this.value);
     }
 
     public focus() {
@@ -203,7 +199,7 @@ export class CodeEditorComponent extends SignalControlComponent<any> implements 
 
         aceEditor.on('blur', () => {
             this.changeValue();
-            this.callTouched();
+            this.touched.set(true);
         });
 
         aceEditor.on('change', () => {
@@ -217,7 +213,7 @@ export class CodeEditorComponent extends SignalControlComponent<any> implements 
         });
 
         this.aceEditor.set(aceEditor);
-        this.setValue(this.value);
+        this.setValue(this.valueText);
     }
 
     private setupCompleter(aceEditor: Editor) {
@@ -265,11 +261,12 @@ export class CodeEditorComponent extends SignalControlComponent<any> implements 
             }
         }
 
-        if (this.value !== newValueText) {
-            this.callChange(newValueOut);
+        if (this.valueText !== newValueText) {
+            this.lastValue = newValueOut;
+            this.value.set(newValueOut);
         }
 
-        this.value = newValueText;
+        this.valueText = newValueText;
     }
 
     private setWordWrap(aceEditor: Editor | undefined, wordWrap: boolean) {
@@ -298,7 +295,7 @@ export class CodeEditorComponent extends SignalControlComponent<any> implements 
         }
 
         const height = this.height();
-        const isDisabled = this.isDisabled();
+        const isDisabled = this.disabled();
         const singleLine = this.singleLine();
 
         let maxLines = undefined;
@@ -347,6 +344,24 @@ export class CodeEditorComponent extends SignalControlComponent<any> implements 
 
         aceEditor.setValue(value);
         aceEditor.clearSelection();
+    }
+}
+
+function formatValue(value: any, valueMode: 'String' | 'Json' | 'JsonString') {
+    try {
+        if (Types.isNull(value) || Types.isUndefined(value)) {
+            return '';
+        } else if (Types.isString(value) && valueMode === 'JsonString') {
+            return JSON.stringify(JSON.parse(value), undefined, 4);
+        } else if (Types.isString(value)) {
+            return value;
+        } else if (valueMode === 'Json') {
+            return JSON.stringify(value, undefined, 4);
+        } else {
+            return '';
+        }
+    } catch {
+        return '';
     }
 }
 

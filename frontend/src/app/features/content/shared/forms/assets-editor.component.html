@@ -1,9 +1,9 @@
-<div class="row gx-1 header" [class.disabled]="isDisabled()">
+<div class="row gx-1 header" [class.disabled]="disabled()">
     <div class="col">
         <div
             class="btn btn-outline-secondary btn-dashed btn-block btn-add mb-1"
             (click)="fileInput.click()"
-            [sqxDropDisabled]="isDisabled()"
+            [sqxDropDisabled]="disabled()"
             (sqxDropFile)="addFiles($event)">
             {{ "contents.assetsUpload" | sqxTranslate }}
             <input class="file-drop-button-input hidden" #fileInput (change)="addFiles($any($event.target!)['files'])" multiple type="file" />
@@ -47,7 +47,7 @@
 </div>
 
 @if (assetFiles().length > 0 || assetItems().length > 0) {
-    <div class="assets-container" [class.expanded]="isExpanded()" [sqxDropDisabled]="isDisabled()" (sqxDropFile)="addFiles($event)" tabindex="1000">
+    <div class="assets-container" [class.expanded]="isExpanded()" [sqxDropDisabled]="disabled()" (sqxDropFile)="addFiles($event)" tabindex="1000">
         <div class="body" (sqxResizeCondition)="setCompact($event)" sqxResizeMaxWidth="0" sqxResizeMinWidth="600">
             @if (!isListView()) {
                 <div class="row g-0">
@@ -56,7 +56,7 @@
                             [assetFile]="file"
                             [folderId]="folderId()"
                             [isCompact]="isCompact()"
-                            [isDisabled]="isDisabled()"
+                            [isDisabled]="disabled()"
                             (loadDone)="addAsset(file, $event)"
                             (loadError)="removeLoadingAsset(file)" />
                     }
@@ -66,7 +66,7 @@
                             [asset]="asset"
                             (edit)="editStart($event)"
                             [isCompact]="isCompact()"
-                            [isDisabled]="isDisabled()"
+                            [isDisabled]="disabled()"
                             (remove)="removeLoadedAsset(asset)"
                             removeMode="true"
                             (update)="notifyOthers(asset)" />
@@ -79,7 +79,7 @@
                             [assetFile]="file"
                             [folderId]="folderId()"
                             [isCompact]="isCompact()"
-                            [isDisabled]="isDisabled()"
+                            [isDisabled]="disabled()"
                             isListView="true"
                             (loadDone)="addAsset(file, $event)"
                             (loadError)="removeLoadingAsset(file)" />
@@ -88,7 +88,7 @@
                     <div
                         cdkDropList
                         [cdkDropListData]="assetItems()"
-                        [cdkDropListDisabled]="isDisabled()"
+                        [cdkDropListDisabled]="disabled()"
                         (cdkDropListDropped)="sortAssets($event)">
                         @for (asset of assetItems(); track asset.id) {
                             <div class="table-drag" cdkDrag cdkDragLockAxis="y">
@@ -96,7 +96,7 @@
                                     [asset]="asset"
                                     (edit)="editStart($event)"
                                     [isCompact]="isCompact()"
-                                    [isDisabled]="isDisabled()"
+                                    [isDisabled]="disabled()"
                                     isListView="true"
                                     (remove)="removeLoadedAsset(asset)"
                                     [removeMode]="true"

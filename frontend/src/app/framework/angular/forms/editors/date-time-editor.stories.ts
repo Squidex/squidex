@@ -5,7 +5,6 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormsModule } from '@angular/forms';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { DateTimeEditorComponent, LocalizerService, UIOptions } from '@app/framework';
 
@@ -38,7 +37,7 @@ export default {
             control: 'boolean',
         },
         change: {
-            action: 'ngModelChange',
+            action: 'valueChange',
         },
         mode: {
             control: 'radio',
@@ -66,21 +65,18 @@ export default {
                     [hideDateButtons]="hideDateButtons"
                     [hideDateTimeModeButton]="hideDateTimeModeButton"
                     [mode]="mode"
-                    (ngModelChange)="ngModel = $event; change($event)"
-                    [ngModel]="ngModel"
+                    (valueChange)="value = $event; change($event)"
+                    [value]="value"
                     [size]="size">
                 </sqx-date-time-editor>
                 <div style="margin-bottom: 0.5rem; font-family: monospace; color: #555;">
-                    ngModel: {{ ngModel }}
+                    value: {{ value }}
                 </div>
             </div>
         `,
     }),
     decorators: [
         moduleMetadata({
-            imports: [
-                FormsModule,
-            ],
             providers: [
                 {
                     provide: LocalizerService,
@@ -105,7 +101,7 @@ export const Date: Story = {
 export const DateValue: Story = {
     args: {
         mode: 'Date',
-        ngModel: '2023-12-11',
+        value: '2023-12-11',
     } as any,
 };
 
@@ -118,14 +114,14 @@ export const DateTime: Story = {
 export const DateTimeValue: Story = {
     args: {
         mode: 'DateTime',
-        ngModel: '2023-12-11T10:09:08',
+        value: '2023-12-11T10:09:08',
     } as any,
 };
 
 export const DateTimeValueUtc: Story = {
     args: {
         mode: 'DateTime',
-        ngModel: '2023-12-11T10:09:08Z',
+        value: '2023-12-11T10:09:08Z',
     } as any,
 };
 

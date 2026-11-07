@@ -38,7 +38,7 @@
                             <span class="me-2"> {{ "common.disabled" | sqxTranslate }}</span>
                         }
 
-                        <sqx-toggle [ngModel]="snapshot.isEnabled" (ngModelChange)="changeEnabled($event)" />
+                        <sqx-toggle [value]="snapshot.isEnabled" (valueChange)="changeEnabled(!!$event)" />
                     </div>
                     <input
                         class="input-name form-control"

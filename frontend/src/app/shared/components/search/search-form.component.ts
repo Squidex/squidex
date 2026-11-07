@@ -6,7 +6,8 @@
  */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, inject, input, linkedSignal, output, Type } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
 import { BooleanValue, BootstrapClasses, EMPTY_FILTER_MODEL, FieldComponent, FilterField, Input as FilterInput, FilterModel, FilterOptions, NumberValue, SelectValue, StringValue } from 'ngx-inline-filter';
 import { DateTimeEditorComponent, DropdownComponent, FocusOnInitDirective, FormErrorComponent, FormRowComponent, HighlightPipe, LocalizerService, ModalDialogComponent, ModalDirective, ShortcutComponent, TooltipDirective, TourStepDirective, TranslatePipe, Types } from '@app/framework';
 import { AppLanguageDto, ContributorsState, DialogModel, Queries, Query, QueryModel, sanitize, SaveQueryForm } from '@app/shared/internal';
@@ -24,13 +25,13 @@ import { TourHintDirective } from '../tour-hint.directive';
         DropdownComponent,
         FilterInput,
         FocusOnInitDirective,
+        FormField,
         FormRowComponent,
         FormsModule,
         HighlightPipe,
         ModalDialogComponent,
         ModalDirective,
         ReferenceInputComponent,
-        ReactiveFormsModule,
         ShortcutComponent,
         TooltipDirective,
         TourHintDirective,
@@ -208,7 +209,7 @@ export class SearchFormComponent {
     }
 
     public saveQuery() {
-        this.saveQueryForm.submitCompleted({});
+        this.saveQueryForm.reset();
         this.saveQueryDialog.show();
     }
 
@@ -216,23 +217,22 @@ export class SearchFormComponent {
         const queries = this.queries();
         const query = this.query();
 
-        const value = this.saveQueryForm.submit();
-        if (!value || !queries) {
+        if (!queries) {
             return;
         }
 
-        if (!query) {
-            this.saveQueryForm.submitFailed('i18n:search.queryNotUsed');
-            return;
-        }
+        this.saveQueryForm.submit(async value => {
+            if (!query) {
+                throw 'i18n:search.queryNotUsed';
+            }
 
-        if (value.user) {
-            queries.addUser(value.name, query);
-        } else {
-            queries.addShared(value.name, query);
-        }
+            if (value.user) {
+                queries.addUser(value.name, query);
+            } else {
+                queries.addShared(value.name, query);
+            }
 
-        this.saveQueryForm.submitCompleted();
-        this.saveQueryDialog.hide();
+            this.saveQueryDialog.hide();
+        }, { resetAfterSubmit: true });
     }
 }

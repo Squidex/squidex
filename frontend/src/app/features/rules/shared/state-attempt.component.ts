@@ -7,7 +7,6 @@
 
 
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { CodeEditorComponent, FlowExecutionStepAttemptDto, TranslatePipe } from '@app/shared';
 
 @Component({
@@ -17,7 +16,6 @@ import { CodeEditorComponent, FlowExecutionStepAttemptDto, TranslatePipe } from 
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeEditorComponent,
-        FormsModule,
         TranslatePipe,
     ],
 })

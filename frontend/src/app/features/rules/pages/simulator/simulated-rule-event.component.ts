@@ -9,7 +9,6 @@
 
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { CodeEditorComponent, FlowView, JoinPipe, RuleElementDto, SimulatedRuleEventDto, TranslatePipe } from '@app/shared';
 import { HistoryStepComponent } from '../../shared/history-step.component';
 import { RuleClassPipe, SimulatedRuleEventStatusPipe } from '../../shared/pipes';
@@ -38,7 +37,6 @@ const ERRORS_AFTER_ENRICHED_EVENT = [
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeEditorComponent,
-        FormsModule,
         HistoryStepComponent,
         JoinPipe,
         RuleClassPipe,

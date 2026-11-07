@@ -5,10 +5,8 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, inject, linkedSignal } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
-import { distinctUntilChanged, map } from 'rxjs/operators';
-import { AppLanguageDto, ComponentContentsState, ContentsColumnsPipe, LanguageSelectorComponent, LanguagesState, LayoutComponent, ListViewComponent, PagerComponent, QuerySynchronizer, Router2State, ShortcutDirective, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, linkedSignal, untracked } from '@angular/core';
+import { AppLanguageDto, ComponentContentsState, ContentsColumnsPipe, LanguageSelectorComponent, LanguagesState, LayoutComponent, ListViewComponent, PagerComponent, QuerySynchronizer, routeParam, Router2State, ShortcutDirective, TitleComponent, TooltipDirective, TranslatePipe } from '@app/shared';
 import { ReferenceItemComponent } from '../../shared/references/reference-item.component';
 
 @Component({
@@ -36,7 +34,7 @@ import { ReferenceItemComponent } from '../../shared/references/reference-item.c
 export class ReferencesPageComponent {
     private readonly contentsRoute = inject(Router2State);
     private readonly languagesState = inject(LanguagesState);
-    private readonly route = inject(ActivatedRoute);
+    private readonly referenceId = routeParam('referenceId');
 
     protected readonly contentsState = inject(ComponentContentsState);
 
@@ -49,22 +47,23 @@ export class ReferencesPageComponent {
     });
 
     constructor() {
-        effect(onCleanup => {
-            const subscription =
-                getReferenceId(this.route)
-                    .subscribe(referenceId => {
-                        const initial =
-                            this.contentsRoute.mapTo(this.contentsState)
-                                .withPaging('contents', 10)
-                                .withSynchronizer(QuerySynchronizer.INSTANCE)
-                                .getInitial();
+        effect(() => {
+            const referenceId = this.referenceId();
+            if (!referenceId) {
+                return;
+            }
 
-                        this.contentsState.schema = { name: null! };
-                        this.contentsState.loadReferences(referenceId, initial);
-                        this.contentsRoute.listen();
-                    });
+            untracked(() => {
+                const initial =
+                    this.contentsRoute.mapTo(this.contentsState)
+                        .withPaging('contents', 10)
+                        .withSynchronizer(QuerySynchronizer.INSTANCE)
+                        .getInitial();
 
-            onCleanup(() => subscription.unsubscribe());
+                this.contentsState.schema = { name: null! };
+                this.contentsState.loadReferences(referenceId, initial);
+                this.contentsRoute.listen();
+            });
         });
     }
 
@@ -75,8 +74,4 @@ export class ReferencesPageComponent {
     protected changeLanguage(language: AppLanguageDto) {
         this.language.set(language);
     }
-}
-
-function getReferenceId(route: ActivatedRoute) {
-    return route.params.pipe(map(x => x['referenceId'] as string), distinctUntilChanged());
 }

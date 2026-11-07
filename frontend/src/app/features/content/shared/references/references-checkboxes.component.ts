@@ -5,32 +5,21 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, forwardRef, inject, input, signal } from '@angular/core';
-import { FormControl, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
-import { AppLanguageDto, AppsState, CheckboxGroupComponent, ContentDto, ContentsService, LocalizerService, SignalControlComponent, UIOptions } from '@app/shared';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, inject, input, model, signal } from '@angular/core';
+import { FormValueControl } from '@angular/forms/signals';
+import { AppLanguageDto, AppsState, CheckboxGroupComponent, ContentDto, ContentsService, LocalizerService, UIOptions } from '@app/shared';
 import { ReferencesTagsConverter } from './references-tag-converter';
-
-export const SQX_REFERENCES_CHECKBOXES_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesCheckboxesComponent), multi: true,
-};
-
-const NO_EMIT = { emitEvent: false };
 
 @Component({
     selector: 'sqx-references-checkboxes',
     styleUrls: ['./references-checkboxes.component.scss'],
     templateUrl: './references-checkboxes.component.html',
-    providers: [
-        SQX_REFERENCES_CHECKBOXES_CONTROL_VALUE_ACCESSOR,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CheckboxGroupComponent,
-        FormsModule,
-        ReactiveFormsModule,
     ],
 })
-export class ReferencesCheckboxesComponent extends SignalControlComponent<ReadonlyArray<string> | null | undefined> {
+export class ReferencesCheckboxesComponent implements FormValueControl<ReadonlyArray<string> | null> {
     private readonly appsState = inject(AppsState);
     private readonly contentsService = inject(ContentsService);
     private readonly localizer = inject(LocalizerService);
@@ -47,13 +36,24 @@ export class ReferencesCheckboxesComponent extends SignalControlComponent<Readon
         return this.isValid() && !!contentItems && contentItems.length > 0;
     });
 
+    /** The value of the control. */
+    public readonly value = model<ReadonlyArray<string> | null>(null);
+
+    /** Disables the control. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
+
+    /** Indicates whether the control has been touched. */
+    public readonly touched = model(false);
+
     /** The ID of the schema to select the contents from. */
     public readonly schemaId = input.required<string | undefined | null>();
 
     /** The language to build the names of the contents. */
     public readonly language = input.required<AppLanguageDto>();
 
-    protected readonly control = new FormControl<ReadonlyArray<string> | null | undefined>([]);
+    protected readonly isGroupDisabled = computed(() => {
+        return this.disabled() || !this.isSuccess();
+    });
 
     protected readonly converter = computed(() => {
         const contentItems = this.contentItems();
@@ -65,16 +65,6 @@ export class ReferencesCheckboxesComponent extends SignalControlComponent<Readon
     });
 
     constructor() {
-        super();
-
-        effect(() => {
-            if (this.isDisabled() || !this.isSuccess()) {
-                this.control.disable(NO_EMIT);
-            } else {
-                this.control.enable(NO_EMIT);
-            }
-        });
-
         effect(onCleanup => {
             const schemaId = this.schemaId();
             if (!schemaId) {
@@ -95,25 +85,15 @@ export class ReferencesCheckboxesComponent extends SignalControlComponent<Readon
 
             onCleanup(() => subscription.unsubscribe());
         });
-
-        effect(onCleanup => {
-            const subscription =
-                this.control.valueChanges
-                    .subscribe(value => {
-                        this.callTouched();
-
-                        if (value && value.length > 0) {
-                            this.callChange(value);
-                        } else {
-                            this.callChange(null);
-                        }
-                    });
-
-            onCleanup(() => subscription.unsubscribe());
-        });
     }
 
-    public writeValue(obj: ReadonlyArray<string>) {
-        this.control.setValue(obj, NO_EMIT);
+    protected updateValue(value: ReadonlyArray<string> | null | undefined) {
+        this.touched.set(true);
+
+        if (value && value.length > 0) {
+            this.value.set(value);
+        } else {
+            this.value.set(null);
+        }
     }
 }

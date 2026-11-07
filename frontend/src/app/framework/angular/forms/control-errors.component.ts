@@ -5,14 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, inject, input, signal, untracked } from '@angular/core';
-import { AbstractControl, FormGroupDirective, UntypedFormArray } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, computed, inject, input } from '@angular/core';
 import { FieldTree } from '@angular/forms/signals';
-import { merge } from 'rxjs';
 import { LocalizerService, Types } from '@app/framework/internal';
 import { ControlErrorsMessagesComponent } from './control-errors-messages.component';
-import { formatError } from './error-formatting';
-import { touchedChange$ } from './forms-helper';
 import { formatSignalErrors, getFieldKey } from './signal-validators';
 
 @Component({
@@ -25,7 +21,6 @@ import { formatSignalErrors, getFieldKey } from './signal-validators';
     ],
 })
 export class ControlErrorsComponent {
-    private readonly formGroupDirective = inject(FormGroupDirective, { optional: true, host: true });
     private readonly localizer = inject(LocalizerService);
 
     private readonly field = computed(() => {
@@ -35,19 +30,6 @@ export class ControlErrorsComponent {
         }
 
         return control as FieldTree<unknown>;
-    });
-
-    private readonly control = computed(() => {
-        const control = this.for();
-        if (Types.isFunction(control)) {
-            return null;
-        }
-
-        if (!Types.isString(control)) {
-            return control;
-        }
-
-        return this.formGroupDirective?.form?.controls[control] ?? null;
     });
 
     private readonly controlDisplayName = computed(() => {
@@ -68,9 +50,16 @@ export class ControlErrorsComponent {
         return this.localizer.get(`common.${control}`) || control.substring(0, 1).toUpperCase() + control.substring(1);
     });
 
-    private readonly controlErrorMessages = signal<ReadonlyArray<string>>([]);
+    /** The field to show the errors for. */
+    public readonly for = input.required<string | FieldTree<unknown>>();
 
-    private readonly fieldErrorMessages = computed(() => {
+    /** Shows the errors only when the form has been submitted, if set. */
+    public readonly submitCount = input<number | null>();
+
+    /** The field name in the error messages. Falls back to a name derived from the control. */
+    public readonly fieldName = input<string | null>();
+
+    protected readonly errorMessages = computed(() => {
         const field = this.field();
         if (!field) {
             return [];
@@ -88,69 +77,4 @@ export class ControlErrorsComponent {
 
         return formatSignalErrors(this.localizer, this.controlDisplayName(), field);
     }, { equal: Types.equals });
-
-    /** The control or the name of the control in the parent form group. */
-    public readonly for = input.required<string | AbstractControl | FieldTree<unknown>>();
-
-    /** Shows the errors only when the form has been submitted, if set. */
-    public readonly submitCount = input<number | null>();
-
-    /** The field name in the error messages. Falls back to a name derived from the control. */
-    public readonly fieldName = input<string | null>();
-
-    protected readonly errorMessages = computed(() => {
-        return this.field() ? this.fieldErrorMessages() : this.controlErrorMessages();
-    });
-
-    constructor() {
-        effect(onCleanup => {
-            const control = this.control();
-            const controlDisplayName = this.controlDisplayName();
-            const submitCount = this.submitCount();
-
-            const update = () => {
-                untracked(() => this.updateMessages(control, controlDisplayName, submitCount));
-            };
-
-            update();
-
-            if (!control) {
-                return;
-            }
-
-            const subscription =
-                merge(
-                    control.valueChanges,
-                    control.statusChanges,
-                    touchedChange$(control),
-                ).subscribe(update);
-
-            onCleanup(() => subscription.unsubscribe());
-        });
-    }
-
-    private updateMessages(control: AbstractControl | null, controlDisplayName: string, submitCount: number | null | undefined) {
-        const errorMessages: string[] = [];
-
-        const isSubmitted = !Types.isNumber(submitCount) || submitCount > 0;
-        const isTouched = control?.touched || Types.is(control, UntypedFormArray);
-
-        if (control?.errors && control.invalid && isTouched && isSubmitted) {
-            for (const [key, error] of Object.entries(control.errors)) {
-                const message = formatError(this.localizer, controlDisplayName, key, error, control.value);
-
-                if (Types.isString(message)) {
-                    errorMessages.push(message);
-                } else if (Types.isArray(message)) {
-                    errorMessages.push(...message);
-                }
-            }
-        }
-
-        if (errorMessages.length === 0 && this.controlErrorMessages().length === 0) {
-            return;
-        }
-
-        this.controlErrorMessages.set(errorMessages);
-    }
 }

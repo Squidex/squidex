@@ -5,7 +5,7 @@
             class="form-control search-control"
             #searchBox
             [class.hidden]="!isGoogleMaps"
-            [disabled]="isDisabled()"
+            [disabled]="disabled()"
             placeholder="{{ 'common.searchGoogleMaps' | sqxTranslate }}" />
     </form>
 
@@ -32,7 +32,7 @@
 
                 @if (!isCompact()) {
                     <div class="col col-auto">
-                        <button class="btn btn-text clear" (click)="clearValue()" [disabled]="isDisabled()" type="button">
+                        <button class="btn btn-text clear" (click)="clearValue()" [disabled]="disabled()" type="button">
                             {{ "common.clear" | sqxTranslate }}
                         </button>
                     </div>

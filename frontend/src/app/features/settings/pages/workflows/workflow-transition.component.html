@@ -31,12 +31,11 @@
             allowDuplicates="false"
             [disabled]="disabled()"
             [itemsSource]="roles()"
-            [ngModel]="transitionValue.values.roles"
-            (ngModelChange)="changeRole($event)"
-            [ngModelOptions]="onBlur"
             placeholder="{{ 'common.role' | sqxTranslate }}"
             styleDashed="true"
-            styleScrollable="true" />
+            styleScrollable="true"
+            [value]="transitionValue.values.roles"
+            (valueChange)="changeRole($event)" />
     </div>
 
     <div class="col col-button ps-2">

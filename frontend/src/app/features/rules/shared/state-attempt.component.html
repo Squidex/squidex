@@ -14,12 +14,12 @@
 
         @if (attempt.error) {
             <label class="mt-3">{{ "common.error" | sqxTranslate }}</label>
-            <sqx-code-editor disabled="true" height="auto" mode="ace/mode/text" [ngModel]="attempt.error" wordWrap="true" />
+            <sqx-code-editor disabled="true" height="auto" mode="ace/mode/text" [value]="attempt.error" wordWrap="true" />
         }
 
         @if (output) {
             <label class="mt-3">{{ "common.output" | sqxTranslate }}</label>
-            <sqx-code-editor disabled="true" height="auto" mode="ace/mode/text" [ngModel]="output" wordWrap="true" />
+            <sqx-code-editor disabled="true" height="auto" mode="ace/mode/text" [value]="output" wordWrap="true" />
         }
     }
 </div>

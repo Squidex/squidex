@@ -5,18 +5,15 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, forwardRef, input, signal } from '@angular/core';
-import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { SignalControlComponent, Types } from '@app/framework/internal';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, model, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FormValueControl } from '@angular/forms/signals';
+import { Types } from '@app/framework/internal';
 import { Language, LanguageSelectorComponent } from '../../language-selector.component';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { IndeterminateValueDirective } from '../indeterminate-value.directive';
 import { DateTimeEditorComponent } from './date-time-editor.component';
 import { TagEditorComponent } from './tag-editor.component';
-
-export const SQX_LOCALIZED_INPUT_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => LocalizedInputComponent), multi: true,
-};
 
 const DEFAULT_LANGUAGE = { iso2Code: 'iv', englishName: 'Invariant' };
 
@@ -26,9 +23,6 @@ type LocalizedValue = { [key: string]: any };
     selector: 'sqx-localized-input',
     styleUrls: ['./localized-input.component.scss'],
     templateUrl: './localized-input.component.html',
-    providers: [
-        SQX_LOCALIZED_INPUT_CONTROL_VALUE_ACCESSOR,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         DateTimeEditorComponent,
@@ -39,8 +33,21 @@ type LocalizedValue = { [key: string]: any };
         TranslatePipe,
     ],
 })
-export class LocalizedInputComponent extends SignalControlComponent<LocalizedValue> {
-    private readonly value = signal<LocalizedValue | undefined>(undefined);
+export class LocalizedInputComponent implements FormValueControl<LocalizedValue | null> {
+    private readonly valueObject = computed(() => {
+        const value = this.value();
+
+        return Types.isObject(value) ? value as LocalizedValue : null;
+    });
+
+    /** The values per language. */
+    public readonly value = model<LocalizedValue | null>(null);
+
+    /** Disables the control. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
+
+    /** Indicates whether the control has been touched. */
+    public readonly touched = model(false);
 
     /** The languages to edit a value for. */
     public readonly languages = input.required<ReadonlyArray<Language>>();
@@ -57,11 +64,11 @@ export class LocalizedInputComponent extends SignalControlComponent<LocalizedVal
     protected readonly language = signal<Language>(DEFAULT_LANGUAGE);
 
     protected readonly valueCurrent = computed(() => {
-        return this.value()?.[this.language().iso2Code];
+        return this.valueObject()?.[this.language().iso2Code] ?? null;
     });
 
     protected readonly valueIsEmpty = computed(() => {
-        const value = this.value();
+        const value = this.valueObject();
         if (!value) {
             return true;
         }
@@ -73,27 +80,21 @@ export class LocalizedInputComponent extends SignalControlComponent<LocalizedVal
         this.language.set(language);
     }
 
-    public writeValue(obj: any) {
-        this.value.set(Types.isObject(obj) ? obj : {});
-    }
-
     protected setValue(value: any) {
-        const result = { ...this.value() || {}, [this.language().iso2Code]: value };
+        const result = { ...this.valueObject() || {}, [this.language().iso2Code]: value };
 
         this.value.set(result);
-        this.callChange(result);
     }
 
     protected unset() {
-        let result: LocalizedValue | undefined = { ...this.value() || {} };
+        const result = { ...this.valueObject() || {} };
 
         delete result[this.language().iso2Code];
 
         if (Object.keys(result).length === 0) {
-            result = undefined;
+            this.value.set(null);
+        } else {
+            this.value.set(result);
         }
-
-        this.value.set(result);
-        this.callChange(result);
     }
 }

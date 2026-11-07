@@ -7,7 +7,6 @@
 
 import { HttpClient } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, effect, inject, input, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { CodeEditorComponent } from '@app/framework';
 
 @Component({
@@ -17,7 +16,6 @@ import { CodeEditorComponent } from '@app/framework';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeEditorComponent,
-        FormsModule,
     ],
 })
 export class AssetTextEditorComponent {

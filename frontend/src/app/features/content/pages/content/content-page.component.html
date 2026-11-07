@@ -8,7 +8,7 @@
 @let languages = this.languages();
 @let showIdInput = this.showIdInput();
 <sqx-title [message]="schema.displayName" [url]="['..']" />
-<form [formGroup]="contentForm.form" (ngSubmit)="saveAndPublish('Edit')">
+<form (ngSubmit)="saveAndPublish('Edit')">
     <sqx-layout [hideSidebar]="!content" layout="main">
         <ng-container title>
             <div class="d-flex align-items-center">

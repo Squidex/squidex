@@ -1,4 +1,4 @@
-<input class="form-control" [class.form-control-sm]="small()" (click)="openDialog()" [ngModel]="selectedName()" readonly />
+<input class="form-control" [class.form-control-sm]="small()" (click)="openDialog()" [value]="selectedName() ?? ''" readonly />
 
 <sqx-content-selector
     canClear="true"

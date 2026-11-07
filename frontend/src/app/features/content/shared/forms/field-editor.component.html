@@ -65,7 +65,7 @@
         </div>
 
         @if (form()) {
-            <sqx-control-errors [fieldName]="field.displayName" [for]="$any(fieldForm())" />
+            <sqx-control-errors [fieldName]="field.displayName" [for]="fieldForm()" />
         }
 
         <div [class.hidden]="isCollapsed()">
@@ -73,8 +73,8 @@
                 <sqx-iframe-editor
                     #editor
                     [context]="formContext()"
-                    [formControlBinding]="$any(fieldForm())"
-                    [formField]="formModel().field.name"
+                    [formControlBinding]="fieldForm()"
+                    [fieldName]="formModel().field.name"
                     [formIndex]="index()"
                     [formValue]="form().value()"
                     [isExpanded]="isExpanded()"
@@ -101,7 +101,7 @@
                     @case ("Assets") {
                         <sqx-assets-editor
                             [folderId]="field.rawProperties.folderId"
-                            [formControl]="$any(fieldForm())"
+                            [formField]="fieldForm()"
                             [hasChatBot]="hasChatBot()"
                             [isExpanded]="isExpanded()" />
                     }
@@ -109,7 +109,7 @@
                     @case ("Boolean") {
                         @switch (field.rawProperties.editor) {
                             @case ("Toggle") {
-                                <sqx-toggle [formControl]="$any(fieldForm())" [threeStates]="!field.properties.isRequired" />
+                                <sqx-toggle [formField]="fieldForm()" [threeStates]="!field.properties.isRequired" />
                             }
 
                             @case ("Checkbox") {
@@ -117,7 +117,7 @@
                                     <input
                                         class="form-check-input"
                                         id="{{ uniqueId }}"
-                                        [formControl]="$any(fieldForm())"
+                                        [formField]="fieldForm()"
                                         sqxIndeterminateValue
                                         [threeStates]="!field.properties.isRequired"
                                         type="checkbox" />
@@ -153,33 +153,33 @@
                     }
 
                     @case ("DateTime") {
-                        <sqx-date-time-editor [formControl]="$any(fieldForm())" [mode]="field.rawProperties.editor" />
+                        <sqx-date-time-editor [formField]="fieldForm()" [mode]="field.rawProperties.editor" />
                     }
 
                     @case ("Geolocation") {
-                        <sqx-geolocation-editor [formControl]="$any(fieldForm())" />
+                        <sqx-geolocation-editor [formField]="fieldForm()" />
                     }
 
                     @case ("Json") {
-                        <sqx-code-editor [formControl]="$any(fieldForm())" [height]="350" valueMode="Json" />
+                        <sqx-code-editor [formField]="fieldForm()" [height]="350" valueMode="Json" />
                     }
 
                     @case ("Number") {
                         @switch (field.rawProperties.editor) {
                             @case ("Input") {
-                                <input class="form-control" [formControl]="$any(fieldForm())" [placeholder]="field.displayPlaceholder" type="number" />
+                                <input class="form-control" [formField]="fieldForm()" [placeholder]="field.displayPlaceholder" type="number" />
                             }
 
                             @case ("Stars") {
-                                <sqx-stars [formControl]="$any(fieldForm())" [maximumStars]="field.rawProperties.maxValue" />
+                                <sqx-stars [formField]="fieldForm()" [maximumStars]="field.rawProperties.maxValue" />
                             }
 
                             @case ("Radio") {
-                                <sqx-radio-group [formControl]="$any(fieldForm())" unsorted="true" [values]="field.rawProperties.allowedValues" />
+                                <sqx-radio-group [formField]="fieldForm()" unsorted="true" [values]="field.rawProperties.allowedValues" />
                             }
 
                             @case ("Dropdown") {
-                                <select class="form-select" [formControl]="$any(fieldForm())">
+                                <select class="form-select" [formField]="fieldForm()">
                                     <option [ngValue]="null"></option>
 
                                     @for (value of field.rawProperties.allowedValues; track value) {
@@ -196,7 +196,7 @@
                                 <sqx-references-editor
                                     [allowDuplicates]="field.rawProperties.allowDuplicated"
                                     [formContext]="formContext()"
-                                    [formControl]="$any(fieldForm())"
+                                    [formField]="fieldForm()"
                                     [isExpanded]="isExpanded()"
                                     [language]="language()"
                                     [languages]="languages()"
@@ -206,7 +206,7 @@
 
                             @case ("Dropdown") {
                                 <sqx-reference-dropdown
-                                    [formControl]="$any(fieldForm())"
+                                    [formField]="fieldForm()"
                                     [language]="language()"
                                     [languages]="languages()"
                                     mode="Array"
@@ -215,7 +215,7 @@
 
                             @case ("Input") {
                                 <sqx-reference-input
-                                    [formControl]="$any(fieldForm())"
+                                    [formField]="fieldForm()"
                                     [language]="language()"
                                     [languages]="languages()"
                                     mode="Array"
@@ -225,18 +225,18 @@
 
                             @case ("Tags") {
                                 <sqx-references-tags
-                                    [formControl]="$any(fieldForm())"
+                                    [formField]="fieldForm()"
                                     [language]="language()"
                                     [languages]="languages()"
                                     [schemaId]="field.rawProperties.singleId" />
                             }
 
                             @case ("Checkboxes") {
-                                <sqx-references-checkboxes [formControl]="$any(fieldForm())" [language]="language()" [schemaId]="field.rawProperties.singleId" />
+                                <sqx-references-checkboxes [formField]="fieldForm()" [language]="language()" [schemaId]="field.rawProperties.singleId" />
                             }
 
                             @case ("Radio") {
-                                <sqx-references-radio-buttons [formControl]="$any(fieldForm())" [language]="language()" [schemaId]="field.rawProperties.singleId" />
+                                <sqx-references-radio-buttons [formField]="fieldForm()" [language]="language()" [schemaId]="field.rawProperties.singleId" />
                             }
                         }
                     }
@@ -244,19 +244,19 @@
                     @case ("String") {
                         @switch (field.rawProperties.editor) {
                             @case ("Input") {
-                                <input class="form-control" [formControl]="$any(fieldForm())" [placeholder]="field.displayPlaceholder" />
+                                <input class="form-control" [formField]="fieldForm()" [placeholder]="field.displayPlaceholder" />
                             }
 
                             @case ("Slug") {
                                 <input
                                     class="form-control"
-                                    [formControl]="$any(fieldForm())"
+                                    [formField]="fieldForm()"
                                     [placeholder]="field.displayPlaceholder"
                                     sqxTransformInput="Slugify" />
                             }
 
                             @case ("TextArea") {
-                                <textarea class="form-control" [formControl]="$any(fieldForm())" [placeholder]="field.displayPlaceholder" rows="5"></textarea>
+                                <textarea class="form-control" [formField]="fieldForm()" [placeholder]="field.displayPlaceholder" rows="5"></textarea>
                             }
 
                             @case ("RichText") {
@@ -268,7 +268,7 @@
                                     (annotationsUpdate)="annotationsUpdate($event)"
                                     [classNames]="field.rawProperties.classNames"
                                     [folderId]="field.rawProperties.folderId"
-                                    [formControl]="$any(fieldForm())"
+                                    [formField]="fieldForm()"
                                     [hasAnnotations]="!!comments()"
                                     [hasChatBot]="hasChatBot()"
                                     [language]="language()"
@@ -278,7 +278,7 @@
                             }
 
                             @case ("Html") {
-                                <sqx-code-editor #editor [formControl]="$any(fieldForm())" [height]="350" mode="ace/mode/html" />
+                                <sqx-code-editor #editor [formField]="fieldForm()" [height]="350" mode="ace/mode/html" />
                             }
 
                             @case ("Markdown") {
@@ -290,7 +290,7 @@
                                     (annotationsUpdate)="annotationsUpdate($event)"
                                     [classNames]="undefined"
                                     [folderId]="field.rawProperties.folderId"
-                                    [formControl]="$any(fieldForm())"
+                                    [formField]="fieldForm()"
                                     [hasAnnotations]="!!comments()"
                                     [hasChatBot]="hasChatBot()"
                                     [language]="language()"
@@ -300,11 +300,11 @@
                             }
 
                             @case ("StockPhoto") {
-                                <sqx-stock-photo-editor [formControl]="$any(fieldForm())" />
+                                <sqx-stock-photo-editor [formField]="fieldForm()" />
                             }
 
                             @case ("Dropdown") {
-                                <select class="form-select" [formControl]="$any(fieldForm())">
+                                <select class="form-select" [formField]="fieldForm()">
                                     <option [ngValue]="null"></option>
 
                                     @for (value of field.rawProperties.allowedValues; track value) {
@@ -314,11 +314,11 @@
                             }
 
                             @case ("Radio") {
-                                <sqx-radio-group [formControl]="$any(fieldForm())" unsorted="true" [values]="field.rawProperties.allowedValues" />
+                                <sqx-radio-group [formField]="fieldForm()" unsorted="true" [values]="field.rawProperties.allowedValues" />
                             }
 
                             @case ("Color") {
-                                <sqx-color-picker [formControl]="$any(fieldForm())" [placeholder]="field.displayPlaceholder" />
+                                <sqx-color-picker [formField]="fieldForm()" [placeholder]="field.displayPlaceholder" />
                             }
                         }
                     }
@@ -332,7 +332,7 @@
                             (annotationsUpdate)="annotationsUpdate($event)"
                             [classNames]="field.rawProperties.classNames"
                             [folderId]="field.rawProperties.folderId"
-                            [formControl]="$any(fieldForm())"
+                            [formField]="fieldForm()"
                             [hasAnnotations]="!!comments()"
                             [hasChatBot]="hasChatBot()"
                             [language]="language()"
@@ -345,17 +345,17 @@
                         @switch (field.rawProperties.editor) {
                             @case ("Tags") {
                                 <sqx-tag-editor
-                                    [formControl]="$any(fieldForm())"
+                                    [formField]="fieldForm()"
                                     [itemsSource]="field.rawProperties.allowedValues"
                                     [placeholder]="field.displayPlaceholder" />
                             }
 
                             @case ("Checkboxes") {
-                                <sqx-checkbox-group [formControl]="$any(fieldForm())" [values]="field.rawProperties.allowedValues" />
+                                <sqx-checkbox-group [formField]="fieldForm()" [values]="field.rawProperties.allowedValues" />
                             }
 
                             @case ("Dropdown") {
-                                <select class="form-select" [formControl]="$any(fieldForm())" multiple>
+                                <select class="form-select" [formField]="fieldForm()" multiple>
                                     @for (value of field.rawProperties.allowedValues; track value) {
                                         <option [ngValue]="value">{{ value }}</option>
                                     }
@@ -369,7 +369,7 @@
                     }
 
                     @case ("UserInfo") {
-                        <sqx-user-info-editor [formControl]="$any(fieldForm())" [formId]="formModel().path" />
+                        <sqx-user-info-editor [formField]="fieldForm()" [formId]="formModel().path" />
                     }
                 }
             }

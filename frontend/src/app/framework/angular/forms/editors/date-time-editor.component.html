@@ -20,24 +20,24 @@
             class="form-control form-date"
             #dateInput
             [attr.id]="id()"
-            (blur)="callTouched()"
+            (blur)="markTouched()"
+            [class.ng-invalid]="invalid()"
+            [class.ng-touched]="touched()"
             [class.with-buttons]="isDateTimeMode() && shouldShowDateTimeModeButton()"
             [class.with-clear]="!hideClear()"
-            [disabled]="isDisabled()"
-            [ngModel]="valueInput()"
-            (ngModelChange)="updateValue($event)"
-            [ngModelOptions]="{ standalone: true }"
+            [disabled]="disabled()"
+            (input)="updateValue($any($event.target).value)"
             placeholder="{{ 'common.date' | sqxTranslate }}"
             step="1"
-            sqxForwardFormClasses
-            [type]="isDateTimeMode() ? 'datetime-local' : 'date'" />
+            [type]="isDateTimeMode() ? 'datetime-local' : 'date'"
+            [value]="valueInput() ?? ''" />
     </div>
 
     @if (isDateTimeMode() && shouldShowDateButtons()) {
         <button
             class="btn btn-text-secondary btn-quick"
             (click)="writeNow()"
-            [disabled]="isDisabled()"
+            [disabled]="disabled()"
             title="i18n:common.dateTimeEditor.nowTooltip"
             type="button">
             {{ "common.dateTimeEditor.now" | sqxTranslate }}
@@ -48,7 +48,7 @@
         <button
             class="btn btn-text-secondary btn-quick"
             (click)="writeToday()"
-            [disabled]="isDisabled()"
+            [disabled]="disabled()"
             title="i18n:common.dateTimeEditor.todayTooltip"
             type="button">
             {{ "common.dateTimeEditor.today" | sqxTranslate }}
@@ -59,9 +59,9 @@
         <button
             class="btn btn-text-secondary btn-clear"
             attr.aria-label="{{ 'common.clear' | sqxTranslate }}"
-            [class.invisible]="!value()"
+            [class.invisible]="!valueParsed()"
             (click)="reset()"
-            [disabled]="isDisabled()"
+            [disabled]="disabled()"
             type="button">
             <i class="icon-close"></i>
         </button>

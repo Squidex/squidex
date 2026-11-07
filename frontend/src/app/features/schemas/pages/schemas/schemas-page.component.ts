@@ -6,12 +6,11 @@
  */
 
 import { CdkDropListGroup } from '@angular/cdk/drag-drop';
-import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { form, FormField } from '@angular/forms/signals';
 import { ActivatedRoute, Router, RouterOutlet } from '@angular/router';
-import { map } from 'rxjs/operators';
-import { CreateCategoryForm, DialogModel, getCategoryTree, LayoutComponent, MessageBus, ModalDirective, SchemaCategoryComponent, SchemaDto, SchemasState, ShortcutDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
+import { CreateCategoryForm, DialogModel, getCategoryTree, LayoutComponent, MessageBus, ModalDirective, routeParam, SchemaCategoryComponent, SchemaDto, SchemasState, ShortcutDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { SchemaCloning } from '../messages';
 import { SchemaFormComponent } from './schema-form.component';
 
@@ -39,6 +38,7 @@ import { SchemaFormComponent } from './schema-form.component';
 export class SchemasPageComponent {
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
+    private readonly showDialog = routeParam('showDialog');
 
     protected readonly schemasState = inject(SchemasState);
 
@@ -69,16 +69,10 @@ export class SchemasPageComponent {
             onCleanup(() => subscription.unsubscribe());
         });
 
-        effect(onCleanup => {
-            const subscription =
-                this.route.params.pipe(map(q => q['showDialog']))
-                    .subscribe(showDialog => {
-                        if (showDialog) {
-                            this.addSchemaDialog.show();
-                        }
-                    });
-
-            onCleanup(() => subscription.unsubscribe());
+        effect(() => {
+            if (this.showDialog()) {
+                untracked(() => this.addSchemaDialog.show());
+            }
         });
     }
 

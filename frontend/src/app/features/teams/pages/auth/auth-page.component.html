@@ -6,7 +6,7 @@
                     <div class="card-header">
                         <div class="row">
                             <div class="col-auto">
-                                <sqx-toggle [disabled]="!isEditable()" [ngModel]="isEditing()" (ngModelChange)="toggle($event)" />
+                                <sqx-toggle [disabled]="!isEditable()" [value]="isEditing()" (valueChange)="toggle(!!$event)" />
                             </div>
 
                             <div class="col">

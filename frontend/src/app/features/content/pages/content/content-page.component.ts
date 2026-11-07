@@ -6,13 +6,12 @@
  */
 
 import { Location } from '@angular/common';
-import { ChangeDetectionStrategy, Component, computed, effect, inject, linkedSignal, signal, untracked } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, Injector, linkedSignal, signal, untracked } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { Observable, of } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
-import { AnnotationCreate, AnnotationCreateAfterNavigate, AnnotationsSelected, AnnotationsSelectedAfterNavigate, ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, CollaborationService, CommentsState, ConfirmClickDirective, ContentDto, ContentsState, DialogService, DropdownMenuComponent, EditContentForm, LanguageSelectorComponent, LanguagesState, LayoutComponent, LocalStoreService, MessageBus, ModalDirective, ModalModel, ModalPlacementDirective, NotifoComponent, PreviousUrl, ResolveAssets, ResolveContents, SchemaDto, SchemasState, Settings, ShortcutDirective, SidebarMenuDirective, TempService, TitleComponent, ToolbarComponent, ToolbarService, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe, Types, Version, WatchingUsersComponent } from '@app/shared';
+import { firstValueFrom, Observable, of } from 'rxjs';
+import { tap } from 'rxjs/operators';
+import { AnnotationCreate, AnnotationCreateAfterNavigate, AnnotationsSelected, AnnotationsSelectedAfterNavigate, ApiUrlConfig, AppLanguageDto, AppsState, AuthService, AutoSaveKey, AutoSaveService, CanComponentDeactivate, CollaborationService, CommentsState, ConfirmClickDirective, ContentDto, ContentsState, DialogService, DropdownMenuComponent, EditContentForm, LanguageSelectorComponent, LanguagesState, LayoutComponent, LocalStoreService, MessageBus, ModalDirective, ModalModel, ModalPlacementDirective, NotifoComponent, PreviousUrl, queryParam, ResolveAssets, ResolveContents, SchemaDto, SchemasState, Settings, ShortcutDirective, SidebarMenuDirective, TempService, TitleComponent, ToolbarComponent, ToolbarService, TooltipDirective, TourHintDirective, TourStepDirective, TranslatePipe, Types, Version, WatchingUsersComponent } from '@app/shared';
 import { ContentExtensionComponent } from '../../shared/content-extension.component';
 import { PreviewButtonComponent } from '../../shared/preview-button.component';
 import { ContentEditorComponent } from './editor/content-editor.component';
@@ -49,7 +48,6 @@ type Tab = 'editor' | 'references' | 'referencing' | 'inspect' | 'extension';
         ModalPlacementDirective,
         NotifoComponent,
         PreviewButtonComponent,
-        ReactiveFormsModule,
         RouterLink,
         RouterLinkActive,
         RouterOutlet,
@@ -73,6 +71,7 @@ export class ContentPageComponent implements CanComponentDeactivate {
     private readonly localStore = inject(LocalStoreService);
     private readonly location = inject(Location);
     private readonly previousUrl = inject(PreviousUrl);
+    private readonly injector = inject(Injector);
     private readonly route = inject(ActivatedRoute);
     private readonly router = inject(Router);
     private readonly schemasState = inject(SchemasState);
@@ -90,7 +89,7 @@ export class ContentPageComponent implements CanComponentDeactivate {
 
     protected readonly formContext = signal<any>(undefined);
 
-    protected readonly contentTab = toSignal(this.route.queryParams.pipe(map(x => x['tab'] as Tab || 'editor')), { initialValue: 'editor' });
+    protected readonly contentTab = queryParam<Tab>('tab', 'editor');
 
     protected readonly contentId = signal('');
 
@@ -193,7 +192,7 @@ export class ContentPageComponent implements CanComponentDeactivate {
     }
 
     private createForm(schema: SchemaDto) {
-        return new EditContentForm(this.languages(), schema, this.schemasState.schemaMap, this.formContext());
+        return new EditContentForm(this.languages(), schema, this.schemasState.schemaMap, this.formContext(), this.injector);
     }
 
     private updateContent(content: ContentDto | null | undefined) {
@@ -237,7 +236,7 @@ export class ContentPageComponent implements CanComponentDeactivate {
     }
 
     private autoSave(contentForm: EditContentForm, value: any) {
-        if (!contentForm.form.enabled) {
+        if (contentForm.form().disabled()) {
             return;
         }
 
@@ -277,61 +276,48 @@ export class ContentPageComponent implements CanComponentDeactivate {
         this.saveContent(false, navigationMode);
     }
 
-    private saveContent(publish: boolean, navigationMode: SaveNavigationMode) {
+    private async saveContent(publish: boolean, navigationMode: SaveNavigationMode) {
         const contentForm = this.contentForm();
+        const content = this.content();
 
-        const value = contentForm.submit();
-        if (!value) {
-            contentForm.submitFailed('i18n:contents.contentNotValid', false);
+        if (content && !content.canUpdate) {
             return;
         }
 
-        const content = this.content();
-        if (content) {
-            if (!content.canUpdate) {
-                return;
+        if (!content && !this.canCreate(publish)) {
+            return;
+        }
+
+        const isSaved = await contentForm.submit(async value => {
+            if (content) {
+                return await firstValueFrom(this.contentsState.update(content, value));
             }
 
-            this.contentsState.update(content, value)
-                .subscribe({
-                    next: () => {
-                        contentForm.submitCompleted({ noReset: true });
-                    },
-                    error: error => {
-                        contentForm.submitFailed(error);
-                    },
-                });
-        } else {
-            if (!this.canCreate(publish)) {
-                return;
+            const created = await firstValueFrom(this.contentsState.create(value, publish, this.contentId()));
+
+            switch (navigationMode) {
+                case 'Add':
+                    this.contentForm.set(this.createForm(this.schema()));
+                    break;
+
+                case 'Edit':
+                    contentForm.load(created.data, true);
+
+                    this.router.navigate([created.id, 'history'], { relativeTo: this.route.parent! });
+                    break;
+
+                case 'Close':
+                    this.autoSaveIgnore = true;
+
+                    this.router.navigate(['./'], { relativeTo: this.route.parent! });
+                    break;
             }
 
-            this.contentsState.create(value, publish, this.contentId())
-                .subscribe({
-                    next: content => {
-                        switch (navigationMode) {
-                            case 'Add':
-                                this.contentForm.set(this.createForm(this.schema()));
-                                break;
+            return created;
+        });
 
-                            case 'Edit':
-                                contentForm.submitCompleted({ noReset: true });
-                                contentForm.load(content.data, true);
-
-                                this.router.navigate([content.id, 'history'], { relativeTo: this.route.parent! });
-                                break;
-
-                            case 'Close':
-                                this.autoSaveIgnore = true;
-
-                                this.router.navigate(['./'], { relativeTo: this.route.parent! });
-                                break;
-                        }
-                    },
-                    error: error => {
-                        contentForm.submitFailed(error);
-                    },
-                });
+        if (!isSaved && !contentForm.error()) {
+            contentForm.setError('i18n:contents.contentNotValid');
         }
     }
 

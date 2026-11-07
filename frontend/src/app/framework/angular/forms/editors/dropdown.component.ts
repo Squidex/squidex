@@ -6,9 +6,9 @@
  */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, contentChildren, effect, forwardRef, input, output, signal, TemplateRef, untracked } from '@angular/core';
-import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
-import { FloatingPlacement, Keys, ModalModel, SignalControlComponent, StringHelper, Types } from '@app/framework/internal';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, contentChildren, effect, input, model, output, signal, TemplateRef, untracked } from '@angular/core';
+import { FormValueControl } from '@angular/forms/signals';
+import { FloatingPlacement, Keys, ModalModel, StringHelper, Types } from '@app/framework/internal';
 import { DropdownMenuComponent } from '../../dropdown-menu.component';
 import { LoaderComponent } from '../../loader.component';
 import { ModalPlacementDirective } from '../../modals/modal-placement.directive';
@@ -17,40 +17,39 @@ import { TranslatePipe } from '../../pipes/translate.pipe';
 import { ScrollActiveDirective } from '../../scroll-active.directive';
 import { TemplateWrapperDirective } from '../../template-wrapper.directive';
 import { FocusOnInitDirective } from '../focus-on-init.directive';
-import { ForwardFormClassesDirective } from '../forward-form-classes.directive';
-
-export const SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DropdownComponent), multi: true,
-};
-
-const NO_EMIT = { emitEvent: false };
 
 @Component({
     selector: 'sqx-dropdown',
     styleUrls: ['./dropdown.component.scss'],
     templateUrl: './dropdown.component.html',
-    providers: [
-        SQX_DROPDOWN_CONTROL_VALUE_ACCESSOR,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         DropdownMenuComponent,
         FocusOnInitDirective,
-        FormsModule,
-        ForwardFormClassesDirective,
         LoaderComponent,
         ModalDirective,
         ModalPlacementDirective,
-        ReactiveFormsModule,
         ScrollActiveDirective,
         TemplateWrapperDirective,
         TranslatePipe,
     ],
 })
-export class DropdownComponent extends SignalControlComponent<ReadonlyArray<any>> {
+export class DropdownComponent implements FormValueControl<any> {
     private readonly templates = contentChildren(TemplateRef);
 
-    private value: any;
+    private lastValue: any;
+
+    /** The value of the control. */
+    public readonly value = model<any>(null);
+
+    /** Disables the control. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
+
+    /** Indicates whether the value is invalid, provided by the form. */
+    public readonly invalid = input(false, { transform: booleanAttribute });
+
+    /** Indicates whether the control has been touched. */
+    public readonly touched = model(false);
 
     /** Emits when the dropdown is opened. */
     public readonly dropdownOpen = output();
@@ -114,25 +113,21 @@ export class DropdownComponent extends SignalControlComponent<ReadonlyArray<any>
 
     protected readonly query = signal<RegExp | undefined>(undefined);
 
-    protected readonly queryInput = new UntypedFormControl();
+    protected readonly queryText = signal('');
 
     constructor() {
-        super();
-
         effect(() => {
-            if (this.isDisabled()) {
-                this.queryInput.disable(NO_EMIT);
-            } else {
-                this.queryInput.enable(NO_EMIT);
-            }
-        });
+            const value = this.value();
 
-        effect(onCleanup => {
-            const subscription = this.queryInput.valueChanges.subscribe((queryText: string) => {
-                this.search(queryText);
+            untracked(() => {
+                // Values that have been set by this component are already selected.
+                if (value === this.lastValue) {
+                    return;
+                }
+
+                this.lastValue = value;
+                this.selectIndex(this.getSelectedIndex(value), false);
             });
-
-            onCleanup(() => subscription.unsubscribe());
         });
 
         effect(() => {
@@ -142,15 +137,9 @@ export class DropdownComponent extends SignalControlComponent<ReadonlyArray<any>
                 this.suggestedItems.set(items);
 
                 this.selectSearch('');
-                this.selectIndex(this.getSelectedIndex(this.value), false);
+                this.selectIndex(this.getSelectedIndex(this.value()), false);
             });
         });
-    }
-
-    public writeValue(obj: any) {
-        this.value = obj;
-
-        this.selectIndex(this.getSelectedIndex(obj), false);
     }
 
     protected onKeyDown(event: KeyboardEvent) {
@@ -182,7 +171,11 @@ export class DropdownComponent extends SignalControlComponent<ReadonlyArray<any>
             this.dropdown.show();
         }
 
-        this.callTouched();
+        this.touched.set(true);
+    }
+
+    protected onSearch(queryText: string) {
+        this.selectSearch(queryText);
     }
 
     protected selectIndexAndClose(selectedIndex: number) {
@@ -236,18 +229,20 @@ export class DropdownComponent extends SignalControlComponent<ReadonlyArray<any>
             selectedValue = selectedValue[valueProperty];
         }
 
-        if (this.value === selectedValue) {
+        selectedValue ??= null;
+
+        if (this.value() === selectedValue) {
             return;
         }
 
-        this.value = selectedValue;
-
-        this.callChange(selectedValue);
-        this.callTouched();
+        this.lastValue = selectedValue;
+        this.value.set(selectedValue);
+        this.touched.set(true);
     }
 
-    private selectSearch(value: string) {
-        this.queryInput.setValue(value);
+    private selectSearch(queryText: string) {
+        this.queryText.set(queryText);
+        this.search(queryText);
     }
 
     private search(queryText: string) {

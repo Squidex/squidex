@@ -6,32 +6,34 @@
  */
 
 
-import { ChangeDetectionStrategy, Component, computed, effect, forwardRef, input, signal, viewChild } from '@angular/core';
-import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { CodeEditorComponent, ScriptCompletions, SignalControlComponent, Types } from '@app/shared';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, input, model, signal } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { FormValueControl } from '@angular/forms/signals';
+import { CodeEditorComponent, ScriptCompletions, Types } from '@app/shared';
 
 type TemplateMode = 'Text' | 'Script' | 'Liquid';
-
-export const SQX_FORMATTABLE_INPUT_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => FormattableInputComponent), multi: true,
-};
 
 @Component({
     selector: 'sqx-formattable-input',
     styleUrls: ['./formattable-input.component.scss'],
     templateUrl: './formattable-input.component.html',
-    providers: [
-        SQX_FORMATTABLE_INPUT_CONTROL_VALUE_ACCESSOR,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeEditorComponent,
         FormsModule,
     ],
 })
-export class FormattableInputComponent extends SignalControlComponent<string> {
-    private readonly codeEditor = viewChild(CodeEditorComponent);
-    private value?: string;
+export class FormattableInputComponent implements FormValueControl<string | null> {
+    private currentValue: string | null = null;
+
+    /** The value, optionally wrapped with the template mode, e.g. "Liquid(...)". */
+    public readonly value = model<string | null>(null);
+
+    /** Disables the control. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
+
+    /** Indicates whether the control has been touched. */
+    public readonly touched = model(false);
 
     /** Renders a single line input for text or a large editor for code. */
     public readonly type = input.required<'Text' | 'Code'>();
@@ -42,6 +44,8 @@ export class FormattableInputComponent extends SignalControlComponent<string> {
     protected readonly modes: TemplateMode[] = ['Text', 'Script', 'Liquid'];
 
     protected readonly mode = signal<TemplateMode>('Text');
+
+    protected readonly text = signal<string | null>(null);
 
     protected readonly editorMode = computed(() => {
         switch (this.mode()) {
@@ -64,52 +68,44 @@ export class FormattableInputComponent extends SignalControlComponent<string> {
     });
 
     constructor() {
-        super();
-
         effect(() => {
-            const codeEditor = this.codeEditor();
-            if (!codeEditor) {
+            const value = this.value();
+
+            // Ignore the values we have emitted ourselves, because the text is trimmed when it is emitted.
+            if (value === this.currentValue) {
                 return;
             }
 
-            codeEditor.registerOnChange((value: any) => {
-                this.value = value;
+            const parsed = getModeFromValue(value);
 
-                this.callChange(getValueFromMode(value, this.mode()));
-            });
-
-            codeEditor.registerOnTouched(() => {
-                this.callTouched();
-            });
-
-            codeEditor.writeValue(this.value);
+            this.currentValue = value;
+            this.text.set(parsed.value ?? null);
+            this.mode.set(parsed.mode);
         });
     }
 
-    public writeValue(obj: any) {
-        const { value, mode } = getModeFromValue(obj);
-
-        this.value = value;
-
-        this.setMode(mode, false);
-        this.codeEditor()?.writeValue(value);
+    protected setText(text: string | null) {
+        this.text.set(text);
+        this.emitValue();
     }
 
-    protected setMode(mode: TemplateMode, emit = true) {
+    protected setMode(mode: TemplateMode) {
         if (this.mode() === mode) {
             return;
         }
 
         this.mode.set(mode);
+        this.emitValue();
+        this.touched.set(true);
+    }
 
-        if (emit) {
-            this.callChange(getValueFromMode(this.value, mode));
-            this.callTouched();
-        }
+    private emitValue() {
+        this.currentValue = getValueFromMode(this.text(), this.mode()) ?? null;
+        this.value.set(this.currentValue);
     }
 }
 
-function getValueFromMode(value: string | undefined, mode: TemplateMode) {
+function getValueFromMode(value: string | null | undefined, mode: TemplateMode) {
     if (!value) {
         return value;
     }

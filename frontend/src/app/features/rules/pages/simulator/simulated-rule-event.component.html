@@ -38,7 +38,7 @@
                             </div>
                         </ng-container>
                         <ng-container details>
-                            <sqx-code-editor disabled="true" height="auto" maxLines="20" [ngModel]="event.event" valueMode="Json" wordWrap="false" />
+                            <sqx-code-editor disabled="true" height="auto" maxLines="20" [value]="event.event" valueMode="Json" wordWrap="false" />
                         </ng-container>
                     </sqx-history-step>
 
@@ -60,7 +60,7 @@
                                     disabled="true"
                                     height="auto"
                                     maxLines="20"
-                                    [ngModel]="event.enrichedEvent"
+                                    [value]="event.enrichedEvent"
                                     valueMode="Json"
                                     wordWrap="false" />
                             </ng-container>

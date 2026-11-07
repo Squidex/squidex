@@ -7,7 +7,6 @@
 
 export * from './angular/drag-helper';
 export * from './angular/routers/router-utils';
-export * from './angular/signal-control.component';
 export * from './configurations';
 export * from './services/analytics.service';
 export * from './services/clipboard.service';

@@ -3,7 +3,7 @@
     class="toggle-container"
     [attr.data-state]="checked ? 'checked' : checked === false ? 'unchecked' : 'indeterminate'"
     [class.checked]="checked === true"
-    [class.disabled]="isDisabled()"
+    [class.disabled]="disabled()"
     [class.unchecked]="checked === false"
     (click)="changeState()">
     <div class="toggle-button"></div>

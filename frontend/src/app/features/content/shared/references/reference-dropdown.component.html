@@ -1,4 +1,4 @@
-<sqx-dropdown (dropdownOpen)="onOpened()" [formControl]="control" [items]="contentNames()" [itemsLoading]="contentsLoading()" valueProperty="id">
+<sqx-dropdown [disabled]="isDropdownDisabled()" (dropdownOpen)="onOpened()" [items]="contentNames()" [itemsLoading]="contentsLoading()" [value]="selectedId()" (valueChange)="updateValue($event)" valueProperty="id">
     <ng-template let-content="$implicit" let-context="context">
         <span class="truncate" [innerHTML]="content.name | sqxHighlight: context | sqxSafeHtml"></span>
     </ng-template>

@@ -325,6 +325,10 @@ export class FieldsValidators implements FieldPropertiesVisitor<ReadonlyArray<Va
         return validators;
     }
 
+    public static createWithoutRequired(field: FieldDto | NestedFieldDto, isOptional: boolean) {
+        return field.properties.accept(new FieldsValidators(isOptional));
+    }
+
     public visitArray(properties: ArrayFieldPropertiesDto): ReadonlyArray<ValidatorFn> {
         const validators: ValidatorFn[] = [
             ValidatorsEx.betweenLength(properties.minItems, properties.maxItems),

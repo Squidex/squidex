@@ -151,7 +151,7 @@ export class ContentFieldComponent {
         }
 
         if (this.showAllControls()) {
-            formModel.setValue(formModelCompare.form.value);
+            formModel.setValue(formModelCompare.value());
             return;
         }
 
@@ -159,7 +159,7 @@ export class ContentFieldComponent {
 
         const target = formModel.get(languageCode);
         if (target) {
-            target.setValue(formModelCompare.get(languageCode)?.form.value);
+            target.setValue(formModelCompare.get(languageCode)?.value());
         }
     }
 
@@ -172,7 +172,7 @@ export class ContentFieldComponent {
         }
 
         const masterCode = master.iso2Code;
-        const masterValue = this.formModel().get(masterCode)!.form.value;
+        const masterValue = this.formModel().get(masterCode)!.value();
         if (!masterValue) {
             return;
         }
@@ -192,7 +192,7 @@ export class ContentFieldComponent {
             return;
         }
 
-        if (control.form.value) {
+        if (control.value()) {
             return;
         }
 
@@ -205,7 +205,7 @@ export class ContentFieldComponent {
         this.translations.translate(this.appsState.appName, request)
             .subscribe(result => {
                 if (result.text) {
-                    control.form.setValue(result.text);
+                    control.setValue(result.text);
                 }
             });
     }

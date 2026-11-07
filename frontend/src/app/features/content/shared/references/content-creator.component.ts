@@ -5,8 +5,9 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, forwardRef, inject, input, linkedSignal, output, signal, untracked } from '@angular/core';
-import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, computed, effect, forwardRef, inject, Injector, input, linkedSignal, output, signal, untracked } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { tap } from 'rxjs';
 import { AppLanguageDto, ComponentContentsState, ContentDto, EditContentForm, FormErrorComponent, LanguageSelectorComponent, ModalDialogComponent, ResolveAssets, ResolveContents, SchemaDto, SchemasState, TooltipDirective, TranslatePipe } from '@app/shared';
 import { ContentSectionComponent } from '../forms/content-section.component';
 
@@ -25,7 +26,6 @@ import { ContentSectionComponent } from '../forms/content-section.component';
         FormsModule,
         LanguageSelectorComponent,
         ModalDialogComponent,
-        ReactiveFormsModule,
         TooltipDirective,
         TranslatePipe,
         forwardRef(() => ContentSectionComponent),
@@ -33,6 +33,7 @@ import { ContentSectionComponent } from '../forms/content-section.component';
 })
 export class ContentCreatorComponent {
     private readonly contentsState = inject(ComponentContentsState);
+    private readonly injector = inject(Injector);
     private readonly schemasState = inject(SchemasState);
 
     private isInitialDataLoaded = false;
@@ -102,7 +103,7 @@ export class ContentCreatorComponent {
 
         this.contentsState.schema = schema;
 
-        const contentForm = new EditContentForm(languages, schema, this.schemasState.schemaMap, { user: formContext.user });
+        const contentForm = new EditContentForm(languages, schema, this.schemasState.schemaMap, { user: formContext.user }, this.injector);
 
         formContext['languages'] = languages;
         formContext['schema'] = schema;
@@ -125,15 +126,9 @@ export class ContentCreatorComponent {
         this.saveContent(false);
     }
 
-    private saveContent(publish: boolean) {
+    private async saveContent(publish: boolean) {
         const contentForm = this.contentForm();
         if (!contentForm) {
-            return;
-        }
-
-        const value = contentForm.submit();
-        if (!value) {
-            contentForm.submitFailed('i18n:contents.contentNotValid');
             return;
         }
 
@@ -141,17 +136,13 @@ export class ContentCreatorComponent {
             return;
         }
 
-        this.contentsState.create(value, publish)
-            .subscribe({
-                next: content => {
-                    contentForm.submitCompleted({ noReset: true });
+        const isSaved = await contentForm.submit(value => {
+            return this.contentsState.create(value, publish).pipe(tap(content => this.emitSelect(content)));
+        });
 
-                    this.emitSelect(content);
-                },
-                error: error => {
-                    contentForm.submitFailed(error);
-                },
-            });
+        if (!isSaved && !contentForm.error()) {
+            contentForm.setError('i18n:contents.contentNotValid');
+        }
     }
 
     private canCreate(publish: boolean) {

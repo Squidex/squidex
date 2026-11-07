@@ -1,12 +1,12 @@
 @let maxStars = maximumStars();
 <div class="stars-container">
     @if (maxStars > 0 && maxStars <= 15) {
-        <span class="stars" [class.disabled]="isDisabled()" (mouseleave)="stopPreview()">
+        <span class="stars" [class.disabled]="disabled()" (mouseleave)="stopPreview()">
             @for (star of starsArray(); track star) {
                 <span class="star" [class.selected]="star <= valuePreview()" (click)="setValue(star)" (mouseenter)="setPreview(star)"></span>
             }
         </span>
-        <button class="btn btn-text-secondary" [class.hidden]="!value()" (click)="reset()" type="button">
+        <button class="btn btn-text-secondary" [class.hidden]="!valueNumber()" (click)="reset()" type="button">
             {{ "common.clear" | sqxTranslate }}
         </button>
     } @else {

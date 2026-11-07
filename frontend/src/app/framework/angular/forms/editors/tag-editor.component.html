@@ -7,7 +7,7 @@
         #form
         [class.blank]="styleBlank()"
         [class.dashed]="styleDashed() && !(tags().length > 0)"
-        [class.disabled]="isDisabled()"
+        [class.disabled]="disabled()"
         [class.focus]="hasFocus()"
         [class.multiline]="!styleScrollableValue"
         [class.readonly]="readonlyValue"
@@ -15,10 +15,11 @@
         [class.suggested]="itemsSortedValue.length > 0"
         (focus)="focusInput($event)"
         (mousedown)="focusInput($event)"
-        sqxForwardFormClasses
+        [class.ng-invalid]="invalid()"
+        [class.ng-touched]="touched()"
         tabindex="0">
         @for (tag of tags(); track tag; let i = $index) {
-            <span class="item" [class.disabled]="addInput.disabled"> {{ tag }} <i class="icon-close" (click)="remove(i)"></i> </span>
+            <span class="item" [class.disabled]="disabled()"> {{ tag }} <i class="icon-close" (click)="remove(i)"></i> </span>
         }
         <input
             class="blank text-input"
@@ -30,12 +31,14 @@
             (blur)="markTouched()"
             (copy)="onCopy($event)"
             (cut)="onCut($event)"
-            (focus)="focus()"
-            [formControl]="addInput"
+            (focus)="onFocus()"
+            [disabled]="disabled()"
+            (input)="setText($any($event.target).value)"
             (keydown)="onKeyDown($event)"
             (paste)="onPaste($event)"
             [placeholder]="placeholder() | sqxTranslate"
-            spellcheck="false" />
+            spellcheck="false"
+            [value]="addText()" />
     </div>
 
     @if (!readonlyValue && (allowOpen() || itemsSortedValue.length > 0)) {
@@ -82,8 +85,8 @@
                         <input
                             class="form-check-input"
                             id="tag_{{ i }}"
-                            [ngModel]="isSelected(item)"
-                            (ngModelChange)="toggleValue($event, item)"
+                            [checked]="!!isSelected(item)"
+                            (change)="toggleValue($any($event.target).checked, item)"
                             type="checkbox" />
                         <label class="form-check-label" for="tag_{{ i }}" title="{{ item.name }}" titlePosition="top-start">
                             <span class="truncate">{{ item.name }}</span>

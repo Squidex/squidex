@@ -7,7 +7,6 @@
 
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, DestroyRef, effect, inject, input, signal } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { FormsModule } from '@angular/forms';
 import { of } from 'rxjs';
 import { map, switchMap } from 'rxjs/operators';
 import { AppLanguageDto, CodeEditorComponent, ContentDto, ContentsService, ContentsState, ErrorDto, FormErrorComponent, ToolbarService, TranslatePipe } from '@app/shared';
@@ -22,7 +21,6 @@ type Mode = 'Content' | 'Data' | 'FlatData';
     imports: [
         CodeEditorComponent,
         FormErrorComponent,
-        FormsModule,
         TranslatePipe,
     ],
 })

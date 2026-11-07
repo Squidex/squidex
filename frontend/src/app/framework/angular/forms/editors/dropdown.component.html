@@ -7,11 +7,12 @@
         autocomplete="off"
         autocorrect="off"
         (click)="openModal()"
-        [disabled]="isDisabled()"
+        [disabled]="disabled()"
         (keydown)="onKeyDown($event)"
         [name]="formName()"
         readonly
-        sqxForwardFormClasses />
+        [class.ng-invalid]="invalid()"
+        [class.ng-touched]="touched()" />
     @if (selectedItem(); as selected) {
         <div class="control-dropdown-item">
             <div class="no-wrap">
@@ -39,10 +40,12 @@
             <div class="search-form">
                 <input
                     class="form-control search"
-                    [formControl]="queryInput"
+                    [disabled]="disabled()"
+                    (input)="onSearch($any($event.target).value)"
                     (keydown)="onKeyDown($event)"
                     placeholder="{{ 'common.search' | sqxTranslate }}"
-                    sqxFocusOnInit />
+                    sqxFocusOnInit
+                    [value]="queryText()" />
             </div>
         }
 

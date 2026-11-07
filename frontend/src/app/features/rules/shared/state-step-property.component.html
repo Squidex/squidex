@@ -2,9 +2,9 @@
 @let valueFormatted = this.valueFormatted();
 <sqx-form-row [for]="property().name" hideError label="property.display">
     @if (valueType === "MultilineJson") {
-        <sqx-code-editor disabled="true" height="auto" [ngModel]="valueFormatted" />
+        <sqx-code-editor disabled="true" height="auto" [value]="valueFormatted" />
     } @else if (valueType === "MultilineAny") {
-        <sqx-code-editor disabled="true" height="auto" mode="ace/mode/text" [ngModel]="valueFormatted" />
+        <sqx-code-editor disabled="true" height="auto" mode="ace/mode/text" [value]="valueFormatted" />
     } @else {
         <div class="simple-value">{{ valueFormatted }}</div>
     }

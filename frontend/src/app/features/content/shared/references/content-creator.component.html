@@ -45,7 +45,7 @@
         @let schemaSelected = schema();
         @let form = contentForm();
         @if (schemaSelected && form) {
-            <form [formGroup]="form.form" (ngSubmit)="saveAndPublish()">
+            <form (ngSubmit)="saveAndPublish()">
                 @for (section of form.sections; track section) {
                     <sqx-content-section
                         [form]="form"

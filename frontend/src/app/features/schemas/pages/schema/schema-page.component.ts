@@ -6,10 +6,8 @@
  */
 
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { map } from 'rxjs/operators';
-import { ConfirmClickDirective, DropdownMenuComponent, LanguagesState, LayoutComponent, ListViewComponent, MessageBus, ModalDirective, ModalModel, ModalPlacementDirective, SchemasState, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, UIOptions } from '@app/shared';
+import { ConfirmClickDirective, DropdownMenuComponent, LanguagesState, LayoutComponent, ListViewComponent, MessageBus, ModalDirective, ModalModel, ModalPlacementDirective, queryParam, SchemasState, SidebarMenuDirective, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe, UIOptions } from '@app/shared';
 import { SchemaCloning } from '../messages';
 import { SchemaEditFormComponent } from './common/schema-edit-form.component';
 import { SchemaMigrateFormComponent } from './common/schema-migrate-form.component';
@@ -72,9 +70,7 @@ export class SchemaPageComponent {
     constructor() {
         this.schema = this.schemasState.selectedSchema;
 
-        this.schemaTab = toSignal(
-            this.route.queryParams.pipe(map(x => (x['tab'] || 'fields') as string)),
-            { initialValue: 'fields' });
+        this.schemaTab = queryParam('tab', 'fields');
 
         this.languageState.load();
     }

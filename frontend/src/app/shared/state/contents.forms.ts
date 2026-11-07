@@ -5,133 +5,137 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { computed, signal } from '@angular/core';
-import { UntypedFormControl, UntypedFormGroup, Validators } from '@angular/forms';
-import { distinctUntilChanged } from 'rxjs/operators';
-import { debounceTimeSafe, ExtendedFormGroup, Form, FormArrayTemplate, FormGroupTemplate, TemplatedFormArray, TemplatedFormGroup, Types, value$ } from '@app/framework';
-import { AppLanguageDto, ComponentFieldPropertiesDto, FieldDto, fieldInvariant, LanguageDto, SchemaDto, TableField } from '../model';
-import { ComponentRulesProvider, RootRulesProvider } from './contents.form-rules';
-import { AbstractContentForm, AbstractContentFormState, AnyFieldDto, contentTranslationStatus, ControlArgs, FieldSection, fieldTranslationStatus, FormGlobals, groupFields, PartitionConfig } from './contents.forms-helpers';
-import { FieldDefaultValue, FieldsValidators } from './contents.forms.visitors';
+import { computed, Injector, Signal, signal, WritableSignal } from '@angular/core';
+import { required, SchemaPathTree, validate } from '@angular/forms/signals';
+import { SignalForm, Types } from '@app/framework';
+import { AppLanguageDto, FieldDto, SchemaDto, TableField } from '../model';
+import { ContentRules } from './contents.form-rules';
+import { contentTranslationStatus, FieldSection, FormGlobals, groupFields, PartitionConfig } from './contents.forms-helpers';
+import { FieldForm } from './contents.forms-model';
+import { ContentSchemaBuilder, toErrors } from './contents.forms-schema';
+import { ContentValues, sanitizeValue } from './contents.forms-values';
+import { FieldsValidators } from './contents.forms.visitors';
+
+export * from './contents.forms-model';
 
 type SaveQueryFormType = { name: string; user: boolean };
 
-export class SaveQueryForm extends Form<ExtendedFormGroup, SaveQueryFormType> {
-    constructor() {
-        super(new ExtendedFormGroup({
-            name: new UntypedFormControl('',
-                Validators.required,
-            ),
-            user: new UntypedFormControl(false,
-                Validators.nullValidator,
-            ),
-        }));
+export class SaveQueryForm extends SignalForm<SaveQueryFormType, SaveQueryFormType> {
+    constructor(injector?: Injector) {
+        super({ name: '', user: false }, path => {
+            required(path.name);
+        }, injector);
     }
 }
 
-export class PatchContentForm extends Form<ExtendedFormGroup, any> {
+export class PatchContentForm extends SignalForm<Record<string, any>, any> {
     private readonly editableFields: ReadonlyArray<FieldDto>;
-    private readonly dirtyState = signal(false);
 
-    public readonly dirty = this.dirtyState.asReadonly();
+    public readonly dirty = computed(() => {
+        return this.form().dirty();
+    });
 
     constructor(
-        private readonly listFields: ReadonlyArray<TableField>,
+        listFields: ReadonlyArray<TableField>,
         private readonly language: AppLanguageDto,
+        injector?: Injector,
     ) {
-        super(new ExtendedFormGroup({}));
+        const editableFields = listFields.filter(x => x.rootField?.isInlineEditable).map(x => x.rootField!);
 
-        this.editableFields = this.listFields.filter(x => x.rootField?.isInlineEditable).map(x => x.rootField!);
+        super(createPatchModel(editableFields), path => {
+            for (const field of editableFields) {
+                const validators = [...FieldsValidators.create(field, language.isOptional)];
 
-        for (const field of this.editableFields) {
-            const validators = FieldsValidators.create(field, this.language.isOptional);
+                validate((path as SchemaPathTree<Record<string, any>>)[field.name], ctx => {
+                    return toErrors(validators, ctx.value());
+                });
+            }
+        }, injector);
 
-            this.form.setControl(field.name, new UntypedFormControl(undefined, { validators }));
-        }
-
-        this.form.events.subscribe(() => {
-            this.dirtyState.set(this.form.dirty);
-        });
+        this.editableFields = editableFields;
     }
 
-    public submit() {
-        const result = super.submit();
+    protected transformSubmit(value: Record<string, any>) {
+        const request = {} as Record<string, any>;
 
-        if (result) {
-            const request = {} as Record<string, any>;
+        for (const field of this.editableFields) {
+            const fieldValue = sanitizeValue(value[field.name]);
 
-            for (const field of this.editableFields) {
-                const value = result[field.name];
-
-                if (field.isLocalizable) {
-                    request[field.name] = { [this.language.iso2Code]: value };
-                } else {
-                    request[field.name] = { iv: value };
-                }
+            if (field.isLocalizable) {
+                request[field.name] = { [this.language.iso2Code]: fieldValue };
+            } else {
+                request[field.name] = { iv: fieldValue };
             }
-
-            return request;
         }
 
-        return result;
+        return request;
     }
 }
 
-export class EditContentForm extends Form<ExtendedFormGroup, any> {
+export class EditContentForm extends SignalForm<any, any> {
     private readonly fields: { [name: string]: FieldForm } = {};
-    private readonly valueState = signal<any>(this.form.value);
+    private readonly context: WritableSignal<any>;
+    private readonly values: ContentValues;
     private initialData: any;
 
     public readonly sections: ReadonlyArray<FieldSection<FieldDto, FieldForm>>;
 
-    public readonly value = this.valueState.asReadonly();
+    public readonly value = this.model.asReadonly();
 
     public readonly translationStatus = computed(() => {
-        return contentTranslationStatus(this.valueState(), this.schema, this.languages);
+        return contentTranslationStatus(this.model(), this.schema, this.languages);
     });
 
     constructor(
         public readonly languages: ReadonlyArray<AppLanguageDto>,
-        public readonly schema: SchemaDto, schemas: { [id: string ]: SchemaDto },
-        public context: any,
-        debounce = 100,
+        public readonly schema: SchemaDto,
+        schemas: { [id: string ]: SchemaDto },
+        context: any,
+        injector?: Injector,
     ) {
-        super(new ExtendedFormGroup({}));
+        const partitions = new PartitionConfig(languages);
+        const values = new ContentValues(partitions, schemas);
+        const contextSignal = signal<any>(context);
 
-        const globals: FormGlobals = {
-            schema,
+        let root: Signal<any> | undefined;
+
+        const builder = new ContentSchemaBuilder({
+            context: contextSignal,
+            partitions,
+            root: () => root?.(),
+            rules: new ContentRules(schema, schemas),
             schemas,
-            partitions: new PartitionConfig(languages),
-            remoteValidator: this.remoteValidator,
-        };
+        });
 
-        const form = this.form;
-        const rules = new RootRulesProvider(schema);
+        super(values.createData(schema), path => {
+            builder.build(path, schema);
+        }, injector);
+
+        root = this.model;
+
+        this.context = contextSignal;
+        this.values = values;
+
+        const globals: FormGlobals = { partitions, schema, schemas, values };
 
         this.sections = groupFields(schema.fields).map(({ separator, fields }) => {
             const forms: FieldForm[] = [];
 
             for (const field of fields) {
-                const childForm =
-                    new FieldForm({
-                        field,
-                        globals,
-                        isOptional: false,
-                        partition: '',
-                        path: field.name,
-                        rules,
-                    });
+                const childForm = new FieldForm({
+                    field,
+                    globals,
+                    isOptional: false,
+                    partition: '',
+                    path: field.name,
+                }, (this.form as any)[field.name]);
 
-                form.setControl(field.name, childForm.form);
                 forms.push(childForm);
+
                 this.fields[field.name] = childForm;
             }
 
             return new FieldSection<FieldDto, FieldForm>(separator, forms);
-        });
-
-        value$(this.form).pipe(debounceTimeSafe(debounce), distinctUntilChanged(Types.equals)).subscribe(value => {
-            this.updateValue(value);
         });
 
         this.updateInitialData();
@@ -146,7 +150,7 @@ export class EditContentForm extends Form<ExtendedFormGroup, any> {
     }
 
     public hasChanged() {
-        return !Types.equals(this.initialData, this.value(), true);
+        return !Types.equals(this.initialData, this.model(), true);
     }
 
     public hasChanges(changes: any) {
@@ -159,489 +163,39 @@ export class EditContentForm extends Form<ExtendedFormGroup, any> {
         if (isInitial) {
             this.updateInitialData();
         }
-
-        this.updateValue(this.form.value);
-    }
-
-    protected disable() {
-        this.form.disable();
-    }
-
-    protected enable() {
-        this.form.enable({ onlySelf: true });
-        this.updateState(this.value());
     }
 
     public setContext(context?: any) {
-        this.context = context;
-        this.updateState(this.value());
+        this.context.set(context);
     }
 
-    public submitCompleted(options?: { newValue?: any; noReset?: boolean }) {
-        super.submitCompleted(options);
+    protected transformLoad(value: any) {
+        return this.values.createData(this.schema, value);
+    }
+
+    protected transformSubmit(value: any) {
+        return sanitizeValue(value);
+    }
+
+    protected onSubmitted() {
         this.updateInitialData();
     }
 
-    private updateInitial(data?: any) {
-        for (const [key, field] of Object.entries(this.fields)) {
-            field.updateInitial(Types.isObject(data) ? data[key] : undefined);
-        }
-    }
-
-    private updateValue(value: any) {
-        this.valueState.set(value);
-        this.updateState(value);
-    }
-
     private updateInitialData() {
-        this.initialData = this.form.value;
-        this.updateInitial(this.initialData);
-    }
+        this.initialData = this.model();
 
-    private updateState(data: any) {
-        const context = { ...this.context || {}, data };
-
-        for (const field of Object.values(this.fields)) {
-            field.updateState(context, data, { isDisabled: this.form.disabled });
-        }
-
-        for (const section of this.sections) {
-            section.updateHidden();
+        for (const [key, field] of Object.entries(this.fields)) {
+            field.updateInitial(this.initialData?.[key]);
         }
     }
 }
 
-export class FieldForm extends AbstractContentForm<FieldDto, UntypedFormGroup> {
-    private readonly partitions: { [partition: string]: FieldItemForm } = {};
-    private readonly initialValue = signal<{ value: any } | null>(null);
-    private cachedInitial: any;
-    private cachedHash?: string | null;
-    private isRequired: boolean;
+function createPatchModel(fields: ReadonlyArray<FieldDto>) {
+    const result: Record<string, any> = {};
 
-    public readonly translationStatus = computed(() => {
-        return fieldTranslationStatus(this.value());
-    });
-
-    public readonly hasChanges = computed(() => {
-        const initial = this.initialValue();
-        if (!initial) {
-            return false;
-        }
-
-        return !Types.equals(initial.value, this.value());
-    });
-
-    public get initialHash() {
-        return (this.cachedHash ??= Types.hashWithId(this.cachedInitial, this.field.name))
+    for (const field of fields) {
+        result[field.name] = null;
     }
 
-    constructor(args: ControlArgs<FieldDto>) {
-        super(args, FieldForm.buildForm());
-
-        for (const { key: partition, isOptional } of args.globals.partitions.getAll(args.field)) {
-            const childForm =
-                buildForm({
-                    ...args,
-                    isOptional,
-                    partition,
-                    path: this.relativePath(partition),
-                });
-
-            this.partitions[partition] = childForm;
-
-            this.form.setControl(partition, childForm.form);
-        }
-
-        this.isRequired = !!args.field.properties.isRequired;
-    }
-
-    public get(language: string | LanguageDto | AppLanguageDto) {
-        if (this.field.isLocalizable) {
-            return this.partitions[(language as any)['iso2Code'] || language];
-        } else {
-            return this.partitions[fieldInvariant];
-        }
-    }
-
-    protected updateCustomState(context: any, itemData: any, state: AbstractContentFormState) {
-        const isRequired = state.isRequired === true;
-
-        if (this.isRequired !== isRequired) {
-            this.isRequired = isRequired;
-
-            for (const partition of Object.values(this.partitions)) {
-                if (!partition.isOptional) {
-                    let validators = FieldsValidators.create(this.field, false);
-
-                    if (isRequired) {
-                        validators.push(Validators.required);
-                    } else {
-                        validators = validators.filter(x => x !== Validators.required);
-                    }
-
-                    if (this.globals.remoteValidator) {
-                        validators.push(this.globals.remoteValidator);
-                    }
-
-                    partition.form.setValidators(validators);
-                    partition.form.updateValueAndValidity();
-                }
-            }
-        }
-
-        for (const partition of Object.values(this.partitions)) {
-            partition.updateState(context, itemData, state);
-        }
-    }
-
-    public updateInitial(data: any) {
-        this.cachedInitial = data;
-        this.cachedHash = null;
-        this.initialValue.set({ value: data });
-    }
-
-    private static buildForm() {
-        return new ExtendedFormGroup({});
-    }
-}
-
-export class FieldValueForm extends AbstractContentForm<AnyFieldDto, UntypedFormControl> {
-    private isRequired = false;
-
-    constructor(args: ControlArgs) {
-        super(args, FieldValueForm.buildControl(args, args.partition));
-
-        this.isRequired = !!args.field.properties.isRequired && !args.isOptional;
-    }
-
-    protected updateCustomState(_context: any, _itemData: any, state: AbstractContentFormState) {
-        const isRequired = state.isRequired === true;
-
-        if (!this.isOptional && this.isRequired !== isRequired) {
-            this.isRequired = isRequired;
-
-            let validators = FieldsValidators.create(this.field, true);
-            if (isRequired) {
-                validators.push(Validators.required);
-            } else {
-                validators = validators.filter(x => x !== Validators.required);
-            }
-
-            this.form.setValidators(validators);
-            this.form.updateValueAndValidity();
-        }
-    }
-
-    private static buildControl(args: ControlArgs, partition: string) {
-        const value = FieldDefaultValue.get(args.field, partition);
-
-        const validators = FieldsValidators.create(args.field, args.isOptional);
-
-        if (args.globals.remoteValidator) {
-            validators.push(args.globals.remoteValidator);
-        }
-
-        return new UntypedFormControl(value, { validators });
-    }
-}
-
-export class FieldArrayForm extends AbstractContentForm<AnyFieldDto, TemplatedFormArray> {
-    private readonly itemsState = signal<ReadonlyArray<ObjectFormBase>>([]);
-
-    public readonly items = this.itemsState.asReadonly();
-
-    public set internalItems(value: ReadonlyArray<ObjectFormBase>) {
-        this.itemsState.set(value);
-    }
-
-    constructor(args: ControlArgs,
-        public readonly isComponents: boolean,
-    ) {
-        super(args,
-            new TemplatedFormArray(
-                new ArrayTemplate(() => this),
-                FieldsValidators.create(args.field, args.isOptional)));
-
-        this.form.setValue(FieldDefaultValue.get(args.field, args.partition), { emitEvent: false });
-        this.syncFormState();
-
-        (this.form.template as any)['form'] = this;
-    }
-
-    public get(index: number) {
-        return this.items()[index];
-    }
-
-    public addCopy(source: ObjectFormBase) {
-        this.form.add().reset(source.form.value);
-    }
-
-    public addComponent(schemaId: string) {
-        this.form.add().patchValue({ schemaId });
-    }
-
-    public addItem() {
-        this.form.add();
-    }
-
-    public removeItemAt(index: number) {
-        this.form.removeAt(index);
-    }
-
-    public move(index: number, item: ObjectFormBase) {
-        const children = [...this.items()];
-
-        children.splice(children.indexOf(item), 1);
-        children.splice(index, 0, item);
-
-        this.internalItems = children;
-
-        this.sort(children);
-    }
-
-    public sort(children: ReadonlyArray<ObjectFormBase>) {
-        for (let i = 0; i < children.length; i++) {
-            this.form.setControl(i, children[i].form);
-        }
-    }
-
-    protected updateCustomState(context: any, itemData: any, state: AbstractContentFormState) {
-        for (const item of this.items()) {
-            item.updateState(context, itemData, state);
-        }
-    }
-}
-
-class ArrayTemplate implements FormArrayTemplate {
-    protected get model() {
-        return this.modelProvider();
-    }
-
-    constructor(
-        private readonly modelProvider: () => FieldArrayForm,
-    ) {
-    }
-
-    public createControl() {
-        const model = this.model;
-
-        const child = this.model.isComponents ?
-            this.createComponent(model) :
-            this.createItem(model);
-
-        model.internalItems = [...this.model.items(), child];
-        return child.form;
-    }
-
-    public removeControl(index: number) {
-        const model = this.model;
-        model.internalItems = model.items().filter((_, i) => i !== index);
-    }
-
-    public clearControls() {
-        const model = this.model;
-        model.internalItems = [];
-    }
-
-    private createItem(model: FieldArrayForm) {
-        return new ArrayItemForm(model.args);
-    }
-
-    private createComponent(model: FieldArrayForm) {
-        return new ComponentForm(model.args);
-    }
-}
-
-export type FieldItemForm = ComponentForm | FieldValueForm | FieldArrayForm;
-
-type FieldMap = { [name: string]: FieldItemForm };
-
-export class ObjectFormBase extends AbstractContentForm<AnyFieldDto, TemplatedFormGroup> {
-    private readonly sectionsState = signal<ReadonlyArray<FieldSection<AnyFieldDto, FieldItemForm>>>([]);
-    private readonly fieldsState = signal<FieldMap>({});
-
-    public readonly sections = this.sectionsState.asReadonly();
-
-    public readonly fields = this.fieldsState.asReadonly();
-
-    public set internalFieldSections(value: ReadonlyArray<FieldSection<AnyFieldDto, FieldItemForm>>) {
-        this.sectionsState.set(value);
-    }
-
-    public set internalFieldByName(value: FieldMap) {
-        this.fieldsState.set(value);
-    }
-
-    constructor(args: ControlArgs, template: ObjectTemplate) {
-        super(args, ObjectFormBase.buildControl(template));
-    }
-
-    public get(field: string | { name: string }): FieldItemForm | undefined {
-        return this.fields()[(field as any)['name'] || field];
-    }
-
-    protected updateCustomState(context: any, _: any, state: AbstractContentFormState) {
-        for (const field of Object.values(this.fields())) {
-            field.updateState(context, this.form.value, state);
-        }
-
-        for (const section of this.sections()) {
-            section.updateHidden();
-        }
-    }
-
-    private static buildControl(template: ObjectTemplate) {
-        return new TemplatedFormGroup(template);
-    }
-}
-
-abstract class ObjectTemplate<T extends ObjectFormBase = ObjectFormBase> implements FormGroupTemplate {
-    private currentSchema: ReadonlyArray<AnyFieldDto> | undefined;
-
-    protected get model() {
-        return this.modelProvider();
-    }
-
-    constructor(
-        private readonly modelProvider: () => T,
-    ) {
-    }
-
-    protected abstract getSchema(value: any, model: T): ReadonlyArray<AnyFieldDto> | undefined;
-
-    public setControls(form: UntypedFormGroup, value: any) {
-        const schema = this.getSchema(value, this.model);
-
-        if (this.currentSchema !== schema) {
-            const model = this.model;
-
-            this.clearControlsCore(model);
-
-            if (schema) {
-                this.setControlsCore(schema, value, model, form);
-            }
-
-            this.currentSchema = schema;
-        }
-    }
-
-    public clearControls() {
-        if (this.currentSchema !== undefined) {
-            this.clearControlsCore(this.model);
-
-            this.currentSchema = undefined;
-        }
-    }
-
-    protected setControlsCore(schema: ReadonlyArray<AnyFieldDto>, _: any, model: T, form: UntypedFormGroup) {
-        const fieldByName: FieldMap = {};
-        const fieldSections: FieldSection<AnyFieldDto, FieldItemForm>[] = [];
-
-        for (const { separator, fields } of groupFields(schema)) {
-            const forms: FieldItemForm[] = [];
-
-            for (const field of fields) {
-                const childForm = buildForm({
-                    ...model.args,
-                    field,
-                    path: model.relativePath(field.name),
-                });
-
-                form.setControl(field.name, childForm.form);
-                forms.push(childForm);
-                fieldByName[field.name] = childForm;
-            }
-
-            fieldSections.push(new FieldSection<AnyFieldDto, FieldItemForm>(separator, forms));
-        }
-
-        model.internalFieldByName = fieldByName;
-        model.internalFieldSections = fieldSections;
-    }
-
-    protected clearControlsCore(model: T) {
-        for (const name of Object.keys(model.form.controls)) {
-            model.form.removeControl(name);
-        }
-
-        model.internalFieldByName = {};
-        model.internalFieldSections = [];
-    }
-}
-
-export class ArrayItemForm extends ObjectFormBase {
-    constructor(args: ControlArgs) {
-        super(args, new ArrayItemTemplate(() => this));
-        this.form.build({});
-    }
-}
-
-class ArrayItemTemplate extends ObjectTemplate<ArrayItemForm> {
-    public getSchema() {
-        if (Types.is(this.model.field, FieldDto)) {
-            return this.model.field.nested || [];
-        } else {
-            return [];
-        }
-    }
-}
-
-export class ComponentForm extends ObjectFormBase {
-    private readonly schemaState = signal<SchemaDto | undefined>(undefined);
-
-    public readonly schema = this.schemaState.asReadonly();
-
-    public set internalSchema(value: SchemaDto | undefined) {
-        this.schemaState.set(value);
-    }
-
-    public get properties() {
-        return this.field.properties as ComponentFieldPropertiesDto;
-    }
-
-    constructor(args: ControlArgs) {
-        super({
-            ...args,
-            rules: new ComponentRulesProvider(args.path, args.rules, () => this.schema()),
-        }, new ComponentTemplate(() => this));
-
-        this.form.reset(undefined);
-    }
-
-    public selectSchema(schemaId: string) {
-        this.form.patchValue({ schemaId });
-    }
-}
-
-class ComponentTemplate extends ObjectTemplate<ComponentForm> {
-    public getSchema(value: any, model: ComponentForm) {
-        return model.globals.schemas[value?.schemaId]?.fields;
-    }
-
-    protected setControlsCore(schema: ReadonlyArray<FieldDto>, value: any, model: ComponentForm, form: UntypedFormGroup) {
-        form.setControl('schemaId', new UntypedFormControl());
-
-        this.model.internalSchema = model.globals.schemas[value?.schemaId];
-
-        super.setControlsCore(schema, value, model, form);
-    }
-
-    protected clearControlsCore(model: ComponentForm) {
-        this.model.internalSchema = undefined;
-
-        super.clearControlsCore(model);
-    }
-}
-
-function buildForm(args: ControlArgs) {
-    switch (args.field.properties.fieldType) {
-        case 'Array':
-            return new FieldArrayForm(args, false);
-        case 'Component':
-            return new ComponentForm(args);
-        case 'Components':
-            return new FieldArrayForm(args, true);
-        default:
-            return new FieldValueForm(args);
-    }
+    return result;
 }

@@ -5,32 +5,21 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, forwardRef, inject, input, signal } from '@angular/core';
-import { FormControl, FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
-import { AppLanguageDto, AppsState, ContentDto, ContentsService, LocalizerService, RadioGroupComponent, SignalControlComponent, UIOptions } from '@app/shared';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, inject, input, model, signal } from '@angular/core';
+import { FormValueControl } from '@angular/forms/signals';
+import { AppLanguageDto, AppsState, ContentDto, ContentsService, LocalizerService, RadioGroupComponent, UIOptions } from '@app/shared';
 import { ReferencesTagsConverter } from './references-tag-converter';
-
-export const SQX_REFERENCES_RADIO_BUTTONS_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferencesRadioButtonsComponent), multi: true,
-};
-
-const NO_EMIT = { emitEvent: false };
 
 @Component({
     selector: 'sqx-references-radio-buttons',
     styleUrls: ['./references-radio-buttons.component.scss'],
     templateUrl: './references-radio-buttons.component.html',
-    providers: [
-        SQX_REFERENCES_RADIO_BUTTONS_CONTROL_VALUE_ACCESSOR,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        FormsModule,
         RadioGroupComponent,
-        ReactiveFormsModule,
     ],
 })
-export class ReferencesRadioButtonsComponent extends SignalControlComponent<ReadonlyArray<string> | null | undefined> {
+export class ReferencesRadioButtonsComponent implements FormValueControl<ReadonlyArray<string> | null> {
     private readonly appsState = inject(AppsState);
     private readonly contentsService = inject(ContentsService);
     private readonly localizer = inject(LocalizerService);
@@ -47,13 +36,28 @@ export class ReferencesRadioButtonsComponent extends SignalControlComponent<Read
         return this.isValid() && !!contentItems && contentItems.length > 0;
     });
 
+    /** The value of the control. */
+    public readonly value = model<ReadonlyArray<string> | null>(null);
+
+    /** Disables the control. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
+
+    /** Indicates whether the control has been touched. */
+    public readonly touched = model(false);
+
     /** The ID of the schema to select the contents from. */
     public readonly schemaId = input.required<string | undefined | null>();
 
     /** The language to build the names of the contents. */
     public readonly language = input.required<AppLanguageDto>();
 
-    protected readonly control = new FormControl<string | null | undefined>(undefined);
+    protected readonly isGroupDisabled = computed(() => {
+        return this.disabled() || !this.isSuccess();
+    });
+
+    protected readonly selectedId = computed(() => {
+        return this.value()?.[0] ?? null;
+    });
 
     protected readonly converter = computed(() => {
         const contentItems = this.contentItems();
@@ -65,16 +69,6 @@ export class ReferencesRadioButtonsComponent extends SignalControlComponent<Read
     });
 
     constructor() {
-        super();
-
-        effect(() => {
-            if (this.isDisabled() || !this.isSuccess()) {
-                this.control.disable(NO_EMIT);
-            } else {
-                this.control.enable(NO_EMIT);
-            }
-        });
-
         effect(onCleanup => {
             const schemaId = this.schemaId();
             if (!schemaId) {
@@ -95,25 +89,15 @@ export class ReferencesRadioButtonsComponent extends SignalControlComponent<Read
 
             onCleanup(() => subscription.unsubscribe());
         });
-
-        effect(onCleanup => {
-            const subscription =
-                this.control.valueChanges
-                    .subscribe(value => {
-                        this.callTouched();
-
-                        if (value) {
-                            this.callChange([value]);
-                        } else {
-                            this.callChange(null);
-                        }
-                    });
-
-            onCleanup(() => subscription.unsubscribe());
-        });
     }
 
-    public writeValue(obj: ReadonlyArray<string> | null | undefined) {
-        this.control.setValue(obj?.[0], NO_EMIT);
+    protected updateValue(value: string | null | undefined) {
+        this.touched.set(true);
+
+        if (value) {
+            this.value.set([value]);
+        } else {
+            this.value.set(null);
+        }
     }
 }

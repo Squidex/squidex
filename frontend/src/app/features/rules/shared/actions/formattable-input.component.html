@@ -1,8 +1,16 @@
 @let mode = this.mode();
-@let isDisabled = this.isDisabled();
+@let isDisabled = disabled();
 @if (type() === "Text") {
     <div class="input-group">
-        <sqx-code-editor [completion]="editorCompletion()" [disabled]="isDisabled" [mode]="editorMode()" singleLine="true" [snippets]="mode === 'Script'" />
+        <sqx-code-editor
+            [completion]="editorCompletion()"
+            [disabled]="isDisabled"
+            [mode]="editorMode()"
+            singleLine="true"
+            [snippets]="mode === 'Script'"
+            [(touched)]="touched"
+            [value]="text()"
+            (valueChange)="setText($event)" />
         <div class="input-group-apppend">
             <select class="form-select" [disabled]="isDisabled" [ngModel]="mode" (ngModelChange)="setMode($event)" tabindex="-1">
                 @for (supportedMode of modes; track supportedMode) {
@@ -19,5 +27,13 @@
             </button>
         }
     </div>
-    <sqx-code-editor [completion]="editorCompletion()" [disabled]="isDisabled" [height]="350" [mode]="editorMode()" [snippets]="mode === 'Script'" />
+    <sqx-code-editor
+        [completion]="editorCompletion()"
+        [disabled]="isDisabled"
+        [height]="350"
+        [mode]="editorMode()"
+        [snippets]="mode === 'Script'"
+        [(touched)]="touched"
+        [value]="text()"
+        (valueChange)="setText($event)" />
 }

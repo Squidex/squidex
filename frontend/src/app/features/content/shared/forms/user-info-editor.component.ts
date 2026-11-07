@@ -5,15 +5,10 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, effect, forwardRef, inject, input } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl, Validators } from '@angular/forms';
-import { map } from 'rxjs';
-import { CodeComponent, ExtendedFormGroup, FormHintComponent, FormRowComponent, generateApiKey, MarkdownDirective, RolesState, SignalControlComponent, TranslatePipe, Types, value$ } from '@app/shared';
-
-export const SQX_USER_INFO_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => UserInfoEditorComponent), multi: true,
-};
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, inject, input, model, signal, untracked } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { disabled, form, FormField, FormValueControl, required } from '@angular/forms/signals';
+import { CodeComponent, FormHintComponent, FormRowComponent, generateApiKey, MarkdownDirective, RolesState, SignalSelectDirective, TranslatePipe, Types } from '@app/shared';
 
 type UserInfo = { apiKey: string; role: string };
 
@@ -21,72 +16,88 @@ type UserInfo = { apiKey: string; role: string };
     selector: 'sqx-user-info-editor',
     styleUrls: ['./user-info-editor.component.scss'],
     templateUrl: './user-info-editor.component.html',
-    providers: [
-        SQX_USER_INFO_EDITOR_CONTROL_VALUE_ACCESSOR,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         CodeComponent,
-        FormsModule,
+        FormField,
         FormHintComponent,
-        MarkdownDirective,
-        ReactiveFormsModule,
         FormRowComponent,
+        FormsModule,
+        MarkdownDirective,
+        SignalSelectDirective,
         TranslatePipe,
     ],
 })
-export class UserInfoEditorComponent extends SignalControlComponent<UserInfo> {
+export class UserInfoEditorComponent implements FormValueControl<UserInfo | null> {
+    private readonly userInfo = signal<UserInfo>({ apiKey: '', role: '' });
+
     protected readonly rolesState = inject(RolesState);
+
+    /** The value of the control. */
+    public readonly value = model<UserInfo | null>(null);
+
+    /** Disables the control. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
+
+    /** Indicates whether the control has been touched. */
+    public readonly touched = model(false);
 
     /** The prefix for the IDs of the inner inputs. */
     public readonly formId = input.required<string>();
 
-    protected readonly form = new ExtendedFormGroup({
-        apiKey: new UntypedFormControl('',
-            Validators.required,
-        ),
-        role: new UntypedFormControl('',
-            Validators.required,
-        ),
+    protected readonly userInfoForm = form(this.userInfo, path => {
+        disabled(path, () => this.disabled());
+        required(path.apiKey);
+        required(path.role);
     });
 
-    protected readonly apiKey = toSignal(
-        value$(this.form.get('apiKey')!)
-            .pipe(map(x => x || 'NONE')),
-        { initialValue: 'NONE' });
+    protected readonly apiKey = computed(() => {
+        return this.userInfo().apiKey || 'NONE';
+    });
 
     constructor() {
-        super();
-
         this.rolesState.loadIfNotLoaded();
 
-        effect(onCleanup => {
-            const subscription =
-                this.form.valueChanges.subscribe(value => {
-                    if (this.form.valid) {
-                        this.callChange(value);
-                    } else {
-                        this.callChange(null);
-                    }
+        effect(() => {
+            const value = this.value();
 
-                    this.callTouched();
-                });
+            untracked(() => {
+                if (Types.equals(value, this.buildValue())) {
+                    return;
+                }
 
-            onCleanup(() => subscription.unsubscribe());
+                if (Types.isObject(value)) {
+                    this.userInfo.set({ apiKey: value.apiKey ?? '', role: value.role ?? '' });
+                } else {
+                    this.userInfo.set({ apiKey: '', role: '' });
+                }
+            });
+        });
+
+        effect(() => {
+            const value = this.buildValue();
+
+            untracked(() => {
+                if (Types.equals(value, this.value())) {
+                    return;
+                }
+
+                this.value.set(value);
+            });
         });
     }
 
-    public writeValue(obj: UserInfo | undefined | null) {
-        if (Types.isObject(obj)) {
-            this.form.setValue(obj, { emitEvent: true });
-        } else {
-            this.form.reset();
-        }
-    }
-
-    protected async generateApiKey() {
+    protected generateApiKey() {
         const apiKey = generateApiKey();
 
-        this.form.patchValue({ apiKey });
+        this.userInfo.update(x => ({ ...x, apiKey }));
+    }
+
+    private buildValue(): UserInfo | null {
+        if (!this.userInfoForm().valid()) {
+            return null;
+        }
+
+        return { ...this.userInfo() };
     }
 }

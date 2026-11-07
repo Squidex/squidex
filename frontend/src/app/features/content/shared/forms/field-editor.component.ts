@@ -6,8 +6,9 @@
  */
 
 import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, ElementRef, inject, input, numberAttribute, output, signal, viewChild } from '@angular/core';
-import { AbstractControl, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { AbstractContentForm, AnnotationCreate, AnnotationsSelected, AnyFieldDto, AppLanguageDto, ChatDialogComponent, CheckboxGroupComponent, CodeEditorComponent, ColorPickerComponent, CommentSelected, CommentsState, ControlErrorsComponent, DateTimeEditorComponent, DialogModel, EditContentForm, FieldSelected, FormHintComponent, GeolocationEditorComponent, HTTP, IndeterminateValueDirective, isValidValue, MarkdownDirective, MathHelper, MenuComponent, MenuItemComponent, MessageBus, ModalDirective, RadioGroupComponent, ReferenceInputComponent, ReferencesFieldPropertiesDto, RichEditorComponent, StarsComponent, TagEditorComponent, ToggleComponent, TooltipDirective, TransformInputDirective, Types } from '@app/shared';
+import { FormsModule } from '@angular/forms';
+import { FormField } from '@angular/forms/signals';
+import { AbstractContentForm, AnnotationCreate, AnnotationsSelected, AnyFieldDto, AppLanguageDto, ChatDialogComponent, CheckboxGroupComponent, CodeEditorComponent, ColorPickerComponent, CommentSelected, CommentsState, ControlErrorsComponent, DateTimeEditorComponent, DialogModel, EditContentForm, FieldSelected, FormHintComponent, GeolocationEditorComponent, HTTP, IndeterminateValueDirective, isValidValue, MarkdownDirective, MathHelper, MenuComponent, MenuItemComponent, MessageBus, ModalDirective, RadioGroupComponent, ReferenceInputComponent, ReferencesFieldPropertiesDto, RichEditorComponent, SignalSelectDirective, SignalSelectMultipleDirective, StarsComponent, TagEditorComponent, ToggleComponent, TooltipDirective, TransformInputDirective, Types } from '@app/shared';
 import { ReferenceDropdownComponent } from '../references/reference-dropdown.component';
 import { ReferencesCheckboxesComponent } from '../references/references-checkboxes.component';
 import { ReferencesEditorComponent } from '../references/references-editor.component';
@@ -36,6 +37,7 @@ import { UserInfoEditorComponent } from './user-info-editor.component';
         ControlErrorsComponent,
         DateTimeEditorComponent,
         FormHintComponent,
+        FormField,
         FormsModule,
         GeolocationEditorComponent,
         IFrameEditorComponent,
@@ -45,7 +47,8 @@ import { UserInfoEditorComponent } from './user-info-editor.component';
         MenuItemComponent,
         ModalDirective,
         RadioGroupComponent,
-        ReactiveFormsModule,
+        SignalSelectDirective,
+        SignalSelectMultipleDirective,
         ReferenceDropdownComponent,
         ReferenceInputComponent,
         ReferencesCheckboxesComponent,
@@ -87,7 +90,7 @@ export class FieldEditorComponent {
     public readonly formLevel = input.required<number, unknown>({ transform: numberAttribute });
 
     /** The form model of the field to edit. */
-    public readonly formModel = input.required<AbstractContentForm<AnyFieldDto, AbstractControl>>();
+    public readonly formModel = input.required<AbstractContentForm<AnyFieldDto>>();
 
     /** The language of the field value. */
     public readonly language = input.required<AppLanguageDto>();
@@ -117,7 +120,7 @@ export class FieldEditorComponent {
         return this.formModel().field;
     });
 
-    protected readonly fieldForm = computed(() => {
+    protected readonly fieldForm = computed<any>(() => {
         return this.formModel().form;
     });
 

@@ -33,7 +33,7 @@
 
         <div class="section">
             <label>{{ "common.to" | sqxTranslate }}</label>
-            <sqx-checkbox-group layout="Multiline" [(ngModel)]="copyTargets" [values]="languageCodes()" />
+            <sqx-checkbox-group layout="Multiline" [value]="copyTargets()" (valueChange)="copyTargets.set($event ?? [])" [values]="languageCodes()" />
         </div>
     </sqx-dropdown-menu>
 }

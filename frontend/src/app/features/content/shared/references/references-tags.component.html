@@ -2,8 +2,10 @@
     allowDuplicates="false"
     allowOpen="true"
     (dropdownOpen)="onOpened()"
-    [formControl]="control"
+    [disabled]="isEditorDisabled()"
     [itemConverter]="converter()"
     [itemsSource]="converter().tags"
     [itemsSourceLoading]="contentsLoading()"
+    [value]="selectedIds()"
+    (valueChange)="updateValue($event)"
     placeholder="{{ 'common.tagAddReference' | sqxTranslate }}" />

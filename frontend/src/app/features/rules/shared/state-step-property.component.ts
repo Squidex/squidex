@@ -7,7 +7,6 @@
 
 
 import { ChangeDetectionStrategy, Component, computed, input } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { CodeEditorComponent, FormRowComponent, RuleElementPropertyDto, Types } from '@app/shared';
 
 type ValueType = 'Raw' | 'Singleline' | 'MultilineAny' | 'MultilineJson';
@@ -20,7 +19,6 @@ type ValueType = 'Raw' | 'Singleline' | 'MultilineAny' | 'MultilineJson';
     imports: [
         CodeEditorComponent,
         FormRowComponent,
-        FormsModule,
     ],
 })
 export class StateStepPropertyComponent {

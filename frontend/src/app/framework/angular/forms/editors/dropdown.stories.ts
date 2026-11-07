@@ -6,7 +6,6 @@
  */
 
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { DropdownComponent, LocalizerService, RootViewComponent } from '@app/framework';
 
@@ -54,7 +53,7 @@ export default {
             control: 'boolean',
         },
         change: {
-            action:'ngModelChange',
+            action: 'valueChange',
         },
         position: {
             control: 'radio',
@@ -77,8 +76,8 @@ export default {
                     [dropdownFullWidth]="dropdownFullWidth"
                     [items]="items"
                     [itemsLoading]="itemsLoading"
-                    (ngModelChange)="change($event)"
-                    [ngModel]="model">
+                    (valueChange)="change($event)"
+                    [value]="model">
                 </sqx-dropdown>
             </sqx-root-view>
         `,
@@ -86,7 +85,6 @@ export default {
     decorators: [
         moduleMetadata({
             imports: [
-                FormsModule,
                 RootViewComponent,
                 TestComponent,
             ],
@@ -172,7 +170,7 @@ export const ComplexValues: Story = {
                     [items]="items"
                     [itemsLoading]="itemsLoading"
                     [searchProperty]="searchProperty"
-                    [ngModel]="model"
+                    [value]="model"
                     [valueProperty]="valueProperty">
                     <ng-template let-target="$implicit">
                         {{target.label}}

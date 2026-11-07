@@ -9,7 +9,7 @@
 /* eslint-disable @angular-eslint/component-selector */
 
 
-import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, inject, input, output, viewChildren } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, ChangeDetectorRef, Component, computed, inject, Injector, input, output, viewChildren } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirective, ContentListCellResizeDirective, ContentListFieldComponent, ContentsState, ContentStatusComponent, DropdownMenuComponent, ExternalLinkDirective, ModalDirective, ModalModel, ModalPlacementDirective, PatchContentForm, SchemaDto, StopClickDirective, TableField, TableSettings, TabRouterlinkDirective, TranslatePipe } from '@app/shared';
@@ -39,6 +39,7 @@ import { AppLanguageDto, ConfirmClickDirective, ContentDto, ContentListCellDirec
 export class ContentComponent {
     private readonly changeDetector = inject(ChangeDetectorRef);
     private readonly contentsState = inject(ContentsState);
+    private readonly injector = inject(Injector);
 
     private readonly fields = viewChildren(ContentListFieldComponent);
 
@@ -92,42 +93,29 @@ export class ContentComponent {
             return undefined;
         }
 
-        return new PatchContentForm(this.tableFields(), this.language());
+        return new PatchContentForm(this.tableFields(), this.language(), this.injector);
     });
 
     protected readonly isDirty = computed(() => {
         return this.patchForm()?.dirty() === true;
     });
 
-    protected save() {
+    protected async save() {
         const content = this.content();
         const patchForm = this.patchForm();
         if (!content.canUpdate || !patchForm) {
             return;
         }
 
-        const value = patchForm.submit();
-        if (!value) {
-            return;
-        }
+        await patchForm.submit(value => {
+            return this.contentsState.patch(content, value);
+        });
 
-        this.contentsState.patch(content, value)
-            .subscribe({
-                next: () => {
-                    patchForm.submitCompleted({ noReset: true });
-
-                    this.changeDetector.detectChanges();
-                },
-                error: error => {
-                    patchForm.submitFailed(error);
-
-                    this.changeDetector.detectChanges();
-                },
-            });
+        this.changeDetector.detectChanges();
     }
 
     protected shouldStop(field: TableField) {
-        const isDirty = this.patchForm()?.form.dirty === true;
+        const isDirty = this.patchForm()?.dirty() === true;
 
         if (field.rootField) {
             return isDirty || (field.rootField.isInlineEditable && this.patchAllowed());
@@ -137,7 +125,7 @@ export class ContentComponent {
     }
 
     protected cancel() {
-        this.patchForm()?.submitCompleted();
+        this.patchForm()?.reset();
 
         for (const field of this.fields()) {
             field.reset();

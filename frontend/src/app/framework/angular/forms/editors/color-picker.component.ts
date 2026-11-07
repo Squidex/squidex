@@ -5,37 +5,34 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, ElementRef, forwardRef, input, signal, viewChild } from '@angular/core';
-import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { MathHelper, SignalControlComponent } from '@app/framework/internal';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, ElementRef, input, model, viewChild } from '@angular/core';
+import { FormValueControl } from '@angular/forms/signals';
+import { MathHelper } from '@app/framework/internal';
 import { FocusComponent } from '../forms-helper';
-
-export const SQX_COLOR_PICKER_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ColorPickerComponent), multi: true,
-};
 
 @Component({
     selector: 'sqx-color-picker',
     styleUrls: ['./color-picker.component.scss'],
     templateUrl: './color-picker.component.html',
-    providers: [
-        SQX_COLOR_PICKER_CONTROL_VALUE_ACCESSOR,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    imports: [
-        FormsModule,
-    ],
 })
-export class ColorPickerComponent extends SignalControlComponent<string> implements FocusComponent {
+export class ColorPickerComponent implements FormValueControl<string | null>, FocusComponent {
     private readonly inputElement = viewChild<ElementRef<HTMLElement>>('input');
+
+    /** The color value. */
+    public readonly value = model<string | null>(null);
+
+    /** Disables the control. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
+
+    /** Indicates whether the control has been touched. */
+    public readonly touched = model(false);
 
     /** The placeholder of the text input. */
     public readonly placeholder = input('');
 
     /** Renders a text input or only a colored circle. */
     public readonly mode = input<'Input' | 'Circle'>('Input');
-
-    protected readonly value = signal<string | null>('black');
 
     protected readonly valueParsed = computed(() => {
         return parseColor(this.value());
@@ -49,12 +46,8 @@ export class ColorPickerComponent extends SignalControlComponent<string> impleme
         return 'black';
     });
 
-    public writeValue(value: any) {
-        this.value.set(value);
-    }
-
     public focus() {
-        if (this.isDisabled()) {
+        if (this.disabled()) {
             return;
         }
 
@@ -62,21 +55,20 @@ export class ColorPickerComponent extends SignalControlComponent<string> impleme
     }
 
     protected blur() {
-        if (this.isDisabled()) {
+        if (this.disabled()) {
             return;
         }
 
-        this.callTouched();
+        this.touched.set(true);
     }
 
     protected updateValue(value: string) {
-        if (this.isDisabled()) {
+        if (this.disabled()) {
             return;
         }
 
         if (this.value() !== value) {
-            this.callChange(value);
-            this.writeValue(value);
+            this.value.set(value);
         }
     }
 }

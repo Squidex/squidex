@@ -6,10 +6,9 @@
  */
 
 
-import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, ElementRef, forwardRef, input, output, signal, untracked, viewChild } from '@angular/core';
-import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
-import { distinctUntilChanged, map, tap } from 'rxjs/operators';
-import { getTagValues, Keys, ModalModel, SignalControlComponent, StringConverter, TagConverter, TagValue, TextMeasurer, Types } from '@app/framework/internal';
+import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, ElementRef, input, model, output, signal, untracked, viewChild } from '@angular/core';
+import { FormValueControl } from '@angular/forms/signals';
+import { getTagValues, Keys, ModalModel, StringConverter, TagConverter, TagValue, TextMeasurer, Types } from '@app/framework/internal';
 import { DropdownMenuComponent } from '../../dropdown-menu.component';
 import { LoaderComponent } from '../../loader.component';
 import { ModalPlacementDirective } from '../../modals/modal-placement.directive';
@@ -18,13 +17,6 @@ import { TooltipDirective } from '../../modals/tooltip.directive';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { ScrollActiveDirective } from '../../scroll-active.directive';
 import { StopClickDirective } from '../../stop-click.directive';
-import { ForwardFormClassesDirective } from '../forward-form-classes.directive';
-
-export const SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => TagEditorComponent), multi: true,
-};
-
-const NO_EMIT = { emitEvent: false };
 
 function normalizeQuery(query: unknown) {
     return Types.isString(query) ? query.trim().toLowerCase() : '';
@@ -56,30 +48,36 @@ function convertTags(obj: any, converter: TagConverter) {
     selector: 'sqx-tag-editor',
     styleUrls: ['./tag-editor.component.scss'],
     templateUrl: './tag-editor.component.html',
-    providers: [
-        SQX_TAG_EDITOR_CONTROL_VALUE_ACCESSOR,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         DropdownMenuComponent,
-        FormsModule,
         LoaderComponent,
-        ForwardFormClassesDirective,
         ModalDirective,
         ModalPlacementDirective,
-        ReactiveFormsModule,
         ScrollActiveDirective,
         StopClickDirective,
         TooltipDirective,
         TranslatePipe,
     ],
 })
-export class TagEditorComponent extends SignalControlComponent<ReadonlyArray<any>> {
+export class TagEditorComponent implements FormValueControl<any> {
     private readonly formElement = viewChild.required<ElementRef<HTMLElement>>('form');
     private readonly inputElement = viewChild<ElementRef<HTMLInputElement>>('input');
     private readonly textMeasurer = new TextMeasurer(() => this.inputElement());
-    private latestValue: any;
+    private lastValue: any;
     private latestInput?: string;
+
+    /** The value of the control. */
+    public readonly value = model<any>(null);
+
+    /** Disables the control. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
+
+    /** Indicates whether the value is invalid, provided by the form. */
+    public readonly invalid = input(false, { transform: booleanAttribute });
+
+    /** Indicates whether the control has been touched. */
+    public readonly touched = model(false);
 
     /** Emits when the editor loses the focus. */
     public readonly editorBlur = output<boolean>();
@@ -96,8 +94,8 @@ export class TagEditorComponent extends SignalControlComponent<ReadonlyArray<any
     /** Converts between the values and the tags. */
     public readonly itemConverter = input<TagConverter>(StringConverter.INSTANCE);
 
-    /** Emits undefined instead of an empty array when all tags are removed. */
-    public readonly undefinedWhenEmpty = input(true, { transform: booleanAttribute });
+    /** Emits null instead of an empty array when all tags are removed. */
+    public readonly nullWhenEmpty = input(true, { transform: booleanAttribute });
 
     /** Adds the typed text as tag when enter is pressed. */
     public readonly acceptEnter = input(false, { transform: booleanAttribute });
@@ -148,28 +146,34 @@ export class TagEditorComponent extends SignalControlComponent<ReadonlyArray<any
     protected readonly suggestedIndex = signal(0);
     protected readonly tags = signal<ReadonlyArray<TagValue>>([]);
 
-    protected readonly addInput = new UntypedFormControl();
+    protected readonly addText = signal('');
 
     constructor() {
-        super();
-
         afterNextRender(() => {
             this.resetSize();
         });
 
         effect(() => {
-            if (this.isDisabled()) {
-                this.addInput.disable(NO_EMIT);
-            } else {
-                this.addInput.enable(NO_EMIT);
-            }
+            const value = this.value();
+
+            untracked(() => {
+                // Values that have been set by this component are already shown as tags.
+                if (value === this.lastValue) {
+                    return;
+                }
+
+                this.lastValue = value;
+                this.resetForm();
+                this.resetSize();
+                this.tags.set(convertTags(value, this.itemConverter()));
+            });
         });
 
         effect(() => {
             const converter = this.itemConverter();
 
             untracked(() => {
-                this.tags.set(convertTags(this.latestValue, converter));
+                this.tags.set(convertTags(this.value(), converter));
             });
         });
 
@@ -177,7 +181,7 @@ export class TagEditorComponent extends SignalControlComponent<ReadonlyArray<any
             const itemsSorted = this.itemsSorted();
 
             untracked(() => {
-                const query = this.addInput.value;
+                const query = this.addText();
                 if (!query) {
                     return;
                 }
@@ -186,66 +190,52 @@ export class TagEditorComponent extends SignalControlComponent<ReadonlyArray<any
                 this.suggestedItems.set(this.findSuggestions(itemsSorted, query));
             });
         });
-
-        effect(onCleanup => {
-            const subscription =
-                this.addInput.valueChanges.pipe(
-                    tap(() => {
-                        this.resetSize();
-                    }),
-                    map(normalizeQuery),
-                    tap(query => {
-                        if (!query) {
-                            this.resetAutocompletion();
-                        } else if (!this.latestInput) {
-                            this.dropdownOpen.emit();
-                        }
-
-                        this.latestInput = query;
-                    }),
-                    distinctUntilChanged(),
-                    map(query => {
-                        if (!query) {
-                            return [];
-                        }
-
-                        return this.findSuggestions(this.itemsSorted(), query);
-                    }))
-                .subscribe(suggestedItems => {
-                    this.suggestedIndex.set(-1);
-                    this.suggestedItems.set(suggestedItems);
-                });
-
-            onCleanup(() => subscription.unsubscribe());
-        });
     }
 
-    public writeValue(obj: any) {
-        this.latestValue = obj;
-
-        this.resetForm();
-        this.resetSize();
-
-        this.tags.set(convertTags(obj, this.itemConverter()));
+    public focus() {
+        this.inputElement()?.nativeElement.focus();
     }
 
-    protected focus() {
-        if (this.addInput.enabled) {
+    protected onFocus() {
+        if (!this.disabled()) {
             this.hasFocus.set(true);
         }
     }
 
     protected markTouched() {
-        this.selectValue(this.addInput.value, true);
+        this.selectValue(this.addText(), true);
 
         this.resetAutocompletion();
         this.resetFocus();
 
-        this.callTouched();
+        this.setTouched();
     }
 
     protected remove(index: number) {
         this.updateItems(this.tags().filter((_, i) => i !== index), true);
+    }
+
+    protected setText(text: string) {
+        this.addText.set(text);
+        this.resetSize();
+
+        const query = normalizeQuery(text);
+        const queryPrevious = this.latestInput;
+
+        if (!query) {
+            this.resetAutocompletion();
+        } else if (!queryPrevious) {
+            this.dropdownOpen.emit();
+        }
+
+        this.latestInput = query;
+
+        if (query === queryPrevious) {
+            return;
+        }
+
+        this.suggestedIndex.set(-1);
+        this.suggestedItems.set(query ? this.findSuggestions(this.itemsSorted(), query) : []);
     }
 
     private resetSize() {
@@ -254,7 +244,7 @@ export class TagEditorComponent extends SignalControlComponent<ReadonlyArray<any
             return;
         }
 
-        const widthTextValue = this.textMeasurer.getTextSize(input.value);
+        const widthTextValue = this.textMeasurer.getTextSize(this.addText());
         const widthPlaceholder = this.textMeasurer.getTextSize(this.placeholder());
 
         const width = Math.max(widthTextValue, widthPlaceholder);
@@ -275,9 +265,9 @@ export class TagEditorComponent extends SignalControlComponent<ReadonlyArray<any
 
     protected onKeyDown(event: KeyboardEvent) {
         if (Keys.isComma(event)) {
-            return !this.selectValue(this.addInput.value);
+            return !this.selectValue(this.addText());
         } else if (Keys.isDelete(event)) {
-            const value = this.addInput.value as string;
+            const value = this.addText();
 
             if (!value || value.length === 0) {
                 this.updateItems(this.tags().slice(0, this.tags().length - 1), false);
@@ -307,7 +297,7 @@ export class TagEditorComponent extends SignalControlComponent<ReadonlyArray<any
         }
 
         if (this.acceptEnter()) {
-            return !this.selectValue(this.addInput.value);
+            return !this.selectValue(this.addText());
         }
 
         return true;
@@ -384,10 +374,10 @@ export class TagEditorComponent extends SignalControlComponent<ReadonlyArray<any
         }
     }
 
-    public callTouched() {
+    private setTouched() {
         this.editorBlur.emit(true);
 
-        super.callTouched();
+        this.touched.set(true);
     }
 
     protected focusInput(event: Event) {
@@ -455,7 +445,7 @@ export class TagEditorComponent extends SignalControlComponent<ReadonlyArray<any
     }
 
     private resetForm() {
-        this.addInput.reset();
+        this.setText('');
     }
 
     private hasSelection() {
@@ -468,14 +458,16 @@ export class TagEditorComponent extends SignalControlComponent<ReadonlyArray<any
     private updateItems(tags: ReadonlyArray<TagValue>, touched: boolean) {
         this.tags.set(tags);
 
-        if (tags.length === 0 && this.undefinedWhenEmpty()) {
-            this.callChange(undefined);
-        } else {
-            this.callChange(tags.map(x => x.value));
+        let value: ReadonlyArray<any> | null = tags.map(x => x.value);
+        if (tags.length === 0 && this.nullWhenEmpty()) {
+            value = null;
         }
 
+        this.lastValue = value;
+        this.value.set(value);
+
         if (touched) {
-            this.callTouched();
+            this.setTouched();
         }
 
         this.resetSize();

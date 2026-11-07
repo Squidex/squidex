@@ -6,7 +6,6 @@
  */
 
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
 import { LocalizerService, RootViewComponent, TagEditorComponent } from '@app/framework';
 
@@ -56,7 +55,7 @@ export default {
             control: 'boolean',
         },
         change: {
-            action:'ngModelChange',
+            action: 'valueChange',
         },
     },
     render: args => ({
@@ -68,8 +67,8 @@ export default {
                     [disabled]="disabled"
                     [itemsSource]="itemsSource"
                     [itemsSourceLoading]="itemsSourceLoading"
-                    (ngModelChange)="change($event)"
-                    [ngModel]="model"
+                    (valueChange)="change($event)"
+                    [value]="model"
                     [styleScrollable]="styleScrollable"
                     [styleBlank]="styleBlank"
                     [styleDashed]="styleDashed">
@@ -80,7 +79,6 @@ export default {
     decorators: [
         moduleMetadata({
             imports: [
-                FormsModule,
                 RootViewComponent,
                 TestComponent,
             ],

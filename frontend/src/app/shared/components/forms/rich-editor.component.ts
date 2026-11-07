@@ -5,28 +5,21 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, forwardRef, inject, input, output, signal, viewChild } from '@angular/core';
+import { afterNextRender, booleanAttribute, ChangeDetectionStrategy, Component, DestroyRef, effect, ElementRef, inject, input, model, output, signal, untracked, viewChild } from '@angular/core';
 import { toObservable, toSignal } from '@angular/core/rxjs-interop';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
+import { FormValueControl } from '@angular/forms/signals';
 import { catchError, of, switchMap } from 'rxjs';
-import { HTTP, ModalDirective, SignalControlComponent, ThemeService } from '@app/framework';
+import { HTTP, ModalDirective, ThemeService } from '@app/framework';
 import { ApiUrlConfig, AppLanguageDto, AppsState, AssetDto, AssetsService, AssetUploaderState, ContentDto, DialogModel, getContentValue, ResourceLoaderService, Types } from '@app/shared/internal';
 import { AssetDialogComponent } from '../assets/asset-dialog.component';
 import { AssetSelectorComponent } from '../assets/asset-selector.component';
 import { ChatDialogComponent } from '../chat-dialog.component';
 import { ContentSelectorComponent } from '../references/content-selector.component';
 
-export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => RichEditorComponent), multi: true,
-};
-
 @Component({
     selector: 'sqx-rich-editor',
     styleUrls: ['./rich-editor.component.scss'],
     templateUrl: './rich-editor.component.html',
-    providers: [
-        SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AssetDialogComponent,
@@ -36,7 +29,7 @@ export const SQX_RICH_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
         ModalDirective,
     ],
 })
-export class RichEditorComponent extends SignalControlComponent<EditorValue> {
+export class RichEditorComponent implements FormValueControl<EditorValue> {
     private readonly apiUrl = inject(ApiUrlConfig);
     private readonly appsState = inject(AppsState);
     private readonly assetUploader = inject(AssetUploaderState);
@@ -47,11 +40,20 @@ export class RichEditorComponent extends SignalControlComponent<EditorValue> {
     private readonly editor = viewChild.required<ElementRef>('editor');
     private readonly assetId = signal<string | null>(null);
     private editorWrapper?: SquidexEditorWrapper;
-    private value?: string;
+    private currentValue: EditorValue = null;
     private isDestroyed = false;
     private currentContents?: ResolvablePromise<any>;
     private currentAssets?: ResolvablePromise<any>;
     private currentChat?: ResolvablePromise<string | undefined | null>;
+
+    /** The value of the editor. */
+    public readonly value = model<EditorValue>(null);
+
+    /** Disables the control. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
+
+    /** Indicates whether the control has been touched. */
+    public readonly touched = model(false);
 
     /** Emits when the asset plugin is clicked. */
     public readonly assetPluginClick = output<any>();
@@ -102,8 +104,6 @@ export class RichEditorComponent extends SignalControlComponent<EditorValue> {
     constructor() {
         const destroyRef = inject(DestroyRef);
 
-        super();
-
         this.assetToEdit = toSignal(
             toObservable(this.assetId).pipe(
                 switchMap(id => {
@@ -117,13 +117,21 @@ export class RichEditorComponent extends SignalControlComponent<EditorValue> {
             { initialValue: null });
 
         effect(() => {
+            const value = this.value();
+
+            untracked(() => {
+                this.applyValue(value);
+            });
+        });
+
+        effect(() => {
             const annotations = this.annotations();
 
             this.editorWrapper?.setAnnotations(annotations);
         });
 
         effect(() => {
-            const isDisabled = this.isDisabled();
+            const isDisabled = this.disabled();
 
             this.editorWrapper?.setIsDisabled(isDisabled);
         });
@@ -154,7 +162,7 @@ export class RichEditorComponent extends SignalControlComponent<EditorValue> {
 
         this.editorWrapper = new SquidexEditorWrapper(this.editor().nativeElement, {
             onSelectAIText: async () => {
-                if (this.isDisabled()) {
+                if (this.disabled()) {
                     return;
                 }
 
@@ -164,7 +172,7 @@ export class RichEditorComponent extends SignalControlComponent<EditorValue> {
                 return await this.currentChat.promise;
             },
             onSelectAssets: async () => {
-                if (this.isDisabled()) {
+                if (this.disabled()) {
                     return;
                 }
 
@@ -174,7 +182,7 @@ export class RichEditorComponent extends SignalControlComponent<EditorValue> {
                 return await this.currentAssets.promise;
             },
             onSelectContents: async () => {
-                if (this.isDisabled()) {
+                if (this.disabled()) {
                     return;
                 }
 
@@ -187,7 +195,8 @@ export class RichEditorComponent extends SignalControlComponent<EditorValue> {
                 return this.uploadFiles(requests);
             },
             onChange: (value: EditorValue) => {
-                this.callChange(value);
+                this.currentValue = value ?? null;
+                this.value.set(this.currentValue);
             },
             onEditAsset: id => {
                 this.assetId.set(id);
@@ -216,8 +225,8 @@ export class RichEditorComponent extends SignalControlComponent<EditorValue> {
             canSelectContents: !!this.schemaIds(),
             classNames: this.classNames(),
             ...this.editorColors(),
-            isDisabled: this.isDisabled(),
-            value: this.value || '',
+            isDisabled: this.disabled(),
+            value: this.currentValue || '',
         });
     }
 
@@ -242,12 +251,13 @@ export class RichEditorComponent extends SignalControlComponent<EditorValue> {
         });
     }
 
-    public writeValue(obj: any) {
-        if (this.editorWrapper) {
-            this.editorWrapper.setValue(obj);
-        } else {
-            this.value = obj;
+    private applyValue(value: EditorValue) {
+        if (Types.equals(value, this.currentValue)) {
+            return;
         }
+
+        this.currentValue = value;
+        this.editorWrapper?.setValue(value);
     }
 
     protected insertText(content: string | HTTP.UploadFile | undefined | null) {

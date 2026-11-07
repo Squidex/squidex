@@ -4,7 +4,7 @@
     </div>
 
     <div class="col-auto">
-        <button class="btn btn-sm btn-secondary" attr.aria-label="{{ 'common.clear' | sqxTranslate }}" (click)="unset()" [disabled]="valueIsEmpty()" type="button">
+        <button class="btn btn-sm btn-secondary" attr.aria-label="{{ 'common.clear' | sqxTranslate }}" (click)="unset()" [disabled]="valueIsEmpty() || disabled()" type="button">
             <i class="icon-close"></i>
         </button>
     </div>
@@ -17,9 +17,10 @@
             [attr.id]="id()"
             [attr.name]="name()"
             [attr.type]="type()"
-            (blur)="callTouched()"
-            [ngModel]="valueCurrent()"
-            (ngModelChange)="setValue($event)" />
+            (blur)="touched.set(true)"
+            [disabled]="disabled()"
+            (input)="setValue($any($event.target).value)"
+            [value]="valueCurrent() ?? ''" />
     }
 
     @case ("number") {
@@ -28,21 +29,22 @@
             [attr.id]="id()"
             [attr.name]="name()"
             [attr.type]="type()"
-            (blur)="callTouched()"
-            [ngModel]="valueCurrent()"
-            (ngModelChange)="setValue($event)" />
+            (blur)="touched.set(true)"
+            [disabled]="disabled()"
+            (input)="setValue($any($event.target).value)"
+            [value]="valueCurrent() ?? ''" />
     }
 
     @case ("tags") {
-        <sqx-tag-editor [id]="id()" (editorBlur)="callTouched()" [ngModel]="valueCurrent()" (ngModelChange)="setValue($event)" />
+        <sqx-tag-editor [disabled]="disabled()" [id]="id()" (editorBlur)="touched.set(true)" [value]="valueCurrent()" (valueChange)="setValue($event)" />
     }
 
     @case ("datetime") {
-        <sqx-date-time-editor [id]="id()" (editorBlur)="callTouched()" mode="DateTime" [ngModel]="valueCurrent()" (ngModelChange)="setValue($event)" />
+        <sqx-date-time-editor [disabled]="disabled()" [id]="id()" (editorBlur)="touched.set(true)" mode="DateTime" [value]="valueCurrent()" (valueChange)="setValue($event)" />
     }
 
     @case ("date") {
-        <sqx-date-time-editor [id]="id()" (editorBlur)="callTouched()" mode="Date" [ngModel]="valueCurrent()" (ngModelChange)="setValue($event)" />
+        <sqx-date-time-editor [disabled]="disabled()" [id]="id()" (editorBlur)="touched.set(true)" mode="Date" [value]="valueCurrent()" (valueChange)="setValue($event)" />
     }
 
     @case ("boolean") {
@@ -50,7 +52,8 @@
             <input
                 class="form-check-input"
                 [attr.id]="id()"
-                (blur)="callTouched()"
+                (blur)="touched.set(true)"
+                [disabled]="disabled()"
                 [ngModel]="valueCurrent()"
                 (ngModelChange)="setValue($event)"
                 sqxIndeterminateValue

@@ -1,18 +1,19 @@
 @let f = field();
-<div [formGroup]="form()">
+@let control = form()[f.name];
+<div>
     @switch (f.properties.fieldType) {
         @case ("Number") {
             @switch (f.rawProperties.editor) {
                 @case ("Input") {
-                    <input class="form-control" [formControlName]="f.name" [placeholder]="f.displayPlaceholder" type="number" />
+                    <input class="form-control" [formField]="control" [placeholder]="f.displayPlaceholder" type="number" />
                 }
 
                 @case ("Stars") {
-                    <sqx-stars [formControlName]="f.name" [maximumStars]="f.rawProperties.maxValue" />
+                    <sqx-stars [formField]="control" [maximumStars]="f.rawProperties.maxValue" />
                 }
 
                 @case ("Dropdown") {
-                    <select class="form-select" [formControlName]="f.name">
+                    <select class="form-select" [formField]="control">
                         <option [ngValue]="null"></option>
 
                         @for (value of f.rawProperties.allowedValues; track value) {
@@ -26,15 +27,15 @@
         @case ("String") {
             @switch (f.rawProperties.editor) {
                 @case ("Input") {
-                    <input class="form-control" [formControlName]="f.name" [placeholder]="f.displayPlaceholder" />
+                    <input class="form-control" [formField]="control" [placeholder]="f.displayPlaceholder" />
                 }
 
                 @case ("Slug") {
-                    <input class="form-control" [formControlName]="f.name" [placeholder]="f.displayPlaceholder" sqxTransformInput="Slugify" />
+                    <input class="form-control" [formField]="control" [placeholder]="f.displayPlaceholder" sqxTransformInput="Slugify" />
                 }
 
                 @case ("Dropdown") {
-                    <select class="form-select" [formControlName]="f.name">
+                    <select class="form-select" [formField]="control">
                         <option [ngValue]="null"></option>
 
                         @for (value of f.rawProperties.allowedValues; track value) {
@@ -48,12 +49,12 @@
         @case ("Boolean") {
             @switch (f.rawProperties.editor) {
                 @case ("Toggle") {
-                    <sqx-toggle [formControlName]="f.name" [threeStates]="!f.properties.isRequired" />
+                    <sqx-toggle [formField]="control" [threeStates]="!f.properties.isRequired" />
                 }
 
                 @case ("Checkbox") {
                     <div class="form-check">
-                        <input class="form-check-input" id="{{ uniqueId }}" [formControlName]="f.name" sqxIndeterminateValue type="checkbox" />
+                        <input class="form-check-input" id="{{ uniqueId }}" [formField]="control" sqxIndeterminateValue type="checkbox" />
                         <label class="form-check-label" for="{{ uniqueId }}"></label>
                     </div>
                 }

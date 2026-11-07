@@ -5,16 +5,11 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, effect, forwardRef, inject, signal } from '@angular/core';
-import { toSignal } from '@angular/core/rxjs-interop';
-import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, inject, input, linkedSignal, model, signal } from '@angular/core';
+import { FormValueControl } from '@angular/forms/signals';
 import { BehaviorSubject, of } from 'rxjs';
 import { debounceTime, map, switchMap, tap } from 'rxjs/operators';
-import { DialogModel, ExternalLinkDirective, FocusOnInitDirective, LoaderComponent, ModalDialogComponent, ModalDirective, SignalControlComponent, StockPhotoDto, StockPhotoService, StopClickDirective, thumbnail, TooltipDirective, TranslatePipe, Types, value$, valueProjection$ } from '@app/shared';
-
-export const SQX_STOCK_PHOTO_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => StockPhotoEditorComponent), multi: true,
-};
+import { DialogModel, ExternalLinkDirective, FocusOnInitDirective, LoaderComponent, ModalDialogComponent, ModalDirective, StockPhotoDto, StockPhotoService, StopClickDirective, thumbnail, TooltipDirective, TranslatePipe } from '@app/shared';
 
 type Request = { search?: string; page: number };
 
@@ -22,34 +17,38 @@ type Request = { search?: string; page: number };
     selector: 'sqx-stock-photo-editor',
     styleUrls: ['./stock-photo-editor.component.scss'],
     templateUrl: './stock-photo-editor.component.html',
-    providers: [
-        SQX_STOCK_PHOTO_EDITOR_CONTROL_VALUE_ACCESSOR,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ExternalLinkDirective,
         FocusOnInitDirective,
-        FormsModule,
         LoaderComponent,
         ModalDialogComponent,
         ModalDirective,
-        ReactiveFormsModule,
         StopClickDirective,
         TooltipDirective,
         TranslatePipe,
     ],
 })
-export class StockPhotoEditorComponent extends SignalControlComponent<string> {
+export class StockPhotoEditorComponent implements FormValueControl<string | null> {
     private readonly stockPhotoService = inject(StockPhotoService);
     private readonly stockPhotoRequests = new BehaviorSubject<Request>({ page: 1 });
 
-    protected readonly valueControl = new UntypedFormControl('');
+    /** The value of the control. */
+    public readonly value = model<string | null>(null);
 
-    protected readonly value = toSignal(value$<string>(this.valueControl), { initialValue: '' });
+    /** Disables the control. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
 
-    protected readonly stockPhotoThumbnail = toSignal(valueProjection$(this.valueControl, x => thumbnail(x, undefined, 300) || x));
+    /** Indicates whether the control has been touched. */
+    public readonly touched = model(false);
 
-    protected readonly stockPhotoSearch = new UntypedFormControl('');
+    protected readonly stockPhotoThumbnail = computed(() => {
+        const value = this.value();
+
+        return value ? thumbnail(value, undefined, 300) || value : null;
+    });
+
+    protected readonly stockPhotoSearch = signal('');
 
     protected readonly stockPhotos = signal<ReadonlyArray<StockPhotoDto>>([]);
 
@@ -57,36 +56,20 @@ export class StockPhotoEditorComponent extends SignalControlComponent<string> {
 
     protected readonly stockPhotosLoading = signal(false);
 
-    protected readonly thumbnailStatus = signal<'Loaded' | 'Failed' | undefined>(undefined);
+    protected readonly thumbnailStatus = linkedSignal<string | null, 'Loaded' | 'Failed' | undefined>({
+        source: this.value,
+        computation: () => undefined,
+    });
 
     protected readonly searchDialog = new DialogModel();
 
     constructor() {
-        super();
-
         effect(() => {
-            if (this.isDisabled()) {
-                this.stockPhotoSearch.disable({ emitEvent: false });
-            } else {
-                this.stockPhotoSearch.enable({ emitEvent: false });
-            }
+            this.stockPhotoRequests.next({ search: this.stockPhotoSearch(), page: 1 });
         });
 
         effect(onCleanup => {
-            const subscriptions = [
-                value$(this.valueControl)
-                    .subscribe(() => {
-                        this.thumbnailStatus.set(undefined);
-                    }),
-                value$(this.stockPhotoSearch)
-                    .subscribe(search => {
-                        this.stockPhotoRequests.next({ search, page: 1 });
-                    }),
-                this.valueControl.valueChanges
-                    .subscribe(value => {
-                        this.callChange(value);
-                        this.callTouched();
-                    }),
+            const subscription =
                 this.stockPhotoRequests.pipe(
                     debounceTime(500),
                     tap(request => {
@@ -105,37 +88,28 @@ export class StockPhotoEditorComponent extends SignalControlComponent<string> {
                     this.stockPhotosLoading.set(false);
                     this.stockPhotos.update(x => request.page > 1 ? [...x, ...result] : result);
                     this.stockPhotosHasMore.set(result.length === 20);
-                }),
-            ];
+                });
 
-            onCleanup(() => {
-                for (const subscription of subscriptions) {
-                    subscription.unsubscribe();
-                }
-            });
+            onCleanup(() => subscription.unsubscribe());
         });
     }
 
-    public writeValue(obj: string) {
-        if (Types.isString(obj)) {
-            this.valueControl.setValue(obj);
-        } else {
-            this.valueControl.setValue('');
-        }
-    }
-
     protected selectPhoto(photo: StockPhotoDto) {
-        if (!this.isDisabled()) {
-            this.valueControl.setValue(photo.url);
+        if (!this.disabled()) {
+            this.updateValue(photo.url);
 
             this.searchDialog.hide();
         }
     }
 
     public reset() {
-        if (!this.isDisabled()) {
-            this.valueControl.setValue('');
+        if (!this.disabled()) {
+            this.updateValue(null);
         }
+    }
+
+    protected search(event: Event) {
+        this.stockPhotoSearch.set((event.target as HTMLInputElement).value);
     }
 
     protected loadMore() {
@@ -154,5 +128,10 @@ export class StockPhotoEditorComponent extends SignalControlComponent<string> {
 
     protected isSelected(photo: StockPhotoDto) {
         return photo.url === this.value();
+    }
+
+    private updateValue(value: string | null) {
+        this.value.set(value);
+        this.touched.set(true);
     }
 }

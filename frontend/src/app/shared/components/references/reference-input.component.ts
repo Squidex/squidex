@@ -5,35 +5,36 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, forwardRef, inject, input, signal } from '@angular/core';
-import { FormsModule, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { ModalDirective, SignalControlComponent } from '@app/framework';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, inject, input, model, signal, untracked } from '@angular/core';
+import { FormValueControl } from '@angular/forms/signals';
+import { ModalDirective } from '@app/framework';
 import { AppLanguageDto, AppsState, ContentDto, ContentsService, DialogModel, getContentValue, LocalizerService, Types } from '@app/shared/internal';
 import { ContentSelectorComponent } from './content-selector.component';
-
-export const SQX_REFERENCE_INPUT_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferenceInputComponent), multi: true,
-};
 
 @Component({
     selector: 'sqx-reference-input',
     styleUrls: ['./reference-input.component.scss'],
     templateUrl: './reference-input.component.html',
-    providers: [
-        SQX_REFERENCE_INPUT_CONTROL_VALUE_ACCESSOR,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         ContentSelectorComponent,
-        FormsModule,
         ModalDirective,
     ],
 })
-export class ReferenceInputComponent extends SignalControlComponent<ReadonlyArray<string> | string> {
+export class ReferenceInputComponent implements FormValueControl<ReadonlyArray<string> | string | null> {
     private readonly appsState = inject(AppsState);
     private readonly contentsService = inject(ContentsService);
     private readonly localizer = inject(LocalizerService);
     private readonly selectedContent = signal<ContentDto | undefined>(undefined);
+
+    /** The selected content ID, or an array with the selected content ID. */
+    public readonly value = model<ReadonlyArray<string> | string | null>(null);
+
+    /** Disables the control. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
+
+    /** Indicates whether the control has been touched. */
+    public readonly touched = model(false);
 
     /** The IDs or names of the schemas to select the content from. */
     public readonly schemaIds = input<ReadonlyArray<string>>();
@@ -72,14 +73,35 @@ export class ReferenceInputComponent extends SignalControlComponent<ReadonlyArra
         return name || this.localizer.getOrKey('common.noValue');
     });
 
-    public writeValue(obj: any) {
-        if (Types.isString(obj)) {
-            this.loadContent(obj);
-        } else if (Types.isArrayOfString(obj)) {
-            this.loadContent(obj[0]);
-        } else {
-            this.selectedContent.set(undefined);
+    constructor() {
+        effect(() => {
+            const value = this.value();
+
+            untracked(() => {
+                this.applyValue(value);
+            });
+        });
+    }
+
+    private applyValue(value: ReadonlyArray<string> | string | null) {
+        let id: string | undefined;
+
+        if (Types.isString(value)) {
+            id = value;
+        } else if (Types.isArrayOfString(value)) {
+            id = value[0];
         }
+
+        if (!id) {
+            this.selectedContent.set(undefined);
+            return;
+        }
+
+        if (id === this.selectedContent()?.id) {
+            return;
+        }
+
+        this.loadContent(id);
     }
 
     private loadContent(id: string) {
@@ -95,7 +117,7 @@ export class ReferenceInputComponent extends SignalControlComponent<ReadonlyArra
     }
 
     protected openDialog() {
-        if (this.isDisabled()) {
+        if (this.disabled()) {
             return;
         }
 
@@ -111,7 +133,7 @@ export class ReferenceInputComponent extends SignalControlComponent<ReadonlyArra
     }
 
     private selectContent(selectedContent?: ContentDto) {
-        if (this.isDisabled()) {
+        if (this.disabled()) {
             return;
         }
 
@@ -119,12 +141,12 @@ export class ReferenceInputComponent extends SignalControlComponent<ReadonlyArra
         const isSingle = this.mode() === 'Single';
 
         if (id) {
-            this.callChange(isSingle ? id : [id]);
+            this.value.set(isSingle ? id : [id]);
         } else {
-            this.callChange(isSingle ? null : []);
+            this.value.set(isSingle ? null : []);
         }
 
-        this.callTouched();
+        this.touched.set(true);
         this.selectedContent.set(selectedContent);
     }
 }

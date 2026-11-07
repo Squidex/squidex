@@ -5,40 +5,41 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { booleanAttribute, ChangeDetectionStrategy, Component, computed, ElementRef, forwardRef, inject, input, linkedSignal, output, signal, viewChild } from '@angular/core';
-import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule } from '@angular/forms';
-import { DateHelper, DateTime, SignalControlComponent, UIOptions } from '@app/framework/internal';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, linkedSignal, model, output, signal, viewChild } from '@angular/core';
+import { FormValueControl } from '@angular/forms/signals';
+import { DateHelper, DateTime, UIOptions } from '@app/framework/internal';
 import { TooltipDirective } from '../../modals/tooltip.directive';
 import { TranslatePipe } from '../../pipes/translate.pipe';
 import { ResizedDirective } from '../../resized.directive';
 import { FocusComponent } from '../forms-helper';
-import { ForwardFormClassesDirective } from '../forward-form-classes.directive';
-
-export const SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => DateTimeEditorComponent), multi: true,
-};
 
 @Component({
     selector: 'sqx-date-time-editor',
     styleUrls: ['./date-time-editor.component.scss'],
     templateUrl: './date-time-editor.component.html',
-    providers: [
-        SQX_DATE_TIME_EDITOR_CONTROL_VALUE_ACCESSOR,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
-        FormsModule,
-        ForwardFormClassesDirective,
-        ReactiveFormsModule,
         ResizedDirective,
         TooltipDirective,
         TranslatePipe,
     ],
 })
-export class DateTimeEditorComponent extends SignalControlComponent<string | null> implements FocusComponent {
+export class DateTimeEditorComponent implements FormValueControl<string | null>, FocusComponent {
     private readonly hideDateButtonsSettings = !!inject(UIOptions).value.hideDateButtons;
     private readonly hideDateTimeModeButtonSetting = !!inject(UIOptions).value.hideDateTimeModeButton;
     private readonly dateInput = viewChild.required<ElementRef<HTMLInputElement>>('dateInput');
+
+    /** The date as ISO string. */
+    public readonly value = model<string | null>(null);
+
+    /** Disables the control. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
+
+    /** Indicates whether the control has been touched. */
+    public readonly touched = model(false);
+
+    /** Indicates whether the value is invalid, provided by the form. */
+    public readonly invalid = input(false, { transform: booleanAttribute });
 
     /** Emits when the editor loses the focus. */
     public readonly editorBlur = output<boolean>();
@@ -77,10 +78,16 @@ export class DateTimeEditorComponent extends SignalControlComponent<string | nul
         return !this.hideDateTimeModeButtonSetting && !this.hideDateTimeModeButton();
     });
 
-    protected readonly value = signal<DateTime | null | undefined>(undefined);
+    protected readonly valueParsed = computed(() => {
+        try {
+            return DateTime.parseISO(this.value()!, false);
+        } catch {
+            return null;
+        }
+    });
 
     protected readonly valueInput = computed(() => {
-        const value = this.value();
+        const value = this.valueParsed();
         if (!value) {
             return null;
         }
@@ -90,25 +97,13 @@ export class DateTimeEditorComponent extends SignalControlComponent<string | nul
         return this.isLocal() ? value.toStringFormat(format) : value.toStringFormatUTC(format);
     });
 
-    public callTouched() {
-        this.editorBlur.emit(true);
-
-        super.callTouched();
-    }
-
     public focus() {
         this.dateInput().nativeElement.focus();
     }
 
-    public writeValue(obj: any) {
-        let value: DateTime | null;
-        try {
-            value = DateTime.parseISO(obj, false);
-        } catch {
-            value = null;
-        }
-
-        this.value.set(value);
+    protected markTouched() {
+        this.editorBlur.emit(true);
+        this.touched.set(true);
     }
 
     protected writeToday() {
@@ -128,7 +123,7 @@ export class DateTimeEditorComponent extends SignalControlComponent<string | nul
 
     protected setLocalMode(isLocal: boolean) {
         this.isLocal.set(isLocal);
-        this.update(this.value());
+        this.markTouched();
         return false;
     }
 
@@ -137,11 +132,9 @@ export class DateTimeEditorComponent extends SignalControlComponent<string | nul
         return false;
     }
 
-    private update(value: DateTime | null | undefined) {
-        this.value.set(value);
-
-        this.callChange(value?.toISOString());
-        this.callTouched();
+    private update(value: DateTime | null) {
+        this.value.set(value?.toISOString() ?? null);
+        this.markTouched();
     }
 
     protected setSize(size: DOMRect) {

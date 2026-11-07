@@ -18,7 +18,8 @@
             [class.form-empty]="inputStyleValue === 'empty'"
             [class.form-icon]="!!iconValue"
             [class.form-underlined]="inputStyleValue === 'underlined'"
-            [formControl]="queryInput"
+            [disabled]="disabled()"
+            (input)="onInput($any($event.target).value)"
             (keydown)="onKeyDown($event)"
             (keypress)="editorKeyPress.emit($event)"
             [name]="formName()"
@@ -26,7 +27,9 @@
             rows="2"
             sqxAutosize
             [sqxFocusOnInit]="autoFocus()"
-            sqxForwardFormClasses></textarea>
+            [class.ng-invalid]="invalid()"
+            [class.ng-touched]="touched()"
+            [value]="queryText()"></textarea>
     } @else {
         <input
             class="form-control"
@@ -39,12 +42,14 @@
             [class.form-empty]="inputStyleValue === 'empty'"
             [class.form-icon]="!!iconValue"
             [class.form-underlined]="inputStyleValue === 'underlined'"
-            [formControl]="queryInput"
+            [disabled]="disabled()"
+            (input)="onInput($any($event.target).value)"
             (keydown)="onKeyDown($event)"
             (keypress)="editorKeyPress.emit($event)"
             [name]="formName()"
             [placeholder]="placeholder()"
-            [sqxFocusOnInit]="autoFocus()" />
+            [sqxFocusOnInit]="autoFocus()"
+            [value]="queryText()" />
     }
 
     @if (iconValue) {

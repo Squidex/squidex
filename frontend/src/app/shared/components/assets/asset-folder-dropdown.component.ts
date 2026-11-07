@@ -6,24 +6,17 @@
  */
 
 
-import { ChangeDetectorRef, Component, forwardRef, inject, signal } from '@angular/core';
-import { NG_VALUE_ACCESSOR } from '@angular/forms';
-import { ModalDirective, ModalModel, ModalPlacementDirective, SignalControlComponent, TranslatePipe, Types } from '@app/framework';
+import { booleanAttribute, ChangeDetectorRef, Component, effect, inject, input, model, signal, untracked } from '@angular/core';
+import { FormValueControl } from '@angular/forms/signals';
+import { ModalDirective, ModalModel, ModalPlacementDirective, TranslatePipe, Types } from '@app/framework';
 import { AppsState, AssetsService, ROOT_ITEM } from '@app/shared/internal';
 import { AssetFolderDropdownItemComponent } from './asset-folder-dropdown-item.component';
 import { AssetFolderDropdowNode } from './asset-folder-dropdown.state';
-
-export const SQX_ASSETS_FOLDER_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => AssetFolderDropdownComponent), multi: true,
-};
 
 @Component({
     selector: 'sqx-asset-folder-dropdown',
     styleUrls: ['./asset-folder-dropdown.component.scss'],
     templateUrl: './asset-folder-dropdown.component.html',
-    providers: [
-        SQX_ASSETS_FOLDER_DROPDOWN_CONTROL_VALUE_ACCESSOR,
-    ],
     imports: [
         AssetFolderDropdownItemComponent,
         ModalDirective,
@@ -31,11 +24,21 @@ export const SQX_ASSETS_FOLDER_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
         TranslatePipe,
     ],
 })
-export class AssetFolderDropdownComponent extends SignalControlComponent<string> {
+export class AssetFolderDropdownComponent implements FormValueControl<string | null> {
     private readonly assetsService = inject(AssetsService);
     private readonly changeDetector = inject(ChangeDetectorRef);
+    private selectedId?: string;
 
-    protected readonly appName: string;
+    /** The ID of the selected folder. */
+    public readonly value = model<string | null>(null);
+
+    /** Disables the control. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
+
+    /** Indicates whether the control has been touched. */
+    public readonly touched = model(false);
+
+    protected readonly appName = inject(AppsState).appName;
 
     protected readonly root: AssetFolderDropdowNode = { item: ROOT_ITEM, children: [], parent: null };
 
@@ -45,25 +48,28 @@ export class AssetFolderDropdownComponent extends SignalControlComponent<string>
     protected readonly dropdown = new ModalModel();
 
     constructor() {
-        const appsState = inject(AppsState);
+        effect(() => {
+            const value = this.value();
 
-        super();
-
-        this.appName = appsState.appName;
+            untracked(() => {
+                this.loadSelection(value);
+            });
+        });
     }
 
-    public writeValue(obj: string) {
-        if (!Types.isString(obj)) {
-            obj = ROOT_ITEM.id;
+    private loadSelection(value: string | null) {
+        const id = Types.isString(value) ? value : ROOT_ITEM.id;
+        if (id === this.selectedId) {
+            return;
         }
 
-        const node = this.findNode(this.root, obj);
+        const node = this.findNode(this.root, id);
         if (node?.isLoaded) {
             this.select(node, false);
             return;
         }
 
-        this.assetsService.getAssetFolders(this.appName, obj, 'PathAndItems')
+        this.assetsService.getAssetFolders(this.appName, id, 'PathAndItems')
             .subscribe(dto => {
                 let parent = this.root;
 
@@ -94,6 +100,10 @@ export class AssetFolderDropdownComponent extends SignalControlComponent<string>
     }
 
     protected select(selected: AssetFolderDropdowNode, emit = true) {
+        if (emit && this.disabled()) {
+            return;
+        }
+
         this.resetSelected(this.root);
 
         const path: AssetFolderDropdowNode[] = [];
@@ -109,12 +119,13 @@ export class AssetFolderDropdownComponent extends SignalControlComponent<string>
 
         selected.isSelected = true;
 
+        this.selectedId = selected.item.id;
         this.selection.set(selected);
         this.selectionPath.set(path.filter(x => x.item !== ROOT_ITEM).map(x => x.item.folderName).join('/'));
 
         if (emit) {
-            this.callChange(selected.item.id);
-            this.callTouched();
+            this.value.set(selected.item.id);
+            this.touched.set(true);
 
             this.dropdown.hide();
         }

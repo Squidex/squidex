@@ -9,6 +9,7 @@ import { computed, Injector, signal, WritableSignal } from '@angular/core';
 import { disabled, FieldTree, form, SchemaPathTree, submit, TreeValidationResult } from '@angular/forms/signals';
 import { isObservable, lastValueFrom, Observable } from 'rxjs';
 import { ErrorDto, Types } from '@app/framework/internal';
+import { nullSafeSignal } from './null-safe-signal';
 import { serverErrors } from './signal-form-server-errors';
 
 export interface SubmitOptions {
@@ -43,7 +44,7 @@ export abstract class SignalForm<TModel, TOut, TIn = TOut> {
         schema?: (path: SchemaPathTree<TModel>) => void,
         injector?: Injector,
     ) {
-        this.model = signal(initialModel);
+        this.model = nullSafeSignal(initialModel);
         this.form = form(this.model, path => {
             disabled(path as SchemaPathTree<unknown>, () => this.isDisabled() || this.submitting());
 
@@ -83,6 +84,10 @@ export abstract class SignalForm<TModel, TOut, TIn = TOut> {
         this.setValue(value, this.initialModel);
     }
 
+    public setError(error: string | ErrorDto) {
+        this.submitError.set(getError(error));
+    }
+
     public reset() {
         this.load(undefined);
     }
@@ -103,6 +108,10 @@ export abstract class SignalForm<TModel, TOut, TIn = TOut> {
         });
     }
 
+    protected onSubmitted() {
+
+    }
+
     private async run<TResult>(action: SubmitAction<TOut, TResult>, onSuccess: (result: TResult) => void) {
         let isSuccess = false;
 
@@ -119,6 +128,7 @@ export abstract class SignalForm<TModel, TOut, TIn = TOut> {
                 const result = await toPromise(action(value));
 
                 onSuccess(result);
+                this.onSubmitted();
                 isSuccess = true;
                 return undefined;
             } catch (ex) {

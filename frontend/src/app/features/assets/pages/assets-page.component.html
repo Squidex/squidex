@@ -14,11 +14,11 @@
                         <sqx-tag-editor
                             class="tags"
                             [itemsSource]="assetsState.tagsNames()"
-                            [ngModel]="assetsState.selectedTagNames()"
-                            (ngModelChange)="selectTags($event)"
+                            nullWhenEmpty="false"
                             placeholder="{{ 'assets.searchByTags' | sqxTranslate }}"
                             styleScrollable="true"
-                            undefinedWhenEmpty="false" />
+                            [value]="assetsState.selectedTagNames()"
+                            (valueChange)="selectTags($event)" />
                     </div>
 
                     <div class="col-6">

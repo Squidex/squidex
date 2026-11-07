@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, computed, effect, inject, output, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { ListViewComponent, ModalDialogComponent, PagerComponent, TagEditorComponent, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AssetDto, ComponentAssetsState, LocalStoreService, Query, Settings } from '@app/shared/internal';
 import { SearchFormComponent } from '../search/search-form.component';
@@ -22,7 +21,6 @@ import { AssetsListComponent } from './assets-list.component';
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         AssetsListComponent,
-        FormsModule,
         ListViewComponent,
         ModalDialogComponent,
         PagerComponent,

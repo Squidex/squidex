@@ -5,8 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { FormsModule } from '@angular/forms';
-import { Meta, moduleMetadata, StoryObj } from '@storybook/angular';
+import { Meta, StoryObj } from '@storybook/angular';
 import { RadioGroupComponent, ToggleComponent } from '@app/framework';
 
 export default {
@@ -17,7 +16,7 @@ export default {
             control: 'boolean',
         },
         change: {
-            action:'ngModelChange',
+            action: 'valueChange',
         },
     },
     render: args => ({
@@ -25,18 +24,11 @@ export default {
         template: `
             <sqx-toggle
                 [disabled]="disabled"
-                (ngModelChange)="change($event)"
-                [ngModel]="model">
+                (valueChange)="change($event)"
+                [value]="model">
             </sqx-toggle>
         `,
     }),
-    decorators: [
-        moduleMetadata({
-            imports: [
-                FormsModule,
-            ],
-        }),
-    ],
 } as Meta;
 
 type Story = StoryObj<RadioGroupComponent & { model: any }>;

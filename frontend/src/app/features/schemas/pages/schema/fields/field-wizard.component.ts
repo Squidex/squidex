@@ -5,7 +5,7 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Component, computed, ElementRef, inject, Injector, input, output, signal, viewChild } from '@angular/core';
+import { afterNextRender, Component, computed, ElementRef, inject, Injector, input, output, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { firstValueFrom } from 'rxjs';
@@ -136,10 +136,13 @@ export class FieldWizardComponent {
     }
 
     private focusName() {
-        const nameInput = this.nameInput()?.nativeElement;
-        if (nameInput && Types.isFunction(nameInput.focus)) {
-            nameInput.focus();
-        }
+        // The input is only enabled again after the next change detection.
+        afterNextRender(() => {
+            const nameInput = this.nameInput()?.nativeElement;
+            if (nameInput && Types.isFunction(nameInput.focus)) {
+                nameInput.focus();
+            }
+        }, { injector: this.injector });
     }
 }
 

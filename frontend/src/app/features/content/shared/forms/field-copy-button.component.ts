@@ -66,7 +66,7 @@ export class FieldCopyButtonComponent {
         }
 
         const formModel = this.formModel();
-        const source = formModel.get(copySource).form.value;
+        const source = formModel.get(copySource).value();
 
         for (const target of copyTargets) {
             if (target !== copySource) {

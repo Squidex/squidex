@@ -5,36 +5,25 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { ChangeDetectionStrategy, Component, computed, effect, forwardRef, inject, input, linkedSignal, signal } from '@angular/core';
-import { FormsModule, NG_VALUE_ACCESSOR, ReactiveFormsModule, UntypedFormControl } from '@angular/forms';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, effect, inject, input, linkedSignal, model, signal, untracked } from '@angular/core';
+import { FormValueControl } from '@angular/forms/signals';
 import { Observable } from 'rxjs';
-import { AppLanguageDto, ContentDto, ContentsDto, DropdownComponent, getContentValue, HighlightPipe, LocalizerService, ResolveContents, SafeHtmlPipe, SignalControlComponent, Types } from '@app/shared';
-
-export const SQX_REFERENCE_DROPDOWN_CONTROL_VALUE_ACCESSOR: any = {
-    provide: NG_VALUE_ACCESSOR, useExisting: forwardRef(() => ReferenceDropdownComponent), multi: true,
-};
+import { AppLanguageDto, ContentDto, ContentsDto, DropdownComponent, getContentValue, HighlightPipe, LocalizerService, ResolveContents, SafeHtmlPipe, Types } from '@app/shared';
 
 type ContentName = { name: string; id?: string };
-
-const NO_EMIT = { emitEvent: false };
 
 @Component({
     selector: 'sqx-reference-dropdown',
     styleUrls: ['./reference-dropdown.component.scss'],
     templateUrl: './reference-dropdown.component.html',
-    providers: [
-        SQX_REFERENCE_DROPDOWN_CONTROL_VALUE_ACCESSOR,
-    ],
     changeDetection: ChangeDetectionStrategy.OnPush,
     imports: [
         DropdownComponent,
-        FormsModule,
         HighlightPipe,
-        ReactiveFormsModule,
         SafeHtmlPipe,
     ],
 })
-export class ReferenceDropdownComponent extends SignalControlComponent<ReadonlyArray<string> | string> {
+export class ReferenceDropdownComponent implements FormValueControl<ReadonlyArray<string> | string | null> {
     private readonly contentsResolver = inject(ResolveContents);
     private readonly localizer = inject(LocalizerService);
 
@@ -51,6 +40,15 @@ export class ReferenceDropdownComponent extends SignalControlComponent<ReadonlyA
 
     private isOpenedBefore = false;
 
+    /** The value of the control. */
+    public readonly value = model<ReadonlyArray<string> | string | null>(null);
+
+    /** Disables the control. */
+    public readonly disabled = input(false, { transform: booleanAttribute });
+
+    /** Indicates whether the control has been touched. */
+    public readonly touched = model(false);
+
     /** The language to build the names of the contents. */
     public readonly language = input.required<AppLanguageDto>();
 
@@ -63,7 +61,21 @@ export class ReferenceDropdownComponent extends SignalControlComponent<ReadonlyA
     /** Defines whether the value is a single ID or an array with one ID. */
     public readonly mode = input.required<'Array' | 'Single'>();
 
-    protected readonly control = new UntypedFormControl('');
+    protected readonly selectedId = computed(() => {
+        const value = this.value();
+
+        if (Types.isString(value)) {
+            return value;
+        } else if (Types.isArrayOfString(value)) {
+            return value[0] ?? null;
+        } else {
+            return null;
+        }
+    });
+
+    protected readonly isDropdownDisabled = computed(() => {
+        return this.disabled() || !this.isValid() || this.contentsFailed();
+    });
 
     protected readonly contentsLoading = signal(false);
 
@@ -90,47 +102,36 @@ export class ReferenceDropdownComponent extends SignalControlComponent<ReadonlyA
     });
 
     constructor() {
-        super();
-
         effect(() => {
-            if (this.isDisabled() || !this.isValid() || this.contentsFailed()) {
-                this.control.disable(NO_EMIT);
-            } else {
-                this.control.enable(NO_EMIT);
-            }
-        });
+            const id = this.selectedId();
 
-        effect(onCleanup => {
-            const subscription =
-                this.control.valueChanges
-                    .subscribe((id: string) => {
-                        if (!this.control.enabled) {
-                            return;
-                        }
+            untracked(() => {
+                if (!id) {
+                    return;
+                }
 
-                        const isSingle = this.mode() === 'Single';
-
-                        if (id) {
-                            this.callChange(isSingle ? id : [id]);
-                        } else {
-                            this.callChange(isSingle ? null : []);
-                        }
-
-                        this.callTouched();
-                    });
-
-            onCleanup(() => subscription.unsubscribe());
+                const isNewId = !this.contents().find(x => x.id === id);
+                if (isNewId) {
+                    this.loadMore(this.contentsResolver.resolveMany([id]));
+                }
+            });
         });
     }
 
-    public writeValue(obj: any) {
-        if (Types.isString(obj)) {
-            this.selectContent(obj);
-        } else if (Types.isArrayOfString(obj)) {
-            this.selectContent(obj[0]);
-        } else {
-            this.selectContent(undefined);
+    protected updateValue(id: string | null | undefined) {
+        if (this.isDropdownDisabled()) {
+            return;
         }
+
+        const isSingle = this.mode() === 'Single';
+
+        if (id) {
+            this.value.set(isSingle ? id : [id]);
+        } else {
+            this.value.set(isSingle ? null : []);
+        }
+
+        this.touched.set(true);
     }
 
     protected onOpened() {
@@ -140,16 +141,6 @@ export class ReferenceDropdownComponent extends SignalControlComponent<ReadonlyA
 
         this.isOpenedBefore = true;
         this.loadMore(this.contentsResolver.resolveAll(this.schemaId()));
-    }
-
-    private selectContent(id: string | undefined) {
-        const isNewId = !this.contents().find(x => x.id === id);
-
-        if (id && isNewId) {
-            this.loadMore(this.contentsResolver.resolveMany([id]));
-        }
-
-        this.control.setValue(id, NO_EMIT);
     }
 
     private loadMore(observable: Observable<ContentsDto>) {

@@ -6,7 +6,6 @@
  */
 
 import { ChangeDetectionStrategy, Component, computed, inject, input, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 import { ApiUrlConfig, CodeEditorComponent, ConfirmClickDirective, Duration, ExternalLinkDirective, FromNowPipe, JobDto, JobsState, StatusIconComponent, TranslatePipe } from '@app/shared';
 
 @Component({
@@ -18,7 +17,6 @@ import { ApiUrlConfig, CodeEditorComponent, ConfirmClickDirective, Duration, Ext
         CodeEditorComponent,
         ConfirmClickDirective,
         ExternalLinkDirective,
-        FormsModule,
         FromNowPipe,
         StatusIconComponent,
         TranslatePipe,
