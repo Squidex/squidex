@@ -29,23 +29,12 @@ export class WorkflowAddFormComponent {
     protected readonly addWorkflowForm = new AddWorkflowForm();
 
     protected addWorkflow() {
-        const value = this.addWorkflowForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.workflowsState.add(value)
-            .subscribe({
-                next: () => {
-                    this.addWorkflowForm.submitCompleted();
-                },
-                error: error => {
-                    this.addWorkflowForm.submitFailed(error);
-                },
-            });
+        this.addWorkflowForm.submit(value => {
+            return this.workflowsState.add(value);
+        }, { resetAfterSubmit: true });
     }
 
     protected cancel() {
-        this.addWorkflowForm.submitCompleted();
+        this.addWorkflowForm.reset();
     }
 }

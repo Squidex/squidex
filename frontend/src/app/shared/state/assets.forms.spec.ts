@@ -6,6 +6,7 @@
  */
 
 import { TestBed } from '@angular/core/testing';
+import { AnnotateAssetDto } from '../model';
 import { AnnotateAssetForm } from './assets.forms';
 
 describe('AnnotateAssetForm', () => {
@@ -82,21 +83,31 @@ describe('AnnotateAssetForm', () => {
         ]);
     });
 
-    it('should convert values if submitting', () => {
+    it('should convert values if submitting', async () => {
         form.load(asset);
 
-        const request = form.submit({ fileName: 'Old File.png' } as any)!;
+        let request = null as AnnotateAssetDto | null;
+        let isDisabled = false;
 
-        expect(request.toJSON()).toEqual(asset);
-        expect(form.form().disabled()).toBeTruthy();
+        await form.submitChanges({ fileName: 'Old File.png' } as any, async x => {
+            request = x;
+            isDisabled = form.form().disabled();
+        });
+
+        expect(request!.toJSON()).toEqual(asset);
+        expect(isDisabled).toBeTruthy();
     });
 
-    it('should return null if nothing changed before submit', () => {
+    it('should return null if nothing changed before submit', async () => {
         form.load(asset);
 
-        const result = form.submit(asset);
+        let request = undefined as AnnotateAssetDto | null | undefined;
 
-        expect(result).toBeNull();
+        await form.submitChanges(asset, async x => {
+            request = x;
+        });
+
+        expect(request).toBeNull();
         expect(form.form().disabled()).toBeFalsy();
     });
 
@@ -131,13 +142,16 @@ describe('AnnotateAssetForm', () => {
         ]);
     });
 
-    it('should not submit if metadata name is missing', () => {
+    it('should not submit if metadata name is missing', async () => {
         form.load(asset);
         form.addMetadata();
 
-        const result = form.submit(asset);
+        const action = vi.fn(async () => {});
 
-        expect(result).toBeNull();
+        const result = await form.submitChanges(asset, action);
+
+        expect(result).toBeFalsy();
+        expect(action).not.toHaveBeenCalled();
         expect(form.form.metadata[4].name().errors().length).toBe(1);
     });
 });

@@ -120,21 +120,10 @@ export class FieldComponent {
 
         const editForm = this.editForm();
 
-        const value = editForm.submit();
-        if (!value) {
-            return;
-        }
+        editForm.submit(value => {
+            const properties = createProperties(this.field().properties.fieldType as any, value);
 
-        const properties = createProperties(this.field().properties.fieldType as any, value);
-
-        this.schemasState.updateField(this.schema(), this.field(), new UpdateFieldDto({ properties }))
-            .subscribe({
-                next: () => {
-                    editForm.submitCompleted({ noReset: true });
-                },
-                error: error => {
-                    editForm.submitFailed(error);
-                },
-            });
+            return this.schemasState.updateField(this.schema(), this.field(), new UpdateFieldDto({ properties }));
+        });
     }
 }

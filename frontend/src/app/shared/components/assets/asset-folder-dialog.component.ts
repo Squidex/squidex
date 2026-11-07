@@ -8,6 +8,7 @@
 import { Component, effect, inject, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
+import { firstValueFrom } from 'rxjs';
 import { FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormRowComponent, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/framework';
 import { AssetFolderDto, AssetsState, RenameAssetFolderForm } from '@app/shared/internal';
 
@@ -52,23 +53,15 @@ export class AssetFolderDialogComponent {
     }
 
     protected createAssetFolder() {
-        const value = this.editForm.submit();
-        if (!value) {
-            return;
-        }
+        this.editForm.submit(async value => {
+            const assetFolder = this.assetFolder();
+            if (assetFolder) {
+                await firstValueFrom(this.assetsState.updateAssetFolder(assetFolder, value));
+            } else {
+                await firstValueFrom(this.assetsState.createAssetFolder(value.folderName));
+            }
 
-        const assetFolder = this.assetFolder();
-        const request = assetFolder ?
-            this.assetsState.updateAssetFolder(assetFolder, value) :
-            this.assetsState.createAssetFolder(value.folderName);
-
-        request.subscribe({
-            next: () => {
-                this.emitClose();
-            },
-            error: error => {
-                this.editForm.submitFailed(error);
-            },
+            this.emitClose();
         });
     }
 }

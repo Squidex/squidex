@@ -35,6 +35,7 @@ npm run lint
 - Document component inputs and outputs with a short `/** ... */` comment. Do not add any other comments to components.
 - Use `inject()` in components instead of constructor parameters.
 - Order class members: `private readonly` fields first, then other `private` fields, then everything else.
+- Pass submit actions to `submit()`/`submitAndUpdate()` as block-body arrows with an explicit `return`.
 
 ## Backend
 

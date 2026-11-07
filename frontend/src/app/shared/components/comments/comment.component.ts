@@ -136,14 +136,13 @@ export class CommentComponent {
             return;
         }
 
-        const { text } = this.replyForm.submit() || {};
+        this.replyForm.submit(async ({ text }) => {
+            const replyTo = this.commentItem().comment.id;
+            if (text && text.length > 0 && replyTo) {
+                this.comments().create(this.userToken(), text, this.currentUrl(), { replyTo });
+            }
+        }, { resetAfterSubmit: true });
 
-        const replyTo = this.commentItem().comment.id;
-        if (text && text.length > 0 && replyTo) {
-            this.comments().create(this.userToken(), text, this.currentUrl(), { replyTo });
-        }
-
-        this.replyForm.submitCompleted();
         this.cancelUpdateOrReply();
     }
 
@@ -152,20 +151,19 @@ export class CommentComponent {
             return;
         }
 
-        const { text } = this.updateForm.submit() || {};
+        this.updateForm.submit(async ({ text }) => {
+            if (!text || text.length === 0) {
+                this.dialogs.confirm('i18n:comments.deleteConfirmTitle', 'i18n:comments.deleteConfirmText')
+                    .subscribe(confirmed => {
+                        if (confirmed) {
+                            this.delete();
+                        }
+                    });
+            } else {
+                this.comments().update(this.commentItem().index, { text });
+            }
+        }, { resetAfterSubmit: true });
 
-        if (!text || text.length === 0) {
-            this.dialogs.confirm('i18n:comments.deleteConfirmTitle', 'i18n:comments.deleteConfirmText')
-                .subscribe(confirmed => {
-                    if (confirmed) {
-                        this.delete();
-                    }
-                });
-        } else {
-            this.comments().update(this.commentItem().index, { text });
-        }
-
-        this.updateForm.submitCompleted();
         this.cancelUpdateOrReply();
     }
 

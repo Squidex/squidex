@@ -9,6 +9,7 @@ import { LowerCasePipe } from '@angular/common';
 import { booleanAttribute, Component, effect, inject, Injector, input, linkedSignal, output, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
+import { lastValueFrom } from 'rxjs';
 import { AppsState, CodeEditorComponent, DynamicFlowStepDefinitionDto, EntriesPipe, FormErrorComponent, FormHintComponent, FormRowComponent, MarkdownDirective, ModalDialogComponent, RuleElementDto, RulesService, ScriptCompletions, SignalSelectDirective, StepForm, TranslatePipe } from '@app/shared';
 import { BranchesInputComponent } from '../../shared/actions/branches-input.component';
 import { FormattableInputComponent } from '../../shared/actions/formattable-input.component';
@@ -106,20 +107,10 @@ export class StepDialogComponent {
             return;
         }
 
-        const values = currentStep.submit();
-        if (!values) {
-            return;
-        }
+        currentStep.submit(async values => {
+            await lastValueFrom(this.rulesService.validateStep(this.appsState.appName, values), { defaultValue: undefined });
 
-        this.rulesService.validateStep(this.appsState.appName, values)
-            .subscribe({
-                error: error =>{
-                    currentStep.submitFailed(error);
-                },
-                complete: () => {
-                    this.dialogSave.emit(new DynamicFlowStepDefinitionDto({ name: this.stepName(), ignoreError: this.stepIgnoreError(), step: values }));
-                },
-            });
-
+            this.dialogSave.emit(new DynamicFlowStepDefinitionDto({ name: this.stepName(), ignoreError: this.stepIgnoreError(), step: values }));
+        });
     }
 }

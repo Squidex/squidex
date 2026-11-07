@@ -78,20 +78,12 @@ export class IndexFormComponent {
         this.create.emit();
     }
 
-    protected createSchema() {
-        const value = this.createForm.submit();
-        if (!value) {
-            return;
+    protected async createSchema() {
+        const isCreated = await this.createForm.submit(value => {
+            return this.indexesState.create(value);
+        });
+        if (isCreated) {
+            this.emitCreate();
         }
-
-        this.indexesState.create(value)
-            .subscribe({
-                next: () => {
-                    this.emitCreate();
-                },
-                error: error => {
-                    this.createForm.submitFailed(error);
-                },
-            });
     }
 }

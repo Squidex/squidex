@@ -23,7 +23,7 @@ describe('AssignContributorForm', () => {
     it('should submit contributor', () => {
         form.load({ user: 'user1', role: 'Editor' });
 
-        const result = form.submit();
+        const result = form.getValue();
 
         expect(form.hasNoUser()).toBeFalsy();
         expect(result).toEqual(new AssignContributorDto({ contributorId: 'user1', role: 'Editor', invite: true }));
@@ -32,9 +32,7 @@ describe('AssignContributorForm', () => {
     it('should not submit without role', () => {
         form.load({ user: 'user1' });
 
-        const result = form.submit();
-
-        expect(result).toBeNull();
+        expect(form.form().valid()).toBeFalsy();
     });
 });
 

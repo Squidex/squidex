@@ -29,23 +29,12 @@ export class RoleAddFormComponent {
     protected readonly addRoleForm = new AddRoleForm();
 
     protected addRole() {
-        const value = this.addRoleForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.rolesState.add(value)
-            .subscribe({
-                next: () => {
-                    this.addRoleForm.submitCompleted();
-                },
-                error: error => {
-                    this.addRoleForm.submitFailed(error);
-                },
-            });
+        this.addRoleForm.submit(value => {
+            return this.rolesState.add(value);
+        }, { resetAfterSubmit: true });
     }
 
     protected cancel() {
-        this.addRoleForm.submitCompleted();
+        this.addRoleForm.reset();
     }
 }

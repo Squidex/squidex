@@ -109,21 +109,10 @@ export class RoleComponent {
     }
 
     protected save() {
-        const value = this.editForm.submit();
-        if (!value) {
-            return;
-        }
+        this.editForm.submit(value => {
+            const request = new UpdateRoleDto({ ...value, properties: this.properties() });
 
-        const request = new UpdateRoleDto({ ...value, properties: this.properties() });
-
-        this.rolesState.update(this.role(), request)
-            .subscribe({
-                next: () => {
-                    this.editForm.submitCompleted({ noReset: true });
-                },
-                error: error => {
-                    this.editForm.submitFailed(error);
-                },
-            });
+            return this.rolesState.update(this.role(), request);
+        });
     }
 }

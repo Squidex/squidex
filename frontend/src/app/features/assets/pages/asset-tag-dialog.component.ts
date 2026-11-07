@@ -8,6 +8,7 @@
 import { Component, effect, inject, input, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
+import { firstValueFrom } from 'rxjs';
 import { FocusOnInitDirective, FormErrorComponent, ModalDialogComponent, TooltipDirective, TranslatePipe } from '@app/shared';
 import { AssetsState, FormRowComponent, RenameAssetTagForm } from '@app/shared/internal';
 
@@ -48,24 +49,12 @@ export class AssetTagDialogComponent {
     }
 
     protected renameAssetTag() {
-        const value = this.editForm.submit();
-        if (!value) {
-            return;
-        }
+        this.editForm.submit(async value => {
+            if (value.tagName !== this.tagName()) {
+                await firstValueFrom(this.assetsState.renameTag(this.tagName(), value.tagName));
+            }
 
-        if (value.tagName === this.tagName()) {
             this.emitClose();
-            return;
-        }
-
-        this.assetsState.renameTag(this.tagName(), value.tagName)
-            .subscribe({
-                next: () => {
-                    this.emitClose();
-                },
-                error: error => {
-                    this.editForm.submitFailed(error);
-                },
-            });
+        });
     }
 }

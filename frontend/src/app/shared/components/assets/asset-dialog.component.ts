@@ -11,9 +11,10 @@ import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { RouterLink } from '@angular/router';
 import { NgxDocViewerModule } from 'ngx-doc-viewer';
-import { map } from 'rxjs/operators';
+import { EMPTY, lastValueFrom } from 'rxjs';
+import { map, tap } from 'rxjs/operators';
 import { ConfirmClickDirective, ControlErrorsComponent, CopyDirective, DialogService, FormErrorComponent, FormRowComponent, HTTP, ModalDialogComponent, ProgressBarComponent, switchMapCached, TagEditorComponent, TooltipDirective, TransformInputDirective, TranslatePipe, Types, VideoPlayerComponent } from '@app/framework';
-import { AnnotateAssetDto, AnnotateAssetForm, AppsState, AssetDto, AssetsService, AssetsState, AssetUploaderState, MoveAssetDto, MoveAssetForm, ROOT_ITEM, UploadCanceled } from '@app/shared/internal';
+import { AnnotateAssetDto, AnnotateAssetForm, AppsState, AssetDto, AssetsService, AssetsState, AssetUploaderState, MoveAssetForm, ROOT_ITEM, UploadCanceled } from '@app/shared/internal';
 import { AssetFolderDropdownComponent } from './asset-folder-dropdown.component';
 import { AssetHistoryComponent } from './asset-history.component';
 import { AssetPathComponent } from './asset-path.component';
@@ -215,7 +216,12 @@ export class AssetDialogComponent {
             return;
         }
 
-        this.annotateInternal(imageFocus.submit(this.assetActual()));
+        this.annotateInternal(imageFocus.getChanges(this.assetActual()))
+            .subscribe({
+                error: error => {
+                    this.dialogs.notifyError(error);
+                },
+            });
     }
 
     protected annotateAsset() {
@@ -223,7 +229,9 @@ export class AssetDialogComponent {
             return;
         }
 
-        this.annotateInternal(this.annotateForm.submit(this.assetActual()));
+        this.annotateForm.submitChanges(this.assetActual(), request => {
+            return this.annotateInternal(request);
+        });
     }
 
     protected moveAsset() {
@@ -231,53 +239,31 @@ export class AssetDialogComponent {
             return;
         }
 
-        this.moveInternal(this.moveForm.submit());
-    }
+        this.moveForm.submit(async value => {
+            const dto = await lastValueFrom(this.assetsState.moveAsset(this.assetActual(), value.parentId), { defaultValue: undefined });
+            if (dto) {
+                this.assetUpdated.emit(dto);
+                this.assetActual.set(dto);
 
-    private annotateInternal(value: AnnotateAssetDto | null) {
-        if (!value) {
-            this.dialogs.notifyInfo('i18n:common.nothingChanged');
-            return;
-        }
+                this.dialogs.notifyInfo('i18n:assets.moved');
+            }
 
-        this.assetsState.updateAsset(this.assetActual(), value)
-            .subscribe({
-                next: dto => {
-                    this.assetUpdated.emit(dto);
-                    this.assetActual.set(dto);
-
-                    this.annotateForm.submitCompleted({ noReset: true });
-
-                    this.dialogs.notifyInfo('i18n:assets.updated');
-                },
-                error: error => {
-                    this.annotateForm.submitFailed(error);
-                },
-            });
-    }
-
-    private moveInternal(values: MoveAssetDto | null) {
-        if (!values) {
             this.isMoving.set(false);
-            return;
+        });
+    }
+
+    private annotateInternal(request: AnnotateAssetDto | null) {
+        if (!request) {
+            this.dialogs.notifyInfo('i18n:common.nothingChanged');
+            return EMPTY;
         }
 
-        this.assetsState.moveAsset(this.assetActual(), values.parentId)
-            .subscribe({
-                next: dto => {
-                    this.assetUpdated.emit(dto);
-                    this.assetActual.set(dto);
+        return this.assetsState.updateAsset(this.assetActual(), request).pipe(
+            tap(dto => {
+                this.assetUpdated.emit(dto);
+                this.assetActual.set(dto);
 
-                    this.dialogs.notifyInfo('i18n:assets.moved');
-                },
-                error: error => {
-                    this.moveForm.submitFailed(error);
-                },
-                complete: () => {
-                    this.moveForm.submitCompleted({ noReset: true });
-
-                    this.isMoving.set(false);
-                },
-            });
+                this.dialogs.notifyInfo('i18n:assets.updated');
+            }));
     }
 }

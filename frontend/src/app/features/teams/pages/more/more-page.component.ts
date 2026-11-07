@@ -72,20 +72,9 @@ export class MorePageComponent {
             return;
         }
 
-        const value = this.updateForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.teamsState.update(team, value)
-            .subscribe({
-                next: team => {
-                    this.updateForm.submitCompleted({ newValue: team });
-                },
-                error: error => {
-                    this.updateForm.submitFailed(error);
-                },
-            });
+        this.updateForm.submitAndUpdate(value => {
+            return this.teamsState.update(team, value);
+        }, { resetAfterSubmit: true });
     }
 
     protected deleteTeam() {

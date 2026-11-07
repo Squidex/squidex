@@ -9,6 +9,7 @@ import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } 
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { map } from 'rxjs';
 import { ApiUrlConfig, CopyDirective, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, SidebarMenuDirective, TeamsState, ToggleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 import { TeamAuthState, UpdateTeamAuthForm } from '../../internal';
 
@@ -92,19 +93,8 @@ export class AuthPageComponent {
             return;
         }
 
-        const value = this.updateForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.authState.update(value)
-            .subscribe({
-                next: scheme => {
-                    this.updateForm.submitCompleted({ newValue: scheme || {} });
-                },
-                error: error => {
-                    this.updateForm.submitFailed(error);
-                },
-            });
+        this.updateForm.submitAndUpdate(value => {
+            return this.authState.update(value).pipe(map(scheme => scheme || {}));
+        }, { resetAfterSubmit: true });
     }
 }

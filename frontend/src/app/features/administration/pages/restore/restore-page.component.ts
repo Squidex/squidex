@@ -10,7 +10,7 @@ import { Component, inject } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { timer } from 'rxjs';
+import { catchError, EMPTY, tap, timer } from 'rxjs';
 import { ControlErrorsComponent, DialogService, ISODatePipe, JobsService, LayoutComponent, ListViewComponent, RestoreForm, SidebarMenuDirective, switchSafe, TitleComponent, TooltipDirective, TourStepDirective, TranslatePipe } from '@app/shared';
 
 @Component({
@@ -45,21 +45,15 @@ export class RestorePageComponent {
         timer(0, 2000).pipe(switchSafe(() => this.jobsService.getRestore()));
 
     protected restore() {
-        const value = this.restoreForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.restoreForm.submitCompleted();
-
-        this.jobsService.postRestore(value)
-            .subscribe({
-                next: () => {
+        this.restoreForm.submit(value => {
+            return this.jobsService.postRestore(value).pipe(
+                tap(() => {
                     this.dialogs.notifyInfo('i18n:jobs.restoreStarted');
-                },
-                error: error => {
+                }),
+                catchError(error => {
                     this.dialogs.notifyError(error);
-                },
-            });
+                    return EMPTY;
+                }));
+        }, { resetAfterSubmit: true });
     }
 }

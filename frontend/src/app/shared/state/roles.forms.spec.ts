@@ -33,16 +33,14 @@ describe('EditRoleForm', () => {
     it('should not submit if permission is empty', () => {
         form.addPermission();
 
-        const result = form.submit();
-
-        expect(result).toBeNull();
+        expect(form.form().valid()).toBeFalsy();
         expect(form.form.permissions[0]().errors().map(x => x.kind)).toEqual(['required']);
     });
 
     it('should submit permissions', () => {
         form.load({ permissions: ['a'] });
 
-        const result = form.submit();
+        const result = form.getValue();
 
         expect(result).toEqual(new UpdateRoleDto({ permissions: ['a'], properties: {} }));
     });

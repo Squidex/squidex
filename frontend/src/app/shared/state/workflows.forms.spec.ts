@@ -29,14 +29,14 @@ describe('AddWorkflowForm', () => {
     it('should validate name length', () => {
         form.form.name().value.set('a'.repeat(41));
 
-        expect(form.submit()).toBeNull();
+        expect(form.form().valid()).toBeFalsy();
         expect(form.form.name().errors().map(x => x.kind)).toEqual(['maxLength']);
     });
 
     it('should submit dto', () => {
         form.form.name().value.set('my-workflow');
 
-        const result = form.submit();
+        const result = form.getValue();
 
         expect(result).toEqual(new AddWorkflowDto({ name: 'my-workflow' }));
     });

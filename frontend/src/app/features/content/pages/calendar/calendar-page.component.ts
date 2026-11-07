@@ -47,7 +47,6 @@ export class CalendarPageComponent {
     private readonly resourceLoader = inject(ResourceLoaderService);
     private readonly languagesState = inject(LanguagesState);
     private readonly localizer = inject(LocalizerService);
-
     private readonly calendarContainer = viewChild.required<ElementRef>('calendarContainer');
     private readonly language: AppLanguageDto;
     private calendar: any;

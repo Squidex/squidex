@@ -30,23 +30,12 @@ export class ClientAddFormComponent {
     protected readonly addClientForm = new AddClientForm();
 
     protected addClient() {
-        const value = this.addClientForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.clientsState.attach(value)
-            .subscribe({
-                next: () => {
-                    this.addClientForm.submitCompleted();
-                },
-                error: error => {
-                    this.addClientForm.submitFailed(error);
-                },
-            });
+        this.addClientForm.submit(value => {
+            return this.clientsState.attach(value);
+        }, { resetAfterSubmit: true });
     }
 
     protected cancel() {
-        this.addClientForm.submitCompleted();
+        this.addClientForm.reset();
     }
 }

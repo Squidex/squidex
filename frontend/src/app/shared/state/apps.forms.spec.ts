@@ -46,16 +46,14 @@ describe('EditAppSettingsForm', () => {
     it('should not submit if added pattern is invalid', () => {
         form.addPattern();
 
-        const result = form.submit();
-
-        expect(result).toBeNull();
+        expect(form.form().valid()).toBeFalsy();
         expect(form.form.patterns[0].name().errors().map(x => x.kind)).toEqual(['required']);
     });
 
     it('should submit settings', () => {
         form.load(createSettings());
 
-        const result = form.submit();
+        const result = form.getValue();
 
         expect(result).toEqual(new UpdateAppSettingsDto({
             patterns: [new PatternDto({ name: 'pattern1', regex: 'regex1', message: '' })],

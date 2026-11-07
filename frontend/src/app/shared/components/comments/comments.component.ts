@@ -100,17 +100,15 @@ export class CommentsComponent {
     }
 
     protected comment() {
-        const { text } = this.commentForm.submit() || {};
+        this.commentForm.submit(async ({ text }) => {
+            if (text && text.length > 0) {
+                const reference = this.reference();
 
-        if (text && text.length > 0) {
-            const reference = this.reference();
+                const { from, to } = reference?.annotation || {};
 
-            const { from, to } = reference?.annotation || {};
-
-            this.commentsState.create(this.commentUser, text, this.router.url, { editorId: reference?.editorId, from, to });
-        }
-
-        this.commentForm.submitCompleted();
+                this.commentsState.create(this.commentUser, text, this.router.url, { editorId: reference?.editorId, from, to });
+            }
+        }, { resetAfterSubmit: true });
     }
 
     protected onKeyPress(event: KeyboardEvent) {

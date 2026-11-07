@@ -66,19 +66,8 @@ export class LanguageAddFormComponent {
     protected readonly addLanguageForm = new AddLanguageForm();
 
     protected addLanguage() {
-        const value = this.addLanguageForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.languagesState.add(value.language)
-            .subscribe({
-                next: () => {
-                    this.addLanguageForm.submitCompleted();
-                },
-                error: error => {
-                    this.addLanguageForm.submitFailed(error);
-                },
-            });
+        this.addLanguageForm.submit(value => {
+            return this.languagesState.add(value.language);
+        }, { resetAfterSubmit: true });
     }
 }

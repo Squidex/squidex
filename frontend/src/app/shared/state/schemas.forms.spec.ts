@@ -44,7 +44,7 @@ describe('EditFieldForm', () => {
         const form = createEditForm(properties);
         form.load(properties);
 
-        const value = form.submit()!;
+        const value = form.getValue()!;
         expect(value['label']).toEqual('Label');
         expect(value['maxLength']).toEqual(10);
         expect(value['minLength']).toBeUndefined();
@@ -64,7 +64,7 @@ describe('EditFieldForm', () => {
 
         form.form.label().value.set('a'.repeat(101));
 
-        expect(form.submit()).toBeNull();
+        expect(form.form().valid()).toBeFalsy();
         expect(form.form.label().errors().map(x => x.kind)).toEqual(['maxLength']);
     });
 
@@ -74,7 +74,7 @@ describe('EditFieldForm', () => {
         const dateTimeForm = form.form as FieldTree<DateTimeFieldFormModel>;
         dateTimeForm.maxValue().value.set('invalid');
 
-        expect(form.submit()).toBeNull();
+        expect(form.form().valid()).toBeFalsy();
         expect(dateTimeForm.maxValue().errors().map(x => x.kind)).toEqual(['validdatetime']);
     });
 
@@ -95,7 +95,7 @@ describe('EditFieldForm', () => {
         input.dispatchEvent(new Event('input'));
         fixture.detectChanges();
 
-        expect(fixture.componentInstance.editForm.submit()!['maxValue']).toBeUndefined();
+        expect(fixture.componentInstance.editForm.getValue()!['maxValue']).toBeUndefined();
     });
 });
 
@@ -115,7 +115,7 @@ describe('AddFieldForm', () => {
 
         form.load({ name: 'my-field', partitioning: 'language', properties: createProperties('Number') });
 
-        const value = form.submit()!;
+        const value = form.getValue()!;
         expect(value.name).toEqual('my-field');
         expect(value.partitioning).toEqual('language');
         expect(value.properties.fieldType).toEqual('Number');
@@ -131,7 +131,7 @@ describe('CreateSchemaForm', () => {
         expect(form.model().initialCategory).toEqual('my-category');
         expect(form.model().importing).toEqual({ fields: [] });
 
-        const value = form.submit()!;
+        const value = form.getValue()!;
         expect(value.name).toEqual('my-schema');
         expect(value.type).toEqual('Singleton');
         expect(value.category).toEqual('my-category');
@@ -142,7 +142,7 @@ describe('CreateSchemaForm', () => {
 
         form.form.name().value.set('Invalid Name');
 
-        expect(form.submit()).toBeNull();
+        expect(form.form().valid()).toBeFalsy();
     });
 });
 
@@ -152,7 +152,7 @@ describe('EditSchemaForm', () => {
 
         form.form.searchFields().value.set(['a', 'b', 'c', 'd', 'e']);
 
-        expect(form.submit()).toBeNull();
+        expect(form.form().valid()).toBeFalsy();
     });
 
     it('should convert empty urls to undefined', () => {
@@ -160,7 +160,7 @@ describe('EditSchemaForm', () => {
 
         form.load({ label: 'Label', contentsSidebarUrl: null as any });
 
-        const value = form.submit()!;
+        const value = form.getValue()!;
         expect(value.label).toEqual('Label');
         expect(value.contentsSidebarUrl).toBeUndefined();
     });
@@ -198,7 +198,7 @@ describe('ConfigureFieldRulesForm', () => {
 
         form.add();
 
-        expect(form.submit()).toBeNull();
+        expect(form.form().valid()).toBeFalsy();
         expect(form.form[0].field().errors().map(x => x.kind)).toEqual(['required']);
     });
 
@@ -207,7 +207,7 @@ describe('ConfigureFieldRulesForm', () => {
 
         form.add('field1');
 
-        const value = form.submit()!;
+        const value = form.getValue()!;
         expect(value.fieldRules?.map(x => x.field)).toEqual(['field1']);
     });
 });
@@ -221,7 +221,7 @@ describe('ConfigurePreviewUrlsForm', () => {
         form.form[1].name().value.set('app');
         form.form[1].url().value.set('https://app');
 
-        expect(form.submit()).toEqual({ web: 'https://web', app: 'https://app' });
+        expect(form.getValue()).toEqual({ web: 'https://web', app: 'https://app' });
     });
 
     it('should remove preview url', () => {
@@ -244,7 +244,7 @@ describe('CreateIndexForm', () => {
         form.form[0].order().value.set('Ascending');
         form.remove(1);
 
-        const value = form.submit()!;
+        const value = form.getValue()!;
         expect(value.fields.map(x => [x.name, x.order])).toEqual([['data.field1.iv', 'Ascending']]);
     });
 
@@ -253,7 +253,7 @@ describe('CreateIndexForm', () => {
 
         form.add();
 
-        expect(form.submit()).toBeNull();
+        expect(form.form().valid()).toBeFalsy();
     });
 });
 

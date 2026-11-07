@@ -61,7 +61,7 @@ export class ImageFocusPointComponent {
         });
     }
 
-    public submit(asset: AssetDto): AnnotateAssetDto | null {
+    public getChanges(asset: AssetDto): AnnotateAssetDto | null {
         const previous = getFocusPoint(asset.metadata);
 
         const focus = this.focus();

@@ -6,7 +6,7 @@
  */
 
 import { applyEach, maxLength, required } from '@angular/forms/signals';
-import { generateSlug, SignalForm, Types } from '@app/framework';
+import { generateSlug, SignalForm, SubmitAction, Types } from '@app/framework';
 import { AnnotateAssetDto, AssetDto, AssetFolderDto, MoveAssetDto, RenameAssetFolderDto, RenameTagDto, UpdateAssetScriptsDto } from '../model';
 
 export type AssetMetadataFormModel = { name: string; value: string };
@@ -65,47 +65,10 @@ export class AnnotateAssetForm extends SignalForm<AnnotateAssetFormModel, Annota
         return new AnnotateAssetDto({ ...value, metadata });
     }
 
-    public submit(asset?: AssetDto) {
-        const value = super.submit();
-        if (!asset || !value) {
-            return null;
-        }
-
-        const result: Record<string, any> = {};
-
-        let fileName = value.fileName;
-
-        const index = asset.fileName.lastIndexOf('.');
-        if (index > 0) {
-            fileName += asset.fileName.substring(index);
-        }
-
-        if (fileName !== asset.fileName) {
-            result['fileName'] = fileName;
-        }
-
-        if (value.slug !== asset.slug) {
-            result['slug'] = value.slug;
-        }
-
-        if (value.isProtected !== asset.isProtected) {
-            result['isProtected'] = value.isProtected;
-        }
-
-        if (!Types.equals(value.metadata, asset.metadata)) {
-            result['metadata'] = value.metadata;
-        }
-
-        if (!Types.equals(value.tags, asset.tags)) {
-            result['tags'] = value.tags;
-        }
-
-        if (Object.keys(result).length === 0) {
-            this.setEnabled(true);
-            return null;
-        }
-
-        return new AnnotateAssetDto(result);
+    public submitChanges(asset: AssetDto, action: SubmitAction<AnnotateAssetDto | null, unknown>) {
+        return this.submit(value => {
+            return action(getChanges(asset, value));
+        });
     }
 
     protected transformLoad(value: Partial<AssetDto>): AnnotateAssetFormModel {
@@ -213,4 +176,41 @@ export class MoveAssetForm extends SignalForm<{ parentId: string }, MoveAssetDto
     protected transformSubmit(value: { parentId: string }) {
         return new MoveAssetDto(value);
     }
+}
+
+function getChanges(asset: AssetDto, value: AnnotateAssetDto) {
+    const result: Record<string, any> = {};
+
+    let fileName = value.fileName;
+
+    const index = asset.fileName.lastIndexOf('.');
+    if (index > 0) {
+        fileName += asset.fileName.substring(index);
+    }
+
+    if (fileName !== asset.fileName) {
+        result['fileName'] = fileName;
+    }
+
+    if (value.slug !== asset.slug) {
+        result['slug'] = value.slug;
+    }
+
+    if (value.isProtected !== asset.isProtected) {
+        result['isProtected'] = value.isProtected;
+    }
+
+    if (!Types.equals(value.metadata, asset.metadata)) {
+        result['metadata'] = value.metadata;
+    }
+
+    if (!Types.equals(value.tags, asset.tags)) {
+        result['tags'] = value.tags;
+    }
+
+    if (Object.keys(result).length === 0) {
+        return null;
+    }
+
+    return new AnnotateAssetDto(result);
 }

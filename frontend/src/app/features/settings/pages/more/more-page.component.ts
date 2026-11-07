@@ -9,6 +9,7 @@ import { Component, computed, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
+import { tap } from 'rxjs';
 import { AppsState, AvatarComponent, ConfirmClickDirective, DialogService, FileDropDirective, FormErrorComponent, FormHintComponent, FormRowComponent, LayoutComponent, ListViewComponent, ProgressBarComponent, SidebarMenuDirective, SignalSelectDirective, TeamsState, TooltipDirective, TourStepDirective, TransferAppForm, TranslatePipe, Types, UpdateAppForm } from '@app/shared';
 
 @Component({
@@ -92,22 +93,10 @@ export class MorePageComponent {
             return;
         }
 
-        const value = this.updateForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.appsState.update(app, value)
-            .subscribe({
-                next: updated => {
-                    this.updateForm.submitCompleted({ newValue: updated });
-                },
-                error: error => {
-                    this.dialogs.notifyError(error);
-
-                    this.updateForm.submitFailed(error);
-                },
-            });
+        this.updateForm.submitAndUpdate(value => {
+            return this.appsState.update(app, value).pipe(
+                tap({ error: error => this.dialogs.notifyError(error) }));
+        }, { resetAfterSubmit: true });
     }
 
     protected transfer() {
@@ -116,22 +105,10 @@ export class MorePageComponent {
             return;
         }
 
-        const value = this.transferForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.appsState.transfer(app, value)
-            .subscribe({
-                next: updated => {
-                    this.transferForm.submitCompleted({ newValue: updated });
-                },
-                error: error => {
-                    this.dialogs.notifyError(error);
-
-                    this.transferForm.submitFailed(error);
-                },
-            });
+        this.transferForm.submitAndUpdate(value => {
+            return this.appsState.transfer(app, value).pipe(
+                tap({ error: error => this.dialogs.notifyError(error) }));
+        }, { resetAfterSubmit: true });
     }
 
     protected uploadImage(file: ReadonlyArray<File>) {

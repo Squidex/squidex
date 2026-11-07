@@ -77,19 +77,8 @@ export class AssetScriptsPageComponent {
             return;
         }
 
-        const value = this.editForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.assetScriptsState.update(value)
-            .subscribe({
-                next: () => {
-                    this.editForm.submitCompleted({ noReset: true });
-                },
-                error: error => {
-                    this.editForm.submitFailed(error);
-                },
-            });
+        this.editForm.submit(value => {
+            return this.assetScriptsState.update(value);
+        });
     }
 }

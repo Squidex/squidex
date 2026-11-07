@@ -5,33 +5,38 @@
  * Copyright (c) Squidex UG (haftungsbeschränkt). All rights reserved.
  */
 
-import { Injector, signal, WritableSignal } from '@angular/core';
-import { disabled, FieldTree, form, SchemaPathTree, validateTree } from '@angular/forms/signals';
+import { computed, Injector, signal, WritableSignal } from '@angular/core';
+import { disabled, FieldTree, form, SchemaPathTree, submit, TreeValidationResult } from '@angular/forms/signals';
+import { isObservable, lastValueFrom, Observable } from 'rxjs';
 import { ErrorDto, Types } from '@app/framework/internal';
-import { State } from '../../state';
-import { FormState } from './model';
-import { SERVER_ERROR_KIND, serverErrors } from './signal-form-server-errors';
+import { serverErrors } from './signal-form-server-errors';
+
+export interface SubmitOptions {
+    resetAfterSubmit?: boolean;
+}
+
+export type SubmitAction<TValue, TResult> = (value: TValue) => Observable<TResult> | Promise<TResult>;
 
 export abstract class SignalForm<TModel, TOut, TIn = TOut> {
-    private readonly state = new State<FormState>({ submitCount: 0, submitting: false });
     private readonly isDisabled = signal(false);
-    private readonly serverError = signal<{ error: ErrorDto; model: TModel } | null>(null);
+    private readonly submitCounter = signal(0);
+    private readonly submitError = signal<ErrorDto | null>(null);
 
     public readonly model: WritableSignal<TModel>;
 
     public readonly form: FieldTree<TModel>;
 
-    public readonly submitCount =
-        this.state.project(x => x.submitCount);
+    public readonly submitCount = this.submitCounter.asReadonly();
 
-    public readonly submitted =
-        this.state.project(x => x.submitCount > 0);
+    public readonly submitted = computed(() => {
+        return this.submitCounter() > 0;
+    });
 
-    public readonly submitting =
-        this.state.project(x => x.submitting);
+    public readonly submitting = computed(() => {
+        return this.root().submitting();
+    });
 
-    public readonly error =
-        this.state.project(x => x.error);
+    public readonly error = this.submitError.asReadonly();
 
     constructor(
         private readonly initialModel: TModel,
@@ -40,13 +45,7 @@ export abstract class SignalForm<TModel, TOut, TIn = TOut> {
     ) {
         this.model = signal(initialModel);
         this.form = form(this.model, path => {
-            const root = path as SchemaPathTree<unknown>;
-
-            disabled(root, () => this.isDisabled());
-
-            validateTree(root, ctx => {
-                return serverErrors(ctx.fieldTree, this.model(), this.serverError());
-            });
+            disabled(path as SchemaPathTree<unknown>, () => this.isDisabled() || this.submitting());
 
             schema?.(path as SchemaPathTree<TModel>);
         }, { injector }) as FieldTree<TModel>;
@@ -56,8 +55,8 @@ export abstract class SignalForm<TModel, TOut, TIn = TOut> {
         this.isDisabled.set(!isEnabled);
     }
 
-    protected transformLoad(value: Partial<TIn>): TModel {
-        const result: Record<string, any> = { ...this.initialModel as Record<string, any> };
+    protected transformLoad(value: Partial<TIn>, base: TModel): TModel {
+        const result: Record<string, any> = { ...base as Record<string, any> };
 
         for (const key of Object.keys(result)) {
             const loaded = (value as Record<string, any>)[key];
@@ -70,7 +69,7 @@ export abstract class SignalForm<TModel, TOut, TIn = TOut> {
         return result as TModel;
     }
 
-    protected transformSubmit(value: TModel): TOut {
+    protected transformSubmit(value: TModel): TOut | null {
         return value as unknown as TOut;
     }
 
@@ -79,83 +78,94 @@ export abstract class SignalForm<TModel, TOut, TIn = TOut> {
     }
 
     public load(value: Partial<TIn> | undefined) {
-        this.state.resetState();
-        this.setValue(value);
+        this.submitCounter.set(0);
+        this.submitError.set(null);
+        this.setValue(value, this.initialModel);
     }
 
-    public submit(): TOut | null {
-        markAllAsTouched(this.form as FieldTree<unknown>, this.model());
+    public reset() {
+        this.load(undefined);
+    }
 
-        const hasErrors = (this.form as FieldTree<unknown>)().errorSummary().some(x => x.kind !== SERVER_ERROR_KIND);
-        if (hasErrors) {
-            return null;
+    public submit<TResult>(action: SubmitAction<TOut, TResult>, options?: SubmitOptions) {
+        return this.run(action, () => {
+            if (options?.resetAfterSubmit) {
+                this.setValue(undefined, this.initialModel);
+            } else {
+                this.root().reset();
+            }
+        });
+    }
+
+    public submitAndUpdate(action: SubmitAction<TOut, Partial<TIn> | undefined>, options?: SubmitOptions) {
+        return this.run(action, result => {
+            this.setValue(result, options?.resetAfterSubmit ? this.initialModel : this.model());
+        });
+    }
+
+    private async run<TResult>(action: SubmitAction<TOut, TResult>, onSuccess: (result: TResult) => void) {
+        let isSuccess = false;
+
+        this.submitCounter.update(x => x + 1);
+        this.submitError.set(null);
+
+        await submit(this.form, async () => {
+            const value = this.transformSubmit(this.model());
+            if (!value) {
+                return undefined;
+            }
+
+            try {
+                const result = await toPromise(action(value));
+
+                onSuccess(result);
+                isSuccess = true;
+                return undefined;
+            } catch (ex) {
+                return this.handleError(ex);
+            }
+        });
+
+        return isSuccess;
+    }
+
+    private handleError(ex: unknown): TreeValidationResult {
+        const error = getError(ex);
+        if (!error) {
+            throw ex;
         }
 
-        const value = this.transformSubmit(this.model());
-        if (value) {
-            this.updateSubmitState(null, true);
-            this.isDisabled.set(true);
-        }
+        this.submitError.set(error);
 
-        return value;
+        return serverErrors(this.form as FieldTree<unknown>, this.model(), error);
     }
 
-    public submitCompleted(options?: { newValue?: TIn; noReset?: boolean }) {
-        this.updateSubmitState(null, false);
-        this.isDisabled.set(false);
-
-        if (options?.noReset) {
-            (this.form as FieldTree<unknown>)().reset();
-        } else {
-            this.setValue(options?.newValue);
-        }
+    private setValue(value: Partial<TIn> | undefined, base: TModel) {
+        this.model.set(value ? this.transformLoad(value, base) : base);
+        this.root().reset();
     }
 
-    public submitFailed(errorOrMessage?: string | ErrorDto, replaceDetails = true) {
-        this.updateSubmitState(errorOrMessage, false, replaceDetails);
-        this.isDisabled.set(false);
-    }
-
-    private setValue(value?: Partial<TIn>) {
-        this.model.set(value ? this.transformLoad(value) : this.initialModel);
-        (this.form as FieldTree<unknown>)().reset();
-    }
-
-    private updateSubmitState(errorOrMessage: string | ErrorDto | undefined | null, submitting: boolean, replaceDetails = true) {
-        const error = getError(errorOrMessage);
-
-        this.state.next(s => ({
-            submitCount: s.submitCount + (submitting ? 1 : 0),
-            submitting,
-            error,
-        }));
-
-        if (replaceDetails) {
-            this.serverError.set(error ? { error, model: this.model() } : null);
-        }
+    private root() {
+        return (this.form as FieldTree<unknown>)();
     }
 }
 
-export function markAllAsTouched(field: FieldTree<unknown> | undefined, value: any) {
-    if (!field) {
-        return;
+function toPromise<T>(result: Observable<T> | Promise<T>): Promise<T> {
+    if (isObservable(result)) {
+        return lastValueFrom(result, { defaultValue: undefined as T });
     }
 
-    field().markAsTouched();
-
-    if (Types.isArray(value)) {
-        value.forEach((item, i) => markAllAsTouched((field as any)[i], item));
-    } else if (Types.isObject(value)) {
-        for (const key of Object.keys(value)) {
-            markAllAsTouched((field as any)[key], value[key]);
-        }
-    }
+    return result;
 }
 
-function getError(error?: string | ErrorDto | null): ErrorDto | undefined | null {
+function getError(error: unknown): ErrorDto | null {
+    if (Types.is(error, ErrorDto)) {
+        return error;
+    }
+
     if (Types.isString(error)) {
         return new ErrorDto(500, error);
     }
 
-    return error;
+    return null;
 }

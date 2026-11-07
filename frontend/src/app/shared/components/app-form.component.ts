@@ -55,22 +55,15 @@ export class AppFormComponent {
         this.templateSelected.set(template);
     }
 
-    protected createApp() {
-        const value = this.createForm.submit();
-        if (!value) {
-            return;
+    protected async createApp() {
+        const isCreated = await this.createForm.submit(value => {
+            const request = new CreateAppDto({ ...value, template: this.templateSelected()?.name });
+
+            return this.appsStore.create(request);
+        });
+
+        if (isCreated) {
+            this.emitClose();
         }
-
-        const request = new CreateAppDto({ ...value, template: this.templateSelected()?.name });
-
-        this.appsStore.create(request)
-            .subscribe({
-                next: () => {
-                    this.emitClose();
-                },
-                error: error => {
-                    this.createForm.submitFailed(error);
-                },
-            });
     }
 }

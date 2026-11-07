@@ -8,7 +8,7 @@
 import { ChangeDetectionStrategy, Component, computed, effect, inject, Injectable, input } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
-import { Observable, of } from 'rxjs';
+import { firstValueFrom, Observable, of } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { AssignContributorForm, AssignContributorFormModel, AutocompleteComponent, AutocompleteSource, ContributorsState, DialogModel, DialogService, FormHintComponent, ModalDirective, RoleDto, SignalSelectDirective, TranslatePipe, UserDtoPicture, UsersService } from '@app/shared';
 import { ImportContributorsDialogComponent } from './import-contributors-dialog.component';
@@ -78,30 +78,21 @@ export class ContributorAddFormComponent {
 
     constructor() {
         effect(() => {
-            this.assignContributorForm.submitCompleted({ newValue: this.defaultValue() });
+            this.assignContributorForm.load(this.defaultValue());
         });
     }
 
     protected assignContributor() {
-        const value = this.assignContributorForm.submit();
-        if (!value) {
-            return;
-        }
+        this.assignContributorForm.submitAndUpdate(async value => {
+            const isCreated = await firstValueFrom(this.contributorsState.assign(value));
 
-        this.contributorsState.assign(value)
-            .subscribe({
-                next: isCreated => {
-                    this.assignContributorForm.submitCompleted({ newValue: this.defaultValue() });
+            if (isCreated) {
+                this.dialogs.notifyInfo('i18n:contributors.contributorAssigned');
+            } else {
+                this.dialogs.notifyInfo('i18n:contributors.contributorAssignedOld');
+            }
 
-                    if (isCreated) {
-                        this.dialogs.notifyInfo('i18n:contributors.contributorAssigned');
-                    } else {
-                        this.dialogs.notifyInfo('i18n:contributors.contributorAssignedOld');
-                    }
-                },
-                error: error => {
-                    this.assignContributorForm.submitFailed(error);
-                },
-            });
+            return this.defaultValue();
+        }, { resetAfterSubmit: true });
     }
 }

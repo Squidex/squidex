@@ -9,7 +9,7 @@ import { Component, inject, Injectable } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { Observable, of } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { map, tap } from 'rxjs/operators';
 import { AutocompleteComponent, AutocompleteSource, DialogModel, DialogService, FormHintComponent, ModalDirective, TranslatePipe, UsersService } from '@app/shared';
 import { UserDtoPicture } from '@app/shared';
 import { AssignTeamContributorForm } from '../../internal';
@@ -73,25 +73,15 @@ export class ContributorAddFormComponent {
     protected readonly importDialog = new DialogModel();
 
     protected assignContributor() {
-        const value = this.assignContributorForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.contributorsState.assign(value)
-            .subscribe({
-                next: isCreated => {
-                    this.assignContributorForm.submitCompleted({ newValue: { user: '' } });
-
+        this.assignContributorForm.submit(value => {
+            return this.contributorsState.assign(value).pipe(
+                tap(isCreated => {
                     if (isCreated) {
                         this.dialogs.notifyInfo('i18n:contributors.contributorAssigned');
                     } else {
                         this.dialogs.notifyInfo('i18n:contributors.contributorAssignedOld');
                     }
-                },
-                error: error => {
-                    this.assignContributorForm.submitFailed(error);
-                },
-            });
+                }));
+        }, { resetAfterSubmit: true });
     }
 }

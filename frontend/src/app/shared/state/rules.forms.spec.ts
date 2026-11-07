@@ -37,9 +37,7 @@ describe('StepForm', () => {
     });
 
     it('should validate required properties', () => {
-        const result = form.submit();
-
-        expect(result).toBeNull();
+        expect(form.form().valid()).toBeFalsy();
         expect(form.field('url')().errors().map(x => x.kind)).toEqual(['required']);
         expect(form.checkboxField('flag')().errors()).toEqual([]);
     });
@@ -69,7 +67,7 @@ describe('StepForm', () => {
     it('should add step type when submitting', () => {
         form.load({ url: 'https://squidex.io', flag: false, hidden: 'value', stepType: 'Other' });
 
-        const result = form.submit();
+        const result = form.getValue();
 
         expect(result).toEqual({ url: 'https://squidex.io', method: 'GET', flag: false, hidden: 'value', branches: [], stepType: 'Webhook' });
     });
@@ -93,7 +91,7 @@ describe('TriggerForm', () => {
 
         form.load({ condition: 'event.text' });
 
-        const result = form.submit();
+        const result = form.getValue();
 
         expect(result?.triggerType).toEqual('Comment');
         expect((result as any).condition).toEqual('event.text');
@@ -104,16 +102,14 @@ describe('TriggerForm', () => {
 
         form.form.numDays().value.set(31);
 
-        const result = form.submit();
-
-        expect(result).toBeNull();
+        expect(form.form().valid()).toBeFalsy();
         expect(form.form.numDays().errors().map(x => x.kind)).toEqual(['between']);
     });
 
     it('should submit usage trigger', () => {
         const form = TestBed.runInInjectionContext(() => new UsageTriggerForm());
 
-        const result = form.submit();
+        const result = form.getValue();
 
         expect(result).toBeInstanceOf(UsageRuleTriggerDto);
         expect((result as UsageRuleTriggerDto).limit).toEqual(20000);
@@ -123,9 +119,7 @@ describe('TriggerForm', () => {
     it('should require cron expression', () => {
         const form = TestBed.runInInjectionContext(() => new CronJobTriggerForm());
 
-        const result = form.submit();
-
-        expect(result).toBeNull();
+        expect(form.form().valid()).toBeFalsy();
         expect(form.form.cronExpression().errors().map(x => x.kind)).toEqual(['required']);
     });
 
@@ -154,9 +148,7 @@ describe('TriggerForm', () => {
 
         form.addReferencedSchema();
 
-        const result = form.submit();
-
-        expect(result).toBeNull();
+        expect(form.form().valid()).toBeFalsy();
         expect(form.form.referencedSchemas[0].schemaId().errors().map(x => x.kind)).toEqual(['required']);
     });
 
@@ -165,7 +157,7 @@ describe('TriggerForm', () => {
 
         form.load({ handleAll: false, schemas: [{ schemaId: '1', condition: 'true' }] });
 
-        const result = form.submit();
+        const result = form.getValue();
 
         expect(result).toBeInstanceOf(ContentChangedRuleTriggerDto);
         expect((result as ContentChangedRuleTriggerDto).schemas?.[0].schemaId).toEqual('1');

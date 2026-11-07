@@ -50,16 +50,14 @@ export class ImportContributorsDialogComponent {
     protected detect() {
         this.importStage.set('Change');
 
-        const contributors = this.importForm.submit();
-
-        if (contributors) {
+        this.importForm.submit(async contributors => {
             this.importStatus.set(contributors.map(contributor => ({
                 email: contributor.contributorId,
                 result: 'Pending',
                 resultText: 'Pending',
                 role: 'Developer',
             })));
-        }
+        });
     }
 
     protected import() {

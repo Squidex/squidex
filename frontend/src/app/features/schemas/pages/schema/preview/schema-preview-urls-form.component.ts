@@ -64,19 +64,8 @@ export class SchemaPreviewUrlsFormComponent {
             return;
         }
 
-        const value = this.editForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.schemasState.configurePreviewUrls(this.schema(), value)
-            .subscribe({
-                next: () => {
-                    this.editForm.submitCompleted({ noReset: true });
-                },
-                error: error => {
-                    this.editForm.submitFailed(error);
-                },
-            });
+        this.editForm.submit(value => {
+            return this.schemasState.configurePreviewUrls(this.schema(), value);
+        });
     }
 }

@@ -9,6 +9,7 @@ import { Component, effect, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
 import { ActivatedRoute, Router } from '@angular/router';
+import { tap } from 'rxjs';
 import { FormErrorComponent, FormRowComponent, LayoutComponent, ShortcutDirective, TitleComponent, TooltipDirective, TranslatePipe, UpdateUserDto } from '@app/shared';
 import { UserDto, UserForm, UsersState } from '../../internal';
 
@@ -60,33 +61,15 @@ export class UserPageComponent {
             return;
         }
 
-        const value = this.userForm.submit();
-        if (!value) {
-            return;
-        }
-
-        if (this.user) {
-            const request = new UpdateUserDto({ ...value });
-
-            this.usersState.update(this.user, request)
-                .subscribe({
-                    next: user => {
-                        this.userForm.submitCompleted({ newValue: user });
-                    },
-                    error: error => {
-                        this.userForm.submitFailed(error);
-                    },
-                });
+        const user = this.user;
+        if (user) {
+            this.userForm.submitAndUpdate(value => {
+                return this.usersState.update(user, new UpdateUserDto({ ...value }));
+            }, { resetAfterSubmit: true });
         } else {
-            this.usersState.create(value)
-                .subscribe({
-                    next: () => {
-                        this.back();
-                    },
-                    error: error => {
-                        this.userForm.submitFailed(error);
-                    },
-                });
+            this.userForm.submit(value => {
+                return this.usersState.create(value).pipe(tap(() => this.back()));
+            });
         }
     }
 

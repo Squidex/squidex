@@ -72,19 +72,8 @@ export class SchemaEditFormComponent {
             return;
         }
 
-        const value = this.schemaForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.schemasState.update(this.schema(), value)
-            .subscribe({
-                next: () => {
-                    this.schemaForm.submitCompleted({ noReset: true });
-                },
-                error: error => {
-                    this.schemaForm.submitFailed(error);
-                },
-            });
+        this.schemaForm.submit(value => {
+            return this.schemasState.update(this.schema(), value);
+        });
     }
 }

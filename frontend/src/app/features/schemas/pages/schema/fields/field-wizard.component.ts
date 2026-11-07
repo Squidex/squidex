@@ -8,7 +8,8 @@
 import { Component, computed, ElementRef, inject, Injector, input, output, signal, viewChild } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
-import { AddFieldForm, AppSettingsDto, createProperties, DropdownMenuComponent, EditFieldForm, FieldDto, fieldTypes, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormRowComponent, LanguagesState, ModalDialogComponent, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, SchemasState, TooltipDirective, TranslatePipe, Types, UpdateFieldDto } from '@app/shared';
+import { firstValueFrom } from 'rxjs';
+import { AddFieldForm, AnyFieldDto, AppSettingsDto, createProperties, DropdownMenuComponent, EditFieldForm, FieldDto, fieldTypes, FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormRowComponent, LanguagesState, ModalDialogComponent, ModalDirective, ModalModel, ModalPlacementDirective, SchemaDto, SchemasState, TooltipDirective, TranslatePipe, Types, UpdateFieldDto } from '@app/shared';
 import { FieldFormComponent } from './forms/field-form.component';
 
 
@@ -75,64 +76,56 @@ export class FieldWizardComponent {
         this.dialogClose.emit();
     }
 
-    protected addField(navigationMode: SaveNavigationMode) {
-        const value = this.addFieldForm.submit();
-        if (!value) {
+    protected async addField(navigationMode: SaveNavigationMode) {
+        let added: AnyFieldDto | undefined;
+
+        const isAdded = await this.addFieldForm.submit(async value => {
+            added = await firstValueFrom(this.schemasState.addField(this.schema(), value, this.parent()));
+        });
+
+        if (!isAdded) {
             return;
         }
 
-        this.schemasState.addField(this.schema(), value, this.parent())
-            .subscribe({
-                next: dto => {
-                    switch (navigationMode) {
-                        case 'Add':
-                            this.addFieldForm.submitCompleted({ newValue: { ...DEFAULT_FIELD } });
-                            this.focusName();
-                            break;
+        switch (navigationMode) {
+            case 'Add':
+                this.addFieldForm.load({ ...DEFAULT_FIELD });
+                this.focusName();
+                break;
 
-                        case 'Edit':
-                            this.startEditing(dto as any);
-                            break;
+            case 'Edit':
+                this.startEditing(added as FieldDto);
+                break;
 
-                        case 'Close':
-                            this.emitClose();
-                    }
-                },
-                error: error => {
-                    this.addFieldForm.submitFailed(error);
-                },
-            });
+            case 'Close':
+                this.emitClose();
+        }
     }
 
-    protected save(navigationMode: SaveNavigationMode) {
+    protected async save(navigationMode: SaveNavigationMode) {
         const editing = this.editing();
         if (!editing) {
             return;
         }
 
-        const value = editing.form.submit();
-        if (!value) {
+        const isSaved = await editing.form.submit(value => {
+            const properties = createProperties(editing.field.properties.fieldType as any, value);
+
+            return this.schemasState.updateField(this.schema(), editing.field, new UpdateFieldDto({ properties }));
+        });
+
+        if (!isSaved) {
             return;
         }
 
-        const properties = createProperties(editing.field.properties.fieldType as any, value);
-
-        this.schemasState.updateField(this.schema(), editing.field, new UpdateFieldDto({ properties }))
-            .subscribe({
-                next: () => {
-                    switch (navigationMode) {
-                        case 'Add':
-                            this.editing.set(null);
-                            break;
-                        case 'Close': {
-                            this.emitClose();
-                        }
-                    }
-                },
-                error: error => {
-                    editing.form.submitFailed(error);
-                },
-            });
+        switch (navigationMode) {
+            case 'Add':
+                this.editing.set(null);
+                break;
+            case 'Close': {
+                this.emitClose();
+            }
+        }
     }
 
     private startEditing(field: FieldDto) {

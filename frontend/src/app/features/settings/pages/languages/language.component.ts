@@ -78,22 +78,11 @@ export class LanguageComponent {
             return;
         }
 
-        const value = this.editForm.submit();
-        if (!value) {
-            return;
-        }
+        this.editForm.submit(value => {
+            const request = new UpdateLanguageDto({ ...value, fallback: this.fallbackLanguagesLocal().map(x => x.iso2Code) });
 
-        const request = new UpdateLanguageDto({ ...value, fallback: this.fallbackLanguagesLocal().map(x => x.iso2Code) });
-
-        this.languagesState.update(this.language(), request)
-            .subscribe({
-                next: () => {
-                    this.editForm.submitCompleted({ noReset: true });
-                },
-                error: error => {
-                    this.editForm.submitFailed(error);
-                },
-            });
+            return this.languagesState.update(this.language(), request);
+        });
     }
 
     protected removeFallbackLanguage(language: LanguageDto) {

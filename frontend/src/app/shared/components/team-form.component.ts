@@ -8,6 +8,7 @@
 import { ChangeDetectionStrategy, Component, inject, output } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { FormField } from '@angular/forms/signals';
+import { tap } from 'rxjs';
 import { FocusOnInitDirective, FormAlertComponent, FormErrorComponent, FormRowComponent, ModalDialogComponent, TooltipDirective, TransformInputDirective, TranslatePipe } from '@app/framework';
 import { CreateTeamForm, TeamsState } from '@app/shared/internal';
 
@@ -42,19 +43,8 @@ export class TeamFormComponent {
     }
 
     protected createTeam() {
-        const value = this.createForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.teamsStore.create(value)
-            .subscribe({
-                next: () => {
-                    this.emitClose();
-                },
-                error: error => {
-                    this.createForm.submitFailed(error);
-                },
-            });
+        this.createForm.submit(value => {
+            return this.teamsStore.create(value).pipe(tap(() => this.emitClose()));
+        });
     }
 }

@@ -88,8 +88,8 @@ export class StepForm extends SignalForm<StepFormModel, Record<string, any>> {
         this.model.update(model => ({ ...model, [name]: this.getBranches(model, name).filter((_, i) => i !== index) }));
     }
 
-    protected transformLoad(value: Partial<StepFormModel>) {
-        const result = super.transformLoad(value);
+    protected transformLoad(value: Partial<StepFormModel>, base: StepFormModel) {
+        const result = super.transformLoad(value, base);
 
         for (const property of this.definition.properties) {
             if (property.editor === 'Branches') {

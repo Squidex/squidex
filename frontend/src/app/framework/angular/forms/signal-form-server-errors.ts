@@ -8,43 +8,42 @@
 import { FieldTree, ValidationError } from '@angular/forms/signals';
 import { ErrorDto, Types } from '@app/framework/internal';
 
-export const SERVER_ERROR_KIND = 'custom';
+const SERVER_ERROR_KIND = 'custom';
 
 export interface ServerValidationError extends ValidationError.WithOptionalField {
     readonly errors: ReadonlyArray<string>;
 }
 
-export function serverErrors(root: FieldTree<unknown>, model: any, source: { error: ErrorDto; model: any } | null): ServerValidationError[] {
-    const details = source?.error.details;
+export function serverErrors(root: FieldTree<unknown>, model: any, error: ErrorDto): ServerValidationError[] {
+    const details = error.details;
     if (!details || details.length === 0) {
         return [];
     }
 
     const result: ServerValidationError[] = [];
 
-    const visit = (field: FieldTree<unknown> | undefined, value: any, valueAtError: any, path: string) => {
+    const visit = (field: FieldTree<unknown> | undefined, value: any, path: string) => {
         if (!field) {
             return;
         }
 
         if (path) {
             const errors = getErrors(details, path);
-
-            if (errors.length > 0 && Types.equals(value, valueAtError)) {
+            if (errors.length > 0) {
                 result.push({ kind: SERVER_ERROR_KIND, errors, fieldTree: field });
             }
         }
 
         if (Types.isArray(value)) {
-            value.forEach((item, i) => visit((field as any)[i], item, valueAtError?.[i], `${path}[${i + 1}]`));
+            value.forEach((item, i) => visit((field as any)[i], item, `${path}[${i + 1}]`));
         } else if (Types.isObject(value)) {
             for (const key of Object.keys(value)) {
-                visit((field as any)[key], value[key], valueAtError?.[key], path ? `${path}.${key}` : key);
+                visit((field as any)[key], value[key], path ? `${path}.${key}` : key);
             }
         }
     };
 
-    visit(root, model, source!.model, '');
+    visit(root, model, '');
     return result;
 }
 

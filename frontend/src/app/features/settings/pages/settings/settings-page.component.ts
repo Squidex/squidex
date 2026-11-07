@@ -71,19 +71,8 @@ export class SettingsPageComponent {
             return;
         }
 
-        const value = this.editForm.submit();
-        if (!value) {
-            return;
-        }
-
-        this.appsState.updateSettings(settings, value)
-            .subscribe({
-                next: () => {
-                    this.editForm.submitCompleted({ noReset: true });
-                },
-                error: error => {
-                    this.editForm.submitFailed(error);
-                },
-            });
+        this.editForm.submit(value => {
+            return this.appsState.updateSettings(settings, value);
+        });
     }
 }

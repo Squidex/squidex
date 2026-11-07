@@ -87,16 +87,9 @@ export class SchemasPageComponent {
     }
 
     protected addCategory() {
-        const value = this.addCategoryForm.submit();
-        if (!value) {
-            return;
-        }
-
-        try {
+        this.addCategoryForm.submit(async value => {
             this.schemasState.addCategory(value.name);
-        } finally {
-            this.addCategoryForm.submitCompleted();
-        }
+        }, { resetAfterSubmit: true });
     }
 
     protected redirectSchema(schema: SchemaDto) {

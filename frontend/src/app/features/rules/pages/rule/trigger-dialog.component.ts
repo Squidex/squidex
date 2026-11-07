@@ -7,6 +7,7 @@
 
 import { booleanAttribute, Component, effect, inject, Injector, input, output, signal, untracked } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { lastValueFrom } from 'rxjs';
 import { AnyTriggerForm, createTriggerForm, EntriesPipe, FormErrorComponent, ManualRuleTriggerDto, ModalDialogComponent, RulesService, RuleTriggerDto, RuleTriggerMetadataDto, SchemasState, TranslatePipe } from '@app/shared';
 import { RuleElementComponent } from '../../shared/rule-element.component';
 import { AssetChangedTriggerComponent } from '../../shared/triggers/asset-changed-trigger.component';
@@ -105,19 +106,10 @@ export class TriggerDialogComponent {
             return;
         }
 
-        const values = currentTrigger.submit();
-        if (!values) {
-            return;
-        }
+        currentTrigger.submit(async values => {
+            await lastValueFrom(this.rulesService.validateTrigger(this.schemasState.appName, values), { defaultValue: undefined });
 
-        this.rulesService.validateTrigger(this.schemasState.appName, values)
-            .subscribe({
-                error: error =>{
-                    currentTrigger.submitFailed(error);
-                },
-                complete: () => {
-                    this.dialogSave.emit(values);
-                },
-            });
+            this.dialogSave.emit(values);
+        });
     }
 }
